@@ -176,7 +176,7 @@ def getSeedTrackFitResult(reco_track):
     # It does not matter, which particle we put in here, so we just use a pion
     particle_type = Belle2.Const.pion
     p_value = float('nan')
-    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
+    b_field = Belle2.BFieldManager.getField(ROOT.Math.XYZVector(position)).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
     # the value 0xFFFF will cause the TrackFitResult::getNDF() to return -1

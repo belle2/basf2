@@ -5,33 +5,30 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module`
+
+/* Own header. */
 #include <ecl/modules/eclGammaGammaECollector/eclGammaGammaECollectorModule.h>
 
-//Root
-#include <TH2F.h>
-
-//Analysis
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
-
-//Framework
-#include <framework/gearbox/Const.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationVector.h>
-
-//MDST
-#include <mdst/dataobjects/TRGSummary.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
+/* Basf2 headers. */
+#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/RelationVector.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
+/* ROOT headers. */
+#include <Math/Vector4D.h>
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -40,7 +37,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclGammaGammaECollector)
+REG_MODULE(eclGammaGammaECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -76,30 +73,36 @@ void eclGammaGammaECollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", 8736, 0, 8736, 140, 0, 1.4);
+  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", ECLElementNumbers::c_NCrystals,
+                             0, ECLElementNumbers::c_NCrystals, 140, 0, 1.4);
   registerObject<TH2F>("EnVsCrysID", EnVsCrysID);
 
-  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy vs crystal ID;crystal ID;Energy (GeV)", 8736, 0, 8736);
+  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy vs crystal ID;crystal ID;Energy (GeV)",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ExpEvsCrys", ExpEvsCrys);
 
   auto ElecCalibvsCrys = new TH1F("ElecCalibvsCrys", "Sum electronics calib const vs crystal ID;crystal ID;calibration constant",
-                                  8736, 0, 8736);
+                                  ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ElecCalibvsCrys", ElecCalibvsCrys);
 
   auto InitialCalibvsCrys = new TH1F("InitialCalibvsCrys",
-                                     "Sum initial gamma gamma calib const vs crystal ID;crystal ID;calibration constant", 8736, 0, 8736);
+                                     "Sum initial gamma gamma calib const vs crystal ID;crystal ID;calibration constant", ECLElementNumbers::c_NCrystals, 0,
+                                     ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("InitialCalibvsCrys", InitialCalibvsCrys);
 
-  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal", 8736,
-                                     0, 8736);
+  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal",
+                                     ECLElementNumbers::c_NCrystals,
+                                     0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("CalibEntriesvsCrys", CalibEntriesvsCrys);
 
   /** Raw digit quantities for debugging purposes only */
-  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude", 8736, 0, 8736, 200, 0,
+  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude",
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 200, 0,
                                     200000);
   registerObject<TH2F>("RawDigitAmpvsCrys", RawDigitAmpvsCrys);
 
-  auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Digit Time vs crystal ID;crystal ID;Time", 8736, 0, 8736, 200, -2000,
+  auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Digit Time vs crystal ID;crystal ID;Time", ECLElementNumbers::c_NCrystals,
+                                     0, ECLElementNumbers::c_NCrystals, 200, -2000,
                                      2000);
   registerObject<TH2F>("RawDigitTimevsCrys", RawDigitTimevsCrys);
 
@@ -121,7 +124,7 @@ void eclGammaGammaECollectorModule::prepare()
   B2INFO("requireL1: " << m_requireL1);
 
   /** Resize vectors */
-  EperCrys.resize(8736);
+  EperCrys.resize(ECLElementNumbers::c_NCrystals);
 
   /**----------------------------------------------------------------------------------------*/
   /** Get expected energies and calibration constants from DB. Need to call hasChanged() for later comparison */
@@ -137,7 +140,7 @@ void eclGammaGammaECollectorModule::prepare()
   }
 
   /** Verify that we have valid values for the payloads */
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclGammaGammaECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
     if (ExpGammaGammaE[crysID] == 0) {B2FATAL("eclGammaGammaECollector: ExpGammaGammaE = 0 for crysID = " << crysID);}
     if (GammaGammaECalib[crysID] == 0) {B2FATAL("eclGammaGammaECollector: GammaGammaECalib = 0 for crysID = " << crysID);}
@@ -159,7 +162,7 @@ void eclGammaGammaECollectorModule::collect()
 
   /** Record the input database constants for the first call */
   if (storeCalib) {
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysID + 0.001, ExpGammaGammaE[crysID]);
       getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, GammaGammaECalib[crysID]);
@@ -195,7 +198,7 @@ void eclGammaGammaECollectorModule::collect()
     }
 
     /** Verify that we have valid values for the starting calibrations */
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclGammaGammaECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
       if (ExpGammaGammaE[crysID] == 0) {B2FATAL("eclGammaGammaECollector: ExpGammaGammaE = 0 for crysID = " << crysID);}
       if (GammaGammaECalib[crysID] == 0) {B2FATAL("eclGammaGammaECollector: GammaGammaECalib = 0 for crysID = " << crysID);}
@@ -264,27 +267,27 @@ void eclGammaGammaECollectorModule::collect()
 
   /** And that their invariant mass is greater than specified value */
   ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
+  const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
 
   double phi0 = m_eclClusterArray[icMax[0]]->getPhi();
   TVector3 p30(0., 0., maxClustE[0]);
   p30.SetTheta(theta0);
   p30.SetPhi(phi0);
-  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex, usePhotons);
+  const ROOT::Math::PxPyPzEVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex, usePhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
   TVector3 p31(0., 0., maxClustE[1]);
   p31.SetTheta(theta1);
   p31.SetPhi(phi1);
-  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex, usePhotons);
+  const ROOT::Math::PxPyPzEVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex, usePhotons);
 
   double pairmass = (p40 + p41).M();
   if (pairmass < m_minPairMass) {return;}
 
   /** And that they are back-to-back in phi */
   PCmsLabTransform boostrotate;
-  TLorentzVector p40COM = boostrotate.rotateLabToCms() * p40;
-  TLorentzVector p41COM = boostrotate.rotateLabToCms() * p41;
+  ROOT::Math::PxPyPzEVector p40COM = boostrotate.rotateLabToCms() * p40;
+  ROOT::Math::PxPyPzEVector p41COM = boostrotate.rotateLabToCms() * p41;
   double dphi = abs(p41COM.Phi() - p40COM.Phi()) * TMath::RadToDeg();
   if (dphi > 180.) {dphi = 360. - dphi;}
   if (dphi < m_mindPhi) {return;}

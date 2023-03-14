@@ -44,6 +44,7 @@ class IntervalOfValidity:
 
     For simplicity ``-1`` can be passed in instead of infinity when creating objects.
     """
+
     def __init__(self, *iov):
         """Create a new object.
 
@@ -250,7 +251,7 @@ class IntervalOfValidity:
         return None
 
     def contains(self, exp, run):
-        """Check if a run is part of the validtiy"""
+        """Check if a run is part of the validity"""
         return self.first <= (exp, run) <= self.final
 
     @property
@@ -290,6 +291,7 @@ class IoVSet:
         >>> a
         {(0, 0, 0, 5), (0, 8, 0, 9)}
     """
+
     def __init__(self, iterable=None, *, allow_overlaps=False, allow_startone=False):
         """Create a new set.
 
@@ -578,7 +580,7 @@ class IoVSet:
 
     @property
     def gaps(self):
-        """Return the gaps in the set: Any area not covered between the first
+        """Return the gaps in the set. Any area not covered between the first
         point of validity and the last
 
         >>> a = IoVSet([(0,0,2,-1)])

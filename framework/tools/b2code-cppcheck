@@ -10,7 +10,7 @@
 
 # make sure belle2 is setup
 if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
-  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
+  echo "Please setup the Belle II software before calling this script by sourcing b2setup"
   exit 1
 fi
 
@@ -45,6 +45,13 @@ EOT
     exit 1;
 fi
 
+# set include paths individually, otherwise segmentation violation is thrown
+INCLUDE_PATHS=$(find ${SOFTWARE_DIR}/include/* -maxdepth 0 -type d)
+INCLUDES=""
+for INCLUDE_PATH in ${INCLUDE_PATHS}; do
+    INCLUDES+=" -I ${INCLUDE_PATH}"
+done
+
 # ignore all the directories containing imported code
 IMPORTED_PATHS=$(find ${SOFTWARE_DIR} -type f -name '.imported' | sed -r 's|/[^/]+$||' | sort -u)
 EXCLUDES=""
@@ -56,5 +63,5 @@ cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --
          --force --relative-paths=${SOFTWARE_DIR} \
          -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \
          -D__GNUC__=8 -UR__DICTIONARY_FILENAME -U__CINT__ -U__ROOTCLING__ -U__APPLE__ -U__ECC -U__ICC \
-         -I ${SOFTWARE_DIR}/include/ -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \
+         ${INCLUDES} -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \
          -i ${SOFTWARE_DIR}/build/ -i ${SOFTWARE_DIR}/include/ "$@" ${EXCLUDES} 2>&1

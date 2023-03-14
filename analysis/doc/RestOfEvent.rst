@@ -358,6 +358,9 @@ It is possible to load ROE as a particle, which can be manipulated as any other 
   # A shorter option:
   # ma.fillParticleListFromROE('B0:tagFromROE -> B0:rec', '', 'cleanMask', path=main_path)
 
+  ma.reconstructDecay('Upsilon(4S):rec -> B0:rec B0:tagFromROE', 'hasCorrectROECombination==1', path=main_path)
+  # 'hasCorrectROECombination' returns 1 if the combination of candidates of B0:rec and B0:tagFromROE is correct
+
 The resulting particle list can be combined with other particles, like
 ``Upsilon(4S) -> B0:tagFromROE B0:rec`` in this example.
 Also, any variable should be valid for the ROE particle, however, one should be

@@ -29,7 +29,7 @@ using namespace ECLDisplayUtility;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EclDisplay)
+REG_MODULE(EclDisplay);
 
 //-----------------------------------------------------------------
 //                 Implementation

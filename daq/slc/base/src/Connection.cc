@@ -40,6 +40,12 @@ Connection::~Connection()
 
 }
 
+const Connection& Connection::operator=(const Connection& connection)
+{
+  Enum::operator=(connection);
+  return *this;
+}
+
 const Connection& Connection::operator=(const std::string& msg)
 {
   if (msg == ONLINE.getLabel()) *this = ONLINE;

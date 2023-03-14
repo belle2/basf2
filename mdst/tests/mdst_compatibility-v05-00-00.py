@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,6 +20,9 @@ CHANGES since release-05-00-00:
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + mask
 - TRGSummary:
   + getTimQuality added
   + isPoissonInInjectionVeto()
@@ -32,6 +34,14 @@ CHANGES since release-05-00-00:
   + getMinTrkDistanceID
 - EventLevelTriggerTimeInfo
   *  added new storage element for information from the Trigger Timing Distribution (TTD)
+- Track:
+  + statusBitmap and getStatusBit
+  + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

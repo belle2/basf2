@@ -2,7 +2,8 @@ Import('env')
 
 env['LIBS'] = [
     'framework',
-    'mdst_dataobjects'
+    'mdst_dataobjects',
+    'GenVector'
     ]
 
 Return('env')

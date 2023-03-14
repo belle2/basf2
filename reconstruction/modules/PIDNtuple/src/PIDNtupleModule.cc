@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <reconstruction/modules/PIDNtuple/PIDNtupleModule.h>
 
 // framework - DataStore
@@ -32,7 +32,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PIDNtuple)
+REG_MODULE(PIDNtuple);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -139,24 +139,24 @@ void PIDNtupleModule::event()
     m_pid.clear();
     m_pid.evt = evtMetaData->getEvent();
     m_pid.run = evtMetaData->getRun();
-    TVector3 momentum = trackFit->getMomentum();
-    m_pid.p = momentum.Mag();
+    ROOT::Math::XYZVector momentum = trackFit->getMomentum();
+    m_pid.p = momentum.R();
     if (m_makeFlat) {
       if (gRandom->Rndm() * momDistribution(m_pid.p) > m_value) continue;
     }
-    m_pid.cth = momentum.CosTheta();
+    m_pid.cth = cos(momentum.Theta());
     m_pid.phi = momentum.Phi();
     m_pid.pValue = trackFit->getPValue();
     if (mcParticle) {
       m_pid.PDG = mcParticle->getPDG();
       if (mother) m_pid.motherPDG = mother->getPDG();
       m_pid.primary = mcParticle->getStatus(MCParticle::c_PrimaryParticle);
-      TVector3 prodVertex = mcParticle->getProductionVertex();
-      m_pid.rhoProd = prodVertex.Perp();
+      ROOT::Math::XYZVector prodVertex = mcParticle->getProductionVertex();
+      m_pid.rhoProd = prodVertex.Rho();
       m_pid.zProd = prodVertex.Z();
       m_pid.phiProd = prodVertex.Phi();
-      TVector3 decVertex = mcParticle->getDecayVertex();
-      m_pid.rhoDec = decVertex.Perp();
+      ROOT::Math::XYZVector decVertex = mcParticle->getDecayVertex();
+      m_pid.rhoDec = decVertex.Rho();
       m_pid.zDec = decVertex.Z();
       m_pid.phiDec = decVertex.Phi();
     }

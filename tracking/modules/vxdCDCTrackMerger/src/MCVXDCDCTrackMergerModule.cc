@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(MCVXDCDCTrackMerger)
+REG_MODULE(MCVXDCDCTrackMerger);
 
 
 MCVXDCDCTrackMergerFindlet::MCVXDCDCTrackMergerFindlet()
@@ -53,14 +53,14 @@ void MCVXDCDCTrackMergerFindlet::apply()
       continue;
     }
 
-    const RecoTrack* cdcMCRecoTrack = cdcMCLookUp.getMatchedMCRecoTrack(*cdcRecoTrack);
+    const RecoTrack* cdcMCRecoTrack = cdcMCLookUp.getAnyChargeMatchedMCRecoTrack(*cdcRecoTrack);
 
     if (not cdcMCRecoTrack) {
       continue;
     }
 
     for (auto& vxdRecoTrack : vxdRecoTrackVector) {
-      const RecoTrack* vxdMCRecoTrack = vxdMCLookUp.getMatchedMCRecoTrack(*vxdRecoTrack);
+      const RecoTrack* vxdMCRecoTrack = vxdMCLookUp.getAnyChargeMatchedMCRecoTrack(*vxdRecoTrack);
       if (not vxdMCRecoTrack) {
         continue;
       }

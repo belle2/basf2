@@ -27,7 +27,7 @@ if __name__ == "__main__":
                  # 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
                  # 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',
                  # 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)', 'daughter(2, phi)',
-                 # 'daughterInvariantMass(1, 2)', 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)',
+                 # 'daughterInvM(1, 2)', 'daughterInvM(0, 1)', 'daughterInvM(0, 2)',
                  # 'daughterAngle(0, 1)', 'daughterAngle(0, 2)', 'daughterAngle(1, 2)',
                  'M',
                  ]

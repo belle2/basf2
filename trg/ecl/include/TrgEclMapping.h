@@ -44,7 +44,7 @@ namespace Belle2 {
     /**TC position (cm)*/
     TVector3 getTCPosition(int);
     /** Get TC from FAM # and Channel #*/
-    int getTCIdFromFAMChannel(int , int);
+    int getTCIdFromFAMChannel(int, int);
     /** Get FAM # and Channel # from TC Id*/
     std::vector<int> getFAMChannelFromTCId(int);
     //! get TCId from phi and theta position(LSB = 1.4)

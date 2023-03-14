@@ -17,6 +17,9 @@
 
 namespace Belle2 {
 
+  /**
+   * SVD overlap resolver module.
+   */
   class SVDOverlapResolverModule : public Module {
 
   public:

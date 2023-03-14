@@ -18,7 +18,7 @@ void printDQMFile(TString name="",TString opt=""){
   
   TIter next(_file0->GetListOfKeys());
   TKey* key;
-  Belle2::DQMFileMetaData* meta;
+  Belle2::DQMFileMetaData* meta = nullptr;
   std::vector<Belle2::MonitoringObject*> monobj;
   while((key=(TKey*)next())){
     std::cout << key->GetClassName() << std::endl;
@@ -28,7 +28,7 @@ void printDQMFile(TString name="",TString opt=""){
 
   std::cout << "DQM file content" << std::endl << std::endl;
   
-  meta->Print("all");
+  if (meta) meta->Print("all");
   
   for(auto mon : monobj){    
     if(name.Length() && name!=mon->GetName()) continue;

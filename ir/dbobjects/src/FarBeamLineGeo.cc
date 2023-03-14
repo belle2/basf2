@@ -20,7 +20,7 @@ void FarBeamLineGeo::initialize(const GearDir& content)
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"TubeR", "TubeL", "GateShield", "PolyShieldR", "PolyShieldL", "ConcreteShieldR", "ConcreteShieldL"};
+  std::vector<std::string> names = {"TubeR", "TubeL"};
 
   for (auto name : names) {
     GearDir sect(content, name + "/");
@@ -54,12 +54,12 @@ void FarBeamLineGeo::initialize(const GearDir& content)
   }
   addParameter("Collimator", collimators);
 
-  std::string collimatorShields;
-  for (const GearDir& collShield : content.getNodes("CollimatorShield")) {
-    std::string name = collShield.getString("@name");
-    addParameters(collShield, name);
-    if (!collimatorShields.empty()) collimatorShields += " ";
-    collimatorShields += name;
+  std::string shields;
+  for (const GearDir& shield : content.getNodes("Shield")) {
+    std::string name = shield.getString("@name");
+    addParameters(shield, name);
+    if (!shields.empty()) shields += " ";
+    shields += name;
   }
-  addParameter("CollimatorShield", collimatorShields);
+  addParameter("Shield", shields);
 }

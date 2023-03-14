@@ -72,7 +72,7 @@ namespace Belle2 {
       /**
        * Set CDC Packet header
        */
-      void setCDCPacketHeader(int* buf)
+      void setCDCPacketHeader(const int* buf)
       {
 
         if ((buf[0] & 0xff000000) == 0x22000000) { // raw data mode.

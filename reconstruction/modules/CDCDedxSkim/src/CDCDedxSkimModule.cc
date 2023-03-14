@@ -24,7 +24,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(CDCDedxSkim)
+REG_MODULE(CDCDedxSkim);
 
 CDCDedxSkimModule::CDCDedxSkimModule() : Module()
 {
@@ -118,9 +118,9 @@ void CDCDedxSkimModule::event()
       if (!isGoodTrack(track, Const::electron)) break;
 
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::electron);
-      TVector3 trackMom = fitResult->getMomentum();
+      ROOT::Math::XYZVector trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_e * mass_e);
-      double EoverP = trackEnergy / trackMom.Mag();
+      double EoverP = trackEnergy / trackMom.R();
 
       // track level cuts
       if (EoverP < m_EoverP[1] && EoverP > m_EoverP[0])
@@ -134,9 +134,9 @@ void CDCDedxSkimModule::event()
       if (!isGoodTrack(track, Const::muon)) break;
 
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::muon);
-      TVector3 trackMom = fitResult->getMomentum();
+      ROOT::Math::XYZVector trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_mu * mass_mu);
-      double EoverP = trackEnergy / trackMom.Mag();
+      double EoverP = trackEnergy / trackMom.R();
 
       // track level cuts
       if (EoverP < m_EoverP[1] && EoverP > m_EoverP[0])
@@ -173,10 +173,9 @@ bool CDCDedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStab
   double trackPVal = fitResult->getPValue();
   double d0 = fitResult->getD0();
   double z0 = fitResult->getZ0();
-  int nCDCHits = recoTrack->getNumberOfTotalHits();
 
   // apply track quality cuts
-  if (trackPVal < 0.00001 || nCDCHits < 1 || std::abs(d0) <= 0.1 || std::abs(z0) <= 10) {
+  if (trackPVal < 0.00001 || std::abs(d0) <= 0.1 || std::abs(z0) <= 10) {
     return false;
   }
 

@@ -5,8 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-// Own include
+
+// Own header.
 #include <top/modules/TOPDigitizer/TOPDigitizerModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/modules/TOPDigitizer/TimeDigitizer.h>
 
@@ -30,10 +33,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPDigitizer)
+  REG_MODULE(TOPDigitizer);
 
 
   //-----------------------------------------------------------------

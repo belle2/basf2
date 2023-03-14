@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SVDOccupancyAnalysis)
+REG_MODULE(SVDOccupancyAnalysis);
 
 SVDOccupancyAnalysisModule::SVDOccupancyAnalysisModule() : Module()
 {

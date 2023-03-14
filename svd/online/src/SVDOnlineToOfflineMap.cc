@@ -196,7 +196,7 @@ SVDOnlineToOfflineMap::ReadLayer(int nlayer, ptree const& xml_layer)
   for (ptree::value_type const& v : xml_layer) {
     // if the daughter is a <ladder> then read it!
     if (v.first == "ladder") {
-      ReadLadder(nlayer, v.second.get<int>("<xmlattr>.n") , v.second);
+      ReadLadder(nlayer, v.second.get<int>("<xmlattr>.n"), v.second);
     }
   }
 }
@@ -208,7 +208,7 @@ SVDOnlineToOfflineMap::ReadLadder(int nlayer, int nladder, ptree const& xml_ladd
   for (ptree::value_type const& v : xml_ladder) {
     // if the daughter is a <sensor> then read it!
     if (v.first == "sensor") {
-      ReadSensor(nlayer, nladder, v.second.get<int>("<xmlattr>.n") , v.second);
+      ReadSensor(nlayer, nladder, v.second.get<int>("<xmlattr>.n"), v.second);
     }
   }
 }

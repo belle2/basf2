@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   }
 
   for (const auto& filename : filenames)
-    Belle2::MVA::extract(filename, directory);
+    Belle2::MVA::Utility::extract(filename, directory);
   return 0;
 
 }

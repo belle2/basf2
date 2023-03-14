@@ -1,7 +1,7 @@
 Import('env')
 
 env['SUBLIB'] = True
-env['LIBS'] = ['framework', 'analysis_dataobjects', 'mdst_dataobjects', 'mdst_dbobjects',
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'mdst_dataobjects', 'mdst_dbobjects', 'analysis_dbobjects',
                '$ROOT_LIBS']
 
 Return('env')

@@ -133,7 +133,7 @@ namespace Belle2 {
 
     inline double EnergyMask::mask(int i) const
     {
-      unsigned k = abs(i);
+      unsigned k = std::abs(i);
       if (k < m_mask.size()) return m_mask[k];
       return 0;
     }

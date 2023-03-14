@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPCosmicT0Finder/TOPCosmicT0FinderModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
@@ -38,10 +40,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCosmicT0Finder)
+  REG_MODULE(TOPCosmicT0Finder);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -110,7 +112,7 @@ namespace Belle2 {
         if (abs(extHit.getPdgCode()) != Const::muon.getPDGCode()) continue;
         if (extHit.getDetectorID() != Const::EDetector::TOP) continue;
         if (extHit.getCopyID() <= 0) continue;
-        double dot = extHit.getPosition() * extHit.getMomentum();
+        double dot = extHit.getPosition().Dot(extHit.getMomentum());
         if (m_useIncomingTrack) {
           if (dot > 0) continue;
           if (not extHit0) extHit0 = &extHit;
@@ -122,7 +124,7 @@ namespace Belle2 {
         }
       }
       if (not extHit0) continue;
-      double p = extHit0->getMomentum().Mag();
+      double p = extHit0->getMomentum().R();
       if (p > p0) {
         p0 = p;
         selectedExtHit = extHit0;
@@ -153,7 +155,7 @@ namespace Belle2 {
     // full time window in which data are taken (smaller time window is used in reconstruction)
 
     const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / static_cast<double>(TOPNominalTDC::c_syncWindows);
 
     // find rough t0
 

@@ -14,15 +14,15 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <analysis/utility/ParticleCopy.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
 using namespace Belle2;
 
-REG_MODULE(TreeFitter)
+REG_MODULE(TreeFitter);
 
 TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_nCandidatesAfter(-1)
 {
@@ -73,7 +73,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("updateAllDaughters", m_updateDaughters,
            "Type::[bool]. Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
            false);
-  //
+  addParam("expertBeamConstraintPDG", m_beamConstraintPDG,
+           "Type int, default 0. The 4-momentum of particles with the given PDG will be constrained to the 4-momentum of the initial e+e- system.",
+           0);
   addParam("expertMassConstraintType", m_massConstraintType,
            "Type::[int]. False(0): use particles parameters in mass constraint; True: use sum of daughter parameters for mass constraint. WAARNING not even guaranteed that it works.",
            0);
@@ -85,12 +87,17 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
+  addParam("treatAsInvisible", m_treatAsInvisible,
+           "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
+
+  addParam("ignoreFromVertexFit", m_ignoreFromVertexFit,
+           "Type::[string]. Decay string to select particles that will be ignored to determine the vertex position while kept for kinematics determination.", {});
 }
 
 void TreeFitterModule::initialize()
 {
   m_plist.isRequired(m_particleList);
-  StoreArray<Particle>().isRequired();
+  m_particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 
@@ -100,10 +107,47 @@ void TreeFitterModule::initialize()
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
   }
+
+  if (!m_treatAsInvisible.empty()) {
+    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
+      B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
+  }
+
+  if (!m_ignoreFromVertexFit.empty()) {
+    bool valid = m_pDDescriptorForIgnoring.init(m_ignoreFromVertexFit);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_ignoreFromVertexFit);
+  }
+
 }
 
 void TreeFitterModule::beginRun()
 {
+  if (!m_beamparams.isValid())
+    B2FATAL("BeamParameters are not available!");
+
+  const ROOT::Math::PxPyPzEVector& her = m_beamparams->getHER();
+  const ROOT::Math::PxPyPzEVector& ler = m_beamparams->getLER();
+  const ROOT::Math::PxPyPzEVector& cms = her + ler;
+
+  m_beamMomE(0) = cms.X();
+  m_beamMomE(1) = cms.Y();
+  m_beamMomE(2) = cms.Z();
+  m_beamMomE(3) = cms.E();
+
+  const TMatrixDSym& HERcoma = m_beamparams->getCovHER();
+  const TMatrixDSym& LERcoma = m_beamparams->getCovLER();
+
+  m_beamCovariance = Eigen::Matrix4d::Zero();
+  const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
+  for (size_t i = 0; i < 4; ++i) {
+    m_beamCovariance(i, i) =
+      covE;
+    // TODO Currently, we do not get a full covariance matrix from beamparams, and the py value is zero, which means there is no constraint on py. Therefore, we approximate it by a diagonal matrix using the energy value for all components. This is based on the assumption that the components of the beam four-momentum are independent and of comparable size.
+  }
 }
 
 void TreeFitterModule::event()
@@ -114,14 +158,51 @@ void TreeFitterModule::event()
   }
 
   std::vector<unsigned int> toRemove;
-  const unsigned int n = m_plist->getListSize();
-  m_nCandidatesBeforeFit += n;
+  const unsigned int nParticles = m_plist->getListSize();
+  m_nCandidatesBeforeFit += nParticles;
 
-  for (unsigned i = 0; i < n; i++) {
-    Belle2::Particle* particle = m_plist->getParticle(i);
+  TMatrixFSym dummyCovMatrix(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    dummyCovMatrix(row, row) = 10000;
+  }
+
+  TMatrixFSym dummyCovMatrix_smallMomError(dummyCovMatrix);
+  for (int row = 0; row < 4; ++row) {
+    dummyCovMatrix_smallMomError(row, row) = 1e-10;
+  }
+
+  for (unsigned iPart = 0; iPart < nParticles; iPart++) {
+    Particle* particle = m_plist->getParticle(iPart);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
+    }
+
+    if (!m_treatAsInvisible.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
+      Particle* daughterCopy = ParticleCopy::copyParticle(targetD);
+      daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+      daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
+
+      bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
+      if (!isReplaced)
+        B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
+    }
+
+    if (!m_ignoreFromVertexFit.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorForIgnoring.getSelectionParticles(particle);
+
+      for (auto part : selParticlesTarget) {
+        Particle* targetD = m_particles[part->getArrayIndex()];
+        Particle* daughterCopy = ParticleCopy::copyParticle(targetD);
+        daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+        daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix_smallMomError);
+
+        bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
+        if (!isReplaced)
+          B2ERROR("TreeFitterModule::event No target particle found for " << m_ignoreFromVertexFit);
+      }
     }
 
     try {
@@ -151,7 +232,7 @@ void TreeFitterModule::terminate()
   }
 }
 
-bool TreeFitterModule::fitTree(Belle2::Particle* head)
+bool TreeFitterModule::fitTree(Particle* head)
 {
   const TreeFitter::ConstraintConfiguration constrConfig(
     m_massConstraintType,
@@ -165,6 +246,9 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_customOriginVertex,
     m_customOriginCovariance,
     m_originDimension,
+    m_beamConstraintPDG,
+    m_beamMomE,
+    m_beamCovariance,
     m_inflationFactorCovZ
   );
 
@@ -205,6 +289,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m      (_)                 (_)                                                   \033[0m");
   B2INFO("\033[40;97m                                                                                \033[0m");
   B2INFO("\033[1;35m============= TREEFIT STATISTICS ===============================================\033[0m");
+  B2INFO("\033[1;39mTarget particle list: " << m_particleList <<  "\033[0m");
   B2INFO("\033[1;39mCandidates before fit: " << m_nCandidatesBeforeFit << "\033[0m");
   B2INFO("\033[1;39mCandidates after fit:  " << m_nCandidatesAfter << "\033[0m");
   B2INFO("\033[1;39mA total of " << m_nCandidatesBeforeFit - m_nCandidatesAfter <<
@@ -213,6 +298,6 @@ void TreeFitterModule::plotFancyASCII()
          "% of candidates survived the fit.\033[0m");
   B2INFO("\033[1;39m" << 100. - (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
          "% of candidates did not.\033[0m");
-  B2INFO("\033[1;39mYou choose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
+  B2INFO("\033[1;39mYou chose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
   B2INFO("\033[1;35m================================================================================\033[0m");
 }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -31,7 +30,7 @@ basf2.set_random_seed(1337)
 
 
 class CDCFull(TrackingValidationRun):
-    """Validate the full CDC track-finding chain include Legendre step"""
+    """Validate the full CDC track-finding chain"""
     #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)

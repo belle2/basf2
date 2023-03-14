@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <background/modules/BeamBkgHitRateMonitor/ARICHHitRateCounter.h>
 
 // framework aux
@@ -27,7 +27,7 @@ namespace Belle2 {
 
       // make map of modules to 18 segments
       // (first hapd ring is 6 segments (by sector), for the rest, each segment merges 3 hapd rings (again by sector))
-      int nModInRing[7] = {0, 42, 90, 144, 204, 270, 342};
+      const int nModInRing[7] = {0, 42, 90, 144, 204, 270, 342};
       int iRing = 0;
       for (int i = 0; i < 420; i++) {
         if (i == nModInRing[iRing + 1]) iRing++;

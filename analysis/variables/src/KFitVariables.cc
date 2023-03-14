@@ -6,10 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/KFitVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>

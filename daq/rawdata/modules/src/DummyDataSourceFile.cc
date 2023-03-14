@@ -47,7 +47,6 @@ void DummyDataSourceFileModule::initialize()
 
   rawcprarray.registerInDataStore();
 
-  //  n_basf2evt = 0;
   n_basf2evt = 0;
   m_start_flag = 0;
 
@@ -141,9 +140,9 @@ void DummyDataSourceFileModule::event()
   // Monitor
   //
   if (max_nevt >= 0) {
-    if (n_basf2evt >= max_nevt && max_nevt > 0) {
+    if (n_basf2evt >= (unsigned int) max_nevt && max_nevt > 0) {
       printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n",
-             max_nevt , n_basf2evt);
+             max_nevt, n_basf2evt);
       fflush(stdout);
       m_eventMetaDataPtr->setEndOfData();
     }

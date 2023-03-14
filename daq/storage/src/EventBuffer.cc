@@ -66,11 +66,10 @@ unsigned int EventBuffer::write(const int* buf, unsigned int nword,
   if (m_buf == NULL) return 0;
   if (nword == 0) return 0;
   if (nword > m_nword) return -1;
-  unsigned int i_w = 0;
-  unsigned int i_r = 0;
+
   while (true) {
-    i_w = m_header.nword_in % m_nword;
-    i_r = m_header.nword_out % m_nword;
+    unsigned int i_w = m_header.nword_in % m_nword;
+    unsigned int i_r = m_header.nword_out % m_nword;
     if ((serial == 0 || serial - 1 == m_header.count_in) &&
         m_header.nword_in - m_header.nword_out < m_nword - (nword + 1)) {
       if (i_w >= i_r) {
@@ -100,12 +99,10 @@ unsigned int EventBuffer::read(int* buf, EventBuffer::Header* hdr)
 {
   if (m_buf == NULL) return 0;
   m_header.nreader++;
-  unsigned int i_w = 0;
-  unsigned int i_r = 0;
   unsigned int nword = 0;
   while (true) {
-    i_w = m_header.nword_in % m_nword;
-    i_r = m_header.nword_out % m_nword;
+    unsigned int i_w = m_header.nword_in % m_nword;
+    unsigned int i_r = m_header.nword_out % m_nword;
     nword = m_buf[i_r];
     if (nword > 0) {
       if (m_header.nword_in - m_header.nword_out >= (nword + 1)) {

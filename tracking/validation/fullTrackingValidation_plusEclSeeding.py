@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -72,6 +71,8 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
     resolution = True
     #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
+    #: define empty list of non expert parameters so that no shifter plots are created (to revert just remove following line)
+    non_expert_parameters = []
 
 
 def main():

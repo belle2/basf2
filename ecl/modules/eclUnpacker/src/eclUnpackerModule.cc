@@ -21,7 +21,6 @@
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/utility/ECLDspUtilities.h>
 
 using namespace std;
@@ -76,7 +75,7 @@ ADC_NUM*SAMPLES_NUM |                                                           
 */
 
 
-REG_MODULE(ECLUnpacker)
+REG_MODULE(ECLUnpacker);
 
 ECLUnpackerModule::ECLUnpackerModule() :
   m_globalEvtNum(0),
@@ -105,11 +104,6 @@ ECLUnpackerModule::ECLUnpackerModule() :
            "exist in ECL mapping", false);
   addParam("useUnpackingParameters", m_useUnpackingParameters,
            "Use ECLUnpackingParameters payload", true);
-}
-
-ECLUnpackerModule::~ECLUnpackerModule()
-{
-
 }
 
 void ECLUnpackerModule::initialize()
@@ -238,8 +232,7 @@ unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
       val += m_bufPtr[m_bufPos] << (32 - m_bitPos);
       m_bitPos += bitsToRead;
       m_bitPos -= 32;
-    }
-  else {
+    } else {
     m_bitPos += bitsToRead;
     if (m_bitPos == 32) {
       m_bufPos++;
@@ -273,10 +266,27 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   std::vector <int> eclWaveformSamples;
 
   int nodeID = rawCOPPERData->GetNodeID(n);
+  int channelsCount = rawCOPPERData->GetMaxNumOfCh(n);
 
+  int collectorsInNode = -1;
+
+  bool pcie40Data = false;
+  if (channelsCount == 4) { // COPPER data
+    pcie40Data = false;
+    collectorsInNode = 2;
+  } else if (channelsCount == 48) { // PCIe40 data
+    pcie40Data = true;
+    collectorsInNode = 18;
+    if (nodeID == BECL_ID + 3) {
+      collectorsInNode = 16;
+    }
+  } else {
+    B2FATAL("The maximum number of channels per readout board is invalid."
+            << LogVar("Number of channels", channelsCount));
+  }
 
   // loop over FINESSEs in the COPPER
-  for (int iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
+  for (int iFINESSE = 0; iFINESSE < collectorsInNode; iFINESSE++) {
 
     m_bitPos = 0;
     m_bufPos = 0;
@@ -286,7 +296,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     if (m_bufLength <= 0) continue;
 
     // get Number of Collector/Crate connected to the FINESSE
-    iCrate = m_eclMapper.getCrateID(nodeID, iFINESSE);
+    iCrate = m_eclMapper.getCrateID(nodeID, iFINESSE, pcie40Data);
 
     // pointer to data from COPPER/FINESSE
     m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);

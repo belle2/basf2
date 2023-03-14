@@ -37,7 +37,7 @@ namespace Belle2 {
     virtual void init(NSMCommunicator&) {}
     virtual void term() {}
     virtual void timeout(NSMCommunicator&) {}
-    virtual bool perform(NSMCommunicator& com);
+    bool perform(NSMCommunicator& com) override;
     virtual void ok(const char* /*node*/, const char* /*data*/) {}
     virtual void fatal(const char* /*node*/, const char* /*data*/) {}
     virtual void error(const char* /*node*/, const char* /*data*/) {}
@@ -67,7 +67,7 @@ namespace Belle2 {
     void setCategory(const std::string& category) { m_category = category; }
 
   protected:
-    virtual void notify(const NSMVar& var);
+    void notify(const NSMVar& var) override;
     void reg(const NSMCommand& cmd) { m_cmd_v.push_back(cmd); }
     void addNode(const NSMNode& node);
     const NSMNodeMap& getNodes() { return m_nodes; }

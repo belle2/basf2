@@ -138,9 +138,9 @@ void DeSerializerPCModule::initialize()
 int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int flag)
 {
   int n = 0;
-  int read_size = 0;
   while (1) {
-    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
+    int read_size = 0;
+    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n, flag)) < 0) {
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -287,8 +287,6 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
   // Read Header and obtain data size
   //
   int send_hdr_buf[ SendHeader::SENDHDR_NWORDS ];
-  int temp_num_events = 0;
-  int temp_num_nodes = 0;
 
   // Read header
   for (int i = 0; i < (int)(m_socket.size()); i++) {
@@ -298,8 +296,8 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
 
-    temp_num_events = send_hdr.GetNumEventsinPacket();
-    temp_num_nodes = send_hdr.GetNumNodesinPacket();
+    int temp_num_events = send_hdr.GetNumEventsinPacket();
+    int temp_num_nodes = send_hdr.GetNumNodesinPacket();
 
 
 
@@ -313,7 +311,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       char err_buf[500];
       sprintf(err_buf,
               "[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
-              *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
+              *num_events_in_sendblock, temp_num_events, i,  *num_nodes_in_sendblock, temp_num_nodes, i);
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -801,7 +799,7 @@ void DeSerializerPCModule::event()
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
-             max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+             max_nevt, max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }

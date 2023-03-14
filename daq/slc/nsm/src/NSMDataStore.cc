@@ -36,9 +36,9 @@ bool NSMDataStore::open(unsigned short max)
   buf += m_mutex.size();
   m_cond = MCond(buf);
   buf += m_cond.size();
-  m_header = (Header*)buf;
+  m_header = reinterpret_cast<Header*>(buf);
   buf += sizeof(Header);
-  m_entries = (Entry*)buf;
+  m_entries = reinterpret_cast<Entry*>(buf);
   if (max > 0) {
     m_header->maxentries = max;
   }

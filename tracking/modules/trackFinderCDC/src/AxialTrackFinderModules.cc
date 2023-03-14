@@ -22,31 +22,31 @@ REG_MODULE(TFCDC_MonopoleAxialTrackFinderLegendre);
 REG_MODULE(TFCDC_AxialStraightTrackFinder);
 
 TFCDC_AxialTrackFinderLegendreModule::TFCDC_AxialTrackFinderLegendreModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super({"CDCWireHitVector", "CDCTrackVector"})
 {
 }
 
 TFCDC_AxialTrackFinderHoughModule::TFCDC_AxialTrackFinderHoughModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super({"CDCWireHitVector", "CDCTrackVector"})
 {
 }
 
 TFCDC_AxialTrackCreatorSegmentHoughModule::TFCDC_AxialTrackCreatorSegmentHoughModule()
-  : Super( {"CDCSegment2DVector", "CDCTrackVector"})
+  : Super({"CDCSegment2DVector", "CDCTrackVector"})
 {
 }
 
 TFCDC_AxialTrackCreatorMCTruthModule::TFCDC_AxialTrackCreatorMCTruthModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super({"CDCWireHitVector", "CDCTrackVector"})
 {
 }
 
 TFCDC_MonopoleAxialTrackFinderLegendreModule::TFCDC_MonopoleAxialTrackFinderLegendreModule()
-  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
+  : Super({"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }
 
 TFCDC_AxialStraightTrackFinderModule::TFCDC_AxialStraightTrackFinderModule()
-  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
+  : Super({"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }

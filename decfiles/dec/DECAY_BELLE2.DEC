@@ -70,7 +70,7 @@
 #   Added decay table for sigma_0 particle (f_0(500) in the PDG)
 #
 # Sept.-Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
-#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://agira.desy.de/browse/BII-7249.
+#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://gitlab.desy.de/belle2/software/basf2/-/issues/7124.
 #   Further updates and corrections applied in https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview.
 #   Added the remaining rare decays from the Belle mixedrare.dec and chargedrare.dec files.
 #   Pythia hadron contributions rescaled by S. Duell (https://stash.desy.de/projects/B2/repos/software/pull-requests/6690/overview)
@@ -82,6 +82,15 @@
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+#
+# December 2021, V. Bertacchi (bertacchi@cppm.in2p3.fr)
+#   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
+#   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
+#   https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/581
+#
+# March 2022, H. Svidras (henrikas.svidras@desy.de)
+#   Corrected the BTOXSGAMMA model branching fraction to the correct inclusive B->Xs gamma decay branching fraction in the PDG
+
 
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
@@ -410,16 +419,24 @@ Decay B0
 
 # B -> cc= s
 #
+#$ forbid_pythia()
+0.000000000   J/psi  K0                                    PHSP;
 0.000436500   J/psi  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000436500   J/psi  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   J/psi  K*0                                   PHSP;
 0.000211667   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psi K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000211667   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
-0.000846667   J/psi  anti-K*0T                             SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+0.000846667   J/psi  K*0T                                  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 
-# Example of how to subtract K* contribution from inc. BF: ! get_branching('S042:Desig=4') - ! get_branching('S042:Desig=22') * get_branching('M018:Desig=12') * 2 / 3.
-0.000303333   J/psi  K+  pi-                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]
-0.000151665   J/psi  K0  pi0                               PHSP; #No PDGLive value. Assume BF(J/psi K0 pi0) = BF(J/psi K+ pi-) / 2. #[BF update - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=4') - BF('S042:Desig=22') * BF('M018:Desig=12') * 2 / 3
+0.000303333   J/psi  K+  pi-                               PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B0 -> J/psi K+ pi-') / 2
+0.000151665   J/psi  K0  pi0                               PHSP; #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
 0.000017700   J/psi  omega                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
@@ -449,15 +466,24 @@ Decay B0
 0.000008440   J/psi  f_1                                   PHSP; #Gamma_230 PDGLive. #[BF update - PG 09/2020]
 0.000660000   J/psi  K*0  pi+  pi-                         PHSP;
 
+#$ forbid_pythia()
+0.000000000   psi(2S)  K0                                  PHSP;
 0.000290000   psi(2S)  K_S0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000290000   psi(2S)  K_L0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   psi(2S)  K*0                                 PHSP;
 0.000098333   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #psi(2S) K*0 is Gamma_257 PDGLive = 5.9e-4. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000098333   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000393333   psi(2S)  K*0T                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
 
-0.000186667   psi(2S)  K+  pi-                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
-0.000093333   psi(2S)  K0  pi0                             PHSP; #No PDGLive value. Assume BF(psi(2S) K0 pi0) = BF(psi(2S) K+ pi-) / 2. #[BF update - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=70') - BF('S042:Desig=69') * BF('M018:Desig=12') * 2 / 3
+0.000186667   psi(2S)  K+  pi-                             PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B0 -> psi(2S) K+ pi-') / 2
+0.000093333   psi(2S)  K0  pi0                             PHSP; #[BF update - PG 09/2020]
 0.000200000   psi(2S)  K0  pi-  pi+                        PHSP;
 0.000100000   psi(2S)  K0  pi0  pi0                        PHSP;
 0.000100000   psi(2S)  K+  pi-  pi0                        PHSP;
@@ -465,9 +491,13 @@ Decay B0
 0.000022090   psi(2S)  pi+  pi-                            PHSP; #[BF update - PG 09/2020]
 0.000011700   psi(2S)  pi0                                 PHSP;
 
+#$ forbid_pythia()
+0.000000000   eta_c  K0                                    PHSP;
 0.000400000   eta_c  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000400000   eta_c  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   eta_c  K*0                                   PHSP;
 0.000105000   K*S  eta_c                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000105000   K*L  eta_c                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 0.000420000   K*0T  eta_c                                  SVS;
@@ -478,10 +508,14 @@ Decay B0
 0.000100000   eta_c  K0  pi0  pi0                          PHSP;
 0.000100000   eta_c  K+  pi-  pi0                          PHSP;
 
+#$ forbid_pythia()
+0.000000000   eta_c(2S)  K0                                PHSP;
 # Br(B0 -> eta_c K_S0) = Br(B+ -> eta_c K+) * Br(B0 -> eta_c (-> p anti-p pi+ pi-) K_S0) / Br (B+ -> eta_c (-> p anti-p pi+ pi-) K+) = 4.4e-4 * (4.2e-7 / 1.12e-6) = 0.00016500. #[Comment - KL 09/2020]
 0.000165000   eta_c(2S)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[BF update - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000165000   eta_c(2S)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
 
+#$ forbid_pythia()
+0.000000000   eta_c(2S)  K*0                               PHSP;
 0.000110000   K*S  eta_c(2S)                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000110000   K*L  eta_c(2S)                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 0.000440000   K*0T  eta_c(2S)                              SVS;
@@ -492,9 +526,13 @@ Decay B0
 0.000050000   eta_c(2S)  K0  pi0  pi0                      PHSP;
 0.000050000   eta_c(2S)  K+  pi-  pi0                      PHSP;
 
+#$ forbid_pythia()
+0.000000000   chi_c0  K0                                   PHSP;
 0.000073500   chi_c0  K_S0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000073500   chi_c0  K_L0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   chi_c0  K*0                                  PHSP;
 0.000028000   K*S  chi_c0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000028000   K*L  chi_c0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000113000   K*0T  chi_c0                                 SVS;
@@ -508,39 +546,23 @@ Decay B0
 # B0 -> chi_c1 X
 
 # B0 -> chi_c1 K0 (PDG 2019 data)
+#$ forbid_pythia()
+0.000000000   chi_c1  K0                                   PHSP;
 0.000196500   chi_c1  K_S0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000196500   chi_c1  K_L0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-# B0 -> chi_c1 pi- K+ (PDG 2019 data)
-#
-# Branching fraction: 0.000497
-#
-# Using branching fractions:
-# Br(B0 -> chi_c1 K*(892)0) = 0.000238
-# Br(K*(892)0 -> (K pi)0) = 0.99754
-#
-# Partial branching fractions:
-# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi-)) =
-#    0.000238 * 0.99754 * (2/3) = 0.00015828
-# 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
+#$ forbid_pythia()
+0.000000000   chi_c1  K*0                                  PHSP;
+0.000039570   chi_c1  K*S                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;   #[w/CPV - BO 09/2017]
+0.000039570   chi_c1  K*L                                  SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000158280   chi_c1  K*0T                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[w/CPV - BO 09/2017]
-0.000338720   chi_c1  K+  pi-                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
 
-# B0 -> chi_c1 pi0 K0 (PDG 2019 data).
-#
-# Branching fraction (estimated from B0 -> chi_c1 pi- K+ assuming decay via
-# K* resonances): 4.97e-4 / 2 = 0.0002485
-#
-# Using branching fractions:
-# Br(B0 -> chi_c1 K*(892)0) = 0.000238
-# Br(K*(892)0 -> (K pi)0) = 0.99754
-#
-# Partial branching fractions:
-# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi0) =
-#    0.000238 * 0.99754 * (1/3) = 0.00007914
-# 2) Br(B0 -> chi_c1 K0 pi0) = 0.0002485 - 0.00007914 = 0.00016936
-0.000039570   K*S  chi_c1                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;   #[w/CPV - BO 09/2017]
-0.000039570   K*L  chi_c1                                  SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=441') - BF('S042:Desig=127') * BF('M018:Desig=12') * 2 / 3
+0.000338720   chi_c1  K+  pi-                              PHSP; #[Comment - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B0 -> chi_c1 K+ pi-') / 2
 0.000169360   chi_c1  K0  pi0                              PHSP;
 
 0.000316000   chi_c1  K0  pi-  pi+                         PHSP; #[BF update - PG 09/2020]
@@ -548,6 +570,8 @@ Decay B0
 0.000352000   chi_c1  K+  pi-  pi0                         PHSP; #[BF update - PG 09/2020]
 0.000011200   chi_c1  pi0                                  PHSP;
 
+#$ forbid_pythia()
+0.000000000   chi_c2  K0                                   PHSP;
 0.000007500   chi_c2  K_S0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #Taken from UL of <1.5e-5. #[w/CPV - BO 09/2017]
 0.000007500   chi_c2  K_L0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
@@ -559,9 +583,13 @@ Decay B0
 0.000010000   chi_c2  K+  pi-  pi0                         PHSP; #No PDGLive value. Set BF<UL https://arxiv.org/abs/1512.02672. #[BF update - PG 09/2020]
 0.000010000   chi_c2  K0  pi0  pi0                         PHSP; #No PDGLive value. Set BF<UL of above channels.                #[BF update - PG 09/2020]
 
+#$ forbid_pythia()
+0.000000000   psi(3770)  K0                                PHSP;
 0.000240000   psi(3770)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000240000   psi(3770)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   psi(3770)  K*0                               PHSP;
 0.000080000   psi(3770)  K*S                               SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000080000   psi(3770)  K*L                               SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000320000   psi(3770)  K*0T                              SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
@@ -735,8 +763,8 @@ Decay B0
 0.003547860   D_s1+  D-                                    SVS;  #[BF update - PG 09/2020]
 0.009282570   D*-  D_s1+                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; #[BF update - PG 09/2020]
 
-0.000880000   D-  K+  anti-K*0                             PHSP;
-0.001290000   D*-  K+  anti-K*0                            PHSP;
+0.000580000   D-  K+  anti-K*0                             PHSP; #[BF update - VB 12/2021, subtracted resonant D- a_1+ component, BR(R+NR)=0.00088]
+0.000640292   D*-  K+  anti-K*0                            PHSP; #[BF update - VB 12/2021, subtracted resonant D*- a_1+ component, BR(R+NR)=0.00129]
 0.000300000   D*-  K0  pi+                                 PHSP;
 0.000300000   D*+  K0  pi-                                 PHSP;
 0.000490000   D-  K0  pi+                                  PHSP;
@@ -750,10 +778,7 @@ Decay B0
 0.000052310   anti-D0  K0                                  PHSP; #[BF update - PG 09/2020]
 0.000036000   anti-D*0  K0                                 PHSP;
 0.002718500   D*0  pi+  pi+  pi-  pi-                      PHSP; #[BF update - PG 09/2020]
-0.000795130   eta_c  K0                                    PHSP; #[BF update - PG 09/2020]
 0.000170000   K0  D0  anti-D0  pi0                         PHSP;
-0.000584530   psi(2S)  K0                                  PHSP; #[BF update - PG 09/2020]
-0.000001110   chi_c0  K0                                   PHSP; #[BF update - PG 09/2020]
 
 0.000103560   anti-D0  p+  anti-p-                         PHSP; #[BF update - PG 09/2020]
 0.000028410   D_s-  anti-Lambda0  p+                       PHSP; #[BF update - PG 09/2020]
@@ -781,8 +806,9 @@ Decay B0
 0.000145000   pi-  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000294000   rho-  e+  nu_e                               BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
-0.000294000   rho-  mu+  nu_mu                             BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000294000   rho-  e+  nu_e                               BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000294000   rho-  mu+  nu_mu                             BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 
 0.000000000   D(2S)-  e+  nu_e                             ISGW2;
 0.000000000   D(2S)-  mu+  nu_mu                           ISGW2;
@@ -791,8 +817,8 @@ Decay B0
 0.001701000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000094227   pi-  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000156755   rho-  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000094227   pi-  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000156755   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000090000   a_1-  tau+  nu_tau                           ISGW2;
 0.000008000   b_1-  tau+  nu_tau                           ISGW2;
 0.000008000   a_0-  tau+  nu_tau                           ISGW2;
@@ -817,14 +843,14 @@ Decay B0
 
 # b -> s gamma
 #
-0.000041770   K*0  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;
-0.000043000   K_10  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000006500   K'_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 1.5e-6.
-0.000012370   K_2*0  gamma                                 HELAMP 1.0 0.0 1.0 0.0;      #[BF update - PG 09/2020]
-0.000001700   K''*0  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 2e-3.
-0.000273500   Xsd  gamma                                   BTOXSGAMMA 2 ;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000041770   K*0  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
+0.000043000   K_10  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 5.8e-5. #[Comment - PG 04/2022]
+0.000006500   K'_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]
+0.000012370   K_2*0  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000001700   K''*0  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]
+0.000242360   Xsd  gamma                                   BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
 
 # Do not include to avoid double counting with higher K states.
 #0.000004600   K+  pi-  gamma                                PHSP; #Commented out as this double counts the K*2_0 decaying into Kpi.
@@ -886,24 +912,32 @@ Decay B0
 0.000001000   f_0  b_10                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
 # Penguin dominated modes are sin2beta, not sin2alpha. #[w/CPV - BO 09/2017]
+# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
+#$ forbid_pythia()
+0.000000000   phi  K0                                      PHSP;
+#$ forbid_pythia()
+0.000000000   phi  anti-K0                                 PHSP;
 0.000004300   phi  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000004300   phi  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#$ forbid_pythia()
+0.000000000   eta  K0                                      PHSP;
+#$ forbid_pythia()
+0.000000000   eta  anti-K0                                 PHSP;
 0.000000550   eta  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000000550   eta  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#$ forbid_pythia()
+0.000000000   eta'  K0                                     PHSP;
+#$ forbid_pythia()
+0.000000000   eta'  anti-K0                                PHSP;
 0.000033000   eta'  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000033000   eta'  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#$ forbid_pythia()
+0.000000000   omega  K0                                    PHSP;
+#$ forbid_pythia()
+0.000000000   omega  anti-K0                               PHSP;
 0.000002500   omega  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000002500   omega  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
-0.000000000   phi  K0                                      PHSP;
-0.000000000   phi  anti-K0                                 PHSP;
-0.000000000   eta  K0                                      PHSP;
-0.000000000   eta  anti-K0                                 PHSP;
-0.000000000   eta'  K0                                     PHSP;
-0.000000000   eta'  anti-K0                                PHSP;
-0.000000000   omega  K0                                    PHSP;
-0.000000000   omega  anti-K0                               PHSP;
 
 0.000000100   phi  pi0                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF<0. Set BF<UL.  https://arxiv.org/pdf/1206.4760.pdf. #[BF update - PG 09/2020]
 0.000000200   phi  eta                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF with 1.4sigma. https://arxiv.org/pdf/0907.1743.pdf. #[BF update - PG 09/2020]
@@ -919,7 +953,8 @@ Decay B0
 0.000019580   K+  pi-                                      PHSP; #[BF update - PG 09/2020]
 0.000000080   K+  K-                                       PHSP; #[BF update - PG 09/2020]
 0.000009930   K0  pi0                                      PHSP; #[BF update - PG 09/2020]
-0.000001210   K0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
+#$ forbid_pythia()
+0.000000000   K0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
 0.000000240   K_S0  K_S0                                   PHSP;
 0.000000240   K_L0  K_L0                                   PHSP;
 0.000000000   K_S0  K_L0                                   PHSP; #K_S0 K_L0 is 0, see http://babar-hn.slac.stanford.edu:5090/HyperNews/get/pubboard14/156.html.
@@ -956,12 +991,16 @@ Decay B0
 0.000000000   rho(3S)+  pi-                                SVS;
 0.000000000   rho(3S)-  pi+                                SVS;
 
+#$ forbid_pythia()
+0.000000000   rho0  K0                                     PHSP;
 0.000002350   rho0  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000002350   rho0  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
 0.000007010   rho-  K+                                     SVS;  #[BF update - PG 09/2020]
 
 # rho(1450)
+#$ forbid_pythia()
+0.000000000   rho(2S)0  K0                                 PHSP;
 0.000000500   rho(2S)0  K_S0                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000000500   rho(2S)0  K_L0                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
@@ -1027,7 +1066,6 @@ Decay B0
 0.000001000   K0  eta  eta                                 PHSP;
 0.000001000   K0  eta  eta'                                PHSP;
 0.000001000   K0  eta'  eta'                               PHSP;
-0.000048000   K0  anti-K0  K0                              PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess).
 
 0.000001000   pi0  pi0  pi0                                PHSP;
 0.000001000   pi0  pi0  eta                                PHSP;
@@ -1605,6 +1643,9 @@ Decay B0
 
 # PPP
 #
+# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
+#$ forbid_pythia()
+0.000000000   K0  anti-K0  K0                              PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess).  KS/KL combination are in PPP section below
 0.000006200   K_S0  K_S0  K_S0                             PHSP; #Measured, inclusive
 0.000006200   K_L0  K_L0  K_L0                             PHSP; #Same as KsKsKs
 0.000007400   K_S0  K_S0  K_L0                             PHSP; #UL
@@ -2065,31 +2106,31 @@ Decay B0
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.00987248    anti-cd_0  ud_0                              PYTHIA 63;
-0.01974506    anti-cd_1  ud_1                              PYTHIA 63;
+0.00992629    anti-cd_0  ud_0                              PYTHIA 63;
+0.01985270    anti-cd_1  ud_1                              PYTHIA 63;
 
 # Xi_c X      2.5%
-0.00269252    anti-cs_0  ud_0                              PYTHIA 63;
-0.00538503    anti-cs_1  ud_1                              PYTHIA 63;
+0.00270702    anti-cs_0  ud_0                              PYTHIA 63;
+0.00541400    anti-cs_1  ud_1                              PYTHIA 63;
 
-0.24219051    u  anti-d  anti-c  d                         PYTHIA 23;
-0.04128504    u  anti-d  anti-c  d                         PYTHIA 43;
-0.01884754    u  anti-s  anti-c  d                         PYTHIA 43;
-0.01615504    u  anti-c  anti-d  d                         PYTHIA 23;
-0.00080774    u  anti-c  anti-s  d                         PYTHIA 23;
+0.24349378    u  anti-d  anti-c  d                         PYTHIA 23;
+0.04150720    u  anti-d  anti-c  d                         PYTHIA 43;
+0.01894896    u  anti-s  anti-c  d                         PYTHIA 43;
+0.01624197    u  anti-c  anti-d  d                         PYTHIA 23;
+0.00081209    u  anti-c  anti-s  d                         PYTHIA 23;
 # Try to crank up the psi production (Lange).
-0.06641505    c  anti-s  anti-c  d                         PYTHIA 43;
-0.00538503    c  anti-d  anti-c  d                         PYTHIA 43;
-0.00269252    u  anti-d  anti-u  d                         PYTHIA 23;
-0.00359003    c  anti-s  anti-u  d                         PYTHIA 23;
+0.06677709    c  anti-s  anti-c  d                         PYTHIA 43;
+0.00541438    c  anti-d  anti-c  d                         PYTHIA 43;
+0.00270721    u  anti-d  anti-u  d                         PYTHIA 23;
+0.00360960    c  anti-s  anti-u  d                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00183985    u  anti-u  anti-d  d                         PYTHIA 23;
-0.00006284    d  anti-d  anti-d  d                         PYTHIA 23;
-0.00008077    s  anti-s  anti-d  d                         PYTHIA 23;
-0.00197446    u  anti-u  anti-s  d                         PYTHIA 23;
-0.00161547    d  anti-d  anti-s  d                         PYTHIA 23;
-0.00134626    s  anti-s  anti-s  d                         PYTHIA 23;
-0.00448752    anti-s  d                                    PYTHIA 91;
+0.00184987    u  anti-u  anti-d  d                         PYTHIA 23;
+0.00006317    d  anti-d  anti-d  d                         PYTHIA 23;
+0.00008121    s  anti-s  anti-d  d                         PYTHIA 23;
+0.00198523    u  anti-u  anti-s  d                         PYTHIA 23;
+0.00162428    d  anti-d  anti-s  d                         PYTHIA 23;
+0.00135359    s  anti-s  anti-s  d                         PYTHIA 23;
+0.00451198    anti-s  d                                    PYTHIA 91;
 
 Enddecay
 
@@ -2168,16 +2209,24 @@ Decay anti-B0
 
 # B -> cc= s
 #
+#$ forbid_pythia()
+0.000000000   J/psi  anti-K0                               PHSP;
 0.000436500   J/psi  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000436500   J/psi  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   J/psi  anti-K*0                              PHSP;
 0.000211667   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psi K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000211667   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
-0.000846667   J/psi  K*0T                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.000846667   J/psi  anti-K*0T                             SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
 
-# Example of how to subtract K* contribution from inc. BF: ! get_branching('S042:Desig=4') - ! get_branching('S042:Desig=22') * get_branching('M018:Desig=12') * 2 / 3.
-0.000303333   J/psi  K-  pi+                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]
-0.000151665   J/psi  anti-K0  pi0                          PHSP; #No PDGLive value. Assume BF(J/psi K0 pi0) = BF(J/psi K+ pi-) / 2. #[BF update - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=4') - BF('S042:Desig=22') * BF('M018:Desig=12') * 2 / 3
+0.000303333   J/psi  K-  pi+                               PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('anti-B0 -> J/psi K- pi+') / 2
+0.000151665   J/psi  anti-K0  pi0                          PHSP; #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
 0.000017700   J/psi  omega                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
@@ -2207,15 +2256,24 @@ Decay anti-B0
 0.000008440   J/psi  f_1                                   PHSP; #[BF update - PG 09/2020]
 0.000660000   J/psi  anti-K*0  pi+  pi-                    PHSP;
 
+#$ forbid_pythia()
+0.000000000   psi(2S)  anti-K0                             PHSP;
 0.000290000   psi(2S)  K_S0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000290000   psi(2S)  K_L0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   psi(2S)  anti-K*0                            PHSP;
 0.000098333   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #psi(2S) K*0 is Gamma_257 PDGLive = 5.9e-4. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000098333   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000393333   psi(2S)  anti-K*0T                           SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 
-0.000186667   psi(2S)  K-  pi+                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
-0.000093333   psi(2S)  anti-K0  pi0                        PHSP; #No PDGLive value. Assume BF(psi(2S) K0 pi0) = BF(psi(2S) K+ pi-) / 2. #[BF update - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=70') - BF('S042:Desig=69') * BF('M018:Desig=12') * 2 / 3
+0.000186667   psi(2S)  K-  pi+                             PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B0 -> psi(2S) K- pi+') / 2
+0.000093333   psi(2S)  anti-K0  pi0                        PHSP; #[BF update - PG 09/2020]
 0.000200000   psi(2S)  anti-K0  pi+  pi-                   PHSP;
 0.000100000   psi(2S)  anti-K0  pi0  pi0                   PHSP;
 0.000100000   psi(2S)  K-  pi+  pi0                        PHSP;
@@ -2223,9 +2281,13 @@ Decay anti-B0
 0.000022090   psi(2S)  pi+  pi-                            PHSP; #[BF update - PG 09/2020]
 0.000011700   psi(2S)  pi0                                 PHSP;
 
+#$ forbid_pythia()
+0.000000000   eta_c  anti-K0                               PHSP;
 0.000400000   eta_c  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000400000   eta_c  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   eta_c  anti-K*0                              PHSP;
 0.000105000   K*S  eta_c                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000105000   K*L  eta_c                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 0.000420000   anti-K*0T  eta_c                             SVS;
@@ -2236,10 +2298,14 @@ Decay anti-B0
 0.000100000   eta_c  anti-K0  pi0  pi0                     PHSP;
 0.000100000   eta_c  K-  pi+  pi0                          PHSP;
 
+#$ forbid_pythia()
+0.000000000   eta_c(2S)  anti-K0                           PHSP;
 # Br(B0 -> eta_c K_S0) = Br(B+ -> eta_c K+) * Br(B0 -> eta_c (-> p anti-p pi+ pi-) K_S0) / Br (B+ -> eta_c (-> p anti-p pi+ pi-) K+) = 4.4e-4 * (4.2e-7 / 1.12e-6) = 0.00016500. #[Comment - KL 09/2020]
 0.000165000   eta_c(2S)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[BF update - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000165000   eta_c(2S)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
 
+#$ forbid_pythia()
+0.000000000   eta_c(2S)  anti-K*0                          PHSP;
 0.000110000   K*S  eta_c(2S)                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000110000   K*L  eta_c(2S)                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 0.000440000   anti-K*0T  eta_c(2S)                         SVS;
@@ -2250,9 +2316,13 @@ Decay anti-B0
 0.000050000   eta_c(2S)  anti-K0  pi0  pi0                 PHSP;
 0.000050000   eta_c(2S)  K-  pi+  pi0                      PHSP;
 
+#$ forbid_pythia()
+0.000000000   chi_c0  anti-K0                              PHSP;
 0.000073500   chi_c0  K_S0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000073500   chi_c0  K_L0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   chi_c0  anti-K*0                             PHSP;
 0.000028000   K*S  chi_c0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000028000   K*L  chi_c0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000113000   anti-K*0T  chi_c0                            SVS;
@@ -2266,39 +2336,23 @@ Decay anti-B0
 # anti-B0 -> chi_c1 X
 
 # anti-B0 -> chi_c1 anti-K0 (PDG 2019 data)
+#$ forbid_pythia()
+0.000000000   chi_c1  anti-K0                              PHSP;
 0.000196500   chi_c1  K_S0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000196500   chi_c1  K_L0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-# anti-B0 -> chi_c1 pi+ K- (PDG 2019 data)
-#
-# Branching fraction: 0.000497
-#
-# Using branching fractions:
-# Br(B0 -> chi_c1 K*(892)0) = 0.000238
-# Br(K*(892)0 -> (K pi)0) = 0.99754
-#
-# Partial branching fractions:
-# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi-)) =
-#    0.000238 * 0.99754 * (2/3) = 0.00015828
-# 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
+#$ forbid_pythia()
+0.000000000   chi_c1  anti-K*0                             PHSP;
+0.000039570   chi_c1  K*S                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;   #[w/CPV - BO 09/2017]
+0.000039570   chi_c1  K*L                                  SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000158280   chi_c1  anti-K*0T                            SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[w/CPV - BO 09/2017]
-0.000338720   chi_c1  K-  pi+                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
 
-# anti-B0 -> chi_c1 pi0 K0 (PDG 2019 data)
-#
-# Branching fraction (estimated from B0 -> chi_c1 pi- K+ assuming decay via
-# K* resonances): 4.97e-4 / 2 = 0.0002485
-#
-# Using branching fractions:
-# Br(B0 -> chi_c1 K*(892)0) = 0.000238
-# Br(K*(892)0 -> (K pi)0) = 0.99754
-#
-# Partial branching fractions:
-# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi0) =
-#    0.000238 * 0.99754 * (1/3) = 0.00007914
-# 2) Br(B0 -> chi_c1 K0 pi0) = 0.0002485 - 0.00007914 = 0.00016936
-0.000039570   K*S  chi_c1                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;   #[w/CPV - BO 09/2017]
-0.000039570   K*L  chi_c1                                  SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=441') - BF('S042:Desig=127') * BF('M018:Desig=12') * 2 / 3
+0.000338720   chi_c1  K-  pi+                              PHSP; #[Comment - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('anti-B0 -> chi_c1 K- pi+') / 2
 0.000169360   chi_c1  anti-K0  pi0                         PHSP;
 
 0.000316000   chi_c1  anti-K0  pi+  pi-                    PHSP; #[BF update - PG 09/2020]
@@ -2306,6 +2360,8 @@ Decay anti-B0
 0.000352000   chi_c1  K-  pi+  pi0                         PHSP; #[BF update - PG 09/2020]
 0.000011200   chi_c1  pi0                                  PHSP;
 
+#$ forbid_pythia()
+0.000000000   chi_c2  anti-K0                              PHSP;
 0.000007500   chi_c2  K_S0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #Taken from UL of <1.5e-5. #[w/CPV - BO 09/2017]
 0.000007500   chi_c2  K_L0                                 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 
@@ -2320,10 +2376,14 @@ Decay anti-B0
 0.000240000   psi(3770)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000240000   psi(3770)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
+#$ forbid_pythia()
+0.000000000   psi(3770)  anti-K0                           PHSP;
 0.000080000   psi(3770)  K*S                               SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000080000   psi(3770)  K*L                               SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000320000   psi(3770)  anti-K*0T                         SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 
+#$ forbid_pythia()
+0.000000000   psi(3770)  anti-K*0                          PHSP;
 0.000140000   psi(3770)  K-  pi+                           PHSP; #No PDGLive value. Previously excluded. Added back with original value in .DEC. #[BF update - PG 09/2020]
 0.000070000   psi(3770)  anti-K0  pi0                      PHSP; #Assume BF(psi(3770) K0 pi0) = BF(psi(3770) K+ pi-) /2.                         #[BF update - PG 09/2020]
 0.000140000   psi(3770)  anti-K0  pi+  pi-                 PHSP;
@@ -2493,8 +2553,8 @@ Decay anti-B0
 0.003547860   D_s1-  D+                                    SVS;  #[BF update - PG 09/2020]
 0.009282570   D*+  D_s1-                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; #[BF update - PG 09/2020]
 
-0.000880000   D+  K-  K*0                                  PHSP;
-0.001290000   D*+  K-  K*0                                 PHSP;
+0.000580000   D+  K-  K*0                                  PHSP; #[BF update - VB 12/2021, subtracted resonant D+ a_1- component, BR(R+NR)=0.00088]
+0.000640292   D*+  K-  K*0                                 PHSP; #[BF update - VB 12/2021, subtracted resonant D*+ a_1- component, BR(R+NR)=0.00129]
 0.000300000   D*+  K0  pi-                                 PHSP;
 0.000300000   D*-  K0  pi+                                 PHSP;
 0.000490000   D+  anti-K0  pi-                             PHSP;
@@ -2508,10 +2568,7 @@ Decay anti-B0
 0.000052310   D0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
 0.000036000   D*0  anti-K0                                 PHSP;
 0.002718500   anti-D*0  pi-  pi-  pi+  pi+                 PHSP; #[BF update - PG 09/2020]
-0.000795130   eta_c  anti-K0                               PHSP; #[BF update - PG 09/2020]
 0.000170000   anti-K0  anti-D0  D0  pi0                    PHSP;
-0.000584530   psi(2S)  anti-K0                             PHSP; #[BF update - PG 09/2020]
-0.000001110   chi_c0  anti-K0                              PHSP; #[BF update - PG 09/2020]
 
 0.000103560   D0  anti-p-  p+                              PHSP; #[BF update - PG 09/2020]
 0.000028410   D_s+  Lambda0  anti-p-                       PHSP; #[BF update - PG 09/2020]
@@ -2539,8 +2596,9 @@ Decay anti-B0
 0.000145000   pi+  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000294000   rho+  e-  anti-nu_e                          BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
-0.000294000   rho+  mu-  anti-nu_mu                        BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000294000   rho+  e-  anti-nu_e                          BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000294000   rho+  mu-  anti-nu_mu                        BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 
 0.000000000   D(2S)+  e-  anti-nu_e                        ISGW2;
 0.000000000   D(2S)+  mu-  anti-nu_mu                      ISGW2;
@@ -2549,8 +2607,8 @@ Decay anti-B0
 0.001701000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000094227   pi+  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000156755   rho+  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000094227   pi+  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000156755   rho+  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000090000   a_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   b_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   a_0+  tau-  anti-nu_tau                      ISGW2;
@@ -2575,14 +2633,14 @@ Decay anti-B0
 
 # b -> s gamma
 #
-0.000041770   anti-K*0  gamma                              SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 09/2020]
-0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;
-0.000043000   anti-K_10  gamma                             SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000006500   anti-K'_10  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.5e-6.
-0.000012370   anti-K_2*0  gamma                            HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 09/2020]
-0.000001700   anti-K''*0  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3.
-0.000273500   anti-Xsd  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000041770   anti-K*0  gamma                              SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
+0.000043000   anti-K_10  gamma                             SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 5.8e-5. #[Comment - PG 04/2022]
+0.000006500   anti-K'_10  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]
+0.000012370   anti-K_2*0  gamma                            HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000001700   anti-K''*0  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]
+0.000242360   anti-Xsd  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
 
 # Do not include to avoid double counting with higher K states.
 #0.000004600  K-  pi+  gamma                                PHSP; #Commented out as this double counts the K*2_0 decaying into Kpi.
@@ -2644,24 +2702,32 @@ Decay anti-B0
 0.000001000   f_0  b_10                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
 # Penguin dominated modes are sin2beta, not sin2alpha. #[w/CPV - BO 09/2017]
+# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
+#$ forbid_pythia()
+0.000000000   phi  K0                                      PHSP;
+#$ forbid_pythia()
+0.000000000   phi  anti-K0                                 PHSP;
 0.000004300   phi  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000004300   phi  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#$ forbid_pythia()
+0.000000000   eta  K0                                      PHSP;
+#$ forbid_pythia()
+0.000000000   eta  anti-K0                                 PHSP;
 0.000000550   eta  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000000550   eta  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#$ forbid_pythia()
+0.000000000   eta'  K0                                     PHSP;
+#$ forbid_pythia()
+0.000000000   eta'  anti-K0                                PHSP;
 0.000033000   eta'  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000033000   eta'  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#$ forbid_pythia()
+0.000000000   omega  K0                                    PHSP;
+#$ forbid_pythia()
+0.000000000   omega  anti-K0                               PHSP;
 0.000002500   omega  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000002500   omega  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
-0.000000000   phi  K0                                      PHSP;
-0.000000000   phi  anti-K0                                 PHSP;
-0.000000000   eta  K0                                      PHSP;
-0.000000000   eta  anti-K0                                 PHSP;
-0.000000000   eta'  K0                                     PHSP;
-0.000000000   eta'  anti-K0                                PHSP;
-0.000000000   omega  K0                                    PHSP;
-0.000000000   omega  anti-K0                               PHSP;
 
 0.000000100   phi  pi0                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF<0. Set BF<UL.  https://arxiv.org/pdf/1206.4760.pdf. #[BF update - PG 09/2020]
 0.000000200   phi  eta                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF with 1.4sigma. https://arxiv.org/pdf/0907.1743.pdf. #[BF update - PG 09/2020]
@@ -2677,7 +2743,8 @@ Decay anti-B0
 0.000019580   K-  pi+                                      PHSP; #[BF update - PG 09/2020]
 0.000000080   K+  K-                                       PHSP; #[BF update - PG 09/2020]
 0.000009930   anti-K0  pi0                                 PHSP; #[BF update - PG 09/2020]
-0.000001210   K0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
+#$ forbid_pythia()
+0.000000000   K0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
 0.000000240   K_S0  K_S0                                   PHSP;
 0.000000240   K_L0  K_L0                                   PHSP;
 0.000000000   K_S0  K_L0                                   PHSP; #K_S0 K_L0 is 0 see http://babar-hn.slac.stanford.edu:5090/HyperNews/get/pubboard14/156.html.
@@ -2714,12 +2781,16 @@ Decay anti-B0
 0.000000000   rho(3S)-  pi+                                SVS;
 0.000000000   rho(3S)+  pi-                                SVS;
 
+#$ forbid_pythia()
+0.000000000   rho0  anti-K0                                PHSP;
 0.000002350   rho0  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000002350   rho0  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
 0.000007010   rho+  K-                                     SVS;  #[BF update - PG 09/2020]
 
 # rho(1450)
+#$ forbid_pythia()
+0.000000000   rho(2S)0  anti-K0                            PHSP;
 0.000000500   rho(2S)0  K_S0                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000000500   rho(2S)0  K_L0                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
@@ -2785,7 +2856,6 @@ Decay anti-B0
 0.000001000   anti-K0  eta  eta                            PHSP;
 0.000001000   anti-K0  eta  eta'                           PHSP;
 0.000001000   anti-K0  eta'  eta'                          PHSP;
-0.000048000   anti-K0  K0  anti-K0                         PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess).
 
 0.000001000   pi0  pi0  pi0                                PHSP;
 0.000001000   pi0  pi0  eta                                PHSP;
@@ -3363,6 +3433,9 @@ Decay anti-B0
 
 # PPP
 #
+# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
+#$ forbid_pythia()
+0.000000000   anti-K0  K0  anti-K0                         PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess). KS/KL combination are in PPP section below
 0.000006200   K_S0  K_S0  K_S0                             PHSP; #Measured, inclusive
 0.000006200   K_L0  K_L0  K_L0                             PHSP; #Same as KsKsKs
 0.000007400   K_S0  K_S0  K_L0                             PHSP; #UL
@@ -3823,31 +3896,31 @@ Decay anti-B0
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.00987248    cd_0  anti-ud_0                              PYTHIA 63;
-0.01974506    cd_1  anti-ud_1                              PYTHIA 63;
+0.00992629    cd_0  anti-ud_0                              PYTHIA 63;
+0.01985270    cd_1  anti-ud_1                              PYTHIA 63;
 
 # Xi_c X      2.5%
-0.00269252    cs_0  anti-ud_0                              PYTHIA 63;
-0.00538503    cs_1  anti-ud_1                              PYTHIA 63;
+0.00270702    cs_0  anti-ud_0                              PYTHIA 63;
+0.00541400    cs_1  anti-ud_1                              PYTHIA 63;
 
-0.24219051    anti-u  d  c  anti-d                         PYTHIA 23;
-0.04128504    anti-u  d  c  anti-d                         PYTHIA 65;
-0.01884754    anti-u  s  c  anti-d                         PYTHIA 63;
-0.01615504    anti-u  c  d  anti-d                         PYTHIA 23;
-0.00080774    anti-u  c  s  anti-d                         PYTHIA 23;
+0.24349378    anti-u  d  c  anti-d                         PYTHIA 23;
+0.04150720    anti-u  d  c  anti-d                         PYTHIA 65;
+0.01894896    anti-u  s  c  anti-d                         PYTHIA 63;
+0.01624197    anti-u  c  d  anti-d                         PYTHIA 23;
+0.00081209    anti-u  c  s  anti-d                         PYTHIA 23;
 # Try to crank up the psi production (Lange).
-0.06641505    anti-c  s  c  anti-d                         PYTHIA 43;
-0.00538503    anti-c  d  c  anti-d                         PYTHIA 43;
-0.00269252    anti-u  d  u  anti-d                         PYTHIA 23;
-0.00359003    anti-c  s  u  anti-d                         PYTHIA 23;
+0.06677709    anti-c  s  c  anti-d                         PYTHIA 43;
+0.00541438    anti-c  d  c  anti-d                         PYTHIA 43;
+0.00270721    anti-u  d  u  anti-d                         PYTHIA 23;
+0.00360960    anti-c  s  u  anti-d                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00183985    anti-u  u  d  anti-d                         PYTHIA 23;
-0.00006284    anti-d  d  d  anti-d                         PYTHIA 23;
-0.00008077    anti-s  s  d  anti-d                         PYTHIA 23;
-0.00197446    anti-u  u  s  anti-d                         PYTHIA 23;
-0.00161547    anti-d  d  s  anti-d                         PYTHIA 23;
-0.00134626    anti-s  s  s  anti-d                         PYTHIA 23;
-0.00448752    s  anti-d                                    PYTHIA 91;
+0.00184987    anti-u  u  d  anti-d                         PYTHIA 23;
+0.00006317    anti-d  d  d  anti-d                         PYTHIA 23;
+0.00008121    anti-s  s  d  anti-d                         PYTHIA 23;
+0.00198523    anti-u  u  s  anti-d                         PYTHIA 23;
+0.00162428    anti-d  d  s  anti-d                         PYTHIA 23;
+0.00135359    anti-s  s  s  anti-d                         PYTHIA 23;
+0.00451198    s  anti-d                                    PYTHIA 91;
 
 Enddecay
 
@@ -3946,16 +4019,23 @@ Decay B+
 #
 0.001005560   J/psi  K+                                    SVS; #[BF update - PG 09/2020]
 
-0.001429920   J/psi  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #[BF update - PG 09/2020]
-0.000189690   J/psi  K0  pi+                               PHSP; #Gamma_276 PDGLive => 0.001142970. Subtract K* component: BF = 0.001142970 - 2/3 * 0.001429920.   #[BF update - PG 09/2020]
-0.000094840   J/psi  K+  pi0                               PHSP; #No PDGLive value. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                         #[BF update - PG 09/2020]
+0.001430000   J/psi  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - KC 05/2022]
+# Requires subtraction of K* component.
+#$ BF('S041:Desig=612') - BF('S041:Desig=142') * BF('M018:Desig=11') * 2 / 3
+0.000186667   J/psi  K0  pi+                               PHSP; #[BF update - KC 05/2022]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B+ -> J/psi K0 pi+') / 2
+0.000093333   J/psi  K+  pi0                               PHSP; #[BF update - PG 05/2022]
 
 0.000038670   J/psi  pi+                                   SVS;  #[BF update - PG 09/2020]
 0.000040970   J/psi  rho+                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 09/2020]
 0.000100000   J/psi  K'_1+                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.001800000   J/psi  K_1+                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*+                                 PHSP;
-0.000811420   J/psi  K+  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
+# Requires subtraction of resonant components
+#$ BF('S041:Desig=19') - BF('B+ -> J/psi K1(1400)+') * ( BF('M064:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M064:Desig=2')*(1/3)*BF(M009:Desig=1) + BF('M064:Desig=5')*BF('M001:Desig=2') + BF('K1(1430)+ -> K+ pi+ pi-')) - BF('S041:Desig=271') * ( BF('M028:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF(M028:Desig=2)*(1/3)*BF(M009:Desig=1) + BF(M028:Desig=5)*BF('M001:Desig=2') + BF('K1(1270)+ -> K+ pi+ pi-') ) - BF('B+ -> J/psi K2(1430)+') * ( BF('M022:Desig=2')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M022:Desig=3')*(1/3)*BF(M009:Desig=1) + BF('M022:Desig=4')*BF('M001:Desig=2') )
+0.000055137   J/psi  K+  pi+  pi-                          PHSP; #[BF update - JP 05/2022]
 0.000033700   J/psi  K+  K+  K-                            PHSP;
 0.000123590   J/psi  eta  K+                               PHSP; #[BF update - PG 09/2020]
 0.000050120   J/psi  phi  K+                               PHSP; #[BF update - PG 09/2020]
@@ -3969,8 +4049,13 @@ Decay B+
 0.000619130   psi(2S)  K+                                  SVS;  #[BF update - PG 09/2020]
 
 0.000667680   psi(2S)  K*+                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #[BF update - PG 09/2020]
-0.000142880   psi(2S)  K0  pi+                             PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #[BF update - PG 09/2020]
-0.000071440   psi(2S)  K+  pi0                             PHSP; #No PDGLive value. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                             #[BF update - PG 09/2020]
+# Requires subtraction of K* component. No value, unused BaBar BF=0.000588000.
+#$ BF('S041:Desig=613') - BF('S041:Desig=143') * BF('M018:Desig=11') * 2 / 3
+0.000142880   psi(2S)  K0  pi+                             PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B+ -> psi(2S) K0 pi+') / 2
+0.000071440   psi(2S)  K+  pi0                             PHSP; #[BF update - PG 09/2020]
 
 0.000434100   psi(2S)  K+  pi+  pi-                        PHSP; #[BF update - PG 09/2020]
 0.000100000   psi(2S)  K+  pi0  pi0                        PHSP;
@@ -4008,34 +4093,13 @@ Decay B+
 # B+ -> chi_c1 K+
 0.000485160   chi_c1  K+                                   SVS;  #[BF update - PG 09/2020]
 
-# B+ -> chi_c1 K0 pi+ (PDG 2019 data)
-#
-# Branching fraction: 0.00058
-#
-# Using branching fractions:
-# Br(B+ -> chi_c1 K*(892)+) = 0.0003
-# Br(K*(892)+ -> (K pi)+) = 0.99901
-#
-# Partial branching fractions:
-# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi+) =
-#    0.0003 * 0.99901 * (2/3) = 0.0001998
-# 2) Br(B+ -> chi_c1 K0 pi+) = 0.00058 - 0.0001998 = 0.0003802
 0.000295800   chi_c1  K*+                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 09/2020]
-0.000380200   chi_c1  K0  pi+                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
-
-# B+ -> chi_c1 K+ pi0 (PDG 2019 data)
-#
-# Branching fraction: 0.000329
-#
-# Using branching fractions:
-# Br(B+ -> chi_c1 K*(892)+) = 0.0003
-# Br(K*(892)+ -> (K pi)+) = 0.99901
-#
-# Partial branching fractions:
-# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi0) =
-#    0.0003 * 0.99901 * (1/3) = 0.0000999
-# 2) Br(B+ -> chi_c1 K+ pi0) = 0.000329 - 0.0000999 = 0.0002291
-0.000229100   chi_c1  K+  pi0                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=611') - BF('S042:Desig=216') * BF('M018:Desig=11') * 2 / 3
+0.000380200   chi_c1  K0  pi+                              PHSP; #[Comment - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=678') - BF('S042:Desig=216') * BF('M018:Desig=12') * 1 / 3
+0.000229100   chi_c1  K+  pi0                              PHSP; #[Comment - PG 09/2020]
 
 0.000374000   chi_c1  K+  pi+  pi-                         PHSP;
 0.000200000   chi_c1  K+  pi0  pi0                         PHSP;
@@ -4186,8 +4250,8 @@ Decay B+
 0.003091320   D_s1+  anti-D0                               SVS;  #[BF update - PG 09/2020]
 0.011960470   anti-D*0  D_s1+                              SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0; #[BF update - PG 09/2020]
 0.000550000   anti-D0  K+  anti-K0                         PHSP;
-0.000750000   anti-D0  K+  anti-K*0                        PHSP;
-0.001530000   anti-D*0  K+  anti-K*0                       PHSP; #[BF update - PG 09/2020]
+0.000525000   anti-D0  K+  anti-K*0                        PHSP; #[BF update - VB 12/2021, subtracted resonant D0 a_1+ component, BR(R+NR)=0.00075]
+0.000590000   anti-D*0  K+  anti-K*0                       PHSP; #[BF update - VB 12/2021, subtracted resonant D*0 a_1+ component, BR(R+NR)=0.00153]
 0.004100000   anti-D0  omega  pi+                          PHSP; #[BF update - PG 09/2020]
 0.004500000   anti-D*0  omega  pi+                         PHSP;
 0.000450000   anti-D0  D'_s1+                              PHSP;
@@ -4216,10 +4280,11 @@ Decay B+
 0.000038000   eta  mu+  nu_mu                              ISGW2; #[PDG2017]
 
 # rho0, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000158000   rho0  e+  nu_e                               BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000158000   rho0  mu+  nu_mu                             BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000119000   omega  e+  nu_e                              BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
-0.000119000   omega  mu+  nu_mu                            BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000158000   rho0  e+  nu_e                               BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000158000   rho0  mu+  nu_mu                             BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000119000   omega  e+  nu_e                              BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
+0.000119000   omega  mu+  nu_mu                            BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
 0.000023000   eta'  e+  nu_e                               ISGW2; #[PDG2017]
 0.000023000   eta'  mu+  nu_mu                             ISGW2; #[PDG2017]
@@ -4230,9 +4295,9 @@ Decay B+
 0.001724000   Xu0  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000050804   pi0  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000084530   rho0  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
-0.000064974   omega  tau+  nu_tau                          ISGW2; #Assuming R_om  = 0.546 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000050804   pi0  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000084530   rho0  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000064974   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000012000   eta  tau+  nu_tau                            ISGW2;
 0.000018000   eta'  tau+  nu_tau                           ISGW2;
 0.000046000   a_10  tau+  nu_tau                           ISGW2;
@@ -4258,14 +4323,14 @@ Decay B+
 
 # b -> s gamma
 #
-0.000039180   K*+  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000043800   K_1+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000013770   K_2*+  gamma                                 HELAMP 1.0 0.0 1.0 0.0;      #[BF update - PG 09/2020]
-0.000000980   rho+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[PDG2016]
-0.000009700   K'_1+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000027100   K'*+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000066700   K''*+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000137920   Xsu  gamma                                   BTOXSGAMMA 2;                #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000039180   K*+  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000043800   K_1+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000013770   K_2*+  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000000980   rho+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000009700   K'_1+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000027100   K'*+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000066700   K''*+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000147770   Xsu  gamma                                   BTOXSGAMMA 2;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[BF update - PG 04/2022]
 
 # Do not include K pi pi gamma and K*0 pi gamma to avoid double counting with higher K states.
 #0.000007600   K+  pi-  pi+  gamma                          PHSP;
@@ -5347,27 +5412,27 @@ Decay B+
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02968449    anti-cd_1  uu_1                              PYTHIA 63;
+0.02983137    anti-cd_1  uu_1                              PYTHIA 63;
 
 # Xi_c X      2.4%
-0.00809581    anti-cs_1  uu_1                              PYTHIA 63;
+0.00813587    anti-cs_1  uu_1                              PYTHIA 63;
 
-0.20263378    u  anti-d  anti-c  u                         PYTHIA 23;
-0.03867983    u  anti-d  anti-c  u                         PYTHIA 43;
-0.02023943    u  anti-s  anti-c  u                         PYTHIA 43;
+0.20363635    u  anti-d  anti-c  u                         PYTHIA 23;
+0.03887120    u  anti-d  anti-c  u                         PYTHIA 43;
+0.02033957    u  anti-s  anti-c  u                         PYTHIA 43;
 # Try to crank up the psi production (Lange).
-0.06656528    c  anti-s  anti-c  u                         PYTHIA 43;
-0.00359810    c  anti-d  anti-c  u                         PYTHIA 43;
-0.00269857    u  anti-d  anti-u  u                         PYTHIA 23;
-0.00359810    c  anti-s  anti-u  u                         PYTHIA 23;
+0.06689463    c  anti-s  anti-c  u                         PYTHIA 43;
+0.00361591    c  anti-d  anti-c  u                         PYTHIA 43;
+0.00271192    u  anti-d  anti-u  u                         PYTHIA 23;
+0.00361591    c  anti-s  anti-u  u                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00184404    u  anti-u  anti-d  u                         PYTHIA 23;
-0.00006300    d  anti-d  anti-d  u                         PYTHIA 23;
-0.00008097    s  anti-s  anti-d  u                         PYTHIA 23;
-0.00197900    u  anti-u  anti-s  u                         PYTHIA 23;
-0.00161917    d  anti-d  anti-s  u                         PYTHIA 23;
-0.00134934    s  anti-s  anti-s  u                         PYTHIA 23;
-0.00449762    anti-s  u                                    PYTHIA 91;
+0.00185316    u  anti-u  anti-d  u                         PYTHIA 23;
+0.00006331    d  anti-d  anti-d  u                         PYTHIA 23;
+0.00008137    s  anti-s  anti-d  u                         PYTHIA 23;
+0.00198879    u  anti-u  anti-s  u                         PYTHIA 23;
+0.00162718    d  anti-d  anti-s  u                         PYTHIA 23;
+0.00135602    s  anti-s  anti-s  u                         PYTHIA 23;
+0.00451987    anti-s  u                                    PYTHIA 91;
 
 Enddecay
 
@@ -5454,16 +5519,23 @@ Decay B-
 #
 0.001005560   J/psi  K-                                    SVS; #[BF update - PG 09/2020]
 
-0.001429920   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #[BF update - PG 09/2020]
-0.000189690   J/psi  anti-K0  pi-                          PHSP; #Gamma_276 PDGLive => Exclusive BF.                                                               #[BF update - PG 09/2020]
-0.000094840   J/psi  K-  pi0                               PHSP; #No PDGLive value. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                         #[BF update - PG 09/2020]
+0.001430000   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - KC 05/2022]
+# Requires subtraction of K* component.
+#$ BF('S041:Desig=612') - BF('S041:Desig=142') * BF('M018:Desig=11') * 2 / 3
+0.000186667   J/psi  anti-K0  pi-                         PHSP; #[BF update - KC 05/2022]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B- -> J/psi anti-K0 pi-') / 2
+0.000093333   J/psi  K-  pi0                               PHSP; #[BF update - KC 05/2022]
 
 0.000038670   J/psi  pi-                                   SVS;  #[BF update - PG 09/2020]
 0.000040970   J/psi  rho-                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;  #[BF update - PG 09/2020]
 0.000100000   J/psi  K'_1-                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.001800000   J/psi  K_1-                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*-                                 PHSP;
-0.000811420   J/psi  K-  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
+# Requires subtraction of resonant components
+#$ BF('S041:Desig=19') - BF('B+ -> J/psi K1(1400)+') * ( BF('M064:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M064:Desig=2')*(1/3)*BF(M009:Desig=1) + BF('M064:Desig=5')*BF('M001:Desig=2') + BF('K1(1430)+ -> K+ pi+ pi-')) - BF('S041:Desig=271') * ( BF('M028:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF(M028:Desig=2)*(1/3)*BF(M009:Desig=1) + BF(M028:Desig=5)*BF('M001:Desig=2') + BF('K1(1270)+ -> K+ pi+ pi-') ) - BF('B+ -> J/psi K2(1430)+') * ( BF('M022:Desig=2')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M022:Desig=3')*(1/3)*BF(M009:Desig=1) + BF('M022:Desig=4')*BF('M001:Desig=2') )
+0.000055137   J/psi  K-  pi+  pi-                          PHSP; #[BF update - JP 05/2022]
 0.000033700   J/psi  K-  K+  K-                            PHSP;
 0.000123590   J/psi  eta  K-                               PHSP; #[BF update - PG 09/2020]
 0.000050120   J/psi  phi  K-                               PHSP; #[BF update - PG 09/2020]
@@ -5477,8 +5549,13 @@ Decay B-
 0.000619130   psi(2S)  K-                                  SVS;  #[BF update - PG 09/2020]
 
 0.000667680   psi(2S)  K*-                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #[BF update - PG 09/2020]
-0.000142880   psi(2S)  anti-K0  pi-                        PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #[BF update - PG 09/2020]
-0.000071440   psi(2S)  K-  pi0                             PHSP; #No PDGLive value. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                             #[BF update - PG 09/2020]
+# Requires subtraction of K* component. No value, unused BaBar BF=0.000588000.
+#$ BF('S041:Desig=613') - BF('S041:Desig=143') * BF('M018:Desig=11') * 2 / 3
+0.000142880   psi(2S)  anti-K0  pi-                        PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B- -> psi(2S) anti-K0 pi-') / 2
+0.000071440   psi(2S)  K-  pi0                             PHSP; #[BF update - PG 09/2020]
 
 0.000434100   psi(2S)  K-  pi+  pi-                        PHSP; #[BF update - PG 09/2020]
 0.000100000   psi(2S)  K-  pi0  pi0                        PHSP;
@@ -5516,34 +5593,13 @@ Decay B-
 # B- -> chi_c1 K-
 0.000485160   chi_c1  K-                                   SVS;  #[BF update - PG 09/2020]
 
-# B- -> chi_c1 anti-K0 pi- (PDG 2019 data)
-#
-# Branching fraction: 0.00058
-#
-# Using branching fractions:
-# Br(B+ -> chi_c1 K*(892)+) = 0.0003
-# Br(K*(892)+ -> (K pi)+) = 0.99901
-#
-# Partial branching fractions:
-# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi+) =
-#    0.0003 * 0.99901 * (2/3) = 0.0001998
-# 2) Br(B+ -> chi_c1 K0 pi+) = 0.00058 - 0.0001998 = 0.0003802
 0.000295800   chi_c1  K*-                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;  #[BF update - PG 09/2020]
-0.000380200   chi_c1  anti-K0  pi-                         PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
-
-# B- -> chi_c1 K- pi0 (PDG 2019 data)
-#
-# Branching fraction: 0.000329
-#
-# Using branching fractions:
-# Br(B+ -> chi_c1 K*(892)+) = 0.0003
-# Br(K*(892)+ -> (K pi)+) = 0.99901
-#
-# Partial branching fractions:
-# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi0) =
-#    0.0003 * 0.99901 * (1/3) = 0.0000999
-# 2) Br(B+ -> chi_c1 K+ pi0) = 0.000329 - 0.0000999 = 0.0002291
-0.000229100   chi_c1  K-  pi0                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=611') - BF('S042:Desig=216') * BF('M018:Desig=11') * 2 / 3
+0.000380200   chi_c1  anti-K0  pi-                         PHSP; #[Comment - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=678') - BF('S042:Desig=216') * BF('M018:Desig=12') * 1 / 3
+0.000229100   chi_c1  K-  pi0                              PHSP; #[Comment - PG 09/2020]
 
 0.000374000   chi_c1  K-  pi+  pi-                         PHSP;
 0.000200000   chi_c1  K-  pi0  pi0                         PHSP;
@@ -5694,8 +5750,8 @@ Decay B-
 0.003091320   D_s1-  D0                                    SVS;  #[BF update - PG 09/2020]
 0.011960470   D*0  D_s1-                                   SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;  #[BF update - PG 09/2020]
 0.000550000   D0  K-  anti-K0                              PHSP;
-0.000750000   D0  K-  anti-K*0                             PHSP;
-0.001530000   D*0  K-  anti-K*0                            PHSP; #[BF update - PG 09/2020]
+0.000525000   D0  K-  anti-K*0                             PHSP; #[BF update - VB 12/2021, subtracted resonant anti-D0 a_1- component, BR(R+NR)=0.00075]
+0.000590000   D*0  K-  anti-K*0                            PHSP; #[BF update - VB 12/2021, subtracted resonant anti-D*0 a_1- component, BR(R+NR)=0.00153]
 0.004100000   D0  omega  pi-                               PHSP; #[BF update - PG 09/2020]
 0.004500000   D*0  omega  pi-                              PHSP;
 0.000450000   D0  D'_s1-                                   PHSP;
@@ -5724,10 +5780,11 @@ Decay B-
 0.000038000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2017]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000158000   rho0  e-  anti-nu_e                          BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000158000   rho0  mu-  anti-nu_mu                        BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000119000   omega  e-  anti-nu_e                         BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
-0.000119000   omega  mu-  anti-nu_mu                       BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000158000   rho0  e-  anti-nu_e                          BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000158000   rho0  mu-  anti-nu_mu                        BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000119000   omega  e-  anti-nu_e                         BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
+0.000119000   omega  mu-  anti-nu_mu                       BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
 0.000023000   eta'  e-  anti-nu_e                          ISGW2; #[PDG2017]
 0.000023000   eta'  mu-  anti-nu_mu                        ISGW2; #[PDG2017]
@@ -5738,9 +5795,9 @@ Decay B-
 0.001724000   Xu0  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000050804   pi0  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000084530   rho0  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
-0.000064974   omega  tau-  anti-nu_tau                     ISGW2; #Assuming R_om  = 0.546 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000050804   pi0  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000084530   rho0  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000064974   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000012000   eta  tau-  anti-nu_tau                       ISGW2;
 0.000018000   eta'  tau-  anti-nu_tau                      ISGW2;
 0.000046000   a_10  tau-  anti-nu_tau                      ISGW2;
@@ -5766,14 +5823,14 @@ Decay B-
 
 # b -> s gamma
 #
-0.000039180   K*-  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000043800   K_1-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000013770   K_2*-  gamma                                 HELAMP 1.0 0.0 1.0 0.0;      #[BF update - PG 09/2020]
-0.000000980   rho-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[PDG2016]
-0.000009700   K'_1-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000027100   K'*-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000066700   K''*-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000137920   anti-Xsu  gamma                              BTOXSGAMMA 2 ;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000039180   K*-  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000043800   K_1-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000013770   K_2*-  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000000980   rho-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000009700   K'_1-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000027100   K'*-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000066700   K''*-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000147770   anti-Xsu  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[BF update - PG 04/2022]
 
 # Do not include K pi pi gamma and K*0 pi gamma to avoid double counting with higher K states.
 #0.000007600   K-  pi+  pi-  gamma                          PHSP;
@@ -6855,27 +6912,27 @@ Decay B-
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02968449    cd_1  anti-uu_1                              PYTHIA 63;
+0.02983137    cd_1  anti-uu_1                              PYTHIA 63;
 
 # Xi_c X      2.4%
-0.00809581    cs_1  anti-uu_1                              PYTHIA 63;
+0.00813587    cs_1  anti-uu_1                              PYTHIA 63;
 
-0.20263378    anti-u  d  c  anti-u                         PYTHIA 23;
-0.03867983    anti-u  d  c  anti-u                         PYTHIA 43;
-0.02023943    anti-u  s  c  anti-u                         PYTHIA 43;
+0.20363635    anti-u  d  c  anti-u                         PYTHIA 23;
+0.03887120    anti-u  d  c  anti-u                         PYTHIA 43;
+0.02033957    anti-u  s  c  anti-u                         PYTHIA 43;
 # Try to crank up the psi production (Lange).
-0.06656528    anti-c  s  c  anti-u                         PYTHIA 43;
-0.00359810    anti-c  d  c  anti-u                         PYTHIA 43;
-0.00269857    anti-u  d  u  anti-u                         PYTHIA 23;
-0.00359810    anti-c  s  u  anti-u                         PYTHIA 23;
+0.06689463    anti-c  s  c  anti-u                         PYTHIA 43;
+0.00361591    anti-c  d  c  anti-u                         PYTHIA 43;
+0.00271192    anti-u  d  u  anti-u                         PYTHIA 23;
+0.00361591    anti-c  s  u  anti-u                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00184404    anti-u  u  d  anti-u                         PYTHIA 23;
-0.00006300    anti-d  d  d  anti-u                         PYTHIA 23;
-0.00008097    anti-s  s  d  anti-u                         PYTHIA 23;
-0.00197900    anti-u  u  s  anti-u                         PYTHIA 23;
-0.00161917    anti-d  d  s  anti-u                         PYTHIA 23;
-0.00134934    anti-s  s  s  anti-u                         PYTHIA 23;
-0.00449762    s  anti-u                                    PYTHIA 91;
+0.00185316    anti-u  u  d  anti-u                         PYTHIA 23;
+0.00006331    anti-d  d  d  anti-u                         PYTHIA 23;
+0.00008137    anti-s  s  d  anti-u                         PYTHIA 23;
+0.00198879    anti-u  u  s  anti-u                         PYTHIA 23;
+0.00162718    anti-d  d  s  anti-u                         PYTHIA 23;
+0.00135602    anti-s  s  s  anti-u                         PYTHIA 23;
+0.00451987    s  anti-u                                    PYTHIA 91;
 
 Enddecay
 
@@ -7310,6 +7367,7 @@ Decay B_s0
 # PR LHCb update Br Bs -> K- K+
 0.000033000   K-  K+                                       PHSP;
 # PR LHCb 4/07/04 Split in KS/KL
+#$ forbid_pythia()
 0.000000000   anti-K0  K0                                  PHSP;
 0.000010000   K_S0  K_S0                                   PHSP;
 0.000010000   K_L0  K_L0                                   PHSP;
@@ -7335,11 +7393,13 @@ Decay B_s0
 #
 0.000004600   K*+  K-                                      SVS;
 # PR LHCb 4/07/04 split in KS/KL
+#$ forbid_pythia()
 0.000000000   K*0  anti-K0                                 SVS;
 0.000002000   K*0  K_S0                                    SVS;
 0.000002000   K*0  K_L0                                    SVS;
 0.000008200   K*-  K+                                      SVS;
 # PR LHCb 4/07/04 split in KS/KL
+#$ forbid_pythia()
 0.000000000   anti-K*0  K0                                 SVS;
 0.000002000   anti-K*0  K_S0                               SVS;
 0.000002000   anti-K*0  K_L0                               SVS;
@@ -7762,6 +7822,7 @@ Decay anti-B_s0
 # PR LHCb 04/07/04 update BR
 0.000033000   K-  K+                                       PHSP;
 # PR LHCb 04/07/04 split into KS/KL
+#$ forbid_pythia()
 0.000000000   anti-K0  K0                                  PHSP;
 0.000010000   K_S0  K_S0                                   PHSP;
 0.000010000   K_L0  K_L0                                   PHSP;
@@ -7787,11 +7848,13 @@ Decay anti-B_s0
 #
 0.000004600   K*-  K+                                      SVS;
 # PR LHCb 04/07/04 Split into KS/KL
+#$ forbid_pythia()
 0.000000000   anti-K*0  K0                                 SVS;
 0.000002000   anti-K*0  K_S0                               SVS;
 0.000002000   anti-K*0  K_L0                               SVS;
 0.000008200   K*+  K-                                      SVS;
 # PR LHCb 04/07/04 Split into KS/KL
+#$ forbid_pythia()
 0.000000000   K*0  anti-K0                                 SVS;
 0.000002000   K*0  K_S0                                    SVS;
 0.000002000   K*0  K_L0                                    SVS;
@@ -7845,71 +7908,60 @@ Enddecay
 ##########                                                              ##########
 ##################################################################################
 #
-# Updated to PDG 2011
-#
+# Updated to https://docs.belle2.org/record/1982/files/BELLE2-NOTE-PH-2020-055_v2.pdf Table V
+# adapted from http://pdg.lbl.gov/2020/reviews/rpp2020-rev-tau-branching-fractions.pdf
 
 # tau-
 Decay tau-
-0.154002925   e-  anti-nu_e  nu_tau                        TAULNUNU;
-0.170000000   mu-  anti-nu_mu  nu_tau                      TAULNUNU;
-0.109100000   pi-  nu_tau                                  TAUSCALARNU;
-0.006960000   K-  nu_tau                                   TAUSCALARNU;
-0.255100000   pi-  pi0  nu_tau                             TAUHADNU -0.108 0.775 0.149 1.364 0.400;
-0.001124109   nu_tau  gamma  pi-  pi0                      PYTHIA 21;
-0.079301562   pi0  pi0  pi-  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.000385656   nu_tau  K-  pi0  pi0                         PYTHIA 21;
-0.008508640   nu_tau  pi-  pi0  pi0  pi0                   PYTHIA 21;
-0.000864699   nu_tau  pi-  pi0  pi0  pi0  pi0              PHSP;
-#0.2515         rho- nu_tau                                 TAUVECTORNU;
-#0.1790         a_1-  nu_tau                                TAUVECTORNU;
-
-# Modes with K0s
-0.000319939   nu_tau  pi-  anti-K0                         PYTHIA 21;
-0.001590000   nu_tau  K-  K0                               PYTHIA 21;
-0.001700000   nu_tau  K0  pi-  anti-K0                     PYTHIA 21;
-0.001590000   nu_tau  K-  pi0  K0                          PYTHIA 21;
-0.004000000   nu_tau  pi-  anti-K0  pi0                    PYTHIA 21;
-
-# 3 Charged Particles
-0.093200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.046100000   nu_tau  pi-  pi+  pi-  pi0                   PYTHIA 21;
-0.000501526   nu_tau  pi-  pi-  pi+  pi0  pi0              PHSP;
-0.000155646   nu_tau  pi-  pi-  pi+  pi0  pi0  pi0         PHSP;
-0.003420000   nu_tau  K-  pi+  pi-                         PYTHIA 21;
-0.001360000   nu_tau  K-  pi+  pi-  pi0                    PYTHIA 21;
-0.001400000   nu_tau  K-  pi-  K+                          PYTHIA 21;
-0.000015800   nu_tau  K-  K+  K-                           PYTHIA 21;
-
-# 5 Charged Particles
-0.000700406   nu_tau  pi-  pi-  pi-  pi+  pi+              PHSP;
-0.000129705   nu_tau  pi-  pi-  pi-  pi+  pi+  pi0         PHSP;
-
-# Misc other modes
-0.012000000   K*-  nu_tau                                  TAUVECTORNU;
-0.001390000   nu_tau  eta  pi-  pi0                        PYTHIA 21;
-0.003199387   nu_tau  pi-  omega  pi0                      PYTHIA 21;
-0.000410000   nu_tau  K-  omega                            PYTHIA 21;
-0.002200000   anti-K*0  pi-  nu_tau                        PHSP;
-0.002100000   K*0  K-  nu_tau                              PHSP;
-0.000034000   phi  pi-  nu_tau                             PHSP;
-0.000037000   phi  K-  nu_tau                              PHSP;
-0.003600000   mu-  anti-nu_mu  nu_tau  gamma               PHSP;
-0.017500000   e-  anti-nu_e  nu_tau  gamma                 PHSP;
-0.004290000   K-  pi0  nu_tau                              PHSP;
-0.002200000   anti-K0  rho-  nu_tau                        PHSP;
-0.000260000   pi-  anti-K0  pi0  pi0  nu_tau               PHSP;
-0.000310000   pi-  K0  anti-K0  pi0  nu_tau                PHSP;
-0.000061000   K-  K+  pi-  pi0  nu_tau                     PHSP;
-0.000028000   e-  e-  e+  anti-nu_e  nu_tau                PHSP;
-0.004700000   K_1-  nu_tau                                 PHSP;
-0.001700000   K'_1-  nu_tau                                PHSP;
-0.001500000   K'*-  nu_tau                                 PHSP;
-0.000150000   eta  pi-  pi0  pi0  nu_tau                   PHSP;
-0.000161000   eta  K-  nu_tau                              PHSP;
-0.000138000   eta  K*-  nu_tau                             PHSP;
-0.000048000   eta  K-  pi0  nu_tau                         PHSP;
-0.000093000   eta  anti-K0  pi-  nu_tau                    PHSP;
-0.000360000   f_1  pi-  nu_tau                             PHSP;
+0.178175 e-           anti-nu_e      nu_tau TAULNUNU;
+0.000028 e-  e-   e+  anti-nu_e      nu_tau PYTHIA 21;
+0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
+0.108164 pi-                         nu_tau TAUSCALARNU;
+0.000353 pi- gamma                   nu_tau PYTHIA 21;
+0.254941 rho-                        nu_tau TAUVECTORNU;
+0.092595 pi- pi0  pi0                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.010429 pi- pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001118 pi- pi0  pi0 pi0 pi0        nu_tau PYTHIA 21;
+0.003817 pi- K0   pi0                nu_tau PYTHIA 21;
+0.000263 pi- K0   pi0 pi0            nu_tau PYTHIA 21;
+0.000235 pi- K_S0 K_S0               nu_tau PYTHIA 21;
+0.000235 pi- K_L0 K_L0               nu_tau PYTHIA 21;
+0.001081 pi- K_S0 K_L0               nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_S0 K_S0          nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_L0 K_L0          nu_tau PYTHIA 21;
+0.000325 pi- pi0  K_S0 K_L0          nu_tau PYTHIA 21;
+0.089868 pi- pi-  pi+                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.027404 pi- pi-  pi+  pi0           nu_tau PYTHIA 21;
+0.000981 pi- pi-  pi+  pi0  pi0      nu_tau PYTHIA 21;
+0.000014 pi- pi-  pi+  pi0  pi0 pi0  nu_tau PYTHIA 21;
+0.000247 pi- pi-  pi+  K0            nu_tau PYTHIA 21;
+0.006964 K-                          nu_tau TAUSCALARNU;
+0.012712 K*-                         nu_tau TAUVECTORNU;
+0.000647 K-  pi0  pi0                nu_tau PYTHIA 21;
+0.000478 K-  pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001486 K-  K0                      nu_tau PYTHIA 21;
+0.001500 K-  K0   pi0                nu_tau PYTHIA 21;
+0.002927 K-  pi-  pi+                nu_tau PYTHIA 21;
+0.000394 K-  pi-  pi+ pi0            nu_tau PYTHIA 21;
+0.001435 pi- K-   K+                 nu_tau PYTHIA 21;
+0.000061 pi- K-   K+  pi0            nu_tau PYTHIA 21;
+0.001389 pi- pi0  eta                nu_tau PYTHIA 21;
+0.000195 pi- pi0  pi0 eta            nu_tau PYTHIA 21;
+0.000220 pi- pi-  pi+ eta            nu_tau PYTHIA 21;
+0.000155 K-  eta                     nu_tau PYTHIA 21;
+0.000048 K-  pi0  eta                nu_tau PYTHIA 21;
+0.000094 pi- K0   eta                nu_tau PYTHIA 21;
+0.019494 pi- omega                   nu_tau PYTHIA 21;
+0.004085 pi- pi0  omega              nu_tau PYTHIA 21;
+0.000072 pi- pi0  pi0 omega          nu_tau PYTHIA 21;
+0.000084 pi- pi-  pi+ omega          nu_tau PYTHIA 21;
+0.000410 K-  omega                   nu_tau PYTHIA 21;
+0.000022 K-  K+   K-                 nu_tau PYTHIA 21;
+0.000015 K-  K_S0 K_L0               nu_tau PYTHIA 21;
+0.000827 pi- pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000038 pi- pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
 Enddecay
 
 CDecay tau+
@@ -8074,10 +8126,12 @@ Decay D+
 ###############################################################
 0.015620000   K_S0  pi+                                    PHSP; # [PDG2019]
 0.014600000   K_L0  pi+                                    PHSP; # [PDG2019]
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+                                 PHSP;
 
 0.025951000   a_1+  K_S0                                   SVS;
 0.025951000   a_1+  K_L0                                   SVS;
+#$ forbid_pythia()
 0.000000000   a_1+  anti-K0                                SVS;
 
 0.027091000   anti-K'_10  pi+                              SVS;
@@ -8089,14 +8143,17 @@ Decay D+
 # the Dalitz mode below includes K0bar rho+, and K*bar(892)0 pi+ resonances
 0.073600000   K_S0  pi+  pi0                               D_DALITZ; # [PDG2019]
 0.073600000   K_L0  pi+  pi0                               D_DALITZ; # copied K_S0 pi+ pi0, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+  pi0                            D_DALITZ;
 
 0.001248000   K_S0  rho0  pi+                              PHSP;
 0.001248000   K_L0  rho0  pi+                              PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  rho0  pi+                           PHSP;
 
 0.001925500   K_S0  omega  pi+                             PHSP;
 0.001925500   K_L0  omega  pi+                             PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  omega  pi+                          PHSP;
 
 0.008018000   K-  rho+  pi+                                PHSP; # Not included in PDG, adjusted to balance other changes 06/2021
@@ -8110,14 +8167,17 @@ Decay D+
 
 0.002473000   K_S0  pi+  pi+  pi-                          PHSP;
 0.002473000   K_L0  pi+  pi+  pi-                          PHSP; # copied K_S0 pi+ pi+ pi-, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+  pi+  pi-                       PHSP;
 
 0.013100000   K_S0  eta  pi+                               PHSP; # [New mode added - PDG2021]
 0.013100000   K_L0  eta  pi+                               PHSP; # [New mode added] - copied K_S0 eta' pi+, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  eta  pi+                            PHSP;
 
 0.001900000   K_S0  eta'  pi+                              PHSP; # [New mode added - PDG2019]
 0.001900000   K_L0  eta'  pi+                              PHSP; # [New mode added] - copied K_S0 eta' pi+, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  eta'  pi+                           PHSP;
 
 # Modes not in PDG, commented out for now [EO 06/2021]
@@ -8133,10 +8193,12 @@ Decay D+
 
 0.002540000   K_S0  K_S0  K+                               PHSP; # [PDG2019]
 0.002540000   K_L0  K_L0  K+                               PHSP; # copied K_S0 K_S0 K+, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  anti-K0  K+                         PHSP;
 
 0.000240000   K_S0  K+  K-  pi+                            PHSP; # [PDG2019]
 0.000240000   K_L0  K+  K-  pi+                            PHSP; # copied K_S0 K+ K- pi+, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  K-  pi+                         PHSP;
 
 0.009300000   anti-K*0  a_1+                               PHSP; # [PDG2019]
@@ -8178,6 +8240,7 @@ Decay D+
 ###############################################################
 0.003040000   K_S0  K+                                     PHSP; # [PDG2021]
 0.003120000   K_L0  K+                                     PHSP; # [PDG2021]
+#$ forbid_pythia()
 0.000000000   anti-K0  K+                                  PHSP;
 
 0.001273000   K*BR  K+                                     SVS; # K*BR is "fake" resonance that forces anti-K*0 -> anti-K0 pi0 to avoid doubling counting of K+ K- pi+ Dalitz mode
@@ -8189,10 +8252,12 @@ Decay D+
 
 0.005070000   K_S0  K+  pi0                                PHSP; # [New mode added - PDG2021]
 0.005240000   K_L0  K+  pi0                                PHSP; # [New mode added - PDG2021]
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  pi0                             PHSP; # Removed 06/2021, split into preceding two lines
 
 0.000000000   K_S0  K_S0  pi+                              PHSP; # Entire BF for this mode is coming from K*+ anti-K0 listed below
 0.000000000   K_L0  K_L0  pi+                              PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi+                             PHSP;
 
 0.000770000   K*+  K-  pi+                                 PHSP;
@@ -8200,24 +8265,29 @@ Decay D+
 
 0.000385000   K*+  K_S0  pi0                               PHSP;
 0.000385000   K*+  K_L0  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   K*+  anti-K0  pi0                            PHSP;
 
 0.000770000   anti-K*0  K+  pi0                            PHSP;
 
 0.000385000   anti-K*0  K_S0  pi+                          PHSP;
 0.000385000   anti-K*0  K_L0  pi+                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K*0  K0  pi+                            PHSP;
 
 0.000385000   K*0  K_S0  pi+                               PHSP;
 0.000385000   K*0  K_L0  pi+                               PHSP;
+#$ forbid_pythia()
 0.000000000   K*0  anti-K0  pi+                            PHSP;
 
 0.001740000   K_S0  K+  pi+  pi-                           PHSP; # [PDG2019]
 0.001740000   K_L0  K+  pi+  pi-                           PHSP; # copied K_S0 K+ pi+ pi-, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  pi+  pi-                        PHSP;
 
 0.002380000   K_S0  K-  pi+  pi+                           PHSP; # [PDG2019]
 0.002380000   K_L0  K-  pi+  pi+                           PHSP; # copied K_S0 K- pi+ pi+, best estimate
+#$ forbid_pythia()
 0.000000000   K0  K-  pi+  pi+                             PHSP;
 
 0.000230000   K+  K-  pi+  pi+  pi-                        PHSP; # [PDG2019]
@@ -8229,6 +8299,7 @@ Decay D+
 
 0.009000000   K*+  K_S0                                    SVS; # (1.7+/-0.8)% - calculated to give correct 2K_S0 pi+
 0.009000000   K*+  K_L0                                    SVS; # copied K*+ K_S0, best estimate
+#$ forbid_pythia()
 0.000000000   K*+  anti-K0                                 SVS;
 
 ###############################################################
@@ -8291,10 +8362,12 @@ Decay D-
 ###############################################################
 0.015620000   K_S0  pi-                                    PHSP; # [PDG2019]
 0.014600000   K_L0  pi-                                    PHSP; # [PDG2019]
+#$ forbid_pythia()
 0.000000000   K0  pi-                                      PHSP;
 
 0.025951000   a_1-  K_S0                                   SVS;
 0.025951000   a_1-  K_L0                                   SVS;
+#$ forbid_pythia()
 0.000000000   a_1-  K0                                     SVS;
 
 0.027091000   K'_10  pi-                                   SVS;
@@ -8306,14 +8379,17 @@ Decay D-
 # the Dalitz mode below includes K0 rho-, and K*(892)0 pi- resonances.
 0.073600000   K_S0  pi-  pi0                               D_DALITZ; # [PDG2019]
 0.073600000   K_L0  pi-  pi0                               D_DALITZ; # copied K_S0 pi- pi0, best estimate
+#$ forbid_pythia()
 0.000000000   K0  pi-  pi0                                 D_DALITZ;
 
 0.001248000   K_S0  rho0  pi-                              PHSP;
 0.001248000   K_L0  rho0  pi-                              PHSP;
+#$ forbid_pythia()
 0.000000000   K0  rho0  pi-                                PHSP;
 
 0.001925500   K_S0  omega  pi-                             PHSP;
 0.001925500   K_L0  omega  pi-                             PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  omega  pi-                          PHSP;
 
 0.008018000   K+  rho-  pi-                                PHSP; # Not included in PDG, adjusted to balance other changes 06/2021
@@ -8327,14 +8403,17 @@ Decay D-
 
 0.002473000   K_S0  pi+  pi-  pi-                          PHSP;
 0.002473000   K_L0  pi+  pi-  pi-                          PHSP; # copied K_S0 pi+ pi- pi-, best estimate
+#$ forbid_pythia()
 0.000000000   K0  pi+  pi-  pi-                            PHSP;
 
 0.013100000   K_S0  eta  pi-                               PHSP; # [New mode added - PDG2021]
 0.013100000   K_L0  eta  pi-                               PHSP; # [New mode added] - copied K_S0 eta' pi+, best estimate
+#$ forbid_pythia()
 0.000000000   K0  eta  pi-                                 PHSP;
 
 0.001900000   K_S0  eta'  pi-                              PHSP; # [New mode added - PDG2019]
 0.001900000   K_L0  eta'  pi-                              PHSP; # [New mode added] - copied K_S0 eta' pi-, best estimate
+#$ forbid_pythia()
 0.000000000   K0  eta'  pi-                                PHSP;
 
 # Modes not in PDG, commented out for now [EO 06/2021]
@@ -8350,10 +8429,12 @@ Decay D-
 
 0.002540000   K_S0  K_S0  K-                               PHSP; # [PDG2019]
 0.002540000   K_L0  K_L0  K-                               PHSP; # copied K_S0 K_S0 K-, best estimate
+#$ forbid_pythia()
 0.000000000   K0  K0  K-                                   PHSP;
 
 0.000240000   K_S0  K+  K-  pi-                            PHSP; # [PDG2019]
 0.000240000   K_L0  K+  K-  pi-                            PHSP; # copied K_S0 K+ K- pi-, best estimate
+#$ forbid_pythia()
 0.000000000   K0  K+  K-  pi-                              PHSP;
 
 0.009300000   K*0  a_1-                                    PHSP;
@@ -8395,6 +8476,7 @@ Decay D-
 ###############################################################
 0.003040000   K_S0  K-                                     PHSP; # [PDG2021]
 0.003120000   K_L0  K-                                     PHSP; # [PDG2021]
+#$ forbid_pythia()
 0.000000000   K0  K-                                       PHSP;
 
 0.001273000   K*0R  K-                                     SVS; # K*0R is "fake" resonance that forces K*0 -> K0 pi0 to avoid doubling counting of K+ K- pi+ Dalitz mode
@@ -8406,10 +8488,12 @@ Decay D-
 
 0.005070000   K_S0  K-  pi0                                PHSP; # [New mode added - PDG2021]
 0.005240000   K_L0  K-  pi0                                PHSP; # [New mode added - PDG2021]
+#$ forbid_pythia()
 0.000000000   K0  K-  pi0                                  PHSP; # Removed 06/2021, split into preceding two lines
 
 0.000000000   K_S0  K_S0  pi-                              PHSP; # Entire BF for this mode is coming from K*- K0 listed below
 0.000000000   K_L0  K_L0  pi-                              PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi-                             PHSP;
 
 0.000770000   K*-  K+  pi-                                 PHSP;
@@ -8417,24 +8501,29 @@ Decay D-
 
 0.000385000   K*-  K_S0  pi0                               PHSP;
 0.000385000   K*-  K_L0  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   K*-  K0  pi0                                 PHSP;
 
 0.000770000   K*0  K-  pi0                                 PHSP;
 
 0.000385000   K*0  K_S0  pi-                               PHSP;
 0.000385000   K*0  K_L0  pi-                               PHSP;
+#$ forbid_pythia()
 0.000000000   K*0  anti-K0  pi-                            PHSP;
 
 0.000385000   anti-K*0  K_S0  pi-                          PHSP;
 0.000385000   anti-K*0  K_L0  pi-                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K*0  K0  pi-                            PHSP;
 
 0.001740000   K_S0  K-  pi+  pi-                           PHSP; # [PDG2019]
 0.001740000   K_L0  K-  pi+  pi-                           PHSP; # copied K_S0 K- pi+ pi-, best estimate
+#$ forbid_pythia()
 0.000000000   K0  K-  pi+  pi-                             PHSP;
 
 0.002380000   K_S0  K+  pi-  pi-                           PHSP; # [PDG2019]
 0.002380000   K_L0  K+  pi-  pi-                           PHSP; # copied K_S0 K+ pi- pi-, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  pi-  pi-                        PHSP;
 
 0.000230000   K+  K-  pi+  pi-  pi-                        PHSP; # [PDG2019]
@@ -8446,6 +8535,7 @@ Decay D-
 
 0.009000000   K*-  K_S0                                    SVS; # (1.7+/-0.8)% - calculated to give correct 2K_S0 pi+
 0.009000000   K*-  K_L0                                    SVS; # copied K*+ K_S0, best estimate
+#$ forbid_pythia()
 0.000000000   K*-  K0                                      SVS;
 
 ###############################################################
@@ -8513,18 +8603,22 @@ Decay D0
 
 0.012400000   K_S0  pi0                                    PHSP; # [PDG2019]
 0.010000000   K_L0  pi0                                    PHSP; # [PDG2019]
+#$ forbid_pythia()
 0.000000000   anti-K0  pi0                                 PHSP;
 
 0.005090000   K_S0  eta                                    PHSP; # [PDG2019]
 0.005090000   K_L0  eta                                    PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  eta                                 PHSP;
 
 0.009490000   K_S0  eta'                                   PHSP; # [PDG2019]
 0.009490000   K_L0  eta'                                   PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  eta'                                PHSP;
 
 0.011100000   omega  K_S0                                  SVS; # [PDG2019]
 0.011100000   omega  K_L0                                  SVS;
+#$ forbid_pythia()
 0.000000000   omega  anti-K0                               SVS;
 
 0.001610000   anti-K*0  eta                                SVS;
@@ -8545,14 +8639,17 @@ Decay D0
 # LHCb PR 09 Apr 2004 split into KS/KL
 0.028000000   K_S0  pi+  pi-                               D_DALITZ; # [PDG2019]
 0.028000000   K_L0  pi+  pi-                               D_DALITZ;
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+  pi-                            D_DALITZ;
 
 0.008300000   K_S0  pi0  pi0                               PHSP;
 0.008300000   K_L0  pi0  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  pi0  pi0                            PHSP;
 
 0.010100000   K_S0  eta  pi0                               PHSP; # [PDG2021]
 0.010100000   K_L0  eta  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  eta  pi0                            PHSP;
 
 0.024000000   anti-K*0  pi+  pi-                           PHSP;
@@ -8567,6 +8664,7 @@ Decay D0
 
 0.006000000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract contributions from 11 resonances (K_S0 (eta, eta', omega, phiR), anti-K*0 (rho0, omega, pi+ pi-), K*- (rho+, pi+ pi0), K_1- pi+, anti-K_10 pi0) from PDG value of 0.052
 0.006000000   K_L0  pi+  pi-  pi0                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+  pi-  pi0                       PHSP;
 
 # K- pi+ pi0 pi0 is not in PDG but was well-measured at BESIII
@@ -8575,14 +8673,17 @@ Decay D0
 
 0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi0  pi0  pi0                            PHSP;
+#$ forbid_pythia()
 0.000000000 anti-K0  pi0  pi0  pi0                         PHSP;
 
 0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
+#$ forbid_pythia()
 0.000000000 anti-K0  pi+  pi-  pi0  pi0                    PHSP;
 
 0.008655500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008655500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
+#$ forbid_pythia()
 0.000000000 anti-K0  pi+  pi-  pi0  pi0  pi0               PHSP;
 
 0.000000000   K-  pi+  pi+  pi-  pi0                       PHSP;
@@ -8590,10 +8691,12 @@ Decay D0
 
 0.002800000   K_S0  pi+  pi+  pi-  pi-                     PHSP;
 0.002800000   K_L0  pi+  pi+  pi-  pi-                     PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+  pi+  pi-  pi-                  PHSP;
 
 0.002115000   phiR  K_S0                                   SVS; # phiR is "fake" resonance to prevent double counting of K_S0 K+ K- Dalitz mode
 0.002115000   phiR  K_L0                                   SVS;
+#$ forbid_pythia()
 0.000000000   phiR  anti-K0                                SVS;
 
 0.019000000   anti-K*0  pi+  pi-  pi0                      PHSP;
@@ -8605,16 +8708,19 @@ Decay D0
 #  and f_0 K_0 resonances (BaBar Report arXiv:hep-ex/0207089)
 0.004420000   K_S0  K+  K-                                 D_DALITZ;  # [PDG2019 - Dalitz model added]
 0.004420000   K_L0  K+  K-                                 D_DALITZ;
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  K-                              D_DALITZ;
 
 0.000750000   K_S0  K_S0  K_S0                             PHSP; # [PDG2019]
 
 0.000310000   K_S0  K_S0  K+  pi-                          PHSP;
 0.000310000   K_L0  K_L0  K+  pi-                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  K+  pi-                         PHSP;
 
 0.000310000   K_S0  K_S0  K-  pi+                          PHSP;
 0.000310000   K_L0  K_L0  K-  pi+                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  K-  pi+                         PHSP;
 
 ###############################################################
@@ -8660,14 +8766,17 @@ Decay D0
 
 0.000141000   K_S0  K_S0                                   PHSP; # [PDG2019]
 0.000141000   K_L0  K_L0                                   PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0                                  PHSP;
 
 0.000168000   K*0  K_S0                                    SVS; # [PDG2019] - calculated to give correct K_S0 K+ pi- contribution
 0.000168000   K*0  K_L0                                    SVS;
+#$ forbid_pythia()
 0.000000000   K*0  anti-K0                                 SVS;
 
 0.000123000   anti-K*0  K_S0                               SVS; # [PDG2019] - calculated to give correct K_S0 K- pi+ contribution
 0.000123000   anti-K*0  K_L0                               SVS;
+#$ forbid_pythia()
 0.000000000   anti-K*0  K0                                 SVS;
 
 0.004574000   K*+  K-                                      SVS; # [PDG2019] - calculated to give correct K+ K- pi0 contribution
@@ -8677,10 +8786,12 @@ Decay D0
 
 0.001698000   K_S0  K-  pi+                                PHSP; # [PDG2019] - subtract anti-K*0 K_S0 and K*+ K- BFs from PDG value of 0.0033
 0.001698000   K_L0  K-  pi+                                PHSP;
+#$ forbid_pythia()
 0.000000000   K0  K-  pi+                                  PHSP;
 
 0.001518000   K_S0  K+  pi-                                PHSP; # [PDG2019] - subtract K*0 K_S0 and K*- K+ BFs from PDG value of 0.00217
 0.001518000   K_L0  K+  pi-                                PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  pi-                             PHSP;
 
 0.000768000   K+  K-  pi0                                  PHSP; # [PDG2019] - subtract resonance BFs from PDG value of 0.00342
@@ -8690,10 +8801,12 @@ Decay D0
 
 0.001280000   K_S0  K_S0  pi+  pi-                         PHSP; # [PDG2019]
 0.001280000   K_L0  K_L0  pi+  pi-                         PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi+  pi-                        PHSP;
 
 0.000610000   K_S0  K_S0  pi0  pi0                         PHSP; # [New mode added - PDG2019]
 0.000610000   K_L0  K_L0  pi0  pi0                         PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi0  pi0                        PHSP;
 
 0.003100000   K+  K-  pi+  pi-  pi0                        PHSP;
@@ -8761,18 +8874,22 @@ Decay anti-D0
 
 0.012400000   K_S0  pi0                                    PHSP; # [PDG2019]
 0.010000000   K_L0  pi0                                    PHSP; # [PDG2019]
+#$ forbid_pythia()
 0.000000000   K0  pi0                                      PHSP;
 
 0.005090000   K_S0  eta                                    PHSP; # [PDG2019]
 0.005090000   K_L0  eta                                    PHSP;
+#$ forbid_pythia()
 0.000000000   K0  eta                                      PHSP;
 
 0.009490000   K_S0  eta'                                   PHSP; # [PDG2019]
 0.009490000   K_L0  eta'                                   PHSP;
+#$ forbid_pythia()
 0.000000000   K0  eta'                                     PHSP;
 
 0.011100000   omega  K_S0                                  SVS; # [PDG2019]
 0.011100000   omega  K_L0                                  SVS;
+#$ forbid_pythia()
 0.000000000   omega  K0                                    SVS;
 
 0.001610000   K*0  eta                                     SVS;
@@ -8793,14 +8910,17 @@ Decay anti-D0
 # LHCb PR 09 Apr 2004, split into KS/KL
 0.028000000   K_S0  pi+  pi-                               D_DALITZ; # [PDG2019]
 0.028000000   K_L0  pi+  pi-                               D_DALITZ;
+#$ forbid_pythia()
 0.000000000   K0  pi+  pi-                                 D_DALITZ;
 
 0.008300000   K_S0  pi0  pi0                               PHSP;
 0.008300000   K_L0  pi0  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   K0  pi0  pi0                                 PHSP;
 
 0.010100000   K_S0  eta  pi0                               PHSP; # [PDG2021]
 0.010100000   K_L0  eta  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   K0  eta  pi0                                 PHSP;
 
 0.024000000   K*0  pi+  pi-                                PHSP;
@@ -8815,6 +8935,7 @@ Decay anti-D0
 
 0.006000000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract contributions from 11 resonances (K_S0 (eta, eta', omega, phiR), K*0 (rho0, omega, pi+ pi-), K*+ (rho-, pi- pi0), K_1+ pi-, K_10 pi0) from PDG value of 0.052
 0.006000000   K_L0  pi+  pi-  pi0                          PHSP;
+#$ forbid_pythia()
 0.000000000   K0  pi+  pi-  pi0                            PHSP;
 
 # K+ pi- pi0 pi0 is not in PDG but was well-measured at BESIII
@@ -8823,14 +8944,17 @@ Decay anti-D0
 
 0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi0  pi0  pi0                            PHSP;
+#$ forbid_pythia()
 0.000000000 K0  pi0  pi0  pi0                              PHSP;
 
 0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
+#$ forbid_pythia()
 0.000000000 K0  pi+  pi-  pi0  pi0                         PHSP;
 
 0.008655500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008655500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
+#$ forbid_pythia()
 0.000000000 K0  pi+  pi-  pi0  pi0  pi0                    PHSP;
 
 0.000000000   K+  pi-  pi+  pi-  pi0                       PHSP;
@@ -8838,10 +8962,12 @@ Decay anti-D0
 
 0.002800000   K_S0  pi+  pi+  pi-  pi-                     PHSP;
 0.002800000   K_L0  pi+  pi+  pi-  pi-                     PHSP;
+#$ forbid_pythia()
 0.000000000   K0  pi+  pi+  pi-  pi-                       PHSP;
 
 0.002115000   phiR  K_S0                                   SVS; # phiR is "fake" resonance to prevent double counting of K_S0 K+ K- Dalitz mode
 0.002115000   phiR  K_L0                                   SVS;
+#$ forbid_pythia()
 0.000000000   phiR  K0                                     SVS;
 
 0.019000000   K*0  pi+  pi-  pi0                           PHSP;
@@ -8853,16 +8979,19 @@ Decay anti-D0
 #  and f_0 K_0 resonances (BaBar Report arXiv:hep-ex/0207089)
 0.004420000   K_S0  K+  K-                                 D_DALITZ; # [PDG2019 - Dalitz model added]
 0.004420000   K_L0  K+  K-                                 D_DALITZ;
+#$ forbid_pythia()
 0.000000000   K0  K+  K-                                   D_DALITZ;
 
 0.000750000   K_S0  K_S0  K_S0                             PHSP; # [PDG2019]
 
 0.000310000   K_S0  K_S0  K-  pi+                          PHSP;
 0.000310000   K_L0  K_L0  K-  pi+                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  K-  pi+                         PHSP;
 
 0.000310000   K_S0  K_S0  K+  pi-                          PHSP;
 0.000310000   K_L0  K_L0  K+  pi-                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  K+  pi-                         PHSP;
 
 ###############################################################
@@ -8908,14 +9037,17 @@ Decay anti-D0
 
 0.000141000   K_S0  K_S0                                   PHSP; # [PDG2019]
 0.000141000   K_L0  K_L0                                   PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0                                  PHSP;
 
 0.000168000   anti-K*0  K_S0                               SVS; # [PDG2019] - calculated to give correct K_S0 K- pi+ contribution
 0.000168000   anti-K*0  K_L0                               SVS;
+#$ forbid_pythia()
 0.000000000   anti-K*0  K0                                 SVS;
 
 0.000123000   K*0  K_S0                                    SVS; # [PDG2019] - calculated to give correct K_S0 K+ pi- contribution
 0.000123000   K*0  K_L0                                    SVS;
+#$ forbid_pythia()
 0.000000000   K*0  anti-K0                                 SVS;
 
 0.004574000   K*-  K+                                      SVS; # [PDG2019] - calculated to give correct K+ K- pi0 contribution
@@ -8925,10 +9057,12 @@ Decay anti-D0
 
 0.001698000   K_S0  K+  pi-                                PHSP; # [PDG2019] - subtract K*0 K_S0 and K*- K+ BFs from PDG value of 0.0033
 0.001698000   K_L0  K+  pi-                                PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  pi-                             PHSP;
 
 0.001518000   K_S0  K-  pi+                                PHSP; # [PDG2019] - subtract anti-K*0 K_S0 and K*+ K- BFs from PDG value of 0.00217
 0.001518000   K_L0  K-  pi+                                PHSP;
+#$ forbid_pythia()
 0.000000000   K0  K-  pi+                                  PHSP;
 
 0.000768000   K+  K-  pi0                                  PHSP; # [PDG2019] - subtract resonance BFs from PDG value of 0.00342
@@ -8938,10 +9072,12 @@ Decay anti-D0
 
 0.001280000   K_S0  K_S0  pi+  pi-                         PHSP; # [PDG2019]
 0.001280000   K_L0  K_L0  pi+  pi-                         PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi+  pi-                        PHSP;
 
 0.000610000   K_S0  K_S0  pi0  pi0                         PHSP; # [New mode added - PDG2019]
 0.000610000   K_L0  K_L0  pi0  pi0                         PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi0  pi0                        PHSP;
 
 0.003100000   K+  K-  pi+  pi-  pi0                        PHSP; # [PDG2019]
@@ -9012,6 +9148,7 @@ Decay D_s+
 ###############################################################
 0.015000000   K_S0  K+                                     PHSP; # [PDG2019]
 0.015000000   K_L0  K+                                     PHSP; # [PDG2019]
+#$ forbid_pythia()
 0.000000000   anti-K0  K+                                  PHSP;
 
 # the Dalitz model below includes anti-K*0 K+, anti-K_0*(1430)0 K+,
@@ -9032,10 +9169,12 @@ Decay D_s+
 
 0.009600000   K_S0  K+  pi+  pi-                           PHSP;
 0.009600000   K_L0  K+  pi+  pi-                           PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K+  pi+  pi-                        PHSP;
 
 0.000840000   K_S0  K_S0  pi+  pi+  pi-                    PHSP;
 0.000840000   K_L0  K_L0  pi+  pi+  pi-                    PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi+  pi+  pi-                   PHSP;
 
 ###############################################################
@@ -9087,11 +9226,13 @@ Decay D_s+
 
 0.001220000   K_S0  pi+                                    PHSP; # [PDG2019]
 0.001220000   K_L0  pi+                                    PHSP; # copied K_S0 pi+, best estimate
+#$ forbid_pythia()
 0.000000000   K0  pi+                                      PHSP;
 
 # Should we replace these with K_S0 rho+, K_L0 rho+? (ERO 03/10/2020)
 0.005000000   K_S0  pi+  pi0                               PHSP;
 0.005000000   K_L0  pi+  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   K0  pi+  pi0                                 PHSP;
 
 0.000182000   phi  K+                                      SVS; # [PDG2019] - calculated to give correct K+ K+ K- contribution
@@ -9105,6 +9246,7 @@ Decay D_s+
 
 0.000953000   a_1+  K_S0                                   SVS;
 0.000953000   a_1+  K_L0                                   SVS;
+#$ forbid_pythia()
 0.000000000   a_1+  K0                                     SVS;
 
 0.000710000   K*0R  pi+                                    SVS; # K*0R is "fake" resonance that forces K*0 -> K0 pi0 to prevent double counting of K+ pi+ pi- Dalitz mode
@@ -9117,6 +9259,7 @@ Decay D_s+
 
 0.002900000   K_S0  pi+  pi-  pi+                          PHSP;
 0.002900000   K_L0  pi+  pi-  pi+                          PHSP;
+#$ forbid_pythia()
 0.000000000   K0  pi+  pi-  pi+                            PHSP;
 
 0.000209000   K+  K+  K-                                   PHSP; # [PDG2019] - subtract contribution from phi K+
@@ -9171,6 +9314,7 @@ Decay D_s-
 ###############################################################
 0.015000000   K_S0  K-                                     PHSP; # [PDG2019]
 0.015000000   K_L0  K-                                     PHSP;
+#$ forbid_pythia()
 0.000000000   K0  K-                                       PHSP;
 
 # the Dalitz model below includes K*0 K-, K_0*(1430)0 K-,
@@ -9191,10 +9335,12 @@ Decay D_s-
 
 0.009600000   K_S0  K-  pi+  pi-                           PHSP;
 0.009600000   K_L0  K-  pi+  pi-                           PHSP;
+#$ forbid_pythia()
 0.000000000   K0  K-  pi+  pi-                             PHSP;
 
 0.000840000   K_S0  K_S0  pi+  pi-  pi-                    PHSP;
 0.000840000   K_L0  K_L0  pi+  pi-  pi-                    PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  K0  pi+  pi-  pi-                   PHSP;
 
 ###############################################################
@@ -9246,11 +9392,13 @@ Decay D_s-
 
 0.001220000   K_S0  pi-                                    PHSP; # [PDG2019]
 0.001220000   K_L0  pi-                                    PHSP; # copied K_S0 pi-, best estimate
+#$ forbid_pythia()
 0.000000000   anti-K0  pi-                                 PHSP;
 
 # Should we replace these with K_S0 rho-, K_L0 rho-? (ERO 03/10/2020)
 0.005000000   K_S0  pi-  pi0                               PHSP;
 0.005000000   K_L0  pi-  pi0                               PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  pi-  pi0                            PHSP;
 
 0.000182000   phi  K-                                      SVS; # [PDG2019] - calculated to give correct K+ K+ K- contribution
@@ -9264,6 +9412,7 @@ Decay D_s-
 
 0.000953000   a_1-  K_S0                                   SVS;
 0.000953000   a_1-  K_L0                                   SVS;
+#$ forbid_pythia()
 0.000000000   a_1-  anti-K0                                SVS;
 
 0.000710000   K*BR  pi-                                    SVS; # K*BR is "fake" resonance that forces anti-K*0 -> anti-K0 pi0 to prevent double counting of K- pi+ pi- Dalitz mode
@@ -9276,6 +9425,7 @@ Decay D_s-
 
 0.002900000   K_S0  pi+  pi-  pi-                          PHSP;
 0.002900000   K_L0  pi+  pi-  pi-                          PHSP;
+#$ forbid_pythia()
 0.000000000   anti-K0  pi+  pi-  pi-                       PHSP;
 
 0.000209000   K+  K-  K-                                   PHSP; # [PDG2019] - subtract contribution from phi K-
@@ -9896,27 +10046,27 @@ CDecay a_0-
 #   paritial amplitudes. Interference effects are significant but neglected here
 # - Partial amplitudes from CLEO, Phys.Rev. D61 (2000) 01200.
 
-Decay a_10 #  Edited by U. Tamponi, March 2016
+Decay a_10 #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021)
 0.233300000   rho-  pi+                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.233300000   rho+  pi-                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.233400000   rho0  pi0                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.200000000   pi+  pi-  pi0                                PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   K+  pi-  K0                                  PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   K-  pi+  anti-K0                             PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   anti-K0  pi0  K0                             PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   K+  K-  pi0                                  PHSP; #placeholder for K* K final states, which are off-shell
+0.200000000   sigma_0  pi0                                 PHSP;
+0.025000000   K*-  K+                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   K*+  K-                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   K*0  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   anti-K*0  K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
 # a_1(1260)+
-Decay a_1+ #  Edited by U. Tamponi, March 2016
+Decay a_1+ #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021)
 0.308750000   rho0  pi+                                    VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
 0.308750000   rho+  pi0                                    VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
 0.013000000   rho(2S)0  pi+                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.013000000   rho(2S)+  pi0                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.161800000   sigma_0  pi+                                 PHSP;
-0.025000000   K+  K0  pi0                                  PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   anti-K0  K0  pi+                             PHSP; #placeholder for K* K final states, which are off-shell
-0.147300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
+0.050000000   anti-K*0  K+                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.050000000   K*+  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.097300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
 Enddecay
 
 CDecay a_1-
@@ -10341,9 +10491,13 @@ Decay J/psi
 0.001700000   omega  pi-  K+  K_L0                         PHSP;
 0.001700000   omega  pi+  K-  K_S0                         PHSP;
 0.001700000   omega  pi+  K-  K_L0                         PHSP;
+#$ forbid_pythia()
 0.000000000   omega  pi-  K+  K0                           PHSP;
+#$ forbid_pythia()
 0.000000000   omega  pi-  K+  anti-K0                      PHSP;
+#$ forbid_pythia()
 0.000000000   omega  pi+  K-  K0                           PHSP;
+#$ forbid_pythia()
 0.000000000   omega  pi+  K-  anti-K0                      PHSP;
 0.002300000   b_10  pi0                                    PARTWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.002290000   eta  pi+  pi-  pi+  pi-                      PHSP;
@@ -10382,9 +10536,13 @@ Decay J/psi
 0.001100000   eta  pi-  K+  K_L0                           PHSP;
 0.001100000   eta  pi+  K-  K_S0                           PHSP;
 0.001100000   eta  pi+  K-  K_L0                           PHSP;
+#$ forbid_pythia()
 0.000000000   eta  pi-  K+  K0                             PHSP;
+#$ forbid_pythia()
 0.000000000   eta  pi-  K+  anti-K0                        PHSP;
+#$ forbid_pythia()
 0.000000000   eta  pi+  K-  K0                             PHSP;
+#$ forbid_pythia()
 0.000000000   eta  pi+  K-  anti-K0                        PHSP;
 
 0.001020000   K+  K-  pi0                                  PHSP;
@@ -10420,6 +10578,7 @@ Decay J/psi
 0.084693481   rndmflav  anti-rndmflav                      PYTHIA 42;
 0.365559757   g  g  g                                      PYTHIA 92;
 0.032103862   gamma  g  g                                  PYTHIA 92;
+#$ forbid_pythia()
 0.000000000   K0  anti-K0                                  PHSP;
 0.000000000   K_S0  K_S0                                   PHSP;
 0.000000000   K_L0  K_L0                                   PHSP;
@@ -10514,6 +10673,7 @@ Decay psi(2S)
 0.000117000   phi  pi-  pi+                                PHSP;
 0.000170000   pi+  pi-  K_S0  K_S0                         PHSP;
 0.000800000   h_c  pi0                                     PHSP;
+#$ forbid_pythia()
 0.000000000   K0  anti-K0                                  PHSP;
 0.000000000   K_S0  K_S0                                   PHSP;
 0.000000000   K_L0  K_L0                                   PHSP;
@@ -10708,6 +10868,7 @@ Decay chi_c0
 # branching(M056, 41)
 0.005700000   K_L0  K_L0  pi+  pi-                         PHSP;
 # Forbidden, added to disable in Pythia.
+#$ forbid_pythia()
 0.000000000   K0  anti-K0  pi+  pi-                        PHSP;
 # branching(M056, 68)
 0.003000000   K+  K-  eta  pi0                             PHSP;
@@ -10742,12 +10903,14 @@ Decay chi_c0
 # branching(M056, 15)
 0.003160000   K_L0  K_L0                                   PHSP;
 # Forbidden, added to disable in Pythia.
+#$ forbid_pythia()
 0.000000000   K0 anti-K0                                   PHSP;
 # branching(M056, 42)
 0.001400000   K+  K-  K_S0  K_S0                           PHSP;
 # branching(M056, 42)
 0.001400000   K+  K-  K_L0  K_L0                           PHSP;
 # Forbidden, added to disable in Pythia.
+#$ forbid_pythia()
 0.000000000   K+  K-  K0  anti-K0                          PHSP;
 # branching(M056, 94)
 0.000580000   K_S0  K_S0  K_S0  K_S0                       PHSP;
@@ -10756,6 +10919,7 @@ Decay chi_c0
 # branching(M056, 94)
 0.000580000   K_L0  K_L0  K_L0  K_L0                       PHSP;
 # Forbidden, added to disable in Pythia.
+#$ forbid_pythia()
 0.000000000   K0  anti-K0  K0  anti-K0                     PHSP;
 # branching(M056, 14)
 0.002820000   K+  K-  K+  K-                               PHSP;
@@ -10882,6 +11046,7 @@ Decay chi_c1
 0.003550000   K+  anti-K0  pi-                             PHSP;
 0.003550000   K-  K0  pi+                                  PHSP;
 0.000550000   K+  K-  K+  K-                               PHSP;
+#$ forbid_pythia()
 0.000000000   K0  anti-K0                                  PHSP;
 0.000010000   K_S0  K_S0                                   PHSP;
 0.000010000   K_L0  K_L0                                   PHSP;
@@ -10968,6 +11133,7 @@ Decay chi_c2
 0.001505000   K*-  K0  pi+                                 PHSP;
 0.001320000   pi+  pi-  p+  anti-p-                        PHSP;
 0.000192000   Lambda0  anti-Lambda0                        PHSP;
+#$ forbid_pythia()
 0.000000000   K0  anti-K0                                  PHSP;
 0.000550000   K_S0  K_S0                                   PHSP;
 0.000650000   K_L0  K_L0                                   PHSP;
@@ -11395,108 +11561,133 @@ Enddecay
 #####################################################################
 # Lambda_c+
 Decay Lambda_c+
-0.021000000   e+  nu_e  Lambda0                            PYTHIA 22; #[Reconstructed PDG2011]
-0.005000000   e+  nu_e  Sigma0                             PYTHIA 22;
-0.005000000   e+  nu_e  Sigma*0                            PYTHIA 22;
-0.003000000   e+  nu_e  n0                                 PYTHIA 22;
-0.002000000   e+  nu_e  Delta0                             PYTHIA 22;
-0.006000000   e+  nu_e  p+  pi-                            PYTHIA 22;
-0.006000000   e+  nu_e  n0  pi0                            PYTHIA 22;
-0.020000000   mu+  nu_mu  Lambda0                          PYTHIA 22; #[Reconstructed PDG2011]
-0.005000000   mu+  nu_mu  Sigma0                           PYTHIA 22;
-0.005000000   mu+  nu_mu  Sigma*0                          PYTHIA 22;
-0.003000000   mu+  nu_mu  n0                               PYTHIA 22;
-0.002000000   mu+  nu_mu  Delta0                           PYTHIA 22;
-0.006000000   mu+  nu_mu  p+  pi-                          PYTHIA 22;
-0.006000000   mu+  nu_mu  n0  pi0                          PYTHIA 22;
-0.008600000   Delta++  K-                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.025000000   Delta++  K*-                                 PYTHIA  0;
-0.023000000   p+  anti-K0                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.016000000   p+  anti-K*0                                 PYTHIA  0; #[Reconstructed PDG2011]
-0.005000000   Delta+  anti-K0                              PYTHIA  0;
-0.005000000   Delta+  anti-K*0                             PYTHIA  0;
-0.010700000   Lambda0  pi+                                 PYTHIA  0; #[Reconstructed PDG2011]
-0.005000000   Lambda0  rho+                                PYTHIA  0;
-0.010500000   Sigma0  pi+                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.004000000   Sigma0  rho+                                 PYTHIA  0;
-0.004000000   Sigma*0  pi+                                 PYTHIA  0;
-0.004000000   Sigma*0  rho+                                PYTHIA  0;
-0.010000000   Sigma+  pi0                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.005500000   Sigma+  eta                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.002000000   Sigma+  eta'                                 PYTHIA  0;
-0.004000000   Sigma+  rho0                                 PYTHIA  0;
-0.027000000   Sigma+  omega                                PYTHIA  0; #[Reconstructed PDG2011]
-0.003000000   Sigma*+  pi0                                 PYTHIA  0;
-0.008500000   Sigma*+  eta                                 PYTHIA  0; #[Reconstructed PDG2011]
-0.003000000   Sigma*+  rho0                                PYTHIA  0;
-0.003000000   Sigma*+  omega                               PYTHIA  0;
-0.003900000   Xi0  K+                                      PYTHIA  0; #[Reconstructed PDG2011]
-0.002000000   Xi0  K*+                                     PYTHIA  0;
-0.002600000   Xi*0  K+                                     PYTHIA  0; #[Reconstructed PDG2011]
-0.001000000   Delta++  pi-                                 PYTHIA  0;
-0.001000000   Delta++  rho-                                PYTHIA  0;
-0.002000000   p+  pi0                                      PYTHIA  0;
-0.001000000   p+  eta                                      PYTHIA  0;
-0.001000000   p+  eta'                                     PYTHIA  0;
-0.002000000   p+  rho0                                     PYTHIA  0;
-0.002000000   p+  omega                                    PYTHIA  0;
-0.000820000   p+  phi                                      PYTHIA  0; #[Reconstructed PDG2011]
-0.002800000   p+  f_0                                      PYTHIA  0; #[Reconstructed PDG2011]
-0.001000000   Delta+  pi0                                  PYTHIA  0;
-0.001000000   Delta+  eta                                  PYTHIA  0;
-0.001000000   Delta+  eta'                                 PYTHIA  0;
-0.001000000   Delta+  rho0                                 PYTHIA  0;
-0.001000000   Delta+  omega                                PYTHIA  0;
-0.003000000   n0  pi+                                      PYTHIA  0;
-0.003000000   n0  rho+                                     PYTHIA  0;
-0.003000000   Delta0  pi+                                  PYTHIA  0;
-0.003000000   Delta0  rho+                                 PYTHIA  0;
-0.005000000   Lambda0  K+                                  PYTHIA  0;
-0.005000000   Lambda0  K*+                                 PYTHIA  0;
-0.002000000   Sigma0  K+                                   PYTHIA  0;
-0.002000000   Sigma0  K*+                                  PYTHIA  0;
-0.001000000   Sigma*0  K+                                  PYTHIA  0;
-0.001000000   Sigma*0  K*+                                 PYTHIA  0;
-0.002000000   Sigma+  K0                                   PYTHIA  0;
-0.002800000   Sigma+  K*0                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.001000000   Sigma*+  K0                                  PYTHIA  0;
-0.001000000   Sigma*+  K*0                                 PYTHIA  0;
-0.064091000   u  anti-d  d  su_0                           PYTHIA 43; #[Reconstructed PDG2011]
-0.028103000   u  anti-d  d  su_1                           PYTHIA 43; #[Reconstructed PDG2011]
-0.017256000   u  anti-s  d  su_0                           PYTHIA 43; #[Reconstructed PDG2011]
-0.017256000   u  anti-d  d  ud_0                           PYTHIA 43; #[Reconstructed PDG2011]
-0.046838000   s  uu_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.069025000   u  su_0                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.069025000   u  su_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.014794000   d  uu_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.007396000   u  ud_0                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.007396000   u  ud_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.025400000   p+  K-  pi+                                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.033000000   p+  anti-K0  pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.012000000   p+  anti-K0  eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.026000000   p+  anti-K0  pi+  pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.023000000   p+  K-  pi+  pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.011000000   p+  K*-  pi+                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001100000   p+  K-  pi+  pi+  pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.008000000   p+  K-  pi+  pi0  pi0                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000700000   p+  pi+  pi-                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001800000   p+  pi+  pi+  pi-  pi-                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   p+  K+  K-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.036000000   Lambda0  pi+  pi0                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.015000000   Lambda0  pi+  pi+  pi-                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.011000000   Lambda0  pi+  rho0                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.009500000   Lambda0  pi+  eta                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.012000000   Lambda0  pi+  omega                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.004700000   Lambda0  K+  anti-K0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.036000000   Sigma+  pi+  pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.017000000   Sigma-  pi+  pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.018000000   Sigma0  pi+  pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.008300000   Sigma0  pi+  pi+  pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   Sigma+  K+  K-                               PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.003100000   Sigma+  phi                                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.002500000   Xi-  K+  pi+                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   Sigma+  K+  pi-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+# Note that PDG 2021 numbers are normalized to a pKpi branching fraction of a guess of 0.0664
+# For isospin model, see Gronau and Rosner, Phys. Rev. D 98, 030001 and references therein
+0.038060000   e+  nu_e  Lambda0                            PYTHIA         22; # [PDG2021]
+0.000530000   e+  nu_e  Sigma0                             PYTHIA         22; # All other e modes are small PDG2021
+0.000530000   e+  nu_e  Sigma*0                            PYTHIA         22;
+0.000530000   e+  nu_e  n0                                 PYTHIA         22;
+0.000530000   e+  nu_e  Delta0                             PYTHIA         22;
+0.000530000   e+  nu_e  p+  pi-                            PYTHIA         22;
+0.000530000   e+  nu_e  n0  pi0                            PYTHIA         22;
+0.036989630   mu+  nu_mu  Lambda0                          PYTHIA         22; # [PDG2021]
+0.000530000   mu+  nu_mu  Sigma0                           PYTHIA         22; # All other mu modes are small PDG2021
+0.000530000   mu+  nu_mu  Sigma*0                          PYTHIA         22;
+0.000530000   mu+  nu_mu  n0                               PYTHIA         22;
+0.000530000   mu+  nu_mu  Delta0                           PYTHIA         22;
+0.000530000   mu+  nu_mu  p+  pi-                          PYTHIA         22;
+0.000530000   mu+  nu_mu  n0  pi0                          PYTHIA         22;
+0.011420000   Delta++  K-                                  PYTHIA         0; # [PDG2021]
+# Contributes 0.01142 to pK-pi+
+0.026440000   Delta++  K*-                                 PYTHIA         0;
+# Contributes 0.025*0.66 = 0.0166 to pK0pi-pi+  and 0.0083 to pKpi0pi+
+0.033620000   p+  anti-K0                                  PYTHIA         0; # [PDG2021]
+0.020730000   p+  anti-K*0                                 PYTHIA         0; # [PDG2021]
+# Contributes 0.0207*0.665 = 0.01376 to pKpi+ and 0.0207*0.333 = 0.0689 to pK0pi0 
+0.005290000   Delta+  anti-K0                              PYTHIA         0; # [produces ppi0K0 and npiK0]
+0.005290000   Delta+  anti-K*0                             PYTHIA         0;
+0.013750000   Lambda0  pi+                                 PYTHIA         0; # [PDG2021]
+0.006340000   Lambda0  rho+                                PYTHIA         0; # [ESTIMATE goes into L0pipi0] 
+0.013650000   Sigma0  pi+                                  PYTHIA         0; # [PDG2021]
+0.005290000   Sigma0  rho+                                 PYTHIA         0; # [ESTIMATE goes into S0pipi0]
+0.004220000   Sigma*0  pi+                                 PYTHIA         0;
+# Contributes 0.00371 to Lambda pi0 pi+ 
+0.004230000   Sigma*0  rho+                                PYTHIA         0;
+0.013210000   Sigma+  pi0                                  PYTHIA         0; # [PDG2021]
+0.004650000   Sigma+  eta                                  PYTHIA         0; # [PDG2021]
+0.015860000   Sigma+  eta'                                 PYTHIA         0; # [PDG2021]
+0.004230000   Sigma+  rho0                                 PYTHIA         0; # [goes into Sigma+ pi+pi-]
+0.017980000   Sigma+  omega                                PYTHIA         0; # [PDG2021]
+0.003170000   Sigma*+  pi0                                 PYTHIA         0;
+# 0.00279 to Lambda pi+ pi0
+0.008990000   Sigma*+  eta                                 PYTHIA         0; # [PDG2011]
+# Contributes 0.0791 To Lambda  pi eta
+0.000630000   Sigma*+  rho0                                PYTHIA         0; # [PDG2021 contributes to L(3pi)]]
+0.003170000   Sigma*+  omega                               PYTHIA         0;
+0.005810000   Xi0  K+                                      PYTHIA         0; # [PDG2021]
+0.002110000   Xi0  K*+                                     PYTHIA         0;
+0.004540000   Xi*0  K+                                     PYTHIA         0; # [PDG2021]
+0.001140000   Delta++  pi-                                 PYTHIA         0; # [PDG2021]
+0.001060000   Delta++  rho-                                PYTHIA         0;
+0.000080000   p+  pi0                                      PYTHIA         0; # [Theory - Cheng, Kang, Xu, Phys. Rev D 97, 074028 ]
+0.000500000   p+  eta'                                     PYTHIA         0; # [Belle2022]
+0.002110000   p+  rho0                                     PYTHIA         0;
+0.002110000   p+  omega                                    PYTHIA         0;
+0.001120000   p+  phi                                      PYTHIA         0; # [PDG2021]
+0.002960000   p+  f_0                                      PYTHIA         0; # [PDG2021]
+0.001060000   Delta+  pi0                                  PYTHIA         0;
+0.001060000   Delta+  eta                                  PYTHIA         0;
+0.001060000   Delta+  eta'                                 PYTHIA         0;
+0.001060000   Delta+  rho0                                 PYTHIA         0;
+0.001060000   Delta+  omega                                PYTHIA         0;
+0.003170000   n0  pi+                                      PYTHIA         0;
+0.003170000   n0  rho+                                     PYTHIA         0;
+0.003170000   Delta0  pi+                                  PYTHIA         0;
+0.003170000   Delta0  rho+                                 PYTHIA         0;
+0.006450000   Lambda0  K+                                  PYTHIA         0; # [PDG2021]
+0.005280000   Lambda0  K*+                                 PYTHIA         0;
+0.000530000   Sigma0  K+                                   PYTHIA         0; # [PDG2021]
+0.002110000   Sigma0  K*+                                  PYTHIA         0;
+0.001060000   Sigma*0  K+                                  PYTHIA         0;
+0.001060000   Sigma*0  K*+                                 PYTHIA         0;
+0.002110000   Sigma+  K0                                   PYTHIA         0;
+0.003700000   Sigma+  K*0                                  PYTHIA         0; # [PDG2021]
+0.001060000   Sigma*+  K0                                  PYTHIA         0;
+0.001060000   Sigma*+  K*0                                 PYTHIA         0;
+0.035850000   p+  K-  pi+                                  PHSP;  # [Adjusted PDG2021 such that total is 0.0664]
+0.034780000   p+  anti-K0  pi0                             PHSP;  # [PDG2021 corrected for pKstar (2*1.97 - 0.33*1.96)]
+0.008670000   p+  anti-K0  eta                             PHSP;  # [PDG2021 *2]
+0.033850000   p+  anti-K0  pi+  pi-                        PHSP;  # [PDG2021 *2 ]
+0.037220000   p+  K-  pi+  pi0                             PHSP;  # [PDG2021 - 0.666*0.014 from pK*- pi+]
+0.014800000   p+  K*-  pi+                                 PHSP;  # [PDG2021]
+0.001770000   p+  K-  pi+  pi+  pi-                        PHSP;  # Use isopin model rather than PDG for pK(3pi)
+0.001240000   p+  K-  pi+  pi0  pi0                        PHSP;  # Use isospin model rather than PDG for pK(3pi)
+0.002820000   p+  anti-K0  pi+ pi-  pi0                    PHSP;  #    
+0.001240000   n0  anti-K0  pi+  pi0  pi0                   PHSP;  #  
+0.001410000   n0 K- pi+ pi+ pi0                            PHSP;  # 
+0.001760000   n0 anti-K0 pi+ pi+ pi-                       PHSP;  # 
+0.001310000   p+ eta                                       PHSP;  # [PDG2021]
+0.004860000   p+  pi+  pi-                                 PHSP;  # [PDG2021]    
+0.004860000   p+  pi0  pi0                                 PHSP;  # [Isospin model]
+0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG2021]
+0.001690000   p+  pi+  pi-  pi0  pi0                       PHSP;  # [Isospin model]
+0.001160000   p+  pi0  pi0  pi0  pi0                       PHSP;  # [Isospin model]		
+0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addtion to pphi mode]
+0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]  
+0.002430000   n0  pi+  pi0  pi+  pi-                       PHSP;  # [Isospin model]
+0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]
+0.000530000   n0  K+  K0                                   PHSP;  # [PDG2021]
+0.038490000   n0 anti-K0 pi+                               PHSP;  # [PDG2021]
+0.062180000   Lambda0  pi+  pi0                            PHSP;  # [PDG2021]
+# In addition there is 0.00634 from rho and 0.00371 from Sigma*0 pi+ and 0.00279 from Sigma*+ pi0
+# Lambda0  pi+  pi+  pi-                                   PHSP;  # [No non-resonant decays in PDG2021]
+0.015860000   Lambda0  pi+  rho0                           PHSP;  # [PDG2021; goes to Lambda pi+pi-pi+]
+0.027320110   Lambda0  pi+ pi0 pi0                         PHSP;  # Isospin model guess
+0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  # [No non-resonant decays in PDG 2021] 
+0.019450000   Lambda0  pi+  eta                            PHSP;  # [PDG2021; contributes to L0 4pi]
+0.015890000   Lambda0  pi+  omega                          PHSP;  # [PDG2021; contributes to L0 4pi]
+0.006020000   Lambda0  K+  anti-K0                         PHSP;  # [PDG2021]
+0.047580000   Sigma+  pi+  pi-                             PHSP;  # [PDG2021 - resonances not measured]
+0.016390000   Sigma+  pi0  pi0                             PHSP;  # [PDG2021 - resonances not measured]	
+0.019780000   Sigma-  pi+  pi+                             PHSP;  # [PDG2021]
+0.037000000   Sigma0  pi+  pi0                             PHSP;  # [PDG2021]
+0.011740000   Sigma0  pi+  pi+  pi-                        PHSP;  # [PDG2021]
+0.011740000   Sigma0  pi+  pi0  pi0                        PHSP;  # not measured
+0.022210000   Sigma-  pi+  pi+  pi0                        PHSP;  # [PDG2021]
+0.011740000   Sigma+  pi+  pi-  pi0                        PHSP;  # not measured
+0.011630000   Sigma+  pi0  pi0  pi0                        PHSP;  # not measured
+0.001590000   Sigma+  K+  K-                               PHSP;  # [PDG2021 - Sigma+phi]
+0.004120000   Sigma+  phi                                  PHSP;  # [PDG2021 contributes to Sigma+ K+K-] 
+0.003700000   Sigma+  K0 anti-K0                           PHSP;  # [From phase-space model]
+0.003700000   Sigma0  K+ anti-K0                           PHSP;  # [From phase-space model]	
+0.004650000   Xi-  K+  pi+                                 PHSP;  # [PDG2021 - subtracted for Xi(1530)K]
+0.006030000   Xi0  K+  pi0                                 PHSP;  # [Isospin model subtracted for Xi(1530)K]
+0.006550000   Xi0  K0  pi+                                 PHSP;  # [Isospin model]		
+0.000000000   Sigma+  K+  pi-                              PHSP;  # [PDG2021 only decays resonantly]
+0.023260000   Lambda(1520)0 pi+                            PHSP;  # [PDG2021]
+# Contributes 0.00534 to pKpi, 0.00534 to nK0bar pi, 0.00324 to Sigma+pipi 0.00324 to Sigma-pipi
+# 0.0015 to Lambda 3pi
+0.000110000   p+ K+ pi-                                    PHSP;  # [PDG2021]
 Enddecay
 CDecay anti-Lambda_c-
 

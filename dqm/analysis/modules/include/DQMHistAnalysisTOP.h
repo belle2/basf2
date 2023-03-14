@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TH1.h>
@@ -21,32 +21,57 @@ namespace Belle2 {
    * Class for TOP histogram analysis.
    */
 
-  class DQMHistAnalysisTOPModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTOPModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisTOPModule();
-    virtual ~DQMHistAnalysisTOPModule();
-
-    //! Module functions to be called from main process
-    virtual void initialize() override;
-
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
 
     /**
-     * Find histogram corresponding to canvas.
-     * @param hname Name of the histogram
-     * @return The pointer to the histogram, or nullptr if not found.
+     * Destructor.
      */
-    TH1* find_histo_in_canvas(TString hname);
+    ~DQMHistAnalysisTOPModule();
+
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
+
     //! Data members
   private:
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
+
     /** Canvas for the mean of the good hits. */
     TCanvas* m_c_goodHitsMean = nullptr;
     /** Canvas for the RMS of the good hits. */
@@ -82,6 +107,10 @@ namespace Belle2 {
     TPaveText* m_text1 = nullptr;
     /** The text for the conditions of the nornal window. */
     TPaveText* m_text2 = nullptr;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
+
   };
 } // end namespace Belle2
 

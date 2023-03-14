@@ -52,6 +52,11 @@ namespace Belle2 {
     RCState next() const;
 
   public:
+
+    /**
+     * Operator =.
+     */
+    const RCState& operator=(const RCState& state);
     const RCState& operator=(const std::string& msg);
     const RCState& operator=(const char* msg);
     const RCState& operator=(int id);

@@ -8,6 +8,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <string>
 
 namespace genfit {
@@ -70,6 +72,8 @@ namespace Belle2 {
      * especially useful for VXD-only beamtest. In the future this could be changed to check
      * implicitly if the cdc is available in the geometry.*/
     bool m_param_initializeCDCTranslators = true;
+
+    StoreArray<RecoTrack> m_recoTracks; /**< RecoTracks StoreArray */
   };
 }
 

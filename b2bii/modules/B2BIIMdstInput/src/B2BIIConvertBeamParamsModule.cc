@@ -16,6 +16,7 @@
 #include <framework/database/EventDependency.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/dbobjects/BeamParameters.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/utilities/FileSystem.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
@@ -137,10 +138,10 @@ namespace Belle2 {
 
     CollisionBoostVector collisionBoostVector;
     CollisionInvariantMass collisionInvM;
-    TLorentzVector cms = beamParams.getLER() + beamParams.getHER();
-    collisionBoostVector.setBoost(cms.BoostVector(), TMatrixTSym<double>(3));
+    ROOT::Math::PxPyPzEVector cms = beamParams.getLER() + beamParams.getHER();
+    collisionBoostVector.setBoost(B2Vector3D(-cms.BoostToCM()), TMatrixTSym<double>(3));
     //note: maybe we could use Belle::BeamEnergy::E_beam_corr(), Belle::BeamEnergy::E_beam_err()
-    collisionInvM.setMass(cms.M(), 0.0 , 0.0);
+    collisionInvM.setMass(cms.M(), 0.0, 0.0);
 
     // Boost vector and invariant mass are not intra-run dependent, store now
     if (m_storeCollisionBoostVector)
@@ -158,7 +159,7 @@ namespace Belle2 {
         file << m_event->getExperiment() << "," << m_event->getRun() << std::endl;
       }
       std::vector<double> covariance; // 0 = no error
-      beamParams.setVertex(TVector3(
+      beamParams.setVertex(ROOT::Math::XYZVector(
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN()), covariance);
@@ -206,7 +207,7 @@ namespace Belle2 {
       HepPoint3D ip = Belle::IpProfile::e_position();
       HepSymMatrix ipErr = Belle::IpProfile::e_position_err();
 
-      beamParams.setVertex(CLHEPtoROOT(ip));
+      beamParams.setVertex(ROOT::Math::XYZVector(ip.x(), ip.y(), ip.z()));
       beamParams.setCovVertex(CLHEPtoROOT(ipErr));
       beamparamsList.emplace_back(beamParams);
 

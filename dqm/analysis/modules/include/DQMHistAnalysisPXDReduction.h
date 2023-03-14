@@ -12,47 +12,72 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
-
-#include <TH2F.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
-#include <vector>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */
 
-  class DQMHistAnalysisPXDReductionModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDReductionModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDReductionModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDReductionModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDReductionModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    //! low warn limit for alarm
+    double m_lowarnlimit;
+    //! low error limit for alarm
+    double m_loerrorlimit;
+    //! high warn limit for alarm
+    double m_hiwarnlimit;
+    //! high error limit for alarm
+    double m_hierrorlimit;
+    /** Update entry intervall */
+    int m_minEntries = 1000;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -70,6 +95,9 @@ namespace Belle2 {
 
     /** flag if to export to EPICS */
     bool m_useEpics;
+
+    /** flag if to import from EPICS only */
+    bool m_useEpicsRO;
 
 #ifdef _BELLE2_EPICS
     //! EPICS PVs

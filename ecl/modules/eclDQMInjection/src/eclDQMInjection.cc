@@ -6,21 +6,21 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclDQMInjection/eclDQMInjection.h>
 
-//Boost
-#include <boost/format.hpp>
-#include <boost/range/combine.hpp>
-
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLDspUtilities.h>
 
-//ROOT
-#include "TDirectory.h"
+/* Boost headers. */
+#include <boost/format.hpp>
+#include <boost/range/combine.hpp>
 
-//STL
+/* ROOT headers. */
+#include <TDirectory.h>
+
+/* C++ headers. */
 #include <stdexcept>
 
 using namespace std;
@@ -30,7 +30,7 @@ using namespace Belle2::ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDQMInjection)
+REG_MODULE(ECLDQMInjection);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -81,10 +81,10 @@ void ECLDQMInjectionModule::defineHisto()
                               "Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
   hOccAfterInjLER = new TH2F("ECLOccAfterInjLER",
-                             "ECL Occupancy after LER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
+                             "ECL Occupancy after LER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
                              100, 0, 20000, 98, 2, 100);
   hOccAfterInjHER = new TH2F("ECLOccAfterInjHER",
-                             "ECL Occupancy after HER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
+                             "ECL Occupancy after HER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
                              100, 0, 20000, 98, 2, 100);
 
 
@@ -174,7 +174,7 @@ void ECLDQMInjectionModule::event()
     m_iEvent = m_eventmetadata->getEvent();
   } else m_iEvent = -1;
 
-  int amps[8736] = {};
+  int amps[ECLElementNumbers::c_NCrystals] = {};
   unsigned int ECLDigitsAboveThr = 0; // Threshold is set to 20 MeV
   unsigned int ECLDigitsAboveThr1MeV = 0;
   for (const auto& aECLDigit : m_storeHits) {
@@ -227,14 +227,14 @@ void ECLDQMInjectionModule::event()
         hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
         hEBurstsAfterInjHER->Fill(diff2);
         hVetoAfterInjHER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
-        if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / 8736.*100.);
+        if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
       } else {
         hHitsAfterInjLER->Fill(diff2, all);
         hEHitsAfterInjLER->Fill(diff2);
         hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
         hEBurstsAfterInjLER->Fill(diff2);
         hVetoAfterInjLER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
-        if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / 8736.*100.);
+        if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
       }
 
       //== Filling h_ped_peak histograms
@@ -256,8 +256,8 @@ void ECLDQMInjectionModule::event()
             //== Identify which histogram to fill (HER/LER,FWD/BAR/BWD)
             int cid = aECLDsp.getCellId();
             int part_id = 0;              // forward endcap
-            if (cid >= 1153) part_id = 1; // barrel
-            if (cid >= 7777) part_id = 2; // backward endcap
+            if (ECLElementNumbers::isBarrel(cid)) part_id = 1; // barrel
+            if (ECLElementNumbers::isBackward(cid)) part_id = 2; // backward endcap
 
             int hist_id = is_her * 3 * range_count + part_id * range_count + range_id;
             // NOTE: We are using the approximate conversion to energy here.

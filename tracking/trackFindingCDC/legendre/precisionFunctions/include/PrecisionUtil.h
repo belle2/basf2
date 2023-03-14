@@ -69,7 +69,7 @@ namespace Belle2 {
         double precision = exp(-16.1987 * pt - 5.96206) + 0.000190872 - 0.0000739319 * pt;
 
         /* 10.5 - 0.24 * exp(-4.13118 * convertRhoToPt(curv) + 2.74); */
-        B2DEBUG(100, "origin: precision = " << precision << "; curv = " << curv);
+        B2DEBUG(25, "origin: precision = " << precision << "; curv = " << curv);
         return precision;
       }
 
@@ -98,7 +98,7 @@ namespace Belle2 {
           precision = exp(-0.357335 + 0.000438872 * pt) - 0.697786;
         }
 
-        B2DEBUG(100, "non origin: precision = " << precision << "; curv = " << curv);
+        B2DEBUG(25, "non origin: precision = " << precision << "; curv = " << curv);
         return precision;
       }
     };

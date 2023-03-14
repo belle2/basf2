@@ -15,7 +15,7 @@ using namespace Belle2::PXD::PXDError;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDPostErrorChecker)
+REG_MODULE(PXDPostErrorChecker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -27,114 +27,105 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   setDescription("PXD: Check Post Unpacking for DAQ errors");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  PXDError::PXDErrorFlags defaulterrormask;
-  defaulterrormask[c_nrEVENT_STRUCT ] = 1;
-  defaulterrormask[c_nrFRAME_TNR_MM ] = 1;
-  defaulterrormask[c_nrMETA_MM ] = 1;
-  defaulterrormask[c_nrONSEN_TRG_FIRST ] = 1;
-  //
-  defaulterrormask[c_nrDHC_END_MISS ] = 1;
-  defaulterrormask[c_nrNR_FRAMES_TO_SMALL ] = 1;
-  // defaulterrormask[c_nrROI_PACKET_INV_SIZE ] = 1; // does not affect pixel data
-  defaulterrormask[c_nrDATA_OUTSIDE ] = 1;
-  //
-  defaulterrormask[c_nrDHC_START_SECOND ] = 1;
-  // defaulterrormask[c_nrDHE_WRONG_ID_SEQ ] = 1; // until this is fixed in FW, we have to live with this
-  defaulterrormask[c_nrFIX_SIZE ] = 1;
-  defaulterrormask[c_nrDHE_CRC ] = 1;
-  //
-  defaulterrormask[c_nrDHC_UNKNOWN ] = 1;
-  defaulterrormask[c_nrHEADERTYPE_INV ] = 1;
-  defaulterrormask[c_nrPACKET_SIZE ] = 1;
-  defaulterrormask[c_nrMAGIC ] = 1;
-  //
-  defaulterrormask[c_nrFRAME_NR ] = 1;
-  defaulterrormask[c_nrFRAME_SIZE ] = 1;
-  defaulterrormask[c_nrHLTROI_MAGIC ] = 1;
-  defaulterrormask[c_nrMERGER_TRIGNR ] = 1;
-  //
-  defaulterrormask[c_nrDHP_SIZE ] = 1;
-  defaulterrormask[c_nrDHE_DHP_DHEID ] = 1;
-  defaulterrormask[c_nrDHE_DHP_PORT ] = 1;
-  // defaulterrormask[c_nrDHP_PIX_WO_ROW ] = 1; // FIXME this should not be needed
-  //
-  defaulterrormask[c_nrDHE_START_END_ID ] = 1;
-  defaulterrormask[c_nrDHE_START_ID ] = 1;
-  defaulterrormask[c_nrDHE_START_WO_END ] = 1;
-  // defaulterrormask[c_nrNO_PXD ] = 1; // THEN we anyway have no data
-  //
-  // defaulterrormask[c_nrNO_DATCON ] = 1;  // does not affect pixel data
-  // defaulterrormask[c_nrFAKE_NO_DATA_TRIG ] = 1; // this will trigger always!!!!
-  defaulterrormask[c_nrDHE_ACTIVE ] = 1;
-  // defaulterrormask[c_nrDHP_ACTIVE ] = 1; // GHOST problem ... bit always set
-  //
-  defaulterrormask[c_nrSENDALL_TYPE ] = 1;
-  defaulterrormask[c_nrNOTSENDALL_TYPE ] = 1;
-  defaulterrormask[c_nrDHP_DBL_HEADER ] = 1;
-  defaulterrormask[c_nrHEADER_ERR ] = 1;
-  //
-  defaulterrormask[c_nrHEADER_ERR_GHOST ] = 1;
-  defaulterrormask[c_nrSUSP_PADDING ] = 1;
-  defaulterrormask[c_nrDHC_WIE ] = 1;
-  defaulterrormask[c_nrDHE_WIE ] = 1;
-  //
-  defaulterrormask[c_nrROW_OVERFLOW ] = 1;
-  // defaulterrormask[c_nrDHP_NOT_CONT ] = 1; // GHOST problem
-  defaulterrormask[c_nrDHP_DHP_FRAME_DIFFER ] = 1;
-  defaulterrormask[c_nrDHP_DHE_FRAME_DIFFER ] = 1;
-  //
-  defaulterrormask[c_nrDHE_ID_INVALID ] = 1;
-  defaulterrormask[c_nrDHC_DHCID_START_END_MM ] = 1;
-  defaulterrormask[c_nrDHE_END_WO_START ] = 1;
-  defaulterrormask[c_nrDHC_END_DBL ] = 1;
-  //
-  defaulterrormask[c_nrMETA_MM_DHC ] = 1;
-  defaulterrormask[c_nrMETA_MM_DHE ] = 1;
-  // defaulterrormask[c_nrCOL_OVERFLOW ] = 1; // we might get that for unconnected lines -> "DHPT fix"
-  defaulterrormask[c_nrUNEXPECTED_FRAME_TYPE ] = 1;
-  //
-  defaulterrormask[c_nrMETA_MM_DHC_ERS ] = 1;
-  // defaulterrormask[c_nrMETA_MM_DHC_TT ] = 1; // time tag is not set correctly in EvtMeta
-  defaulterrormask[c_nrMETA_MM_ONS_HLT ] = 1;
-  // defaulterrormask[c_nrMETA_MM_ONS_DC ] = 1; // problem with NO-DATCON
-  //
-  // defaulterrormask[c_nrEVT_TRG_GATE_DIFFER ] = 1; // still a bug in DHE FW
-  // defaulterrormask[c_nrEVT_TRG_FRM_NR_DIFFER ] = 1; // still a bug in DHE FW
-  // defaulterrormask[c_nrDHP_ROW_WO_PIX ] = 1; // still a bug in DHE FW?
-  defaulterrormask[c_nrDHE_START_THIRD ] = 1;
-  //
-  defaulterrormask[c_nrFAKE_NO_FAKE_DATA ] = 1;
-  // other bits not used yet
-
   addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of input PXDDAQEvtStats", std::string(""));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of input PXDRawHits", std::string(""));
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
-
-  int crit = 0;
-  addParam("CriticalErrorMask", crit, "Set error mask for which data is removed (0=none, 1=default, other undefined yet)", 1);
-  switch (crit) {
-    case 0:
-      m_criticalErrorMask = 0;
-      B2INFO("Disabling critical error mask");
-      break;
-    case 1:
-      m_criticalErrorMask = defaulterrormask;
-      break;
-    default:
-      B2FATAL("Undefined value for criticalErrorMaskSet");
-      break;
-  }
-  // B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
-
+  addParam("CriticalErrorMask", m_criticalErrorMaskParam,
+           "Set error mask for which data is removed (0=none, 1=default, other undefined yet)", 1);
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
   addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);
-
-
 }
 
 void PXDPostErrorCheckerModule::initialize()
 {
+  if (m_criticalErrorMaskParam == 0) {
+    m_criticalErrorMask = 0;
+    B2INFO("Disabling critical error mask");
+  } else if (m_criticalErrorMaskParam == 1) {
+    PXDError::PXDErrorFlags defaulterrormask;
+    defaulterrormask[c_nrEVENT_STRUCT ] = 1;
+    defaulterrormask[c_nrFRAME_TNR_MM ] = 1;
+    defaulterrormask[c_nrMETA_MM ] = 1;
+    defaulterrormask[c_nrONSEN_TRG_FIRST ] = 1;
+    //
+    defaulterrormask[c_nrDHC_END_MISS ] = 1;
+    defaulterrormask[c_nrNR_FRAMES_TO_SMALL ] = 1;
+    // defaulterrormask[c_nrROI_PACKET_INV_SIZE ] = 1; // does not affect pixel data
+    defaulterrormask[c_nrDATA_OUTSIDE ] = 1;
+    //
+    defaulterrormask[c_nrDHC_START_SECOND ] = 1;
+    // defaulterrormask[c_nrDHE_WRONG_ID_SEQ ] = 1; // until this is fixed in FW, we have to live with this
+    defaulterrormask[c_nrFIX_SIZE ] = 1;
+    defaulterrormask[c_nrDHE_CRC ] = 1;
+    //
+    defaulterrormask[c_nrDHC_UNKNOWN ] = 1;
+    defaulterrormask[c_nrHEADERTYPE_INV ] = 1;
+    defaulterrormask[c_nrPACKET_SIZE ] = 1;
+    defaulterrormask[c_nrMAGIC ] = 1;
+    //
+    defaulterrormask[c_nrFRAME_NR ] = 1;
+    defaulterrormask[c_nrFRAME_SIZE ] = 1;
+    defaulterrormask[c_nrHLTROI_MAGIC ] = 1;
+    defaulterrormask[c_nrMERGER_TRIGNR ] = 1;
+    //
+    defaulterrormask[c_nrDHP_SIZE ] = 1;
+    defaulterrormask[c_nrDHE_DHP_DHEID ] = 1;
+    defaulterrormask[c_nrDHE_DHP_PORT ] = 1;
+    // defaulterrormask[c_nrDHP_PIX_WO_ROW ] = 1; // FIXME this should not be needed
+    //
+    defaulterrormask[c_nrDHE_START_END_ID ] = 1;
+    defaulterrormask[c_nrDHE_START_ID ] = 1;
+    defaulterrormask[c_nrDHE_START_WO_END ] = 1;
+    // defaulterrormask[c_nrNO_PXD ] = 1; // THEN we anyway have no data
+    //
+    // defaulterrormask[c_nrNO_DATCON ] = 1;  // does not affect pixel data
+    // defaulterrormask[c_nrFAKE_NO_DATA_TRIG ] = 1; // this will trigger always!!!!
+    defaulterrormask[c_nrDHE_ACTIVE ] = 1;
+    // defaulterrormask[c_nrDHP_ACTIVE ] = 1; // GHOST problem ... bit always set
+    //
+    defaulterrormask[c_nrSENDALL_TYPE ] = 1;
+    defaulterrormask[c_nrNOTSENDALL_TYPE ] = 1;
+    defaulterrormask[c_nrDHP_DBL_HEADER ] = 1;
+    defaulterrormask[c_nrHEADER_ERR ] = 1;
+    //
+    defaulterrormask[c_nrHEADER_ERR_GHOST ] = 1;
+    defaulterrormask[c_nrSUSP_PADDING ] = 1;
+    defaulterrormask[c_nrDHC_WIE ] = 1;
+    defaulterrormask[c_nrDHE_WIE ] = 1;
+    //
+    defaulterrormask[c_nrROW_OVERFLOW ] = 1;
+    // defaulterrormask[c_nrDHP_NOT_CONT ] = 1; // GHOST problem
+    defaulterrormask[c_nrDHP_DHP_FRAME_DIFFER ] = 1;
+    defaulterrormask[c_nrDHP_DHE_FRAME_DIFFER ] = 1;
+    //
+    defaulterrormask[c_nrDHE_ID_INVALID ] = 1;
+    defaulterrormask[c_nrDHC_DHCID_START_END_MM ] = 1;
+    defaulterrormask[c_nrDHE_END_WO_START ] = 1;
+    defaulterrormask[c_nrDHC_END_DBL ] = 1;
+    //
+    defaulterrormask[c_nrMETA_MM_DHC ] = 1;
+    defaulterrormask[c_nrMETA_MM_DHE ] = 1;
+    // defaulterrormask[c_nrCOL_OVERFLOW ] = 1; // we might get that for unconnected lines -> "DHPT fix"
+    defaulterrormask[c_nrUNEXPECTED_FRAME_TYPE ] = 1;
+    //
+    defaulterrormask[c_nrMETA_MM_DHC_ERS ] = 1;
+    // defaulterrormask[c_nrMETA_MM_DHC_TT ] = 1; // time tag is not set correctly in EvtMeta
+    defaulterrormask[c_nrMETA_MM_ONS_HLT ] = 1;
+    // defaulterrormask[c_nrMETA_MM_ONS_DC ] = 1; // problem with NO-DATCON
+    //
+    // defaulterrormask[c_nrEVT_TRG_GATE_DIFFER ] = 1; // still a bug in DHE FW
+    // defaulterrormask[c_nrEVT_TRG_FRM_NR_DIFFER ] = 1; // still a bug in DHE FW
+    // defaulterrormask[c_nrDHP_ROW_WO_PIX ] = 1; // still a bug in DHE FW?
+    defaulterrormask[c_nrDHE_START_THIRD ] = 1;
+    //
+    defaulterrormask[c_nrFAKE_NO_FAKE_DATA ] = 1;
+    // other bits not used yet
+    m_criticalErrorMask = defaulterrormask;
+  } else {
+    B2FATAL("Undefined value for criticalErrorMaskSet");
+  }
+
   m_storeDAQEvtStats.isRequired();
 
   // Needed if we need to Clear them on detected Error

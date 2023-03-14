@@ -118,14 +118,5 @@ namespace Belle2 {
       /// Dataobjects
       DBObjPtr<TRGGDLDBFTDLBits> m_l1NameLookup;
     };
-
-    /// HLT unit number information.
-    namespace HLTUnit {
-      /// Maximum number of HLT units used during the experiment
-      static constexpr unsigned int max_hlt_units = 10;
-
-      /// Location of HLT unit number information
-      static constexpr char hlt_unit_file[] = "/home/usr/hltdaq/HLT.UnitNumber";
-    };
   }
 }

@@ -14,7 +14,7 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(CDCTriggerNeuro)
+REG_MODULE(CDCTriggerNeuro);
 
 CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
 {
@@ -147,9 +147,6 @@ CDCTriggerNeuroModule::event()
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
-    // get the complete hit pattern for debug purposes
-    unsigned long chitPattern =
-      m_NeuroTrigger.getCompleteHitPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
     // get the pure driftthreshold vector
     unsigned long puredriftth =
       m_NeuroTrigger.getPureDriftThreshold(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
@@ -197,10 +194,10 @@ CDCTriggerNeuroModule::event()
     if (m_neuroTrackInputMode) {
       quadrant = m_tracks2D[itrack]->getQuadrant();
     } else {
-      if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
-      else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }
-      else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 2; }
-      else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 3; }
+      if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 3; }
+      else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 0; }
+      else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 1; }
+      else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 2; }
     }
 
 
@@ -237,6 +234,9 @@ CDCTriggerNeuroModule::event()
     NNtrack->setRawPhi0(std::stoi(intphi.str()));
     NNtrack->setRawZ(std::stoi(intz.str()));
     NNtrack->setRawTheta(std::stoi(inttheta.str()));
+    NNtrack->setHasETFTime(m_tracks2D[itrack]->getHasETFTime());
+    NNtrack->setETF_unpacked(m_tracks2D[itrack]->getETF_unpacked());
+    NNtrack->setETF_recalced(m_tracks2D[itrack]->getETF_recalced());
 
     m_tracks2D[itrack]->addRelationTo(NNtrack);
     if (m_neuroTrackInputMode) {

@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ZMQTxInput)
+REG_MODULE(ZMQTxInput);
 
 ZMQTxInputModule::ZMQTxInputModule() : Module()
 {

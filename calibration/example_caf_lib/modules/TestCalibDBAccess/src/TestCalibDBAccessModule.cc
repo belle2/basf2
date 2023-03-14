@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TestCalibDBAccess)
+REG_MODULE(TestCalibDBAccess);
 
 //-----------------------------------------------------------------
 //                 Implementation

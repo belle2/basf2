@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCCrossTalkAdder)
+REG_MODULE(CDCCrossTalkAdder);
 CDCCrossTalkAdderModule::CDCCrossTalkAdderModule() : Module()
 {
   // Set description
@@ -221,7 +221,7 @@ void CDCCrossTalkAdderModule::setFEElectronics()
   if (!m_fEElectronicsFromDB) B2FATAL("No FEEElectronics dbobject!");
   const CDCFEElectronics& fp = *((*m_fEElectronicsFromDB)[0]);
   int mode = (fp.getBoardID() == -1) ? 1 : 0;
-  int iNBoards = static_cast<int>(nBoards);
+  int iNBoards = static_cast<int>(c_nBoards);
 
   //set typical values for all channels first if mode=1
   if (mode == 1) {

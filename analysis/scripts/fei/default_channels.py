@@ -364,7 +364,7 @@ def get_default_channels(
     D0.addChannel(['K-', 'K+', 'pi0'])
     D0.addChannel(['K-', 'K+', 'K_S0'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         D0_SL = Particle('D0:semileptonic',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignalAcceptMissingNeutrino'),
@@ -416,7 +416,7 @@ def get_default_channels(
     DP.addChannel(['K_S0', 'pi+', 'pi+', 'pi-'])
     DP.addChannel(['K+', 'K_S0', 'K_S0'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         DP_SL = Particle('D+:semileptonic',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignalAcceptMissingNeutrino'),
@@ -470,7 +470,7 @@ def get_default_channels(
     DSP.addChannel(['D+', 'pi0'])
     DSP.addChannel(['D+', 'gamma'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         DSP_SL = Particle('D*+:semileptonic',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignalAcceptMissingNeutrino'),
@@ -507,7 +507,7 @@ def get_default_channels(
     DS0.addChannel(['D0', 'pi0'])
     DS0.addChannel(['D0', 'gamma'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         DS0_SL = Particle('D*0:semileptonic',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignalAcceptMissingNeutrino'),
@@ -648,12 +648,19 @@ def get_default_channels(
         BP.addChannel(['D*+', 'p+', 'anti-p-', 'pi+', 'pi-'])
         BP.addChannel(['anti-Lambda_c-', 'p+', 'pi+'])
 
+    B_SL_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
+                 'chiProb', 'daughter({}, chiProb)', 'extraInfo(preCut_rank)',
+                 'useRestFrame(daughter({}, p))',
+                 'useRestFrame(daughter({}, distance))',
+                 'cosAngleBetweenMomentumAndVertexVector',
+                 'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'daughter({},extraInfo(decayModeID))']
+
     semileptonic_user_cut = ''
     if B_extra_cut is not None:
         semileptonic_user_cut += B_extra_cut
 
     BP_SL = Particle('B+:semileptonic',
-                     MVAConfiguration(variables=B_vars,
+                     MVAConfiguration(variables=B_SL_vars,
                                       target='isSignalAcceptMissingNeutrino'),
                      PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
@@ -669,7 +676,7 @@ def get_default_channels(
     BP_SL.addChannel(['D*-', 'pi+', 'e+'])
     BP_SL.addChannel(['D*-', 'pi+', 'mu+'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+'])
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0'])
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0', 'pi0'])
@@ -800,7 +807,7 @@ def get_default_channels(
         B0.addChannel(['anti-D*0', 'p+', 'anti-p-', 'pi+', 'pi-'])
 
     B0_SL = Particle('B0:semileptonic',
-                     MVAConfiguration(variables=B_vars,
+                     MVAConfiguration(variables=B_SL_vars,
                                       target='isSignalAcceptMissingNeutrino'),
                      PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
@@ -816,7 +823,7 @@ def get_default_channels(
     B0_SL.addChannel(['anti-D*0', 'pi-', 'e+'])
     B0_SL.addChannel(['anti-D*0', 'pi-', 'mu+'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         B0_SL.addChannel(['D-:semileptonic', 'pi+'])
         B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0'])
         B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0', 'pi0'])

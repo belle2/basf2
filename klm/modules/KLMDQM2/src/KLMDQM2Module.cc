@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Belle 2 headers. */
+/* Own header. */
 #include <klm/modules/KLMDQM2/KLMDQM2Module.h>
+
+/* Basf2 headers. */
 #include <mdst/dataobjects/Track.h>
 
 /* ROOT headers. */
@@ -17,8 +19,6 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 /* C++ headers. */
-#include <vector>
-#include <algorithm>
 #include <string>
 
 using namespace Belle2;
@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(KLMDQM2)
+REG_MODULE(KLMDQM2);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -40,23 +40,19 @@ KLMDQM2Module::KLMDQM2Module() :
   m_GeometryBKLM{nullptr},
   m_MatchedHitsBKLM{nullptr},
   m_AllExtHitsBKLM{nullptr},
-  m_PlaneEfficienciesBKLM{nullptr},
   m_MatchedHitsEKLM{nullptr},
   m_AllExtHitsEKLM{nullptr},
-  m_PlaneEfficienciesEKLM{nullptr},
   m_MatchedHitsBKLMSector{nullptr},
   m_AllExtHitsBKLMSector{nullptr},
-  m_PlaneEfficienciesBKLMSector{nullptr},
   m_MatchedHitsEKLMSector{nullptr},
-  m_AllExtHitsEKLMSector{nullptr},
-  m_PlaneEfficienciesEKLMSector{nullptr}
+  m_AllExtHitsEKLMSector{nullptr}
 {
   // Set module properties
-  setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
+  setDescription(R"DOC(Additional Module for KLMDQM plots after HLT filters
 
-    An additional module developed to display plane efficiencies for the KLM dduring runs (i.e. for online analyses). 
-    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events. 
-    The output histograms would be plane efficiences = MatchedDigits/AllExtits.
+    An additional module developed to display plane efficiencies for the KLM during runs (i.e. for online analyses).
+    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events.
+    The output histograms would be plane efficiencies = MatchedDigits/AllExtits.
     )DOC");
 
   // Parameter definitions
@@ -80,6 +76,9 @@ KLMDQM2Module::KLMDQM2Module() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLMEfficiencyDQM"));
+  addParam("SoftwareTriggerName", m_SoftwareTriggerName,
+           "Software Trigger for event selection",
+           std::string("software_trigger_cut&skim&accept_mumutight"));
 
 }
 
@@ -104,22 +103,11 @@ void KLMDQM2Module::defineHisto()
                                "Matched Hits in BKLM Plane",
                                m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
   m_MatchedHitsBKLM->GetXaxis()->SetTitle("Layer Number");
-  //m_MatchedHitsBKLM->SetOption("LIVE");
 
   m_AllExtHitsBKLM = new TH1F("all_ext_hitsBKLM",
                               "All ExtHits in BKLM Plane",
                               m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
   m_AllExtHitsBKLM->GetXaxis()->SetTitle("Layer number");
-  //m_AllExtHitsBKLM->SetOption("LIVE");
-
-
-  m_PlaneEfficienciesBKLM = new TH1F("plane_eff_bklm",
-                                     "Plane Efficiency in BKLM Planes",
-                                     m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
-  m_PlaneEfficienciesBKLM->GetXaxis()->SetTitle("Layer number");
-  m_PlaneEfficienciesBKLM->SetOption("LIVE");
-  m_PlaneEfficienciesBKLM->SetOption("HIST");
-  m_PlaneEfficienciesBKLM->SetStats(11);
 
 
 
@@ -127,20 +115,12 @@ void KLMDQM2Module::defineHisto()
                                "Matched Hits in EKLM Plane",
                                m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
   m_MatchedHitsEKLM->GetXaxis()->SetTitle("Plane number");
-  //m_MatchedHitsEKLM->SetOption("LIVE");
 
   m_AllExtHitsEKLM = new TH1F("all_ext_hitsEKLM",
                               "All ExtHits in EKLM Plane",
                               m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
   m_AllExtHitsEKLM->GetXaxis()->SetTitle("Plane number");
-  //m_AllExtHitsEKLM->SetOption("LIVE");
 
-  m_PlaneEfficienciesEKLM = new TH1F("plane_eff_eklm",
-                                     "Plane Efficiency in EKLM Plane",
-                                     m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
-  m_PlaneEfficienciesEKLM->GetXaxis()->SetTitle("Plane number");
-  m_PlaneEfficienciesEKLM->SetOption("LIVE");
-  m_PlaneEfficienciesEKLM->SetOption("HIST");
 
 
   /********************/
@@ -153,49 +133,31 @@ void KLMDQM2Module::defineHisto()
                                      "Matched Hits in BKLM Sector",
                                      BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_MatchedHitsBKLMSector->GetXaxis()->SetTitle("Sector Number");
-  //m_MatchedHitsBKLMSector->SetOption("LIVE");
 
   m_AllExtHitsBKLMSector = new TH1F("all_ext_hitsBKLMSector",
                                     "All ExtHits in BKLM Sector",
                                     BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_AllExtHitsBKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_AllExtHitsBKLMSector->SetOption("LIVE");
 
-  m_PlaneEfficienciesBKLMSector = new TH1F("plane_eff_bklmSector",
-                                           "Plane Efficiency in BKLM Sector",
-                                           BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
-  m_PlaneEfficienciesBKLMSector->GetXaxis()->SetTitle("Sector number");
-  m_PlaneEfficienciesBKLMSector->GetYaxis()->SetRangeUser(0., 1.1);
-  m_PlaneEfficienciesBKLMSector->SetOption("LIVE");
-  m_PlaneEfficienciesBKLMSector->SetOption("HIST");
 
 
   m_MatchedHitsEKLMSector = new TH1F("matched_hitsEKLMSector",
                                      "Matched Hits in EKLM Sector",
                                      EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_MatchedHitsEKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_MatchedHitsEKLMSector->SetOption("LIVE");
 
   m_AllExtHitsEKLMSector = new TH1F("all_ext_hitsEKLMSector",
                                     "All ExtHits in EKLM Sector",
                                     EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_AllExtHitsEKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_AllExtHitsEKLMSector->SetOption("LIVE");
 
-  m_PlaneEfficienciesEKLMSector = new TH1F("plane_eff_eklmSector",
-                                           "Plane Efficiency in EKLM Sector",
-                                           EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
-  m_PlaneEfficienciesEKLMSector->GetXaxis()->SetTitle("Sector number");
-  m_PlaneEfficienciesEKLMSector->GetYaxis()->SetRangeUser(0., 1.1);
-  m_PlaneEfficienciesEKLMSector->SetOption("LIVE");
-  m_PlaneEfficienciesEKLMSector->SetOption("HIST");
 }//end of defineHisto
 
 void KLMDQM2Module::initialize()
 {
   REG_HISTOGRAM;
   //inputs
-  m_softwareTriggerResult.isRequired();
+  m_softwareTriggerResult.isOptional();
   m_MuonList.isRequired(m_MuonListName);
   m_Digits.isOptional();
   m_GeometryBKLM = bklm::GeometryPar::instance();
@@ -208,22 +170,18 @@ void KLMDQM2Module::beginRun()
   /* KLM General Related. */
   m_MatchedHitsBKLM->Reset();
   m_AllExtHitsBKLM->Reset();
-  m_PlaneEfficienciesBKLM->Reset();
   m_MatchedHitsEKLM->Reset();
   m_AllExtHitsEKLM->Reset();
-  m_PlaneEfficienciesEKLM->Reset();
 
   m_MatchedHitsBKLMSector->Reset();
   m_AllExtHitsBKLMSector->Reset();
-  m_PlaneEfficienciesBKLMSector->Reset();
   m_MatchedHitsEKLMSector->Reset();
   m_AllExtHitsEKLMSector->Reset();
-  m_PlaneEfficienciesEKLMSector->Reset();
 }
 
 void KLMDQM2Module::event()
 {
-  if (triggerFlag()) {
+  if (triggerFlag() || m_SoftwareTriggerName == "") {
     unsigned int nMuons = m_MuonList->getListSize();
     for (unsigned int i = 0; i < nMuons; ++i) {
       const Particle* muon = m_MuonList->getParticle(i);
@@ -233,17 +191,6 @@ void KLMDQM2Module::event()
                        m_MatchedHitsEKLMSector, m_AllExtHitsEKLMSector);
 
     }
-    m_PlaneEfficienciesBKLM->Divide(m_MatchedHitsBKLM,
-                                    m_AllExtHitsBKLM, 1, 1, "B");
-
-    m_PlaneEfficienciesEKLM->Divide(m_MatchedHitsEKLM,
-                                    m_AllExtHitsEKLM, 1, 1, "B");
-
-    m_PlaneEfficienciesBKLMSector->Divide(m_MatchedHitsBKLMSector,
-                                          m_AllExtHitsBKLMSector, 1, 1, "B");
-
-    m_PlaneEfficienciesEKLMSector->Divide(m_MatchedHitsEKLMSector,
-                                          m_AllExtHitsEKLMSector, 1, 1, "B");
 
   }
 }
@@ -262,7 +209,7 @@ bool KLMDQM2Module::triggerFlag()
   bool passed = false;
   if (m_softwareTriggerResult) {
     try {
-      passed = (m_softwareTriggerResult->getResult("software_trigger_cut&skim&accept_mumutight") == SoftwareTriggerCutResult::c_accept) ?
+      passed = (m_softwareTriggerResult->getResult(m_SoftwareTriggerName) == SoftwareTriggerCutResult::c_accept) ?
                true : false;
     } catch (const std::out_of_range&) {
       passed = false;
@@ -325,7 +272,7 @@ bool KLMDQM2Module::collectDataTrack(
   KLMChannelNumber channel;
   enum KLMChannelStatus::ChannelStatus status;
   struct HitData hitData, hitDataPrevious;
-  TVector3 extHitPosition;
+  ROOT::Math::XYZVector extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
   int layer;
   int extHitLayer[nExtrapolationLayers] = {0};
@@ -476,7 +423,6 @@ bool KLMDQM2Module::collectDataTrack(
   }
   /* Find matching digits. */
   int nDigits = 0;
-  std::map<int, int>::iterator it2;
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
     findMatchingDigit(&(it->second));
     if (it->second.digit != nullptr) {
@@ -523,7 +469,7 @@ bool KLMDQM2Module::collectDataTrack(
        * The muons with sufficiently large momentum have a very small
        * probability to get absorbed in the detector.
        */
-      if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+      if (muon->getP() < m_MinimalMomentumNoOuterLayers)
         continue;
     }
     //Filling AddExtHits and MatchedHits histograms

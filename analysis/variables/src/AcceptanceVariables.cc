@@ -6,9 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/AcceptanceVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 using namespace std;
 
@@ -182,7 +186,9 @@ Checks if particle is within ECL angular acceptance.
 This variable checks if the particle polar angle :math:`\theta` is within certain ranges.
 Return values and the corresponding :math:`\theta` ranges are the following:
 
-* 0: Outside of ECL acceptance, :math:`\theta < 12.4^\circ` or :math:`\theta < 155.1^\circ`.
+* 0: Outside of ECL acceptance, :math:`\theta < 12.4^\circ` or :math:`\theta > 155.1^\circ`,
+  or in one of the acceptance gaps at :math:`31.4^{\circ} < \theta < 32.2^{\circ}`
+  or :math:`128.7^{\circ} < \theta < 130.7^{\circ}`;
 * 1: Forward ECL,  :math:`12.4^\circ < \theta < 31.4^\circ`; 
 * 2: Barrel ECL,   :math:`32.2^\circ < \theta < 128.7^\circ`; 
 * 3: Backward ECL, :math:`130.7^\circ < \theta < 155.1^\circ`.

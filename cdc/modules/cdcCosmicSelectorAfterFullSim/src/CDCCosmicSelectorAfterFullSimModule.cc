@@ -17,7 +17,7 @@ using namespace std;
 using namespace Belle2;
 
 // register module
-REG_MODULE(CDCCosmicSelectorAfterFullSim)
+REG_MODULE(CDCCosmicSelectorAfterFullSim);
 CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Module()
 {
   // Set description
@@ -92,11 +92,11 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     //    B2INFO("No .of prim. charged MC particles= " << nPrimChgds);
     if (nPrimChgds > 1) continue;
     /*
-    const TVector3 vertex = m_P->getProductionVertex();
+    const B2Vector3D vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();
     const double vY0 = vertex.Y();
     const double vZ0 = vertex.Z();
-    const TVector3 momentum = m_P->getMomentum();
+    const B2Vector3D momentum = m_P->getMomentum();
     const double pX0 = momentum.X();
     const double pY0 = momentum.Y();
     const double pZ0 = momentum.Z();
@@ -183,15 +183,15 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     //calculate flight time from y_up to y=0 plane (linear approx.)
     //    std::cout <<"ihit_up,dn= " << ihit_up <<" "<< ihit_dn << std::endl;
     if (ihit_up < 0 || ihit_dn < 0) continue;
-    const TVector3 pos_up = m_simHits[ihit_up]->getPosTrack();
-    const TVector3 pos_dn = m_simHits[ihit_dn]->getPosTrack();
-    const TVector3 mom_up = m_simHits[ihit_up]->getMomentum();
-    const TVector3 mom_dn = m_simHits[ihit_dn]->getMomentum();
+    const B2Vector3D pos_up = m_simHits[ihit_up]->getPosTrack();
+    const B2Vector3D pos_dn = m_simHits[ihit_dn]->getPosTrack();
+    // const B2Vector3D mom_up = m_simHits[ihit_up]->getMomentum();
+    // const B2Vector3D mom_dn = m_simHits[ihit_dn]->getMomentum();
     if (tof_up > tof_dn) B2WARNING("tof_up > tof_dn " << tof_up << " " << tof_dn);
     //    std::cout <<"tof_up,dn= " << tof_up <<" "<< tof_dn << std::endl;
 
-    //    const TVector3 mom_mean = 0.5 * (mom_up + mom_dn);
-    const TVector3 dpos = pos_dn - pos_up;
+    //    const B2Vector3D mom_mean = 0.5 * (mom_up + mom_dn);
+    const B2Vector3D dpos = pos_dn - pos_up;
     double cx = dpos.X() / dpos.Mag();
     double cy = dpos.Y() / dpos.Mag();
     double cz = dpos.Z() / dpos.Mag();

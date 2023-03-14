@@ -9,11 +9,11 @@
 #pragma once
 
 /* External headers. */
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
@@ -101,7 +101,7 @@ namespace Belle2 {
      * Get momentum.
      * @return 4-Momentum.
      */
-    TLorentzVector getMomentum() const;
+    ROOT::Math::PxPyPzEVector getMomentum() const;
 
     /**
      * Get KLM cluster momentum error matrix.

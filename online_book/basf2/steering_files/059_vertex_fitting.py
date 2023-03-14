@@ -14,7 +14,7 @@ import vertex
 filenumber = sys.argv[1]
 
 # set analysis global tag (needed for flavor tagging)
-b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # create path
 main = b2.Path()

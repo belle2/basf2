@@ -12,21 +12,21 @@ Collaborative Tools.
 
     **Prerequisites**:
 
-        * DESY accounts.
-        * An internet browser.
+    * DESY accounts.
+    * An internet browser.
 
     **Questions**:
 
-        * Where do I find information?
-        * Where can I ask for help?
-        * Where can I report bugs?
-        * Where do I find the source code?
+    * Where do I find information?
+    * Where can I ask for help?
+    * Where can I report bugs?
+    * Where do I find the source code?
 
     **Objectives**:
 
-        * Learn where things are or where to look.
-        * Learn to ask good questions at the right places.
-        * Learn how to report problems.
+    * Learn where things are or where to look.
+    * Learn to ask good questions at the right places.
+    * Learn how to report problems.
 
 Belle II is an international collaboration of more than 1000 members from all
 over the world.
@@ -56,19 +56,16 @@ right away (for newcomers) and that are needed in these lessons.
     Used for many things from run planning to tracking progress through a
     physics analysis.
 
-`stash.desy.de <https://stash.desy.de>`_
-    Our git server.
-    All code should go here, ideally under the Belle II "project".
+`gitlab.desy.de <https://gitlab.desy.de>`_
+    Our Git server.
+    All code should go here, ideally under the Belle II "group".
     **It is a rule that your analysis code must be viewable to the rest of the
     collaboration.**
-    To make this less painful, you should get happy with git and the stash tool.
-
-`agira.desy.de <https://agira.desy.de>`_
-    Our bug reporting and work-tracking system.
+    To make this less painful, you should get happy with Git and GitLab.
+    This is also our bug reporting and work-tracking system.
     Used to report problems, request features, request MC samples, and track
     work.
-    You will hear people refer to this as "JIRA".
-
+    
 `software.belle2.org <https://software.belle2.org>`_
     The documentation for
     the Belle II software.
@@ -89,9 +86,9 @@ right away (for newcomers) and that are needed in these lessons.
         We've got you covered.
         Try `search.belle2.org <https://search.belle2.org>`_.
 
-You should note that **confluence**, **stash**, and agira/**jira** are part of
-a `suite of commercial tools <https://www.atlassian.com/>`_, and **"sphinx"**
-is an industry-standard open-source tool for generating documentation.
+You should note that **confluence** is part of a
+`suite of commercial tools <https://www.atlassian.com/>`_, while
+**GitLab** and **"sphinx"** are industry-standard open-source tools.
 This means that there is non-Belle II-specific help on the internet.
 
 .. admonition:: Question
@@ -110,13 +107,13 @@ This means that there is non-Belle II-specific help on the internet.
 .. admonition:: Question
      :class: exercise stacked
 
-     Where is the documentation for **confluence**, **stash**, and **jira**?
+     Where is the documentation for **confluence** and **gitlab**?
 
 .. admonition:: Solution
    :class: toggle solution
 
-   At `support.atlassian.com <https://support.atlassian.com>`_!
-   (You need to choose the tool and browse to "documentation".)
+   At `support.atlassian.com/confluence-cloud <https://support.atlassian.com/confluence-cloud/>`_
+   and `docs.gitlab.com <https://docs.gitlab.com/>`_!
 
 .. admonition:: Question
      :class: exercise stacked
@@ -185,7 +182,7 @@ Let's assume you are working on an analysis when...
   You have a crash or a segmentation fault, or the output cannot possibly be
   correct.
   **You probably have a bug.**
-  Bugs should be reported at `agira.desy.de`_.
+  Bugs should be reported at `<https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
   You should continue to try and investigate and understand it yourself.
 
 ... with the grid
@@ -348,7 +345,7 @@ of the software you are using.
 
     Some inspiration:
 
-    * Link to a JIRA ticket.
+    * Link to a GitLab issue.
     * Link to another confluence page.
     * Tag your colleagues.
     * Add the date.
@@ -461,13 +458,13 @@ If you know an answer to a question: answer it!
     If you *don't* know the answer, but know someone who you think might:
     please tag them in a comment.
 
-A bit more about working with stash and JIRA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A bit more about working with GitLab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Go to https://stash.desy.de
+     Go to https://gitlab.desy.de
 
      * What's displayed at the dashboard/home screen?
      * Find the main Belle II basf2 repository.
@@ -480,59 +477,22 @@ A bit more about working with stash and JIRA
    Some of that is just browsing.
    We trust that you did it.
    The main software repository is:
-   https://stash.desy.de/projects/B2/repos/basf2 , and the list of commits
-   is `here <https://stash.desy.de/projects/B2/repos/basf2/commits>`__.
-
-.. seealso::
-
-  In this video we will show you around stash. It will also contain the solution
-  to the last exercise.
+   https://gitlab.desy.de/belle2/software/basf2 , and the list of commits
+   is `here <https://gitlab.desy.de/belle2/software/basf2/-/commits/main>`__.
 
 
-  .. raw:: html
-
-      <iframe width="640" height="400" src="https://rebrand.ly/axdfhy4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-.. .. FIXME video above needs redoing to navigate around the **basf2** repository
-
-.. admonition:: Exercise
-     :class: exercise stacked
-
-     Go to https://agira.desy.de
-
-     * What’s displayed at the dashboard/home screen?
-     * Where is the Belle II "project"?
-     * Browse a couple of issues.
-
-.. admonition:: Solution
-   :class: toggle solution
-
-   The Belle II project is:
-   https://agira.desy.de/projects/BII
-
-.. seealso::
-
-  In this video we will show you around JIRA. It will also contain the solution
-  to the last exercise.
-
-  .. raw:: html
-
-      <iframe width="640" height="400" src="https://rebrand.ly/zzbewnf" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-
-Here is a rough workflow for working with stash and JIRA.
+Here is a rough workflow for working with GitLab.
 
 1. Identify an issue: Feature requests, bug report, ...
 
    - If you don’t know if it's a real bug, you can always ask on questions.
 
-2. Open an issue on JIRA and assign someone to work on it
+2. Open an issue on GitLab and assign someone to work on it
 
    - Click "create" and fill out the form.
 
-   - It can be reassigned, so either guess someone or leave it as "Automatic".
-     If you leave assignee as Automatic but choose a "component" then the
-     person in charge of the package is automatically assigned.
+   - It can be reassigned, so guess someone. Please choose an appropriate
+     label for the issue (select one or more labels among the existing ones).
 
 3. Discuss there in comments: Is this really a bug? Do we really need this
    feature?
@@ -540,24 +500,19 @@ Here is a rough workflow for working with stash and JIRA.
 4. You (or someone else will) create a branch that references the issue,
    write some code, and add some commits to the branch.
 
-5. You (or someone else will) open a pull request, add reviewers, and add a
+5. You (or someone else will) open a merge request, add a reviewer, and add a
    clear description.
 
-   - You (or someone else) can edit the text, title, and reviewers after a
+   - You (or someone else) can edit the text, title, and the reviewer after a
      first attempt.
 
-6. Reviewers look at the changes, leave comments on code and in general.
+6. The reviewer looks at the changes, leave comments on code and in general.
 
-7. The developer will react to reviewers
+7. The developer will react to the reviewer
 
    - more commits to this branch
 
-8. After all reviewers agree: Merge!
-
-.. seealso::
-
-    `How do I send a JIRA ticket?
-    <https://questions.belle2.org/question/1317/how-do-i-send-a-jira-ticket/>`_
+8. After the review is done: write a comment with written "Merge" in the merge request!
 
 .. tip::
 
@@ -590,7 +545,7 @@ The page you are now reading is written in sphinx.
 
 If you discover an omission or a problem (or even a typo) you can actually
 fix it quite easily yourself.
-It is a good excuse for a first pull request, and you will make the software
+It is a good excuse for a first merge request, and you will make the software
 developers very happy.
 
 .. seealso:: :ref:`doctools`
@@ -606,7 +561,7 @@ You can make a difference!
 People are nice: don't be too afraid to bother them or break stuff (chances are
 you won't, anyway).
 Ask for help on `questions.belle2.org <https://questions.belle2.org>`_ or leave
-a comment on a confluence page or on a JIRA ticket.
+a comment on a confluence page or on a GitLab issue.
 
 Help us out with documentation: as a beginner, you know best what is missing!
 
@@ -616,8 +571,7 @@ Help us out with documentation: as a beginner, you know best what is missing!
     * Software documentation → `software.belle2.org <https://software.belle2.org>`_.
     * Ask questions (and answer them) at `questions.belle2.org <https://questions.belle2.org>`_.
     * `Confluence <https://confluence.desy.de>`_ is our wiki.
-    * Code → `stash.desy.de <https://stash.desy.de>`_.
-    * Bugs, feature requests → `agira.desy.de <https://agira.desy.de>`_.
+    * Code, bugs, feature requests → `gitlab.desy.de <https://gitlab.desy.de>`_.
 
 .. tip:: Good questions are also documentation and are also helpful!
 
@@ -625,7 +579,7 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-     Kilian Lieret,
-     Sam Cunliffe
+Kilian Lieret,
+Sam Cunliffe

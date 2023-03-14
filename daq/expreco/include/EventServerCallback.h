@@ -28,9 +28,9 @@ namespace Belle2 {
   public:
     virtual void load(const DBObject&);
     virtual void start();
-    virtual void stop();
+    void stop() override;
     virtual void recover(const DBObject&);
-    virtual void abort();
+    void abort() override;
 
     void EventServerLogger();
 

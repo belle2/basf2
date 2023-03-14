@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::ECL::ECLChannelMapper+;
+#pragma link C++ class Belle2::ECL::ECLChannelMapper+; // checksum=0x8091fd4f, version=1
 
 #endif

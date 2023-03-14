@@ -12,17 +12,10 @@ import re
 import struct
 import pdg
 import basf2
-
 import pybasf2
-# inspect is also used by LogPythonInterface. Do not remove
+import uproot
+
 import numpy as np
-import ROOT
-from ROOT import Belle2
-
-logging = pybasf2.LogPythonInterface()
-
-ROOT.gSystem.Load("libanalysis.so")
-ROOT.gSystem.Load("libanalysis_utility.so")
 
 
 def _bitwiseConversion(value, i='f', o='i'):
@@ -60,19 +53,24 @@ class DecayHashMap:
 
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         """Constructor"""
-        import root_numpy
-        ntuple = root_numpy.root2array(rootfile)
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        with uproot.open(rootfile) as rf:
+            trees = rf.keys()
+            assert len(trees) == 1
+            ntuple = rf[trees[0]].arrays(library='np')
         # self._removeGammaFlag = removeRadiativeGammaFlag
         #: Dict Int -> DecayStrings
         self._string = {}
         #: Dict Int -> Reconstructed DecayTree
         self._forest = {}
-        for decayHash, decayHashExtended, decayString in ntuple:
-            decayInt = Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)
+        for decayHash, decayHashExtended, decayString in zip(
+                ntuple['decayHash'], ntuple['decayHashExtended'], ntuple['decayString']):
+            decayInt = ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)
             if decayInt in self._string:
                 continue
             self._string[decayInt] = decayString
-            self._forest[decayInt] = Belle2.DecayForest(decayString, True, removeRadiativeGammaFlag)
+            self._forest[decayInt] = ROOT.Belle2.DecayForest(decayString, True, removeRadiativeGammaFlag)
 
     def get_string(self, decayHash, decayHashExtended):
         """
@@ -80,7 +78,9 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        return self._string[Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)]
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        return self._string[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)]
 
     def get_original_decay(self, decayHash, decayHashExtended):
         """
@@ -88,7 +88,9 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        return self._forest[Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getOriginalTree()
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        return self._forest[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getOriginalTree()
 
     def get_reconstructed_decay(self, decayHash, decayHashExtended):
         """
@@ -96,7 +98,9 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        return self._forest[Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getReconstructedTree()
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        return self._forest[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getReconstructedTree()
 
     def print_hash(self, decayHash, decayHashExtended):
         """

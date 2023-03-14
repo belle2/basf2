@@ -1,4 +1,4 @@
-[INFO] Steering file: mdst/tests/mdst_compatibility-v06-00-00.py
+[INFO] Steering file: mdst_compatibility-v06-00-00.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v06-00-00.root
@@ -15,14 +15,23 @@ Untested method EventMetaData::setProduction
 Untested method EventMetaData::setRun
 Untested method EventMetaData::setSubrun
 Untested method EventMetaData::setTime
+Untested method Track::addStatusBits
 Untested method Track::getInfoHTML
+Untested method Track::getStatusBit
+Untested method Track::getTrackFitResultByName
+Untested method Track::getTrackFitResultWithClosestMassByName
 Untested method Track::getTrackFitResults
+Untested method Track::getTrackFitResultsByName
+Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
+Untested method Track::setTrackTime
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
 Untested method TrackFitResult::getInfoHTML
 Untested method TrackFitResult::getUncertainHelix
+Untested method TrackFitResult::mask
+Untested method TrackFitResult::updateTrackFitResult
 Untested method EventLevelTrackingInfo::getNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::hasCDCSLayer
 Untested method EventLevelTrackingInfo::setCDCLayer
@@ -181,6 +190,9 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -203,6 +215,9 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -226,6 +241,9 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -250,6 +268,9 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -272,6 +293,9 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#5:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -293,6 +317,9 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#15
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -314,6 +341,9 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#18
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -335,6 +365,9 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#21
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#21
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -384,12 +417,12 @@ TrackFitResult#0:
      6.582748e-07  5.869704e-07  5.267531e-07  6.635175e-05 -5.846080e-05 
     -6.305169e-07 -6.197307e-07 -4.813686e-07 -5.846080e-05  5.342415e-05 
   getCovariance6(): 
-     5.238625e-06  1.568192e-05 -2.085713e-07 -9.111404e-07 -2.666108e-06  2.533142e-08 
+     5.238625e-06  1.568192e-05 -2.085713e-07 -9.111403e-07 -2.666108e-06  2.533142e-08 
      1.568192e-05  4.694421e-05 -6.243607e-07 -2.726692e-06 -7.978763e-06  7.576744e-08 
-    -2.085713e-07 -6.243607e-07  6.635175e-05  4.229686e-06 -1.283406e-06 -9.006771e-06 
-    -9.111404e-07 -2.726692e-06  4.229686e-06  5.630316e-07  3.488912e-07 -5.314364e-07 
+    -2.085713e-07 -6.243607e-07  6.635175e-05  4.229686e-06 -1.283406e-06 -9.006770e-06 
+    -9.111403e-07 -2.726692e-06  4.229686e-06  5.630315e-07  3.488912e-07 -5.314363e-07 
     -2.666108e-06 -7.978763e-06 -1.283406e-06  3.488912e-07  1.448198e-06  1.602878e-07 
-     2.533142e-08  7.576744e-08 -9.006771e-06 -5.314364e-07  1.602878e-07  1.301062e-06 
+     2.533142e-08  7.576744e-08 -9.006770e-06 -5.314363e-07  1.602878e-07  1.301062e-06 
   getD0(): -0.00270966
   getEnergy(): 0.25457
   getHitPatternCDC(): 0111110100000000000000111111111111111111111111111111111111111111
@@ -440,10 +473,10 @@ TrackFitResult#1:
     -1.758005e-06 -1.789575e-06 -1.459133e-06 -1.918822e-04  1.765274e-04 
   getCovariance6(): 
      1.634429e-05  5.011239e-05 -5.847123e-07 -3.168949e-06 -9.365421e-06  6.472959e-08 
-     5.011239e-05  1.536471e-04 -1.793333e-06 -9.717203e-06 -2.871759e-05  1.985387e-07 
+     5.011239e-05  1.536471e-04 -1.793333e-06 -9.717202e-06 -2.871759e-05  1.985387e-07 
     -5.847123e-07 -1.793333e-06  2.148767e-04  1.511324e-05 -4.535372e-06 -3.221211e-05 
-    -3.168949e-06 -9.717203e-06  1.511324e-05  2.563686e-06  1.246466e-06 -1.891425e-06 
-    -9.365421e-06 -2.871759e-05 -4.535372e-06  1.246466e-06  5.732142e-06  5.728193e-07 
+    -3.168949e-06 -9.717202e-06  1.511324e-05  2.563686e-06  1.246466e-06 -1.891425e-06 
+    -9.365421e-06 -2.871759e-05 -4.535372e-06  1.246466e-06  5.732141e-06  5.728193e-07 
      6.472959e-08  1.985387e-07 -3.221211e-05 -1.891425e-06  5.728193e-07  5.200307e-06 
   getD0(): 0.00104703
   getEnergy(): 0.54536
@@ -495,11 +528,11 @@ TrackFitResult#2:
      2.427561e-05  3.204336e-05  1.532598e-05 -2.737630e-02  1.322937e-02 
   getCovariance6(): 
      7.119608e-02 -1.493453e-02  1.443327e-03 -8.036762e-03 -4.751363e-04 -7.072891e-06 
-    -1.493453e-02  4.282869e-03 -4.188255e-04  2.169471e-03  1.286277e-04  5.787439e-06 
+    -1.493453e-02  4.282869e-03 -4.188255e-04  2.169471e-03  1.286277e-04  5.787438e-06 
      1.443327e-03 -4.188255e-04  7.004327e-02 -1.759793e-04 -6.219934e-04 -7.846425e-03 
-    -8.036762e-03  2.169471e-03 -1.759793e-04  1.110637e-03  6.477650e-05 -2.293198e-06 
-    -4.751363e-04  1.286277e-04 -6.219934e-04  6.477650e-05  2.155721e-05  8.370508e-05 
-    -7.072891e-06  5.787439e-06 -7.846425e-03 -2.293198e-06  8.370508e-05  1.086829e-03 
+    -8.036762e-03  2.169471e-03 -1.759793e-04  1.110637e-03  6.477649e-05 -2.293198e-06 
+    -4.751363e-04  1.286277e-04 -6.219934e-04  6.477649e-05  2.155721e-05  8.370507e-05 
+    -7.072891e-06  5.787438e-06 -7.846425e-03 -2.293198e-06  8.370507e-05  1.086829e-03 
   getD0(): -0.683317
   getEnergy(): 0.321137
   getHitPatternCDC(): 1010110000011111111111111111111111111111111111111111111111111111
@@ -549,11 +582,11 @@ TrackFitResult#3:
     -2.598332e-03 -1.143935e-03 -3.574205e-05  1.316486e-01 -4.339854e-02 
      5.435115e-05  3.600695e-05  1.498443e-05 -4.339854e-02  1.819623e-02 
   getCovariance6(): 
-     1.325550e-01 -2.878137e-02  2.628411e-03 -1.787276e-02 -6.629273e-04 -2.151445e-05 
-    -2.878137e-02  8.492479e-03 -7.800866e-04  5.073919e-03  1.872950e-04  1.019066e-05 
-     2.628411e-03 -7.800866e-04  1.316486e-01 -4.158667e-04 -1.389857e-03 -1.757516e-02 
-    -1.787276e-02  5.073919e-03 -4.158667e-04  3.044615e-03  1.108301e-04 -2.563443e-06 
-    -6.629273e-04  1.872950e-04 -1.389857e-03  1.108301e-04  4.860134e-05  2.312538e-04 
+     1.325550e-01 -2.878137e-02  2.628411e-03 -1.787276e-02 -6.629274e-04 -2.151445e-05 
+    -2.878137e-02  8.492479e-03 -7.800866e-04  5.073919e-03  1.872951e-04  1.019066e-05 
+     2.628411e-03 -7.800866e-04  1.316486e-01 -4.158667e-04 -1.389858e-03 -1.757516e-02 
+    -1.787276e-02  5.073919e-03 -4.158667e-04  3.044616e-03  1.108301e-04 -2.563443e-06 
+    -6.629274e-04  1.872951e-04 -1.389858e-03  1.108301e-04  4.860134e-05  2.312538e-04 
     -2.151445e-05  1.019066e-05 -1.757516e-02 -2.563443e-06  2.312538e-04  2.984376e-03 
   getD0(): -0.764967
   getEnergy(): 0.640892
@@ -605,11 +638,11 @@ TrackFitResult#4:
      5.019453e-05  2.235942e-05  8.477488e-06 -3.942711e-02  1.502313e-02 
   getCovariance6(): 
      1.365878e-01 -3.657231e-02  2.935468e-03 -2.347133e-02 -1.253618e-04 -2.625203e-05 
-    -3.657231e-02  1.308393e-02 -1.068947e-03  8.370915e-03  3.729504e-05  1.166487e-05 
+    -3.657231e-02  1.308393e-02 -1.068947e-03  8.370915e-03  3.729504e-05  1.166488e-05 
      2.935468e-03 -1.068947e-03  1.377423e-01 -6.776783e-04 -1.826562e-03 -2.331725e-02 
     -2.347133e-02  8.370915e-03 -6.776783e-04  5.355749e-03  2.346940e-05  6.098719e-06 
     -1.253618e-04  3.729504e-05 -1.826562e-03  2.346940e-05  1.303591e-04  4.033345e-04 
-    -2.625203e-05  1.166487e-05 -2.331725e-02  6.098719e-06  4.033345e-04  5.255042e-03 
+    -2.625203e-05  1.166488e-05 -2.331725e-02  6.098719e-06  4.033345e-04  5.255042e-03 
   getD0(): -0.938724
   getEnergy(): 1.11201
   getHitPatternCDC(): 1010110000011111111111111111111111111111111111111111111111111111
@@ -659,12 +692,12 @@ TrackFitResult#5:
      1.046885e-07  8.943652e-08  1.058669e-08  4.755731e-06 -4.029285e-06 
     -2.918638e-09 -5.089381e-09 -9.611208e-09 -4.029285e-06  3.662869e-06 
   getCovariance6(): 
-     2.932213e-06  2.171616e-07 -1.044674e-07 -1.904784e-06  1.651378e-10 -5.590370e-08 
-     2.171616e-07  1.664130e-08 -8.060766e-09 -1.505185e-07 -1.648688e-10 -4.166776e-09 
+     2.932213e-06  2.171616e-07 -1.044674e-07 -1.904784e-06  1.651378e-10 -5.590369e-08 
+     2.171616e-07  1.664130e-08 -8.060766e-09 -1.505184e-07 -1.648687e-10 -4.166775e-09 
     -1.044674e-07 -8.060766e-09  4.755731e-06  1.315291e-07 -1.629148e-06 -1.905796e-06 
-    -1.904784e-06 -1.505185e-07  1.315291e-07  1.401806e-06 -1.229175e-07  1.010822e-07 
-     1.651378e-10 -1.648688e-10 -1.629148e-06 -1.229175e-07  3.522866e-06 -1.800992e-06 
-    -5.590370e-08 -4.166776e-09 -1.905796e-06  1.010822e-07 -1.800992e-06  2.963846e-06 
+    -1.904784e-06 -1.505184e-07  1.315291e-07  1.401806e-06 -1.229175e-07  1.010822e-07 
+     1.651378e-10 -1.648687e-10 -1.629148e-06 -1.229175e-07  3.522866e-06 -1.800991e-06 
+    -5.590369e-08 -4.166775e-09 -1.905796e-06  1.010822e-07 -1.800991e-06  2.963845e-06 
   getD0(): 0.0483831
   getEnergy(): 1.08749
   getHitPatternCDC(): 0011110111111111111111111111111111111111111111111111111111111111
@@ -687,7 +720,7 @@ TrackFitResult#5:
   getTransverseMomentum(): 0.819593
   getZ0(): -0.0399356
 TrackFitResult#6:
-  get4Momentum(): (0.0292276,-0.819348,0.70121,1.18642)
+  get4Momentum(): (0.0292276,-0.819348,0.701209,1.18642)
   getChargeSign(): -1
   getChi2(): 62.7734
   getCotTheta(): 0.85527
@@ -716,15 +749,15 @@ TrackFitResult#6:
   getCovariance6(): 
      3.372662e-06  2.520411e-07 -1.214338e-07 -2.235674e-06 -1.296862e-08 -5.378838e-08 
      2.520411e-07  1.942629e-08 -9.459009e-09 -1.770997e-07 -1.176958e-09 -4.007048e-09 
-    -1.214338e-07 -9.459009e-09  5.514940e-06  1.552229e-07 -1.911557e-06 -2.237565e-06 
+    -1.214338e-07 -9.459009e-09  5.514940e-06  1.552229e-07 -1.911557e-06 -2.237564e-06 
     -2.235674e-06 -1.770997e-07  1.552229e-07  1.656630e-06 -1.160599e-07  9.404888e-08 
     -1.296862e-08 -1.176958e-09 -1.911557e-06 -1.160599e-07  3.593480e-06 -1.642754e-06 
-    -5.378838e-08 -4.007048e-09 -2.237565e-06  9.404888e-08 -1.642754e-06  3.083971e-06 
+    -5.378838e-08 -4.007048e-09 -2.237564e-06  9.404888e-08 -1.642754e-06  3.083970e-06 
   getD0(): 0.0482991
   getEnergy(): 1.18642
   getHitPatternCDC(): 0011110111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000000001010101010100010001
-  getMomentum(): (0.0292276,-0.819348,0.70121)
+  getMomentum(): (0.0292276,-0.819348,0.701209)
   getNDF(): 64
   getOmega(): -0.00531224
   getPValue(): 0.519962
@@ -769,12 +802,12 @@ TrackFitResult#7:
      1.695905e-07  1.527953e-07  1.742425e-08  7.599538e-06 -6.653882e-06 
     -7.696199e-09 -1.186611e-08 -1.604275e-08 -6.653882e-06  6.132097e-06 
   getCovariance6(): 
-     4.585382e-06  3.484013e-07 -1.692211e-07 -3.158429e-06 -2.676028e-08 -6.695367e-08 
-     3.484013e-07  2.713900e-08 -1.338982e-08 -2.513606e-07 -2.231842e-09 -5.048355e-09 
-    -1.692211e-07 -1.338982e-08  7.599538e-06  2.217339e-07 -2.697119e-06 -3.157874e-06 
-    -3.158429e-06 -2.513606e-07  2.217339e-07  2.375982e-06 -1.555615e-07  1.244279e-07 
-    -2.676028e-08 -2.231842e-09 -2.697119e-06 -1.555615e-07  4.980945e-06 -2.217110e-06 
-    -6.695367e-08 -5.048355e-09 -3.157874e-06  1.244279e-07 -2.217110e-06  4.292470e-06 
+     4.585382e-06  3.484013e-07 -1.692211e-07 -3.158429e-06 -2.676028e-08 -6.695366e-08 
+     3.484013e-07  2.713900e-08 -1.338982e-08 -2.513606e-07 -2.231841e-09 -5.048354e-09 
+    -1.692211e-07 -1.338982e-08  7.599538e-06  2.217339e-07 -2.697118e-06 -3.157873e-06 
+    -3.158429e-06 -2.513606e-07  2.217339e-07  2.375981e-06 -1.555615e-07  1.244279e-07 
+    -2.676028e-08 -2.231841e-09 -2.697118e-06 -1.555615e-07  4.980944e-06 -2.217109e-06 
+    -6.695366e-08 -5.048354e-09 -3.157873e-06  1.244279e-07 -2.217109e-06  4.292469e-06 
   getD0(): 0.0481598
   getEnergy(): 1.43185
   getHitPatternCDC(): 0011110111111111111111111111111111111111111111111111111111111111
@@ -879,12 +912,12 @@ TrackFitResult#9:
     -2.531211e-04 -7.979051e-05 -3.165645e-06  1.870711e-03 -4.299925e-04 
      6.580632e-06  3.193664e-06  8.794736e-07 -4.299925e-04  1.202141e-04 
   getCovariance6(): 
-     1.305098e-04 -2.491470e-04 -1.051558e-04 -1.300974e-05  1.278563e-05 -1.347485e-07 
+     1.305098e-04 -2.491470e-04 -1.051558e-04 -1.300974e-05  1.278563e-05 -1.347484e-07 
     -2.491470e-04  5.116339e-04  2.504638e-04  2.938760e-05 -2.799970e-05  1.383298e-07 
     -1.051558e-04  2.504638e-04  1.870711e-03  5.774699e-05  2.438854e-05 -4.196924e-05 
-    -1.300974e-05  2.938760e-05  5.774699e-05  3.358496e-06 -2.905421e-07 -4.632142e-07 
-     1.278563e-05 -2.799970e-05  2.438854e-05 -2.905421e-07  3.002181e-06 -4.479758e-07 
-    -1.347485e-07  1.383298e-07 -4.196924e-05 -4.632142e-07 -4.479758e-07  2.485686e-06 
+    -1.300974e-05  2.938760e-05  5.774699e-05  3.358496e-06 -2.905420e-07 -4.632141e-07 
+     1.278563e-05 -2.799970e-05  2.438854e-05 -2.905420e-07  3.002180e-06 -4.479758e-07 
+    -1.347484e-07  1.383298e-07 -4.196924e-05 -4.632141e-07 -4.479758e-07  2.485686e-06 
   getD0(): -1.23558
   getEnergy(): 0.688925
   getHitPatternCDC(): 0100001000000000111111111111111111111111111111111111111111111111
@@ -936,10 +969,10 @@ TrackFitResult#10:
   getCovariance6(): 
      2.780451e-04 -5.351328e-04 -2.245864e-04 -2.851945e-05  2.819641e-05 -3.569505e-07 
     -5.351328e-04  1.108805e-03  5.402456e-04  6.503008e-05 -6.230970e-05  4.679454e-07 
-    -2.245864e-04  5.402456e-04  3.957123e-03  1.268665e-04  5.286639e-05 -9.182527e-05 
-    -2.851945e-05  6.503008e-05  1.268665e-04  7.663005e-06 -6.178385e-07 -9.210127e-07 
-     2.819641e-05 -6.230970e-05  5.286639e-05 -6.178385e-07  6.866596e-06 -9.093150e-07 
-    -3.569505e-07  4.679454e-07 -9.182527e-05 -9.210127e-07 -9.093150e-07  5.838537e-06 
+    -2.245864e-04  5.402456e-04  3.957123e-03  1.268664e-04  5.286639e-05 -9.182527e-05 
+    -2.851945e-05  6.503008e-05  1.268664e-04  7.663004e-06 -6.178384e-07 -9.210126e-07 
+     2.819641e-05 -6.230970e-05  5.286639e-05 -6.178384e-07  6.866595e-06 -9.093149e-07 
+    -3.569505e-07  4.679454e-07 -9.182527e-05 -9.210126e-07 -9.093149e-07  5.838536e-06 
   getD0(): -1.24108
   getEnergy(): 1.05989
   getHitPatternCDC(): 0100001000000000111111111111111111111111111111111111111111111111
@@ -990,11 +1023,11 @@ TrackFitResult#11:
      1.441049e-07  8.112686e-08  3.863759e-08 -1.079046e-05  9.274770e-06 
   getCovariance6(): 
      6.454416e-06 -2.773863e-06  2.355004e-07 -2.544474e-06  1.209699e-06  8.090811e-08 
-    -2.773863e-06  1.193025e-06 -9.335347e-08  1.104577e-06 -5.240884e-07 -3.530673e-08 
+    -2.773863e-06  1.193025e-06 -9.335347e-08  1.104577e-06 -5.240885e-07 -3.530673e-08 
      2.355004e-07 -9.335347e-08  1.414778e-05  9.809537e-07  2.484371e-06 -3.384636e-06 
-    -2.544474e-06  1.104577e-06  9.809537e-07  1.611034e-06  6.747643e-07  5.510040e-07 
-     1.209699e-06 -5.240884e-07  2.484371e-06  6.747643e-07  3.283200e-06  1.506761e-06 
-     8.090811e-08 -3.530673e-08 -3.384636e-06  5.510040e-07  1.506761e-06  2.743116e-06 
+    -2.544474e-06  1.104577e-06  9.809537e-07  1.611034e-06  6.747643e-07  5.510041e-07 
+     1.209699e-06 -5.240885e-07  2.484371e-06  6.747643e-07  3.283200e-06  1.506762e-06 
+     8.090811e-08 -3.530673e-08 -3.384636e-06  5.510041e-07  1.506762e-06  2.743116e-06 
   getD0(): -0.0369555
   getEnergy(): 0.662315
   getHitPatternCDC(): 0010010000000000000000000111111111111111111111111100000011111111
@@ -1017,7 +1050,7 @@ TrackFitResult#11:
   getTransverseMomentum(): 0.508629
   getZ0(): -0.594729
 TrackFitResult#12:
-  get4Momentum(): (-0.18766,-0.474221,-0.401629,0.815552)
+  get4Momentum(): (-0.18766,-0.474221,-0.401628,0.815552)
   getChargeSign(): -1
   getChi2(): 46.613
   getCotTheta(): -0.787504
@@ -1044,17 +1077,17 @@ TrackFitResult#12:
     -2.215192e-07  3.836903e-08 -6.463524e-08  1.963271e-05 -1.556240e-05 
      1.784781e-07  1.095895e-07  5.648848e-08 -1.556240e-05  1.359989e-05 
   getCovariance6(): 
-     9.128354e-06 -3.934330e-06  2.064989e-07 -3.769075e-06  1.723487e-06  8.598977e-08 
+     9.128354e-06 -3.934330e-06  2.064989e-07 -3.769075e-06  1.723487e-06  8.598976e-08 
     -3.934330e-06  1.696801e-06 -8.019353e-08  1.637725e-06 -7.478116e-07 -3.761527e-08 
-     2.064989e-07 -8.019353e-08  1.963271e-05  1.438631e-06  3.582279e-06 -4.896844e-06 
-    -3.769075e-06  1.637725e-06  1.438631e-06  2.300346e-06  7.059516e-07  5.768931e-07 
-     1.723487e-06 -7.478116e-07  3.582279e-06  7.059516e-07  4.081842e-06  1.583118e-06 
-     8.598977e-08 -3.761527e-08 -4.896844e-06  5.768931e-07  1.583118e-06  3.508775e-06 
+     2.064989e-07 -8.019353e-08  1.963271e-05  1.438631e-06  3.582278e-06 -4.896843e-06 
+    -3.769075e-06  1.637725e-06  1.438631e-06  2.300346e-06  7.059515e-07  5.768931e-07 
+     1.723487e-06 -7.478116e-07  3.582278e-06  7.059515e-07  4.081842e-06  1.583117e-06 
+     8.598976e-08 -3.761527e-08 -4.896843e-06  5.768931e-07  1.583117e-06  3.508774e-06 
   getD0(): -0.0368989
   getEnergy(): 0.815552
   getHitPatternCDC(): 0010010000000000000000000111111111111111111111111100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
-  getMomentum(): (-0.18766,-0.474221,-0.401629)
+  getMomentum(): (-0.18766,-0.474221,-0.401628)
   getNDF(): 42
   getOmega(): -0.00853924
   getPValue(): 0.288364
@@ -1101,10 +1134,10 @@ TrackFitResult#13:
   getCovariance6(): 
      1.613225e-05 -6.975667e-06  9.957960e-08 -7.051175e-06  3.127216e-06  1.265266e-07 
     -6.975667e-06  3.017812e-06 -3.292608e-08  3.067170e-06 -1.359201e-06 -5.531083e-08 
-     9.957960e-08 -3.292608e-08  3.347669e-05  2.647101e-06  6.461048e-06 -8.863604e-06 
+     9.957960e-08 -3.292608e-08  3.347669e-05  2.647101e-06  6.461048e-06 -8.863603e-06 
     -7.051175e-06  3.067170e-06  2.647101e-06  4.276201e-06  1.007577e-06  8.360057e-07 
      3.127216e-06 -1.359201e-06  6.461048e-06  1.007577e-06  6.853802e-06  2.298344e-06 
-     1.265266e-07 -5.531083e-08 -8.863604e-06  8.360057e-07  2.298344e-06  6.009832e-06 
+     1.265266e-07 -5.531083e-08 -8.863603e-06  8.360057e-07  2.298344e-06  6.009832e-06 
   getD0(): -0.036907
   getEnergy(): 1.14551
   getHitPatternCDC(): 0010010000000000000000000111111111111111111111111100000011111111
@@ -1154,12 +1187,12 @@ TrackFitResult#14:
     -2.388246e-04 -1.892470e-05  6.671025e-05  7.851031e-03 -2.675870e-03 
     -9.902172e-05 -6.707947e-05 -3.312837e-05 -2.675870e-03  1.313579e-03 
   getCovariance6(): 
-     9.621783e-04 -1.834237e-03 -1.199917e-04 -2.435178e-05  5.223249e-05  1.754778e-06 
+     9.621783e-04 -1.834237e-03 -1.199917e-04 -2.435178e-05  5.223249e-05  1.754777e-06 
     -1.834237e-03  3.528645e-03  2.065197e-04  4.984527e-05 -1.067940e-04 -2.889586e-06 
-    -1.199917e-04  2.065197e-04  7.851031e-03  9.695208e-05  5.627579e-05 -1.308087e-04 
-    -2.435178e-05  4.984527e-05  9.695208e-05  3.497127e-06 -5.865939e-07 -1.470152e-06 
-     5.223249e-05 -1.067940e-04  5.627579e-05 -5.865939e-07  5.371578e-06 -8.922534e-07 
-     1.754778e-06 -2.889586e-06 -1.308087e-04 -1.470152e-06 -8.922534e-07  3.940414e-06 
+    -1.199917e-04  2.065197e-04  7.851031e-03  9.695207e-05  5.627579e-05 -1.308087e-04 
+    -2.435178e-05  4.984527e-05  9.695207e-05  3.497126e-06 -5.865938e-07 -1.470152e-06 
+     5.223249e-05 -1.067940e-04  5.627579e-05 -5.865938e-07  5.371577e-06 -8.922533e-07 
+     1.754777e-06 -2.889586e-06 -1.308087e-04 -1.470152e-06 -8.922533e-07  3.940414e-06 
   getD0(): -0.176918
   getEnergy(): 0.180022
   getHitPatternCDC(): 0001011100000000000000000000000000000000000000000001111111111111
@@ -1211,10 +1244,10 @@ TrackFitResult#15:
   getCovariance6(): 
      1.378350e-02 -2.295824e-02 -1.918160e-03  1.786220e-03  2.451187e-03  2.462565e-03 
     -2.295824e-02  3.827270e-02  3.146781e-03 -2.992421e-03 -4.117255e-03 -4.128362e-03 
-    -1.918160e-03  3.146781e-03  4.311637e-02  2.360201e-04  8.965534e-06 -1.420096e-03 
-     1.786220e-03 -2.992421e-03  2.360201e-04  5.850645e-04  5.603651e-04  6.683314e-04 
-     2.451187e-03 -4.117255e-03  8.965534e-06  5.603651e-04  6.186019e-04  6.844637e-04 
-     2.462565e-03 -4.128362e-03 -1.420096e-03  6.683314e-04  6.844637e-04  8.628551e-04 
+    -1.918160e-03  3.146781e-03  4.311637e-02  2.360201e-04  8.965533e-06 -1.420096e-03 
+     1.786220e-03 -2.992421e-03  2.360201e-04  5.850644e-04  5.603651e-04  6.683313e-04 
+     2.451187e-03 -4.117255e-03  8.965533e-06  5.603651e-04  6.186019e-04  6.844637e-04 
+     2.462565e-03 -4.128362e-03 -1.420096e-03  6.683313e-04  6.844637e-04  8.628551e-04 
   getD0(): -0.104642
   getEnergy(): 0.516424
   getHitPatternCDC(): 0001011100000000000000000000000000000000000000000001111111111111
@@ -1320,10 +1353,10 @@ TrackFitResult#17:
      4.224244e-05  3.032256e-05  1.413834e-05 -2.926243e-03  1.320526e-03 
   getCovariance6(): 
      4.487892e-04 -1.216591e-03  2.172223e-05 -2.595081e-04 -6.636364e-06  3.512295e-04 
-    -1.216591e-03  3.301336e-03 -6.850655e-05  7.066358e-04  1.555890e-05 -9.545371e-04 
+    -1.216591e-03  3.301336e-03 -6.850655e-05  7.066358e-04  1.555891e-05 -9.545371e-04 
      2.172223e-05 -6.850655e-05  8.451121e-03 -2.221715e-04 -7.313675e-05 -2.078486e-04 
-    -2.595081e-04  7.066358e-04 -2.221715e-04  3.698494e-04  8.779068e-05 -5.261752e-04 
-    -6.636364e-06  1.555890e-05 -7.313675e-05  8.779068e-05  3.615029e-05 -1.310351e-04 
+    -2.595081e-04  7.066358e-04 -2.221715e-04  3.698494e-04  8.779069e-05 -5.261752e-04 
+    -6.636364e-06  1.555891e-05 -7.313675e-05  8.779069e-05  3.615029e-05 -1.310351e-04 
      3.512295e-04 -9.545371e-04 -2.078486e-04 -5.261752e-04 -1.310351e-04  7.957951e-04 
   getD0(): -0.0678204
   getEnergy(): 0.593587
@@ -1374,12 +1407,12 @@ TrackFitResult#18:
     -1.497420e-04 -1.791209e-04 -7.291179e-05  2.218024e-02 -7.753633e-03 
      1.086230e-04  7.666845e-05  3.474649e-05 -7.753633e-03  3.409046e-03 
   getCovariance6(): 
-     1.319355e-03 -3.572122e-03  4.430106e-05 -8.862777e-04 -5.840633e-05  1.216535e-03 
+     1.319355e-03 -3.572122e-03  4.430106e-05 -8.862776e-04 -5.840633e-05  1.216535e-03 
     -3.572122e-03  9.679221e-03 -1.435209e-04  2.411381e-03  1.535708e-04 -3.305809e-03 
-     4.430106e-05 -1.435209e-04  2.218024e-02 -6.128759e-04 -2.053415e-04 -5.883357e-04 
-    -8.862777e-04  2.411381e-03 -6.128759e-04  1.401379e-03  3.450349e-04 -2.012223e-03 
-    -5.840633e-05  1.535708e-04 -2.053415e-04  3.450349e-04  1.293397e-04 -5.136890e-04 
-     1.216535e-03 -3.305809e-03 -5.883357e-04 -2.012223e-03 -5.136890e-04  3.025267e-03 
+     4.430106e-05 -1.435209e-04  2.218024e-02 -6.128759e-04 -2.053414e-04 -5.883356e-04 
+    -8.862776e-04  2.411381e-03 -6.128759e-04  1.401379e-03  3.450348e-04 -2.012223e-03 
+    -5.840633e-05  1.535708e-04 -2.053414e-04  3.450348e-04  1.293397e-04 -5.136890e-04 
+     1.216535e-03 -3.305809e-03 -5.883356e-04 -2.012223e-03 -5.136890e-04  3.025267e-03 
   getD0(): -0.0656225
   getEnergy(): 0.999835
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -1429,12 +1462,12 @@ TrackFitResult#19:
      9.590669e-05 -1.292792e-04 -2.175287e-04  9.833749e-02 -5.631503e-02 
      2.072356e-04  2.222558e-04  1.320472e-04 -5.631503e-02  3.345928e-02 
   getCovariance6(): 
-     7.612306e-03 -2.677342e-03  9.009198e-05 -1.679759e-03 -6.410150e-04 -3.878963e-03 
-    -2.677342e-03  9.416590e-04 -3.289645e-05  5.909557e-04  2.265357e-04  1.368117e-03 
+     7.612306e-03 -2.677342e-03  9.009198e-05 -1.679759e-03 -6.410151e-04 -3.878963e-03 
+    -2.677342e-03  9.416590e-04 -3.289645e-05  5.909558e-04  2.265357e-04  1.368117e-03 
      9.009198e-05 -3.289645e-05  9.833749e-02  1.551974e-03  4.247566e-03 -1.684959e-03 
-    -1.679759e-03  5.909557e-04  1.551974e-03  6.017054e-04  8.133172e-04  2.970809e-03 
-    -6.410150e-04  2.265357e-04  4.247566e-03  8.133172e-04  2.090171e-03  6.794370e-03 
-    -3.878963e-03  1.368117e-03 -1.684959e-03  2.970809e-03  6.794370e-03  2.520578e-02 
+    -1.679759e-03  5.909558e-04  1.551974e-03  6.017055e-04  8.133173e-04  2.970809e-03 
+    -6.410151e-04  2.265357e-04  4.247566e-03  8.133173e-04  2.090171e-03  6.794371e-03 
+    -3.878963e-03  1.368117e-03 -1.684959e-03  2.970809e-03  6.794371e-03  2.520579e-02 
   getD0(): 0.00622708
   getEnergy(): 1.06834
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -1484,12 +1517,12 @@ TrackFitResult#20:
      1.188518e-04 -1.551350e-04 -2.612357e-04  1.186494e-01 -6.775443e-02 
      2.490699e-04  2.669736e-04  1.581372e-04 -6.775443e-02  4.013205e-02 
   getCovariance6(): 
-     9.193790e-03 -3.234195e-03  1.116565e-04 -2.027477e-03 -7.797385e-04 -4.701555e-03 
+     9.193790e-03 -3.234195e-03  1.116565e-04 -2.027477e-03 -7.797384e-04 -4.701555e-03 
     -3.234195e-03  1.137732e-03 -4.073685e-05  7.134206e-04  2.755869e-04  1.658488e-03 
      1.116565e-04 -4.073685e-05  1.186494e-01  1.869103e-03  5.115266e-03 -2.037881e-03 
-    -2.027477e-03  7.134206e-04  1.869103e-03  7.279060e-04  9.878469e-04  3.608576e-03 
-    -7.797385e-04  2.755869e-04  5.115266e-03  9.878469e-04  2.536205e-03  8.253824e-03 
-    -4.701555e-03  1.658488e-03 -2.037881e-03  3.608576e-03  8.253824e-03  3.061763e-02 
+    -2.027477e-03  7.134206e-04  1.869103e-03  7.279059e-04  9.878468e-04  3.608575e-03 
+    -7.797384e-04  2.755869e-04  5.115266e-03  9.878468e-04  2.536205e-03  8.253823e-03 
+    -4.701555e-03  1.658488e-03 -2.037881e-03  3.608575e-03  8.253823e-03  3.061763e-02 
   getD0(): 0.00620031
   getEnergy(): 1.16993
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -1649,12 +1682,12 @@ TrackFitResult#23:
     -4.682558e-06  4.057471e-06 -5.657380e-07  2.667599e-03  2.164076e-04 
     -3.495484e-06  5.710149e-07 -6.933038e-08  2.164076e-04  2.652045e-05 
   getCovariance6(): 
-     1.537669e-03  4.937803e-05  4.686181e-06  1.025246e-04  5.400776e-06  1.397570e-06 
-     4.937803e-05  1.596352e-06 -1.734227e-08  3.099399e-06  1.631685e-07  3.694669e-08 
-     4.686181e-06 -1.734227e-08  2.667599e-03  1.884441e-07  8.802690e-05  1.028463e-04 
-     1.025246e-04  3.099399e-06  1.884441e-07  1.031985e-05  2.613922e-07  1.614300e-07 
-     5.400776e-06  1.631685e-07  8.802690e-05  2.613922e-07  7.945164e-06  2.095593e-06 
-     1.397570e-06  3.694669e-08  1.028463e-04  1.614300e-07  2.095593e-06  8.585408e-06 
+     1.537669e-03  4.937803e-05  4.686181e-06  1.025246e-04  5.400775e-06  1.397570e-06 
+     4.937803e-05  1.596352e-06 -1.734227e-08  3.099399e-06  1.631685e-07  3.694668e-08 
+     4.686181e-06 -1.734227e-08  2.667599e-03  1.884441e-07  8.802688e-05  1.028463e-04 
+     1.025246e-04  3.099399e-06  1.884441e-07  1.031984e-05  2.613921e-07  1.614300e-07 
+     5.400775e-06  1.631685e-07  8.802688e-05  2.613921e-07  7.945162e-06  2.095592e-06 
+     1.397570e-06  3.694668e-08  1.028463e-04  1.614300e-07  2.095592e-06  8.585405e-06 
   getD0(): 0.0456091
   getEnergy(): 1.09184
   getHitPatternCDC(): 0011110111111111111111111111111111111111111111111111111111111111
@@ -1707,7 +1740,7 @@ TrackFitResult#24:
      5.196998e-04 -6.836520e-04 -1.301809e-04 -1.757165e-05  1.547877e-05 -2.655427e-07 
     -6.836520e-04  8.997411e-04  2.020919e-04  2.359998e-05 -1.998506e-05  3.630517e-07 
     -1.301809e-04  2.020919e-04  4.161046e-03  4.560899e-05  2.911655e-05 -3.827419e-05 
-    -1.757165e-05  2.359998e-05  4.560899e-05  1.233836e-06 -1.250445e-08  2.464283e-08 
+    -1.757165e-05  2.359998e-05  4.560899e-05  1.233835e-06 -1.250445e-08  2.464283e-08 
      1.547877e-05 -1.998506e-05  2.911655e-05 -1.250445e-08  8.712639e-07  4.186240e-09 
     -2.655427e-07  3.630517e-07 -3.827419e-05  2.464283e-08  4.186240e-09  1.057555e-06 
   getD0(): -1.22826
@@ -1732,7 +1765,7 @@ TrackFitResult#24:
   getTransverseMomentum(): 0.282155
   getZ0(): -1.10807
 TrackFitResult#25:
-  get4Momentum(): (0.0703995,0.0430739,0.0708599,0.108779)
+  get4Momentum(): (0.0703995,0.0430739,0.07086,0.108779)
   getChargeSign(): -1
   getChi2(): 25.4925
   getCotTheta(): 0.85858
@@ -1759,17 +1792,17 @@ TrackFitResult#25:
     -6.978597e-05  6.707686e-04  1.250439e-04  5.279436e-02 -4.947617e-03 
     -6.822294e-04 -1.257778e-04 -1.255946e-05 -4.947617e-03  4.795602e-04 
   getCovariance6(): 
-     8.242182e-03 -1.349467e-02 -4.127588e-05 -3.329721e-05  1.209414e-04  4.968567e-07 
-    -1.349467e-02  2.209440e-02  5.655762e-05  5.445688e-05 -1.980787e-04 -8.019635e-07 
+     8.242182e-03 -1.349467e-02 -4.127588e-05 -3.329721e-05  1.209415e-04  4.968567e-07 
+    -1.349467e-02  2.209440e-02  5.655762e-05  5.445688e-05 -1.980787e-04 -8.019636e-07 
     -4.127588e-05  5.655762e-05  5.279436e-02  1.378918e-04  1.492688e-04 -2.404592e-04 
-    -3.329721e-05  5.445688e-05  1.378918e-04  8.806132e-07  3.226799e-07 -1.458976e-07 
-     1.209414e-04 -1.980787e-04  1.492688e-04  3.226799e-07  2.657984e-06 -1.493458e-07 
-     4.968567e-07 -8.019635e-07 -2.404592e-04 -1.458976e-07 -1.493458e-07  1.701127e-06 
+    -3.329721e-05  5.445688e-05  1.378918e-04  8.806134e-07  3.226799e-07 -1.458977e-07 
+     1.209415e-04 -1.980787e-04  1.492688e-04  3.226799e-07  2.657984e-06 -1.493458e-07 
+     4.968567e-07 -8.019636e-07 -2.404592e-04 -1.458977e-07 -1.493458e-07  1.701127e-06 
   getD0(): -0.00848351
   getEnergy(): 0.108779
   getHitPatternCDC(): 0001011100000000000000000000000000000000000000000001111111111111
   getHitPatternVXD(): 00000000010101010000000000000000
-  getMomentum(): (0.0703995,0.0430739,0.0708599)
+  getMomentum(): (0.0703995,0.0430739,0.07086)
   getNDF(): 21
   getOmega(): -0.0527809
   getPValue(): 0.226462
@@ -4391,7 +4424,8 @@ MCParticle#5:
   getName(): Lambda0
   getPDG(): 3122
  ... message repeated 4 times
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93517
@@ -4521,7 +4555,8 @@ MCParticle#9:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93037
@@ -4587,7 +4622,8 @@ MCParticle#11:
   getNDaughters(): 2
   getName(): rho-
   getPDG(): -213
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93083
@@ -4619,7 +4655,8 @@ MCParticle#12:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.13146
@@ -4651,7 +4688,8 @@ MCParticle#13:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.13146
@@ -4689,7 +4727,8 @@ MCParticle#14:
   getNDaughters(): 6
   getName(): anti-n0
   getPDG(): -2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93532
@@ -4723,7 +4762,8 @@ MCParticle#15:
   getNDaughters(): 2
   getName(): rho-
   getPDG(): -213
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93532
@@ -4789,7 +4829,8 @@ MCParticle#17:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93597
@@ -4854,7 +4895,8 @@ MCParticle#19:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93037
@@ -4886,7 +4928,8 @@ MCParticle#20:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93037
@@ -4918,7 +4961,8 @@ MCParticle#21:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93037
@@ -4984,7 +5028,8 @@ MCParticle#23:
   getNDaughters(): 3
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93083
@@ -5016,7 +5061,8 @@ MCParticle#24:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93083
@@ -5050,7 +5096,8 @@ MCParticle#25:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93083
@@ -5082,7 +5129,8 @@ MCParticle#26:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 13.7596
@@ -5114,7 +5162,8 @@ MCParticle#27:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 13.7596
@@ -5146,7 +5195,8 @@ MCParticle#28:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 386.422
@@ -5178,7 +5228,8 @@ MCParticle#29:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 13.7596
@@ -5210,7 +5261,8 @@ MCParticle#30:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 13.7596
@@ -5242,7 +5294,8 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 115.389
@@ -5274,7 +5327,8 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93532
@@ -5308,7 +5362,8 @@ MCParticle#33:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93532
@@ -5342,7 +5397,8 @@ MCParticle#34:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.01858
@@ -5374,7 +5430,8 @@ MCParticle#35:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.01858
@@ -5406,7 +5463,8 @@ MCParticle#36:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93597
@@ -5438,7 +5496,8 @@ MCParticle#37:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93597
@@ -5472,7 +5531,8 @@ MCParticle#38:
   getNDaughters(): 2
   getName(): K+
   getPDG(): 321
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.9304
@@ -5508,7 +5568,8 @@ MCParticle#39:
   getNDaughters(): 4
   getName(): K-
   getPDG(): -321
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.9304
@@ -5542,7 +5603,8 @@ MCParticle#40:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.9304
@@ -5606,7 +5668,8 @@ MCParticle#42:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 52.9715
@@ -5638,7 +5701,8 @@ MCParticle#43:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 14.9689
@@ -5670,7 +5734,8 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 36.6018
@@ -5702,7 +5767,8 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93083
@@ -5734,7 +5800,8 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93083
@@ -5766,7 +5833,8 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93532
@@ -5798,7 +5866,8 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93532
@@ -5830,7 +5899,8 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 32.6268
@@ -5865,7 +5935,8 @@ MCParticle#50:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 32.6268
@@ -5897,7 +5968,8 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.6519
@@ -5932,7 +6004,8 @@ MCParticle#52:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.6519
@@ -5964,7 +6037,8 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.75512
@@ -5997,7 +6071,8 @@ MCParticle#54:
   getNDaughters(): 1
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3062
@@ -6029,7 +6104,8 @@ MCParticle#55:
   getNDaughters(): 0
   getName(): anti-nu_e
   getPDG(): -12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3062
@@ -6063,7 +6139,8 @@ MCParticle#56:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3062
@@ -6095,7 +6172,8 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 29.7251
@@ -6130,7 +6208,8 @@ MCParticle#58:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 29.7251
@@ -6164,7 +6243,8 @@ MCParticle#59:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.08645
@@ -6200,7 +6280,8 @@ MCParticle#60:
   getNDaughters(): 4
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.08645
@@ -6232,7 +6313,8 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 862.299
@@ -6264,7 +6346,8 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 862.299
@@ -6296,7 +6379,8 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 862.299
@@ -6328,7 +6412,8 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4337.92
@@ -6360,7 +6445,8 @@ MCParticle#65:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4337.92
@@ -6392,7 +6478,8 @@ MCParticle#66:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4337.92
@@ -6424,7 +6511,8 @@ MCParticle#67:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3911
@@ -6456,7 +6544,8 @@ MCParticle#68:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3062
@@ -6488,7 +6577,8 @@ MCParticle#69:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3062
@@ -6520,7 +6610,8 @@ MCParticle#70:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 632.654
@@ -6552,7 +6643,8 @@ MCParticle#71:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 632.654
@@ -6585,7 +6677,8 @@ MCParticle#72:
   getNDaughters(): 1
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 632.654
@@ -6617,7 +6710,8 @@ MCParticle#73:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 78.6197
@@ -6652,7 +6746,8 @@ MCParticle#74:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 78.6197
@@ -6684,7 +6779,8 @@ MCParticle#75:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.0585
@@ -6716,7 +6812,8 @@ MCParticle#76:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 633.182
@@ -6748,7 +6845,8 @@ MCParticle#77:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 23.5669
@@ -6780,7 +6878,8 @@ MCParticle#78:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 23.7046
@@ -6812,7 +6911,8 @@ MCParticle#79:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 632.988
@@ -6844,7 +6944,8 @@ MCParticle#80:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3007.16
@@ -6876,7 +6977,8 @@ MCParticle#81:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3007.16
@@ -6908,7 +7010,8 @@ MCParticle#82:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3007.16
@@ -6975,6 +7078,9 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6997,6 +7103,9 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7020,6 +7129,9 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7042,6 +7154,9 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7063,6 +7178,9 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7085,6 +7203,9 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#16
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7108,6 +7229,9 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#19
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): nan
@@ -7129,6 +7253,9 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#8:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -7150,6 +7277,9 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#22
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7172,6 +7302,9 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#24
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#25
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#10:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -7194,6 +7327,9 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#28
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#11:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): nan
@@ -7215,6 +7351,9 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#29
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#29
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#29
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#12:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -7236,6 +7375,9 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#31
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -7285,9 +7427,9 @@ TrackFitResult#0:
      1.293775e-02 -1.068652e-02  1.751062e-03 -1.521651e-04  1.998335e-04 -5.330338e-05 
     -1.068652e-02  8.900669e-03 -1.239925e-03  1.365717e-04 -1.766384e-04  4.352715e-05 
      1.751062e-03 -1.239925e-03  6.014039e-02 -2.277057e-04 -3.272954e-04 -3.284391e-04 
-    -1.521651e-04  1.365717e-04 -2.277057e-04  5.794120e-06 -8.152307e-07  9.925473e-07 
-     1.998335e-04 -1.766384e-04 -3.272954e-04 -8.152307e-07  9.303290e-06 -1.488991e-07 
-    -5.330338e-05  4.352715e-05 -3.284391e-04  9.925473e-07 -1.488991e-07  6.969205e-06 
+    -1.521651e-04  1.365717e-04 -2.277057e-04  5.794120e-06 -8.152307e-07  9.925472e-07 
+     1.998335e-04 -1.766384e-04 -3.272954e-04 -8.152307e-07  9.303289e-06 -1.488990e-07 
+    -5.330338e-05  4.352715e-05 -3.284391e-04  9.925472e-07 -1.488990e-07  6.969205e-06 
   getD0(): -0.291443
   getEnergy(): 0.192636
   getHitPatternCDC(): 0000110000000000000000000000000000000000000000000001100010111110
@@ -7338,11 +7480,11 @@ TrackFitResult#1:
     -2.211084e-03 -7.703435e-04 -2.232602e-04 -4.128934e-02  1.145537e-02 
   getCovariance6(): 
      2.269412e-01 -1.354272e-01  3.525531e-02  1.385201e-03  1.322568e-02 -1.670203e-02 
-    -1.354272e-01  8.082273e-02 -2.115639e-02 -8.297467e-04 -7.878638e-03  9.954766e-03 
-     3.525531e-02 -2.115639e-02  2.366002e-01 -3.324903e-04  8.176845e-04 -4.976828e-03 
-     1.385201e-03 -8.297467e-04 -3.324903e-04  6.552559e-05  1.646483e-04 -2.238184e-04 
-     1.322568e-02 -7.878638e-03  8.176845e-04  1.646483e-04  9.478805e-04 -1.207638e-03 
-    -1.670203e-02  9.954766e-03 -4.976828e-03 -2.238184e-04 -1.207638e-03  1.657244e-03 
+    -1.354272e-01  8.082273e-02 -2.115639e-02 -8.297467e-04 -7.878637e-03  9.954765e-03 
+     3.525531e-02 -2.115639e-02  2.366002e-01 -3.324902e-04  8.176844e-04 -4.976827e-03 
+     1.385201e-03 -8.297467e-04 -3.324902e-04  6.552559e-05  1.646483e-04 -2.238184e-04 
+     1.322568e-02 -7.878637e-03  8.176844e-04  1.646483e-04  9.478805e-04 -1.207638e-03 
+    -1.670203e-02  9.954765e-03 -4.976827e-03 -2.238184e-04 -1.207638e-03  1.657244e-03 
   getD0(): 0.0573369
   getEnergy(): 0.524574
   getHitPatternCDC(): 0000110000000000000000000000000000000000000000000001100010111110
@@ -7447,10 +7589,10 @@ TrackFitResult#3:
     -4.978688e-07 -7.872510e-07 -1.934517e-07  3.850578e-05 -3.406241e-05 
      1.707788e-08  1.737979e-07  1.789479e-07 -3.406241e-05  3.151193e-05 
   getCovariance6(): 
-     1.659751e-05 -1.109438e-05 -4.048245e-07 -5.547730e-06  3.282753e-06 -5.496174e-08 
+     1.659751e-05 -1.109438e-05 -4.048245e-07 -5.547729e-06  3.282753e-06 -5.496174e-08 
     -1.109438e-05  7.420087e-06  2.925706e-07  3.731899e-06 -2.206556e-06  3.452989e-08 
     -4.048245e-07  2.925706e-07  3.850578e-05  3.506799e-06  5.208247e-06 -7.672717e-06 
-    -5.547730e-06  3.731899e-06  3.506799e-06  2.513466e-06 -2.980815e-07 -2.943655e-07 
+    -5.547729e-06  3.731899e-06  3.506799e-06  2.513465e-06 -2.980815e-07 -2.943655e-07 
      3.282753e-06 -2.206556e-06  5.208247e-06 -2.980815e-07  2.115058e-06 -4.993377e-07 
     -5.496174e-08  3.452989e-08 -7.672717e-06 -2.943655e-07 -4.993377e-07  2.193692e-06 
   getD0(): -0.0509213
@@ -7503,11 +7645,11 @@ TrackFitResult#4:
      4.809587e-08  3.387860e-07  3.639760e-07 -7.072033e-05  6.596284e-05 
   getCovariance6(): 
      3.321297e-05 -2.234479e-05 -1.048191e-06 -1.179446e-05  6.988092e-06 -1.153549e-07 
-    -2.234479e-05  1.503945e-05  7.407337e-07  7.972178e-06 -4.719749e-06  7.342998e-08 
-    -1.048191e-06  7.407337e-07  7.833887e-05  7.524555e-06  1.110731e-05 -1.639709e-05 
-    -1.179446e-05  7.972178e-06  7.524555e-06  5.654904e-06 -5.255974e-07 -5.200029e-07 
-     6.988092e-06 -4.719749e-06  1.110731e-05 -5.255974e-07  4.912468e-06 -8.956783e-07 
-    -1.153549e-07  7.342998e-08 -1.639709e-05 -5.200029e-07 -8.956783e-07  5.068628e-06 
+    -2.234479e-05  1.503945e-05  7.407337e-07  7.972177e-06 -4.719749e-06  7.342997e-08 
+    -1.048191e-06  7.407337e-07  7.833887e-05  7.524554e-06  1.110731e-05 -1.639709e-05 
+    -1.179446e-05  7.972177e-06  7.524554e-06  5.654904e-06 -5.255974e-07 -5.200029e-07 
+     6.988092e-06 -4.719749e-06  1.110731e-05 -5.255974e-07  4.912467e-06 -8.956782e-07 
+    -1.153549e-07  7.342997e-08 -1.639709e-05 -5.200029e-07 -8.956782e-07  5.068627e-06 
   getD0(): -0.0518551
   getEnergy(): 1.06289
   getHitPatternCDC(): 0100001111111111111111111111111111111111111111111111111111111111
@@ -7557,12 +7699,12 @@ TrackFitResult#5:
      2.998490e-06  1.790619e-06 -3.084548e-07  5.663671e-05 -5.000200e-05 
     -4.588274e-07 -1.765730e-08  2.848349e-07 -5.000200e-05  4.615036e-05 
   getCovariance6(): 
-     1.828256e-05 -1.028934e-05 -2.596650e-06 -4.848459e-06  3.061756e-06  9.002553e-08 
-    -1.028934e-05  5.796217e-06  1.502783e-06  2.702860e-06 -1.712178e-06 -5.236316e-08 
-    -2.596650e-06  1.502783e-06  5.663671e-05 -3.737677e-06 -7.126912e-06 -5.900930e-06 
-    -4.848459e-06  2.702860e-06 -3.737677e-06  1.907272e-06 -6.565122e-08  1.942853e-08 
-     3.061756e-06 -1.712178e-06 -7.126912e-06 -6.565122e-08  1.814363e-06  6.806797e-08 
-     9.002553e-08 -5.236316e-08 -5.900930e-06  1.942853e-08  6.806797e-08  1.739012e-06 
+     1.828256e-05 -1.028934e-05 -2.596650e-06 -4.848459e-06  3.061755e-06  9.002552e-08 
+    -1.028934e-05  5.796217e-06  1.502783e-06  2.702860e-06 -1.712178e-06 -5.236315e-08 
+    -2.596650e-06  1.502783e-06  5.663671e-05 -3.737676e-06 -7.126911e-06 -5.900930e-06 
+    -4.848459e-06  2.702860e-06 -3.737676e-06  1.907271e-06 -6.565120e-08  1.942852e-08 
+     3.061755e-06 -1.712178e-06 -7.126911e-06 -6.565120e-08  1.814362e-06  6.806795e-08 
+     9.002552e-08 -5.236315e-08 -5.900930e-06  1.942852e-08  6.806795e-08  1.739011e-06 
   getD0(): 0.0558531
   getEnergy(): 0.585673
   getHitPatternCDC(): 0011111000000111111111111111111111111111111111111111100111101111
@@ -7612,11 +7754,11 @@ TrackFitResult#6:
      3.784655e-06  2.461034e-06 -4.892632e-07  8.839485e-05 -7.970243e-05 
     -3.374054e-07  1.403722e-07  4.568693e-07 -7.970243e-05  7.439405e-05 
   getCovariance6(): 
-     2.699285e-05 -1.508006e-05 -3.285139e-06 -7.538196e-06  4.701589e-06  9.501094e-08 
-    -1.508006e-05  8.431598e-06  1.884392e-06  4.179072e-06 -2.612893e-06 -5.506452e-08 
+     2.699285e-05 -1.508006e-05 -3.285139e-06 -7.538196e-06  4.701590e-06  9.501094e-08 
+    -1.508006e-05  8.431598e-06  1.884392e-06  4.179073e-06 -2.612893e-06 -5.506452e-08 
     -3.285139e-06  1.884392e-06  8.839485e-05 -6.097894e-06 -1.135114e-05 -9.454138e-06 
-    -7.538196e-06  4.179072e-06 -6.097894e-06  3.036920e-06 -1.279294e-07  1.225585e-07 
-     4.701589e-06 -2.612893e-06 -1.135114e-05 -1.279294e-07  2.850599e-06  2.366136e-07 
+    -7.538196e-06  4.179073e-06 -6.097894e-06  3.036920e-06 -1.279295e-07  1.225585e-07 
+     4.701590e-06 -2.612893e-06 -1.135114e-05 -1.279295e-07  2.850599e-06  2.366136e-07 
      9.501094e-08 -5.506452e-08 -9.454138e-06  1.225585e-07  2.366136e-07  2.621472e-06 
   getD0(): 0.0566805
   getEnergy(): 0.755293
@@ -7668,11 +7810,11 @@ TrackFitResult#7:
      3.759818e-08  5.623061e-07  8.798521e-07 -1.552148e-04  1.461919e-04 
   getCovariance6(): 
      4.874973e-05 -2.707032e-05 -4.851754e-06 -1.455483e-05  8.955092e-06  1.245610e-07 
-    -2.707032e-05  1.504109e-05  2.752071e-06  8.038330e-06 -4.954222e-06 -7.082784e-08 
+    -2.707032e-05  1.504109e-05  2.752071e-06  8.038330e-06 -4.954222e-06 -7.082783e-08 
     -4.851754e-06  2.752071e-06  1.690996e-04 -1.233190e-05 -2.242556e-05 -1.879163e-05 
     -1.455483e-05  8.038330e-06 -1.233190e-05  6.195526e-06 -1.320966e-07  1.444629e-07 
      8.955092e-06 -4.954222e-06 -2.242556e-05 -1.320966e-07  5.898989e-06  2.980605e-07 
-     1.245610e-07 -7.082784e-08 -1.879163e-05  1.444629e-07  2.980605e-07  5.657148e-06 
+     1.245610e-07 -7.082783e-08 -1.879163e-05  1.444629e-07  2.980605e-07  5.657148e-06 
   getD0(): 0.0571487
   getEnergy(): 1.10478
   getHitPatternCDC(): 0011111000000111111111111111111111111111111111111111100111101111
@@ -7722,11 +7864,11 @@ TrackFitResult#8:
      1.107469e-08  8.573764e-09  1.229176e-09  4.662480e-06 -2.958421e-06 
     -8.102893e-10 -3.196764e-10 -9.976777e-10 -2.958421e-06  2.406800e-06 
   getCovariance6(): 
-     4.118928e-06  2.026901e-07 -1.106635e-08 -1.922442e-06  2.850700e-08 -3.403636e-09 
+     4.118928e-06  2.026901e-07 -1.106635e-08 -1.922442e-06  2.850701e-08 -3.403636e-09 
      2.026901e-07  1.099838e-08 -5.968202e-10 -1.092060e-07  1.258885e-09 -1.814829e-10 
     -1.106635e-08 -5.968202e-10  4.662480e-06  8.117280e-09 -1.339003e-07 -2.029831e-06 
     -1.922442e-06 -1.092060e-07  8.117280e-09  1.105915e-06 -3.552134e-08  2.149429e-09 
-     2.850700e-08  1.258885e-09 -1.339003e-07 -3.552134e-08  1.471749e-06 -2.193007e-08 
+     2.850701e-08  1.258885e-09 -1.339003e-07 -3.552134e-08  1.471749e-06 -2.193007e-08 
     -3.403636e-09 -1.814829e-10 -2.029831e-06  2.149429e-09 -2.193007e-08  1.139406e-06 
   getD0(): 0.0483169
   getEnergy(): 0.704554
@@ -7777,12 +7919,12 @@ TrackFitResult#9:
      1.487301e-08  1.206625e-08  1.681563e-09  5.949542e-06 -4.057167e-06 
     -1.180743e-09 -5.782549e-10 -1.407237e-09 -4.057167e-06  3.399104e-06 
   getCovariance6(): 
-     5.352099e-06  2.745535e-07 -1.486139e-08 -2.663809e-06  2.169583e-08 -3.507494e-09 
-     2.745535e-07  1.529996e-08 -8.276888e-10 -1.540234e-07  8.691540e-10 -1.918162e-10 
-    -1.486139e-08 -8.276888e-10  5.949542e-06  1.135834e-08 -1.837703e-07 -2.788197e-06 
-    -2.663809e-06 -1.540234e-07  1.135834e-08  1.574562e-06 -3.544934e-08  2.019066e-09 
-     2.169583e-08  8.691540e-10 -1.837703e-07 -3.544934e-08  1.707153e-06 -6.289104e-09 
-    -3.507494e-09 -1.918162e-10 -2.788197e-06  2.019066e-09 -6.289104e-09  1.612737e-06 
+     5.352099e-06  2.745535e-07 -1.486139e-08 -2.663810e-06  2.169583e-08 -3.507495e-09 
+     2.745535e-07  1.529996e-08 -8.276888e-10 -1.540234e-07  8.691541e-10 -1.918162e-10 
+    -1.486139e-08 -8.276888e-10  5.949542e-06  1.135834e-08 -1.837704e-07 -2.788197e-06 
+    -2.663810e-06 -1.540234e-07  1.135834e-08  1.574562e-06 -3.544935e-08  2.019067e-09 
+     2.169583e-08  8.691541e-10 -1.837704e-07 -3.544935e-08  1.707153e-06 -6.289106e-09 
+    -3.507495e-09 -1.918162e-10 -2.788197e-06  2.019067e-09 -6.289106e-09  1.612738e-06 
   getD0(): 0.0482887
   getEnergy(): 0.849813
   getHitPatternCDC(): 0011011111111111111111111111111111111111111111111111111000111111
@@ -7887,12 +8029,12 @@ TrackFitResult#11:
     -6.794349e-07 -1.026129e-07  1.440411e-06  1.226777e-04 -1.128323e-04 
     -9.410529e-07 -1.439499e-06 -1.356172e-06 -1.128323e-04  1.062077e-04 
   getCovariance6(): 
-     3.351656e-05  3.906174e-05 -4.348691e-07 -4.991014e-06 -5.866558e-06 -2.256501e-08 
-     3.906174e-05  4.552620e-05 -5.220389e-07 -5.808810e-06 -6.830626e-06 -2.492657e-08 
+     3.351656e-05  3.906174e-05 -4.348691e-07 -4.991014e-06 -5.866559e-06 -2.256501e-08 
+     3.906174e-05  4.552620e-05 -5.220389e-07 -5.808810e-06 -6.830627e-06 -2.492657e-08 
     -4.348691e-07 -5.220389e-07  1.226777e-04 -6.977932e-06  5.800296e-06 -1.157109e-05 
-    -4.991014e-06 -5.808810e-06 -6.977932e-06  1.368913e-06  4.116933e-07  4.939603e-07 
-    -5.866558e-06 -6.830626e-06  5.800296e-06  4.116933e-07  1.455534e-06 -3.925998e-07 
-    -2.256501e-08 -2.492657e-08 -1.157109e-05  4.939603e-07 -3.925998e-07  1.308931e-06 
+    -4.991014e-06 -5.808810e-06 -6.977932e-06  1.368913e-06  4.116934e-07  4.939604e-07 
+    -5.866559e-06 -6.830627e-06  5.800296e-06  4.116934e-07  1.455534e-06 -3.925999e-07 
+    -2.256501e-08 -2.492657e-08 -1.157109e-05  4.939604e-07 -3.925999e-07  1.308932e-06 
   getD0(): -0.0193914
   getEnergy(): 0.252589
   getHitPatternCDC(): 0100010100000000000000000000011100010111111111111111111111111111
@@ -7944,10 +8086,10 @@ TrackFitResult#12:
   getCovariance6(): 
      9.757288e-05  1.155648e-04 -1.190796e-06 -1.664593e-05 -1.971171e-05 -5.808921e-09 
      1.155648e-04  1.368765e-04 -1.450815e-06 -1.970000e-05 -2.333658e-05 -3.733579e-09 
-    -1.190796e-06 -1.450815e-06  3.740333e-04 -2.407605e-05  1.975760e-05 -3.972084e-05 
+    -1.190796e-06 -1.450815e-06  3.740333e-04 -2.407605e-05  1.975760e-05 -3.972085e-05 
     -1.664593e-05 -1.970000e-05 -2.407605e-05  5.566445e-06  1.277357e-06  1.546426e-06 
-    -1.971171e-05 -2.333658e-05  1.975760e-05  1.277357e-06  5.789730e-06 -1.235504e-06 
-    -5.808921e-09 -3.733579e-09 -3.972084e-05  1.546426e-06 -1.235504e-06  5.374099e-06 
+    -1.971171e-05 -2.333658e-05  1.975760e-05  1.277357e-06  5.789730e-06 -1.235505e-06 
+    -5.808921e-09 -3.733579e-09 -3.972085e-05  1.546426e-06 -1.235505e-06  5.374099e-06 
   getD0(): -0.0153363
   getEnergy(): 0.546291
   getHitPatternCDC(): 0100010100000000000000000000011100010111111111111111111111111111
@@ -7998,11 +8140,11 @@ TrackFitResult#13:
     -4.372951e-06 -7.497257e-06 -6.926786e-06 -7.364286e-04  6.781678e-04 
   getCovariance6(): 
      2.223320e-04  2.668186e-04 -2.940239e-06 -1.577590e-04  4.301451e-05  1.166929e-04 
-     2.668186e-04  3.202099e-04 -3.599158e-06 -1.884900e-04  5.098539e-05  1.392331e-04 
-    -2.940239e-06 -3.599158e-06  8.110288e-04 -5.342201e-05  4.366009e-05 -9.806717e-05 
-    -1.577590e-04 -1.884900e-04 -5.342201e-05  9.326443e-04 -6.872692e-04 -8.966432e-04 
-     4.301451e-05  5.098539e-05  4.366009e-05 -6.872692e-04  5.343032e-04  6.740904e-04 
-     1.166929e-04  1.392331e-04 -9.806717e-05 -8.966432e-04  6.740904e-04  8.972550e-04 
+     2.668186e-04  3.202099e-04 -3.599158e-06 -1.884900e-04  5.098538e-05  1.392331e-04 
+    -2.940239e-06 -3.599158e-06  8.110288e-04 -5.342200e-05  4.366009e-05 -9.806716e-05 
+    -1.577590e-04 -1.884900e-04 -5.342200e-05  9.326441e-04 -6.872691e-04 -8.966430e-04 
+     4.301451e-05  5.098538e-05  4.366009e-05 -6.872691e-04  5.343031e-04  6.740903e-04 
+     1.166929e-04  1.392331e-04 -9.806716e-05 -8.966430e-04  6.740903e-04  8.972548e-04 
   getD0(): -0.0124891
   getEnergy(): 0.974341
   getHitPatternCDC(): 0100010100000000000000000000011100010111111111111111111111111111
@@ -8055,9 +8197,9 @@ TrackFitResult#14:
      1.962300e-05 -2.778415e-05  1.579862e-07 -4.140191e-06  6.118949e-06 -2.514610e-08 
     -2.778415e-05  3.934255e-05 -1.883633e-07  5.855190e-06 -8.645149e-06  3.322614e-08 
      1.579862e-07 -1.883633e-07  1.269303e-04  1.097940e-05  7.785157e-06 -1.525045e-05 
-    -4.140191e-06  5.855190e-06  1.097940e-05  2.623255e-06 -1.577932e-07 -6.142642e-07 
+    -4.140191e-06  5.855190e-06  1.097940e-05  2.623255e-06 -1.577932e-07 -6.142643e-07 
      6.118949e-06 -8.645149e-06  7.785157e-06 -1.577932e-07  2.819196e-06 -4.460519e-07 
-    -2.514610e-08  3.322614e-08 -1.525045e-05 -6.142642e-07 -4.460519e-07  2.728911e-06 
+    -2.514610e-08  3.322614e-08 -1.525045e-05 -6.142643e-07 -4.460519e-07  2.728911e-06 
   getD0(): 0.0257971
   getEnergy(): 0.413363
   getHitPatternCDC(): 0010011000000000000000000000000011111111111111111111111100111110
@@ -8111,8 +8253,8 @@ TrackFitResult#15:
     -4.739043e-05  6.695121e-05 -7.443036e-07  1.063598e-05 -1.563279e-05  1.256108e-07 
      5.662706e-07 -7.443036e-07  2.165406e-04  1.971364e-05  1.407463e-05 -2.748587e-05 
     -7.537520e-06  1.063598e-05  1.971364e-05  5.112831e-06 -2.654401e-07 -1.049423e-06 
-     1.108995e-05 -1.563279e-05  1.407463e-05 -2.654401e-07  5.435543e-06 -7.800800e-07 
-    -9.114107e-08  1.256108e-07 -2.748587e-05 -1.049423e-06 -7.800800e-07  5.299800e-06 
+     1.108995e-05 -1.563279e-05  1.407463e-05 -2.654401e-07  5.435543e-06 -7.800801e-07 
+    -9.114107e-08  1.256108e-07 -2.748587e-05 -1.049423e-06 -7.800801e-07  5.299800e-06 
   getD0(): 0.025854
   getEnergy(): 0.632601
   getHitPatternCDC(): 0010011000000000000000000000000011111111111111111111111100111110
@@ -8163,11 +8305,11 @@ TrackFitResult#16:
      8.694226e-07  1.994360e-06  1.608046e-06 -2.880055e-04  2.351876e-04 
   getCovariance6(): 
      5.936659e-05 -8.378561e-05  1.347038e-06 -1.474860e-05  2.156192e-05 -2.554432e-07 
-    -8.378561e-05  1.182574e-04 -1.819981e-06  2.079613e-05 -3.037052e-05  3.586636e-07 
-     1.347038e-06 -1.819981e-06  3.663384e-04  3.668958e-05  2.629428e-05 -5.128303e-05 
-    -1.474860e-05  2.079613e-05  3.668958e-05  1.175156e-05 -3.070480e-08 -9.802101e-07 
-     2.156192e-05 -3.037052e-05  2.629428e-05 -3.070480e-08  1.195619e-05 -8.164881e-07 
-    -2.554432e-07  3.586636e-07 -5.128303e-05 -9.802101e-07 -8.164881e-07  1.211311e-05 
+    -8.378561e-05  1.182574e-04 -1.819981e-06  2.079613e-05 -3.037053e-05  3.586636e-07 
+     1.347038e-06 -1.819981e-06  3.663384e-04  3.668958e-05  2.629428e-05 -5.128304e-05 
+    -1.474860e-05  2.079613e-05  3.668958e-05  1.175156e-05 -3.070481e-08 -9.802101e-07 
+     2.156192e-05 -3.037053e-05  2.629428e-05 -3.070481e-08  1.195619e-05 -8.164881e-07 
+    -2.554432e-07  3.586636e-07 -5.128304e-05 -9.802101e-07 -8.164881e-07  1.211312e-05 
   getD0(): 0.0252819
   getEnergy(): 1.02831
   getHitPatternCDC(): 0010011000000000000000000000000011111111111111111111111100111110
@@ -8219,8 +8361,8 @@ TrackFitResult#17:
   getCovariance6(): 
      2.989364e-06 -3.796331e-07 -3.757623e-08 -2.183337e-06  4.020422e-07  4.211582e-08 
     -3.796331e-07  4.863867e-08  4.624315e-09  2.925254e-07 -5.348060e-08 -5.444310e-09 
-    -3.757623e-08  4.624315e-09  3.692484e-06  7.328926e-08  4.758342e-07 -2.379409e-06 
-    -2.183337e-06  2.925254e-07  7.328926e-08  2.328139e-06  1.394798e-06  2.798814e-07 
+    -3.757623e-08  4.624315e-09  3.692484e-06  7.328925e-08  4.758342e-07 -2.379409e-06 
+    -2.183337e-06  2.925254e-07  7.328925e-08  2.328139e-06  1.394798e-06  2.798814e-07 
      4.020422e-07 -5.348060e-08  4.758342e-07  1.394798e-06  1.673703e-05  2.955690e-06 
      4.211582e-08 -5.444310e-09 -2.379409e-06  2.798814e-07  2.955690e-06  2.937131e-06 
   getD0(): -0.0500829
@@ -8272,12 +8414,12 @@ TrackFitResult#18:
     -3.950326e-08 -1.309675e-08  6.712857e-10  3.822390e-06 -1.433743e-06 
      4.431205e-09  1.037346e-09 -3.834684e-10 -1.433743e-06  7.784814e-07 
   getCovariance6(): 
-     3.109793e-06 -3.955203e-07 -3.921193e-08 -2.298415e-06  4.098161e-07  4.175773e-08 
-    -3.955203e-07  5.074889e-08  4.833369e-09  3.082161e-07 -5.456530e-08 -5.393549e-09 
+     3.109793e-06 -3.955203e-07 -3.921193e-08 -2.298416e-06  4.098161e-07  4.175773e-08 
+    -3.955203e-07  5.074889e-08  4.833369e-09  3.082162e-07 -5.456531e-08 -5.393549e-09 
     -3.921193e-08  4.833369e-09  3.822390e-06  7.758955e-08  5.039227e-07 -2.501553e-06 
-    -2.298415e-06  3.082161e-07  7.758955e-08  2.451212e-06  1.341079e-06  2.681195e-07 
-     4.098161e-07 -5.456530e-08  5.039227e-07  1.341079e-06  1.632987e-05  2.842083e-06 
-     4.175773e-08 -5.393549e-09 -2.501553e-06  2.681195e-07  2.842083e-06  3.050551e-06 
+    -2.298416e-06  3.082162e-07  7.758955e-08  2.451213e-06  1.341079e-06  2.681196e-07 
+     4.098161e-07 -5.456531e-08  5.039227e-07  1.341079e-06  1.632988e-05  2.842084e-06 
+     4.175773e-08 -5.393549e-09 -2.501553e-06  2.681196e-07  2.842084e-06  3.050551e-06 
   getD0(): -0.0500245
   getEnergy(): 1.92036
   getHitPatternCDC(): 0011101011111111111111111111111111111111111101111111111111111111
@@ -8327,11 +8469,11 @@ TrackFitResult#19:
     -4.361084e-08 -1.491648e-08  7.666470e-10  4.155830e-06 -1.617273e-06 
      5.157652e-09  1.283095e-09 -4.389418e-10 -1.617273e-06  8.935759e-07 
   getCovariance6(): 
-     3.414701e-06 -4.358338e-07 -4.328730e-08 -2.594898e-06  4.457590e-07  4.398739e-08 
-    -4.358338e-07  5.611814e-08  5.354291e-09  3.488071e-07 -5.952267e-08 -5.687914e-09 
-    -4.328730e-08  5.354291e-09  4.155830e-06  8.854333e-08  5.757913e-07 -2.820955e-06 
-    -2.594898e-06  3.488071e-07  8.854333e-08  2.802192e-06  1.431528e-06  2.852312e-07 
-     4.457590e-07 -5.952267e-08  5.757913e-07  1.431528e-06  1.759533e-05  3.025647e-06 
+     3.414701e-06 -4.358338e-07 -4.328730e-08 -2.594898e-06  4.457589e-07  4.398739e-08 
+    -4.358338e-07  5.611814e-08  5.354291e-09  3.488071e-07 -5.952266e-08 -5.687914e-09 
+    -4.328730e-08  5.354291e-09  4.155830e-06  8.854332e-08  5.757913e-07 -2.820955e-06 
+    -2.594898e-06  3.488071e-07  8.854332e-08  2.802192e-06  1.431528e-06  2.852312e-07 
+     4.457589e-07 -5.952266e-08  5.757913e-07  1.431528e-06  1.759533e-05  3.025647e-06 
      4.398739e-08 -5.687914e-09 -2.820955e-06  2.852312e-07  3.025647e-06  3.454240e-06 
   getD0(): -0.0498768
   getEnergy(): 2.0799
@@ -8384,9 +8526,9 @@ TrackFitResult#20:
   getCovariance6(): 
      2.252544e+00 -4.337398e-01  2.185436e-01  7.234071e-02 -1.332121e-05 -4.064617e-03 
     -4.337398e-01  9.448745e-02 -1.870408e-02 -1.548626e-02  4.189835e-04  1.339560e-03 
-     2.185436e-01 -1.870408e-02  6.827126e+00  1.321505e-03  6.711045e-02  1.043775e-01 
-     7.234071e-02 -1.548626e-02  1.321505e-03  2.545478e-03 -9.643258e-05 -2.565410e-04 
-    -1.332121e-05  4.189835e-04  6.711045e-02 -9.643258e-05  1.043055e-03  1.328532e-03 
+     2.185436e-01 -1.870408e-02  6.827126e+00  1.321505e-03  6.711044e-02  1.043775e-01 
+     7.234071e-02 -1.548626e-02  1.321505e-03  2.545478e-03 -9.643257e-05 -2.565410e-04 
+    -1.332121e-05  4.189835e-04  6.711044e-02 -9.643257e-05  1.043055e-03  1.328532e-03 
     -4.064617e-03  1.339560e-03  1.043775e-01 -2.565410e-04  1.328532e-03  2.044738e-03 
   getD0(): -2.5664
   getEnergy(): 0.467734
@@ -8437,10 +8579,10 @@ TrackFitResult#21:
      1.394374e-03  3.310675e-04 -1.921634e-05  8.273019e-03 -1.333617e-03 
      5.646363e-05  1.894876e-05  5.929619e-06 -1.333617e-03  4.012041e-04 
   getCovariance6(): 
-     3.938749e-04  5.239864e-04  3.403333e-04  6.166069e-06 -3.393524e-05  1.235326e-06 
+     3.938749e-04  5.239864e-04  3.403333e-04  6.166070e-06 -3.393524e-05  1.235326e-06 
      5.239864e-04  4.909234e-03  1.535069e-03  2.090664e-05 -1.170117e-04  6.389983e-07 
      3.403333e-04  1.535069e-03  8.273019e-03  1.035506e-04 -2.230157e-05 -1.121332e-04 
-     6.166069e-06  2.090664e-05  1.035506e-04  2.685819e-06 -6.332148e-08 -1.735228e-06 
+     6.166070e-06  2.090664e-05  1.035506e-04  2.685820e-06 -6.332148e-08 -1.735228e-06 
     -3.393524e-05 -1.170117e-04 -2.230157e-05 -6.332148e-08  4.333699e-06 -5.594050e-07 
      1.235326e-06  6.389983e-07 -1.121332e-04 -1.735228e-06 -5.594050e-07  3.237053e-06 
   getD0(): -2.1948
@@ -8492,12 +8634,12 @@ TrackFitResult#22:
      4.406217e-03  8.111400e-04 -5.556192e-05  2.783826e-02 -4.399756e-03 
      1.729060e-04  5.526210e-05  1.356259e-05 -4.399756e-03  1.046144e-03 
   getCovariance6(): 
-     5.995939e-04  7.187693e-04  3.622148e-04  1.004764e-05 -6.215675e-05  3.064530e-06 
-     7.187693e-04  1.672916e-02  4.703958e-03  8.751094e-05 -4.296266e-04 -6.822355e-07 
-     3.622148e-04  4.703958e-03  2.783826e-02  3.777548e-04 -2.876067e-05 -4.219812e-04 
-     1.004764e-05  8.751094e-05  3.777548e-04  1.009589e-05  1.109713e-07 -4.830535e-06 
-    -6.215675e-05 -4.296266e-04 -2.876067e-05  1.109713e-07  1.523477e-05 -1.663774e-06 
-     3.064530e-06 -6.822355e-07 -4.219812e-04 -4.830535e-06 -1.663774e-06  1.190180e-05 
+     5.995939e-04  7.187693e-04  3.622148e-04  1.004764e-05 -6.215676e-05  3.064530e-06 
+     7.187693e-04  1.672916e-02  4.703958e-03  8.751094e-05 -4.296266e-04 -6.822356e-07 
+     3.622148e-04  4.703958e-03  2.783826e-02  3.777548e-04 -2.876068e-05 -4.219813e-04 
+     1.004764e-05  8.751094e-05  3.777548e-04  1.009589e-05  1.109713e-07 -4.830536e-06 
+    -6.215676e-05 -4.296266e-04 -2.876068e-05  1.109713e-07  1.523477e-05 -1.663774e-06 
+     3.064530e-06 -6.822356e-07 -4.219813e-04 -4.830536e-06 -1.663774e-06  1.190180e-05 
   getD0(): -2.07895
   getEnergy(): 0.541168
   getHitPatternCDC(): 0001101000000000000000000000000000000011111111111100000000111011
@@ -8547,12 +8689,12 @@ TrackFitResult#23:
     -2.783106e-06 -1.235926e-07  8.446384e-07  9.602098e-05 -8.633908e-05 
      1.124620e-06 -3.043656e-07 -7.915493e-07 -8.633908e-05  8.027549e-05 
   getCovariance6(): 
-     2.094117e-05  2.217593e-05 -1.864796e-06 -3.679317e-06 -4.703174e-06  6.135967e-07 
+     2.094117e-05  2.217593e-05 -1.864796e-06 -3.679317e-06 -4.703174e-06  6.135968e-07 
      2.217593e-05  2.348576e-05 -2.065968e-06 -3.892735e-06 -4.966830e-06  6.537017e-07 
     -1.864796e-06 -2.065968e-06  9.602098e-05  6.893792e-06 -6.171489e-06 -8.767277e-06 
     -3.679317e-06 -3.892735e-06  6.893792e-06  2.963365e-06 -1.233837e-06  1.904571e-06 
-    -4.703174e-06 -4.966830e-06 -6.171489e-06 -1.233837e-06  3.012909e-06 -1.920787e-06 
-     6.135967e-07  6.537017e-07 -8.767277e-06  1.904571e-06 -1.920787e-06  4.709804e-06 
+    -4.703174e-06 -4.966830e-06 -6.171489e-06 -1.233837e-06  3.012910e-06 -1.920787e-06 
+     6.135968e-07  6.537017e-07 -8.767277e-06  1.904571e-06 -1.920787e-06  4.709804e-06 
   getD0(): -0.0264815
   getEnergy(): 0.352061
   getHitPatternCDC(): 0001001000000000000000000000000000000000111111011111111100000000
@@ -8605,9 +8747,9 @@ TrackFitResult#24:
      5.053923e-05  5.314718e-05 -2.042524e-06 -9.718887e-06 -1.172930e-05  9.313924e-07 
      5.314718e-05  5.589383e-05 -2.313945e-06 -1.021748e-05 -1.230715e-05  9.858565e-07 
     -2.042524e-06 -2.313945e-06  2.333641e-04  1.757799e-05 -1.625489e-05 -2.223937e-05 
-    -9.718887e-06 -1.021748e-05  1.757799e-05  6.726094e-06 -2.109538e-06  3.252730e-06 
+    -9.718887e-06 -1.021748e-05  1.757799e-05  6.726093e-06 -2.109538e-06  3.252730e-06 
     -1.172930e-05 -1.230715e-05 -1.625489e-05 -2.109538e-06  6.863928e-06 -3.268785e-06 
-     9.313924e-07  9.858565e-07 -2.223937e-05  3.252730e-06 -3.268785e-06  9.721081e-06 
+     9.313924e-07  9.858565e-07 -2.223937e-05  3.252730e-06 -3.268785e-06  9.721080e-06 
   getD0(): -0.028025
   getEnergy(): 0.596304
   getHitPatternCDC(): 0001001000000000000000000000000000000000111111011111111100000000
@@ -8658,10 +8800,10 @@ TrackFitResult#25:
      1.793100e-06 -2.406458e-06 -3.177083e-06 -3.956255e-04  3.718724e-04 
   getCovariance6(): 
      9.378063e-05  9.716026e-05 -1.192524e-06 -2.040660e-05 -2.431184e-05  1.680410e-06 
-     9.716026e-05  1.006693e-04 -1.500599e-06 -2.114098e-05 -2.513370e-05  1.748835e-06 
+     9.716026e-05  1.006693e-04 -1.500599e-06 -2.114098e-05 -2.513371e-05  1.748835e-06 
     -1.192524e-06 -1.500599e-06  4.288309e-04  3.612206e-05 -3.426703e-05 -4.595139e-05 
     -2.040660e-05 -2.114098e-05  3.612206e-05  1.640643e-05 -5.593423e-06  8.668534e-06 
-    -2.431184e-05 -2.513370e-05 -3.426703e-05 -5.593423e-06  1.660487e-05 -8.600908e-06 
+    -2.431184e-05 -2.513371e-05 -3.426703e-05 -5.593423e-06  1.660487e-05 -8.600908e-06 
      1.680410e-06  1.748835e-06 -4.595139e-05  8.668534e-06 -8.600908e-06  2.423983e-05 
   getD0(): -0.0316
   getEnergy(): 1.01044
@@ -8712,12 +8854,12 @@ TrackFitResult#26:
      1.073866e-05  6.045143e-06 -3.258831e-06  7.793976e-04 -6.752030e-04 
      3.591995e-07  3.007050e-06  3.312278e-06 -6.752030e-04  6.147851e-04 
   getCovariance6(): 
-     6.117623e-05  3.113680e-05 -9.625476e-06 -7.090228e-07 -3.367686e-05  9.001336e-05 
+     6.117623e-05  3.113680e-05 -9.625476e-06 -7.090229e-07 -3.367686e-05  9.001336e-05 
      3.113680e-05  1.585052e-05 -4.765196e-06 -2.774906e-07 -1.736202e-05  4.649563e-05 
     -9.625476e-06 -4.765196e-06  7.793976e-04  1.995396e-05 -3.880193e-05 -3.268933e-05 
-    -7.090228e-07 -2.774906e-07  1.995396e-05  4.481800e-05 -9.573505e-05  3.114725e-04 
-    -3.367686e-05 -1.736202e-05 -3.880193e-05 -9.573505e-05  2.254214e-04 -7.215411e-04 
-     9.001336e-05  4.649563e-05 -3.268933e-05  3.114725e-04 -7.215411e-04  2.351042e-03 
+    -7.090229e-07 -2.774906e-07  1.995396e-05  4.481800e-05 -9.573506e-05  3.114726e-04 
+    -3.367686e-05 -1.736202e-05 -3.880193e-05 -9.573506e-05  2.254214e-04 -7.215412e-04 
+     9.001336e-05  4.649563e-05 -3.268933e-05  3.114726e-04 -7.215412e-04  2.351042e-03 
   getD0(): 0.0322605
   getEnergy(): 0.773453
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -8767,12 +8909,12 @@ TrackFitResult#27:
      1.342269e-05  7.837355e-06 -4.372367e-06  1.030005e-03 -9.061571e-04 
      9.234028e-07  4.231882e-06  4.486396e-06 -9.061571e-04  8.325859e-04 
   getCovariance6(): 
-     8.227619e-05  4.190670e-05 -1.202716e-05 -7.585859e-07 -4.615740e-05  1.235506e-04 
-     4.190670e-05  2.134836e-05 -5.964911e-06 -2.722950e-07 -2.380703e-05  6.384829e-05 
-    -1.202716e-05 -5.964911e-06  1.030005e-03  2.678135e-05 -5.222721e-05 -4.374240e-05 
-    -7.585859e-07 -2.722950e-07  2.678135e-05  6.201610e-05 -1.325712e-04  4.313797e-04 
-    -4.615740e-05 -2.380703e-05 -5.222721e-05 -1.325712e-04  3.119753e-04 -9.989239e-04 
-     1.235506e-04  6.384829e-05 -4.374240e-05  4.313797e-04 -9.989239e-04  3.254923e-03 
+     8.227619e-05  4.190670e-05 -1.202716e-05 -7.585859e-07 -4.615739e-05  1.235506e-04 
+     4.190670e-05  2.134836e-05 -5.964911e-06 -2.722950e-07 -2.380703e-05  6.384828e-05 
+    -1.202716e-05 -5.964911e-06  1.030005e-03  2.678135e-05 -5.222721e-05 -4.374239e-05 
+    -7.585859e-07 -2.722950e-07  2.678135e-05  6.201609e-05 -1.325712e-04  4.313796e-04 
+    -4.615739e-05 -2.380703e-05 -5.222721e-05 -1.325712e-04  3.119752e-04 -9.989238e-04 
+     1.235506e-04  6.384828e-05 -4.374239e-05  4.313796e-04 -9.989238e-04  3.254923e-03 
   getD0(): 0.0323148
   getEnergy(): 0.907747
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -8822,12 +8964,12 @@ TrackFitResult#28:
      2.067597e-05  1.270884e-05 -7.393794e-06  1.721772e-03 -1.542706e-03 
      2.527920e-06  7.598206e-06  7.679659e-06 -1.542706e-03  1.431960e-03 
   getCovariance6(): 
-     1.408822e-04  7.177315e-05 -1.851891e-05 -3.941309e-07 -8.222204e-05  2.211253e-04 
+     1.408822e-04  7.177315e-05 -1.851891e-05 -3.941309e-07 -8.222204e-05  2.211254e-04 
      7.177315e-05  3.657056e-05 -9.204009e-06  3.223751e-09 -4.240579e-05  1.142654e-04 
-    -1.851891e-05 -9.204009e-06  1.721772e-03  4.574145e-05 -8.956651e-05 -7.500113e-05 
-    -3.941309e-07  3.223751e-09  4.574145e-05  1.130227e-04 -2.422198e-04  7.883116e-04 
-    -8.222204e-05 -4.240579e-05 -8.956651e-05 -2.422198e-04  5.693530e-04 -1.824435e-03 
-     2.211253e-04  1.142654e-04 -7.500113e-05  7.883116e-04 -1.824435e-03  5.944818e-03 
+    -1.851891e-05 -9.204009e-06  1.721772e-03  4.574145e-05 -8.956652e-05 -7.500113e-05 
+    -3.941309e-07  3.223751e-09  4.574145e-05  1.130227e-04 -2.422198e-04  7.883117e-04 
+    -8.222204e-05 -4.240579e-05 -8.956652e-05 -2.422198e-04  5.693530e-04 -1.824436e-03 
+     2.211254e-04  1.142654e-04 -7.500113e-05  7.883117e-04 -1.824436e-03  5.944819e-03 
   getD0(): 0.0322739
   getEnergy(): 1.21177
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -8988,11 +9130,11 @@ TrackFitResult#31:
      2.047000e-05  3.758074e-05  3.259644e-05 -2.287490e-03  2.001505e-03 
   getCovariance6(): 
      4.104077e-04  8.803530e-04 -2.748083e-06  2.222925e-04 -2.158077e-04  1.773780e-04 
-     8.803530e-04  1.888419e-03 -5.979925e-06  4.762820e-04 -4.626392e-04  3.801192e-04 
-    -2.748083e-06 -5.979925e-06  2.674572e-03  9.701570e-05 -4.716777e-05 -2.015059e-04 
-     2.222925e-04  4.762820e-04  9.701570e-05  1.040036e-03 -5.625398e-04  7.091605e-04 
-    -2.158077e-04 -4.626392e-04 -4.716777e-05 -5.625398e-04  3.299905e-04 -3.904272e-04 
-     1.773780e-04  3.801192e-04 -2.015059e-04  7.091605e-04 -3.904272e-04  5.125908e-04 
+     8.803530e-04  1.888419e-03 -5.979925e-06  4.762820e-04 -4.626393e-04  3.801193e-04 
+    -2.748083e-06 -5.979925e-06  2.674572e-03  9.701571e-05 -4.716778e-05 -2.015059e-04 
+     2.222925e-04  4.762820e-04  9.701571e-05  1.040037e-03 -5.625399e-04  7.091607e-04 
+    -2.158077e-04 -4.626393e-04 -4.716778e-05 -5.625399e-04  3.299906e-04 -3.904273e-04 
+     1.773780e-04  3.801193e-04 -2.015059e-04  7.091607e-04 -3.904273e-04  5.125909e-04 
   getD0(): -0.0016116
   getEnergy(): 0.512297
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -9042,12 +9184,12 @@ TrackFitResult#32:
     -5.043134e-06  9.878530e-06  5.721400e-08  8.676228e-04 -8.161210e-06 
      1.105858e-06  9.148024e-07 -5.991859e-06 -8.161210e-06  7.185100e-04 
   getCovariance6(): 
-     1.802667e-04  1.978278e-04 -3.159880e-06 -5.163356e-07 -2.641683e-06  1.720966e-06 
-     1.978278e-04  2.178366e-04 -3.943028e-06  2.080494e-06  1.580968e-07  1.770700e-06 
-    -3.159880e-06 -3.943028e-06  8.676228e-04 -1.070698e-06 -2.496115e-06 -1.153072e-06 
-    -5.163356e-07  2.080494e-06 -1.070698e-06  2.592578e-05 -3.938465e-06  5.911739e-06 
-    -2.641683e-06  1.580968e-07 -2.496115e-06 -3.938465e-06  2.629371e-05 -6.279556e-06 
-     1.720966e-06  1.770700e-06 -1.153072e-06  5.911739e-06 -6.279556e-06  3.156409e-05 
+     1.802667e-04  1.978278e-04 -3.159880e-06 -5.163356e-07 -2.641682e-06  1.720966e-06 
+     1.978278e-04  2.178366e-04 -3.943028e-06  2.080494e-06  1.580967e-07  1.770700e-06 
+    -3.159880e-06 -3.943028e-06  8.676228e-04 -1.070697e-06 -2.496115e-06 -1.153072e-06 
+    -5.163356e-07  2.080494e-06 -1.070697e-06  2.592578e-05 -3.938465e-06  5.911738e-06 
+    -2.641682e-06  1.580967e-07 -2.496115e-06 -3.938465e-06  2.629370e-05 -6.279555e-06 
+     1.720966e-06  1.770700e-06 -1.153072e-06  5.911738e-06 -6.279555e-06  3.156408e-05 
   getD0(): -0.0318699
   getEnergy(): 1.01403
   getHitPatternCDC(): 0001001000000000000000000000000000000000111111011111111100000000
@@ -9100,9 +9242,9 @@ TrackFitResult#33:
      1.279993e-03  6.175845e-04  1.115943e-03  2.172694e-05 -9.105224e-05  9.601303e-07 
      6.175845e-04  4.921546e-03  1.617721e-03  2.270708e-05 -1.237960e-04  5.155265e-07 
      1.115943e-03  1.617721e-03  8.991783e-03  1.098041e-04 -7.440881e-05 -1.036900e-04 
-     2.172694e-05  2.270708e-05  1.098041e-04  4.858603e-06 -5.605499e-07 -3.841790e-06 
-    -9.105224e-05 -1.237960e-04 -7.440881e-05 -5.605499e-07  8.177493e-06 -1.104538e-06 
-     9.601303e-07  5.155265e-07 -1.036900e-04 -3.841790e-06 -1.104538e-06  5.839261e-06 
+     2.172694e-05  2.270708e-05  1.098041e-04  4.858604e-06 -5.605500e-07 -3.841791e-06 
+    -9.105224e-05 -1.237960e-04 -7.440881e-05 -5.605500e-07  8.177493e-06 -1.104538e-06 
+     9.601303e-07  5.155265e-07 -1.036900e-04 -3.841791e-06 -1.104538e-06  5.839261e-06 
   getD0(): -2.19478
   getEnergy(): 0.240416
   getHitPatternCDC(): 0001101000000000000000000000000000000011111111111100000000111011
@@ -9207,12 +9349,12 @@ TrackFitResult#35:
      4.257469e-03  9.876916e-04 -5.328930e-05  2.826049e-02 -4.252462e-03 
      1.741736e-04  5.314943e-05  1.589534e-05 -4.252462e-03  1.234185e-03 
   getCovariance6(): 
-     1.076342e-03  6.752020e-04  7.570030e-04  2.065130e-05 -9.684348e-05  2.636390e-06 
-     6.752020e-04  1.672091e-02  4.665732e-03  8.683648e-05 -4.289565e-04 -8.187149e-07 
-     7.570030e-04  4.665732e-03  2.826049e-02  3.768748e-04 -6.088451e-05 -4.108876e-04 
-     2.065130e-05  8.683648e-05  3.768748e-04  1.172308e-05 -2.647814e-07 -6.261982e-06 
-    -9.684348e-05 -4.289565e-04 -6.088451e-05 -2.647814e-07  1.800066e-05 -2.051655e-06 
-     2.636390e-06 -8.187149e-07 -4.108876e-04 -6.261982e-06 -2.051655e-06  1.380121e-05 
+     1.076342e-03  6.752020e-04  7.570030e-04  2.065130e-05 -9.684347e-05  2.636390e-06 
+     6.752020e-04  1.672091e-02  4.665732e-03  8.683647e-05 -4.289565e-04 -8.187148e-07 
+     7.570030e-04  4.665732e-03  2.826049e-02  3.768748e-04 -6.088450e-05 -4.108875e-04 
+     2.065130e-05  8.683647e-05  3.768748e-04  1.172308e-05 -2.647814e-07 -6.261981e-06 
+    -9.684347e-05 -4.289565e-04 -6.088450e-05 -2.647814e-07  1.800066e-05 -2.051655e-06 
+     2.636390e-06 -8.187148e-07 -4.108875e-04 -6.261981e-06 -2.051655e-06  1.380121e-05 
   getD0(): -2.07889
   getEnergy(): 0.964445
   getHitPatternCDC(): 0001101000000000000000000000000000000011111111111100000000111011
@@ -12058,7 +12200,7 @@ MCParticle#2:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#3:
-  get4Vector(): (-0.140336,-0.315071,-0.591684,2.12371)
+  get4Vector(): (-0.140336,-0.315071,-0.591684,2.1237)
   getArrayIndex(): 3
   getCharge(): -1
   getDaughter(0): -> MCParticles#11
@@ -12142,7 +12284,8 @@ MCParticle#5:
   getName(): pi+
   getPDG(): 211
  ... message repeated 2 times
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12239,7 +12382,8 @@ MCParticle#8:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93004
@@ -12271,7 +12415,8 @@ MCParticle#9:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93004
@@ -12303,7 +12448,8 @@ MCParticle#10:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93004
@@ -12371,7 +12517,8 @@ MCParticle#12:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12435,7 +12582,8 @@ MCParticle#14:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12467,7 +12615,8 @@ MCParticle#15:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 147.5
@@ -12530,7 +12679,8 @@ MCParticle#17:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12564,7 +12714,8 @@ MCParticle#18:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12632,7 +12783,8 @@ MCParticle#20:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93004
@@ -12678,7 +12830,7 @@ MCParticle#21:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#22:
-  get4Vector(): (-0.394567,-0.275415,-0.421839,0.63991)
+  get4Vector(): (-0.394567,-0.275415,-0.421839,0.639911)
   getArrayIndex(): 22
   getCharge(): -1
   getDaughter(0): -> MCParticles#40
@@ -12728,7 +12880,8 @@ MCParticle#23:
   getNDaughters(): 0
   getName(): anti-nu_e
   getPDG(): -12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92894
@@ -12760,7 +12913,8 @@ MCParticle#24:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92894
@@ -12792,7 +12946,8 @@ MCParticle#25:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.65674
@@ -12887,7 +13042,8 @@ MCParticle#28:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12921,7 +13077,8 @@ MCParticle#29:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.54436
@@ -12953,7 +13110,8 @@ MCParticle#30:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -12985,7 +13143,8 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92917
@@ -13019,7 +13178,8 @@ MCParticle#32:
   getNDaughters(): 2
   getName(): K-
   getPDG(): -321
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13054,7 +13214,8 @@ MCParticle#33:
   getNDaughters(): 3
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13088,7 +13249,8 @@ MCParticle#34:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13122,7 +13284,8 @@ MCParticle#35:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13154,7 +13317,8 @@ MCParticle#36:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.37755
@@ -13189,7 +13353,8 @@ MCParticle#37:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.37755
@@ -13252,7 +13417,8 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92894
@@ -13285,7 +13451,8 @@ MCParticle#40:
   getNDaughters(): 1
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.44792
@@ -13317,7 +13484,8 @@ MCParticle#41:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.44792
@@ -13350,7 +13518,8 @@ MCParticle#42:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.39706
@@ -13413,7 +13582,8 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.87366
@@ -13445,7 +13615,8 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.6753
@@ -13480,7 +13651,8 @@ MCParticle#46:
   getNDaughters(): 3
   getName(): mu-
   getPDG(): 13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.6753
@@ -13512,7 +13684,8 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.19397
@@ -13544,7 +13717,8 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.19397
@@ -13576,7 +13750,8 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.210274
@@ -13608,7 +13783,8 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 28.797
@@ -13643,7 +13819,8 @@ MCParticle#51:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 28.797
@@ -13675,7 +13852,8 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13707,7 +13885,8 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13739,7 +13918,8 @@ MCParticle#54:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13771,7 +13951,8 @@ MCParticle#55:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92992
@@ -13803,7 +13984,8 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 11488.3
@@ -13835,7 +14017,8 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 11488.3
@@ -13867,7 +14050,8 @@ MCParticle#58:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 11488.3
@@ -13932,7 +14116,8 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.5577
@@ -13964,7 +14149,8 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8.83898
@@ -13997,7 +14183,8 @@ MCParticle#62:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.438593
@@ -14029,7 +14216,8 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1820.8
@@ -14061,7 +14249,8 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): anti-nu_e
   getPDG(): -12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1820.8
@@ -14093,7 +14282,8 @@ MCParticle#65:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1820.8
@@ -14125,7 +14315,8 @@ MCParticle#66:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 627.66
@@ -14157,7 +14348,8 @@ MCParticle#67:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 627.66
@@ -14189,7 +14381,8 @@ MCParticle#68:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 627.66
@@ -14223,7 +14416,8 @@ MCParticle#69:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14257,7 +14451,8 @@ MCParticle#70:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14291,7 +14486,8 @@ MCParticle#71:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14323,7 +14519,8 @@ MCParticle#72:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.27266
@@ -14355,7 +14552,8 @@ MCParticle#73:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14387,7 +14585,8 @@ MCParticle#74:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14419,7 +14618,8 @@ MCParticle#75:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22927
@@ -14451,7 +14651,8 @@ MCParticle#76:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22927
@@ -14483,7 +14684,8 @@ MCParticle#77:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14515,7 +14717,8 @@ MCParticle#78:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.22928
@@ -14577,6 +14780,9 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -14600,6 +14806,9 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#2:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -14621,6 +14830,9 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -14643,6 +14855,9 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -14666,6 +14881,9 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -14689,6 +14907,9 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#16
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -14712,6 +14933,9 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#19
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -14733,6 +14957,9 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#21
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#22
+  getTrackTime(): nan
+  isFlippedAndRefitted(): False
+  wasRefined(): False
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -14825,12 +15052,12 @@ TrackFitResult#1:
     -1.832189e-03 -6.357616e-04  2.213964e-05  1.282323e-01 -4.699535e-02 
      1.519280e-04 -2.134478e-05 -9.869719e-06 -4.699535e-02  2.094852e-02 
   getCovariance6(): 
-     1.249020e-01 -2.956207e-02  1.803944e-03 -1.838931e-02  8.061288e-03 -5.816618e-05 
-    -2.956207e-02  7.911396e-03 -4.486272e-04  3.685873e-03 -1.616155e-03  3.037131e-05 
-     1.803944e-03 -4.486272e-04  1.282323e-01  1.291302e-04  9.732014e-04 -2.011786e-02 
-    -1.838931e-02  3.685873e-03  1.291302e-04  3.199823e-03 -1.384532e-03 -7.523393e-05 
-     8.061288e-03 -1.616155e-03  9.732014e-04 -1.384532e-03  6.475821e-04 -1.618701e-04 
-    -5.816618e-05  3.037131e-05 -2.011786e-02 -7.523393e-05 -1.618701e-04  3.838972e-03 
+     1.249020e-01 -2.956207e-02  1.803944e-03 -1.838932e-02  8.061289e-03 -5.816619e-05 
+    -2.956207e-02  7.911396e-03 -4.486272e-04  3.685874e-03 -1.616155e-03  3.037131e-05 
+     1.803944e-03 -4.486272e-04  1.282323e-01  1.291302e-04  9.732015e-04 -2.011786e-02 
+    -1.838932e-02  3.685874e-03  1.291302e-04  3.199824e-03 -1.384532e-03 -7.523395e-05 
+     8.061289e-03 -1.616155e-03  9.732015e-04 -1.384532e-03  6.475823e-04 -1.618701e-04 
+    -5.816619e-05  3.037131e-05 -2.011786e-02 -7.523395e-05 -1.618701e-04  3.838973e-03 
   getD0(): 0.493817
   getEnergy(): 0.654356
   getHitPatternCDC(): 1011000101111111111111111111111111111111111111111111111111111111
@@ -14883,9 +15110,9 @@ TrackFitResult#2:
      1.274835e-01 -4.211247e-02  1.238309e-03 -2.538470e-02  1.191835e-02 -6.390784e-05 
     -4.211247e-02  1.455218e-02 -4.010253e-04  7.478911e-03 -3.509213e-03  3.362981e-05 
      1.238309e-03 -4.010253e-04  1.399143e-01  3.215483e-04  1.351545e-03 -2.897663e-02 
-    -2.538470e-02  7.478911e-03  3.215483e-04  6.365020e-03 -2.919097e-03 -1.574611e-04 
+    -2.538470e-02  7.478911e-03  3.215483e-04  6.365019e-03 -2.919097e-03 -1.574611e-04 
      1.191835e-02 -3.509213e-03  1.351545e-03 -2.919097e-03  1.525867e-03 -3.213708e-04 
-    -6.390784e-05  3.362981e-05 -2.897663e-02 -1.574611e-04 -3.213708e-04  7.762044e-03 
+    -6.390784e-05  3.362981e-05 -2.897663e-02 -1.574611e-04 -3.213708e-04  7.762043e-03 
   getD0(): 0.375577
   getEnergy(): 1.14147
   getHitPatternCDC(): 1011000101111111111111111111111111111111111111111111111111111111
@@ -14936,11 +15163,11 @@ TrackFitResult#3:
      4.572584e-07  3.519117e-07  2.381633e-07 -3.503741e-05  3.126323e-05 
   getCovariance6(): 
      3.317616e-06  8.895784e-06 -3.473648e-07 -8.042442e-07 -1.965607e-06  1.386823e-08 
-     8.895784e-06  2.385445e-05 -9.242744e-07 -2.160260e-06 -5.280818e-06  3.689395e-08 
-    -3.473648e-07 -9.242744e-07  4.135651e-05  3.901403e-06 -1.321824e-06 -6.457541e-06 
-    -8.042442e-07 -2.160260e-06  3.901403e-06  8.963601e-07  2.358636e-07 -4.174706e-07 
-    -1.965607e-06 -5.280818e-06 -1.321824e-06  2.358636e-07  1.338272e-06  1.537083e-07 
-     1.386823e-08  3.689395e-08 -6.457541e-06 -4.174706e-07  1.537083e-07  1.209914e-06 
+     8.895784e-06  2.385445e-05 -9.242744e-07 -2.160260e-06 -5.280817e-06  3.689394e-08 
+    -3.473648e-07 -9.242744e-07  4.135651e-05  3.901402e-06 -1.321824e-06 -6.457541e-06 
+    -8.042442e-07 -2.160260e-06  3.901402e-06  8.963599e-07  2.358635e-07 -4.174705e-07 
+    -1.965607e-06 -5.280817e-06 -1.321824e-06  2.358635e-07  1.338272e-06  1.537083e-07 
+     1.386823e-08  3.689394e-08 -6.457541e-06 -4.174705e-07  1.537083e-07  1.209914e-06 
   getD0(): 0.0126879
   getEnergy(): 0.337391
   getHitPatternCDC(): 0011111100000000000011111111111111111111111111111111111111111111
@@ -15048,7 +15275,7 @@ TrackFitResult#5:
      1.456474e-05  4.087411e-05 -1.294936e-06 -4.336428e-06 -1.080418e-05  1.405898e-08 
      4.087411e-05  1.147216e-04 -3.615213e-06 -1.219469e-05 -3.038365e-05  3.667012e-08 
     -1.294936e-06 -3.615213e-06  1.878937e-04  2.149223e-05 -7.112907e-06 -3.549539e-05 
-    -4.336428e-06 -1.219469e-05  2.149223e-05  7.647294e-06  9.507994e-07 -1.497207e-06 
+    -4.336428e-06 -1.219469e-05  2.149223e-05  7.647293e-06  9.507994e-07 -1.497207e-06 
     -1.080418e-05 -3.038365e-05 -7.112907e-06  9.507994e-07  9.209748e-06  5.684684e-07 
      1.405898e-08  3.667012e-08 -3.549539e-05 -1.497207e-06  5.684684e-07  8.705359e-06 
   getD0(): 0.0210241
@@ -15100,12 +15327,12 @@ TrackFitResult#6:
      4.877571e-06  3.807581e-06  1.068052e-06  4.120624e-04 -1.394099e-04 
     -1.863412e-06 -1.051678e-06 -5.019771e-07 -1.394099e-04  6.549292e-05 
   getCovariance6(): 
-     1.309821e-04 -1.613914e-04  2.949949e-06 -1.021610e-05  1.140582e-05 -8.539117e-08 
-    -1.613914e-04  1.990786e-04 -3.895119e-06  1.285671e-05 -1.436061e-05  1.140165e-07 
-     2.949949e-06 -3.895119e-06  4.120624e-04 -9.436173e-06 -6.972818e-06 -2.496311e-05 
-    -1.021610e-05  1.285671e-05 -9.436173e-06  1.528588e-06 -9.256841e-07  6.830070e-07 
-     1.140582e-05 -1.436061e-05 -6.972818e-06 -9.256841e-07  1.717539e-06  5.491220e-07 
-    -8.539117e-08  1.140165e-07 -2.496311e-05  6.830070e-07  5.491220e-07  2.150611e-06 
+     1.309821e-04 -1.613914e-04  2.949949e-06 -1.021610e-05  1.140582e-05 -8.539118e-08 
+    -1.613914e-04  1.990786e-04 -3.895119e-06  1.285671e-05 -1.436061e-05  1.140166e-07 
+     2.949949e-06 -3.895119e-06  4.120624e-04 -9.436174e-06 -6.972819e-06 -2.496311e-05 
+    -1.021610e-05  1.285671e-05 -9.436174e-06  1.528589e-06 -9.256843e-07  6.830071e-07 
+     1.140582e-05 -1.436061e-05 -6.972819e-06 -9.256843e-07  1.717540e-06  5.491221e-07 
+    -8.539118e-08  1.140166e-07 -2.496311e-05  6.830071e-07  5.491221e-07  2.150612e-06 
   getD0(): -0.0758704
   getEnergy(): 0.278775
   getHitPatternCDC(): 0100111000000000111111111111111111111111111111111111111111111111
@@ -15155,12 +15382,12 @@ TrackFitResult#7:
      2.086289e-05  1.436606e-05  3.435543e-06  1.396347e-03 -4.803130e-04 
     -6.205501e-06 -3.395832e-06 -1.610026e-06 -4.803130e-04  2.247694e-04 
   getCovariance6(): 
-     4.308744e-04 -5.458035e-04  1.241153e-05 -3.674766e-05  4.145518e-05 -2.304850e-07 
-    -5.458035e-04  6.925259e-04 -1.682404e-05  4.773668e-05 -5.388712e-05  3.271119e-07 
-     1.241153e-05 -1.682404e-05  1.396347e-03 -3.504255e-05 -2.515402e-05 -9.195966e-05 
-    -3.674766e-05  4.773668e-05 -3.504255e-05  6.116641e-06 -3.499956e-06  2.580749e-06 
-     4.145518e-05 -5.388712e-05 -2.515402e-05 -3.499956e-06  6.888219e-06  2.063467e-06 
-    -2.304850e-07  3.271119e-07 -9.195966e-05  2.580749e-06  2.063467e-06  8.494169e-06 
+     4.308744e-04 -5.458035e-04  1.241153e-05 -3.674766e-05  4.145519e-05 -2.304850e-07 
+    -5.458035e-04  6.925259e-04 -1.682404e-05  4.773669e-05 -5.388712e-05  3.271119e-07 
+     1.241153e-05 -1.682404e-05  1.396347e-03 -3.504255e-05 -2.515402e-05 -9.195967e-05 
+    -3.674766e-05  4.773669e-05 -3.504255e-05  6.116642e-06 -3.499957e-06  2.580750e-06 
+     4.145519e-05 -5.388712e-05 -2.515402e-05 -3.499957e-06  6.888219e-06  2.063468e-06 
+    -2.304850e-07  3.271119e-07 -9.195967e-05  2.580750e-06  2.063468e-06  8.494169e-06 
   getD0(): -0.0942715
   getEnergy(): 0.557004
   getHitPatternCDC(): 0100111000000000111111111111111111111111111111111111111111111111
@@ -15183,7 +15410,7 @@ TrackFitResult#7:
   getTransverseMomentum(): 0.233493
   getZ0(): -0.0205424
 TrackFitResult#8:
-  get4Momentum(): (0.1459,-0.204463,0.26121,0.388333)
+  get4Momentum(): (0.1459,-0.204463,0.261209,0.388333)
   getChargeSign(): 1
   getChi2(): 90.1644
   getCotTheta(): 1.03992
@@ -15210,17 +15437,17 @@ TrackFitResult#8:
     -1.178619e-06 -8.621186e-07 -9.445471e-07  1.434161e-04 -1.090196e-04 
      2.440498e-06  2.093693e-06  7.572261e-07 -1.090196e-04  8.739780e-05 
   getCovariance6(): 
-     4.662811e-05  3.504789e-05  9.430141e-07 -8.876159e-06 -6.653003e-06 -2.188026e-07 
+     4.662811e-05  3.504789e-05  9.430141e-07 -8.876159e-06 -6.653002e-06 -2.188026e-07 
      3.504789e-05  2.634739e-05  7.075763e-07 -6.689742e-06 -5.015701e-06 -1.651757e-07 
      9.430141e-07  7.075763e-07  1.434161e-04  7.771407e-06 -1.126359e-05 -1.315467e-05 
-    -8.876159e-06 -6.689742e-06  7.771407e-06  2.346664e-06  5.393798e-07 -5.319702e-07 
-    -6.653003e-06 -5.015701e-06 -1.126359e-05  5.393798e-07  2.129424e-06  8.427594e-07 
-    -2.188026e-07 -1.651757e-07 -1.315467e-05 -5.319702e-07  8.427594e-07  1.614110e-06 
+    -8.876159e-06 -6.689742e-06  7.771407e-06  2.346663e-06  5.393797e-07 -5.319701e-07 
+    -6.653002e-06 -5.015701e-06 -1.126359e-05  5.393797e-07  2.129424e-06  8.427592e-07 
+    -2.188026e-07 -1.651757e-07 -1.315467e-05 -5.319701e-07  8.427592e-07  1.614110e-06 
   getD0(): 0.0327291
   getEnergy(): 0.388333
   getHitPatternCDC(): 0101001001111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
-  getMomentum(): (0.1459,-0.204463,0.26121)
+  getMomentum(): (0.1459,-0.204463,0.261209)
   getNDF(): 87
   getOmega(): 0.0173396
   getPValue(): 0.386881
@@ -15265,12 +15492,12 @@ TrackFitResult#9:
     -1.172049e-06 -1.074614e-06 -1.848446e-06  2.738464e-04 -2.179907e-04 
      4.256637e-06  3.992053e-06  1.539826e-06 -2.179907e-04  1.815929e-04 
   getCovariance6(): 
-     8.862832e-05  6.672194e-05  9.338690e-07 -1.805670e-05 -1.342437e-05 -4.058561e-07 
+     8.862832e-05  6.672194e-05  9.338690e-07 -1.805670e-05 -1.342437e-05 -4.058562e-07 
      6.672194e-05  5.023690e-05  7.090982e-07 -1.362590e-05 -1.013492e-05 -3.073443e-07 
-     9.338690e-07  7.090982e-07  2.738464e-04  1.600281e-05 -2.291469e-05 -2.683509e-05 
-    -1.805670e-05 -1.362590e-05  1.600281e-05  5.099391e-06  1.098821e-06 -1.103185e-06 
-    -1.342437e-05 -1.013492e-05 -2.291469e-05  1.098821e-06  4.643507e-06  1.744224e-06 
-    -4.058561e-07 -3.073443e-07 -2.683509e-05 -1.103185e-06  1.744224e-06  3.590542e-06 
+     9.338690e-07  7.090982e-07  2.738464e-04  1.600281e-05 -2.291470e-05 -2.683510e-05 
+    -1.805670e-05 -1.362590e-05  1.600281e-05  5.099392e-06  1.098821e-06 -1.103185e-06 
+    -1.342437e-05 -1.013492e-05 -2.291470e-05  1.098821e-06  4.643508e-06  1.744224e-06 
+    -4.058562e-07 -3.073443e-07 -2.683510e-05 -1.103185e-06  1.744224e-06  3.590543e-06 
   getD0(): 0.0326646
   getEnergy(): 0.617241
   getHitPatternCDC(): 0101001001111111111111111111111111111111111111111111111111111111
@@ -15321,11 +15548,11 @@ TrackFitResult#10:
      6.220235e-06  6.434786e-06  2.679237e-06 -4.020977e-04  3.428417e-04 
   getCovariance6(): 
      1.564252e-04  1.177506e-04 -3.266749e-07 -3.578257e-05 -2.629881e-05 -6.735894e-07 
-     1.177506e-04  8.864902e-05 -2.186360e-07 -2.699143e-05 -1.985050e-05 -5.106207e-07 
-    -3.266749e-07 -2.186360e-07  4.904514e-04  3.235367e-05 -4.561833e-05 -5.365169e-05 
-    -3.578257e-05 -2.699143e-05  3.235367e-05  1.148518e-05  2.046456e-06 -2.087762e-06 
+     1.177506e-04  8.864902e-05 -2.186360e-07 -2.699142e-05 -1.985050e-05 -5.106207e-07 
+    -3.266749e-07 -2.186360e-07  4.904514e-04  3.235366e-05 -4.561833e-05 -5.365169e-05 
+    -3.578257e-05 -2.699142e-05  3.235366e-05  1.148517e-05  2.046456e-06 -2.087761e-06 
     -2.629881e-05 -1.985050e-05 -4.561833e-05  2.046456e-06  1.064125e-05  3.305389e-06 
-    -6.735894e-07 -5.106207e-07 -5.365169e-05 -2.087762e-06  3.305389e-06  8.666956e-06 
+    -6.735894e-07 -5.106207e-07 -5.365169e-05 -2.087761e-06  3.305389e-06  8.666956e-06 
   getD0(): 0.0327163
   getEnergy(): 1.02084
   getHitPatternCDC(): 0101001001111111111111111111111111111111111111111111111111111111
@@ -15377,10 +15604,10 @@ TrackFitResult#11:
   getCovariance6(): 
      3.413793e-06 -2.801498e-06  8.226290e-08 -1.397426e-06  1.275296e-06 -1.512041e-09 
     -2.801498e-06  2.299733e-06 -6.810057e-08  1.142073e-06 -1.042337e-06  1.550045e-09 
-     8.226290e-08 -6.810057e-08  6.975703e-06  4.559125e-07  5.773446e-07 -2.590917e-06 
+     8.226290e-08 -6.810057e-08  6.975703e-06  4.559125e-07  5.773447e-07 -2.590917e-06 
     -1.397426e-06  1.142073e-06  4.559125e-07  9.732046e-07 -1.310806e-07 -5.760883e-08 
-     1.275296e-06 -1.042337e-06  5.773446e-07 -1.310806e-07  9.761770e-07 -6.235813e-08 
-    -1.512041e-09  1.550045e-09 -2.590917e-06 -5.760883e-08 -6.235813e-08  1.120223e-06 
+     1.275296e-06 -1.042337e-06  5.773447e-07 -1.310806e-07  9.761771e-07 -6.235814e-08 
+    -1.512041e-09  1.550045e-09 -2.590917e-06 -5.760883e-08 -6.235814e-08  1.120223e-06 
   getD0(): 0.0410461
   getEnergy(): 0.526258
   getHitPatternCDC(): 0011011011111111111101111111111111111111111111111111111100110000
@@ -15431,11 +15658,11 @@ TrackFitResult#12:
      4.926842e-08  2.319948e-08  2.108808e-08 -9.841484e-06  9.060714e-06 
   getCovariance6(): 
      5.846673e-06 -4.786873e-06  1.420892e-07 -2.469658e-06  2.242739e-06 -5.023707e-09 
-    -4.786873e-06  3.920075e-06 -1.174172e-07  2.016009e-06 -1.830872e-06  4.676240e-09 
-     1.420892e-07 -1.174172e-07  1.141508e-05  7.855047e-07  9.979159e-07 -4.472059e-06 
-    -2.469658e-06  2.016009e-06  7.855047e-07  1.673733e-06 -3.137592e-07 -1.276825e-07 
+    -4.786873e-06  3.920075e-06 -1.174172e-07  2.016010e-06 -1.830872e-06  4.676240e-09 
+     1.420892e-07 -1.174172e-07  1.141508e-05  7.855048e-07  9.979159e-07 -4.472059e-06 
+    -2.469658e-06  2.016010e-06  7.855048e-07  1.673733e-06 -3.137592e-07 -1.276825e-07 
      2.242739e-06 -1.830872e-06  9.979159e-07 -3.137592e-07  1.650319e-06 -1.413976e-07 
-    -5.023707e-09  4.676240e-09 -4.472059e-06 -1.276825e-07 -1.413976e-07  1.967331e-06 
+    -5.023707e-09  4.676240e-09 -4.472059e-06 -1.276825e-07 -1.413976e-07  1.967332e-06 
   getD0(): 0.0411641
   getEnergy(): 0.709981
   getHitPatternCDC(): 0011011011111111111101111111111111111111111111111111111100110000
@@ -15485,12 +15712,12 @@ TrackFitResult#13:
     -3.841878e-07 -3.069428e-07 -4.585474e-08  2.246872e-05 -2.011957e-05 
      1.044835e-07  4.894110e-08  4.278573e-08 -2.011957e-05  1.878181e-05 
   getCovariance6(): 
-     1.194078e-05 -9.742167e-06  2.966494e-07 -5.246302e-06  4.760053e-06 -1.132865e-08 
-    -9.742167e-06  7.949714e-06 -2.444653e-07  4.271379e-06 -3.875530e-06  1.054728e-08 
-     2.966494e-07 -2.444653e-07  2.246872e-05  1.636736e-06  2.089366e-06 -9.342329e-06 
-    -5.246302e-06  4.271379e-06  1.636736e-06  3.760633e-06 -5.622946e-07 -2.256470e-07 
-     4.760053e-06 -3.875530e-06  2.089366e-06 -5.622946e-07  3.742090e-06 -2.483096e-07 
-    -1.132865e-08  1.054728e-08 -9.342329e-06 -2.256470e-07 -2.483096e-07  4.280187e-06 
+     1.194078e-05 -9.742167e-06  2.966494e-07 -5.246303e-06  4.760054e-06 -1.132865e-08 
+    -9.742167e-06  7.949714e-06 -2.444653e-07  4.271380e-06 -3.875531e-06  1.054729e-08 
+     2.966494e-07 -2.444653e-07  2.246872e-05  1.636736e-06  2.089366e-06 -9.342330e-06 
+    -5.246303e-06  4.271380e-06  1.636736e-06  3.760634e-06 -5.622948e-07 -2.256471e-07 
+     4.760054e-06 -3.875531e-06  2.089366e-06 -5.622948e-07  3.742091e-06 -2.483097e-07 
+    -1.132865e-08  1.054729e-08 -9.342330e-06 -2.256471e-07 -2.483097e-07  4.280188e-06 
   getD0(): 0.0417043
   getEnergy(): 1.07342
   getHitPatternCDC(): 0011011011111111111101111111111111111111111111111111111100110000
@@ -15544,8 +15771,8 @@ TrackFitResult#14:
      1.202303e-03  7.601261e-04 -1.669879e-04 -5.033471e-05 -2.203253e-05  1.372587e-06 
     -4.268634e-04 -1.669879e-04  2.991440e-02 -4.096520e-06  1.610386e-05 -2.813704e-04 
     -7.494791e-05 -5.033471e-05 -4.096520e-06  3.714535e-06  1.280528e-06  1.121548e-07 
-    -3.399339e-05 -2.203253e-05  1.610386e-05  1.280528e-06  1.281020e-06 -4.475159e-07 
-     2.954971e-06  1.372587e-06 -2.813704e-04  1.121548e-07 -4.475159e-07  5.791586e-06 
+    -3.399339e-05 -2.203253e-05  1.610386e-05  1.280528e-06  1.281020e-06 -4.475158e-07 
+     2.954971e-06  1.372587e-06 -2.813704e-04  1.121548e-07 -4.475158e-07  5.791585e-06 
   getD0(): 2.50086
   getEnergy(): 0.483283
   getHitPatternCDC(): 0011100011111111111111111111111111111111111111111111111111111111
@@ -15598,7 +15825,7 @@ TrackFitResult#15:
      3.818245e-03  2.345990e-03 -2.049856e-04 -1.504067e-04 -6.490719e-05  1.876770e-06 
      2.345990e-03  1.493071e-03 -4.537454e-05 -1.009729e-04 -4.256950e-05  9.450536e-07 
     -2.049856e-04 -4.537454e-05  3.420099e-02 -1.164899e-05  1.662517e-05 -3.953111e-04 
-    -1.504067e-04 -1.009729e-04 -1.164899e-05  7.496338e-06  2.586488e-06  2.452166e-07 
+    -1.504067e-04 -1.009729e-04 -1.164899e-05  7.496337e-06  2.586488e-06  2.452166e-07 
     -6.490719e-05 -4.256950e-05  1.662517e-05  2.586488e-06  2.375335e-06 -7.956159e-07 
      1.876770e-06  9.450536e-07 -3.953111e-04  2.452166e-07 -7.956159e-07  1.044029e-05 
   getD0(): 2.50183
@@ -15650,12 +15877,12 @@ TrackFitResult#16:
      3.845947e-04  4.667951e-05 -5.865190e-07  4.524092e-02 -1.493374e-03 
      3.780363e-06  5.046820e-07  8.881256e-08 -1.493374e-03  1.059209e-04 
   getCovariance6(): 
-     8.681530e-03  5.329242e-03  3.212261e-04 -3.544778e-04 -1.481040e-04 -3.733486e-07 
-     5.329242e-03  3.381041e-03  2.414600e-04 -2.360755e-04 -9.720802e-05  8.473620e-08 
-     3.212261e-04  2.414600e-04  4.524092e-02 -3.107942e-05  2.071405e-05 -7.031910e-04 
-    -3.544778e-04 -2.360755e-04 -3.107942e-05  1.796098e-05  6.085601e-06  5.868919e-07 
-    -1.481040e-04 -9.720802e-05  2.071405e-05  6.085601e-06  5.684533e-06 -1.720450e-06 
-    -3.733486e-07  8.473620e-08 -7.031910e-04  5.868919e-07 -1.720450e-06  2.327721e-05 
+     8.681530e-03  5.329242e-03  3.212261e-04 -3.544778e-04 -1.481041e-04 -3.733486e-07 
+     5.329242e-03  3.381041e-03  2.414600e-04 -2.360755e-04 -9.720803e-05  8.473621e-08 
+     3.212261e-04  2.414600e-04  4.524092e-02 -3.107942e-05  2.071405e-05 -7.031911e-04 
+    -3.544778e-04 -2.360755e-04 -3.107942e-05  1.796098e-05  6.085602e-06  5.868921e-07 
+    -1.481041e-04 -9.720803e-05  2.071405e-05  6.085602e-06  5.684534e-06 -1.720450e-06 
+    -3.733486e-07  8.473621e-08 -7.031911e-04  5.868921e-07 -1.720450e-06  2.327722e-05 
   getD0(): 2.49609
   getEnergy(): 1.05196
   getHitPatternCDC(): 0011100011111111111111111111111111111111111111111111111111111111
@@ -15705,12 +15932,12 @@ TrackFitResult#17:
     -1.701314e-06 -1.716153e-06  4.151617e-07  2.071859e-04 -1.613239e-04 
     -1.073046e-06 -8.157996e-07 -3.406590e-07 -1.613239e-04  1.319768e-04 
   getCovariance6(): 
-     2.178295e-05 -7.903858e-06 -1.594073e-06 -9.260189e-06  4.194590e-06  2.949002e-06 
+     2.178295e-05 -7.903858e-06 -1.594073e-06 -9.260190e-06  4.194590e-06  2.949002e-06 
     -7.903858e-06  2.871341e-06  6.051482e-07  3.383411e-06 -1.540775e-06 -1.100943e-06 
-    -1.594073e-06  6.051482e-07  2.071859e-04  9.502261e-06  2.784986e-05 -1.061123e-05 
-    -9.260189e-06  3.383411e-06  9.502261e-06  7.408336e-06  8.939200e-06  2.510151e-05 
-     4.194590e-06 -1.540775e-06  2.784986e-05  8.939200e-06  3.643442e-05  8.771587e-05 
-     2.949002e-06 -1.100943e-06 -1.061123e-05  2.510151e-05  8.771587e-05  2.497413e-04 
+    -1.594073e-06  6.051482e-07  2.071859e-04  9.502262e-06  2.784986e-05 -1.061123e-05 
+    -9.260190e-06  3.383411e-06  9.502262e-06  7.408338e-06  8.939202e-06  2.510152e-05 
+     4.194590e-06 -1.540775e-06  2.784986e-05  8.939202e-06  3.643442e-05  8.771589e-05 
+     2.949002e-06 -1.100943e-06 -1.061123e-05  2.510152e-05  8.771589e-05  2.497413e-04 
   getD0(): -0.0659315
   getEnergy(): 1.59815
   getHitPatternCDC(): 0001100000000000000000000000000000000000101111111111111111110110
@@ -15762,10 +15989,10 @@ TrackFitResult#18:
   getCovariance6(): 
      2.365999e-05 -8.585924e-06 -1.744475e-06 -1.009427e-05  4.495189e-06  3.014486e-06 
     -8.585924e-06  3.119424e-06  6.611112e-07  3.688126e-06 -1.651284e-06 -1.126775e-06 
-    -1.744475e-06  6.611112e-07  2.249702e-04  1.033313e-05  3.029245e-05 -1.153937e-05 
-    -1.009427e-05  3.688126e-06  1.033313e-05  7.945942e-06  9.308002e-06  2.614907e-05 
-     4.495189e-06 -1.651284e-06  3.029245e-05  9.308002e-06  3.816568e-05  9.131528e-05 
-     3.014486e-06 -1.126775e-06 -1.153937e-05  2.614907e-05  9.131528e-05  2.602399e-04 
+    -1.744475e-06  6.611112e-07  2.249702e-04  1.033313e-05  3.029246e-05 -1.153938e-05 
+    -1.009427e-05  3.688126e-06  1.033313e-05  7.945943e-06  9.308004e-06  2.614908e-05 
+     4.495189e-06 -1.651284e-06  3.029246e-05  9.308004e-06  3.816569e-05  9.131530e-05 
+     3.014486e-06 -1.126775e-06 -1.153938e-05  2.614908e-05  9.131530e-05  2.602399e-04 
   getD0(): -0.0659177
   getEnergy(): 1.6674
   getHitPatternCDC(): 0001100000000000000000000000000000000000101111111111111111110110
@@ -15815,11 +16042,11 @@ TrackFitResult#19:
     -2.311275e-06 -2.270958e-06  5.476400e-07  2.727041e-04 -2.134030e-04 
     -1.435521e-06 -1.103253e-06 -4.501935e-07 -2.134030e-04  1.749884e-04 
   getCovariance6(): 
-     2.871904e-05 -1.042398e-05 -2.166853e-06 -1.237173e-05  5.325080e-06  3.223145e-06 
+     2.871904e-05 -1.042398e-05 -2.166853e-06 -1.237173e-05  5.325079e-06  3.223145e-06 
     -1.042398e-05  3.787868e-06  8.179939e-07  4.519963e-06 -1.956522e-06 -1.208757e-06 
     -2.166853e-06  8.179939e-07  2.727041e-04  1.260156e-05  3.694007e-05 -1.407299e-05 
-    -1.237173e-05  4.519963e-06  1.260156e-05  9.487121e-06  1.050629e-05  2.954616e-05 
-     5.325080e-06 -1.956522e-06  3.694007e-05  1.050629e-05  4.356643e-05  1.029889e-04 
+    -1.237173e-05  4.519963e-06  1.260156e-05  9.487120e-06  1.050628e-05  2.954616e-05 
+     5.325079e-06 -1.956522e-06  3.694007e-05  1.050628e-05  4.356643e-05  1.029889e-04 
      3.223145e-06 -1.208757e-06 -1.407299e-05  2.954616e-05  1.029889e-04  2.940829e-04 
   getD0(): -0.0658607
   getEnergy(): 1.85185
@@ -15843,7 +16070,7 @@ TrackFitResult#19:
   getTransverseMomentum(): 0.556996
   getZ0(): 0.00325577
 TrackFitResult#20:
-  get4Momentum(): (-0.0927605,0.475398,0.0996876,0.513834)
+  get4Momentum(): (-0.0927605,0.475398,0.0996876,0.513833)
   getChargeSign(): 1
   getChi2(): 19.7617
   getCotTheta(): 0.205812
@@ -15870,14 +16097,14 @@ TrackFitResult#20:
     -4.109315e-08 -4.698066e-08 -9.279599e-09  6.922201e-06 -5.631251e-06 
      4.149016e-09  2.555292e-09  7.891399e-09 -5.631251e-06  5.015605e-06 
   getCovariance6(): 
-     7.060569e-06  1.112093e-06 -4.072514e-08  4.819596e-07 -1.757840e-05 -3.567892e-06 
-     1.112093e-06  1.758159e-07 -5.857679e-09  8.576827e-08 -2.782107e-06 -5.650410e-07 
-    -4.072514e-08 -5.857679e-09  6.922201e-06 -7.339344e-08  4.949635e-07 -2.624692e-06 
-     4.819596e-07  8.576827e-08 -7.339344e-08  9.355440e-06 -4.841724e-05 -1.011030e-05 
-    -1.757840e-05 -2.782107e-06  4.949635e-07 -4.841724e-05  2.849920e-04  5.927523e-05 
-    -3.567892e-06 -5.650410e-07 -2.624692e-06 -1.011030e-05  5.927523e-05  1.350656e-05 
+     7.060569e-06  1.112093e-06 -4.072514e-08  4.819595e-07 -1.757839e-05 -3.567891e-06 
+     1.112093e-06  1.758159e-07 -5.857679e-09  8.576826e-08 -2.782107e-06 -5.650409e-07 
+    -4.072514e-08 -5.857679e-09  6.922201e-06 -7.339342e-08  4.949634e-07 -2.624692e-06 
+     4.819595e-07  8.576826e-08 -7.339342e-08  9.355437e-06 -4.841722e-05 -1.011030e-05 
+    -1.757839e-05 -2.782107e-06  4.949634e-07 -4.841722e-05  2.849919e-04  5.927521e-05 
+    -3.567891e-06 -5.650409e-07 -2.624692e-06 -1.011030e-05  5.927521e-05  1.350655e-05 
   getD0(): -0.0436356
-  getEnergy(): 0.513834
+  getEnergy(): 0.513833
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.0927605,0.475398,0.0996876)
@@ -15927,9 +16154,9 @@ TrackFitResult#21:
   getCovariance6(): 
      1.218861e-05  1.917179e-06 -9.240892e-08  1.195044e-07 -2.737552e-05 -5.519298e-06 
      1.917179e-06  3.024254e-07 -1.400666e-08  3.021247e-08 -4.314679e-06 -8.702491e-07 
-    -9.240892e-08 -1.400666e-08  1.194881e-05 -1.336148e-07  9.160009e-07 -4.709869e-06 
-     1.195044e-07  3.021247e-08 -1.336148e-07  1.644791e-05 -8.366668e-05 -1.745204e-05 
-    -2.737552e-05 -4.314679e-06  9.160009e-07 -8.366668e-05  4.871953e-04  1.011883e-04 
+    -9.240892e-08 -1.400666e-08  1.194881e-05 -1.336148e-07  9.160008e-07 -4.709869e-06 
+     1.195044e-07  3.021247e-08 -1.336148e-07  1.644790e-05 -8.366668e-05 -1.745204e-05 
+    -2.737552e-05 -4.314679e-06  9.160008e-07 -8.366668e-05  4.871952e-04  1.011883e-04 
     -5.519298e-06 -8.702491e-07 -4.709869e-06 -1.745204e-05  1.011883e-04  2.315929e-05 
   getD0(): -0.0427905
   getEnergy(): 0.694894
@@ -15980,12 +16207,12 @@ TrackFitResult#22:
     -2.535397e-07 -2.328069e-07 -4.252874e-08  2.649861e-05 -2.366291e-05 
      4.860184e-08  2.412995e-08  3.677150e-08 -2.366291e-05  2.199534e-05 
   getCovariance6(): 
-     2.656226e-05  4.183568e-06 -2.506597e-07 -1.767241e-06 -5.082163e-05 -1.012207e-05 
-     4.183568e-06  6.602424e-07 -3.932340e-08 -2.775266e-07 -7.931572e-06 -1.579223e-06 
+     2.656226e-05  4.183568e-06 -2.506597e-07 -1.767241e-06 -5.082162e-05 -1.012207e-05 
+     4.183568e-06  6.602424e-07 -3.932340e-08 -2.775266e-07 -7.931571e-06 -1.579223e-06 
     -2.506597e-07 -3.932340e-08  2.649861e-05 -3.154596e-07  2.180149e-06 -1.078140e-05 
-    -1.767241e-06 -2.775266e-07 -3.154596e-07  3.716544e-05 -1.852528e-04 -3.853169e-05 
-    -5.082163e-05 -7.931572e-06  2.180149e-06 -1.852528e-04  1.062156e-03  2.199046e-04 
-    -1.012207e-05 -1.579223e-06 -1.078140e-05 -3.853169e-05  2.199046e-04  5.048967e-05 
+    -1.767241e-06 -2.775266e-07 -3.154596e-07  3.716544e-05 -1.852527e-04 -3.853168e-05 
+    -5.082162e-05 -7.931571e-06  2.180149e-06 -1.852527e-04  1.062156e-03  2.199045e-04 
+    -1.012207e-05 -1.579223e-06 -1.078140e-05 -3.853168e-05  2.199045e-04  5.048966e-05 
   getD0(): -0.0417026
   getEnergy(): 1.05599
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
@@ -16037,10 +16264,10 @@ TrackFitResult#23:
   getCovariance6(): 
      1.977429e-03  1.202267e-03 -4.266957e-04 -7.483034e-05 -3.395382e-05  2.972276e-06 
      1.202267e-03  7.600477e-04 -1.669952e-04 -5.033317e-05 -2.203364e-05  1.378873e-06 
-    -4.266957e-04 -1.669952e-04  2.991594e-02 -4.082329e-06  1.609959e-05 -2.813215e-04 
-    -7.483034e-05 -5.033317e-05 -4.082329e-06  3.722033e-06  1.283134e-06  1.125026e-07 
-    -3.395382e-05 -2.203364e-05  1.609959e-05  1.283134e-06  1.282643e-06 -4.484377e-07 
-     2.972276e-06  1.378873e-06 -2.813215e-04  1.125026e-07 -4.484377e-07  5.801635e-06 
+    -4.266957e-04 -1.669952e-04  2.991594e-02 -4.082329e-06  1.609959e-05 -2.813216e-04 
+    -7.483034e-05 -5.033317e-05 -4.082329e-06  3.722033e-06  1.283135e-06  1.125026e-07 
+    -3.395382e-05 -2.203364e-05  1.609959e-05  1.283135e-06  1.282643e-06 -4.484377e-07 
+     2.972276e-06  1.378873e-06 -2.813216e-04  1.125026e-07 -4.484377e-07  5.801636e-06 
   getD0(): 2.50086
   getEnergy(): 0.483373
   getHitPatternCDC(): 0011100011111111111111111111111111111111111111111111111111111111
@@ -18868,7 +19095,8 @@ MCParticle#4:
   getName(): e-
   getPDG(): 11
  ... message repeated 3 times
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -18900,7 +19128,8 @@ MCParticle#5:
   getNDaughters(): 0
   getName(): anti-nu_e
   getPDG(): -12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -19033,7 +19262,8 @@ MCParticle#9:
   getNDaughters(): 5
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92767
@@ -19100,7 +19330,8 @@ MCParticle#11:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -19167,7 +19398,8 @@ MCParticle#13:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92767
@@ -19295,7 +19527,8 @@ MCParticle#17:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92767
@@ -19327,7 +19560,8 @@ MCParticle#18:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.74002
@@ -19341,7 +19575,7 @@ MCParticle#18:
   isPrimaryParticle(): False
   isVirtual(): False
 MCParticle#19:
-  get4Vector(): (-0.00877153,-0.0101492,-0.00634103,0.939683)
+  get4Vector(): (-0.00877153,-0.0101492,-0.00634103,0.939682)
   getArrayIndex(): 19
   getCharge(): 0
   getDaughter(0): -> NULL
@@ -19359,7 +19593,8 @@ MCParticle#19:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.6427
@@ -19391,7 +19626,8 @@ MCParticle#20:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9.34805
@@ -19423,7 +19659,8 @@ MCParticle#21:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9.11945
@@ -19455,7 +19692,8 @@ MCParticle#22:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 149.37
@@ -19521,7 +19759,8 @@ MCParticle#24:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -19555,7 +19794,8 @@ MCParticle#25:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -19587,7 +19827,8 @@ MCParticle#26:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.13064
@@ -19622,7 +19863,8 @@ MCParticle#27:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.13064
@@ -19659,7 +19901,8 @@ MCParticle#28:
   getNDaughters(): 5
   getName(): K_L0
   getPDG(): 130
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -19726,7 +19969,8 @@ MCParticle#30:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -19758,7 +20002,8 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92767
@@ -19790,7 +20035,8 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92767
@@ -19856,7 +20102,8 @@ MCParticle#34:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -19870,7 +20117,7 @@ MCParticle#34:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#35:
-  get4Vector(): (-0.322116,-0.366965,-0.134324,0.525305)
+  get4Vector(): (-0.322116,-0.366965,-0.134324,0.525304)
   getArrayIndex(): 35
   getCharge(): -1
   getDaughter(0): -> MCParticles#62
@@ -19889,7 +20136,8 @@ MCParticle#35:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -19923,7 +20171,8 @@ MCParticle#36:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -19955,7 +20204,8 @@ MCParticle#37:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -20021,7 +20271,8 @@ MCParticle#39:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.82472
@@ -20055,7 +20306,8 @@ MCParticle#40:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.82472
@@ -20087,7 +20339,8 @@ MCParticle#41:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 74.2883
@@ -20122,7 +20375,8 @@ MCParticle#42:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 74.2883
@@ -20154,7 +20408,8 @@ MCParticle#43:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -20186,7 +20441,8 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.93008
@@ -20218,7 +20474,8 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 862.309
@@ -20250,7 +20507,8 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 862.309
@@ -20282,7 +20540,8 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 862.309
@@ -20314,7 +20573,8 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.31197
@@ -20346,7 +20606,8 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.31197
@@ -20378,7 +20639,8 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 25.8882
@@ -20413,7 +20675,8 @@ MCParticle#51:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 25.8882
@@ -20445,7 +20708,8 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 42.8199
@@ -20479,7 +20743,8 @@ MCParticle#53:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -20513,7 +20778,8 @@ MCParticle#54:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -20547,7 +20813,8 @@ MCParticle#55:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -20579,7 +20846,8 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -20611,7 +20879,8 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -20645,7 +20914,8 @@ MCParticle#58:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.30326
@@ -20679,7 +20949,8 @@ MCParticle#59:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.30326
@@ -20711,7 +20982,8 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -20743,7 +21015,8 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -20775,7 +21048,8 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.85955
@@ -20807,7 +21081,8 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -20839,7 +21114,8 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92763
@@ -20872,7 +21148,8 @@ MCParticle#65:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92564
@@ -20904,7 +21181,8 @@ MCParticle#66:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92564
@@ -20936,7 +21214,8 @@ MCParticle#67:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.82472
@@ -20968,7 +21247,8 @@ MCParticle#68:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -2.82472
@@ -21000,7 +21280,8 @@ MCParticle#69:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.10761
@@ -21032,7 +21313,8 @@ MCParticle#70:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.10761
@@ -21064,7 +21346,8 @@ MCParticle#71:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 740.46
@@ -21096,7 +21379,8 @@ MCParticle#72:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 740.46
@@ -21128,7 +21412,8 @@ MCParticle#73:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 740.46
@@ -21160,7 +21445,8 @@ MCParticle#74:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2018.83
@@ -21192,7 +21478,8 @@ MCParticle#75:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2018.83
@@ -21224,7 +21511,8 @@ MCParticle#76:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2018.83
@@ -21256,7 +21544,8 @@ MCParticle#77:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -21288,7 +21577,8 @@ MCParticle#78:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -21320,7 +21610,8 @@ MCParticle#79:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -21352,7 +21643,8 @@ MCParticle#80:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -21384,7 +21676,8 @@ MCParticle#81:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -21416,7 +21709,8 @@ MCParticle#82:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): -3.92679
@@ -21448,7 +21742,8 @@ MCParticle#83:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.30326
@@ -21480,7 +21775,8 @@ MCParticle#84:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.30326
@@ -21512,7 +21808,8 @@ MCParticle#85:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 37.063
@@ -21547,7 +21844,8 @@ MCParticle#86:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 37.063
@@ -21579,7 +21877,8 @@ MCParticle#87:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.37727
@@ -21611,7 +21910,8 @@ MCParticle#88:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2155.62
@@ -21643,7 +21943,8 @@ MCParticle#89:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2155.62
@@ -21675,7 +21976,8 @@ MCParticle#90:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2155.62

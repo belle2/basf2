@@ -57,7 +57,7 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                input_data_names=collection_names,
                                input_data_filters={
                                    "cosmic": [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"]] + quality_flags,
-                                   "mumu": [INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"]] + quality_flags,
+                                   "mumu": [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"]] + quality_flags,
                                    "hadron": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"]] + quality_flags,
                                    "offip": [INPUT_DATA_FILTERS["Data Tag"]["offip_calib"]] + quality_flags
                                },
@@ -223,10 +223,10 @@ def create_prompt(files, cfg):
     cfg : dict
       Expert config dictionary
     """
-    select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
-    select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
-    select_files(files["hadron"], 0.5e5, cfg["hadron.max_processed_events_per_file"])
-    select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
+    mumu = select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
+    cosmic = select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
+    hadron = select_files(files["hadron"], 0.5e5, cfg["hadron.max_processed_events_per_file"])
+    offip = select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_prompt',
@@ -380,8 +380,8 @@ def create_stage2(files, cfg):
     cfg : dict
       Expert config dictionary
     """
-    select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
-    select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
+    mumu = select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
+    cosmic = select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_stage2',

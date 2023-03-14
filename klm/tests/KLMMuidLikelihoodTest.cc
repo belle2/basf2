@@ -9,7 +9,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
@@ -19,8 +19,6 @@
 
 /* Google Test headers. */
 #include <gtest/gtest.h>
-
-using namespace std;
 
 namespace Belle2 {
 

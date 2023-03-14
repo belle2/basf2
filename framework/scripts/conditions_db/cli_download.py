@@ -117,13 +117,13 @@ def command_legacydownload(args, db=None):
     Download a globaltag from the database
 
     This command allows to download a globaltag from the central database to be
-    used locally, either als lookup directory for payloads or as a standalone
+    used locally, either as lookup directory for payloads or as a standalone
     local database if --create-dbfile is specified.
 
     The command requires the TAGNAME to download and optionally an output
     directory which defaults to centraldb in the local working directory. It
     will check for existing payloads in the output directory and only download
-    payloads which are not present or don't have the excpeted checksum.
+    payloads which are not present or don't have the expected checksum.
 
     One can filter the payloads to be downloaded by payload name using the
     --filter, --exclude and --regex options.
@@ -237,7 +237,7 @@ def command_download(args, db=None):
 
     The command requires at least one tag name to download. It will check for
     existing payloads in the output directory and only download payloads which
-    are not present or don't have the excpeted checksum.
+    are not present or don't have the expected checksum.
 
     By default this script will create a local directory called ``conditions/``
     which contains a ``metadata.sqlite`` with all the payload information of all
@@ -245,7 +245,7 @@ def command_download(args, db=None):
 
     This can be changed by specifying a different name for the metadata file
     using the ``-o`` argument but the payloads will always be saved in sub
-    directoies in the same directory as the sqlite file.
+    directories in the same directory as the sqlite file.
 
     .. versionchanged:: release-04-00-00
 
@@ -253,7 +253,7 @@ def command_download(args, db=None):
        one globaltag and optionally create a text file with payload information
        as well as download all necessary file. This has been changed and will
        now create a sqlite file containing the payload metadata. If you need the
-       old behavior please use the command ``b2conditionsdb legacydownload``
+       old behavior please use the command ``b2conditionsdb-legacydownload``
     """
 
     if db is None:

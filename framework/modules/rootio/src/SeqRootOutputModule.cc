@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SeqRootOutput)
+REG_MODULE(SeqRootOutput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -39,7 +39,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
 
   vector<string> emptyvector;
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName,
+  addParam("outputFileName", m_outputFileName,
            "Output file name. Add a .gz suffix to save a gzip-compressed file. Parameter can be overridden using the -o argument to basf2.",
            string("SeqRootOutput.sroot"));
   addParam("compressionLevel", m_compressionLevel,

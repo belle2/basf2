@@ -362,7 +362,7 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   */
   //each rings have 12 section of ~250m
   //the 1st section D01, the second section is D12, followed by D11, D10 .... for both rings
-  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  const int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   //int ring_section = section_ordering[(int)((m_inputSAD_ssraw + 1500.) / 12.)];
   double ssraw = 0.;
   if (ring == 1) {
@@ -383,8 +383,8 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   }
 
   //Set missing particle information
-  particle.setMomentum(TVector3(particleMomGeant4));
-  particle.setProductionVertex(TVector3(particlePosGeant4));
+  particle.setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
+  particle.setProductionVertex(ROOT::Math::XYZVector(particlePosGeant4[0], particlePosGeant4[1], particlePosGeant4[2]));
   particle.setProductionTime(0.0);
   particle.setEnergy(sqrt(m_lostE * m_lostE + particle.getMass()*particle.getMass()));
   particle.setValidVertex(true);
@@ -451,7 +451,7 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     straights[name] = straight;
   }
 
-  string str_checklist[] = {"LHR1", "LHR2", "LLR1", "LLR2", "LLR3", "LLR4", "LLR5", "LHL1", "LHL2", "LLL1", "LLL2", "LLL3", "LLL4", "LLL5"};
+  string str_checklist[] = {"LHR1", "LHR2", "LLR1", "LLR2", "LLR3", "LLR4", "LLR5", "LLR6", "LHL1", "LHL2", "LLL1", "LLL2", "LLL3", "LLL4", "LLL5"};
   for (const string& str : str_checklist) {
     if (straights.count(str) == 0)
       B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
@@ -484,14 +484,14 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     bendings[name] = bending;
   }
 
-  string bend_checklist[] = {"BLC2RE", "BC1RP", "BLCWRP", "BLC1RP", "BLC2RP", "BLC1LE", "BC1LP", "BLC1LP1", "BLC1LP2", "BLC2LP"};
+  string bend_checklist[] = {"BLC2RE", "BC1RP", "BLCWRP", "BLC1RP", "BLC2RP", "BLC2RP.2", "BLY2RP.2", "BLC1LE", "BC1LP", "BLC1LP1", "BLC1LP2", "BLC2LP"};
   for (const string& bnd : bend_checklist) {
     if (bendings.count(bnd) == 0)
       B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
   }
 
   static double her_breakpoints[6];
-  static double ler_breakpoints[18];
+  static double ler_breakpoints[21];
 
   // positive s
   her_breakpoints[0] = straights["LHL1"].l;
@@ -511,21 +511,23 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   ler_breakpoints[4] = ler_breakpoints[3] + straights["LLL3"].l;
   ler_breakpoints[5] = ler_breakpoints[4] + bendings["BLC1LP2"].rt * bendings["BLC1LP2"].dphi;
   ler_breakpoints[6] = ler_breakpoints[5] + straights["LLL4"].l;
+  ler_breakpoints[7] = ler_breakpoints[6] + bendings["BLC2LP"].rt * bendings["BLC2LP"].dphi;
+  ler_breakpoints[8] = ler_breakpoints[7] + straights["LLL5"].l;
 
   // negative s
-  ler_breakpoints[7] = -straights["LLR1"].l;
-  ler_breakpoints[8] = ler_breakpoints[7] - bendings["BC1RP"].rt * bendings["BC1RP"].dphi;
-  ler_breakpoints[9] = ler_breakpoints[8] - straights["LLR2"].l;
-  ler_breakpoints[10] = ler_breakpoints[9] - bendings["BLCWRP"].rt * bendings["BLCWRP"].dphi;
-  ler_breakpoints[11] = ler_breakpoints[10] - straights["LLR3"].l;
-  ler_breakpoints[12] = ler_breakpoints[11] - bendings["BLC1RP"].rt * bendings["BLC1RP"].dphi;
-  ler_breakpoints[13] = ler_breakpoints[12] - straights["LLR4"].l;
-  ler_breakpoints[14] = ler_breakpoints[13] - bendings["BLC2RP"].rt * bendings["BLC2RP"].dphi;
-  ler_breakpoints[15] = ler_breakpoints[14] - straights["LLR5"].l;
+  ler_breakpoints[9] = -straights["LLR1"].l;
+  ler_breakpoints[10] = ler_breakpoints[9] - bendings["BC1RP"].rt * bendings["BC1RP"].dphi;
+  ler_breakpoints[11] = ler_breakpoints[10] - straights["LLR2"].l;
+  ler_breakpoints[12] = ler_breakpoints[11] - bendings["BLCWRP"].rt * bendings["BLCWRP"].dphi;
+  ler_breakpoints[13] = ler_breakpoints[12] - straights["LLR3"].l;
+  ler_breakpoints[14] = ler_breakpoints[13] - bendings["BLC1RP"].rt * bendings["BLC1RP"].dphi;
+  ler_breakpoints[15] = ler_breakpoints[14] - straights["LLR4"].l;
+  ler_breakpoints[16] = ler_breakpoints[15] - bendings["BLC2RP"].rt * bendings["BLC2RP"].dphi;
+  ler_breakpoints[17] = ler_breakpoints[16] - bendings["BLC2RP.2"].rt * bendings["BLC2RP.2"].dphi;
+  ler_breakpoints[18] = ler_breakpoints[17] - straights["LLR5"].l;
+  ler_breakpoints[19] = ler_breakpoints[18] - bendings["BLY2RP.2"].rt * bendings["BLY2RP.2"].dphi;
+  ler_breakpoints[20] = ler_breakpoints[20] - straights["LLR6"].l;
 
-  // positive s (extended)
-  ler_breakpoints[16] = ler_breakpoints[6] + bendings["BLC2LP"].rt * bendings["BLC2LP"].dphi;
-  ler_breakpoints[17] = ler_breakpoints[16] + straights["LLL5"].l;
 
   double dx = 0;
   double dz = 0;
@@ -581,8 +583,8 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
         phi = straights["LLL4"].phi;
         dx = straights["LLL4"].x0 + sloc * sin(phi);
         dz = straights["LLL4"].z0 + sloc * cos(phi);
-      } else if (s < ler_breakpoints[17]) {
-        double sloc = s - ler_breakpoints[16];
+      } else if (s < ler_breakpoints[8]) {
+        double sloc = s - ler_breakpoints[7];
         phi = straights["LLL5"].phi;
         dx = straights["LLL5"].x0 + sloc * sin(phi);
         dz = straights["LLL5"].z0 + sloc * cos(phi);
@@ -594,58 +596,75 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     }
     // negative s
     else if (s < -400.0 * Unit::cm) {
-      if (s > ler_breakpoints[7]) {
+      if (s > ler_breakpoints[9]) {
         double sloc = -s;
         phi = straights["LLR1"].phi;
         dx = straights["LLR1"].x0 + sloc * sin(phi);
         dz = straights["LLR1"].z0 + sloc * cos(phi);
-      } else if (s > ler_breakpoints[8]) {
-        double sloc = ler_breakpoints[7] - s;
+      } else if (s > ler_breakpoints[10]) {
+        double sloc = ler_breakpoints[9] - s;
         phi = bendings["BC1RP"].sphi + bendings["BC1RP"].dphi - sloc / bendings["BC1RP"].rt;
         phi = -phi;
         dx = bendings["BC1RP"].x0 + bendings["BC1RP"].rt * cos(-phi);
         dz = bendings["BC1RP"].z0 + bendings["BC1RP"].rt * sin(-phi);
         phi += M_PI;
-      } else if (s > ler_breakpoints[9]) {
-        double sloc = ler_breakpoints[8] - s;
+      } else if (s > ler_breakpoints[11]) {
+        double sloc = ler_breakpoints[10] - s;
         phi = straights["LLR2"].phi;
         dx = straights["LLR2"].x0 + sloc * sin(phi);
         dz = straights["LLR2"].z0 + sloc * cos(phi);
-      } else if (s > ler_breakpoints[10]) {
-        double sloc = ler_breakpoints[9] - s;
+      } else if (s > ler_breakpoints[12]) {
+        double sloc = ler_breakpoints[11] - s;
         phi = bendings["BLCWRP"].sphi + bendings["BLCWRP"].dphi - sloc / bendings["BLCWRP"].rt;
         phi = -phi;
         dx = bendings["BLCWRP"].x0 + bendings["BLCWRP"].rt * cos(-phi);
         dz = bendings["BLCWRP"].z0 + bendings["BLCWRP"].rt * sin(-phi);
         phi += M_PI;
-      } else if (s > ler_breakpoints[11]) {
-        double sloc = ler_breakpoints[10] - s;
+      } else if (s > ler_breakpoints[13]) {
+        double sloc = ler_breakpoints[12] - s;
         phi = straights["LLR3"].phi;
         dx = straights["LLR3"].x0 + sloc * sin(phi);
         dz = straights["LLR3"].z0 + sloc * cos(phi);
-      } else if (s > ler_breakpoints[12]) {
-        double sloc = ler_breakpoints[11] - s;
+      } else if (s > ler_breakpoints[14]) {
+        double sloc = ler_breakpoints[13] - s;
         phi = bendings["BLC1RP"].sphi + bendings["BLC1RP"].dphi - sloc / bendings["BLC1RP"].rt;
         phi = -phi;
         dx = bendings["BLC1RP"].x0 + bendings["BLC1RP"].rt * cos(-phi);
         dz = bendings["BLC1RP"].z0 + bendings["BLC1RP"].rt * sin(-phi);
         phi += M_PI;
-      } else if (s > ler_breakpoints[13]) {
-        double sloc = ler_breakpoints[12] - s;
+      } else if (s > ler_breakpoints[15]) {
+        double sloc = ler_breakpoints[14] - s;
         phi = straights["LLR4"].phi;
         dx = straights["LLR4"].x0 + sloc * sin(phi);
         dz = straights["LLR4"].z0 + sloc * cos(phi);
-      } else if (s > ler_breakpoints[14]) {
-        double sloc = ler_breakpoints[13] - s;
+      } else if (s > ler_breakpoints[16]) {
+        double sloc = ler_breakpoints[15] - s;
         phi = bendings["BLC2RP"].sphi + sloc / bendings["BLC2RP"].rt;
         phi = -phi;
         dx = bendings["BLC2RP"].x0 + bendings["BLC2RP"].rt * cos(-phi);
         dz = bendings["BLC2RP"].z0 + bendings["BLC2RP"].rt * sin(-phi);
-      } else if (s > ler_breakpoints[15]) {
-        double sloc = ler_breakpoints[14] - s;
+      } else if (s > ler_breakpoints[17]) {
+        double sloc = ler_breakpoints[16] - s;
+        phi = bendings["BLC2RP.2"].sphi + sloc / bendings["BLC2RP.2"].rt;
+        phi = -phi;
+        dx = bendings["BLC2RP.2"].x0 + bendings["BLC2RP.2"].rt * cos(-phi);
+        dz = bendings["BLC2RP.2"].z0 + bendings["BLC2RP.2"].rt * sin(-phi);
+      } else if (s > ler_breakpoints[18]) {
+        double sloc = ler_breakpoints[17] - s;
         phi = straights["LLR5"].phi;
         dx = straights["LLR5"].x0 + sloc * sin(phi);
         dz = straights["LLR5"].z0 + sloc * cos(phi);
+      } else if (s > ler_breakpoints[19]) {
+        double sloc = ler_breakpoints[18] - s;
+        phi = bendings["BLY2RP.2"].sphi + sloc / bendings["BLY2RP.2"].rt;
+        phi = -phi;
+        dx = bendings["BLY2RP.2"].x0 + bendings["BLY2RP.2"].rt * cos(-phi);
+        dz = bendings["BLY2RP.2"].z0 + bendings["BLY2RP.2"].rt * sin(-phi);
+      } else if (s > ler_breakpoints[20]) {
+        double sloc = ler_breakpoints[19] - s;
+        phi = straights["LLR6"].phi;
+        dx = straights["LLR6"].x0 + sloc * sin(phi);
+        dz = straights["LLR6"].z0 + sloc * cos(phi);
       }
     }
   }

@@ -6,8 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/VariableManager/Manager.h>
+// Own header.
 #include <analysis/variables/MCParticleTag.h>
+
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
+
+// analysis dataobjects
+#include <analysis/dataobjects/Particle.h>
 
 // analysis utilities
 #include <analysis/utility/GenBplusTag.h>

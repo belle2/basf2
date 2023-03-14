@@ -38,14 +38,14 @@ namespace Belle2 {
   private:
 
     //datastore
-    StoreObjPtr<EventT0> m_eventT0; /**< event T0 */
+    StoreObjPtr<EventT0> m_EventT0; /**< event T0 */
     StoreArray<SVDCluster> m_clusters; /**< svd clusters */
 
     //rootfile
     std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    std::string m_recoTracksStoreArrayName{"RecoTracks"};  /**< storeArray name of the input and output RecoTracks */
+    std::string m_recoTracksStoreArrayName = "";  /**< storeArray name of the input and output RecoTracks */
 
     TTree* m_t = nullptr; /**< tree containing info related to the clusters related to tracks*/
 
@@ -65,6 +65,11 @@ namespace Belle2 {
     std::vector<float> m_svdTrkp;     /**< p of the track*/
     std::vector<float> m_svdTrkpT;     /**< pT of the track*/
     std::vector<float> m_svdTrkpCM;     /**< pCM of the track*/
+    std::vector<float> m_svdTrkTheta; /**< polar angle of the track*/
+    std::vector<float> m_svdTrkPhi; /**< azimuthal angle of the track*/
+    std::vector<float> m_svdTrkCharge; /**< charge of the track*/
+    std::vector<float> m_svdTrkPValue; /**< pValue of the track*/
+    std::vector<float> m_svdTrkNDF; /**< pValue of the track*/
     std::vector<int> m_svdLayer;  /**< layer */
     std::vector<int> m_svdLadder; /**< ladder */
     std::vector<int> m_svdSensor; /**< sensor */
@@ -72,10 +77,35 @@ namespace Belle2 {
     std::vector<int> m_svdisUside; /**< is U-cluster side */
     std::vector<int> m_trkNumber; /**< track number in the event*/
 
-    float m_svdEventT0 = -99; /**< event T0 */
-    float m_svdEventT0Err = -99; /**< event T0 error */
+
+
+    float m_eventT0             = std::numeric_limits<float>::quiet_NaN(); /**< final event T0 */
+    float m_eventT0Err          = std::numeric_limits<float>::quiet_NaN(); /**< final event T0 error */
+    float m_svdEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< SVD event T0 */
+    float m_svdEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< SVD event T0 Error */
+    float m_svdOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< SVD online event T0 */
+    float m_svdOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< SVD online event T0 Error */
+    float m_cdcEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 */
+    float m_cdcEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 Error */
+    float m_cdcOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< CDC online event T0 */
+    float m_cdcOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< CDC online event T0 Error */
+    float m_topEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< TOP event T0 */
+    float m_topEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< TOP event T0 Error */
+    float m_topOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< TOP online event T0 */
+    float m_topOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< TOP online event T0 Error */
+    float m_eclEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< ECL event T0 */
+    float m_eclEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< ECL event T0 Error */
+    float m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< ECL online event T0 */
+    float m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< ECL online event T0 Error */
+    int m_eclTCEmax             = std::numeric_limits<int>::quiet_NaN();   /**< ECal TC Emax  */
+    int m_eclTCid               = std::numeric_limits<int>::quiet_NaN();   /**< ECal TC id  */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
+    float m_trueEventT0         = std::numeric_limits<float>::quiet_NaN(); /**< true event t0 */
+    int m_exp = -99; /**< experiment number */
+    int m_run = -99; /**< run number */
+    int m_event = -99; /**< event number */
+
   };
 }
 

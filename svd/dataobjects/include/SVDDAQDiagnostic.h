@@ -165,6 +165,9 @@ namespace Belle2 {
     /** functions for setting values of
      * - APV match code*/
     void setAPVMatch(bool APVMatch) { m_apvMatch = APVMatch; }
+    /** functions for setting values of
+     * - FADC match code*/
+    void setFADCMatch(bool FADCMatch) { m_fadcMatch = FADCMatch; }
     /** functions for setting values for
      * - Upset APVs*/
     void setUpsetAPV(bool UpsetAPV) { m_upsetApv = UpsetAPV; }
@@ -180,7 +183,6 @@ namespace Belle2 {
     /** functions for setting values for
      * - Missed Header */
     void setMissedHeader(bool MissedHeader) { m_missedHeader = MissedHeader; }
-
 
   private:
     /** Trigger number */

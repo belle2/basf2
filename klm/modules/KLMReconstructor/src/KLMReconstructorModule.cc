@@ -13,7 +13,7 @@
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -75,7 +75,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_eklmNStrip(0),
   m_eklmTransformData{nullptr}
 {
-  setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
+  setDescription("Create BKLMHit1ds from KLMDigits and then create KLMHit2ds from BKLMHit1ds; create KLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TimeCableDelayCorrection", m_TimeCableDelayCorrection,
            "Perform cable delay time correction (true) or not (false).", true);
@@ -103,17 +103,16 @@ void KLMReconstructorModule::initialize()
   m_Digits.isRequired();
   if (m_EventT0Correction)
     m_EventT0.isRequired();
+  m_Hit2ds.registerInDataStore();
+  m_Hit2ds.registerRelationTo(m_bklmHit1ds);
+  m_Hit2ds.registerRelationTo(m_Digits);
   /* BKLM. */
   m_bklmHit1ds.registerInDataStore();
-  m_bklmHit2ds.registerInDataStore();
   m_bklmHit1ds.registerRelationTo(m_Digits);
-  m_bklmHit2ds.registerRelationTo(m_bklmHit1ds);
   m_bklmGeoPar = bklm::GeometryPar::instance();
   /* EKLM. */
-  m_eklmHit2ds.registerInDataStore();
   m_eklmAlignmentHits.registerInDataStore();
-  m_eklmHit2ds.registerRelationTo(m_Digits);
-  m_eklmAlignmentHits.registerRelationTo(m_eklmHit2ds);
+  m_eklmAlignmentHits.registerRelationTo(m_Hit2ds);
   m_eklmTransformData =
     new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
   m_eklmGeoDat = &(EKLM::GeometryData::Instance());
@@ -297,7 +296,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       double time = 0.5 * (phiTime + zTime);
       if (m_EventT0Correction)
         time -= m_EventT0Value;
-      BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
+      KLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation KLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
     }
@@ -425,7 +424,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
             time = (t1 + t2) / 2;
             if (m_EventT0Correction)
               time -= m_EventT0Value;
-            EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
+            KLMHit2d* hit2d = m_Hit2ds.appendNew(*it8);
             hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() +
                                     (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());

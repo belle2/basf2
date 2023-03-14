@@ -7,7 +7,6 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-from variables import utils
 
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
@@ -107,6 +106,10 @@ track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue', 'ndf']
 #: Replacement for TrackHits tool
 track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']
 
+#: Track fit parameters
+trackfit_parameters = ['omega', 'omegaErr', 'tanLambda', 'tanLambdaErr',
+                       'd0', 'd0Err', 'z0', 'z0Err', 'phi0', 'phi0Err', 'pValue', 'ndf']
+
 #: Replacement for MCTruth tool
 mc_truth = ['isSignal', 'mcErrors', 'mcPDG']
 
@@ -140,8 +143,19 @@ mc_variables = [
 ]
 
 #: PID variables
-pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'electronID_noTOP', 'deuteronID',
-       'binaryPID(211, 13)', 'binaryPID(211, 321)', 'binaryPID(211, 2212)', 'binaryPID(321, 2212)']
+pid = [
+    'electronID',
+    'muonID',
+    'pionID',
+    'kaonID',
+    'protonID',
+    'deuteronID',
+    'binaryPID(11, 211)',
+    'binaryPID(13, 211)',
+    'binaryPID(211, 321)',
+    'binaryPID(321, 2212)',
+    'binaryPID(211, 2212)',
+]
 
 #: Replacement for ROEMultiplicities tool
 roe_multiplicities = [
@@ -354,10 +368,3 @@ belle_track_hit = [
     "BelleLastCDCHitY",
     "BelleLastCDCHitZ"
 ]
-
-# now register all the variables declared in this file as collections
-# TODO: this is still not optimal but better than before. Should we not just
-# get rid of the collections in the manager?
-for name, value in list(globals().items()):
-    if isinstance(value, list):
-        utils.add_collection(value, name)

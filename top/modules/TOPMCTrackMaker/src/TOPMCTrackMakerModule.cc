@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPMCTrackMaker/TOPMCTrackMakerModule.h>
 
 // framework - DataStore
@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPMCTrackMaker)
+  REG_MODULE(TOPMCTrackMaker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -116,7 +116,7 @@ namespace Belle2 {
       track->addRelationTo(&mcParticle);
 
       const Const::ChargedStable& chargedStable = Const::pion;
-      double pmom = barHit->getMomentum().Mag();
+      double pmom = barHit->getMomentum().R();
       double mass = chargedStable.getMass();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       double tof = barHit->getLength() / beta / Const::speedOfLight;

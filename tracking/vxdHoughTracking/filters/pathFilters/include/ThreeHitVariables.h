@@ -12,6 +12,7 @@
 #include <framework/geometry/B2Vector3.h>
 
 #include <cmath>
+#include <boost/math/special_functions/sign.hpp>
 
 namespace Belle2 {
   namespace vxdHoughTracking {

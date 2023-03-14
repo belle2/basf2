@@ -10,10 +10,9 @@
 #include <framework/gearbox/Const.h>
 #include <TObject.h>
 
-#include <boost/optional.hpp>
-
-#include <vector>
 #include <cmath>
+#include <optional>
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -62,7 +61,7 @@ namespace Belle2 {
     double getEventT0() const;
 
     /// Return the final event t0, if one is set. Else, return an empty optional.
-    boost::optional<EventT0Component> getEventT0Component() const;
+    std::optional<EventT0Component> getEventT0Component() const;
 
     /// Return the final event t0 uncertainty, if one is set. Else, return NAN.
     double getEventT0Uncertainty() const;

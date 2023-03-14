@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace boost::algorithm;
 
 // Register module in the framework
-REG_MODULE(SkimFilter)
+REG_MODULE(SkimFilter);
 
 SkimFilterModule::SkimFilterModule() : Module()
 {

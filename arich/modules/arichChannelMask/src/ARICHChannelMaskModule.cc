@@ -12,12 +12,11 @@
 
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ARICHChannelMask)
+REG_MODULE(ARICHChannelMask);
 
 //-----------------------------------------------------------------
 //                 Implementation

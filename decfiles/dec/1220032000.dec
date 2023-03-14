@@ -1,0 +1,22 @@
+# EventType: 1220032000
+# Descriptor: [B+ -> a_10 pi+]
+# NickName: Bu_a10_pi+
+# Documentation: Peaking background for B+ -> rho+rho0
+# Tested: Yes
+# Physics WG: BToCharmless 
+# Responsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 28/02/2022
+
+Decay Upsilon(4S)
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
+Enddecay
+
+Decay B+sig
+1.0       a_10 pi+               PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+End

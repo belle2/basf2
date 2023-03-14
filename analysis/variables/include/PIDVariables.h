@@ -8,10 +8,13 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <vector>
+#include <string>
+
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
@@ -22,8 +25,8 @@ namespace Belle2 {
      * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
      * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
      * Examples:
-     * pi likelihood using TOP and CDC only =  particleLogLikelihoodValue(211, TOP, CDC);
-     * pi likelihood using all the information =  particleLogLikelihoodValue(211, ALL);
+     * pi likelihood using TOP and CDC only = pidLogLikelihoodValueExpert(211, TOP, CDC);
+     * pi likelihood using all the information = pidLogLikelihoodValueExpert(211, ALL);
      */
     Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments);
 
@@ -33,8 +36,8 @@ namespace Belle2 {
      * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
      * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
      * Examples:
-     * LL(pi) - LL(K) using TOP and CDC only =  deltaLogLikelihoodValue(211, 321, TOP, CDC);
-     * LL(pi) - LL(K) using all the information =  particleLogLikelihoodValue(211, 321, ALL);
+     * LL(pi) - LL(K) using TOP and CDC only = pidDeltaLogLikelihoodValueExpert(211, 321, TOP, CDC);
+     * LL(pi) - LL(K) using all the information = pidDeltaLogLikelihoodValueExpert(211, 321, ALL);
      */
     Manager::FunctionPtr pidDeltaLogLikelihoodValueExpert(const std::vector<std::string>& arguments);
 
@@ -44,8 +47,8 @@ namespace Belle2 {
      * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
      * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
      * Examples:
-     * probability of pi over K, using TOP and CDC only =  particlePairProbability(211, 321, TOP, CDC);
-     * probability of K over pi, using ARICH, TOP, CDC only =  particlePairProbability(321, 211, ARICH, TOP, CDC);
+     * probability of pi over K, using TOP and CDC only = pidPairProbabilityExpert(211, 321, TOP, CDC);
+     * probability of K over pi, using ARICH, TOP, CDC only = pidPairProbabilityExpert(321, 211, ARICH, TOP, CDC);
      */
     Manager::FunctionPtr pidPairProbabilityExpert(const std::vector<std::string>& arguments);
 
@@ -55,8 +58,8 @@ namespace Belle2 {
     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
     * Examples:
-    * probability of pi hypothesis, using TOP and CDC only =  particleProbability(211, TOP, CDC);
-    * probability of K hypothesis, using ARICH, TOP, CDC only =  particleProbability(321, ARICH, TOP, CDC);
+    * probability of pi hypothesis, using TOP and CDC only = pidProbabilityExpert(211, TOP, CDC);
+    * probability of K hypothesis, using ARICH, TOP, CDC only = pidProbabilityExpert(321, ARICH, TOP, CDC);
     */
     Manager::FunctionPtr pidProbabilityExpert(const std::vector<std::string>& arguments);
 
@@ -155,6 +158,42 @@ namespace Belle2 {
     double electronID_noTOP(const Particle* part);
 
     /**
+     * SPECIAL (TEMP) variable (BII-8444).
+     * @return binary PID between electron hypothesis and another hypothesis, without TOP information.
+     */
+    double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-8444, BII-8760).
+     * @return electron ID without SVD and TOP information.
+     */
+    double electronID_noSVD_noTOP(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-8444, BII-8760).
+     * @return binary PID between electron hypothesis and another hypothesis, without TOP information.
+     */
+    double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-9461)
+     * @return pion ID with special ARICH likelihood treatment
+     */
+    double pionID_noARICHwoECL(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-9461)
+     * @return kaon ID with special ARICH likelihood treatment
+     */
+    double kaonID_noARICHwoECL(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-9461)
+     * @return binary PID between two particle hypotheses with special ARICH likelihood treatment
+     */
+    double binaryPID_noARICHwoECL(const Particle* part, const std::vector<double>& arguments);
+
+    /**
     * returns the MVA score for anti-neutron PID (not for neutron)
     * -1 means invalid
     *  0 background-like
@@ -187,12 +226,12 @@ namespace Belle2 {
     /**
      * returns most likely PDG code based on PID information.
      */
-    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments);
+    double mostLikelyPDG(const Particle* part, const std::vector<double>& arguments);
 
     /**
      * returns true if a particle is assigned to its most likely type according to PID likelihood
      */
-    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments);
+    bool isMostLikely(const Particle* part, const std::vector<double>& arguments);
 
     /**
      * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()
@@ -216,6 +255,73 @@ namespace Belle2 {
      * Returns Belle's eID variable.
      **/
     double eIDBelle(const Particle*);
+
+    /**
+     * @return  Weighted LogL(particle's hypothesis) for a particle, using an arbitrary combination of sub-detectors
+     * For expert's use only!!
+     * The first argument should be the db object name of the calibration weight matrix.
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
+     * Examples:
+     * pi likelihood using TOP and CDC only =  pidWeightedLogLikelihoodValueExpert(CalibrationWeightMatrix, 211, TOP, CDC);
+     * pi likelihood using all the information =  pidWeightedLogLikelihoodValueExpert(CalibrationWeightMatrix,211, ALL);
+     */
+    Manager::FunctionPtr pidWeightedLogLikelihoodValueExpert(const std::vector<std::string>& arguments);
+
+    /**
+     * @return  weighted posterior probability for a certain mass hypothesis  with respect to an alternative hypothesis. Any set of detectors can be used to calculate the likelihood ratios.
+     * For expert's use only!!
+     * The first argument should be the db object name of the calibration weight matrix.
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
+     * Examples:
+     * probability of pi over K, using TOP and CDC only =  pidWeightedPairProbabilityExpert(CalibrationWeightMatrix, 211, 321, TOP, CDC);
+     * probability of K over pi, using ARICH, TOP, CDC only =  pidWeightedPairProbabilityExpert(CalibrationWeightMatrix, 321, 211, ARICH, TOP, CDC);
+     */
+    Manager::FunctionPtr pidWeightedPairProbabilityExpert(const std::vector<std::string>& arguments);
+
+    /**
+    * @return  weighted posterior probability for a certain mass hypothesis, taking into account all the possible alternatives. Any set of detectors can be used to calculate the likelihood ratios.
+    * For expert's use only!!
+    * The first argument should be the db object name of the calibration weight matrix.
+    * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
+    * Examples:
+    * probability of pi hypothesis, using TOP and CDC only =  pidWeightedProbabilityExpert(CalibrationWeightMatrix, 211, TOP, CDC);
+    * probability of K hypothesis, using ARICH, TOP, CDC only =  pidWeightedProbabilityExpert(CalibrationWeightMatrix, 321, ARICH, TOP, CDC);
+    */
+    Manager::FunctionPtr pidWeightedProbabilityExpert(const std::vector<std::string>& arguments);
+
+
+    /**
+     * @return weighted electron ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedElectronID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted muon ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedMuonID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted pion ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedPionID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted kaon ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedKaonID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted proton ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedProtonID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted deuteron ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments);
 
     /**
      * Parses the detector list for the PID metafunctions.

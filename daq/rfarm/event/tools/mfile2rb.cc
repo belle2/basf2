@@ -50,17 +50,17 @@ int main(int argc, char** argv)
   for (int i = 0; i < nevt; i++) {
     evbuf[i] = new char[MAXEVTSIZE];
     while (true) {
-      int is = file->read(evbuf[i], MAXEVTSIZE);
-      if (is <= 0) {
+      int isN = file->read(evbuf[i], MAXEVTSIZE);
+      if (isN <= 0) {
         perror("read file");
         exit(-1);
       }
-      printf("eventsize = %d\n", is);
-      if (is > MAXEVTSIZE) {
-        printf("Event size too large : %d\n", is);
+      printf("eventsize = %d\n", isN);
+      if (isN > MAXEVTSIZE) {
+        printf("Event size too large : %d\n", isN);
         exit(-1);
       }
-      if (is > 190000) break;
+      if (isN > 190000) break;
     }
   }
 
@@ -69,9 +69,8 @@ int main(int argc, char** argv)
     int bufno = std::rand() % nevt;
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbuf->insq((int*)evbuf[bufno], (is - 1) / 4 + 1);
+      int irb = rbuf->insq((int*)evbuf[bufno], (is - 1) / 4 + 1);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

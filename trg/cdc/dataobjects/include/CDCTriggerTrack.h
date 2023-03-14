@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
     /** default constructor, initializing everything to 0. */
     CDCTriggerTrack(): Helix(), m_chi2D(0.), m_chi3D(0.), m_time(0), m_quadrant(-1), m_foundoldtrack(6, false), m_driftthreshold(9,
-          false), m_valstereobit(false) , m_expert(-1), m_tsvector(9, 0), m_qualityvector(0) { }
+          false), m_valstereobit(false), m_expert(-1), m_tsvector(9, 0), m_qualityvector(0) { }
 
     /** 2D constructor, initializing 3D values to 0.
      *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].
@@ -104,7 +104,7 @@ namespace Belle2 {
      */
     double getPt() const
     {
-      const double bField = BFieldManager::getField(TVector3(0, 0, getZ0())).Z() / Unit::T;
+      const double bField = BFieldManager::getField(0, 0, getZ0()).Z() / Unit::T;
       return getTransverseMomentum(bField);
     }
     /** get the quadrant */
@@ -160,10 +160,15 @@ namespace Belle2 {
     {
       m_rawtheta = theta;
     }
+    void setRawInput(const std::vector<int> input)
+    {
+      m_rawinput = input;
+    }
     int getRawPhi0() const {return m_rawphi0;}
     int getRawOmega() const {return m_rawomega;}
     int getRawZ() const {return m_rawz;}
     int getRawTheta() const {return m_rawtheta;}
+    std::vector<int> getRawInput() const {return m_rawinput;}
 
   protected:
     float m_chi2D;
@@ -197,9 +202,9 @@ namespace Belle2 {
      */
     unsigned m_qualityvector;
     /** unpacked etf time from the unpacker */
-    int m_etf_unpacked;
+    int m_etf_unpacked{0};
     /** etf time recalculated from the hw input */
-    int m_etf_recalced;
+    int m_etf_recalced{0};
     /** chi2 value from 2D fitter */
     bool m_hasETFTime{0};
     /** values to store the raw network and 2dfinder output */
@@ -207,8 +212,9 @@ namespace Belle2 {
     int m_rawomega{0};
     int m_rawz{0};
     int m_rawtheta{0};
+    std::vector<int> m_rawinput;
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 12);
+    ClassDef(CDCTriggerTrack, 13);
 
   };
 }

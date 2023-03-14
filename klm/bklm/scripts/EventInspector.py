@@ -10,7 +10,7 @@
 ##########################################################################
 
 # Purpose:
-#   basf module to histogram useful values in RawKLM, KLMDigit, BKLMHit1d, and BKLMHit2d
+#   basf module to histogram useful values in RawKLM, KLMDigit, BKLMHit1d, and KLMHit2d
 #   data-objects in a DST ROOT file and to create BKLM event displays from these data-objects.
 #
 
@@ -22,7 +22,7 @@ from ROOT import Belle2
 
 
 class EventInspector(basf2.Module):
-    """Fill BKLM histograms of values from RawKLMs, KLMDigits, BKLMHit1ds, and BKLMHit2ds;
+    """Fill BKLM histograms of values from RawKLMs, KLMDigits, BKLMHit1ds, and KLMHit2ds;
     (optionally) draw event displays from these data-objects."""
 
     #: COPPER base identifier for BKLM readout
@@ -68,7 +68,7 @@ class EventInspector(basf2.Module):
             eventPdfName (str): path name of the output event-display PDF file
             verbosity (int): determines how many histograms are written to the histogram PDF file
             maxDisplays (int): max # of events displays to write
-            minRPCHits (int): min # of RPC BKLMHit2ds in any sector for event display
+            minRPCHits (int): min # of RPC KLMHit2ds in any sector for event display
             legacyTimes (bool): true to correct BKLMHit{1,2}d times in legacy reconstruction, False otherwise
             singleEntry (int): select events with any (0) or exactly one (1) or more than one (2) entries/channel
             view (int): view event displays using one-dimensional (1) or two-dimensional (2) BKLMHits
@@ -88,9 +88,9 @@ class EventInspector(basf2.Module):
         self.verbosity = verbosity
         #: internal copy of the maximum number of event displays to write
         self.maxDisplays = maxDisplays
-        #: internal copy of the minimum number of RPC BKLMHit2ds in any sector for event display
+        #: internal copy of the minimum number of RPC KLMHit2ds in any sector for event display
         self.minRPCHits = minRPCHits
-        #: calculate prompt time for legacy BKLMHit1ds and BKLMHit2ds (True) or use stored time (False)
+        #: calculate prompt time for legacy BKLMHit1ds and KLMHit2ds (True) or use stored time (False)
         self.legacyTimes = legacyTimes
         #: select events with any (0) or exactly one (1) or more than one (2) entries/channel
         self.singleEntry = singleEntry
@@ -163,13 +163,13 @@ class EventInspector(basf2.Module):
         self.t0Cal = 312
         #: RPC-time calibration adjustment (ns) for BKLMHit1ds
         self.t0Cal1d = 325
-        #: RPC-time calibration adjustment (ns) for BKLMHit2ds
+        #: RPC-time calibration adjustment (ns) for KLMHit2ds
         self.t0Cal2d = 308
         #: scint-ctime calibration adjustment (ns) for rawKLMs
         self.ct0Cal = 455
         #: scint-ctime calibration adjustment (ns) for BKLMHit1ds
         self.ct0Cal1d = 533
-        #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
+        #: scint-ctime calibration adjustment (ns) for KLMHit2ds
         self.ct0Cal2d = 520
         #: per-layer variations in RPC z- and phi-time calibration adjustment (ns) for rawKLMs
         self.t0RPC = [[[0, 0, 17, 16, 15, 13, 14, 14, 16, 17, 18, 16, 16, 18, 16],
@@ -669,82 +669,82 @@ class EventInspector(basf2.Module):
                                         't(phi1D) - t(z1D) (ns)',
                                         50, -100.0, 100.0)
 
-        # Create the BKLMHit2d-related histograms
+        # Create the KLMHit2d-related histograms
 
-        #: histogram of the number of BKLMHit2ds
-        self.hist_nHit2d = ROOT.TH1F('NHit2d', expRun + '# of BKLMHit2ds', 50, -0.5, 49.5)
-        #: scatterplot of end view of forward BKLM for in-time BKLMHit2ds
+        #: histogram of the number of KLMHit2ds
+        self.hist_nHit2d = ROOT.TH1F('NHit2d', expRun + '# of KLMHit2ds', 50, -0.5, 49.5)
+        #: scatterplot of end view of forward BKLM for in-time KLMHit2ds
         self.hist_occupancyForwardXYPrompt = ROOT.TH2F('occupancyForwardXYPrompt',
                                                        expRun + 'Forward xy RPC occupancy for in-time hits;x(cm);y(cm)',
                                                        230, -345.0, 345.0, 230, -345.0, 345.0)
-        #: scatterplot of end view of backward BKLM for in-time BKLMHit2ds
+        #: scatterplot of end view of backward BKLM for in-time KLMHit2ds
         self.hist_occupancyBackwardXYPrompt = ROOT.TH2F('occupancyBackwardXYPrompt',
                                                         expRun + 'Backward xy RPC occupancy for in-time hits;x(cm);y(cm)',
                                                         230, -345.0, 345.0, 230, -345.0, 345.0)
-        #: scatterplot of end view of forward BKLM for out-of-time BKLMHit2ds
+        #: scatterplot of end view of forward BKLM for out-of-time KLMHit2ds
         self.hist_occupancyForwardXYBkgd = ROOT.TH2F('occupancyForwardXYBkgd',
                                                      expRun + 'Forward xy RPC occupancy for out-of-time hits;x(cm);y(cm)',
                                                      230, -345.0, 345.0, 230, -345.0, 345.0)
-        #: scatterplot of end view of backward BKLM for out-of-time BKLMHit2ds
+        #: scatterplot of end view of backward BKLM for out-of-time KLMHit2ds
         self.hist_occupancyBackwardXYBkgd = ROOT.TH2F('occupancyBackwardXYBkgd',
                                                       expRun + 'Backward xy RPC occupancy for out-of-time hits;x(cm);y(cm)',
                                                       230, -345.0, 345.0, 230, -345.0, 345.0)
-        #: scatterplot of side view of forward BKLM for in-time BKLMHit2ds
+        #: scatterplot of side view of forward BKLM for in-time KLMHit2ds
         self.hist_occupancyRZPrompt = ROOT.TH2F('occupancyRZPrompt',
                                                 expRun + 'layer-z occupancy for in-time hits;z(cm);layer',
                                                 48, -190.0, 290.0, 16, -0.5, 15.5)
-        #: histogram of z coordinate for in-time BKLMHit2ds
+        #: histogram of z coordinate for in-time KLMHit2ds
         self.hist_occupancyZPrompt = ROOT.TH1F('occupancyZPrompt',
                                                expRun + 'z occupancy for in-time hits;z(cm)',
                                                48, -190.0, 290.0)
-        #: histogram of layer# for in-time BKLMHit2ds
+        #: histogram of layer# for in-time KLMHit2ds
         self.hist_occupancyRPrompt = ROOT.TH1F('occupancyRPrompt',
                                                expRun + 'layer occupancy for in-time hits;layer',
                                                16, -0.5, 15.5)
-        #: scatterplot of side view of forward BKLM for in-time BKLMHit2ds
+        #: scatterplot of side view of forward BKLM for in-time KLMHit2ds
         self.hist_occupancyRZBkgd = ROOT.TH2F('occupancyRZBkgd',
                                               expRun + 'layer-z occupancy for out-of-time hits;z(cm);layer',
                                               48, -190.0, 290.0, 16, -0.5, 15.5)
-        #: histogram of z coordinate for out-of-time BKLMHit2ds
+        #: histogram of z coordinate for out-of-time KLMHit2ds
         self.hist_occupancyZBkgd = ROOT.TH1F('occupancyZBkgd',
                                              expRun + 'z occupancy for out-of-time hits;z(cm)',
                                              48, -190.0, 290.0)
-        #: histogram of layer# for out-of-time BKLMHit2ds
+        #: histogram of layer# for out-of-time KLMHit2ds
         self.hist_occupancyRBkgd = ROOT.TH1F('occupancyRBkgd',
                                              expRun + 'layer occupancy for out-of-time hits;layer',
                                              16, -0.5, 15.5)
-        #: histogram of RPC calibrated time in BKLMHit2ds
+        #: histogram of RPC calibrated time in KLMHit2ds
         self.hist_tRPCCal2d = ROOT.TH1F('tRPCCal2d',
-                                        expRun + 'RPC BKLMHit2d time distribution;' +
+                                        expRun + 'RPC KLMHit2d time distribution;' +
                                         't(2D) - dt(layer) (ns)',
                                         256, -0.5, 1023.5)
-        #: scatterplot of RPC calibrated time in BKLMHit2ds vs sector
+        #: scatterplot of RPC calibrated time in KLMHit2ds vs sector
         self.hist_tRPCCal2dBySector = ROOT.TH2F('tRPCCal2dBySector',
-                                                expRun + 'RPC BKLMHit2d time distribution;' +
+                                                expRun + 'RPC KLMHit2d time distribution;' +
                                                 'sector # (0-7 = backward, 8-15 = forward);' +
                                                 't(2D) - dt(layer) (ns)',
                                                 16, -0.5, 15.5, 256, -0.5, 1023.5)
-        #: histogram of scint calibrated time in BKLMHit2ds
+        #: histogram of scint calibrated time in KLMHit2ds
         self.hist_ctScintCal2d = ROOT.TH1F('ctScintCal2d',
-                                           expRun + 'Scint BKLMHit2d ctime distribution;' +
+                                           expRun + 'Scint KLMHit2d ctime distribution;' +
                                            't(2D) - dt(layer) (ns)',
                                            128, -0.5, 1023.5)
-        #: scatterplot of scint calibrated time in BKLMHit2ds vs sector
+        #: scatterplot of scint calibrated time in KLMHit2ds vs sector
         self.hist_ctScintCal2dBySector = ROOT.TH2F('ctScintCal2dBySector',
-                                                   expRun + 'Scint BKLMHit2d ctime distribution;' +
+                                                   expRun + 'Scint KLMHit2d ctime distribution;' +
                                                    'sector # (0-7 = backward, 8-15 = forward);' +
                                                    't(2D) - dt(layer) (ns)',
                                                    16, -0.5, 15.5, 128, -0.5, 1023.5)
 
-        #: profile histogram of BKLMHit2d RPC time vs z (forward)
+        #: profile histogram of KLMHit2d RPC time vs z (forward)
         self.hist_tVsZFwd = ROOT.TProfile("tVsZForward",
-                                          expRun + 'RPC BKLMHit2d time vs z (forward);' +
+                                          expRun + 'RPC KLMHit2d time vs z (forward);' +
                                           'z (cm);' +
                                           't(2D) - dt(layer) (ns)',
                                           48, 0.0, 216.96)
-        #: profile histogram of BKLMHit2d RPC time vs z (forward)
+        #: profile histogram of KLMHit2d RPC time vs z (forward)
         self.hist_tVsZBwd = ROOT.TProfile("tVsZBackward",
-                                          expRun + 'RPC BKLMHit2d time vs z (backward);' +
+                                          expRun + 'RPC KLMHit2d time vs z (backward);' +
                                           'z (cm);' +
                                           't(2D) - dt(layer) (ns)',
                                           48, 0.0, 216.96)
@@ -1427,7 +1427,7 @@ class EventInspector(basf2.Module):
         rawklms = Belle2.PyStoreArray('RawKLMs')
         digits = Belle2.PyStoreArray('BKLMDigits')
         hit1ds = Belle2.PyStoreArray('BKLMHit1ds')
-        hit2ds = Belle2.PyStoreArray('BKLMHit2ds')
+        hit2ds = Belle2.PyStoreArray('KLMHit2ds')
         self.hist_nRawKLM.Fill(len(rawklms))
         self.hist_nDigit.Fill(len(digits))
         self.hist_nHit1d.Fill(len(hit1ds))
@@ -1496,7 +1496,7 @@ class EventInspector(basf2.Module):
                 minScintCtime = 99999
                 maxScintCtime = 0
                 # first pass over this DC: determine per-channel multiplicities, event time ranges, and
-                # fill dictionaries for accessing RawKLM hit information from BLKMHit1ds and BKLMHit2ds
+                # fill dictionaries for accessing RawKLM hit information from BLKMHit1ds and KLMHit2ds
                 for j in range(0, n):
                     word0 = bufSlot[j * 2]
                     word1 = bufSlot[j * 2 + 1]
@@ -1916,7 +1916,7 @@ class EventInspector(basf2.Module):
             if drawnSectors > 0:
                 self.eventDisplays += 1
 
-        # Process the BKLMHit2ds
+        # Process the KLMHit2ds
 
         xyList = []
         zyList = []

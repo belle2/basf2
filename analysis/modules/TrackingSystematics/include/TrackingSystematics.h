@@ -67,10 +67,16 @@ namespace Belle2 {
 
   private:
     /**
-    * Returns the needed scale factor for particle based on tableName and scalingFactorName
+    * Returns the needed scale factor for particle based on payloadName and scalingFactorName
     * @param particle
     */
-    double getScale(Particle* particle);
+    double getScalingFactor(Particle* particle);
+
+    /**
+    * Returns the needed smearing factor for particle based on payloadName and smearingFactorName
+    * @param particle
+    */
+    double getSmearingFactor(Particle* particle);
 
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
@@ -78,10 +84,13 @@ namespace Belle2 {
     double m_scale;
 
     /** Name of the table  */
-    std::string m_tableName;
+    std::string m_payloadName;
 
-    /** Name of the table */
+    /** Name of the scale factor from table */
     std::string m_scalingFactorName;
+
+    /** Name of the smear factor from table */
+    std::string m_smearingFactorName;
 
     /** Pointer to the table in DB */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
@@ -89,6 +98,11 @@ namespace Belle2 {
      * function to set momentum scaling factor
      */
     void setMomentumScalingFactor(Particle* particle);
+
+    /**
+     * function to set momentum scaling factor
+     */
+    void setMomentumSmearingFactor(Particle* particle);
 
   }; // TrackingMomentumModule
 

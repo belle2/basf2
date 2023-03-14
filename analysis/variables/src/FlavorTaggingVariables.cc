@@ -6,15 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/ROEVariables.h>
+
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/KLMClusterVariables.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -32,13 +34,13 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
-
 // framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <algorithm>
 #include <cmath>
@@ -48,7 +50,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    auto& labToCms = PCmsLabTransform::labToCms;
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     //   ############################################## FlavorTagger Variables   ###############################################
 
@@ -59,47 +60,80 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      TLorentzVector roeCMSVec;
+      ROOT::Math::PxPyPzEVector roeCMSVec;
 
       const auto& roeChargedParticles = roe->getChargedParticles();
       for (auto roeChargedParticle : roeChargedParticles) {
-        roeCMSVec += labToCms(roeChargedParticle->get4Vector());
+        roeCMSVec += PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
       }
 
       double missMom = -roeCMSVec.P();
       return missMom ;
     }
 
+    Manager::FunctionPtr momentumMissingTagSideWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle*) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        ROOT::Math::PxPyPzEVector roeCMSVec;
+
+        const auto& roeChargedParticles = roe->getChargedParticles(maskName);
+        for (auto roeChargedParticle : roeChargedParticles)
+        {
+          roeCMSVec += PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
+        }
+        double missMom = -roeCMSVec.P();
+        return missMom ;
+      };
+      return func;
+    }
+
     double cosTPTO(const Particle* part)
     {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (!roe.isValid()) return 0;
+      StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+      const RestOfEvent* roe;
+      if (roeobject.isValid()) { // if in for_each loop over ROE
+        roe = &(*roeobject);
+      } else {
+        roe = getRelatedROEObject(part);
+        if (!roe)
+          return 0;
+      }
 
-      std::vector<TVector3> p3_cms_roe;
+      std::vector<ROOT::Math::XYZVector> p3_cms_roe;
       static const double P_MAX(3.2);
 
       // Charged tracks
-      //
       const auto& roeTracks = roe->getChargedParticles();
       for (auto& roeChargedParticle : roeTracks) {
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-        TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
+        ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
         if (p_cms != p_cms) continue;
-        if (p_cms.Rho() > P_MAX) continue;
+        if (p_cms.P() > P_MAX) continue;
         p3_cms_roe.push_back(p_cms.Vect());
       }
 
-      // ECLCluster -> Gamma
+      // ECLCluster->Gamma
       const auto& roePhotons = roe->getPhotons();
       for (auto& roePhoton : roePhotons) {
         if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
-          TLorentzVector p_lab = roePhoton->get4Vector();
+          ROOT::Math::PxPyPzEVector p_lab = roePhoton->get4Vector();
           if (p_lab != p_lab) continue;
-          if (p_lab.Rho() < 0.05) continue;
-          TLorentzVector p_cms = labToCms(p_lab);
+          if (p_lab.P() < 0.05) continue;
+          ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
-          if (p_cms.Rho() > P_MAX) continue;
+          if (p_cms.P() > P_MAX) continue;
           p3_cms_roe.push_back(p_cms.Vect());
         }
       }
@@ -107,23 +141,104 @@ namespace Belle2 {
       const auto& roeKlongs = roe->getHadrons();
       for (auto& roeKlong : roeKlongs) {
         if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-          TLorentzVector p_lab = roeKlong->get4Vector();
+          ROOT::Math::PxPyPzEVector p_lab = roeKlong->get4Vector();
           if (p_lab != p_lab) continue;
-          if (p_lab.Rho() < 0.05) continue;
-          TLorentzVector p_cms = labToCms(p_lab);
+          if (p_lab.P() < 0.05) continue;
+          ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
-          if (p_cms.Rho() > P_MAX) continue;
+          if (p_cms.P() > P_MAX) continue;
           p3_cms_roe.push_back(p_cms.Vect());
         }
       }
 
-      const TVector3 thrustO  = Thrust::calculateThrust(p3_cms_roe);
-      const TVector3 pAxis = labToCms(part->get4Vector()).Vect();
+      const B2Vector3D thrustO = Thrust::calculateThrust(p3_cms_roe);
+      const B2Vector3D pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
 
       double result = 0 ;
       if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
 
       return result;
+    }
+
+    Manager::FunctionPtr cosTPTOWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+        const RestOfEvent* roe;
+        if (roeobject.isValid())   // if in for_each loop over ROE
+        {
+          roe = &(*roeobject);
+        } else
+        {
+          roe = getRelatedROEObject(particle);
+          if (!roe)
+            return 0;
+        }
+
+        std::vector<ROOT::Math::XYZVector> p3_cms_roe;
+        // static const double P_MAX(3.2);
+
+        // Charged tracks
+        const auto& roeTracks = roe->getChargedParticles(maskName);
+        for (auto& roeChargedParticle : roeTracks)
+        {
+          // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
+          // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
+          ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
+          if (p_cms != p_cms) continue;
+          // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
+          p3_cms_roe.push_back(p_cms.Vect());
+        }
+
+        // ECLCluster->Gamma
+        const auto& roePhotons = roe->getPhotons(maskName);
+        for (auto& roePhoton : roePhotons)
+        {
+          if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
+            ROOT::Math::PxPyPzEVector p_lab = roePhoton->get4Vector();
+            if (p_lab != p_lab) continue;
+            // if (p_lab.P() < 0.05) continue; // Should not be added without any description.
+            ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
+            if (p_cms != p_cms) continue;
+            // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        // KLMCluster
+        const auto& roeKlongs = roe->getHadrons(maskName);
+        for (auto& roeKlong : roeKlongs)
+        {
+          if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+            ROOT::Math::PxPyPzEVector p_lab = roeKlong->get4Vector();
+            if (p_lab != p_lab) continue;
+            // if (p_lab.P() < 0.05) continue; // Should not be added without any description.
+            ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
+            if (p_cms != p_cms) continue;
+            // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        const B2Vector3D thrustO  = Thrust::calculateThrust(p3_cms_roe);
+        const B2Vector3D pAxis = PCmsLabTransform::labToCms(particle->get4Vector()).Vect();
+
+        double result = 0 ;
+        if (pAxis == pAxis)
+          result = abs(cos(pAxis.Angle(thrustO))); // abs??
+
+        return result;
+
+      };
+      return func;
     }
 
     int lambdaFlavor(const Particle* particle)
@@ -157,7 +272,7 @@ namespace Belle2 {
     double momentumOfSecondDaughterCMS(const Particle* part)
     {
       if (!part->getDaughter(1)) return 0.0;
-      TLorentzVector vec = labToCms(part->getDaughter(1)->get4Vector());
+      ROOT::Math::PxPyPzEVector vec = PCmsLabTransform::labToCms(part->getDaughter(1)->get4Vector());
       return vec.P();
     }
 
@@ -195,6 +310,60 @@ namespace Belle2 {
 
     }
 
+    Manager::FunctionPtr transverseMomentumOfChargeTracksInRoeWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        double sum = 0.0;
+
+        for (const auto& track : roe->getChargedParticles(maskName))
+        {
+          if (particle->isCopyOf(track, true)) continue;
+          sum += track->getMomentum().Rho();
+        }
+
+        return sum;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr transverseMomentumSquaredOfChargeTracksInRoeWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        double sum = 0.0;
+
+        for (const auto& track : roe->getChargedParticles(maskName))
+        {
+          if (particle->isCopyOf(track, true)) continue;
+          sum += track->getMomentum().Perp2();
+        }
+
+        return sum;
+      };
+      return func;
+    }
+
     int NumberOfKShortsInRoe(const Particle* particle)
     {
       StoreObjPtr<ParticleList> KShortList("K_S0:inRoe");
@@ -223,7 +392,7 @@ namespace Belle2 {
           double probMuon = pMuon->getExtraInfo("isRightTrack(Muon)");
           if (probMuon > maximumProbMuon) {
             maximumProbMuon = probMuon;
-            trackTargetMuon = pMuon -> getTrack();
+            trackTargetMuon = pMuon->getTrack();
           }
         }
       }
@@ -241,7 +410,7 @@ namespace Belle2 {
           double probElectron = pElectron->getExtraInfo("isRightTrack(Electron)");
           if (probElectron > maximumProbElectron) {
             maximumProbElectron = probElectron;
-            trackTargetElectron = pElectron -> getTrack();
+            trackTargetElectron = pElectron->getTrack();
           }
         }
       }
@@ -281,6 +450,33 @@ namespace Belle2 {
       return vote > 0;
     }
 
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0WithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle*) -> bool {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        int vote = 0;
+        for (auto& track : roe->getChargedParticles(maskName))
+        {
+          const MCParticle* mcParticle = track->getMCParticle();
+          vote += getB0flavourMC(mcParticle);
+        }
+
+        return vote > 0;
+
+      };
+      return func;
+    }
+
     bool isMajorityInRestOfEventFromB0bar(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -295,10 +491,56 @@ namespace Belle2 {
       return vote < 0;
     }
 
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0barWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle*) -> bool {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        int vote = 0;
+        for (auto& track : roe->getChargedParticles(maskName))
+        {
+          const MCParticle* mcParticle = track->getMCParticle();
+          vote += getB0flavourMC(mcParticle);
+        }
+
+        return vote < 0;
+
+      };
+      return func;
+    }
+
     bool hasRestOfEventTracks(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       return (roe && roe-> getNTracks() > 0);
+    }
+
+    Manager::FunctionPtr hasRestOfEventTracksWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle*) -> bool {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        return roe->getNTracks(maskName) > 0;
+      };
+      return func;
     }
 
     int isRelatedRestOfEventB0Flavor(const Particle* particle)
@@ -340,12 +582,71 @@ namespace Belle2 {
       return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
+    Manager::FunctionPtr isRelatedRestOfEventB0FlavorWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> int {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        const MCParticle* BcpMC = particle->getMCParticle();
+        if (!BcpMC) return 0;
+        if (Variable::isSignal(particle) <= 0) return 0;
+
+        const MCParticle* Y4S = BcpMC->getMother();
+        if (!Y4S) return 0;
+
+        int BtagFlavor = 0;
+        int BcpFlavor = 0;
+
+        for (auto& roeChargedParticle : roe->getChargedParticles(maskName))
+        {
+          const MCParticle* mcParticle = roeChargedParticle->getMCParticle();
+          while (mcParticle) {
+            if (mcParticle->getMother() != Y4S) {
+              mcParticle = mcParticle->getMother();
+              continue;
+            }
+
+            if (mcParticle == BcpMC) { // if mcParticle is associated with CP-side unfortunately
+              if (mcParticle->getPDG() > 0)
+                BcpFlavor = 2;
+              else
+                BcpFlavor = -2;
+            } else if (BtagFlavor == 0) { // only first mcParticle is checked.
+              if (abs(mcParticle->getPDG()) == 511 || abs(mcParticle->getPDG()) == 521) {
+                if (mcParticle->getPDG() > 0)
+                  BtagFlavor = 1;
+                else
+                  BtagFlavor = -1;
+              } else {
+                BtagFlavor = 5;
+              }
+            }
+            break;
+          }
+          if (BcpFlavor != 0 || BtagFlavor == 5) break;
+        }
+
+        return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
+      };
+      return func;
+
+    }
+
     int isRestOfEventB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventB0Flavor(Bcp);
     }
 
@@ -354,18 +655,18 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       const MCParticle* Y4S = BcpMC->getMother();
       const MCParticle* mcParticle = particle->getMCParticle();
 
       int outputB0tagQ = 0;
       while (mcParticle) {
         if (mcParticle->getMother() == Y4S) {
-          if (mcParticle != BcpMC && abs(mcParticle -> getPDG()) == 511) {
-            if (mcParticle -> getPDG() == 511) outputB0tagQ = 1;
+          if (mcParticle != BcpMC && abs(mcParticle->getPDG()) == 511) {
+            if (mcParticle->getPDG() == 511) outputB0tagQ = 1;
             else outputB0tagQ = -1;
           } else if (mcParticle == BcpMC) {
-            if (mcParticle -> getPDG() == 511) outputB0tagQ = 2;
+            if (mcParticle->getPDG() == 511) outputB0tagQ = 2;
             else outputB0tagQ = -2;
           } else outputB0tagQ = 5;
           break;
@@ -381,8 +682,8 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -1;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       return MCMatching::getMCErrors(Bcp, BcpMC);
     }
 
@@ -417,12 +718,58 @@ namespace Belle2 {
         return (q_MC > 0);
     }
 
+    Manager::FunctionPtr isRelatedRestOfEventMajorityB0FlavorWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle*) -> int {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return -2;
+
+        int q_MC = 0; //Flavor of B
+
+        if (roe->getNTracks(maskName) > 0)
+        {
+          for (auto& track : roe->getChargedParticles(maskName)) {
+            const MCParticle* mcParticle = track->getMCParticle();
+            q_MC += getB0flavourMC(mcParticle);
+          }
+        } else if (roe->getNECLClusters(maskName) > 0)   // only if there are no tracks
+        {
+          for (auto& cluster : roe->getPhotons(maskName)) {
+            if (cluster->getECLClusterEHypothesisBit() != ECLCluster::EHypothesisBit::c_nPhotons) continue;
+            const MCParticle* mcParticle = cluster->getMCParticle();
+            q_MC += getB0flavourMC(mcParticle);
+          }
+        } else if (roe->getNKLMClusters(maskName) > 0)   // only if there are no tracks nor ecl-clusters
+        {
+          for (auto& klmcluster : roe->getHadrons(maskName)) {
+            const MCParticle* mcParticle = klmcluster->getMCParticle();
+            q_MC += getB0flavourMC(mcParticle);
+          }
+        }
+
+        if (q_MC == 0)
+          return -2;
+        else
+          return int(q_MC > 0);
+
+      };
+      return func;
+    }
+
     int isRestOfEventMajorityB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -2;//gRandom->Uniform(0, 1);
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventMajorityB0Flavor(Bcp);
     }
 
@@ -459,80 +806,97 @@ namespace Belle2 {
 
     Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments)
     {
+
+      std::string requestedVariable;
+      std::string maskName;
       if (arguments.size() == 1) {
-        auto requestedVariable = arguments[0];
-        auto func = [requestedVariable](const Particle * particle) -> double {
-          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          if (!roe.isValid()) return 0;
-
-          TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
-
-          const auto& roeChargedParticles = roe->getChargedParticles();
-          for (auto& roeChargedParticle : roeChargedParticles)
-          {
-            if (roeChargedParticle->isCopyOf(particle, true)) continue;
-            momXChargedTracks += roeChargedParticle->get4Vector();
-          }
-
-          TLorentzVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(); //Momentum of neutral X clusters in CMS-System
-
-          const auto& klongs = roe->getHadrons();
-          for (auto& klong : klongs)
-          {
-            if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-              momXNeutralClusters += klong->get4Vector();
-            }
-          }
-
-          TLorentzVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
-          TLorentzVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
-          TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
-
-          double output = 0.0;
-          if (requestedVariable == "recoilMass") output = momX.M();
-          else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
-          else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
-          else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
-          else if (requestedVariable == "EW90")
-          {
-
-            TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
-            float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-
-            const auto& photons = roe->getPhotons();
-            for (auto& photon : photons) {
-              if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
-                E_W_90 += photon->getECLClusterEnergy();
-              }
-            }
-            for (auto& roeChargedParticle : roeChargedParticles) {
-              if (!roeChargedParticle->isCopyOf(particle, true)) {
-                for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
-                  // ignore everything except the nPhotons hypothesis
-                  if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-                    continue;
-                  float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-                  if (iEnergy == iEnergy) {
-                    if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
-                                                   ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
-                      E_W_90 += iEnergy;
-                  }
-                }
-              }
-            }
-
-            output = E_W_90;
-          } else {
-            B2FATAL("Wrong variable " << requestedVariable <<
-            " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
-          }
-
-          return output;
-        };
-        return func;
+        requestedVariable = arguments[0];
+        maskName = RestOfEvent::c_defaultMaskName;
+      } else if (arguments.size() == 2) {
+        requestedVariable = arguments[0];
+        maskName = arguments[1];
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function BtagToWBosonVariables");
+        B2FATAL("Number of arguments must be 1 (requestedVariable) or 2 (requestedVariable, maskName).");
       }
+
+      const std::vector<string> availableVariables = {"recoilMass",
+                                                      "recoilMassSqrd",
+                                                      "pMissCMS",
+                                                      "cosThetaMissCMS",
+                                                      "EW90"
+                                                     };
+
+      if (std::find(availableVariables.begin(), availableVariables.end(), requestedVariable) == availableVariables.end()) {
+        B2FATAL("Wrong variable " << requestedVariable <<
+                " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
+      }
+
+      auto func = [requestedVariable, maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid())
+          return 0;
+
+        ROOT::Math::PxPyPzEVector momXChargedTracks; //Momentum of charged X tracks in lab-System
+        const auto& roeChargedParticles = roe->getChargedParticles(maskName);
+        for (auto& roeChargedParticle : roeChargedParticles)
+        {
+          if (roeChargedParticle->isCopyOf(particle, true)) continue;
+          momXChargedTracks += roeChargedParticle->get4Vector();
+        }
+
+        ROOT::Math::PxPyPzEVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(maskName); //Momentum of neutral X clusters in lab-System
+        const auto& klongs = roe->getHadrons(maskName);
+        for (auto& klong : klongs)
+        {
+          if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+            momXNeutralClusters += klong->get4Vector();
+          }
+        }
+
+        ROOT::Math::PxPyPzEVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+        ROOT::Math::PxPyPzEVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
+        ROOT::Math::PxPyPzEVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+
+        double output = 0.0;
+        if (requestedVariable == "recoilMass") output = momX.M();
+        if (requestedVariable == "recoilMassSqrd") output = momX.M2();
+        if (requestedVariable == "pMissCMS") output = momMiss.P();
+        if (requestedVariable == "cosThetaMissCMS") output = momTarget.Vect().Unit().Dot(momMiss.Vect().Unit());
+        if (requestedVariable == "EW90")
+        {
+
+          ROOT::Math::PxPyPzEVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
+          float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+
+          const auto& photons = roe->getPhotons(maskName);
+          for (auto& photon : photons) {
+            if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
+              E_W_90 += photon->getECLClusterEnergy();
+            }
+          }
+          for (auto& roeChargedParticle : roeChargedParticles) {
+            if (roeChargedParticle->isCopyOf(particle, true))
+              continue;
+
+            for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
+              // ignore everything except the nPhotons hypothesis
+              if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+                continue;
+              float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+              if (iEnergy == iEnergy) {
+                if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
+                                               ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
+                  E_W_90 += iEnergy;
+              }
+            }
+          }
+
+          output = E_W_90;
+        }
+
+        return output;
+      };
+      return func;
     }
 
     Manager::FunctionPtr KaonPionVariables(const std::vector<std::string>& arguments)
@@ -551,7 +915,7 @@ namespace Belle2 {
           B2FATAL("Wrong variable  " << requestedVariable << " requested. The possibilities are cosKaonPion or HaveOpositeCharges");
 
 
-        TLorentzVector momTargetSlowPion;
+        ROOT::Math::PxPyPzEVector momTargetSlowPion;
         double chargeTargetSlowPion = 0;
         if (SlowPionList.isValid())
         {
@@ -565,7 +929,7 @@ namespace Belle2 {
             if (probSlowPion > maximumProbSlowPion) {
               maximumProbSlowPion = probSlowPion;
               chargeTargetSlowPion =  pSlowPion->getCharge();
-              momTargetSlowPion = labToCms(pSlowPion->get4Vector());
+              momTargetSlowPion = PCmsLabTransform::labToCms(pSlowPion->get4Vector());
             }
           }
         }
@@ -581,9 +945,9 @@ namespace Belle2 {
         //TODO: when momTargetSlowPion == momTargetSlowPion fail?
         else if (requestedVariable == "cosKaonPion")
         {
-          TLorentzVector momTargetKaon = labToCms(particle->get4Vector());
+          ROOT::Math::PxPyPzEVector momTargetKaon = PCmsLabTransform::labToCms(particle->get4Vector());
           if (momTargetKaon == momTargetKaon && momTargetSlowPion == momTargetSlowPion)
-            output = cos(momTargetKaon.Angle(momTargetSlowPion.Vect()));
+            output = momTargetKaon.Vect().Unit().Dot(momTargetSlowPion.Vect().Unit());
         }
 
         return output;
@@ -608,14 +972,14 @@ namespace Belle2 {
 
 
         double maximumProbFastest = 0;
-        TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
+        ROOT::Math::PxPyPzEVector momFastParticle;  //Momentum of Fast Pion in CMS-System
         Particle* TargetFastParticle = nullptr;
         for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i)
         {
           Particle* particlei = FastParticleList->getParticle(i);
           if (!particlei) continue;
 
-          TLorentzVector momParticlei = labToCms(particlei->get4Vector());
+          ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
           if (momParticlei != momParticlei) continue;
 
           double probFastest = momParticlei.P();
@@ -633,13 +997,13 @@ namespace Belle2 {
         double output = 0.0;
 
         if (requestedVariable == "cosTPTOFast")
-          output = std::get<double>(Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle));
+          output = cosTPTO(TargetFastParticle);
 
-        TLorentzVector momSlowPion = labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
+        ROOT::Math::PxPyPzEVector momSlowPion = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
         if (momSlowPion == momSlowPion)   // FIXME
         {
           if (requestedVariable == "cosSlowFast") {
-            output = cos(momSlowPion.Angle(momFastParticle.Vect()));
+            output = momSlowPion.Vect().Unit().Dot(momFastParticle.Vect().Unit());
           } else if (requestedVariable == "SlowFastHaveOpositeCharges") {
             if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
               output = 1;
@@ -654,150 +1018,132 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr hasHighestProbInCat(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() != 2) {
-        B2FATAL("Wrong number of arguments (2 required) for meta function hasHighestProbInCat");
-      }
-
-      auto particleListName = arguments[0];
-      auto extraInfoName = arguments[1];
-      auto func = [particleListName, extraInfoName](const Particle * particle) -> bool {
-        if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
-        || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
-        || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastHadron)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
-        || extraInfoName == "isRightCategory(Electron)" || extraInfoName == "isRightCategory(IntermediateElectron)" || extraInfoName == "isRightCategory(Muon)" || extraInfoName == "isRightCategory(IntermediateMuon)"
-        || extraInfoName == "isRightCategory(KinLepton)" || extraInfoName == "isRightCategory(IntermediateKinLepton)" || extraInfoName == "isRightCategory(Kaon)"
-        || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastHadron)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
-        || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
-        {
-          B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
-          ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
-          << endl <<
-          "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-          return 0;
-        }
-
-        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-        if (!ListOfParticles.isValid()) return 0;
-
-        double maximumProb = 0;
-        for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
-        {
-          const Particle* particlei = ListOfParticles->getParticle(i);
-          if (!particlei) continue;
-
-          double prob = 0;
-          if (extraInfoName == "isRightTrack(MaximumPstar)") {
-            TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
-            if (momParticlei == momParticlei) {
-              prob = momParticlei.P();
-            }
-          } else {
-            if (particlei->hasExtraInfo(extraInfoName)) {
-              prob = particlei->getExtraInfo(extraInfoName);
-            }
-          }
-          if (prob > maximumProb) {
-            maximumProb = prob;
-          }
-
-        }
-
-        bool output = false;
-        if ((extraInfoName == "isRightTrack(MaximumPstar)") && (labToCms(particle->get4Vector()).P() == maximumProb))
-        {
-          output = true;
-        } else if (extraInfoName != "isRightTrack(MaximumPstar)" && particle->hasExtraInfo(extraInfoName))
-        {
-          if (particle->getExtraInfo(extraInfoName) == maximumProb) output = true;
-        }
-
-        return output;
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr HighestProbInCat(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() != 2) {
-        B2FATAL("Wrong number of arguments (2 required) for meta function HighestProbInCat");
-      }
-
-      auto particleListName = arguments[0];
-      auto extraInfoName = arguments[1];
-      auto func = [particleListName, extraInfoName](const Particle*) -> double {
-        if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
-        || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
-        || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastHadron)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
-        || extraInfoName == "isRightCategory(Electron)" || extraInfoName == "isRightCategory(IntermediateElectron" || extraInfoName == "isRightCategory(Muon)" || extraInfoName == "isRightCategory(IntermediateMuon)"
-        || extraInfoName == "isRightCategory(KinLepton)" || extraInfoName == "isRightCategory(IntermediateKinLepton)" || extraInfoName == "isRightCategory(Kaon)"
-        || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastHadron)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
-        || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
-        {
-          B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
-          ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
-          << endl <<
-          "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-          return 0.0;
-        }
-
-        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-        if (!ListOfParticles.isValid()) return 0;
-
-        double maximumProb = 0;
-        for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
-        {
-          const Particle* particlei = ListOfParticles->getParticle(i);
-          if (!particlei) continue;
-
-          double prob = 0;
-          if (extraInfoName == "isRightTrack(MaximumPstar)") {
-            TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
-            if (momParticlei == momParticlei) {
-              prob = momParticlei.P();
-            }
-          } else {
-            if (particlei->hasExtraInfo(extraInfoName)) {
-              prob = particlei->getExtraInfo(extraInfoName);
-            }
-          }
-          maximumProb = max(maximumProb, prob);
-        }
-
-        return maximumProb;
-      };
-      return func;
-    }
 
 //  Target Variables ----------------------------------------------------------------------------------------------
 
     // Lists used in target variables
-    const std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
+    static const std::vector<int> charmMesons = {
+      411 /*D+*/, 413 /*D*+*/, 415/*D_2*+*/, 421 /*D0*/, 423 /*D*0*/, 425/*D_2*0*/, 431/*D_s+*/, 433/*D_s*+*/, 435/*D_s2*+*/,
+      10411 /*D_0*+*/, 10413 /*D_1+*/, 10421 /*D_0*0*/, 10423 /*D_10*/, 10431 /*D_s0*+*/, 10433/*D'_s1+*/,
+      20413 /*D'_1+*/, 20423 /*D'_10*/, 20433/*D_s1+*/,
+    };
 
-    const std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
-                                            4414, 4424, 4432, 4434, 4444
-                                          };
+    static const std::vector<int> charmBaryons = {
+      4112 /*Sigma_c0*/, 4114 /*Sigma_c*0*/, 4122 /*Lambda_c+*/, 4132 /*Xi_c0*/,
+      4212 /*Sigma_c+*/, 4214 /*Sigma_c*+*/, 4222 /*Sigma_c++*/, 4224 /*sigma_c*++*/, 4232 /*Xi_c+*/,
+      4312 /*Xi'_c0*/, 4314 /*Xi_c*0*/, 4322 /*Xi'_c+*/, 4324 /*Xi_c*+*/, 4332 /*Omega_c0*/, 4334 /*Omega_c*0*/,
+      4412 /*Xi_cc+*/, 4414 /*Xi_cc*+*/, 4422 /*Xi_cc++*/, 4424 /*Xi_cc*0*/, 4432 /*Omega_cc+*/, 4434 /*Omega_cc*+*/,
 
-    const std::vector<int> qqbarMesons = {// light qqbar
-      111, 9000111, 100111, 10111, 200111, 113, 10113, 20113, 9000113, 100113, 9010113, 9020113, 30113, 9030113, 9040113,
-      115, 10115, 100115, 9000115, 117, 9000117, 9010117, 119,
+      4444 /*Omega_ccc++ not in evt.pdl*/
+    };
+
+    static const std::vector<int> qqbarMesons = {
+      // light qqbar
+      111 /*pi0*/, 113 /*rho_0*/, 115 /*a_20*/, 117 /*rho(3)(1690)0*/, 119 /*a_4(1970)0*/,
+      10111 /*pi(2S)0*/, 10113 /*b_10*/, 10115 /*pi(2)(1670)0*/,
+      20113 /*a_10*/, 30113 /*rho(3S)0*/,
+      100111 /*pi0_1300 not in evt.pdl*/, 100113 /*rho(2S)0*/,
+      9000111 /*a_00*/, 9000113 /*pi(1)(1400)0*/, 9010113 /*pi(1)(1600)0*/, 9040113 /*rho(2150)0*/,
+
+      // not in evt.pdl
+      200111 /*?*/, 9020113 /*a1_1640*/, 9030113 /*rho(1900)0*/, 100115 /*?*/, 9000115 /*?*/,
+      9000117 /*rho(3)(1990)0*/, 9010117 /*rho(3)(2250)0*/,
+
       // ssbar Mesons
-      221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
-      10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
-      9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
+      221 /*eta*/, 223 /*omega*/, 225 /*f_2*/, 227 /*omega(3)(1670)*/, 229 /*f(4)(2050)*/,
+      331 /*eta'*/, 333 /*phi*/, 335 /*f'_2*/, 337 /*phi(3)(1850)*/,
+      10223 /*h_1*/, 10225 /*eta(2)(1645)*/, 10331 /*f(0)(1710)*/, 10333 /*h'_1*/,
+      20223 /*f_1*/, 20333 /*f'_1*/, 30223 /*omega(1650)*/,
+      100223 /*omega(2S)*/, 100333 /*phi(1680)*/,
+      9000221 /*sigma_0*/, 9010221 /*f_0*/, 9020221 /*eta(1405)*/, 9030221 /*f_0(1500)*/,
+      9050225 /*f(2)(1950)*/, 9060225 /*f(2)(2010)*/,
+
+      // not in evt.pdl
+      10221 /*f0(980)*/,  10335 /*eta(2)(1870)*/,
+      100331 /*eta(1470)*/,
+      9000223 /*f_1(1510)*/, 9000225 /*f_2(1430)*/, 9000229 /*f_J(2220)*/,
+      9010223 /*h_1(1595)*/, 9010225 /*f_2(1565)*/, 9020225 /*f_2(1640)*/, 9030225 /*f_2(1810)*/,
+      9040221 /*eta(1760)*/, 9040225 /*f_2(1910)*/, 9050221 /*f_0(2020)*/,
+      9060221 /*f_0(2100)*/, 9070221 /*f_0(2200)*/, 9070225 /*f_2(2150)*/,
+
+      100225 /*?*/, 100335 /*?*/,
+      200221 /*?*/,
+      9000339 /*?*/,
+
       // ccbar Mesons
-      441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
+      441 /*eta_c*/, 443 /*J/psi*/, 445 /*chi_c2*/,
+      10441 /*chi_c0*/, 10443 /*h_c*/, 20443 /*chi_c1*/, 30443 /*psi(3770)*/,
+      100441 /*eta_c(2S)*/, 100443 /*phi(2S)*/,
+      9000443 /*phi(4040)*/, 9010443 /*psi(4160)*/, 9020443 /*psi(4415)*/,
+      9000445 /*? not in evt.pdl*/,
     };
 
-    const std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into hadrons conserving flavor
-      9000211, 100211, 10211, 200211, 213, 10213, 20213, 9000213, 100213, 9010213, 9020213, 30213, 9030213, 9040213,
-      215, 10215, 100215, 9000215, 217, 9000217, 9010217, 219,
+    static const std::vector<int> flavorConservingMesons = {
+      // Excited light mesons that can decay into hadrons conserving flavor
+      213 /*rho+*/, 215 /*a_2+*/, 217 /*rho(3)(1690)+*/, 219 /*a_4(1970)+*/,
+      10211 /*a(0)(1450)+*/, 10213 /*b_1+*/, 10215 /*pi(2)(1670)+*/,
+      20213 /*a_1+*/, 30213 /*rho(3S)+*/,
+      100211 /*pi(2S)+*/, 100213 /*rho(2S)+*/,
+      9000211 /*a_0+*/, 9000213 /*pi(1)(1400)+*/, 9010213 /*pi(1)(1600)+*/,
+
+      // not in evt.pdl
+      9000215 /*a_2(1700)+*/, 9000217 /*rho_3(1990)+*/,
+      9010217 /*rho_3(2250)+*/, 9020213 /*a_1(1640)+*/, 9030213 /*rho(1900)+*/, 9040213 /*rho(2150)+*/,
+
+      100215 /*?*/, 200211 /*?*/,
+
       // Excited K Mesons that hadronize conserving flavor
-      30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
-      9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
-      9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
+      313 /*K*0*/, 315 /*K_2*0*/, 317 /*K_3*0*/, 319 /*K_4*0*/,
+      323 /*K*+*/, 325 /*K_2*+*/, 327 /*K_3*+*/, 329 /*K_4*+*/,
+      10311 /*K_0*0*/, 10313 /*K_10*/, 10315 /*K(2)(1770)0*/,
+      10321 /*K_0*+*/, 10323 /*K_1+*/, 10325 /*K(2)(1770)+*/,
+      20313 /*K'_10*/, 20315 /*K(2)(1820)0*/,
+      20323 /*K'_1+*/, 20325 /*K(2)(1820)+*/,
+      30313 /*K''*0*/, 30323 /*K''*+*/, 30343 /*Xsd*/,
+      100313 /*K'*0*/, 100323 /*K'*+*/,
+
+      // not in evt.pdl
+      100311 /*K(1460)0*/, 100321 /*K(1460)+*/,
+      9000311 /*K*(700)0*/, 9000313 /*K_1(1650)0*/, 9000315 /*K_2(1580)0*/,
+      9000321 /*K*(700)+*/, 9000323 /*K_1(1650)+*/, 9000325 /*K_2(1580)+*/,
+      9010315 /*K_2*(1980)0*/, 9010317 /*K_3(2320)0*/,
+      9010325 /*K_2*(1980)+*/, 9010327 /*K_3(2320)+*/,
+
+      100315 /*?*/, 100325 /*?*/,
+      200311 /*?*/, 200321 /*?*/,
+      9000319 /*?*/, 9000329 /*?*/,
     };
+
+    const std::vector<std::string> availableForIsRightTrack = { "Electron",             // 0
+                                                                "IntermediateElectron", // 1
+                                                                "Muon",                 // 2
+                                                                "IntermediateMuon",     // 3
+                                                                "KinLepton",            // 4
+                                                                "IntermediateKinLepton",// 5
+                                                                "Kaon",                 // 6
+                                                                "SlowPion",             // 7
+                                                                "FastHadron",           // 8
+                                                                "Lambda",               // 9
+                                                                "mcAssociated"          // 10
+                                                              };
+
+    const std::vector<std::string> availableForIsRightCategory = { "Electron",             // 0
+                                                                   "IntermediateElectron", // 1
+                                                                   "Muon",                 // 2
+                                                                   "IntermediateMuon",     // 3
+                                                                   "KinLepton",            // 4
+                                                                   "IntermediateKinLepton",// 5
+                                                                   "Kaon",                 // 6
+                                                                   "SlowPion",             // 7
+                                                                   "FastHadron",           // 8
+                                                                   "KaonPion",             // 9
+                                                                   "MaximumPstar",         // 10
+                                                                   "FSC",                  // 11
+                                                                   "Lambda",               // 12
+                                                                   "mcAssociated"          // 13
+                                                                 };
+
+
 
     Manager::FunctionPtr isRightTrack(const std::vector<std::string>& arguments)
     {
@@ -805,24 +1151,11 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments (1 required) for meta function isRightTrack");
       }
 
-
       auto particleName = arguments[0];
 
-      std::vector<std::string> names = {     "Electron",             // 0
-                                             "IntermediateElectron", // 1
-                                             "Muon",                 // 2
-                                             "IntermediateMuon",     // 3
-                                             "KinLepton",            // 4
-                                             "IntermediateKinLepton",// 5
-                                             "Kaon",                 // 6
-                                             "SlowPion",             // 7
-                                             "FastHadron",             // 8
-                                             "Lambda",               // 9
-                                             "mcAssociated"          // 10
-                                       };
-
-      unsigned index = std::find(names.begin(), names.end(), particleName) - names.begin();
-      if (index == names.size()) {
+      unsigned index = std::find(availableForIsRightTrack.begin(), availableForIsRightTrack.end(), particleName)
+                       - availableForIsRightTrack.begin();
+      if (index == availableForIsRightTrack.size()) {
         B2FATAL("isRightTrack: Not available category " << particleName <<
                 ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron and Lambda");
       }
@@ -842,9 +1175,9 @@ namespace Belle2 {
         while (mcMother)
         {
           mothersPDG.push_back(abs(mcMother->getPDG()));
-          if (index == 8) mothersPointers.push_back(mcMother);
+          mothersPointers.push_back(mcMother);
           if (abs(mcMother->getPDG()) == 511) break;
-          mcMother = mcMother -> getMother();
+          mcMother = mcMother->getMother();
         }
 
         if (mothersPDG.size() == 0) return -2;
@@ -855,120 +1188,108 @@ namespace Belle2 {
         // ----------------  Is D Meson in the decay chain  --------------------------------------
 
         bool isCharmedMesonInChain = false;
-        if ((index == 6) && mothersPDG.size() > 1)
+        for (auto& iMCMotherPDG : mothersPDG)
         {
-          for (auto& iMCMotherPDG : mothersPDG) {
-            if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
-              isCharmedMesonInChain = true;
-              break;
-            }
+          if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
+            isCharmedMesonInChain = true;
+            break;
           }
         }
 
         // ----------------  Is Charmed Baryon in the decay chain  --------------------------------
 
         bool isCharmedBaryonInChain = false;
-        if ((index == 6 || index == 9) && mothersPDG.size() > 1)
+        for (auto& iMCMotherPDG : mothersPDG)
         {
-          for (auto& iMCMotherPDG : mothersPDG) {
-            if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
-              isCharmedBaryonInChain = true;
-              break;
-            }
+          if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
+            isCharmedBaryonInChain = true;
+            break;
           }
         }
 
         // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
 
         bool isQQbarMesonInChain = false;
-        if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8) && mothersPDG.size() > 1)
+        for (auto& iMCMotherPDG : mothersPDG)
         {
-          for (auto& iMCMotherPDG : mothersPDG) {
-            if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {
-              isQQbarMesonInChain = true;
-              break;
-            }
+          if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {
+            isQQbarMesonInChain = true;
+            break;
           }
         }
 
         // --------------  Is the Hadron a descendant of a Meson that conserves flavor  --------------------------
 
         bool isB0DaughterConservingFlavor = false;
-        if ((index == 8) && mothersPDG.size() > 1)
+        if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                      mothersPDG.rbegin()[1]) != flavorConservingMesons.end())
         {
-          if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
-                        mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
-            isB0DaughterConservingFlavor = true;
-          }
+          isB0DaughterConservingFlavor = true;
         }
 
         // -----------------------------  Is the Hadron a single daughter of a tau ----- --------------------------
 
         bool isHadronSingleTauDaughter = false;
-        if (index == 8 && mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
+        if (mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
         {
           int numberOfChargedDaughters = 0;
-          for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
-            if (tauDaughter -> getCharge() != 0) numberOfChargedDaughters += 1;
+          for (auto& tauDaughter : mothersPointers.rbegin()[1]->getDaughters()) {
+            if (tauDaughter->getCharge() != 0)
+              numberOfChargedDaughters += 1;
           }
-          if (numberOfChargedDaughters == 1) isHadronSingleTauDaughter = true;
+          if (numberOfChargedDaughters == 1)
+            isHadronSingleTauDaughter = true;
         }
 
-        //direct electron
-        if (index == 0
-            && mcPDG == Const::electron.getPDGCode()
-            && mothersPDG[0] == 511)
+        if (index == 0 // Electron
+            && mcPDG == Const::electron.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1;
-          //intermediate electron
-        } else if (index == 1
-                   && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1
-                   && isQQbarMesonInChain == false)
+        } else if (index == 1 // IntermediateElectron
+                   && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1 && isQQbarMesonInChain == false)
         {
           return 1;
-          //direct muon
-        } else if (index == 2
+        } else if (index == 2 // Muon
                    && mcPDG == Const::muon.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1;
-          //intermediate muon
-        } else if (index == 3
-                   && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1
-                   && isQQbarMesonInChain == false)
+        } else if (index == 3 // IntermediateMuon
+                   && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1 && isQQbarMesonInChain == false)
         {
           return 1;
-          //KinLepton
-        } else if (index == 4
+        } else if (index == 4 // KinLepton
                    && (mcPDG == Const::muon.getPDGCode() || mcPDG == Const::electron.getPDGCode()) && mothersPDG[0] == 511)
         {
           return 1;
-          //IntermediateKinLepton
-        } else if (index == 5
+        } else if (index == 5 //IntermediateKinLepton
                    && (mcPDG == Const::muon.getPDGCode() || mcPDG == Const::electron.getPDGCode()) && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1;
-          //kaon
-        } else if (index == 6
-                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
+        } else if (index == 6 // Kaon
+                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false
+                   && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
         {
           return 1;
-          //slow pion
-        } else if (index == 7
+        } else if (index == 7 // SlowPion
                    && mcPDG == Const::pion.getPDGCode() && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
         {
           return 1;
-          //high momentum hadrons
-        } else if (index == 8
-                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
-                       && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
+        } else if (index == 8 // FastHadron
+                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode())
+                   && isQQbarMesonInChain == false
+                   && (mothersPDG[0] == 511
+                       || (mothersPDG.rbegin()[0] == 511 && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1;
-          //lambdas
-        } else if (index == 9 && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
+        } else if (index == 9 // Lambda
+                   && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1;
-        } else return 0;
+        } else
+        {
+          return 0;
+        }
       };
       return func;
     }
@@ -979,27 +1300,11 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments (1 required) for meta function isRightCategory");
       }
 
-
       auto particleName = arguments[0];
 
-      const std::vector<std::string> names = {    "Electron",             // 0
-                                                  "IntermediateElectron", // 1
-                                                  "Muon",                 // 2
-                                                  "IntermediateMuon",     // 3
-                                                  "KinLepton",            // 4
-                                                  "IntermediateKinLepton",// 5
-                                                  "Kaon",                 // 6
-                                                  "SlowPion",             // 7
-                                                  "FastHadron",             // 8
-                                                  "KaonPion",             // 9
-                                                  "MaximumPstar",         // 10
-                                                  "FSC",                  // 11
-                                                  "Lambda",               // 12
-                                                  "mcAssociated"          // 13
-                                             };
-
-      unsigned index = find(names.begin(), names.end(), particleName) - names.begin();
-      if (index == names.size()) {
+      unsigned index = find(availableForIsRightCategory.begin(), availableForIsRightCategory.end(), particleName)
+                       - availableForIsRightCategory.begin();
+      if (index == availableForIsRightCategory.size()) {
         B2FATAL("isRightCategory: Not available category " << particleName <<
                 ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
       }
@@ -1007,7 +1312,7 @@ namespace Belle2 {
       auto func = [index](const Particle * particle) -> int {
 
         Particle* nullParticle = nullptr;
-        double qTarget = particle -> getCharge();
+        double qTarget = particle->getCharge();
         double qMC = Variable::isRestOfEventB0Flavor(nullParticle);
 
         const MCParticle* mcParticle = particle->getMCParticle();
@@ -1023,7 +1328,7 @@ namespace Belle2 {
         while (mcMother)
         {
           mothersPDG.push_back(abs(mcMother->getPDG()));
-          if (index == 8 || index == 9) mothersPointers.push_back(mcMother);
+          mothersPointers.push_back(mcMother);
           if (abs(mcMother->getPDG()) == 511) break;
           mcMother = mcMother->getMother();
         }
@@ -1035,70 +1340,64 @@ namespace Belle2 {
         // ----------------  Is D Meson in the decay chain  --------------------------------------
 
         bool isCharmedMesonInChain = false;
-        if ((index == 6) && mothersPDG.size() > 1)
+        for (auto& iMCMotherPDG : mothersPDG)
         {
-          for (auto& iMCMotherPDG : mothersPDG) {
-            if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
-              isCharmedMesonInChain = true;
-              break;
-            }
+          if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
+            isCharmedMesonInChain = true;
+            break;
           }
         }
 
         // ----------------  Is Charmed Baryon in the decay chain  --------------------------------
 
         bool isCharmedBaryonInChain = false;
-        if ((index == 6 || index == 12) && mothersPDG.size() > 1)
+        for (auto& iMCMotherPDG : mothersPDG)
         {
-          for (auto& iMCMotherPDG : mothersPDG) {
-            if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
-              isCharmedBaryonInChain = true;
-              break;
-            }
+          if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
+            isCharmedBaryonInChain = true;
+            break;
           }
         }
 
         // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
 
         bool isQQbarMesonInChain = false;
-        if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8 || index == 11) && mothersPDG.size() > 1)
+        for (auto& iMCMotherPDG : mothersPDG)
         {
-          for (auto& iMCMotherPDG : mothersPDG) {
-            if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {
-              isQQbarMesonInChain = true;
-              break;
-            }
+          if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {
+            isQQbarMesonInChain = true;
+            break;
           }
         }
 
         // --------------  Is the Hadron a descendant of a Meson that conserves flavor  --------------------------
 
         bool isB0DaughterConservingFlavor = false;
-        if ((index == 8) && mothersPDG.size() > 1)
+        if (mothersPDG.size() > 1)
         {
           if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
                         mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
             isB0DaughterConservingFlavor = true;
           }
-
         }
 
         // -----------------------------  Is the Hadron a single daughter of a tau ----- --------------------------
 
         bool isHadronSingleTauDaughter = false;
-        if (index == 8 && mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
+        if (mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
         {
           int numberOfChargedDaughters = 0;
-          for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
-            if (tauDaughter -> getCharge() != 0) numberOfChargedDaughters += 1;
+          for (auto& tauDaughter : mothersPointers.rbegin()[1]->getDaughters()) {
+            if (tauDaughter->getCharge() != 0)
+              numberOfChargedDaughters += 1;
           }
-          if (numberOfChargedDaughters == 1) isHadronSingleTauDaughter = true;
+          if (numberOfChargedDaughters == 1)
+            isHadronSingleTauDaughter = true;
         }
 
         // ----------------------------  For KaonPion Category ------------------------------------
         bool haveKaonPionSameMother = false;
-        // if KaonPion
-        if (index == 9)
+        if (index == 9)   // KaonPion
         {
           const MCParticle* mcSlowPionMother = nullptr;
           StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
@@ -1108,7 +1407,7 @@ namespace Belle2 {
             for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
               Particle* pSlowPion = SlowPionList->getParticle(i);
               if (!pSlowPion) continue;
-              if (pSlowPion -> hasExtraInfo("isRightCategory(SlowPion)")) {
+              if (pSlowPion->hasExtraInfo("isRightCategory(SlowPion)")) {
                 double probSlowPion = pSlowPion->getExtraInfo("isRightCategory(SlowPion)");
                 if (probSlowPion > mcProbSlowPion) {
                   mcProbSlowPion = probSlowPion;
@@ -1118,7 +1417,7 @@ namespace Belle2 {
             }
             if (targetSlowPion != nullptr) {
               const MCParticle* mcSlowPion = targetSlowPion ->getMCParticle();
-              //               SlowPion_q = targetSlowPion -> getCharge();
+              //               SlowPion_q = targetSlowPion->getCharge();
               if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr
                   && abs(mcSlowPion->getPDG()) == Const::pion.getPDGCode() && abs(mcSlowPion->getMother()->getPDG()) == 413) {
                 mcSlowPionMother = mcSlowPion->getMother();
@@ -1134,8 +1433,7 @@ namespace Belle2 {
         // ----------------------------  For FastSlowCorrelated Category ----------------------------
         int FastParticlePDGMother = 0;
         double qFSC = 0;
-        // FSC",
-        if (index == 11)
+        if (index == 11)   // FSC
         {
           StoreObjPtr<ParticleList> FastParticleList("pi+:inRoe");
           Particle* targetFastParticle = nullptr;
@@ -1145,7 +1443,7 @@ namespace Belle2 {
               Particle* particlei = FastParticleList->getParticle(i);
               if (!particlei) continue;
 
-              TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
+              ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
               if (momParticlei == momParticlei) {
                 double probFastest = momParticlei.P();
                 if (probFastest > mcProbFastest) {
@@ -1156,7 +1454,7 @@ namespace Belle2 {
             }
             if (targetFastParticle != nullptr) {
               const MCParticle* mcFastParticle = targetFastParticle ->getMCParticle();
-              //               FastParticle_q = targetFastParticle -> getCharge();
+              //               FastParticle_q = targetFastParticle->getCharge();
               if (mcFastParticle != nullptr && mcFastParticle->getMother() != nullptr) {
                 FastParticlePDGMother = abs(mcFastParticle->getMother()->getPDG());
                 qFSC = mcFastParticle->getCharge();
@@ -1185,43 +1483,51 @@ namespace Belle2 {
         {
           return 1;
         }  else if (index == 4 // KinLepton
-                    && qTarget == qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG[0] == 511)
+                    && qTarget == qMC
+                    && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG[0] == 511)
         {
           return 1;
         }  else if (index == 5 // IntermediateKinLepton
-                    && qTarget != qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG.size() > 1
-                    && isQQbarMesonInChain == false)
+                    && qTarget != qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode())
+                    && mothersPDG.size() > 1 && isQQbarMesonInChain == false)
         {
           return 1;
-        } else if (index == 6 && qTarget == qMC // Kaon
-                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
+        } else if (index == 6// Kaon
+                   && qTarget == qMC && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false
+                   && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
         {
           return 1;
-        } else if (index == 7 && qTarget != qMC // SlowPion
-                   && mcPDG == Const::pion.getPDGCode() && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
+        } else if (index == 7 // SlowPion
+                   && qTarget != qMC && mcPDG == Const::pion.getPDGCode()
+                   && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
         {
           return 1;
-        } else if (index == 8 && qTarget == qMC // FastHadron
-                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
-                       && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
+        } else if (index == 8 // FastHadron
+                   && qTarget == qMC && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode())
+                   && isQQbarMesonInChain == false
+                   && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                                                && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1;
-        } else if (index == 9  && qTarget == qMC // KaonPion
-                   && mcPDG == Const::kaon.getPDGCode() && haveKaonPionSameMother == true)
+        } else if (index == 9 // KaonPion
+                   && qTarget == qMC && mcPDG == Const::kaon.getPDGCode() && haveKaonPionSameMother == true)
         {
           return 1;
         } else if (index == 10 && qTarget == qMC)   // MaximumPstar
         {
           return 1;
-        } else if (index == 11 && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
+        } else if (index == 11 // FSC
+                   && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC
                    && mcPDG == Const::pion.getPDGCode() && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
         {
           return 1;
-        } else if (index == 12 && (particle->getPDGCode() / abs(particle->getPDGCode())) != qMC // Lambda
+        } else if (index == 12 // Lambda
+                   && (particle->getPDGCode() / abs(particle->getPDGCode())) != qMC
                    && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1;
-        } else {
+        } else
+        {
           return 0;
         }
       };
@@ -1229,40 +1535,187 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr hasHighestProbInCat(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2FATAL("Wrong number of arguments (2 required) for meta function hasHighestProbInCat");
+      }
+
+      auto particleListName = arguments[0];
+      auto extraInfoName = arguments[1];
+
+      bool isAvailable = false;
+      for (const auto& name : availableForIsRightTrack) {
+        if (extraInfoName == "isRightTrack(" + name + ")") {
+          isAvailable = true;
+          break;
+        }
+      }
+      for (const auto& name : availableForIsRightCategory) {
+        if (extraInfoName == "isRightCategory(" + name + ")") {
+          isAvailable = true;
+          break;
+        }
+      }
+      if (extraInfoName == "isRightTrack(MaximumPstar)")
+        isAvailable = true;
+
+
+      if (!isAvailable) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
+        B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [particleListName, extraInfoName](const Particle * particle) -> bool {
+        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+        if (!ListOfParticles.isValid()) return 0;
+
+        double maximumProb = 0;
+        for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+        {
+          const Particle* particlei = ListOfParticles->getParticle(i);
+          if (!particlei) continue;
+
+          double prob = 0;
+          if (extraInfoName == "isRightTrack(MaximumPstar)") {
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
+            if (momParticlei == momParticlei) {
+              prob = momParticlei.P();
+            }
+          } else {
+            if (particlei->hasExtraInfo(extraInfoName)) {
+              prob = particlei->getExtraInfo(extraInfoName);
+            }
+          }
+          if (prob > maximumProb) {
+            maximumProb = prob;
+          }
+
+        }
+
+        bool output = false;
+        if ((extraInfoName == "isRightTrack(MaximumPstar)") && (PCmsLabTransform::labToCms(particle->get4Vector()).P() == maximumProb))
+        {
+          output = true;
+        } else if (extraInfoName != "isRightTrack(MaximumPstar)" && particle->hasExtraInfo(extraInfoName))
+        {
+          if (particle->getExtraInfo(extraInfoName) == maximumProb) output = true;
+        }
+
+        return output;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr HighestProbInCat(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2FATAL("Wrong number of arguments (2 required) for meta function HighestProbInCat");
+      }
+
+      auto particleListName = arguments[0];
+      auto extraInfoName = arguments[1];
+
+      bool isAvailable = false;
+      for (const auto& name : availableForIsRightTrack) {
+        if (extraInfoName == "isRightTrack(" + name + ")") {
+          isAvailable = true;
+          break;
+        }
+      }
+      for (const auto& name : availableForIsRightCategory) {
+        if (extraInfoName == "isRightCategory(" + name + ")") {
+          isAvailable = true;
+          break;
+        }
+      }
+      if (extraInfoName == "isRightTrack(MaximumPstar)")
+        isAvailable = true;
+
+
+      if (!isAvailable) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
+        B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [particleListName, extraInfoName](const Particle*) -> double {
+        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+        if (!ListOfParticles.isValid()) return 0;
+
+        double maximumProb = 0;
+        for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+        {
+          const Particle* particlei = ListOfParticles->getParticle(i);
+          if (!particlei) continue;
+
+          double prob = 0;
+          if (extraInfoName == "isRightTrack(MaximumPstar)") {
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
+            if (momParticlei == momParticlei) {
+              prob = momParticlei.P();
+            }
+          } else {
+            if (particlei->hasExtraInfo(extraInfoName)) {
+              prob = particlei->getExtraInfo(extraInfoName);
+            }
+          }
+          maximumProb = max(maximumProb, prob);
+        }
+
+        return maximumProb;
+      };
+      return func;
+    }
+
 
     // List of available extrainfos used in QpOf, weightedQpOf and variableOfTarget.
-    std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
-                                                         "isRightTrack(IntermediateElectron)", // 1
-                                                         "isRightTrack(Muon)",                 // 2
-                                                         "isRightTrack(IntermediateMuon)",     // 3
-                                                         "isRightTrack(KinLepton)",            // 4
-                                                         "isRightTrack(IntermediateKinLepton)",// 5
-                                                         "isRightTrack(Kaon)",                 // 6
-                                                         "isRightTrack(SlowPion)",             // 7
-                                                         "isRightTrack(FastHadron)",             // 8
-                                                         "isRightTrack(MaximumPstar)",         // 9
-                                                         "isRightTrack(Lambda)",                // 10
-                                                         "isRightCategory(Electron)",             // 11
-                                                         "isRightCategory(IntermediateElectron)", // 12
-                                                         "isRightCategory(Muon)",                 // 13
-                                                         "isRightCategory(IntermediateMuon)",     // 14
-                                                         "isRightCategory(KinLepton)",            // 15
-                                                         "isRightCategory(IntermediateKinLepton)",// 16
-                                                         "isRightCategory(Kaon)",                 // 17
-                                                         "isRightCategory(SlowPion)",             // 18
-                                                         "isRightCategory(FastHadron)",             // 19
-                                                         "isRightCategory(MaximumPstar)",         // 20
-                                                         "isRightCategory(Lambda)",                // 21
-                                                         "isRightCategory(KaonPion)",             // 22
-                                                         "isRightCategory(FSC)",                  // 23
-                                                   };
+    const std::vector<std::string> availableExtraInfos = {"isRightTrack(Electron)",             // 0
+                                                          "isRightTrack(IntermediateElectron)", // 1
+                                                          "isRightTrack(Muon)",                 // 2
+                                                          "isRightTrack(IntermediateMuon)",     // 3
+                                                          "isRightTrack(KinLepton)",            // 4
+                                                          "isRightTrack(IntermediateKinLepton)",// 5
+                                                          "isRightTrack(Kaon)",                 // 6
+                                                          "isRightTrack(SlowPion)",             // 7
+                                                          "isRightTrack(FastHadron)",           // 8
+                                                          "isRightTrack(MaximumPstar)",         // 9
+                                                          "isRightTrack(Lambda)",               // 10
+                                                          "isRightCategory(Electron)",             // 11
+                                                          "isRightCategory(IntermediateElectron)", // 12
+                                                          "isRightCategory(Muon)",                 // 13
+                                                          "isRightCategory(IntermediateMuon)",     // 14
+                                                          "isRightCategory(KinLepton)",            // 15
+                                                          "isRightCategory(IntermediateKinLepton)",// 16
+                                                          "isRightCategory(Kaon)",                 // 17
+                                                          "isRightCategory(SlowPion)",             // 18
+                                                          "isRightCategory(FastHadron)",           // 19
+                                                          "isRightCategory(MaximumPstar)",         // 20
+                                                          "isRightCategory(Lambda)",               // 21
+                                                          "isRightCategory(KaonPion)",             // 22
+                                                          "isRightCategory(FSC)",                  // 23
+                                                         };
 
     Manager::FunctionPtr QpOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 3) {
         B2FATAL("Wrong number of arguments (3 required) for meta function QpOf");
       }
-
 
       auto particleListName = arguments[0];
       auto outputExtraInfo = arguments[1];
@@ -1273,20 +1726,18 @@ namespace Belle2 {
       unsigned indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(),
                                    outputExtraInfo)  - availableExtraInfos.begin();
 
-      if (indexRanking == availableExtraInfos.size()) {
+      if (indexRanking == availableExtraInfos.size() or indexOutput == availableExtraInfos.size()) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
         B2FATAL("QpOf: Not available category " << rankingExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
-
-      if (indexOutput == availableExtraInfos.size()) {
-        B2FATAL("QpOf: Not available category " << outputExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-      }
-
 
       auto func = [particleListName, indexOutput, indexRanking](const Particle*) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
@@ -1301,7 +1752,7 @@ namespace Belle2 {
 
           double target_prob = 0;
           if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
-            TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
             if (momParticlei == momParticlei) {
               target_prob = momParticlei.P();
             }
@@ -1329,13 +1780,14 @@ namespace Belle2 {
         } else if (indexRanking == 1 || indexRanking == 3 || indexRanking == 5 || indexRanking == 7 ||
                    indexRanking == 12 || indexRanking == 14 || indexRanking == 16 || indexRanking == 18)
         {
-          qTarget = (-1) * target -> getCharge();
-        } else {
-          qTarget = target -> getCharge();
+          qTarget = (-1) * target->getCharge();
+        } else
+        {
+          qTarget = target->getCharge();
         }
 
         //Get the probability of being right classified flavor from event level
-        double prob = target -> getExtraInfo(availableExtraInfos[indexOutput]);
+        double prob = target->getExtraInfo(availableExtraInfos[indexOutput]);
 
         //float r = abs(2 * prob - 1); //Definition of the dilution factor  */
         //return 0.5 * (qTarget * r + 1);
@@ -1363,19 +1815,19 @@ namespace Belle2 {
                                    outputExtraInfo)  - availableExtraInfos.begin();
 
 
-      if (indexRanking == availableExtraInfos.size()) {
+      if (indexRanking == availableExtraInfos.size() or indexOutput == availableExtraInfos.size()) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
         B2FATAL("weightedQpOf: Not available category " << rankingExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      if (indexOutput == availableExtraInfos.size()) {
-        B2FATAL("weightedQpOf: Not available category " << outputExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-      }
 
       auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo](const Particle*) -> double {
 
@@ -1393,8 +1845,8 @@ namespace Belle2 {
         };
 
         auto compareMomentum = [rankingExtraInfo](const Particle * part1, const Particle * part2)-> bool {
-          double info1 = labToCms(part1 -> get4Vector()).P();
-          double info2 = labToCms(part2 -> get4Vector()).P();
+          double info1 = PCmsLabTransform::labToCms(part1->get4Vector()).P();
+          double info2 = PCmsLabTransform::labToCms(part2->get4Vector()).P();
           return (info1 > info2);
         };
 
@@ -1446,6 +1898,80 @@ namespace Belle2 {
       return func;
     }
 
+
+    Manager::FunctionPtr QpTrack(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 3) {
+        B2FATAL("Wrong number of arguments (3 required) for meta function QpTrack");
+      }
+
+      auto particleListName = arguments[0];
+      auto outputExtraInfo = arguments[1];
+      auto rankingExtraInfo = arguments[2];
+
+      unsigned indexRanking = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   rankingExtraInfo) - availableExtraInfos.begin();
+      unsigned indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   outputExtraInfo)  - availableExtraInfos.begin();
+
+      if (indexRanking == availableExtraInfos.size() or indexOutput == availableExtraInfos.size()) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
+        B2FATAL("QpTrack: Not available category " << rankingExtraInfo <<
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [particleListName, indexOutput, indexRanking](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+        if (!ListOfParticles.isValid()) return 0;
+
+        const auto mdstIndex = particle->getMdstArrayIndex();
+
+        Particle* target = nullptr; //Particle selected as target
+        for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+        {
+          Particle* particlei = ListOfParticles->getParticle(i);
+          if (!particlei)
+            continue;
+
+          if (particlei->getMdstArrayIndex() == mdstIndex) {
+            target = particlei;
+            break;
+          }
+        }
+
+        // nothing found
+        if (!target) return 0;
+
+        double qTarget = 0; //Flavor of the track selected as target
+        // Get the flavor of the track selected as target
+        if (indexRanking == 10 || indexRanking == 21)   // Lambda
+        {
+          qTarget = (-1) * target->getPDGCode() / abs(target->getPDGCode());
+          //     IntermediateElectron    IntermediateMuon        IntermediateKinLepton   SlowPion
+        } else if (indexRanking == 1 || indexRanking == 3 || indexRanking == 5 || indexRanking == 7 ||
+                   indexRanking == 12 || indexRanking == 14 || indexRanking == 16 || indexRanking == 18)
+        {
+          qTarget = (-1) * target->getCharge();
+        } else
+        {
+          qTarget = target->getCharge();
+        }
+
+        //Get the probability of being right classified flavor from event level
+        double prob = target->getExtraInfo(availableExtraInfos[indexOutput]);
+
+        return qTarget * prob;
+      };
+      return func;
+    }
+
     Manager::FunctionPtr variableOfTarget(const std::vector<std::string>& arguments)
     {
 
@@ -1463,10 +1989,16 @@ namespace Belle2 {
       }
 
       if (indexRanking == -1) {
-        B2FATAL("variableOfTarget: category " << rankingExtraInfo << "not available" <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
+        B2FATAL("variableOfTarget: Not available category " << rankingExtraInfo <<
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
       const Variable::Manager::Var* var = Manager::Instance().getVariable(inputVariable);
@@ -1484,7 +2016,7 @@ namespace Belle2 {
 
           double target_prob = 0;
           if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
-            TLorentzVector momParticlei = labToCms(particlei->get4Vector());
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
             if (momParticlei == momParticlei) {
               target_prob = momParticlei.P();
             }
@@ -1523,15 +2055,28 @@ namespace Belle2 {
       }
 
       auto categoryName = arguments[0];
-      auto func = [categoryName](const Particle*) -> double {
-        if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-        || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
-        {
-          B2FATAL("hasTrueTarget: Not available category" << categoryName <<
-          ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-          return 0.0;
-        }
 
+      bool isAvailable = false;
+      for (const auto& name : availableForIsRightCategory) {
+        if (categoryName == name) {
+          isAvailable = true;
+          break;
+        }
+      }
+      if (categoryName == "mcAssociated")
+        isAvailable = false;
+
+      if (!isAvailable) {
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory) {
+          if (name == "mcAssociated") continue;
+          strAvailableForIsRightCategory += name + " ";
+        }
+        B2FATAL("hasTrueTarget: Not available category" << categoryName <<
+                ". The possibilities for the category name are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [categoryName](const Particle*) -> double {
         std::string particleListName;
         std::string trackTargetName = categoryName;
 
@@ -1556,8 +2101,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            bool targetFlag = std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(
-              iParticle));
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            bool targetFlag = std::get<bool>(selectionFunction(iParticle));
             if (targetFlag) {
               particlesHaveMCAssociated = true;
               ++nTargets;
@@ -1580,17 +2126,29 @@ namespace Belle2 {
       if (arguments.size() != 1) {
         B2FATAL("Wrong number of arguments (1 required) for meta function isTrueCategory");
       }
-
       auto categoryName = arguments[0];
-      auto func = [categoryName](const Particle*) -> double {
-        if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-        || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
-        {
-          B2FATAL("isTrueCategory: Not available category" << categoryName <<
-          ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-          return 0.0;
-        }
 
+      bool isAvailable = false;
+      for (const auto& name : availableForIsRightCategory) {
+        if (categoryName == name) {
+          isAvailable = true;
+          break;
+        }
+      }
+      if (categoryName == "mcAssociated")
+        isAvailable = false;
+
+      if (!isAvailable) {
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory) {
+          if (name == "mcAssociated") continue;
+          strAvailableForIsRightCategory += name + " ";
+        }
+        B2FATAL("isTrueCategory: Not available category" << categoryName <<
+                ". The possibilities for the category name are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [categoryName](const Particle*) -> double {
         std::string particleListName;
         std::string trackTargetName = categoryName;
 
@@ -1611,14 +2169,15 @@ namespace Belle2 {
 
 
         double output = 0;
-        int nTargets = 0;
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
         {
           Particle* iParticle = ListOfParticles->getParticle(i);
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            if (std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(iParticle)))
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            if (std::get<bool>(selectionFunction(iParticle)))
               targetParticles.push_back(iParticle);
           } else if (std::get<int>(manager.getVariable("isRightTrack(" + trackTargetName + ")")->function(iParticle))) {
             targetParticles.push_back(iParticle);
@@ -1631,25 +2190,10 @@ namespace Belle2 {
                                                         targetParticle));
           if (isTargetOfRightCategory == 1) {
             output = 1;
-            nTargets += 1; targetParticlesCategory.push_back(targetParticle);
+            targetParticlesCategory.push_back(targetParticle);
           } else if (isTargetOfRightCategory == -2 && output != 1)
             output = realNaN;
         }
-
-        /*            if (nTargets > 1) {
-                      B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
-                      for (auto& iTargetParticlesCategory : targetParticlesCategory) {
-                      const MCParticle* MCp = iTargetParticlesCategory -> getMCParticle();
-
-                      RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
-                      if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");
-
-                      B2INFO("MCParticle has pdgCode = " << MCp -> getPDG() << ", MCMother has pdgCode = " << MCp-> getMother() -> getPDG() << " and " <<
-                      MCp-> getMother() -> getNDaughters() << " daughters.");
-
-                      for (auto& iDaughter : MCp->getMother() -> getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter -> getPDG());
-                      }
-                      }*/
 
         return output;
       };
@@ -1739,7 +2283,7 @@ namespace Belle2 {
           std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
           if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
           else if (iQpCategories.size() != 0) B2FATAL("qpCategory: Category with name " << categoryName
-            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+                                                        << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
         }
         return output;
       };
@@ -1762,7 +2306,7 @@ namespace Belle2 {
           std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
           if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
           else if (iIsTrueCategories.size() != 0) B2FATAL("isTrueFTCategory: Category with name " << categoryName
-            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+                                                            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
         }
 
         return output;
@@ -1786,7 +2330,7 @@ namespace Belle2 {
           std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
           if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
           else if (iHasTrueTargets.size() != 0) B2FATAL("hasTrueTargets: Category with name " << categoryName
-            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+                                                          << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
         }
 
         return output;
@@ -1796,65 +2340,103 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Flavor Tagger Expert Variables");
 
-    REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,
-                      "[Expert] Calculates the missing momentum for a given particle on the tag side.");
-    REGISTER_VARIABLE("cosTPTO"  , cosTPTO ,
-                      "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.");
+    REGISTER_VARIABLE("pMissTag", momentumMissingTagSide, R"DOC(
+[Expert] Calculates the missing momentum for a given particle on the tag side. 
+:noindex:
+)DOC","GeV/c");
+    REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideWithMask,
+                          "[Expert] Calculates the missing momentum for a given particle on the tag side. The unit of the missing momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("cosTPTO"  , cosTPTO, R"DOC(
+[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("cosTPTO(maskName)", cosTPTOWithMask,
+                          "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.\n\n",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
-                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.");
+                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.\n\n","GeV/c");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.\n\n","GeV/c");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
-    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
-                      "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.");
+    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe, R"DOC(
+[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.
+:noindex:
+)DOC","GeV/c");
+    REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeWithMask,
+                          "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is :math:`[\\text{GeV}/\\text{c}]^2` ",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
 
     REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,
                       "[Expert] Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 otherwise.");
 
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,
-                      "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.");
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
-                      "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.");
-    REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
-                      "[Expert] Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, R"DOC(
+[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0(maskName)", isMajorityInRestOfEventFromB0WithMask,
+                          "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.",
+                          Manager::VariableDataType::c_bool);
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, R"DOC(
+[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0bar(maskName)", isMajorityInRestOfEventFromB0barWithMask,
+                          "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.",
+                          Manager::VariableDataType::c_bool);
+    REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks, R"DOC(
+[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("hasRestOfEventTracks(maskName)", hasRestOfEventTracksWithMask,
+                          "[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.",
+                          Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor, R"DOC(
 [Eventbased][Expert] Returns -1 (1) if current RestOfEvent is related to a ``anti-B0`` (``B0``). 
 The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
 The output of the variable is 0 otherwise. 
-If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.");
+If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
 )DOC");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
                       "[Expert] Checks the decay chain of the given particle upwards up to the ``Upsilon(4S)`` resonance and outputs 0 (1) if an ancestor is found to be a ``anti-B0`` (``B0``), if not -2.");
     REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "[Expert] Returns MC-matching flag, see :b2:var:`mcErrors` for the particle, e.g. ``B0`` .");
-    REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
-                      "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).");
+    REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor, R"DOC(
+[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("isRelatedRestOfEventMajorityB0Flavor(maskName)", isRelatedRestOfEventMajorityB0FlavorWithMask,
+                      "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).",
+                      Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "[Expert] Returns 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a ``anti-B0`` (``B0``).");
     REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,  R"DOC(
 [Expert] Returns the MC flavor (+1 or -1) of the accompanying tag-side B meson if the given particle is a correctly truth-matched B candidate, 0 otherwise.
-In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.");
+In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.
 )DOC");
 
 
-    REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables, R"DOC(
+    REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
-The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
+The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
+  REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
 The input values of ``requestedVariable`` can be the following:  cosKaonPion, HaveOpositeCharges.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
-The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
+The input values of ``requestedVariable`` can be the following: pFastCMS in ``GeV/c``, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
 [Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 
@@ -1885,7 +2467,7 @@ The probability is accessed via ``extraInfoName``, which can have the following 
 * isRightCategory(KaonPion),
 * isRightCategory(FSC).
 
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
                       "[Expert] Returns the highest target track probability value for the given category, for allowed input values for ``extraInfoName`` see :b2:var:`hasHighestProbInCat`.", Manager::VariableDataType::c_double);
 
@@ -1905,7 +2487,7 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 * Lambda,
 * mcAssociated.
 
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isRightCategory(particleName)", isRightCategory,  R"DOC(
 [Expert] Returns 1.0 if the class track by ``particleName`` category has the same flavor as the MC target track, 0.0 otherwise.
 Allowed input values for ``particleName`` argument in this variable are the following:
@@ -1925,22 +2507,30 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 * Lambda,
 * mcAssociated.
 
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
 [Eventbased][Expert] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf, R"DOC(
 [Eventbased][Expert] Returns the weighted :math:`q*p` value for a given particle list, provided as the  1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particles in the list are ranked according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The values for the three top particles is combined into an effective (weighted) output.
 )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("QpTrack(particleListName, outputExtraInfo, rankingExtraInfo)", QpTrack,  R"DOC(
+[Expert] Returns the :math:`q*p` value of the particle in a given particle list provided as the 1st argument that is originated from the same Track of given particle.
+where :math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+)DOC", Manager::VariableDataType::c_double);
+
     REGISTER_METAVARIABLE("variableOfTarget(particleListName, inputVariable, rankingExtraInfo)", variableOfTarget, R"DOC(
 [Eventbased][Expert] Returns the value of an input variable provided as the 2nd argument for a particle selected from the given list provided as the 1st argument.
 The particles are ranked according to a flavor tagging extraInfo, provided as the 2nd argument, 
@@ -1982,7 +2572,7 @@ The return values and the corresponding dilution ranges are the following:
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
 Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given combiner method. 
 The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).

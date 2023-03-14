@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMChannelStatusCollector)
+REG_MODULE(KLMChannelStatusCollector);
 
 KLMChannelStatusCollectorModule::KLMChannelStatusCollectorModule() :
   CalibrationCollectorModule(),

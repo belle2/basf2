@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -17,7 +17,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 /* ROOT headers. */
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
 
 /* C++ headers. */
 #include <string>
@@ -52,7 +52,7 @@ namespace Belle2 {
     InitialParticleGeneration m_initial;
 
     /** Boost rotation. */
-    TLorentzRotation m_boost;
+    ROOT::Math::LorentzRotation m_boost;
 
     /** Beam parameters. */
     DBObjPtr<BeamParameters> m_beamParameters;

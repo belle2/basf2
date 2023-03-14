@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 
 namespace Belle2 {
 
   /** Analysis of HLT Tracking DQM plots */
-  class DQMHistAnalysisTrackingHLTModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTrackingHLTModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -26,9 +26,9 @@ namespace Belle2 {
     ~DQMHistAnalysisTrackingHLTModule() {};
 
     /** Module function initialize */
-    void initialize() override;
+    void initialize() override final;
     /** Module function event */
-    void event() override;
+    void event() override final;
 
     // parameters
     bool m_printCanvas = false; /**< if true print the pdf of the canvases */
@@ -36,7 +36,7 @@ namespace Belle2 {
   private:
 
     int m_statThreshold = 1000; /**< minimal number of events to judge */
-    double m_failureRateThreshold = 1; /**< above this rate, there is maybe a problem?*/
+    double m_failureRateThreshold = 0.01; /**< above this rate, there is maybe a problem?*/
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;

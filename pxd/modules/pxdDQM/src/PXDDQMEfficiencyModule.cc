@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiency)
+REG_MODULE(PXDDQMEfficiency);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -185,7 +185,7 @@ void PXDDQMEfficiencyModule::event()
           //If not, even if measured the cluster was thrown away->Not PXD's fault
           bool fitInsideROI = false;
           for (auto& roit : m_ROIs) {
-            if (aVxdID != roit.getSensorID()) {
+            if (aVxdID != (roit.getSensorID()).getID()) {
               continue; //ROI on other sensor
             }
 

@@ -1,53 +1,187 @@
-Changes in the analysis package since release-06-00
----------------------------------------------------
+Changes in the analysis package in light-2207-bengal
+----------------------------------------------------
 
-Neutral Hadron Analysis Tool
+PID Calibration Weight Tools
 ++++++++++++++++++++++++++++
-
- * Added a module that modifies 4-momentum of a neutral hadron in a given decay (e.g. :math:`B^0 \to J/\psi K_L^0`, :math:`B^0 \to
-   p \bar{n} D^*(2010)^-`).
- * Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the
-   above module.
+* Added the module ``scripts/pidDataUtils.py`` to provide a set of tools for preparing and analyzing data with weights
+* Added the script ``scripts/pidTrainWeights.py`` to train a set of calibration weights on a dataset
+* Added an example for training a set of weights and using them in an analysis in ``analysis/examples/PIDCalibration``
 
 Variables
 +++++++++
+* Added the variable `pionID_noARICHwoECL` which returns pionID without using ARICH likelihood for tracks without associated
+  ECL cluster.
+* Added the variable `kaonID_noARICHwoECL` which returns kaonID without using ARICH likelihood for tracks without associated
+  ECL cluster.
+* Added the metavariable `binaryPID_noARICHwoECL` which returns binary PID without using ARICH likelihood
+  for tracks without associated ECL cluster.
 
- * Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
- * Modified ``InvM`` to be calculated at the decay vertex if the particle is V0 or decay at rho > 5 mm.
- * Added ``clusterTotalMCMatchWeight`` which returns the sum of all deposited MC energies that can be used to identify beam
-   background clusters.
- * The no ROE mask case in the ROE-related variables has now a different name: ``"all"`` instead of an empty string ``""``.
-   Similarly to the ParticleLoader's ``all`` particle lists, this name is reserved, user cannot create a mask with this name. 
-   If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically, 
-   but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``. 
- * Added ``v0DaughterNRemovedHits`` which returns the number of track hits removed in V0Finder.
- * Added `hadronicSplitOffSuppression` which returns the output of an MVA that uses shower-related variables to distinguish
-   between true photons and hadronic split-offs.
- * The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this 
-   MVA have also been updated due to a change in training samples used. 
- * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate originated. Use case would be e.g. the FEI.
- * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B meson.
- * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the `mostcommonBTagIndex`.
- * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit in terms of
-   a :math:`\chi^2` value.
+Changes in the analysis package in light-2205-abys
+--------------------------------------------------
+
+Variables
++++++++++
+* Added the variable `nPrimaryMCParticles` which returns the number of primary MC particles.
+* Added the variable `nVirtualPrimaryMCParticles` which returns the number of virtual primary MC particles.
+* Added the variable `nInitialPrimaryMCParticles` which returns the number of initial primary MC particles.
+* Changed the `nCompositeDaughters` so that one can specify the PDG code of composite daughters. If no argument is given, it works
+  same as before. Please note that brackets have to appended even if no argument is given i.e. ``nCompositeDaughters()``.
+* Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of
+  daughters.
+* Added optional argument to `helixExtTheta`, `helixExtPhi` to allow performing the extrapolation using the mass hypothesis that
+  provides the best track fit result, regardless of the particle object's PDG.
+* Users can clear aliases by using ``variables.clearAliases()``, which is useful when processing several independent ``Path``
+  objects in a single basf2 session, e.g. b2luigi job submission.
+* Added the variable `cosAngleBetweenMomentumAndBoostVector` which returns the cosine of angle between momentum and boost vector.
 
 Modules
 +++++++
+* Added an option ``basketsize`` to :func:`modularAnalysis.variablesToNtuple` to set the size of TBaskets in the output ntuple in
+  bytes.
+* Added an argument ``reference_list_name`` to :func:`modularAnalysis.calculateTrackIsolation`. The reference ParticleList is used
+  as reference to calculate the distance for the input ParticleList given by ``input_list``. By default, the ``:all`` list of the
+  same particle type as the ``input_list`` is used.
+* The :b2:mod:`TrackIsoCalculator` and :b2:mod:`ChargedPidMVA` modules now support decay string grammar,
+  which allows to run these modules on daughter or granddaughter particles.
+* In the CDC volume, the calculation of track-to-closest-neighbour distance in the :b2:mod:`TrackIsoCalculator` module now is done
+  for 9 surface layers (was only at the entry surface). Also, the definition of distance has been changed to adapt to each
+  sub-detector's geometrical segmentation.
+* In the :b2:mod:`TrackIsoCalculator` module, added an option to calculate the distance using the track fit result of the most
+  probable mass hypothesis for the particles in the reference list.
 
- * The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale track momenta based on phase-space dependent
-   scaling factors given which are read from payloads according to parameters ``tableName`` and ``scalingFactorName``. The
-   corresponding wrapper function `scaleTrackMomenta` has been also extended accordingly.
- * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
-   `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
-   uncertainties of the K_S0 daughter helix parameters.
- * Variables `nRejectedECLShowersFWDEndcap`, `nRejectedECLShowersBarrel`, `nRejectedECLShowersBWDEndcap`: if the values of the
-   counters exceed uint8_t maximum (255), it is set to 255.
- * The invariant mass of the particles built from the missing momentum in the event (`fillParticleListFromROE` with option
-   ``useMissing=True``) is no longer fixed to zero, but set based on the full missing 4-momentum.
- * A cut provided to the `ParticleCombiner` was always applied to the daughter particle combination, even when choosing one of the
-   two recoil options. Now it is applied to the created mother particle as written in the documentation. This changes the behavior
-   of `reconstructRecoil` and `reconstructRecoilDaughter`.
- * The :b2:mod:`ParticleKinematicFitter` module has been extended to support the fit in which an additional unmeasured photon
-   is assumed along HER/LER. To use the feature, one has to set ``addUnmeasuredPhoton`` and ``fixUnmeasuredToHER`` (``fixUnmeasuredToLER``)
-   to ``true``.
- * Added a `Pi0VetoEfficiencySystematics` module to obtain pi0 veto efficiency Data/MC weights, their statistical and systematic errors as extrainfo variables for a given hard photon and the veto threshold. `addPi0VetoEfficiencySystematics` is a corresponding wrapper function.
+MC Truth Information
+++++++++++++++++++++
+* The :b2:mod:`PrintMCParticles` and :b2:mod:`VariablesToNtuple` (:b2:mod:`VariablesToEventBasedTree`) are extended.
+  The MCParticles information printed by the :b2:mod:`PrintMCParticles` module can be stored in TTree via
+  :b2:mod:`VariablesToNtuple` and :b2:mod:`VariablesToEventBasedTree`. When the :b2:mod:`PrintMCParticles`
+  is called, the branch ``__MCDecayString__`` is automatically created and the same information that is printed
+  by the :b2:mod:`PrintMCParticles`.
+* An argument ``suppressPrint`` is added to `modularAnalysis.printMCParticles` to suppress printing the information
+  on the log message. This option helps to reduce the size of the log message while keeping the branch
+  ``__MCDecayString__`` in a TTree.
+
+MVA-based K_S0 Selector
++++++++++++++++++++++++
+* Added a new function :func:`ksSelector.ksSelector`, which applies MVA-based selection of K_S0 particleList
+* Added a example for usage and training of ``ksSelector`` at ``B2A910``, ``B2A911``, and ``B2A912``
+
+Changes in the analysis package in light-2203-zeus
+--------------------------------------------------
+
+Lepton ID Analysis Helper
++++++++++++++++++++++++++
+* Added :func:`stdCharged.stdLep` helper to build standard lepton lists for a number of supported working
+  points and LID methods (Likelihood ratio or BDT, global or binary). The helper also decorates the particles with the
+  recommended Data/MC corrections and associated uncertainties for efficiency and fake rates, based on the chosen GT.
+
+Vertex Fitting
+++++++++++++++
+* Fixed the calculation of kinematics after vertex KFit with selected particles. Disabled the feature of selecting fit particles
+  for KFit except for vertex fit.
+
+Variables
++++++++++
+* Removed ``EventType``, which was deprecated for more than a year since light-2012-minos.
+* Deprecated the variable `daughterInvariantMass`, which duplicates `daughterInvM`.
+* Added new Flavor Tagger related meta-variables to use ROE-mask correctly, ``pMissTag``, ``cosTPTO``, ``ptTracksRoe``,
+  ``pt2TracksRoe``, ``isMajorityInRestOfEventFromB0``, ``isMajorityInRestOfEventFromB0bar``, ``hasRestOfEventTracks``, and
+  ``isRelatedRestOfEventMajorityB0Flavor``. Added an argument ``maskName`` to ``BtagToWBosonVariables``.
+* Added the variable `trackFitCovariance`, which returns the track fit covariance matrix element corresponding to the two provided
+  indices.
+
+Modules
++++++++
+* The :b2:mod:`TrackingMomentum` module can now also smear track momenta based on phase-space dependent smearing factors which are
+  read from payloads according to parameters ``payloadName`` and ``smearingFactorName``. The corresponding wrapper function
+  `smearTrackMomenta` has been added. The argument ``tableName`` has been renamed as ``payloadName`` in `scaleTrackMomenta`.
+* Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
+* Added an argument ``prefix`` to :func:`flavorTagger.flavorTagger` so that one can choose the version of weight files.
+
+Changes in the analysis package in light-2112-uranus
+----------------------------------------------------
+
+Vertex Fitting
+++++++++++++++
+* Added a new fit-type option ``recoilmass`` to function :func:`vertex.kFit`. The kinematic fit is performed with a constraint
+  of a recoil mass specified by the option ``recoilMass``.
+* Fixed a bug in ``fourC`` and ``massfourC`` kfit. The mass of final-state particles were not fixed in old version.
+
+Variables
++++++++++
+* Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit
+  in terms of a :math:`\chi^2` value.
+
+Modules
++++++++
+* A cut provided to the `ParticleCombiner` was always applied to the daughter particle combination, even when choosing one of the
+  two recoil options. Now it is applied to the created mother particle as written in the documentation. This changes the behavior
+  of `reconstructRecoil` and `reconstructRecoilDaughter`.
+* The :b2:mod:`ParticleKinematicFitter` module has been extended to support the fit in which an additional unmeasured photon is
+  assumed along HER/LER. To use the feature, one has to set ``addUnmeasuredPhoton`` and ``fixUnmeasuredToHER``
+  (``fixUnmeasuredToLER``) to ``true``.
+* Added a `Pi0VetoEfficiencySystematics` module to obtain pi0 veto efficiency Data/MC weights, their statistical and systematic
+  errors as extrainfo variables for a given hard photon and the veto threshold. `addPi0VetoEfficiencySystematics` is a
+  corresponding wrapper function. The allowed range of the veto threshold is extended to (0.10,0.99).
+
+PID Priors
+++++++++++
+* Added ``analysis-train-priors`` tool that trains a pytorch model for calculating PID priors using an ntuple containing momentum
+  and cos(:math:`\theta`) information. It generates a second order combination of the previously mentioned variables along with
+  transverse momentum giving a total of nine features and trains the model using a taylor series of cross entropy loss to reduce
+  the effect of outliers on the training.
+* For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using
+  the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.
+
+Changes in the analysis package in light-2110-tartarus
+------------------------------------------------------
+
+Variables
++++++++++
+* The no ROE mask case in the ROE-related variables has now a different name: ``"all"`` instead of an empty string ``""``.
+  Similarly to the ParticleLoader's ``all`` particle lists, this name is reserved, user cannot create a mask with this name.
+  If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically,
+  but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``.
+* Added ``v0DaughterNRemovedHits`` which returns the number of track hits removed in V0Finder.
+* Added `hadronicSplitOffSuppression` which returns the output of an MVA that uses shower-related variables to distinguish
+  between true photons and hadronic split-offs.
+* The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this
+  MVA have also been updated due to a change in training samples used.
+* Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate
+  originated. Use case would be e.g. the FEI.
+* Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B
+  meson.
+* Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the
+  `mostcommonBTagIndex`.
+
+Modules
++++++++
+* Variables `nRejectedECLShowersFWDEndcap`, `nRejectedECLShowersBarrel`, `nRejectedECLShowersBWDEndcap`: if the values of the
+  counters exceed uint8_t maximum (255), it is set to 255.
+* The invariant mass of the particles built from the missing momentum in the event (`fillParticleListFromROE` with option
+  ``useMissing=True``) is no longer fixed to zero, but set based on the full missing 4-momentum.
+
+Changes in the analysis package in light-2108-selene
+----------------------------------------------------
+
+Neutral Hadron Analysis Tool
+++++++++++++++++++++++++++++
+* Added a module that modifies 4-momentum of a neutral hadron in a given decay (e.g. :math:`B^0 \to J/\psi K_L^0`, :math:`B^0 \to
+  p \bar{n} D^*(2010)^-`).
+* Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the
+  above module.
+
+Variables
++++++++++
+* Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
+* Modified ``InvM`` to be calculated at the decay vertex if the particle is V0 or decay at rho > 5 mm.
+* Added ``clusterTotalMCMatchWeight`` which returns the sum of all deposited MC energies that can be used to identify beam
+  background clusters.
+
+Modules
++++++++
+* The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale track momenta based on phase-space dependent
+  scaling factors given which are read from payloads according to parameters ``tableName`` and ``scalingFactorName``. The
+  corresponding wrapper function `scaleTrackMomenta` has also been extended accordingly.
+* The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
+  `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
+  uncertainties of the K_S0 daughter helix parameters.

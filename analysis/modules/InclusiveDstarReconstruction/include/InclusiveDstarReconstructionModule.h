@@ -18,8 +18,6 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
 
-#include <TLorentzVector.h>
-
 #include <string>
 #include <memory>
 
@@ -80,7 +78,7 @@ namespace Belle2 {
      * @param pion - a pion particle
      * @returns estimated D* four momentum
      * */
-    TLorentzVector estimateDstarFourMomentum(const Particle* pion);
+    ROOT::Math::PxPyPzEVector estimateDstarFourMomentum(const Particle* pion);
 
     /**
      * Checks if the given pion is list if compatible with the charge

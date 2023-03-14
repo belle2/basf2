@@ -444,7 +444,7 @@ class TestSampleList:
             processing (str): Data processing campaign number to query.
             experiment (str, int): Experiment number to query.
             beam_energy (str): Beam energy to query.
-            general_skim (skim): ``GeneralSkimName`` to query.
+            general_skim (str): ``GeneralSkimName`` to query.
             exact_match (bool): If passed, an error is raised if there is not exactly
                 one matching sample. If there is exactly one matching sample, then the
                 single sample is returned, rather than a list.

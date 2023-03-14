@@ -12,14 +12,9 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 #include <TMatrixFSym.h>
+#include <Math/Vector3D.h>
 
 namespace TreeFitter {
-
-  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
-    : ParticleBase(particle, mother), m_params(), m_hasEnergy(true)
-  {
-    updateParams();
-  }
 
   RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
                                bool massConstraint)
@@ -47,8 +42,8 @@ namespace TreeFitter {
 
   void RecoComposite::updateParams()
   {
-    const TVector3 pos = particle()->getVertex();
-    const TVector3 mom = particle()->getMomentum();
+    const ROOT::Math::XYZVector pos = particle()->getVertex();
+    const ROOT::Math::XYZVector mom = particle()->getMomentum();
     const double energy = particle()->getEnergy();
 
     m_params = Eigen::Matrix<double, 7, 1>::Zero(7, 1);
@@ -72,7 +67,7 @@ namespace TreeFitter {
 
     for (int row = 0; row < 3; ++row) { //then the x block
       for (int col = 0; col <= row; ++col) {
-        m_covariance(row, col) = cov7in[3 + row][3 + col];
+        m_covariance(row, col) = cov7in[4 + row][4 + col];
       }
     }
   }

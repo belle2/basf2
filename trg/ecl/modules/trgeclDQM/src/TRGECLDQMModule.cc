@@ -72,7 +72,7 @@ void TRGECLDQMModule::defineHisto()
 
 
 
-  const char* label[44] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "Low multi bit 12", "Low multi bit 13", "mumu bit", "prescale bit", "ECL burst bit" , "2D Bhabha bit 1", "2D Bhabha bit 2"  , "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
+  const char* label[44] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "Low multi bit 12", "Low multi bit 13", "mumu bit", "prescale bit", "ECL burst bit", "2D Bhabha bit 1", "2D Bhabha bit 2", "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
 
 
   for (int j = 0; j < 29; j++) {

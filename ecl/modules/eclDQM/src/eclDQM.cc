@@ -6,37 +6,36 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclDQM/eclDQM.h>
 
-//Boost
-#include <boost/format.hpp>
-#include <boost/range/combine.hpp>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
-//FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-//TRG
 #include <mdst/dataobjects/TRGSummary.h>
 
-//ROOT
-#include <TProfile.h>
+/* Boost headers. */
+#include <boost/format.hpp>
+#include <boost/range/combine.hpp>
+
+/* ROOT headers. */
+#include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
+#include <TProfile.h>
 
-//STL
+/* C++ headers. */
 #include <iostream>
 #include <iterator>
 #include <cmath>
@@ -46,7 +45,7 @@
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLDQM)
+REG_MODULE(ECLDQM);
 
 ECLDQMModule::ECLDQMModule()
   : HistoModule(),
@@ -89,51 +88,44 @@ void ECLDQMModule::defineHisto()
 
   //1D histograms creation.
   h_evtot = new TH1F("event", "Total event bank", 1, 0, 1);
-  h_evtot->SetOption("LIVE");
 
   h_quality = new TH1F("quality", "Fit quality flag. 0-good, 1-integer overflow, 2-low amplitude, 3-bad chi2", 4, 0, 4);
   h_quality->GetXaxis()->SetTitle("Flag number");
   h_quality->GetYaxis()->SetTitle("ECL hits count");
   h_quality->SetFillColor(kPink - 4);
-  h_quality->SetOption("LIVE");
 
   h_quality_other = new TH1F("quality_other", "Fit quality flag for unexpectedly saved waveforms", 4, 0, 4);
   h_quality_other->GetXaxis()->SetTitle("Flag number. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
   h_quality_other->SetFillColor(kPink - 4);
-  h_quality_other->SetOption("LIVE");
 
-  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID", 8736, 1, 8737);
+  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID",
+                           ECLElementNumbers::c_NCrystals, 1, 8737);
   h_bad_quality->GetXaxis()->SetTitle("Cell ID");
   h_bad_quality->GetYaxis()->SetTitle("ECL hits count");
-  h_bad_quality->SetOption("LIVE");
 
   h_trigtag1 = new TH1F("trigtag1", "Consistency b/w global event number and trigger tag. 0-good, 1-DQM error", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Flag number");
   h_trigtag1->GetYaxis()->SetTitle("Events count");
   h_trigtag1->SetDrawOption("hist");
-  h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
 
   h_adc_hits = new TH1F("adc_hits", "Fraction of high-energy hits (E > 50 MeV)", 1001, 0, 1.001);
   h_adc_hits->GetXaxis()->SetTitle("Fraction");
   h_adc_hits->GetYaxis()->SetTitle("Events count");
-  h_adc_hits->SetOption("LIVE");
 
   h_time_crate_Thr1GeV_large = new TH1F("time_crate_Thr1GeV_large",
                                         "Number of hits with timing outside #pm 100 ns per Crate ID (E > 1 GeV)",
                                         52, 1, 53);
   h_time_crate_Thr1GeV_large->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_time_crate_Thr1GeV_large->GetYaxis()->SetTitle("ECL hits count");
-  h_time_crate_Thr1GeV_large->SetOption("LIVE");
 
   for (const auto& id : m_HitThresholds) {
     std::string h_name, h_title;
     h_name = str(boost::format("cid_Thr%1%MeV") % id);
     h_title = str(boost::format("Occupancy per Cell ID (E > %1% MeV)") % id);
-    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8736, 1, 8737);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), ECLElementNumbers::c_NCrystals, 1, 8737);
     h->GetXaxis()->SetTitle("Cell ID");
     h->GetYaxis()->SetTitle("Occupancy (hits / events_count)");
-    h->SetOption("LIVE");
     h_cids.push_back(h);
   }
 
@@ -143,7 +135,6 @@ void ECLDQMModule::defineHisto()
     h_title = str(boost::format("Total energy (thr = %1% MeV)") % id);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), (int)(100 * m_EnergyUpperThr), 0, m_EnergyUpperThr);
     h->GetXaxis()->SetTitle("Energy, [GeV]");
-    h->SetOption("LIVE");
     h_edeps.push_back(h);
   }
 
@@ -158,8 +149,6 @@ void ECLDQMModule::defineHisto()
     TH1F* h_time_endcap = new TH1F(h_end_name.c_str(), h_end_title.c_str(), 206, -1030, 1030);
     h_time_barrel->GetXaxis()->SetTitle("Time, [ns]");
     h_time_endcap->GetXaxis()->SetTitle("Time, [ns]");
-    h_time_barrel->SetOption("LIVE");
-    h_time_endcap->SetOption("LIVE");
     h_time_barrels.push_back(h_time_barrel);
     h_time_endcaps.push_back(h_time_endcap);
   }
@@ -172,7 +161,6 @@ void ECLDQMModule::defineHisto()
     h_title = str(boost::format("Number of hits in event (E > %1% MeV)") % id1);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), id2, 0, id2);
     h->GetXaxis()->SetTitle("Number of hits");
-    h->SetOption("LIVE");
     h_ncevs.push_back(h);
   }
 
@@ -183,7 +171,6 @@ void ECLDQMModule::defineHisto()
     h_title = str(boost::format("Reconstructed time for ECL crate #%1% with E > 1 GeV") % (crate));
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 400, -100, 100);
     h->GetXaxis()->SetTitle("Time [ns]");
-    h->SetOption("LIVE");
     h_time_crate_Thr1GeV.push_back(h);
   }
 
@@ -199,24 +186,19 @@ void ECLDQMModule::defineHisto()
     if (id == "dphy") h_title = "#frac{Saved}{Expected} waveforms for delayed bhabha (DPHY) events";
     if (id == "all") h_title = "#frac{Saved}{Expected} waveforms for all events";
     h_cell_name = str(boost::format("wf_cid_%1%") % (id));
-    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), 8736, 1, 8737);
+    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), ECLElementNumbers::c_NCrystals, 1, 8737);
     h_cell->GetXaxis()->SetTitle("Cell ID");
-    h_cell->SetOption("LIVE");
     if (id == "psd") {
-      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid", 8736, 1, 8737);
-      h_cell_psd_norm->SetOption("LIVE");
+      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid", ECLElementNumbers::c_NCrystals, 1, 8737);
     }
     if (id == "logic") {
       h_evtot_logic = new TH1F("event_logic", "Event bank for logic", 1, 0, 1);
-      h_evtot_logic->SetOption("LIVE");
     }
     if (id == "rand") {
       h_evtot_rand = new TH1F("event_rand", "Event bank for rand", 1, 0, 1);
-      h_evtot_rand->SetOption("LIVE");
     }
     if (id == "dphy") {
       h_evtot_dphy = new TH1F("event_dphy", "Event bank for dphy", 1, 0, 1);
-      h_evtot_dphy->SetOption("LIVE");
     }
     h_cells.push_back(h_cell);
   }
@@ -227,29 +209,24 @@ void ECLDQMModule::defineHisto()
                                52, 1, 53, 11, -1, 10);
   h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Data consistency flag");
-  h_trigtag2_trigid->SetOption("LIVE");
 
-  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", 8736, 1, 8737);
+  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", ECLElementNumbers::c_NCrystals, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC units, #approx 0.05 MeV)");
-  h_pedmean_cellid->SetOption("LIVE");
 
   h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal stddev vs Cell ID",
-                                 8736, 1, 8737);
+                                 ECLElementNumbers::c_NCrystals, 1, 8737);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
-  h_pedrms_cellid->SetOption("LIVE");
 
   h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal stddev vs #theta ID",
                                   68, 0, 68);
   h_pedrms_thetaid->GetXaxis()->SetTitle("#theta ID (0-12=FWD, 59-67=BWD endcap)");
   h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
-  h_pedrms_thetaid->SetOption("LIVE");
 
   h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs Crate ID", 52, 1, 53, 145, 0, 145);
   h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time (only even, 0-142)");
-  h_trigtime_trigid->SetOption("LIVE");
 
   //cd into parent directory.
 

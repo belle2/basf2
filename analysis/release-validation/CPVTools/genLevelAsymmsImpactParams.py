@@ -250,14 +250,12 @@ def makePlotsForEachParticleKind(cutOnUpsilonFourS=""):
             limXmin = variablesPlotParamsDict[inputVariable][2]
             limXmax = variablesPlotParamsDict[inputVariable][3]
 
-            negativeHistogram = ROOT.TH1F("negative" + Particle + str(Belle2.makeROOTCompatible(inputVariable)), "",
-                                          nBins,
-                                          limXmin,
-                                          limXmax)
-            positiveHistogram = ROOT.TH1F("positive" + Particle + str(Belle2.makeROOTCompatible(inputVariable)), "",
-                                          nBins,
-                                          limXmin,
-                                          limXmax)
+            negativeHistogram = ROOT.TH1F(
+                "negative" + Particle + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)),
+                "", nBins, limXmin, limXmax)
+            positiveHistogram = ROOT.TH1F(
+                "positive" + Particle + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)),
+                "", nBins, limXmin, limXmax)
             condition = "MCParticles.m_status%2==1 && abs(MCParticles.m_pdg) == " + particleConditions[Particle][1] + " && "
             condition = condition + cutOnUpsilonFourS
             condition = condition + " abs(MCParticles.m_pdg[MCParticles.m_mother - 1])==511 && "
@@ -271,14 +269,14 @@ def makePlotsForEachParticleKind(cutOnUpsilonFourS=""):
                       factorMultiplication +
                       ">> negative" +
                       Particle +
-                      str(Belle2.makeROOTCompatible(inputVariable)), condition +
+                      str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), condition +
                       particleConditions[Particle][2])
 
             tree.Draw(variablesPlotParamsDict[inputVariable][0] +
                       factorMultiplication +
                       ">> positive" +
                       Particle +
-                      str(Belle2.makeROOTCompatible(inputVariable)), condition +
+                      str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), condition +
                       particleConditions[Particle][3])
 
             negativeScalingFactor = negativeHistogram.Integral()
@@ -397,7 +395,7 @@ def makePlotsForEachParticleKind(cutOnUpsilonFourS=""):
 
             ax2.set_xlabel(xLabel, fontsize=50)
             plt.savefig(workingDirectory + '/GenLevelVariablesPlots' + '/' + belleOrBelle2 + withOrWithoutCut +
-                        "_" + Particle + "_" + str(Belle2.makeROOTCompatible(inputVariable)) + '.pdf')
+                        "_" + Particle + "_" + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)) + '.pdf')
             fig1.clear()
 
             negativeHistogram.Delete()
@@ -455,11 +453,11 @@ def makeZtagDecayPlot(cutOnUpsilonFourS="", asymplot=True):
         limXmin = variablesPlotB0tag[inputVariable][2]
         limXmax = variablesPlotB0tag[inputVariable][3]
 
-        negativeHistogram = ROOT.TH1F("negative" + Particle + str(Belle2.makeROOTCompatible(inputVariable)), "",
+        negativeHistogram = ROOT.TH1F("negative" + Particle + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), "",
                                       nBins,
                                       limXmin,
                                       limXmax)
-        positiveHistogram = ROOT.TH1F("positive" + Particle + str(Belle2.makeROOTCompatible(inputVariable)), "",
+        positiveHistogram = ROOT.TH1F("positive" + Particle + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), "",
                                       nBins,
                                       limXmin,
                                       limXmax)
@@ -473,10 +471,10 @@ def makeZtagDecayPlot(cutOnUpsilonFourS="", asymplot=True):
             factorMultiplication = "*10 "
 
         tree.Draw(variablesPlotB0tag[inputVariable][0] + factorMultiplication + ">> negative" + Particle +
-                  str(Belle2.makeROOTCompatible(inputVariable)), condition + particleCondsB0tag[Particle][2])
+                  str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), condition + particleCondsB0tag[Particle][2])
 
         tree.Draw(variablesPlotB0tag[inputVariable][0] + factorMultiplication + ">> positive" + Particle +
-                  str(Belle2.makeROOTCompatible(inputVariable)), condition + particleCondsB0tag[Particle][3])
+                  str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), condition + particleCondsB0tag[Particle][3])
 
         negativeScalingFactor = negativeHistogram.Integral()
         positiveScalingFactor = positiveHistogram.Integral()
@@ -595,7 +593,7 @@ def makeZtagDecayPlot(cutOnUpsilonFourS="", asymplot=True):
 
         plt.savefig(workingDirectory + '/GenLevelVariablesPlots' + '/' +
                     belleOrBelle2 + withOrWithoutCut + "_" + Particle + "_" +
-                    str(Belle2.makeROOTCompatible(inputVariable)) + '.pdf')
+                    str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)) + '.pdf')
         fig1.clear()
 
         negativeHistogram.Delete()

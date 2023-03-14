@@ -7,22 +7,15 @@
  **************************************************************************/
 #include <tracking/modules/recoTrackParticleLoader/RecoTrackParticleLoaderModule.h>
 
-#include <framework/datastore/StoreArray.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
+#include <framework/geometry/B2Vector3.h>
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
 
 using namespace Belle2;
 
-REG_MODULE(RecoTrackParticleLoader)
+REG_MODULE(RecoTrackParticleLoader);
 
 RecoTrackParticleLoaderModule::RecoTrackParticleLoaderModule() :
   Module()
@@ -41,29 +34,24 @@ RecoTrackParticleLoaderModule::RecoTrackParticleLoaderModule() :
 
 void RecoTrackParticleLoaderModule::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
-  recoTracks.isRequired();
+  m_RecoTracks.isRequired(m_recoTrackColName);
 
-  StoreArray<Particle> particles;
-  particles.registerInDataStore();
-  particles.registerRelationTo(recoTracks);
+  m_Particles.registerInDataStore();
+  m_Particles.registerRelationTo(m_RecoTracks);
 
+  // Seems to not be needed anywhere, no idea why it's here
   StoreObjPtr<ParticleExtraInfoMap> extraInfo;
   extraInfo.registerInDataStore();
 
-  StoreObjPtr<ParticleList> pList(m_particleListName);
-  pList.registerInDataStore();
+  m_ParticleList.registerInDataStore(m_particleListName);
 }
 
 void RecoTrackParticleLoaderModule::event()
 {
-  StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
-  StoreArray<Particle> particles;
-  StoreObjPtr<ParticleList> pList(m_particleListName);
-  pList.create();
-  pList->initialize(m_pdgCode, m_particleListName);
+  m_ParticleList.create();
+  m_ParticleList->initialize(m_pdgCode, m_particleListName);
 
-  for (auto& recoTrack : recoTracks) {
+  for (auto& recoTrack : m_RecoTracks) {
     if (!recoTrack.wasFitSuccessful()) {
       B2DEBUG(20, "Skipping unfitted RecoTrack.");
       continue;
@@ -73,7 +61,7 @@ void RecoTrackParticleLoaderModule::event()
     auto firstHit = recoTrack.getMeasuredStateOnPlaneFromFirstHit(rep);
     genfit::MeasuredStateOnPlane extrapolatedMSoP = firstHit;
     try {
-      extrapolatedMSoP.extrapolateToLine(TVector3(0.0, 0.0, 0.0), TVector3(0.0, 0.0, 1.0));
+      extrapolatedMSoP.extrapolateToLine(B2Vector3D(0.0, 0.0, 0.0), B2Vector3D(0.0, 0.0, 1.0));
     } catch (...) {
       B2WARNING("Could not extrapolate the fit result for pdg " << pdg <<
                 " to the IP. Why, I don't know.");
@@ -87,14 +75,14 @@ void RecoTrackParticleLoaderModule::event()
     double charge = rep->getCharge(extrapolatedMSoP); // mplTrackRep returns magnetic charge
     double E = std::sqrt(mom.x() * mom.x() + mom.y() * mom.y() + mom.z() * mom.z() + mass * mass);
     double pValue = recoTrack.getTrackFitStatus(rep)->getPVal();
-    TLorentzVector lorentzMom(mom.x(), mom.y(), mom.z(), E);
+    ROOT::Math::PxPyPzEVector lorentzMom(mom.x(), mom.y(), mom.z(), E);
 
-    Particle* newPart = particles.appendNew(lorentzMom, pdg);
-    newPart->setVertex(pos);
+    Particle* newPart = m_Particles.appendNew(lorentzMom, pdg);
+    newPart->setVertex(ROOT::Math::XYZVector(pos));
     newPart->setPValue(pValue);
     newPart->writeExtraInfo("magCharge", charge);
     newPart->writeExtraInfo("massFromFit", mass);
     newPart->addRelationTo(&recoTrack);
-    if (std::abs(pdg) == m_pdgCode) pList->addParticle(newPart);
+    if (std::abs(pdg) == m_pdgCode) m_ParticleList->addParticle(newPart);
   }
 }

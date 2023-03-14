@@ -15,7 +15,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVD6SampleEventSkim)
+REG_MODULE(SVD6SampleEventSkim);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -16,7 +16,7 @@ Double_t data[36][13];
 Double_t data_err[36][13];
 Double_t malt[6]={ 5.0, 5.0, 5.0, 1.0, 1.0, 0.5};
 
-static void FCN(int &npar, Double_t *gin, Double_t &f, Double_t *par, int iflag){
+static void FCN(int &npar, Double_t *gin, Double_t &f, const Double_t *par, int iflag){
 
   f = 0;
   for (Int_t i = 0; i < 36; i++){  // loop over graphs

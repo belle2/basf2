@@ -32,8 +32,10 @@
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is master_2020-05-02
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
-[INFO]  - ROE related to particle with PDG: 511
-[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - ROE related to particle with
+	PDG = 511
+[INFO]  - ROE related to MC particle with
+	PDG = -1
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 0
 [INFO]  - No. of K_L0 and neutrons in ROE: 0
@@ -53,8 +55,10 @@
 [INFO]      o) nROE_Composites(cleanMask) = 3
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
-[INFO]  - ROE related to particle with PDG: 511
-[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - ROE related to particle with
+	PDG = 511
+[INFO]  - ROE related to MC particle with
+	PDG = -1
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 0
 [INFO]  - No. of K_L0 and neutrons in ROE: 0

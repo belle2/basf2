@@ -29,7 +29,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CurlTagger)
+REG_MODULE(CurlTagger);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -39,12 +39,12 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC("Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.")DOC");
+    R"DOC(Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.)DOC");
 
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists to check for curls or use for training");
   addParam("belle", m_BelleFlag, "flag to distinuguish Belle (true) from Belle II (false) data", false);
-  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.5);
+  addParam("ptCut", m_PtCut, "Preselection pt cut. Only consider tracks below threshold as candidates for curlers.", 0.5);
   addParam("selectorType", m_SelectorType,
            "the name of the selector to use when deciding if two reconstructed particles are the same true particle, available : 'cut', 'mva'",
            std::string("cut"));

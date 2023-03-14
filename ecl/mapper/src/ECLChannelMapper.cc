@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //
 #include <ecl/mapper/ECLChannelMapper.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
@@ -70,7 +77,7 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 
-      if (cellID > ECL_TOTAL_CHANNELS) {
+      if (cellID > static_cast<float>(ECL_TOTAL_CHANNELS)) {
         B2ERROR("ECLChannelMapper:: wrong cellID in the init file " << eclMapFileName);
         return false;
       }
@@ -219,37 +226,61 @@ ECLChannelMap ECLChannelMapper::getDBObject()
   return map;
 }
 
-int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
+int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE, bool pcie40)
 {
   int iCrate;
 
-  if (iFINESSE > ECL_FINESSES_IN_COPPER - 1) {
-    B2ERROR("ECLChannelMapper::ERROR:: wrong FINESSE " << iFINESSE);
-    return -1;
-  }
+  if (!pcie40) {
+    // Converting from COPPER nodes
+    if (iFINESSE > ECL_FINESSES_IN_COPPER - 1) {
+      B2ERROR("ECLChannelMapper::ERROR:: wrong FINESSE " << iFINESSE);
+      return -1;
+    }
 
-  if ((iCOPPERNode & BECL_ID) == BECL_ID) {
-
-    iCrate = (iCOPPERNode - BECL_ID - 1) * ECL_FINESSES_IN_COPPER + iFINESSE + 1;
-
-  } else if ((iCOPPERNode & EECL_ID) == EECL_ID) {
-
-    iCrate = ECL_BARREL_CRATES + iFINESSE * ECL_FWD_CRATES + (iCOPPERNode - EECL_ID - 1) + 1;
-
+    if ((iCOPPERNode & BECL_ID) == BECL_ID) {
+      iCrate = (iCOPPERNode - BECL_ID - 1) * ECL_FINESSES_IN_COPPER + iFINESSE + 1;
+    } else if ((iCOPPERNode & EECL_ID) == EECL_ID) {
+      iCrate = ECL_BARREL_CRATES + iFINESSE * ECL_FWD_CRATES + (iCOPPERNode - EECL_ID - 1) + 1;
+    } else {
+      B2ERROR("ECLChannelMapper::ERROR:: wrong COPPER NodeID 0x" << std::hex << iCOPPERNode << " BECL_ID 0x" << BECL_ID << " EECL_ID 0x"
+              << EECL_ID);
+      return -1;
+    }
   } else {
+    // Converting from PCIe40 nodes
+    const int ECL_BARREL_FEE_IN_PCIE40 = 18;
+    const int ECL_ENDCAP_FEE_IN_PCIE40 = 16;
 
-    B2ERROR("ECLChannelMapper::ERROR:: wrong COPPER NodeID 0x" << std::hex << iCOPPERNode << " BECL_ID 0x" << BECL_ID << " EECL_ID 0x"
-            << EECL_ID);
-    return -1;
+    // crates  1..18 -> PCIe40, #1
+    // crates 19..36 -> PCIe40, #2
+    // crates 37,45,38,46,..,44,52 -> PCIe40, #3
+
+    if (iCOPPERNode == BECL_ID + 1 || iCOPPERNode == BECL_ID + 2) {
+      // Barrel crates
+      iCrate = (iCOPPERNode - BECL_ID - 1) * ECL_BARREL_FEE_IN_PCIE40 + iFINESSE + 1;
+      if (iFINESSE >= ECL_BARREL_FEE_IN_PCIE40) {
+        B2ERROR("ECLChannelMapper:: slot id must be less than 18, got slot id " << iFINESSE);
+        return -1;
+      }
+    } else if (iCOPPERNode == BECL_ID + 3) {
+      // Endcap crates
+      iCrate = 2 * ECL_BARREL_FEE_IN_PCIE40 + (iFINESSE % 2) * 8 + iFINESSE / 2 + 1;
+      if (iFINESSE >= ECL_ENDCAP_FEE_IN_PCIE40) {
+        B2ERROR("ECLChannelMapper:: slot id must be less than 16, got slot id " << iFINESSE);
+        return -1;
+      }
+    } else {
+      B2ERROR("ECLChannelMapper:: wrong COPPER NodeID 0x" << std::hex << iCOPPERNode << " expected BECL_ID 0x" << BECL_ID);
+      return -1;
+    }
   }
-//    B2DEBUG(100,"ECLChannelMapper:: " << std::hex << "0x"<<iCOPPERNode << " " << iFINESSE << " iCrate = " << std::dec << iCrate);
+
   if (iCrate > ECL_CRATES || iCrate < 1) {
     B2ERROR("ECLChannelMapper::getCrateID::ERROR:: wrong crate number " << iCrate << " return -1");
     return -1;
   }
 
   return iCrate;
-
 }
 
 int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)

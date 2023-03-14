@@ -8,6 +8,7 @@
 
 import basf2
 from ROOT import Belle2
+import nntd
 
 ################################################################################
 # Defining some standard names for trigger tracks here:
@@ -45,11 +46,16 @@ def filterTRG(path):
 
 
 class nnt_eventfilter(basf2.Module):
-    def initialize(self):
-        self.tracksegmentsname = hwneuroinputsegmenthits,
-        self.twodtracksname = hwneuroinput2dfindertracks,
-        self.neurotracksname = hwneurotracks,
-        self.recotracksname = "RecoTracks"
+    def initialize(self,
+                   tracksegmentsname=hwneuroinputsegmenthits,
+                   twodtracksname=hwneuroinput2dfindertracks,
+                   neurotracksname=hwneurotracks,
+                   recotracksname="RecoTracks"
+                   ):
+        self.tracksegmentsname = tracksegmentsname
+        self.twodtracksname = twodtracksname
+        self.neurotracksname = neurotracksname
+        self.recotracksname = recotracksname
         self.nullpath = basf2.create_path()
 
     def event(self):
@@ -68,35 +74,50 @@ class nnt_eventfilter(basf2.Module):
         return isgoodquality
 
 
-class nnt_eventfilter(basf2.Module):
-    def initialize(self,
-                   tracksegmentsname=hwneuroinputsegmenthits,
-                   twodtracksname=hwneuroinput2dfindertracks,
-                   neurotracksname=hwneurotracks,
-                   recotracksname="RecoTracks"
-                   ):
-        self.tracksegmentsname = tracksegmentsname
-        self.twodtracksname = twodtracksname
-        self.neurotracksname = neurotracksname
-        self.recotracksname = recotracksname
-        self.nullpath = basf2.create_path()
+class randommaker(basf2.Module):
+    def initialize(self):
+        self.counter = 0
 
     def event(self):
-        self.return_value(bool(self.hastrginfo() and
-                               self.neurotrack_allgoodquality()
-                               ))
-        self.if_false(self.nullpath)
+        print("counter is " + str(self.counter))
+        if self.counter % 1000 == 0:
+            print("case 0")
+            self.return_value(0)
+        elif self.counter % 3 == 0:
+            print("case 1")
+            self.return_value(1)
+        elif self.counter % 3 == 1:
+            print("case 2")
+            self.return_value(2)
+        elif self.counter % 3 == 2:
+            print("case 3")
+            self.return_value(3)
+        else:
+            print("some kind of error")
+        self.counter += 1
 
-    def hastrginfo(self):
-        return bool(Belle2.PyStoreArray(self.twodtracksname).getEntries() > 0)
 
-    def neurotrack_allgoodquality(self):
-        isgoodquality = True
-        for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
-            if tr.getQualityVector() > 0:
-                isgoodquality = False
-                break
-        return isgoodquality
+def add_train_output(path, baseOutputFileName, baseAnaFileName, excludeBranchNames=[], branchNames=[]):
+    # create 4 output paths:
+    outpaths = []
+    for x in range(4):
+        outpaths.append([".random_"+str(x), basf2.create_path()])
+    # add the randommaker module:
+    rm = basf2.register_module(randommaker())
+    path.add_module(rm)
+
+    # also add nnta module:
+
+    rm.if_value('==0', outpaths[0][1])
+    rm.if_value('==1', outpaths[1][1])
+    rm.if_value('==2', outpaths[2][1])
+    rm.if_value('==3', outpaths[3][1])
+    for p in outpaths:
+        nnta = basf2.register_module(nntd.nntd())
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
+                        p[0]+".root", excludeBranchNames=excludeBranchNames, branchNames=branchNames)
+        p[1].add_module(nnta)
 
 
 def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):

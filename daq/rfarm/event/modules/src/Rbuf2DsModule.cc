@@ -140,8 +140,6 @@ void Rbuf2DsModule::event()
          " (proc= " << (int)getpid() << ")");
 
   // Build EvtMessage and decompose it
-  vector<TObject*> objlist;
-  vector<string> namelist;
   EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
   if (msg->type() == MSG_TERMINATE) {
     B2INFO("Rx: got termination message. Exitting....");

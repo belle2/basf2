@@ -262,7 +262,7 @@ namespace Belle2 {
 
 
 
-    double JetFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const
+    double JetFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal, int metaSet) const
     {
 
       assert(metaSet == 0);
@@ -287,7 +287,7 @@ namespace Belle2 {
     }
 
 
-    double JetFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const
+    double JetFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal, int jlocal, int metaSet) const
     {
       assert(metaSet == 0);
       if (!cachevalid) updateCache();

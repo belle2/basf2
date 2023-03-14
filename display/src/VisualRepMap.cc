@@ -100,7 +100,7 @@ void VisualRepMap::select(const TObject* object) const
   m_currentlySelecting = false;
 }
 
-void VisualRepMap::selectOnly(TEveElement* eveObj) const
+void VisualRepMap::selectOnly(const TEveElement* eveObj) const
 {
   //copy current selection, then deselect each element
   const std::list<TEveElement*> sel(gEve->GetSelection()->BeginChildren(), gEve->GetSelection()->EndChildren());

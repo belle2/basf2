@@ -14,10 +14,8 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
   const int N_CHANNELS = 16;
   int size = src.size();
 
-  // cppcheck-suppress knownConditionTrueFalse
   if (getPackerVersion() == 0) {
     dst = src;
-    // cppcheck-suppress knownConditionTrueFalse
   } else if (getPackerVersion() >= 1) {
     // Apply reversible transformation to shrink the range
     // of saved coefficients into much smaller interval.
@@ -34,7 +32,6 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
     }
   }
 
-  // cppcheck-suppress knownConditionTrueFalse
   if (getPackerVersion() == 2) {
     // Rearrange the data in such a way that each coeff
     // only takes up 4 bits (special value 0xF indicates

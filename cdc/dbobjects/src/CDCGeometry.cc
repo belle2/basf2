@@ -42,6 +42,13 @@ void CDCGeometry::read(const GearDir& content)
   m_globalOffsetB  = content.getAngle("OffsetB");
   m_globalOffsetC  = content.getAngle("OffsetC");
 
+  m_maxNSenseLayers = content.getInt("MaxNSenseLayers");
+  m_maxNFieldLayers = content.getInt("MaxNFieldLayers");
+  m_maxNSuperLayers = content.getInt("SuperLayers");
+  m_firstLayerOffset = content.getInt("FirstLayerOffset");
+  m_firstSuperLayerOffset = content.getInt("SuperLayerOffset");
+  m_maxNCellsPerLayer = content.getInt("MaxNCells");
+
   // Mother volume.
   const int nBound = content.getNumberNodes("MomVol/ZBound");
   for (int iBound = 0; iBound < nBound; iBound++) {
@@ -67,7 +74,7 @@ void CDCGeometry::read(const GearDir& content)
     const int nWires = atoi((layerContent.getString("NHoles")).c_str()) / 2;
     const double nShifts = atof((layerContent.getString("NShift")).c_str());
 
-    SenseLayer sense(iSLayer, r, zfwd, zbwd,
+    SenseLayer sense(iSLayer + m_firstLayerOffset, r, zfwd, zbwd,
                      dzfwd, dzbwd, offset, nWires, nShifts);
 
     m_senseLayers.push_back(sense);
@@ -82,7 +89,7 @@ void CDCGeometry::read(const GearDir& content)
     const double r = layerContent.getLength("Radius");
     const double zfwd = layerContent.getLength("ForwardZ");
     const double zbwd = layerContent.getLength("BackwardZ");
-    FieldLayer field(iFLayer, r, zfwd, zbwd);
+    FieldLayer field(iFLayer + m_firstLayerOffset, r, zfwd, zbwd);
     m_fieldLayers.push_back(field);
   }
 
@@ -104,7 +111,7 @@ void CDCGeometry::read(const GearDir& content)
       double rmax = epLayerContent.getLength("OuterR");
       double zfwd = epLayerContent.getLength("ForwardZ");
       double zbwd = epLayerContent.getLength("BackwardZ");
-      std::string name = "Layer" + to_string(i) + epName + to_string(iEPLayer);
+      std::string name = "Layer" + to_string(i + m_firstLayerOffset) + epName + to_string(iEPLayer);
 
       ep.appendNew(name, iEPLayer, rmin, rmax, zfwd, zbwd);
     }

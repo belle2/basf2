@@ -37,7 +37,7 @@ using namespace he3tube;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(He3tubeStudy)
+REG_MODULE(He3tubeStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -51,6 +51,8 @@ He3tubeStudyModule::He3tubeStudyModule() : HistoModule()
   // Parameter definitions
   addParam("sampleTime", m_sampletime, "Length of sample, in us", 10000);
 
+  //convert sample time into rate in Hz
+  rateCorrection = m_sampletime / 1e6;
 }
 
 He3tubeStudyModule::~He3tubeStudyModule()
@@ -87,18 +89,18 @@ void He3tubeStudyModule::defineHisto()
   h_NeutronRateVrs = new TH2F("NeutronRateVrs", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5, 12, 0., 12.);
   h_DefNeutronRateVrs = new TH2F("DefNeutronRateVrs", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5, 12, 0., 12.);
 
-  h_Edep1H3H =       new TH1F("Edep1H3H"     , "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
+  h_Edep1H3H =       new TH1F("Edep1H3H", "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
   h_Edep1H3H_detNB = new TH1F("Edep1H3H_tube", "Energy deposited by Proton and Tritium in each tube;Tube Num; MeV", 4, -0.5, 3.5);
-  h_Edep1H =         new TH1F("Edep1H"       , "Energy deposited by Protons;MeV", 100, 0, 0.7);
-  h_Edep3H =         new TH1F("Edep3H"       , "Energy deposited by Tritiums;MeV", 100, 0, 0.4);
-  h_TotEdep =        new TH1F("TotEdep"      , "Total energy deposited;MeV", 100, 0, 1.5);
-  h_DetN_Edep =      new TH1F("DetN_Edep"    , "Energy deposited vs detector number;Tube Num;MeV", 4, -0.5, 3.5);
+  h_Edep1H =         new TH1F("Edep1H", "Energy deposited by Protons;MeV", 100, 0, 0.7);
+  h_Edep3H =         new TH1F("Edep3H", "Energy deposited by Tritiums;MeV", 100, 0, 0.4);
+  h_TotEdep =        new TH1F("TotEdep", "Total energy deposited;MeV", 100, 0, 1.5);
+  h_DetN_Edep =      new TH1F("DetN_Edep", "Energy deposited vs detector number;Tube Num;MeV", 4, -0.5, 3.5);
 
   h_PulseHeights_NotNeutron = new TH1F("PulseHeights_NotNeutron", "Pulse height of waveforms from non-neutron events", 100, 0, 18000);
-  h_PulseHeights_Neutron =    new TH1F("PulseHeights_Neutron"   , "Pulse height of waveforms from neutron events", 100, 0, 18000);
-  h_PulseHeights_DefNeutron =    new TH1F("PulseHeights_DefNeutron"   , "Pulse height of waveforms from definite neutron events", 100,
+  h_PulseHeights_Neutron =    new TH1F("PulseHeights_Neutron", "Pulse height of waveforms from neutron events", 100, 0, 18000);
+  h_PulseHeights_DefNeutron =    new TH1F("PulseHeights_DefNeutron", "Pulse height of waveforms from definite neutron events", 100,
                                           0, 18000);
-  h_PulseHeights_All =        new TH1F("PulseHeights_All"   , "Pulse height of waveforms from all events", 100, 0, 18000);
+  h_PulseHeights_All =        new TH1F("PulseHeights_All", "Pulse height of waveforms from all events", 100, 0, 18000);
 
   h_DefNeutronHits->Sumw2();
   h_DefNeutronRate->Sumw2();
@@ -122,9 +124,6 @@ void He3tubeStudyModule::initialize()
   B2INFO("He3tubeStudyModule: Initialize");
 
   REG_HISTOGRAM
-
-  //convert sample time into rate in Hz
-  rateCorrection = m_sampletime / 1e6;
 }
 
 void He3tubeStudyModule::beginRun()

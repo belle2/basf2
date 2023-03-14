@@ -5,13 +5,13 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import basf2
-from ROOT import Belle2
+import variables
 import tables
 import numpy as np
 import warnings
-from variables import variables as variable_manager
-from variables import std_vector
+
 
 """
 Python uilities to help create or manage ntuples and work with them in pandas
@@ -46,16 +46,21 @@ class VariablesToHDF5(basf2.Module):
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
         event processing."""
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         #: variable names
-        self._varnames = [str(varname) for varname in variable_manager.resolveCollections(std_vector(*self._variables))]
+        self._varnames = [
+            str(varname) for varname in variables.variables.resolveCollections(
+                variables.std_vector(
+                    *self._variables))]
         #: variable objects for each variable
-        self._var_objects = [variable_manager.getVariable(n) for n in self._varnames]
+        self._var_objects = [variables.variables.getVariable(n) for n in self._varnames]
 
         #: Event metadata
-        self._evtmeta = Belle2.PyStoreObj("EventMetaData")
+        self._evtmeta = ROOT.Belle2.PyStoreObj("EventMetaData")
         self._evtmeta.isRequired()
         #: Pointer to the particle list
-        self._plist = Belle2.PyStoreObj(self._listname)
+        self._plist = ROOT.Belle2.PyStoreObj(self._listname)
         self._plist.isRequired()
 
         #: The hdf5 file
@@ -96,7 +101,7 @@ class VariablesToHDF5(basf2.Module):
                 # pyroot proxy not working with callables, we should fix this.
                 # For now we need to go back by name and call it.
                 # should be `row[v.name] = v.func(p)`
-                row[name] = variable_manager.evaluate(v.name, p)
+                row[name] = variables.variables.evaluate(v.name, p)
 
         self._table.append(buf)
 
@@ -104,6 +109,8 @@ class VariablesToHDF5(basf2.Module):
         """save and close the output"""
         self._table.flush()
         self._hdf5file.close()
+        import ROOT
+        ROOT.Belle2.MetadataService.Instance().addHDF5File(self._filename)
 
 
 def make_mcerrors_readable(dataframe, column="mcErrors"):
@@ -119,6 +126,8 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
                 with column containing the output of the  mcErrors variable
         column(str): the name containing the values from the mcErrors variable
     """
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
 
     if column not in dataframe:
         raise KeyError(f"Cannot find coulumn '{column}'")
@@ -127,9 +136,9 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
     mcErrors = dataframe[column].astype(int)
 
     # and loop over all the c_ constants in the Belle2.MCMatching class
-    for flag in (e for e in dir(Belle2.MCMatching) if e.startswith("c_")):
+    for flag in (e for e in dir(ROOT.Belle2.MCMatching) if e.startswith("c_")):
         try:
-            value = int(getattr(Belle2.MCMatching, flag))
+            value = int(getattr(ROOT.Belle2.MCMatching, flag))
         except ValueError:
             # probably the extraInfo column name, ignore
             continue

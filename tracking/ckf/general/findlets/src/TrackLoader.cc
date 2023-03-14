@@ -81,7 +81,7 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
       for (unsigned int index = 0; index < relatedTracksWithWeight.size(); ++index) {
         const RecoTrack* relatedTrack = relatedTracksWithWeight[index];
         const float weight = relatedTracksWithWeight.weight(index);
-        if (relatedTrack and weight == m_param_relationCheckForDirection) {
+        if (relatedTrack and weight == static_cast<float>(m_param_relationCheckForDirection)) {
           hasAlreadyRelation = true;
           break;
         }
@@ -98,7 +98,7 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
   }
 
   const auto hasLowPt = [this](const auto & track) {
-    return track->getMomentumSeed().Pt() < m_param_minimalPtRequirement;
+    return track->getMomentumSeed().Rho() < m_param_minimalPtRequirement;
   };
   TrackFindingCDC::erase_remove_if(seeds, hasLowPt);
 

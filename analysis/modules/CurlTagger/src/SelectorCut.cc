@@ -9,7 +9,6 @@
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 
 //Root includes
-#include "TVector3.h"
 #include "TMath.h"
 
 using namespace Belle2;
@@ -36,8 +35,8 @@ SelectorCut::~SelectorCut() = default;
 std::vector<float> SelectorCut::getVariables(Particle* iPart, Particle* jPart)
 {
   float chargeProduct = iPart -> getCharge() * jPart -> getCharge();
-  float magDiffP = (iPart->getMomentum() - jPart->getMomentum()).Mag();
-  float phi = iPart->getMomentum().Angle(jPart->getMomentum());
+  float magDiffP = (iPart->getMomentum() - jPart->getMomentum()).R();
+  float phi = acos(iPart->getMomentum().Unit().Dot(jPart->getMomentum().Unit()));
   return {chargeProduct, magDiffP, phi};
 }
 

@@ -28,6 +28,32 @@ Variable::Manager& Variable::Manager::Instance()
   return v;
 }
 
+const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& functionName,
+    const std::vector<std::string>& functionArguments)
+{
+  // Combine to full name for alias resolving
+  std::string fullname = functionName + "(" + boost::algorithm::join(functionArguments, ", ") + ")";
+
+  // resolve aliases. Aliases might point to other aliases so we need to keep a
+  // set of what we have seen so far to avoid running into infinite loops
+  std::set<std::string> aliasesSeen;
+  for (auto aliasIter = m_alias.find(fullname); aliasIter != m_alias.end(); aliasIter = m_alias.find(fullname)) {
+    const auto [it, added] = aliasesSeen.insert(fullname);
+    if (!added) {
+      B2FATAL("Encountered a loop in the alias definitions between the aliases "
+              << boost::algorithm::join(aliasesSeen, ", "));
+    }
+    fullname = aliasIter->second;
+  }
+  auto mapIter = m_variables.find(fullname);
+  if (mapIter == m_variables.end()) {
+    if (!createVariable(fullname, functionName, functionArguments)) return nullptr;
+    mapIter = m_variables.find(fullname);
+    if (mapIter == m_variables.end()) return nullptr;
+  }
+  return mapIter->second.get();
+}
+
 const Variable::Manager::Var* Variable::Manager::getVariable(std::string name)
 {
   // resolve aliases. Aliases might point to other aliases so we need to keep a
@@ -88,6 +114,10 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   return true;
 }
 
+void Variable::Manager::clearAliases()
+{
+  m_alias.clear();
+}
 
 void Variable::Manager::printAliases()
 {
@@ -104,6 +134,18 @@ void Variable::Manager::printAliases()
            ' ') << " --> " << a.second);
   }
   B2INFO("=====================================");
+}
+
+std::string Variable::Manager::resolveAlias(const std::string& alias)
+{
+
+  assertValidName(alias);
+
+  if (m_alias.find(alias) == m_alias.end()) {
+    return alias;
+  } else {
+    return m_alias[alias];
+  }
 }
 
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
@@ -219,14 +261,76 @@ bool Variable::Manager::createVariable(const std::string& name)
       return true;
     }
   }
+  // Try Formula registration with python parser if variable is not a simple identifier (else we get a infinite loop)
+  if (not std::regex_match(name, std::regex("^[a-zA-Z_][a-zA-Z_0-9]*$")) and not name.empty()) {
+    Py_Initialize();
+    try {
+      // Import parser
+      py::object b2parser_namespace = py::import("b2parser");
+      // Parse Expression
+      py::tuple expression_tuple = py::extract<boost::python::tuple>(b2parser_namespace.attr("parse_expression")(name));
+      try {
+        // Compile ExpressionNode
+        std::shared_ptr<const AbstractExpressionNode<Belle2::Variable::Manager>> expression_node =
+              NodeFactory::compile_expression_node<Belle2::Variable::Manager>(expression_tuple);
+        // Create lambda capturing the ExpressionNode
+        Variable::Manager::FunctionPtr func = [expression_node](const Particle * object) -> VarVariant {
+          return expression_node->evaluate(object);
+        };
+        // Put new variable into set of variables
+        m_variables[name] = std::make_shared<Var>(name, func, std::string("Returns expression ") + name);
+        return true;
+      } catch (std::runtime_error& exception) {
+        B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+      }
+    } catch (py::error_already_set&) {
+      PyErr_Print();
+      B2FATAL("Parsing error for formula: '" << name << "'");
+    }
+  }
 
   B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;
 }
 
+bool Variable::Manager::createVariable(const std::string& fullname, const std::string& functionName,
+                                       const std::vector<std::string>& functionArguments)
+{
+  // Search function name in parameter variables
+  auto parameterIter = m_parameter_variables.find(functionName);
+  if (parameterIter != m_parameter_variables.end()) {
+
+    std::vector<double> arguments;
+    for (auto& arg : functionArguments) {
+      double number = 0;
+      number = Belle2::convertString<double>(arg);
+      arguments.push_back(number);
+    }
+    auto pfunc = parameterIter->second->function;
+    auto func = [pfunc, arguments](const Particle * particle) -> std::variant<double, int, bool> { return pfunc(particle, arguments); };
+    m_variables[fullname] = std::make_shared<Var>(fullname, func, parameterIter->second->description, parameterIter->second->group,
+                                                  parameterIter->second->variabletype);
+    return true;
+
+  }
+
+  // Search function fullname in meta variables
+  auto metaIter = m_meta_variables.find(functionName);
+  if (metaIter != m_meta_variables.end()) {
+    auto func = metaIter->second->function(functionArguments);
+    m_variables[fullname] = std::make_shared<Var>(fullname, func, metaIter->second->description, metaIter->second->group,
+                                                  metaIter->second->variabletype);
+    return true;
+  }
+
+  B2FATAL("Encountered bad variable name '" << fullname << "'. Maybe you misspelled it?");
+  return false;
+}
+
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype,
+                                         const std::string& unit)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -241,13 +345,17 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
+    if (!unit.empty()) {
+      var.get()->extendDescriptionString(":Unit: " + unit);
+    }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype,
+                                         const std::string& unit)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -261,6 +369,9 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     B2DEBUG(19, "Registered parameter Variable " << rawName);
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
+    if (!unit.empty()) {
+      var.get()->extendDescriptionString(":Unit: " + unit);
+    }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
@@ -298,11 +409,33 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   auto mapIter = m_variables.find(name);
   if (mapIter != m_variables.end()) {
     if (make_fatal) {
-      mapIter->second.get()->extendDescriptionString("\n.. warning:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
     } else {
-      mapIter->second.get()->extendDescriptionString("\n.. note:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
     }
     mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+  } else {
+    auto parMapIter = m_parameter_variables.find(name);
+    if (parMapIter != m_parameter_variables.end()) {
+      if (make_fatal) {
+        parMapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+      } else {
+        parMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+      }
+      parMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+    } else {
+      auto metaMapIter = m_meta_variables.find(name);
+      if (metaMapIter != m_meta_variables.end()) {
+        if (make_fatal) {
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+        } else {
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+        }
+        metaMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+      } else {
+        B2FATAL("The variable '" << name << "' is not registered so it makes no sense to try to deprecate it.");
+      }
+    }
   }
 
 }
@@ -345,7 +478,6 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   const Var* var = getVariable(varName);
   if (!var) {
     throw std::runtime_error("Variable::Manager::evaluate(): variable '" + varName + "' not found!");
-    return 0.0; //never reached, suppresses cppcheck warning
   }
 
   if (var->variabletype == Variable::Manager::VariableDataType::c_double)

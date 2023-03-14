@@ -21,7 +21,7 @@ void show_event(unsigned long *head, int len)
 {
     int i, j;
     for (i = 0; i + 1 < (len / 4); i += 8) {
-	printf("%08d %08x %08x %08x %08x %08x %08x %08x %08x\n", i,
+	printf("%08d %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
 	       buffer[i], buffer[i + 1], buffer[i + 2], buffer[i + 3],
 	       buffer[i + 4], buffer[i + 5], buffer[i + 6], buffer[i + 7]);
     }
@@ -35,7 +35,6 @@ void show_event(unsigned long *head, int len)
 unsigned long xor(unsigned long *start, int wordlen)
 {
     unsigned long ret = 0;
-    int i;
     while (wordlen--) {
 	ret ^= *(start++);
     }
@@ -69,7 +68,6 @@ main(int argc, char ** argv)
     int ret, i = 0;
     int fd;
     int maxevent = 0;
-    fd_set rfds, efds;
     int ch;
 
     while ((ch = getopt(argc, argv, "c:")) != -1) {
@@ -173,14 +171,14 @@ main(int argc, char ** argv)
 	    }
 
 	    if (header->event_number != event) {
-		fprintf(stderr, "bad copper evn = %x should be %x\n",
+		fprintf(stderr, "bad copper evn = %lx should be %x\n",
 			buffer[1], event);
 	    }
 	}
 
 	if (1 || event < 10) {
 #if 1
-	    printf("xor = %08x\n", xor((unsigned long *) buffer, ret / 4));
+	    printf("xor = %08lx\n", xor((unsigned long *) buffer, ret / 4));
 	    show_event(buffer, ret);
 #else
 	    fwrite(buffer, ret, 1, stdout);

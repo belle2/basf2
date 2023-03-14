@@ -9,6 +9,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/geometry/B2Vector3.h>
 
 //tracking:
 #include <tracking/modules/VXDTFHelperTools/TrackFinderVXDAnalizerModule.h>
@@ -18,23 +19,18 @@
 #include <tracking/trackFindingVXD/analyzingTools/AnalyzingAlgorithmFactory.h>
 #include <tracking/trackFindingVXD/analyzingTools/AlgoritmType.h>
 
-//root-stuff
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <string>
 
-
-
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::Tracking;
-
 
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackFinderVXDAnalizer)
+REG_MODULE(TrackFinderVXDAnalizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -44,12 +40,12 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
 {
   B2INFO("TrackFinderVXDAnalizer-initialize");
 
-  vector<string> rootFileNameVals;
+  std::vector<std::string> rootFileNameVals;
   rootFileNameVals.push_back("TrackFinderVXDAnalizerResults");
   rootFileNameVals.push_back("RECREATE");
 
 
-  vector< vector< vector< string> > > trackedParametersDouble = {
+  std::vector< std::vector< std::vector< std::string> > > trackedParametersDouble = {
     { {"Reference"},
       {"AnalyzingAlgorithmValueP", "AnalyzingAlgorithmValuePT", "AnalyzingAlgorithmValuePTheta", "AnalyzingAlgorithmValuePPhi", "AnalyzingAlgorithmValueDistSeed2IPXY", "AnalyzingAlgorithmValueDistSeed2IPZ", "AnalyzingAlgorithmValueQI"}
     },
@@ -76,7 +72,7 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
     },
   };
 
-  vector< vector< vector< string> > > trackedParametersInt = {
+  std::vector< std::vector< std::vector< std::string> > > trackedParametersInt = {
     { {"Reference"},
       {"AnalyzingAlgorithmTotalUClusters", "AnalyzingAlgorithmTotalVClusters"}
     },
@@ -95,7 +91,7 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
   };
 
 
-  vector< vector< vector< string> > > trackedParametersVecDouble = {
+  std::vector< std::vector< std::vector< std::string> > > trackedParametersVecDouble = {
     { {"Reference"},
       {"AnalyzingAlgorithmTotalUEDep", "AnalyzingAlgorithmTotalVEDep"}
     },
@@ -119,11 +115,12 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
 
 
   addParam("referenceTCname", m_PARAMreferenceTCname, "the name of the storeArray container provided by the reference TF",
-           string("mcTracks"));
-  addParam("testTCname", m_PARAMtestTCname, "the name of the storeArray container provided by the TF to be evaluated", string(""));
+           std::string("mcTracks"));
+  addParam("testTCname", m_PARAMtestTCname, "the name of the storeArray container provided by the TF to be evaluated",
+           std::string(""));
   addParam("acceptedTCname", m_PARAMacceptedTCname, "special name for accepted/successfully reconstructed track candidates",
-           string("acceptedVXDTFTracks"));
-  addParam("lostTCname", m_PARAMlostTCname, "special name for lost track candidates", string("lostTracks"));
+           std::string("acceptedVXDTFTracks"));
+  addParam("lostTCname", m_PARAMlostTCname, "special name for lost track candidates", std::string("lostTracks"));
   addParam("purityThreshold", m_PARAMpurityThreshold,
            " chose value to filter TCs found by Test TF. TCs having purities lower than this value won't be marked as reconstructed",
            double(0.7));
@@ -181,8 +178,8 @@ void TrackFinderVXDAnalizerModule::initialize()
   if (m_PARAMwriteToRoot == false) { return; }
 
   if ((m_PARAMrootFileName.size()) != 2) {
-    string output;
-    for (string& entry : m_PARAMrootFileName) {
+    std::string output;
+    for (std::string& entry : m_PARAMrootFileName) {
       output += "'" + entry + "' ";
     }
     B2FATAL("TrackFinderVXDAnalizer::initialize(), rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
@@ -192,9 +189,9 @@ void TrackFinderVXDAnalizerModule::initialize()
   // deal with algorithms:
   m_rootParameterTracker.initialize(m_PARAMrootFileName[0] + ".root", m_PARAMrootFileName[1]);
   // typedef for increased readability:
-  using AlgorithmDouble = AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>;
-  using AlgorithmInt = AnalyzingAlgorithmBase<int, AnalizerTCInfo, TVector3>;
-  using AlgorithmVecDouble = AnalyzingAlgorithmBase<vector<double>, AnalizerTCInfo, TVector3>;
+  using AlgorithmDouble = AnalyzingAlgorithmBase<double, AnalizerTCInfo, B2Vector3D>;
+  using AlgorithmInt = AnalyzingAlgorithmBase<int, AnalizerTCInfo, B2Vector3D>;
+  using AlgorithmVecDouble = AnalyzingAlgorithmBase<std::vector<double>, AnalizerTCInfo, B2Vector3D>;
 
 
   // prepare all algorithms which store a double per tc:
@@ -216,7 +213,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       m_rootParameterTracker.addParameters4DoubleAlgorithms(tcTypeName, algorithm);
     }
   }
-  AlgorithmDouble::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmDouble::setOrigin(B2Vector3D(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
   AlgorithmDouble::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 
   // prepare all algorithms which store an int per tc:
@@ -238,7 +235,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       m_rootParameterTracker.addParameters4IntAlgorithms(tcTypeName, algorithm);
     }
   }
-  AlgorithmInt::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmInt::setOrigin(B2Vector3D(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
   AlgorithmInt::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 
   // prepare all algorithms which store a vector< double> per tc:
@@ -260,7 +257,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       m_rootParameterTracker.addParameters4VecDoubleAlgorithms(tcTypeName, algorithm);
     }
   }
-  AlgorithmVecDouble::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmVecDouble::setOrigin(B2Vector3D(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
   AlgorithmVecDouble::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 }
 
@@ -270,7 +267,7 @@ void TrackFinderVXDAnalizerModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(10, "################## entering TrackFinderVXDAnalizerModule - event " << m_eventCounter << " ######################");
+  B2DEBUG(20, "################## entering TrackFinderVXDAnalizerModule - event " << m_eventCounter << " ######################");
 
   int nReferenceTCs = m_referenceTCs.getEntries();
   m_mcTrackCounter += nReferenceTCs;
@@ -281,9 +278,9 @@ void TrackFinderVXDAnalizerModule::event()
 
   /// collect all reference TCs
   unsigned nTC = 0;
-  vector<AnalizerTCInfo> referenceTCVector;
+  std::vector<AnalizerTCInfo> referenceTCVector;
   for (SpacePointTrackCand& aTC : m_referenceTCs) {
-    vector<MCVXDPurityInfo > purities = createPurityInfos(aTC);
+    std::vector<MCVXDPurityInfo > purities = createPurityInfos(aTC);
 
     MCVXDPurityInfo particleInfo = returnDominantParticleID(purities);
     B2DEBUG(25, "Calculating purities for reference TC " << nTC << ", name. Dominating iD " << particleInfo.getParticleID() <<
@@ -299,10 +296,10 @@ void TrackFinderVXDAnalizerModule::event()
 
   /// collect all test TCs
   nTC = 0;
-  vector<AnalizerTCInfo> testTCVector;
+  std::vector<AnalizerTCInfo> testTCVector;
   for (SpacePointTrackCand& aTC : m_testTCs) {
     if (m_PARAMignoreDeadTCs and aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive) == false) { continue; }
-    vector<MCVXDPurityInfo > purities = createPurityInfos(aTC);
+    std::vector<MCVXDPurityInfo > purities = createPurityInfos(aTC);
 
     MCVXDPurityInfo particleInfo = returnDominantParticleID(purities);
     B2DEBUG(25, "Calculating purities for test TC " << nTC << ", name. Dominating iD " << particleInfo.getParticleID() <<
@@ -323,18 +320,18 @@ void TrackFinderVXDAnalizerModule::event()
    *
    * additionally all the relevant stuff will be counted.
    */
-  vector<std::pair<AnalizerTCInfo*, AnalizerTCInfo*> > pairedTCs;
+  std::vector<std::pair<AnalizerTCInfo*, AnalizerTCInfo*> > pairedTCs;
   for (AnalizerTCInfo& testTC : testTCVector) {
     int testID = testTC.assignedID.getParticleID();
 
     for (AnalizerTCInfo& referenceTC : referenceTCVector) {
       int refID = referenceTC.assignedID.getParticleID();
-      B2DEBUG(50, "test TC with assigned ID " << testID << " was matched with refID " << refID);
+      B2DEBUG(29, "test TC with assigned ID " << testID << " was matched with refID " << refID);
       if (refID != testID) continue;
 
       testTC.tcType = AnalizerTCInfo::classifyTC(referenceTC, testTC, m_PARAMpurityThreshold, m_PARAMminNDFThreshold);
 
-      B2DEBUG(50, "test TC with assigned ID " << testID <<
+      B2DEBUG(29, "test TC with assigned ID " << testID <<
               " was classified for the corresponding with type for testTC/refTC: " << TCType::getTypeName(testTC.tcType) <<
               "/" << TCType::getTypeName(referenceTC.tcType) << " and will now paired up");
 
@@ -399,55 +396,55 @@ void TrackFinderVXDAnalizerModule::event()
 
 
   /// providing some debug output
-  string summary1 = "TrackFinderVXDAnalizer-Event " + to_string(m_eventCounter) +
-                    ": the tested TrackFinder found: " +
-                    " IDs (total/perfect/clean/contaminated/clone/tooShort/ghost: " + to_string(nFound) +
-                    "/" + to_string(nPerfectTCs) +
-                    "/" + to_string(nCleanTCs) +
-                    "/" + to_string(nContaminatedTCs) +
-                    "/" + to_string(nClonedTCs) +
-                    "/" + to_string(nSmallTCs) +
-                    "/" + to_string(nGhostTCs) +
-                    ") within " + to_string(nTestTCs) +
-                    " TCs and lost (test/ref) " + to_string(nLostTestTCs) +
-                    "/" + to_string(nLostRefTCs) +
-                    " TCs. nBadCases: " + to_string(nBadCases) +
-                    " refClones: " + to_string(nRefClones) +
-                    "\n" +
-                    "There are " + to_string(nReferenceTCs) +
-                    " referenceTCs, with mean of " + to_string((float(refPXDClusters) / float(nReferenceTCs))) +
-                    "/" + to_string((float(refSVDClusters) / float(nReferenceTCs))) + " PXD/SVD clusters"
-                    "\n" +
-                    "There are " + to_string(nTestTCs) +
-                    " testTCs, with mean of " + to_string((float(testPXDClusters) / float(nTestTCs))) +
-                    "/" + to_string((float(testSVDClusters) / float(nTestTCs))) + " PXD/SVD clusters";
+  std::string summary1 = "TrackFinderVXDAnalizer-Event " + std::to_string(m_eventCounter) +
+                         ": the tested TrackFinder found: " +
+                         " IDs (total/perfect/clean/contaminated/clone/tooShort/ghost: " + std::to_string(nFound) +
+                         "/" + std::to_string(nPerfectTCs) +
+                         "/" + std::to_string(nCleanTCs) +
+                         "/" + std::to_string(nContaminatedTCs) +
+                         "/" + std::to_string(nClonedTCs) +
+                         "/" + std::to_string(nSmallTCs) +
+                         "/" + std::to_string(nGhostTCs) +
+                         ") within " + std::to_string(nTestTCs) +
+                         " TCs and lost (test/ref) " + std::to_string(nLostTestTCs) +
+                         "/" + std::to_string(nLostRefTCs) +
+                         " TCs. nBadCases: " + std::to_string(nBadCases) +
+                         " refClones: " + std::to_string(nRefClones) +
+                         "\n" +
+                         "There are " + std::to_string(nReferenceTCs) +
+                         " referenceTCs, with mean of " + std::to_string((float(refPXDClusters) / float(nReferenceTCs))) +
+                         "/" + std::to_string((float(refSVDClusters) / float(nReferenceTCs))) + " PXD/SVD clusters"
+                         "\n" +
+                         "There are " + std::to_string(nTestTCs) +
+                         " testTCs, with mean of " + std::to_string((float(testPXDClusters) / float(nTestTCs))) +
+                         "/" + std::to_string((float(testSVDClusters) / float(nTestTCs))) + " PXD/SVD clusters";
 
-  string summary2 = "TrackFinderVXDAnalizer-Event " + to_string(m_eventCounter) +
-                    ": the tested TrackFinder had an efficiency : total/perfect/clean/contaminated/clone/tooShort/ghost: " +
-                    to_string(double(100 * nFound) / double(nReferenceTCs)) +
-                    "%/" + to_string(double(100 * nPerfectTCs) / double(nReferenceTCs)) +
-                    "%/" + to_string(double(100 * nCleanTCs) / double(nReferenceTCs)) +
-                    "%/" + to_string(double(100 * nContaminatedTCs) / double(nReferenceTCs)) +
-                    "%/" + to_string(double(100 * nClonedTCs) / double(nReferenceTCs)) +
-                    "%/" + to_string(double(100 * nSmallTCs) / double(nReferenceTCs)) +
-                    "%/" + to_string(double(100 * nGhostTCs) / double(nReferenceTCs)) + "%";
+  std::string summary2 = "TrackFinderVXDAnalizer-Event " + std::to_string(m_eventCounter) +
+                         ": the tested TrackFinder had an efficiency : total/perfect/clean/contaminated/clone/tooShort/ghost: " +
+                         std::to_string(double(100 * nFound) / double(nReferenceTCs)) +
+                         "%/" + std::to_string(double(100 * nPerfectTCs) / double(nReferenceTCs)) +
+                         "%/" + std::to_string(double(100 * nCleanTCs) / double(nReferenceTCs)) +
+                         "%/" + std::to_string(double(100 * nContaminatedTCs) / double(nReferenceTCs)) +
+                         "%/" + std::to_string(double(100 * nClonedTCs) / double(nReferenceTCs)) +
+                         "%/" + std::to_string(double(100 * nSmallTCs) / double(nReferenceTCs)) +
+                         "%/" + std::to_string(double(100 * nGhostTCs) / double(nReferenceTCs)) + "%";
 
-  string summary3 = "TrackFinderVXDAnalizer-Event " + to_string(m_eventCounter) +
-                    ": totalCA|totalMC|ratio of pxdHits " + to_string(testPXDClusters) +
-                    "|" + to_string(refPXDClusters) +
-                    "|" + to_string(float(testPXDClusters) / float(refPXDClusters)) +
-                    ", svdHits " + to_string(testSVDClusters) +
-                    "|" + to_string(refSVDClusters) +
-                    "|" + to_string(float(testSVDClusters) / float(refSVDClusters)) + " found by the two TFs";
+  std::string summary3 = "TrackFinderVXDAnalizer-Event " + std::to_string(m_eventCounter) +
+                         ": totalCA|totalMC|ratio of pxdHits " + std::to_string(testPXDClusters) +
+                         "|" + std::to_string(refPXDClusters) +
+                         "|" + std::to_string(float(testPXDClusters) / float(refPXDClusters)) +
+                         ", svdHits " + std::to_string(testSVDClusters) +
+                         "|" + std::to_string(refSVDClusters) +
+                         "|" + std::to_string(float(testSVDClusters) / float(refSVDClusters)) + " found by the two TFs";
 
   if (m_PARAMdoEventSummary) {
     B2INFO(summary1);
     B2INFO(summary2);
     B2INFO(summary3);
   } else {
-    B2DEBUG(10, summary1);
-    B2DEBUG(10, summary2);
-    B2DEBUG(10, summary3);
+    B2DEBUG(20, summary1);
+    B2DEBUG(20, summary2);
+    B2DEBUG(20, summary3);
   }
 
   m_totalRealHits += refPXDClusters + refSVDClusters;
@@ -507,7 +504,7 @@ void TrackFinderVXDAnalizerModule::event()
 void TrackFinderVXDAnalizerModule::endRun()
 {
   B2INFO("------------- >>>TrackFinderVXDAnalizerModule::endRun<<< -------------");
-  B2DEBUG(1, "TrackFinderVXDAnalizerModule-explanation: \n" <<
+  B2DEBUG(20, "TrackFinderVXDAnalizerModule-explanation: \n" <<
           " perfect recovery means: all hits of mc-TC found again and clean TC. \n" <<
           " clean recovery means: no foreign hits within TC. \n" <<
           " ghost means: QI was below threshold or mcTC was found more than once (e.g. because of curlers) \n" <<

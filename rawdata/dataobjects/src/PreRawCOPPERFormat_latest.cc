@@ -177,7 +177,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     }
   } else {
     printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x : eve 0x%x exp %d run %d sub %d\n",
-           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum,
+           *cur_exprunsubrun_no, prev_exprunsubrun_no, *cur_evenum_rawcprhdr, prev_evenum,
            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n));
 
     // Check if the first event of a run is zero.
@@ -201,8 +201,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                 "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %u sub %u ) cur(exp %u run %u sub %u ) (",
                 hostname, -1,
                 prev_evenum, *cur_evenum_rawcprhdr,
-                prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
-                *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
+                prev_exprunsubrun_no >> 22, (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
+                *cur_exprunsubrun_no >> 22, (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
 
         char err_buf_temp[2500];
         for (unsigned i = 0; i < summary_table.size(); ++i) {
@@ -317,9 +317,9 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
       eve[ i ] = m_buffer[ offset_finesse + SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
       exprun[ i ] = m_buffer[ offset_finesse + SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
       temp_ctime_trgtype_footer =
-        m_buffer[ offset_finesse + finesse_nwords - (SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER) + POS_TT_CTIME_B2LFEE ];
+        m_buffer[ offset_finesse + finesse_nwords - (static_cast<int>(SIZE_B2LFEE_TRAILER) + SIZE_B2LHSLB_TRAILER) + POS_TT_CTIME_B2LFEE ];
       temp_eve_footer =
-        m_buffer[ offset_finesse + finesse_nwords - (SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER) + POS_CHKSUM_B2LFEE ];
+        m_buffer[ offset_finesse + finesse_nwords - (static_cast<int>(SIZE_B2LFEE_TRAILER) + SIZE_B2LHSLB_TRAILER) + POS_CHKSUM_B2LFEE ];
 
       if (flag == 0) {
         temp_ctime_trgtype = ctime_trgtype[ i ];
@@ -585,7 +585,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   // Calculate CRC16
   //
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER;
-  int nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  int nwords = GetFINESSENwords(n, finesse_num) - (static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_TRAILER +
+                                                   SIZE_B2LHSLB_TRAILER);
   unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, buf, nwords);
 
   //
@@ -601,7 +602,7 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     PrintData(GetBuffer(n), *(GetBuffer(n) + tmp_header.POS_NWORDS));
     printf("[FATAL] %s ch=%d : ERROR_EVENT : PRE CRC16 error : slot %c : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
            hostname, finesse_num,
-           65 + finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+           65 + finesse_num, *buf, temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
       printf("%.8x ", temp_buf[ k ]);
@@ -653,8 +654,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   for (int i = 0; i < MAX_PCIE40_CH; i++) {
     if (detector_buf_ch[ i ] == NULL || nwords_ch[ i ] <= 0) continue;    // for an empty FINESSE slot
     length_nwords += nwords_ch[ i ];
-    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
-                     + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+    length_nwords += static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   }
 
   // allocate buffer

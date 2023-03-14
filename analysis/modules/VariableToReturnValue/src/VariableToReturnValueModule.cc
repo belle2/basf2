@@ -8,7 +8,7 @@
 
 #include <analysis/modules/VariableToReturnValue/VariableToReturnValueModule.h>
 
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
@@ -17,7 +17,7 @@
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariableToReturnValue)
+REG_MODULE(VariableToReturnValue);
 
 
 VariableToReturnValueModule::VariableToReturnValueModule() :

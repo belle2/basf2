@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 

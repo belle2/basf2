@@ -200,7 +200,7 @@ namespace Belle2 {
     }
 
 
-    double ISRPhotonFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const
+    double ISRPhotonFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal, int metaSet) const
     {
       assert(metaSet == 0);
       switch (iMeta) {
@@ -222,7 +222,7 @@ namespace Belle2 {
       return -999;
     }
 
-    double ISRPhotonFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal, int metaSet) const
+    double ISRPhotonFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal, int jlocal, int metaSet) const
     {
       assert(metaSet == 0);
       if (!cachevalid) updateCache();
@@ -288,7 +288,7 @@ namespace Belle2 {
       double pg2h = pg * pg / 2.;
       double exponent = -pg2h * (4. / pi_ + a * pg2h) / (1. + a * pg2h);
       double u = sqrt((exponent < -1.e-14) ? 1. - exp(exponent) : -exponent);  // approximation to avoid numerical problem
-      pz = sign * pow((PzMinB + (PzMaxB - PzMinB) * u) , (1. / b));
+      pz = sign * pow((PzMinB + (PzMaxB - PzMinB) * u), (1. / b));
 
       pt2 = px * px + py * py;
       p2  = pt2 + pz * pz;

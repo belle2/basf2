@@ -185,7 +185,7 @@ namespace Belle2 {
 
     inline double DeltaRayPDF::angularDistr(double kz) const
     {
-      if (abs(kz) < 1 / m_phaseIndex) {
+      if (std::abs(kz) < 1 / m_phaseIndex) {
         double x = sqrt((1 - 1 / pow(m_phaseIndex, 2)) / (1 - pow(kz, 2)));
         return 1 - acos(x) * 4 / M_PI;
       }

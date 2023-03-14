@@ -239,7 +239,7 @@ namespace Belle2 {
                                               (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
               s_base = new G4SubtractionSolid("s_base_hole2", s_base, s_hole, 0, G4ThreeVector(-(0.5 - 0.315)*InchtoCm,
         (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));*/
-        double iTheta[4] = {0, 90, 180, 270};
+        const double iTheta[4] = {0, 90, 180, 270};
         G4LogicalVolume* l_base = new G4LogicalVolume(s_base, G4Material::GetMaterial("Al6061"), "l_base");
         l_base->SetVisAttributes(yellow);
         G4Transform3D transform;

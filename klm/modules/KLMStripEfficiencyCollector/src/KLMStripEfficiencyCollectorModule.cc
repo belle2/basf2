@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMStripEfficiencyCollector)
+REG_MODULE(KLMStripEfficiencyCollector);
 
 KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   CalibrationCollectorModule(),
@@ -25,8 +25,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
   m_MatchingFile(nullptr),
   m_MatchingTree(nullptr),
-  m_MatchingHitData( {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr}),
-                   m_MatchedStrip(0)
+  m_MatchingHitData({0, 0, 0, 0, 0, 0, 0., nullptr, nullptr}),
+                  m_MatchedStrip(0)
 {
   setDescription("Module for KLM strip efficiency data collection.");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
@@ -226,7 +226,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
   KLMChannelNumber channel;
   enum KLMChannelStatus::ChannelStatus status;
   struct HitData hitData, hitDataPrevious;
-  TVector3 extHitPosition;
+  ROOT::Math::XYZVector extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
   int layer;
   int extHitLayer[nExtrapolationLayers] = {0};
@@ -377,7 +377,6 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
   }
   /* Find matching digits. */
   int nDigits = 0;
-  std::map<int, int>::iterator it2;
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
     findMatchingDigit(&(it->second));
     if (it->second.digit != nullptr) {
@@ -424,7 +423,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
        * The muons with sufficiently large momentum have a very small
        * probability to get absorbed in the detector.
        */
-      if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+      if (muon->getP() < m_MinimalMomentumNoOuterLayers)
         continue;
     }
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));

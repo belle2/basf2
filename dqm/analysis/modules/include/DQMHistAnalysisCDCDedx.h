@@ -22,7 +22,7 @@
 #include "TH1.h"
 #include "TH2D.h"
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 namespace Belle2 {
 
@@ -33,7 +33,7 @@ namespace Belle2 {
    */
 
 
-  class DQMHistAnalysisCDCDedxModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisCDCDedxModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -46,32 +46,32 @@ namespace Belle2 {
     /**
     * destructor
     */
-    virtual ~DQMHistAnalysisCDCDedxModule();
+    ~DQMHistAnalysisCDCDedxModule();
 
     /**
     * init function for default values
     */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
     * begin each run
     */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
     * event by event function
     */
-    virtual void event() override;
+    void event() override final;
 
     /**
     * end of each run
     */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
     * terminating at the end of last run
     */
-    virtual void terminate() override;
+    void terminate() override final;
 
     /**
     * funtion to get metadata from histogram
@@ -81,7 +81,7 @@ namespace Belle2 {
     /**
     * funtion to draw dEdx+Fit
     */
-    void drawDedx();
+    void drawDedxPR();
 
     /**
     * funtion to draw dEdx+Fit for run variation
@@ -111,22 +111,22 @@ namespace Belle2 {
     /**
     * funtion to add plot style
     */
-    void set_Plot_Style();
+    void setPlotStyle();
 
     /**
     * funtion to add text style
     */
-    void set_Text_Style(TPaveText*& obj);
+    void setTextStyle(TPaveText*& obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Hist_Style(TH1* obj);
+    void setHistStyle(TH1* obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Pad_Style(double l, double r, double t, double b);
+    void setPadStyle(double l, double r, double t, double b);
 
 
   private:
@@ -147,13 +147,7 @@ namespace Belle2 {
 
     //DQM analysis and Mirabelle
     TCanvas* c_pr_dedx = nullptr; /**< dedx dist+fit */
-    TCanvas* c_pr_dedxphi = nullptr; /**< dedx vs phi  */
-    TCanvas* c_pr_dedxcos = nullptr; /**< dedx vs costh  */
-    TCanvas* c_pr_bands = nullptr; /**< dedx band plot */
-    TCanvas* c_pr_wires = nullptr; /**< dead wire status */
     TCanvas* c_ir_dedx = nullptr; /**< intra-run dedx status */
-    TCanvas* c_ir_mean = nullptr; /**< intra-run dedx mean */
-    TCanvas* c_ir_reso = nullptr; /**< intra-run dedx sigma */
 
     TF1* f_gaus = nullptr; /**< fit function */
     TLine* l_line = nullptr; /**< line for dedx mean */

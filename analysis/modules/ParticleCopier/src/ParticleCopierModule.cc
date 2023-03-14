@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleCopier/ParticleCopierModule.h>
 
 
@@ -24,70 +24,75 @@
 #include <analysis/utility/ParticleCopy.h>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+//-----------------------------------------------------------------
+//                 Register module
+//-----------------------------------------------------------------
 
-  //-----------------------------------------------------------------
-  //                 Register module
-  //-----------------------------------------------------------------
+REG_MODULE(ParticleCopier);
 
-  REG_MODULE(ParticleCopier)
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
 
-  //-----------------------------------------------------------------
-  //                 Implementation
-  //-----------------------------------------------------------------
+ParticleCopierModule::ParticleCopierModule() : Module()
+{
+  setDescription("Replaces each Particle in the ParticleList with its copy.\n"
+                 "Particle's (grand)^n-daughter Particles are copied as well.\n"
+                 "The existing relations of the original Particle (or it's (grand-)^n-daughters)\n"
+                 "are copied as well.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
-  ParticleCopierModule::ParticleCopierModule() : Module()
-  {
-    setDescription("Replaces each Particle in the ParticleList with its copy.\n"
-                   "Particle's (grand)^n-daughter Particles are copied as well.\n"
-                   "The existing relations of the original Particle (or it's (grand-)^n-daughters)\n"
-                   "are copied as well.");
-    setPropertyFlags(c_ParallelProcessingCertified);
+  // Add parameters
+  vector<string> defaultList;
+  addParam("inputListNames", m_inputListNames,
+           "list of input ParticleList names", defaultList);
+}
 
-    // Add parameters
-    vector<string> defaultList;
-    addParam("inputListNames", m_inputListNames,
-             "list of input ParticleList names", defaultList);
+void ParticleCopierModule::initialize()
+{
+  // Input lists
+  for (const std::string& listName : m_inputListNames) {
+    StoreObjPtr<ParticleList>().isRequired(listName);
   }
+}
 
-  void ParticleCopierModule::initialize()
-  {
-    // Input lists
-    for (const std::string& listName : m_inputListNames) {
-      StoreObjPtr<ParticleList>().isRequired(listName);
+void ParticleCopierModule::event()
+{
+  // copy all particles from input lists that pass selection criteria into plist
+  for (const auto& inputListName : m_inputListNames) {
+    const StoreObjPtr<ParticleList> plist(inputListName);
+
+    bool isReserved = plist->getIsReserved();
+    if (isReserved)
+      plist->setEditable(true);
+
+    const unsigned int origSize = plist->getListSize();
+    std::vector<Particle*> copies(origSize);
+
+    for (unsigned i = 0; i < origSize; i++) {
+      const Particle* origP = plist->getParticle(i);
+
+      // copy the particle
+      Particle* copyP = ParticleCopy::copyParticle(origP);
+      copies.at(i) = copyP;
     }
+
+    // clear the original list and fill it with copies
+    plist->clear();
+    for (unsigned i = 0; i < origSize; i++)
+      plist->addParticle(copies[i]);
+
+    unsigned int copySize = plist->getListSize();
+
+    // cppcheck-suppress knownConditionTrueFalse; we know that this shouldn't happen
+    if (copySize != origSize)
+      B2FATAL("Size of the ParticleList " << inputListName
+              << " has changed while copying the Particles! original size = "
+              << origSize << " vs. new size = " << copySize);
+
+    if (isReserved)
+      plist->setEditable(false);
   }
-
-  void ParticleCopierModule::event()
-  {
-    // copy all particles from input lists that pass selection criteria into plist
-    for (const auto& inputListName : m_inputListNames) {
-      const StoreObjPtr<ParticleList> plist(inputListName);
-
-      const unsigned int origSize = plist->getListSize();
-      std::vector<Particle*> copies(origSize);
-
-      for (unsigned i = 0; i < origSize; i++) {
-        const Particle* origP = plist->getParticle(i);
-
-        // copy the particle
-        Particle* copyP = ParticleCopy::copyParticle(origP);
-        copies.at(i) = copyP;
-      }
-
-      // clear the original list and fill it with copies
-      plist->clear();
-      for (unsigned i = 0; i < origSize; i++)
-        plist->addParticle(copies[i]);
-
-      unsigned int copySize = plist->getListSize();
-
-      if (copySize != origSize)
-        B2FATAL("Size of the ParticleList " << inputListName
-                << " has changed while copying the Particles! original size = "
-                << origSize << " vs. new size = " << copySize);
-
-    }
-  }
-} // end Belle2 namespace
+}

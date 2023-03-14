@@ -530,10 +530,9 @@ void SpaceResolutionCalibration::readSigmaFromText()
   unsigned short np = 0;
   unsigned short iCL, iLR;
   double theta, alpha;
-  unsigned nRead = 0;
 
   ifs >> m_sigmaParamMode_old >> np;
-  double sigma[8];
+  double sigma[8]; // cppcheck-suppress constVariable
   //  if (m_sigmaParamMode < 0 || m_sigmaParamMode > 1) cout<<"CDCGeometryPar: invalid sigma-parameterization mode read !"<<endl;
   //if (m_sigmaParamMode == 1) cout<<"CDCGeometryPar: sigma-parameterization mode=1 not ready yet"<<endl;
   //  if (np <= 0 || np > nSigmaParams) cout<<"CDCGeometryPar: no. of sigma-params. outside limits !"<<endl;
@@ -543,7 +542,6 @@ void SpaceResolutionCalibration::readSigmaFromText()
     for (int i = 0; i < np; ++i) {
       ifs >> sigma[i];
     }
-    ++nRead;
 
     int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {
@@ -595,7 +593,7 @@ void SpaceResolutionCalibration::readSigmaFromDB()
   }
   m_sigmaParamMode_old = (*m_sResolFromDB)->getSigmaParamMode();
 
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < nalpha_old; ++iA) {
         for (unsigned short iT = 0; iT < ntheta_old; ++iT) {

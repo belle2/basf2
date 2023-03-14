@@ -7,11 +7,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
+
 namespace TreeFitter {
 
   Origin::Origin(Belle2::Particle* daughter,
@@ -54,27 +55,27 @@ namespace TreeFitter {
   {
     if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 3) {
       m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
-      const TVector3& vertexVector = m_beamSpot->getIPPosition();
+      const Belle2::B2Vector3D& vertexVector = m_beamSpot->getIPPosition();
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
-      m_posVec(0) = vertexVector.x();
-      m_posVec(1) = vertexVector.y();
-      m_posVec(2) = vertexVector.z();
-      m_covariance(0, 0) = covVertex(0 , 0);
-      m_covariance(1, 1) = covVertex(1 , 1);
-      m_covariance(2, 2) = covVertex(2 , 2);
-      m_covariance(1, 0) = covVertex(1 , 0);
-      m_covariance(2, 0) = covVertex(2 , 0);
-      m_covariance(2, 1) = covVertex(2 , 1);
+      m_posVec(0) = vertexVector.X();
+      m_posVec(1) = vertexVector.Y();
+      m_posVec(2) = vertexVector.Z();
+      m_covariance(0, 0) = covVertex(0, 0);
+      m_covariance(1, 1) = covVertex(1, 1);
+      m_covariance(2, 2) = covVertex(2, 2);
+      m_covariance(1, 0) = covVertex(1, 0);
+      m_covariance(2, 0) = covVertex(2, 0);
+      m_covariance(2, 1) = covVertex(2, 1);
 
     } else if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 2) {
       m_covariance = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
-      const TVector3& vertexVector = m_beamSpot->getIPPosition();
+      const Belle2::B2Vector3D& vertexVector = m_beamSpot->getIPPosition();
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
-      m_posVec(0) = vertexVector.x();
-      m_posVec(1) = vertexVector.y();
-      m_covariance(0, 0) = covVertex(0 , 0);
-      m_covariance(1, 1) = covVertex(1 , 1);
-      m_covariance(1, 0) = covVertex(1 , 0);
+      m_posVec(0) = vertexVector.X();
+      m_posVec(1) = vertexVector.Y();
+      m_covariance(0, 0) = covVertex(0, 0);
+      m_covariance(1, 1) = covVertex(1, 1);
+      m_covariance(1, 0) = covVertex(1, 0);
 
     } else if (!m_isBeamSpot && m_constraintDimension == 3) {
 

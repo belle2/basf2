@@ -19,8 +19,8 @@ SVDStripNoiseMap::SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr):
   m_onl2offl_map_ptr(onl2offl_map_ptr)
 {
 
-  memset(m_pedestalMap , 0, sizeof(m_pedestalMap));
-  memset(m_noiseMap    , 0, sizeof(m_noiseMap));
+  memset(m_pedestalMap, 0, sizeof(m_pedestalMap));
+  memset(m_noiseMap, 0, sizeof(m_noiseMap));
   memset(m_thresholdMap, 0, sizeof(m_thresholdMap));
   memset(m_goodStripMap, 0, sizeof(m_goodStripMap));
 
@@ -48,8 +48,8 @@ int SVDStripNoiseMap::initializeMap(const string& noisefilename)
     return -1;
   }
 
-  memset(m_pedestalMap , 0, sizeof(m_pedestalMap));
-  memset(m_noiseMap    , 0, sizeof(m_noiseMap));
+  memset(m_pedestalMap, 0, sizeof(m_pedestalMap));
+  memset(m_noiseMap, 0, sizeof(m_noiseMap));
   memset(m_thresholdMap, 0, sizeof(m_thresholdMap));
   memset(m_goodStripMap, 0, sizeof(m_goodStripMap));
 
@@ -119,7 +119,7 @@ int SVDStripNoiseMap::initializeMap(const string& noisefilename)
         (m_onl2offl_map_ptr->getSensorInfo(fadc_id, apv_id)).m_uSide;
       short svd_sensor_id = SVDPar::getSVDSensorID(vxd_id, is_u);
       if (svd_sensor_id < 0) {
-        B2ERROR("Invalid SVDSensorID: " << svd_sensor_id << " (FADC ID: " << fadc_id << ", APV: " << apv << ")");
+        B2ERROR("Invalid SVDSensorID: " << LogVar("SVDSensorID", svd_sensor_id) << " (FADC ID: " << fadc_id << ", APV: " << apv << ")");
         return -1;
       }
 
@@ -148,7 +148,7 @@ float SVDStripNoiseMap::getPedestal(VxdID id, bool is_u, short strip)
 
   short sensor_id = SVDPar::getSVDSensorID(id, is_u);
   if (sensor_id < 0 || SVDPar::nSensorID <= sensor_id) {
-    B2ERROR("Invalid SVDSensorID: " << sensor_id);
+    B2ERROR("Invalid SVDSensorID: " << LogVar("SVDSensorID", sensor_id));
     return -9999.0;
   }
 
@@ -159,13 +159,13 @@ float SVDStripNoiseMap::getNoise(VxdID id, bool is_u, short strip)
 {
 
   if (strip < 0 || SVDPar::maxStrip <= strip) {
-    B2ERROR("Invalid strip number: " << strip);
+    B2ERROR("Invalid strip number: " << LogVar("strip number", strip));
     return -9999.0;
   }
 
   short sensor_id = SVDPar::getSVDSensorID(id, is_u);
   if (sensor_id < 0 || SVDPar::nSensorID <= sensor_id) {
-    B2ERROR("Invalid SVDSensorID: " << sensor_id);
+    B2ERROR("Invalid SVDSensorID: " << LogVar("SVDSensorID", sensor_id));
     return -9999.0;
   }
 
@@ -176,13 +176,13 @@ float SVDStripNoiseMap::getThreshold(VxdID id, bool is_u, short strip)
 {
 
   if (strip < 0 || SVDPar::maxStrip <= strip) {
-    B2ERROR("Invalid strip number: " << strip);
+    B2ERROR("Invalid strip number: " << LogVar("strip number", strip));
     return -9999.0;
   }
 
   short sensor_id = SVDPar::getSVDSensorID(id, is_u);
   if (sensor_id < 0 || SVDPar::nSensorID <= sensor_id) {
-    B2ERROR("Invalid SVDSensorID: " << sensor_id);
+    B2ERROR("Invalid SVDSensorID: " << LogVar("SVDSensorID", sensor_id));
     return -9999.0;
   }
 
@@ -193,13 +193,13 @@ bool SVDStripNoiseMap::isGood(VxdID id, bool is_u, short strip)
 {
 
   if (strip < 0 || SVDPar::maxStrip <= strip) {
-    B2ERROR("Invalid strip number: " << strip);
+    B2ERROR("Invalid strip number: " << LogVar("strip number", strip));
     return false;
   }
 
   short sensor_id = SVDPar::getSVDSensorID(id, is_u);
   if (sensor_id < 0 || SVDPar::nSensorID <= sensor_id) {
-    B2ERROR("Invalid SVDSensorID: " << sensor_id);
+    B2ERROR("Invalid SVDSensorID: " << LogVar("SVDSensorID", sensor_id));
     return false;
   }
 

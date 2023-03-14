@@ -308,7 +308,7 @@ namespace Belle2 {
       assert(ilocal >= 0 && ilocal < getNPar());
       if (par[ilocal] == par_) return false;
       invalidateCache();
-      bool result = pow((par_ - par[ilocal]) , 2) > eps2 * cov[ilocal][ilocal];
+      bool result = pow((par_ - par[ilocal]), 2) > eps2 * cov[ilocal][ilocal];
       par[ilocal] = par_;
       return result;
     }
@@ -501,7 +501,7 @@ namespace Belle2 {
         if (iglobal >= 0) {
           assert(iglobal < idim);
           for (int j = 0; j < BaseDefs::nMetaVars[metaSet]; j++) {
-            y[iglobal] += lambda * der[j] * getFirstDerivative_Meta_Local(j , ilocal , metaSet);
+            y[iglobal] += lambda * der[j] * getFirstDerivative_Meta_Local(j, ilocal, metaSet);
           }
         }
       }
@@ -516,7 +516,7 @@ namespace Belle2 {
         int iglobal = globalParNum[ilocal];
         if (iglobal >= 0) {
           for (int j = 0; j < BaseDefs::nMetaVars[metaSet]; j++) {
-            double x = der[j] * getFirstDerivative_Meta_Local(j, ilocal , metaSet);
+            double x = der[j] * getFirstDerivative_Meta_Local(j, ilocal, metaSet);
             M[idim * kglobal + iglobal] += x;
             M[idim * iglobal + kglobal] += x;
           }
@@ -542,7 +542,7 @@ namespace Belle2 {
           if (jglobal < 0) continue;
           double sum(0);
           for (int imeta = 0; imeta < BaseDefs::nMetaVars[metaSet]; imeta++) {
-            sum += factor[imeta] * getSecondDerivative_Meta_Local(imeta, ilocal , jlocal , metaSet);
+            sum += factor[imeta] * getSecondDerivative_Meta_Local(imeta, ilocal, jlocal, metaSet);
           }
           der2[idim * iglobal + jglobal] += sum;
           if (iglobal != jglobal) der2[idim * jglobal + iglobal] += sum;
@@ -599,7 +599,7 @@ namespace Belle2 {
           double cov_i_j = 0; // this will become the covariance of intermediate variables i and j
           for (int k = 0; k < getNPar(); k++) {
             for (int l = 0; l < getNPar(); l++) {
-              cov_i_j += getFirstDerivative_Meta_Local(i , k , metaSet) * cov[k][l] * getFirstDerivative_Meta_Local(j , l , metaSet);
+              cov_i_j += getFirstDerivative_Meta_Local(i, k, metaSet) * cov[k][l] * getFirstDerivative_Meta_Local(j, l, metaSet);
             }
           }
           totError += der[i] * der[j] * cov_i_j;

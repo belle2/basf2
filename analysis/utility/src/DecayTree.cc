@@ -20,17 +20,13 @@ DecayTree::DecayTree(const std::string& decaystring, bool removeRadiativeGammaFl
   m_valid = decaystring.find("No match") == std::string::npos;
   if (m_valid) {
     const auto& root_nodes = this->build_tree(decaystring, removeRadiativeGammaFlag);
-    if (root_nodes.size() == 1)
+    if (root_nodes.size() == 1) {
       m_root_node = root_nodes[0];
-    else
+      // Build cache
+      build_cache(m_root_node);
+    } else
       m_valid = false;
   }
-
-  // Build cache
-  if (m_valid) {
-    build_cache(m_root_node);
-  }
-
 }
 
 DecayTree::DecayTree(const DecayTree& tree):

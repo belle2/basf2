@@ -17,9 +17,9 @@ namespace Belle2 {
   public:
     NSMNodeDaemon() : m_timeout(0) {}
     NSMNodeDaemon(NSMCallback* callback1,
-                  const std::string host1, int port1,
+                  const std::string& host1, int port1,
                   NSMCallback* callback2 = NULL,
-                  const std::string host2 = "", int port2 = 0)
+                  const std::string& host2 = "", int port2 = 0)
       : m_timeout(0)
     {
       add(callback1, host1, port1);

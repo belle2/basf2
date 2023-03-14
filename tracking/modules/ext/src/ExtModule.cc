@@ -12,7 +12,7 @@
 /* Tracking headers. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 #include <simulation/kernel/ExtManager.h>
 
@@ -25,10 +25,9 @@
 /* C++ headers. */
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(Ext)
+REG_MODULE(Ext);
 
 ExtModule::ExtModule() :
   Module(),
@@ -59,13 +58,13 @@ ExtModule::ExtModule() :
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled", false);
   addParam("magneticFieldStepper", m_MagneticFieldStepperName,
            "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
-           string("default"));
+           std::string("default"));
   addParam("magneticCacheDistance", m_MagneticCacheDistance,
            "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the last BField value. 0 means no caching",
            0.0);
   addParam("deltaChordInMagneticField", m_DeltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
-  vector<string> defaultCommands;
+  std::vector<std::string> defaultCommands;
   addParam("UICommands", m_UICommands, "A list of Geant4 UI commands that should be applied at the start of the job",
            defaultCommands);
 }

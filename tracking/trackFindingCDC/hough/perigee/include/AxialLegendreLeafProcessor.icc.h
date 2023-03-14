@@ -58,7 +58,7 @@ namespace Belle2 {
 
         float lowerCurv = *(curvs[0]);
         float upperCurv = *(curvs[1]);
-        if (ESignUtil::common(lowerCurv, upperCurv) * curv < 0) {
+        if (static_cast<double>(ESignUtil::common(lowerCurv, upperCurv)) * curv < 0) {
           trajectory2D.reverse();
         }
       }

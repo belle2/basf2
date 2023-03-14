@@ -5,18 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDisplay/EclData.h>
 
-//ROOT
-#include <TLeaf.h>
-#include <TFile.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-//ECL
-#include <ecl/dataobjects/ECLCalDigit.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TLeaf.h>
 
 using namespace Belle2;
 
@@ -145,7 +147,7 @@ void EclData::initEventRanges()
 
 int EclData::getCrystalCount()
 {
-  return 8736;
+  return ECLElementNumbers::c_NCrystals;
 }
 
 TTree* EclData::getTree()
@@ -194,11 +196,11 @@ bool EclData::isCrystalInSubsystem(int crystal, EclData::EclSubsystem subsys)
     case ALL:
       return true;
     case BARR:
-      return crystal >= 1153 && crystal <= 7776;
+      return ECLElementNumbers::isBarrel(crystal);
     case FORW:
-      return crystal < 1153;
+      return ECLElementNumbers::isForward(crystal);
     case BACKW:
-      return crystal > 7776;
+      return ECLElementNumbers::isBackward(crystal);
     default:
       return false;
   }
@@ -324,7 +326,7 @@ void EclData::loadRootFile(const char* path)
 
   tree->SetBranchAddress("ECLCalDigits.m_CellId", &m_branch_ch);
   tree->SetBranchAddress("ECLCalDigits.m_Energy", &m_branch_energy);
-  tree->SetBranchAddress("ECLCalDigits.m_Time"  , &m_branch_time);
+  tree->SetBranchAddress("ECLCalDigits.m_Time", &m_branch_time);
 
   TLeaf* leafCellId;
   TLeaf* leafEnergy;

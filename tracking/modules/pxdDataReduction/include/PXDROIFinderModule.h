@@ -38,21 +38,36 @@ namespace Belle2 {
   private:
 
     /**
-     *Initializes the Module.
+     * Initializes the module.
      */
     void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     void endRun() override;
 
-    ROIPixelTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
-    PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
+    StoreArray<RecoTrack> m_RecoTracks;   /**< RecoTracks StoreArray */
+    StoreArray<PXDIntercept> m_PXDIntercepts;   /**< PXDIntercepts StoreArray */
+    StoreArray<ROIid> m_ROIs;   /**< ROIs StoreArray */
+    ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
+
     std::string m_PXDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
+
+    ROIPixelTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
+    PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
 
     double m_toleranceZ; /**< tolerance for finding sensor in Z coordinate (cm) */
     double m_tolerancePhi; /**< tolerance for finding sensor in phi coordinate (radians) */
@@ -64,7 +79,6 @@ namespace Belle2 {
     double m_maxWidthU;  /**< maximum U width of the ROI */
     double m_maxWidthV;  /**< maximum V width of the ROI */
 
-    ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
 
   };
 }

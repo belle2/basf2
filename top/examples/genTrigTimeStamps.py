@@ -55,7 +55,7 @@ simulation = b2.register_module('FullSim')
 main.add_module(simulation)
 
 # TOP digitization
-main.add_module('TOPDigitizer', allChannels=True, readoutWindows=12, offsetWindows=4)
+main.add_module('TOPDigitizer', allChannels=True)
 
 # TOP trigger digitization (time stamps)
 trigdigi = b2.register_module('TOPTriggerDigitizer')

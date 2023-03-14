@@ -88,7 +88,7 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
       }
       segmentPair.setTrajectory3D(mcTrajectory3D);
     }
-    return pairFBInfo * static_cast<Weight>(fromSegment.size() + toSegment.size());
+    return static_cast<double>(pairFBInfo) * static_cast<Weight>(fromSegment.size() + toSegment.size());
   }
   return NAN;
 }

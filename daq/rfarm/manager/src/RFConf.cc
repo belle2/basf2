@@ -34,8 +34,7 @@ RFConf::~RFConf()
 char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
 {
   char buf[1024], keybuf[256];
-  char* p, *q, *keyp, *delp, *valp;
-  int line;
+  char* p, *q;
 
   struct RFConf_t top, *cur;
   top.key = NULL;
@@ -55,7 +54,7 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
   // Search for the record in the configuration file
   rewind(m_fd);
   if (! top.key) { /* the first invokation */
-    line = 0;
+    int line = 0;
     cur = &top;
     while (fgets(buf, sizeof(buf), m_fd)) {
       line++;
@@ -71,7 +70,9 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
       //      printf ( "buf = %s\n", buf );
 
       /* sorry for this very tricky code... */
-      keyp = valp = delp = 0;
+      char* keyp = nullptr;
+      char* delp = nullptr;
+      char* valp = nullptr;
       for (p = buf; *p && *p != '#'; p++) {
         if (! keyp) {
           if (! isspace(*p)) keyp = p;

@@ -21,7 +21,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
-from stdPi0s import loadStdSkimPi0, stdPi0s
+from stdPi0s import loadStdSkimPi0, stdPi0s, loadStdSkimHighEffPi0
 from stdV0s import stdKshorts
 from variables import variables as vm
 from stdKlongs import stdKlongs
@@ -73,6 +73,7 @@ class TDCPV_qqs(BaseSkim):
     * ``eta:SkimHighEff``
     * ``pi0:eff40_May2020``
     * ``pi0:skim``
+    * ``pi0:SkimHighEff``
     * ``rho0:SkimHighEff``
     * ``omega:SkimHighEff``
     * ``f_0:SkimHighEff``
@@ -81,7 +82,8 @@ class TDCPV_qqs(BaseSkim):
     * ``omega:SkimHighEff``
     * ``K*0:SkimHighEff``
     * ``gamma:E15 , cut : 1.4 < E < 4``
-    * ``k_S0:merged``
+    * ``gamma:ECMS16 , cut : 1.6 < useCMSFrame(E)``
+    * ``K_S0:merged``
     * ``K+:1%``
 
     **Cuts used**:
@@ -104,12 +106,13 @@ class TDCPV_qqs(BaseSkim):
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
+        loadStdSkimHighEffPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPi0s("eff40_May2020", path=path)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)
@@ -121,6 +124,7 @@ class TDCPV_qqs(BaseSkim):
 
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
+        ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
@@ -145,6 +149,7 @@ class TDCPV_qqs(BaseSkim):
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged',
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged gamma:E15',
             'pi0:skim K_S0:merged gamma:E15',
+            'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
         ]
 
         bu_qqs_Channels = [
@@ -155,13 +160,11 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_List = []
         for chID, channel in enumerate(bd_qqs_Channels):
             ma.reconstructDecay('B0:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            ma.applyCuts('B0:TDCPV_qqs' + str(chID), 'nTracks>4', path=path)
             bd_qqs_List.append('B0:TDCPV_qqs' + str(chID))
 
         bu_qqs_List = []
         for chID, channel in enumerate(bu_qqs_Channels):
             ma.reconstructDecay('B+:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            ma.applyCuts('B+:TDCPV_qqs' + str(chID), 'nTracks>4', path=path)
             bu_qqs_List.append('B+:TDCPV_qqs' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
@@ -257,14 +260,14 @@ class TDCPV_ccs(BaseSkim):
         stdK("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
 
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPi0s("eff40_May2020", path=path)
         loadStdSkimHighEffKstar0(path=path)
 
         loadStdJpsiToee_noTOP(path=path)

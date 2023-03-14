@@ -18,6 +18,12 @@ const RFCommand RFCommand::PAUSE(606, "RF_PAUSE");
 const RFCommand RFCommand::RESUME(607, "RF_RESUME");
 const RFCommand RFCommand::STATUS(608, "RF_STATUS");
 
+const RFCommand& RFCommand::operator=(const RFCommand& command)
+{
+  NSMCommand::operator=(command);
+  return *this;
+}
+
 const RFCommand& RFCommand::operator=(const std::string& label)
 {
   if (label == CONFIGURE.getLabel()) *this = CONFIGURE;

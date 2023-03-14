@@ -63,7 +63,7 @@ namespace Belle2 {
     void setTriggerNumber(unsigned long int triggerNumber); /**< set trigger number*/
 
     //! set run/ subrun/exp number
-    void setRunSubrunExpNumber(int run , int subrun , int exp); /**< set run, subrun and experiment number*/
+    void setRunSubrunExpNumber(int run, int subrun, int exp);   /**< set run, subrun and experiment number*/
 
     //    void addROIraw(ROIrawID roiraw);
     void addROIraw(unsigned long int roiraw); /**< add a ROIrawID */

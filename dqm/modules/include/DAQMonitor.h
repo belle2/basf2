@@ -12,9 +12,11 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -86,6 +88,12 @@ namespace Belle2 {
 
     /** Histogram for total data size. */
     TH1F* h_totalSize{nullptr};
+
+    /** Histogram for run nr crosscheck */
+    TH1F* h_runNr{nullptr};
+
+    /** Input ptr for EventMetaData. */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /** PXD raw data. */
     StoreArray<RawPXD> m_pxdRaw;

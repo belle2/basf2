@@ -18,7 +18,7 @@ namespace Belle2 {
      * Please note that (a) is recommended and (b) should be used only for
      * very specific rare cases (such as prepation of new ECLChannelMap payloads)
      */
-    class ECLChannelMapper {
+    class ECLChannelMapper final {
 
       /// initialization flag
       bool isInitialized;
@@ -54,27 +54,31 @@ namespace Belle2 {
       /// Convert internal data to ECLChannelMap database object
       ECLChannelMap getDBObject();
 
-      /// get crate number by given COPPER node number and FINESSE number
-      int getCrateID(int iCOPPERNode, int iFINESSE); // iFINNES = 0 (FINESSE A) or 1 (FINESSE B)
-      /// get CellId by given crate number, shaper position in the crate and DSP channel number in the shaper
+      /** Get crate number by given COPPER node number and FINESSE number
+       * @param iCOPPERNode  Node ID (26 nodes in COPPER case, 3 nodes in PCIe40 case)
+       * @param iFINESSE     Channel number (0 or 1 in COPPER case, 0-17 in PCIe40 case)
+       * @param pcie40       Set to true if unpacking PCIe40 data
+       */
+      int getCrateID(int iCOPPERNode, int iFINESSE, bool pcie40 = false);
+      /// Get CellId by given crate number, shaper position in the crate and DSP channel number in the shaper
       int getCellId(int iCrate, int iShaper, int iChannel);
-      /// get number of COPPER node by given crate number
+      /// Get number of COPPER node by given crate number
       int getCOPPERNode(int iCrate);
-      /// get number of FINESSE (0/1) in COPPER by given crate number
+      /// Get number of FINESSE (0/1) in COPPER by given crate number
       int getFINESSE(int iCrate);
-      /// get ECL subsystem ID by given crate number: 0 -- barrel, 1 -- forward. 2 -- backward endcap
+      /// Get ECL subsystem ID by given crate number: 0 -- barrel, 1 -- forward. 2 -- backward endcap
       int getSubSystem(int iCrate);
 
-      /// get crate number by given CellId
+      /// Get crate number by given CellId
       int getCrateID(int cellID);
-      /// get position of the shaper in the crate by given CellId
+      /// Get position of the shaper in the crate by given CellId
       int getShaperPosition(int cellID);
-      /// get number of DSP channel in the shaper by given number of  CellId
+      /// Get number of DSP channel in the shaper by given number of  CellId
       int getShaperChannel(int cellID);
       /// Return channel index in ECLChannelMap
       int getElectronicsID(int cellID);
 
-      /// get number of ShaperDSP modules in the given VME crate number
+      /// Get number of ShaperDSP modules in the given VME crate number
       inline int getNShapersInCrate(int iCrate)
       {
         if (iCrate <= ECL_BARREL_CRATES) return ECL_BARREL_SHAPERS_IN_CRATE;
@@ -82,6 +86,9 @@ namespace Belle2 {
         if (ECL_BARREL_CRATES + ECL_FWD_CRATES < iCrate && iCrate <= ECL_CRATES) return ECL_BKW_SHAPERS_IN_CRATE;
         return 0;
       }
+
+      ClassDef(ECLChannelMapper, 1); /**< ClassDef */
+
     };
   }
 }

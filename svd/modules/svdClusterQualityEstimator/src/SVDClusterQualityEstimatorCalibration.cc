@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SVDClusterQualityEstimatorCalibration)
+REG_MODULE(SVDClusterQualityEstimatorCalibration);
 
 SVDClusterQualityEstimatorCalibrationModule::SVDClusterQualityEstimatorCalibrationModule() :
   Module()

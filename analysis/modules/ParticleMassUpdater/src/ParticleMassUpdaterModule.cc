@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(ParticleMassUpdater)
+REG_MODULE(ParticleMassUpdater);
 
 ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
 {

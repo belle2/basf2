@@ -39,7 +39,7 @@ namespace {
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(InclusiveParticleChecker)
+REG_MODULE(InclusiveParticleChecker);
 
 //-----------------------------------------------------------------
 //                 Implementation

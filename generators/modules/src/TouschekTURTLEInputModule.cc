@@ -25,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TouschekTURTLEInput)
+REG_MODULE(TouschekTURTLEInput);
 
 //-----------------------------------------------------------------
 //                 Implementation

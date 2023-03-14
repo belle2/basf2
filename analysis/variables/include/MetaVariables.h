@@ -251,11 +251,11 @@ namespace Belle2 {
     Manager::FunctionPtr mcDaughterAngle(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns the angle between the granddaughter particle's
+     * Returns the angle between the granddaughter particle's
      * and the reverted particle's momentum vector in the daughter particle's rest frame.
      * Two arguments representing the indices of the daughter and granddaughter have to be provided as arguments.
      */
-    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments);
+    double grandDaughterDecayAngle(const Particle* particle, const std::vector<double>& arguments);
 
     /**
      * Returns function which returns the angle between clusters associated to the two daughters.
@@ -265,7 +265,7 @@ namespace Belle2 {
      * Returns nan if any of the daughters specified don't have an associated cluster.
      * The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.
      */
-    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments);
+    double daughterClusterAngleInBetween(const Particle* particle, const std::vector<double>& daughterIndices);
 
     /**
      * Returns function which returns the invariant Mass m_ij=sqrt((pi + pj)^2) of the two given daughters
@@ -523,6 +523,11 @@ namespace Belle2 {
      * Returns the value of the variable in the rest frame of the recoil system against the first Particle in the given ParticleList.
      */
     Manager::FunctionPtr useRecoilParticleRestFrame(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the value of the variable in the rest frame of the daughter identified via generalized index.
+     */
+    Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments);
 
     /**
     * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.

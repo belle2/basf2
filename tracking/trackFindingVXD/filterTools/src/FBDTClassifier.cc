@@ -16,7 +16,6 @@
 #endif
 
 using namespace Belle2;
-using namespace std;
 
 template<size_t Ndims>
 void FBDTClassifier<Ndims>::readFromStream(std::istream& is)

@@ -1,0 +1,21 @@
+# EventType: 1220032002
+# Descriptor: [B+ -> eta' rho+]
+# NickName: Bu_etaprho+
+# Documentation: Peaking background for B+ -> rho+rho0
+# Tested: Yes
+# Physics WG: BToCharmless 
+# Responsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 28/02/2022
+
+Decay Upsilon(4S)
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
+Enddecay
+Decay B+sig
+1.0  rho+  eta'           PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+End

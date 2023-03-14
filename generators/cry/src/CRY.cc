@@ -175,10 +175,10 @@ namespace Belle2 {
         particle.setPDG(pdg);
         particle.setFirstDaughter(0);
         particle.setLastDaughter(0);
-        particle.setMomentum(TVector3(mom.x(), mom.y(), mom.z()));
+        particle.setMomentum(ROOT::Math::XYZVector(mom.x(), mom.y(), mom.z()));
         particle.setMass(mass);
         particle.setEnergy(mom.e());
-        particle.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()));
+        particle.setProductionVertex(ROOT::Math::XYZVector(pos.x(), pos.y(), pos.z()));
         particle.setProductionTime(time);
         eventInAcceptance = true;
       }

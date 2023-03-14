@@ -1,0 +1,33 @@
+# EventType: 4110841002
+# Descriptor: [vpho_gammaXb_pipichib1_gammaY(1S)_ll]
+# NickName: vpho_gammaXb_pipichib1_gammaY(1S)_ll
+# Cuts: None
+# Documentation:
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20221008
+# parameter of Xb: pdg.add_particle('Xb',1111553,10.60435,1.2e-3,0.0,1.0,0.1, 0, 0)
+
+Alias Xbsig Xb
+Alias chi_b1sig chi_b1
+
+Decay vpho
+1.0 Xbsig gamma PHSP;
+Enddecay
+
+Decay Xbsig
+1.0 pi+ pi- chi_b1sig PHSP;
+Enddecay
+
+Decay chi_b1sig
+1.0 gamma   Upsilonsig                                HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
+Enddecay
+
+Decay Upsilonsig
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+End

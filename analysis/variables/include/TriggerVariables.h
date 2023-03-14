@@ -14,7 +14,6 @@
 
 
 namespace Belle2 {
-
   class Particle;
 
   namespace Variable {

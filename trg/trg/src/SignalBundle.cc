@@ -138,7 +138,6 @@ namespace Belle2 {
 
       bool active = true;
       int nLoops = 0;
-      // cppcheck-suppress knownConditionTrueFalse
       while (active) {
         int clk = states[i] + nLoops;
         lastClock = clk;
@@ -294,7 +293,7 @@ namespace Belle2 {
   }
 
   void
-  TRGSignalBundle::dumpCOE(const string& fnIn, int start , int stop) const
+  TRGSignalBundle::dumpCOE(const string& fnIn, int start, int stop) const
   {
 
     string fn = fnIn;

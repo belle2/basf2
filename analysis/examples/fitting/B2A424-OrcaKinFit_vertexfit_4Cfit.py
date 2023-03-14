@@ -79,10 +79,7 @@ uvars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
 
 uvarsv = uvars + ['chiProb']
 
-uvars4c = uvars + vu.create_aliases(['OrcaKinFitProb',
-                                     'OrcaKinFitProb',
-                                     'OrcaKinFitChi2',
-                                     'OrcaKinFitErrorCode'], 'extraInfo({variable})', "") + \
+uvars4c = uvars + ['OrcaKinFitProb', 'OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode'] + \
     vu.create_aliases(['VertexFitChi2',
                        'VertexFitProb'], 'daughter(1, extraInfo({variable}))', "A")
 

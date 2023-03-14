@@ -9,12 +9,14 @@
 #include <generators/modules/aafhinput/AafhInputModule.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(AafhInput)
+REG_MODULE(AafhInput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -107,10 +109,10 @@ void AafhInputModule::event()
   const MCInitialParticles& initial = m_initial.generate();
 
   // True boost.
-  TLorentzRotation boost = initial.getCMSToLab();
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex.
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   MCParticleGraph mpg;
 
@@ -121,7 +123,7 @@ void AafhInputModule::event()
   for (size_t i = 0; i < mpg.size(); ++i) {
     mpg[i].set4Vector(boost * mpg[i].get4Vector());
 
-    TVector3 v3 = mpg[i].getProductionVertex();
+    ROOT::Math::XYZVector v3 = mpg[i].getProductionVertex();
     v3 = v3 + vertex;
     mpg[i].setProductionVertex(v3);
     mpg[i].setValidVertex(true);

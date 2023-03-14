@@ -73,7 +73,7 @@ void ERecoMaster::Hook_Message_Handlers()
 
 // NSM callback functions for message
 
-void ERecoMaster::Log_Handler(NSMmsg* msg, NSMcontext* ctx)
+void ERecoMaster::Log_Handler(NSMmsg* /*msg*/, NSMcontext* /*ctx*/)
 {
   //  printf ( "ERecoMaster : [INFO] received\n" );
   //  b2nsm_ok ( msg, "INFO!!", NULL );

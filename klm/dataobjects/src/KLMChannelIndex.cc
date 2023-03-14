@@ -317,7 +317,7 @@ KLMChannelIndex& KLMChannelIndex::increment()
   return *this;
 }
 
-bool KLMChannelIndex::operator==(const KLMChannelIndex& index)
+bool KLMChannelIndex::operator==(const KLMChannelIndex& index) const
 {
   switch (m_IndexLevel) {
     case c_IndexLevelStrip:
@@ -347,7 +347,7 @@ bool KLMChannelIndex::operator==(const KLMChannelIndex& index)
   return true;
 }
 
-bool KLMChannelIndex::operator!=(const KLMChannelIndex& index)
+bool KLMChannelIndex::operator!=(const KLMChannelIndex& index) const
 {
   switch (m_IndexLevel) {
     case c_IndexLevelStrip:

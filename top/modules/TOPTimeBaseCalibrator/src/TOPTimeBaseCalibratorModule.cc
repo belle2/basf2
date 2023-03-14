@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPTimeBaseCalibrator/TOPTimeBaseCalibratorModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
@@ -36,10 +38,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPTimeBaseCalibrator)
+  REG_MODULE(TOPTimeBaseCalibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -362,7 +364,7 @@ namespace Belle2 {
     double meanTimeDifference = 0;
     for (auto& x : profMeans) meanTimeDifference += x;
     meanTimeDifference /= profMeans.size();
-    meanTimeDifference -= int(meanTimeDifference / c_TimeAxisSize) * c_TimeAxisSize;
+    meanTimeDifference -= int(meanTimeDifference / static_cast<double>(c_TimeAxisSize)) * c_TimeAxisSize;
 
     // perform the fit
 
@@ -533,7 +535,7 @@ namespace Belle2 {
                                                  TH1F& HDeltaT)
   {
     std::vector<double> xval(c_TimeAxisSize + 1, 0.0);
-    double wx = 2 * m_syncTimeBase / c_TimeAxisSize;
+    double wx = 2 * m_syncTimeBase / static_cast<double>(c_TimeAxisSize);
     for (int i = 0; i < c_TimeAxisSize + 1; i++) xval[i] = i * wx;
 
     B2INFO("TimeBaseCalibration starts for channel#" << chan);
@@ -568,7 +570,7 @@ namespace Belle2 {
       return false;
     }
 
-    double DeltaT = meanTimeDifference * (2 * m_syncTimeBase / c_TimeAxisSize);
+    double DeltaT = meanTimeDifference * (2 * m_syncTimeBase / static_cast<double>(c_TimeAxisSize));
     HDeltaT.SetBinContent(chan + 1, DeltaT);
 
     std::vector<double> timeInterval;

@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SignalSideVariablesToDaughterExtraInfo)
+REG_MODULE(SignalSideVariablesToDaughterExtraInfo);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -73,7 +73,7 @@ void SignalSideVariablesToDaughterExtraInfoModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    auto* signalSide = roe->getRelated<Particle>();
+    auto* signalSide = roe->getRelatedFrom<Particle>();
     Particle* daughter = plist->getParticle(0);
 
     const unsigned int nVars = m_functions.size();

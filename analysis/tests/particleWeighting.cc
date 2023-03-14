@@ -41,9 +41,9 @@ namespace {
     auto* bin5 = new ParticleWeightingBinLimits(2.5, 3);
 
     int added_bin_id_1 = a->addBin(bin1);
-    EXPECT_EQ(added_bin_id_1 , 1);
+    EXPECT_EQ(added_bin_id_1, 1);
     int added_bin_id_2 = a->addBin(bin2);
-    EXPECT_EQ(added_bin_id_2 , 2);
+    EXPECT_EQ(added_bin_id_2, 2);
     EXPECT_B2FATAL(a->addBin(bin3));
     EXPECT_B2FATAL(a->addBin(bin4));
     EXPECT_B2FATAL(a->addBin(bin5));

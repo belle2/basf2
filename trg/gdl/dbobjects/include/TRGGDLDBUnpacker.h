@@ -25,8 +25,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGDLDBUnpacker(): m_nLeafs(0), m_nLeafsExtra(0), m_nClks(0), m_nBits(0), m_conf(0), m_LeafNames{0}, m_LeafMap{0}, m_BitMap{0},
-      m_nword_header(0), m_nword_input(0), m_nword_output(0), m_BitMap_extra{0} {}
+    TRGGDLDBUnpacker(): m_nLeafs(0), m_nLeafsExtra(0), m_nClks(0), m_nBits(0), m_conf(0), m_LeafNames{{0}}, m_LeafMap{0}, m_BitMap{{0}},
+    m_nword_header(0), m_nword_input(0), m_nword_output(0), m_BitMap_extra{{0}} {}
 
     /** copy constructor */
     TRGGDLDBUnpacker(const TRGGDLDBUnpacker& b): TObject(b)

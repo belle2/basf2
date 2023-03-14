@@ -1,3 +1,6 @@
+# disable doxygen check for this file
+# @cond
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -18,12 +21,12 @@ from caf import strategies
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
-                               expert_username="eberthol",
+                               expert_username="dvthanh",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["mumutight_or_highm_calib", "hadron_calib", "cosmic_calib"],
-                               input_data_filters={"mumutight_or_highm_calib":
-                                                   [INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+                               input_data_names=["mumu_tight_or_highm_calib", "hadron_calib", "cosmic_calib"],
+                               input_data_filters={"mumu_tight_or_highm_calib":
+                                                   [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]],
                                                    "hadron_calib":
@@ -36,28 +39,32 @@ settings = CalibrationSettings(name="CDC Tracking",
                                                         INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "max_files_per_run": 1000,
                                    "min_events_per_file": 500,
-                                   "max_events_per_file": 30000,
+                                   "max_events_per_file": 20000,
                                    "max_events_per_file_hadron_for_tz_tw": 5000,
-                                   "max_events_per_file_hadron_for_xt_sr": 30000,
+                                   "max_events_per_file_hadron_for_xt_sr": 12000,
                                    "min_events_for_tz_tw_calibration": 500000,
                                    "max_events_for_tz_tw_calibration": 1000000,
                                    "min_events_for_xt_sr_calibration": 1000000,  # 1M
                                    "max_events_for_xt_sr_calibration": 10000000,  # 10M
                                    "fractions_for_each_type": [0.5, 1, 0.5],  # [mumu, hadron, cosmic]
+                                   "max_job_for_each_type": [400, 700, 400],
+                                   "calib_mode": "quick",  # manual or predefined: quick, full
+                                   "calibration_procedure": {"tz0": 1, "xt0": 0, "sr_tz0": 0, "tz2": 0},
                                    "payload_boundaries": [],
-                                   "request_memory": 80
+                                   "backend_args": {"request_memory": "4 GB"}
                                })
 
 
-def select_files(all_input_files, min_events, max_events, max_processed_events_per_file, min_events_per_file=500):
+def select_files(all_input_files, min_events, max_events, max_processed_events_per_file, max_job=800, min_events_per_file=500):
     basf2.B2INFO(f"Minimum  number of events: {min_events}")
     basf2.B2INFO(f"Maximum  number of events: {max_events}")
+    basf2.B2INFO(f"Conditions: ({min_events_per_file} < #Event/file < {max_processed_events_per_file}) and max_job = {max_job}")
     # Let's iterate, taking a sample of files from the total (no repeats or replacement) until we get enough events
     total_events = 0
     chosen_files = []
-    while total_events < max_events:
+    njob = 0
+    while total_events < max_events and njob < max_job:
         # If the set is empty we must have used all available files. Here we break and continue. But you may want to
         # raise an Error...
         if not all_input_files:
@@ -79,6 +86,7 @@ def select_files(all_input_files, min_events, max_events, max_processed_events_p
             events_contributed = max_processed_events_per_file
         chosen_files.append(new_file_choice)
         total_events += events_contributed
+        njob += 1
 
     basf2.B2INFO(f"Total chosen files = {len(chosen_files)}")
     basf2.B2INFO(f"Total events in chosen files = {total_events}")
@@ -95,10 +103,12 @@ def select_files(all_input_files, min_events, max_events, max_processed_events_p
 
 def get_calibrations(input_data, **kwargs):
     import basf2
-    # Gets the input files and IoV objects associated with the files.
-
+    #    from prompt.utils import filter_by_max_files_per_run
     # read expert_config values
     expert_config = kwargs.get("expert_config")
+    calib_mode = expert_config["calib_mode"]
+    #    max_files_per_run = expert_config["max_files_per_run"]
+    min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_file = expert_config["max_events_per_file"]
 
     min_events_for_tz_tw = expert_config["min_events_for_tz_tw_calibration"]  # for t0, tw calib.
@@ -112,9 +122,11 @@ def get_calibrations(input_data, **kwargs):
     Max_events_per_file_for_tz_tw = [max_events_per_file, max_events_per_file_hadron_for_tz_tw, max_events_per_file]
     Max_events_per_file_for_xt_sr = [max_events_per_file, max_events_per_file_hadron_for_xt_sr, max_events_per_file]
 
-    fracion_of_event_for_types = expert_config["fractions_for_each_type"]
-    basf2.B2INFO(f"Fraction for [di-muon, hadron, cosmic]: {fracion_of_event_for_types}")
-    if len(fracion_of_event_for_types) != 3:
+    fraction_of_event_for_types = expert_config["fractions_for_each_type"]
+    max_jobs = expert_config["max_job_for_each_type"]
+    basf2.B2INFO(f"Number of job for each type are limitted at [di-muon, hadron, cosmic]: {max_jobs}")
+    basf2.B2INFO(f"Fraction for [di-muon, hadron, cosmic]: {fraction_of_event_for_types}")
+    if len(fraction_of_event_for_types) != 3:
         basf2.B2FATAL("fraction of event must be an array with the size of 3, with order [mumu, hadron, cosmic]")
 
     payload_boundaries = []
@@ -124,39 +136,13 @@ def get_calibrations(input_data, **kwargs):
     files_for_xt_sr_dict = {}
     files_for_tz_tw_dict = {}
 
-    if fracion_of_event_for_types[0] > 0:
-        basf2.B2INFO("***********************Select di-muon data for calibration ***************")
-        min_mumu_events_for_xt_sr = fracion_of_event_for_types[0] * min_events_for_xt_sr
-        max_mumu_events_for_xt_sr = fracion_of_event_for_types[0] * max_events_for_xt_sr
-        min_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * min_events_for_tz_tw
-        max_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * max_events_for_tz_tw
-
-        file_to_iov_mumu = input_data["mumutight_or_highm_calib"]
-        # select data file for t0 and tw calibration
-        basf2.B2INFO("----> For T0 and Time walk correction")
-        chosen_files_mumu_for_tz_tw = select_files(
-            # input_files_mumu[:],
-            list(file_to_iov_mumu.keys()),
-            min_mumu_events_for_tz_tw,
-            max_mumu_events_for_tz_tw,
-            max_events_per_file)
-
-        # select data file for xt, sigma calibration
-        basf2.B2INFO("----> For XT, space resolution calib")
-        chosen_files_mumu_for_xt_sr = select_files(list(file_to_iov_mumu.keys()),  # input_files_mumu[:],
-                                                   min_mumu_events_for_xt_sr,
-                                                   max_mumu_events_for_xt_sr,
-                                                   max_events_per_file)
-
-        files_for_xt_sr_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_xt_sr
-        files_for_tz_tw_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_tz_tw
-
-    if fracion_of_event_for_types[1] > 0:
+    # select data file for t0 and tw calibration
+    if fraction_of_event_for_types[1] > 0:
         basf2.B2INFO("*********************** Select Hadron data for calibration ****************")
-        min_hadron_events_for_tz_tw = fracion_of_event_for_types[1] * min_events_for_tz_tw
-        max_hadron_events_for_tz_tw = fracion_of_event_for_types[1] * max_events_for_tz_tw
-        min_hadron_events_for_xt_sr = fracion_of_event_for_types[1] * min_events_for_xt_sr
-        max_hadron_events_for_xt_sr = fracion_of_event_for_types[1] * max_events_for_xt_sr
+        min_hadron_events_for_tz_tw = fraction_of_event_for_types[1] * min_events_for_tz_tw
+        max_hadron_events_for_tz_tw = fraction_of_event_for_types[1] * max_events_for_tz_tw
+        min_hadron_events_for_xt_sr = fraction_of_event_for_types[1] * min_events_for_xt_sr
+        max_hadron_events_for_xt_sr = fraction_of_event_for_types[1] * max_events_for_xt_sr
 
         file_to_iov_hadron = input_data["hadron_calib"]
         # select data file for tw, t0
@@ -164,24 +150,56 @@ def get_calibrations(input_data, **kwargs):
         chosen_files_hadron_for_tz_tw = select_files(list(file_to_iov_hadron.keys()),
                                                      min_hadron_events_for_tz_tw,
                                                      max_hadron_events_for_tz_tw,
-                                                     max_events_per_file_hadron_for_tz_tw)
+                                                     max_events_per_file_hadron_for_tz_tw,
+                                                     max_jobs[1],
+                                                     min_events_per_file)
         # select data file for xt, sigma
         basf2.B2INFO("----> For XT, space resolution calib")
         chosen_files_hadron_for_xt_sr = select_files(list(file_to_iov_hadron.keys()),
                                                      min_hadron_events_for_xt_sr,
                                                      max_hadron_events_for_xt_sr,
-                                                     max_events_per_file_hadron_for_xt_sr)
+                                                     max_events_per_file_hadron_for_xt_sr,
+                                                     max_jobs[1],
+                                                     min_events_per_file)
 
         files_for_xt_sr_dict["hadron_calib"] = chosen_files_hadron_for_xt_sr
         files_for_tz_tw_dict["hadron_calib"] = chosen_files_hadron_for_tz_tw
 
+    if fraction_of_event_for_types[0] > 0:
+        basf2.B2INFO("***********************Select di-muon data for calibration ***************")
+        min_mumu_events_for_xt_sr = fraction_of_event_for_types[0] * min_events_for_xt_sr
+        max_mumu_events_for_xt_sr = fraction_of_event_for_types[0] * max_events_for_xt_sr
+        min_mumu_events_for_tz_tw = fraction_of_event_for_types[0] * min_events_for_tz_tw
+        max_mumu_events_for_tz_tw = fraction_of_event_for_types[0] * max_events_for_tz_tw
+        file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
+        basf2.B2INFO("----> For T0 and Time walk correction")
+        chosen_files_mumu_for_tz_tw = select_files(list(file_to_iov_mumu.keys()),
+                                                   min_mumu_events_for_tz_tw,
+                                                   max_mumu_events_for_tz_tw,
+                                                   max_events_per_file,
+                                                   max_jobs[0],
+                                                   min_events_per_file)
+
+        # select data file for xt, sigma calibration
+        basf2.B2INFO("----> For XT, space resolution calib")
+
+        chosen_files_mumu_for_xt_sr = select_files(list(file_to_iov_mumu.keys()),  # input_files_mumu[:],
+                                                   min_mumu_events_for_xt_sr,
+                                                   max_mumu_events_for_xt_sr,
+                                                   max_events_per_file,
+                                                   max_jobs[0],
+                                                   min_events_per_file)
+
+        files_for_xt_sr_dict["mumu_tight_or_highm_calib"] = chosen_files_mumu_for_xt_sr
+        files_for_tz_tw_dict["mumu_tight_or_highm_calib"] = chosen_files_mumu_for_tz_tw
+
         '''    For cosmic data '''
-    if fracion_of_event_for_types[2] > 0:
+    if fraction_of_event_for_types[2] > 0:
         basf2.B2INFO("********************* Select cosmic data for calibration *******************")
-        min_cosmic_events_for_tz_tw = fracion_of_event_for_types[2] * min_events_for_tz_tw
-        max_cosmic_events_for_tz_tw = fracion_of_event_for_types[2] * max_events_for_tz_tw
-        min_cosmic_events_for_xt_sr = fracion_of_event_for_types[2] * min_events_for_xt_sr
-        max_cosmic_events_for_xt_sr = fracion_of_event_for_types[2] * max_events_for_xt_sr
+        min_cosmic_events_for_tz_tw = fraction_of_event_for_types[2] * min_events_for_tz_tw
+        max_cosmic_events_for_tz_tw = fraction_of_event_for_types[2] * max_events_for_tz_tw
+        min_cosmic_events_for_xt_sr = fraction_of_event_for_types[2] * min_events_for_xt_sr
+        max_cosmic_events_for_xt_sr = fraction_of_event_for_types[2] * max_events_for_xt_sr
 
         file_to_iov_cosmic = input_data["cosmic_calib"]
 
@@ -190,14 +208,18 @@ def get_calibrations(input_data, **kwargs):
         chosen_files_cosmic_for_tz_tw = select_files(list(file_to_iov_cosmic.keys()),
                                                      min_cosmic_events_for_tz_tw,
                                                      max_cosmic_events_for_tz_tw,
-                                                     max_events_per_file)
+                                                     max_events_per_file,
+                                                     max_jobs[2],
+                                                     min_events_per_file)
 
         # select cosmics data for xt and sigma calibration
         basf2.B2INFO("----> For T0 and Time walk correction")
         chosen_files_cosmic_for_xt_sr = select_files(list(file_to_iov_cosmic.keys()),
                                                      min_cosmic_events_for_xt_sr,
                                                      max_cosmic_events_for_xt_sr,
-                                                     max_events_per_file)
+                                                     max_events_per_file,
+                                                     max_jobs[2],
+                                                     min_events_per_file)
         files_for_xt_sr_dict["cosmic_calib"] = chosen_files_cosmic_for_xt_sr
         files_for_tz_tw_dict["cosmic_calib"] = chosen_files_cosmic_for_tz_tw
 
@@ -215,118 +237,88 @@ def get_calibrations(input_data, **kwargs):
     if payload_boundaries:
         basf2.B2INFO('Found payload_boundaries: set collector granularity to run')
         collector_granularity = 'run'
+    if calib_mode == "full":
+        calibration_procedure = {
+            "tz0": 4,
+            "xt0": 0,
+            "sr_tz0": 0,
+            "xt1": 0,
+            "sr_tz1": 0,
+            "tw0": 1,
+            "tz1": 1,
+            "xt2": 0,
+            "sr_tz2": 0,
+            "tz2": 0
+        }
+    elif calib_mode == "quick":
+        calibration_procedure = {
+            "tz0": 3,
+            "xt0": 0,
+            "sr_tz0": 0,
+            "tw0": 1,
+            "tz1": 1,
+            "xt1": 0,
+            "sr_tz1": 0,
+            "tz2": 0
+        }
+    elif calib_mode == "manual":
+        calibration_procedure = expert_config["calibration_procedure"]
+    else:
+        basf2.B2FATAL(f"Calibration mode is not defined {calib_mode}, should be quick, full, or manual")
     # t0
-    tz0 = CDCCalibration(name='tz0',
-                         algorithms=[tz_algo()],
-                         input_file_dict=files_for_tz_tw_dict,
-                         max_iterations=4,
-                         max_events=Max_events_per_file_for_tz_tw,
-                         use_badWires=True,
-                         collector_granularity=collector_granularity
-                         )
-    # 1
-    # xt
-    xt0 = CDCCalibration(name='xt0',
-                         algorithms=[xt_algo()],
-                         input_file_dict=files_for_xt_sr_dict,
-                         max_events=Max_events_per_file_for_xt_sr,
-                         collector_granularity=collector_granularity,
-                         dependencies=[tz0]
-                         )
+    calib_keys = list(calibration_procedure)
+    cals = [None]*len(calib_keys)
+    basf2.B2INFO(f"Run calibration mode = {calib_mode}:")
+    print(calib_keys)
+    for i in range(len(cals)):
+        max_iter = calibration_procedure[calib_keys[i]]
+        alg = None
+        data_files = None
+        cal_name = ''.join([i for i in calib_keys[i] if not i.isdigit()])
+        if cal_name == "tz":
+            alg = [tz_algo()]
+        elif cal_name == "tw":
+            alg = [tw_algo()]
+        elif cal_name == "xt":
+            alg = [xt_algo()]
+        elif cal_name == "sr_tz":
+            alg = [sr_algo(), tz_algo()]
+        else:
+            basf2.B2FATAL(f"The calibration is not defined, check spelling: calib {i}: {calib_keys[i]}")
 
-    # space resolution
-    sr_tz0 = CDCCalibration(name='sr_tz0',
-                            algorithms=[sr_algo(), tz_algo()],
-                            input_file_dict=files_for_xt_sr_dict,
-                            max_events=Max_events_per_file_for_xt_sr,
-                            collector_granularity=collector_granularity,
-                            max_iterations=0,
-                            dependencies=[xt0]
-                            )
-    # 2
-    # xt
-    xt1 = CDCCalibration(name='xt1',
-                         algorithms=[xt_algo()],
-                         input_file_dict=files_for_xt_sr_dict,
-                         max_events=Max_events_per_file_for_xt_sr,
-                         collector_granularity=collector_granularity,
-                         dependencies=[sr_tz0]
-                         )
-
-    # space resolution
-    sr_tz1 = CDCCalibration(name='sr_tz1',
-                            algorithms=[sr_algo(), tz_algo()],
-                            input_file_dict=files_for_xt_sr_dict,
-                            max_events=Max_events_per_file_for_xt_sr,
-                            collector_granularity=collector_granularity,
-                            max_iterations=0,
-                            dependencies=[xt1]
-                            )
-    # tw
-    tw0 = CDCCalibration(name='tw0',
-                         algorithms=[tw_algo()],
-                         input_file_dict=files_for_tz_tw_dict,
-                         max_iterations=1,
-                         max_events=Max_events_per_file_for_tz_tw,
-                         collector_granularity=collector_granularity,
-                         dependencies=[sr_tz1]
-                         )
-
-    tz1 = CDCCalibration(name='tz1',
-                         algorithms=[tz_algo()],
-                         input_file_dict=files_for_tz_tw_dict,
-                         max_iterations=1,
-                         max_events=Max_events_per_file_for_tz_tw,
-                         collector_granularity=collector_granularity,
-                         use_badWires=True,
-                         dependencies=[tw0]
-                         )
-    # 2
-    xt2 = CDCCalibration(name='xt2',
-                         algorithms=[xt_algo()],
-                         input_file_dict=files_for_xt_sr_dict,
-                         max_events=Max_events_per_file_for_xt_sr,
-                         collector_granularity=collector_granularity,
-                         dependencies=[tz1]
-                         )
-
-    # space resolution
-    sr_tz2 = CDCCalibration(name='sr_tz2',
-                            algorithms=[sr_algo(), tz_algo()],
-                            input_file_dict=files_for_xt_sr_dict,
-                            max_events=Max_events_per_file_for_xt_sr,
-                            collector_granularity=collector_granularity,
-                            max_iterations=0,
-                            dependencies=[xt2]
-                            )
-    tz2 = CDCCalibration(name='tz2',
-                         algorithms=[tz_algo()],
-                         input_file_dict=files_for_tz_tw_dict,
-                         max_events=Max_events_per_file_for_tz_tw,
-                         collector_granularity=collector_granularity,
-                         max_iterations=0,
-                         use_badWires=True,
-                         dependencies=[sr_tz2])
-
-    algs = [tz0, xt0, sr_tz0, xt1, sr_tz1, tw0, tz1, xt2, sr_tz2, tz2]
-
+        if cal_name == "xt" or cal_name == "sr_tz":
+            max_event = Max_events_per_file_for_xt_sr
+            data_files = files_for_xt_sr_dict
+        else:
+            max_event = Max_events_per_file_for_tz_tw
+            data_files = files_for_tz_tw_dict
+        basf2.B2INFO(f"calibration for {calib_keys[i]} with number of iteration={max_iter}")
+        cals[i] = CDCCalibration(name=calib_keys[i],
+                                 algorithms=alg,
+                                 input_file_dict=data_files,
+                                 max_iterations=max_iter,
+                                 max_events=max_event,
+                                 use_badWires=True if calib_keys[i] == "tz" else False,
+                                 collector_granularity=collector_granularity,
+                                 backend_args=expert_config["backend_args"],
+                                 dependencies=[cals[i-1]] if i > 0 else None
+                                 )
     if payload_boundaries:
         basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
-        algs[0].strategies = strategies.SequentialBoundaries
-        for alg in algs:
+        cals[0].strategies = strategies.SequentialBoundaries
+        for alg in cals:
             for algorithm in alg.algorithms:
                 algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
 
     else:
-        for alg in algs:
+        for alg in cals:
             for algorithm in alg.algorithms:
                 algorithm.params = {"apply_iov": output_iov}
 
-    return algs
+    return cals
 
 
 #################################################
-
 def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
     """
     Define pre collection (reconstruction in our purpose).
@@ -367,7 +359,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
         add_cosmics_reconstruction(path=reco_path,
                                    components=Components,
                                    pruneTracks=False,
-                                   merge_tracks=True,
+                                   merge_tracks=False,
                                    posttracking=False)
     else:
         from reconstruction import default_event_abort
@@ -492,7 +484,8 @@ class CDCCalibration(Calibration):
                  dependencies=None,
                  max_events=[20000, 10000, 20000],
                  use_badWires=False,
-                 collector_granularity='All'):
+                 collector_granularity='All',
+                 backend_args=None):
         for algo in algorithms:
             algo.setHistFileName(name)
 
@@ -509,17 +502,20 @@ class CDCCalibration(Calibration):
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events[2],
                                                                          is_cosmic=True,
-                                                                         use_badWires=use_badWires))
+                                                                         use_badWires=use_badWires),
+                                        backend_args=backend_args)
             elif skim_type == "hadron_calib":
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events[1],
-                                                                         use_badWires=use_badWires))
+                                                                         use_badWires=use_badWires),
+                                        backend_args=backend_args)
             else:
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events[0],
-                                                                         use_badWires=use_badWires))
+                                                                         use_badWires=use_badWires),
+                                        backend_args=backend_args)
 
             self.add_collection(name=skim_type, collection=collection)
 

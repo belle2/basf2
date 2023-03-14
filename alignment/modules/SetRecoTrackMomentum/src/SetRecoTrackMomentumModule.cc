@@ -9,13 +9,14 @@
 #include <alignment/modules/SetRecoTrackMomentum/SetRecoTrackMomentumModule.h>
 
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SetRecoTrackMomentum)
+REG_MODULE(SetRecoTrackMomentum);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -24,7 +25,7 @@ REG_MODULE(SetRecoTrackMomentum)
 SetRecoTrackMomentumModule::SetRecoTrackMomentumModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("Set momentum magnitude for RecoTracks seed to given value (for runs without magnetic field)
+  setDescription(R"DOC(Set momentum magnitude for RecoTracks seed to given value (for runs without magnetic field)
 
   Take the momentum direction from seed and update its magnitude to artificial value for all RecoTracks - needed for tracks without magnetic field.
   By default activated automatically, when zero B-field is detected at the origin
@@ -44,7 +45,7 @@ void SetRecoTrackMomentumModule::initialize()
 void SetRecoTrackMomentumModule::event()
 {
   // In automatic mode, do nothing if B-field > 0 at origin
-  if (m_automatic && BFieldManager::getInstance().getField(B2Vector3D(0., 0., 0.)).Mag() > 1.e-14) {
+  if (m_automatic && BFieldManager::getInstance().getField(0., 0., 0.).R() > 1.e-14) {
     return;
   }
 

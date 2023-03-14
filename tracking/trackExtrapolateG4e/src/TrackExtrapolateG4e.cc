@@ -9,7 +9,7 @@
 /* Own header. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -147,7 +147,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_tracks.registerRelationTo(m_extHits);
 
   // Save the magnetic field z component (gauss) at the origin
-  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+  m_MagneticField = BFieldManager::getField(0, 0, 0).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert user cutoff values to geant4 units
   m_MinPt = std::max(0.0, minPt) * CLHEP::GeV;
@@ -198,8 +198,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
   // Define required objects, register the new ones and relations
   m_eclClusters.isRequired();
-  m_bklmHit2ds.isRequired();
-  m_eklmHit2ds.isRequired();
+  m_klmHit2ds.isRequired();
   m_klmClusters.isRequired();
   m_recoTracks.isRequired();
   m_tracks.isRequired();
@@ -210,8 +209,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_tracks.registerRelationTo(m_extHits);
   m_tracks.registerRelationTo(m_klmMuidLikelihoods);
   m_tracks.registerRelationTo(m_klmMuidHits);
-  m_tracks.registerRelationTo(m_bklmHit2ds);
-  m_tracks.registerRelationTo(m_eklmHit2ds);
+  m_tracks.registerRelationTo(m_klmHit2ds);
   m_tracks.registerRelationTo(m_trackClusterSeparations);
   m_tracks.registerRelationTo(m_klmClusters);
   m_klmClusters.registerRelationTo(m_trackClusterSeparations);
@@ -223,7 +221,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MaxDt = maxDt;
 
   // Save the magnetic field z component (gauss) at the origin
-  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+  m_MagneticField = BFieldManager::getField(0, 0, 0).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert from sigma to variance for hit-position uncertainty
   m_MaxDistSqInVariances = maxKLMTrackHitDistance * maxKLMTrackHitDistance;
@@ -345,8 +343,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
     if (!m_MuidBuilderMap.empty()) {
       if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
-        for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
-          delete muidBuilder;
+        for (auto const& muidBuilder : m_MuidBuilderMap)
+          delete muidBuilder.second;
         m_MuidBuilderMap.clear();
       } else /* Return if m_MuidBuilderMap is already initialized. */
         return;
@@ -386,7 +384,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
                                                m_klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
     }
     // Keep track of (re-)use of BKLMHit2ds
-    std::vector<std::map<const Track*, double> > bklmHitUsed(m_bklmHit2ds.getEntries());
+    std::vector<std::map<const Track*, double> > bklmHitUsed(m_klmHit2ds.getEntries());
     for (auto& b2track : m_tracks) {
       for (const auto& hypothesis : *m_HypothesesMuid) {
         int pdgCode = hypothesis.getPDGCode();
@@ -422,8 +420,8 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_DefaultHypotheses;
   if (byMuid) {
     delete m_TargetMuid;
-    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
-      delete muidBuilder;
+    for (auto const& muidBuilder : m_MuidBuilderMap)
+      delete muidBuilder.second;
   }
   if (m_TargetExt != nullptr) {
     delete m_TargetExt;
@@ -474,7 +472,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
-  // cppcheck-suppress knownConditionTrueFalse
   if (isCosmic)
     momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
@@ -1514,17 +1511,19 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
   int bestHit = -1;
   int matchingLayer = intersection.layer + 1;
   G4ThreeVector n(m_BarrelSectorPerp[intersection.sector]);
-  for (int h = 0; h < m_bklmHit2ds.getEntries(); ++h) {
-    BKLMHit2d* hit = m_bklmHit2ds[h];
+  for (int h = 0; h < m_klmHit2ds.getEntries(); ++h) {
+    KLMHit2d* hit = m_klmHit2ds[h];
+    if (hit->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     if (hit->getLayer() != matchingLayer)
       continue;
     if (hit->isOutOfTime())
       continue;
     if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt)
       continue;
-    G4ThreeVector diff(hit->getGlobalPositionX() - intersection.position.x(),
-                       hit->getGlobalPositionY() - intersection.position.y(),
-                       hit->getGlobalPositionZ() - intersection.position.z());
+    G4ThreeVector diff(hit->getPositionX() - intersection.position.x(),
+                       hit->getPositionY() - intersection.position.y(),
+                       hit->getPositionZ() - intersection.position.z());
     double dn = diff * n; // in cm
     if (std::fabs(dn) < 2.0) {
       // Hit and extrapolated point are in the same sector
@@ -1569,7 +1568,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
   }
 
   if (bestHit >= 0) {
-    BKLMHit2d* hit = m_bklmHit2ds[bestHit];
+    KLMHit2d* hit = m_klmHit2ds[bestHit];
     intersection.isForward = (hit->getSection() == 1);
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
@@ -1584,7 +1583,8 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.55; // measured-in-Belle resolution
       localVariance[1] = m_BarrelZStripVariance[intersection.layer] * factor;
     }
-    G4ThreeVector hitPos(hit->getGlobalPositionX(), hit->getGlobalPositionY(), hit->getGlobalPositionZ());
+    G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(),
+                         hit->getPositionZ());
     adjustIntersection(intersection, localVariance, hitPos, extPos0);
     if (intersection.chi2 >= 0.0) {
       intersection.hit = bestHit;
@@ -1609,8 +1609,10 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   int matchingLayer = intersection.layer + 1;
   int matchingEndcap = (intersection.isForward ? 2 : 1);
   G4ThreeVector n(0.0, 0.0, (intersection.isForward ? 1.0 : -1.0));
-  for (int h = 0; h < m_eklmHit2ds.getEntries(); ++h) {
-    EKLMHit2d* hit = m_eklmHit2ds[h];
+  for (int h = 0; h < m_klmHit2ds.getEntries(); ++h) {
+    KLMHit2d* hit = m_klmHit2ds[h];
+    if (hit->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     if (hit->getLayer() != matchingLayer)
       continue;
     if (hit->getSection() != matchingEndcap)
@@ -1633,7 +1635,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   }
 
   if (bestHit >= 0) {
-    EKLMHit2d* hit = m_eklmHit2ds[bestHit];
+    KLMHit2d* hit = m_klmHit2ds[bestHit];
     intersection.hit = bestHit;
     intersection.isForward = (hit->getSection() == 2);
     intersection.sector = hit->getSector() - 1;

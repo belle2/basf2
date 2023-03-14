@@ -39,8 +39,8 @@ namespace Belle2 {
 
     // for serialization
   public:
-    virtual void readObject(Reader&);
-    virtual void writeObject(Writer&) const;
+    void readObject(Reader&) override;
+    void writeObject(Writer&) const override;
 
     // operators
   public:

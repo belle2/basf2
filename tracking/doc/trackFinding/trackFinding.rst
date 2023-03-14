@@ -19,3 +19,4 @@ We have three classes of algorithms for the hit finding:
     trackFindingSVD
     trackFindingCDC
     ckf
+    qualityIndicators

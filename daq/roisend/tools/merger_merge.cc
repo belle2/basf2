@@ -778,8 +778,8 @@ main(int argc, char* argv[])
       continue;
     }
 
-    int t;
     if (FD_ISSET(sd_acc, &rset)) {   // new connection
+      int t;
       struct sockaddr_in isa;
       socklen_t i = sizeof(isa);
       getsockname(sd_acc, (struct sockaddr*)&isa, &i);

@@ -35,7 +35,7 @@ testpath.add_module("HistoManager")
 # analysis DQM modules to be tested
 add_analysis_dqm(testpath)
 add_mirabelle_dqm(testpath)
-add_IP_dqm(testpath)
+add_IP_dqm(testpath, dqm_environment='expressreco')
 add_V0_dqm(testpath)
 
 b2.print_path(testpath)

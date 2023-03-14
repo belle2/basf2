@@ -9,7 +9,9 @@
 #pragma once
 
 #include <framework/dataobjects/MCInitialParticles.h>
+#include <framework/logging/Logger.h>
 #include <TMatrixDSym.h>
+#include <Math/Vector4D.h>
 
 namespace Belle2 {
   /** This class contains the nominal beam parameters and the parameters used for
@@ -17,21 +19,29 @@ namespace Belle2 {
    * independent (but might be run or even sub run dependent)
    */
   class BeamParameters: public MCInitialParticles {
+
   public:
+
     using MCInitialParticles::setLER;
     using MCInitialParticles::setHER;
     using MCInitialParticles::setVertex;
 
-    /** default constructor */
-    BeamParameters(): MCInitialParticles(), m_covHER{0}, m_covLER{0}, m_covVertex{0} {}
-    /** copy constructor */
+    /** Default constructor */
+    BeamParameters(): MCInitialParticles(), m_covHER{0}, m_covLER{0}, m_covVertex{0}
+    {
+      // 14 means all the smearings turned on
+      m_generationFlags = 14;
+    }
+
+    /** Copy constructor */
     BeamParameters(const BeamParameters& b): MCInitialParticles(b)
     {
       std::copy_n(b.m_covHER, 6, m_covHER);
       std::copy_n(b.m_covLER, 6, m_covLER);
       std::copy_n(b.m_covVertex, 6, m_covVertex);
     }
-    /** assignment operator */
+
+    /** Assignment operator */
     BeamParameters& operator=(const BeamParameters& b)
     {
       MCInitialParticles::operator=(b);
@@ -40,7 +50,8 @@ namespace Belle2 {
       std::copy_n(b.m_covVertex, 6, m_covVertex);
       return *this;
     }
-    /** equality operator */
+
+    /** Equality operator */
     bool operator==(const BeamParameters& b) const
     {
       // since we only save the covariance matrices with float precision we
@@ -52,16 +63,35 @@ namespace Belle2 {
              std::equal(m_covVertex, m_covVertex + 6, b.m_covVertex, floatcmp);
     }
 
+    /** Set the generation flags to be used for event generation (ORed combination of EGenerationFlags).
+     * The only difference w.r.t. MCInitialParticles::setGenerationFlags() is that a WARNING is thrown
+     * if a flag different from 14 (= all the smearings turned on) is set.
+     */
+    void setGenerationFlags(int flags) override
+    {
+      if (flags != 14)
+        B2WARNING(R"RAW(The generation flags are not set to the default value.
+
+    The default value for the generation flags is 14: a different value means
+    that some smearings (beam energy, vertex position, etc.) may be turned off.
+
+    This is fine only for local tests or for special MC productions, but not
+    for default MC productions.)RAW");
+      m_generationFlags = flags;
+    }
+
     /** Set the covariance matrix for HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
      * actual direction in spread and theta_y is the vertical angle
      * The upper triangle will be saved. */
     void setCovHER(const TMatrixDSym& cov) { setCovMatrix(m_covHER, cov); }
+
     /** Set the covariance matrix for LER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
      * actual direction in spread and theta_y is the vertical angle.
      * The upper triangle will be saved. */
     void setCovLER(const TMatrixDSym& cov) { setCovMatrix(m_covLER, cov); }
+
     /** Set the covariance matrix of the vertex position. The upper triangle will be saved. */
     void setCovVertex(const TMatrixDSym& cov) { setCovMatrix(m_covVertex, cov); }
 
@@ -115,34 +145,33 @@ namespace Belle2 {
      * @param vertex vertex position
      * @param cov entries of the covariance matrix.
      */
-    void setVertex(const TVector3& vertex, const std::vector<double>& cov);
+    void setVertex(const ROOT::Math::XYZVector& vertex, const std::vector<double>& cov);
 
     /** Get the covariance matrix of HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
      * actual direction in spread and theta_y is the vertical angle */
     TMatrixDSym getCovHER() const { return getCovMatrix(m_covHER); }
+
     /** Get the covariance matrix of LER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
      * actual direction in spread and theta_y is the vertical angle */
     TMatrixDSym getCovLER() const { return getCovMatrix(m_covLER); }
+
     /** Get the covariance matrix of the vertex position */
     TMatrixDSym getCovVertex() const { return getCovMatrix(m_covVertex); }
 
-    /** Return energy smearing of LER */
-    //double getEnergySmearingLER() const;
-    /** Return energy smearing of LER */
-    //double getEnergySmearingHER() const;
-    /** Return energy smearing of the CMS */
-    //double getEnergySmearingCMS() const;
+    /** Calculate FourVector of a beam from energy and angles in xz and yz planes.
+     * if isHER=true,  the angles are measured wrt +p
+     * if isHER=false, the angles are measured wrt -p, as is the standard convention for LER
+     * @param energy beam energy
+     * @param angleX horizontal angle wrt z-axis, i.e. angle measured in xz plane
+     * @param angleY vertical angle wrt z-axis, i.e. angle measured in yz plane
+     * @param isHER  isHER=true for HER, isHER=false for LER
+     */
+    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY, bool isHER);
 
   private:
-    /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
-     * Negative angles will be treated as angle = M_PI - fabs(angle)
-     * @param energy beam energy
-     * @param angleX horizontal angle wrt z-axis
-     * @param angleY vertical angle wrt z-axis
-     */
-    static TLorentzVector getFourVector(double energy, double angleX, double angleY);
+
     /** Set covariance matrix from vector of entries.
      *
      * The vector for the covariance matrix can have either 0, 1, 3, 6 or 9 entries:
@@ -163,18 +192,24 @@ namespace Belle2 {
      *        for all diagonal elements
      */
     static void setCovMatrix(Double32_t* member, const std::vector<double>& cov, bool common);
+
     /** Set covariance matrix from ROOT Matrix object */
     static void setCovMatrix(Double32_t* member, const TMatrixDSym& cov);
+
     /** Obtain covariance matrix from a given float array */
     static TMatrixDSym getCovMatrix(const Double32_t* member);
+
     /** Covariance matrix of the high energy beam at the IP */
     Double32_t m_covHER[6];
+
     /** Covariance matrix of the low energy beam at the IP */
     Double32_t m_covLER[6];
+
     /** Covariance matrix of the vertex position */
     Double32_t m_covVertex[6];
 
-    ClassDef(BeamParameters, 2); /**< nominal beam and primary vertex parameters (including smearing). */
+    /** ClassDef */
+    ClassDefOverride(BeamParameters, 3);
   };
 
 } //Belle2 namespace

@@ -22,7 +22,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(TOPLaserCalibratorCollector)
+REG_MODULE(TOPLaserCalibratorCollector);
 
 TOPLaserCalibratorCollectorModule::TOPLaserCalibratorCollectorModule()
 {

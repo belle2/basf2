@@ -8,12 +8,13 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
+  class MCParticle;
 
   /**
    * Module for MC matching for KLM clusters.
@@ -38,32 +39,20 @@ namespace Belle2 {
     void initialize() override;
 
     /**
-     * Called when entering a new run.
-     */
-    void beginRun() override;
-
-    /**
      * This method is called for each event.
      */
     void event() override;
 
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
-
   private:
 
-    /** Add relations for BKLMHit2d and EKLMHit2d. */
+    /** Add relations for KLMHit2d and KLMHit2d. */
     bool m_Hit2dRelations;
 
     /** KLM clusters. */
     StoreArray<KLMCluster> m_KLMClusters;
+
+    /** MCParticles StoreArray */
+    StoreArray<MCParticle> m_MCParticles;
 
   };
 

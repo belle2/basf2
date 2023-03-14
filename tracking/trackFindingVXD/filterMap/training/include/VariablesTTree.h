@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /** All the variables will be written in @param tree */
-    VariablesTTree(TTree* tree): m_tree(tree) {};
+    explicit VariablesTTree(TTree* tree): m_tree(tree) {};
 
     /** Accessor to the TTree pointer */
     TTree* getTTree(void) { return m_tree; };
@@ -100,6 +100,8 @@ namespace Belle2 {
     VariablesTTree<Filter<argsB ...> > m_nodeB;
   public:
     /// Constructor
+    // member var m_tree is initialized in VariablesTTree<>(tree), which is not recognized by cppcheck
+    // cppcheck-suppress uninitMemberVar
     explicit VariablesTTree(TTree* tree): VariablesTTree<>(tree),
       m_nodeA(tree), m_nodeB(tree)
     {};

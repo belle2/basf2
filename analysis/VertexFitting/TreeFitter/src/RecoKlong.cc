@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -22,7 +23,7 @@ namespace TreeFitter {
     RecoParticle(particle, mother),
     m_dim(3),
     m_init(false),
-    m_useEnergy(true),
+    m_useEnergy(false),
     m_clusterPars(),
     m_covariance()
   {
@@ -40,9 +41,8 @@ namespace TreeFitter {
 
     const double distanceToMother = vertexToCluster.norm();
     const double energy =  m_clusterPars(3);
-    const double energy2 = energy * energy;
-    const double pdgMass2 = ParticleBase::pdgMass() * ParticleBase::pdgMass();
-    const double absMom = -1 * std::sqrt(energy2 - pdgMass2);
+    const double pdgMass = particle()->getPDGMass();
+    const double absMom = std::sqrt(energy * energy - pdgMass * pdgMass);
 
     const int momindex = momIndex();
 
@@ -50,8 +50,6 @@ namespace TreeFitter {
       //px = |p| dx/|dx|
       fitparams.getStateVector()(momindex + i) = absMom * vertexToCluster(i) / distanceToMother;
     }
-
-    fitparams.getStateVector()(momindex + 3) = energy ;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -82,7 +80,7 @@ namespace TreeFitter {
   {
     const Belle2::KLMCluster* cluster = particle()->getKLMCluster();
 
-    const TVector3 cluster_pos = cluster->getClusterPosition();
+    const Belle2::B2Vector3D cluster_pos = cluster->getClusterPosition();
 
     m_init = true;
     m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
@@ -103,20 +101,20 @@ namespace TreeFitter {
     m_clusterPars(0) = cluster_pos.X();
     m_clusterPars(1) = cluster_pos.Y();
     m_clusterPars(2) = cluster_pos.Z();
-    m_clusterPars(3) = sqrt(particle()->getPDGMass() * particle()->getPDGMass() + cluster->getMomentumMag() *
-                            cluster->getMomentumMag());
+    m_clusterPars(3) = sqrt(particle()->getPDGMass() * particle()->getPDGMass() +
+                            cluster->getMomentumMag() * cluster->getMomentumMag());
 
     auto p_vec = particle()->getMomentum();
     // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec(0)) >= std::abs(p_vec(1))) && (std::abs(p_vec(0)) >= std::abs(p_vec(2)))) {
+    if ((std::abs(p_vec.X()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.X()) >= std::abs(p_vec.Z()))) {
       m_i1 = 0; m_i2 = 1; m_i3 = 2;
-    } else if ((std::abs(p_vec(1)) >= std::abs(p_vec(0))) && (std::abs(p_vec(1)) >= std::abs(p_vec(2)))) {
+    } else if ((std::abs(p_vec.Y()) >= std::abs(p_vec.X())) && (std::abs(p_vec.Y()) >= std::abs(p_vec.Z()))) {
       m_i1 = 1; m_i2 = 0; m_i3 = 2;
-    } else if ((std::abs(p_vec(2)) >= std::abs(p_vec(1))) && (std::abs(p_vec(2)) >= std::abs(p_vec(0)))) {
+    } else if ((std::abs(p_vec.Z()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.Z()) >= std::abs(p_vec.X()))) {
       m_i1 = 2; m_i2 = 1; m_i3 = 0;
     } else {
       B2ERROR("Could not estimate highest momentum for Klong constraint. Aborting this fit.\n px: "
-              << p_vec(0) << " py: " << p_vec(1) << " pz: " << p_vec(2) << " calculated from Ec: " << m_clusterPars(3));
+              << p_vec.X() << " py: " << p_vec.Y() << " pz: " << p_vec.Z() << " calculated from Ec: " << m_clusterPars(3));
       return ErrCode(ErrCode::Status::photondimerror);
     }
 
@@ -136,7 +134,8 @@ namespace TreeFitter {
     // p_vec[m_i1] must not be 0
     const double elim = (m_clusterPars[m_i1] - x_vertex[m_i1]) / p_vec[m_i1];
     const double mom = p_vec.norm();
-    const double energy = fitparams.getStateVector()(momindex + 3);
+    const double pdgMass = particle()->getPDGMass();
+    const double energy = std::sqrt(mom * mom + pdgMass * pdgMass);
 
     // r'
     Eigen::Matrix<double, 3, 1> residual3 = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
@@ -179,7 +178,6 @@ namespace TreeFitter {
     p.getH()(2, momindex + m_i1) = -1. * p_vec[m_i1] / mom;
     p.getH()(2, momindex + m_i2) = -1. * p_vec[m_i2] / mom;
     p.getH()(2, momindex + m_i3) = -1. * p_vec[m_i3] / mom;
-    p.getH()(2, momindex + 3) = -1;
 
     return ErrCode(ErrCode::Status::success);
   }

@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHRAWUNPACKERMODULE_H
-#define ARICHRAWUNPACKERMODULE_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <TH1F.h>
@@ -39,27 +37,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
 
   protected:
     unsigned int calbyte(const int* buf);
@@ -91,5 +71,3 @@ namespace Belle2 {
 
 
 } // Belle2 namespace
-
-#endif

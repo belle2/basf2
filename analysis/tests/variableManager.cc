@@ -38,12 +38,80 @@ namespace {
   /** test VariableManager. */
   TEST(VariableTest, ManagerDeathTest)
   {
-
+    //this does not exist
     EXPECT_B2FATAL(Manager::Instance().getVariable("THISDOESNTEXIST"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST+:THISDOENTEITHER"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST':THISDOENTEITHER"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST-:THISDOENTEITHER"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST&THISDOENTEITHER"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST&"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(&THISISILLEGAL+1"));
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST + THISDOENTEITHER"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST+abs(THISDOENTEITHER))"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST + abs( THISDOENTEITHER))"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST * 1)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST - 2)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST**3)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST**abs(p))"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(THISDOESNTEXIST&**abs(p))"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("abs(funcdoesnotexist&(p))"));
 
     //this exists
+    const Manager::Var* absvar1 = Manager::Instance().getVariable("abs(1+1)");
+    EXPECT_TRUE(absvar1 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar1->function(nullptr)), 2);
+
+    const Manager::Var* absvar2 = Manager::Instance().getVariable("abs(1/2)");
+    EXPECT_TRUE(absvar2 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar2->function(nullptr)), 0.5);
+
+    const Manager::Var* absvar3 = Manager::Instance().getVariable("abs(2*10)");
+    EXPECT_TRUE(absvar3 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar3->function(nullptr)), 20);
+
+    const Manager::Var* absvar4 = Manager::Instance().getVariable("abs(2**10)");
+    EXPECT_TRUE(absvar4 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar4->function(nullptr)), 1024);
+
+    const Manager::Var* absvar5 = Manager::Instance().getVariable("abs(2^10)");
+    EXPECT_TRUE(absvar5 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar5->function(nullptr)), 1024);
+
+    const Manager::Var* absvar6 = Manager::Instance().getVariable("abs(10*p)");
+    EXPECT_TRUE(absvar6 != nullptr);
+
+    const Manager::Var* absvar7 = Manager::Instance().getVariable("abs(10+p)");
+    EXPECT_TRUE(absvar7 != nullptr);
+
+    const Manager::Var* absvar8 = Manager::Instance().getVariable("abs(10-p)");
+    EXPECT_TRUE(absvar8 != nullptr);
+
+    const Manager::Var* absvar9 = Manager::Instance().getVariable("abs(10**p)");
+    EXPECT_TRUE(absvar9 != nullptr);
+
+    const Manager::Var* absvar10 = Manager::Instance().getVariable("abs(10^p)");
+    EXPECT_TRUE(absvar10 != nullptr);
+
+    const Manager::Var* absvar11 = Manager::Instance().getVariable("abs(10/p)");
+    EXPECT_TRUE(absvar11 != nullptr);
+
     const Manager::Var* pvar = Manager::Instance().getVariable("p");
     EXPECT_TRUE(pvar != nullptr);
+
+    const Manager::Var* absvar12 = Manager::Instance().getVariable("abs(2+3*2)");
+    EXPECT_TRUE(absvar12 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar12->function(nullptr)), 8);
+
+    const Manager::Var* absvar13 = Manager::Instance().getVariable("abs(((2+3)*2))");
+    EXPECT_TRUE(absvar13 != nullptr);
+    EXPECT_EQ(std::get<double>(absvar13->function(nullptr)), 10);
+
+    // Test that nested metavariables with multiple arguments are parsed correctly
+    const Manager::Var* minformulas = Manager::Instance().getVariable("passesCut(min(2+min(1/3, abs(-2/3)), 2+2/3) > 2.3)");
+    EXPECT_TRUE(minformulas != nullptr);
+    EXPECT_TRUE(std::get<bool>(minformulas->function(nullptr)));
+
 
     //test special variable operations
     const Manager::Var* daughterProductP = Manager::Instance().getVariable("daughterProductOf(p)");
@@ -192,7 +260,7 @@ namespace {
 
     a = Cut::compile("dummymetavar(123) < 100.0");
     EXPECT_TRUE(a->check(nullptr));
-    a = Cut::compile("dummymetavar(1) <= dummymetavar(1<) <= dummymetavar(1<3)");
+    a = Cut::compile("dummymetavar(1) <= dummymetavar(1<2) <= dummymetavar(1<23)");
     EXPECT_TRUE(a->check(nullptr));
   }
 

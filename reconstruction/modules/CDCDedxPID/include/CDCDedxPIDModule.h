@@ -97,7 +97,7 @@ namespace Belle2 {
     double getMean(double bg) const;
 
     /** parameterized resolution for predictions */
-    double sigmaCurve(double* x, double* par, int version) const;
+    double sigmaCurve(double* x, const double* par, int version) const;
 
     /** calculate the predicted resolution using the parameterized resolution */
     double getSigma(double dedx, double nhit, double sin) const;

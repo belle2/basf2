@@ -41,7 +41,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
   buf += m_mutex.size();
   m_cond = MCond(buf);
   buf += m_cond.size();
-  m_header = (Header*)buf;
+  m_header = reinterpret_cast<Header*>(buf);
   buf += sizeof(Header);
   m_buf = (int*)buf;
   if (recreate) init();
@@ -145,11 +145,10 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
   while (!fouce && m_header->nreader > 0) {
     m_cond.wait(m_mutex);
   }
-  unsigned int i_w = 0;
-  unsigned int i_r = 0;
+
   while (true) {
-    i_w = m_header->nword_in % m_nword;
-    i_r = m_header->nword_out % m_nword;
+    unsigned int i_w = m_header->nword_in % m_nword;
+    unsigned int i_r = m_header->nword_out % m_nword;
     if ((serial == 0 || serial - 1 == m_header->count_in) &&
         m_header->nword_in - m_header->nword_out < m_nword - (nword + 1)) {
       if (i_w >= i_r) {
@@ -190,12 +189,11 @@ unsigned int SharedEventBuffer::read(int* buf, bool fouce, bool unlocked,
   while (!fouce && m_header->nwriter > 0) {
     m_cond.wait(m_mutex);
   }
-  unsigned int i_w = 0;
-  unsigned int i_r = 0;
+
   unsigned int nword = 0;
   while (true) {
-    i_w = m_header->nword_in % m_nword;
-    i_r = m_header->nword_out % m_nword;
+    unsigned int i_w = m_header->nword_in % m_nword;
+    unsigned int i_r = m_header->nword_out % m_nword;
     nword = m_buf[i_r];
     if (nword > 0) {
       if (m_header->nword_in - m_header->nword_out >= (nword + 1)) {

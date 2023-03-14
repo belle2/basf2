@@ -87,8 +87,8 @@ std::vector<int> DBRecord::getIntArray(int i) const
 {
   std::vector<int> value_i_v;
   std::vector<std::string> value_v = getArray(i);
-  for (size_t i = 0; i < value_v.size(); i++) {
-    value_i_v.push_back(atoi(value_v[i].c_str()));
+  for (size_t j = 0; j < value_v.size(); j++) {
+    value_i_v.push_back(atoi(value_v[j].c_str()));
   }
   return value_i_v;
 }
@@ -107,8 +107,8 @@ std::vector<float> DBRecord::getFloatArray(int i) const
 {
   std::vector<float> value_i_v;
   std::vector<std::string> value_v = getArray(i);
-  for (size_t i = 0; i < value_v.size(); i++) {
-    value_i_v.push_back(atof(value_v[i].c_str()));
+  for (size_t j = 0; j < value_v.size(); j++) {
+    value_i_v.push_back(atof(value_v[j].c_str()));
   }
   return value_i_v;
 }

@@ -22,10 +22,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPChannelT0Calibrator)
+  REG_MODULE(TOPChannelT0Calibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -235,11 +235,11 @@ namespace Belle2 {
       m_y = localPosition.Y();
       m_z = localPosition.Z();
       const auto& localMomentum = m_selector.getLocalMomentum();
-      m_p = localMomentum.Mag();
+      m_p = localMomentum.R();
       m_theta = localMomentum.Theta();
       m_phi = localMomentum.Phi();
       const auto& pocaPosition = m_selector.getPOCAPosition();
-      m_pocaR = pocaPosition.Perp();
+      m_pocaR = pocaPosition.Rho();
       m_pocaZ = pocaPosition.Z();
       m_pocaX = pocaPosition.X();
       m_pocaY = pocaPosition.Y();
@@ -307,7 +307,7 @@ namespace Belle2 {
     // merge all finders of a slot to find module T0
 
     TH1F h_moduleT0("moduleT0", "Relative module T0",
-                    c_numModules, 0.5, c_numModules + 0.5);
+                    c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     h_moduleT0.SetXTitle("slot number");
     h_moduleT0.SetYTitle("relative module T0 [ns]");
     auto finderCommon = m_finders[0][0][0];

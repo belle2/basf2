@@ -16,90 +16,99 @@ import time
 
 from basf2_mva_python_interface.tensorflow import State
 
-old_time = time.time()
-
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
 
-    number_of_features *= 20
-    tf.reset_default_graph()
-    x = tf.placeholder(tf.float32, [None, number_of_features])
-    y = tf.placeholder(tf.float32, [None, 1])
+    number_of_features *= 5
 
-    def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name):
-            weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
-            biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
-            weight_decay = tf.reduce_sum(0.001 * tf.nn.l2_loss(weights))
-            tf.add_to_collection('losses', weight_decay)  # for adding to the loss in loss model
-            layer = unit(tf.matmul(x, weights) + biases)
-        return layer
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
-    inference_hidden1 = layer(x, [number_of_features, number_of_features], 'inference_hidden1')
-    inference_hidden2 = layer(inference_hidden1, [number_of_features, number_of_features], 'inference_hidden2')
-    inference_hidden3 = layer(inference_hidden2, [number_of_features, number_of_features], 'inference_hidden3')
-    inference_hidden4 = layer(inference_hidden3, [number_of_features, number_of_features], 'inference_hidden4')
-    inference_hidden5 = layer(inference_hidden4, [number_of_features, number_of_features], 'inference_hidden5')
-    inference_hidden6 = layer(inference_hidden5, [number_of_features, number_of_features], 'inference_hidden6')
-    inference_hidden7 = layer(inference_hidden6, [number_of_features, number_of_features], 'inference_hidden7')
-    inference_hidden8 = layer(inference_hidden7, [number_of_features, number_of_features], 'inference_hidden8')
-    inference_hidden9 = layer(inference_hidden8, [number_of_features, number_of_features], 'inference_hidden9')
-    inference_hidden10 = layer(inference_hidden9, [number_of_features, number_of_features], 'inference_hidden10')
-    inference_hidden11 = layer(inference_hidden10, [number_of_features, number_of_features], 'inference_hidden11')
-    inference_hidden12 = layer(inference_hidden11, [number_of_features, number_of_features], 'inference_hidden12')
-    inference_hidden13 = layer(inference_hidden12, [number_of_features, number_of_features], 'inference_hidden13')
-    inference_hidden14 = layer(inference_hidden13, [number_of_features, number_of_features], 'inference_hidden14')
-    inference_hidden15 = layer(inference_hidden14, [number_of_features, number_of_features], 'inference_hidden15')
-    inference_activation = layer(inference_hidden15, [number_of_features, 1], 'inference_sigmoid', unit=tf.sigmoid)
+    class my_model(tf.Module):
 
-    epsilon = 1e-5
-    inference_loss = (-tf.reduce_sum(y * tf.log(inference_activation + epsilon) +
-                                     (1.0 - y) * tf.log(1 - inference_activation + epsilon)) +
-                      tf.reduce_sum(tf.get_collection('losses')))
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
 
-    inference_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-    inference_minimize = inference_optimizer.minimize(inference_loss)
+            self.optimizer = tf.optimizers.Adam(0.01)
 
-    init = tf.global_variables_initializer()
+            def create_layer_variables(shape, name, activation_function):
+                weights = tf.Variable(
+                    tf.random.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))),
+                    name=f'{name}_weights')
+                biases = tf.Variable(tf.zeros(shape=[shape[1]]), name=f'{name}_biases')
+                return weights, biases, activation_function
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
+            self.n_layers = 10
+            self.layer_variables = []
 
-    session.run(init)
-    state = State(x, y, inference_activation, inference_loss, inference_minimize, session)
+            shape = [number_of_features, number_of_features]
+            for i in range(self.n_layers - 1):
+                self.layer_variables.append(create_layer_variables(shape, f'inference_hidden{i}', tf.nn.relu))
+            self.layer_variables.append(create_layer_variables([number_of_features, 1], 'inference_sigmoid', tf.nn.sigmoid))
+
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def __call__(self, x):
+
+            def dense(x, W, b, activation_function):
+                return activation_function(tf.matmul(x, W) + b)
+
+            for i in range(self.n_layers):
+                x = dense(x, *self.layer_variables[i])
+            return x
+
+        @tf.function
+        def loss(self, predicted_y, target_y, w):
+            lam = 1e-15
+            epsilon = 1e-5
+            l2_loss = lam * tf.math.add_n([tf.nn.l2_loss(n) for n in self.trainable_variables
+                                           if '_weights' in n.name and 'sigmoid' not in n.name])
+
+            diff_from_truth = tf.where(target_y == 1., predicted_y, 1. - predicted_y)
+            cross_entropy = - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
+            return cross_entropy + l2_loss
+
+    state = State(model=my_model())
+    state.epoch = 0
+    state.avg_costs = []  # keeps track of the avg costs per batch over an epoch
+
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
-    Pass received data to tensorflow session
+    Pass batches of received data to tensorflow
     """
-    global old_time
-    N = 100
-    batch_size = 500
-    epoch = 0
-    indices = np.arange(len(X))
-    for i in range(N):
-        np.random.shuffle(indices)
-        for pos in range(0, len(indices), batch_size):
-            epoch += 1
-            if pos + batch_size >= len(indices):
-                break
-            index = indices[pos: pos + batch_size]
-            x_batch = np.repeat(X[index], 20, axis=1)
-            y_batch = y[index]
+    X = np.repeat(X, 5, axis=1)
 
-            feed_dict = {state.x: x_batch, state.y: y_batch}
-            state.session.run(state.optimizer, feed_dict=feed_dict)
+    with tf.GradientTape() as tape:
+        avg_cost = state.model.loss(state.model(X), y, w)
+        grads = tape.gradient(avg_cost, state.model.trainable_variables)
 
-            if epoch % 1000 == 0:
-                avg_cost = state.session.run(state.cost, feed_dict=feed_dict)
-                new_time = time.time()
-                print("Time Difference", new_time - old_time)
-                old_time = new_time
-                print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-    return False
+    state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
+
+    if batch == 0 and epoch == 0:
+        state.avg_costs = [avg_cost]
+    elif batch != state.nBatches-1:
+        state.avg_costs.append(avg_cost)
+    else:
+        # end of the epoch, print summary results, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [avg_cost]
+
+    if epoch == 100000:
+        return False
+    return True
+
+
+def apply(state, X):
+    """
+    Apply estimator to passed data.
+    """
+    X = np.repeat(X, 5, axis=1)
+    r = state.model(X).numpy().flatten()
+    return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 if __name__ == "__main__":
@@ -122,7 +131,7 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
@@ -130,6 +139,8 @@ if __name__ == "__main__":
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/tensorflow/simple_deep.py'
     specific_options.m_normalize = True
+    specific_options.m_nIterations = 100
+    specific_options.m_mini_batch_size = 500
 
     training_start = time.time()
     basf2_mva.teacher(general_options, specific_options)
@@ -141,5 +152,5 @@ if __name__ == "__main__":
     p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("Tensorflow", training_time, inference_time, auc)

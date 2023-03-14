@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,10 +48,6 @@ histo = b2.register_module('HistoManager')
 histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
-# Gearbox: access to database (xml files)
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
-
 # Particle gun: generate multiple tracks
 particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
@@ -77,12 +72,10 @@ add_simulation(main, usePXDDataReduction=False)
 add_tracking_reconstruction(main)
 
 # Track extrapolation
-ext = b2.register_module('Ext')
-main.add_module(ext)
+main.add_module('Ext')
 
 # convert ARICHDigits to ARICHHits
-arichHits = b2.register_module('ARICHFillHits')
-main.add_module(arichHits)
+main.add_module('ARICHFillHits')
 
 # ARICH reconstruction
 # calculate PID likelihoods for all tracks
@@ -99,8 +92,7 @@ main.add_module(arichNtuple)
 
 # ARICH DQM
 # create DQM occupancy plots
-arichdqm = b2.register_module('ARICHDQM')
-main.add_module(arichdqm)
+main.add_module('ARICHDQM')
 
 # Uncomment to store DataStore content to root file
 # output = register_module('RootOutput')
@@ -114,8 +106,7 @@ main.add_module(arichdqm)
 # main.add_module(display)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

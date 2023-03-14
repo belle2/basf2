@@ -244,59 +244,49 @@ if __name__ == '__main__':
             variables = list(reversed(variables))
 
         if identifiers[0].find('Electron') != -1:
-            ft.setVariables()
             if identifiers[0].find('Intermediate') != -1:
-                variables = ft.variables['IntermediateElectron']
+                variables = ft.getTrainingVariables('IntermediateElectron')
             else:
-                variables = ft.variables['Electron']
+                variables = ft.getTrainingVariables('Electron')
 
         if identifiers[0].find('Muon') != -1:
-            ft.setVariables()
             if identifiers[0].find('Intermediate') != -1:
-                variables = ft.variables['IntermediateMuon']
+                variables = ft.getTrainingVariables('IntermediateMuon')
             else:
-                variables = ft.variables['Muon']
+                variables = ft.getTrainingVariables('Muon')
 
         if identifiers[0].find('Lepton') != -1:
-            ft.setVariables()
             if identifiers[0].find('Intermediate') != -1:
-                variables = ft.variables['IntermediateKinLepton']
+                variables = ft.getTrainingVariables('IntermediateKinLepton')
             else:
-                variables = ft.variables['KinLepton']
+                variables = ft.getTrainingVariables('KinLepton')
 
         if identifiers[0].find('KaonFBDT') != -1:
             displayHeatMap = True
-            ft.setVariables()
-            variables = ft.variables['Kaon']
+            variables = ft.getTrainingVariables('Kaon')
 
         if identifiers[0].find('SlowPion') != -1:
-            ft.setVariables()
-            variables = ft.variables['SlowPion']
+            variables = ft.getTrainingVariables('SlowPion')
 
         if identifiers[0].find('FastHadron') != -1:
-            ft.setVariables()
-            variables = ft.variables['FastHadron']
+            variables = ft.getTrainingVariables('FastHadron')
 
         if identifiers[0].find('KaonPion') != -1:
-            ft.setVariables()
-            variables = ft.variables['KaonPion']
+            variables = ft.getTrainingVariables('KaonPion')
 
         if identifiers[0].find('FSC') != -1:
-            ft.setVariables()
-            variables = ft.variables['FSC']
+            variables = ft.getTrainingVariables('FSC')
 
         if identifiers[0].find('MaximumPstar') != -1:
-            ft.setVariables()
-            variables = ft.variables['MaximumPstar']
+            variables = ft.getTrainingVariables('MaximumPstar')
 
         if identifiers[0].find('Lambda') != -1:
             displayHeatMap = True
-            ft.setVariables()
-            variables = ft.variables['Lambda']
+            variables = ft.getTrainingVariables('Lambda')
 
         variables = list(reversed(variables))
         for iVarPosition in range(len(variables)):
-            root_variables[iVarPosition] = Belle2.makeROOTCompatible(variables[iVarPosition])
+            root_variables[iVarPosition] = Belle2.MakeROOTCompatible.makeROOTCompatible(variables[iVarPosition])
 
         # Set special name
         if identifiers[0].find('FSC') != -1:

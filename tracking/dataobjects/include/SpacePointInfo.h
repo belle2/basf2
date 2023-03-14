@@ -9,7 +9,7 @@
 #pragma once
 
 #include <TObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -19,26 +19,26 @@ namespace Belle2 {
   public:
     /// constructor
     SpacePointInfo() :
-      m_position( {0., 0., 0.}),
-                m_positionError({1., 1., 1.}),
-                m_normalizedLocalU(0.),
-                m_normalizedLocalV(0.),
-                m_clustersAssignedU(false),
-                m_clustersAssignedV(false),
-                m_vxdID(Belle2::VxdID::baseType(0)),
-                m_sensorType(-1),
-                m_qualityIndicator(0.5),
-                m_isAssigned(false)
+      m_position(0., 0., 0.),
+      m_positionError(1., 1., 1.),
+      m_normalizedLocalU(0.),
+      m_normalizedLocalV(0.),
+      m_clustersAssignedU(false),
+      m_clustersAssignedV(false),
+      m_vxdID(Belle2::VxdID::baseType(0)),
+      m_sensorType(-1),
+      m_qualityIndicator(0.5),
+      m_isAssigned(false)
     {
-    };
+    }
 
     /// destructor
-    ~SpacePointInfo() {};
+    ~SpacePointInfo() {}
 
     /** setter for the position.
      * @param v: 3-vector with new position
     */
-    void setPosition(TVector3 v) { m_position = v; };
+    void setPosition(ROOT::Math::XYZVector v) { m_position = v; };
 
     /// getter for the x-position
     double getX() { return m_position.X(); };
@@ -52,7 +52,7 @@ namespace Belle2 {
     /** setter for the uncertainty on the position
      * @param v: vector with new position uncertainties
     */
-    void setPositionError(TVector3 v) { m_positionError = v; };
+    void setPositionError(ROOT::Math::XYZVector v) { m_positionError = v; };
 
     /// getter for uncertainty on x
     double getErrorX() { return m_positionError.X(); };
@@ -130,10 +130,10 @@ namespace Belle2 {
 
   private:
     /// 3-vector with positon in global coordinates
-    TVector3 m_position;
+    ROOT::Math::XYZVector m_position;
 
     /// uncertainty on the position
-    TVector3 m_positionError;
+    ROOT::Math::XYZVector m_positionError;
 
     /// normalized coordinates of spacepoint in local coordinates u-direction
     double m_normalizedLocalU;
@@ -160,6 +160,6 @@ namespace Belle2 {
     bool m_isAssigned;
 
     //! needed by root
-    ClassDef(SpacePointInfo, 1);
+    ClassDef(SpacePointInfo, 2);
   };
 }

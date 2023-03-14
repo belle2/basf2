@@ -38,8 +38,8 @@ namespace Belle2 {
     /** empty constructor */
     MCVXDPurityInfo() :
       m_iD(-1),
-      m_nTotalClusters( { {0, 0, 0} }),
-    m_nFoundClusters({ {0, 0, 0} }) {}
+      m_nTotalClusters{0, 0, 0},
+      m_nFoundClusters{0, 0, 0} {}
 
     /** constructor
      * parameters:
@@ -59,7 +59,7 @@ namespace Belle2 {
                     unsigned int nSVDUClusters,
                     unsigned int nSVDVClusters) :
       m_iD(iD),
-      m_nTotalClusters( { {nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal} }),
+      m_nTotalClusters({ {nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal} }),
     m_nFoundClusters({ {nPXDClusters, nSVDUClusters, nSVDVClusters} }) {}
 
     /**

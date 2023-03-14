@@ -7,9 +7,12 @@
  **************************************************************************/
 
 #pragma once
-#include <ecl/calibration/eclee5x5Algorithm.h>
-#include <calibration/CalibrationAlgorithm.h>
+
+/* ECL headers. */
 #include <ecl/geometry/ECLNeighbours.h>
+
+/* Basf2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
   namespace ECL {

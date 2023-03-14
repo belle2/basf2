@@ -16,7 +16,7 @@
 // #include "cantProceed.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <time.h>
@@ -24,7 +24,7 @@
 namespace Belle2 {
   /** Class for generating snapshots for histograms. */
 
-  class DQMHistSnapshotsModule : public DQMHistAnalysisModule {
+  class DQMHistSnapshotsModule final : public DQMHistAnalysisModule {
 
     /**
      * The struct for the snapshots.
@@ -41,18 +41,41 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistSnapshotsModule();
-    virtual ~DQMHistSnapshotsModule();
 
-    //! Module functions to be called from main process
-    virtual void initialize() override;
+    /**
+     * Destructor.
+     */
+    ~DQMHistSnapshotsModule();
 
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
+
     /**
      * Find a snapshot by the histogram's name.
      * @param a The name of the hisotgram in the snapshot.

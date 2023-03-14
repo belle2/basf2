@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPLaserCalibrator/TOPLaserCalibratorModule.h>
+
+// TOP headers.
 #include <top/modules/TOPLaserCalibrator/LaserCalibratorFit.h>
 
 // framework - DataStore
@@ -31,10 +33,10 @@ using namespace std;
 
 namespace Belle2 {
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPLaserCalibrator)
+  REG_MODULE(TOPLaserCalibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation

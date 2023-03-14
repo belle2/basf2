@@ -257,6 +257,14 @@ namespace Belle2 {
                                           const std::vector<double>& pedestals,
                                           int ADCRange) const;
 
+      /**
+       * Generate time walk by taking into account pile-up of hits.
+       * @param hitTime time of the hit
+       * @param peakTime peaking time of signal
+       * @return time walk
+       */
+      double generateTimeWalk(double hitTime, double peakTime) const;
+
       static unsigned s_storageDepth;  /**< ASIC analog storage depth */
       static unsigned s_readoutWindows;   /**< number of readout windows */
       static int s_offsetWindows;    /**< number of windows before first wf window */

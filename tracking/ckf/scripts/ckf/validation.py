@@ -52,8 +52,8 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
 
         result["mc_store_array_number"] = mc_track.getArrayIndex()
 
-        this_best_track_cdc = self.mc_track_matcher_cdc.getMatchedPRRecoTrack(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getMatchedPRRecoTrack(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getAnyChargeMatchedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getAnyChargeMatchedPRRecoTrack(mc_track)
 
         result.update(peelers.peel_reco_track_hit_content(this_best_track_cdc, key="cdc_{part_name}"))
         result.update(peelers.peel_reco_track_seed(this_best_track_cdc, key="cdc_{part_name}"))
@@ -161,8 +161,8 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
 def peel_matching_information(pr_track_and_mc_track_matcher, key="{part_name}"):
     pr_track, mc_track_matcher = pr_track_and_mc_track_matcher
     if pr_track:
-        is_matched = mc_track_matcher.isMatchedPRRecoTrack(pr_track)
-        is_clone = mc_track_matcher.isClonePRRecoTrack(pr_track)
+        is_matched = mc_track_matcher.isAnyChargeMatchedPRRecoTrack(pr_track)
+        is_clone = mc_track_matcher.isAnyChargeClonePRRecoTrack(pr_track)
         is_background = mc_track_matcher.isBackgroundPRRecoTrack(pr_track)
         is_ghost = mc_track_matcher.isGhostPRRecoTrack(pr_track)
 
@@ -190,6 +190,7 @@ def peel_matching_information(pr_track_and_mc_track_matcher, key="{part_name}"):
 
 class VxdCdcMergerHarvesterPRSide(HarvestingModule):
     """Gather the reconstructed VXD-CDC-merger results into ROOT file"""
+
     def __init__(self, foreach, others, output_file_name):
         """
         Init harvester
@@ -217,7 +218,7 @@ class VxdCdcMergerHarvesterPRSide(HarvestingModule):
 
         result["store_array_number"] = pr_track.getArrayIndex()
 
-        mc_track = self.mc_track_matcher.getMatchedMCRecoTrack(pr_track)
+        mc_track = self.mc_track_matcher.getAnyChargeMatchedMCRecoTrack(pr_track)
 
         if mc_track:
             result["mc_store_array_number"] = mc_track.getArrayIndex()

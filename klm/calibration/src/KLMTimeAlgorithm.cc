@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
@@ -57,7 +57,7 @@ static bool compareEventNumber(const std::pair<KLMChannelNumber, unsigned int>& 
   return pair1.second < pair2.second;
 }
 
-static double timeDensity(double x[2], double* par)
+static double timeDensity(const double x[2], const double* par)
 {
   double polynomial, t0, gauss;
   polynomial = par[0];

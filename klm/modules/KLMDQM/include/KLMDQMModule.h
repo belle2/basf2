@@ -12,13 +12,13 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -128,8 +128,8 @@ namespace Belle2 {
 
     /** Number of hits per channel. */
     TH1F** m_ChannelHits[
-      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+    EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+    BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
 
     /** Masked channels per sector. */
     TH1F* m_MaskedChannelsPerSector;
@@ -197,8 +197,8 @@ namespace Belle2 {
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_BklmHit1ds;
 
-    /** EKLM 2d hits. */
-    StoreArray<EKLMHit2d> m_EklmHit2ds;
+    /** KLM 2d hits. */
+    StoreArray<KLMHit2d> m_Hit2ds;
 
   };
 

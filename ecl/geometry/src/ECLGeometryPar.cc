@@ -6,15 +6,24 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/geometry/ECLGeometryPar.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-#include <G4VTouchable.hh>
-#include <G4PhysicalVolumeStore.hh>
+/* Geant4 headers. */
 #include <G4NavigationHistory.hh>
-#include <G4Transform3D.hh>
+#include <G4PhysicalVolumeStore.hh>
 #include <G4Point3D.hh>
+#include <G4Transform3D.hh>
 #include <G4Vector3D.hh>
+#include <G4VTouchable.hh>
+
+/* C++ headers. */
 #include <iomanip>
 
 using namespace std;
@@ -364,9 +373,9 @@ void ECLGeometryPar::InitCrystal(int cid)
     sincos<16>(ss16, nreplica, s, c);
 
   G4Transform3D* T;
-  if (cid < 1152) {
+  if (ECLElementNumbers::isForward(cid + 1)) {
     T = m_ECLForwardGlobalT;
-  } else if (cid < 7776) {
+  } else if (ECLElementNumbers::isBarrel(cid + 1)) {
     T = m_ECLBarrelGlobalT;
   } else {
     T = m_ECLBackwardGlobalT;
@@ -501,7 +510,7 @@ EclNbr::EclNbr() :
 }
 
 EclNbr::EclNbr(const EclNbr& aNbr) :
-  m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)) ,
+  m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)),
   m_nearSize(aNbr.m_nearSize)
 {
   mNbr_cellID = 0;
@@ -510,15 +519,15 @@ EclNbr::EclNbr(const EclNbr& aNbr) :
 }
 
 EclNbr::EclNbr(
-  const std::vector< Identifier >&           aNbrs     ,
+  const std::vector< Identifier >&           aNbrs,
   const std::vector< Identifier >::size_type aNearSize
 ) :
-  m_nbrs(*new std::vector< Identifier > (aNbrs)) ,
+  m_nbrs(*new std::vector< Identifier > (aNbrs)),
   m_nearSize(aNearSize)
 {
   // sort vector separately for near, nxt-near nbrs
-  std::sort(m_nbrs.begin() , m_nbrs.begin() + aNearSize , std::less< Identifier >()) ;
-  std::sort(m_nbrs.begin() + aNearSize ,   m_nbrs.end() , std::less< Identifier >()) ;
+  std::sort(m_nbrs.begin(), m_nbrs.begin() + aNearSize, std::less< Identifier >()) ;
+  std::sort(m_nbrs.begin() + aNearSize,   m_nbrs.end(), std::less< Identifier >()) ;
 }
 
 EclNbr::~EclNbr()
@@ -658,8 +667,8 @@ EclNbr::getNbr(const Identifier aCellId)
   int tp1 = thetaId + 1;
   int tp2 = thetaId + 2;
 
-  if (aCellId > 1151 && aCellId < 7776) {
-    // barrel
+  if (ECLElementNumbers::isBarrel(aCellId + 1)) {
+    // Barrel.
     //
     //   12 13 14 15 16      ^ theta
     //   11  2  3  4 17      |
@@ -672,42 +681,43 @@ EclNbr::getNbr(const Identifier aCellId)
     int fm2 = (phiId + 142) % 144;
     int fp2 = (phiId + 2) % 144;
 
-    vNbr.push_back(GetCellID(t00 , fm1));
-    vNbr.push_back(GetCellID(tp1 , fm1));
-    vNbr.push_back(GetCellID(tp1 , f00));
-    vNbr.push_back(GetCellID(tp1 , fp1));
-    vNbr.push_back(GetCellID(t00 , fp1));
-    vNbr.push_back(GetCellID(tm1 , fp1));
-    vNbr.push_back(GetCellID(tm1 , f00));
-    vNbr.push_back(GetCellID(tm1 , fm1));
+    vNbr.push_back(GetCellID(t00, fm1));
+    vNbr.push_back(GetCellID(tp1, fm1));
+    vNbr.push_back(GetCellID(tp1, f00));
+    vNbr.push_back(GetCellID(tp1, fp1));
+    vNbr.push_back(GetCellID(t00, fp1));
+    vNbr.push_back(GetCellID(tm1, fp1));
+    vNbr.push_back(GetCellID(tm1, f00));
+    vNbr.push_back(GetCellID(tm1, fm1));
 
     nearSize = vNbr.size();
 
-    vNbr.push_back(GetCellID(tm1 , fm2));
-    vNbr.push_back(GetCellID(t00 , fm2));
-    vNbr.push_back(GetCellID(tp1 , fm2));
-    vNbr.push_back(GetCellID(tp2 , fm2));
-    vNbr.push_back(GetCellID(tp2 , fm1));
-    vNbr.push_back(GetCellID(tp2 , f00));
-    vNbr.push_back(GetCellID(tp2 , fp1));
-    vNbr.push_back(GetCellID(tp2 , fp2));
-    vNbr.push_back(GetCellID(tp1 , fp2));
-    vNbr.push_back(GetCellID(t00 , fp2));
-    vNbr.push_back(GetCellID(tm1 , fp2));
-    vNbr.push_back(GetCellID(tm2 , fp2));
-    vNbr.push_back(GetCellID(tm2 , fp1));
-    vNbr.push_back(GetCellID(tm2 , f00));
-    vNbr.push_back(GetCellID(tm2 , fm1));
-    vNbr.push_back(GetCellID(tm2 , fm2));
-  }//if( aCellId > 1152 && aCellId < 7777 )
-  else {
+    vNbr.push_back(GetCellID(tm1, fm2));
+    vNbr.push_back(GetCellID(t00, fm2));
+    vNbr.push_back(GetCellID(tp1, fm2));
+    vNbr.push_back(GetCellID(tp2, fm2));
+    vNbr.push_back(GetCellID(tp2, fm1));
+    vNbr.push_back(GetCellID(tp2, f00));
+    vNbr.push_back(GetCellID(tp2, fp1));
+    vNbr.push_back(GetCellID(tp2, fp2));
+    vNbr.push_back(GetCellID(tp1, fp2));
+    vNbr.push_back(GetCellID(t00, fp2));
+    vNbr.push_back(GetCellID(tm1, fp2));
+    vNbr.push_back(GetCellID(tm2, fp2));
+    vNbr.push_back(GetCellID(tm2, fp1));
+    vNbr.push_back(GetCellID(tm2, f00));
+    vNbr.push_back(GetCellID(tm2, fm1));
+    vNbr.push_back(GetCellID(tm2, fm2));
+  } else {
+    // Forward or backward.
     // endcap -- not always 24!
     int n00 = 1000;
     int np1 = 1000;
     int np2 = 1000;
     int nm1 = 1000;
     int nm2 = 1000;
-    if (aCellId < 1153) { // forward
+    if (ECLElementNumbers::isForward(aCellId + 1)) {
+      // Forward.
       const EclIdentifier mPerRingForward[]
         = { 48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
       if (thetaId > 1) nm2 = mPerRingForward[ thetaId - 2 ];
@@ -715,7 +725,8 @@ EclNbr::getNbr(const Identifier aCellId)
       n00 = mPerRingForward[ thetaId     ];
       np1 = mPerRingForward[ thetaId + 1 ];
       np2 = mPerRingForward[ thetaId + 2 ];
-    } else { // backward
+    } else {
+      // Backward.
       const EclIdentifier mPerRingBackward[]
         = { 64, 64, 64, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
       if (thetaId < 67) np2 = mPerRingBackward[ 66 - thetaId ];
@@ -867,41 +878,41 @@ EclNbr::getNbr(const Identifier aCellId)
     vNbr.push_back(GetCellID(t00, f00m1));
     vNbr.push_back(GetCellID(t00, f00p1));
     if (nm1 < 999) {
-      vNbr.push_back(GetCellID(tm1 , fm100));
+      vNbr.push_back(GetCellID(tm1, fm100));
       if (fm1m1 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1m1));
+        vNbr.push_back(GetCellID(tm1, fm1m1));
       if (fm1p1 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1p1));
+        vNbr.push_back(GetCellID(tm1, fm1p1));
     }
     if (np1 < 999) {
-      vNbr.push_back(GetCellID(tp1 , fp100));
+      vNbr.push_back(GetCellID(tp1, fp100));
       if (fp1m1 < 999)
-        vNbr.push_back(GetCellID(tp1 , fp1m1));
+        vNbr.push_back(GetCellID(tp1, fp1m1));
       if (fp1p1 < 999)
-        vNbr.push_back(GetCellID(tp1 , fp1p1));
+        vNbr.push_back(GetCellID(tp1, fp1p1));
     }
     nearSize = vNbr.size() ;
 
     // now on to next-near neighbors
     if (nm2 < 999) {
-      vNbr.push_back(GetCellID(tm2 , fm200));
+      vNbr.push_back(GetCellID(tm2, fm200));
       if (fm2m1 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2m1));
+        vNbr.push_back(GetCellID(tm2, fm2m1));
       if (fm2p1 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2p1));
+        vNbr.push_back(GetCellID(tm2, fm2p1));
       if (fm2m2 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2m2));
+        vNbr.push_back(GetCellID(tm2, fm2m2));
       if (fm2p2 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2p2));
+        vNbr.push_back(GetCellID(tm2, fm2p2));
     }
     if (nm1 < 999) {
       if (fm1m2 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1m2));
+        vNbr.push_back(GetCellID(tm1, fm1m2));
       if (fm1p2 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1p2));
+        vNbr.push_back(GetCellID(tm1, fm1p2));
     }
-    vNbr.push_back(GetCellID(t00 , f00m2));
-    vNbr.push_back(GetCellID(t00 , f00p2));
+    vNbr.push_back(GetCellID(t00, f00m2));
+    vNbr.push_back(GetCellID(t00, f00p2));
     if (np1 < 999) {
       if (fp1m2 < 999)
         vNbr.push_back(GetCellID(tp1, fp1m2));
@@ -919,7 +930,6 @@ EclNbr::getNbr(const Identifier aCellId)
       if (fp2p2 < 999)
         vNbr.push_back(GetCellID(tp2, fp2p2));
     }
-  }//else( aCellId > 1152 && aCellId < 7777 )
-  return
-    EclNbr(vNbr, nearSize);
+  }
+  return EclNbr(vNbr, nearSize);
 }

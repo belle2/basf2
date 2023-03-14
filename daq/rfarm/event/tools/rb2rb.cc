@@ -50,9 +50,8 @@ int main(int argc, char** argv)
     }
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbufout->insq((int*)evbuf, bsize);
+      int irb = rbufout->insq((int*)evbuf, bsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

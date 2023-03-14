@@ -45,13 +45,13 @@ namespace Belle2 {
     virtual ~RawInputModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun() override;
+    void event() override;
+    void endRun() override;
+    void terminate() override;
 
   private:
     //! function to read raw data

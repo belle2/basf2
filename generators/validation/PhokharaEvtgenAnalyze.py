@@ -5,7 +5,7 @@
 <header>
     <input>PhokharaEvtgenData.root</input>
     <output>PhokharaEvtgenAnalysis.root</output>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Analysis of e+ e- -> J/psi eta_c events.</description>
 </header>
 """
@@ -115,6 +115,7 @@ main = b2.create_path()
 main.add_module(root_input)
 main.add_module(phokhara_evtgen)
 
+main.add_module('Progress')
 # Run.
 b2.process(main)
 

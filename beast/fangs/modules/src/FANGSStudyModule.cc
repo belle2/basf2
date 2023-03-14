@@ -33,7 +33,7 @@ using namespace fangs;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FANGSStudy)
+REG_MODULE(FANGSStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -80,71 +80,71 @@ void FANGSStudyModule::defineHisto()
   h_edepThres3 = new TH2F("h_edepThres3", "Time bin # vs. energy deposited", 20, 0., 20., 1000, 0., 10.);
   h_edepThres3->Sumw2();
   for (int i = 0; i < 3; i++) {
-    h_zvedep[i] = new TH1F(TString::Format("h_zvedep_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25.);
+    h_zvedep[i] = new TH1F(TString::Format("h_zvedep_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25.);
     h_zvedep[i]->Sumw2();
 
-    h_xvzvedep[i] = new TH2F(TString::Format("h_xvzvedep_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvzvedep[i] = new TH2F(TString::Format("h_xvzvedep_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvzvedep[i]->Sumw2();
 
-    h_yvzvedep[i] = new TH2F(TString::Format("h_yvzvedep_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_yvzvedep[i] = new TH2F(TString::Format("h_yvzvedep_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_yvzvedep[i]->Sumw2();
 
-    h_rvzvedep[i] = new TH2F(TString::Format("h_rvzvedep_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
+    h_rvzvedep[i] = new TH2F(TString::Format("h_rvzvedep_%d", i), "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedep[i]->Sumw2();
 
-    h_xvyvedep[i] = new TH2F(TString::Format("h_xvyvedep_%d", i) , "edep [MeV] vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvyvedep[i] = new TH2F(TString::Format("h_xvyvedep_%d", i), "edep [MeV] vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvyvedep[i]->Sumw2();
 
-    h_zvedepW[i] = new TH1F(TString::Format("h_zvedepW_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25.);
+    h_zvedepW[i] = new TH1F(TString::Format("h_zvedepW_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25.);
     h_zvedepW[i]->Sumw2();
 
-    h_xvzvedepW[i] = new TH2F(TString::Format("h_xvzvedepW_%d", i) , "edep [MeV] vs. x vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvzvedepW[i] = new TH2F(TString::Format("h_xvzvedepW_%d", i), "edep [MeV] vs. x vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvzvedepW[i]->Sumw2();
 
-    h_yvzvedepW[i] = new TH2F(TString::Format("h_yvzvedepW_%d", i) , "edep [MeV] vs. y vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_yvzvedepW[i] = new TH2F(TString::Format("h_yvzvedepW_%d", i), "edep [MeV] vs. y vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_yvzvedepW[i]->Sumw2();
 
-    h_xvyvedepW[i] = new TH2F(TString::Format("h_xvyvedepW_%d", i) , "edep [MeV] vs. x vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvyvedepW[i] = new TH2F(TString::Format("h_xvyvedepW_%d", i), "edep [MeV] vs. x vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvyvedepW[i]->Sumw2();
 
-    h_rvzvedepW[i] = new TH2F(TString::Format("h_rvzvedepW_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
+    h_rvzvedepW[i] = new TH2F(TString::Format("h_rvzvedepW_%d", i), "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepW[i]->Sumw2();
 
 
-    h_zvedepT[i] = new TH1F(TString::Format("h_zvedepT_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25.);
+    h_zvedepT[i] = new TH1F(TString::Format("h_zvedepT_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25.);
     h_zvedepT[i]->Sumw2();
 
-    h_xvzvedepT[i] = new TH2F(TString::Format("h_xvzvedepT_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvzvedepT[i] = new TH2F(TString::Format("h_xvzvedepT_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvzvedepT[i]->Sumw2();
 
-    h_yvzvedepT[i] = new TH2F(TString::Format("h_yvzvedepT_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_yvzvedepT[i] = new TH2F(TString::Format("h_yvzvedepT_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_yvzvedepT[i]->Sumw2();
 
-    h_rvzvedepT[i] = new TH2F(TString::Format("h_rvzvedepT_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
+    h_rvzvedepT[i] = new TH2F(TString::Format("h_rvzvedepT_%d", i), "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepT[i]->Sumw2();
 
-    h_xvyvedepT[i] = new TH2F(TString::Format("h_xvyvedepT_%d", i) , "edep [MeV] vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvyvedepT[i] = new TH2F(TString::Format("h_xvyvedepT_%d", i), "edep [MeV] vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvyvedepT[i]->Sumw2();
 
-    h_zvedepWT[i] = new TH1F(TString::Format("h_zvedepWT_%d", i) , "edep [MeV] vs. z [cm]", 2000, -25., 25.);
+    h_zvedepWT[i] = new TH1F(TString::Format("h_zvedepWT_%d", i), "edep [MeV] vs. z [cm]", 2000, -25., 25.);
     h_zvedepWT[i]->Sumw2();
 
-    h_xvzvedepWT[i] = new TH2F(TString::Format("h_xvzvedepWT_%d", i) , "edep [MeV] vs. x vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvzvedepWT[i] = new TH2F(TString::Format("h_xvzvedepWT_%d", i), "edep [MeV] vs. x vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvzvedepWT[i]->Sumw2();
 
-    h_yvzvedepWT[i] = new TH2F(TString::Format("h_yvzvedepWT_%d", i) , "edep [MeV] vs. y vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_yvzvedepWT[i] = new TH2F(TString::Format("h_yvzvedepWT_%d", i), "edep [MeV] vs. y vs. z [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_yvzvedepWT[i]->Sumw2();
 
-    h_xvyvedepWT[i] = new TH2F(TString::Format("h_xvyvedepWT_%d", i) , "edep [MeV] vs. x vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
+    h_xvyvedepWT[i] = new TH2F(TString::Format("h_xvyvedepWT_%d", i), "edep [MeV] vs. x vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvyvedepWT[i]->Sumw2();
 
-    h_rvzvedepWT[i] = new TH2F(TString::Format("h_rvzvedepWT_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
+    h_rvzvedepWT[i] = new TH2F(TString::Format("h_rvzvedepWT_%d", i), "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepWT[i]->Sumw2();
   }
   h_Edep = new TH2F("h_Edep", "det # # vs. energy deposited", 20, 0., 20., 1000, 0., 10.);
   h_pxNb = new TH2F("h_pxNb", "det # # vs. nb pixel", 20, 0., 20., 1000, 0., 1000.);
   for (int i = 0; i < 15; i++) {
-    h_cvr[i] = new TH2F(TString::Format("cvr_%d", i) , " col v. row", 80, 0., 80., 336, 0., 336.);
+    h_cvr[i] = new TH2F(TString::Format("cvr_%d", i), " col v. row", 80, 0., 80., 336, 0., 336.);
   }
 }
 

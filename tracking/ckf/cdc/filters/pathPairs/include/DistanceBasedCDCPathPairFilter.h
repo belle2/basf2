@@ -17,12 +17,12 @@ namespace Belle2 {
   class DistanceBasedCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final {
+    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
+    {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
 
-      auto sumOfDistances = [](const CDCCKFPath & path)
-      {
+      auto sumOfDistances = [](const CDCCKFPath & path) {
         // compute sum of distances for the two pats:
         double sum = 0;
         for (auto const& state : path) {
@@ -36,8 +36,7 @@ namespace Belle2 {
       const auto rhsDistSum = sumOfDistances(rhs);
 
       // priority is most hits
-      if (lhs.size() != rhs.size())
-      {
+      if (lhs.size() != rhs.size()) {
         return lhs.size() > rhs.size();
       }
 

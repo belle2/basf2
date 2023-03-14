@@ -58,8 +58,8 @@ namespace Belle2 {
     {
       auto compareClusters = [](const ClusterType * a, const ClusterType * b) -> bool {
         return (a->getSensorID() == b->getSensorID()
-        and a->isUCluster() == b->isUCluster()
-        and a->getPosition() == b->getPosition()); };
+                and a->isUCluster() == b->isUCluster()
+                and a->getPosition() == b->getPosition()); };
 
       std::vector<const ClusterType*> uniqueClusters;
       for (const auto* firstCluster : firstTC) {

@@ -212,14 +212,14 @@ namespace Photospp {
       should be included in all separately compiled libraries.
   */
 
-  inline void* operator new(long unsigned int size, const char* filename, int line)
+  inline void* operator new (long unsigned int size, const char* filename, int line)
   {
     void* ptr = (void*)malloc(size);
     Photos::Log::NewPointer((unsigned long)ptr, size, filename, line);
     return (ptr);
   }
 
-  inline void  operator delete(void* p)
+  inline void  operator delete (void* p)
   {
     Photos::Log::DeletePointer((unsigned long)p);
     free(p);

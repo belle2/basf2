@@ -10,7 +10,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -41,7 +41,7 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param lenght size of the array
    */
-  void phokhara_rndmarray(double* drvec, int* lengt)
+  void phokhara_rndmarray(double* drvec, const int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       drvec[i] = gRandom->Rndm();
@@ -56,19 +56,19 @@ extern "C" {
   void phokhara_set_parameter_file(const char* paramfilename);
 
   /** Callback to show error if event is rejected*/
-  void phokhara_error_trials_(double* trials)
+  void phokhara_error_trials_(const double* trials)
   {
     B2ERROR("PHOKHARA: Event rejected! Number of maximal trials (" << *trials << " << exceeded");
   }
 
   /** Callback to show warning if weight is larger than maxweight*/
-  void phokhara_warning_weight_(int* photmult, double* weight, double* max)
+  void phokhara_warning_weight_(const int* photmult, const double* weight, const double* max)
   {
     B2WARNING("PHOKHARA: Event weight (" << *weight <<  ") exceeds limit (" << *max << "), photon multiplicity: " << *photmult);
   }
 
   /** Callback to show warning if weight is negative*/
-  void phokhara_warning_negweight_(int* photmult, double* weight)
+  void phokhara_warning_negweight_(const int* photmult, const double* weight)
   {
     B2WARNING("PHOKHARA: Event weight (" << *weight <<  ") is negative, photon multiplicity: " << *photmult);
   }
@@ -173,7 +173,7 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+double Phokhara::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
 
   //Generate event
@@ -329,8 +329,8 @@ void Phokhara::applySettings()
 }
 
 
-void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
-                             bool isVirtual, bool isInitial)
+void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                             ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial)
 {
 
   //   Create particle
@@ -357,7 +357,7 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   // part.get4Vector() uses mass, need to set invariant mass for virtual photons
   if ((m_finalState == 0) && m_replaceMuonsByVirtualPhoton && (pdg == 10022))
     part.setMass(sqrt(mom[3] * mom[3] - mom[0] * mom[0] - mom[1] * mom[1] -
@@ -367,13 +367,13 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

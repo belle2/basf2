@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 
@@ -22,13 +22,33 @@ namespace Belle2 {
   /**
    * Class for HLT-related histogram analysis.
    */
-  class DQMHistAnalysisHLTModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisHLTModule final : public DQMHistAnalysisModule {
   public:
+
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisHLTModule();
-    void initialize() final;
-    void beginRun()  final;
-    void event() final;
-    void terminate() final;
+
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
 
   private:
     /// prefix for EPICS PVs

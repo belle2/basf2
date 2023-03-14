@@ -13,16 +13,15 @@
 # use basf2_mva_evaluation.py with train.root and test.root at the end to see the impact on the spectator variables.
 
 import basf2_mva
-from basf2_mva_python_interface.contrib_keras import State
-import tensorflow.keras as keras
+from basf2_mva_python_interface.keras import State
 
-from keras.layers import Dense, Input
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
-from keras.activations import sigmoid, tanh, softmax
-from keras.callbacks import EarlyStopping
-from keras.utils import plot_model
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import binary_crossentropy, sparse_categorical_crossentropy
+from tensorflow.keras.activations import sigmoid, tanh, softmax
+from tensorflow.keras.callbacks import EarlyStopping, Callback
+from tensorflow.keras.utils import plot_model
 
 import numpy as np
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
@@ -147,7 +146,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Save Validation Data for monitoring Training
     """
@@ -158,7 +157,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Fit the model.
     For every training step of MLP. Adverserial Network will be trained K times.
@@ -182,7 +181,7 @@ def partial_fit(state, X, S, y, w, epoch):
         # Build Batch Generator for adversary Callback
         state.batch_gen = batch_generator(X, y, S)
 
-    class AUC_Callback(keras.callbacks.Callback):
+    class AUC_Callback(Callback):
         """
         Callback to print AUC after every epoch.
         """
@@ -197,7 +196,7 @@ def partial_fit(state, X, S, y, w, epoch):
             self.val_aucs.append(val_auc)
             return
 
-    class Adversary(keras.callbacks.Callback):
+    class Adversary(Callback):
         """
         Callback to train Adversary
         """
@@ -253,12 +252,12 @@ if __name__ == "__main__":
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
-    general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
+    general_options.m_spectators = basf2_mva.vector('daughterInvM(0, 1)', 'daughterInvM(0, 2)')
     general_options.m_target_variable = "isSignal"
-    general_options.m_identifier = "keras"
+    general_options.m_identifier = "keras_adversary"
 
     specific_options = basf2_mva.PythonOptions()
-    specific_options.m_framework = "contrib_keras"
+    specific_options.m_framework = "keras"
     specific_options.m_steering_file = 'mva/examples/keras/adversary_network.py'
     specific_options.m_normalize = True
     specific_options.m_training_fraction = 0.9

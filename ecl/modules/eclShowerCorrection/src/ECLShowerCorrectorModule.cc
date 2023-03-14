@@ -23,8 +23,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLShowerCorrector)
-REG_MODULE(ECLShowerCorrectorPureCsI)
+REG_MODULE(ECLShowerCorrector);
+REG_MODULE(ECLShowerCorrectorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -43,7 +43,8 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
 
 ECLShowerCorrectorModule::~ECLShowerCorrectorModule()
 {
-  ;
+  if (m_leakagePosition != nullptr)
+    delete m_leakagePosition;
 }
 
 void ECLShowerCorrectorModule::initialize()
@@ -54,7 +55,7 @@ void ECLShowerCorrectorModule::initialize()
   m_eclShowers.registerInDataStore(eclShowerArrayName());
 
   //..Class to find cellID and position within crystal from theta and phi
-  leakagePosition = new ECLLeakagePosition();
+  m_leakagePosition = new ECLLeakagePosition();
 
 }
 
@@ -119,7 +120,7 @@ void ECLShowerCorrectorModule::event()
 
     //-----------------------------------------------------------------
     //..Location of shower. cellID = positionVector[0] is for debugging only
-    std::vector<int> positionVector = leakagePosition->getLeakagePosition(icellIDMaxE, thetaLocation, phiLocation, nPositionBins);
+    std::vector<int> positionVector = m_leakagePosition->getLeakagePosition(icellIDMaxE, thetaLocation, phiLocation, nPositionBins);
     const int iThetaID = positionVector[1];
     const int iRegion = positionVector[2];
     const int iThetaBin = positionVector[3];

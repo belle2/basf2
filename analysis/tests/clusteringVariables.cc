@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 #include <TRandom3.h>
+#include <Math/Cartesian2D.h>
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
@@ -79,11 +80,11 @@ namespace {
 
       for (int i = 0; i < tracks.getEntries(); ++i) {
         int charge = (i % 2 == 0) ? +1 : -1;
-        TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-        TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-        TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+        ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
+        ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+        ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
         trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215, 0);
         tracks[i]->setTrackFitResultIndex(Const::pion, i);
       }
@@ -442,8 +443,8 @@ namespace {
     float E_0, E_1;
     E_0 = sqrt(pow(px_0, 2) + pow(py_0, 2) + pow(pz_0, 2));
     E_1 = sqrt(pow(px_1, 2) + pow(py_1, 2) + pow(pz_1, 2));
-    TLorentzVector momentum;
-    TLorentzVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
+    ROOT::Math::PxPyPzEVector momentum;
+    ROOT::Math::PxPyPzEVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
 
     // add the two photons as the two daughters of some particle and create the latter
     Particle dau0_noclst(dau0_4vec, 22);
@@ -569,6 +570,7 @@ namespace {
     // initialise the photon list
     gammalist.create();
     gammalist->initialize(22, gammalist.getName());
+    gammalist->setEditable(true);
 
     // make the photons from clusters
     for (int i = 0; i < eclclusters.getEntries(); ++i) {
@@ -577,6 +579,7 @@ namespace {
         gammalist->addParticle(p);
       }
     }
+    gammalist->setEditable(false);
 
     // initialize the pion lists
     pionlist.create();
@@ -584,12 +587,14 @@ namespace {
     piminuslist.create();
     piminuslist->initialize(-211, piminuslist.getName());
     piminuslist->bindAntiParticleList(*(pionlist));
+    pionlist->setEditable(true);
 
     // fill the pion list with the tracks
     for (int i = 0; i < tracks.getEntries(); ++i) {
       const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
       pionlist->addParticle(p);
     }
+    pionlist->setEditable(false);
 
     // check overlap without any arguments
     const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");
@@ -686,11 +691,11 @@ namespace {
 
     for (int i = 0; i < tracks.getEntries(); ++i) {
       int charge = (i % 2 == 0) ? +1 : -1;
-      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
+      ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
       trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215, 0);
       tracks[i]->setTrackFitResultIndex(Const::muon, i);
     }
@@ -784,8 +789,8 @@ namespace {
     StoreArray<KLMCluster> klmClusters;
 
     // add a TrackFitResult
-    TVector3 position(1.0, 0, 0);
-    TVector3 momentum(0, 1.0, 0);
+    ROOT::Math::XYZVector position(1.0, 0, 0);
+    ROOT::Math::XYZVector momentum(0, 1.0, 0);
     TMatrixDSym cov6(6);
     const int charge = 1;
     const float pValue = 0.5;

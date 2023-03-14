@@ -6,17 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
+/* Own header. */
 #include <ecl/modules/eclLOM/eclLOMModule.h>
-#include "trg/ecl/dataobjects/TRGECLWaveform.h"
-//#include "trg/ecl/dataobjects/TRGECLDigi.h"
-#include "mdst/dataobjects/MCParticle.h"
+
+/* ROOT headers. */
+#include <Math/Boost.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLLOM)
+REG_MODULE(ECLLOM);
 
 
 ECLLOMModule::ECLLOMModule()
@@ -46,9 +46,7 @@ ECLLOMModule::~ECLLOMModule()
 
 void ECLLOMModule::initialize()
 {
-  StoreArray<MCParticle>   MCParticles;
-  StoreArray<TRGECLWaveform>  TrgEclWaveformArray;
-  if (!(MCParticles.isRequired() && TrgEclWaveformArray.isRequired())) {
+  if (!(m_MCParticles.isRequired() && m_TrgEclWaveforms.isRequired())) {
     //Fatal is not neccessary here as the storeArrays should just look
     //empty if not registered but let's make sure everything is present
     B2FATAL("Not all collections found, exiting processing");
@@ -147,40 +145,37 @@ void ECLLOMModule::terminate()
 
 void ECLLOMModule::get_MCparticles()
 {
-  StoreArray<MCParticle> MCParticles;
-  int nMCParticles = MCParticles.getEntries();
-  if (nMCParticles >= 4) {
+  int nm_MCParticles = m_MCParticles.getEntries();
+  if (nm_MCParticles >= 4) {
     for (int ind = 2; ind < 4; ind++) {
-      m_mcen[ind - 2] = MCParticles[ind]->getEnergy();
-      m_mcth[ind - 2] = MCParticles[ind]->getMomentum().Theta();
-      m_mcph[ind - 2] = MCParticles[ind]->getMomentum().Phi();
+      m_mcen[ind - 2] = m_MCParticles[ind]->getEnergy();
+      m_mcth[ind - 2] = m_MCParticles[ind]->getMomentum().Theta();
+      m_mcph[ind - 2] = m_MCParticles[ind]->getMomentum().Phi();
     }
 
-    TLorentzVector SummP(MCParticles[0]->get4Vector() + MCParticles[1]->get4Vector());
-    TVector3 Boost_backV;
-    Boost_backV = -SummP.BoostVector();
-    TLorentzVector ComP[2];
-    ComP[0] = MCParticles[2]->get4Vector();
-    ComP[1] = MCParticles[3]->get4Vector();
-    ComP[0].Boost(Boost_backV);
-    ComP[1].Boost(Boost_backV);
+    ROOT::Math::PxPyPzEVector SummP(m_MCParticles[0]->get4Vector() + m_MCParticles[1]->get4Vector());
+    ROOT::Math::XYZVector Boost_backV = SummP.BoostToCM();
+    ROOT::Math::PxPyPzEVector ComP[2];
+    ComP[0] = m_MCParticles[2]->get4Vector();
+    ComP[1] = m_MCParticles[3]->get4Vector();
+    ComP[0] = ROOT::Math::Boost(Boost_backV) * ComP[0];
+    ComP[1] = ROOT::Math::Boost(Boost_backV) * ComP[1];
     for (int ind = 0; ind < 2; ind++) {
       m_com_en[ind] = ComP[ind].E();
-      m_com_th[ind] = ComP[ind].Vect().Theta();
-      m_com_ph[ind] = ComP[ind].Vect().Phi();
+      m_com_th[ind] = ComP[ind].Theta();
+      m_com_ph[ind] = ComP[ind].Phi();
     }
   }
 }
 
 void ECLLOMModule::get_waveforms()
 {
-  StoreArray<TRGECLWaveform> TrgEclWaveformArray;
   //int n_trg_digi = TrgEclDigiArray.getEntries();
-  int n_trg_wf   = TrgEclWaveformArray.getEntries();
+  int n_trg_wf   = m_TrgEclWaveforms.getEntries();
   // calculate signals of endcap sectors for LOM input
   // as sum of corresponding TC signals
   for (int i = 0; i < n_trg_wf; i++) {
-    const TRGECLWaveform* TCWaveform = TrgEclWaveformArray[i];
+    const TRGECLWaveform* TCWaveform = m_TrgEclWaveforms[i];
     //int m_tcid = TCWaveform->getTCID();
     int tc_theta_id = TCWaveform->getThetaID(); //FE:1,2,3 BE:16,17  Checked for rel 4 02 08
     int tc_phi_id   = TCWaveform->getPhiID();   // 1 - 32

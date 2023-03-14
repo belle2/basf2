@@ -51,18 +51,19 @@ namespace Belle2 {
        */
       // cppcheck-suppress passedByValue
       QuadTreeNode(XSpan xSpan, YSpan ySpan, int level, This* parent)
-        : m_xBinBounds(
-      {
+        : m_xBinBounds {
         xSpan[0],
-              xSpan[0] + (xSpan[1] - xSpan[0]) / 2,
-              xSpan[1] - (xSpan[1] - xSpan[0]) / 2,
-              xSpan[1]
-      })
-      , m_yBinBounds({ySpan[0],
-                      ySpan[0] + (ySpan[1] - ySpan[0]) / 2,
-                      ySpan[1] - (ySpan[1] - ySpan[0]) / 2,
-                      ySpan[1]
-                     })
+        xSpan[0] + (xSpan[1] - xSpan[0]) / 2,
+        xSpan[1] - (xSpan[1] - xSpan[0]) / 2,
+        xSpan[1]
+      }
+      , m_yBinBounds(
+        {
+          ySpan[0],
+          ySpan[0] + (ySpan[1] - ySpan[0]) / 2,
+          ySpan[1] - (ySpan[1] - ySpan[0]) / 2,
+          ySpan[1]
+        })
       , m_level(level)
       , m_parent(level > 0 ? parent : nullptr)
       , m_filled(false)

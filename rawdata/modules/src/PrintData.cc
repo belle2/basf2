@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintData)
+REG_MODULE(PrintData);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -182,7 +182,7 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 
   timeval tv;
   int n = 0;
-  rawftsw.GetTTTimeVal(n , &tv);
+  rawftsw.GetTTTimeVal(n, &tv);
   printf("eve %u TLU %d: %d %d %.8x: tv %d %d\n",
          rawftsw.GetEveNo(n),
          rawftsw.Get15bitTLUTag(n),

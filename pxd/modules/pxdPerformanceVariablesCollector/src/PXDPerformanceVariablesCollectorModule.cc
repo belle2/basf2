@@ -28,7 +28,7 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDPerformanceVariablesCollector)
+REG_MODULE(PXDPerformanceVariablesCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -216,6 +216,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
   StoreObjPtr<ParticleList> particles4Eff(m_PList4EffName);
   if (particles4Eff.isValid() && particles4Eff->getListSize() == 1)
     m_selected4Eff = true;
+  const Particle* vpho4eff = particles4Eff->getParticle(0);
 
   collectDeltaIP(); // using ParticleList(m_PList4ResName)
 
@@ -228,6 +229,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
 
   for (auto const& particle : *particles) {
     const Track* trackPtr = particle.getTrack();
+    auto mass = particle.getMass();
     if (!trackPtr) return;
     auto recoTrackPtr = trackPtr->getRelated<RecoTrack>("");
     if (!recoTrackPtr) return;
@@ -235,7 +237,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
     for (auto const& pxdIntercept : pxdIntercepts) {
       TrackCluster_t trackCluster;
       // Function setValues() also returns a recoTrack pointer
-      if (!trackCluster.setValues(pxdIntercept, "", "PXDClustersFromTracks"))
+      if (!trackCluster.setValues(pxdIntercept, "", "PXDClustersFromTracks", mass))
         continue;
 
       auto const& cluster = trackCluster.cluster;
@@ -244,8 +246,13 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
 
 
       // Collect info for efficiency study
-      if (m_selected4Eff && intersection.inside)
-        collectEfficiencyVariables(trackCluster);
+      if (m_selected4Eff && intersection.inside) {
+        // check if the particle is vpho4eff's daughter
+        for (auto const& daughter : vpho4eff->getDaughters()) {
+          if (particle.isCopyOf(daughter))
+            collectEfficiencyVariables(trackCluster);
+        }  // end of vpho4eff daughter loop
+      }
 
       // Collect info for gain calibration
       // Check for valid cluster and intersection
@@ -274,7 +281,7 @@ void PXDPerformanceVariablesCollectorModule::collectDeltaIP()
 
   // Use beam spot info for the interaction point
   DBObjPtr<BeamSpot> beamSpotDB;
-  auto ip = beamSpotDB->getIPPosition();
+  auto ip = ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
   auto vertex = ip;
 
   const Particle* part0 = mother->getDaughter(0);
@@ -284,12 +291,12 @@ void PXDPerformanceVariablesCollectorModule::collectDeltaIP()
   const TrackFitResult* tr0 = part0->getTrack()->getTrackFitResultWithClosestMass(Const::pion);
   const TrackFitResult* tr1 = part1->getTrack()->getTrackFitResultWithClosestMass(Const::pion);
 
-  track_struct.setTrackVariables(tr0, vertex);
-  auto d0p_0 = track_struct.d0p;
-  auto z0p_0 = track_struct.z0p;
-  track_struct.setTrackVariables(tr1, vertex);
-  auto d0p_1 = track_struct.d0p;
-  auto z0p_1 = track_struct.z0p;
+  m_track_struct.setTrackVariables(tr0, vertex);
+  auto d0p_0 = m_track_struct.d0p;
+  auto z0p_0 = m_track_struct.z0p;
+  m_track_struct.setTrackVariables(tr1, vertex);
+  auto d0p_1 = m_track_struct.d0p;
+  auto z0p_1 = m_track_struct.z0p;
 
   m_deltaD0oSqrt2 = (d0p_0 + d0p_1) / sqrt(2.);
   m_deltaZ0oSqrt2 = (z0p_0 - z0p_1) / sqrt(2.);
@@ -354,7 +361,7 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
 
   VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
   const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-  auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z), true);
+  auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(tPoint.x, tPoint.y, tPoint.z), true);
   auto uID = Info.getUCellID(localPoint.X());
   auto vID = Info.getVCellID(localPoint.Y());
   auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);

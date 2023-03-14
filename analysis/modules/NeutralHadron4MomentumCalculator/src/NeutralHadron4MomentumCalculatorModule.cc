@@ -11,16 +11,13 @@
 #include <framework/logging/Logger.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <analysis/utility/ParticleCopy.h>
-#include <framework/geometry/B2Vector3.h>
-#include <TLorentzVector.h>
 #include <vector>
 #include <cmath>
 
 using namespace Belle2;
 
-REG_MODULE(NeutralHadron4MomentumCalculator)
+REG_MODULE(NeutralHadron4MomentumCalculator);
 
 NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule() : Module()
 {
@@ -31,6 +28,8 @@ NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule()
   // Parameter definitions
   addParam("decayString", m_decayString, "Decay string for which one wants to perform the calculation", std::string(""));
   addParam("allowGamma", m_allowGamma, "Whether allow the selected particle to be gamma", false);
+  addParam("allowAnyParticleSource", m_allowAnyParticleSource, "Whether allow the selected particle to be from any ParticleSource",
+           false);
 
 }
 
@@ -49,11 +48,15 @@ void NeutralHadron4MomentumCalculatorModule::initialize()
 
   std::string neutralHadronName = hierarchy[0][1].second;
   if (neutralHadronName != "n0" and neutralHadronName != "K_L0") {
-    if (m_allowGamma == true and hierarchy[0][1].second == "gamma")
+    if (m_allowGamma and neutralHadronName == "gamma")
       B2WARNING("NeutralHadron4MomentumCalculatorModule::initialize The selected particle is gamma but you allowed so; be aware.");
+    else if (m_allowAnyParticleSource)
+      B2WARNING("NeutralHadron4momentumCalculatorModule::initialize The selected particle can be from anything; the magnitude of "
+                "the momentum will be overridden by that calculated from the mother mass constraint; be aware.");
     else
       B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a long-lived neutral hadron "
-              "i.e. (anti-)n0 or K_L0, or at least a photon (gamma), in which case you need to set allowGamma as true."
+              "i.e. (anti-)n0 or K_L0, unless you set allowGamma to true and selected a photon (gamma), or you set "
+              "allowAnyParticleSource to true."
               "Input particle: " << m_decayString);
   }
 
@@ -70,7 +73,7 @@ void NeutralHadron4MomentumCalculatorModule::event()
   for (unsigned i = 0; i < n; i++) {
     Particle* particle = m_plist->getParticle(i);
     std::vector<Particle*> daughters = particle->getDaughters();
-    TLorentzVector others4Momentum = TLorentzVector();
+    ROOT::Math::PxPyPzEVector others4Momentum;
     for (int j = 0; j < m_decayDescriptor.getNDaughters(); j++) {
       if (j != m_iNeutral) {
         others4Momentum += daughters[j]->get4Vector();
@@ -78,34 +81,26 @@ void NeutralHadron4MomentumCalculatorModule::event()
     }
     const Particle* originalNeutral = daughters[m_iNeutral];
     Particle* neutral = ParticleCopy::copyParticle(originalNeutral);
-    particle->removeDaughter(originalNeutral);
-    particle->appendDaughter(neutral);
-    B2Vector3D neutralDirection;
-    if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
-      neutralDirection = neutral->getECLCluster()->getClusterPosition().Unit();
-    } else if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
-      neutralDirection = neutral->getKLMCluster()->getClusterPosition().Unit();
-    } else {
-      B2ERROR("Your neutral particle doesn't originate from ECLCluster nor KLMCluster.");
-    }
-    double a = others4Momentum.Vect() * neutralDirection;
-    double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.Mag2()) / 2.;
+    particle->replaceDaughter(originalNeutral, neutral);
+    ROOT::Math::XYZVector neutralDirection = neutral->getMomentum().Unit();
+    double a = others4Momentum.Vect().Dot(neutralDirection);
+    double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.mag2()) / 2.;
     double c = others4Momentum.E();
     double d = std::pow(neutral->getMass(), 2);
     double D = (a * a - c * c) * d + b * b;
     if (D >= 0) {
       double neutralP = (-1. * a * b - c * std::sqrt(D)) / (a * a - c * c);
-      double neutralPx = neutralP * neutralDirection.x();
-      double neutralPy = neutralP * neutralDirection.y();
-      double neutralPz = neutralP * neutralDirection.z();
+      double neutralPx = neutralP * neutralDirection.X();
+      double neutralPy = neutralP * neutralDirection.Y();
+      double neutralPz = neutralP * neutralDirection.Z();
       double neutralE = std::sqrt(neutralP * neutralP + d);
-      const TLorentzVector& newNeutral4Momentum = TLorentzVector(neutralPx, neutralPy, neutralPz, neutralE);
+      const ROOT::Math::PxPyPzEVector newNeutral4Momentum(neutralPx, neutralPy, neutralPz, neutralE);
 
       double motherPx = newNeutral4Momentum.Px() + others4Momentum.Px();
       double motherPy = newNeutral4Momentum.Py() + others4Momentum.Py();
       double motherPz = newNeutral4Momentum.Pz() + others4Momentum.Pz();
       double motherE = newNeutral4Momentum.E() + others4Momentum.E();
-      const TLorentzVector& newMother4Momentum = TLorentzVector(motherPx, motherPy, motherPz, motherE);
+      const ROOT::Math::PxPyPzEVector newMother4Momentum(motherPx, motherPy, motherPz, motherE);
 
       neutral->set4Vector(newNeutral4Momentum);
       particle->set4Vector(newMother4Momentum);

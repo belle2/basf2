@@ -115,7 +115,7 @@ with b2test_utils.clean_working_directory():
     assert bool(t1), methodPrefixEventLevel + "_tree" + " isn't contained in file"
     assert t1.GetEntries() > 0, methodPrefixEventLevel + "_tree" + "contains zero entries"
     for iVariable in variablesToBeSaved:
-        iROOTVariable = str(ROOT.Belle2.makeROOTCompatible(iVariable))
+        iROOTVariable = str(ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(iVariable))
         assert t1.GetListOfBranches().Contains(iROOTVariable),  iROOTVariable +\
             " branch is missing from " + methodPrefixEventLevel + "_tree"
 
@@ -136,9 +136,6 @@ with b2test_utils.clean_working_directory():
         assert abs(t1.pt) > 0, " pt should be greater than 0"
         assert abs(t1.cosTheta) > 0, " cosTheta should be greater than 0"
         assert abs(t1.electronID) > 0, " electronID should be greater than 0"
-        assert abs(t1.eid_TOP) > 0, " eid_TOP should be greater than 0"
-        assert abs(t1.eid_ARICH) > 0, " eid_ARICH should be greater than 0"
-        assert abs(t1.eid_ECL) > 0, "eid_ECL should be greater than 0"
         assert abs(t1.BtagToWBosonVariables__borecoilMassSqrd__bc) > 0, " recoilMassSqrd should be greater than 0"
         assert abs(t1.BtagToWBosonVariables__bopMissCMS__bc) > 0, " pMissCMS should be greater than 0"
         assert abs(t1.BtagToWBosonVariables__bocosThetaMissCMS__bc) > 0, " cosThetaMissCMS should be greater than 0"

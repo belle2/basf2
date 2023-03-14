@@ -42,6 +42,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # Check components.
     check_components(components)
 
+    if dqm_mode in ["dont_care", "filtered"]:
+        # TTD trigger and bunch injection monitoring
+        path.add_module('TTDDQM')
+
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
@@ -300,9 +304,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('ParallelTrackFilter', min_d0=-0.5, max_d0=0.5, min_z0=-1, max_z0=1,
                             inputArrayName="", outputINArrayName="TracksFromIP", outputOUTArrayName="TracksNotFromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_FromIP",
-                            tracksStoreArrayName="TracksFromIP").set_name("TrackingExpressRecoDQM_FromIP")
+                            tracksStoreArrayName="TracksFromIP", histogramTitleSuffix=" - Tracks from IP") \
+                .set_name("TrackingExpressRecoDQM_FromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_NotFromIP",
-                            tracksStoreArrayName="TracksNotFromIP").set_name("TrackingExpressRecoDQM_NotFromIP")
+                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP") \
+                .set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):

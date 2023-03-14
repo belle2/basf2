@@ -47,7 +47,7 @@ if __name__ == "__main__":
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     # Spectators are the variables for which the selection should be uniform
-    general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
+    general_options.m_spectators = basf2_mva.vector('daughterInvM(0, 1)', 'daughterInvM(0, 2)')
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "fastbdt"
 

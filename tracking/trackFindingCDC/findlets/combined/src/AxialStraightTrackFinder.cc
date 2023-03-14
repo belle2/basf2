@@ -40,7 +40,7 @@ void AxialStraightTrackFinder::exposeParameters(ModuleParamList* moduleParamList
 void AxialStraightTrackFinder::apply(const std::vector<CDCWireHit>& wireHits,
                                      std::vector<CDCTrack>& tracks)
 {
-  B2DEBUG(100, "**********   CDCTrackingModule  ************");
+  B2DEBUG(25, "**********   CDCTrackingModule  ************");
 
 // Acquire ecl clusters
   std::vector<const ECLCluster*> clusters;

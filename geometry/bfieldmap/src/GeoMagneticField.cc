@@ -28,7 +28,7 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 using namespace std;
 using namespace boost;
@@ -47,12 +47,12 @@ geometry::CreatorFactory<GeoMagneticField> GeoMagneticFieldFactory("GeoMagneticF
 GeoMagneticField::GeoMagneticField() : CreatorBase()
 {
   //Add the function pointers called for reading the components to the map
-  m_componentTypeMap.insert(make_pair("Constant", boost::bind(&GeoMagneticField::readConstantBField, this, _1)));
-  m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, _1)));
-  m_componentTypeMap.insert(make_pair("Quad",     boost::bind(&GeoMagneticField::readQuadBField,     this, _1)));
-  m_componentTypeMap.insert(make_pair("Beamline", boost::bind(&GeoMagneticField::readBeamlineBField, this, _1)));
-  m_componentTypeMap.insert(make_pair("Klm1", boost::bind(&GeoMagneticField::readKlm1BField, this, _1)));
-  m_componentTypeMap.insert(make_pair("3d", boost::bind(&GeoMagneticField::read3dBField, this, _1)));
+  m_componentTypeMap.insert(make_pair("Constant", boost::bind(&GeoMagneticField::readConstantBField, this, boost::placeholders::_1)));
+  m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, boost::placeholders::_1)));
+  m_componentTypeMap.insert(make_pair("Quad",     boost::bind(&GeoMagneticField::readQuadBField,     this, boost::placeholders::_1)));
+  m_componentTypeMap.insert(make_pair("Beamline", boost::bind(&GeoMagneticField::readBeamlineBField, this, boost::placeholders::_1)));
+  m_componentTypeMap.insert(make_pair("Klm1", boost::bind(&GeoMagneticField::readKlm1BField, this, boost::placeholders::_1)));
+  m_componentTypeMap.insert(make_pair("3d", boost::bind(&GeoMagneticField::read3dBField, this, boost::placeholders::_1)));
 }
 
 
@@ -82,7 +82,7 @@ void GeoMagneticField::addConstantBField(const GearDir& component, MagneticField
   double RmaxValue = component.getLength("MaxR"); // stored in cm
   double ZminValue = component.getLength("MinZ"); // stored in cm
   double ZmaxValue = component.getLength("MaxZ"); // stored in cm
-  auto field = new MagneticFieldComponentConstant(B2Vector3D(xValue, yValue, zValue),
+  auto field = new MagneticFieldComponentConstant(ROOT::Math::XYZVector(xValue, yValue, zValue),
                                                   RminValue, RmaxValue, ZminValue, ZmaxValue);
   fieldmap.addComponent(field);
 }
@@ -105,7 +105,7 @@ void GeoMagneticField::add3dBField(const GearDir& component, MagneticField& fiel
     return;
   }
 
-  std::vector<B2Vector3F> bmap;
+  std::vector<ROOT::Math::XYZVector> bmap;
   bmap.reserve(mapSizeR * mapSizeZ * mapSizePhi);
   // Load B-field map file
   iostreams::filtering_istream fieldMapFile;

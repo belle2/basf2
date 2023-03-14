@@ -29,7 +29,7 @@ namespace Belle2 {
     // constructors and destructor
   public:
     MMutex();
-    MMutex(void*);
+    explicit MMutex(void*);
     MMutex(const MMutex&);
     ~MMutex();
 

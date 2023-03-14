@@ -7,6 +7,7 @@ env['LIBS'] = [
     'analysis_dataobjects',
     'analysis',
     'analysis_DecayDescriptor',
+    'analysis_utility',
     'framework',
     '$ROOT_LIBS',
     'analysis_dbobjects',

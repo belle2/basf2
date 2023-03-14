@@ -27,7 +27,7 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC(""Takes a list of PDG values and lifetime paramters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation.)DOC");
+    R"DOC(Takes a list of PDG values and lifetime paramters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation.)DOC");
 
   // Parameter definitions
   addParam("lifetimeOption", m_lifetimeOption,

@@ -6,9 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
 
+// TOP headers.
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPSimHit.h>
@@ -223,7 +224,6 @@ namespace Belle2 {
 
         const MCParticle* mother = currParticle->getMother();
 
-        int mm = 0;
         while (mother) {
           const MCParticle* pommother = mother->getMother();
           if (!pommother) {
@@ -243,7 +243,6 @@ namespace Belle2 {
             originpt->Fill(pt);
           }
           mother = pommother;
-          mm++;
         }
       }
     }
@@ -257,7 +256,7 @@ namespace Belle2 {
       int subdet = tophit->getSubDet();
       if (subdet != 5) continue;
 
-      TVector3 pos = tophit->getPosition();
+      auto pos = tophit->getPosition();
       double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) / 3.14159265358979 * 180.;
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {
@@ -294,7 +293,7 @@ namespace Belle2 {
           gflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,
                           1. / 917.65 / m_TimeOfSimulation * 2.);
           gorigin->Fill(toptrk->getProductionPoint().Z());
-          genergy2->Fill(toptrk->getMomentum().Mag() * 1000);
+          genergy2->Fill(toptrk->getMomentum().R() * 1000);
           origin_zx->SetPoint(count, toptrk->getProductionPoint().Z(),
                               toptrk->getProductionPoint().X());
           origin_zy->SetPoint(count, toptrk->getProductionPoint().Z() / 0.999143,

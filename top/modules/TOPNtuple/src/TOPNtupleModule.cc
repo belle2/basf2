@@ -6,9 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPNtuple/TOPNtupleModule.h>
 
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
@@ -186,8 +187,8 @@ namespace Belle2 {
 
       if (extHit) {
         int moduleID = extHit->getCopyID();
-        TVector3 position = extHit->getPositionTVector3();
-        TVector3 momentum = extHit->getMomentumTVector3();
+        auto position = static_cast<ROOT::Math::XYZPoint>(extHit->getPosition());
+        auto momentum = extHit->getMomentum();
         if (geo->isModuleIDValid(moduleID)) {
           const auto& module = geo->getModule(moduleID);
           position = module.pointToLocal(position);
@@ -198,7 +199,7 @@ namespace Belle2 {
         m_top.extHit.x = position.X();
         m_top.extHit.y = position.Y();
         m_top.extHit.z = position.Z();
-        m_top.extHit.p = momentum.Mag();
+        m_top.extHit.p = momentum.R();
         m_top.extHit.theta = momentum.Theta();
         m_top.extHit.phi = momentum.Phi();
         m_top.extHit.time = extHit->getTOF();
@@ -206,8 +207,8 @@ namespace Belle2 {
 
       if (barHit) {
         int moduleID = barHit->getModuleID();
-        TVector3 position = barHit->getPosition();
-        TVector3 momentum = barHit->getMomentum();
+        auto position = barHit->getPosition();
+        auto momentum = barHit->getMomentum();
         if (geo->isModuleIDValid(moduleID)) {
           const auto& module = geo->getModule(moduleID);
           position = module.pointToLocal(position);
@@ -218,7 +219,7 @@ namespace Belle2 {
         m_top.barHit.x = position.X();
         m_top.barHit.y = position.Y();
         m_top.barHit.z = position.Z();
-        m_top.barHit.p = momentum.Mag();
+        m_top.barHit.p = momentum.R();
         m_top.barHit.theta = momentum.Theta();
         m_top.barHit.phi = momentum.Phi();
         m_top.barHit.time = barHit->getTime() - trueEventT0;

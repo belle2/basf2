@@ -13,7 +13,7 @@
 #include <klm/dataobjects/KLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>

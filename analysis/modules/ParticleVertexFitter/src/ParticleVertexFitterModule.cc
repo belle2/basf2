@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleVertexFitter/ParticleVertexFitterModule.h>
 
 // framework aux
@@ -28,6 +28,9 @@
 
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
+
+// KFit
+#include <analysis/VertexFitting/KFit/KFitConst.h>
 
 #include <TVector.h>
 #include <TRotation.h>
@@ -140,10 +143,12 @@ void ParticleVertexFitterModule::event()
   if ((m_vertexFitter == "Rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
                                      || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
+
   std::vector<unsigned int> toRemove;
-  unsigned int n = m_plist->getListSize();
-  for (unsigned i = 0; i < n; i++) {
-    Particle* particle = m_plist->getParticle(i);
+  unsigned int nParticles = m_plist->getListSize();
+
+  for (unsigned iPart = 0; iPart < nParticles; iPart++) {
+    Particle* particle = m_plist->getParticle(iPart);
     m_hasCovMatrix = false;
     if (m_updateDaughters == true) {
       if (m_decayString.empty() || m_vertexFitter == "KFit")
@@ -165,6 +170,7 @@ void ParticleVertexFitterModule::event()
         }
       }
     }
+
     bool hasTube = true;
     if (m_withConstraint == "btube") {
       Btube* Ver = particle->getRelatedTo<Btube>();
@@ -184,6 +190,7 @@ void ParticleVertexFitterModule::event()
       particle->setPValue(-1);
     if (particle->getPValue() < m_confidenceLevel)
       toRemove.push_back(particle->getArrayIndex());
+
   }
   m_plist->removeParticles(toRemove);
 
@@ -830,8 +837,16 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      daughters[iChild]->set4Vector(
-        CLHEPToROOT::getLorentzVector(kv.getTrackMomentum(iChild)));
+      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double dx = kv.getVertex().x() - kv.getTrackPosition(iChild).x();
+      double dy = kv.getVertex().y() - kv.getTrackPosition(iChild).y();
+
+      ROOT::Math::PxPyPzEVector i4Vector(kv.getTrackMomentum(iChild).x() - a * dy,
+                                         kv.getTrackMomentum(iChild).y() + a * dx,
+                                         kv.getTrackMomentum(iChild).z(),
+                                         kv.getTrackMomentum(iChild).t());
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
+
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
       daughters[iChild]->setMomentumVertexErrorMatrix(
@@ -849,7 +864,16 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
       auto daughter = const_cast<Particle*>(fitChildren[iChild]);
 
-      daughter->set4Vector(CLHEPToROOT::getLorentzVector(kv.getTrackMomentum(iChild)));
+      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughter->getCharge();
+      double dx = kv.getVertex().x() - kv.getTrackPosition(iChild).x();
+      double dy = kv.getVertex().y() - kv.getTrackPosition(iChild).y();
+
+      ROOT::Math::PxPyPzEVector i4Vector(kv.getTrackMomentum(iChild).x() - a * dy,
+                                         kv.getTrackMomentum(iChild).y() + a * dx,
+                                         kv.getTrackMomentum(iChild).z(),
+                                         kv.getTrackMomentum(iChild).t());
+      daughter->set4VectorDividingByMomentumScaling(i4Vector);
+
       daughter->setVertex(CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
       daughter->setMomentumVertexErrorMatrix(CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
     }
@@ -877,7 +901,8 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
         ROOT::Math::PxPyPzEVector sum4Vector;
         for (auto daughter : part->getDaughters())
           sum4Vector += daughter->get4Vector();
-        part->set4Vector(sum4Vector);
+
+        part->set4VectorDividingByMomentumScaling(sum4Vector);
       }
 
       return includeFitChildren;
@@ -911,8 +936,16 @@ bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKF
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      daughters[iChild]->set4Vector(
-        CLHEPToROOT::getLorentzVector(kmv.getTrackMomentum(iChild)));
+      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double dx = kmv.getVertex().x() - kmv.getTrackPosition(iChild).x();
+      double dy = kmv.getVertex().y() - kmv.getTrackPosition(iChild).y();
+
+      ROOT::Math::PxPyPzEVector i4Vector(kmv.getTrackMomentum(iChild).x() - a * dy,
+                                         kmv.getTrackMomentum(iChild).y() + a * dx,
+                                         kmv.getTrackMomentum(iChild).z(),
+                                         kmv.getTrackMomentum(iChild).t());
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
+
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kmv.getTrackPosition(iChild)));
       daughters[iChild]->setMomentumVertexErrorMatrix(
@@ -943,8 +976,16 @@ bool ParticleVertexFitterModule::makeKMassPointingVertexMother(analysis::MassPoi
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      daughters[iChild]->set4Vector(
-        CLHEPToROOT::getLorentzVector(kmpv.getTrackMomentum(iChild)));
+      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double dx = kmpv.getVertex().x() - kmpv.getTrackPosition(iChild).x();
+      double dy = kmpv.getVertex().y() - kmpv.getTrackPosition(iChild).y();
+
+      ROOT::Math::PxPyPzEVector i4Vector(kmpv.getTrackMomentum(iChild).x() - a * dy,
+                                         kmpv.getTrackMomentum(iChild).y() + a * dx,
+                                         kmpv.getTrackMomentum(iChild).z(),
+                                         kmpv.getTrackMomentum(iChild).t());
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
+
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kmpv.getTrackPosition(iChild)));
       daughters[iChild]->setMomentumVertexErrorMatrix(
@@ -974,8 +1015,16 @@ bool ParticleVertexFitterModule::makeKMassMother(analysis::MassFitKFit& km,
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      daughters[iChild]->set4Vector(
-        CLHEPToROOT::getLorentzVector(km.getTrackMomentum(iChild)));
+      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double dx = km.getVertex().x() - km.getTrackPosition(iChild).x();
+      double dy = km.getVertex().y() - km.getTrackPosition(iChild).y();
+
+      ROOT::Math::PxPyPzEVector i4Vector(km.getTrackMomentum(iChild).x() - a * dy,
+                                         km.getTrackMomentum(iChild).y() + a * dx,
+                                         km.getTrackMomentum(iChild).z(),
+                                         km.getTrackMomentum(iChild).t());
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
+
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(km.getTrackPosition(iChild)));
       daughters[iChild]->setMomentumVertexErrorMatrix(
@@ -1131,8 +1180,16 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      daughters[iChild]->set4Vector(
-        CLHEPToROOT::getLorentzVector(kf.getTrackMomentum(iChild)));
+      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double dx = kf.getVertex().x() - kf.getTrackPosition(iChild).x();
+      double dy = kf.getVertex().y() - kf.getTrackPosition(iChild).y();
+
+      ROOT::Math::PxPyPzEVector i4Vector(kf.getTrackMomentum(iChild).x() - a * dy,
+                                         kf.getTrackMomentum(iChild).y() + a * dx,
+                                         kf.getTrackMomentum(iChild).z(),
+                                         kf.getTrackMomentum(iChild).t());
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
+
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kf.getTrackPosition(iChild)));
       daughters[iChild]->setMomentumVertexErrorMatrix(

@@ -20,24 +20,24 @@
 namespace Belle2 {
 
   /** Class derived from HistoModule, for SVD monitoring variables at MiraBelle */
-  class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDOnMiraBelleModule final : public DQMHistAnalysisModule {
 
   public:
 
     /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
     /** Destructor */
-    virtual ~DQMHistAnalysisSVDOnMiraBelleModule();
+    ~DQMHistAnalysisSVDOnMiraBelleModule();
     /** Module function initialize */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Module function beginRun */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Module function event */
-    virtual void event() override;
+    void event() override final;
     /** Module function endRun */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Module function terminate */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 

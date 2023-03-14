@@ -72,8 +72,8 @@ namespace Belle2 {
       // cut on local z
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& module = geo->getModule(trk.getModuleID());
-      m_localPosition = module.pointToLocal(trk.getExtHit()->getPositionTVector3());
-      m_localMomentum = module.momentumToLocal(trk.getExtHit()->getMomentumTVector3());
+      m_localPosition = module.pointToLocal(static_cast<ROOT::Math::XYZPoint>(trk.getExtHit()->getPosition()));
+      m_localMomentum = module.momentumToLocal(trk.getExtHit()->getMomentum());
       if (m_localPosition.Z() < m_minZ or m_localPosition.Z() > m_maxZ) return false;
 
       return true;

@@ -29,6 +29,7 @@
 #include <algorithm> // for sort
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   namespace Variable {
@@ -89,12 +90,12 @@ namespace Belle2 {
         return barHit ? barHit->getModuleID() : std::numeric_limits<double>::quiet_NaN();
       }
 
-      bool getLocalPosition(const Particle* particle, TVector3& result)
+      bool getLocalPosition(const Particle* particle, XYZPoint& result)
       {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return false;
         int slotID = extHit->getCopyID();
-        const auto position = extHit->getPositionTVector3();
+        const auto& position = static_cast<XYZPoint>(extHit->getPosition());
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if (not geo or not geo->isModuleIDValid(slotID)) return false;
         const auto& module = geo->getModule(slotID);
@@ -104,7 +105,7 @@ namespace Belle2 {
 
       double getTOPLocalX(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPosition(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.X();
@@ -112,7 +113,7 @@ namespace Belle2 {
 
       double getTOPLocalY(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPosition(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Y();
@@ -120,13 +121,13 @@ namespace Belle2 {
 
       double getTOPLocalZ(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPosition(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Z();
       }
 
-      bool getLocalPositionMCMatch(const Particle* particle, TVector3& result)
+      bool getLocalPositionMCMatch(const Particle* particle, XYZPoint& result)
       {
         const auto* barHit = getBarHit(particle);
         if (not barHit) return false;
@@ -141,7 +142,7 @@ namespace Belle2 {
 
       double getTOPLocalXMCMatch(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPositionMCMatch(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.X();
@@ -149,7 +150,7 @@ namespace Belle2 {
 
       double getTOPLocalYMCMatch(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPositionMCMatch(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Y();
@@ -157,18 +158,18 @@ namespace Belle2 {
 
       double getTOPLocalZMCMatch(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPositionMCMatch(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Z();
       }
 
-      bool getLocalMomentum(const Particle* particle, TVector3& result)
+      bool getLocalMomentum(const Particle* particle, XYZVector& result)
       {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return false;
         int slotID = extHit->getCopyID();
-        const auto& momentum = extHit->getMomentumTVector3();
+        const auto& momentum = extHit->getMomentum();
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if ((not geo) or (not geo->isModuleIDValid(slotID))) return false;
         const auto& module = geo->getModule(slotID);
@@ -178,7 +179,7 @@ namespace Belle2 {
 
       double getTOPLocalPhi(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentum(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Phi();
@@ -186,13 +187,13 @@ namespace Belle2 {
 
       double getTOPLocalTheta(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentum(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Theta();
       }
 
-      bool getLocalMomentumMCMatch(const Particle* particle, TVector3& result)
+      bool getLocalMomentumMCMatch(const Particle* particle, XYZVector& result)
       {
         const auto* barHit = getBarHit(particle);
         if (not barHit) return false;
@@ -207,7 +208,7 @@ namespace Belle2 {
 
       double getTOPLocalPhiMCMatch(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentumMCMatch(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Phi();
@@ -215,7 +216,7 @@ namespace Belle2 {
 
       double getTOPLocalThetaMCMatch(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentumMCMatch(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Theta();

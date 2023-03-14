@@ -228,7 +228,7 @@ namespace Belle2 {
       m_y = localPosition.Y();
       m_z = localPosition.Z();
       const auto& localMomentum = m_selector.getLocalMomentum();
-      m_p = localMomentum.Mag();
+      m_p = localMomentum.R();
       m_theta = localMomentum.Theta();
       m_phi = localMomentum.Phi();
       const auto& pocaPosition = m_selector.getPOCAPosition();

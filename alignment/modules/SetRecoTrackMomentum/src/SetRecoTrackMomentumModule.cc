@@ -25,7 +25,7 @@ REG_MODULE(SetRecoTrackMomentum);
 SetRecoTrackMomentumModule::SetRecoTrackMomentumModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("Set momentum magnitude for RecoTracks seed to given value (for runs without magnetic field)
+  setDescription(R"DOC(Set momentum magnitude for RecoTracks seed to given value (for runs without magnetic field)
 
   Take the momentum direction from seed and update its magnitude to artificial value for all RecoTracks - needed for tracks without magnetic field.
   By default activated automatically, when zero B-field is detected at the origin

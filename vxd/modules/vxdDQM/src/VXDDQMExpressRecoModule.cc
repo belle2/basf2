@@ -23,6 +23,7 @@
 #include <vxd/geometry/GeoTools.h>
 
 #include <TMath.h>
+#include <Math/Vector3D.h>
 
 #include <boost/format.hpp>
 
@@ -332,8 +333,8 @@ void VXDDQMExpressRecoModule::event()
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = digitPXD1.getSensorID();
         auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
-        TVector3 rLocal1(info.getUCellPosition(digitPXD1.getUCellID()), info.getVCellPosition(digitPXD1.getVCellID()), 0);
-        TVector3 ral1 = info.pointToGlobal(rLocal1);
+        ROOT::Math::XYZVector rLocal1(info.getUCellPosition(digitPXD1.getUCellID()), info.getVCellPosition(digitPXD1.getVCellID()), 0);
+        ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
         iIsU1 = 1;
         iIsV1 = 1;
@@ -360,8 +361,8 @@ void VXDDQMExpressRecoModule::event()
           }
           if (iCont == 0) continue;
           float possi = info.getUCellPosition(digitSVD1.getCellID());
-          TVector3 rLocal1(possi, 0, 0);
-          TVector3 ral1 = info.pointToGlobal(rLocal1);
+          ROOT::Math::XYZVector rLocal1(possi, 0, 0);
+          ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
           iIsU1 = 1;
           fPosSPU1 = ral1.Phi() / TMath::Pi() * 180;
         } else {
@@ -375,8 +376,8 @@ void VXDDQMExpressRecoModule::event()
           //float possi = digitSVD1.getCellPosition();  //   is not work anymore
           float possi = info.getVCellPosition(digitSVD1.getCellID());
 
-          TVector3 rLocal1(0, possi, 0);
-          TVector3 ral1 = info.pointToGlobal(rLocal1);
+          ROOT::Math::XYZVector rLocal1(0, possi, 0);
+          ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
           iIsV1 = 1;
           fPosSPV1 = ral1.Theta() / TMath::Pi() * 180;
         }
@@ -391,8 +392,8 @@ void VXDDQMExpressRecoModule::event()
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = clusterPXD1.getSensorID();
         auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
-        TVector3 rLocal1(clusterPXD1.getU(), clusterPXD1.getV(), 0);
-        TVector3 ral1 = info.pointToGlobal(rLocal1);
+        ROOT::Math::XYZVector rLocal1(clusterPXD1.getU(), clusterPXD1.getV(), 0);
+        ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
         iIsU1 = 1;
         iIsV1 = 1;
@@ -413,14 +414,14 @@ void VXDDQMExpressRecoModule::event()
         auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
         if (clusterSVD1.isUCluster()) {
           if (fCharge1 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
-          TVector3 rLocal1(clusterSVD1.getPosition(), 0, 0);
-          TVector3 ral1 = info.pointToGlobal(rLocal1);
+          ROOT::Math::XYZVector rLocal1(clusterSVD1.getPosition(), 0, 0);
+          ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
           iIsU1 = 1;
           fPosSPU1 = ral1.Phi() / TMath::Pi() * 180;
         } else {
           if (fCharge1 < m_CutCorrelationSigVSVD * 200) continue;  // in electrons
-          TVector3 rLocal1(0, clusterSVD1.getPosition(), 0);
-          TVector3 ral1 = info.pointToGlobal(rLocal1);
+          ROOT::Math::XYZVector rLocal1(0, clusterSVD1.getPosition(), 0);
+          ROOT::Math::XYZVector ral1 = info.pointToGlobal(rLocal1);
           iIsV1 = 1;
           fPosSPV1 = ral1.Theta() / TMath::Pi() * 180;
         }
@@ -455,8 +456,8 @@ void VXDDQMExpressRecoModule::event()
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = digitPXD2.getSensorID();
           auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
-          TVector3 rLocal2(info.getUCellPosition(digitPXD2.getUCellID()), info.getVCellPosition(digitPXD2.getVCellID()), 0);
-          TVector3 ral2 = info.pointToGlobal(rLocal2);
+          ROOT::Math::XYZVector rLocal2(info.getUCellPosition(digitPXD2.getUCellID()), info.getVCellPosition(digitPXD2.getVCellID()), 0);
+          ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
           iIsU2 = 1;
           iIsV2 = 1;
@@ -484,8 +485,8 @@ void VXDDQMExpressRecoModule::event()
             }
             if (iCont == 0) continue;
             float possi = info.getUCellPosition(digitSVD2.getCellID());
-            TVector3 rLocal2(possi, 0, 0);
-            TVector3 ral2 = info.pointToGlobal(rLocal2);
+            ROOT::Math::XYZVector rLocal2(possi, 0, 0);
+            ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
             iIsU2 = 1;
             fPosSPU2 = ral2.Phi() / TMath::Pi() * 180;
           } else {
@@ -496,8 +497,8 @@ void VXDDQMExpressRecoModule::event()
             }
             if (iCont == 0) continue;
             float possi = info.getVCellPosition(digitSVD2.getCellID());
-            TVector3 rLocal2(0, possi, 0);
-            TVector3 ral2 = info.pointToGlobal(rLocal2);
+            ROOT::Math::XYZVector rLocal2(0, possi, 0);
+            ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
             iIsV2 = 1;
             fPosSPV2 = ral2.Theta() / TMath::Pi() * 180;
           }
@@ -512,8 +513,8 @@ void VXDDQMExpressRecoModule::event()
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = clusterPXD2.getSensorID();
           auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
-          TVector3 rLocal2(clusterPXD2.getU(), clusterPXD2.getV(), 0);
-          TVector3 ral2 = info.pointToGlobal(rLocal2);
+          ROOT::Math::XYZVector rLocal2(clusterPXD2.getU(), clusterPXD2.getV(), 0);
+          ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
           iIsU2 = 1;
           iIsV2 = 1;
@@ -534,14 +535,14 @@ void VXDDQMExpressRecoModule::event()
           auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
           if (clusterSVD2.isUCluster()) {
             if (fCharge2 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
-            TVector3 rLocal2(clusterSVD2.getPosition(), 0, 0);
-            TVector3 ral2 = info.pointToGlobal(rLocal2);
+            ROOT::Math::XYZVector rLocal2(clusterSVD2.getPosition(), 0, 0);
+            ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
             iIsU2 = 1;
             fPosSPU2 = ral2.Phi() / TMath::Pi() * 180;
           } else {
             if (fCharge2 < m_CutCorrelationSigVSVD * 200) continue;  // in electrons
-            TVector3 rLocal2(0, clusterSVD2.getPosition(), 0);
-            TVector3 ral2 = info.pointToGlobal(rLocal2);
+            ROOT::Math::XYZVector rLocal2(0, clusterSVD2.getPosition(), 0);
+            ROOT::Math::XYZVector ral2 = info.pointToGlobal(rLocal2);
             iIsV2 = 1;
             fPosSPV2 = ral2.Theta() / TMath::Pi() * 180;
           }

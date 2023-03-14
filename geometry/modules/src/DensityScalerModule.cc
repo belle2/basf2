@@ -19,7 +19,7 @@ REG_MODULE(DensityScaler);
 DensityScalerModule::DensityScalerModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("Scale density of simulation/reconstruction geometry
+  setDescription(R"DOC(Scale density of simulation/reconstruction geometry
 
 This is obviously only meant for systematic studies to scale the density in different
 parts of the detector to estimate the effect on for example tracking performance.

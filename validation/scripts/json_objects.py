@@ -92,7 +92,7 @@ class Script(JsonBase):
     Contains information about a script and its execution output
     """
 
-    def __init__(self, name, path, status, log_url=None, return_code=None):
+    def __init__(self, name, path, status, log_url=None, return_code=None, input=None, output=None):
         """
         Create a new Script object and fill all members
         """
@@ -111,6 +111,12 @@ class Script(JsonBase):
         #: integer which is the return code of the script
         #  execution
         self.return_code = return_code
+        #: input files for the script as declared in the
+        #  header
+        self.input = input
+        #: output files produced by the script as declared in
+        #  the header
+        self.output = output
 
 
 class PlotFile(JsonBase):
@@ -153,6 +159,7 @@ class Plot(JsonBase):
         contact=None,
         width=None,
         height=None,
+        issue=None,
     ):
         """
         Create a new Plot object and fill all members
@@ -170,6 +177,10 @@ class Plot(JsonBase):
         self.width = width
         #: height of the plot in pixels
         self.height = height
+        #: linked issues
+        if not issue:
+            issue = []
+        self.issue = issue
 
 
 class NTuple(JsonBase):

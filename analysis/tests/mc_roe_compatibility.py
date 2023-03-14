@@ -31,7 +31,7 @@ fsps = ['mu+', 'K_S0', 'Lambda0', 'gamma']
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
 for fsp in fsps:
-    testpath.add_module('ParticleLoader', decayStrings=[fsp],
+    testpath.add_module('ParticleLoader', decayStrings=[fsp + ':MC'],
                         addDaughters=True, skipNonPrimaryDaughters=True, useMCParticles=True)
     testpath.add_module('ParticleListManipulator', outputListName=fsp,
                         inputListNames=[fsp + ':MC'], cut='mcPrimary > 0')

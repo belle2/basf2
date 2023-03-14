@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <simulation/background/BkgSensitiveDetector.h>
 
 /* Geant4 headers. */
@@ -93,6 +93,7 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
   hit->setLayer(layer);
   hit->setPlane(plane);
   hit->setStrip(strip);
+  hit->setLastStrip(strip);
   // hit->setPropagationTime();
   hit->setTime(hitTime);
   hit->setEnergyDeposit(eDep);

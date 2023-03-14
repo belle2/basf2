@@ -18,7 +18,7 @@ from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
 
-__liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
+__liaison__ = "Sen Jia <jiasen@seu.edu.cn>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -174,7 +174,7 @@ class CharmoniumPsi(BaseSkim):
 
     def load_standard_lists(self, path):
         stdMu('loosepid', path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
 

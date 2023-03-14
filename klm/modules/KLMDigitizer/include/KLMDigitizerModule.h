@@ -13,13 +13,15 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSimHit.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/rawdata/RawData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <klm/time/KLMTime.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -89,14 +91,19 @@ namespace Belle2 {
     void checkScintillatorFEEParameters();
 
     /**
-     * Digitization in BKLM.
+     * Digitization in RPCs.
      */
-    void digitizeBKLM();
+    void digitizeRPC();
 
     /**
-     * Digitization in EKLM.
+     * Digitization in scintillators.
      */
-    void digitizeEKLM();
+    void digitizeScintillator();
+
+    /**
+     * Digitization in ASIC.
+     */
+    void digitizeAsic();
 
     /**
      * Check if channel is active (status is not KLMChannelStatus::c_Dead).
@@ -113,6 +120,9 @@ namespace Belle2 {
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
     /** Scintillator digitization parameters. */
     DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
@@ -147,20 +157,31 @@ namespace Belle2 {
     /** Efficiency determination mode (converted from the string parameter). */
     EfficiencyMode m_EfficiencyMode;
 
+    /** Whether to create multi-strip digits. */
+    bool m_CreateMultiStripDigits;
+
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
-    /** Simulation hit map for BKLM (by channel). */
-    std::multimap<KLMChannelNumber, const KLMSimHit*> m_bklmSimHitChannelMap;
+    /** Simulation hit map (by plane). */
+    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_MapPlaneSimHit;
 
-    /** Simulation hit map for BKLM (by plane). */
-    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_bklmSimHitPlaneMap;
+    /** Simulation hit map (by channel). */
+    std::multimap<KLMChannelNumber, const KLMSimHit*> m_MapChannelSimHit;
 
-    /** Simulation hit map for EKLM (by channel). */
-    std::multimap<KLMChannelNumber, const KLMSimHit*> m_eklmSimHitChannelMap;
+    /** Simulation hit map (by ASIC). */
+    std::multimap<KLMElectronicsChannel, const KLMSimHit*> m_MapAsicSimHit;
 
-    /** Simulation hit map for EKLM (by plane). */
-    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_eklmSimHitPlaneMap;
+    /** Digits corresponding to ASIC channels. */
+    KLMDigit* m_AsicDigits[KLM::c_NChannelsAsic];
+
+    /** Simulation hits lower bound for ASIC digit. */
+    std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+    m_AsicDigitSimHitsLowerBound[KLM::c_NChannelsAsic];
+
+    /** Simulation hits upper bound for ASIC digit. */
+    std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+    m_AsicDigitSimHitsUpperBound[KLM::c_NChannelsAsic];
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

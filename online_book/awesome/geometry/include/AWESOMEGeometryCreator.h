@@ -11,7 +11,7 @@
 /* AWESOME headers. */
 #include <online_book/awesome/simulation/AWESOMESensitiveDetector.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <geometry/CreatorBase.h>
 

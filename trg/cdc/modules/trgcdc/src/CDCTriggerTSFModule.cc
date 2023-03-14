@@ -345,7 +345,7 @@ CDCTriggerTSFModule::event()
 
   if (m_crosstalk_tdcfilter) {
     //check number of hits in each asic
-    int ncdchit_asic[500][6] = {0};
+    int ncdchit_asic[500][6] = {{0}};
     vector<int> id_ncdchit_asic[500][6];
     for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
       UChar_t lay = m_cdcHits[i]->getICLayer();

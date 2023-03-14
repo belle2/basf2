@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/PIDVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -1016,9 +1016,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
-    - 1  signal(antineutron) like
-    - 0  background like
-    - -1 invalid using this PID due to some ECL variables used unavailable
+- 1  signal(antineutron) like
+- 0  background like
+- -1 invalid using this PID due to some ECL variables used unavailable
 
 This PID is only for antineutron. Neutron is also considered as background.
 The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,

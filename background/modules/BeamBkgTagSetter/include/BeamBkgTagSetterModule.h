@@ -22,8 +22,7 @@
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/KLMSimHit.h>
 
 // BEAST SimHits
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>
@@ -107,8 +106,7 @@ namespace Belle2 {
     StoreArray<ARICHSimHit> m_arichSimHits; /**< ARICH simulated hits */
     StoreArray<ECLSimHit> m_eclSimHits; /**< ECL simulated hits */
     StoreArray<ECLHit> m_eclHits; /**< ECL simulated hits (short version) */
-    StoreArray<BKLMSimHit> m_bklmSimHits; /**< BKLM simulated hits */
-    StoreArray<EKLMSimHit> m_eklmSimHits; /**< EKLM simulated hits */
+    StoreArray<KLMSimHit> m_klmSimHits; /**< KLM simulated hits */
 
     StoreArray<BeamabortSimHit> m_diaSimHits; /**< beast simulated hits */
     StoreArray<CLAWSSimHit> m_clw2SimHits;  /**< beast simulated hits */

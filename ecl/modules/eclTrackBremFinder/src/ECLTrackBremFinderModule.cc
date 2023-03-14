@@ -13,7 +13,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-#include <framework/datastore/StoreArray.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>

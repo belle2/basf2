@@ -3,6 +3,8 @@
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/udst-v05-00-00.root
 Untested method Particle::appendDaughter
+Untested method Particle::fillAllDaughters
+Untested method Particle::fillFSPDaughters
 Untested method Particle::forEachDaughter
 Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer

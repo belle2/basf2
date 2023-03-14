@@ -48,7 +48,7 @@ The ultimate goal is that these standard particle lists will provide recommended
 criteria for final-state particles, and in some cases, for composite particles.
 The recommended selections will be provided by the performance group(s).
 Furthermore the intention is that systematics will be provided centrally for these recommended lists.
-For information about their status, please see :issue:`BII-4105`.
+For information about their status, please see :issue:`4045`.
 
 There are also some skimming, development and legacy lists available.
 These are specifically for use in skims, for study, or for comparison with Belle and old simulations.

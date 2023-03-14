@@ -89,6 +89,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            1);
   addParam("treatAsInvisible", m_treatAsInvisible,
            "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
+
+  addParam("ignoreFromVertexFit", m_ignoreFromVertexFit,
+           "Type::[string]. Decay string to select particles that will be ignored to determine the vertex position while kept for kinematics determination.", {});
 }
 
 void TreeFitterModule::initialize()
@@ -112,6 +115,13 @@ void TreeFitterModule::initialize()
     else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
       B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
+
+  if (!m_ignoreFromVertexFit.empty()) {
+    bool valid = m_pDDescriptorForIgnoring.init(m_ignoreFromVertexFit);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_ignoreFromVertexFit);
+  }
+
 }
 
 void TreeFitterModule::beginRun()
@@ -156,8 +166,13 @@ void TreeFitterModule::event()
     dummyCovMatrix(row, row) = 10000;
   }
 
+  TMatrixFSym dummyCovMatrix_smallMomError(dummyCovMatrix);
+  for (int row = 0; row < 4; ++row) {
+    dummyCovMatrix_smallMomError(row, row) = 1e-10;
+  }
+
   for (unsigned iPart = 0; iPart < nParticles; iPart++) {
-    Belle2::Particle* particle = m_plist->getParticle(iPart);
+    Particle* particle = m_plist->getParticle(iPart);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
@@ -166,12 +181,28 @@ void TreeFitterModule::event()
     if (!m_treatAsInvisible.empty()) {
       std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
       Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
-      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
+      Particle* daughterCopy = ParticleCopy::copyParticle(targetD);
       daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
       daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
+
       bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
       if (!isReplaced)
         B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
+    }
+
+    if (!m_ignoreFromVertexFit.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorForIgnoring.getSelectionParticles(particle);
+
+      for (auto part : selParticlesTarget) {
+        Particle* targetD = m_particles[part->getArrayIndex()];
+        Particle* daughterCopy = ParticleCopy::copyParticle(targetD);
+        daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+        daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix_smallMomError);
+
+        bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
+        if (!isReplaced)
+          B2ERROR("TreeFitterModule::event No target particle found for " << m_ignoreFromVertexFit);
+      }
     }
 
     try {
@@ -201,7 +232,7 @@ void TreeFitterModule::terminate()
   }
 }
 
-bool TreeFitterModule::fitTree(Belle2::Particle* head)
+bool TreeFitterModule::fitTree(Particle* head)
 {
   const TreeFitter::ConstraintConfiguration constrConfig(
     m_massConstraintType,

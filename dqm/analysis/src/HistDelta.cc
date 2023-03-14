@@ -6,20 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <dqm/analysis/HistDelta.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <string>
 #include <TROOT.h>
 
 using namespace Belle2;
 
-HistDelta::HistDelta(int t, int p, unsigned int a)
+HistDelta::HistDelta(EDeltaType t, int p, unsigned int a)
 {
   m_type = t;
   m_parameter = p;
   m_amountDeltas = a;
   m_lastHist = nullptr;
+  m_lastValue = 0;
 };
 
-void HistDelta::set(int t, int p, unsigned int a)
+void HistDelta::set(EDeltaType t, int p, unsigned int a)
 {
   m_type = t;
   m_parameter = p;
@@ -41,16 +43,23 @@ void HistDelta::update(TH1* currentHist)
   // now check if need to update m_deltaHists
   bool need_update = false;
   switch (m_type) {
-    case 1:
+    case c_Entries:
       // default case, look at the entries in the histogram
       need_update = currentHist->GetEntries() - m_lastHist->GetEntries() >= m_parameter;
       break;
-    case 2:
+    case c_Underflow:
       // here we misuse underflow as event counter in some histograms, e.g. PXD
       need_update = currentHist->GetBinContent(0) - m_lastHist->GetBinContent(0) >= m_parameter;
       break;
+    case c_Events:
+      // use event processed counter
+      need_update = DQMHistAnalysisModule::getEventProcessed() - m_lastValue >= m_parameter;
+      if (need_update) m_lastValue = DQMHistAnalysisModule::getEventProcessed(); // update last value
+      break;
     default:
-      // any unsupported types map to case 0, and will disable delta for this hist
+      // any unsupported types map to case 0(Disabled), and will disable delta for this hist
+      [[fallthrough]];
+    case c_Disabled:
       break;
   }
 

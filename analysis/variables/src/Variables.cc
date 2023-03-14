@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/Variables.h>
 
 // include VariableManager
@@ -47,6 +47,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <boost/algorithm/string.hpp>
 
 
 using namespace std;
@@ -1096,6 +1097,14 @@ namespace Belle2 {
 
       std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
 
+      std::string detNamesConcat("");
+      for (auto& detName : detectorNames) {
+        boost::to_upper(detName);
+        detNamesConcat += "_" + detName;
+      }
+
+      std::string extraInfo = "trkIsoScore" + detNamesConcat + "_VS_" + referenceListName + extraSuffix;
+
       auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
@@ -1104,24 +1113,71 @@ namespace Belle2 {
           B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScore!");
         }
 
-        double scoreSum(0.0);
-        for (auto& detName : detectorNames)
+        if (!part->hasExtraInfo(extraInfo))
         {
-          std::string extraInfo = "trkIsoScore" + detName + "_VS_" + referenceListName + extraSuffix;
-          if (!part->hasExtraInfo(extraInfo)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          auto scoreDet = part->getExtraInfo(extraInfo);
-          if (std::isnan(scoreDet)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          scoreSum += scoreDet;
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        auto scoreDet = part->getExtraInfo(extraInfo);
+        if (std::isnan(scoreDet))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
-        // Normalise sum of scores between [0, 1]
-        auto minScore = 0.;
-        auto maxScore = detectorNames.size();
-        return (scoreSum - minScore) / (maxScore - minScore);
+        return scoreDet;
+
+      };
+
+      return func;
+    }
+
+
+    Manager::FunctionPtr particleExtTrkIsoScoreVarAsWeightedAvg(const std::vector<std::string>& arguments)
+    {
+
+      if (arguments.size() < 3) {
+        B2ERROR("Wrong number of arguments (at least 3 required) for meta variable minET2ETIsoScoreAsWeightedAvg");
+        return nullptr;
+      }
+
+      std::string referenceListName = arguments[0];
+      bool useHighestProbMassForExt;
+      try {
+        useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[1]));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument must be an integer flag.");
+        return nullptr;
+      }
+      std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+
+      std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
+
+      std::string detNamesConcat("");
+      for (auto& detName : detectorNames) {
+        boost::to_upper(detName);
+        detNamesConcat += "_" + detName;
+      }
+
+      std::string extraInfo = "trkIsoScoreAsWeightedAvg" + detNamesConcat + "_VS_" + referenceListName + extraSuffix;
+
+      auto func = [ = ](const Particle * part) -> double {
+
+        StoreObjPtr<ParticleList> refPartList(referenceListName);
+        if (!refPartList.isValid())
+        {
+          B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScoreAsWeightedAvg!");
+        }
+
+        if (!part->hasExtraInfo(extraInfo))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        auto scoreDet = part->getExtraInfo(extraInfo);
+        if (std::isnan(scoreDet))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+
+        return scoreDet;
 
       };
 
@@ -1294,7 +1350,7 @@ value possible with the information provided.
     REGISTER_VARIABLE("eventRandom", eventRandom,
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
     REGISTER_METAVARIABLE("minET2ETDist(detName, detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
-                          R"DOC(Returns the distance in [cm] between the particle and the nearest particle in the reference list at the given detector layer surface.
+                          R"DOC(Returns the distance :math:`d_{\mathrm{i}}` in [cm] between the particle and the nearest particle in the reference list at the given detector :math:`i`-th layer surface.
 The definition is based on the track helices extrapolation.
 
 * The first argument is the name of the detector to consider.
@@ -1310,7 +1366,7 @@ The definition is based on the track helices extrapolation.
 			  Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("minET2ETDistVar(detName, detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
-			  R"DOC(Returns the value of the variable for the nearest neighbour to this particle as taken from the reference list at the given detector layer surface.
+			  R"DOC(Returns the value of the variable for the nearest neighbour to this particle as taken from the reference list at the given detector :math:`i`-th layer surface
 , according to the distance definition of `minET2ETDist`.
 
 * The first argument is the name of the detector to consider.
@@ -1325,24 +1381,71 @@ The definition is based on the track helices extrapolation.
 			  Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
-			  R"DOC(Returns the particle's isolation score based on:
+			  R"DOC(Returns a particle's isolation score :math:`s` defined as:
 
-* The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsoCalculator`` module.
-* A set of per-detector weights quantifying the impact of each detector on the PID for this particle type.
+.. math::
+   :nowrap:
+
+   \begin{split}
+
+     s &= \sum_{\mathrm{det}} 1 - \left(-w_{\mathrm{det}} \cdot \frac{\sum_{i}^{N_{\mathrm{det}}^{\mathrm{layers}}} H(i)}{N_{\mathrm{det}}^{\mathrm{layers}}}\right), \\
+
+     H(i) &=
+       \begin{cases}
+         0 & d_{\mathrm{i}} > D_{\mathrm{det}}^{\mathrm{thresh}} \\
+         1 & d_{\mathrm{i}} <= D_{\mathrm{det}}^{\mathrm{thresh}}, \\
+       \end{cases}
+
+   \end{split}
+
+where :math:`d_{\mathrm{i}}` is the distance to the closest neighbour at the :math:`i`-th layer of the given detector (c.f., `minET2ETDist`), :math:`N_{\mathrm{det}}^{\mathrm{layers}}` is the
+number of layers of the detector, :math:`D_{\mathrm{det}}^{\mathrm{thresh}}` is a threshold length related to the detector's granularity defined in the ``TrackIsoCalculator`` module,
+and :math:`w_{\mathrm{det}}` are (negative) weights associated to the detector's impact on PID for this particle type, read from a CDB payload.
 
 The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
-
-.. note::
-    The detector weights are considered for the score definition only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
 
 * The first argument is the reference particle list name used to search for the nearest neighbour.
 * The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
   if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
-* The remaining arguments are a comma-separated list of detector names. At least one must be chosen among {CDC, TOP, ARICH, ECL, KLM}.
+* The remaining arguments are a comma-separated list of detector names, which must correspond to the one given to the `TrackIsoCalculator` module.
 
 .. note::
-    This variable requires to run the ``TrackIsoCalculator`` module first.
+    The PID detector weights :math:`w_{\mathrm{det}}` are non-trivial only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
+    Otherwise :math:`w_{\mathrm{det}} = -1`.
+
+.. note::
+    This variable requires to run the `TrackIsoCalculator` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
+
+)DOC",
+			  Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("minET2ETIsoScoreAsWeightedAvg(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVarAsWeightedAvg,
+			  R"DOC(Returns a particle's isolation score :math:`s` based on the weighted average:
+
+.. math::
+
+   s = 1 - \frac{\sum_{\mathrm{det}} \sum_{i}^{N_{\mathrm{det}}^{\mathrm{layers}}} w_{\mathrm{det}} \cdot \frac{D_{\mathrm{det}}^{\mathrm{thresh}}}{d_{\mathrm{i}}} }{ \sum_{\mathrm{det}} w_{\mathrm{det}}},
+
+where :math:`d_{\mathrm{i}}` is the distance to the closest neighbour at the :math:`i`-th layer of the given detector (c.f., `minET2ETDist`), :math:`N_{\mathrm{det}}^{\mathrm{layers}}` is the
+number of layers of the detector, :math:`D_{\mathrm{det}}^{\mathrm{thresh}}` is a threshold length related to the detector's granularity defined in the ``TrackIsoCalculator`` module,
+and :math:`w_{\mathrm{det}}` are (negative) weights associated to the detector's impact on PID for this particle type, read from a CDB payload.
+
+The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
+
+* The first argument is the reference particle list name used to search for the nearest neighbour.
+* The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
+  if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
+* The remaining arguments are a comma-separated list of detector names, which must correspond to the one given to the `TrackIsoCalculator` module.
+
+.. note::
+    The PID detector weights :math:`w_{\mathrm{det}}` are non-trivial only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
+    Otherwise :math:`\lvert w_{\mathrm{det}} \rvert = 1`.
+
+.. note::
+    This variable requires to run the `TrackIsoCalculator` module first.
+    Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
+
 )DOC",
 			  Manager::VariableDataType::c_double);
 

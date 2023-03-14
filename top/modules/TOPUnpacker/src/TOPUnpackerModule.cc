@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPUnpacker/TOPUnpackerModule.h>
+
+// TOP headers.
 #include <top/RawDataTypes.h>
 
 // framework - DataStore

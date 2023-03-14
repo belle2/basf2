@@ -6,13 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* External headers. */
-#include <TMatrixD.h>
-#include <bitset>
-
-/* Belle2 headers. */
+/* Own header. */
 #include <mdst/dataobjects/ECLCluster.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TMatrixD.h>
+
+/* C++ headers. */
+#include <bitset>
 
 using namespace Belle2;
 

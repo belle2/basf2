@@ -21,11 +21,11 @@ namespace Belle2 {
   TEST_F(ECLSimHitTest, Constructors)
   {
     ECLSimHit myECLSimHit;
-    EXPECT_EQ(myECLSimHit.getCellId() , 0);
-    EXPECT_EQ(myECLSimHit.getTrackId() , 0);
-    EXPECT_EQ(myECLSimHit.getPDGCode() , 0);
-    EXPECT_EQ(myECLSimHit.getFlightTime() , 0);
-    EXPECT_EQ(myECLSimHit.getEnergyDep() , 0);
+    EXPECT_EQ(myECLSimHit.getCellId(), 0);
+    EXPECT_EQ(myECLSimHit.getTrackId(), 0);
+    EXPECT_EQ(myECLSimHit.getPDGCode(), 0);
+    EXPECT_EQ(myECLSimHit.getFlightTime(), 0);
+    EXPECT_EQ(myECLSimHit.getEnergyDep(), 0);
     const auto momentum = myECLSimHit.getMomentum();
     EXPECT_EQ(momentum.x(), 0);
     EXPECT_EQ(momentum.y(), 0);

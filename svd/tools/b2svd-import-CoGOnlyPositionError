@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+SVD CoGOnly Position Error Formulas importer:
+json files can be found in the svd_cdb_json repository (B2SVD).
+"""
+import basf2 as b2
+from ROOT import Belle2
+from ROOT.Belle2 import SVDPositionErrorFunction
+from basf2 import conditions as b2conditions
+import datetime
+import argparse
+import json
+
+
+def arg_parser():
+    """ argument parser """
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-j', '--json',
+                        type=str,
+                        help='input json file',
+                        metavar='JSON')
+
+    return parser
+
+def get_side(side):
+    """returns the value of the side to be read in the json file"""
+
+    if side == 0 :
+        return "V"
+    else :
+        return "U"
+
+def get_sensor_type(layer, sensor):
+    """ returns the sensor type to be read in the json file"""
+
+    if layer == 3 :
+        return "L3"
+    elif sensor == 1 :
+        return "FW"
+    else:
+        return "BARREL"
+
+        
+class jsonSVDCoGOnlyPositionErrorImporter(b2.Module):
+    """
+    Defining the python module to do the import.
+    """
+
+    def set_info_uniqueID(self, i1, i2,i3):
+        self.first = i1
+        self.current = i2
+        self.tag = i3
+
+    def beginRun(self):
+        """
+        call the functions to import the cluster parameters
+        """
+        iov = Belle2.IntervalOfValidity.always()
+
+        # cluster position error
+        clsParam = SVDPositionErrorFunction()
+
+        uniqueID = "CoGOnlyPositionError_"+str(self.first)+"_" + str(
+            now.isoformat()) + "_INFO:_current="+str(self.current)+"_"+str(self.tag)
+
+        print("--> json INFO:")
+        print("              "+str(param["_COMMENT"]))
+        print("")
+
+        cls_payload = Belle2.SVDCoGOnlyPositionError.t_payload(clsParam,str(uniqueID))
+
+        geoCache = Belle2.VXD.GeoCache.getInstance()
+
+        for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
+            layerNumber = layer.getLayerNumber()
+            for ladder in geoCache.getLadders(layer):
+                ladderNumber = ladder.getLadderNumber()
+                for sensor in geoCache.getSensors(ladder):
+                    sensorNumber = sensor.getSensorNumber()
+                    for side in (0, 1):
+
+                        print("setting CoGOnly Position Error for " +
+                              str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber) + "." + str(side) +
+                              " --> " + str(get_sensor_type(layerNumber,sensorNumber)) + " " + get_side(side))
+ 
+                        a1 = param[get_side(side)][get_sensor_type(layerNumber,sensorNumber)]["a1"]
+                        clsParam.set_a1(a1[0],a1[1],a1[2],a1[3],a1[4])
+                        print("a1 = "+str(a1))
+
+                        a2 = param[get_side(side)][get_sensor_type(layerNumber,sensorNumber)]["a2"]
+                        clsParam.set_a2(a2[0],a2[1],a2[2],a2[3],a2[4])
+                        print("a2 = "+str(a2))
+
+                        b1 = param[get_side(side)][get_sensor_type(layerNumber,sensorNumber)]["b1"]
+                        clsParam.set_b1(b1[0],b1[1],b1[2],b1[3],b1[4])
+                        print("b1 = "+str(b1))
+
+                        c1 = param[get_side(side)][get_sensor_type(layerNumber,sensorNumber)]["c1"]
+                        clsParam.set_c1(c1[0],c1[1],c1[2],c1[3],c1[4])
+                        print("c1 = "+str(c1))
+
+                        clsParam.set_current(int(param["uniqueID"]["INFO"]["current"]))
+
+                        cls_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, clsParam)
+
+        Belle2.Database.Instance().storeData(Belle2.SVDCoGOnlyPositionError.name, cls_payload, iov)
+
+
+if __name__ == "__main__":
+
+    # Argument parsing
+    args = arg_parser().parse_args()
+
+    # get the time
+    now = datetime.datetime.now()
+
+    # open json file
+    f = open(args.json) 
+    param = json.load(f)
+
+    # Prepend the svd-only in geometry GT
+    b2conditions.prepend_globaltag('svd_onlySVDinGeoConfiguration')
+
+    main = b2.create_path()
+
+    # Event info setter - execute single event
+    eventinfosetter = b2.register_module('EventInfoSetter')
+    eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
+    main.add_module(eventinfosetter)
+    
+    main.add_module("Gearbox")
+    main.add_module("Geometry")
+
+    jsonImporter = b2.register_module(jsonSVDCoGOnlyPositionErrorImporter())
+    jsonImporter.set_info_uniqueID(param["uniqueID"]["INFO"]["first"],param["uniqueID"]["INFO"]["current"],param["uniqueID"]["INFO"]["tag"])
+    main.add_module(jsonImporter)
+
+    # Show progress of processing
+    progress = b2.register_module('Progress')
+    main.add_module(progress)
+    
+    # Process events
+    b2.process(main)

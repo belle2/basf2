@@ -132,6 +132,17 @@ namespace Belle2 {
       int* layer, int* plane, int* strip) const;
 
     /**
+     * Get plane number.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     * @param[in] layer       Layer.
+     * @param[in] plane       Plane.
+     */
+    KLMPlaneNumber planeNumber(int subdetector, int section, int sector,
+                               int layer, int plane) const;
+
+    /**
      * Get plane number for BKLM.
      * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
@@ -246,6 +257,16 @@ namespace Belle2 {
      * @param[in] subdetector Subdetector.
      */
     int getMinimalPlaneNumber(int subdetector) const;
+
+    /**
+     * Get maximal plane number.
+     */
+    static constexpr int getMaximalPlaneNumber()
+    {
+      /* BKLM plane number is 0-based! */
+      return std::max(EKLMElementNumbers::getMaximalPlaneNumber(),
+                      BKLMElementNumbers::getMaximalPlaneNumber() + 1);
+    }
 
     /**
      * Get DAQ name for a given sector.

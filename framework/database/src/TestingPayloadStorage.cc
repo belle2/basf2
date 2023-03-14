@@ -116,8 +116,8 @@ namespace Belle2::Conditions {
               << LogVar("line", lineno) << LogVar("error", e.what()));
     }
     // and reverse all the payloads so the last ones in the file have highest priority
-    for (auto& [name, payloads] : m_payloads) {
-      std::reverse(payloads.begin(), payloads.end());
+    for (auto& payload : m_payloads) {
+      std::reverse(payload.second.begin(), payload.second.end());
     }
   }
 

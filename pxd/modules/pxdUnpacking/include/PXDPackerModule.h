@@ -100,7 +100,7 @@ namespace Belle2 {
       int m_firmware{0};
 
       /** firmware version from DB. */
-      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB;
+      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB{"PXDDHHFirmwareVersion"};
       /** override firmware version from DB. */
       int m_overrideFirmwareVersion{0};
 
@@ -136,10 +136,10 @@ namespace Belle2 {
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
       /** Store start of Vxd Detector related digits */
-      std::map <VxdID , int> startOfVxdID;
+      std::map <VxdID, int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] {0};
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] {{0}};
 
       unsigned int dhe_byte_count{0}; /**< Byte count in current DHE package */
       unsigned int dhc_byte_count{0}; /**< Byte count in current DHC package */

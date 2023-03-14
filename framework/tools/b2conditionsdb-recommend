@@ -52,7 +52,7 @@ if __name__ == "__main__":
         base_tags = metadata[0]['globalTag'].split()
 
     # get recommendation
-    result = recommended_global_tags_v2(basf2.version.version, base_tags, None, metadata)
+    result = recommended_global_tags_v2(basf2.version.get_version(), base_tags, None, metadata)
 
     # print result
     if result and result['tags']:

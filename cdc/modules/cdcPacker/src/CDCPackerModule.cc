@@ -26,7 +26,7 @@ using namespace CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCPacker)
+REG_MODULE(CDCPacker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -126,7 +126,7 @@ void CDCPackerModule::event()
     //
     if (m_fee_board[ sly ][ ily ][ iwire] < 0 || m_fee_ch[ sly ][ ily ][ iwire] < 0) {
       printf("Hit WireID %8d SL %3d IL %3d WI %4d BOARD %3d CH %3d\n",
-             (int)(hit.getID()), sly, ily , iwire,
+             (int)(hit.getID()), sly, ily, iwire,
              m_fee_board[ sly ][ ily ][ iwire], m_fee_ch[ sly ][ ily ][ iwire]);
       exit(1);
     }

@@ -15,9 +15,19 @@ Enddecay
 
 CDecay Myanti-B0
 
+# We need only K_L0 with realistic momentum distribution.
+# Decay everything else to neutrinos to speed up simulation.
+
+Decay B0
+1.0 nu_e anti-nu_e PHSP;
+Enddecay
+
+CDecay anti-B0
+
 Decay MyJ/psi
-0.5 e+ e- PHOTOS VLL;
-0.5 mu+ mu- PHOTOS VLL;
+1.0 nu_e anti-nu_e PHSP;
+#0.5 e+ e- PHOTOS VLL;
+#0.5 mu+ mu- PHOTOS VLL;
 Enddecay
 
 End

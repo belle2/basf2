@@ -28,7 +28,7 @@ import basf2
 import ROOT
 from ROOT import Belle2
 from array import array
-from pxd.utils import style
+from pxd.utils.plots import root_style
 import pxd.calibration.condition_checker as checker
 import pxd.calibration.calibration_checker as calChecker
 import argparse
@@ -176,6 +176,8 @@ class ConditionsTreeModule(basf2.Module):
         c_lg = ROOT.TCanvas('c_lg', 'c_lg', 1000, 400)
         for condition in self.conditions:
             self.conditionCheckers[condition].draw_plots(c_lg)
+            self.conditionCheckers[condition].draw_plots(c_lg, ymax=None, logy=True)
+            c_lg.Write()
         for aCalChecker in self.calibrationCheckers:
             aCalChecker.terminate()
         if not self.only_hist:
@@ -205,7 +207,7 @@ if __name__ == "__main__":
     from conditions_db.testing_payloads import parse_testing_payloads_file
     # ROOT settings
     ROOT.gROOT.SetBatch(True)
-    style()  # set plotting style for PXD
+    root_style()  # set plotting style for PXD
     # selected runs indicated with a tuple (exp, run), e.g., [(7, 111), (8,1022)]
     selected_runs = []
     # Arguments

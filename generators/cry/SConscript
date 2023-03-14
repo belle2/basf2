@@ -3,6 +3,6 @@ import os
 Import('env')
 
 env['SUBLIB'] = True
-env['LIBS'] = ['CRY', '$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'vecgeom', 'Vc']
+env['LIBS'] = ['CRY', '$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'vecgeom', 'Vc','geometry']
 
 Return('env')

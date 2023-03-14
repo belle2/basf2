@@ -12,6 +12,7 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -28,39 +29,16 @@
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
+#include <cdc/geometry/CDCGeometryParConstants.h>
+
 #include <vector>
 #include <string>
 #include <map>
 //#include <fstream>
 
-#include "TVector3.h"
-
-const unsigned MAX_N_SLAYERS   =    56;
-const unsigned MAX_N_SCELLS    =   384;
-const unsigned MAX_N_FLAYERS   =    55;
-const unsigned nSenseWires     = 14336;
-const unsigned nSuperLayers    =     9;
-const unsigned nBoards         =   300;
-//const unsigned nAlphaPoints  =    19;
-const unsigned maxNAlphaPoints =    18;
-const unsigned maxNThetaPoints =     7;
-const unsigned nXTParams       =     9; //#fit params + 1
-const unsigned nSigmaParams    =     9; //7 is used now; 2 for spare
 
 namespace Belle2 {
   namespace CDC {
-    /*
-    const unsigned MAX_N_SLAYERS   =    56;
-    const unsigned MAX_N_SCELLS    =   384;
-    const unsigned MAX_N_FLAYERS   =    55;
-    const unsigned nSenseWires     = 14336;
-    const unsigned nSuperLayers    =     9;
-    const unsigned nBoards         =   300;
-    const unsigned maxNAlphaPoints =    18;
-    const unsigned maxNThetaPoints =     7;
-    const unsigned nXTParams       =     9; //#fit params + 1
-    const unsigned nSigmaParams    =     9; //7 is used now; 2 for spare
-    */
 
     //! The Class for CDC Geometry Parameters
     /*! This class provides CDC gemetry paramters for simulation, reconstruction and so on.
@@ -347,7 +325,7 @@ namespace Belle2 {
           \param position The given position to calculate cell id.
           \return Cell id.
       */
-      unsigned cellId(unsigned layerId, const TVector3& position) const;
+      unsigned cellId(unsigned layerId, const B2Vector3D& position) const;
 
       //! Returns the inner radius of the outer wall.
       /*!
@@ -466,10 +444,10 @@ namespace Belle2 {
           \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
           \return The forward position of the wire.
       */
-      const TVector3 wireForwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
+      const B2Vector3D wireForwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
-      const TVector3 wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
+      const B2Vector3D wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
       {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
@@ -482,10 +460,10 @@ namespace Belle2 {
       \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
       \return The virtual forward position of the wire.
       */
-      const TVector3 wireForwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      const B2Vector3D wireForwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
-      const TVector3 wireForwardPosition(const WireID& wireID, double z,
-                                         EWirePosition set = c_Base) const
+      const B2Vector3D wireForwardPosition(const WireID& wireID, double z,
+                                           EWirePosition set = c_Base) const
       {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
@@ -497,10 +475,10 @@ namespace Belle2 {
           \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
           \return The backward position of the wire.
       */
-      const TVector3 wireBackwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
+      const B2Vector3D wireBackwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
-      const TVector3 wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
+      const B2Vector3D wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
       {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
@@ -513,9 +491,9 @@ namespace Belle2 {
       \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
       \return The virtual backward position of the wire.
       */
-      const TVector3 wireBackwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      const B2Vector3D wireBackwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
-      const TVector3 wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const
+      const B2Vector3D wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const
       {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
@@ -527,7 +505,7 @@ namespace Belle2 {
           \param cellId  The cell  id.
           \return Coefficient for the sense wire sag.
       */
-      double getWireSagCoef(EWirePosition set, int layerId, int cellId) const;
+      double getWireSagCoef(EWirePosition set, uint layerId, int cellId) const;
 
 
       //! Returns threshold for energy deposit in one G4 step
@@ -969,7 +947,7 @@ namespace Belle2 {
        * @param posOnTrack Position on the track at the closest point.
        * @param momentum   Track 3-momentum.
        */
-      unsigned short getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+      unsigned short getOldLeftRight(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack, const B2Vector3D& momentum) const;
 
       /**
        * Returns new left/right_raw.
@@ -978,7 +956,7 @@ namespace Belle2 {
        * @param momentum   Track 3-momentum.
        */
 
-      unsigned short getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+      unsigned short getNewLeftRightRaw(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack, const B2Vector3D& momentum) const;
 
       /**
        * Returns track incident angle in rphi plane (alpha in rad.).
@@ -986,13 +964,13 @@ namespace Belle2 {
        * @param momentum  Track momentum at the closest point.
        */
 
-      double getAlpha(const TVector3& posOnWire, const TVector3& momentum) const;
+      double getAlpha(const B2Vector3D& posOnWire, const B2Vector3D& momentum) const;
 
       /**
        * Returns track incident angle (theta in rad.).
        * @param momentum Track momentum at the closest point.
        */
-      double getTheta(const TVector3& momentum) const;
+      double getTheta(const B2Vector3D& momentum) const;
 
 
       /**
@@ -1057,6 +1035,47 @@ namespace Belle2 {
        */
       void setDisplacement();
 
+
+      /**
+      * Get the number of sense wires.
+      */
+      ushort getNumberOfSenseWires() const { return m_nSenseWires;}
+
+      /**
+      * Get the number of field wires.
+      */
+      ushort getNumberOfFieldWires() const { return m_nFieldWires;}
+
+      /**
+      * Get the number of sense layers.
+      */
+      ushort getNumberOfSenseLayers() const { return m_maxNSenseLayers;}
+
+      /**
+      * Get the number of field layers.
+      */
+      ushort getNumberOfFieldLayers() const { return m_maxNFieldLayers;}
+
+      /**
+      * Get the maximum number of super layers.
+      */
+      ushort getMaxNumberOfSuperLayers() const { return m_maxNSuperLayers;}
+
+      /**
+      * Get the offset of the first layer.
+      */
+      ushort getOffsetOfFirstLayer() const { return m_firstLayerOffset;}
+
+      /**
+      * Get the offset of the first super layer.
+      */
+      ushort getOffsetOfFirstSuperLayer() const { return m_firstSuperLayerOffset;}
+
+      /**
+      * Get the maximum number of cells in one layer.
+      */
+      ushort getMaxNumberOfCellsPerLayer() const { return m_maxNCellsPerLayer;}
+
     private:
       /** Singleton class */
       CDCGeometryPar(const CDCGeometry* = nullptr);
@@ -1091,23 +1110,23 @@ namespace Belle2 {
       unsigned short m_nThetaPoints;  /*!< No. of theta points for xt. */
       unsigned short m_nAlphaPoints4Sgm;  /*!< No. of alpha points for sigma. */
       unsigned short m_nThetaPoints4Sgm;  /*!< No. of theta points for sigma. */
-      signed short m_shiftInSuperLayer[nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
+      signed short m_shiftInSuperLayer[c_nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
 
       double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
       double m_zWall[4][2];  /*!< The array to store z position of inner wall and outer wall. */
 
-      double m_rSLayer[MAX_N_SLAYERS];          /*!< The array to store radius of sense wire layers. */
-      double m_zSForwardLayer[MAX_N_SLAYERS];   /*!< The array to store forward z position of sense wire layers. */
-      double m_dzSForwardLayer[MAX_N_SLAYERS];   /*!< Corrections for forward z position of sense wire layers. */
-      double m_zSBackwardLayer[MAX_N_SLAYERS];  /*!< The array to store backward z position of sense wire layers. */
-      double m_dzSBackwardLayer[MAX_N_SLAYERS]; /*!< Corrections for backward z position of sense wire layers. */
-      double m_rFLayer[MAX_N_FLAYERS];          /*!< The array to store radius of field wire layers. */
-      double m_zFForwardLayer[MAX_N_FLAYERS];   /*!< The array to store forward z position of field wire layers. */
-      double m_zFBackwardLayer[MAX_N_FLAYERS];  /*!< The array to store backward z position of field wire layers. */
-      double m_offSet[MAX_N_SLAYERS];           /*!< The array to store z offset of sense wire layers. */
-      double m_cellSize[MAX_N_SLAYERS];         /*!< The array to store cell size in each sense wire layer. */
-      int m_nShifts[MAX_N_SLAYERS];             /*!< The array to store shifted cell number in each sense wire layer. */
-      unsigned m_nWires[MAX_N_SLAYERS];         /*!< The array to store the wire number in each sense wire layre. */
+      double m_rSLayer[c_maxNSenseLayers];          /*!< The array to store radius of sense wire layers. */
+      double m_zSForwardLayer[c_maxNSenseLayers];   /*!< The array to store forward z position of sense wire layers. */
+      double m_dzSForwardLayer[c_maxNSenseLayers];   /*!< Corrections for forward z position of sense wire layers. */
+      double m_zSBackwardLayer[c_maxNSenseLayers];  /*!< The array to store backward z position of sense wire layers. */
+      double m_dzSBackwardLayer[c_maxNSenseLayers]; /*!< Corrections for backward z position of sense wire layers. */
+      double m_rFLayer[c_maxNFieldLayers];          /*!< The array to store radius of field wire layers. */
+      double m_zFForwardLayer[c_maxNFieldLayers];   /*!< The array to store forward z position of field wire layers. */
+      double m_zFBackwardLayer[c_maxNFieldLayers];  /*!< The array to store backward z position of field wire layers. */
+      double m_offSet[c_maxNSenseLayers];           /*!< The array to store z offset of sense wire layers. */
+      double m_cellSize[c_maxNSenseLayers];         /*!< The array to store cell size in each sense wire layer. */
+      int m_nShifts[c_maxNSenseLayers];             /*!< The array to store shifted cell number in each sense wire layer. */
+      unsigned m_nWires[c_maxNSenseLayers];         /*!< The array to store the wire number in each sense wire layre. */
 
       double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
       double m_senseWireTension;                    /*!< The tension of sense wires. */
@@ -1119,42 +1138,42 @@ namespace Belle2 {
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
-      //      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
-      //      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
+      //      double m_bwdDz[c_maxNSenseLayers];  /*!< Tentative backward z-corrections.*/
+      //      double m_fwdDz[c_maxNSenseLayers];  /*!< Tentative forward  z-corrections.*/
 
       double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
       double m_minTrackLength;         /*!< Minimum track length for G4 step */
 
-      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. displacement at the forward endplate for each cell; to be implemented in a smarter way. */
-      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. displacement at the backward endplate for each cell; ibid. */
-      float m_WireSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient for each cell; ibid. */
+      float m_FWirPos[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. displacement at the forward endplate for each cell; to be implemented in a smarter way. */
+      float m_BWirPos[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. displacement at the backward endplate for each cell; ibid. */
+      float m_WireSagCoef[c_maxNSenseLayers][c_maxNDriftCells]; /*!< Wire sag coefficient for each cell; ibid. */
 
-      float m_FWirPosMisalign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. misalignment at the forward endplate for each cell; ibid. */
-      float m_BWirPosMisalign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. misalignment at the backward endplate for each cell; ibid. */
-      float m_WireSagCoefMisalign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. misalignment for each cell; ibid. */
+      float m_FWirPosMisalign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. misalignment at the forward endplate for each cell; ibid. */
+      float m_BWirPosMisalign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. misalignment at the backward endplate for each cell; ibid. */
+      float m_WireSagCoefMisalign[c_maxNSenseLayers][c_maxNDriftCells]; /*!< Wire sag coefficient incl. misalignment for each cell; ibid. */
 
-      float m_FWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
-      float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
-      float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
-      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][7] = {0}; /*!< edep-to-ADC conv. params. */
+      float m_FWirPosAlign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
+      float m_BWirPosAlign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
+      float m_WireSagCoefAlign[c_maxNSenseLayers][c_maxNDriftCells]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
+      float m_eDepToADCParams[c_maxNSenseLayers][c_maxNDriftCells][7] = {{0}}; /*!< edep-to-ADC conv. params. */
 
-      float m_alphaPoints[maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
-      float m_thetaPoints[maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
-      float m_alphaPoints4Sgm[maxNAlphaPoints]; /*!< alpha sampling points for sigma (rad) */
-      float m_thetaPoints4Sgm[maxNThetaPoints]; /*!< theta sampling points for sigma (rad) */
+      float m_alphaPoints[c_maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
+      float m_thetaPoints[c_maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
+      float m_alphaPoints4Sgm[c_maxNAlphaPoints]; /*!< alpha sampling points for sigma (rad) */
+      float m_thetaPoints4Sgm[c_maxNThetaPoints]; /*!< theta sampling points for sigma (rad) */
 
-      float m_XT[MAX_N_SLAYERS][2][maxNAlphaPoints][maxNThetaPoints][nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
-      float m_Sigma[MAX_N_SLAYERS][2][maxNAlphaPoints][maxNThetaPoints][nSigmaParams];      /*!< position resulution for each layer. */
-      float m_propSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
-      float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS] = {0};  /*!< t0 for each sense-wire (in nsec). */
-      float m_timeWalkCoef[nBoards][2];  /*!< coefficients for time walk. */
+      float m_XT[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
+      float m_Sigma[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nSigmaParams];      /*!< position resulution for each layer. */
+      float m_propSpeedInv[c_maxNSenseLayers];  /*!< Inverse of propagation speed of the sense wire. */
+      float m_t0[c_maxNSenseLayers][c_maxNDriftCells] = {{0}};  /*!< t0 for each sense-wire (in nsec). */
+      float m_timeWalkCoef[c_nBoards][2];  /*!< coefficients for time walk. */
 
       //      float m_meanT0;  /*!< mean t0 over all wires. */
       double m_meanT0;  /*!< mean t0 over all wires; should be double. */
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
       std::map<WireID, unsigned short> m_wireToChannel; /*!< map relating wire-id and channel-id. */
-      unsigned short m_boardAndChannelToWire[nBoards][48]; /*!< array relating board-channel-id and wire-id. */
+      unsigned short m_boardAndChannelToWire[c_nBoards][48]; /*!< array relating board-channel-id and wire-id. */
 
       //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
 
@@ -1165,7 +1184,7 @@ namespace Belle2 {
       double m_nominalDriftVInv;   /*!< Inverse of the nominal drift velocity. */
       double m_nominalPropSpeed;   /*!< Nominal propagation speed of the sense wire (27.25 cm/nsec). */
       double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
-      double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
+      double m_maxSpaceResol;      /*!< max space resolution allowed (cm). */
       double m_fudgeFactorForSigma[3];     /*!< Fuge factor for space resol. */
 
       DBObjPtr<CDCTimeZeros>* m_t0FromDB; /*!< t0s retrieved from DB. */
@@ -1184,6 +1203,15 @@ namespace Belle2 {
       DBObjPtr<HardwareClockSettings> m_clockSettings; /*!< hardware clock settings */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
+
+      ushort m_nSenseWires            = c_nSenseWires;      /*!< Maximum number of Sense Wires */
+      ushort m_nFieldWires            = c_nFieldWires;      /*!< Maximum number of Field Wires */
+      ushort m_maxNSenseLayers        = c_maxNSenseLayers;  /*!< Maximum number of Sense Wire Layers */
+      ushort m_maxNFieldLayers        = c_maxNFieldLayers;  /*!< Maximum number of Field Wire Layers */
+      ushort m_maxNSuperLayers        = c_nSuperLayers;     /*!< Maximum number of Super Layers */
+      ushort m_firstLayerOffset       = 0;                  /*!< Offset of the first layer (for reduced CDC studies) */
+      ushort m_firstSuperLayerOffset  = 0;                  /*!< Offset of the first super layer (for reduced CDC studies) */
+      ushort m_maxNCellsPerLayer      = c_maxNDriftCells;   /*!< Maximum number wires within a layer */
 
     };
 
@@ -1317,7 +1345,7 @@ namespace Belle2 {
 
     inline unsigned CDCGeometryPar::nWireLayers() const
     {
-      return MAX_N_SLAYERS;
+      return c_maxNSenseLayers;
     }
 
     inline const double* CDCGeometryPar::zForwardWireLayer() const

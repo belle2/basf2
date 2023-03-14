@@ -6,22 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
+/* Own header. */
 #include <ecl/calibration/eclTimeShiftsAlgorithm.h>
+
+/* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
-#include "TH1F.h"
-#include "TString.h"
-#include "TFile.h"
-#include "TDirectory.h"
+
+/* ROOT headers. */
 #include <TCanvas.h>
+#include <TDirectory.h>
+#include <TFile.h>
 #include <TGraphErrors.h>
+#include <TH1F.h>
 #include <TLatex.h>
-#include <sstream>
+#include <TString.h>
+
+/* C++ headers. */
 #include <iomanip>
-#include <TLatex.h>
+#include <sstream>
 
 using namespace std;
 using namespace Belle2;
@@ -63,9 +68,9 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
   //------------------------------------------------------------------------
   /* Conversion coefficient from ADC ticks to nanoseconds
-     1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency,
-     fRF=508.889 MHz. Same for all crystals.  Proper accurate value */
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+     1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals.  */
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 
   //------------------------------------------------------------------------
@@ -107,7 +112,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     return c_Failure;
   }
   B2INFO("Number of Entries in tree_perCrystal was " << tree_perCrys->GetEntries());
-  B2INFO("Number of Entries in tree_perCrystal / 8736 = " << float(tree_perCrys->GetEntries()) / 8736.0);
+  B2INFO("Number of Entries in tree_perCrystal / 8736 = " << float(tree_perCrys->GetEntries()) / ECLElementNumbers::c_NCrystals);
 
 
   // Define the variables to be read in from the tree
@@ -486,8 +491,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
          that have the payload with the same revision number */
       int IOV_exp_high = m_ECLCrateTimeOffset.getIoV().getExperimentHigh() ;
       int IOV_run_high = m_ECLCrateTimeOffset.getIoV().getRunHigh() ;
-      B2INFO("IOV_exp_high = " << IOV_exp_high);
-      B2INFO("IOV_run_high = " << IOV_run_high);
+      B2INFO(LogVar("IOV_exp_high", IOV_exp_high));
+      B2INFO(LogVar("IOV_run_high", IOV_run_high));
       if (IOV_run_high == -1) {
         B2INFO("IOV_run_high is -1 so stop looping over all runs");
         break;

@@ -149,7 +149,7 @@ def add_cut_function(args):
                                reject_cut=args.reject_cut.lower() == "true", iov=None)
     trigger_menu = db_access.download_trigger_menu_from_db(args.base_identifier,
                                                            do_set_event_number=False)
-    cuts = list(trigger_menu.getCutIdentifiers())
+    cuts = [str(cut) for cut in trigger_menu.getCutIdentifiers()]
 
     if args.cut_identifier not in cuts:
         cuts.append(args.cut_identifier)
@@ -166,9 +166,8 @@ def remove_cut_function(args):
 
     trigger_menu = db_access.download_trigger_menu_from_db(
         args.base_identifier, do_set_event_number=False)
-    cuts = trigger_menu.getCutIdentifiers()
+    cuts = [str(cut) for cut in trigger_menu.getCutIdentifiers() if str(cut) != args.cut_identifier]
 
-    cuts = [cut for cut in cuts if cut != args.cut_identifier]
     db_access.upload_trigger_menu_to_db(
         args.base_identifier, cuts, accept_mode=trigger_menu.isAcceptMode(), iov=None)
 
@@ -186,9 +185,9 @@ def print_function(args):
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 1000)
         print(df)
-    elif args.format == "jira":
+    elif args.format in ["github", "gitlab"]:
         from tabulate import tabulate
-        print(tabulate(df, tablefmt="jira", showindex=False, headers="keys"))
+        print(tabulate(df, tablefmt="github", showindex=False, headers="keys"))
     elif args.format == "grid":
         from tabulate import tabulate
         print(tabulate(df, tablefmt="grid", showindex=False, headers="keys"))
@@ -345,10 +344,10 @@ Examples:
 
     %(prog)s print
 
-* Print the version of the cuts which was present in 8/1 online in a format understandable by JIRA
+* Print the version of the cuts which was present in 8/1 online in a format understandable by GitLab
   (you need to have the tabulate package installed)
 
-    %(prog)s print --database "online:8/1" --format jira
+    %(prog)s print --database "online:8/1" --format plain
 
 * Add a new skim cut named "accept_b2bcluster_3D" with the specified parameters and upload it to localdb
 
@@ -415,7 +414,8 @@ top in the localdb will be shown.
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     choices = ["human-readable", "json", "list", "pandas"]
     try:
-        choices += ['jira', 'grid']
+        from tabulate import tabulate  # noqa
+        choices += ['github', 'gitlab', 'grid']
     except ImportError:
         pass
     print_parser.add_argument("--format", help="Choose the format how to print the trigger cuts. "
@@ -504,7 +504,7 @@ version of the online GT will be downloaded.
 Attention: this script will override a database defined in the destination
 folder (default localdb)!
 Attention 2: all IoVs of the downloaded triggers will be set to 0, 0, -1, -1
-so you can use the payloads fro your local studies for whatever run you want.
+so you can use the payloads from your local studies for whatever run you want.
 This should not (never!) be used to upload or edit new triggers and
 is purely a convenience function to synchronize your local studies
 with the online database!

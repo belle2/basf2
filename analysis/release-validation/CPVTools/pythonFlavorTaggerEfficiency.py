@@ -30,7 +30,6 @@ import math
 import matplotlib.pyplot as plt
 import ROOT
 from basf2 import B2INFO
-import flavorTagger as ft
 from defaultEvaluationParameters import categories, Quiet, rbins
 from array import array
 
@@ -386,9 +385,6 @@ for cat in categories:
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
-if len(usedCategories) > 1:
-    ft.WhichCategories(usedCategories)
-
 YmaxForQrPlot = 0
 YmaxForDeltaTPlot = 0
 
@@ -417,7 +413,7 @@ for method in methods:
 
             argSet.add(DeltaT)
 
-        for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+        for category in usedCategories:
 
             exec(
                 "%s = %s" %
@@ -455,7 +451,7 @@ for method in methods:
 
         tNumberOfTrueCategories = 0
 
-        for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+        for category in usedCategories:
 
             if category == "MaximumPstar":
                 continue
@@ -1358,7 +1354,7 @@ categoryLabelsDict = {'Electron': r'${\rm Electron}$',
 qrMC = ROOT.RooRealVar('qrMC', 'qrMC', 0, -1.0, 1.0)
 argSet = ROOT.RooArgSet(qrMC)
 
-for (particleList, iCategory, combinerVariable) in ft.eventLevelParticleLists:
+for iCategory in usedCategories:
     #
     with Quiet(ROOT.kError):
         exec(
@@ -1378,8 +1374,7 @@ for (particleList, iCategory, combinerVariable) in ft.eventLevelParticleLists:
         exec("%s" % "argSet.add(qp" + iCategory + ")")
 rooDataSet = ROOT.RooDataSet("data", "data", tree, argSet, "")
 
-
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+for category in usedCategories:
 
     print(category)
     # qrCombined=ROOT.RooRealVar('qp' + category, 'qp' + category, 0, -1.0, 1.1)
@@ -1399,7 +1394,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
         tNumberOfTrueCategories = 0
         noMCAssociated = False
 
-        for (particleList, iCategory, combinerVariable) in ft.eventLevelParticleLists:
+        for iCategory in usedCategories:
 
             if iCategory == "MaximumPstar":
                 continue

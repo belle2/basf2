@@ -5,11 +5,24 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <framework/database/DBImportObjPtr.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-#include <iostream>
+
+/* Basf2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
+
+/* C++ headers. */
+#include <iostream>
+
+using namespace Belle2;
+
 //
 //See  eclComputePulseTemplates_Step0.cc for README instructions.
 ///
@@ -20,7 +33,7 @@ int main()
   //
   TFile* WaveformParameterFileInput = new TFile(FileName, "READ");
   if (!WaveformParameterFileInput or WaveformParameterFileInput->IsZombie()) {
-    std::cout << "Could not open file " << FileName << std::endl;;
+    B2FATAL("Could not open file " << FileName);
   }
   WaveformParameterFileInput->cd();
   TTree* WaveformParametersTree = (TTree*) WaveformParameterFileInput->Get("ParTree");
@@ -37,7 +50,7 @@ int main()
   //
   Belle2::DBImportObjPtr<Belle2::ECLDigitWaveformParameters> importer("ECLDigitWaveformParameters");
   importer.construct();
-  for (int ID = 0; ID < 8736; ID++) {
+  for (int ID = 0; ID < ECLElementNumbers::c_NCrystals; ID++) {
     WaveformParametersTree->GetEntry(ID);
     float tempPhotonPar11[11];
     float tempHadronPar11[11];

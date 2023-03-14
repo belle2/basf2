@@ -12,6 +12,7 @@
 import basf2_mva_util
 
 from basf2_mva_evaluation import plotting
+from basf2 import conditions
 import argparse
 import tempfile
 
@@ -19,14 +20,13 @@ import numpy as np
 from B2Tools import b2latex, format
 from basf2 import B2INFO
 
-import ROOT
-
 import os
 import shutil
 import collections
+from typing import List, Any
 
 
-def getCommandLineOptions():
+def get_argument_parser() -> argparse.ArgumentParser:
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--identifiers', dest='identifiers', type=str, required=True, action='append', nargs='+',
@@ -41,24 +41,36 @@ def getCommandLineOptions():
     parser.add_argument('-w', '--working_directory', dest='working_directory', type=str, default='',
                         help="""Working directory where the created images and root files are stored,
                               default is to create a temporary directory.""")
+    parser.add_argument('-l', '--localdb', dest='localdb', type=str, action='append', nargs='+', required=False,
+                        help="""path or list of paths to local database(s) containing the mvas of interest.
+                                The testing payloads are preprended and take precedence over payloads in global tags.""")
+    parser.add_argument('-g', '--globaltag', dest='globaltag', type=str, action='append', nargs='+', required=False,
+                        help='globaltag or list of globaltags containing the mvas of interest. The globaltags are prepended.')
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
-                        help='Compile latex to pdf')
-    args = parser.parse_args()
-    return args
+                        help='Compile latex to pdf directly')
+    return parser
 
 
-def unique(input):
+def unique(input_list: List[Any]) -> List[Any]:
     """
     Returns a list containing only unique elements, keeps the original order of the list
-    @param input list containing the elements
+    @param input_list list containing the elements
     """
     output = []
-    for x in input:
+    for x in input_list:
         if x not in output:
             output.append(x)
     return output
+
+
+def flatten(input_list: List[List[Any]]) -> List[Any]:
+    """
+    Flattens a list of lists
+    @param input_list list of lists to be flattened
+    """
+    return [item for sublist in input_list for item in sublist]
 
 
 def create_abbreviations(names, length=5):
@@ -84,15 +96,26 @@ def create_abbreviations(names, length=5):
 
 if __name__ == '__main__':
 
+    import ROOT  # noqa
+    ROOT.PyConfig.IgnoreCommandLineOptions = True
+    ROOT.PyConfig.StartGuiThread = False
     ROOT.gROOT.SetBatch(True)
 
     old_cwd = os.getcwd()
-    args = getCommandLineOptions()
+    parser = get_argument_parser()
+    args = parser.parse_args()
 
-    identifiers = sum(args.identifiers, [])
+    identifiers = flatten(args.identifiers)
     identifier_abbreviations = create_abbreviations(identifiers)
 
-    datafiles = sum(args.datafiles, [])
+    datafiles = flatten(args.datafiles)
+    if args.localdb is not None:
+        for localdb in flatten(args.localdb):
+            conditions.prepend_testing_payloads(localdb)
+
+    if args.globaltag is not None:
+        for tag in flatten(args.globaltag):
+            conditions.prepend_globaltag(tag)
 
     print("Load methods")
     methods = [basf2_mva_util.Method(identifier) for identifier in identifiers]
@@ -128,13 +151,15 @@ if __name__ == '__main__':
     for datafile in datafiles:
         rootchain.Add(datafile)
 
-    variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, list(variable_abbreviations.values()))
+    variables_data = basf2_mva_util.chain2dict(rootchain, root_variables, list(variable_abbreviations.values()))
+    spectators_data = basf2_mva_util.chain2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
 
     if args.fillnan:
         for column in variable_abbreviations.values():
             np.nan_to_num(variables_data[column], copy=False)
 
-    spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
+        for column in spectator_abbreviations.values():
+            np.nan_to_num(spectators_data[column], copy=False)
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
@@ -154,7 +179,7 @@ if __name__ == '__main__':
         o += b2latex.Section("Classifiers")
         o += b2latex.String(r"""
             This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree.
-            The same information can be retreived using the basf2\_mva\_info tool.
+            The same information can be retrieved using the basf2\_mva\_info tool.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of identifiers", "{name} & {abbr}", r"Identifier & Abbreviation")
@@ -171,6 +196,11 @@ if __name__ == '__main__':
             This section contains an overview of the importance and correlation of the variables used by the classifiers.
             And distribution plots of the variables on the independent dataset. The distributions are normed for signal and
             background separately, and only the region +- 3 sigma around the mean is shown.
+
+            The importance scores shown are based on the variable importance as estimated by each MVA method internally.
+            This means the variable with the lowest importance will have score 0, and the variable
+            with the highest importance will have score 100. If the method does not provide such a ranking, all
+            importances will be 0.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of variables", "{name} & {abbr}", r"Variable & Abbreviation")

@@ -6,24 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisMiraBelle.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include <TFile.h>
-#include <TF1.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TClass.h>
 #include <TROOT.h>
-
-#include <fstream>
-#include <vector>
-#include <algorithm>
+#include <TF1.h>
 
 using namespace std;
 using namespace Belle2;
@@ -172,6 +159,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float rms_dd0 = hist_dD0->GetRMS();
   float rms_dz0 = hist_dZ0->GetRMS();
   float rms_dpt = hist_dPtcms->GetRMS();
+  float sigma68_dd0 = getSigma68(hist_dD0);
+  float sigma68_dz0 = getSigma68(hist_dZ0);
+  float sigma68_dpt = getSigma68(hist_dPtcms);
   int ntot = hist_nsvd->GetEntries();
   float neve_mumu = ntot;
   float goodmu_frac = hist_muid->GetBinContent(20) / (float)ntot;
@@ -185,6 +175,16 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float nocdc_frac = hist_ncdc->GetBinContent(1) / (float)ntot;
   float notop_frac = hist_topdig->GetBinContent(1) / (float)ntot;
   float noarich_frac = hist_DetPhotonARICH->GetBinContent(1) / (float)ntot;
+  //Calculate M(mumu)
+  float peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
+  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
+  f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.045);
+  f_mumuInvM->SetParLimits(1, peak_mumu - 0.04, peak_mumu + 0.04);
+  f_mumuInvM->SetParLimits(2, 0.01, 0.06);
+  hist_inv_p->Fit(f_mumuInvM, "R");
+  float fit_mumumass = f_mumuInvM->GetParameter(1);
+  if (fit_mumumass < 9) fit_mumumass = 9;
+  if (fit_mumumass > 12) fit_mumumass = 12;
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
@@ -210,6 +210,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("rms_dd0", rms_dd0);
   mon_mumu->setVariable("rms_dz0", rms_dz0);
   mon_mumu->setVariable("rms_dpt", rms_dpt);
+  mon_mumu->setVariable("sigma68_dd0", sigma68_dd0);
+  mon_mumu->setVariable("sigma68_dz0", sigma68_dz0);
+  mon_mumu->setVariable("sigma68_dpt", sigma68_dpt);
   mon_mumu->setVariable("neve_mumu", neve_mumu);
   mon_mumu->setVariable("goodmu_frac", goodmu_frac);
   mon_mumu->setVariable("goodmu_o_badmu", goodmu_o_badmu);
@@ -218,7 +221,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("nocdc_frac", nocdc_frac);
   mon_mumu->setVariable("notop_frac", notop_frac);
   mon_mumu->setVariable("noarich_frac", noarich_frac);
-
+  mon_mumu->setVariable("fit_mumumass", fit_mumumass);
 
   // ========== D*
   // get existing histograms produced by DQM modules
@@ -487,18 +490,4 @@ void DQMHistAnalysisMiraBelleModule::terminate()
 {
 
   B2DEBUG(20, "terminate called");
-}
-
-TCanvas* DQMHistAnalysisMiraBelleModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
 }

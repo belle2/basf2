@@ -82,13 +82,14 @@ namespace Belle2 {
       std::vector<std::string> m_variables; /**< Vector of all variables (branch names) used in the training */
       std::vector<std::string> m_spectators; /**< Vector of all spectators (branch names) used in the training */
       int m_signal_class = 1; /**< Signal class which is used as signal in a classification problem */
+      unsigned int m_nClasses = 2; /**< Number of classes in a classification problem. */
       std::string m_target_variable = "isSignal"; /**< Target variable (branch name) defining the target */
       std::string m_weight_variable = "__weight__"; /**< Weight variable (branch name) defining the weights */
       unsigned int m_max_events = 0; /**< Maximum number of events to process, 0 means all */
     };
 
     /**
-     * Specific Options, all mehtod Options have to inherit from this class
+     * Specific Options, all method Options have to inherit from this class
      */
     class SpecificOptions : public Options {
 
@@ -129,10 +130,10 @@ namespace Belle2 {
       bool m_splot_combined = false; /**< Combine sPlot training with PDF classifier for discriminating variable */
       bool m_splot_boosted = false; /**< Use boosted sPlot training (aPlot) */
 
-      bool m_use_sideband_substraction = false; /**< Use sideband substraction */
+      bool m_use_sideband_subtraction = false; /**< Use sideband subtraction */
       std::vector<std::string> m_sideband_mc_files; /**< used to estimate the number of events in the different regions */
       std::string m_sideband_variable =
-        ""; /**< Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband substraction */
+        ""; /**< Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband subtraction */
 
       bool m_use_reweighting = false; /**< Use a pretraining of data against mc and weight the mc afterwards */
       std::string m_reweighting_identifier = ""; /**< Identifier used to save the reweighting expert */
@@ -149,7 +150,7 @@ namespace Belle2 {
         if (v <= min || v >= max)
         {
           throw po::validation_error(po::validation_error::invalid_option_value, name,
-          std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+                                     std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
         }
       };
     }
@@ -162,7 +163,7 @@ namespace Belle2 {
         {
           if (v <= min || v >= max) {
             throw po::validation_error(po::validation_error::invalid_option_value, name,
-            std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+                                       std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
           }
         }
       };

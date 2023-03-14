@@ -90,7 +90,7 @@ double TrgEclTiming::GetEventTiming00()
 
   if (FastestTCId < 81) {
     Source = 1;
-  } else if (FastestTCId > 80 && FastestTCId < 513) {
+  } else if (FastestTCId < 513) {
     Source = 2;
   } else {
     Source = 4;
@@ -123,7 +123,7 @@ double TrgEclTiming::GetEventTiming01()
   }
   if (maxTCId < 81) {
     Source = 1;
-  } else if (maxTCId > 80 && maxTCId < 513) {
+  } else if (maxTCId < 513) {
     Source = 2;
   } else {
     Source = 4;
@@ -192,7 +192,7 @@ double TrgEclTiming::GetEventTiming02()
 
   if (maxTCId < 81) {
     Source = 1;
-  } else if (maxTCId > 80 && maxTCId < 513) {
+  } else if (maxTCId < 513) {
     Source = 2;
   } else {
     Source = 4;

@@ -8,15 +8,19 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+/* ECL headers. */
 #include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/utility/ECLTimingUtilities.h>
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
 
 class TTree;
 
@@ -63,10 +67,20 @@ namespace Belle2 {
     /** If true, save TTree with more detailed event info */
     bool m_saveTree;
 
-    /****** Parameters END ******/
-
 
     StoreArray<Track> tracks; /**< StoreArray for tracks */
+
+    /**
+     * ECL object for keeping track of mapping between crystals
+     * and crates etc.
+     */
+    std::unique_ptr< Belle2::ECL::ECLChannelMapper> m_crystalMapper =
+      std::make_unique<Belle2::ECL::ECLChannelMapper>();
+
+
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
+
+
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0
      */
@@ -102,6 +116,10 @@ namespace Belle2 {
     DBObjPtr<ECLReferenceCrystalPerCrateCalib> m_RefCrystalsCalibDB; /**< database object */
     std::vector<short> m_RefCrystalsCalib; /**< vector obtained from DB object */
 
+    /** Mapper of ecl channels to various other objects, like crates */
+    DBObjPtr<Belle2::ECLChannelMap> m_channelMapDB; /**< database object */
+
+
     /**
      * Output tree with detailed event data.
      */
@@ -116,7 +134,7 @@ namespace Belle2 {
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evtNum = intNaN;    /**< Event number for debug TTree output*/
-    int m_tree_cid = intNaN;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_cid = intNaN;     /**< ECL Cell ID (1..ECLElementNumbers::c_NCrystals) for debug TTree output */
     int m_tree_amp = intNaN;     /**< Fitting amplitude from ECL for debug TTree output */
     double m_tree_en = realNaN;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
     double m_tree_E1Etot = realNaN;     /**< Energy of crystal with maximum energy within
@@ -151,10 +169,12 @@ namespace Belle2 {
 
     double m_tree_enPlus = realNaN;     /**< Energy of cluster associated to positively charged track, GeV for debug TTree output */
     double m_tree_enNeg = realNaN;     /**< Energy of cluster associated to negatively charged track, GeV for debug TTree output */
-    double m_tree_tClustPos =
-      realNaN;     /**< Cluster time of cluster associated to positively charged track, ns for debug TTree output */
-    double m_tree_tClustNeg =
-      realNaN;     /**< Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
+
+    /** Cluster time of cluster associated to positively charged track, ns for debug TTree output */
+    double m_tree_tClustPos = realNaN;
+    /** Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
+    double m_tree_tClustNeg = realNaN;
+
     double m_tree_maxEcrystPosClust = realNaN;     /**< Time of the highest energy crystal in the cluster
                                                associated to positively charged track, ns for debug TTree output */
     double m_tree_maxEcrystNegClust = realNaN;     /**< Time of the highest energy crystal in the cluster associated
@@ -214,6 +234,8 @@ namespace Belle2 {
     /**  correction to apply to CDC event t0 values in bhabha events to correct for CDC event t0
          bias compared to CDC event t0 in hadronic events in ns*/
     double m_hadronEventT0_TO_bhabhaEventT0_correction;
+
+    bool skipTrgSel; /**< flag to skip the trigger skim selection in the module */
 
 
   };

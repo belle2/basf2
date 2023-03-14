@@ -9,12 +9,14 @@
 #include <generators/modules/BeamParametersModule.h>
 #include <framework/database/Database.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BeamParameters)
+REG_MODULE(BeamParameters);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -73,7 +75,7 @@ void BeamParametersModule::initialize()
 {
   m_beamParams.setHER(m_energyHER, m_angleXHER, m_angleYHER, m_covHER);
   m_beamParams.setLER(m_energyLER, m_angleXLER, m_angleYLER, m_covLER);
-  TVector3 vertex;
+  ROOT::Math::XYZVector vertex;
   if (m_vertex.size() == 3) {
     vertex.SetXYZ(m_vertex[0], m_vertex[1], m_vertex[2]);
   } else {

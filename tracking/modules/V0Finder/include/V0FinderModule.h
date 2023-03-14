@@ -49,6 +49,9 @@ namespace Belle2 {
     /** Creates Belle2::V0s from Belle2::Tracks as described in the class documentation. */
     void event() override;
 
+    /** Prints status summary. */
+    void terminate() override;
+
   private:
 
     std::string m_arrayNameTrack;     ///< StoreArray name of the Tracks          (Input).
@@ -96,5 +99,9 @@ namespace Belle2 {
     double m_mKshortMax2 = 0; ///< pre-calculated maximum Kshort mass squared
     double m_mLambdaMin2 = 0; ///< pre-calculated mininum Lambda mass squared
     double m_mLambdaMax2 = 0; ///< pre-calculated maximum Lambda mass squared
+
+    // counter for V0Finder statistics
+    int m_nForceStored = 0; ///< counter for saved V0s failing to remove the inner hits
+    int m_nHitRemoved  = 0; ///< counter for saved V0s successfully removing the inner hits
   };
 }

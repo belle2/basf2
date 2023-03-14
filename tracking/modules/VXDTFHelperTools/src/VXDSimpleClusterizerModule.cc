@@ -16,11 +16,7 @@
 
 //C++ std lib
 #include <vector>
-using std::vector;
-
 #include <string>
-using std::string;
-
 #include <cmath>
 using std::sin;
 using std::cos;
@@ -31,7 +27,7 @@ using std::sqrt;
 
 using namespace Belle2;
 
-REG_MODULE(VXDSimpleClusterizer)
+REG_MODULE(VXDSimpleClusterizer);
 
 VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 {
@@ -56,15 +52,15 @@ VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
            "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/uniSigma will be used",
            -1.0);
   addParam("PXDTrueHits", m_pxdTrueHitsName,
-           "PXDTrueHit collection name", string(""));
+           "PXDTrueHit collection name", std::string(""));
   addParam("SVDTrueHits", m_svdTrueHitsName,
-           "SVDTrueHit collection name", string(""));
+           "SVDTrueHit collection name", std::string(""));
   addParam("MCParticles", m_mcParticlesName,
-           "MCParticle collection name", string(""));
+           "MCParticle collection name", std::string(""));
   addParam("PXDClusters", m_pxdClustersName,
-           "PXDCluster collection name", string(""));
+           "PXDCluster collection name", std::string(""));
   addParam("SVDClusters", m_svdClustersName,
-           "SVDCluster collection name", string(""));
+           "SVDCluster collection name", std::string(""));
 }
 
 
@@ -110,7 +106,7 @@ void VXDSimpleClusterizerModule::initialize()
 
 void VXDSimpleClusterizerModule::beginRun()
 {
-  string paramValue;
+  std::string paramValue;
   if (m_onlyPrimaries == true) {
     paramValue = "true, means that there are no secondary hits (for 1-track events this means no ghost hits guaranteed)";
   } else {
@@ -135,14 +131,14 @@ void VXDSimpleClusterizerModule::event()
 
   //check all the input containers. First: MCParticles
   int nMcParticles = m_mcParticles.getEntries();
-  if (nMcParticles == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesCollection is empty!");}
+  if (nMcParticles == 0) {B2DEBUG(21, "MCTrackFinder: MCParticlesCollection is empty!");}
   //PXD
   int nPxdTrueHits = m_pxdTrueHits.getEntries();
-  if (nPxdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: PXDHitsCollection is empty!");}
+  if (nPxdTrueHits == 0) {B2DEBUG(21, "MCTrackFinder: PXDHitsCollection is empty!");}
   //SVD
   int nSvdTrueHits = m_svdTrueHits.getEntries();
-  if (nSvdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
-  B2DEBUG(175, "found " << nMcParticles << "/" << nPxdTrueHits << "/" << nSvdTrueHits << " mcParticles, pxdTrueHits, svdTrueHits");
+  if (nSvdTrueHits == 0) {B2DEBUG(21, "MCTrackFinder: SVDHitsCollection is empty!");}
+  B2DEBUG(27, "found " << nMcParticles << "/" << nPxdTrueHits << "/" << nSvdTrueHits << " mcParticles, pxdTrueHits, svdTrueHits");
 
 
   double sigmaU = m_setMeasSigma;
@@ -151,7 +147,7 @@ void VXDSimpleClusterizerModule::event()
 
 ///////////////////////////////////////////////// NOW THE PXD
   for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nPxdTrueHits; ++currentTrueHit) {
-    B2DEBUG(175, "begin PXD current TrueHit: " << currentTrueHit << " of nPxdTrueHits total: " << nPxdTrueHits);
+    B2DEBUG(27, "begin PXD current TrueHit: " << currentTrueHit << " of nPxdTrueHits total: " << nPxdTrueHits);
 
     const PXDTrueHit* aPxdTrueHit = m_pxdTrueHits[currentTrueHit];
     const MCParticle* aMcParticle = aPxdTrueHit->getRelatedFrom<MCParticle>();
@@ -170,10 +166,10 @@ void VXDSimpleClusterizerModule::event()
       }
     }
 
-    B2DEBUG(100, " PXD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
+    B2DEBUG(21, " PXD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
             energy * 1000.0 << "MeV ");
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
-      B2DEBUG(100, " PXD, TrueHit discarded because of energy deposit too small");
+      B2DEBUG(21, " PXD, TrueHit discarded because of energy deposit too small");
       m_weakPXDHitCtr++;
       discardedPXDEdeposit++;
       continue;
@@ -190,7 +186,7 @@ void VXDSimpleClusterizerModule::event()
       sigmaU = sensorInfo->getUPitch(uTrue) * m_uniSigma;
       sigmaV = sensorInfo->getVPitch(vTrue) * m_uniSigma;
     }
-    B2DEBUG(175, "sigU sigV: " << sigmaU << " " << sigmaV);
+    B2DEBUG(27, "sigU sigV: " << sigmaU << " " << sigmaV);
 
     if (m_setMeasSigma != 0) {
       u = gRandom->Gaus(uTrue, sigmaU);
@@ -237,7 +233,7 @@ void VXDSimpleClusterizerModule::event()
 
 ////////////////////////////////////////////////  NOW THE SVD
   for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nSvdTrueHits; ++currentTrueHit) {
-    B2DEBUG(175, "begin SVD current TrueHit: " << currentTrueHit << " of nSvdTrueHits total: " << nSvdTrueHits);
+    B2DEBUG(27, "begin SVD current TrueHit: " << currentTrueHit << " of nSvdTrueHits total: " << nSvdTrueHits);
 
     const SVDTrueHit* aSvdTrueHit = m_svdTrueHits[currentTrueHit];
     const MCParticle* aMcParticle = aSvdTrueHit->getRelatedFrom<MCParticle>();
@@ -254,12 +250,12 @@ void VXDSimpleClusterizerModule::event()
     if (aMcParticle != nullptr) { particleID = aMcParticle->getArrayIndex(); }
     double energy = aSvdTrueHit->getEnergyDep();
 
-    B2DEBUG(100, " SVD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
+    B2DEBUG(21, " SVD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
             energy * 1000.0 << "MeV ");
     if (energy < (m_energyThresholdU + m_energyThresholdV)) { //ignore hit if energy deposity is too snall
       m_weakSVDHitCtr++;
       discardedSVDEdeposit++;
-      B2DEBUG(100, " SVD, TrueHit discarded because of energy deposit too small");
+      B2DEBUG(21, " SVD, TrueHit discarded because of energy deposit too small");
       continue;
     }
 
@@ -275,7 +271,7 @@ void VXDSimpleClusterizerModule::event()
       sigmaU = sensorInfo->getUPitch(uTrue) * m_uniSigma;
       sigmaV = sensorInfo->getVPitch(vTrue) * m_uniSigma;
     }
-    B2DEBUG(150, "sigU sigV: " << sigmaU << " " << sigmaV);
+    B2DEBUG(25, "sigU sigV: " << sigmaU << " " << sigmaV);
 
     if (m_setMeasSigma != 0) {
       u = gRandom->Gaus(uTrue, sigmaU);
@@ -325,16 +321,16 @@ void VXDSimpleClusterizerModule::event()
 
   }
 
-  B2DEBUG(10, "------------------------------------------------------");
+  B2DEBUG(20, "------------------------------------------------------");
 
-  B2DEBUG(10, "VXDSimpleClusterizerModule: Number of PXDHits: " << nPxdTrueHits);
-  B2DEBUG(10, "VXDSimpleClusterizerModule: Number of SVDDHits: " << nSvdTrueHits);
-  B2DEBUG(10, "VXDSimpleClusterizerModule: total Number of MCParticles: " << nMcParticles);
-  B2DEBUG(10, "pxdClusters.getEntries()" << m_pxdClusters.getEntries());
-  B2DEBUG(10, "svdClusters.getEntries()" << m_svdClusters.getEntries());
-  B2DEBUG(10, "------------------------------------------------------");
+  B2DEBUG(20, "VXDSimpleClusterizerModule: Number of PXDHits: " << nPxdTrueHits);
+  B2DEBUG(20, "VXDSimpleClusterizerModule: Number of SVDDHits: " << nSvdTrueHits);
+  B2DEBUG(20, "VXDSimpleClusterizerModule: total Number of MCParticles: " << nMcParticles);
+  B2DEBUG(20, "pxdClusters.getEntries()" << m_pxdClusters.getEntries());
+  B2DEBUG(20, "svdClusters.getEntries()" << m_svdClusters.getEntries());
+  B2DEBUG(20, "------------------------------------------------------");
 
-  B2DEBUG(1, "VXDSimpleClusterizer - event " << eventMetaDataPtr->getEvent() << ":\n" << "of " << nPxdTrueHits << "/" << nSvdTrueHits
+  B2DEBUG(20, "VXDSimpleClusterizer - event " << eventMetaDataPtr->getEvent() << ":\n" << "of " << nPxdTrueHits << "/" << nSvdTrueHits
           << " PXD-/SVDTrueHits, " << discardedPXDEdeposit << "/" << discardedSVDEdeposit << " hits were discarded bec. of low E-deposit & "
           << discardedPXDFake << "/" << discardedSVDFake << " hits were discarded bec. of being a fake. " << m_pxdClusters.getEntries() << "/"
           << m_svdClusters.getEntries() << " Clusters were stored.\n");

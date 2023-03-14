@@ -12,30 +12,52 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TSocket.h>
 #include <string>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisOutputRelayMsgModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisOutputRelayMsgModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisOutputRelayMsgModule();
-    virtual ~DQMHistAnalysisOutputRelayMsgModule();
 
-    //! Module functions to be called from main process
-    virtual void initialize() override;
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisOutputRelayMsgModule();
 
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
 
     // Data members
   private:
@@ -45,7 +67,8 @@ namespace Belle2 {
     int m_port;
     /** The hostname of the canvas server. */
     std::string m_hostname;
-
+    /** Send untagged canvase by default */
+    bool m_canvasSendDefault{true};
   };
 } // end namespace Belle2
 

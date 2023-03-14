@@ -86,10 +86,10 @@ TF1* FitPulse(TGraph* gin, int ShapeFlag, double* pulseInputPara)
     if (nFits == 20 && Attempt == 0 && (Check > 0.01)) {
       //Try new initial conditions
       if (ShapeFlag == 1) {
-        double ParMin11t[11] = {36.1232, -0.284876, 0.350343, 0.432839, 0.445749, 0.27693, 0.00899611, 6.11111, 0.788569, 0.570159, -0.411252};
+        const double ParMin11t[11] = {36.1232, -0.284876, 0.350343, 0.432839, 0.445749, 0.27693, 0.00899611, 6.11111, 0.788569, 0.570159, -0.411252};
         for (int k = 0; k < 11; k++)ParMin11[k] = ParMin11t[k];
       } else {
-        double ParMin11t[11] = {10, 0.031, 4.2e-5, 0.74, 0.43, 0.61, 0.03, 3.8, 0.81, 0.77, 0.59};
+        const double ParMin11t[11] = {10, 0.031, 4.2e-5, 0.74, 0.43, 0.61, 0.03, 3.8, 0.81, 0.77, 0.59};
         for (int k = 0; k < 11; k++)ParMin11[k] = ParMin11t[k];
       }
       Attempt++;

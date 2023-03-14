@@ -8,6 +8,7 @@
 #pragma once
 
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/database/IntraRunDependency.h>
 
 #include <string>
 #include <unordered_set>
@@ -16,7 +17,6 @@ class TFile;
 
 namespace Belle2 {
   class EventMetaData;
-  class IntraRunDependency;
   class DBAccessorBase;
 
   /** Class to hold one entry from the ConditionsDB in the DBStore
@@ -86,6 +86,8 @@ namespace Belle2 {
     ~DBStoreEntry();
     /** get the name of the payload */
     const std::string& getName() const { return m_name; }
+    /** get the globaltag name (or testing payloads path) from which the payload is picked. */
+    const std::string& getGlobaltag() const { return m_globaltag; }
     /** get the revision of the payload, this is an abitrary number which
      * indicates the conditions version */
     unsigned int getRevision() const { return m_revision; }
@@ -111,6 +113,8 @@ namespace Belle2 {
     bool keepUntilExpired() const { return m_keep; }
     /** return whether or not the payload might change even during the run */
     bool isIntraRunDependent() const { return (bool)m_intraRunDependency; }
+    /** return the boundaries of the intra-run changes of the payload, if any */
+    const std::vector<unsigned int> getIntraRunBoundaries() const { if (isIntraRunDependent()) return m_intraRunDependency->getBoundaries(); return std::vector<unsigned int> {}; }
     /** Register an Accessor object to be notified on changes by calling DBAccessorBase::storeEntryChanged() */
     void registerAccessor(DBAccessorBase* object) { m_accessors.insert(object); }
     /** Deregister an Accessor object and remove it from the list of registered objects */
@@ -130,10 +134,11 @@ namespace Belle2 {
      * @param iov new interval of validity for the payload
      * @param filename filename for the payload
      * @param checksum checksum of the payload
+     * @param globaltag globaltag name (or testing payloads path) from which the payload is picked
      * @param event EventMetaData object
      */
     void updatePayload(unsigned int revision, const IntervalOfValidity& iov, const std::string& filename, const std::string& checksum,
-                       const EventMetaData& event);
+                       const std::string& globaltag, const EventMetaData& event);
     /** Actual load the payload from file after all info is set */
     void loadPayload(const EventMetaData& event);
     /** update the payload object according to the new event information.
@@ -172,6 +177,8 @@ namespace Belle2 {
     /** if True this payload should not be updated unless it's really out of date.
      * Usually only set for overrides */
     bool m_keep{false};
+    /** globaltag name (or testing payloads path) from which this payload is picked. */
+    std::string m_globaltag{""};
     /** revision of this payload */
     unsigned int m_revision{0};
     /** validity of this payload */

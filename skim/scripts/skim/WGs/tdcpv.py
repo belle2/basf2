@@ -10,7 +10,7 @@
 ##########################################################################
 
 import modularAnalysis as ma
-from skim.standardlists.dileptons import (loadStdJpsiToee, loadStdJpsiTomumu,
+from skim.standardlists.dileptons import (loadStdJpsiToee_noTOP, loadStdJpsiTomumu,
                                           loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
@@ -21,7 +21,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
-from stdPi0s import loadStdSkimPi0, stdPi0s
+from stdPi0s import loadStdSkimPi0, stdPi0s, loadStdSkimHighEffPi0
 from stdV0s import stdKshorts
 from variables import variables as vm
 from stdKlongs import stdKlongs
@@ -73,6 +73,7 @@ class TDCPV_qqs(BaseSkim):
     * ``eta:SkimHighEff``
     * ``pi0:eff40_May2020``
     * ``pi0:skim``
+    * ``pi0:SkimHighEff``
     * ``rho0:SkimHighEff``
     * ``omega:SkimHighEff``
     * ``f_0:SkimHighEff``
@@ -81,7 +82,8 @@ class TDCPV_qqs(BaseSkim):
     * ``omega:SkimHighEff``
     * ``K*0:SkimHighEff``
     * ``gamma:E15 , cut : 1.4 < E < 4``
-    * ``k_S0:merged``
+    * ``gamma:ECMS16 , cut : 1.6 < useCMSFrame(E)``
+    * ``K_S0:merged``
     * ``K+:1%``
 
     **Cuts used**:
@@ -89,9 +91,7 @@ class TDCPV_qqs(BaseSkim):
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
-    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
-    * ``visibleEnergyOfEventCMS>4"``,
     * ``E_ECL_TDCPV<9``
     """
 
@@ -110,6 +110,7 @@ class TDCPV_qqs(BaseSkim):
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
+        loadStdSkimHighEffPi0(path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
 
@@ -123,6 +124,7 @@ class TDCPV_qqs(BaseSkim):
 
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
+        ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
@@ -147,6 +149,7 @@ class TDCPV_qqs(BaseSkim):
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged',
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged gamma:E15',
             'pi0:skim K_S0:merged gamma:E15',
+            'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
         ]
 
         bu_qqs_Channels = [
@@ -157,17 +160,15 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_List = []
         for chID, channel in enumerate(bd_qqs_Channels):
             ma.reconstructDecay('B0:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            ma.applyCuts('B0:TDCPV_qqs' + str(chID), 'nTracks>4', path=path)
             bd_qqs_List.append('B0:TDCPV_qqs' + str(chID))
 
         bu_qqs_List = []
         for chID, channel in enumerate(bu_qqs_Channels):
             ma.reconstructDecay('B+:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            ma.applyCuts('B+:TDCPV_qqs' + str(chID), 'nTracks>4', path=path)
             bu_qqs_List.append('B+:TDCPV_qqs' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
-                            cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
+                            cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
@@ -186,9 +187,7 @@ class TDCPV_qqs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
-            "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
@@ -242,7 +241,7 @@ class TDCPV_ccs(BaseSkim):
     * ``5.2 < Mbc < 5.29 for Ks/K*``
     * ``5.05 < Mbc < 5.29 for KL``
     * ``abs(deltaE) < 0.5``
-    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
+    * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
     * ``visibleEnergyOfEventCMS>4"``,
     * ``E_ECL_TDCPV<9``
@@ -271,7 +270,7 @@ class TDCPV_ccs(BaseSkim):
         stdPi0s("eff40_May2020", path=path)
         loadStdSkimHighEffKstar0(path=path)
 
-        loadStdJpsiToee(path=path)
+        loadStdJpsiToee_noTOP(path=path)
         loadStdJpsiTomumu(path=path)
         loadStdPsi2s2lepton(path=path)
         stdKlongs(listtype='allklm', path=path)
@@ -319,7 +318,7 @@ class TDCPV_ccs(BaseSkim):
             b0toJPsiKL_List.append('B0:TDCPV_JPsiKL' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
-                            cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
+                            cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
@@ -338,7 +337,7 @@ class TDCPV_ccs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
+            "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"

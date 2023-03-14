@@ -37,15 +37,6 @@ def setupBelleDatabaseServer():
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path):
-    """
-    This function set the Belle Magnetic field (constant).
-    """
-    b2.B2WARNING(
-        'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
-        'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
-
-
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,
@@ -56,7 +47,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=2, enableLocalDB=True):
+                                  SmearTrack=2, enableLocalDB=True,
+                                  convertNbar=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -68,6 +60,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
+            This is recommended for analyses with gammas in the final state.
         path (basf2.Path): Path to add modules in.
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
@@ -84,6 +77,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
             Set to 0 to skip smearing (automatically set to 0 internally for real data).
         enableLocalDB (bool): Enables to use local payloads.
+        convertNbar (bool): Enables conversion of anti-n0:mdst.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -105,12 +99,15 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     b2bii.setB2BII()
 
     if enableLocalDB is True:
-        b2.B2WARNING("B2BII is accessing the payloads from the local database.\n"
-                     "This is the recommended procedure and significantly faster than using the global database.\n"
-                     "Only if you need the latest payloads of the flavor tagging or the FEI,\n"
-                     "you should turn off this feature and set enableLocalDB to True.")
         b2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
         b2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
+    else:
+        b2.B2WARNING(
+            "B2BII is accessing the payloads from the conditions database.\n"
+            "The recommended procedure is to use the offline database and it is significantly\n"
+            "faster than using the global database.\n"
+            "If you need the payloads which are not included in the current offline database,\n"
+            "please contact b2bii librarian.")
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:
@@ -124,11 +121,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # we need magnetic field which is different than default.
     # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
     from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+    from ROOT.Math import XYZVector
     field = Belle2.MagneticField()
     field.addComponent(
         Belle2.MagneticFieldComponentConstant(
-            Belle2.B2Vector3D(
-                0, 0, 1.5 * Belle2.Unit.T)))
+            XYZVector(0, 0, 1.5 * Belle2.Unit.T)))
     Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
     if (not generatorLevelReconstruction):
@@ -165,9 +162,13 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert.param("nisKsInfo", enableNisKsFinder)
     convert.param("RecTrg", enableRecTrg)
     convert.param("convertEvtcls", enableEvtcls)
+    convert.param("convertNbar", convertNbar)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
+    if convertNbar:
+        b2.conditions.append_globaltag('BellePID')
+        path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
 
 
 def parse_process_url(url):

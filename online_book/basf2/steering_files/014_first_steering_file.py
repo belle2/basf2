@@ -13,7 +13,6 @@ main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdstList(
-    environmentType="default",
     filelist=[b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples")],
     path=main,
 )
@@ -41,7 +40,7 @@ ma.reconstructDecay(
 # match reconstructed with MC particles
 ma.matchMCTruth("B0", path=main)
 
-# Save variables to an output file (ntuple)
+# save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
     variables=['Mbc', 'isSignal'],
@@ -50,7 +49,7 @@ ma.variablesToNtuple(
     path=main,
 )
 
-# Start the event loop (actually start processing things)
+# start the event loop (actually start processing things)
 b2.process(main)
 
 # print out the summary

@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
 #include <TH1F.h>
@@ -33,6 +32,10 @@ namespace Belle2 {
       void setMaxRMSDt(double maxRMSDt) {m_maxRMSDt = maxRMSDt;}
       /// Maximum mean of dt of all channels distribution, condition to stop iterating
       void setMaxMeanDt(double maxMeanDt) {m_maxMeanDt = maxMeanDt;}
+      /// Maximum mean of dt of all channels distribution, condition to stop iterating
+      void setOffsetMeanDt(double offsetMeanDt) {m_offsetMeanDt = offsetMeanDt;}
+      /// Maximum channel in which T0 is still need to be calibrated
+      void setMaxBadChannel(double max_bad_channel) {m_maxBadChannel = max_bad_channel;}
 
       /// set common T0
       void setCommonT0(double commonT0) {m_commonT0 = commonT0;}
@@ -52,7 +55,7 @@ namespace Belle2 {
       ///create histo for each channel
       void createHisto();
       /// write outut or store db
-      void write();
+      int write();
       /// calculate mean of the T0 distribution
       double getMeanT0(TH1F* h1);
     private:
@@ -63,8 +66,10 @@ namespace Belle2 {
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
       /*Condition to stop iterate minDt <m_maxDt and rmsDt<m_maxRMS*/
-      double m_maxMeanDt = 0.15;   /**< Mean of dT distribution  of all channels;*/
-      double m_maxRMSDt = 0.8;   /**< RMS of dT distribution  of all channels*/
+      double m_maxMeanDt = 0.2;   /**< Mean of dT distribution  of all channels;*/
+      double m_offsetMeanDt = -0.4;   /**< offset dT distribution caused by event timing extraction;*/
+      double m_maxRMSDt = 0.22;   /**< RMS of dT distribution  of all channels*/
+      double m_maxBadChannel = 50;   /**< Number of channels which has DeltaT0 larger then 0.5*/
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/

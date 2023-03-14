@@ -11,7 +11,7 @@
 
 import modularAnalysis as ma
 from vertex import kFit
-from stdPi0s import stdPi0s
+import stdPi0s
 
 
 def loadStdVeryLooseTracks(particletype, path):
@@ -62,27 +62,17 @@ def loadStdVeryLooseRhoPlus(path):
     @param path         modules are added to this path
     """
     ma.reconstructDecay('rho+:veryLoose -> pi+:SkimVeryLoose pi0:charmlessFit', '0.47 < M < 1.15', 1, path=path)
-    return 'rho+:VeryLoose'
+    return 'rho+:veryLoose'
 
 
 def loadStdPi0ForBToCharmless(path):
     """
     Creates a list 'pi0:charmlessFit' for :math:`B\\to {\\rm charmless}` skims, based on recommendations of
-    the neutral group (avoiding ECL timing cuts) for winter 2020. We require the energy of the photons
-    to be larger than :math:`22.5~{\\rm MeV}` in the forward end cap, :math:`20~{\\rm MeV}` in the barrel,
-    and :math:`20~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
-    :math:`105 < M < 150~{\\rm MeV}/c^2` and a massKFit to converge.
+    the neutral group (avoiding ECL timing cuts) for May 2020. In addition, we require the mass to be
+    :math:`105 < M < 160~{\\rm MeV}/c^2` and a massKFit to converge.
     """
-    stdPi0s('all', path)
-    ma.cutAndCopyList(outputListName='pi0:charmlessFit', inputListName='pi0:all',
-                      cut='[[daughter(0,clusterReg)==1 and daughter(0,E)> 0.0225] or ' +
-                      '[daughter(0,clusterReg)==2 and daughter(0,E)> 0.020] or ' +
-                      '[daughter(0,clusterReg)==3 and daughter(0,E)> 0.020]] and ' +
-                      '[[daughter(1,clusterReg)==1 and daughter(1,E)> 0.0225] or ' +
-                      '[daughter(1,clusterReg)==2 and daughter(1,E)> 0.020] or ' +
-                      '[daughter(1,clusterReg)==3 and daughter(1,E)> 0.020]] and ' +
-                      'M > 0.105 and M < 0.150 ',
-                      path=path)
+    stdPi0s.stdPi0s(listtype='eff60_May2020', path=path)
+    ma.cutAndCopyList('pi0:charmlessFit', 'pi0:eff60_May2020', 'M > 0.105 and M < 0.160', path=path)
     kFit('pi0:charmlessFit', 0.0, fit_type='mass', path=path)
 
 

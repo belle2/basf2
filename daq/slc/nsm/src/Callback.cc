@@ -14,7 +14,7 @@ using namespace Belle2;
 int Callback::reset()
 {
   for (NSMVHandlerList::iterator it = m_handler.begin();
-       it != m_handler.end(); it++) {
+       it != m_handler.end(); ++it) {
     if (it->second != NULL) delete it->second;
   }
   m_handler = NSMVHandlerList();
@@ -80,7 +80,7 @@ void Callback::remove(const DBObject& obj)
   DBObject::NameValueList list;
   obj.search(list, "", true);
   for (DBObject::NameValueList::iterator it = list.begin();
-       it != list.end(); it++) {
+       it != list.end(); ++it) {
     const std::string& name(it->name);
     if (name.size() == 0 || name.at(0) == '$') continue;
     switch (it->type) {

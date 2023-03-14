@@ -35,9 +35,7 @@ from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 from vertex import TagV
 import variables as v
-import glob
 import sys
-import numpy as np
 
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
@@ -63,7 +61,7 @@ outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 main = basf2.create_path()
 
 # Perform analysis.
-ma.inputMdstList('default', input_file_list, path=main)
+ma.inputMdstList(input_file_list, path=main)
 
 main.add_module('ProgressBar')
 

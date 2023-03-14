@@ -71,9 +71,7 @@ namespace Belle2 {
 
 //     const unsigned a = layerId / 32;
 //     _usage[a] |= (1 << (layerId % 32));
-    // cppcheck-suppress arrayIndexOutOfBoundsCond
     _usage[layerId] = true;
-    // cppcheck-suppress arrayIndexOutOfBoundsCond
     _layers[layerId]->vote(rx, ry, (int) targetCharge, weight);
   }
 

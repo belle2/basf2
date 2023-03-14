@@ -27,6 +27,7 @@ namespace {
     EXPECT_EQ(general_options.m_variables.size(), 0);
     EXPECT_EQ(general_options.m_spectators.size(), 0);
     EXPECT_EQ(general_options.m_signal_class, 1);
+    EXPECT_EQ(general_options.m_nClasses, 2);
     EXPECT_EQ(general_options.m_target_variable, "isSignal");
     EXPECT_EQ(general_options.m_weight_variable, "__weight__");
     EXPECT_EQ(general_options.m_max_events, 0u);
@@ -38,6 +39,7 @@ namespace {
     general_options.m_variables = {"v", "a", "r", "s"};
     general_options.m_spectators = {"x", "M"};
     general_options.m_signal_class = 2;
+    general_options.m_nClasses = 4;
     general_options.m_max_events = 100;
     general_options.m_target_variable = "Target";
     general_options.m_weight_variable = "Weight";
@@ -52,6 +54,7 @@ namespace {
     EXPECT_EQ(pt.get<std::string>("target_variable"), "Target");
     EXPECT_EQ(pt.get<std::string>("weight_variable"), "Weight");
     EXPECT_EQ(pt.get<int>("signal_class"), 2);
+    EXPECT_EQ(pt.get<unsigned int>("nClasses"), 4);
     EXPECT_EQ(pt.get<unsigned int>("max_events"), 100u);
     EXPECT_EQ(pt.get<unsigned int>("number_feature_variables"), 4);
     EXPECT_EQ(pt.get<std::string>("variable0"), "v");
@@ -79,13 +82,14 @@ namespace {
     EXPECT_EQ(general_options2.m_spectators[0], "x");
     EXPECT_EQ(general_options2.m_spectators[1], "M");
     EXPECT_EQ(general_options2.m_signal_class, 2);
+    EXPECT_EQ(general_options2.m_nClasses, 4);
     EXPECT_EQ(general_options2.m_max_events, 100u);
     EXPECT_EQ(general_options2.m_target_variable, "Target");
     EXPECT_EQ(general_options2.m_weight_variable, "Weight");
 
     // Test if po::options_description is created without crashing
     auto description = general_options.getDescription();
-    EXPECT_EQ(description.options().size(), 11);
+    EXPECT_EQ(description.options().size(), 12);
   }
 
   TEST(OptionsTest, MetaOptions)
@@ -96,7 +100,7 @@ namespace {
     EXPECT_EQ(meta_options.m_splot_mc_files.size(), 0);
     EXPECT_EQ(meta_options.m_splot_combined, false);
     EXPECT_EQ(meta_options.m_splot_boosted, false);
-    EXPECT_EQ(meta_options.m_use_sideband_substraction, false);
+    EXPECT_EQ(meta_options.m_use_sideband_subtraction, false);
     EXPECT_EQ(meta_options.m_sideband_variable, "");
     EXPECT_EQ(meta_options.m_sideband_mc_files.size(), 0u);
     EXPECT_EQ(meta_options.m_use_reweighting, false);
@@ -110,7 +114,7 @@ namespace {
     meta_options.m_reweighting_variable = "A";
     meta_options.m_reweighting_mc_files = {"reweighting_mc.root"};
     meta_options.m_reweighting_data_files = {"reweighting_data.root"};
-    meta_options.m_use_sideband_substraction = true;
+    meta_options.m_use_sideband_subtraction = true;
     meta_options.m_sideband_variable = "B";
     meta_options.m_sideband_mc_files = {"sideband_mc.root"};
     meta_options.m_use_splot = true;
@@ -127,7 +131,7 @@ namespace {
     EXPECT_EQ(pt.get<unsigned int>("splot_number_of_mc_files"), 1);
     EXPECT_EQ(pt.get<std::string>("splot_mc_file0"), "splot_mc.root");
     EXPECT_EQ(pt.get<std::string>("splot_variable"), "Q");
-    EXPECT_EQ(pt.get<bool>("use_sideband_substraction"), true);
+    EXPECT_EQ(pt.get<bool>("use_sideband_subtraction"), true);
     EXPECT_EQ(pt.get<std::string>("sideband_variable"), "B");
     EXPECT_EQ(pt.get<bool>("use_reweighting"), true);
     EXPECT_EQ(pt.get<std::string>("reweighting_identifier"), "test");
@@ -148,7 +152,7 @@ namespace {
     EXPECT_EQ(meta_options2.m_splot_mc_files[0], "splot_mc.root");
     EXPECT_EQ(meta_options2.m_splot_combined, true);
     EXPECT_EQ(meta_options2.m_splot_boosted, true);
-    EXPECT_EQ(meta_options2.m_use_sideband_substraction, true);
+    EXPECT_EQ(meta_options2.m_use_sideband_subtraction, true);
     EXPECT_EQ(meta_options2.m_sideband_variable, "B");
     EXPECT_EQ(meta_options2.m_sideband_mc_files.size(), 1);
     EXPECT_EQ(meta_options2.m_sideband_mc_files[0], "sideband_mc.root");

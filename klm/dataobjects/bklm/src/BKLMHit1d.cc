@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* C++ headers. */
@@ -30,20 +30,19 @@ BKLMHit1d::BKLMHit1d() :
 {
 }
 
-// Constructor with a cluster of contiguous parallel KLMDigits
-BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
+BKLMHit1d::BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime) :
   RelationsObject(),
   m_ModuleID(0),
   m_Time(0.0),
   m_EnergyDeposit(0.0)
 {
-  if (digits.size() == 0) {
+  if (digitsWithTime.size() == 0) {
     B2WARNING("Attempt to create a BKLMHit1d with no KLMDigits");
     return;
   }
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
-  const KLMDigit* bklmDigit = digits.front();
+  const KLMDigit* bklmDigit = digitsWithTime.front().first;
   if (bklmDigit->getSubdetector() != KLMElementNumbers::c_BKLM)
     B2FATAL("Trying to construct a BKLMHit1d using KLMDigits from EKLM.");
   BKLMElementNumbers::setSectionInModule(m_ModuleID, bklmDigit->getSection());
@@ -51,8 +50,9 @@ BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
   BKLMElementNumbers::setLayerInModule(m_ModuleID, bklmDigit->getLayer());
   BKLMElementNumbers::setPlaneInModule(m_ModuleID, bklmDigit->getPlane());
   BKLMElementNumbers::setStripInModule(m_ModuleID, bklmDigit->getStrip());
-  for (std::vector<const KLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
-    const KLMDigit* digit = *iDigit;
+  for (const std::pair<const KLMDigit*, double>& digitWithTime : digitsWithTime) {
+    const KLMDigit* digit = digitWithTime.first;
+    double correctedTime = digitWithTime.second;
     if (!(bklmDigit->getSection() == digit->getSection() &&
           bklmDigit->getSector() == digit->getSector() &&
           bklmDigit->getLayer() == digit->getLayer() &&
@@ -60,7 +60,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
       B2WARNING("Attempt to combine non-parallel or distinct-module KLMDigits");
       continue;
     }
-    m_Time += digit->getTime();
+    m_Time += correctedTime;
     m_EnergyDeposit += digit->getEnergyDeposit();
     int strip = digit->getStrip();
     stripMin = std::min(stripMin, strip);

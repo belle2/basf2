@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPUnpacker/TOPUnpackerModule.h>
+
+// TOP headers.
 #include <top/RawDataTypes.h>
 
 // framework - DataStore
@@ -33,10 +35,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPUnpacker)
+  REG_MODULE(TOPUnpacker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -64,6 +66,9 @@ namespace Belle2 {
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
     addParam("addRelations", m_addRelations,
              "if true, make relations to TOPProductionHitDebugs (production debug data format only)", true);
+    addParam("errorSuppressFactor", m_errorSuppressFactor,
+             "error messages suppression factor (0 = no suppression)", (unsigned) 1000);
+
   }
 
   TOPUnpackerModule::~TOPUnpackerModule()
@@ -108,6 +113,14 @@ namespace Belle2 {
 
   void TOPUnpackerModule::event()
   {
+    if (m_resetEventCount) {
+      m_numErrors = m_errorCount;
+      m_errorCount = 0;
+      m_eventCount = 0;
+      m_resetEventCount = false;
+    }
+    m_eventCount++;
+
     // clear output store arrays
     m_digits.clear();
     m_rawDigits.clear();
@@ -146,7 +159,7 @@ namespace Belle2 {
               m_swapBytes = true;
             } else {
               if (unpackHeadersInterimFEVer01(buffer, bufferSize, true)) { //if buffer unpacks without errors assuming it's interim format
-                B2DEBUG(200, "Assuming interim FW data format");
+                B2DEBUG(22, "Assuming interim FW data format");
                 dataFormat = 0x0301; //assume it's interim format
                 m_swapBytes = true;
               } else {
@@ -178,20 +191,19 @@ namespace Belle2 {
             break;
 
           default:
-            B2ERROR("TOPUnpacker: unknown data format."
-                    << LogVar("Type", (dataFormat >> 8))
-                    << LogVar("Version", (dataFormat & 0xFF)));
-            err = bufferSize;
-
+            if (printTheError()) {
+              B2ERROR("TOPUnpacker: unknown data format, " << getFrontEndName(raw, finesse)
+                      << LogVar("Type", (dataFormat >> 8))
+                      << LogVar("Version", (dataFormat & 0xFF)));
+            }
+            return;
         }
 
         if (err != 0) {
-          stringstream copperName;
-          //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
-          copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
-          B2ERROR("TOPUnpacker: error in unpacking data from frontend " << copperName.str()
-                  << LogVar("words unused", err)
-                  << LogVar("copper", copperName.str()));
+          if (printTheError()) {
+            B2ERROR("TOPUnpacker: error in unpacking data from " << getFrontEndName(raw, finesse)
+                    << LogVar("words unused", err));
+          }
         }
 
       } // finesse loop
@@ -200,10 +212,34 @@ namespace Belle2 {
   }
 
 
+  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse) const
+  {
+    std::string name;
+    if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
+      int copper = ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF));
+      name = "frontend cpr" + std::to_string(copper) + char('a' + finesse);
+    } else { // PCIe40
+      int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
+      name = (slot < 10) ? "boardstack s0" : "boardstack s";
+      name += std::to_string(slot) + char('a' + finesse % 4);
+    }
+    return name;
+  }
+
+
+  bool TOPUnpackerModule::printTheError()
+  {
+    if (m_eventCount < m_errorSuppressFactor * m_numErrors) return false;
+    m_errorCount++;
+    m_resetEventCount = true;
+    return true;
+  }
+
+
   void TOPUnpackerModule::unpackProductionDraft(const int* buffer, int bufferSize)
   {
 
-    B2DEBUG(200, "Unpacking ProductionDraft to TOPDigits, dataSize = " << bufferSize);
+    B2DEBUG(22, "Unpacking ProductionDraft to TOPDigits, dataSize = " << bufferSize);
 
     unsigned short scrodID = buffer[0] & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
@@ -239,7 +275,7 @@ namespace Belle2 {
   void TOPUnpackerModule::unpackType0Ver16(const int* buffer, int bufferSize)
   {
 
-    B2DEBUG(200, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
+    B2DEBUG(22, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
 
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
@@ -304,7 +340,7 @@ namespace Belle2 {
 
   bool TOPUnpackerModule::unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes)
   {
-    B2DEBUG(200, "Checking whether buffer unpacks as InterimFEVer01, dataSize = " << bufferSize);
+    B2DEBUG(22, "Checking whether buffer unpacks as InterimFEVer01, dataSize = " << bufferSize);
 
     DataArray array(buffer, bufferSize, swapBytes);
 
@@ -376,7 +412,7 @@ namespace Belle2 {
                                               bool pedestalSubtracted)
   {
 
-    B2DEBUG(200, "Unpacking InterimFEVer01 to TOPRawDigits and TOPRawWaveforms, "
+    B2DEBUG(22, "Unpacking InterimFEVer01 to TOPRawDigits and TOPRawWaveforms, "
             "dataSize = " << bufferSize);
 
     int moduleID = 0;
@@ -399,7 +435,7 @@ namespace Belle2 {
       unsigned header = array.getWord(); // word 0
 
       if ((header & 0xFF) == 0xBE) { //this is a super short FE header
-//        B2DEBUG(100, "0b" << std::bitset<8>(header & 0xFF) << " " << std::bitset<8>((header>>8) & 0xFF) << " " << std::bitset<8>((header>>16) & 0xFF) << " " << std::bitset<8>((header>>24) & 0xFF));
+//        B2DEBUG(21, "0b" << std::bitset<8>(header & 0xFF) << " " << std::bitset<8>((header>>8) & 0xFF) << " " << std::bitset<8>((header>>16) & 0xFF) << " " << std::bitset<8>((header>>24) & 0xFF));
 
         unsigned short scrodID_SSFE;
         unsigned short carrier_SSFE;
@@ -429,12 +465,12 @@ namespace Belle2 {
                   << LogVar("SCROD", scrodID_SSFE)
                   << LogVar("slot", moduleID)
                   << LogVar("BS", boardstack));
-          B2DEBUG(100, "Different scrodID's in HLSB and FE header: " << scrodID << " " << scrodID_SSFE << " word = 0x" << std::hex << word);
+          B2DEBUG(21, "Different scrodID's in HLSB and FE header: " << scrodID << " " << scrodID_SSFE << " word = 0x" << std::hex << word);
           info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
           return array.getRemainingWords();
         }
 
-        B2DEBUG(100, scrodID_SSFE << "\t" << carrier_SSFE << "\t"  << asic_SSFE << "\t" << channel_SSFE << "\t" << evtNum_SSFE);
+        B2DEBUG(21, scrodID_SSFE << "\t" << carrier_SSFE << "\t"  << asic_SSFE << "\t" << channel_SSFE << "\t" << evtNum_SSFE);
 
         int channelID = carrier_SSFE * 32 + asic_SSFE * 8 + channel_SSFE;
         channelCounter[channelID] += 1;
@@ -448,8 +484,8 @@ namespace Belle2 {
 
       if (header != 0xaaaa0104 and header != 0xaaaa0103 and header != 0xaaaa0100) {
         B2ERROR("TOPUnpacker: corrupted data - invalid FE header word");
-        B2DEBUG(100, "Invalid FE header word: " << std::hex << header  << " 0b" << std::bitset<32>(header));
-        B2DEBUG(100, "SCROD ID: " << scrodID << " " << std::hex << scrodID);
+        B2DEBUG(21, "Invalid FE header word: " << std::hex << header  << " 0b" << std::bitset<32>(header));
+        B2DEBUG(21, "SCROD ID: " << scrodID << " " << std::hex << scrodID);
 
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidFEHeader);
         return array.getRemainingWords();
@@ -480,9 +516,9 @@ namespace Belle2 {
       unsigned short asicFE = (word >> 12) & 0x03;
       unsigned short carrierFE = (word >> 14) & 0x03;
       unsigned short channelID = carrierFE * 32 + asicFE * 8 + asicChannelFE;
-      //B2DEBUG(100, "carrier asic chn " << carrierFE << " " << asicFE << " " << asicChannelFE << " " << channelID << " 0b" << std::bitset<32>(word) );
+      //B2DEBUG(21, "carrier asic chn " << carrierFE << " " << asicFE << " " << asicChannelFE << " " << channelID << " 0b" << std::bitset<32>(word) );
 
-      B2DEBUG(100, scrodID_FE << "\t" << carrierFE << "\t" << asicFE << "\t" << asicChannelFE << "\t" << evtNum_FEheader);
+      B2DEBUG(21, scrodID_FE << "\t" << carrierFE << "\t" << asicFE << "\t" << asicChannelFE << "\t" << evtNum_FEheader);
 
       channelCounter[channelID] += 1;
 
@@ -593,7 +629,7 @@ namespace Belle2 {
       word = array.getWord(); // word 15
       if (word != 0x7473616c) {
         //B2ERROR("TOPUnpacker: corrupted data - no magic word at the end of FE header");
-        //B2DEBUG(100, "No magic word at the end of FE header, found: "
+        //B2DEBUG(21, "No magic word at the end of FE header, found: "
         //<< std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidMagicWord);
         //return array.getRemainingWords(); do not abort event for now as footer is invalid in current debugging version of firmware
@@ -629,25 +665,25 @@ namespace Belle2 {
       // checks for data corruption
       if (carrier != carrierFE) {
         B2ERROR("TOPUnpacker: different carrier numbers in FE and WF header");
-        B2DEBUG(100, "Different carrier numbers in FE and WF header: "
+        B2DEBUG(21, "Different carrier numbers in FE and WF header: "
                 << carrierFE << " " << carrier);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentCarriers);
       }
       if (asic != asicFE) {
         B2ERROR("TOPUnpacker: different ASIC numbers in FE and WF header");
-        B2DEBUG(100, "Different ASIC numbers in FE and WF header: "
+        B2DEBUG(21, "Different ASIC numbers in FE and WF header: "
                 << asicFE << " " << asic);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentAsics);
       }
       if (asicChannel != asicChannelFE) {
         B2ERROR("TOPUnpacker: different ASIC channel numbers in FE and WF header");
-        B2DEBUG(100, "Different ASIC channel numbers in FE and WF header: "
+        B2DEBUG(21, "Different ASIC channel numbers in FE and WF header: "
                 << asicChannelFE << " " << asicChannel);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentChannels);
       }
       if (window != convertedAddr) {
         B2ERROR("TOPUnpacker: different window numbers in FE and WF header");
-        B2DEBUG(100, "Different window numbers in FE and WF header: "
+        B2DEBUG(21, "Different window numbers in FE and WF header: "
                 << convertedAddr << " " << window);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentWindows);
       }
@@ -733,7 +769,7 @@ namespace Belle2 {
       evtNumOutputString += std::to_string(it.first) + ":\t" + std::to_string(it.second) + "\n";
     }
     evtNumOutputString += "Total:\t" + std::to_string(nASICs);
-    B2DEBUG(100, evtNumOutputString);
+    B2DEBUG(21, evtNumOutputString);
 
     int nChannels = 0;
     int nChannelsDiff = 0;
@@ -770,7 +806,7 @@ namespace Belle2 {
     m_channelStatistics[nChannels] += 1;
 
     channelOutputString += "Total:\t" + std::to_string(nChannels) + " " + std::to_string(nChannelsDiff);
-    B2DEBUG(100, channelOutputString);
+    B2DEBUG(21, channelOutputString);
 
     return array.getRemainingWords();
 
@@ -782,7 +818,7 @@ namespace Belle2 {
                                          bool pedestalSubtracted)
   {
 
-    B2DEBUG(200, "Unpacking Production firmware debug data format to TOPRawDigits "
+    B2DEBUG(22, "Unpacking Production firmware debug data format to TOPRawDigits "
             "dataSize = " << bufferSize);
 
     DataArray array(buffer, bufferSize, m_swapBytes);
@@ -807,7 +843,7 @@ namespace Belle2 {
     }
 
 
-    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+    B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtType = " << evtType
             << ", evtVersion = " << evtVersion
@@ -826,7 +862,7 @@ namespace Belle2 {
     unsigned int evtPhase = (word >> 12) & 0xF;
     unsigned int evtNumWordsCore = word & 0xFFF;
 
-    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+    B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtExtra = " << evtExtra
             << ", evtNumWordsBonus = " << evtNumWordsBonus
@@ -838,7 +874,7 @@ namespace Belle2 {
     unsigned int evtCtime = (word >> 16) & 0x7FF;
     unsigned int evtRevo9Counter = word & 0xFFFF;
 
-    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+    B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSkipHit = " << evtSkipHit
             << ", evtCtime = " << evtCtime
@@ -849,7 +885,7 @@ namespace Belle2 {
     unsigned int evtEventQueueDepth = (word >> 8) & 0xFF;
     unsigned int evtEventNumberByte = word & 0xFF;
 
-    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+    B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtAsicMask = " << evtAsicMask
             << ", evtEventQueueDepth = " << evtEventQueueDepth
@@ -865,7 +901,7 @@ namespace Belle2 {
                                       evtEventQueueDepth,
                                       evtEventNumberByte);
 
-    B2DEBUG(200, "end of event header, start of hits:");
+    B2DEBUG(22, "end of event header, start of hits:");
 
     const int numWordsPerHit = 4 + evtExtra;
     unsigned int numHitsFound = 0;
@@ -907,7 +943,7 @@ namespace Belle2 {
         hitHeapWindow = word  & 0x3F;
 
 
-        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+        B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
                 (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
                 << "\thitCarrier = " << hitCarrier
                 << ", hitAsic = " << hitAsic
@@ -924,7 +960,7 @@ namespace Belle2 {
         word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
         hitVPeak = expand13to16bits(word >> 16);
         hitIntegral = word & 0xFFFF;
-        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+        B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
                 (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
                 << "\thitVPeak = " << hitVPeak
                 << ", hitIntegral = " << hitIntegral);
@@ -942,7 +978,7 @@ namespace Belle2 {
         hitIntegral = word & 0x3F;
 
 
-        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+        B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
                 (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
                 << "\thitCarrier = " << hitCarrier
                 << ", hitAsic = " << hitAsic
@@ -963,7 +999,7 @@ namespace Belle2 {
         hitIsOnHeap = (word >> 7) & 0x1;
         hitHeapWindow = word & 0x1;
 
-        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+        B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
                 (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
                 << "\thitVPeak = " << hitVPeak
                 << ", hitIsOnHeapStraddle = " << hitIsOnHeapStraddle
@@ -990,7 +1026,7 @@ namespace Belle2 {
       word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/vRise1(13)
       short hitVRise0 = expand13to16bits(word >> 16);
       short hitVRise1 = expand13to16bits(word);
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+      B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVRise0 = " << hitVRise0
               << ", hitVRise1 = " << hitVRise1);
@@ -998,7 +1034,7 @@ namespace Belle2 {
       word = array.getWord(); // hit word 3, reserved(3)/vFall0(13)/reserved(3)/vFall1(13)
       short hitVFall0 = expand13to16bits(word >> 16);
       short hitVFall1 = expand13to16bits(word);
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+      B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVFall0 = " << hitVFall0
               << ", hitVFall1 = " << hitVFall1);
@@ -1008,7 +1044,7 @@ namespace Belle2 {
       short hitDSampPeak = (word >> 20) & 0xF;
       short hitDSampFall = (word >> 16) & 0xF;
       unsigned short hitHeaderChecksum = word & 0xFFFF;
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+      B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitSampleRise = " << hitSampleRise
               << ", hitDSampPeak = " << hitDSampPeak
@@ -1067,7 +1103,7 @@ namespace Belle2 {
       //parse extra words if exist:
       for (unsigned int i = 0; i < evtExtra; ++i) {
         word = array.getWord(); // extra hit word i, undefined so far
-        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+        B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
                 (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
                 << "\thit extra word " << i << " (" << evtExtra << ")");
         hitDebug->appendExtraWord(word);
@@ -1085,7 +1121,7 @@ namespace Belle2 {
     unsigned int evtSdData = (word >> 12) & 0xFFF;
     unsigned int evtMagicFooter = (word >> 9) & 0x7;
     unsigned int evtNHits = word & 0x1FF;
-    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+    B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSdType = " << evtSdType
             << ", evtSdData = " << evtSdData
@@ -1102,7 +1138,7 @@ namespace Belle2 {
       return array.getRemainingWords();
     }
 
-    B2DEBUG(200, "the rest:");
+    B2DEBUG(22, "the rest:");
 
     unsigned int numParsedWaveforms = 0;
     while (array.peekWord() != 0x6c617374 //next word is not wf footer word
@@ -1120,7 +1156,7 @@ namespace Belle2 {
       unsigned channel = mapper.getChannel(boardstack, wfCarrier, wfAsic, wfChannel);
       int pixelID = mapper.getPixelID(channel);
 
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+      B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\twfNSamples = " << wfNSamples
               << ", wfNWindows = " << wfNWindows
@@ -1140,7 +1176,7 @@ namespace Belle2 {
       unsigned int wfEventNumber = (word >> 9) & 0x7F;
       unsigned int wfWindowPhysical = word & 0x1FF;
 
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+      B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\twfStartSample = " << wfStartSample
               << ", wfWindowLogic = " << wfWindowLogic
@@ -1164,7 +1200,7 @@ namespace Belle2 {
 
         }
 
-        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+        B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
                 (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
                 << "\twfSample" << 2 * i + 1 << " = " << wfSampleLast
                 << ", wfSample" << 2 * i << " = " << wfSampleFirst);

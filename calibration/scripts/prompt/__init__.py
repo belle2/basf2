@@ -1,3 +1,6 @@
+# disable doxygen check for this file
+# @cond
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -15,12 +18,13 @@ prompt_script_dir = "calibration/scripts/prompt/calibrations"
 prompt_validation_script_package = "prompt.validations."
 prompt_validation_script_dir = "calibration/scripts/prompt/validations"
 
-input_data_filters = {"Magnet": {"On": "On",
+INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                  "Off": "Off",
                                  "Either": "Either"},
                       "Beam Energy": {"No Beam": "No Beam",
                                       "4S": "4S",
                                       "Continuum": "Continuum",
+                                      "": "",
                                       "Scan": "Scan"},
                       "Run Type": {"beam": "beam",
                                    "cosmic": "cosmic",
@@ -31,10 +35,12 @@ input_data_filters = {"Magnet": {"On": "On",
                                    "cosmic_calib": "cosmic_calib",
                                    "gamma_gamma_calib": "gamma_gamma_calib",
                                    "hadron_calib": "hadron_calib",
-                                   "mumutight_calib": "mumutight_calib",
+                                   "btocharm_calib": "btocharm_calib",
+                                   "mumu_tight_or_highm_calib": "mumu_tight_or_highm_calib",
                                    "offip_calib": "offip_calib",
                                    "radmumu_calib": "radmumu_calib",
-                                   "random_calib": "random_calib"},
+                                   "random_calib": "random_calib",
+                                   "single_gamma_mc": "single_gamma_mc"},
                       "Data Quality Tag": {">=30 Minute Run": ">=30 Minute Run",
                                            "Bad For Alignment": "Bad For Alignment",
                                            "Good": "Good",
@@ -60,7 +66,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
     Parameters:
         name (str): The unique calibration name, not longer than 64 characters.
 
-        expert_username (str): The JIRA username of the expert to contact about this script.
+        expert_username (str): The GitLab username of the expert to contact about this script.
             This username will be used to assign the default responsible person for submitting and checking prompt
             calibration jobs.
 
@@ -80,7 +86,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             input_data_filters dictionary e.g. from prompt import input_data_filters with details about data tags and run quality
             tags found at: https://calibration.belle2.org/belle2/data_tags/list/.
             To exclude specific filters, pre-append with *NOT* e.g.
-            {"all_events": ["mumutight_calib", "hadron_calib", "Good", "On"],
+            {"all_events": ["mumu_tight_or_highm_calib", "hadron_calib", "Good", "On"],
             "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
             Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 
@@ -119,6 +125,20 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         if not input_data_names:
             raise ValueError("You must specify at least one input data name")
         input_data_names = frozenset(input_data_names)
+
+        # The input data names in the filters MUST correspond to the input data names for the calibration.
+        if input_data_filters:
+            if set(input_data_filters.keys()) != input_data_names:
+                raise ValueError("The 'input_data_filters' keys don't match the 'input_data_names'!")
+            # Requested input data filters MUST exist in the ones we defined in the global dictionary.
+            allowed_filters = {filter_name for category in INPUT_DATA_FILTERS.values() for filter_name in category}
+            requested_filters = {filter_name.replace("NOT", "", 1).lstrip() for filters in input_data_filters.values()
+                                 for filter_name in filters}
+            if not allowed_filters.issuperset(requested_filters):
+                raise ValueError("The 'input_data_filters' contains unknown filter names:"
+                                 f"{requested_filters.difference(allowed_filters)}")
+        else:
+            input_data_filters = {}
 
         if expert_config:
             # Check that it's a dictionary and not some other valid JSON object

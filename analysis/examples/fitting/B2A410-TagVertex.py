@@ -50,8 +50,7 @@ from modularAnalysis import variablesToNtuple
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
+inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
           path=my_path)
 
 # use standard final state particle lists

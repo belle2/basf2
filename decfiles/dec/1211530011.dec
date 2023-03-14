@@ -15,54 +15,54 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B+sig
-0.09989  J/psisig K+                   SVS; #[Reconstructed PDG2018]
-0.13922  J/psisig K*+                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.00399  J/psisig pi+                  SVS; #[Reconstructed PDG2018]
-0.00487  J/psisig rho+                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.11001  J/psisig K0   pi+             PHSP;
-0.00974  J/psisig K+  pi0              PHSP;
-0.00974  J/psisig K'_1+                SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
-0.04868  J/psisig K_2*+                PHSP;
-0.17524  J/psisig K_1+                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
-0.07886  J/psisig K+ pi+ pi-           PHSP; #Added by Yubo Li 03/09/2018
-0.00328  J/psisig K+ K+ K-             PHSP; #Added by Yubo Li 03/09/2018
-0.01207  J/psisig eta  K+              PHSP; #Added by Yubo Li 03/09/2018
-0.00487  J/psisig phi  K+              PHSP; #Added by Yubo Li 03/09/2018
-0.03115  J/psisig omega  K+            PHSP; #Added by Yubo Li 03/09/2018
-0.00115  J/psisig pi- pi- pi+ pi+ pi+  PHSP; #Added by Yubo Li 03/09/2018
-0.00115  J/psisig p+ anti-Lambda0      PHSP; #Added by Yubo Li 03/09/2018
-0.03636  psi(2S)sig K+             SVS; #[Reconstructed PDG2018]
-0.03892  psi(2S)sig K*+            SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2018]
-0.03415  psi(2S)sig K0  pi+        PHSP; #[use babar's BF fit(not used in PDG)]
-0.01162  psi(2S)sig K+  pi0        PHSP;
-0.02498  psi(2S)sig K+  pi+  pi-   PHSP; #[Reconstructed PDG2018]
-0.00581  psi(2S)sig K+  pi0  pi0   PHSP;
-0.00581  psi(2S)sig K0  pi+  pi0   PHSP;
-0.02323  psi(2S)sig K_1+           PHSP;
-0.00142  psi(2S)sig pi+            PHSP; #Added by Yubo Li 03/09/2018
-0.00023  psi(2S)sig phi K+         PHSP; #Added by Yubo Li 03/09/2018
-0.00019  chi_c0sig  K+                     PHSP; #[Reconstructed PDG2018]
-0.00026  K*+   chi_c0sig                   SVS; #set as UL as PDG
-0.00025  chi_c0sig  K0   pi+               PHSP;
-0.00012  chi_c0sig  K+  pi0                PHSP;
-0.00025  chi_c0sig  K+  pi+  pi-           PHSP;
-0.00012  chi_c0sig  K+  pi0  pi0           PHSP;
-0.00012  chi_c0sig  K0  pi+  pi0           PHSP;
-0.01597  chi_c1sig  K+                     SVS; #[PDG2019]
-0.00990  chi_c1sig  K*+                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.01255  chi_c1sig  K0   pi+              PHSP;
-0.00756  chi_c1sig  K+   pi0              PHSP;
-0.01234  chi_c1sig  K+   pi+  pi-          PHSP;
-0.00660  chi_c1sig  K+  pi0  pi0           PHSP;
-0.00660  chi_c1sig  K0  pi+  pi0           PHSP;
-0.00073  chi_c1sig  pi+                    PHSP; #added by YuBo Li 03/10/2018
-0.00021  chi_c2sig  K+                  STS;
-0.00022  chi_c2sig  K*+                 PHSP; #set as UL as PDG
-0.00217  chi_c2sig  K0   pi+            PHSP;
-0.00116  chi_c2sig  K+  pi0             PHSP; #set as UL as PDG
-0.00250  chi_c2sig  K+  pi+  pi-        PHSP;
-0.00187  chi_c2sig  K+  pi0  pi0        PHSP;
-0.00187  chi_c2sig  K0   pi+  pi0       PHSP;
+0.11235   J/psisig  K+                                    SVS; #[BF update - PG 09/2020]
+0.15976   J/psisig  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #[BF update - PG 09/2020]
+0.02119   J/psisig  K0  pi+                               PHSP; #Gamma_276 PDGLive => 0.001142970. Subtract K* component: BF = 0.001142970 - 2/3 * 0.001429920.   #[BF update - PG 09/2020]
+0.01060   J/psisig  K+  pi0                               PHSP; #No PDGLive value. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                         #[BF update - PG 09/2020]
+0.00432   J/psisig  pi+                                   SVS;  #[BF update - PG 09/2020]
+0.00458   J/psisig  rho+                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 09/2020]
+0.01117   J/psisig  K'_1+                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.20110   J/psisig  K_1+                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.05586   J/psisig  K_2*+                                 PHSP;
+0.09066   J/psisig  K+  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
+0.00377   J/psisig  K+  K+  K-                            PHSP;
+0.01381   J/psisig  eta  K+                               PHSP; #[BF update - PG 09/2020]
+0.00560   J/psisig  phi  K+                               PHSP; #[BF update - PG 09/2020]
+0.03575   J/psisig  omega  K+                             PHSP;
+0.00130   J/psisig  pi-  pi-  pi+  pi+  pi+               PHSP; #[BF update - PG 09/2020]
+0.00163   J/psisig  p+  anti-Lambda0                      PHSP; #[BF update - PG 09/2020]
+0.04127   psi(2S)sig  K+                                  SVS;  #[BF update - PG 09/2020]
+0.04450   psi(2S)sig  K*+                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #[BF update - PG 09/2020]
+0.00952   psi(2S)sig  K0  pi+                             PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #[BF update - PG 09/2020]
+0.00476   psi(2S)sig  K+  pi0                             PHSP; #No PDGLive value. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                             #[BF update - PG 09/2020]
+0.02893   psi(2S)sig  K+  pi+  pi-                        PHSP; #[BF update - PG 09/2020]
+0.00667   psi(2S)sig  K+  pi0  pi0                        PHSP;
+0.00667   psi(2S)sig  K0  pi+  pi0                        PHSP;
+0.02666   psi(2S)sig  K_1+                                PHSP;
+0.00163   psi(2S)sig  pi+                                 PHSP;
+0.00027   psi(2S)sig  phi  K+                             PHSP;
+0.00021   chi_c0sig  K+                                   PHSP; #[BF update - PG 09/2020]
+0.00020   K*+  chi_c0sig                                  SVS;  #PDG UL. BF=0.00014 https://arxiv.org/pdf/0808.1487.pdf. #[BF update - PG 09/2020]
+0.00028   chi_c0sig  K0  pi+                              PHSP;
+0.00014   chi_c0sig  K+  pi0                              PHSP;
+0.00028   chi_c0sig  K+  pi+  pi-                         PHSP;
+0.00014   chi_c0sig  K+  pi0  pi0                         PHSP;
+0.00014   chi_c0sig  K0  pi+  pi0                         PHSP;
+0.01838   chi_c1sig  K+                                   SVS;  #[BF update - PG 09/2020]
+0.01120   chi_c1sig  K*+                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 09/2020]
+0.01440   chi_c1sig  K0  pi+                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
+0.00868   chi_c1sig  K+  pi0                              PHSP; #Do not update to PDG values. #[Comment - PG 09/2020]
+0.01417   chi_c1sig  K+  pi+  pi-                         PHSP;
+0.00757   chi_c1sig  K+  pi0  pi0                         PHSP;
+0.00757   chi_c1sig  K0  pi+  pi0                         PHSP;
+0.00083   chi_c1sig  pi+                                  PHSP;
+0.00024   chi_c2sig  K+                                   STS;  #[BF update - PG 09/2020]
+0.00026   chi_c2sig  K*+                                  PHSP; #Set as PDG UL.
+0.00249   chi_c2sig  K0  pi+                              PHSP;
+0.00133   chi_c2sig  K+  pi0                              PHSP; #Set as PDG UL.
+0.00287   chi_c2sig  K+  pi+  pi-                         PHSP;
+0.00215   chi_c2sig  K+  pi0  pi0                         PHSP;
+0.00215   chi_c2sig  K0  pi+  pi0                         PHSP;
 Enddecay
 CDecay B-sig
 #

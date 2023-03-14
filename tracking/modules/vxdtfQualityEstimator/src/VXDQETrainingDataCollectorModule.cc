@@ -16,7 +16,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(VXDQETrainingDataCollector)
+REG_MODULE(VXDQETrainingDataCollector);
 
 VXDQETrainingDataCollectorModule::VXDQETrainingDataCollectorModule() : Module()
 {
@@ -113,6 +113,8 @@ void VXDQETrainingDataCollectorModule::beginRun()
   m_estimator->setMagneticFieldStrength(bFieldZ);
   if (m_MCInfo) {
     m_estimatorMC->setMagneticFieldStrength(bFieldZ);
+    QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimatorMC.get());
+    MCestimator->forceUpdateClusterNames();
   }
 }
 

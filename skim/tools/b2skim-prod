@@ -17,7 +17,7 @@
 also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of
-valid YAML entries for data and MC. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
+valid YAML entries for data and MCri. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
 to create these YAML files from a list of LPNs.
 
 .. code-block:: yaml
@@ -55,7 +55,7 @@ to create these YAML files from a list of LPNs.
             - 3239
 
 
-    ## Example of a YAML file for MC:
+    ## Example of a YAML file for MCri:
     MC12b_mixed:
         sampleLabel: MC12_mixedBGx1
         LPNPrefix: /belle/MC
@@ -68,7 +68,7 @@ to create these YAML files from a list of LPNs.
         mcType: mixed
         mcBackground: BGx1
         inputDataLevel: mdst
-        runNumber: r00000
+        runNumbers: r00000
 
     MC12b_charged:
         sampleLabel: MC12_chargedBGx1
@@ -85,7 +85,7 @@ to create these YAML files from a list of LPNs.
         mcType: charged
         mcBackground: BGx1
         inputDataLevel: mdst
-        runNumber: 0
+        runNumbers: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the
 names of the skims. The other required arguments include the skim campaign,
@@ -163,16 +163,16 @@ from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
 from skim import CombinedSkim
 from skim.registry import Registry
-from skim.utils.misc import resolve_skim_modules
+from skim.utils.misc import dry_run_steering_file, resolve_skim_modules
 
 
-def read_registry_yaml(sampleRegistryYaml, mc):
+def read_registry_yaml(sampleRegistryYaml, mcri, mcrd):
     """Load in the YAML file as a dict. Checks that all expected values
     present before proceeding.
 
     Args:
         sampleRegistryYaml (str): Location of the registry YAML file to read in.
-        mc (bool): Are these JSON files being produced for MC skims?
+        mcri/mcrd (bool): Are these JSON files being produced for MCri/MCrd skims?
 
     Returns:
         sampleRegistry (dict): The input data/MC registry as a dict.
@@ -189,7 +189,7 @@ def read_registry_yaml(sampleRegistryYaml, mc):
     with open(sampleRegistryYaml) as sampleRegistryFile:
         sampleRegistry = yaml.safe_load(sampleRegistryFile)
 
-    verify_registry(sampleRegistry, mc)
+    verify_registry(sampleRegistry, mcri, mcrd)
 
     return sampleRegistry
 
@@ -215,13 +215,13 @@ def get_skim_stats_dict(SkimStatsJson):
     return skimStats, CombinedSkimDefinitions
 
 
-def verify_registry(sampleRegistry, mc):
+def verify_registry(sampleRegistry, mcri, mcrd):
     """Check that the registry contains all the values that are expected. If a
     value is missing, print an error and exit.
 
     Args:
         sampleRegistry (dict): The input data/MC registry as a dict.
-        mc (bool): Are these JSON files being produced for MC skims?
+        mcri/mcrd (bool): Are these JSON files being produced for MCri/MCrd skims?
     """
     expectedMCEntries = [
         "sampleLabel",
@@ -235,9 +235,11 @@ def verify_registry(sampleRegistry, mc):
         "inputDataLevel",
         "mcType",
         "mcBackground",
-        "runNumber",
+        "runNumbers",
     ]
+
     expectedDataEntries = [
+        "sampleLabel",
         "LPNPrefix",
         "inputReleaseNumber",
         "inputDBGlobalTag",
@@ -247,10 +249,11 @@ def verify_registry(sampleRegistry, mc):
         "beamEnergy",
         "inputDataLevel",
         "runNumbers",
+        "generalSkimName",
     ]
 
     missingEntries = []
-    if mc:
+    if mcri or mcrd:
         missingEntries = [
             (sampleLabel, expectedEntry)
             for (sampleLabel, sampleInfo) in sampleRegistry.items()
@@ -410,18 +413,18 @@ def get_output_directory(args, sampleRegistry):
     return Path(baseDirectory, "skim", args.campaign, args.release, DBGlobalTag, beamEnergy)
 
 
-def get_lpn_list(sampleInfo, mc):
+def get_lpn_list(sampleInfo, mcri, mcrd):
     """Construct the list of LPNs of a set of samples in the sample registry.
 
     Args:
         sampleInfo (dict): Dict of the sample registry. Registry format is
             explained in documentation of `read_registry_yaml`.
-        mc (bool): Are these JSON files being produced for MC skims?
+         mcri/mcrd (bool): Are these JSON files being produced for MCri/MCrd skims?
 
     Returns:
         LPNList (list): List of LPNs to be used for this set of jobs.
     """
-    if mc:
+    if mcri:
         # Allow looping over prod numbers
         if isinstance(sampleInfo["prodNumber"], list):
             prodNumbers = sampleInfo["prodNumber"]
@@ -446,8 +449,8 @@ def get_lpn_list(sampleInfo, mc):
                 sampleInfo["inputDBGlobalTag"]
             ).zfill(8)
 
-        if not str(sampleInfo["runNumber"]).startswith("r"):
-            sampleInfo["runNumber"] = "r" + str(sampleInfo["runNumber"]).zfill(5)
+        if not str(sampleInfo["runNumbers"]).startswith("r"):
+            sampleInfo["runNumbers"] = "r" + str(sampleInfo["runNumbers"]).zfill(5)
 
         LPNList = [
             str(
@@ -459,12 +462,56 @@ def get_lpn_list(sampleInfo, mc):
                     prodNumber,
                     sampleInfo["experimentNumber"],
                     sampleInfo["beamEnergy"],
-                    sampleInfo["runNumber"],
+                    sampleInfo["runNumbers"],
                     sampleInfo["mcType"],
                     sampleInfo["inputDataLevel"],
                 )
             )
             for prodNumber in prodNumbers
+        ]
+    elif mcrd:
+        # Allow prod number, experiment number, run numbers and database global tag ID
+        # to just be numbers in YAML file (without *e.g.* prod0000 at start). This will
+        # pad each number with the correct number of zeros, and add the correct letters
+        # at the front.
+        
+        if not str(sampleInfo["prodNumber"]).startswith("prod"):
+            sampleInfo["prodNumber"] = "prod" + str(
+                sampleInfo["prodNumber"]
+            ).zfill(8)
+        
+        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
+            sampleInfo["inputDBGlobalTag"] = "DB" + str(
+                sampleInfo["inputDBGlobalTag"]
+            ).zfill(8)
+
+        if not str(sampleInfo["experimentNumber"]).startswith("s"):
+            sampleInfo["experimentNumber"] = "s00/e" + str(
+                sampleInfo["experimentNumber"]
+            ).zfill(4)
+
+        sampleInfo["runNumbers"] = [
+            str(n) if str(n).startswith("r") else "r" + str(n).zfill(5)
+            for n in sampleInfo["runNumbers"]
+        ]
+
+        LPNList = [
+            str(
+                Path(
+                    sampleInfo["LPNPrefix"],
+                    sampleInfo["inputReleaseNumber"],
+                    sampleInfo["inputDBGlobalTag"],
+                    sampleInfo["mcCampaign"],
+                    sampleInfo["prodNumber"],
+                    sampleInfo["experimentNumber"],
+                    sampleInfo["beamEnergy"],
+                    run,
+                    sampleInfo["mcType"],
+                    sampleInfo["inputDataLevel"],
+
+                    )
+                )
+            for run in sampleInfo["runNumbers"]
         ]
     else:
         # Allow prod number, experiment number, run numbers and database global tag ID
@@ -745,12 +792,12 @@ def warn_local_script(args):
 
     Args:
         args (argparse.ArgumentParser): An argparser expected to contain values
-            `mc`,
+            `mcri`, 'mcrd',
     """
     if not args.local_skim_script:
         return
 
-    if args.mc:
+    if args.mcri or args.mcrd:
         dataOrMC = "MC"
     else:
         dataOrMC = "data"
@@ -771,7 +818,12 @@ def warn_local_script(args):
 
 
 def make_combined_steering_file(
-    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, mc, LocalModule=None,
+    SkimName,
+    CombinedSkimDefinitions,
+    SteeringFileDirectory,
+    mc,
+    LocalModule=None,
+    analysis_globaltag="",
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -802,6 +854,7 @@ def make_combined_steering_file(
         stats=False,
         hints=False,
         mdstOutput=False,
+        analysis_globaltag=analysis_globaltag,
         backward_compatibility=True,
     )
 
@@ -809,6 +862,7 @@ def make_combined_steering_file(
         f.write(CodeString)
 
     B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
+    return SteeringFile
 
 
 def make_request_dict(
@@ -844,7 +898,7 @@ def make_request_dict(
 
     individualSkims = get_individual_skims(skimName, CombinedSkimDefinitions)
 
-    if args.mc:
+    if args.mcri or args.mcrd:
         fabricationType = "MCSkim"
         LPNPrefix = "/belle/MC"
     else:
@@ -878,12 +932,18 @@ def make_request_dict(
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
-    if args.mc:
+    if args.mcri or args.mcrd:
         skimRequestDict["MCEventType"] = sampleInfo["mcType"].rstrip("BGx1")
         if sampleInfo["mcBackground"] == "BGx0" and not sampleInfo["mcType"].endswith(
             "BGx0"
         ):
             skimRequestDict["MCEventType"] += "BGx0"
+
+    # rd MC needs additional info in production for clarity and to ensure uniqueness
+    if args.mcrd:
+        mcType_dicname = sampleInfo["mcType"].rstrip("BGx1")
+        skimRequestDict["ProductionName"] = f"{args.campaign}_{args.mcrd_campaign}_{mcType_dicname}_{skimName}_{strip_campaign(sampleLabel)}"
+        skimRequestDict["Description"] =  f"{args.campaign} {args.mcrd_campaign} {mcType_dicname} {skimName} skim on {sampleLabel}."
 
     if args.local_skim_script:
         # Read in the name of the local skim module from the arguments
@@ -918,15 +978,21 @@ def write_json_files(sampleRegistry, args, outputDirectory):
         SteeringFileDirectory = Path(
             get_base_directory(args), "skim", args.campaign, args.release, "SkimScripts"
         )
-        make_combined_steering_file(
+        SteeringFile = make_combined_steering_file(
             skimName,
             CombinedSkimDefinitions,
             SteeringFileDirectory,
-            mc=args.mc,
+            mc=[args.mcri if args.mcri else args.mcrd],
             LocalModule=args.local_skim_script,
+            analysis_globaltag=args.analysis_globaltag,
         )
+        dry_run_steering_file(SteeringFile)
 
         for sampleLabel, sampleInfo in sampleRegistry.items():
+            # additional mcType name needed for mcrd filename
+            if args.mcrd_campaign:
+                mcType_outname = sampleRegistry[sampleLabel]["mcType"].rstrip("BGx1")
+
             # Skip taupair sample if the combined skim is not to be produced on taupair
             if (
                     "taupair" in sampleLabel and
@@ -936,7 +1002,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             ):
                 continue
 
-            SampleLPNList = get_lpn_list(sampleInfo, args.mc)
+            SampleLPNList = get_lpn_list(sampleInfo, args.mcri, args.mcrd)
 
             # Make a list of LPN lists so that we can optionally have a maximum number
             # of LPNs per JSON file.
@@ -953,19 +1019,34 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 # If we have broken up the LPNs into some number per JSON file, then we
                 # need to add some more letters and numbers to keep our prod names and
                 # filenames unique.
-                if args.lpns_per_json:
-                    LPNBlockIdentifier = (
-                        f"_b{LPNBlockNumber + args.StartingBatchNumber}"
-                    )
-                    outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
-                elif args.StartingBatchNumber > 1:
-                    LPNBlockIdentifier = f"_b{args.StartingBatchNumber}"
-                    outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                if args.mcrd_campaign:
+                    if args.lpns_per_json:
+                        LPNBlockIdentifier = (
+                            f"_b{LPNBlockNumber + args.StartingBatchNumber}"
+                        )
+                        outputFileName = f"{args.campaign}_{args.mcrd_campaign}_{mcType_outname}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                    elif args.StartingBatchNumber > 1:
+                        LPNBlockIdentifier = f"_b{args.StartingBatchNumber}"
+                        outputFileName = f"{args.campaign}_{args.mcrd_campaign}_{mcType_outname}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                    else:
+                        LPNBlockIdentifier = ""
+                        outputFileName = (
+                            f"{args.campaign}_{args.mcrd_campaign}_{mcType_outname}_{skimName}_{sampleLabelForFilename}.json"
+                        )
                 else:
-                    LPNBlockIdentifier = ""
-                    outputFileName = (
-                        f"{args.campaign}_{skimName}_{sampleLabelForFilename}.json"
-                    )
+                    if args.lpns_per_json:
+                        LPNBlockIdentifier = (
+                            f"_b{LPNBlockNumber + args.StartingBatchNumber}"
+                        )
+                        outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                    elif args.StartingBatchNumber > 1:
+                        LPNBlockIdentifier = f"_b{args.StartingBatchNumber}"
+                        outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                    else:
+                        LPNBlockIdentifier = ""
+                        outputFileName = (
+                            f"{args.campaign}_{skimName}_{sampleLabelForFilename}.json"
+                        )
 
                 outputFilePath = Path(outputDirectory, outputFileName)
 
@@ -1049,10 +1130,24 @@ def get_argument_parser():
         "Should not include any path before the file name.",
     )
     parser.add_argument(
+        "--analysis-globaltag",
+        default="",
+        type=str,
+        metavar="AnalysisGlobaltag",
+        help=(
+            "Analysis globaltag to be passed to the skims."
+        ),
+    )
+    parser.add_argument(
         "-N",
         "--lpns-per-json",
         type=int,
         help="Restrict number of LPNs in each JSON file to given number.",
+    )
+    parser.add_argument(
+    "-rdcamp",
+    "--mcrd-campaign",
+    help="Give the corresponding campaign for mcrd for the json file output name. *e.g.* ``b16``, ``b20``, ``p12exp7``.",
     )
     parser.add_argument(
         "-b",
@@ -1065,7 +1160,10 @@ def get_argument_parser():
 
     mcDataGroup = parser.add_mutually_exclusive_group(required=True)
     mcDataGroup.add_argument(
-        "--mc", "--MC", action="store_true", help="Produce JSON files for MC."
+        "--mcri", "--MCri", action="store_true", help="Produce JSON files for run-independent MC."
+    )    
+    mcDataGroup.add_argument(
+        "--mcrd", "--MCrd", action="store_true", help="Produce JSON files for run-dependent MC."
     )
     mcDataGroup.add_argument(
         "--data", "--Data", action="store_true", help="Produce JSON files for data."
@@ -1079,7 +1177,7 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    sampleRegistry = read_registry_yaml(args.sampleRegistryYaml, args.mc)
+    sampleRegistry = read_registry_yaml(args.sampleRegistryYaml, args.mcri, args.mcrd)
 
     outputDirectory = get_output_directory(args, sampleRegistry)
     outputDirectory.mkdir(parents=True, exist_ok=True)

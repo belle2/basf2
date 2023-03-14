@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include <TMatrixFSym.h>
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -161,17 +160,17 @@ namespace {
     /** Vector containing the energy, theta, phi and radius values for each charged ROE ECLCluster */
     vector<vector<double>> roeChargedECLClusterProperties{{0.964336, 1.23481, -2.25428, 148.729},
       {0.214864, 0.965066,   -0.232973, 170.008},
-      {0.0148855, 0.914396,  1.01693  , 175.861},
-      {0.524092, 0.956389,   0.854331 , 171.378},
-      {0.230255, 1.33317,    -1.45326 , 144.849}};
+      {0.0148855, 0.914396,  1.01693, 175.861},
+      {0.524092, 0.956389,   0.854331, 171.378},
+      {0.230255, 1.33317,    -1.45326, 144.849}};
 
     unsigned int chargedECLCLusterCounter = 0;
 
     /** Create charged particles from tracks for first ROE. */
     for (unsigned i = 0; i < roeTRFCharges.size(); ++i) {
 
-      TVector3 position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
-      TVector3 momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
+      ROOT::Math::XYZVector position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
+      ROOT::Math::XYZVector momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
 
       testsTFRs.appendNew(position, momentum, cov6, roeTRFCharges[i], Const::pion, roeTFRProperties[i][6], bField, roeTRFCDCValues[i],
                           roeTRFVXDValues[i], 0);
@@ -227,7 +226,7 @@ namespace {
 
 
     /** Test if we created the ROE ECLCLusters correctly */
-    TLorentzVector roe1FourVectorECLClusters = roe -> get4VectorNeutralECLClusters();
+    ROOT::Math::PxPyPzEVector roe1FourVectorECLClusters = roe->get4VectorNeutralECLClusters();
 
     B2INFO("The total four momentum of the neutral clusters in the first test ROE is = ("
            << roe1FourVectorECLClusters.E() << ", "
@@ -255,7 +254,7 @@ namespace {
        returns the expected value.*/
     for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = std::get<double>(var->function(roeChargedParticles[i]));
 
       /** In this non-fatal assertion we compare the output of the variable "BtagToWBosonVariables(recoilMass)"
       * with the reference value for the ith ROE track.
@@ -273,7 +272,7 @@ namespace {
 
     for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = std::get<double>(var->function(roeChargedParticles[i]));
 
       EXPECT_NEAR(output, refsBtagToWBosonRecoilMassSqrd[i], 0.0005);
 
@@ -286,7 +285,7 @@ namespace {
 
     for (auto& roeChargedParticle : roeChargedParticles) {
 
-      double output = var -> function(roeChargedParticle);
+      double output = std::get<double>(var->function(roeChargedParticle));
 
       EXPECT_NEAR(output, refsBtagToWBosonPMissCMS, 0.000005);
 
@@ -299,7 +298,7 @@ namespace {
 
     for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = std::get<double>(var->function(roeChargedParticles[i]));
 
       EXPECT_NEAR(output, refsBtagToWBosonCosThetaMissCMS[i], 0.0005);
 
@@ -313,7 +312,7 @@ namespace {
 
     for (unsigned i = 0; i < roeChargedParticles.size(); i++) {
 
-      double output = var -> function(roeChargedParticles[i]);
+      double output = std::get<double>(var->function(roeChargedParticles[i]));
 
       EXPECT_NEAR(output, refsBtagToWBosonEW90[i], 0.0005);
 
@@ -356,7 +355,7 @@ namespace {
     /** Here we set the mc error flag corresponding to a perfectly matched particle,
     * we expect isSignal to return 1.0 .*/
     savedB0->addExtraInfo(MCMatching::c_extraInfoMCErrors, 0);
-    double output1 = var -> function(savedB0);
+    double output1 = std::get<double>(var->function(savedB0));
     ASSERT_EQ(output1, 1.0);
 
     /** We consider also as correctly matched those particles with the mc error flags
@@ -365,7 +364,7 @@ namespace {
     * if c_isIgnoreRadiatedPhotons and c_isIgnoreIntermediate are set to the properties, 2 + 4 = 6  */
     savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, 0);
     savedB0->setProperty(6);
-    double output2 = var -> function(savedB0);
+    double output2 = std::get<double>(var->function(savedB0));
     ASSERT_EQ(output2, 1.0);
 
     /** We do not consider as signal those particles with other mc error flags. See definition in
@@ -375,7 +374,7 @@ namespace {
     for (int notAcceptedMCErrorFlag : notAcceptedMCErrorFlags) {
 
       savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, notAcceptedMCErrorFlag);
-      double output = var -> function(savedB0);
+      double output = std::get<double>(var->function(savedB0));
       ASSERT_EQ(output, 0);
 
     }

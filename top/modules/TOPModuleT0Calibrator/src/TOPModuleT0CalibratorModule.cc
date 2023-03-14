@@ -20,10 +20,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPModuleT0Calibrator)
+  REG_MODULE(TOPModuleT0Calibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -124,12 +124,12 @@ namespace Belle2 {
 
     // histograms
     m_hits1D = TH1F("numHits", "Number of photons per slot",
-                    c_numModules, 0.5, c_numModules + 0.5);
+                    c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     m_hits1D.SetXTitle("slot number");
     m_hits1D.SetYTitle("hits per slot");
 
     m_hits2D = TH2F("timeHits", "Photon times vs. boardstacks",
-                    c_numModules * 4, 0.5, c_numModules + 0.5, 200, 0.0, 20.0);
+                    c_numModules * 4, 0.5, static_cast<float>(c_numModules) + 0.5, 200, 0.0, 20.0);
     m_hits2D.SetXTitle("slot number");
     m_hits2D.SetYTitle("time [ns]");
 
@@ -218,7 +218,7 @@ namespace Belle2 {
         m_numPhotons++;
         m_hits1D.Fill(digit.getModuleID());
         int bs = digit.getBoardstackNumber();
-        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0, digit.getTime());
       }
 
       // fill output tree
@@ -228,11 +228,11 @@ namespace Belle2 {
       m_y = localPosition.Y();
       m_z = localPosition.Z();
       const auto& localMomentum = m_selector.getLocalMomentum();
-      m_p = localMomentum.Mag();
+      m_p = localMomentum.R();
       m_theta = localMomentum.Theta();
       m_phi = localMomentum.Phi();
       const auto& pocaPosition = m_selector.getPOCAPosition();
-      m_pocaR = pocaPosition.Perp();
+      m_pocaR = pocaPosition.Rho();
       m_pocaZ = pocaPosition.Z();
       m_pocaX = pocaPosition.X();
       m_pocaY = pocaPosition.Y();
@@ -270,7 +270,7 @@ namespace Belle2 {
     // merge two statistically independent finders and store results into histograms
 
     TH1F h_relModuleT0("relModuleT0", "Module T0 relative to calibration",
-                       c_numModules, 0.5, c_numModules + 0.5);
+                       c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     h_relModuleT0.SetXTitle("slot number");
     h_relModuleT0.SetYTitle("module T0 residual [ns]");
 
@@ -289,7 +289,7 @@ namespace Belle2 {
 
     // absolute module T0
     TH1F h_moduleT0("moduleT0", "Module T0",
-                    c_numModules, 0.5, c_numModules + 0.5);
+                    c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     h_moduleT0.SetXTitle("slot number");
     h_moduleT0.SetYTitle("module T0 [ns]");
 

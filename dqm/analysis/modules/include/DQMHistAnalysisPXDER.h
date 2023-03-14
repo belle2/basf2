@@ -8,34 +8,41 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include "TFile.h"
-#include "TH1I.h"
-#include "TH1F.h"
-
-#include <vector>
+#include <dqm/core/DQMHistAnalysis.h>
+#include <TFile.h>
 
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */
 
-  class DQMHistAnalysisPXDERModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDERModule final : public DQMHistAnalysisModule {
 
   public:
 
-    /** Constructor */
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDERModule();
-    /* Destructor */
+
+    /**
+     * Destructor.
+     */
     ~DQMHistAnalysisPXDERModule();
 
-  private:
-
-    /** Module functions */
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
-    void endRun() override final;
-    void terminate() override final;
+
 
   private:
 
@@ -171,7 +178,7 @@ namespace Belle2 {
        * @param flaghist Histogram of flags.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
-    int SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
+    int SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
                 TH1I* flaghist);
     /** Function return flag histogram filled based on condition from TH1I source.
        * Flag values:
@@ -200,17 +207,12 @@ namespace Belle2 {
        */
 //     int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
 
+    /** Histogram Directory name */
+    std::string m_histogramDirectoryName;
     /** Reference Histogram Root file name */
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
-
-    /**
-     * Get a histogram by name (DEPRECATED), better use function from base class!
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
 
   };
 

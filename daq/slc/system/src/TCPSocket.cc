@@ -84,10 +84,9 @@ void TCPSocket::setBufferSize(int size)
 size_t TCPSocket::write(const void* buf, size_t count)
 {
   size_t c = 0;
-  int ret;
   while (c < count) {
     errno = 0;
-    ret = send(m_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
+    int ret = send(m_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -108,10 +107,9 @@ size_t TCPSocket::write(const void* buf, size_t count)
 size_t TCPSocket::read(void* buf, size_t count)
 {
   size_t c = 0;
-  int ret;
   while (c < count) {
     errno = 0;
-    ret = recv(m_fd, ((unsigned char*)buf + c), (count - c), 0);
+    int ret = recv(m_fd, ((unsigned char*)buf + c), (count - c), 0);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -127,10 +125,9 @@ size_t TCPSocket::read(void* buf, size_t count)
 
 size_t TCPSocket::read_once(void* buf, size_t count)
 {
-  int ret;
   errno = 0;
   while (true) {
-    ret = recv(m_fd, buf, count, 0);
+    int ret = recv(m_fd, buf, count, 0);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -139,9 +136,10 @@ size_t TCPSocket::read_once(void* buf, size_t count)
           throw (IOException("TCPSocket::read_once Error while reading."));
       }
     }
+    return ret;
     break;
   }
-  return ret;
+  return 0;
 }
 
 void TCPSocket::print()

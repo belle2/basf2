@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichUnpacker/ARICHUnpackerModule.h>
 
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
@@ -30,17 +30,15 @@
 // print bitset
 #include <bitset>
 
-using namespace std;
-
 namespace Belle2 {
 
   //using namespace ARICH;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHUnpacker)
+  REG_MODULE(ARICHUnpacker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -55,10 +53,10 @@ namespace Belle2 {
     addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel, only used for unsuppresed format!)", (uint8_t)0xFF);
     addParam("debug", m_debug, "prints debug information", 0);
 
-    addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", string(""));
-    addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", string(""));
-    addParam("outputRawDigitsName", m_outputRawDigitsName, "name of ARICHRawDigit store array", string(""));
-    addParam("outputarichinfoName", m_outputarichinfoName, "name of ARICHInfo store array", string(""));
+    addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", std::string(""));
+    addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", std::string(""));
+    addParam("outputRawDigitsName", m_outputRawDigitsName, "name of ARICHRawDigit store array", std::string(""));
+    addParam("outputarichinfoName", m_outputarichinfoName, "name of ARICHInfo store array", std::string(""));
     addParam("RawUnpackerMode", m_rawmode, "Activate RawUnpacker mode", 0);
     addParam("DisableUnpackerMode", m_disable_unpacker, "Disable Regular Unpacker mode", 0);
 
@@ -85,10 +83,6 @@ namespace Belle2 {
 
   }
 
-  void ARICHUnpackerModule::beginRun()
-  {
-  }
-
   void ARICHUnpackerModule::event()
   {
 
@@ -100,6 +94,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
 
     digits.clear();
+    bool m_pciedata = false;
     int trgtype = 16;
     double vth_thscan = 0.0;
 
@@ -114,7 +109,12 @@ namespace Belle2 {
 //    if (m_disable_unpacker == 0) {
 
     for (auto& raw : rawData) {
-      for (int finesse = 0; finesse < 4; finesse++) {
+      // Check PCIe40 data or Copper data
+      if (raw.GetMaxNumOfCh(0) == 48) { m_pciedata = true; } // Could be 36 or 48
+      else if (raw.GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+      else { B2FATAL("ARICHUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw.GetMaxNumOfCh(0))); }
+
+      for (int finesse = 0; finesse < raw.GetMaxNumOfCh(0); finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
         int bufferSize = raw.GetDetectorNwords(0, finesse);
 
@@ -144,9 +144,24 @@ namespace Belle2 {
         unsigned int length_all = (unsigned int)head.length;
         unsigned int mrg_evtno = (unsigned int)head.trigger;
         ARICHRawDigit* rawdigit = rawdigits.appendNew(type, ver, boardid, febno, length_all, mrg_evtno);
-        rawdigit->setCopperId(raw.GetNodeID(0));
-        rawdigit->setHslbId(finesse);
-        int nfebs = 0;
+
+        if (!m_pciedata) {
+          rawdigit->setCopperId(raw.GetNodeID(0));
+          rawdigit->setHslbId(finesse);
+        } else {
+          if (raw.GetNodeID(0) == 0x4000001) {
+            rawdigit->setCopperId(raw.GetNodeID(0) + (int)(finesse / 4));
+          } else if (raw.GetNodeID(0) == 0x4000002) {
+            rawdigit->setCopperId(0x400000A + (int)(finesse / 4));
+          } else {
+            B2FATAL("ARICHUnpackerModule: Invalid Node ID from readout: " <<  LogVar("NodeID: ", raw.GetNodeID(0)));
+          }
+
+          rawdigit->setHslbId(finesse % 4);
+          rawdigit->setPcieId(raw.GetNodeID(0));
+          rawdigit->setPcieChId(finesse);
+        }
+
         //-- end of RawDigit for Merger info
 
         // record the ibyte here
@@ -244,12 +259,11 @@ namespace Belle2 {
           for (int i = 0; i < 10; i++) {
             int val = calbyte(buffer);
             jbyte++;
-            if (i < 6) {
+            if (i > 1 && i < 6) {
               feb_trigno |= (0xff & val) << (5 - i) * 8;
             }
           }
           ARICHRawDigit::FEBDigit feb;
-          nfebs++;
           if (type_feb == 0x02) {//Raw mode
             int ch = 143;
             //B2INFO("raw mode");
@@ -402,6 +416,7 @@ namespace Belle2 {
         } // end of raw unpacker
     */
     arichinfo->settrgtype(trgtype);
+    arichinfo->setpciedata(m_pciedata);
     if (vth_thscan > -1.27) { arichinfo->setvth_thscan(vth_thscan); }
     arichinfo->setntrack(0);
     arichinfo->setnexthit(0);
@@ -513,16 +528,6 @@ namespace Belle2 {
       std::cout << i << "-th word bitset: " << std::bitset<32>(*(buffer + i)) << std::endl;
     }
   }
-
-
-  void ARICHUnpackerModule::endRun()
-  {
-  }
-
-  void ARICHUnpackerModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

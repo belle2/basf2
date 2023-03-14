@@ -132,7 +132,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isNotContinuumEvent"
 
     specific_options = basf2_mva.PythonOptions()
-    specific_options.m_framework = "contrib_keras"
+    specific_options.m_framework = "keras"
     specific_options.m_steering_file = 'analysis/examples/mva/B2A714-DeepContinuumSuppression_MVAModel.py'
     specific_options.m_training_fraction = 0.9
 
@@ -157,12 +157,15 @@ if __name__ == "__main__":
                     ' -train ' + train_data +
                     ' -data ' + test_data +
                     ' -id ' + 'Deep_Feed_Forward.xml' +
-                    ' --output qqbarSuppressionEvaluation.pdf',
+                    ' --output qqbarSuppressionEvaluation.pdf' +
+                    ' --fillnan',
                     shell=True
                     )
 
     # If you're only interested in the network output distribution, then
     # comment these in to apply the trained methods on train and test sample
     #
-    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'), basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
-    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'), basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')
+    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    #                                basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
+    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    #                                basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')

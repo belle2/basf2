@@ -136,48 +136,6 @@ namespace Belle2 {
       }
     }
 
-    double CDCdEdx_llog(const Particle* part, const int index)
-    {
-      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
-      if (!dedxTrack) {
-        return -999.0;
-      } else {
-        return dedxTrack->getLogl(index);
-      }
-    }
-
-    double CDCdEdx_llogE(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 0);
-    }
-
-    double CDCdEdx_llogMu(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 1);
-    }
-
-    double CDCdEdx_llogPi(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 2);
-    }
-
-    double CDCdEdx_llogK(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 3);
-    }
-
-    double CDCdEdx_llogP(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 4);
-    }
-
-    double CDCdEdx_llogD(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 5);
-    }
-
-
-
     Manager::FunctionPtr CDCdEdx_PIDvars(const std::vector<std::string>& arguments)
     {
       if (arguments.size() < 2) {
@@ -214,7 +172,8 @@ namespace Belle2 {
         if (!dedxTrack)
         {
           return std::numeric_limits<float>::quiet_NaN();
-        } else {
+        } else
+        {
           if (var == "chi") return dedxTrack->getChi(index);
           else if (var == "pmean") return dedxTrack->getPmean(index);
           else if (var == "preso") return dedxTrack->getPreso(index);
@@ -226,32 +185,32 @@ namespace Belle2 {
 
     double CDCdEdx_chiE(const Particle* part)
     {
-      return Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 11)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 11)")->function(part));
     }
 
     double CDCdEdx_chiMu(const Particle* part)
     {
-      return Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 13)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 13)")->function(part));
     }
 
     double CDCdEdx_chiPi(const Particle* part)
     {
-      return Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 211)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 211)")->function(part));
     }
 
     double CDCdEdx_chiK(const Particle* part)
     {
-      return Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 321)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 321)")->function(part));
     }
 
     double CDCdEdx_chiP(const Particle* part)
     {
-      return Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 2212)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 2212)")->function(part));
     }
 
     double CDCdEdx_chiD(const Particle* part)
     {
-      return Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 1000010020)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 1000010020)")->function(part));
     }
 
 //Variables for SVD dedx
@@ -315,8 +274,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_lnhits", CDCdEdx_lnhits, "layer hits for dedx track");
     REGISTER_VARIABLE("CDCdEdx_lnhitsused", CDCdEdx_lnhitsused, "truncated hits of dedx track");
 
-    REGISTER_VARIABLE("CDCdEdx_PIDvars(var,PDG) var (= chi or pmean or preso) and PDG is of charged particles", CDCdEdx_PIDvars,
-                      "advance CDC dEdx PID related variables for charged particle");
+    REGISTER_METAVARIABLE("CDCdEdx_PIDvars(var,PDG) var (= chi or pmean or preso) and PDG is of charged particles", CDCdEdx_PIDvars,
+                          "advance CDC dEdx PID related variables for charged particle", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("CDCdEdx_chiE", CDCdEdx_chiE, "Chi value of electrons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiMu", CDCdEdx_chiMu, "Chi value of muons from CDC dEdx");
@@ -324,13 +283,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx");
-
-    REGISTER_VARIABLE("CDCdEdx_llogE", CDCdEdx_llogE, "Log likelihood value of electrons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogMu", CDCdEdx_llogMu, "Log likelihood value of muons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogPi", CDCdEdx_llogPi, "Log likelihood value of pions from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogK", CDCdEdx_llogK, "Log likelihood value of kaons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogP", CDCdEdx_llogP, "Log likelihood value of protons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogD", CDCdEdx_llogD, "Log likelihood value of duetrons from CDC dEdx");
 
     //SVD variables
     REGISTER_VARIABLE("SVDdEdx", SVDdedx, "SVD dE/dx truncated mean");

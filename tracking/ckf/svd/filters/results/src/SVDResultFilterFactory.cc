@@ -83,22 +83,31 @@ SVDResultFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDResultFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDResultFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording_with_relations") {
     return std::make_unique<RecordingSVDSeededResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDResultFilter>("ckf_CDCToSVDResult");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva_with_relations") {
     return std::make_unique<MVASVDSeededResultFilter>("ckf_SeededCDCToSVDResult");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth_svd_cdc_relation") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth_svd_cdc_relation");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size") {
     return std::make_unique<SizeSVDResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "weight") {
     return std::make_unique<WeightSVDResultFilter>();
   } else {

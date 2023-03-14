@@ -13,10 +13,10 @@
 <header>
   <input>../1110021010.dst.root</input>
   <output>1110021010_Validation.root</output>
-  <contact>sam.cunliffe@desy.de</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
 </header>
 """
-# Runs a simple analysis on signal [B0 -> rho0 gamma] events. Saves historams
+# Runs a simple analysis on signal [B0 -> rho0 gamma] events. Saves histograms
 # in a format for the validation server. There are better example analysis
 # scripts in analysis/examples and analysis/examples/tutorials.
 
@@ -27,11 +27,11 @@ from stdCharged import stdPi
 from validation_tools.metadata import create_validation_histograms
 
 DECAY_MODE_ID = 1110021010
-INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
-OUTPUT_FILENAME = "%i_Validation.root" % DECAY_MODE_ID
+INPUT_FILENAME = f"../{DECAY_MODE_ID}.dst.root"
+OUTPUT_FILENAME = f"{DECAY_MODE_ID}_Validation.root"
 
 main = basf2.Path()
-inputMdst('default', INPUT_FILENAME, path=main)
+inputMdst(INPUT_FILENAME, path=main)
 
 stdPi('loose', path=main)
 stdPhotons('loose', path=main)
@@ -47,22 +47,24 @@ create_validation_histograms(
     variables_1d=[
         (
             "Mbc", 180, 5.2, 5.29,
-            r"$B^0\to\rho^0\gamma$ candidates' beam-constrained mass",
-            "Sam Cunliffe <sam.cunliffe@desy.de>",
+            "Beam-constrained mass of #it{B^{0} #rightarrow #rho^{0}#gamma} candidates",
+            "Frank Meier <frank.meier@duke.edu>",
             r"The beam-constrained mass distribution of $B^0\to\rho^0\gamma$ decays",
-            "Distribution should be peaking at the nominal $B^0$ mass. Tail towards low mass."
-            "M_{bc} [GeV/c^{2}]", "Candidates",
+            "Distribution should be peaking at the nominal $B^0$ mass. Tail towards low mass.",
+            "M_{bc} [GeV/c^{2}]", "Candidates"
         ),
         (
             "useRestFrame(daughter(1, E))", 50, 1.5, 4.0,
-            r"The photon energy distribution for $B^0\to\rho^0\gamma$ decays",
-            "Sam Cunliffe <sam.cunliffe@desy.de>; Torben Ferber <torben.ferber@desy.de>",
+            "The photon energy distribution for #it{B^{0} #rightarrow #rho^{0}#gamma} decays",
+            "Frank Meier <frank.meier@duke.edu>; Torben Ferber <torben.ferber@desy.de>",
+            r"Photon energy distribution of $B^0\to\rho^0\gamma$ decays",
             "Sharp distribution at 2.5 GeV. Look for differences in "
-            "the abslute scale. This could be an indication of a loss of photon efficiency.",
-            r"E_{\gamma} [GeV]", "Candidates",
+            "the absolute scale. This could be an indication of a loss of photon efficiency.",
+            "E_{#gamma} [GeV]", "Candidates"
         ),
     ]
 )
 
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)

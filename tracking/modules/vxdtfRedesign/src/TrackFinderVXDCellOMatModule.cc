@@ -14,10 +14,9 @@
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(TrackFinderVXDCellOMat)
+REG_MODULE(TrackFinderVXDCellOMat);
 
 
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
@@ -32,17 +31,17 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
   addParam("NetworkName",
            m_PARAMNetworkName,
            "name for StoreObjPtr< DirectedNodeNetwork> which contains the networks needed.",
-           string(""));
+           std::string(""));
 
   addParam("SpacePointTrackCandArrayName",
            m_PARAMSpacePointTrackCandArrayName,
            "name for StoreArray< SpacePointTrackCand> to be filled.",
-           string(""));
+           std::string(""));
 
   addParam("EventLevelTrackingInfoName",
            m_PARAMEventLevelTrackingInfoName,
            "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
-           string("EventLevelTrackingInfo"));
+           std::string("EventLevelTrackingInfo"));
 
   addParam("printNetworks",
            m_PARAMprintNetworks,
@@ -117,7 +116,7 @@ void TrackFinderVXDCellOMatModule::event()
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
   if (nRounds < 0) {
-    B2ERROR("CA failed, skipping event!");
+    B2ERROR("Cellular Automaton failed, skipping event!");
     return;
   }
 
@@ -146,7 +145,7 @@ void TrackFinderVXDCellOMatModule::event()
   /// collect all Paths starting from a Seed:
   m_collectedPaths.clear();
   if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
-    B2WARNING("VXDCellOMat got signal to abort the event.");
+    B2WARNING("Received signal to skip the event and not processing it.");
     m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
     m_network->set_collectedPaths(m_collectedPaths.size());
     return;

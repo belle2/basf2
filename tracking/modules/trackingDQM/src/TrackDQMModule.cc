@@ -14,14 +14,13 @@
 
 using namespace Belle2;
 using namespace Belle2::HistogramFactory;
-using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackDQM)
+REG_MODULE(TrackDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -52,12 +51,11 @@ void TrackDQMModule::defineHisto()
   DQMHistoModuleBase::defineHisto();
 
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
-    B2WARNING("Missing geometry for VXD.");
+    B2FATAL("Missing geometry for VXD.");
 
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
 
-  // There might be problems with nullptr if the directory with the same name already exists (but I am not sure because there isn't anything like that in AlignmentDQM)
   TDirectory* TracksDQM = originalDirectory->GetDirectory("TracksDQM");
   if (!TracksDQM)
     TracksDQM = originalDirectory->mkdir("TracksDQM");
@@ -80,12 +78,13 @@ void TrackDQMModule::defineHisto()
   DefineFlags();
 
   TracksDQMAlignment->cd();
-  DefineSensors();
+  Define1DSensors();
+  Define2DSensors();
 
   originalDirectory->cd();
 
   for (auto change : m_histogramParameterChanges)
-    ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
+    ProcessHistogramParameterChange(std::get<0>(change), std::get<1>(change), std::get<2>(change));
 }
 
 void TrackDQMModule::event()

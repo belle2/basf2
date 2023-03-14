@@ -37,8 +37,8 @@ namespace Belle2 {
     SVDNoiseCalibrations(): m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDNoiseCalibrations: from now on we are using " <<
-        this->m_aDBObjPtr -> get_uniqueID()); });
+        B2DEBUG(20, "SVDNoiseCalibrations: from now on we are using " <<
+                this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
 
@@ -51,7 +51,7 @@ namespace Belle2 {
      * Output: integer corresponding to the strip noise in ADC counts.
      * it throws std::out_of_range if the strip is unknown
      */
-    inline float getNoise(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    inline float getNoise(const VxdID& sensorID, const bool& isU, const unsigned short& strip) const
     {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
@@ -76,7 +76,7 @@ namespace Belle2 {
     *
     * Output: float corresponding to the strip noise in electrons.
     */
-    inline float getNoiseInElectrons(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    inline float getNoiseInElectrons(const VxdID& sensorID, const bool& isU, const unsigned short& strip) const
     {
       SVDPulseShapeCalibrations m_pulseShape;
       return m_pulseShape.getChargeFromADC(sensorID, isU, strip, getNoise(sensorID, isU, strip));

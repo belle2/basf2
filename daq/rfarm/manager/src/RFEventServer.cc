@@ -78,7 +78,7 @@ RFEventServer::~RFEventServer()
 }
 
 // Access to Singleton
-RFEventServer& RFEventServer::Create(string conffile)
+RFEventServer& RFEventServer::Create(const string& conffile)
 {
   if (!s_instance) {
     s_instance = new RFEventServer(conffile);
@@ -115,7 +115,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   char* sender = m_conf->getconf("distributor", "sender", "script");
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
-  char hostname[512], idname[3], shmid[3];
+  char idname[3], shmid[3];
   for (int i = 0; i < maxnodes; i++) {
     sprintf(idname, "%2.2d", idbase + i);
     sprintf(shmid, "%2.2d", i);
@@ -131,8 +131,8 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   }
 
   // 1. Run receiver
-  char* src = m_conf->getconf("distributor", "source");
-  if (strstr(src, "net") != 0) {
+  char* srcG = m_conf->getconf("distributor", "source");
+  if (strstr(srcG, "net") != 0) {
     // Run receiver
     char* receiver = m_conf->getconf("distributor", "receiver", "script");
     char* src = m_conf->getconf("distributor", "receiver", "host");
@@ -142,7 +142,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     sprintf(idbuf, "%2.2d", RF_INPUT_ID);
     m_pid_recv = m_proc->Execute(receiver, (char*)ringbuf.c_str(), src, port, (char*)shmname.c_str(), idbuf);
     m_flow->clear(RF_INPUT_ID);
-  } else if (strstr(src, "file") != 0) {
+  } else if (strstr(srcG, "file") != 0) {
     // Run file reader
     char* filein = m_conf->getconf("distributor", "fileinput", "script");
     char* file = m_conf->getconf("distributor", "fileinput", "filename");

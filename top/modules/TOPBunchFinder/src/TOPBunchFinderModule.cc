@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBunchFinder/TOPBunchFinderModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
@@ -26,7 +28,6 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <set>
 
@@ -36,10 +37,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPBunchFinder)
+  REG_MODULE(TOPBunchFinder);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -63,7 +64,7 @@ namespace Belle2 {
     addParam("sigmaSmear", m_sigmaSmear,
              "sigma in [ns] for additional smearing of PDF", 0.0);
     addParam("minSignal", m_minSignal,
-             "minimal number of signal photons to accept track", 10.0);
+             "minimal number of signal photons to accept track", 8.0);
     addParam("minSBRatio", m_minSBRatio,
              "minimal signal-to-background ratio to accept track", 0.0);
     addParam("minDERatio", m_minDERatio,
@@ -79,11 +80,9 @@ namespace Belle2 {
              "if true, use MC truth for particle mass instead of the most probable from dEdx",
              false);
     addParam("saveHistograms", m_saveHistograms,
-             "if true, save histograms to TOPRecBunch", false);
+             "if true, save histograms to TOPRecBunch and TOPTimeZeros", false);
     addParam("tau", m_tau,
              "first order filter time constant [number of events]", 100.0);
-    addParam("fineSearch", m_fineSearch,
-             "if true, do fine search with two-dimensional PDF", true);
     addParam("correctDigits", m_correctDigits,
              "if true, subtract bunch time in TOPDigits", true);
     addParam("subtractRunningOffset", m_subtractRunningOffset,
@@ -95,6 +94,13 @@ namespace Belle2 {
     addParam("usePIDLikelihoods", m_usePIDLikelihoods,
              "use PIDLikelihoods instead of DedxLikelihoods (only if run on cdst files)",
              false);
+    addParam("nTrackLimit", m_nTrackLimit,
+             "maximum number of tracks (inclusive) to use three particle hypotheses in fine search "
+             "(only when running in data processing mode).", unsigned(3));
+    addParam("useTimeSeed",  m_useTimeSeed, "use SVD or CDC event T0 as a seed "
+             "(only when running in data processing mode and autoRange turned off).", true);
+    addParam("useFillPattern", m_useFillPattern, "use known accelerator fill pattern to enhance efficiency "
+             "(only when running in data processing mode).", true);
   }
 
 
@@ -180,6 +186,7 @@ namespace Belle2 {
     }
 
     if (m_HLTmode) {
+      m_nTrackLimit = 0;  // use single particle hypothesis to save execution time
       B2INFO("TOPBunchFinder: running in HLT/express reco mode");
     } else {
       B2INFO("TOPBunchFinder: running in data processing mode");
@@ -198,6 +205,29 @@ namespace Belle2 {
               << " of experiment " << evtMetaData->getExperiment());
     }
 
+    if (m_HLTmode) return;
+
+    if (m_useTimeSeed and not m_eventT0Offset.isValid()) {
+      B2WARNING("EventT0Offset not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment()
+                << ": seeding with SVD or CDC eventT0 will not be done.");
+    }
+    if (m_useFillPattern) {
+      if (not m_bunchStructure->isSet()) {
+        B2WARNING("BunchStructure not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment()
+                  << ": fill pattern will not be used.");
+      }
+      if (not m_fillPatternOffset.isValid()) {
+        B2WARNING("FillPatternOffset not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment()
+                  << ": fill pattern will not be used.");
+      }
+    }
+
   }
 
 
@@ -212,6 +242,7 @@ namespace Belle2 {
     if (not m_recBunch.isValid()) {
       m_recBunch.create();
     } else {
+      m_revo9Counter = m_recBunch->getRevo9Counter();
       m_recBunch->clearReconstructed();
     }
     m_timeZeros.clear();
@@ -225,18 +256,20 @@ namespace Belle2 {
       int simBunchNumber = round(simTime / m_bunchTimeSep);
       m_recBunch->setSimulated(simBunchNumber, simTime);
     }
+    m_isMC = m_recBunch->isSimulated();
 
     // set revo9 counter from the first raw digit if available (all should be the same)
 
     if (m_topRawDigits.getEntries() > 0) {
       const auto* rawDigit = m_topRawDigits[0];
-      m_recBunch->setRevo9Counter(rawDigit->getRevo9Counter());
+      m_revo9Counter = rawDigit->getRevo9Counter();
+      m_recBunch->setRevo9Counter(m_revo9Counter);
     }
 
     // full time window in which data are taken (smaller time window is used in reconstruction)
 
     const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / static_cast<double>(TOPNominalTDC::c_syncWindows);
 
     // counters and temporary containers
 
@@ -246,6 +279,7 @@ namespace Belle2 {
     std::vector<PDFConstructor> pdfConstructors;
     std::vector<PDF1Dim> top1Dpdfs;
     std::vector<int> numPhotons;
+    std::vector<double> assumedMasses;
     std::vector<Chi2MinimumFinder1D> finders;
 
     // loop over reconstructed tracks, make a selection and push to containers
@@ -274,7 +308,7 @@ namespace Belle2 {
         chargedStable = Const::chargedStableSet.find(abs(trk.getMCParticle()->getPDG()));
         if (chargedStable == Const::invalidParticle) continue;
       } else {
-        chargedStable = getMostProbable(track);
+        if (trk.getMomentumMag() < 4.0) chargedStable = getMostProbable(track);
       }
 
       // construct PDF
@@ -287,9 +321,10 @@ namespace Belle2 {
       pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
 
       // do further track selection
-      double expSignal = pdf1d.getExpectedSignal() + pdf1d.getExpectedDeltaPhotons();
+      double expSignal = pdf1d.getExpectedSignal();
+      double expDelta = pdf1d.getExpectedDeltaPhotons();
       double expBG = pdf1d.getExpectedBG();
-      double expPhot = expSignal + expBG;
+      double expPhot = expSignal + expDelta + expBG;
       double numPhot = pdf1d.getNumOfPhotons();
       if (expSignal < m_minSignal) continue;
       if (expSignal < m_minSBRatio * expBG) continue;
@@ -300,98 +335,127 @@ namespace Belle2 {
       pdfConstructors.push_back(pdfConstructor);
       top1Dpdfs.push_back(pdf1d);
       numPhotons.push_back(numPhot);
+      assumedMasses.push_back(pdfConstructors.back().getHypothesis().getMass());
     }
     m_recBunch->setNumTracks(numTrk, topTracks.size(), m_nodEdxCount);
     if (topTracks.empty()) return;
 
-    // set time region for coarse search
+    // get time seed
 
-    double minT0 = -m_timeRangeCoarse / 2;
-    double maxT0 = m_timeRangeCoarse / 2;
-    if (m_autoRange) {
-      minT0 = top1Dpdfs[0].getMinT0();
-      maxT0 = top1Dpdfs[0].getMaxT0();
+    auto timeSeed = getTimeSeed();
+
+    if (timeSeed.sigma == 0) { // time seed is not given - perform coarse search
+
+      // set time region for coarse search
+
+      double minT0 = -m_timeRangeCoarse / 2;
+      double maxT0 = m_timeRangeCoarse / 2;
+      if (m_autoRange) {
+        minT0 = top1Dpdfs[0].getMinT0();
+        maxT0 = top1Dpdfs[0].getMaxT0();
+        for (const auto& pdf : top1Dpdfs) {
+          minT0 = std::min(minT0, pdf.getMinT0());
+          maxT0 = std::max(maxT0, pdf.getMaxT0());
+        }
+      }
+      double binSize = top1Dpdfs[0].getBinSize();
+      int numBins = (maxT0 - minT0) / binSize;
+      maxT0 = minT0 + binSize * numBins;
+
+      // find coarse T0
+
       for (const auto& pdf : top1Dpdfs) {
-        minT0 = std::min(minT0, pdf.getMinT0());
-        maxT0 = std::max(maxT0, pdf.getMaxT0());
+        finders.push_back(Chi2MinimumFinder1D(numBins, minT0, maxT0));
+        auto& finder = finders.back();
+        const auto& bins = finder.getBinCenters();
+        for (unsigned i = 0; i < bins.size(); i++) {
+          double t0 = bins[i];
+          finder.add(i, -2 * pdf.getLogL(t0));
+        }
       }
-    }
-    double binSize = top1Dpdfs[0].getBinSize();
-    int numBins = (maxT0 - minT0) / binSize;
-    maxT0 = minT0 + binSize * numBins;
-
-    // find coarse T0
-
-    for (const auto& pdf : top1Dpdfs) {
-      finders.push_back(Chi2MinimumFinder1D(numBins, minT0, maxT0));
-      auto& finder = finders.back();
-      const auto& bins = finder.getBinCenters();
-      for (unsigned i = 0; i < bins.size(); i++) {
-        double t0 = bins[i];
-        finder.add(i, -2 * pdf.getLogL(t0));
+      auto coarseFinder = finders[0];
+      for (size_t i = 1; i < finders.size(); i++) {
+        coarseFinder.add(finders[i]);
       }
-    }
-    auto coarseFinder = finders[0];
-    for (size_t i = 1; i < finders.size(); i++) {
-      coarseFinder.add(finders[i]);
-    }
 
-    const auto& t0Coarse = coarseFinder.getMinimum();
-    if (m_saveHistograms) {
-      m_recBunch->addHistogram(coarseFinder.getHistogram("chi2_coarse_",
-                                                         "coarse T0; t_{0} [ns]; -2 log L"));
+      const auto& t0Coarse = coarseFinder.getMinimum();
+      if (m_saveHistograms) {
+        m_recBunch->addHistogram(coarseFinder.getHistogram("chi2_coarse_",
+                                                           "coarse T0; t_{0} [ns]; -2 log L"));
+      }
+      if (t0Coarse.position < minT0 or t0Coarse.position > maxT0 or not t0Coarse.valid) {
+        B2DEBUG(20, "Coarse T0 finder: returning invalid or out of range T0");
+        return;
+      }
+      timeSeed.t0 = t0Coarse.position;
     }
-    if (t0Coarse.position < minT0 or t0Coarse.position > maxT0 or not t0Coarse.valid) {
-      B2DEBUG(100, "Coarse T0 finder: returning invalid or out of range T0");
-      return;
-    }
-
-    auto T0 = t0Coarse;
 
     // find precise T0
 
-    if (m_fineSearch) {
-      finders.clear();
-      numPhotons.clear();
+    finders.clear();
 
-      double timeMin = TOPRecoManager::getMinTime() + t0Coarse.position;
-      double timeMax = TOPRecoManager::getMaxTime() + t0Coarse.position;
-      double t0min = t0Coarse.position - m_timeRangeFine / 2;
-      double t0max = t0Coarse.position + m_timeRangeFine / 2;
+    double timeMin = TOPRecoManager::getMinTime() + timeSeed.t0;
+    double timeMax = TOPRecoManager::getMaxTime() + timeSeed.t0;
+    double timeRangeFine = std::max(m_timeRangeFine, timeSeed.sigma * 6);
+    double t0min = timeSeed.t0 - timeRangeFine / 2;
+    double t0max = timeSeed.t0 + timeRangeFine / 2;
 
-      for (const auto& reco : pdfConstructors) {
-        finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
-        numPhotons.push_back(0);
-        auto& finder = finders.back();
-        std::set<int> nfotSet; // for control only
-        const auto& binCenters = finder.getBinCenters();
-        for (unsigned i = 0; i < binCenters.size(); i++) {
-          double t0 = binCenters[i];
-          auto LL = reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
-          finder.add(i, -2 * LL.logL);
-          if (i == 0) numPhotons.back() = LL.numPhotons;
-          nfotSet.insert(LL.numPhotons);
+    for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+      finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
+      const auto& reco = pdfConstructors[itrk];
+      numPhotons[itrk] = setFinder(finders.back(), reco, timeMin, timeMax);
+      const auto& trk = topTracks[itrk];
+      double momentum = trk.getMomentumMag();
+      if (not m_useMCTruth and momentum > 0.7 and topTracks.size() <= m_nTrackLimit) {
+        std::vector<Const::ChargedStable> other;
+        if (reco.getHypothesis() == Const::kaon) {
+          other.push_back(Const::pion);
+          if (momentum < 4.0) other.push_back(Const::proton);
+        } else if (reco.getHypothesis() == Const::proton) {
+          other.push_back(Const::pion);
+          if (momentum < 2.0) other.push_back(Const::kaon);
+        } else {
+          if (momentum < 2.0) other.push_back(Const::kaon);
+          if (momentum < 4.0) other.push_back(Const::proton);
         }
-        if (nfotSet.size() != 1) B2ERROR("Different number of photons used for log likelihood of different time shifts");
+        for (const auto& chargedStable : other) {
+          PDFConstructor pdfConstructor(trk, chargedStable, PDFConstructor::c_Rough);
+          if (not pdfConstructor.isValid()) continue;
+          pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
+          if (pdfConstructor.getExpectedSignalPhotons() < m_minSignal) continue;
+          Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
+          int numPhot = setFinder(finder, pdfConstructor, timeMin, timeMax);
+          if (numPhot != numPhotons[itrk])
+            B2ERROR("Different number of photons used for log likelihood of different mass hypotheses");
+          if (finder.getMinChi2() < finders.back().getMinChi2()) {
+            finders.back() = finder;
+            assumedMasses[itrk] = chargedStable.getMass();
+          }
+        }
       }
+    }
 
-      if (finders.size() == 0) return; // just in case
-      auto finder = finders[0];
-      for (size_t i = 1; i < finders.size(); i++) {
-        finder.add(finders[i]);
-      }
+    if (finders.size() == 0) return; // just in case
+    auto finderSum = finders[0];
+    for (size_t i = 1; i < finders.size(); i++) {
+      finderSum.add(finders[i]);
+    }
 
-      const auto& t0Fine = finder.getMinimum();
-      if (m_saveHistograms) {
-        m_recBunch->addHistogram(finder.getHistogram("chi2_fine_",
-                                                     "precise T0; t_{0} [ns]; -2 log L"));
+    if (timeSeed.sigma > 0) {
+      const auto& binCenters = finderSum.getBinCenters();
+      for (unsigned i = 0; i < binCenters.size(); i++) {
+        double t0 = binCenters[i];
+        finderSum.add(i, pow((t0 - timeSeed.t0) / timeSeed.sigma, 2)); // add chi2 according to timeSeed resolution
       }
-      if (t0Fine.position < t0min or t0Fine.position > t0max or not t0Fine.valid) {
-        B2DEBUG(100, "Fine T0 finder: returning invalid or out of range T0");
-        return;
-      }
+    }
 
-      T0 = t0Fine;
+    const auto& T0 = finderSum.getMinimum();
+    if (m_saveHistograms) {
+      m_recBunch->addHistogram(finderSum.getHistogram("chi2_fine_", "precise T0; t_{0} [ns]; -2 log L"));
+    }
+    if (T0.position < t0min or T0.position > t0max or not T0.valid) {
+      B2DEBUG(20, "Fine T0 finder: returning invalid or out of range T0");
+      return;
     }
 
     // bunch time and current offset
@@ -420,13 +484,19 @@ namespace Belle2 {
     double err2 = (1 - a) * error;
     m_runningError = sqrt(err1 * err1 + err2 * err2);
 
+    // check if reconstructed bunch is filled; return if not.
+
+    if (m_useFillPattern and not m_HLTmode) {
+      if (not isBucketFilled(bunchNo)) return;
+    }
+
     // store the results
 
     double bunchTime = bunchNo * m_bunchTimeSep;
-    m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error,
-                                 m_runningOffset, m_runningError, m_fineSearch);
-    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime, error,
-                                                             Const::TOP, "bunchFinder"));
+    m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error, m_runningOffset, m_runningError, timeSeed.detector);
+    m_recBunch->setMinChi2(T0.chi2);
+    double svdOffset = m_eventT0Offset.isValid() and not m_isMC ? m_eventT0Offset->get(Const::SVD).offset : 0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime + svdOffset, error, Const::TOP, "bunchFinder"));
     m_success++;
 
     // store T0 of single tracks relative to bunchTime
@@ -434,14 +504,14 @@ namespace Belle2 {
     if (finders.size() == topTracks.size()) {
       for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
         const auto& trk = topTracks[itrk];
-        const auto& reco = pdfConstructors[itrk];
         auto& finder = finders[itrk];
         const auto& t0trk = finder.getMinimum();
         auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(),
                                                t0trk.position - bunchTime,
                                                t0trk.error, numPhotons[itrk]);
-        timeZero->setAssumedMass(reco.getHypothesis().getMass());
+        timeZero->setAssumedMass(assumedMasses[itrk]);
         if (not t0trk.valid) timeZero->setInvalid();
+        timeZero->setMinChi2(finder.getMinChi2());
         timeZero->addRelationTo(trk.getExtHit());
 
         if (m_saveHistograms) {
@@ -543,5 +613,73 @@ namespace Belle2 {
     return Const::chargedStableSet.at(i0);
 
   }
+
+
+  int TOPBunchFinderModule::setFinder(Chi2MinimumFinder1D& finder, const PDFConstructor& reco, double timeMin, double timeMax)
+  {
+    std::set<int> nfotSet; // for control only
+    const auto& binCenters = finder.getBinCenters();
+    int numPhotons = 0;
+    double logL_bkg = reco.getBackgroundLogL(timeMin, timeMax).logL;
+    for (unsigned i = 0; i < binCenters.size(); i++) {
+      double t0 = binCenters[i];
+      auto LL = reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
+      finder.add(i, -2 * (LL.logL - logL_bkg));
+      if (i == 0) numPhotons = LL.numPhotons;
+      nfotSet.insert(LL.numPhotons);
+    }
+
+    if (nfotSet.size() != 1) B2ERROR("Different number of photons used for log likelihood of different time shifts");
+
+    return numPhotons;
+  }
+
+
+  TOPBunchFinderModule::TimeSeed TOPBunchFinderModule::getTimeSeed()
+  {
+    TimeSeed timeSeed; // default time seed; sigma == 0 signals that the seed is not given
+
+    if (m_HLTmode) return timeSeed;
+    if (m_autoRange) return timeSeed;
+    if (not m_useTimeSeed) return timeSeed;
+    if (not m_eventT0Offset.isValid()) return timeSeed;
+
+    for (auto detector : {Const::SVD, Const::CDC}) {
+      if (m_eventT0Offset->isAvailable(detector) and m_eventT0->hasTemporaryEventT0(detector)) {
+        auto eventT0s = m_eventT0->getTemporaryEventT0s(detector);
+        if (eventT0s.empty()) continue;
+        if (detector == Const::CDC and eventT0s.back().algorithm != "chi2") continue;
+        double t0 = eventT0s.back().eventT0;
+        if (std::abs(t0) > m_timeRangeCoarse / 2) continue;
+        timeSeed.t0 = m_isMC ? t0 : t0 - m_eventT0Offset->get(detector).offset;
+        timeSeed.sigma = m_eventT0Offset->get(detector).sigma;
+        timeSeed.detector = detector;
+        break;
+      }
+    }
+
+    return timeSeed;
+  }
+
+
+  bool TOPBunchFinderModule::isBucketFilled(int bunchNo)
+  {
+    // return true if needed information not available
+
+    if (not m_bunchStructure->isSet()) return true;
+    if (not m_fillPatternOffset.isValid()) return true;
+    if (not m_fillPatternOffset->isCalibrated()) return true;
+    if (m_revo9Counter == 0xFFFF) return true;
+
+    // corresponding bucket number
+
+    auto RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
+    int offset = m_isMC ? 0 : m_fillPatternOffset->get();
+    int bucket = (bunchNo + m_revo9Counter * 4 - offset) % RFBuckets;
+    if (bucket < 0) bucket += RFBuckets;
+
+    return m_bunchStructure->getBucket(bucket);
+  }
+
 
 } // end Belle2 namespace

@@ -7,7 +7,12 @@
  **************************************************************************/
 
 #pragma once
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/calibration/eclGammaGammaEAlgorithm.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
@@ -53,17 +58,29 @@ namespace Belle2 {
       /** Getter for m_maxIterations */
       int getMaxIterations() {return m_maxIterations;}
 
-      /** Setter for m_tRatioMin */
-      void setTRatioMin(double tRatioMin) {m_tRatioMin = tRatioMin;}
+      /** Setter for m_tRatioMinNom */
+      void setTRatioMin(double tRatioMin) {m_tRatioMinNom = tRatioMin;}
 
-      /** Getter for m_tRatioMin */
-      double getTRatioMin() {return m_tRatioMin;}
+      /** Getter for m_tRatioMinNom */
+      double getTRatioMin() {return m_tRatioMinNom;}
 
-      /** Setter for m_tRatioMax */
-      void setTRatioMax(double tRatioMax) {m_tRatioMax = tRatioMax;}
+      /** Setter for m_tRatioMaxNom */
+      void setTRatioMax(double tRatioMax) {m_tRatioMaxNom = tRatioMax;}
 
-      /** Getter for m_tRatioMax */
-      double getTRatioMax() {return m_tRatioMax;}
+      /** Getter for m_tRatioMaxNom */
+      double getTRatioMax() {return m_tRatioMaxNom;}
+
+      /** Setter for m_tRatioMinHiStat */
+      void setTRatioMinHiStat(double tRatioMin) {m_tRatioMinHiStat = tRatioMin;}
+
+      /** Getter for m_tRatioMinHiStat */
+      double getTRatioMinHiStat() {return m_tRatioMinHiStat;}
+
+      /** Setter for m_tRatioMaxHiStat */
+      void setTRatioMaxHiStat(double tRatioMax) {m_tRatioMaxHiStat = tRatioMax;}
+
+      /** Getter for m_tRatioMaxHiStat */
+      double getTRatioMaxHiStat() {return m_tRatioMaxHiStat;}
 
       /** Setter for m_upperEdgeThresh */
       void setUpperEdgeThresh(double upperEdgeThresh) {m_upperEdgeThresh = upperEdgeThresh;}
@@ -100,11 +117,17 @@ namespace Belle2 {
       /**..Parameters to control Novosibirsk fit to energy deposited in each crystal by mu+mu- events */
       std::string m_outputName = "eclGammaGammaEAlgorithm.root"; /**< file name for histogram output */
       int m_cellIDLo = 1;  /**<  First cellID to be fit */
-      int m_cellIDHi = 8736;  /**<  Last cellID to be fit */
+      int m_cellIDHi = ECLElementNumbers::c_NCrystals;  /**<  Last cellID to be fit */
       int m_minEntries = 150;  /**<  Minimum entries to fit a crystal */
+      int m_highStatEntries = 25000; /**< Adjust fit range above this many entries */
       int m_maxIterations = 10; /**< no more than maxIteration iterations */
-      double m_tRatioMin = 0.45;  /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
-      double m_tRatioMax = 0.60; /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
+      double m_tRatioMinNom =
+        0.45;  /**< Fit range is adjusted so that fit at lower endpoint is between tRatioMin and tRatioMax of peak */
+      double m_tRatioMaxNom = 0.70; /**< Fit range is adjusted so that fit at lower endpoint is between tRatioMin and tRatioMax of peak */
+      double m_tRatioMinHiStat =
+        0.70;  /**< Fit range is adjusted so that fit at lower endpoint is between tRatioMin and tRatioMax of peak */
+      double m_tRatioMaxHiStat =
+        0.95; /**< Fit range is adjusted so that fit at lower endpoint is between tRatioMin and tRatioMax of peak */
       double m_upperEdgeThresh = 0.02; /**< Upper edge is where the fit = upperEdgeThresh * peak value */
       bool m_performFits = true;  /**<  if false, input histograms are copied to output, but no fits are done */
       bool m_findExpValues =

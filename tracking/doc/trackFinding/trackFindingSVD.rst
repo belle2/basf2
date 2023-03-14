@@ -1,7 +1,7 @@
- .. _tracking_trackFindingSVD: 
+.. _tracking_trackFindingSVD: 
 
 SVD Track Finding
-=================
+^^^^^^^^^^^^^^^^^
 
 .. warning::
   This documentation is under construction!
@@ -9,7 +9,7 @@ SVD Track Finding
 The VXDTF2 is the SVD standalone pattern recognition algorithm. In this page there is a brief description of the logic behind this pattern recognition algorithm.
 
 Reduction of the combinatorial burden with the SectorMaps
----------------------------------------------------------
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 The goal extract track patterns from a huge number of possible combinations of space points (3D hits) in the 4 SVD layers.
 The logic behind the reduction of the number of combinations is the following:
 divide the sensors into sectors (NxM)
@@ -18,6 +18,7 @@ reject background SpacePoints using dedicated filters
 
 .. figure:: figures/friends.png
    :align: center
+   :width: 80%
 
 The connections defining friend sectors are learned from simulation. In order to avoid attaching background hits to patterns, filters based on 2- or 3-hit combinations are also learned from simulation.
 The SectorMap stores the information about the friendship relations between sectors and a set of selection requirements (filters = {variable, range}) used to reject background hits.
@@ -26,18 +27,18 @@ The SectorMap stores the information about the friendship relations between sect
 
     .. container:: leftside
 
-       simplified view of the friendship relations
+      .. figure:: figures/sectormap.png
+	      :align: center
 
-       .. figure:: figures/sectormap.png
-	  :align: center
-
+      Simplified view of the friendship relations
 
     .. container:: rightside
-		   
-       two-hit filter example
-
-       .. figure:: figures/filter.png
-	  :align: center
+    
+      .. figure:: figures/filter.png
+        :align: center
+        :width: 50%
+    
+      Two-hit filter example
 
 Variables used in the filters are geometric (distances, slopes) or properties of the SVD clusters, like the cluster time, listed in the following tables:
 
@@ -63,7 +64,7 @@ The allowed range for each filter is learned from simulation, filling the distri
 Using the friendship relations and the filters, segments connecting two, three or four SpacePoints are built. At this stage a single SpacePoint can be shared by more than one segment and we are ready to build track candidates that are identified and collected by a Cellular Automaton.
 
 SectorMap Training
-------------------
+""""""""""""""""""
 
 The training of the SectorMap is a critical step for the performance of the pattern recognition. Important aspects of the training are:
 
@@ -73,7 +74,7 @@ The training of the SectorMap is a critical step for the performance of the patt
 * difference in misalignment between simulation and real detector: we train with perfectly aligned MC
 
 Track Candidates identified by the Cellular Automaton
------------------------------------------------------
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The SectorMaps is used to produce the Segment Network, a set of segments (a pair of SpacePoints) that satisfy the friendship relations and the filters.
 A Cellular Automaton which uses segments as cells is run to gather the longest paths.
@@ -82,7 +83,7 @@ A Cellular Automaton which uses segments as cells is run to gather the longest p
    :align: center
 
 Best Candidate Selection 
--------------------------
+""""""""""""""""""""""""
 
 Finally, a best candidate selection is performed by looking at a simple quality indicator:
 

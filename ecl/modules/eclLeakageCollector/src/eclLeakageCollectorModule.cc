@@ -18,6 +18,8 @@
 #include <TVector3.h>
 #include <TMath.h>
 #include <TTree.h>
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 
 //..mdst
 #include <mdst/dataobjects/MCParticle.h>
@@ -37,7 +39,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclLeakageCollector)
+REG_MODULE(eclLeakageCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -45,7 +47,6 @@ REG_MODULE(eclLeakageCollector)
 
 //-----------------------------------------------------------------
 eclLeakageCollectorModule::eclLeakageCollectorModule() : CalibrationCollectorModule(),
-  m_eclShowerArray("ECLShowers"),
   m_mcParticleArray("MCParticles"),
   m_evtMetaData("EventMetaData")
 {
@@ -57,6 +58,7 @@ eclLeakageCollectorModule::eclLeakageCollectorModule() : CalibrationCollectorMod
   addParam("energies_forward", m_energies_forward, "generated photon energies, forward", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.483, 1.166, 2.816, 6.800});
   addParam("energies_barrel", m_energies_barrel, "generated photon energies, barrel", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500});
   addParam("energies_backward", m_energies_backward, "generated photon energies, backward", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200});
+  addParam("showerArrayName", m_showerArrayName, "name of ECLShower data object", std::string("ECLShowers"));
 }
 
 
@@ -110,6 +112,7 @@ void eclLeakageCollectorModule::prepare()
   std::cout << "energies_backward ";
   for (int ie = 0; ie < m_number_energies; ie++) {std::cout << m_energies_backward[ie] << " ";}
   std::cout << std::endl;
+  B2INFO("showerArrayName " << m_showerArrayName);
 
   //-----------------------------------------------------------------
   //..Define histogram to store parameters
@@ -140,7 +143,7 @@ void eclLeakageCollectorModule::prepare()
 
   //-----------------------------------------------------------------
   //..Required arrays
-  m_eclShowerArray.isRequired();
+  m_eclShowerArray.isRequired(m_showerArrayName);
   m_mcParticleArray.isRequired();
 }
 
@@ -175,8 +178,8 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Generated MC particle (always the first entry in the list)
   double mcLabE = m_mcParticleArray[0]->getEnergy();
-  TVector3 mcp3 = m_mcParticleArray[0]->getMomentum();
-  TVector3 vertex = m_mcParticleArray[0]->getProductionVertex();
+  ROOT::Math::XYZVector mcp3 = m_mcParticleArray[0]->getMomentum();
+  ROOT::Math::XYZVector vertex = m_mcParticleArray[0]->getProductionVertex();
 
   //-----------------------------------------------------------------
   //..Find the shower closest to the MC true angle
@@ -195,9 +198,9 @@ void eclLeakageCollectorModule::collect()
       position.SetMag(m_eclShowerArray[is]->getR());
 
       //..Direction is difference between position and vertex
-      TVector3 direction = position - vertex;
+      ROOT::Math::XYZVector direction = ROOT::Math::XYZVector(position) - vertex;
 
-      double angle = direction.Angle(mcp3);
+      double angle = ROOT::Math::VectorUtil::Angle(direction, mcp3);
       if (angle < minAngle) {
         minAngle = angle;
         minShower = is;
@@ -251,8 +254,8 @@ void eclLeakageCollectorModule::collect()
   measuredLocation.SetTheta(thetaLocation);
   measuredLocation.SetPhi(phiLocation);
   measuredLocation.SetMag(radius);
-  TVector3 measuredDirection = measuredLocation - vertex;
-  t_locationError = radius * measuredDirection.Angle(mcp3);
+  ROOT::Math::XYZVector measuredDirection = ROOT::Math::XYZVector(measuredLocation) - vertex;
+  t_locationError = radius * ROOT::Math::VectorUtil::Angle(measuredDirection, mcp3);
 
   //-----------------------------------------------------------------
   //..Done

@@ -60,9 +60,8 @@ int main(int argc, char** argv)
     }
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbufout[outptr]->insq((int*)evbuf, bsize);
+      int irb = rbufout[outptr]->insq((int*)evbuf, bsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);
@@ -74,9 +73,8 @@ int main(int argc, char** argv)
 
   // EOF
   for (int i = 0; i < nout; i++) {
-    int irb = 0;
     for (;;) {
-      irb = rbufout[i]->insq((int*)evbuf, bsize);
+      int irb = rbufout[i]->insq((int*)evbuf, bsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

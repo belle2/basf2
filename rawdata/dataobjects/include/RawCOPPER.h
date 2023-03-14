@@ -312,7 +312,7 @@ namespace Belle2 {
     int GetMaxNumOfCh(int n);
 
     //! Compare value from different channels and make a statistics table
-    void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] , std::vector<std::vector< unsigned int>>& result);
+    void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH], std::vector<std::vector< unsigned int>>& result);
 
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;

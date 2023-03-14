@@ -13,7 +13,7 @@
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/Polygon2D.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -326,7 +326,6 @@ bool EKLM::AlignmentChecker::checkAlignment(
             segment = m_ElementNumbers->segmentNumber(
                         iSection, iLayer, iSector, iPlane, iSegment);
             const KLMAlignmentData* segmentAlignmentData =
-              /* cppcheck-suppress nullPointerRedundantCheck */
               segmentAlignment->getSegmentAlignment(segment);
             if (segmentAlignment == nullptr)
               B2FATAL("Incomplete alignment data.");

@@ -35,7 +35,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDClusterizerDirect)
+REG_MODULE(SVDClusterizerDirect);
 
 //-----------------------------------------------------------------
 //                 Implementation

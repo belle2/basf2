@@ -79,11 +79,8 @@ namespace Belle2 {
     /** If true, CDCHit objects will be assigned to trigger segments and trigger tracks will be shown. */
     bool m_showTriggerObjects;
 
-    /** If true, BKLMHit objects will be shown in the display. */
-    bool m_showBKLM2dHits;
-
-    /** If true, EKLMHit2d objects will be shown in the display. */
-    bool m_showEKLM2dHits;
+    /** If true, KLMHit2d objects will be shown in the display. */
+    bool m_showKLM2dHits;
 
     /** If true, ARICHHit objects will be shown as squares, corresponding to channel pixels */
     bool m_showARICHHits;
@@ -93,6 +90,9 @@ namespace Belle2 {
 
     /** Show full geometry instead of simplified shapes. */
     bool m_fullGeometry;
+
+    /** Start the module advancing through events. */
+    bool m_playOnStartup;
 
     /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
     std::vector<std::string> m_hideObjects;

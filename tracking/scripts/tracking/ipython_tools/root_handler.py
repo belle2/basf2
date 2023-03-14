@@ -7,7 +7,7 @@
 ##########################################################################
 
 import numpy as np
-from root_pandas import read_root
+import uproot
 
 import pandas as pd
 
@@ -21,11 +21,11 @@ class TrackingValidationResult:
         #: The root filename
         self.filename = filename
         #: The pr data
-        self.pr_data = read_root(self.filename, tree_key="pr_tree/pr_tree")
+        self.pr_data = uproot.open(self.filename)["pr_tree/pr_tree"].arrays(library="pd")
         self.pr_data["is_prompt"] = (
             np.sqrt(self.pr_data.x_truth ** 2 + self.pr_data.y_truth ** 2) < 0.5) & (self.pr_data.is_primary == 1)
         #: the mc data
-        self.mc_data = read_root(self.filename, tree_key="mc_tree/mc_tree")
+        self.mc_data = uproot.open(self.filename)["mc_tree/mc_tree"].arrays(library="pd")
         self.mc_data["is_prompt"] = (
             np.sqrt(self.mc_data.x_truth ** 2 + self.mc_data.y_truth ** 2) < 0.5) & (self.mc_data.is_primary == 1)
 
@@ -77,11 +77,15 @@ class TrackingValidationResult:
     def get_figure_of_merits(self):
         """Return the figures of merit from the file. Mosty used for internal seeting of the properties."""
         if self.finding_efficiency is None:
-            overview = read_root(self.filename, tree_key="ExpertMCSideTrackingValidationModule_overview_figures_of_merit")
+            overview = uproot.open(
+                self.filename)["ExpertMCSideTrackingValidationModule_overview_figures_of_merit"].arrays(
+                library="pd")
             self.finding_efficiency = overview.finding_efficiency[0]
             self.hit_efficiency = overview.hit_efficiency[0]
 
-            overview = read_root(self.filename, tree_key="ExpertPRSideTrackingValidationModule_overview_figures_of_merit")
+            overview = uproot.open(
+                self.filename)["ExpertPRSideTrackingValidationModule_overview_figures_of_merit"].arrays(
+                library="pd")
             self.clone_rate = overview.clone_rate[0]
             self.fake_rate = overview.fake_rate[0]
 

@@ -27,7 +27,7 @@ namespace TreeFitter {
     if (lhstype == rhstype  &&
         lhstype == ParticleBase::TFParticleType::kRecoTrack) {
 
-      rc =  lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
+      rc =  lhs->particle()->getMomentum().Rho() > rhs->particle()->getMomentum().Rho();
     } else if (lhs->particle() && rhs->particle() && lhs->particle()->getNDaughters() > 0 &&
                rhs->particle()->getNDaughters() > 0) {
       rc = lhs->nFinalChargedCandidates() > rhs->nFinalChargedCandidates();
@@ -44,6 +44,7 @@ namespace TreeFitter {
                                     ) :
     ParticleBase(particle, mother, &config),// config pointer here to allow final states not to have it
     m_massconstraint(false),
+    m_beamconstraint(false),
     m_lifetimeconstraint(false),
     m_isconversion(false),
     m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
@@ -59,8 +60,10 @@ namespace TreeFitter {
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
                                  std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
 
+    m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
+
     if (!m_automatic_vertex_constraining) {
-      // if this is a hadronically decaying resonance it is usefule to constraint the decay vertex to its mothers decay vertex.
+      // if this is a hadronically decaying resonance it is useful to constraint the decay vertex to its mothers decay vertex.
       //
       m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
                                                config.m_fixedToMotherVertexListPDG.end(),
@@ -79,7 +82,7 @@ namespace TreeFitter {
   bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
 
-    return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
+    return lhs->particle()->getMomentum().Rho() > rhs->particle()->getMomentum().Rho();
   }
 
   ErrCode InternalParticle::initMotherlessParticle(FitParams& fitparams)
@@ -110,7 +113,7 @@ namespace TreeFitter {
         }
       }
 
-      TVector3 v;
+      Belle2::B2Vector3D v;
 
       if (trkdaughters.size() >= 2) {
         std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
@@ -126,9 +129,9 @@ namespace TreeFitter {
         double flt1(0), flt2(0);
         HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
-        fitparams.getStateVector()(posindex)     = v.x();
-        fitparams.getStateVector()(posindex + 1) = v.y();
-        fitparams.getStateVector()(posindex + 2) = v.z();
+        fitparams.getStateVector()(posindex)     = v.X();
+        fitparams.getStateVector()(posindex + 1) = v.Y();
+        fitparams.getStateVector()(posindex + 2) = v.Z();
 
         dau1->setFlightLength(flt1);
         dau2->setFlightLength(flt2);
@@ -137,7 +140,7 @@ namespace TreeFitter {
         // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
       } else if (mother() && mother()->posIndex() >= 0) {
         const int posindexmother = mother()->posIndex();
-        const int dim = m_config->m_originDimension; //TODO acess mother
+        const int dim = m_config->m_originDimension; //TODO access mother
         fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
       } else {
         /** (0,0,0) is the best guess in any other case */
@@ -162,7 +165,7 @@ namespace TreeFitter {
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
       const int posindexmom = mother()->posIndex();
-      const int dim = m_config->m_originDimension; //TODO acess mother?
+      const int dim = m_config->m_originDimension; //TODO access mother?
       fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
     }
     return initTau(fitparams);
@@ -181,7 +184,7 @@ namespace TreeFitter {
       fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        double mass = daughter->pdgMass();
+        double mass = daughter->particle()->getPDGMass();
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
@@ -215,7 +218,7 @@ namespace TreeFitter {
       const int daumomindex = daughter->momIndex();
       const Eigen::Matrix<double, 1, 3> p3_vec = fitparams.getStateVector().segment(daumomindex, 3);
 
-      // three momentum is easy just substract the vectors
+      // three momentum is easy just subtract the vectors
       p.getResiduals().segment(0, 3) -= p3_vec;
 
       // energy depends on the parametrisation!
@@ -226,7 +229,7 @@ namespace TreeFitter {
         // m^2 + p^2 = E^2
         // so
         // E = sqrt(m^2 + p^2)
-        const double mass = daughter->pdgMass();
+        const double mass = daughter->particle()->getPDGMass();
         const double p2 = p3_vec.squaredNorm();
         const double energy = std::sqrt(mass * mass + p2);
         p.getResiduals()(3) -= energy;
@@ -247,6 +250,26 @@ namespace TreeFitter {
   }
 
 
+  ErrCode InternalParticle::projectBeamConstraint(const FitParams& fitparams,
+                                                  Projection& p) const
+  {
+
+    const int momindex = momIndex() ;
+
+    const Eigen::Matrix<double, 4, 1> fitMomE = fitparams.getStateVector().segment(momindex, 4);
+
+    p.getResiduals() = m_config->m_beamMomE - fitMomE;
+
+    for (int row = 0; row < 4; ++row) {
+      p.getH()(row, momindex + row) = -1;
+    }
+
+    p.getV() =  m_config->m_beamCovariance;
+
+    return ErrCode(ErrCode::Status::success) ;
+  }
+
+
   ErrCode InternalParticle::projectConstraint(const Constraint::Type type,
                                               const FitParams& fitparams,
                                               Projection& p) const
@@ -261,6 +284,9 @@ namespace TreeFitter {
         break;
       case Constraint::kinematic:
         status |= projectKineConstraint(fitparams, p);
+        break;
+      case Constraint::beam:
+        status |= projectBeamConstraint(fitparams, p);
         break;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);
@@ -279,20 +305,16 @@ namespace TreeFitter {
   {
     // { x, y, z, tau, px, py, pz, E }
     // the last 4 always exists for composite particles
-    // tau index conly exist with a vertex and geo constraint
+    // tau index only exist with a vertex and geo constraint
     //
     if (m_shares_vertex_with_mother) { return 4; }
-    if (!m_shares_vertex_with_mother && !m_geo_constraint) { return 7; }
-    if (!m_shares_vertex_with_mother && m_geo_constraint) { return 8; }
-
-    // this case should not appear
-    if (m_shares_vertex_with_mother && m_geo_constraint) { return -1; }
-    return -1;
+    else if (!m_geo_constraint) { return 7; }
+    else { return 8; }
   }
 
   int InternalParticle::tauIndex() const
   {
-    /** only exists if particle is geo cosntraint and has a mother */
+    /** only exists if particle is geo constraint and has a mother */
     return m_geo_constraint ? index() + 3 : -1;
   }
 
@@ -306,7 +328,7 @@ namespace TreeFitter {
 
     if (m_shares_vertex_with_mother) { return this->index(); }
 
-    if (!m_shares_vertex_with_mother && !m_geo_constraint) {return index() + 3 ;}
+    if (!m_geo_constraint) {return index() + 3 ;}
 
     // this will crash the initialisation
     return -1;
@@ -339,6 +361,10 @@ namespace TreeFitter {
     }
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
+    }
+    if (m_beamconstraint) {
+      assert(m_config);
+      list.push_back(Constraint(this, Constraint::beam, depth, 4, 3));
     }
 
   }

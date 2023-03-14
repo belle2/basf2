@@ -5,11 +5,13 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef QCSMONITOR_SENSITIVEDETECTOR_H
-#define QCSMONITOR_SENSITIVEDETECTOR_H
+
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <G4EmSaturation.hh>
+
+#include <TVector3.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the QCSMONITOR detector */
@@ -78,5 +80,3 @@ namespace Belle2 {
 
   } //qcsmonitor namespace
 } //Belle2 namespace
-
-#endif

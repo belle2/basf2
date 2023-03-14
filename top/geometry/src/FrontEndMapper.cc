@@ -94,7 +94,7 @@ namespace Belle2 {
           else if (finesseSlot == "C") {finesse = 2;}
           else if (finesseSlot == "D") {finesse = 3;}
           else {
-            B2ERROR("TOP::FrontEndMapper: invalid slot (valid are A, B, C, D)."
+            B2ERROR("TOP::FrontEndMapper: invalid finesse slot (valid are A, B, C, D)."
                     << LogVar("FinesseSlot", finesseSlot)
                     << LogVar("path", boardstack.getPath() + "/FinesseSlot"));
             return;
@@ -163,7 +163,7 @@ namespace Belle2 {
     }
 
 
-    void FrontEndMapper::import(const IntervalOfValidity& iov) const
+    void FrontEndMapper::importPayload(const IntervalOfValidity& iov) const
     {
       DBImportArray<TOPFrontEndMap> array;
       for (const auto& map : m_mapping) {
@@ -210,7 +210,7 @@ namespace Belle2 {
       cout << endl;
       cout << "           Mapping of TOP front-end electronics" << endl << endl;
 
-      char label[5] = "ABCD";
+      const char label[5] = "ABCD";
       for (int i = 0; i < c_numModules; i++) {
         int moduleID = i + 1;
         cout << " slot " << moduleID

@@ -177,7 +177,7 @@ namespace Belle2 {
       std::vector<T> getVector(const std::string& identifier) const
       {
         std::vector<T> vector;
-        vector.resize(m_pt.get<T>(identifier + "_size"));
+        vector.resize(m_pt.get<size_t>(identifier + "_size"));
         for (unsigned int i = 0; i < vector.size(); ++i) {
           vector[i] = m_pt.get<T>(identifier + std::to_string(i));
         }
@@ -215,7 +215,7 @@ namespace Belle2 {
       static void saveToStream(Weightfile& weightfile, std::ostream& stream);
 
       /**
-       * Static function which loads a Weightfile from a file or fomr the database
+       * Static function which loads a Weightfile from a file or from the database
        * @param filename of the file containing our serialized Weightfile
        * @param emd EventMetaData
        */

@@ -6,6 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+
 def fix_mille_paths_for_algo(algo):
     """
     Add pre.algorithm to fix mille file paths
@@ -41,7 +42,7 @@ def fix_mille_paths_for_algo(algo):
             for exp, run in runSet:
                 milleData = file.Get(f"MillepedeCollector/mille/mille_{exp}.{run}/mille_1")
 
-                fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
+                fixed_milleFiles = [os.path.join(dirname, os.path.basename(str(milleFile))) for milleFile in milleData.getFiles()]
 
                 milleData.clear()
                 for f in fixed_milleFiles:

@@ -55,7 +55,7 @@ bool Bundle::compareParticles(Particle* iPart, Particle* jPart)
 
 void Bundle::tagCurlInfo()
 {
-  //somewhat slow but should only be comparing 2-3 particles so shouldnt be a problem.
+  //somewhat slow but should only be comparing 2-3 particles so shouldn't be a problem.
   //std::sort (m_Particles.begin(), m_Particles.end(), compareParticles);
   unsigned int bundleSize = size();
   float lowestVal  = 1e10;

@@ -28,10 +28,10 @@ double EventT0::getEventT0() const
   return m_eventT0.eventT0;
 }
 
-boost::optional<EventT0::EventT0Component> EventT0::getEventT0Component() const
+std::optional<EventT0::EventT0Component> EventT0::getEventT0Component() const
 {
   if (hasEventT0()) {
-    return boost::make_optional(m_eventT0);
+    return std::make_optional(m_eventT0);
   }
 
   return {};

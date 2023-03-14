@@ -47,147 +47,191 @@ EARLY_STOPPER = early_stopping()
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """Building Graph inside tensorflow"""
-    tf.reset_default_graph()
-    x = tf.placeholder(tf.float32, [None, number_of_features])
-    y = tf.placeholder(tf.float32, [None, 1])
-    # Used as input for pre training data set.
-    z = tf.placeholder(tf.float32, [None, number_of_spectators])
 
-    def layer(x, shape, name, unit=tf.sigmoid):
-        """Build one hidden layer in feed forward net"""
-        with tf.name_scope(name):
-            weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
-            biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
-            layer = unit(tf.matmul(x, weights) + biases)
-        return layer
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
-    def build_relation_net_variables(shape, name):
-        """Build the variables(not the net itself), who will be shared between multiple relations"""
-        variables = []
-        with tf.name_scope(name), tf.variable_scope(name):
+    class my_model(tf.Module):
+
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+
+            self.optimizer = tf.optimizers.Adam(0.01)
+            self.pre_optimizer = tf.optimizers.Adam(0.01)
+
+            def create_layer_variables(shape, name, activation_function):
+                weights = tf.Variable(
+                    tf.random.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))),
+                    name=f'{name}_weights')
+                biases = tf.Variable(tf.zeros(shape=[shape[1]]), name=f'{name}_biases')
+                return weights, biases, activation_function
+
+            n = int(number_of_features / 6)
+            self.number_of_track_pairs = int(n * (n - 1) / 2)
+            self.number_of_features_per_relation = 1
+            self.parameters = parameters
+
+            # build the relation net variables
+            self.rel_net_vars = []
+            shape = [12, 50, 50, 1]
             for i in range(len(shape) - 1):
-                weights = tf.get_variable('weights_{}'.format(i),
-                                          initializer=tf.truncated_normal(shape[i:i + 2],
-                                                                          stddev=1.0 / np.sqrt(float(shape[0]))))
-                biases = tf.get_variable('biases_{}'.format(i), initializer=tf.constant(0.0, shape=[shape[i + 1]]))
-                variables.append([weights, biases])
-        return variables
+                unit = tf.nn.tanh
+                if i == len(shape) - 2:
+                    unit = tf.nn.sigmoid
+                self.rel_net_vars.append(create_layer_variables(shape[i:i + 2], f'relation_{i}', unit))
 
-    def relation_net(x, variables):
-        """Build one relation net between 2 object using pre-build variables"""
-        net = [x]
-        for layer in variables:
-            if len(variables) != len(net):
-                net.append(tf.nn.tanh(tf.matmul(net[-1], layer[0]) + layer[1]))
+            self.inference_vars = []
+
+            n_features_in = (self.number_of_track_pairs if self.parameters['use_relations'] else number_of_features)
+
+            if self.parameters['use_feed_forward']:
+                self.inference_vars.append(create_layer_variables([n_features_in, 50], 'inf_hidden_1', tf.nn.relu))
+                self.inference_vars.append(create_layer_variables([50, 50], 'inf_hidden_2', tf.nn.relu))
+                self.inference_vars.append(create_layer_variables([50, 1], 'inf_activation', tf.nn.sigmoid))
             else:
-                return tf.nn.sigmoid(tf.matmul(net[-1], layer[0]) + layer[1])
+                self.inference_vars.append(create_layer_variables([n_features_in, 1], 'inf_activation', tf.nn.sigmoid))
 
-    if parameters['use_relations']:
-        # Group input according to relations.
-        tracks = []
-        [tracks.append(tf.slice(x, [0, i * 6], [-1, 6])) for i in range(int(number_of_features / 6))]
+        def dense(self, x, W, b, activation_function):
+            return activation_function(tf.matmul(x, W) + b)
 
-        # Number of features per relation. Each feature is a net with shared variables across all combinations.
-        # Number of Features is also the number of different set of variables for relational nets.
-        number_of_features_per_relation = 1
-        relations = []
-        pre_training_relations = []
-        for feature_number in range(number_of_features_per_relation):
-            # Build the variables, which will be shared across all combinations
-            relational_variables = build_relation_net_variables([12, 50, 50, 1],
-                                                                'tracks_relational_{}'.format(feature_number))
-            # Loop over every combination of input groups.
-            for counter, track1 in enumerate(tracks):
-                for track2 in tracks[counter + 1:]:
-                    # Build the net wit pre-build variables.
-                    relations.append(relation_net(tf.concat([track1, track2], 1), relational_variables))
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def prepare_x(self, x):
+            """ prepare the features for use in the relation net """
+            if not self.parameters['use_relations']:
+                return x
 
-            if parameters['pre_training_epochs'] > 0:
-                # build net for pre-training with the same shared variables.
-                pre_training_relations.append(relation_net(z, relational_variables))
+            tracks = []
+            for i in range(int(number_of_features / 6)):
+                tracks.append(tf.slice(x, [0, i * 6], [-1, 6]))
 
-        new_x = tf.concat(relations, 1)
+            relations = []
 
-    else:
-        new_x = x
+            for feature_number in range(self.number_of_features_per_relation):
+                # Loop over every combination of input groups.
+                for counter, track1 in enumerate(tracks):
+                    for track2 in tracks[counter + 1:]:
+                        relations.append(self.relation_net(tf.concat([track1, track2], 1), self.rel_net_vars))
 
-    if parameters['use_feed_forward']:
-        print('Number of variables going into feed_forward:', int(new_x.get_shape()[1]))
-        inference_hidden1 = layer(new_x, [int(new_x.get_shape()[1]), 50], 'inference_hidden1')
-        inference_hidden2 = layer(inference_hidden1, [50, 50], 'inference_hidden2')
-        inference_activation = layer(inference_hidden2, [50, 1], 'inference_sigmoid', unit=tf.sigmoid)
-    else:
-        print('Number of variables going into reduce_max:', int(new_x.get_shape()[1]))
-        inference_activation = layer(new_x, [int(new_x.get_shape()[1]), 1], 'inference_sigmoid', unit=tf.sigmoid)
-        print(inference_activation.get_shape())
+            # workaround required for saving the model.
+            # Otherwise ValueErrors for trying to concatenate a list of length 0.
+            if relations:
+                return tf.concat(relations, 1)
+            else:
+                return x
 
-    epsilon = 1e-5
-    inference_loss = -tf.reduce_sum(y * tf.log(inference_activation + epsilon) +
-                                    (1.0 - y) * tf.log(1 - inference_activation + epsilon))
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, 12], dtype=tf.float32)])
+        def pre_train(self, z):
+            """build net for pre-training with the same shared variables """
+            if not self.parameters['use_relations']:
+                return z
 
-    inference_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-    inference_minimize = inference_optimizer.minimize(inference_loss)
+            pre_training_relations = []
+            for feature_number in range(self.number_of_features_per_relation):
+                if self.parameters['pre_training_epochs'] > 0:
+                    pre_training_relations.append(self.relation_net(z, self.rel_net_vars))
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
+            if pre_training_relations:
+                return tf.concat(pre_training_relations, 1)
+            else:
+                return z
 
-    state = State(x, y, inference_activation, inference_loss, inference_minimize, session)
+        def relation_net(self, x, variables):
+            """Build one relation net between 2 object using pre-build variables"""
+            for layer in variables:
+                x = self.dense(x, *layer)
+            return x
 
-    if parameters['pre_training_epochs'] > 0:
-        # define training ops for pre-training and save them into state
-        new_z = tf.concat(pre_training_relations, 1)
-        pre_activation = layer(new_z, [int(new_z.get_shape()[1]), 1], 'pre_output')
-        state.pre_loss = -tf.reduce_sum(y * tf.log(pre_activation + epsilon) +
-                                        (1.0 - y) * tf.log(1 - pre_activation + epsilon))
-        pre_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-        state.pre_minimize = pre_optimizer.minimize(state.pre_loss)
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def __call__(self, x):
+            x = self.prepare_x(x)
+            for variables in self.inference_vars:
+                x = self.dense(x, *variables)
+            return x
 
-    state.pre_training_epochs = parameters['pre_training_epochs']
-    state.z = z
-    init = tf.global_variables_initializer()
-    session.run(init)
+        @tf.function
+        def loss(self, predicted_y, target_y, w):
+            epsilon = 1e-5
+            diff_from_truth = tf.where(target_y == 1., predicted_y, 1. - predicted_y)
+            return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
 
+    state = State(model=my_model())
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """Saves the training validation set for monitoring."""
     state.val_x = Xtest
     state.val_y = ytest
     state.val_z = Stest
 
+    state.nBatches = nBatches
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """Pass received data to tensorflow session"""
-    feed_dict = {state.x: X, state.y: y, state.z: S}
+
+    def variable_is_trainable(var, parameters, pre_training=False):
+        out = True
+        if not parameters['use_relations'] and 'relation_' in var.name:
+            out = False
+        if pre_training and 'inf_' in var.name:
+            out = False
+        return out
 
     # pre training trains shared variables on only 2 lines.
     # In this case there is no relation net which have to compare two lines not hitting each other in a signal event.
-    if state.pre_training_epochs > epoch:
-        state.session.run(state.pre_minimize, feed_dict=feed_dict)
-        if epoch % 1000 == 0:
-            avg_cost = state.session.run(state.pre_loss, feed_dict={state.y: state.val_y, state.z: state.val_z})
-            print("Pre-Training: Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-            return True
+    if state.model.parameters['pre_training_epochs'] > epoch:
+        pre_trainable_variables = [
+            x for x in state.model.trainable_variables if variable_is_trainable(
+                x, state.model.parameters, True)]
+        with tf.GradientTape() as tape:
+            avg_cost = state.model.loss(state.model.pre_train(S), y, w)
+            grads = tape.gradient(avg_cost, pre_trainable_variables)
+        state.model.pre_optimizer.apply_gradients(zip(grads, pre_trainable_variables))
+
+        if state.epoch == epoch:
+            state.avg_costs.append()
+        else:
+            # started a new epoch, reset the avg_costs and update the counter
+            print(f"Pre-Training: Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
+            state.avg_costs = [avg_cost]
+            state.epoch = epoch
 
     # Training of the whole network.
     else:
-        state.session.run(state.optimizer, feed_dict=feed_dict)
-        if epoch % 1000 == 0:
-            avg_cost = state.session.run(state.cost, feed_dict={state.y: state.val_y, state.x: state.val_x})
-            print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-            return EARLY_STOPPER.check(avg_cost)
+        trainable_variables = [
+            x for x in state.model.trainable_variables if variable_is_trainable(
+                x, state.model.parameters, False)]
+        with tf.GradientTape() as tape:
+            avg_cost = state.model.loss(state.model(X), y, w)
+            grads = tape.gradient(avg_cost, trainable_variables)
 
+        state.model.optimizer.apply_gradients(zip(grads, trainable_variables))
+
+        if batch == 0 and epoch == 0:
+            state.avg_costs = [avg_cost]
+        elif batch != state.nBatches-1:
+            state.avg_costs.append(avg_cost)
+        else:
+            # started a new epoch, reset the avg_costs and update the counter
+            if epoch == state.model.parameters['pre_training_epochs']:
+                print(f"Pre-Training: Epoch: {epoch:05d}, cost={np.mean(state.avg_costs):.5f}")
+            else:
+                print(f"Epoch: {epoch:05d}, cost={np.mean(state.avg_costs):.5f}")
+
+            early_stopper_flag = EARLY_STOPPER.check(np.mean(state.avg_costs))
+            state.avg_costs = [avg_cost]
+            return early_stopper_flag
     return True
 
 
 if __name__ == "__main__":
     import os
     import pandas
-    from root_pandas import to_root
+    import uproot
     import tempfile
     import json
 
@@ -212,7 +256,7 @@ if __name__ == "__main__":
     # Used as input variables for pre-training.
     spectators = ['Spx1', 'Spy1', 'Spz1', 'Sdx1', 'Sdy1', 'Sdz1', 'Spx2', 'Spy2', 'Spz2', 'Sdx2', 'Sdy2', 'Sdz2']
     # Number of events in training and test root file.
-    number_of_events = 1000000
+    number_of_events = 100000
 
     def build_signal_event():
         """Building two lines which are hitting each other"""
@@ -250,7 +294,8 @@ if __name__ == "__main__":
             dic.update({'isSignal': target})
 
             df = pandas.DataFrame(dic, dtype=np.float32)
-            to_root(df, os.path.join(path, filename), key='variables')
+            with uproot.recreate(os.path.join(path, filename)) as outfile:
+                outfile['variables'] = df
 
         # ##########################Do Training#################################
         # Do a comparison of different Nets for this task.
@@ -264,23 +309,20 @@ if __name__ == "__main__":
 
         specific_options = basf2_mva.PythonOptions()
         specific_options.m_framework = "tensorflow"
-        specific_options.m_steering_file = 'toy_relations.py'
+        specific_options.m_steering_file = 'mva/examples/tensorflow/relations.py'
         specific_options.m_nIterations = 100
         specific_options.m_mini_batch_size = 100
-        specific_options.m_training_fraction = 0.999
 
         print('Train relational net with pre-training')
         general_options.m_identifier = os.path.join(path, 'relation_2.xml')
-        specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': False, 'pre_training_epochs': 30000})
+        specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': False, 'pre_training_epochs': 10})
         basf2_mva.teacher(general_options, specific_options)
 
-        # Train normal feed forward Net:
         print('Train feed forward net')
         general_options.m_identifier = os.path.join(path, 'feed_forward.xml')
         specific_options.m_config = json.dumps({'use_relations': False, 'use_feed_forward': True, 'pre_training_epochs': 0})
         basf2_mva.teacher(general_options, specific_options)
 
-        # Train Relation Net:
         print('Train relational net')
         general_options.m_identifier = os.path.join(path, 'relation.xml')
         specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': True, 'pre_training_epochs': 0})
@@ -300,6 +342,6 @@ if __name__ == "__main__":
         print('Apply special relational net')
         p3, t3 = method3.apply_expert(test_data, general_options.m_treename)
 
-        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
-        print('Relational Net AUC: ', basf2_mva_util.calculate_roc_auc(p2, t2))
-        print('Relational Net with pre-training AUC: ', basf2_mva_util.calculate_roc_auc(p3, t3))
+        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p1, t1))
+        print('Relational Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p2, t2))
+        print('Relational Net with pre-training AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p3, t3))

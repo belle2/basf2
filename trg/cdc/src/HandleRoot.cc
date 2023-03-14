@@ -132,12 +132,12 @@ namespace HandleRoot {
   {
     // Save m_mDouble
     for (map<string, double >::iterator it = trackMapD.begin(); it != trackMapD.end(); ++it) {
-      new((*trackMapTVectorD.at(prefix + "TrackDouble" + (*it).first))[trackMapD["iSave"]]) TVectorD(1, &(*it).second);
+      new ((*trackMapTVectorD.at(prefix + "TrackDouble" + (*it).first))[trackMapD["iSave"]]) TVectorD(1, &(*it).second);
     }
     // Save m_mVector
     for (map<string, vector<double> >::iterator it = trackMapV.begin(); it != trackMapV.end(); ++it) {
       unsigned t_vectorSize = it->second.size();
-      new((*trackMapTVectorD.at(prefix + "TrackVector" + (*it).first))[trackMapD["iSave"]]) TVectorD(t_vectorSize, &((*it).second)[0]);
+      new ((*trackMapTVectorD.at(prefix + "TrackVector" + (*it).first))[trackMapD["iSave"]]) TVectorD(t_vectorSize, &((*it).second)[0]);
     }
 
     trackMapD["iSave"]++;

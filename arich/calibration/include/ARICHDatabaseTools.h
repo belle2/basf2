@@ -30,12 +30,12 @@ namespace Belle2 {
         * @brief m_gValidSectors is a array containing allowed sector ids
         */
       static constexpr auto m_gValidSectors =
-      std::array<uint8_t, 4>({{'A', 'B', 'C', 'D'}});
+      std::array<uint8_t, 4>( {{'A', 'B', 'C', 'D'}});
 
       /**
         * @brief m_gMaxChannel number of maximum channel starting from 0
         */
-      static constexpr auto m_gMaxChannel = int8_t{36};
+      static constexpr auto m_gMaxChannel = int8_t {36};
 
       /**
        * @brief isValidChannel defines the range of valid channels.
@@ -119,7 +119,8 @@ namespace Belle2 {
        * @param id
        */
       friend inline auto operator<<(std::ostream& rStream, const ModuleID_t id)
-      -> std::ostream& {
+      -> std::ostream&
+      {
         rStream << id.getSector() << static_cast<int>(id.getChannel());
         return rStream;
       }
@@ -257,7 +258,7 @@ namespace Belle2 {
 
       /**
        * Double specialization of TokenCast<T> the decimal point is set to '.'!
-       * Note: the spelication on locale is unclear need Basf2 facet defs!
+       * Note: the spelication on locale is unclear need basf2 facet defs!
        * @todo check with framework developer on set facet that defines the decimal
        * point...
        */
@@ -359,17 +360,17 @@ namespace Belle2 {
        */
       template <typename T>
       static inline auto convert(const std::string& rLine, const char delim = ' ')
-      -> std::vector<T> {
+      -> std::vector<T>
+      {
         const auto cast = PrivateHelperClasses::TokenCast<T>();
         // check if line only contains white space, numbers and delimiter char.
         if (!std::all_of(rLine.begin(), rLine.end(),
-        [&cast, delim](const unsigned char c)
-      {
+        [&cast, delim](const unsigned char c) {
         return std::isdigit(c) || std::isspace(c) ||
-          (c == delim) || cast.isValidChar(c);
+                 (c == delim) || cast.isValidChar(c);
         }))
         throw std::runtime_error("Detected invalid character in '" + rLine +
-        "'!");
+                                 "'!");
 
         auto iss = std::istringstream(rLine);
         auto retval = std::vector<T>();
@@ -379,15 +380,13 @@ namespace Belle2 {
         while (std::getline(iss, token, delim))
           try {
             retval.emplace_back(cast(token));
-          } catch (const std::invalid_argument& rErr)
-          {
+          } catch (const std::invalid_argument& rErr) {
             throw std::runtime_error("Invalid token, got:'" + token + "'! " +
-            rErr.what());
-          } catch (const std::out_of_range& rErr)
-          {
+                                     rErr.what());
+          } catch (const std::out_of_range& rErr) {
             // if the values exceeds the requested type
             throw std::runtime_error("Conversion out of range, got: '" + token +
-            "'! " + rErr.what());
+                                     "'! " + rErr.what());
           }
 
         return retval;
@@ -405,7 +404,8 @@ namespace Belle2 {
        */
       template <typename T>
       static inline auto parse(const std::string& rLine, const char delim = ' ')
-      -> std::string {
+      -> std::string
+      {
         auto out = std::stringstream();
         auto iss = std::istringstream(rLine);
         auto token = std::string();
@@ -414,8 +414,7 @@ namespace Belle2 {
           return std::string();
 
         if (std::search(token.begin(), token.end(), m_gRangeOperator.begin(),
-        m_gRangeOperator.end()) != token.end())
-        {
+                        m_gRangeOperator.end()) != token.end()) {
           StringToVector::expand<T>(out, delim, token);
         } else {
           out << token;
@@ -425,22 +424,19 @@ namespace Belle2 {
         while (std::getline(iss, token, delim))
           try {
             if (std::search(token.begin(), token.end(), m_gRangeOperator.begin(),
-            m_gRangeOperator.end()) != token.end())
-            {
+                            m_gRangeOperator.end()) != token.end()) {
               out << ',';
               StringToVector::expand<T>(out, delim, token);
             } else {
               out << delim << token;
             }
-          } catch (const std::invalid_argument& rErr)
-          {
+          } catch (const std::invalid_argument& rErr) {
             throw std::runtime_error("Invalid token, got:'" + token + "'! " +
-            rErr.what());
-          } catch (const std::out_of_range& rErr)
-          {
+                                     rErr.what());
+          } catch (const std::out_of_range& rErr) {
             // if the values exceeds the requested type
             throw std::runtime_error("Conversion out of range, got: '" + token +
-            "'! " + rErr.what());
+                                     "'! " + rErr.what());
           }
         return out.str();
       }
@@ -457,9 +453,10 @@ namespace Belle2 {
        */
       template <typename T>
       static inline auto expand(std::ostream& rStream, const char delim,
-                                const std::string& rToken) -> std::ostream& {
+                                const std::string& rToken) -> std::ostream&
+      {
         auto itPos = std::search(rToken.begin(), rToken.end(),
-        m_gRangeOperator.begin(), m_gRangeOperator.end());
+                                 m_gRangeOperator.begin(), m_gRangeOperator.end());
         const auto cast = PrivateHelperClasses::TokenCast<T>();
         auto lhs = cast(std::string(rToken.begin(), itPos));
         std::advance(itPos, m_gRangeOperator.size());
@@ -488,7 +485,8 @@ namespace Belle2 {
      * @return std::vector<int> of channel with a denined offset.
      */
     auto getDeadCutList(const char chipID, const std::string& line)
-    -> std::vector<int> {
+    -> std::vector<int>
+    {
       auto ids = StringToVector::convert<int>(line, ','); // can throw
       for (auto& rID : ids)
         rID = ModuleID_t(chipID, rID).getNumbering();

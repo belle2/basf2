@@ -36,11 +36,11 @@ namespace {
     const double z = 1.678;
 
     const int charge = -1;
-    const double bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T;
+    const double bfield = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
     const double alpha = 1.0 / (bfield * Belle2::Const::speedOfLight) * 1E4;
     const double aq = charge / alpha;
 
-    Belle2::Helix helix = Belle2::Helix(TVector3(x, y, z), TVector3(px, py, pz), charge, bfield);
+    Belle2::Helix helix = Belle2::Helix(ROOT::Math::XYZVector(x, y, z), ROOT::Math::XYZVector(px, py, pz), charge, bfield);
 
     const double pt = std::sqrt(px * px + py * py);
     const double omega = aq / pt;
@@ -77,8 +77,8 @@ namespace {
     Eigen::Matrix<double, 5, 6> jacobian_numerical = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
     Eigen::Matrix<double, 5, 6> jacobian_analytical = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
 
-    TVector3 postmp;
-    TVector3 momtmp;
+    ROOT::Math::XYZVector postmp;
+    ROOT::Math::XYZVector momtmp;
 
     //random start values to ensure x and p vector are not orthogonal/parallel
     const double px = 0.523214;
@@ -90,20 +90,19 @@ namespace {
 
     const Eigen::Matrix<double, 1, 6> positionAndMom_ = (Eigen::Matrix<double, 1, 6>() << x, y, z, px, py, pz).finished();
     const int charge = -1;
-    const double bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T;
+    const double bfield = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
 
-    Belle2::Helix helix = Belle2::Helix(TVector3(x, y, z), TVector3(px, py, pz), charge, bfield);
+    Belle2::Helix helix = Belle2::Helix(ROOT::Math::XYZVector(x, y, z), ROOT::Math::XYZVector(px, py, pz), charge, bfield);
 
     for (int jin = 0; jin < 6; ++jin) {
-      for (int i = 0; i < 3; ++i) {
-        postmp[i] = positionAndMom_(i);
-        momtmp[i] = positionAndMom_(i + 3);
-      }
-      if (jin < 3) {
-        postmp[jin] += delta;
-      } else {
-        momtmp[jin - 3] += delta;
-      }
+      postmp.SetCoordinates(positionAndMom_(0), positionAndMom_(1), positionAndMom_(2));
+      momtmp.SetCoordinates(positionAndMom_(3), positionAndMom_(4), positionAndMom_(5));
+      if (jin == 0) postmp.SetX(postmp.X() + delta);
+      if (jin == 1) postmp.SetY(postmp.Y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.Z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.X() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.Y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.Z() + delta);
 
       Belle2::Helix helixPlusDelta(postmp, momtmp, charge, bfield);
 

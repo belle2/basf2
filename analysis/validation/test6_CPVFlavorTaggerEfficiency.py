@@ -13,14 +13,12 @@
 <header>
   <input>CPVToolsOutput.root</input>
   <output>test6_CPVFlavorTaggerEfficiency.root</output>
-  <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
+  <contact>Yo Sato; yosato@post.kek.jp</contact>
   <description>This file calculates the effective efficiency of the category based flavor tagger considering the two
-  standard combiners and the individual categories. Validation plots are also pruduced. </description>
+  standard combiners and the individual categories. Validation plots are also produced. </description>
 </header>
 """
 
-
-import flavorTagger as ft
 import ROOT
 from array import array
 
@@ -33,9 +31,9 @@ treeName = str("B0tree")
 workingDirectory = '.'
 
 #
-# *****************************************
-# DETERMINATION OF TOTAL EFFECTIVE EFFIENCY
-# *****************************************
+# *******************************************
+# DETERMINATION OF TOTAL EFFECTIVE EFFICIENCY
+# *******************************************
 #
 
 r_subsample = array('d', [
@@ -49,11 +47,6 @@ r_subsample = array('d', [
     1.0])
 r_size = len(r_subsample)
 average_eff = 0
-
-# working directory
-# needs the B0_B0bar_final.root-file
-# treeName = 'B0tree'
-
 
 # All possible Categories
 categories = [
@@ -109,20 +102,14 @@ for branch in tree.GetListOfBranches():
 if 'FBDT_qrCombined' in totalBranches:
     methods.append("FBDT")
 
-if 'FANN_qrCombined' in totalBranches:
-    methods.append("FANN")
-
 usedCategories = []
 for cat in categories:
     catBranch = 'qp' + cat
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
-if len(usedCategories) > 1:
-    ft.WhichCategories(usedCategories)
-
 categoriesNtupleList = str()
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+for category in usedCategories:
     categoriesNtupleList = categoriesNtupleList + "Eff_%s:" % category
 
 
@@ -133,7 +120,7 @@ outputFile = ROOT.TFile("test6_CPVFlavorTaggerEfficiency.root", "RECREATE")
 outputNtuple = ROOT.TNtuple(
     "FT_Efficiencies",
     "Effective efficiencies of the flavor tagger combiners as well as of the individual tagging categories.",
-    "Eff_FBDT:DeltaEff_FBDT:Eff_FANN:DeltaEff_FANN:" + categoriesNtupleList)
+    "Eff_FBDT:DeltaEff_FBDT:" + categoriesNtupleList)
 
 outputNtuple.SetAlias('Description', "These are the effective efficiencies of the flavor tagger combiners as well as of " +
                       "the individual tagging efficiencies.")
@@ -141,31 +128,31 @@ outputNtuple.SetAlias(
     'Check',
     "These values should not change drastically. Since the nightly reconstruction validation runs" +
     "on the same input file (which changes only from release to release), the values between builds should be the same.")
-outputNtuple.SetAlias('Contact', "abudinen@mpp.mpg.de")
+outputNtuple.SetAlias('Contact', "yosato@post.kek.jp")
 
 efficienciesForNtuple = []
 
 YmaxForQrPlot = 0
 
 for method in methods:
-    # histogram contains the average r in each of 6 bins -> calculation see below
-    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', 6,
+    # histogram contains the average r in each of 7 bins -> calculation see below
+    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 7 bins (B0 and B0bar)', 7,
                             r_subsample)
-    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 6 bins (B0)', 6,
+    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 7 bins (B0)', 7,
                               r_subsample)
-    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 6 bins (B0bar)', 6,
+    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 7 bins (B0bar)', 7,
                                  r_subsample)
     # histogram with number of entries in for each bin
     histo_entries_per_bin = ROOT.TH1F(
         'entries_per_bin',
         'Events binned in r_subsample according to their r-value for B0 and B0bar prob',
-        6,
+        7,
         r_subsample)
     histo_entries_per_binB0 = ROOT.TH1F('entries_per_binB0', 'Events binned in r_subsample according '
-                                        'to their r-value for B0 prob', 6, r_subsample)
+                                        'to their r-value for B0 prob', 7, r_subsample)
     histo_entries_per_binB0bar = ROOT.TH1F('entries_per_binB0bar',
                                            'Events binned in r_subsample according to their r-value '
-                                           'for B0bar prob', 6, r_subsample)
+                                           'for B0bar prob', 7, r_subsample)
     # histogram network output (not qr and not r) for true B0 (signal) - not necessary
     histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0', 'Combiner network output [not equal to r] '
                                      'for true B0 (binning 100)', 100, 0.0, 1.0)
@@ -185,7 +172,7 @@ for method in methods:
     histo_belleplotBoth = ROOT.TH1F('qr_' + method + '_B0Both',
                                     'qr-tagger output (binning 50)',
                                     50, -1.0, 1.0)
-    # calibration plot for B0. If we get a linaer line our MC is fine, than the assumption r ~ 1- 2w is reasonable
+    # calibration plot for B0. If we get a linear line our MC is fine, than the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
     histo_calib_B0 = ROOT.TH1F('Calibration_' + method + '_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
@@ -228,7 +215,7 @@ for method in methods:
     tree.Draw(method + '_qrCombined>>BellePlot_B0_m2',
               'qrMC == -1 && ' + method + '_qrCombined>0 ')
 
-    # filling with abs(qr) in one of 6 bins with its weight
+    # filling with abs(qr) in one of 7 bins with its weight
     # separate calculation for B0 and B0bar
 
     tree.Project('Average_r', 'abs(' + method + '_qrCombined)',
@@ -236,7 +223,7 @@ for method in methods:
     tree.Project('Average_rB0', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==1)')
     tree.Project('Average_rB0bar', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==-1)')
 
-    # filling with abs(qr) in one of 6 bins
+    # filling with abs(qr) in one of 7 bins
     tree.Project('entries_per_bin', 'abs(' + method + '_qrCombined)', 'abs(qrMC) == 1')
     tree.Project('entries_per_binB0', 'abs(' + method + '_qrCombined)', 'qrMC == 1')
     tree.Project('entries_per_binB0bar', 'abs(' + method + '_qrCombined)', 'qrMC == -1')
@@ -255,7 +242,7 @@ for method in methods:
     print(' ')
     print('****************** CALIBRATION CHECK FOR COMBINER USING ' + method + ' ***************************************')
     print(' ')
-    print('Fit ploynomial of first order to the calibration plot. Expected value ~0.5')
+    print('Fit polynomial of first order to the calibration plot. Expected value ~0.5')
     print(' ')
     histo_calib_B0.Fit(diag, 'TEST')
     print('       ')
@@ -290,7 +277,7 @@ for method in methods:
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
         rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
         rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
-        # calculate the wrong tag fractin (only true if MC data good)
+        # calculate the wrong tag fraction (only true if MC data good)
         wvalue[i] = (1 - rvalueB0Average[i]) / 2
         wvalueB0[i] = (1 - rvalueB0[i]) / 2
         wvalueB0bar[i] = (1 - rvalueB0bar[i]) / 2
@@ -431,7 +418,7 @@ for method in methods:
         ROOT.TNamed(
             'Check',
             'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peaks at +-1 decrease.'))
-    histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
 
     histo_belleplotBoth.SetTitle(
         'Flavor tagger output for combiner ' +
@@ -471,7 +458,7 @@ for method in methods:
         ROOT.TNamed(
             'Check',
             'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peak at +1 decreases.'))
-    histo_belleplotB0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_belleplotB0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_belleplotB0.Write()
 
     # Validation Plot 3
@@ -505,7 +492,7 @@ for method in methods:
             ' for true B0bars'))
     histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed(
         'Check', 'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peak at -1 decreases.'))
-    histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_belleplotB0bar.Write()
 
     # IPython.embed()
@@ -570,8 +557,8 @@ for method in methods:
             method +
             ' for true B0s'))
     histo_calib_B0.GetListOfFunctions().Add(
-        ROOT.TNamed('Check', 'Shape should not change drastically. E.g. warning if the shape stops beeing linear.'))
-    histo_calib_B0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+        ROOT.TNamed('Check', 'Shape should not change drastically. E.g. warning if the shape stops being linear.'))
+    histo_calib_B0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_calib_B0.Write()
 
     histo_belleplotBoth.Delete()
@@ -604,7 +591,7 @@ print('*                                                                        
 # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
 # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+for category in usedCategories:
     # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
     hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
                             category + ' (binning 50)', 50, -1.0, 1.0)
@@ -614,7 +601,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_both = ROOT.TH1F('qp_' + category, 'Input Background (B0bar)' +
                           category + ' (binning 50)', 100, -1, 1)
 
-    # per definiton that input is not comparable to the network output, this has to be transformed.
+    # per definition that input is not comparable to the network output, this has to be transformed.
     # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
     hist_probB0 = ROOT.TH1F('ProbabilityB0_' + category,
                             'Transformed to probability (B0) (' + category + ')',
@@ -628,15 +615,15 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_qpB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qp (B0bar) (' +
                              category + ')', 50, -1.0, 1.0)
     # histogram for abs(qp), i.e. this histogram contains the r-values -> transformation below
-    # also used to get the number of entries, sorted into 6 bins
-    hist_absqpB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qp)(B0) (' + category + ')', 6, r_subsample)
-    hist_absqpB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qp) (B0bar) (' + category + ')', 6, r_subsample)
+    # also used to get the number of entries, sorted into 7 bins
+    hist_absqpB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qp)(B0) (' + category + ')', 7, r_subsample)
+    hist_absqpB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qp) (B0bar) (' + category + ')', 7, r_subsample)
     # histogram contains at the end the average r values -> calculation below
-    # sorted into 6 bins
+    # sorted into 7 bins
     hist_aver_rB0 = ROOT.TH1F('AverageRB0_' + category, 'A good one (B0)' +
-                              category, 6, r_subsample)
+                              category, 7, r_subsample)
     hist_aver_rB0bar = ROOT.TH1F('AverageRB0bar_' + category, 'A good one (B0bar)' +
-                                 category, 6, r_subsample)
+                                 category, 7, r_subsample)
     # ****** TEST OF CALIBRATION ******
     # for calibration plot we want to have
     hist_all = ROOT.TH1F('All_' + category, 'Input Signal (B0) and Background (B0Bar)' +
@@ -687,7 +674,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
             purityB0bar[i] = back[i] / (signal[i] + back[i])
             dilutionB0bar2[i] = -1 + 2 * back[i] / (signal[i] + back[i])
 
-        # filling histogram with probabilty from 0 to 1
+        # filling histogram with probability from 0 to 1
         hist_probB0.Fill(purityB0[i], signal[i])
         hist_probB0bar.Fill(purityB0bar[i], back[i])
 
@@ -846,7 +833,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_both.GetListOfFunctions().Add(ROOT.TNamed('Description', 'Output of the flavor tagger category ' + catName))
     hist_both.GetListOfFunctions().Add(
         ROOT.TNamed('Check', 'Shape should not change drastically. E.g. Warning if there is only a peak at 0.'))
-    hist_both.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    hist_both.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
 
     hist_both.SetTitle(
         'Flavor tagger output of the category ' +

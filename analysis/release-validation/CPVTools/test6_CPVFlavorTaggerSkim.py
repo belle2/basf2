@@ -25,7 +25,7 @@ import modularAnalysis as ma
 import os
 import sys
 
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 
 if len(sys.argv) != 3:
     sys.exit('Must provide three input parameters: [Belle_Belle2] [output_root_file_name]'
@@ -49,7 +49,7 @@ if belleOrBelle2Flag == "Belle":
 ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
 ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
-ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
+ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='abs(dM) < 0.11', path=cp_val_path)
 ma.matchMCTruth(list_name='J/psi:mumu', path=cp_val_path)
 
 if belleOrBelle2Flag == "Belle":
@@ -58,50 +58,22 @@ if belleOrBelle2Flag == "Belle":
     ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
 
     # reconstruct B0 -> J/psi Ks decay
-    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)
 
 if belleOrBelle2Flag == "Belle2":
 
     # reconstruct Ks from standard pi+ particle list
     ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
-    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='abs(dM) < 0.25', path=cp_val_path)
 
     # reconstruct B0 -> J/psi Ks decay
-    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)
 
 ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
 ma.buildRestOfEvent(target_list_name='B0:sig', path=cp_val_path)
 
 ma.applyCuts(list_name='B0:sig', cut='abs(isRelatedRestOfEventB0Flavor) == 1', path=cp_val_path)
-
-# # Get Special GT for the flavor tagger weight files
-# b2.use_central_database("analysis_tools_release-03-01-00")
-#
-# # Flavor Tagger, Vertex of Signal Side and TagV
-# ft.flavorTagger(
-#     particleLists=['B0:sig'],
-#     weightFiles='B2JpsiKs_muBGx1',
-#     belleOrBelle2=belleOrBelle2Flag,
-#     path=cp_val_path)
-#
-# cutString = "qpCategory(FastPion) > 0.4 and qpCategory(FastPion) < 0.5 " + \
-#             "and hasTrueTargets(FastPion) < 1 and isRelatedRestOfEventB0Flavor == 1"
-# cutString = "qpCategory(Kaon) > -1 and qpCategory(Kaon) < -0.8 and hasTrueTargets(Kaon) == 0 "
-# cutString = "qpCategory(KinLepton) > 0.8 and qpCategory(KinLepton) < 1 and hasTrueTargets(KinLepton) == 0 "
-# cutString = "qpCategory(SlowPion)> -1 and qpCategory(SlowPion) < -0.8 and hasTrueTargets(SlowPion) == 0 "
-# cutString = "qrOutput(FBDT) > 0.4 and qrOutput(FBDT) < 0.65"
-
-# printVariablesList = []
-# for (particleList, category, combinerVariable) in eventLevelParticleLists:
-#     if category != "MaximumPstar":
-#         cutString = cutString + " and hasTrueTargets(" + category + ") == 0 "
-#    printVariablesList.append("qpCategory(" + category + ")")
-#    printVariablesList.append("hasTrueTargets(" + category + ")")
-
-# applyCuts('B0:sig', cutString)
-
-# printVariableValues('B0:sig', printVariablesList)
 
 # Skim 1
 # The new algorithm

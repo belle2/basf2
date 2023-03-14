@@ -55,8 +55,8 @@
 
 using namespace Belle2;
 
-DisplayUI::DisplayUI(bool automatic):
-  m_automatic(automatic)
+DisplayUI::DisplayUI(bool automatic, bool advance):
+  m_automatic(automatic), m_advance(advance)
 {
   //ensure GUI thread goes away when parent dies. (root UI loves deadlocks)
   prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -78,7 +78,6 @@ DisplayUI::DisplayUI(bool automatic):
 
   m_eventData = new TEveElementList();
 }
-
 
 DisplayUI::~DisplayUI()
 {
@@ -121,6 +120,7 @@ void DisplayUI::setTitle(const std::string& fileName)
   TEveBrowser* browser = gEve->GetBrowser();
   browser->SetWindowName(title.c_str());
 }
+
 void DisplayUI::allowFlaggingEvents(const std::string& description)
 {
   std::string label = "Flag this Event";
@@ -187,7 +187,6 @@ void DisplayUI::goToEvent(Long_t id)
   if (numEntries > 0 and id >= numEntries)
     id = numEntries - 1;
 
-
   if (m_currentEntry == id) return;
 
   if (!InputController::canControlInput() && m_currentEntry != id - 1) {
@@ -203,7 +202,6 @@ void DisplayUI::goToEvent(Long_t id)
   gVirtualX->SetCursor(gEve->GetBrowser()->GetId(), gVirtualX->CreateCursor(kWatch));
   m_nextButton->SetEnabled(false);
   m_prevButton->SetEnabled(false);
-
 
   if (m_timer)
     m_timer->Stop(); //apparently timer only deactivates after processing event, so do it manually
@@ -330,7 +328,7 @@ void DisplayUI::handleEvent(Event_t* event)
         break;
       case 53: //Ctrl + q
         if (event->fState & kKeyControlMask)
-          exit();
+          closeAndExit();
         break;
     }
   }
@@ -346,6 +344,10 @@ bool DisplayUI::startDisplay()
       const int pollIntervalMs = 300;
       t->Connect("Timeout()", "Belle2::DisplayUI", this, "pollNewEvents()");
       t->Start(pollIntervalMs);
+    }
+
+    if (m_advance) {
+      togglePlayPause();
     }
 
     //import the geometry in the projection managers (only needs to be done once)
@@ -365,6 +367,7 @@ bool DisplayUI::startDisplay()
   }
 
   updateUI(); //update button state
+
   m_viewPane->getInfoWidget()->update();
 
   m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements(gEve->GetEventScene()));
@@ -400,15 +403,13 @@ bool DisplayUI::startDisplay()
   return m_reshowCurrentEvent;
 }
 
-
-
 void DisplayUI::makeGui()
 {
   m_guiInitialized = true;
   TEveBrowser* browser = gEve->GetBrowser();
   const int margin = 3;
 
-  browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "exit()");
+  browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "closeAndExit()");
 
   //add handler for keyboard events, needs to be done for browser TGFrame as well as frames of all TGLViewers
   browser->Connect("ProcessedEvent(Event_t*)", "Belle2::DisplayUI", this, "handleEvent(Event_t*)");
@@ -526,7 +527,6 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
-
   TGGroupFrame* viewer_frame = new TGGroupFrame(frmMain);
   viewer_frame->SetTitle("Current Viewer");
   {
@@ -580,7 +580,6 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(visOptionsFrame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
-
   TGGroupFrame* automatisation_frame = new TGGroupFrame(frmMain);
   automatisation_frame->SetTitle("Automatic Saving (experimental)");
   {
@@ -624,7 +623,7 @@ void DisplayUI::makeGui()
       TGButton* b = new TGTextButton(hf, "     Exit     ");
       b->SetToolTipText("Close the display and stop basf2 after this event.");
       hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
-      b->Connect("Clicked()", "Belle2::DisplayUI", this, "exit()");
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "closeAndExit()");
 
     }
     exit_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
@@ -801,8 +800,12 @@ void DisplayUI::pollNewEvents()
     m_nextButton->SetEnabled(numEvents > 0);
 }
 
-void DisplayUI::exit()
+void DisplayUI::closeAndExit()
 {
+  //stop event processing after current event
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData->setEndOfData();
+
   gSystem->ExitLoop();
   gROOT->SetInterrupt();
   m_cumulative = false;
@@ -819,9 +822,10 @@ void DisplayUI::exit()
   gEve->GetBrowser()->UnmapWindow();
   gEve->GetBrowser()->SendCloseMessage();
 
-  //stop event processing after current event
-  StoreObjPtr<EventMetaData> eventMetaData;
-  eventMetaData->setEndOfData();
+  // This is a bit ugly to do, but it allows us to terminate the process faster and without segfaults
+  // TODO: it's possible to handle this better
+  B2INFO("The display and the basf2 process will now be gracefully terminated.");
+  exit(0);
 }
 
 void DisplayUI::showUserData(const DisplayData& displayData)
@@ -837,7 +841,6 @@ void DisplayUI::showUserData(const DisplayData& displayData)
       gEve->GetBrowser()->StartEmbedding(0);
       fileBrowser = gEve->GetBrowser()->MakeFileBrowser();
       gEve->GetBrowser()->StopEmbedding("Histograms");
-
 
       //create new tab with canvas
       gEve->GetBrowser()->StartEmbedding(TRootBrowser::kRight);
@@ -887,19 +890,4 @@ void DisplayUI::showUserData(const DisplayData& displayData)
       B2WARNING("Cannot select object " << pair.first << "[" << pair.second << "], not found. Is the array available?");
     }
   }
-
-  /*
-    TMacro* m = new TMacro;
-    m->AddLine("{ TEveWindowSlot* currentWindow = gEve->GetWindowManager()->GetCurrentWindowAsSlot(); \
-                  if (currentWindow) { \
-                     std::cout << \" this is a slot!\\n\"; \
-                     currentWindow->StartEmbedding(); \
-                     TCanvas* c = new TCanvas; \
-                     c->cd(); \
-                     currentWindow->StopEmbedding(\"Canvas\"); \
-                   } else { std::cout << \" not a slot!\\n\"; } \
-                 }");
-    m->SetName("Add canvas to active window");
-    fileBrowser->Add(m);
-    */
 }

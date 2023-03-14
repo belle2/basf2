@@ -11,12 +11,12 @@
 #pragma link C++ class Belle2::CDCPropSpeeds+; // checksum=0x24873426, version=1
 #pragma link C++ class Belle2::CDCTimeWalks+; // checksum=0xa0bbe541, version=2
 #pragma link C++ class Belle2::CDCXtRelations+; // checksum=0x4c48166, version=2
-#pragma link C++ class Belle2::CDCSpaceResols+; // checksum=0x9afaab02, version=1
+#pragma link C++ class Belle2::CDCSpaceResols+; // checksum=0xbbc7719, version=2
 #pragma link C++ class Belle2::CDCDisplacement+; // checksum=0xfde3a407, version=3
 #pragma link C++ class Belle2::CDCAlignment+; // checksum=0x93495a07, version=2
 #pragma link C++ class Belle2::CDCLayerAlignment+; // checksum=0x84c87874, version=1
 #pragma link C++ class Belle2::CDCMisalignment+; // checksum=0x67b5fdae, version=1
-#pragma link C++ class Belle2::CDCGeometry+; // checksum=0xe6063d38, version=4
+#pragma link C++ class Belle2::CDCGeometry+; // checksum=0xb2234303, version=5
 #pragma link C++ class Belle2::CDCGeometry::Rib+; // checksum=0x4ba6e828, version=2
 #pragma link C++ class Belle2::CDCGeometry::Rib2+; // checksum=0xbfd84675, version=1
 #pragma link C++ class Belle2::CDCGeometry::Rib3+; // checksum=0xf00885b5, version=1
@@ -39,11 +39,12 @@
 #pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=3
 #pragma link C++ class Belle2::CDCWireHitRequirements+; // checksum=0x4c504d88, version=2
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
+#pragma link C++ class Belle2::CDCCorrToThresholds+; // checksum=0xbea4131b, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1
 
 #pragma link C++ class Belle2::asicChannel+; // checksum=0x7a22a583, implicit, version=-1
 #pragma link C++ class Belle2::adcAsicTuple+; // checksum=0x953c3230, implicit, version=-1
-
+#pragma link C++ class Belle2::CDClayerTimeCut+; // checksum=0x6821631B, version=1
 
 #pragma link C++ class std::map <unsigned short, float>+; // checksum=0x868d8139, version=6
 #pragma link C++ class std::vector<float>+; // checksum=0x55a169b, version=6
@@ -74,5 +75,14 @@
     for (int i=0; i < onfile.m_wires.size(); ++i) { \
       m_wires.insert(std::pair<unsigned short,float>(onfile.m_wires[i], effi)); \
     }\
+  }"
+
+#pragma read sourceClass="Belle2::CDCSpaceResols" version="[-1]" \
+  source="unsigned short m_sigmaParamMode" \
+  targetClass="Belle2::CDCSpaceResols" \
+  target="m_maxSpaceResol" \
+  code="{ \
+    /* set 325um for an old object */ \
+    m_maxSpaceResol = 0.0325; \
   }"
 #endif

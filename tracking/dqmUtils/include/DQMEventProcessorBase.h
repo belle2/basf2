@@ -28,11 +28,13 @@ namespace Belle2 {
     /** Constructor.
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
-     * @param tracksStoreArrayName - StoreArray name where the merged Tracks are written. */
+     * @param tracksStoreArrayName - StoreArray name where the merged Tracks are written.
+     * @param runningOnHLT - true if the module runs on HLT*/
     DQMEventProcessorBase(DQMHistoModuleBase* histoModule, const std::string& recoTracksStoreArrayName,
-                          const std::string& tracksStoreArrayName) :
+                          const std::string& tracksStoreArrayName, bool runningOnHLT = false) :
       m_tracksStoreArrayName(tracksStoreArrayName),
-      m_recoTracksStoreArrayName(recoTracksStoreArrayName)
+      m_recoTracksStoreArrayName(recoTracksStoreArrayName),
+      m_runningOnHLT(runningOnHLT)
     {
       m_histoModule = histoModule;
     }
@@ -40,6 +42,11 @@ namespace Belle2 {
     /** Call this to start processing the event data and filling histograms.
     * Calls ProcessTrack function for each track in store array. */
     virtual void Run();
+
+    /**Call this if you want to produce 1D Track Residual plots for each VXD sensor */
+    void produce1Dres() {m_produce1Dres = true;};
+    /**Call this if you want to produce 2D Track Residual plots for each VXD sensor */
+    void produce2Dres() {m_produce2Dres = true;};
 
   protected:
     /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */
@@ -97,6 +104,15 @@ namespace Belle2 {
     /** StoreArray name where RecoTracks are written. */
     std::string m_recoTracksStoreArrayName = "";
 
+    /** true if the DQM is run on HLT */
+    bool m_runningOnHLT;
+
+    /** if true, produce 1D Track residuals plots for each VXD sensor*/
+    bool m_produce1Dres = false;
+
+    /** if true, produce 2D Track residuals plots for each VXD sensor*/
+    bool m_produce2Dres = false;
+
     /** index of track (with valid TrackFitResult and related RecoTrack) */
     int m_iTrack = 0;
     /** index of track where are VXD hits and aren't CDC hits (with valid TrackFitResult and related RecoTrack) */
@@ -119,11 +135,11 @@ namespace Belle2 {
     VxdID m_sensorIDPrev = VxdID(0);
 
     /** local coordinates of the hit position (u, v, w) */
-    TVector3 m_position = TVector3();
+    ROOT::Math::XYZVector m_position = ROOT::Math::XYZVector();
     /** unbiased residual for the hit in micrometers in local coordinates (u, v, w) */
-    TVector3 m_residual_um = TVector3();
+    ROOT::Math::XYZVector m_residual_um = ROOT::Math::XYZVector();
     /** unbiased residual for the hit in micrometers in global coordinates (x, y, z) */
-    TVector3 m_globalResidual_um = TVector3();
+    ROOT::Math::XYZVector m_globalResidual_um = ROOT::Math::XYZVector();
     /** global phi in degrees of the hit */
     float m_phi_deg = .0;
     /** global phi in degrees of the previous hit*/

@@ -23,24 +23,26 @@
  * to perform the calibration itself.                                     *
  **************************************************************************/
 
-
+/* Own header. */
 #include <ecl/modules/eclBhabhaTimeCalibrationValidationCollector/eclBhabhaTimeCalibrationValidationCollectorModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLDigit.h>
+
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLTrig.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/RecoTrack.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
+/* Basf2 headers. */
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <boost/optional.hpp>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/Track.h>
 
+/* ROOT headers. */
 #include <TH2F.h>
 #include <TTree.h>
 #include <TFile.h>
@@ -52,7 +54,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclBhabhaTimeCalibrationValidationCollector)
+REG_MODULE(eclBhabhaTimeCalibrationValidationCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -63,7 +65,8 @@ eclBhabhaTimeCalibrationValidationCollectorModule::eclBhabhaTimeCalibrationValid
   m_dbg_tree_electronClusters(0),
   m_dbg_tree_event(0),
   m_dbg_tree_run(0),
-  m_CrateTimeDB("ECLCrateTimeOffset")//,
+  m_CrateTimeDB("ECLCrateTimeOffset"),
+  m_channelMapDB("ECLChannelMap")//,
 {
   setDescription("This module validates the ECL cluster times");
 
@@ -80,6 +83,7 @@ eclBhabhaTimeCalibrationValidationCollectorModule::eclBhabhaTimeCalibrationValid
   addParam("tightTrkZ0", m_tightTrkZ0, "max Z0 for tight tracks (cm)", 2.);
   addParam("looseTrkD0", m_looseTrkD0, "max D0 for loose tracks (cm)", 2.);
   addParam("tightTrkD0", m_tightTrkD0, "max D0 for tight tracks (cm)", 0.5);  // beam pipe radius = 1cm in 2019
+  addParam("skipTrgSel", skipTrgSel, "boolean to skip the trigger skim selection", false);
 
 
   // specify this flag if you need parallel processing
@@ -102,45 +106,44 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
     // Per electron cluster
     m_dbg_tree_electronClusters = new TTree("tree_electronClusters",
                                             "Validating crystal and crate time calibrations using electron clusters in events with lots of tracks and clusters") ;
-    m_dbg_tree_electronClusters->Branch("EventNum"  , &m_tree_evt_num)   ->SetTitle("Event number") ;
-    m_dbg_tree_electronClusters->Branch("cluster_time"    , &m_tree_time)   ->SetTitle("Cluster time t (calibrated), ns") ;
-    m_dbg_tree_electronClusters->Branch("clust_E"    , &m_E_electron_clust)   ->SetTitle("Electron type cluster energy, GeV") ;
-    m_dbg_tree_electronClusters->Branch("t0"      , &m_tree_t0)     ->SetTitle("T0, ns") ;
-    m_dbg_tree_electronClusters->Branch("t0_unc"  , &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
-    m_dbg_tree_electronClusters->Branch("runNum"  , &m_tree_run)     ->SetTitle("Run number") ;
-    m_dbg_tree_electronClusters->Branch("CrystalCellID"     , &m_tree_cid)    ->SetTitle("Cell ID, 1..8736") ;
-    m_dbg_tree_electronClusters->Branch("dt99"    , &m_tree_dt99)   ->SetTitle("Cluster dt99, ns") ;
+    m_dbg_tree_electronClusters->Branch("EventNum", &m_tree_evt_num)   ->SetTitle("Event number") ;
+    m_dbg_tree_electronClusters->Branch("cluster_time", &m_tree_time)   ->SetTitle("Cluster time t (calibrated), ns") ;
+    m_dbg_tree_electronClusters->Branch("clust_E", &m_E_electron_clust)   ->SetTitle("Electron type cluster energy, GeV") ;
+    m_dbg_tree_electronClusters->Branch("t0", &m_tree_t0)     ->SetTitle("T0, ns") ;
+    m_dbg_tree_electronClusters->Branch("t0_unc", &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
+    m_dbg_tree_electronClusters->Branch("runNum", &m_tree_run)     ->SetTitle("Run number") ;
+    m_dbg_tree_electronClusters->Branch("CrystalCellID", &m_tree_cid)    ->SetTitle("Cell ID, 1..8736") ;
+    m_dbg_tree_electronClusters->Branch("dt99", &m_tree_dt99)   ->SetTitle("Cluster dt99, ns") ;
     m_dbg_tree_electronClusters->SetAutoSave(10) ;
 
     // Per event
     m_dbg_tree_event = new TTree("tree_event",
                                  "Validating crystal and crate time calibrations using electron clusters in events with lots of tracks and clusters") ;
-    m_dbg_tree_event->Branch("EventNum"  , &m_tree_evt_num)   ->SetTitle("Event number") ;
-    m_dbg_tree_event->Branch("t0"      , &m_tree_t0)     ->SetTitle("T0, ns") ;
-    m_dbg_tree_event->Branch("t0_unc"  , &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
-    m_dbg_tree_event->Branch("runNum"  , &m_tree_run)     ->SetTitle("Run number") ;
-    m_dbg_tree_event->Branch("E0"  , &m_tree_E0)   ->SetTitle("Highest E cluster E") ;
-    m_dbg_tree_event->Branch("E1"  , &m_tree_E1)   ->SetTitle("2nd highest E cluster E") ;
-    m_dbg_tree_event->Branch("time_E0"  , &m_tree_time_fromE0)   ->SetTitle("Cluster time of highest E cluster") ;
-    m_dbg_tree_event->Branch("time_E1"  , &m_tree_time_fromE1)   ->SetTitle("Cluster time of 2nd highest E cluster") ;
+    m_dbg_tree_event->Branch("EventNum", &m_tree_evt_num)   ->SetTitle("Event number") ;
+    m_dbg_tree_event->Branch("t0", &m_tree_t0)     ->SetTitle("T0, ns") ;
+    m_dbg_tree_event->Branch("t0_unc", &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
+    m_dbg_tree_event->Branch("runNum", &m_tree_run)     ->SetTitle("Run number") ;
+    m_dbg_tree_event->Branch("E0", &m_tree_E0)   ->SetTitle("Highest E cluster E") ;
+    m_dbg_tree_event->Branch("E1", &m_tree_E1)   ->SetTitle("2nd highest E cluster E") ;
+    m_dbg_tree_event->Branch("time_E0", &m_tree_time_fromE0)   ->SetTitle("Cluster time of highest E cluster") ;
+    m_dbg_tree_event->Branch("time_E1", &m_tree_time_fromE1)   ->SetTitle("Cluster time of 2nd highest E cluster") ;
     m_dbg_tree_event->SetAutoSave(10) ;
 
 
     // Per run
     m_dbg_tree_run = new TTree("tree_run", "Storing crate time constants") ;
-    m_dbg_tree_run->Branch("runNum"  , &m_tree_run)               ->SetTitle("Run number") ;
-    m_dbg_tree_run->Branch("crateid"  , &m_tree_crateid)          ->SetTitle("Crate ID") ;
-    m_dbg_tree_run->Branch("tcrate"  , &m_tree_tcrate)            ->SetTitle("Crate time") ;
-    m_dbg_tree_run->Branch("tcrate_unc"  , &m_tree_tcrate_unc)    ->SetTitle("Crate time uncertainty") ;
+    m_dbg_tree_run->Branch("runNum", &m_tree_run)               ->SetTitle("Run number") ;
+    m_dbg_tree_run->Branch("crateid", &m_tree_crateid)          ->SetTitle("Crate ID") ;
+    m_dbg_tree_run->Branch("tcrate", &m_tree_tcrate)            ->SetTitle("Crate time") ;
+    m_dbg_tree_run->Branch("tcrate_unc", &m_tree_tcrate_unc)    ->SetTitle("Crate time uncertainty") ;
     m_dbg_tree_run->SetAutoSave(10) ;
 
   }
 
 
   //=== MetaData
-  StoreObjPtr<EventMetaData> evtMetaData ;
-  B2INFO("eclBhabhaTimeCalibrationValidationCollector: Experiment = " << evtMetaData->getExperiment() <<
-         "  run = " << evtMetaData->getRun()) ;
+  B2INFO("eclBhabhaTimeCalibrationValidationCollector: Experiment = " << m_EventMetaData->getExperiment() <<
+         "  run = " << m_EventMetaData->getRun()) ;
 
   //=== Create histograms and register them in the data store
 
@@ -169,7 +172,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";crystal Cell ID ;Electron ECL cluster time [ns]", 8736, 1, 8736 + 1, nbins, min_t, max_t) ;
+                                  ";crystal Cell ID ;Electron ECL cluster time [ns]", ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, nbins,
+                                  min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",
@@ -200,6 +204,9 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   m_eclClusterArray.isRequired() ;
   m_eclCalDigitArray.isRequired() ;
 
+
+  B2INFO("skipTrgSel = " << skipTrgSel);
+
 }
 
 void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
@@ -209,12 +216,60 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
 
-  /* Use ECLChannelMapper to get other detector indices for the crystals */
-  /* For conversion from CellID to crate, shaper, and channel ids. */
+  // --- Check the trigger skim is the type that has two tracks
 
-  // Use smart pointer to avoid memory leak when the ECLChannelMapper object needs destroying at the end of the event.
-  shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
-  crystalMapper->initFromDB();
+  /* If we skip the trigger skim selection then still fill the cutflow histogram
+     just so that the positions don't change. */
+  if (!skipTrgSel) {
+    if (!m_TrgResult.isValid()) {
+      B2WARNING("SoftwareTriggerResult required to select bhabha event is not found");
+      return;
+    }
+
+    /* Release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee.  We only want
+       to look at the 2 track bhabha events. */
+    const std::map<std::string, int>& fresults = m_TrgResult->getResults();
+    if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end()) {
+      B2WARNING("Can't find required bhabha trigger identifier");
+      return;
+    }
+
+    const bool eBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
+                          SoftwareTriggerCutResult::c_accept);
+    B2DEBUG(22, "eBhabha (trigger passed) = " << eBhabha);
+
+    if (!eBhabha) {
+      return;
+    }
+  }
+
+  /*  Fill the histgram showing that the trigger skim cut passed OR that we
+      are skipping this selection. */
+  cutIndexPassed++;
+  getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Trigger cut passed: index = " << cutIndexPassed);
+
+
+
+
+
+  /* Use ECLChannelMapper to get other detector indices for the crystals
+     For conversion from CellID to crate, shaper, and channel ids.
+     The initialization function automatically checks to see if the
+     object has been initialized and ifthe payload has changed and
+     thus needs updating. */
+  bool ECLchannelMapHasChanged = m_channelMapDB.hasChanged();
+  if (ECLchannelMapHasChanged) {
+    B2INFO("eclBhabhaTimeCalibrationValidationCollectorModule::collect() " << LogVar("ECLchannelMapHasChanged",
+           ECLchannelMapHasChanged));
+    if (!m_crystalMapper->initFromDB()) {
+      B2FATAL("eclBhabhaTimeCalibrationValidationCollectorModule::collect() : Can't initialize eclChannelMapper!");
+    }
+  }
+
+
+
+
 
   B2DEBUG(29, "Finished checking if previous crystal time payload has changed");
 
@@ -229,16 +284,16 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   // Conversion coefficient from ADC ticks to nanoseconds
   // TICKS_TO_NS ~ 0.4931 ns/clock tick
-  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 
   vector<float> Crate_time_ns(52, 0.0); /**< vector derived from DB object */
   vector<float> Crate_time_unc_ns(52, 0.0); /**< vector derived from DB object */
 
   // Make a crate time offset vector with an entry per crate (instead of per crystal) and convert from ADC counts to ns.
-  for (int crysID = 1; crysID <= 8736; crysID++) {
-    int crateID_temp = crystalMapper->getCrateID(crysID);
+  for (int crysID = 1; crysID <= ECLElementNumbers::c_NCrystals; crysID++) {
+    int crateID_temp = m_crystalMapper->getCrateID(crysID);
     Crate_time_ns[crateID_temp - 1] = m_CrateTime[crysID] * TICKS_TO_NS;
     Crate_time_unc_ns[crateID_temp - 1] = m_CrateTimeUnc[crysID] * TICKS_TO_NS;
   }
@@ -246,7 +301,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
 
   // Storage crystal energies
-  m_EperCrys.resize(8736);
+  m_EperCrys.resize(ECLElementNumbers::c_NCrystals);
   for (auto& eclCalDigit : m_eclCalDigitArray) {
     int tempCrysID = eclCalDigit.getCellId() - 1;
     m_EperCrys[tempCrysID] = eclCalDigit.getEnergy();
@@ -276,8 +331,6 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   //---------------------------------------------------------------------
   //..Some utilities
-  ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
   PCmsLabTransform boostrotate;
 
   //---------------------------------------------------------------------
@@ -305,7 +358,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     double z0 = tempTrackFit->getZ0() ;
     double d0 = tempTrackFit->getD0() ;
     int nCDChits = tempTrackFit->getHitPatternCDC().getNHits() ;
-    double p = tempTrackFit->getMomentum().Mag() ;
+    double p = tempTrackFit->getMomentum().R() ;
 
     /* Test if loose track  */
 
@@ -393,8 +446,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   double trkEClustCOM[2] = {0., 0.};
   double trkpLab[2];
   double trkpCOM[2];
-  TLorentzVector trkp4Lab[2];
-  TLorentzVector trkp4COM[2];
+  ROOT::Math::PxPyPzEVector trkp4Lab[2];
+  ROOT::Math::PxPyPzEVector trkp4COM[2];
 
   // Index of the cluster and the crystal that has the highest energy crystal for the two tracks
   int numClustersPerTrack[2] = { 0, 0 };
@@ -409,11 +462,13 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     if (maxiTrk[icharge] > -1) {
       B2DEBUG(22, "looping over the 2 max pt tracks");
 
-      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
+      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResultWithClosestMass(Const::pion);
+      if (not tempTrackFit) {continue ;}
+
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
-      trkpLab[icharge] = trkp4Lab[icharge].Rho();
-      trkpCOM[icharge] = trkp4COM[icharge].Rho();
+      trkpLab[icharge] = trkp4Lab[icharge].P();
+      trkpCOM[icharge] = trkp4COM[icharge].P();
 
 
       /* For each cluster associated to the current track, sum up the energies to get the total
@@ -530,12 +585,10 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
 
   //=== For each good electron cluster in the processed event and fill histogram.
-
-  StoreObjPtr<EventMetaData> evtMetaData ;
   for (long unsigned int i = 0 ; i < goodClustTimes.size() ; i++) {
     getObjectPtr<TH1F>("clusterTime")->Fill(goodClustTimes[i]) ;
-    getObjectPtr<TH2F>("clusterTime_cid")->Fill(goodClustMaxEcrys_cid[i] + 0.001, goodClustTimes[i] , 1) ;
-    getObjectPtr<TH2F>("clusterTime_run")->Fill(evtMetaData->getRun() + 0.001, goodClustTimes[i] , 1) ;
+    getObjectPtr<TH2F>("clusterTime_cid")->Fill(goodClustMaxEcrys_cid[i] + 0.001, goodClustTimes[i], 1) ;
+    getObjectPtr<TH2F>("clusterTime_run")->Fill(m_EventMetaData->getRun() + 0.001, goodClustTimes[i], 1) ;
     getObjectPtr<TH2F>("clusterTimeClusterE")->Fill(goodClustE[i], goodClustTimes[i], 1) ;
     getObjectPtr<TH2F>("dt99_clusterE")->Fill(goodClustE[i], goodClust_dt99[i], 1) ;
 
@@ -548,8 +601,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
       m_tree_t0_unc    = evt_t0_unc ;
       m_E_electron_clust = goodClustE[i] ;
       m_NtightTracks   = nTrkTight ;
-      m_tree_evt_num   = evtMetaData->getEvent() ;
-      m_tree_run       = evtMetaData->getRun() ;
+      m_tree_evt_num   = m_EventMetaData->getEvent() ;
+      m_tree_run       = m_EventMetaData->getRun() ;
       m_tree_cid       = goodClustMaxEcrys_cid[i] ;
       m_tree_dt99      = goodClust_dt99[i] ;
 
@@ -574,8 +627,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   if (m_saveTree) {
     m_tree_t0          = evt_t0 ;
     m_tree_t0_unc      = evt_t0_unc ;
-    m_tree_evt_num     = evtMetaData->getEvent() ;
-    m_tree_run         = evtMetaData->getRun() ;
+    m_tree_evt_num     = m_EventMetaData->getEvent() ;
+    m_tree_run         = m_EventMetaData->getRun() ;
     m_NtightTracks     = nTrkTight ;
     m_tree_E0          = goodClustE[0] ;
     m_tree_E1          = goodClustE[1] ;
@@ -585,7 +638,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     m_dbg_tree_event->Fill() ;
 
 
-    int runNum = evtMetaData->getRun();
+    int runNum = m_EventMetaData->getRun();
     if (m_tree_PreviousRun != runNum) {
       for (int icrate = 1; icrate <= 52; icrate++) {
         m_tree_run        = runNum ;

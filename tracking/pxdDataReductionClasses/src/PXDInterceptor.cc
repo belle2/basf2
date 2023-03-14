@@ -13,7 +13,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 PXDInterceptor::PXDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, double tolerancePhi):
@@ -60,7 +59,7 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* interceptList, const
       std::list<ROIDetPlane> selectedPlanes;
       B2DEBUG(20, "    append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
               gfTrackState.getPos().Z());
-      m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos(), pxdLayer + 1);
+      m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, ROOT::Math::XYZVector(gfTrackState.getPos()), pxdLayer + 1);
 
       B2DEBUG(20, "    append intercepts for track " << i);
       appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToPXDIntercepts);
@@ -77,7 +76,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
 
   PXDIntercept tmpPXDIntercept;
 
-  genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+  const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
   std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
 

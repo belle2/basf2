@@ -19,7 +19,7 @@ namespace Belle2 {
   void TOPSampleTimes::setTimeAxis(double syncTimeBase)
   {
     double DTime = 2 * syncTimeBase;
-    double timeBin = DTime / c_TimeAxisSize;
+    double timeBin = DTime / static_cast<double>(c_TimeAxisSize);
     for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin * i;
     m_timeAxis[c_TimeAxisSize] = DTime;
     m_calibrated = c_Default;

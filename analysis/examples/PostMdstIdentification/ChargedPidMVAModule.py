@@ -19,7 +19,7 @@ Optionally, binary PID can be stored, by testing one (or more) pair of (S,B) mas
 
 Usage:
 
-basf2 -i /PATH/TO/MDST/FILE.root analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
+basf2 [-i /PATH/TO/MDST/FILE.root] analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
 
 Input: *_mdst_*.root
 Output: *_ntup_*.root
@@ -68,10 +68,25 @@ def argparser():
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        default=["chargedpidmva_rel-05_test", getAnalysisGlobaltag()],
+                        default=[getAnalysisGlobaltag()],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
-                        "NB: these GTs will have lowest priority.\n"
+                        "NB: these GTs will have lowest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
                         "Pass a space-separated list of names.")
+    parser.add_argument("--global_tag_prepend",
+                        type=str,
+                        nargs="+",
+                        default=None,
+                        help="List of names of conditions DB global tag(s) to prepend to GT replay.\n"
+                        "NB: these GTs will have highest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
+                        "Pass a space-separated list of names.")
+    parser.add_argument("--append_testing_payloads",
+                        type=str,
+                        default=None,
+                        help="Path to a text file with local test payloads.\n"
+                        "NB: these will have higher priority than any payload in the GT(s).\n"
+                        "Use ONLY for testing.")
     parser.add_argument("-d", "--debug",
                         dest="debug",
                         action="store",
@@ -96,6 +111,15 @@ if __name__ == '__main__':
         basf2.conditions.append_globaltag(tag)
     print(f"Appending GTs:\n{args.global_tag_append}")
 
+    if args.global_tag_prepend:
+        for tag in reversed(args.global_tag_prepend):
+            basf2.conditions.prepend_globaltag(tag)
+        print(f"Prepending GTs:\n{args.global_tag_prepend}")
+
+    if args.append_testing_payloads:
+        basf2.conditions.append_testing_payloads(args.append_testing_payloads)
+        print(f"Appending testing payloads (will have highest priority!)):\n{args.append_testing_payloads}")
+
     # ------------
     # Create path.
     # ------------
@@ -106,8 +130,7 @@ if __name__ == '__main__':
     # Add input.
     # ----------
 
-    ma.inputMdst(environmentType="default",
-                 filename=basf2.find_file("mdst13.root", "validation"),
+    ma.inputMdst(filename=basf2.find_file("mdst13.root", "validation"),
                  path=path)
 
     # ---------------------------------------
@@ -134,7 +157,7 @@ if __name__ == '__main__':
     if args.matchTruth:
         for plistname, _ in plists:
             ma.matchMCTruth(plistname, path=path)
-            applyCuts(plistname, "isSignal == 1", path=path)
+            ma.applyCuts(plistname, "isSignal == 1", path=path)
 
     # -------------------
     # Global/Binary PID ?

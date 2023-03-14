@@ -20,6 +20,9 @@
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
+// kFit
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+
 // KFit
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -33,6 +36,9 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+// ROOT
+#include <Math/Vector3D.h>
 
 #include <string>
 #include <vector>
@@ -111,23 +117,22 @@ namespace Belle2 {
                            * 1 fit performed with rolled back parameters
                            * 2 unable to recover truth parameters */
     double m_fitPval;             /**< P value of the tag side fit result */
-    TVector3 m_tagV;              /**< tag side fit result */
+    ROOT::Math::XYZVector m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
-    TVector3 m_mcTagV;            /**< generated tag side vertex */
+    ROOT::Math::XYZVector m_mcTagV;            /**< generated tag side vertex */
     double   m_mcTagLifeTime;     /**< generated tag side life time of B-decay */
     int m_mcPDG;                  /**< generated tag side B flavor */
-    TVector3 m_mcVertReco;        /**< generated Breco decay vertex */
+    ROOT::Math::XYZVector m_mcVertReco;        /**< generated Breco decay vertex */
     double m_mcLifeTimeReco;      /**< generated Breco life time */
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_deltaTErr;           /**< reconstructed DeltaT error */
     double m_mcDeltaTau;            /**< generated DeltaT */
     double m_mcDeltaT;            /**< generated DeltaT with boost-direction approximation */
     TMatrixDSym m_constraintCov;  /**< constraint to be used in the tag vertex fit */
-    TVector3 m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
-    TVector3 m_BeamSpotCenter;    /**< Beam spot position */
+    ROOT::Math::XYZVector m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
+    ROOT::Math::XYZVector m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_BeamSpotCov;    /**< size of the beam spot == covariance matrix on the beam spot position */
     bool m_mcInfo;                /**< true if user wants to retrieve MC information out from the tracks used in the fit */
-    double m_shiftZ;              /**< parameter for testing the systematic error from the IP measurement*/
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object*/
     int m_FitType;                /**< fit algo used  */
     double m_tagVl;               /**< tagV component in the boost direction  */
@@ -140,9 +145,10 @@ namespace Belle2 {
     double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
+    double m_kFitReqReducedChi2;  /**< The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied */
     bool m_verbose;               /**< choose if you want to print extra infos */
     TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and KFit) */
-    TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
+    ROOT::Math::PxPyPzEVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
 
 
     /** central method for the tag side vertex fit */
@@ -152,16 +158,16 @@ namespace Belle2 {
     Particle* doVertexFitForBTube(const Particle* mother, std::string fitType) const;
 
     /** calculate the constraint for the vertex fit on the tag side using Breco information*/
-    std::pair<TVector3, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
 
     /** calculate the standard constraint for the vertex fit on the tag side*/
-    std::pair<TVector3, TMatrixDSym> findConstraintBoost(double cut, double shiftAlongBoost = -2000.) const;
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraintBoost(double cut) const;
 
     /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
     the expected BTag line of flights */
-    std::pair<TVector3, TMatrixDSym> findConstraintBTube(const Particle* Breco, double cut);
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraintBTube(const Particle* Breco, double cut);
 
-    /** get the vertex of the MC B particle associated to Btag. It works anly with signal MC */
+    /** get the vertex of the MC B particle associated to Btag. It works only with signal MC */
     void BtagMCVertex(const Particle* Breco);
 
     /** compare Breco with the two MC B particles */
@@ -171,13 +177,15 @@ namespace Belle2 {
     The user can specify a request on the PXD hits left by the tracks*/
     std::vector<const Particle*> getTagTracks_standardAlgorithm(const Particle* Breco, int nPXDHits) const;
 
+
+    /** performs single KFit on particles stored in particleAndWeights
+    this function can be iterated several times until chi2/ndf of the resulting fit is sufficient */
+    analysis::VertexFitKFit doSingleKfit(std::vector<ParticleAndWeight>& particleAndWeights);
+
     /**
-     * Get a list of pions from a list of pions removing the Kshorts
-     * Warning: this assumes all the particles are pions, which is fine are all the particles
-     * are reconstructed as pions in the TagV module.
+     * Get a list of particles with attached weight and associated MC particle
      */
-    std::vector<ParticleAndWeight> getParticlesWithoutKS(const std::vector<const Particle*>& tagParticles,
-                                                         double massWindowWidth = 0.01) const;
+    std::vector<ParticleAndWeight> getParticlesAndWeights(const std::vector<const Particle*>& tagParticles) const;
 
     /** TO DO: tag side vertex fit in the case of semileptonic tag side decay */
     //bool makeSemileptonicFit(Particle *Breco);
@@ -205,7 +213,7 @@ namespace Belle2 {
     /**
      * Fill tagV vertex info
     */
-    void fillTagVinfo(const TVector3& tagVpos, const TMatrixDSym& tagVposErr);
+    void fillTagVinfo(const ROOT::Math::XYZVector& tagVpos, const TMatrixDSym& tagVposErr);
 
     /**
      * make the vertex fit on the tag side:
@@ -229,9 +237,9 @@ namespace Belle2 {
     void resetReturnParams();
 
     /**
-     * Print a TVector3 (useful for debugging)
+     * Print a XYZVector (useful for debugging)
      */
-    static std::string printVector(const TVector3& vec);
+    static std::string printVector(const ROOT::Math::XYZVector& vec);
 
     /**
      * Print a TMatrix (useful for debugging)
@@ -254,7 +262,7 @@ namespace Belle2 {
     /**
      * This finds the point on the true particle trajectory closest to the measured track position
      */
-    static TVector3 getTruePoca(ParticleAndWeight const& paw);
+    static ROOT::Math::XYZVector getTruePoca(ParticleAndWeight const& paw);
 
     /**
      * If the fit has to be done with the rolled back tracks, Rave or KFit is fed with a track where the
@@ -267,7 +275,7 @@ namespace Belle2 {
     /**
      * This shifts the position of tracks by the vector difference of mother B and production point of track from truth info
      */
-    TVector3 getRollBackPoca(ParticleAndWeight const& paw);
+    ROOT::Math::XYZVector getRollBackPoca(ParticleAndWeight const& paw);
   };
 
   /**

@@ -79,7 +79,7 @@ void ClusterMatcherModule::event()
         clusterklm->setLogLikelihood(
           Const::KLM,
           Const::clusterKlong,
-          klmcluster.getRelatedTo<KlId>()->getKlId()
+          (klmcluster.getRelatedTo<KlId>() != nullptr) ? klmcluster.getRelatedTo<KlId>()->getKlId() : std::numeric_limits<float>::quiet_NaN()
         );
         klmcluster.addRelationTo(clusterklm);
       }

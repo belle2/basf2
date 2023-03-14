@@ -1,0 +1,8 @@
+Import('env')
+
+env['CONTINUE'] = True
+
+env['LIBS'] = [ 'framework', 'ecl_dbobjects' ]
+env['SUBLIB'] = True
+
+Return('env')

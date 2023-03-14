@@ -8,10 +8,8 @@
 
 #pragma once
 
-//Calibration
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-
-//Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -21,7 +19,6 @@ namespace Belle2 {
   class EventMetaData;
   class Track;
   class ECLCluster;
-  class ECLCalDigit;
   class ECLDigit;
 
   /** Calibration collector module that uses e+e- --> gamma gamma to do ECL single crystal energy calibration */
@@ -51,7 +48,6 @@ namespace Belle2 {
     /** Required arrays */
     StoreArray<Track> m_trackArray; /**< Required input array of Tracks */
     StoreArray<ECLCluster> m_eclClusterArray; /**< Required input array of ECLClusters */
-    StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
     StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of ECLDigits */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
     StoreObjPtr<TRGSummary> m_TRGResults; /**< dataStore TRGSummary */

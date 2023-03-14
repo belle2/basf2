@@ -77,9 +77,10 @@ namespace Belle2 {
       isgood: flag which is false if some error occured (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
-    TVector3 getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
+    ROOT::Math::XYZVector getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du,
+                                           double& dv);
     /** find the closest cluster*/
-    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(const VxdID& vxdid, ROOT::Math::XYZVector intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/
@@ -123,7 +124,7 @@ namespace Belle2 {
     unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
     double m_z0minCut;/**< cut z0 minimum in cm (large negativ value eg -9999 disables)*/
     double m_z0maxCut;/**< cut z0 maximum in cm (large positiv value eg 9999 disables)*/
-    double m_d0Cut;/**< cut abs(d0) in cm (and negativ value eg -9999 disables)*/
+    double m_d0Cut;/**< cut abs(d0) in cm (large positiv value eg 9999 disables)*/
     int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency

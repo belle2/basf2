@@ -17,7 +17,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeneratorPreselection)
+REG_MODULE(GeneratorPreselection);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -103,13 +103,13 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
   if (m_stableParticles)
     if (!mc.hasStatus(MCParticle::c_StableInGenerator)) return;
 
-  const TVector3& p = mc.getMomentum();
+  const ROOT::Math::XYZVector& p = mc.getMomentum();
   double energy     = mc.getEnergy();
-  double mom        = p.Mag();
+  double mom        = p.R();
   double theta      = p.Theta();
 
   if (m_applyInCMS) {
-    const TLorentzVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
+    const ROOT::Math::PxPyPzEVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
     energy = p_cms.E();
     mom = p_cms.P();
     theta = p_cms.Theta();
@@ -123,9 +123,9 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
   }
 
   if (abs(mc.getCharge()) > 0.) {
-    B2DEBUG(250, "pt = " << p.Pt() << " p=" << mom << " theta=" << theta << " thetamin=" << m_MinChargedTheta << " thetamax=" <<
+    B2DEBUG(250, "pt = " << p.Rho() << " p=" << mom << " theta=" << theta << " thetamin=" << m_MinChargedTheta << " thetamax=" <<
             m_MaxChargedTheta);
-    if (mom >= m_MinChargedP && p.Pt() >= m_MinChargedPt && theta >= m_MinChargedTheta && theta <= m_MaxChargedTheta) {
+    if (mom >= m_MinChargedP && p.Rho() >= m_MinChargedPt && theta >= m_MinChargedTheta && theta <= m_MaxChargedTheta) {
       m_nCharged++;
     }
   }

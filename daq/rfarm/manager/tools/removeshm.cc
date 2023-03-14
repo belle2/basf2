@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     printf("[removeshm] No such RingBuffer : %s\n", argv[1]);
     exit(-1);
   }
-  int shmid, semid;
+  int shmid;
   fscanf(fd, "%d", &shmid);
   fclose(fd);
 
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
   // remove id file
   char fname[1024];
-  sscanf(fname, "/tmp/SHM%d-SEM0-SHM_%s", argv[1]);
+  sscanf(fname, "/tmp/SHM%d-SEM0-SHM_%s", argv[1]); //TODO too few arguments!
   unlink(fname);
 }
 

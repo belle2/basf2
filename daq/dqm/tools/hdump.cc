@@ -19,6 +19,10 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of arguments\n");
+    return 1;
+  }
 
   DqmMemFile* mfile = new DqmMemFile(argv[1]);
 
@@ -38,4 +42,5 @@ int main(int argc, char** argv)
   }
 
   delete(mfile);
+  return 0;
 }

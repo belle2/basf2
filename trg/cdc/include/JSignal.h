@@ -128,7 +128,7 @@ namespace Belle2 {
 
     /// Setters, Getters
     /// Sets name of signal.
-    void setName(std::string name);
+    void setName(const std::string& name);
     /// Sets integer value of signal.
     void setInt(signed long long value);
     /// Sets float value of signal.
@@ -146,7 +146,7 @@ namespace Belle2 {
     /// Sets print flag for signal.
     void setPrintVhdl(bool printVhdl);
     /// Sets ouptut VHDL filename.
-    void setVhdlOutputFile(std::string filename);
+    void setVhdlOutputFile(const std::string& filename);
     /// Sets JSignalData to signal.
     void setCommonData(TRGCDCJSignalData*);
     /// Get name of signal.
@@ -229,10 +229,12 @@ namespace Belle2 {
     /// Changes signal type to unsigned type in VHDL.
     void toUnsignedVhdlCode();
     /// Writes vhdl code using two signals.
-    static void vhdlCode(TRGCDCJSignal const& first, std::string operation, TRGCDCJSignal const& second, TRGCDCJSignal const& result,
+    static void vhdlCode(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second,
+                         TRGCDCJSignal const& result,
                          std::string& targtVhdlCode);
     /// Writes vhdl code using one signal.
-    static void vhdlCode(std::string operation, TRGCDCJSignal const& first, TRGCDCJSignal const& result, std::string& targetVhdlCode);
+    static void vhdlCode(const std::string& operation, TRGCDCJSignal const& first, TRGCDCJSignal const& result,
+                         std::string& targetVhdlCode);
     /// Writes final vhdl code.
     static std::string replaceWithSignalNames(std::string const& fromVhdlCode,
                                               std::vector<std::pair<std::string, std::vector<int> > > const& fromVhdlSignals, int const& finishClock,
@@ -253,6 +255,7 @@ namespace Belle2 {
     static bool isSameSignal(TRGCDCJSignal const& lhs, TRGCDCJSignal const& rhs);
     /// Values => [name, value, bitwidth, min, max, clock]
     /// Changes values to signals.
+    // cppcheck-suppress constParameter
     static void valuesToMapSignals(std::vector<std::tuple<std::string, double, int, double, double, int> > const& inValues,
                                    Belle2::TRGCDCJSignalData* inCommonData, std::map<std::string, Belle2::TRGCDCJSignal>& outMap);
     /// Choose => [signalName, FpgaEffects(=1)/NoFpgaEffects(=0)]

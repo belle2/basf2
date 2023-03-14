@@ -7,9 +7,10 @@
  **************************************************************************/
 
 #include <analysis/variables/ContinuumSuppressionVariables.h>
+
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -25,115 +26,181 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
-
 #include <cmath>
 
 
 namespace Belle2 {
   namespace Variable {
 
-    double R2EventLevel(const Particle*)
+    Manager::FunctionPtr R2WithMask(const std::vector<std::string>& arguments)
     {
-      B2WARNING("The variable R2EventLevel is deprecated. Use `foxWolframR2` and ma.buildEventShape(inputListNames=[], default_cleanup=True, allMoments=False, cleoCones=True, collisionAxis=True, foxWolfram=True, harmonicMoments=True, jets=True, sphericity=True, thrust=True, checkForDuplicates=False, path=mypath)");
+      if (arguments.size() != 1)
+        B2FATAL("An empty argument is not allowed for the variable R2."
+                "Either provide no argument or a valid mask name.");
+      std::string maskName = arguments[0];
+      auto func = [maskName](const Particle * particle) -> double {
+        const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+        if (!qq)
+          return std::numeric_limits<float>::quiet_NaN();
 
-      std::vector<TVector3> p3_all;
-
-      StoreArray<Track> tracks;
-      for (int i = 0; i < tracks.getEntries(); ++i) {
-        // deal with multiple possible track hypotheses in the track fit: try to
-        // retrieve the most likely from PID, maybe this fit failed so then
-        // create a particle with whatever is closest with a TrackFitResult
-        Const::ParticleType mostLikely = tracks[i]->getRelated<PIDLikelihood>()->getMostLikely();
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(mostLikely);
-        if (iTrack == nullptr) continue;
-        if (iTrack->getChargeSign() != 0) {
-          Particle particle(tracks[i], iTrack->getParticleType());
-          PCmsLabTransform T;
-          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-          p3_all.push_back(p_cms.Vect());
-        }
-      }
-
-      StoreArray<ECLCluster> eclClusters;
-      for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only ECLClusters which have the N1 (n photons) hypothesis
-        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-          continue;
-
-        ClusterUtils C;
-        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i], ECLCluster::EHypothesisBit::c_nPhotons);
-        if (momECLCluster == momECLCluster) {
-          if (eclClusters[i]->isNeutral()) {
-            Particle particle(eclClusters[i]);
-            PCmsLabTransform T;
-            TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-            p3_all.push_back(p_cms.Vect());
-          }
-        }
-      }
-
-      FoxWolfram FW(p3_all);
-      FW.calculateBasicMoments();
-      return FW.getR(2);
+        return qq->getR2();
+      };
+      return func;
     }
 
     double R2(const Particle* particle)
     {
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
+      RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+      if (continuumSuppressionRelations.size() == 1) {
+        const ContinuumSuppression* qq = continuumSuppressionRelations[0];
+        return qq->getR2();
+      } else {
+        if (continuumSuppressionRelations.size() > 1) {
+          B2ERROR("The return value of R2 is ambiguous. Please provide the mask name as argument.");
+        }
         return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
 
-      return qq->getR2();
+    Manager::FunctionPtr thrustBmWithMask(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2FATAL("An empty argument is not allowed for the variable thrustBm."
+                "Either provide no argument or a valid mask name.");
+      std::string maskName = arguments[0];
+      auto func = [maskName](const Particle * particle) -> double {
+        const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+        if (!qq)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return qq->getThrustBm();
+      };
+      return func;
     }
 
     double thrustBm(const Particle* particle)
     {
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
+      RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+      if (continuumSuppressionRelations.size() == 1) {
+        const ContinuumSuppression* qq = continuumSuppressionRelations[0];
+        return qq->getThrustBm();
+      } else {
+        if (continuumSuppressionRelations.size() > 1) {
+          B2ERROR("The return value of thrustBm is ambiguous. Please provide the mask name as argument.");
+        }
         return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
 
-      return qq->getThrustBm();
+    Manager::FunctionPtr thrustOmWithMask(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2FATAL("An empty argument is not allowed for the variable thrustOm."
+                "Either provide no argument or a valid mask name.");
+      std::string maskName = arguments[0];
+      auto func = [maskName](const Particle * particle) -> double {
+        const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+        if (!qq)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return qq->getThrustOm();
+      };
+      return func;
     }
 
     double thrustOm(const Particle* particle)
     {
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
+      RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+      if (continuumSuppressionRelations.size() == 1) {
+        const ContinuumSuppression* qq = continuumSuppressionRelations[0];
+        return qq->getThrustOm();
+      } else {
+        if (continuumSuppressionRelations.size() > 1) {
+          B2ERROR("The return value of thrustOm is ambiguous. Please provide the mask name as argument.");
+        }
         return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
 
-      return qq->getThrustOm();
+    Manager::FunctionPtr cosTBTOWithMask(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2FATAL("An empty argument is not allowed for the variable cosTBTO."
+                "Either provide no argument or a valid mask name.");
+      std::string maskName = arguments[0];
+      auto func = [maskName](const Particle * particle) -> double {
+        const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+        if (!qq)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return qq->getCosTBTO();
+      };
+      return func;
     }
 
     double cosTBTO(const Particle* particle)
     {
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
+      RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+      if (continuumSuppressionRelations.size() == 1) {
+        const ContinuumSuppression* qq = continuumSuppressionRelations[0];
+        return qq->getCosTBTO();
+      } else {
+        if (continuumSuppressionRelations.size() > 1) {
+          B2ERROR("The return value of cosTBTO is ambiguous. Please provide the mask name as argument.");
+        }
         return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
 
-      return qq->getCosTBTO();
+    Manager::FunctionPtr cosTBzWithMask(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2FATAL("An empty argument is not allowed for the variable cosTBz."
+                "Either provide no argument or a valid mask name.");
+      std::string maskName = arguments[0];
+      auto func = [maskName](const Particle * particle) -> double {
+        const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+        if (!qq)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return qq->getCosTBz();
+      };
+      return func;
     }
 
     double cosTBz(const Particle* particle)
     {
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
+      RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+      if (continuumSuppressionRelations.size() == 1) {
+        const ContinuumSuppression* qq = continuumSuppressionRelations[0];
+        return qq->getCosTBz();
+      } else {
+        if (continuumSuppressionRelations.size() > 1) {
+          B2ERROR("The return value of cosTBz is ambiguous. Please provide the mask name as argument.");
+        }
         return std::numeric_limits<float>::quiet_NaN();
-
-      return qq->getCosTBz();
+      }
     }
 
     Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1 || arguments.size() == 2) {
+      if (arguments.size() > 0 && arguments.size() < 4) {
         bool useFS1 = false;
         auto variableName = arguments[0];
-        if (arguments.size() == 2) {
+        std::string maskName = "";
+        if (arguments.size() >= 2) {
           if (arguments[1] == "FS1") {
             useFS1 = true;
           } else {
-            B2FATAL("Second argument in KSFWVariables can only be 'FS1' to use the KSFW moments calculated from the B final state particles! Do not include a second argument to use the default KSFW moments calculated from the B primary daughters.");
+            maskName = arguments[1];
+          }
+          if (arguments.size() == 3) {
+            maskName = arguments[2];
+            if (maskName == "FS1") {
+              B2ERROR("It looks like you provided the arguments for KSFWVariables in the wrong order."
+                      "If you want to use the KSFW moments calculated from the B final state particles, the second argument has to be 'FS1'."
+                      "The third argument would then have to be the ROE mask name.");
+            }
           }
         }
         int index = -1;
@@ -152,7 +219,7 @@ namespace Belle2 {
             index = i;
         }
 
-        // throw helfpul error if name provided was not in allowed list
+        // throw helpful error if name provided was not in allowed list
         if (index == -1) {
           std::string allowed = "";
           for (auto n : names)
@@ -160,8 +227,20 @@ namespace Belle2 {
           B2FATAL("Variable name provided: " << variableName << " is not one of the allowed options. Please choose from one of:" << allowed);
         }
 
-        auto func = [index, useFS1](const Particle * particle) -> double {
-          const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+        auto func = [index, useFS1, maskName](const Particle * particle) -> double {
+          RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+          ContinuumSuppression* qq = nullptr;
+          if (maskName.empty())
+          {
+            if (continuumSuppressionRelations.size() == 1) {
+              qq = continuumSuppressionRelations[0];
+            } else if (continuumSuppressionRelations.size() > 1) {
+              B2ERROR("The return value of KSFWVariables is ambiguous. Please provide the mask name as argument.");
+            }
+          } else
+          {
+            qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+          }
           if (!qq) return std::numeric_limits<double>::quiet_NaN();
 
           // get the KSFW moments
@@ -174,13 +253,15 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function KSFWVariables. It only takes one or two arguments. The first argument must be the variable and the second can either be left blank or must be FS1 to use the KSFW moments calculated from the B final state particles.");
+        B2FATAL("Wrong number of arguments for meta function KSFWVariables. It only takes between one and three arguments."
+                " The first argument must be the variable. If you want to use the KSFW moments calculated from the B final state particles, set 'FS1' as second argument."
+                " You can also provide the ROE mask name as second or third argument.");
       }
     }
 
     Manager::FunctionPtr CleoConesCS(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1 || arguments.size() == 2) {
+      if (arguments.size() > 0 && arguments.size() < 4) {
 
         int coneNumber = 0;
         try {
@@ -190,18 +271,40 @@ namespace Belle2 {
         }
 
         bool useROE = false;
-        if (arguments.size() == 2) {
+        std::string maskName = "";
+        if (arguments.size() >= 2) {
           if (arguments[1] == "ROE") {
             useROE = true;
           } else {
-            B2FATAL("Second argument in CleoCones can only be 'ROE' to use the CleoCones calculated from the ROE only! Do not include a second argument to use the default CleoCones calculated from all final state particles.");
+            maskName = arguments[1];
+          }
+          if (arguments.size() == 3) {
+            maskName = arguments[2];
+            if (maskName == "ROE") {
+              B2ERROR("It looks like you provided the arguments for CleoConeCS in the wrong order."
+                      "If you want to use the CleoCones calculated from all final state particles, the second argument has to be 'ROE'."
+                      "The third argument would then have to be the ROE mask name.");
+            }
           }
         }
 
-        auto func = [coneNumber, useROE](const Particle * particle) -> double {
-          const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+        auto func = [coneNumber, useROE, maskName](const Particle * particle) -> double {
+          RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
+          ContinuumSuppression* qq = nullptr;
+          if (maskName.empty())
+          {
+            if (continuumSuppressionRelations.size() == 1) {
+              qq = continuumSuppressionRelations[0];
+            } else if (continuumSuppressionRelations.size() > 1) {
+              B2ERROR("The return value of CleoConeCS is ambiguous. Please provide the mask name as argument.");
+            }
+          } else
+          {
+            qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
+          }
           if (!qq)
             return std::numeric_limits<double>::quiet_NaN();
+
           std::vector<float> cleoCones = qq->getCleoConesALL();
           if (useROE)
             cleoCones = qq->getCleoConesROE();
@@ -209,7 +312,9 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for CleoCones function. It only takes one or two arguments. The first argument must be the cone number and the second can either be left blank or must 'ROE' to use the CleoCones calculated from all final state particles.");
+        B2FATAL("Wrong number of arguments for CleoConeCS function. It only takes between one and three arguments."
+                "The first argument must be the cone number. If you want to use the CleoCones calculated from all final state particles, set 'ROE' as second argument."
+                "You can also provide the ROE mask name as second or third argument.");
       }
     }
 
@@ -239,7 +344,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo(extraInfoName))
           {
             return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
-          } else {
+          } else
+          {
             return std::numeric_limits<double>::quiet_NaN();
           }
         };
@@ -251,7 +357,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr useBThrustFrame(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2) {
+      if (arguments.size() == 2 || arguments.size() == 3) {
         auto variableName = arguments[0];
         std::string mode = arguments[1];
 
@@ -263,77 +369,130 @@ namespace Belle2 {
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
 
-        auto func = [var, modeisSignal, modeisAuto](const Particle * particle) -> double {
+        std::string maskName = arguments.size() == 3 ? arguments[2] : "";
+
+        auto func = [var, modeisSignal, modeisAuto, maskName](const Particle * particle) -> double {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          const Particle* Bparticle = roe->getRelated<Particle>();
-          const ContinuumSuppression* qq = Bparticle->getRelatedTo<ContinuumSuppression>();
+          const Particle* Bparticle = roe->getRelatedFrom<Particle>();
+          RelationVector<ContinuumSuppression> continuumSuppressionRelations = Bparticle->getRelationsTo<ContinuumSuppression>("ALL");
+          ContinuumSuppression* qq = nullptr;
+          if (maskName.empty())
+          {
+            if (continuumSuppressionRelations.size() == 1) {
+              qq = continuumSuppressionRelations[0];
+            } else if (continuumSuppressionRelations.size() > 1) {
+              B2ERROR("The return value of useBThrustFrame is ambiguous. Please provide the mask name as argument.");
+            }
+          } else
+          {
+            qq = Bparticle->getRelatedTo<ContinuumSuppression>(maskName);
+          }
           if (!qq)
             return std::numeric_limits<double>::quiet_NaN();
-          double isinROE = isInRestOfEvent(particle);
-          TVector3 newZ;
-          if (modeisSignal or (modeisAuto and isinROE < 0.5))
+
+          bool isinROE = isInRestOfEvent(particle);
+          ROOT::Math::XYZVector newZ;
+          if (modeisSignal or (modeisAuto and isinROE))
             newZ = qq->getThrustB();
           else
             newZ = qq->getThrustO();
 
-          TVector3 newY(0, 0, 0);
-          if (newZ(2) == 0 and newZ(1) == 0)
-            newY(0) = 1;
-          else{
-            newY(1) = newZ(2);
-            newY(2) = -newZ(1);
+          ROOT::Math::XYZVector newY(0, 0, 0);
+          if (newZ.Z() == 0 and newZ.Y() == 0)
+            newY.SetX(1);
+          else
+          {
+            newY.SetY(newZ.Z());
+            newY.SetZ(-newZ.Y());
           }
-          TVector3 newX = newY.Cross(newZ);
+          ROOT::Math::XYZVector newX = newY.Cross(newZ);
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
-          return var->function(particle);
+          return std::get<double>(var->function(particle));
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function useBThrustFrame. It only takes two arguments. The first argument must be the variable and the second can either be .");
+        B2FATAL("Wrong number of arguments for meta function useBThrustFrame. It only takes two or three arguments. The first argument must be the variable."
+                "The second can either be 'Signal', 'ROE', or 'Auto'."
+                "The third argument is optional (as long as the ContinuumSuppression was built only once) and can define a specific ROE mask name.");
       }
     }
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2EventLevel", R2EventLevel,
-                      "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2.");
-    MAKE_DEPRECATED("R2EventLevel", false, "release-05-00-00", R"DOC(
-                     The same value can be calculated with the Event Shape module, see  :b2:var:`foxWolframR`.)DOC");
-    REGISTER_VARIABLE("R2"          , R2          , R"DOC(
+    REGISTER_METAVARIABLE("R2(maskname)", R2WithMask, R"DOC(
 Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("R2", R2 , R"DOC(
+Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
+
+.. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+:noindex:
 )DOC");
-    REGISTER_VARIABLE("thrustBm"    , thrustBm    , R"DOC(
+    REGISTER_METAVARIABLE("thrustBm(maskname)", thrustBmWithMask, R"DOC(
 Returns magnitude of the signal B thrust axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("thrustBm", thrustBm, R"DOC(
+Returns magnitude of the signal B thrust axis.
+
+.. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+:noindex:
 )DOC");
-    REGISTER_VARIABLE("thrustOm"    , thrustOm    , R"DOC(
+    REGISTER_METAVARIABLE("thrustOm(maskname)", thrustOmWithMask, R"DOC(
 Returns magnitude of the ROE thrust axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("thrustOm", thrustOm, R"DOC(
+Returns magnitude of the ROE thrust axis.
+
+.. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+:noindex:
 )DOC");
-    REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , R"DOC(
+    REGISTER_METAVARIABLE("cosTBTO(maskname)", cosTBTOWithMask, R"DOC(
 Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("cosTBTO", cosTBTO, R"DOC(
+Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.
+
+.. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+:noindex:
 )DOC");
-    REGISTER_VARIABLE("cosTBz"      , cosTBz      , R"DOC(
+    REGISTER_METAVARIABLE("cosTBz(maskname)", cosTBzWithMask, R"DOC(
 Returns cosine of angle between thrust axis of the signal B and z-axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("cosTBz", cosTBz, R"DOC(
+Returns cosine of angle between thrust axis of the signal B and z-axis.
+
+.. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+:noindex:
 )DOC");
-    REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,  R"DOC(
-Returns variable et, mm2, or one of the 16 KSFW moments. If only the ``variable`` argument is specified, the KSFW moment calculated from the B primary daughters is returned. 
-If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.
+    REGISTER_METAVARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
+Returns variable et in ``GeV/c``, mm2 in (GeV/c^2)^2, or one of the 16 KSFW moments.
+The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
+In that case the desired ROE mask name must be provided as well.
+If the second argument is set to 'FS1', the KSFW moment is calculated from the B final state daughters.
+Otherwise, the KSFW moment is calculated from the B primary daughters.
+The ROE mask name is then either the second or the third argument and must not be called 'FS1'.
 Allowed input values for ``variable`` argument are the following:
 
 * mm2,   et
@@ -344,18 +503,21 @@ Allowed input values for ``variable`` argument are the following:
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS, R"DOC(
-Returns i-th cleo cones from the continuum suppression. The allowed inputs for ``integer`` argument are integers from *1* to *9*. 
-If only the ``integer`` argument is specified, the CleoCones are calculated from all final state particles. 
-The ``string`` argument is optional and the only allowed input value is 'ROE', which sets the CleoCones to be calculated only from ROE particles.
+    REGISTER_METAVARIABLE("CleoConeCS(integer[, string, string])", CleoConesCS, R"DOC(
+Returns i-th cleo cones from the continuum suppression. The allowed inputs for the ``integer`` argument are integers from *1* to *9*.
+The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
+In that case the desired ROE mask name must be provided as well.
+If the second argument is set to 'ROE', the CleoCones are calculated only from ROE particles.
+Otherwise, the CleoCones are calculated from all final state particles.
+The ROE mask name is then either the second or the third argument and must not be called 'ROE'. The unit of the CleoConeCS is ``GeV/c``.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, R"DOC(
+    REGISTER_METAVARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, R"DOC(
 Transforms the network output :math:`C \to C'` via: :math:`C'=\operatorname{log}((C-\mathrm{low})/(\mathrm{high}-C))`.
 The arguments of the metavariable are the following:
 
@@ -363,9 +525,9 @@ The arguments of the metavariable are the following:
 * ``low``, ``high`` are floating point numbers.
 
 Returns NaN, if the `extraInfo` has not been found.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,  R"DOC(
+    REGISTER_METAVARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,  R"DOC(
 Returns the variable with respect to rotated coordinates, in which z lies on the specified thrust axis.
 If mode is set to ``Signal`` it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.
 If mode is set to ``Auto`` the function use the thrust axis based on Rest Of Event (ROE) particles.
@@ -373,7 +535,7 @@ Like :b2:var:`isInRestOfEvent`, one has to use this metavariable in ROE loop.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
   }
 }

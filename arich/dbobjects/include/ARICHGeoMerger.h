@@ -293,7 +293,7 @@ namespace Belle2 {
 
     /**
      * Check data consistency of the merger positions
-     * In case of failure print the BASF2 ERROR message using B2ASSERT
+     * In case of failure print the basf2 ERROR message using B2ASSERT
      */
     void checkMergerPositionsDataConsistency() const;
 

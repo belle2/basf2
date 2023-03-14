@@ -82,7 +82,7 @@ void ERecoMasterCallback::configure(const DBObject& obj)
     rcconf = StringUtil::split(rcconf, '@')[1];
   }
   for (NSMNodeList::iterator it = m_nodes.begin();
-       it != m_nodes.end(); it++) {
+       it != m_nodes.end(); ++it) {
     NSMNode& node(*it);
     RCState s(node.getState());
     std::string vname = StringUtil::form("node[%d]", i++);
@@ -101,7 +101,7 @@ void ERecoMasterCallback::setState(NSMNode& node, const RCState& state)
   node.setState(state);
   int i = 0;
   for (NSMNodeList::iterator it = m_nodes.begin();
-       it != m_nodes.end(); it++) {
+       it != m_nodes.end(); ++it) {
     NSMNode& rnode(*it);
     if (StringUtil::toupper(rnode.getName()) == StringUtil::toupper(node.getName())) {
       std::string vname = StringUtil::form("node[%d].rcstate", i);
@@ -123,7 +123,7 @@ void ERecoMasterCallback::monitor()
   unitinfo->rcstate = getNode().getState().getId();
   int i = 0;
   for (StringList::iterator it = m_dataname.begin();
-       it != m_dataname.end(); it++) {
+       it != m_dataname.end(); ++it) {
     NSMData& data(getData(*it));
     try {
       if (data.isAvailable()) {
@@ -135,7 +135,7 @@ void ERecoMasterCallback::monitor()
     i++;
   }
   static unsigned long long count = 0;
-  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it) {
     NSMNode& node(*it);
     if (count % 60 == 59 || node.getState() == RCState::UNKNOWN) {
       if (NSMCommunicator::send(NSMMessage(node, RFCommand::STATUS))) {
@@ -150,7 +150,7 @@ void ERecoMasterCallback::monitor()
 void ERecoMasterCallback::ok(const char* nodename, const char* data)
 {
   for (NSMNodeList::iterator it = m_nodes.begin();
-       it != m_nodes.end(); it++) {
+       it != m_nodes.end(); ++it) {
     NSMNode& node(*it);
     if (node.getName() == nodename) {
       if (strcmp(data, "Configured") == 0) {
@@ -174,7 +174,7 @@ void ERecoMasterCallback::ok(const char* nodename, const char* data)
 void ERecoMasterCallback::error(const char* nodename, const char* data)
 {
   for (NSMNodeList::iterator it = m_nodes.begin();
-       it != m_nodes.end(); it++) {
+       it != m_nodes.end(); ++it) {
     NSMNode& node(*it);
     if (node.getName() == nodename) {
       LogFile::error("ERROR << %s (%s)", nodename, data);
@@ -185,16 +185,16 @@ void ERecoMasterCallback::error(const char* nodename, const char* data)
   LogFile::warning("Error from unknwon node %s : %s)", nodename, data);
 }
 
-void ERecoMasterCallback::load(const DBObject& db, const std::string& runtype)
+void ERecoMasterCallback::load(const DBObject& /*db*/, const std::string& /*runtype*/)
 {
-  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it) {
     NSMNode& node(*it);
     printf("Loading : %s\n", node.getName().c_str());
     if (node.getName().find("EVP") == std::string::npos) {
       while (true) {
         bool configured = true;
         for (NSMNodeList::iterator it2 = m_nodes.begin();
-             it2 != it; it2++) {
+             it2 != it; ++it2) {
           if (it2->getState() != RCState::READY_S)
             configured = false;
         }
@@ -218,7 +218,7 @@ void ERecoMasterCallback::load(const DBObject& db, const std::string& runtype)
   }
   while (true) {
     bool configured = true;
-    for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+    for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it) {
       if (it->getState() != RCState::READY_S) configured = false;
     }
     if (configured) break;
@@ -234,13 +234,13 @@ void ERecoMasterCallback::load(const DBObject& db, const std::string& runtype)
 void ERecoMasterCallback::abort()
 {
   for (NSMNodeList::reverse_iterator it = m_nodes.rbegin();
-       it != m_nodes.rend(); it++) {
+       it != m_nodes.rend(); ++it) {
     NSMNode& node(*it);
     if (node.getName().find("EVP") == std::string::npos) {
       while (true) {
         bool unconfigured = true;
         for (NSMNodeList::reverse_iterator it2 = m_nodes.rbegin();
-             it2 != it; it2++) {
+             it2 != it; ++it2) {
           if (it2->getState() != RCState::NOTREADY_S)
             unconfigured = false;
         }
@@ -263,7 +263,7 @@ void ERecoMasterCallback::abort()
   }
   while (true) {
     bool unconfigured = true;
-    for (NSMNodeList::reverse_iterator it = m_nodes.rbegin(); it != m_nodes.rend(); it++) {
+    for (NSMNodeList::reverse_iterator it = m_nodes.rbegin(); it != m_nodes.rend(); ++it) {
       if (it->getState() != RCState::NOTREADY_S) unconfigured = false;
     }
     if (unconfigured) break;
@@ -291,13 +291,13 @@ void ERecoMasterCallback::start(int expno, int runno)
     script = "run_" + script + ".py";
     printf("ERECO script = %s\n", script.c_str());
   }
-  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it) {
     NSMNode& node(*it);
     if (node.getName().find("EVP") == std::string::npos) {
       while (true) {
         bool configured = true;
         for (NSMNodeList::iterator it2 = m_nodes.begin();
-             it2 != it; it2++) {
+             it2 != it; ++it2) {
           if (it2->getState() != RCState::RUNNING_S)
             configured = false;
         }
@@ -320,7 +320,7 @@ void ERecoMasterCallback::start(int expno, int runno)
   }
   while (true) {
     bool configured = true;
-    for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+    for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it) {
       if (it->getState() != RCState::RUNNING_S) configured = false;
     }
     if (configured) break;
@@ -328,6 +328,10 @@ void ERecoMasterCallback::start(int expno, int runno)
       perform(NSMCommunicator::select(30));
     } catch (const TimeoutException& e) {}
   }
+  char cmdline[] = "hsendcommand DQMRC:CLEAR erctl 9991";
+  system(cmdline);
+  printf("ERecoMaster : DQM TMemFile cleared\n");
+
   if (m_callback != NULL)
     m_callback->setState(RCState::RUNNING_S);
   RCCallback::setState(RCState::RUNNING_S);
@@ -336,13 +340,13 @@ void ERecoMasterCallback::start(int expno, int runno)
 void ERecoMasterCallback::stop()
 {
   for (NSMNodeList::reverse_iterator it = m_nodes.rbegin();
-       it != m_nodes.rend(); it++) {
+       it != m_nodes.rend(); ++it) {
     NSMNode& node(*it);
     if (node.getName().find("EVP") == std::string::npos) {
       while (true) {
         bool unconfigured = true;
         for (NSMNodeList::reverse_iterator it2 = m_nodes.rbegin();
-             it2 != it; it2++) {
+             it2 != it; ++it2) {
           if (it2->getState() != RCState::READY_S)
             unconfigured = false;
         }
@@ -365,7 +369,7 @@ void ERecoMasterCallback::stop()
   }
   while (true) {
     bool unconfigured = true;
-    for (NSMNodeList::reverse_iterator it = m_nodes.rbegin(); it != m_nodes.rend(); it++) {
+    for (NSMNodeList::reverse_iterator it = m_nodes.rbegin(); it != m_nodes.rend(); ++it) {
       if (it->getState() != RCState::READY_S) unconfigured = false;
     }
     if (unconfigured) break;
@@ -440,9 +444,9 @@ bool ERecoMasterCallback::perform(NSMCommunicator& com)
       RCCallback::setState(RCState::ABORTING_RS);
       abort();
       RCCallback::setState(RCState::NOTREADY_S);
-    } catch (const RCHandlerException& e) {
-      std::string emsg = StringUtil::form("Failed to abort : %s", e.what());
-      LogFile::fatal(emsg);
+    } catch (const RCHandlerException& ex) {
+      std::string exmsg = StringUtil::form("Failed to abort : %s", ex.what());
+      LogFile::fatal(exmsg);
     }
   } catch (const std::exception& e) {
     LogFile::fatal("Unknown exception: %s. terminating process", e.what());

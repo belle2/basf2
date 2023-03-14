@@ -12,6 +12,7 @@
 #include <pxd/reconstruction/PXDPixelMasker.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include "TDirectory.h"
 #include "TMatrixDSym.h"
@@ -20,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiencySelftrack)
+REG_MODULE(PXDDQMEfficiencySelftrack);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -57,7 +58,7 @@ PXDDQMEfficiencySelftrackModule::PXDDQMEfficiencySelftrackModule() : HistoModule
   addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
   addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negativ value eg -9999 disables)", double(-1));
   addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positiv value eg 9999 disables)", double(1));
-  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (and negativ value eg -9999 disables)", double(0.5));
+  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (large positiv value eg 9999 disables)", double(0.5));
   addParam("verboseHistos", m_verboseHistos, "Add more verbose histograms for cuts (not for ereoc)", bool(false));
 }
 
@@ -147,7 +148,7 @@ void PXDDQMEfficiencySelftrackModule::event()
       //true = track intersects current sensor
       double sigu(-9999);
       double sigv(-9999);
-      TVector3 intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
+      ROOT::Math::XYZVector intersec_buff = getTrackInterSec(info, a_track, isgood, sigu, sigv);
 
       if (!isgood) {
         continue;//track does not go through this sensor-> nothing to measure anyway
@@ -225,27 +226,28 @@ void PXDDQMEfficiencySelftrackModule::event()
 
 
 
-TVector3 PXDDQMEfficiencySelftrackModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
-                                                           bool& isgood,
-                                                           double& du, double& dv)
+ROOT::Math::XYZVector
+PXDDQMEfficiencySelftrackModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
+                                                  bool& isgood, double& du, double& dv)
 {
   //will be set true if the intersect was found
   isgood = false;
 
-  TVector3 intersec(99999999, 9999999, 0); //point outside the sensor
+  ROOT::Math::XYZVector intersec(99999999, 9999999, 0); //point outside the sensor
 
   genfit::MeasuredStateOnPlane gfTrackState = aTrack.getMeasuredStateOnPlaneFromFirstHit();
 
   //adopted (aka stolen) from tracking/modules/pxdClusterRescue/PXDClusterRescueROIModule
   try {
     // get sensor plane
-    TVector3 zeroVec(0, 0, 0);
-    TVector3 uVec(1, 0, 0);
-    TVector3 vVec(0, 1, 0);
+    ROOT::Math::XYZVector zeroVec(0, 0, 0);
+    ROOT::Math::XYZVector uVec(1, 0, 0);
+    ROOT::Math::XYZVector vVec(0, 1, 0);
 
     genfit::DetPlane* sensorPlane = new genfit::DetPlane();
-    sensorPlane->setO(pxdSensorInfo.pointToGlobal(zeroVec, m_useAlignment));
-    sensorPlane->setUV(pxdSensorInfo.vectorToGlobal(uVec, m_useAlignment), pxdSensorInfo.vectorToGlobal(vVec, m_useAlignment));
+    sensorPlane->setO(XYZToTVector(pxdSensorInfo.pointToGlobal(zeroVec, m_useAlignment)));
+    sensorPlane->setUV(XYZToTVector(pxdSensorInfo.vectorToGlobal(uVec, m_useAlignment)),
+                       XYZToTVector(pxdSensorInfo.vectorToGlobal(vVec, m_useAlignment)));
 
     //boost pointer (will be deleted automatically ?!?!?)
     genfit::SharedPlanePtr sensorPlaneSptr(sensorPlane);
@@ -263,7 +265,7 @@ TVector3 PXDDQMEfficiencySelftrackModule::getTrackInterSec(const VXD::SensorInfo
   }
 
   //local position
-  intersec = pxdSensorInfo.pointToLocal(gfTrackState.getPos(), m_useAlignment);
+  intersec = pxdSensorInfo.pointToLocal(ROOT::Math::XYZVector(gfTrackState.getPos()), m_useAlignment);
 
   //try to get the momentum
   B2DEBUG(1, "Fitted momentum on the plane p = " << gfTrackState.getMom().Mag());
@@ -329,7 +331,7 @@ void PXDDQMEfficiencySelftrackModule::defineHisto()
 
 
 int
-PXDDQMEfficiencySelftrackModule::findClosestCluster(const VxdID& avxdid, TVector3 intersection)
+PXDDQMEfficiencySelftrackModule::findClosestCluster(const VxdID& avxdid, ROOT::Math::XYZVector intersection)
 {
   int closest = -1;
   double mindist = 999999999999; //definitely outside of the sensor
@@ -350,10 +352,10 @@ PXDDQMEfficiencySelftrackModule::findClosestCluster(const VxdID& avxdid, TVector
 
     double u = m_pxdclusters[iclus]->getU();
     double v = m_pxdclusters[iclus]->getV();
-    TVector3 current(u, v, 0);
+    ROOT::Math::XYZVector current(u, v, 0);
 
     //2D dist sqared
-    double dist = (intersection - current).Mag();
+    double dist = (intersection - current).R();
     if (dist < mindist) {
       closest = iclus;
       mindist = dist;

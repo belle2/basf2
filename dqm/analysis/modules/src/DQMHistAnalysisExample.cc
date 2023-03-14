@@ -14,7 +14,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisExample)
+REG_MODULE(DQMHistAnalysisExample);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -41,10 +41,9 @@ void DQMHistAnalysisExampleModule::initialize()
   m_f = new TF1("f_" + a, TString(m_function), -100, 100);
 }
 
-
 void DQMHistAnalysisExampleModule::beginRun()
 {
-  //B2DEBUG(20, "DQMHistAnalysisExample: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisExample : beginRun called");
 }
 
 void DQMHistAnalysisExampleModule::event()
@@ -53,13 +52,11 @@ void DQMHistAnalysisExampleModule::event()
   if (h != NULL) {
     m_c->Clear();
     m_c->cd();
+    h->Fit(m_f, "R");
     h->Draw();
     m_c->Modified();
-    TString a = m_histoname;
-    a.ReplaceAll("/", ".");
-    std::string vname = a.Data();
-    setFloatValue(vname + ".mean", m_f->GetParameter(1));
-    setFloatValue(vname + ".sigma", m_f->GetParameter(2));
+    B2DEBUG(20, "mean " << m_f->GetParameter(1));
+    B2DEBUG(20, "sigma" << m_f->GetParameter(2));
   } else {
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }

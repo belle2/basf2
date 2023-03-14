@@ -23,7 +23,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 
-#include <TLorentzVector.h>
 #include <TMath.h>
 
 #include <iostream>
@@ -65,7 +64,7 @@ double radtodeg;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TRGGRLProjects)
+REG_MODULE(TRGGRLProjects);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -137,9 +136,9 @@ void TRGGRLProjectsModule::initialize()
 {
   radtodeg = 180. / TMath::Pi();
   //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
-  TrgEclMapping* trgecl_obj = new TrgEclMapping();
+  TrgEclMapping* eclMapping = new TrgEclMapping();
   for (int tc = 1; tc <= 576; tc++) {
-    TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
+    TCThetaID.push_back(eclMapping->getTCThetaIdFromTCId(tc));
   }
 
   //-----------------------------------------------------------------------------------------
@@ -148,11 +147,11 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
+    TVector3 CellPosition = eclMapping->getTCPosition(tc);
+    ROOT::Math::PxPyPzEVector CellLab;
+    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
+    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
+    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -161,7 +160,7 @@ void TRGGRLProjectsModule::initialize()
     TCcotThetaLab.push_back(1. / tantheta);
 
     //..Corresponding 4 vector in the COM frame
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
     TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
     TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
 
@@ -170,7 +169,7 @@ void TRGGRLProjectsModule::initialize()
   }
 
   //m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
-
+  delete eclMapping;
 }
 
 void
@@ -646,6 +645,12 @@ void TRGGRLProjectsModule::event()
   bool bha_theta_1 = (ECLtoGDL[2] & (1 << (88 - 32 * 2))) != 0;
   //ecltaub2b
   bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
+  bool ecltaub2b2 = (ECLtoGDL[2] & (1 << (93 - 32 * 2))) != 0;
+  bool ecltaub2b3 = (ECLtoGDL[2] & (1 << (94 - 32 * 2))) != 0;
+  // ehigh1-3
+  bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
+  bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
+  bool ehigh3 = (ECLtoGDL[2] & (1 << (92 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -804,8 +809,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "brlfb2") {bit = brlfb == 2;}
     else if (bitname == "brlnb1") {bit = brlnb == 1;}
     else if (bitname == "brlnb2") {bit = brlnb == 2;}
-    else if (bitname == "seklm_0") {bit = n_seklm == 0;}
-    else if (bitname == "seklm_1") {bit = n_seklm > 0;}
+    else if (bitname == "seklm_0") {bit = n_seklm == 1;}
+    else if (bitname == "seklm_1") {bit = n_seklm > 1;}
     else if (bitname == "ieklm") {bit = n_ieklm > 0;}
     else if (bitname == "secl") {bit = n_secl > 0;}
     else if (bitname == "iecl") {bit = n_iecl > 0;}
@@ -864,6 +869,12 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_mumu") {bit = ecl_mumu;}
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
     else if (bitname == "ecl_taub2b") {bit = ecltaub2b;}
+    else if (bitname == "ecl_taub2b2") {bit = ecltaub2b2;}
+    else if (bitname == "ecl_taub2b3") {bit = ecltaub2b3;}
+    else if (bitname == "ehigh1") {bit = ehigh1;}
+    else if (bitname == "ehigh2") {bit = ehigh2;}
+    else if (bitname == "ehigh3") {bit = ehigh3;}
+
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}
@@ -939,14 +950,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "tsf2b2b") {bit = false;}
     else if (bitname == "grlgg1") {bit = false;}
     else if (bitname == "grlgg2") {bit = false;}
-    else if (bitname == "fwdsb") {bit = false;}
-    else if (bitname == "bwdsb") {bit = false;}
-    else if (bitname == "fwdnb") {bit = false;}
-    else if (bitname == "bwdnb") {bit = false;}
-    else if (bitname == "brlfb1") {bit = false;}
-    else if (bitname == "brlfb2") {bit = false;}
-    else if (bitname == "brlnb1") {bit = false;}
-    else if (bitname == "brlnb2") {bit = false;}
 
     //KLM TOP ECL not ready
     else if (bitname == "ecl_bhauni") {bit = false;}
@@ -962,6 +965,9 @@ void TRGGRLProjectsModule::event()
 
     //other trigger bits
     else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "inp156") {bit = false;}
+    else if (bitname == "inp157") {bit = false;}
+    else if (bitname == "inp158") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
 
     //DITTO: please don't change the WARNING message below.

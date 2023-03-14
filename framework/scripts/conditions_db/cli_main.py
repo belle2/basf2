@@ -188,7 +188,7 @@ def print_globaltag(db, *tags):
 
     ntags = len(results[0]) - 1
     if ntags > 0:
-        pretty_print_table(results, [11] + ['*']*ntags, True)
+        pretty_print_table(results, [11] + ['*'] * ntags, True)
     return ntags
 
 
@@ -580,7 +580,7 @@ def command_diff(args, db):
         # highlighting area (say pull request description)
         print(f" Differences between {args.tagA} and {args.tagB}")
         pretty_print_table(table, columns, transform=color_row,
-                           hline_formatter=lambda w: " " + (w-1)*'-')
+                           hline_formatter=lambda w: " " + (w - 1) * '-')
 
 
 def command_iov(args, db):
@@ -714,20 +714,20 @@ def command_dump(args, db):
 
     .. rubric:: Examples
 
-    Dump the content of a previously downloaded payload file::
+    Dump the content of a previously downloaded payload file:
 
-        $ b2conditionsdb dump -f localdb/dbstore_BeamParameters_rev_59449.root
+        $ b2conditionsdb dump -f centraldb/dbstore_BeamParameters_rev_59449.root
 
-    Dump the content of a payload by name and revision directly from the central database::
+    Dump the content of a payload by name and revision directly from the central database:
 
         $ b2conditionsdb dump -r BeamParameters 59449
 
     Dump the content of the payload by name which is valid in a given globaltag
     for a given experiment and run::
 
-        $ b2conditionsdb dump -g BeamParameters master_2019-09-26 0 0
+        $ b2conditionsdb dump -g BeamParameters main_2021-08-04 0 0
 
-    Or directly by payload id from a previous call to ``b2conditionsdb iov``::
+    Or directly by payload id from a previous call to ``b2conditionsdb iov``:
 
         $ b2conditionsdb dump -i 59685
 
@@ -932,11 +932,11 @@ def get_argument_parser():
     for name, func in sorted(globals().items()):
         if not name.startswith("command_"):
             continue
-        # we interpret command_foo_bar_baz as subcommand baz of subcommmand bar
+        # we interpret command_foo_bar_baz as subcommand baz of subcommand bar
         # of subcommand foo. So let's split this into all commands and remove
         # the command_
         parts = name.split('_')[1:]
-        # now we need to get the subparsers instance for the parent commmand. if
+        # now we need to get the subparsers instance for the parent command. if
         # the command is top level, e.g. foo, we just use parsers. Otherwise we
         # go look into the dict of subparsers for command chains.
         parent = parsers
@@ -1004,7 +1004,7 @@ def main():
     Main function for the command line interface.
 
     it will automatically create an ArgumentParser including all functions which
-    start with command_ in the global namespace as sub commmands. These
+    start with command_ in the global namespace as sub commands. These
     functions should take the arguments as first argument and an instance of the
     ConditionsDB interface as second argument. If the db interface is None the
     first argument is an instance of argparse.ArgumentParser an in this case the

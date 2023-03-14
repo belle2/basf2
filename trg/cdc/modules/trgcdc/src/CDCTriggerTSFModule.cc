@@ -9,6 +9,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
+#include <cdc/dataobjects/WireID.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -38,7 +39,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
-           string(""));
+           string("CDCHits4Trg"));
   addParam("TSHitCollectionName",
            m_TSHitCollectionName,
            "Name of the output StoreArray of CDCTriggerSegmentHits.",
@@ -75,7 +76,15 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("Crosstalk_tdcfilter",
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
-           true);
+           false);
+  addParam("ADC_cut_enable",
+           m_adcflag,
+           "remove hits with lower ADC than cut threshold. True:enable False:disable",
+           false);
+  addParam("ADC_cut_threshold",
+           m_adccut,
+           "Threshold for the adc cut.  Default: -1",
+           -1);
 }
 
 void
@@ -114,11 +123,13 @@ CDCTriggerTSFModule::initialize()
   int is = -1;
   int ias = -1;
   int iss = -1;
-  /* cppcheck-suppress variableScope */
   unsigned axialStereoLayerId;
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
   for (unsigned i = 0; i < nLayers; i++) {
+    if (i < cdc.getOffsetOfFirstLayer()) {
+      continue;
+    }
     const unsigned nWiresInLayer = cdc.nWiresInLayer(i);
 
     //...Axial or stereo?...
@@ -127,6 +138,14 @@ CDCTriggerTSFModule::initialize()
     if (axial) ++ia;
     else ++is;
     axialStereoLayerId = (axial) ? ia : is;
+
+    // Add empty TRGCDCLayer in case a superlayer is not present
+    if (superLayers.size() == 0 and cdc.getOffsetOfFirstSuperLayer() != 0) {
+      for (uint superLayerOffset = 0; superLayerOffset < cdc.getOffsetOfFirstSuperLayer(); superLayerOffset++) {
+        superLayers.push_back(vector<TRGCDCLayer*>());
+        superLayerId++;
+      }
+    }
 
     //...Is this in a new super layer?...
     if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
@@ -178,43 +197,48 @@ CDCTriggerTSFModule::initialize()
   const int shape[2][30] = {
     {
       -2, 0, // relative layer id, relative wire id
-      -1, -1,
-      -1, 0,
-      0, -1,
-      0, 0,
-      0, 1,
-      1, -2,
-      1, -1,
-      1, 0,
-      1, 1,
-      2, -2,
-      2, -1,
-      2, 0,
-      2, 1,
-      2, 2
-    },
+        -1, -1,
+        -1, 0,
+        0, -1,
+        0, 0,
+        0, 1,
+        1, -2,
+        1, -1,
+        1, 0,
+        1, 1,
+        2, -2,
+        2, -1,
+        2, 0,
+        2, 1,
+        2, 2
+      },
     {
       -2, -1,
-      -2, 0,
-      -2, 1,
-      -1, -1,
-      -1, 0,
-      0, 0,
-      1, -1,
-      1, 0,
-      2, -1,
-      2, 0,
-      2, 1,
-      0, 0,
-      0, 0,
-      0, 0,
-      0, 0
-    }
+        -2, 0,
+        -2, 1,
+        -1, -1,
+        -1, 0,
+        0, 0,
+        1, -1,
+        1, 0,
+        2, -1,
+        2, 0,
+        2, 1,
+        0, 0,
+        0, 0,
+        0, 0,
+        0, 0
+      }
   };
   const int layerOffset[2] = {5, 2};
   unsigned id = 0;
   unsigned idTS = 0;
   for (unsigned i = 0; i < superLayers.size(); i++) {
+    if (i < cdc.getOffsetOfFirstSuperLayer()) {
+      TRGCDCLayer* emptylayer = new TRGCDCLayer();
+      tsLayers.push_back(emptylayer);
+      continue;
+    }
     unsigned tsType = (i) ? 1 : 0;
 
     //...TS layer... w is a central wire
@@ -269,27 +293,33 @@ CDCTriggerTSFModule::initialize()
     }
   }
 
+}
+
+void
+CDCTriggerTSFModule::beginRun()
+{
   if (m_deadchflag) {
-    if (!m_db_deadchannel) {
-      B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
-      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+    if (not m_db_deadchannel.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2ERROR("No database for CDCTRG dead channel mapping. Channel masking is skipped. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
             deadch_map[i][j][k] = true;
           }
         }
       }
     } else {
-      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
             deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
           }
         }
       }
     }
   }
-
 }
 
 void
@@ -307,19 +337,18 @@ CDCTriggerTSFModule::event()
 
   if (m_crosstalk_tdcfilter) {
     //check number of hits in each asic
-    int ncdchit_asic[500][6] = {0};
+    int ncdchit_asic[500][6] = {{0}};
     vector<int> id_ncdchit_asic[500][6];
     for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
-      RelationVector<CDCRawHit> cdcrawHits = m_cdcHits[i]->getRelationsTo<CDCRawHit>();
-      if (cdcrawHits.size() > 0) {
-        CDCRawHit* cdcrawhit = cdcrawHits[0];
-        int boardid = cdcrawhit->getBoardId();
-        int fechid = cdcrawhit->getFEChannel();
-        int asicid = fechid / 8;
-        if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
-          ncdchit_asic[boardid][asicid]++;
-          id_ncdchit_asic[boardid][asicid].push_back(i);
-        }
+      UChar_t lay = m_cdcHits[i]->getICLayer();
+      UShort_t IWire = m_cdcHits[i]->getIWire();
+      WireID wireid(lay, IWire);
+      int boardid = cdc.getBoardID(wireid);
+      int fechid = cdc.getChannelID(wireid);
+      int asicid = fechid / 8;
+      if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
+        ncdchit_asic[boardid][asicid]++;
+        id_ncdchit_asic[boardid][asicid].push_back(i);
       }
     }
     //check 16ns time coinsidence if >=4 hits are found in the same asic
@@ -333,16 +362,18 @@ CDCTriggerTSFModule::event()
           }
           std::sort(tdc_asic.begin(), tdc_asic.end());
           for (int ncoin = ncdchit_asic[i][j]; ncoin >= 4; ncoin--) {
+            bool breakOuterLoop = false;
             for (int k = 0; k < ncdchit_asic[i][j] - ncoin; k++) {
               if (tdc_asic[k + ncoin - 1] - tdc_asic[k] <= 16) {
                 for (int l = k; l < k + ncoin - 1; l++) {
                   filtered_hit[id_ncdchit_asic[i][j][l]] = 1;
                 }
-                //break loop
-                ncoin = 0;
-                k = 8;
+                breakOuterLoop = true;
+                break;
               }
             }
+            if (breakOuterLoop)
+              break;
           }
           tdc_asic.clear();
         }
@@ -362,6 +393,11 @@ CDCTriggerTSFModule::event()
     }
     // skim crosstalk hit
     if (filtered_hit[i] == 1)continue;
+
+    // remove hits with low ADC
+    if (m_adcflag) {
+      if (h.getADCCount() < m_adccut)continue;
+    }
 
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
@@ -516,7 +552,11 @@ CDCTriggerTSFModule::terminate()
 void
 CDCTriggerTSFModule::clear()
 {
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
+    if (isl < cdc.getOffsetOfFirstSuperLayer()) {
+      continue;
+    }
     for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
       for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
         TRGCDCWire& w = (TRGCDCWire&) superLayers[isl][il]->cell(iw);
@@ -529,4 +569,5 @@ CDCTriggerTSFModule::clear()
       s.clear();
     }
   }
+
 }

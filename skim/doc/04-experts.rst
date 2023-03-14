@@ -1,3 +1,6 @@
+Information for skim experts
+----------------------------
+
 .. tip:: 
     The functions and tools documented here are intended for skim liaisons and developers. If you are only interested in the selection criteria, then this section is probably not relevant for you.
 
@@ -52,7 +55,7 @@ To write a new skim, please follow these steps:
 
 3. If you require any standard lists to be loaded for your skim, override the method ``load_standard_lists``. This will be run before ``build_lists`` and ``additional_setup``.
 
-   This step is separated into its own function so that the `CombinedSkim` class can do special handling of these functions to avoid accidentally loading a standard list twice when combinining skims.
+   This step is separated into its own function so that the `CombinedSkim` class can do special handling of these functions to avoid accidentally loading a standard list twice when combining skims.
 
 4. If any further setup is required, then override the ``additional_setup`` method.
 
@@ -122,7 +125,7 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
     from skim.WGs.foo import MySkim
 
     path = b2.Path()
-    ma.inputMdstList("default", [], path=path)
+    ma.inputMdstList([], path=path)
     skim = MySkim()
     skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
     b2.process(path)
@@ -257,12 +260,6 @@ In the skim package, there are command-line tools available for running skims, d
    :nodefaultconst:
    :nogroupsections:
 
-
-Skim tutorial
-~~~~~~~~~~~~~
-
-A Jupyter notebook skimming tutorial can be found in ``skim/tutorial/Skimming_Tutorial.ipynb`` in basf2.
-
 .. _skim-registry:
 
 Skim registry
@@ -282,7 +279,7 @@ The skim numbering convention is defined on the `Confluence skim page`_.
 .. _testing-skims:
 
 Testing skim performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 When skims are developed, it is important to test the performance of the skim on a data and on a range of background MC samples. Two command-line tools are provided in the skim package to aid in this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
 
@@ -437,7 +434,7 @@ Miscellaneous utility functions
 .. _b2skim-prod:
 
 ``b2skim-prod``: Produce grid production requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. argparse::
    :filename: skim/tools/b2skim-prod

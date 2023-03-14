@@ -15,7 +15,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TTDDQM)
+REG_MODULE(TTDDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -52,18 +52,24 @@ void TTDDQMModule::defineHisto()
 
   hTriggersDeltaT = new TH1I("hTTDTriggersDeltaT",
                              "#delta Trigger Time since previous trigger;#delta t in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
-  hTriggersPerBunch = new TH1I("hTTDTriggerBunch", "Triggers per Bunch;Bunch(rel);Triggers per 4 Bunches)", 1280, 0, 1280 * 4);
+  hTriggersPerBunch = new TH1I("hTTDTriggerBunch", "Triggers per Bunch;Bunch(rel);Triggers per 4 Bunches", 1280, 0, 1280 * 4);
 
-  hBunchInjHER = new TH1I("hTTDBunchInjHER", "Last Injected Bunch HER;Bunch(rel);Counts per 4 Bunches", 1280, 0, 1280 * 4);
   hBunchInjLER = new TH1I("hTTDBunchInjLER", "Last Injected Bunch LER;Bunch(rel);Counts per 4 Bunches", 1280, 0, 1280 * 4);
+  hBunchInjHER = new TH1I("hTTDBunchInjHER", "Last Injected Bunch HER;Bunch(rel);Counts per 4 Bunches", 1280, 0, 1280 * 4);
 
   hTrigBunchInjLER =  new TH2I("hTTDTrigBunchInjLER",
                                "Correlation between triggered bunch and injected bunch in LER;Injected Bunch(rel);Triggered Bunch(rel)", 256, 0, 1280 * 4, 256, 0,
                                1280 * 4);
-  hTrigBunchInjHER =  new TH2I("hTTDTrigBunchInjHer",
+  hTrigBunchInjHER =  new TH2I("hTTDTrigBunchInjHER",
                                "Correlation between triggered bunch and injected bunch in HER;Injected Bunch(rel);Triggered Bunch(rel)", 256, 0, 1280 * 4, 256, 0,
                                1280 * 4);
 
+  hTrigBunchInjLERproj =  new TH1I("hTTDTrigBunchInjLERproj",
+                                   "Offset between triggered bunch and injected bunch in LER;Injected Bunch(rel)-Triggered Bunch(rel);Counts per 4 Bunches",  1280, 0,
+                                   1280 * 4);
+  hTrigBunchInjHERproj =  new TH1I("hTTDTrigBunchInjHERproj",
+                                   "Offset between triggered bunch and injected bunch in HER;Injected Bunch(rel)-Triggered Bunch(rel);Counts per 4 Bunches", 1280, 0,
+                                   1280 * 4);
   // cd back to root directory
   oldDir->cd();
 }
@@ -85,12 +91,14 @@ void TTDDQMModule::beginRun()
   hBunchInjLER->Reset();
   hTrigBunchInjLER->Reset();
   hTrigBunchInjHER->Reset();
+  hTrigBunchInjLERproj->Reset();
+  hTrigBunchInjHERproj->Reset();
 }
 
 void TTDDQMModule::event()
 {
 
-  if (m_EventLevelTriggerTimeInfo->isValid()) {
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
     // TODO conversion of clock ticks to time not yet done in EventLevelTriggerTimeInfo
     // all values are given in clock ticks of RF clock/4, thus one tick correspond to 4 bunches
     // ~ 508 MHz RF -> 127 = 508/4 (clock ticks)
@@ -105,7 +113,7 @@ void TTDDQMModule::event()
 
     if (m_EventLevelTriggerTimeInfo->hasInjection()) {
       auto time_since_inj_in_ticks = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();// in clock ticks
-      //  127MHz clock ticks to us, inexact rounding, use integer to avoid binning effects
+      // 127MHz clock ticks to us, inexact rounding, use integer to avoid binning effects
       float time_since_inj_in_us = time_since_inj_in_ticks / 127.;
       // swapped? 1280-1-injected_bunch_in_ticks?
       int injected_bunch_in_ticks = ((time_since_inj_in_ticks - triggered_bunch_in_ticks + 1280) % 1280);
@@ -114,10 +122,12 @@ void TTDDQMModule::event()
         hTrigAfterInjHER->Fill(time_since_inj_in_us, time_since_inj_in_us - int(time_since_inj_in_us / (5120 / 508.)) * (5120 / 508.));
         hBunchInjHER->Fill(injected_bunch_in_ticks * 4);
         hTrigBunchInjHER->Fill(injected_bunch_in_ticks * 4, triggered_bunch_in_ticks * 4);
+        hTrigBunchInjHERproj->Fill(((injected_bunch_in_ticks - triggered_bunch_in_ticks + 1280) % 1280) * 4);
       } else {
         hTrigAfterInjLER->Fill(time_since_inj_in_us, time_since_inj_in_us - int(time_since_inj_in_us / (5120 / 508.)) * (5120 / 508.));
         hBunchInjLER->Fill(injected_bunch_in_ticks * 4);
         hTrigBunchInjLER->Fill(injected_bunch_in_ticks * 4, triggered_bunch_in_ticks * 4);
+        hTrigBunchInjLERproj->Fill(((injected_bunch_in_ticks - triggered_bunch_in_ticks + 1280) % 1280) * 4);
       }
     }
   }

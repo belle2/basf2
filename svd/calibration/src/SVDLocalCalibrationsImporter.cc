@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <svd/calibration/SVDLocalCalibrationsImporter.h>
 
 // Map from the online world (FADC id, ADC id, APV ch id)
@@ -112,7 +112,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
   unique_ptr<SVDOnlineToOfflineMap> map =
     make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
-  payload.construct(defaultValue , xmlFileName);
+  payload.construct(defaultValue, xmlFileName);
 
   // This is the property tree
   ptree pt;
@@ -181,12 +181,12 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
                   B2FATAL("Inconsistency among maps: xml files tells \n" <<
                           "layer " << layerId << " ladder " << ladderId <<
                           " hybridID " << hybridId << "\n" <<
-                          "while the BASF2 map tells \n" <<
+                          "while the basf2 map tells \n" <<
                           "layer " << layer << " ladder " << ladder <<
                           " sensor " << sensor << "\n");
 
 
-                payload->set(layer, ladder, sensor, side , strip, value);
+                payload->set(layer, ladder, sensor, side, strip, value);
               }
             }
           }
@@ -221,7 +221,7 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
   unique_ptr<SVDOnlineToOfflineMap> map =
     make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
-  pulseShapes.construct(SVDStripCalAmp() , xmlFileName);
+  pulseShapes.construct(SVDStripCalAmp(), xmlFileName);
 
   // This is the property tree
   ptree pt;
@@ -293,7 +293,7 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
                    )
                   B2ERROR("Inconsistency among maps: xml files tels \n" <<
                           "layer " << layerId << " ladder " << ladderId << " hybridID " << hybridId << "\n" <<
-                          "while the BASF2 map tels \n" <<
+                          "while the basf2 map tels \n" <<
                           "layer " << layer << " ladder " << ladder << " sensor " << sensor << "\n");
 
                 SVDStripCalAmp stripCalAmp;
@@ -301,7 +301,7 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
                 stripCalAmp.gain = amp / 22500.;
                 stripCalAmp.peakTime = peakTime * 31.44 / 8;
                 stripCalAmp.pulseWidth = width * 31.44 / 8 ;
-                pulseShapes->set(layer, ladder, sensor, side , strip, stripCalAmp);
+                pulseShapes->set(layer, ladder, sensor, side, strip, stripCalAmp);
 
               }
             }

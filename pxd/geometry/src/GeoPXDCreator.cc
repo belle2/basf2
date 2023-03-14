@@ -238,7 +238,7 @@ namespace Belle2 {
                                                       paramsShell.getAngle("gamma")
                                                                      );
 
-        VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
+        VXDHalfShellPar halfShell(shell.getString("@name"), shell.getAngle("shellAngle", 0));
 
         for (const GearDir& layer : shell.getNodes("Layer")) {
           int layerID = layer.getInt("@id");
@@ -297,7 +297,8 @@ namespace Belle2 {
           endflange.getAngle("minPhi", 0),
           endflange.getAngle("maxPhi", 2 * M_PI),
           (endflange.getNodes("Cutout").size() > 0),
-          endflange.getLength("Cutout/width", 0.),
+          endflange.getLength("Cutout/width1", 0.),
+          endflange.getLength("Cutout/width2", 0.),
           endflange.getLength("Cutout/height", 0.),
           endflange.getLength("Cutout/depth", 0.)
         );
@@ -620,7 +621,8 @@ namespace Belle2 {
         for (int i = 0; i < nCutouts; ++i) {
           G4Box* box = new G4Box("Cutout", sizeX, sizeY, sizeZ);
           G4Transform3D placement = G4RotateZ3D(phi0 + i * dphi) * G4Translate3D(origin);
-          supportCone = new G4SubtractionSolid("PXD Support endflange", supportCone, box, placement);
+          G4VSolid* supportConeOld = supportCone;
+          supportCone = new G4SubtractionSolid("PXD Support endflange", supportConeOld, box, placement);
         }
 
 

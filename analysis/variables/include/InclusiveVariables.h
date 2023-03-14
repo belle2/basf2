@@ -8,33 +8,40 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <string>
+#include <vector>
+
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
     /**
      * Number of photon daughters
      */
-    double nDaughterPhotons(const Particle* particle);
+    int nDaughterPhotons(const Particle* particle);
     /**
      * Number of neutral hadron daughters
      */
-    double nDaughterNeutralHadrons(const Particle* particle);
+    int nDaughterNeutralHadrons(const Particle* particle);
     /**
      * Number of charged daughters
      */
-    Manager::FunctionPtr nDaughterCharged(const std::vector<std::string>& arguments);
+    int nDaughterCharged(const Particle* particle, const std::vector<double>& argument);
     /**
-     * PDG of the most common mother of daughters
+     * Number of neutral hadron (photon or KL) daughters
      */
-    double nDaughterNeutralHadrons(const Particle* particle);
+    int nDaughterNeutralHadrons(const Particle* particle);
     /**
-     * PDG of the most common mother of daughters
+     * Number of composite daughters (only Primary daughter)
      */
-    double nCompositeDaughters(const Particle* particle);
+    int nCompositeDaughters(const Particle* particle, const std::vector<double>& argument);
+    /**
+     * Number of composite daughters in all generations
+     */
+    int nCompositeAllGenerationDaughters(const Particle* particle, const std::vector<double>& argument);
     /**
      * Average variable values of daughters
      */

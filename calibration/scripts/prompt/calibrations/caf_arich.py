@@ -11,7 +11,7 @@
 """A simple example calibration that takes one input data list from raw data and performs
 a single calibration."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -22,9 +22,9 @@ settings = CalibrationSettings(
     input_data_names=["bhabha_all_calib"],
     input_data_filters={
         "bhabha_all_calib": [
-            input_data_filters["Data Tag"]["bhabha_all_calib"],
-            input_data_filters["Run Type"]["physics"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
+            INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[])
 
 ##############################

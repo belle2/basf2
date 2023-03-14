@@ -114,7 +114,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 mg.Add(graphs[i])
 
             # draw graph for total
-            n = tree.Draw(f'frac_masked:run', "", "goff")
+            n = tree.Draw('frac_masked:run', "", "goff")
             graphs.append(ROOT.TGraph(n, tree.GetV2(), tree.GetV1()))
             graphs[6].SetMarkerStyle(20)
             graphs[6].SetMarkerColor(6 + 1)

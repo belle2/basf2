@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <regex>
 #include <analysis/dataobjects/RestOfEvent.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -17,8 +18,6 @@
 #include <mdst/dataobjects/KLMCluster.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
-
-#include <TLorentzVector.h>
 
 using namespace Belle2;
 // New methods:
@@ -52,7 +51,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     B2DEBUG(10, "ROE contains no particles, masks are empty too");
     return result;
   }
-  if (maskName == "") {
+  if (maskName == RestOfEvent::c_defaultMaskName or maskName.empty()) {
     // if no mask provided work with internal source
     source = m_particleIndices;
   } else {
@@ -65,7 +64,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
       }
     }
     if (!maskFound) {
-      B2FATAL("No " << maskName << " mask defined in current ROE!");
+      B2FATAL("No '" << maskName << "' mask defined in current ROE!");
     }
   }
   for (const int index : source) {
@@ -124,8 +123,8 @@ std::vector<const Particle*> RestOfEvent::getChargedParticles(const std::string&
 
 bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {
-  if (maskName != "" && !hasMask(maskName)) {
-    B2FATAL("No " << maskName << " mask defined in current ROE!");
+  if (maskName != RestOfEvent::c_defaultMaskName && !hasMask(maskName) && !maskName.empty()) {
+    B2FATAL("No '" << maskName << "' mask defined in current ROE!");
   }
 
   std::vector<const Particle*> particlesROE = getParticles(maskName);
@@ -137,8 +136,16 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
   if (name == "") {
     B2FATAL("Creation of ROE Mask with an empty name is not allowed!");
   }
+  if (name == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("Creation of ROE Mask with a name " << RestOfEvent::c_defaultMaskName << " is not allowed!");
+  }
+  std::regex word_regex("^[a-zA-Z][a-zA-Z0-9_]*$");
+  if (!std::regex_match(name, word_regex)) {
+    B2FATAL("Mask name '" << name << "' contains forbidden characters or it does not start with a letter. "
+            "Only alphanumeric and underscore characters are allowed in ROE mask names.");
+  }
   if (findMask(name)) {
-    B2FATAL("ROE Mask already exists!");
+    B2FATAL("ROE Mask '" << name << "' already exists!");
   }
   Mask elon(name, origin);
   m_masks.push_back(elon);
@@ -147,13 +154,17 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
 void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particlesToUpdate,
                                            Particle::EParticleSourceObject listType, bool discard)
 {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(maskName);
   if (!mask) {
-    B2FATAL("No " << maskName << " mask defined in current ROE!");
+    B2FATAL("No '" << maskName << "' mask defined in current ROE!");
   }
   std::string maskNameToGetParticles = maskName;
   if (!mask->isValid()) {
-    maskNameToGetParticles = "";
+    maskNameToGetParticles = RestOfEvent::c_defaultMaskName;
   }
   std::vector<const Particle*> allROEParticles =  getParticles(maskNameToGetParticles);
   std::vector<const Particle*> toKeepinROE;
@@ -180,11 +191,15 @@ void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const st
 void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::shared_ptr<Variable::Cut>& trackCut,
                                      const std::shared_ptr<Variable::Cut>& eclCut, const std::shared_ptr<Variable::Cut>& klmCut, bool updateExisting)
 {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(maskName);
   if (!mask) {
-    B2FATAL("ROE Mask does not exist!");
+    B2FATAL("ROE Mask '" << maskName << "' does not exist!");
   }
-  std::string sourceName = "";
+  std::string sourceName = RestOfEvent::c_defaultMaskName;
   if (updateExisting) {
     // if mask already exists, take its particles to update
     sourceName = maskName;
@@ -215,9 +230,13 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
 
 void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* particleV0)
 {
+  if (name == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(name);
   if (!mask) {
-    B2FATAL("ROE Mask does not exist!");
+    B2FATAL("ROE Mask '" << name << "' does not exist!");
   }
   std::vector<const Particle*> allROEParticles = getParticles(name, false);
   std::vector<int> indicesToErase;
@@ -248,9 +267,13 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
 
 bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const Particle* particleV0)
 {
+  if (name == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(name);
   if (!mask) {
-    B2FATAL("ROE Mask does not exist!");
+    B2FATAL("ROE Mask '" << name << "' does not exist!");
   }
   if (!mask->isValid()) {
     return false; //We should have particles here!
@@ -280,9 +303,9 @@ bool RestOfEvent::hasMask(const std::string& name) const
   }
   return false;
 }
-TLorentzVector RestOfEvent::get4Vector(const std::string& maskName) const
+ROOT::Math::PxPyPzEVector RestOfEvent::get4Vector(const std::string& maskName) const
 {
-  TLorentzVector roe4Vector;
+  ROOT::Math::PxPyPzEVector roe4Vector;
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
     // KLMClusters are discarded, because KLM energy estimation is based on hit numbers, therefore it is unreliable
@@ -330,10 +353,10 @@ int RestOfEvent::getNKLMClusters(const std::string& maskName) const
   return nROEKLMClusters;
 }
 
-TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
+ROOT::Math::PxPyPzEVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
 {
   auto roeClusters = getPhotons(maskName);
-  TLorentzVector roe4VectorECLClusters;
+  ROOT::Math::PxPyPzEVector roe4VectorECLClusters;
 
   // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
   for (auto& roeCluster : roeClusters) {
@@ -368,7 +391,7 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
 void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
 {
   std::string tab = " - ";
-  if (maskName != "") {
+  if (maskName != RestOfEvent::c_defaultMaskName) {
     // Disable possible B2FATAL in printing method, might be useful for tests
     if (!hasMask(maskName)) {
       B2WARNING("No mask with the name '" << maskName << "' exists in this ROE! Nothing else to print");
@@ -421,7 +444,7 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
 {
   StoreArray<Particle> particles;
   std::set<int> source;
-  if (maskName == "") {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
     // if no mask provided work with internal source
     source = m_particleIndices;
   } else {
@@ -434,12 +457,17 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
       }
     }
     if (!maskFound) {
-      B2FATAL("No " << maskName << " mask defined in current ROE!");
+      B2FATAL("No '" << maskName << "' mask defined in current ROE!");
     }
   }
   int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
   auto isFlavored = (isSelfConjugated) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+  // By default, the ROE-based particles should have unspecified property to simplify the MC-matching
+  int propertyFlags = Particle::PropertyFlags::c_IsUnspecified;
+  // Same properties as for "->" usage in DecayDescriptor
+  propertyFlags |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
+  propertyFlags |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons;
   return particles.appendNew(get4Vector(maskName), particlePDG, isFlavored, std::vector(source.begin(),
-                             source.end()), Particle::PropertyFlags::c_IsUnspecified);
+                             source.end()), propertyFlags);
 }
 

@@ -12,7 +12,7 @@
 Airflow script to perform BoostVector calibration.
 """
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_beamspot import settings as beamspot
 
 #: Tells the automated system some details of this script
@@ -21,13 +21,13 @@ settings = CalibrationSettings(
     expert_username="zlebcr",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["mumutight_calib"],
+    input_data_names=["mumu_tight_or_highm_calib"],
     input_data_filters={
-      "mumutight_calib": [
-        input_data_filters["Data Tag"]["mumutight_calib"],
-        input_data_filters["Run Type"]["physics"],
-        input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-        input_data_filters["Magnet"]["On"]]},
+      "mumu_tight_or_highm_calib": [
+        INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
+        INPUT_DATA_FILTERS["Run Type"]["physics"],
+        INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+        INPUT_DATA_FILTERS["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
@@ -58,7 +58,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["mumutight_calib"]
+    file_to_iov_physics = input_data["mumu_tight_or_highm_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!

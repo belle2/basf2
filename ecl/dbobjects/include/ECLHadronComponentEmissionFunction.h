@@ -34,7 +34,10 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~ECLHadronComponentEmissionFunction() {};
+    ~ECLHadronComponentEmissionFunction()
+    {
+      delete m_HadronComponentEmissionFunction;
+    };
 
     /** Return hadron component emission function tgraph
      * @return hadron component emission function tgraph
@@ -42,7 +45,7 @@ namespace Belle2 {
     TGraph* getHadronComponentEmissionFunction() const {return m_HadronComponentEmissionFunction;};
 
     /** Set hadron component emission function tGraph
-     * @param hadron component emission function tgraph
+     * @param inHadronComponentEmissionFunction hadron component emission function tgraph
      */
     void setHadronComponentEmissionFunction(TGraph* inHadronComponentEmissionFunction) {m_HadronComponentEmissionFunction = inHadronComponentEmissionFunction;};
 

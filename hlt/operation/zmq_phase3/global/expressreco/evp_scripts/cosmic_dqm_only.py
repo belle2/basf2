@@ -13,6 +13,9 @@ import hbasf2
 from softwaretrigger import constants
 from softwaretrigger.processing import setup_basf2_and_db, start_zmq_path, finalize_zmq_path, add_expressreco_processing
 
+
+basf2.logging.add_udp('erctl', 6900)
+
 args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.expressreco)

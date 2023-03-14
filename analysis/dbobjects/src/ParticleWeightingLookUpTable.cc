@@ -45,7 +45,7 @@ WeightInfo ParticleWeightingLookUpTable::getInfo(std::map<std::string, double> v
   if (it != m_WeightMap.end()) {
     return  m_WeightMap.at(id);
   } else {
-    B2FATAL("Attampt to acccess undeclared bin");
+    B2FATAL("Attempt to access undeclared bin");
     return m_WeightMap.at(m_OutOfRangeBinID);
   }
 }

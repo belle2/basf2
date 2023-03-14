@@ -21,20 +21,20 @@ using namespace vxdHoughTracking;
 
 void QualityIndicatorFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
-                                m_param_EstimationMethod);
+                                m_EstimationMethod);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_param_MCRecoTracksStoreArrayName,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_MCRecoTracksStoreArrayName,
                                 "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
-                                m_param_MCRecoTracksStoreArrayName);
+                                m_MCRecoTracksStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_param_MCStrictQualityEstimator,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
-                                m_param_MCStrictQualityEstimator);
+                                m_MCStrictQualityEstimator);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "QICut"), m_param_QIcut,
-                                "Cut on the quality indicator. Only process QI values larger than this.", m_param_QIcut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "QICut"), m_QIcut,
+                                "Cut on the quality indicator. Only process QI values larger than this.", m_QIcut);
 }
 
 void QualityIndicatorFilter::beginRun()
@@ -42,36 +42,27 @@ void QualityIndicatorFilter::beginRun()
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
-  if (m_param_EstimationMethod == "mcInfo") {
-    StoreArray<RecoTrack> mcRecoTracks;
-    mcRecoTracks.isRequired(m_param_MCRecoTracksStoreArrayName);
-    std::string svdClustersName = ""; std::string pxdClustersName = "";
-
-    if (mcRecoTracks.getEntries() > 0) {
-      svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-      pxdClustersName = mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
-    } else {
-      B2WARNING("No Entries in mcRecoTracksStoreArray: using empty cluster name for svd and pxd");
-    }
-
+  if (m_EstimationMethod == "mcInfo") {
     QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
-    MCestimator->setClustersNames(svdClustersName, pxdClustersName);
+    MCestimator->forceUpdateClusterNames();
   }
 }
 
 void QualityIndicatorFilter::initialize()
 {
   // create pointer to chosen estimator
-  if (m_param_EstimationMethod == "mcInfo") {
-    m_estimator = std::make_unique<QualityEstimatorMC>(m_param_MCRecoTracksStoreArrayName, m_param_MCStrictQualityEstimator);
-  } else if (m_param_EstimationMethod == "tripletFit") {
+  if (m_EstimationMethod == "mcInfo") {
+    StoreArray<RecoTrack> mcRecoTracks;
+    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
+    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  } else if (m_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
-  } else if (m_param_EstimationMethod == "circleFit") {
+  } else if (m_EstimationMethod == "circleFit") {
     m_estimator = std::make_unique<QualityEstimatorCircleFit>();
-  } else if (m_param_EstimationMethod == "helixFit") {
+  } else if (m_EstimationMethod == "helixFit") {
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod, m_estimator);
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }
 
 TrackFindingCDC::Weight
@@ -92,7 +83,7 @@ QualityIndicatorFilter::operator()(const BasePathFilter::Object& pair)
 
   const auto& estimatorResult = m_estimator->estimateQualityAndProperties(spacePoints);
 
-  if (estimatorResult.qualityIndicator < m_param_QIcut) {
+  if (estimatorResult.qualityIndicator < m_QIcut) {
     return NAN;
   }
 

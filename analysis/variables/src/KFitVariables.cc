@@ -6,10 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/KFitVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
@@ -25,7 +27,7 @@ namespace Belle2 {
     {
       if (part->hasExtraInfo("FourCFitChi2")) return part->getExtraInfo("FourCFitChi2");
       else {
-        B2WARNING("The ExtraInfo 'FourCFitChi2' not found!");
+        B2WARNING("The ExtraInfo 'FourCFitChi2' could not be found!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
@@ -34,16 +36,35 @@ namespace Belle2 {
     {
       if (part->hasExtraInfo("FourCFitProb")) return part->getExtraInfo("FourCFitProb");
       else {
-        B2WARNING("The ExtraInfo 'FourCFitProb' not found!");
+        B2WARNING("The ExtraInfo 'FourCFitProb' could not be found!");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
 
+    double Chi2TracksLBoost(const Particle* part)
+    {
+      if (part->hasExtraInfo("chiSquared_trackL")) return part->getExtraInfo("chiSquared_trackL");
+      else {
+        B2WARNING("The ExtraInfo 'chiSquared_trackL' could not be found!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
 
-    VARIABLE_GROUP("FourCKFit");
+    double KFitnTracks(const Particle* part)
+    {
+      if (part->hasExtraInfo("kFit_nTracks")) return part->getExtraInfo("kFit_nTracks");
+      else {
+        B2WARNING("The ExtraInfo 'kFit_nTracks' could not be found!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    VARIABLE_GROUP("KFit variables");
     REGISTER_VARIABLE("FourCKFitChi2", FourCKFitChi2, "Chi2 of four momentum-constraint kinematical fit in KFit");
     REGISTER_VARIABLE("FourCKFitProb", FourCKFitProb, "Prob of four momentum-constraint kinematical fit in KFit");
 
-
+    REGISTER_VARIABLE("TracksLBoostChi2", Chi2TracksLBoost,
+                      "indicator of vertex KFit quality based on accumulated change of track positions");
+    REGISTER_VARIABLE("KFit_nTracks", KFitnTracks, "number of tracks used in the vertex KFit");
   }
 }

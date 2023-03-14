@@ -41,8 +41,7 @@ from stdPi0s import stdPi0s
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
              path=my_path)
 
 
@@ -85,6 +84,9 @@ variables = [
     "p",  # momentum (of the B0)
     "mcP",  # generated momentum
     "pErr",  # momentum uncertainty taking the full px, py, pz covariance into account
+
+    "daughter(0, E)",  # momentum of the D0 that is updated if updateAllDaughters=True.
+    "originalDaughter(0, E)",  # momentum of the original D0.
 ]
 
 # safe the output

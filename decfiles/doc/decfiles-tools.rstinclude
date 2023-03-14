@@ -1,0 +1,11 @@
+.. _b2help-eventtype:
+
+``b2help-eventtype``: List decfiles used in the event generator
+---------------------------------------------------------------
+
+.. argparse::
+    :filename: decfiles/tools/b2help-eventtype
+    :func: get_argument_parser
+    :prog: b2help-eventtype
+    :nodefault:
+    :nogroupsections:

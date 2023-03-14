@@ -33,7 +33,7 @@ namespace Belle2 {
     bool getBeamBackgroundStudy() const {return m_isBeamBackgroundStudy; }
 
     /** Set beam background study flag
-     * @param beam background study flag
+     * @param study beam background study flag
      */
     void setBeamBackgroundStudy(bool study) { m_isBeamBackgroundStudy = study; }
   private:

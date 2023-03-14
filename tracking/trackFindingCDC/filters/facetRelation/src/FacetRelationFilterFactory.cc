@@ -60,18 +60,25 @@ FacetRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneFilter<BaseFacetRelationFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<AllFacetRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<MCFacetRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "simple") {
     return std::make_unique<SimpleFacetRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "chi2") {
     return std::make_unique<Chi2FacetRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "chi2_old") {
     return std::make_unique<Chi2FacetRelationFilter>(130.0, 200.0);
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "unionrecording") {
     return std::make_unique<UnionRecordingFacetRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVAFacetRelationFilter>();
   } else {

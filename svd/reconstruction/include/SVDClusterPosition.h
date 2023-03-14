@@ -52,6 +52,9 @@ namespace Belle2::SVD {
     /** reconstruct strips*/
     void reconstructStrips(Belle2::SVD::RawCluster& rawCluster);
 
+    /** Apply cluster charges unfolding*/
+    void applyUnfolding(Belle2::SVD::RawCluster& rawCluster);
+
     /** set which algorithm to use for strip charge in cluster position reconstruction*/
     void set_stripChargeAlgo(const std::string& user_stripChargeAlgo) {m_stripChargeAlgo = user_stripChargeAlgo;}
 

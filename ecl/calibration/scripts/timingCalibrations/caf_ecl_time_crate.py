@@ -10,7 +10,7 @@
 
 """ECL timing calibration that performs the crate calibrations, one for each physics run."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings
 from reconstruction import prepare_cdst_analysis
 
 ##############################
@@ -91,11 +91,8 @@ def get_calibrations(input_data, **kwargs):
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
     ###################################################
-    import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################

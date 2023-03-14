@@ -83,14 +83,19 @@ def process_dir(
             header_files.remove(header_file)
 
     # get list of source files
-    src_nodes = get_files(os.path.join(dir_name, '*.cc')) \
+    c_sources = get_files(os.path.join(dir_name, '*.cc')) \
         + get_files(os.path.join(dir_name, 'src', '*.cc')) \
         + get_files(os.path.join(dir_name, '*.c')) \
-        + get_files(os.path.join(dir_name, 'src', '*.c')) \
-        + get_files(os.path.join(dir_name, '*.f')) \
+        + get_files(os.path.join(dir_name, 'src', '*.c'))
+    fortran_sources = get_files(os.path.join(dir_name, '*.f')) \
         + get_files(os.path.join(dir_name, 'src', '*.f')) \
         + get_files(os.path.join(dir_name, '*.F')) \
-        + get_files(os.path.join(dir_name, 'src', '*.F'))
+        + get_files(os.path.join(dir_name, 'src', '*.F')) \
+        + get_files(os.path.join(dir_name, '*.f90')) \
+        + get_files(os.path.join(dir_name, 'src', '*.f90')) \
+        + get_files(os.path.join(dir_name, '*.F90')) \
+        + get_files(os.path.join(dir_name, 'src', '*.F90'))
+    src_nodes = c_sources + fortran_sources
     src_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
                  src_nodes]
 
@@ -166,6 +171,12 @@ def process_dir(
         if (len(additional_src_files) > 0):
             src_files.append(additional_src_files)
         env['SRC_FILES'] = src_files
+
+    # Create Fortran module directory.
+    if len(fortran_sources) > 0:
+        fortran_module_dir = env.Dir('$FORTRANMODDIR').get_abspath()
+        if not os.path.isdir(fortran_module_dir):
+            os.makedirs(fortran_module_dir)
 
     # install header files in the include directory
     includes = env.Install(os.path.join(env['INCDIR'], dir_name),

@@ -72,7 +72,7 @@ void Ds2SampleModule::event()
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
   // Put the message in ring buffer. If failed, just skip the event
-  int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+  m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
 
   B2INFO("Ds2Sample: objs sent in buffer. Size = " << msg->size());
 

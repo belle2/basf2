@@ -9,7 +9,8 @@
 #ifndef TRGTOPUNPACKERSTORE_H
 #define TRGTOPUNPACKERSTORE_H
 
-#include <TObject.h>
+//#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <vector>
 
@@ -19,31 +20,32 @@ namespace Belle2 {
 
 
   //! Example Detector
-  class TRGTOPUnpackerStore : public TObject {
+  //  class TRGTOPUnpackerStore : public TObject {
+  class TRGTOPUnpackerStore : public RelationsObject {
 
   public:
 
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPUnpackerStore() :
-      m_eventIdL1(intNaN),
-      m_eventIdTOP(intNaN),
-      m_windowIdTOP(intNaN),
-      m_rvcB2L(intNaN),
-      m_rvcWindow(intNaN),
-      m_rvcTopTimingDecisionPrev(intNaN),
-      m_rvcTopTimingDecisionNow(intNaN),
-      m_rvcTopTimingDecisionNowGdl(intNaN),
-      m_combinedTimingTop(intNaN),
-      m_nSlotsCombinedTimingTop(intNaN),
-      m_combinedTimingTopResidual(intNaN),
-      m_nErrorsMinor(intNaN),
-      m_nErrorsMajor(intNaN),
-      m_trigType(intNaN),
-      m_nHitSum(intNaN),
-      m_logLSum(intNaN),
-      m_logLVar(intNaN),
-      m_timingVar(intNaN)
+      m_eventIdL1(0),
+      m_eventIdTOP(0),
+      m_windowIdTOP(0),
+      m_rvcB2L(0),
+      m_rvcWindow(0),
+      m_rvcTopTimingDecisionPrev(0),
+      m_rvcTopTimingDecisionNow(0),
+      m_rvcTopTimingDecisionNowGdl(0),
+      m_combinedTimingTop(0),
+      m_nSlotsCombinedTimingTop(0),
+      m_combinedTimingTopResidual(0),
+      m_nErrorsMinor(0),
+      m_nErrorsMajor(0),
+      m_trigType(0),
+      m_nHitSum(0),
+      m_logLSum(0),
+      m_logLVar(0),
+      m_timingVar(0)
     {}
 
     //! A Useful Constructor
@@ -51,23 +53,23 @@ namespace Belle2 {
       int eventIdL1
     ) :
       m_eventIdL1(eventIdL1),
-      m_eventIdTOP(intNaN),
-      m_windowIdTOP(intNaN),
-      m_rvcB2L(intNaN),
-      m_rvcWindow(intNaN),
-      m_rvcTopTimingDecisionPrev(intNaN),
-      m_rvcTopTimingDecisionNow(intNaN),
-      m_rvcTopTimingDecisionNowGdl(intNaN),
-      m_combinedTimingTop(intNaN),
-      m_nSlotsCombinedTimingTop(intNaN),
-      m_combinedTimingTopResidual(intNaN),
-      m_nErrorsMinor(intNaN),
-      m_nErrorsMajor(intNaN),
-      m_trigType(intNaN),
-      m_nHitSum(intNaN),
-      m_logLSum(intNaN),
-      m_logLVar(intNaN),
-      m_timingVar(intNaN)
+      m_eventIdTOP(0),
+      m_windowIdTOP(0),
+      m_rvcB2L(0),
+      m_rvcWindow(0),
+      m_rvcTopTimingDecisionPrev(0),
+      m_rvcTopTimingDecisionNow(0),
+      m_rvcTopTimingDecisionNowGdl(0),
+      m_combinedTimingTop(0),
+      m_nSlotsCombinedTimingTop(0),
+      m_combinedTimingTopResidual(0),
+      m_nErrorsMinor(0),
+      m_nErrorsMajor(0),
+      m_trigType(0),
+      m_nHitSum(0),
+      m_logLSum(0),
+      m_logLVar(0),
+      m_timingVar(0)
     {}
 
     //! Another Useful Constructor

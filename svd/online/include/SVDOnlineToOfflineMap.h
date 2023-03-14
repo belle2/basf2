@@ -17,15 +17,9 @@
 #include <string>
 
 namespace Belle2 {
-  /** This class implements the methods to map raw SVD hits to BASF2 SVD hits.
+  /** This class implements the methods to map raw SVD hits to basf2 SVD hits.
    * Raw SVD hits are identified by: FADC number, APV number, strip number
-   * Basf2 SVD hits are identified by PXD Sensor-id, side, strip number
-   * MODIFICATIONS 06/01/2014 by PKvasnick:
-   * The code no longer relies on consecutive numbering of FADCs or APVs.
-   *
-   * 2015-2018
-   * MODIFIED and EXTENDED by Jarek Wiechczynski to work with packer (new) and unpacker (updated version)
-   *
+   * basf2 SVD hits are identified by PXD Sensor-id, side, strip number
    */
 
 

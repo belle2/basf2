@@ -304,7 +304,7 @@ namespace Belle2 {
     if (1 == expmc) {
       if (mode == 0) {
         scale = scale_data;
-      } else if (mode >= 1) {
+      } else {
         //      scale_momenta_set( mode, expno, runno, scale);
         if (m_reprocess_version == 0) {
           scale_momenta_set_v1(mode, expno, runno, scale);
@@ -2357,12 +2357,12 @@ namespace Belle2 {
     // pt
     scale[0] =  1.213823    - .1029683 * pt;
     scale[1] =  1.239279    - .3706657E-01 * pt;
-    scale[2] = vfunc(pt, 0.6145123 , 0.8834459 , -.4620622 , 0.2099150E-01);
+    scale[2] = vfunc(pt, 0.6145123, 0.8834459, -.4620622, 0.2099150E-01);
     scale[3] =  1.253126    - .1884352 * pt;
-    scale[4] = vfunc(pt, 0.4928604 , 1.169158 , 0.2063893 , -.5428730E-01);
+    scale[4] = vfunc(pt, 0.4928604, 1.169158, 0.2063893, -.5428730E-01);
 
     // tanl
-    scale[2] *= vfunc(tanl, -.1240821 , 0.9274375 , -.8750933E-01 , 0.8611448E-01);
+    scale[2] *= vfunc(tanl, -.1240821, 0.9274375, -.8750933E-01, 0.8611448E-01);
   }
 
 //
@@ -2376,9 +2376,9 @@ namespace Belle2 {
     // pt
     scale[0] = 1.218633    - .1078999 * pt;
     scale[1] = 1.237288    - .2890434E-01 * pt;
-    scale[2] = vfunc(pt, 0.4334312 , 0.9027213 , -.7119852 , 0.1031877E-01);
+    scale[2] = vfunc(pt, 0.4334312, 0.9027213, -.7119852, 0.1031877E-01);
     scale[3] =  1.252394    - .1835607 * pt;
-    scale[4] = vfunc(pt, 0.6194937 , 1.168190 , 0.1285120 , -.5815693E-01);
+    scale[4] = vfunc(pt, 0.6194937, 1.168190, 0.1285120, -.5815693E-01);
   }
 
 //
@@ -2392,9 +2392,9 @@ namespace Belle2 {
     // pt
     scale[0] =  1.217751    - .1075724 * pt;
     scale[1] =  1.233774    - .3122749E-01 * pt;
-    scale[2] = vfunc(pt, 0.5276512 , 0.8852152 , -.7025786 , 0.3136450E-01);
+    scale[2] = vfunc(pt, 0.5276512, 0.8852152, -.7025786, 0.3136450E-01);
     scale[3] =  1.258038    - .1949899 * pt;
-    scale[4] = vfunc(pt, 0.5924365 , 1.162905 , 0.9632715E-01, -.6221822E-01);
+    scale[4] = vfunc(pt, 0.5924365, 1.162905, 0.9632715E-01, -.6221822E-01);
 
   }
 
@@ -3334,8 +3334,8 @@ namespace Belle2 {
 //from the module smear_trk originally coded by Marko Staric.
 //=======================================================================
 
-  static void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[]); /**< Scale error */
-  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[]); /**< Smear MC tracks */
+  static void scale_err_ms(Belle::Mdst_trk_fit& fit, const double scale[]); /**< Scale error */
+  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, const double scale[]); /**< Smear MC tracks */
   static void smear_charged(); /**< Smear tracks in Mdst_Charged */
 
 //==========================
@@ -3404,7 +3404,7 @@ namespace Belle2 {
   }
 
 //====================================================
-  void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[])
+  void scale_err_ms(Belle::Mdst_trk_fit& fit, const double scale[])
   {
 //====================================================
     fit.error(0, scale[0]*scale[0]*fit.error(0));
@@ -3426,7 +3426,7 @@ namespace Belle2 {
   }
 
 //====================================================
-  void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[])
+  void smear_trk_ms(Belle::Mdst_trk_fit& fit, const double scale[])
   {
 //====================================================
     const int n = 5;

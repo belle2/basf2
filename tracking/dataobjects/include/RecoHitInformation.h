@@ -11,8 +11,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
+#include <klm/dataobjects/KLMHit2d.h>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -48,8 +48,8 @@ namespace Belle2 {
     /** Define, use of CDC hits as CDC hits (for symmetry). */
     typedef CDCHit UsedCDCHit;
 
-    /** Define, use of BKLMHit2d as BKLM hits. */
-    typedef BKLMHit2d UsedBKLMHit;
+    /** Define, use of KLMHit2d as BKLM hits. */
+    typedef KLMHit2d UsedBKLMHit;
 
     /** Define, use of EKLMHit2d as EKLM hits. */
     typedef EKLMAlignmentHit UsedEKLMHit;
@@ -85,6 +85,8 @@ namespace Belle2 {
       c_ECLtoCDCCKF,
       c_CDCtoSVDCKF,
       c_SVDtoPXDCKF,
+      // SVDHough track finder
+      c_SVDHough,
       // CDC hit finder implemented in the ReattachCDCWireHitsToRecoTracks module:
       // looks for CDC hits that are close to RecTracks, but that were rejected by the ADC/TOT based filter.
       c_ReattachCDCWireHitsToRecoTracks,

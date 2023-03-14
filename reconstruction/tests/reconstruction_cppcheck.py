@@ -15,7 +15,6 @@ Perform code quality cppchecks for every commit to the reconstruction package.
 
 import re
 from b2test_utils import check_error_free
-from b2test_utils import skip_test
 
 if __name__ == "__main__":
     # Comment: this is a temporary workaround, since this package is affected by cppcheck warnings

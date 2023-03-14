@@ -9,7 +9,7 @@
 /* Own header. */
 #include <mdst/dataobjects/KLMCluster.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -45,11 +45,11 @@ float KLMCluster::getEnergy() const
   return sqrt(mass * mass + m_p * m_p);
 }
 
-TLorentzVector KLMCluster::getMomentum() const
+ROOT::Math::PxPyPzEVector KLMCluster::getMomentum() const
 {
-  TVector3 p3(m_globalX, m_globalY, m_globalZ);
+  ROOT::Math::XYZVector p3(m_globalX, m_globalY, m_globalZ);
   p3 = p3.Unit() * m_p;
-  return TLorentzVector(p3, getEnergy());
+  return ROOT::Math::PxPyPzEVector(p3.X(), p3.Y(), p3.Z(), getEnergy());
 }
 
 bool KLMCluster::getAssociatedEclClusterFlag() const

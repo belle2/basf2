@@ -28,6 +28,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, wait as futures_wait
 import hashlib
 import itertools
+from typing import Union  # noqa
 
 
 def encode_name(name):
@@ -632,8 +633,8 @@ class ConditionsDB:
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
           global_tage (str): name of the globaltag to which the data should be uploaded
-          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
-                                if normalize is a string in addition the file name in the root file metadata will be set to it
+          normalize (Union[bool, str]): if True the payload root files will be normalized to have the same checksum for the
+            same content, if normalize is a string in addition the file name in the root file metadata will be set to it
           ignore_existing (bool): if True do not upload payloads that already exist
           nprocess (int): maximal number of parallel uploads
           uploaded_entries (list): the list of successfully uploaded entries
@@ -776,17 +777,17 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool/str): if True the payload root files will be
+          normalize (Union[bool, str]): if True the payload root files will be
             normalized to have the same checksum for the same content, if
             normalize is a string in addition the file name in the root file
             metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
 
-            * task: category of globaltag, either master, online, prompt, data, mc, or analysis
-            * tag: the globaltage name
-            * request: type of request, either Update, New, or Modification. The latter two imply task == master because
+            * task: category of globaltag, either main, online, prompt, data, mc, or analysis
+            * tag: the globaltag name
+            * request: type of request, either Update, New, or Modification. The latter two imply task == main because
               if new payload classes are introduced or payload classes are modified then they will first be included in
-              the master globaltag. Here a synchronization of code and payload changes has to be managed.
+              the main globaltag. Here a synchronization of code and payload changes has to be managed.
               If new or modified payload classes should be included in other globaltags they must already be in a release.
             * pull-request: number of the pull request containing new or modified payload classes,
               only for request == New or Modified
@@ -810,7 +811,7 @@ class ConditionsDB:
         # determine the staging globaltag name
         data['tag'] = upload_global_tag(data['task'])
         if data['tag'] is None:
-            data['tag'] = f"staging_{data['task']}_{data['user']}_{data['time']}"
+            data['tag'] = f"temp_{data['task']}_{data['user']}_{data['time']}"
 
         # create the staging globaltag if it does not exists yet
         if not self.has_globalTag(data['tag']):
@@ -868,7 +869,7 @@ class ConditionsDB:
                 issue["project"] = {"key": "BII"}
             if "issuetype" not in issue.keys():
                 issue["issuetype"] = {"name": "Task"}
-            if data["task"] == "master":
+            if data["task"] == "main":
                 issue["labels"] = ["TUPPR"]
 
             B2INFO(f"Creating jira issue for {data['task']} globaltag request")

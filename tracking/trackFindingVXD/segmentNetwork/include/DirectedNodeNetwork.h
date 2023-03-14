@@ -77,7 +77,7 @@ namespace Belle2 {
       }
       // check if entries are identical (catch loops):
       if (m_lastOuterNodeID == innerNodeID) {
-        B2WARNING("LastOuterNode and innerEntry are identical! Aborting linking-process");
+        B2WARNING("LastOuterNode and innerEntry are identical! Skipping linking-process");
         return false;
       }
 
@@ -100,7 +100,7 @@ namespace Belle2 {
       }
       // check if entries are identical (catch loops):
       if (outerNodeID == m_lastInnerNodeID) {
-        B2WARNING("OuterEntry and lastInnerNode are identical! Aborting linking-process");
+        B2WARNING("OuterEntry and lastInnerNode are identical! Skipping linking-process");
         return false;
       }
 
@@ -120,7 +120,7 @@ namespace Belle2 {
       m_isFinalized = false;
       // check if entries are identical (catch loops):
       if (outerNodeID == innerNodeID) {
-        B2WARNING("OuterNodeID and innerNodeID are identical! Aborting linking-process");
+        B2WARNING("OuterNodeID and innerNodeID are identical! Skipping linking-process");
         return false;
       }
       if (m_nodeMap.count(innerNodeID) == 0 or m_nodeMap.count(outerNodeID) == 0) {

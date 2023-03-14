@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::MVA::SPlotDataset-;
 #pragma link C++ class Belle2::MVA::ReweightingDataset-;
 #pragma link C++ class Belle2::MVA::SidebandDataset-;
+#pragma link C++ class Belle2::MVA::Utility-;
 
 #endif

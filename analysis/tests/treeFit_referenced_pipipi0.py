@@ -27,7 +27,7 @@ class TestTreeFits(unittest.TestCase):
         main = basf2.create_path()
 
         inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
-        ma.inputMdst('default', inputfile, path=main)
+        ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
@@ -82,4 +82,5 @@ class TestTreeFits(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <gtest/gtest.h>
+#include <framework/utilities/TestHelpers.h>
 #include "utilities/TestParticleFactory.h"
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
@@ -21,11 +22,12 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <framework/gearbox/Gearbox.h>
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Variable;
+using namespace ROOT::Math;
+
 namespace {
   class ROETest : public ::testing::Test {
   protected:
@@ -53,18 +55,18 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-      TVector3 ipposition(0, 0, 0);
-      TLorentzVector ksmomentum(1, 0, 0, 3);
-      TVector3 ksposition(1.0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
+      PxPyPzEVector ksmomentum(1, 0, 0, 3);
+      ROOT::Math::XYZVector ksposition(1.0, 0, 0);
       //Creation of test particles:
       //All daughters and mother particles have the same momenta within a decay
       //In principle, this concept can be better developed if needed
       auto* ksParticle = factory.produceParticle(string("^K_S0 -> ^pi+ ^pi-"), ksmomentum, ksposition);
-      TLorentzVector d0momentum(-2, 0, 0, 4);
+      PxPyPzEVector d0momentum(-2, 0, 0, 4);
       auto* d0Particle = factory.produceParticle(string("^D0 -> ^K+ ^pi-"), d0momentum, ipposition);
-      TLorentzVector pi0momentum(-0.2, 0, 0, 1);
+      PxPyPzEVector pi0momentum(-0.2, 0, 0, 1);
       auto* pi0Particle = factory.produceParticle(string("^pi0 -> ^gamma ^gamma"), pi0momentum, ipposition);
-      TLorentzVector b0momentum(3, 0, 0, 5);
+      PxPyPzEVector b0momentum(3, 0, 0, 5);
       factory.produceParticle(string("^B0 -> [^K_S0 -> ^pi+ ^pi-] [^pi0 -> ^gamma ^gamma] ^gamma"), b0momentum, ipposition);
 
       RestOfEvent roe;
@@ -143,19 +145,23 @@ namespace {
 
     PCmsLabTransform T;
     // Recoil vector against all ROE particles
-    TLorentzVector pRecoil = T.getBeamFourMomentum() - myROEs[0]->get4Vector();
+    PxPyPzEVector pRecoil = T.getBeamFourMomentum() - myROEs[0]->get4Vector();
     Particle tmp(pRecoil, 0);
     RestFrame frame(&tmp);
     //std::cout << "HER: " << T.getBeamParams().getHER()[0] << " LER: " << T.getBeamParams().getLER()[0] << std::endl;
 
     const Manager::Var* var = Manager::Instance().getVariable("useROERecoilFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).P()); // test on D0 in ROE
-    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).P()); // test on B0 on signal side
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[5])),
+                    frame.getMomentum(myParticles[5]->get4Vector()).P()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[14])),
+                    frame.getMomentum(myParticles[14]->get4Vector()).P()); // test on B0 on signal side
     var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).E()); // test on D0 in ROE
-    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).E()); // test on B0 on signal side
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[5])),
+                    frame.getMomentum(myParticles[5]->get4Vector()).E()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[14])),
+                    frame.getMomentum(myParticles[14]->get4Vector()).E()); // test on B0 on signal side
 
     DataStore::Instance().setInitializeActive(true);
     DataStore::Instance().getEntry(myROEObject)->object = nullptr;
@@ -171,8 +177,8 @@ namespace {
     EXPECT_TRUE(roe->getPhotons().size() == 2);
     EXPECT_TRUE(roe->getHadrons().size() == 0);
     EXPECT_TRUE(roe->getChargedParticles().size() == 4);
-    EXPECT_TRUE(roe->getChargedParticles("", 321).size() == 1);
-    EXPECT_TRUE(roe->getChargedParticles("", 211).size() == 3);
+    EXPECT_TRUE(roe->getChargedParticles("all", 321).size() == 1);
+    EXPECT_TRUE(roe->getChargedParticles("all", 211).size() == 3);
   }
 
   TEST_F(ROETest, updateMaskWithCuts)
@@ -233,7 +239,24 @@ namespace {
     for (auto* particle : v0maskParticlesUnpacked) {
       B2INFO("My pdg: " << particle->getPDGCode());
     }
-    EXPECT_FLOAT_EQ(v0maskParticles.size() , 5);
-    EXPECT_FLOAT_EQ(v0maskParticlesUnpacked.size() , 6);
+    EXPECT_FLOAT_EQ(v0maskParticles.size(), 5);
+    EXPECT_FLOAT_EQ(v0maskParticlesUnpacked.size(), 6);
   }
+
+  TEST_F(ROETest, maskNamingConventions)
+  {
+    RestOfEvent roe;
+
+    EXPECT_B2FATAL(roe.initializeMask("clean-mask", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("1mask", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("all", "maskNamingConventionTest"));
+
+    roe.initializeMask("Clean_mask", "maskNamingConventionTest");
+    EXPECT_TRUE(roe.hasMask("Clean_mask"));
+
+    roe.initializeMask("cl3an_mask", "maskNamingConventionTest");
+    EXPECT_TRUE(roe.hasMask("cl3an_mask"));
+  }
+
 } //

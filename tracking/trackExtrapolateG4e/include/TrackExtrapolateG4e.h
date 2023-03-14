@@ -13,19 +13,18 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <ir/dbobjects/BeamPipeGeo.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <structure/dbobjects/COILGeometryPar.h>
 
@@ -458,11 +457,8 @@ namespace Belle2 {
     //! Ext hits
     StoreArray<ExtHit> m_extHits;
 
-    //! BKLM 2d hits
-    StoreArray<BKLMHit2d> m_bklmHit2ds;
-
-    //! EKLM 2d hits
-    StoreArray<EKLMHit2d> m_eklmHit2ds;
+    //! KLM 2d hits
+    StoreArray<KLMHit2d> m_klmHit2ds;
 
     //! KLM clusters
     StoreArray<KLMCluster> m_klmClusters;

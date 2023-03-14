@@ -92,7 +92,7 @@ namespace Belle2 {
     /**
      * Mark current run as reference.
      * @param isLocal is true for local database
-     * @param dbNaem is central DB tag or path to a local DB.
+     * @param dbName is central DB tag or path to a local DB.
      * @param run is the current run number.
      * @param iov is the current validity interval.
      */

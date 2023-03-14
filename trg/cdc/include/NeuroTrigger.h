@@ -7,7 +7,8 @@
  **************************************************************************/
 #ifndef NEUROTRIGGER_H
 #define NEUROTRIGGER_H
-
+#pragma once
+#include <string>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -142,6 +143,7 @@ namespace Belle2 {
     /** set the hit collection and event time to required
      * and store the hit collection name */
     void initializeCollections(std::string hitCollectionName, std::string eventTimeName, const std::string& et_option);
+    void initializeCollections(std::string hitCollectionName);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -179,6 +181,8 @@ namespace Belle2 {
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
+    /** helper function to get the fastest priority time of given ts array */
+    int getLowestTime(unsigned isector, RelationVector<CDCTriggerSegmentHit> Hits, bool onlyAxials);
     /** Read out the event time and store it.
      * It can be given different options in the et_option ("EventTime option")
      * parameter.

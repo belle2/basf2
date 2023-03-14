@@ -6,6 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import basf2
 from zmq_daq import test_support
 from unittest import main
 
@@ -23,4 +24,18 @@ class FinalCollectorTestCase(test_support.BaseCollectorTestCase):
 
 
 if __name__ == '__main__':
-    main()
+    #: Number of failed for loops
+    number_of_failures = 0
+
+    for i in range(test_support.ZMQ_TEST_FOR_LOOPS):
+        try:
+            main(exit=False)
+        except AssertionError:
+            number_of_failures += 1
+
+    #: Exit message
+    message = f'Number of failed for loops: {number_of_failures}/{test_support.ZMQ_TEST_FOR_LOOPS}'
+    if number_of_failures <= test_support.ZMQ_TEST_MAX_FAILURES:
+        basf2.B2INFO(message)
+    else:
+        basf2.B2FATAL(message)

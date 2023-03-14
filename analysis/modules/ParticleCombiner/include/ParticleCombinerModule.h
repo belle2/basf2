@@ -69,6 +69,8 @@ namespace Belle2 {
 
     std::string m_cutParameter;  /**< selection criteria */
 
+    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
     int m_recoilParticleType =

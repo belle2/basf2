@@ -11,8 +11,6 @@
 
 from basf2 import set_log_level, register_module, process, LogLevel, \
     set_random_seed, print_params, create_path, statistics
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.WARNING)

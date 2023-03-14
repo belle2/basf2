@@ -9,13 +9,15 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import *
+import os
+import sys
+import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
-from ROOT import Belle2
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 import modularAnalysis as ma
 
-main = create_path()
+main = b2.create_path()
 
 eventinfosetter = main.add_module("EventInfoSetter", evtNumList=[100], expList=[1003])
 
@@ -29,7 +31,7 @@ if len(sys.argv) > 1:
 main.add_module('EvtGenInput', ParentParticle='Upsilon(4S)', userDECFile=dec_file)
 
 # initialise the displacer module
-displacer = register_module("GeneratedVertexDisplacer")
+displacer = b2.register_module("GeneratedVertexDisplacer")
 
 # list of pdg values for particles to be displaced, here 100
 displacer.param("pdgVal", (100))
@@ -56,4 +58,4 @@ add_reconstruction(main)
 # save to file
 add_mdst_output(main, filename='displacerOut.root')
 
-process(main)
+b2.process(main)

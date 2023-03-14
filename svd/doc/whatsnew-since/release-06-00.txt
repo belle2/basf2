@@ -1,0 +1,15 @@
+Changes in the svd package since release-06-00
+---------------------------------------------------
+
+Beam-Background
++++++++++++++++
+
+* above-threshold strips due to cross-talk are added in the background overlay for simulated background
+
+Reconstruction
+++++++++++++++
+
+* fudge factors are introduced in the reconstruction of the SVD cluster position and time
+  of simulated events in order to match the resolution measured on data.
+
+* correction of the APV charge sharing is applied in the determination of the cluster position when reconstructing data

@@ -14,7 +14,7 @@
 namespace Belle2 {
   /**
    * Loops through the particle list finds a unique signal candidate for each event.
-   * Usefull for use by the FEI and for strange cases where there are two isSignal
+   * Useful for use by the FEI and for strange cases where there are two isSignal
    * flags in the event (for example, clone tracks)
    */
   class TagUniqueSignalModule : public Module {

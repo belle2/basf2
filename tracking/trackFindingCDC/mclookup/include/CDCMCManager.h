@@ -30,6 +30,8 @@ namespace Belle2 {
 
       /// Singleton: Delete copy constructor and assignment operator
       CDCMCManager(CDCMCManager&) = delete;
+
+      /// Operator =.
       CDCMCManager& operator=(const CDCMCManager&) = delete;
 
       /// Getter for the singletone instance of the CDCMCMap

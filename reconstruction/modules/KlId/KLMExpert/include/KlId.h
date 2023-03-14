@@ -20,6 +20,7 @@
 #include <genfit/Exception.h>
 #include <utility>
 #include <math.h>
+#include <Math/VectorUtil.h>
 
 /** Helper functions for all klid modules to improve readability of the code */
 namespace Belle2::KlongId {
@@ -31,10 +32,10 @@ namespace Belle2::KlongId {
 
     Belle2::StoreArray<Belle2::TrackFitResult> tracks;
     for (const Belle2::TrackFitResult& track : tracks) {
-      const TVector3& trackPos = track.getPosition();
+      const ROOT::Math::XYZVector& trackPos = track.getPosition();
 
-      if (trackPos.Angle(pos) < angle) {
-        B2DEBUG(20, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
+      if (ROOT::Math::VectorUtil::Angle(trackPos, pos) < angle) {
+        B2DEBUG(20, "BelleFlagTracklAngle::" << ROOT::Math::VectorUtil::Angle(trackPos, pos));
         return 1;
       }
     }
@@ -61,7 +62,7 @@ namespace Belle2::KlongId {
   }
 
   /** return if MCparticle is beambkg */
-  int mcParticleIsBeamBKG(Belle2::MCParticle* part)
+  int mcParticleIsBeamBKG(const Belle2::MCParticle* part)
   {
     if (part == nullptr) {
       return 1;

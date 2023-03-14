@@ -73,7 +73,7 @@ This is a very minimal implementation of the event shape in a steering file:
 		# to the VariableManager
 
 
-For a complete steering file, see the example `B2A704-EventShape.py <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A704-EventShape.py>`_ .
+For a complete steering file, see the example `B2A704-EventShape.py <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/tutorials/B2A704-EventShape.py>`_ .
 
 Event shape variables
 ---------------------

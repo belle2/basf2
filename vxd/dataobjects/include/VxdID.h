@@ -114,18 +114,20 @@ namespace Belle2 {
   private:
 
     union {
+      // *INDENT-OFF*
       /** Unique id */
-baseType id: Bits;
+      baseType id: Bits;
       struct {
         /** Segment id */
-baseType segment: SegmentBits;
+        baseType segment: SegmentBits;
         /** Sensor id */
-baseType sensor: SensorBits;
+        baseType sensor: SensorBits;
         /** Ladder id */
-baseType ladder: LadderBits;
+        baseType ladder: LadderBits;
         /** Layer id */
-baseType layer: LayerBits;
+        baseType layer: LayerBits;
       } parts /**< Struct to contain all id components */;
+      // *INDENT-ON*
     } m_id; /**< Union to store the ID and all components in one go. */
   };
 

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichFillHits/ARICHFillHitsModule.h>
 
 // framework - DataStore
@@ -22,15 +22,13 @@
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHFillHits)
+  REG_MODULE(ARICHFillHits);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -42,7 +40,7 @@ namespace Belle2 {
     setDescription("Fills ARICHHits collection from ARICHDigits");
     setPropertyFlags(c_ParallelProcessingCertified);
     addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel)", (uint8_t)0xFF);
-    addParam("maxApdHits" , m_maxApdHits , "Remove hits with more than MaxApdHits per APD chip", (uint8_t)18);
+    addParam("maxApdHits", m_maxApdHits, "Remove hits with more than MaxApdHits per APD chip", (uint8_t)18);
     addParam("maxHapdHits", m_maxHapdHits, "Remove hits with more than MaxHapdHits per HAPD", (uint8_t)100);
     addParam("MagFieldCorrection", m_bcorrect, "Apply hit position correction due to non-perp. mag. field", 0);
     addParam("fillAll", m_fillall, "Make hits for all active channels (useful for likelihood PDF studies)", 0);
@@ -62,10 +60,6 @@ namespace Belle2 {
     arichHits.registerInDataStore();
 
     arichHits.registerRelationTo(digits);
-  }
-
-  void ARICHFillHitsModule::beginRun()
-  {
   }
 
   void ARICHFillHitsModule::event()
@@ -154,20 +148,11 @@ namespace Belle2 {
 
   void ARICHFillHitsModule::magFieldCorrection(TVector3& hitpos)
   {
-    TVector3 Bfield = BFieldManager::getField(hitpos);
-    TVector3 shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(ROOT::Math::XYZVector(hitpos));
+    ROOT::Math::XYZVector shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());
   }
-
-  void ARICHFillHitsModule::endRun()
-  {
-  }
-
-  void ARICHFillHitsModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

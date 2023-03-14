@@ -56,7 +56,7 @@ All analysis actions coloured in blue are executed once per event and all colour
 
 .. seealso:: This is an important usecase of the `basf2.Path.for_each` functionality.
 
-.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+.. _ParticleList: https://software.belle2.org/development/classBelle2_1_1ParticleList.html
 
 Examples
 --------

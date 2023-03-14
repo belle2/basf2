@@ -28,10 +28,10 @@ class TestTreeFits(unittest.TestCase):
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
-        ma.inputMdst('default', inputfile, path=main)
+        ma.inputMdst(inputfile, path=main)
 
-        ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
-        ma.fillParticleList('K+:a', 'pidProbabilityExpert(321, ALL) > 0.5', path=main)
+        ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        ma.fillParticleList('K+:a', 'kaonID > 0.5', path=main)
 
         ma.reconstructDecay('D0:rec -> K-:a pi+:a', '', 0, path=main)
         ma.reconstructDecay('D*+:rec -> D0:rec pi+:a', '', 0, path=main)
@@ -75,13 +75,14 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 1413, f"Background rejection {falsePositives} out of {allBkg}")
+        self.assertTrue(falsePositives < 1592, f"Background rejection {falsePositives} out of {allBkg}")
 
-        self.assertTrue(truePositives > 148, f"Signal rejection too high {truePositives} out of {allSig}")
+        self.assertTrue(truePositives > 156, f"Signal rejection too high {truePositives} out of {allSig}")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
         print("Test passed, cleaning up.")
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

@@ -28,15 +28,15 @@ namespace Belle2 {
     ~RFEventServer();
 
     // Instance of singleton
-    static RFEventServer& Create(std::string conffile);
+    static RFEventServer& Create(const std::string& conffile);
     static RFEventServer& Instance();
 
     // Functions to be hooked to NSM
-    int Configure(NSMmsg*, NSMcontext*);
-    int UnConfigure(NSMmsg*, NSMcontext*);
-    int Start(NSMmsg*, NSMcontext*);
-    int Stop(NSMmsg*, NSMcontext*);
-    int Restart(NSMmsg*, NSMcontext*);
+    int Configure(NSMmsg*, NSMcontext*) override;
+    int UnConfigure(NSMmsg*, NSMcontext*) override;
+    int Start(NSMmsg*, NSMcontext*) override;
+    int Stop(NSMmsg*, NSMcontext*) override;
+    int Restart(NSMmsg*, NSMcontext*) override;
 
     // Server function
     void server();

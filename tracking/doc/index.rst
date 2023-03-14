@@ -1,10 +1,8 @@
 .. _tracking:
 
+========
 Tracking
 ========
-
-.. warning::
-  This documentation is under construction!
 
 The main goal of the tracking reconstruction is to find and fit tracks using the hit informations provided by the main tracking sub-detectors: PXD, :ref:`SVD<svd>`, CDC.
 In general, tracking consists in two steps:
@@ -30,36 +28,38 @@ Use :ref:`add_tracking_reconstruction<tracking_addtrkreconstruction>` to append 
 .. autofunction:: tracking.__init__.add_tracking_reconstruction
 		  :noindex:
 .. toctree::
-    :glob:
-    :maxdepth: 2
+   :glob:
+   :maxdepth: 2
 
-    trackFinding/trackFinding.rst
-    trackFitting
-    specials
-    pxdDataReduction
-    calibration
-    scripts.rst
-    tools
-    glossary
+   trackParameterization
+   trackFinding/trackFinding
+   trackFitting
+   specials
+   trackRefining
+   trackMatching
+   eventTimeExtraction
+   pxdDataReduction
+   calibration
+   scripts
+   tools
 
     
-More ?
-------
+More (?)
+--------
 
 The tracking package includes the following sub-packages
 
 .. toctree::
-    :glob:
-    :maxdepth: 3
+   :glob:
+   :maxdepth: 3
 
-    datastore
-    dbobjects
-    dqmUtils
-    eventTimeExtraction
-    modules/*
-    spacePointCreation
-    svdROIFinder
-    tests
-    validation
-    vxdCaTracking
-    vxdMomentumEstimation
+   datastore
+   dbobjects
+   dqmUtils
+   modules/*
+   spacePointCreation
+   svdROIFinder
+   tests
+   validation
+   vxdCaTracking
+   vxdMomentumEstimation

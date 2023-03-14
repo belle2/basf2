@@ -16,10 +16,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPModuleT0DeltaTCollector)
+  REG_MODULE(TOPModuleT0DeltaTCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

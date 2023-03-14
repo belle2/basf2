@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /**
        * Gets the bin corresponding to the given datapoint.
-       * There are no overlow/underflow bins, so data points outside the original range
+       * There are no overflow/underflow bins, so data points outside the original range
        * are mapped to the first and last bin.
        * @param datapoint for which the bin is returned
        */

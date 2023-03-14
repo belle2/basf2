@@ -19,6 +19,7 @@
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace TreeFitter {
 
@@ -29,7 +30,7 @@ namespace TreeFitter {
     m_useEnergy(useEnergy(*particle)),
     m_clusterPars(),
     m_covariance(),
-    m_momentumScalingFactor(particle->getMomentumScalingFactor())
+    m_momentumScalingFactor(particle->getEffectiveMomentumScale())
   {
     initParams() ;
   }
@@ -93,7 +94,7 @@ namespace TreeFitter {
   {
     const Belle2::ECLCluster* cluster = particle()->getECLCluster();
     const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
-    const TVector3 centroid = cluster->getClusterPosition();
+    const Belle2::B2Vector3D centroid = cluster->getClusterPosition();
     const double energy = cluster->getEnergy(clusterhypo);
 
     m_init = true;
@@ -142,15 +143,15 @@ namespace TreeFitter {
 
     auto p_vec = particle()->getMomentum();
     // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec(0)) >= std::abs(p_vec(1))) && (std::abs(p_vec(0)) >= std::abs(p_vec(2)))) {
+    if ((std::abs(p_vec.X()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.X()) >= std::abs(p_vec.Z()))) {
       m_i1 = 0; m_i2 = 1; m_i3 = 2;
-    } else if ((std::abs(p_vec(1)) >= std::abs(p_vec(0))) && (std::abs(p_vec(1)) >= std::abs(p_vec(2)))) {
+    } else if ((std::abs(p_vec.Y()) >= std::abs(p_vec.X())) && (std::abs(p_vec.Y()) >= std::abs(p_vec.Z()))) {
       m_i1 = 1; m_i2 = 0; m_i3 = 2;
-    } else if ((std::abs(p_vec(2)) >= std::abs(p_vec(1))) && (std::abs(p_vec(2)) >= std::abs(p_vec(0)))) {
+    } else if ((std::abs(p_vec.Z()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.Z()) >= std::abs(p_vec.X()))) {
       m_i1 = 2; m_i2 = 1; m_i3 = 0;
     } else {
       B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
-              << p_vec(0) << " py: " << p_vec(1) << " pz: " << p_vec(2) << " calculated from Ec: " << m_clusterPars(3));
+              << p_vec.X() << " py: " << p_vec.Y() << " pz: " << p_vec.Z() << " calculated from Ec: " << m_clusterPars(3));
       return ErrCode(ErrCode::Status::photondimerror);
     }
 
@@ -217,7 +218,7 @@ namespace TreeFitter {
     p.getH()(1, posindex + m_i2) = 0;
     p.getH()(1, posindex + m_i3) = -1.0;
 
-    // elim already devided by p_vec[m_i1]
+    // elim already divided by p_vec[m_i1]
     p.getH()(0, momindex + m_i1) = p_vec[m_i2] * elim / p_vec[m_i1];
     p.getH()(0, momindex + m_i2) = -1. * elim;
     p.getH()(0, momindex + m_i3) = 0;

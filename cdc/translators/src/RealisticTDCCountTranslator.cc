@@ -7,10 +7,8 @@
  **************************************************************************/
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <framework/dataobjects/FileMetaData.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <TVector3.h>
+#include <framework/core/Environment.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -21,17 +19,7 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   m_scp(CDCSimControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
-  StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
-  if (filPtr) {
-    if (filPtr->getMcEvents() == 0) m_realData = true;
-    //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
-  } else { //judge from MCParticle
-    StoreArray<MCParticle> mcp;
-    if (mcp.getEntries() > 0) m_realData = true;
-    //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
-  }
-  //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
-
+  m_realData = !Environment::Instance().isMC();
   if (m_realData) {
     m_fudgeFactor = m_cdcp.getFudgeFactorForSigma(0);
   } else {
@@ -64,8 +52,8 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   // Need to undo everything the digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
-    const TVector3& backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
-    const TVector3& diffWirePos = m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned) - backWirePos;
+    const B2Vector3D& backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
+    const B2Vector3D& diffWirePos = m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned) - backWirePos;
     //subtract distance divided by speed of electric signal in the wire from the drift time.
     //    std::cout << layer <<" "<< diffWirePos.Z() <<" "<< stereoAngleFactor << std::endl;
     double propLength = z - backWirePos.Z();

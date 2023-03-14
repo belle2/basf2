@@ -23,6 +23,10 @@ extern "C" void sighandler(int sig)
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of parameters\n");
+    return 1;
+  }
   RFConf conf(argv[1]);
 
   //  RFRoiSender* roi = new RFRoiSender(argv[1]);
@@ -37,4 +41,5 @@ int main(int argc, char** argv)
 
   roi->server();
 
+  return 0;
 }

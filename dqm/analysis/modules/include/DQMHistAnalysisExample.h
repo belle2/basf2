@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TF1.h>
@@ -20,23 +20,48 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisExampleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisExampleModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisExampleModule();
-    virtual ~DQMHistAnalysisExampleModule();
 
-    //! Module functions to be called from main process
-    virtual void initialize() override;
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisExampleModule();
 
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /**
+     * Initializer.
+     * This method is called at the beginning of data processing.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     * Save run-related stuff, such as statistics.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
 
     //! Parameters accesible from basf2 scripts
   protected:

@@ -21,14 +21,12 @@
 import basf2 as b2
 import modularAnalysis as ma
 import variables as va
-import os
 
 # create path
 path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
              path=path)
 
 # ID of weight table
@@ -62,7 +60,7 @@ weight_vars = ['p', 'E', 'theta', 'phi',
 
 ma.variablesToNtuple(decayString='gamma:full',
                      variables=weight_vars,
-                     filename=f'B2A907-PhotonDetectionEfficiencyRatios.root',
+                     filename='B2A907-PhotonDetectionEfficiencyRatios.root',
                      path=path)
 
 # process the events

@@ -10,12 +10,11 @@
 #include <map>
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDShaperDigitFilter)
+REG_MODULE(SVDShaperDigitFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -63,10 +62,10 @@ void SVDShaperDigitFilterModule::initialize()
 void SVDShaperDigitFilterModule::event()
 {
 
-  multimap< VxdID, ROIid > ROIids;
+  std::multimap< VxdID, ROIid > ROIids;
 
   for (auto ROI : m_ROIs)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID() , ROI));
+    ROIids.insert(std::pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids](const SVDShaperDigit * theSVDShaper) {
     auto ROIidsRange = ROIids.equal_range(theSVDShaper->getSensorID()) ;

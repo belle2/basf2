@@ -14,7 +14,7 @@
 #include "trg/trg/Utilities.h"
 #include "trg/grl/TRGGRL.h"
 #include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include "trg/ecl/TrgEclCluster.h"
 #include <math.h>
@@ -177,7 +177,7 @@ namespace Belle2 {
       else if (n_cluster == 1) {
         TRGGRLMatch* match = new TRGGRLMatch(trackList[i], ClusterArray[0], 0);
         matchList.push_back(match);
-      } else if (n_cluster > 1) {
+      } else {
         int best_j = 0; double old_dr = 99999;
         for (unsigned j = 0; j < n_cluster; j++) {
           TRGGRLMatch* match = new TRGGRLMatch(trackList[i], ClusterArray[j], 0);
@@ -194,7 +194,7 @@ namespace Belle2 {
       else if (n_cluster == 1) {
         TRGGRLMatch* match = new TRGGRLMatch(trackList3D[i], ClusterArray[0], 1);
         matchList.push_back(match);
-      } else if (n_cluster > 1) {
+      } else {
         int best_j = 0; double old_dr = 99999;
         for (unsigned j = 0; j < n_cluster; j++) {
           TRGGRLMatch* match = new TRGGRLMatch(trackList3D[i], ClusterArray[j], 0);

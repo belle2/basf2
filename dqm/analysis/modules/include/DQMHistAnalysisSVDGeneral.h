@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include <TFile.h>
@@ -24,23 +24,47 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDGeneralModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDGeneralModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisSVDGeneralModule();
-    virtual ~DQMHistAnalysisSVDGeneralModule();
 
-    //! Module functions to be called from main process
-    virtual void initialize() override;
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisSVDGeneralModule();
 
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
+
+  private:
 
     // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
@@ -59,9 +83,6 @@ namespace Belle2 {
 
     //! Parameters accesible from basf2 scripts
     //  protected:
-
-
-  private:
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;

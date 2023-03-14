@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/RestOfEventPrinter/RestOfEventPrinterModule.h>
 
 // framework - DataStore
@@ -23,81 +23,79 @@
 #include <iostream>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+//-----------------------------------------------------------------
+//                 Register module
+//-----------------------------------------------------------------
 
-  //-----------------------------------------------------------------
-  //                 Register module
-  //-----------------------------------------------------------------
+REG_MODULE(RestOfEventPrinter);
 
-  REG_MODULE(RestOfEventPrinter)
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
 
-  //-----------------------------------------------------------------
-  //                 Implementation
-  //-----------------------------------------------------------------
+RestOfEventPrinterModule::RestOfEventPrinterModule() : Module()
+{
+  // set module description (e.g. insert text)
+  setDescription("Prints basic or detailed RestOfEvent info to screen. It is possible to print out ROEMasks for specific mask names as well.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
-  RestOfEventPrinterModule::RestOfEventPrinterModule() : Module()
-  {
-    // set module description (e.g. insert text)
-    setDescription("Prints basic or detailed RestOfEvent info to screen. It is possible to print out ROEMasks for specific mask names as well.");
-    setPropertyFlags(c_ParallelProcessingCertified);
+  // Add parameters
+  std::vector<std::string> emptyVector;
 
-    // Add parameters
-    std::vector<std::string> emptyVector;
+  addParam("maskNames", m_maskNames, "List of all mask names for which the info will be printed.", emptyVector);
+  addParam("fullPrint", m_fullPrint, "If true, print whole masks content.", false);
+  addParam("unpackComposites", m_unpackComposites, "If true, replace composites by their daughters", true);
+}
 
-    addParam("maskNames", m_maskNames, "List of all mask names for which the info will be printed.", emptyVector);
-    addParam("fullPrint", m_fullPrint, "If true, print whole masks content.", false);
-    addParam("unpackComposites", m_unpackComposites, "If true, replace composites by their daughters", true);
-  }
+void RestOfEventPrinterModule::initialize()
+{
+  StoreArray<RestOfEvent>().isRequired();
+}
 
-  void RestOfEventPrinterModule::initialize()
-  {
-    StoreArray<RestOfEvent>().isRequired();
-  }
+void RestOfEventPrinterModule::event()
+{
+  B2INFO("[RestOfEventPrinterModule] START ----------------------------------------");
 
-  void RestOfEventPrinterModule::event()
-  {
-    B2INFO("[RestOfEventPrinterModule] START ----------------------------------------");
+  StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
-    StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+  if (roe.isValid()) {
 
-    if (roe.isValid()) {
+    const Particle* part = roe->getRelatedFrom<Particle>();
+    const MCParticle* mcpart = part->getRelated<MCParticle>();
 
-      const Particle* part = roe->getRelated<Particle>();
-      const MCParticle* mcpart = part->getRelated<MCParticle>();
+    int relatedPDG = part->getPDGCode();
+    int relatedMCPDG;
+    if (mcpart)
+      relatedMCPDG = mcpart->getPDG();
+    else
+      relatedMCPDG = -1;
 
-      int relatedPDG = part->getPDGCode();
-      int relatedMCPDG;
-      if (mcpart)
-        relatedMCPDG = mcpart->getPDG();
-      else
-        relatedMCPDG = -1;
+    // Start printing
+    B2INFO(" - " << "ROE related to particle with" << LogVar("PDG", relatedPDG));
+    B2INFO(" - " << "ROE related to MC particle with" << LogVar("PDG", relatedMCPDG));
 
-      // Start printing
-      B2INFO(" - " << "ROE related to particle with PDG: " << relatedPDG);
-      B2INFO(" - " << "ROE related to MC particle with PDG: " << relatedMCPDG);
+    roe->print(RestOfEvent::c_defaultMaskName, m_unpackComposites);
 
-      roe->print("", m_unpackComposites);
+    for (const auto& maskName : m_maskNames) {
+      if (!roe->hasMask(maskName)) continue;
+      B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");
+      roe->print(maskName, m_unpackComposites);
 
-      for (const auto& maskName : m_maskNames) {
-        B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");
-        roe->print(maskName, m_unpackComposites);
-
-        if (m_fullPrint) {
-          printMaskParticles(roe->getParticles(maskName));
-        }
+      if (m_fullPrint) {
+        printMaskParticles(roe->getParticles(maskName));
       }
-    } else
-      B2ERROR("RestOfEvent object not valid! Did you build ROE?");
-
-    B2INFO("[RestOfEventPrinterModule] END ------------------------------------------");
-  }
-
-  void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles) const
-  {
-    for (auto* particle : maskParticles) {
-      particle->print();
     }
-  }
-} // end Belle2 namespace
+  } else
+    B2ERROR("RestOfEvent object not valid! Did you build ROE?");
 
+  B2INFO("[RestOfEventPrinterModule] END ------------------------------------------");
+}
+
+void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles) const
+{
+  for (auto* particle : maskParticles) {
+    particle->print();
+  }
+}

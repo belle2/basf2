@@ -106,6 +106,12 @@ namespace Belle2 {
      */
     double getTimeTrig() const { return m_TimeTrig; }
 
+    /**
+     * Find ECLTrig by Cell ID using linear search.
+     * This is shown to be faster than getRelated(..) method.
+     */
+    static ECLTrig* getByCellID(int cid);
+
   private:
     int m_TrigId;      /**< Trig ID */
     double m_TimeTrig; /**< Trig Time */

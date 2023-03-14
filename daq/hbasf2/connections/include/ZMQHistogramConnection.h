@@ -99,7 +99,7 @@ namespace Belle2 {
     /// The input data handling is passed from the ZMQConfirmedOutput
     void handleIncomingData() { m_output.handleIncomingData(); }
     /// The is ready is passed from the ZMQConfirmedOutput
-    bool isReady() const { return m_output.isReady(); }
+    bool isReady() const override { return m_output.isReady(); }
     /// The sockets are passed from ZMQConfirmedOutput
     std::vector<zmq::socket_t*> getSockets() const final { return m_output.getSockets(); }
     /// Return the connection string
@@ -138,7 +138,7 @@ namespace Belle2 {
     /// The input data handling is passed from the ZMQRawOutput
     void handleIncomingData() { m_output.handleIncomingData(); }
     /// The is ready is passed from the ZMQRawOutput
-    bool isReady() const { return m_output.isReady(); }
+    bool isReady() const override { return m_output.isReady(); }
     /// The sockets are passed from ZMQRawOutput
     std::vector<zmq::socket_t*> getSockets() const final { return m_output.getSockets(); }
     /// Return the connection string

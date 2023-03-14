@@ -13,7 +13,7 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* CLHEP headers. */
@@ -23,7 +23,6 @@
 /* C++ headers. */
 #include <cfloat>
 
-using namespace std;
 using namespace CLHEP;
 using namespace Belle2;
 using namespace Belle2::bklm;
@@ -58,7 +57,7 @@ BKLMTrackFitter::~BKLMTrackFitter()
 }
 
 //! do fit and returns chi square of the fit.
-double BKLMTrackFitter::fit(std::list<BKLMHit2d* >& listHitSector)
+double BKLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
 {
 
   // We can only do fit if there are at least two hits
@@ -153,7 +152,7 @@ double BKLMTrackFitter::fit(std::list<BKLMHit2d* >& listHitSector)
 }
 
 //! Distance from track to a hit in the plane of the module
-double BKLMTrackFitter::distanceToHit(BKLMHit2d* hit,
+double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
                                       double& error,
                                       double& sigma)
 {
@@ -170,7 +169,7 @@ double BKLMTrackFitter::distanceToHit(BKLMHit2d* hit,
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
   const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-  CLHEP::Hep3Vector globalPos(hit->getGlobalPosition()[0], hit->getGlobalPosition()[1], hit->getGlobalPosition()[2]);
+  CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(), hit->getPositionZ());
 
   //+++ local coordinates of the hit
   CLHEP::Hep3Vector local = refMod->globalToLocal(globalPos);
@@ -231,7 +230,7 @@ double BKLMTrackFitter::distanceToHit(BKLMHit2d* hit,
 }
 
 //! Distance from track to a hit calculated in the global system
-double BKLMTrackFitter::globalDistanceToHit(BKLMHit2d* hit,
+double BKLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
                                             double& error,
                                             double& sigma)
 {
@@ -243,9 +242,9 @@ double BKLMTrackFitter::globalDistanceToHit(BKLMHit2d* hit,
   }
 
   //in global fit, we have two functions y = a + b*x and y = c + d*z
-  double x_mea = hit->getGlobalPosition()[0];
-  double y_mea = hit->getGlobalPosition()[1];
-  double z_mea = hit->getGlobalPosition()[2];
+  double x_mea = hit->getPositionX();
+  double y_mea = hit->getPositionY();
+  double z_mea = hit->getPositionZ();
 
   double x_pre = (y_mea - m_GlobalPar[ AY ]) / m_GlobalPar[ BY ]; //y_mea has uncertainties actually
   double z_pre = (y_mea - m_GlobalPar[ AZ ]) / m_GlobalPar[ BZ ];
@@ -269,7 +268,7 @@ double BKLMTrackFitter::globalDistanceToHit(BKLMHit2d* hit,
   //error from trackPar is inclueded, error from y_mea is not included
   errors = A * m_GlobalErr * A.T();
 
-  //here get the resolustion of a hit, repeated several times, ugly. should we store this in BKLMHit2d object ?
+  //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
   const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
   double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
   double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
@@ -329,7 +328,7 @@ double BKLMTrackFitter::globalDistanceToHit(BKLMHit2d* hit,
 
 
 //! do fit in the y-x plane or z-x plane
-double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
+double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
                                          HepVector&  eta,
                                          HepSymMatrix&  error,
                                          int depDir,    int indDir)
@@ -337,7 +336,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
 
 // Fit d = a + bi, where d is dependent direction and i is independent
 
-  std::list< BKLMHit2d* >::iterator iHit;
+  std::list< KLMHit2d* >::iterator iHit;
 
   Hep3Vector localHitPos;
   HepMatrix  localHitErr(3, 3, 0);
@@ -364,7 +363,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
   HepSymMatrix  V_A, V_A_inverse;
 
   iHit = hitList.begin();
-  BKLMHit2d* hit = *iHit;
+  KLMHit2d* hit = *iHit;
   int section = hit->getSection();
   int sector  = hit->getSector();
 
@@ -384,9 +383,9 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
     const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
     CLHEP::Hep3Vector globalPos;
-    globalPos[0] = hit->getGlobalPosition()[0];
-    globalPos[1] = hit->getGlobalPosition()[1];
-    globalPos[2] = hit->getGlobalPosition()[2];
+    globalPos[0] = hit->getPositionX();
+    globalPos[1] = hit->getPositionY();
+    globalPos[2] = hit->getPositionZ();
 
     localHitPos = refMod->globalToLocal(globalPos);
     double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
@@ -484,7 +483,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
 }
 
 //! do fit in global system, handle tracks that go thrugh multi-sectors
-double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
+double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
                                    HepVector&  eta,
                                    HepSymMatrix&  error,
                                    int depDir,    int indDir)
@@ -517,18 +516,18 @@ double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
   const Belle2::bklm::Module* corMod;
 
   int n = 0;
-  for (std::list< BKLMHit2d* >::iterator iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
+  for (std::list< KLMHit2d* >::iterator iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
 
-    BKLMHit2d* hit = *iHit;
+    KLMHit2d* hit = *iHit;
 
     // m_GeoPar = GeometryPar::instance();
     //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
     corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
     CLHEP::Hep3Vector globalPos;
-    globalPos[0] = hit->getGlobalPosition()[0];
-    globalPos[1] = hit->getGlobalPosition()[1];
-    globalPos[2] = hit->getGlobalPosition()[2];
+    globalPos[0] = hit->getPositionX();
+    globalPos[1] = hit->getPositionY();
+    globalPos[2] = hit->getPositionZ();
 
     //localHitPos = refMod->globalToLocal(globalPos);
     double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);

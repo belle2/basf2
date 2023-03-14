@@ -53,12 +53,12 @@ std::map<std::string, int> make_map(const std::string& file, int chg)
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TauDecayMode)
+REG_MODULE(TauDecayMode);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TauDecayModeModule::TauDecayModeModule() : Module() , m_taum_no(0), m_taup_no(0), m_mmode(-2), m_pmode(-2),
+TauDecayModeModule::TauDecayModeModule() : Module(), m_taum_no(0), m_taup_no(0), m_mmode(-2), m_pmode(-2),
   m_mprong(0), m_pprong(0), tauPair(false), numOfTauMinus(0), numOfTauPlus(0), idOfTauMinus(-1), idOfTauPlus(-1),
   m_isEtaPizPizPizFromTauMinus(false), m_isEtaPizPizPizFromTauPlus(false),
   m_isOmegaPimPipFromTauMinus(false), m_isOmegaPimPipFromTauPlus(false)
@@ -285,6 +285,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     if (pdgid == Const::electron.getPDGCode() && elecFirst)  {
       elecFirst = false;
       const MCParticle* mother = p.getMother();
+      if (not mother) continue; // In some low multiplicity generators there may be no mother
       const vector<MCParticle*> daughters = mother->getDaughters();
       int nElMinus = 0;
       int nElPlus = 0;
@@ -303,6 +304,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     if (pdgid == Const::muon.getPDGCode() && muonFirst)  {
       muonFirst = false;
       const MCParticle* mother = p.getMother();
+      if (not mother) continue; // In some low multiplicity generators there may be no mother
       const vector<MCParticle*> daughters = mother->getDaughters();
       int nMuMinus = 0;
       int nMuPlus = 0;
@@ -322,6 +324,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     bool accept_photon = false;
     if (pdgid == Const::photon.getPDGCode())  {
       const MCParticle* mother = p.getMother();
+      if (not mother) continue; // In some low multiplicity generators there may be no mother
       int mothid = abs(mother->getPDG());
 
       // check if the gamma comes from final state charged particles {e, mu, pi, K, p, b_1}
@@ -368,7 +371,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       if (mothid == 24) isRadiationfromIntermediateWBoson = true;
 
       // check if it is a tau- -> pi- omega nu, omega -> pi0 gamma decay
-      // Note: TauolaBelle2 generator treats this a coherant production
+      // Note: TauolaBelle2 generator treats this a coherent production
       // e.g. includes omega in the form factor but not as an explicit final state particle
       bool isPiPizGam = false;
       if (isRadiationfromIntermediateWBoson) {
@@ -408,7 +411,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       bool isRadiationfromTau = false;
       if (mothid == 15) isRadiationfromTau = true;
 
-      // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitary number of extra photon radiations from PHOTOS/FSR
+      // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitrary number of extra photon radiations from PHOTOS/FSR
       bool isLFVTau2BodyDecay = false;
       if (isRadiationfromTau) {
         bool hasNeutrinoAsSister = false;
@@ -547,7 +550,8 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     if (pdgid == 111 && (isEtaPizPizPizFromTauMinusFirst || isEtaPizPizPizFromTauPlusFirst)) {
       const MCParticle* mother = p.getMother();
-      if (mother->getPDG() == 221) { // eta -> pi0 pi0 pi0
+      // In some low multiplicity generators there may be no mother
+      if (mother and (mother->getPDG() == 221)) { // eta -> pi0 pi0 pi0
         const vector<MCParticle*> daughters = mother->getDaughters();
         int nPizSisters = 0;
         for (MCParticle* d : daughters) {
@@ -578,7 +582,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     // Without further analysis, it is NOT possible to separate
     // tau- ->  pi-     2pi0 omega (-> pi- pi+)     nu decays [Mode 49] from
     // tau- -> 2pi- pi+ 2pi0                        nu decays [Mode 66]
-    // Note: TauolaBelle2 treats Mode 66 is coherant production,
+    // Note: TauolaBelle2 treats Mode 66 is coherent production,
     // e.g. includes omega in the form factor but not as an explicit final state particle.
     // Note2: omega is explicitly included in following mode:
     // tau- ->  pi-      pi0 omega (-> pi- pi+ pi0) nu decays [Mode 130]
@@ -590,7 +594,8 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     if (pdgid == -211 && (isOmegaPimPipFromTauMinusFirst || isOmegaPimPipFromTauPlusFirst)) {
       const MCParticle* mother = p.getMother();
-      if (mother->getPDG() == 223) { // omega -> pi- pi+
+      // In some low multiplicity generators there may be no mother
+      if (mother and (mother->getPDG() == 223)) { // omega -> pi- pi+
         const vector<MCParticle*> daughters = mother->getDaughters();
         int nOmegaDaughters = 0;
         int nPimSisters = 0;

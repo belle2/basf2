@@ -68,7 +68,6 @@ def run_validation(job_path, input_data_path, expert_config):
     ggEntries = EnVsCrysID.GetEntries()
     crossSection = 3990000.  # fb
     lumi = ggEntries / crossSection
-    nomUnc = 0.5  # percent
     nomLum = 2.36  # fb-1
     estUnc = 0.5 * np.sqrt(nomLum / lumi)
 

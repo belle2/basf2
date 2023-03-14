@@ -19,9 +19,9 @@ namespace Belle2 {
     /** this component is exclusive: ignore all others */
     BFieldFrameworkInterface(): MagneticFieldComponent(true) {}
     /** everything is inside this component */
-    virtual bool inside(const B2Vector3D&) const final override { return true; }
+    virtual bool inside(const ROOT::Math::XYZVector&) const final override { return true; }
     /** and we return the values from the exsiting BFieldMap */
-    virtual B2Vector3D getField(const B2Vector3D& position) const final override
+    virtual ROOT::Math::XYZVector getField(const ROOT::Math::XYZVector& position) const final override
     {
       return BFieldMap::Instance().getBField(position) * Unit::T;
     }

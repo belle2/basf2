@@ -9,6 +9,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
+
 namespace Belle2 {
 
   /*! Class to store ECL digitized hits (output of ECLDigi)
@@ -79,6 +80,11 @@ namespace Belle2 {
      */
     int getChi() const { return m_Chi; }
 
+    /**
+     * Find ECLDigit by Cell ID using linear search.
+     * This is shown to be faster than getRelated(..) method.
+     */
+    static ECLDigit* getByCellID(int cid);
 
   private:
 
@@ -92,5 +98,6 @@ namespace Belle2 {
     ClassDef(ECLDigit, 2);/**< ClassDef */
 
   };
+
 } // end namespace Belle2
 

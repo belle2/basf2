@@ -47,8 +47,8 @@ namespace Belle2 {
       TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
       d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
       // Add a random z component
-      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
       TMatrixDSym cov6(6);
 
@@ -59,12 +59,12 @@ namespace Belle2 {
       EXPECT_NEAR(position.X(), myResult.getPosition().X(), absError);
       EXPECT_NEAR(position.Y(), myResult.getPosition().Y(), absError);
       EXPECT_NEAR(position.Z(), myResult.getPosition().Z(), absError);
-      EXPECT_NEAR(momentum.Px(), myResult.getMomentum().Px(), absError);
-      EXPECT_NEAR(momentum.Py(), myResult.getMomentum().Py(), absError);
-      EXPECT_NEAR(momentum.Pz(), myResult.getMomentum().Pz(), absError);
+      EXPECT_NEAR(momentum.X(), myResult.getMomentum().X(), absError);
+      EXPECT_NEAR(momentum.Y(), myResult.getMomentum().Y(), absError);
+      EXPECT_NEAR(momentum.Z(), myResult.getMomentum().Z(), absError);
 
       // Test getter for transverse momentum
-      EXPECT_NEAR(momentum.Perp(), myResult.getTransverseMomentum(), absError);
+      EXPECT_NEAR(momentum.Rho(), myResult.getTransverseMomentum(), absError);
 
       // Test other variables
       EXPECT_EQ(charge, myResult.getChargeSign());
@@ -148,8 +148,8 @@ namespace Belle2 {
   {
     auto bField = 1.5;
     auto pValue = 0.45;
-    TVector3 position(0., 0., 0.);
-    TVector3 momentum(1., 1., 1.);
+    ROOT::Math::XYZVector position(0., 0., 0.);
+    ROOT::Math::XYZVector momentum(1., 1., 1.);
     TMatrixDSym cov6(6);
     auto pType = Belle2::Const::electron;
 

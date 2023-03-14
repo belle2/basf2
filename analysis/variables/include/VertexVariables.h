@@ -7,12 +7,11 @@
  **************************************************************************/
 
 #pragma once
-// Own include
+
 #include <analysis/VariableManager/Manager.h>
 
-
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -178,7 +177,7 @@ namespace Belle2 {
     /**
      * returns an element of a production vertex covariance matrix
      */
-    Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments);
+    double particleProductionCovElement(const Particle* part, const std::vector<double>& indices);
     /**
      * return x component uncertainty of particle production vertex
      */

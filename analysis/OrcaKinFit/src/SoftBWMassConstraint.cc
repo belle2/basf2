@@ -40,7 +40,7 @@ namespace Belle2 {
     SoftBWMassConstraint::~SoftBWMassConstraint()
     {}
 
-// calulate current value of constraint function
+// calculate current value of constraint function
     double SoftBWMassConstraint::getValue() const
     {
       double totE[2] = {0, 0};
@@ -72,7 +72,7 @@ namespace Belle2 {
       return result;
     }
 
-// calculate vector/array of derivatives of this contraint
+// calculate vector/array of derivatives of this constraint
 // w.r.t. to ALL parameters of all fitobjects
 // here: d M /d par(j)
 //          = d M /d p(i) * d p(i) /d par(j)

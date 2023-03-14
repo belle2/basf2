@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import os
 import re
 
@@ -35,7 +36,7 @@ class Basf2EnvironmentInformation(EnvironmentInformation):
         self.architecture = os.environ.get("BELLE2_ARCH")
         #: Release version (if any)
         self.release = os.environ.get("BELLE2_RELEASE")
-        #: Basf2 folder
+        #: basf2 folder
         self.release_folder = os.environ.get("BELLE2_LOCAL_DIR")
 
 

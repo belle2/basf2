@@ -6,21 +6,25 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own header.
 #include <analysis/variables/MetaVariables.h>
+
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/variables/VariableFormulaConstructor.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/utilities/Conversion.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/gearbox/Const.h>
@@ -36,10 +40,10 @@
 #include <cmath>
 #include <stdexcept>
 #include <memory>
-#include <string>
 #include <regex>
 
 #include <TDatabasePDG.h>
+#include <Math/Vector4D.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -50,7 +54,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<RestFrame> frame(particle);
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
@@ -65,7 +69,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<CMSFrame> frame;
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
@@ -80,7 +84,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<LabFrame> frame;
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
@@ -109,11 +113,11 @@ namespace Belle2 {
           }
 
           PCmsLabTransform T;
-          TLorentzVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
+          ROOT::Math::PxPyPzEVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
           Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
 
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
 
@@ -135,11 +139,11 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           if (listSize > 1)
             B2WARNING("The selected ParticleList contains more than 1 Particles in this event. The variable useParticleRestFrame will use only the first candidate, and the result may not be the expected one."
-            << LogVar("ParticleList", listName)
-            << LogVar("Number of candidates in the list", listSize));
+                      << LogVar("ParticleList", listName)
+                      << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           UseReferenceFrame<RestFrame> frame(p);
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
@@ -160,21 +164,50 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           if (listSize > 1)
             B2WARNING("The selected ParticleList contains more than 1 Particles in this event. The variable useParticleRestFrame will use only the first candidate, and the result may not be the expected one."
-            << LogVar("ParticleList", listName)
-            << LogVar("Number of candidates in the list", listSize));
+                      << LogVar("ParticleList", listName)
+                      << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           PCmsLabTransform T;
-          TLorentzVector recoil = T.getBeamFourMomentum() - p->get4Vector();
+          ROOT::Math::PxPyPzEVector recoil = T.getBeamFourMomentum() - p->get4Vector();
           /* Let's use 0 as PDG code to avoid wrong assumptions. */
           Particle pRecoil(recoil, 0);
           pRecoil.setVertex(particle->getVertex());
           UseReferenceFrame<RestFrame> frame(&pRecoil);
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function useParticleRestFrame.");
+      }
+    }
+
+    Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var, arguments](const Particle * particle) -> double {
+
+          // Sum of the 4-momenta of all the selected daughters
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+
+          for (unsigned int i = 1; i < arguments.size(); i++)
+          {
+            auto generalizedIndex = arguments[i];
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pSum +=  dauPart->get4Vector();
+            else
+              return std::numeric_limits<float>::quiet_NaN();
+          }
+          Particle tmp(pSum, 0);
+          UseReferenceFrame<RestFrame> frame(&tmp);
+          double result = std::get<double>(var->function(particle));
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useDaughterRestFrame.");
       }
     }
 
@@ -191,7 +224,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo(extraInfoName))
           {
             return particle->getExtraInfo(extraInfoName);
-          } else {
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -212,7 +246,8 @@ namespace Belle2 {
           if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);
-          } else {
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -226,7 +261,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        std::string key = std::string("__") + MakeROOTCompatible::makeROOTCompatible(var->name);
         auto func = [var, key](const Particle*) -> double {
 
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
@@ -235,8 +270,17 @@ namespace Belle2 {
           if (eventExtraInfo->hasExtraInfo(key))
           {
             return eventExtraInfo->getExtraInfo(key);
-          } else {
-            double value = var->function(nullptr);
+          } else
+          {
+            double value = std::numeric_limits<double>::quiet_NaN();
+            auto var_result = var->function(nullptr);
+            if (std::holds_alternative<double>(var_result)) {
+              value = std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            }
             eventExtraInfo->addExtraInfo(key, value);
             return value;
           }
@@ -251,14 +295,15 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        std::string key = std::string("__") + MakeROOTCompatible::makeROOTCompatible(var->name);
         auto func = [var, key](const Particle * particle) -> double {
 
           if (particle->hasExtraInfo(key))
           {
             return particle->getExtraInfo(key);
-          } else {
-            double value = var->function(particle);
+          } else
+          {
+            double value = std::get<double>(var->function(particle));
             // Remove constness from Particle pointer.
             // The extra-info is used as a cache in our case,
             // indicated by the double-underscore in front of the key.
@@ -298,9 +343,9 @@ namespace Belle2 {
         if (arguments.size() == 1)
           cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
-        auto func = [cut](const Particle*) -> double {
+        auto func = [cut](const Particle*) -> int {
 
-          unsigned int number_of_tracks = 0;
+          int number_of_tracks = 0;
           StoreArray<Track> tracks;
           for (const auto& track : tracks)
           {
@@ -314,7 +359,7 @@ namespace Belle2 {
             }
           }
 
-          return static_cast<double>(number_of_tracks);
+          return number_of_tracks;
 
         };
         return func;
@@ -331,9 +376,9 @@ namespace Belle2 {
         if (arguments.size() == 1)
           cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
-        auto func = [cut](const Particle*) -> double {
+        auto func = [cut](const Particle*) -> int {
 
-          unsigned int number_of_clusters = 0;
+          int number_of_clusters = 0;
           StoreArray<ECLCluster> clusters;
           for (const auto& cluster : clusters)
           {
@@ -346,7 +391,7 @@ namespace Belle2 {
               number_of_clusters++;
           }
 
-          return static_cast<double>(number_of_clusters);
+          return number_of_clusters;
 
         };
         return func;
@@ -360,15 +405,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
-        auto func = [cut](const Particle * particle) -> double {
-
-          if (particle == nullptr)
-            return std::numeric_limits<float>::quiet_NaN();
+        auto func = [cut](const Particle * particle) -> bool {
           if (cut->check(particle))
             return 1;
           else
             return 0;
-
         };
         return func;
       } else {
@@ -381,12 +422,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
-        auto func = [cut](const Particle*) -> double {
+        auto func = [cut](const Particle*) -> bool {
           if (cut->check(nullptr))
             return 1;
           else
             return 0;
-
         };
         return func;
       } else {
@@ -405,10 +445,17 @@ namespace Belle2 {
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [pdgCode, var](const Particle * particle) -> double {
-
-          if (std::abs(particle -> getPDGCode()) == std::abs(pdgCode))
-            return var -> function(particle);
-          else return std::numeric_limits<float>::quiet_NaN();
+          if (std::abs(particle->getPDGCode()) == std::abs(pdgCode))
+          {
+            auto var_result = var->function(particle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -421,15 +468,21 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-
-          if (particle -> getMCParticle())
+          if (particle->getMCParticle())
           {
-            if (particle -> getMCParticle() -> getStatus(MCParticle::c_PrimaryParticle)
-            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_IsVirtual))
-            && (! particle -> getMCParticle() -> getStatus(MCParticle::c_Initial))) {
-              return var -> function(particle);
-            } else return std::numeric_limits<float>::quiet_NaN();
-          } else return std::numeric_limits<float>::quiet_NaN();
+            if (particle->getMCParticle()->getStatus(MCParticle::c_PrimaryParticle)
+                && (! particle->getMCParticle()->getStatus(MCParticle::c_IsVirtual))
+                && (! particle->getMCParticle()->getStatus(MCParticle::c_Initial))) {
+              auto var_result = var->function(particle);
+              if (std::holds_alternative<double>(var_result)) {
+                return std::get<double>(var_result);
+              } else if (std::holds_alternative<int>(var_result)) {
+                return std::get<int>(var_result);
+              } else if (std::holds_alternative<bool>(var_result)) {
+                return std::get<bool>(var_result);
+              } else return std::numeric_limits<double>::quiet_NaN();
+            } else return std::numeric_limits<double>::quiet_NaN();
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -441,7 +494,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         std::string listName = arguments[0];
-        auto func = [listName](const Particle * particle) -> double {
+        auto func = [listName](const Particle * particle) -> int {
 
           (void) particle;
           StoreObjPtr<ParticleList> listOfParticles(listName);
@@ -465,7 +518,7 @@ namespace Belle2 {
       }
       auto listName = arguments[0];
 
-      auto func = [listName](const Particle * particle) -> double {
+      auto func = [listName](const Particle * particle) -> bool {
 
         // check the list exists
         StoreObjPtr<ParticleList> list(listName);
@@ -475,8 +528,7 @@ namespace Belle2 {
         }
 
         // is the particle in the list?
-        bool isIn = list->contains(particle);
-        return double(isIn);
+        return list->contains(particle);
 
       };
       return func;
@@ -490,7 +542,7 @@ namespace Belle2 {
       }
       auto listName = arguments[0];
 
-      auto func = [listName](const Particle * particle) -> double {
+      auto func = [listName](const Particle * particle) -> int {
 
         // check the list exists
         StoreObjPtr<ParticleList> list(listName);
@@ -503,8 +555,8 @@ namespace Belle2 {
         // from some mdst object (tracks, clusters..)
         Particle::EParticleSourceObject particlesource = particle->getParticleSource();
         if (particlesource == Particle::EParticleSourceObject::c_Composite
-        or particlesource == Particle::EParticleSourceObject::c_Undefined)
-          return -1.0;
+            or particlesource == Particle::EParticleSourceObject::c_Undefined)
+          return -1;
 
         // it *is* possible to have a particle list from different sources (like
         // hadrons from the ECL and KLM) so we have to check each particle in
@@ -514,9 +566,9 @@ namespace Belle2 {
           Particle* iparticle = list->getParticle(i);
           if (particlesource == iparticle->getParticleSource())
             if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
-              return 1.0;
+              return 1;
         }
-        return 0.0;
+        return 0;
 
       };
       return func;
@@ -530,7 +582,7 @@ namespace Belle2 {
       }
       auto listName = arguments[0];
 
-      auto func = [listName](const Particle * particle) -> double {
+      auto func = [listName](const Particle * particle) -> bool {
 
         // check the list exists
         StoreObjPtr<ParticleList> list(listName);
@@ -539,16 +591,16 @@ namespace Belle2 {
 
         // this can only be true for mc-matched particles or particles are created from MCParticles
         const MCParticle* mcp = particle->getMCParticle();
-        if (mcp == nullptr) return 0.0;
+        if (mcp == nullptr) return false;
 
         // check every particle in the input list is not matched to (or created from) the same MCParticle
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           const MCParticle* imcp = list->getParticle(i)->getMCParticle();
           if ((imcp != nullptr) and (mcp->getArrayIndex() == imcp->getArrayIndex()))
-            return 1.0;
+            return true;
         }
-        return 0.0;
+        return false;
       };
       return func;
     }
@@ -573,13 +625,13 @@ namespace Belle2 {
     {
       if (arguments.size() > 0) {
         auto listNames = arguments;
-        auto func = [listNames](const Particle * particle) -> double {
-          double output = 0;
+        auto func = [listNames](const Particle * particle) -> bool {
+          bool output = false;
           int generation_flag = -1;
-          try {
+          try
+          {
             generation_flag = Belle2::convertString<int>(listNames.back());
           } catch (std::exception& e) {}
-
 
           for (auto& iListName : listNames)
           {
@@ -589,14 +641,14 @@ namespace Belle2 {
             } catch (std::exception& e) {}
 
             // Creating recursive lambda
-            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, int flag)-> int {
-              int result = 0;
+            auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
+              bool result = false;
               for (unsigned i = 0; i < m->getNDaughters(); ++i)
               {
                 const Particle* daughter = m->getDaughter(i);
                 if ((flag == 1.) or (flag < 0)) {
                   if (p->isCopyOf(daughter)) {
-                    return 1;
+                    return true;
                   }
                 }
 
@@ -604,14 +656,13 @@ namespace Belle2 {
                   if (daughter->getNDaughters() > 0) {
                     result = self(self, daughter, p, flag - 1);
                     if (result == 1) {
-                      return 1;
+                      return true;
                     }
                   }
                 }
               }
               return result;
             };
-
 
             StoreObjPtr<ParticleList> listOfParticles(iListName);
 
@@ -620,7 +671,7 @@ namespace Belle2 {
             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
               Particle* iParticle = listOfParticles->getParticle(i);
               output = list_comparison(list_comparison, iParticle, particle, generation_flag);
-              if (output == 1) {
+              if (output) {
                 return output;
               }
             }
@@ -637,16 +688,17 @@ namespace Belle2 {
     {
       if (arguments.size() > 0) {
         auto listNames = arguments;
-        auto func = [listNames](const Particle * particle) -> double {
-          double output = 0;
+        auto func = [listNames](const Particle * particle) -> bool {
+          bool output = false;
           int generation_flag = -1;
-          try {
+          try
+          {
             generation_flag = Belle2::convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
           {
-            return 0;
+            return false;
           }
 
           for (auto& iListName : listNames)
@@ -656,30 +708,29 @@ namespace Belle2 {
               continue;
             } catch (std::exception& e) {}
             // Creating recursive lambda
-            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, int flag)-> int {
-              int result = 0;
+            auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
+              bool result = false;
               for (unsigned i = 0; i < m->getNDaughters(); ++i)
               {
                 const Particle* daughter = m->getDaughter(i);
                 if ((flag == 1.) or (flag < 0)) {
                   if (daughter->getMCParticle() != nullptr) {
                     if (p->getMCParticle()->getArrayIndex() == daughter->getMCParticle()->getArrayIndex()) {
-                      return 1;
+                      return true;
                     }
                   }
                 }
                 if (flag != 1.) {
                   if (daughter->getNDaughters() > 0) {
                     result = self(self, daughter, p, flag - 1);
-                    if (result == 1) {
-                      return 1;
+                    if (result) {
+                      return true;
                     }
                   }
                 }
               }
               return result;
             };
-
 
             StoreObjPtr<ParticleList> listOfParticles(iListName);
 
@@ -688,7 +739,7 @@ namespace Belle2 {
             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
               Particle* iParticle = listOfParticles->getParticle(i);
               output = list_comparison(list_comparison, iParticle, particle, generation_flag);
-              if (output == 1) {
+              if (output) {
                 return output;
               }
             }
@@ -707,10 +758,21 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           double product = 1.0;
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          if (particle->getNDaughters() == 0)
           {
-            product *= var->function(particle->getDaughter(j));
+            return std::numeric_limits<double>::quiet_NaN();
           }
+          if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              product *= std::get<double>(var->function(particle->getDaughter(j)));
+            }
+          } else if (std::holds_alternative<int>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              product *= std::get<int>(var->function(particle->getDaughter(j)));
+            }
+          } else return std::numeric_limits<double>::quiet_NaN();
           return product;
         };
         return func;
@@ -725,10 +787,21 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           double sum = 0.0;
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          if (particle->getNDaughters() == 0)
           {
-            sum += var->function(particle->getDaughter(j));
+            return std::numeric_limits<double>::quiet_NaN();
           }
+          if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += std::get<double>(var->function(particle->getDaughter(j)));
+            }
+          } else if (std::holds_alternative<int>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += std::get<int>(var->function(particle->getDaughter(j)));
+            }
+          } else return std::numeric_limits<double>::quiet_NaN();
           return sum;
         };
         return func;
@@ -743,12 +816,25 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           double min = std::numeric_limits<double>::quiet_NaN();
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          if (particle->getNDaughters() == 0)
           {
-            double iValue = var->function(particle->getDaughter(j));
-            if (std::isnan(iValue)) continue;
-            if (std::isnan(min)) min = iValue;
-            if (iValue < min) min = iValue;
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+          if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              double iValue = std::get<double>(var->function(particle->getDaughter(j)));
+              if (std::isnan(iValue)) continue;
+              if (std::isnan(min)) min = iValue;
+              if (iValue < min) min = iValue;
+            }
+          } else if (std::holds_alternative<int>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              int iValue = std::get<int>(var->function(particle->getDaughter(j)));
+              if (std::isnan(min)) min = iValue;
+              if (iValue < min) min = iValue;
+            }
           }
           return min;
         };
@@ -764,12 +850,25 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           double max = std::numeric_limits<double>::quiet_NaN();
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          if (particle->getNDaughters() == 0)
           {
-            double iValue = var->function(particle->getDaughter(j));
-            if (std::isnan(iValue)) continue;
-            if (std::isnan(max)) max = iValue;
-            if (iValue > max) max = iValue;
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+          if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              double iValue = std::get<double>(var->function(particle->getDaughter(j)));
+              if (std::isnan(iValue)) continue;
+              if (std::isnan(max)) max = iValue;
+              if (iValue > max) max = iValue;
+            }
+          } else if (std::holds_alternative<int>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              int iValue = std::get<int>(var->function(particle->getDaughter(j)));
+              if (std::isnan(max)) max = iValue;
+              if (iValue > max) max = iValue;
+            }
           }
           return max;
         };
@@ -796,11 +895,21 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
-            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
-            {
+            auto result_j = var->function(particle->getDaughter(jDaughterNumber));
+            auto result_i = var->function(particle->getDaughter(iDaughterNumber));
+            double diff = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i)) {
+              diff = std::get<double>(result_j) - std::get<double>(result_i);
+            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i)) {
+              diff = std::get<int>(result_j) - std::get<int>(result_i);
+            } else {
+              throw std::runtime_error("Bad variant access");
+            }
+            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))
+                or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)"))) {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -837,15 +946,24 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
             const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
-            if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")))
-            {
+            auto result_j = var->function(&jTmpPart);
+            auto result_i = var->function(&iTmpPart);
+            double diff = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i)) {
+              diff = std::get<double>(result_j) - std::get<double>(result_i);
+            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i)) {
+              diff = std::get<int>(result_j) - std::get<int>(result_i);
+            } else {
+              throw std::runtime_error("Bad variant access");
+            }
+            if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))) {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -877,18 +995,21 @@ namespace Belle2 {
         }
         auto variablename = arguments[4];
         auto func = [variablename, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
-        bgrandDaughterNumber](const Particle * particle) -> double {
+                      bgrandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
           if (agrandDaughterNumber >= int((particle->getDaughter(iDaughterNumber))->getNDaughters()) || bgrandDaughterNumber >= int((particle->getDaughter(jDaughterNumber))->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber));
-            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
-            {
+            double diff = std::get<double>(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(
+                                                           bgrandDaughterNumber))) - std::get<double>(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(
+                                                                 agrandDaughterNumber)));
+            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))
+                or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)"))) {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -979,9 +1100,16 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
-            double iValue = var->function(particle->getDaughter(iDaughterNumber));
-            double jValue = var->function(particle->getDaughter(jDaughterNumber));
+          else
+          {
+            double iValue, jValue;
+            if (std::holds_alternative<double>(var->function(particle->getDaughter(jDaughterNumber)))) {
+              iValue = std::get<double>(var->function(particle->getDaughter(iDaughterNumber)));
+              jValue = std::get<double>(var->function(particle->getDaughter(jDaughterNumber)));
+            } else if (std::holds_alternative<int>(var->function(particle->getDaughter(jDaughterNumber)))) {
+              iValue = std::get<int>(var->function(particle->getDaughter(iDaughterNumber)));
+              jValue = std::get<int>(var->function(particle->getDaughter(jDaughterNumber)));
+            } else return std::numeric_limits<double>::quiet_NaN();
             return (jValue - iValue) / (jValue + iValue);
           }
         };
@@ -1006,11 +1134,21 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function(particle) - var->function(particle->getDaughter(daughterNumber));
-            if (variablename == "phi" or variablename == "useCMSFrame(phi)")
-            {
+            auto result_mother = var->function(particle);
+            auto result_daughter = var->function(particle->getDaughter(daughterNumber));
+            double diff = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter)) {
+              diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
+            } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter)) {
+              diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
+            } else {
+              throw std::runtime_error("Bad variant access");
+            }
+
+            if (variablename == "phi" or variablename == "useCMSFrame(phi)") {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -1043,9 +1181,16 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
-            double daughterValue = var->function(particle->getDaughter(daughterNumber));
-            double motherValue = var->function(particle);
+          else
+          {
+            double daughterValue = 0.0, motherValue = 0.0;
+            if (std::holds_alternative<double>(var->function(particle))) {
+              daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
+              motherValue = std::get<double>(var->function(particle));
+            } else if (std::holds_alternative<int>(var->function(particle))) {
+              daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
+              motherValue = std::get<int>(var->function(particle));
+            }
             return (motherValue - daughterValue) / (motherValue + daughterValue);
           }
         };
@@ -1063,7 +1208,7 @@ namespace Belle2 {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
 
-          std::vector<TLorentzVector> pDaus;
+          std::vector<ROOT::Math::PxPyPzEVector> pDaus;
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
@@ -1080,9 +1225,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
           else
-            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
+            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
         };
         return func;
       } else {
@@ -1090,44 +1235,34 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments)
+    double grandDaughterDecayAngle(const Particle* particle, const std::vector<double>& arguments)
     {
       if (arguments.size() == 2) {
 
-        auto func = [arguments](const Particle * particle) -> double {
-          if (!particle)
-            return std::numeric_limits<double>::quiet_NaN();
+        if (!particle)
+          return std::numeric_limits<double>::quiet_NaN();
 
-          unsigned daughterIndex, grandDaughterIndex;
-          try {
-            daughterIndex = Belle2::convertString<int>(arguments[0]);
-            grandDaughterIndex = Belle2::convertString<int>(arguments[1]);
-          } catch (std::invalid_argument&)
-          {
-            B2FATAL("The arguments of grandDaughterDecayAngle have to be integers!");
-          }
+        int daughterIndex = std::lround(arguments[0]);
+        if (daughterIndex >= int(particle->getNDaughters()))
+          return std::numeric_limits<float>::quiet_NaN();
+        const Particle* dau = particle->getDaughter(daughterIndex);
 
-          if (daughterIndex >= particle->getNDaughters())
-            return std::numeric_limits<float>::quiet_NaN();
+        int grandDaughterIndex = std::lround(arguments[1]);
+        if (grandDaughterIndex >= int(dau->getNDaughters()))
+          return std::numeric_limits<float>::quiet_NaN();
 
-          const Particle* daughter = particle->getDaughter(daughterIndex);
+        B2Vector3D  boost = dau->get4Vector().BoostToCM();
 
-          if (grandDaughterIndex >= daughter->getNDaughters())
-            return std::numeric_limits<float>::quiet_NaN();
+        ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
+        motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
 
-          TVector3  boost = - (daughter->get4Vector().BoostVector());
+        ROOT::Math::PxPyPzEVector grandDaughterMomentum = dau->getDaughter(grandDaughterIndex)->get4Vector();
+        grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
 
-          TLorentzVector motherMomentum = - particle->get4Vector();
-          motherMomentum.Boost(boost);
+        return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));
 
-          TLorentzVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
-          grandDaughterMomentum.Boost(boost);
-
-          return motherMomentum.Angle(grandDaughterMomentum.Vect());
-        };
-        return func;
       } else {
-        B2FATAL("The meta variable grandDaughterDecayAngle needs exactly two integers as arguments!");
+        B2FATAL("The variable grandDaughterDecayAngle needs exactly two integers as arguments!");
       }
     }
 
@@ -1139,28 +1274,42 @@ namespace Belle2 {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
 
-          std::vector<TLorentzVector> pDaus;
+          std::vector<ROOT::Math::PxPyPzEVector> pDaus;
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
-            if (dauPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+            for (auto& generalizedIndex : arguments) {
+              const MCParticle* mcPart = particle->getMCParticle();
+              if (mcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+              const MCParticle* dauMcPart = mcPart->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            const MCParticle* dauMcPart = dauPart->getMCParticle();
-            if (dauMcPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
+          } else
+          {
+            for (auto& generalizedIndex : arguments) {
+              const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+              const MCParticle* dauMcPart = dauPart->getMCParticle();
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
           }
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
           else
-            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
+            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
         };
         return func;
       } else {
@@ -1168,92 +1317,72 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments)
+    double daughterClusterAngleInBetween(const Particle* particle, const std::vector<double>& daughterIndices)
     {
-      if (arguments.size() == 2 || arguments.size() == 3) {
-        std::vector<int> daughterIndices;
-        try {
-          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (std::invalid_argument&) {
-          B2FATAL("The arguments of daughterClusterAngleInBetween meta function must be integers!");
+      if (daughterIndices.size() == 2) {
+        int daughterIndexi = std::lround(daughterIndices[0]);
+        int daughterIndexj = std::lround(daughterIndices[1]);
+        if (std::max(daughterIndexi, daughterIndexj) >= int(particle->getNDaughters())) {
+          return std::numeric_limits<double>::quiet_NaN();
+        } else {
+          const ECLCluster* clusteri = particle->getDaughter(daughterIndexi)->getECLCluster();
+          const ECLCluster* clusterj = particle->getDaughter(daughterIndexj)->getECLCluster();
+          if (clusteri and clusterj) {
+            const auto& frame = ReferenceFrame::GetCurrent();
+            const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndexi))->getECLClusterEHypothesisBit();
+            const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndexj))->getECLClusterEHypothesisBit();
+            ClusterUtils clusutils;
+            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+            return pi.Angle(pj);
+          }
+          return std::numeric_limits<float>::quiet_NaN();
         }
-        auto func = [daughterIndices](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return std::numeric_limits<double>::quiet_NaN();
-          if (daughterIndices.size() == 2)
-          {
-            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
-              return std::numeric_limits<double>::quiet_NaN();
-            else {
-              const auto& frame = ReferenceFrame::GetCurrent();
-              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
-              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
-              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
-              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
-              if (clusteri and clusterj) {
-                ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-                return pi.Angle(pj);
-              }
-              return std::numeric_limits<float>::quiet_NaN();
-            }
-          } else if (daughterIndices.size() == 3)
-          {
-            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
-                || daughterIndices[2] >= int(particle->getNDaughters())) return std::numeric_limits<double>::quiet_NaN();
-            else {
-              const auto& frame = ReferenceFrame::GetCurrent();
-              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
-              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
-              const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
-              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
-              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
-              const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
-
-              if (clusteri and clusterj and clusterk) {
-                ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
-                return pk.Angle(pi + pj);
-              }
-              return std::numeric_limits<float>::quiet_NaN();
-            }
-          } else return std::numeric_limits<double>::quiet_NaN();
-
-        };
-        return func;
+      } else if (daughterIndices.size() == 3) {
+        int daughterIndexi = std::lround(daughterIndices[0]);
+        int daughterIndexj = std::lround(daughterIndices[1]);
+        int daughterIndexk = std::lround(daughterIndices[2]);
+        if (std::max(std::max(daughterIndexi, daughterIndexj), daughterIndexk) >= int(particle->getNDaughters())) {
+          return std::numeric_limits<double>::quiet_NaN();
+        } else {
+          const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+          const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+          const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+          if (clusteri and clusterj and clusterk) {
+            const auto& frame = ReferenceFrame::GetCurrent();
+            const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
+            const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
+            const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
+            ClusterUtils clusutils;
+            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+            B2Vector3D pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
+            return pk.Angle(pi + pj);
+          }
+          return std::numeric_limits<float>::quiet_NaN();
+        }
       } else {
-        B2FATAL("Wrong number of arguments for meta function daughterClusterAngleInBetween");
+        B2FATAL("Wrong number of arguments for daughterClusterAngleInBetween!");
       }
     }
 
     Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 1) {
-        std::vector<int> daughterIndices;
-        try {
-          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (std::invalid_argument&) {
-          B2FATAL("The arguments of daughterInvM meta function must be integers!");
-        }
-        auto func = [daughterIndices](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return std::numeric_limits<float>::quiet_NaN();
-          else {
-            const auto& frame = ReferenceFrame::GetCurrent();
-            TLorentzVector pSum;
+        auto func = [arguments](const Particle * particle) -> double {
+          const auto& frame = ReferenceFrame::GetCurrent();
+          ROOT::Math::PxPyPzEVector pSum;
 
-            for (auto& index : daughterIndices)
-            {
-              if (index >= int(particle->getNDaughters())) {
-                return std::numeric_limits<float>::quiet_NaN();
-              } else pSum += frame.getMomentum(particle->getDaughter(index));
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pSum += frame.getMomentum(dauPart);
+            else {
+              return std::numeric_limits<float>::quiet_NaN();
             }
-
-            return pSum.M();
           }
+          return pSum.M();
         };
         return func;
       } else {
@@ -1271,7 +1400,19 @@ namespace Belle2 {
         } catch (std::invalid_argument&) {
           B2FATAL("Second argument of modulo meta function must be integer!");
         }
-        auto func = [var, divideBy](const Particle * particle) -> double { return int(var->function(particle)) % divideBy; };
+        auto func = [var, divideBy](const Particle * particle) -> int {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return int(std::get<double>(var_result)) % divideBy;
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result) % divideBy;
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return int(std::get<bool>(var_result)) % divideBy;
+          } else return 0;
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function modulo");
@@ -1283,7 +1424,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
-        auto func = [var](const Particle * particle) -> double { return std::isnan(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> bool { return std::isnan(std::get<double>(var->function(particle))); };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function isNAN");
@@ -1301,7 +1442,7 @@ namespace Belle2 {
           B2FATAL("The second argument of ifNANgiveX meta function must be a number!");
         }
         auto func = [var, defaultOutput](const Particle * particle) -> double {
-          double output = var->function(particle);
+          double output = std::get<double>(var->function(particle));
           if (std::isnan(output)) return defaultOutput;
           else return output;
         };
@@ -1316,7 +1457,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
-        auto func = [var](const Particle * particle) -> double { return std::isinf(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> bool { return std::isinf(std::get<double>(var->function(particle))); };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function isInfinity");
@@ -1342,11 +1483,19 @@ namespace Belle2 {
 
         // unmask the variable
         auto func = [var, finalMask](const Particle * particle) -> double {
-          int value = int(var->function(particle));
-
-          // judge if the value is nan before unmasking
-          if (std::isnan(value))
-            return std::numeric_limits<double>::quiet_NaN();
+          int value = 0;
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            // judge if the value is nan before unmasking
+            if (std::isnan(std::get<double>(var_result))) {
+              return std::numeric_limits<double>::quiet_NaN();
+            }
+            value = int(std::get<double>(var_result));
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            value = std::get<int>(var_result);
+          }
 
           // apply the final mask
           value &= (~finalMask);
@@ -1359,7 +1508,6 @@ namespace Belle2 {
         B2FATAL("Meta function unmask needs at least two arguments!");
       }
     }
-
 
     Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
     {
@@ -1375,9 +1523,26 @@ namespace Belle2 {
           if (particle == nullptr)
             return std::numeric_limits<float>::quiet_NaN();
           if (cut->check(particle))
-            return variableIfTrue->function(particle);
-          else
-            return variableIfFalse->function(particle);
+          {
+            auto var_result = variableIfTrue->function(particle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          } else
+          {
+            auto var_result = variableIfFalse->function(particle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
 
@@ -1385,7 +1550,6 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function conditionalVariableSelector");
       }
     }
-
 
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments)
     {
@@ -1398,7 +1562,7 @@ namespace Belle2 {
           double pValueProduct = 1.;
           for (auto variable : variables)
           {
-            double pValue = variable->function(particle);
+            double pValue = std::get<double>(variable->function(particle));
             if (pValue < 0)
               return -1;
             else
@@ -1423,7 +1587,16 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::abs(std::get<double>(var_result));
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::abs(std::get<int>(var_result));
+          } else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function abs");
@@ -1440,10 +1613,24 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double max = var1->function(particle);
-          if (max < var2->function(particle))
-            max = var2->function(particle);
-          return max;
+          double val1, val2;
+          auto var_result1 = var1->function(particle);
+          auto var_result2 = var2->function(particle);
+          if (std::holds_alternative<double>(var_result1))
+          {
+            val1 = std::get<double>(var_result1);
+          } else if (std::holds_alternative<int>(var_result1))
+          {
+            val1 = std::get<int>(var_result1);
+          }
+          if (std::holds_alternative<double>(var_result2))
+          {
+            val2 = std::get<double>(var_result2);
+          } else if (std::holds_alternative<int>(var_result2))
+          {
+            val2 = std::get<int>(var_result2);
+          }
+          return std::max(val1, val2);
         };
         return func;
       } else {
@@ -1461,10 +1648,24 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double min = var1->function(particle);
-          if (min > var2->function(particle))
-            min = var2->function(particle);
-          return min;
+          double val1, val2;
+          auto var_result1 = var1->function(particle);
+          auto var_result2 = var2->function(particle);
+          if (std::holds_alternative<double>(var_result1))
+          {
+            val1 = std::get<double>(var_result1);
+          } else if (std::holds_alternative<int>(var_result1))
+          {
+            val1 = std::get<int>(var_result1);
+          }
+          if (std::holds_alternative<double>(var_result2))
+          {
+            val2 = std::get<double>(var_result2);
+          } else if (std::holds_alternative<int>(var_result2))
+          {
+            val2 = std::get<int>(var_result2);
+          }
+          return std::min(val1, val2);
         };
         return func;
       } else {
@@ -1476,7 +1677,14 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::sin(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::sin(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::sin(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function sin");
@@ -1487,7 +1695,14 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::asin(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::asin(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::asin(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function asin");
@@ -1498,7 +1713,14 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::cos(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::cos(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::cos(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function cos");
@@ -1509,10 +1731,39 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::acos(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::acos(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::acos(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function acos");
+      }
+    }
+
+    Manager::FunctionPtr tan(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::tan(std::get<double>(var->function(particle))); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function tan");
+      }
+    }
+
+    Manager::FunctionPtr atan(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::atan(std::get<double>(var->function(particle))); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function atan");
       }
     }
 
@@ -1520,7 +1771,14 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::exp(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::exp(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::exp(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function exp");
@@ -1531,7 +1789,14 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::log(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::log(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::log(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function log");
@@ -1542,10 +1807,50 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::log10(var->function(particle)); };
+        auto func = [var](const Particle * particle) -> double {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::log10(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::log10(std::get<int>(var_result));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function log10");
+      }
+    }
+
+    Manager::FunctionPtr originalParticle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<float>::quiet_NaN();
+
+          StoreArray<Particle> particles;
+          if (!particle->hasExtraInfo("original_index"))
+            return std::numeric_limits<float>::quiet_NaN();
+
+          auto originalParticle = particles[particle->getExtraInfo("original_index")];
+          if (!originalParticle)
+            return std::numeric_limits<float>::quiet_NaN();
+          auto var_result = var->function(originalParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function originalParticle");
       }
     }
 
@@ -1565,7 +1870,56 @@ namespace Belle2 {
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<float>::quiet_NaN();
           else
-            return var->function(particle->getDaughter(daughterNumber));
+          {
+            auto var_result = var->function(particle->getDaughter(daughterNumber));
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughter");
+      }
+    }
+
+    Manager::FunctionPtr originalDaughter(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of daughter meta function must be integer!");
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<float>::quiet_NaN();
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<float>::quiet_NaN();
+          else
+          {
+            StoreArray<Particle> particles;
+            if (!particle->getDaughter(daughterNumber)->hasExtraInfo("original_index"))
+              return std::numeric_limits<float>::quiet_NaN();
+            auto originalDaughter = particles[particle->getDaughter(daughterNumber)->getExtraInfo("original_index")];
+            if (!originalDaughter)
+              return std::numeric_limits<float>::quiet_NaN();
+
+            auto var_result = var->function(originalDaughter);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
@@ -1592,8 +1946,16 @@ namespace Belle2 {
               return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
-            return var->function(&tempParticle);
-          } else {
+            auto var_result = var->function(&tempParticle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -1616,8 +1978,16 @@ namespace Belle2 {
               return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getMother());
-            return var->function(&tempParticle);
-          } else {
+            auto var_result = var->function(&tempParticle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -1647,7 +2017,17 @@ namespace Belle2 {
 
           MCParticle* mcParticle = mcParticles[particleNumber];
           Particle part = Particle(mcParticle);
-          return var->function(&part);
+          auto var_result = var->function(&part);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -1674,7 +2054,17 @@ namespace Belle2 {
           }
 
           Particle upsilon4S = Particle(mcUpsilon4S);
-          return var->function(&upsilon4S);
+          auto var_result = var->function(&upsilon4S);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -1705,8 +2095,16 @@ namespace Belle2 {
           for (unsigned int i = 0; i < numParticles; i++)
           {
             const Particle* p = list->getParticle(i);
-            if (p->getExtraInfo(extraInfoName) == rank)
-              return var->function(p);
+            if (p->getExtraInfo(extraInfoName) == rank) {
+              auto var_result = var->function(p);
+              if (std::holds_alternative<double>(var_result)) {
+                return std::get<double>(var_result);
+              } else if (std::holds_alternative<int>(var_result)) {
+                return std::get<int>(var_result);
+              } else if (std::holds_alternative<bool>(var_result)) {
+                return std::get<bool>(var_result);
+              } else return std::numeric_limits<double>::quiet_NaN();
+            }
           }
           // return 0;
           return std::numeric_limits<double>::signaling_NaN();
@@ -1730,10 +2128,10 @@ namespace Belle2 {
 
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
-        auto func = [listName, cut](const Particle*) -> double {
+        auto func = [listName, cut](const Particle*) -> int {
 
           StoreObjPtr<ParticleList> list(listName);
-          double sum = 0;
+          int sum = 0;
           for (unsigned int i = 0; i < list->getListSize(); i++)
           {
             const Particle* particle = list->getParticle(i);
@@ -1769,16 +2167,14 @@ namespace Belle2 {
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
-        auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return std::numeric_limits<float>::quiet_NaN();
+        auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> bool {
           StoreObjPtr<ParticleList> roeList(roeListName);
-          TLorentzVector vec = particle->get4Vector();
+          ROOT::Math::PxPyPzEVector vec = particle->get4Vector();
           for (unsigned int i = 0; i < roeList->getListSize(); i++)
           {
             const Particle* roeParticle = roeList->getParticle(i);
             if (not particle->overlapsWith(roeParticle)) {
-              TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
+              ROOT::Math::PxPyPzEVector tempCombination = roeParticle->get4Vector() + vec;
               std::vector<int> indices = { particle->getArrayIndex(), roeParticle->getArrayIndex() };
               Particle tempParticle = Particle(tempCombination, pdgCode, flavourType, indices, particle->getArrayPointer());
               if (cut->check(&tempParticle)) {
@@ -1799,10 +2195,8 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
-        auto func = [cut](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return std::numeric_limits<float>::quiet_NaN();
-          unsigned int n = 0;
+        auto func = [cut](const Particle * particle) -> int {
+          int n = 0;
           for (auto& daughter : particle->getDaughters())
           {
             if (cut->check(daughter))
@@ -1816,12 +2210,60 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr countFSPDaughters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle * particle) -> int {
+
+          std::vector<const Particle*> fspDaughters;
+          particle->fillFSPDaughters(fspDaughters);
+
+          int n = 0;
+          for (auto& daughter : fspDaughters)
+          {
+            if (cut->check(daughter))
+              ++n;
+          }
+          return n;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function countFSPDaughters");
+      }
+    }
+
+    Manager::FunctionPtr countDescendants(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle * particle) -> int {
+
+          std::vector<const Particle*> allDaughters;
+          particle->fillAllDaughters(allDaughters);
+
+          int n = 0;
+          for (auto& daughter : allDaughters)
+          {
+            if (cut->check(daughter))
+              ++n;
+          }
+          return n;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function countDescendants");
+      }
+    }
+
     Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments)
     {
 
-      auto func = [arguments](const Particle * particle) -> double {
+      auto func = [arguments](const Particle * particle) -> int {
 
-        unsigned _numberOfNonOverlappingParticles = 0;
+        int _numberOfNonOverlappingParticles = 0;
         for (const auto& listName : arguments)
         {
           StoreObjPtr<ParticleList> list(listName);
@@ -1853,7 +2295,17 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           }
           Particle tmpPart(mcp);
-          return var->function(&tmpPart);
+          auto var_result = var->function(&tmpPart);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -1861,31 +2313,65 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr matchedMCHasPDG(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr clusterBestMatchedMCParticle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
-        int inputPDG = 0 ;
-        try {
-          inputPDG = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("Argument must be an integer value.");
-        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
-        auto func = [inputPDG](const Particle * particle) -> double{
-          const MCParticle* mcp = particle->getMCParticle();
-          if (!mcp)
-            return 0.5;
+        auto func = [var](const Particle * particle) -> double {
 
-          if (std::abs(mcp->getPDG()) == inputPDG)
+          const ECLCluster* cluster = particle->getECLCluster();
+          if (!cluster) return std::numeric_limits<double>::quiet_NaN();
+
+          auto mcps = cluster->getRelationsTo<MCParticle>();
+          if (mcps.size() == 0) return std::numeric_limits<double>::quiet_NaN();
+
+          std::vector<std::pair<double, int>> weightsAndIndices;
+          for (unsigned int i = 0; i < mcps.size(); ++i)
+            weightsAndIndices.emplace_back(mcps.weight(i), i);
+
+          // sort descending by weight
+          std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+                    ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
+
+          // cppcheck-suppress containerOutOfBounds
+          const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
+
+          Particle tmpPart(mcp);
+          auto var_result = var->function(&tmpPart);
+          if (std::holds_alternative<double>(var_result))
           {
-            return 1;
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
           } else
-            return 0;
-
+          {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
+
         return func;
-      } else
-        B2FATAL("Wrong number of arguments for meta function matchedMC");
+      } else {
+        B2FATAL("Wrong number of arguments for meta function clusterBestMatchedMCParticle");
+      }
+    }
+
+    double matchedMCHasPDG(const Particle* particle, const std::vector<double>& pdgCode)
+    {
+      if (pdgCode.size() != 1) {
+        B2FATAL("Too many arguments provided to matchedMCHasPDG!");
+      }
+      int inputPDG = std::lround(pdgCode[0]);
+
+      const MCParticle* mcp = particle->getMCParticle();
+      if (!mcp)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      return std::abs(mcp->getPDG()) == inputPDG;
     }
 
     Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments)
@@ -1993,7 +2479,7 @@ namespace Belle2 {
 
         auto func = [arguments](const Particle * particle) -> double {
 
-          TLorentzVector total4Vector;
+          ROOT::Math::PxPyPzEVector total4Vector;
           // To make sure particles in particlesList don't overlap.
           std::vector<Particle*> particlePool;
 
@@ -2130,12 +2616,22 @@ namespace Belle2 {
 
           if (!(listOfParticles.isValid())) B2FATAL("Invalid list name " << listName << " given to averageValueInList");
           int nParticles = listOfParticles->getListSize();
-          double average = 0;
-          for (int i = 0; i < nParticles; i++)
+          if (nParticles == 0)
           {
-            const Particle* part = listOfParticles->getParticle(i);
-            average += var->function(part) / nParticles;
+            return std::numeric_limits<double>::quiet_NaN();
           }
+          double average = 0;
+          if (std::holds_alternative<double>(var->function(listOfParticles->getParticle(0))))
+          {
+            for (int i = 0; i < nParticles; i++) {
+              average += std::get<double>(var->function(listOfParticles->getParticle(i))) / nParticles;
+            }
+          } else if (std::holds_alternative<int>(var->function(listOfParticles->getParticle(0))))
+          {
+            for (int i = 0; i < nParticles; i++) {
+              average += std::get<int>(var->function(listOfParticles->getParticle(i))) / nParticles;
+            }
+          } else return std::numeric_limits<double>::quiet_NaN();
           return average;
         };
         return func;
@@ -2160,16 +2656,23 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           }
           std::vector<double> valuesInList;
-          for (int i = 0; i < nParticles; i++)
+          if (std::holds_alternative<double>(var->function(listOfParticles->getParticle(0))))
           {
-            const Particle* part = listOfParticles->getParticle(i);
-            valuesInList.push_back(var->function(part));
-          }
+            for (int i = 0; i < nParticles; i++) {
+              valuesInList.push_back(std::get<double>(var->function(listOfParticles->getParticle(i))));
+            }
+          } else if (std::holds_alternative<int>(var->function(listOfParticles->getParticle(0))))
+          {
+            for (int i = 0; i < nParticles; i++) {
+              valuesInList.push_back(std::get<int>(var->function(listOfParticles->getParticle(i))));
+            }
+          } else return std::numeric_limits<double>::quiet_NaN();
           std::sort(valuesInList.begin(), valuesInList.end());
           if (nParticles % 2 != 0)
           {
             return valuesInList[nParticles / 2];
-          } else {
+          } else
+          {
             return 0.5 * (valuesInList[nParticles / 2] + valuesInList[nParticles / 2 - 1]);
           }
         };
@@ -2199,14 +2702,14 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (minAngle > angle) minAngle = angle;
         }
@@ -2234,7 +2737,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
@@ -2242,7 +2745,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (minAngle > angle) {
             minAngle = angle;
@@ -2252,8 +2755,17 @@ namespace Belle2 {
 
         // final check that the list wasn't empty (or some other problem)
         if (iClosest == -1) return std::numeric_limits<double>::quiet_NaN();
-
-        return var->function(list->getParticle(iClosest));
+        auto var_result = var->function(list->getParticle(iClosest));
+        if (std::holds_alternative<double>(var_result))
+        {
+          return std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result))
+        {
+          return std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result))
+        {
+          return std::get<bool>(var_result);
+        } else return std::numeric_limits<double>::quiet_NaN();
       };
       return func;
     }
@@ -2278,7 +2790,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -2286,7 +2798,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (maxAngle < angle) maxAngle = angle;
         }
@@ -2314,7 +2826,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -2323,7 +2835,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (maxAngle < angle) {
             maxAngle = angle;
@@ -2333,8 +2845,17 @@ namespace Belle2 {
 
         // final check that the list wasn't empty (or some other problem)
         if (iMostB2B == -1) return std::numeric_limits<double>::quiet_NaN();
-
-        return var->function(list->getParticle(iMostB2B));
+        auto var_result = var->function(list->getParticle(iMostB2B));
+        if (std::holds_alternative<double>(var_result))
+        {
+          return std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result))
+        {
+          return std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result))
+        {
+          return std::get<bool>(var_result);
+        } else return std::numeric_limits<double>::quiet_NaN();
       };
       return func;
     }
@@ -2355,9 +2876,9 @@ namespace Belle2 {
           double maxOpeningAngle = -1;
           for (int i = 0; i < nParticles; i++)
           {
-            TVector3 v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            B2Vector3D v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
             for (int j = i + 1; j < nParticles; j++) {
-              TVector3 v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
+              B2Vector3D v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
               const double angle = v1.Angle(v2);
               if (angle > maxOpeningAngle) maxOpeningAngle = angle;
             }
@@ -2387,7 +2908,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Sum of the 4-momenta of all the selected daughters
-          TLorentzVector pSum(0, 0, 0, 0);
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
 
           // Loop over the arguments. Each one of them is a generalizedIndex,
           // pointing to a particle in the decay tree.
@@ -2404,17 +2925,25 @@ namespace Belle2 {
           }
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+          Particle sumOfDaughters(pSum, 100); // 100 is one of the special numbers
 
+          auto var_result = var->function(&sumOfDaughters);
           // Calculate the variable on the dummy particle
-          return var->function(sumOfDaughters);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else
         B2FATAL("Wrong number of arguments for meta function daughterCombination");
     }
-
-
 
     Manager::FunctionPtr useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments)
     {
@@ -2439,9 +2968,8 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
         // Parses the other arguments, which are in the form of index:particleName pairs,
-        // and stores indexes and masses in two std::vectors
-        std::vector<unsigned int>indexesToBeReplaced = {};
-        std::vector<double>massesToBeReplaced = {};
+        // and stores indexes and pdgs in std::unordered_map
+        std::unordered_map<unsigned int, int> mapOfReplacedDaughters;
 
         // Loop over the arguments to parse them
         for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++) {
@@ -2478,12 +3006,14 @@ namespace Belle2 {
             return nullptr;
           }
 
-          // Stores the indexes and the masses in the vectors that will be passed to the lambda function
+          // Stores the indexes and the pdgs in the map that will be passed to the lambda function
           int pdgCode = particlePDG->PdgCode();
-          double dauNewMass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
-          indexesToBeReplaced.push_back(dauIndex);
-          massesToBeReplaced.push_back(dauNewMass);
+          mapOfReplacedDaughters[dauIndex] = pdgCode;
         } // End of parsing
+
+        // Check the size of mapOfReplacedDaughters
+        if (mapOfReplacedDaughters.size() != arguments.size() - 1)
+          B2FATAL("Overlapped daughter's index is detected in the meta-variable useAlternativeDaughterHypothesis");
 
         //----
         // 2) replacing
@@ -2491,7 +3021,7 @@ namespace Belle2 {
 
         // Core function: creates a new particle from the original one changing
         // some of the daughters' masses
-        auto func = [var, indexesToBeReplaced, massesToBeReplaced](const Particle * particle) -> double {
+        auto func = [var, mapOfReplacedDaughters](const Particle * particle) -> double {
           if (particle == nullptr)
           {
             B2WARNING("Trying to access a particle that does not exist. Skipping");
@@ -2500,8 +3030,11 @@ namespace Belle2 {
 
           const auto& frame = ReferenceFrame::GetCurrent();
 
+          // Create a dummy particle from the given particle to overwrite its kinematics
+          Particle* dummy = ParticleCopy::copyParticle(particle);
+
           // Sum of the 4-momenta of all the daughters with the new mass assumptions
-          TLorentzVector pSum(0, 0, 0, 0);
+          ROOT::Math::PxPyPzMVector pSum(0, 0, 0, 0);
 
           for (unsigned int iDau = 0; iDau < particle->getNDaughters(); iDau++)
           {
@@ -2511,27 +3044,50 @@ namespace Belle2 {
               return std::numeric_limits<float>::quiet_NaN();
             }
 
-            TLorentzVector dauMom =  frame.getMomentum(dauPart);
+            ROOT::Math::PxPyPzMVector dauMom = ROOT::Math::PxPyPzMVector(frame.getMomentum(dauPart));
 
-            // This can be improved with a faster algorithm to check if an std::vector contains a
-            // certain element
-            for (unsigned int iReplace = 0; iReplace < indexesToBeReplaced.size(); iReplace++) {
-              if (indexesToBeReplaced[iReplace] == iDau) {
-                double p_x = dauMom.Vect().Px();
-                double p_y = dauMom.Vect().Py();
-                double p_z = dauMom.Vect().Pz();
-                dauMom.SetXYZM(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
-                break;
-              }
+            int pdgCode;
+            try {
+              pdgCode = mapOfReplacedDaughters.at(iDau);
+            } catch (std::out_of_range&) {
+              // iDau is not in mapOfReplacedDaughters
+              pSum += dauMom;
+              continue;
             }
-            pSum = pSum + dauMom;
+
+            // overwrite the daughter's kinematics
+            double p_x = dauMom.Px();
+            double p_y = dauMom.Py();
+            double p_z = dauMom.Pz();
+            dauMom.SetCoordinates(p_x, p_y, p_z, TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass());
+            const_cast<Particle*>(dummy->getDaughter(iDau))->set4VectorDividingByMomentumScaling(ROOT::Math::PxPyPzEVector(dauMom));
+
+            // overwrite the daughter's pdg
+            const int charge = dummy->getDaughter(iDau)->getCharge();
+            if (TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge() / 3.0 == charge)
+              const_cast<Particle*>(dummy->getDaughter(iDau))->setPDGCode(pdgCode);
+            else
+              const_cast<Particle*>(dummy->getDaughter(iDau))->setPDGCode(-1 * pdgCode);
+
+            pSum += dauMom;
           } // End of loop over number of daughter
 
-          // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+          // overwrite the particle's kinematics
+          dummy->set4Vector(ROOT::Math::PxPyPzEVector(pSum));
+
+          auto var_result = var->function(dummy);
 
           // Calculate the variable on the dummy particle
-          return var->function(sumOfDaughters);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
         }; // end of lambda function
         return func;
       }// end of check on number of arguments
@@ -2539,13 +3095,12 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
     }
 
-
     Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
         int pdg_code = -1;
         std::string arg = arguments[0];
-        std::string variable_of_interest = arguments[1];
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
 
         if (part != nullptr) {
@@ -2560,10 +3115,10 @@ namespace Belle2 {
           B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code or particle name.");
         }
 
-        auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
+        auto func = [pdg_code, var](const Particle * particle) -> double {
           const Particle* p = particle;
 
-          int ancestor_level = Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p);
+          int ancestor_level = std::get<double>(Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p));
           if ((ancestor_level <= 0) or (std::isnan(ancestor_level)))
           {
             return std::numeric_limits<float>::quiet_NaN();
@@ -2575,8 +3130,18 @@ namespace Belle2 {
           {
             i_p = i_p->getMother();
           }
-          const Particle* m_p = new Particle(i_p);
-          return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
+          Particle m_p(i_p);
+          auto var_result = var->function(&m_p);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -2584,18 +3149,15 @@ namespace Belle2 {
       }
     }
 
-
-
-
-
     VARIABLE_GROUP("MetaFunctions");
-    REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
-                      "[Eventbased] Returns the number of clean Clusters in the event\n"
-                      "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.");
-    REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
-                      "[Eventbased] Returns the number of clean Tracks in the event\n"
-                      "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
-    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
+    REGISTER_METAVARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
+                          "[Eventbased] Returns the number of clean Clusters in the event\n"
+                          "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.",
+                          Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("nCleanedTracks(cut)", nCleanedTracks,
+                          "[Eventbased] Returns the number of clean Tracks in the event\n"
+                          "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
 Returns the result of the given formula, where v1 to vN are variables or floating
 point numbers. Currently the only supported operations are addition (``+``),
 subtraction (``-``), multiplication (``*``), division (``/``) and power (``^``
@@ -2609,62 +3171,72 @@ arguments. Operator precedence is taken into account. For example ::
    now both, ``[]`` and ``()`` can be used for grouping operations, ``**`` can
    be used for exponent and float literals are possible directly in the
    formula.
-)DOCSTRING");
-    REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
+)DOCSTRING", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
-                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame");
-    REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
+                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
-                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.");
-    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
+                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
 Returns the value of ``variable`` in the *lab* frame.
 
 .. tip::
-    The lab frame is the default reference frame, usually you don't need to use this meta-variable. 
+    The lab frame is the default reference frame, usually you don't need to use this meta-variable.
     E.g. ``useLabFrame(E)`` returns the energy of a particle in the Lab frame, same as just ``E``.
 
 Specifying the lab frame is useful in some corner-cases. For example:
 ``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
-)DOC");
-    REGISTER_VARIABLE("useTagSideRecoilRestFrame(variable, daughterIndexTagB)", useTagSideRecoilRestFrame,
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useTagSideRecoilRestFrame(variable, daughterIndexTagB)", useTagSideRecoilRestFrame,
                       "Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.\n"
                       "The variable should only be applied to an Upsilon(4S) list.\n"
-                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.");
-    REGISTER_VARIABLE("useParticleRestFrame(variable, particleList)", useParticleRestFrame,
+                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useParticleRestFrame(variable, particleList)", useParticleRestFrame,
                       "Returns the value of the variable in the rest frame of the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
-		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
-    REGISTER_VARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
-                      "Returns the value of the variable in the rest frame of recoil system againt the first Particle contained in the given ParticleList.\n"
+		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
+                      "Returns the value of the variable in the rest frame of recoil system against the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
-		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
-    REGISTER_VARIABLE("passesCut(cut)", passesCut,
+		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useDaughterRestFrame(variable, daughterIndex_1, [daughterIndex_2, ... daughterIndex_3])", useDaughterRestFrame,
+                      "Returns the value of the variable in the rest frame of the selected daughter particle.\n"
+		      "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
+		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
+		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
+		      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
-                      "Useful if you want to write out if a particle would have passed a cut or not.\n"
-                      "Returns NaN if particle is a nullptr.");
-    REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
+                      "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("passesEventCut(cut)", passesEventCut,
                       "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
-                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
-    REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
-                      "Used by the skimming package (for what exactly?)\n"
-                      "Returns NaN if particle is a nullptr.");
-    REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
+                      "Used by the skimming package (for what exactly?)", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("countFSPDaughters(cut)", countDescendants,
+			  "Returns number of final-state daughters which satisfy the cut.",
+			  Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("countDescendants(cut)", countDescendants,
+			  "Returns number of descendants for all generations which satisfy the cut.",
+			  Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
-                      "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.");
-    REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
+                      "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("varForMCGen(variable)", varForMCGen,
                       "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
-                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
-    REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
-                      "[Eventbased] Returns number of particles in the given particle List.");
-    REGISTER_VARIABLE("isInList(particleListName)", isInList,
-                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.");
-    REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
-                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
-    REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
+                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
+                      "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("isInList(particleListName)", isInList,
+                      "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
+                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
                       Returns 1 if the given particle appears in the decay chain of the particles in the given ParticleLists.
 
                       Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:
@@ -2673,8 +3245,8 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * ``isDescendantOfList(<particle_list>,2)`` returns 1 if particle is a granddaughter of the list,
                       * ``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc.
                       * Default value is ``-1`` that is inclusive for all generations.
-                      )DOC");
-    REGISTER_VARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList, R"DOC(
+                      )DOC", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList, R"DOC(
                       Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.
 
                       Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:
@@ -2685,33 +3257,47 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * Default value is ``-1`` that is inclusive for all generations.
 
                       It makes only sense for lists created with `fillParticleListFromMC` function with ``addDaughters=True`` argument.
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_bool);
 
-    REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
-Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
+    REGISTER_METAVARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
+Returns 1 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0 if not. 
 
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
-)DOC");
+)DOC", Manager::VariableDataType::c_int);
 
-    REGISTER_VARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
-Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
+    REGISTER_METAVARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
+Returns 1 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
 (or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
 
 .. seealso:: :b2:var:`isMCDescendantOfList` to check daughters.
-)DOC");
+)DOC", Manager::VariableDataType::c_bool);
 
-    REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
-                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
-    REGISTER_VARIABLE("daughter(i, variable)", daughter, R"DOC(
+    REGISTER_METAVARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
+                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("originalParticle(variable)", originalParticle, R"DOC(
+                      Returns value of variable for the original particle from which the given particle is copied.
+
+                      The copy of particle is created, for example, when the vertex fit updates the daughters and `modularAnalysis.copyParticles` is called.
+                      Returns NaN if the given particle is not copied and so there is no original particle.
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughter(i, variable)", daughter, R"DOC(
                       Returns value of variable for the i-th daughter. E.g.
 
                       * ``daughter(0, p)`` returns the total momentum of the first daughter.
                       * ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.
 
                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
-                      )DOC");
-    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("originalDaughter(i, variable)", originalDaughter, R"DOC(
+                      Returns value of variable for the original particle from which the i-th daughter is copied.
+
+                      The copy of particle is created, for example,  when the vertex fit updates the daughters and `modularAnalysis.copyParticles` is called.
+                      Returns NaN if the daughter is not copied and so there is no original daughter.
+
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
                       Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.
 
                       Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
@@ -2721,8 +3307,8 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       particle of the reconstructed particle the function is applied to.
 
                       The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
-                      )DOC");
-    REGISTER_VARIABLE("mcMother(variable)", mcMother, R"DOC(
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcMother(variable)", mcMother, R"DOC(
                       Returns the value of the requested variable for the Monte Carlo mother of the particle.
 
                       Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
@@ -2732,108 +3318,109 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       particle of the reconstructed particle the function is applied to.
 
                       The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
-                      )DOC");
-    REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
-The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
+The arguments of the function must be the ``index`` of the particle in the MCParticle Array,
 and ``variable``, the name of the function or variable for that generator particle.
 If ``index`` goes beyond the length of the MCParticles array, NaN will be returned.
 
-E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is 
+E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is
 the Upsilon(4S) in a generic decay.
 ``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
 the first MC Particle, which is the momentum of the second B meson in a generic decay.
-)DOC");
-    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
 [Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
 If no generator level :math:`\Upsilon(4S)` exists for the event, NaN will be returned.
 
 E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
 ``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
 generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in a generic decay.
-)DOC");
-    REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
-                      "E.g. ``daughterProductOf(extraInfo(SignalProbability))`` returns the product of the SignalProbabilitys of all daughters.");
-    REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf,
+                      "E.g. ``daughterProductOf(extraInfo(SignalProbability))`` returns the product of the SignalProbabilitys of all daughters.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterSumOf(variable)", daughterSumOf,
                       "Returns sum of a variable over all daughters.\n"
-                      "E.g. ``daughterSumOf(nDaughters)`` returns the number of grand-daughters.");
-    REGISTER_VARIABLE("daughterLowest(variable)", daughterLowest,
+                      "E.g. ``daughterSumOf(nDaughters)`` returns the number of grand-daughters.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterLowest(variable)", daughterLowest,
                       "Returns the lowest value of the given variable among all daughters.\n"
-                      "E.g. ``useCMSFrame(daughterLowest(p))`` returns the lowest momentum in CMS frame.");
-    REGISTER_VARIABLE("daughterHighest(variable)", daughterHighest,
+                      "E.g. ``useCMSFrame(daughterLowest(p))`` returns the lowest momentum in CMS frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterHighest(variable)", daughterHighest,
                       "Returns the highest value of the given variable among all daughters.\n"
-                      "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.");
-    REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
+                      "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
                       "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
-    REGISTER_VARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
-                      "MC matched version of the `daughterDiffOf` function."); 
-    REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
+                      "MC matched version of the `daughterDiffOf` function.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
                       "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.");
-    REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the two given daughters.\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
+                      "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.");
-    MAKE_DEPRECATED("daughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
+                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("daughterDiffOfPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
-                      "MC matched version of the `daughterDiffOfPhi` function."); 
-    MAKE_DEPRECATED("mcDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
+    REGISTER_METAVARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
+                      "MC matched version of the `daughterDiffOfPhi` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("mcDaughterDiffOfPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
+    REGISTER_METAVARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
+                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n");
-    MAKE_DEPRECATED("grandDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("grandDaughterDiffOfPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
+    REGISTER_METAVARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.");
-    MAKE_DEPRECATED("daughterDiffOfClusterPhi(i, j)", false, "release-06-00-00", R"DOC(
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("daughterDiffOfClusterPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
+    REGISTER_METAVARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
-    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi(i, j)", false, "release-06-00-00", R"DOC(
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
+    REGISTER_METAVARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
+                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.");
-    MAKE_DEPRECATED("daughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
+                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("daughterDiffOfPhiCMS", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "MC matched version of the `daughterDiffOfPhiCMS` function.");      
-    MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
+    REGISTER_METAVARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
+                      "MC matched version of the `daughterDiffOfPhiCMS` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
+    REGISTER_METAVARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i``.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.");
-    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
+    REGISTER_METAVARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
-                      "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.");
-    REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
+                      "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
                       "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. ``useRestFrame(daughterMotherDiffOf(0, p))`` returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
-    REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
+                      "E.g. ``useRestFrame(daughterMotherDiffOf(0, p))`` returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
-    REGISTER_VARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
+                      "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.
+                       The unit of the angle is ``rad``.
 
                        The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
                        daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
@@ -2852,91 +3439,107 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            ``daughterAngle(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and
                            the first daughter of the fourth daughter.
 
-                      )DOC");
-    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
+                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
-                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.");
+                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.\n\n", "rad");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
-                      "Returns function which returns the angle between clusters associated to the two daughters."
+                      "Returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
                       "If three indices given: returns the angle between the momentum of the third particle's cluster and a vector "
                       "which is the sum of the first two daughter's cluster momenta."
                       "Returns nan if any of the daughters specified don't have an associated cluster."
-                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
-    REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
-                      "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
-                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.");
-    REGISTER_VARIABLE("extraInfo(name)", extraInfo,
+                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.\n\n", "rad");
+    REGISTER_METAVARIABLE("daughterInvM(i[, j, ...])", daughterInvM, R"DOC(
+                       Returns the invariant mass adding the Lorentz vectors of the given daughters. The unit of the invariant mass is GeV/:math:`\text{c}^2`
+                       E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}` of the first, second and third daughter.
+
+                       Daughters from different generations of the decay tree can be combined using generalized daughter indexes,
+                       which are simply colon-separated daughter indexes for each generation, starting from the root particle. For
+                       example, ``0:1:3`` identifies the fourth daughter (3) of the second daughter (1) of the first daughter(0) of
+                       the mother particle.
+
+                       Returns NaN if the given daughter-index is out of bound (>= number of daughters))DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"
                       "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the ``MVAExpert`` module.\n"
                       "If nothing is set under the given name or if the particle is a nullptr, NaN is returned.\n"
-                      "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.");
-    REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
+                      "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "If nothing is set under this name, NaN is returned.");
-    REGISTER_VARIABLE("eventCached(variable)", eventCached,
+                      "If nothing is set under this name, NaN is returned.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.\n"
                       "It is recommended to use this variable in order to declare custom aliases as event-based. This is "
-                      "necessary if using the eventwise mode of variablesToNtuple).");
-    REGISTER_VARIABLE("particleCached(variable)", particleCached,
+                      "necessary if using the eventwise mode of variablesToNtuple).", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
-                      "The result of second call to this variable on the same particle will be provided from the cache.");
-    REGISTER_VARIABLE("modulo(variable, n)", modulo,
-                      "Returns rest of division of variable by n.");
-    REGISTER_VARIABLE("abs(variable)", abs,
+                      "The result of second call to this variable on the same particle will be provided from the cache.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("modulo(variable, n)", modulo,
+                      "Returns rest of division of variable by n.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
-                      "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
-    REGISTER_VARIABLE("max(var1,var2)", max, "Returns max value of two variables.\n");
-    REGISTER_VARIABLE("min(var1,var2)", min, "Returns min value of two variables.\n");
-    REGISTER_VARIABLE("sin(variable)", sin, "Returns sine value of the given variable.");
-    REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.");
-    REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.");
-    REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.");
-    REGISTER_VARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.");
-    REGISTER_VARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.");
-    REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.");
-    REGISTER_VARIABLE("isNAN(variable)", isNAN,
+                      "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("max(var1,var2)", max, "Returns max value of two variables.\n", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("min(var1,var2)", min, "Returns min value of two variables.\n", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("sin(variable)", sin, "Returns sine value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("asin(variable)", asin, "Returns arcsine of the given variable. The unit of the asin() is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable. The unit of the acos() is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("tan(variable)", tan, "Returns tangent value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable. The unit of the atan() is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
-                      "Useful for debugging.");
-    REGISTER_VARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
+                      "Useful for debugging.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
                       "Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
-                      "Useful for technical purposes while training MVAs.");
-    REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
+                      "Useful for technical purposes while training MVAs.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
-                      "Useful for debugging.");
-    REGISTER_VARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
+                      "Useful for debugging.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
                       "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
                       "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
                       "``unmask(variable, 2, 8, 16)`` or ``unmask(variable, 26)``.\n"
-                      "");
-    REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
+                      "", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
-                      "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");
-    REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
+                      "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
-                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");
-    REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
                       "around the neutral Pion mass (e.g. ``0.130 < M < 0.140``). \n"
-                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1");
-    REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
+                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
-                      "Returns NaN if no matched MCParticle exists.");
-    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
+                      "Returns NaN if no matched MCParticle exists.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("clusterBestMatchedMCParticle(variable)", clusterBestMatchedMCParticle,
+                      "Returns variable output for the MCParticle that is best-matched with the ECLCluster of the given Particle.\n"
+                      "E.g. To get the energy of the MCParticle that matches best with an ECLCluster, one could use ``clusterBestMatchedMCParticle(E)``\n"
+                      "When the variable is called for ``gamma`` and if the ``gamma`` is matched with MCParticle, it works same as `matchedMC`.\n"
+                      "If the variable is called for ``gamma`` that fails to match with an MCParticle, it provides the mdst-level MCMatching information abouth the ECLCluster.\n"
+                      "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching MCParticles", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
-                      "The variable is event-based and does not need a valid particle pointer as input.");
-    REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
-                      Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
+                      "The variable is event-based and does not need a valid particle pointer as input.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
+                      [Eventbased] Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
 
                       .. note::
                         The `BestCandidateSelection` module available via `rankByHighest` / `rankByLowest` has to be used before.
@@ -2949,78 +3552,78 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       which either has to be the name of the variable used to order the candidates or the selected outputVariable name without the ending ``_rank``.
                       This means that your selected name for the rank variable has to end with ``_rank``.
 
-                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
-                      )DOC");
+                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
+                      )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
-                      "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."
-                      "Returns 0/0.5/1 if PDGCode does not match/is not available/ matches");
-    REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
+                      "Returns if the absolute value of the PDGCode of the MCParticle related to the Particle matches a given PDGCode."
+                      "Returns 0/NAN/1 if PDGCode does not match/is not available/ matches");
+    REGISTER_METAVARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
-                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
-    REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
-                      "Returns the total energy of particles in the given particle List.");
-    REGISTER_VARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
-                      "Returns the total momentum Px of particles in the given particle List.");
-    REGISTER_VARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
-                      "Returns the total momentum Py of particles in the given particle List.");
-    REGISTER_VARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
-                      "Returns the total momentum Pz of particles in the given particle List.");
-    REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
-                      "Returns the invariant mass of the combination of particles in the given particle lists.");
-    REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
-                      "Returns the total ECL energy of particles in the given particle List.");
-    REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
-                      "Returns maximum transverse momentum Pt in the given particle List.");
-    REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
-                      "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
-    REGISTER_VARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
-                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.");
-    REGISTER_VARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
-                      "Returns the median value of the given variable of the particles in the given particle list.");
-    REGISTER_VARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
-                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided.");
-    REGISTER_VARIABLE("closestInList(particleListName, variable)", closestInList,
-                      "Returns `variable` for the closest particle (smallest opening angle) in the list provided.");
-    REGISTER_VARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
-                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
-    REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
-                      "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
-    REGISTER_VARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
-                      "Returns maximum opening angle in the given particle List.");
-    REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
-Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
+                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
+                      "Returns the total energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
+                      "Returns the total momentum Px of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
+                      "Returns the total momentum Py of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
+                      "Returns the total momentum Pz of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
+                      "Returns the invariant mass of the combination of particles in the given particle lists. The unit of the invariant mass is GeV/:math:`\\text{c}^2` ", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
+                      "Returns the total ECL energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("maxPtInList(particleListName)", maxPtInList,
+                      "Returns maximum transverse momentum Pt in the given particle List. The unit of the transverse momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
+                      "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
+                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
+                      "Returns the median value of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
+                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("closestInList(particleListName, variable)", closestInList,
+                      "Returns `variable` for the closest particle (smallest opening angle) in the list provided.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
+                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
+                      "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
+                      "Returns maximum opening angle in the given particle List. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
+Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters.
 
 .. warning::
     ``variable`` can only be a function of the daughters' 4-momenta.
 
-Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply colon-separated 
-the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth 
+Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply colon-separated
+the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth
 daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
 
 .. tip::
-    ``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle. 
+    ``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle.
     ``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
 
-)DOC");
-    REGISTER_VARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
-Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers. 
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
+Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughters.
 
 .. warning::
-    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta. 
+    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta, and the daughters' 4-momentum.
     This means that if you made a kinematic fit without updating the daughters' momenta, the result of this variable will not reflect the effect of the kinematic fit.
-    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumpion is 
-    used only internally by the variable, and is not stored in the datastore (i.e the daughters are not permanently changed).
+    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions.
+    In the variable, a copy of the given particle is created with daughters' alternative mass assumption (i.e. the original particle and daughters are not changed).
 
 .. warning::
     Generalized daughter indexes are not supported (yet!): this variable can be used only on first-generation daughters.
 
 .. tip::
-    ``useAlternativeDaughterHypothesis(M, 0:K+, 2:pi-)`` will return the invariant mass of the particle assuming that the first daughter is a kaon and the third is a pion, instead of whatever was used in reconstructing the decay. 
-    ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
+    ``useAlternativeDaughterHypothesis(M, 0:K+, 2:pi-)`` will return the invariant mass of the particle assuming that the first daughter is a kaon and the third is a pion, instead of whatever was used in reconstructing the decay.
+    ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay.
 
-)DOC");
-    REGISTER_VARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
-Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC")
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double)
 
   }
 }

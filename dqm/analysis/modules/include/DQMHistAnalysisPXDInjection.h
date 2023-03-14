@@ -13,31 +13,39 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <TH1.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD occupancy after Injection */
 
-  class DQMHistAnalysisPXDInjectionModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDInjectionModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDInjectionModule();
 
-  private:
-
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory

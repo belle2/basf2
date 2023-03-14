@@ -49,6 +49,12 @@ def hot_pixel_mask_calibration(
           PXDHotPixelMaskCollector will be used then instead of PXDRawHotPixelMaskCollector
 
         "debug_hist" is the flag to save a ROOT file for debug histograms.
+        "inefficientPixelMultiplier" is the multiplier on median occupancy to define an inefficient pixel.
+          0 means only dead pixels are marked as dead.
+          A value > 0 means any pixels with occupancy below the threshold will be marked as dead.
+        "minInefficientPixels" is the minimum number of pixels to define a dead or inefficient row.
+          The rows with inefficient pixels >= this value will be marked as dead rows for now.
+        "deadPixelPayloadName" is the payload name used for more defective pixel types. The default is PXDDeadPixelPar.
 
     Return:
       A caf.framework.Calibration obj.
@@ -68,16 +74,25 @@ def hot_pixel_mask_calibration(
     debug_hist = kwargs.get("debug_hist", True)
     if not isinstance(debug_hist, bool):
         raise ValueError("debug_hist is not a boolean!")
+    inefficientPixelMultiplier = kwargs.get("inefficientPixelMultiplier", 0.)
+    if not isinstance(inefficientPixelMultiplier, float):
+        raise ValueError("inefficientPixelMultiplier is not a float!")
+    minInefficientPixels = kwargs.get("minInefficientPixels", 250)
+    if not isinstance(minInefficientPixels, int):
+        raise ValueError("minInefficientPixels is not an int!")
+    deadPixelPayloadName = kwargs.get("deadPixelPayloadName", "PXDDeadPixelPar")
+    if not isinstance(deadPixelPayloadName, str):
+        raise ValueError("deadPixelPayloadName is not a str!")
 
-    # Create BASF2 path
+    # Create basf2 path
 
     gearbox = register_module('Gearbox')
     geometry = register_module('Geometry')
     geometry.param('components', ['PXD'])
     pxdunpacker = register_module('PXDUnpacker')
-    pxdunpacker.param('SuppressErrorMask', 0xFFFFFFFFFFFFFFFF)
+    # pxdunpacker.param('ContinueOnError', True)
     checker = register_module('PXDPostErrorChecker')
-    checker.param("CriticalErrorMask", 0)  # 0xC000000000000000)
+    # checker.param("CriticalErrorMask", 0)
 
     main = create_path()
     main.add_module(gearbox)
@@ -106,6 +121,11 @@ def hot_pixel_mask_calibration(
     algorithm.drainMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
     algorithm.maskRows = True               # Set True to allow masking of hot rows
     algorithm.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
+    # Occupancy threshold is median occupancy x multiplier
+    algorithm.inefficientPixelMultiplier = inefficientPixelMultiplier
+    # Minimum number of inefficient pixels in a dead/inefficient row
+    algorithm.minInefficientPixels = minInefficientPixels
+    algorithm.deadPixelPayloadName = deadPixelPayloadName
     algorithm.setDebugHisto(debug_hist)
     algorithm.setPrefix(collector_name)
     if run_type.lower() == 'cosmic':
@@ -154,6 +174,17 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
       validation (bool): Adding validation algorithm if True (default)
 
       **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+        Supported options are listed below:
+
+        "collector_prefix": a string indicating which collector to be used for gain calibration. The supported
+          collectors are:
+            PXDPerformanceVariablesCollector (default),
+            PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
+        "useClusterPosition": Flag to use cluster postion rather than track point to group pixels for calibration.
+        "particle_type": Particle type assigned to tracks. "e" by default.
+        "track_cuts_4gain": Track cuts used for gain calibration.
+        "track_cuts_4eff": Track cuts used for efficiency study.
+        "track_cuts_4res": Track cuts used for resolution study.
 
     Return:
       A caf.framework.Calibration obj.
@@ -167,15 +198,22 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         gain_method = 'analytic'
     if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
         raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
+    collector_prefix = kwargs.get("collector_prefix", "PXDPerformanceVariablesCollector")
+    supported_collectors = ["PXDPerformanceVariablesCollector", "PXDPerformanceCollector"]
+    if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
+        raise ValueError("collector_prefix not found in {}".format(supported_collectors))
+    useClusterPosition = kwargs.get("useClusterPosition", False)
+    if not isinstance(useClusterPosition, bool):
+        raise ValueError("useClusterPosition has to be a boolean!")
+    particle_type = kwargs.get("particle_type", "e")  # rely on modular analysis for value check
+    track_cuts_4gain = kwargs.get("track_cuts_4gain", "p > 1.0")  # see above
+    track_cuts_4eff = kwargs.get("track_cuts_4eff", "pt > 2.0")  # see above
+    track_cuts_4res = kwargs.get("track_cuts_4res", "Note2019")  # NOTE-TE-2019-018
 
-    # Create BASF2 path
+    # Create basf2 path
 
     gearbox = register_module('Gearbox')
     geometry = register_module('Geometry', useDB=True)
-    # pxdunpacker = register_module('PXDUnpacker')
-    # pxdunpacker.param('SuppressErrorMask', 0xFFFFFFFFFFFFFFFF)
-    # checker = register_module('PXDPostErrorChecker')
-    # checker.param("CriticalErrorMask", 0)  # 0xC000000000000000)
     genFitExtrapolation = register_module('SetupGenfitExtrapolation')
     roiFinder = register_module('PXDROIFinder')
     # roiFinder.param('tolerancePhi', 0.15)  # default: 0.15
@@ -184,32 +222,71 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     main = create_path()
     main.add_module(gearbox)
     main.add_module(geometry)
-    # main.add_module(pxdunpacker)
-    # main.add_module(checker)
-    # main.add_module("PXDRawHitSorter")
     main.add_module(genFitExtrapolation)
     main.add_module(roiFinder)  # for PXDIntercepts
-    main.add_module("PXDPerformance")
+    main.add_module("ActivatePXDPixelMasker")
 
     # Collector setup
+    collector = register_module(collector_prefix)
+    if collector_prefix == "PXDPerformanceCollector":
+        main.add_module("PXDPerformance")
+        collector.param("fillEventTree", False)
+    else:  # the default PXDPerformanceVariablesCollector
+        import modularAnalysis as ana
+        import vertex
+        # Particle list for gain calibration
+        p = particle_type
+        ana.fillParticleList(f'{p}+:gain', track_cuts_4gain, path=main)
 
-    collector = register_module("PXDPerformanceCollector")
+        # Particle list for event selection in efficiency monitoring
+        # nSVDHits > 5 doesn't help, firstSVDLayer == 3 for < 0.1% improvement?
+        ana.fillParticleList(f'{p}+:eff', track_cuts_4eff, path=main)
+        # Mass cut (9.5 < M < 11.5) below can improve efficiency by ~ 1%
+        ana.reconstructDecay(f'vpho:eff -> {p}+:eff {p}-:eff', '9.5<M<11.5', path=main)
+        # < 0.1% improvement by using kfit pvalue >= 0.01 after mass cut
+        # vertex.kFit('vpho:eff', conf_level=0.01, fit_type="fourC", daughtersUpdate=False, path=main)
+
+        # Particle list for studying impact parameter resolution
+        # Alias dosn't work with airflow implementation
+        # from variables import variables as vm
+        # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
+        # vm.addAlias("absLambda", "abs(atan(tanLambda))")
+        track_cuts_4res_note2019 = 'pt>1.0 and abs(dz)<1.0 and dr<0.3'
+        track_cuts_4res_note2019 += ' and nCDCHits>20 and nSVDHits>=8 and nPXDHits>=1'
+        track_cuts_4res_note2019 += ' and [abs(atan(tanLambda)) < 0.5]'
+        track_cuts_4res_note2019 += ' and [formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5) > 2.0]'
+        # track_cuts_4res_note2019 += ' and [absLambda<0.5]'
+        # track_cuts_4res_note2019 += ' and [pBetaSinTheta3o2>2.0]'
+        if track_cuts_4res == "Note2019":
+            track_cuts_4res = track_cuts_4res_note2019
+        ana.fillParticleList(f'{p}+:res', track_cuts_4res, path=main)
+        ana.reconstructDecay(f'vpho:res -> {p}+:res {p}-:res', '9.5<M<11.5', path=main)
+        # Remove multiple candidate events
+        ana.applyCuts('vpho:res', 'nParticlesInList(vpho:res)==1', path=main)
+        vertex.kFit('vpho:res', conf_level=0.0, path=main)
+
+        collector.param("PList4GainName", f"{p}+:gain")
+        collector.param("PList4EffName", "vpho:eff")
+        collector.param("PList4ResName", "vpho:res")
+        collector.param("maskedDistance", 3)
+        collector.param("useClusterPosition", useClusterPosition)
+
     collector.param("granularity", "run")
     collector.param("minClusterCharge", 8)
     collector.param("minClusterSize", 1)
     collector.param("maxClusterSize", 10)
     collector.param("nBinsU", 4)
     collector.param("nBinsV", 6)
-    collector.param("fillEventTree", False)
     collector.param("fillChargeRatioHistogram", True)
 
     # Algorithm setup
     algorithms = []
     if validation:
         validation_alg = PXDValidationAlgorithm()
-        validation_alg.setPrefix("PXDPerformanceCollector")
+        validation_alg.setPrefix(collector_prefix)
         validation_alg.minTrackPoints = 10     # Minimum number of track points
         validation_alg.save2DHists = True      # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
+        validation_alg.saveD0Z0 = kwargs.get("saveD0Z0", False)  # Flag to save corrected d0 (z0) difference
         algorithms.append(validation_alg)
 
     # validation_alg.setBoundaries(boundaries)  # This takes boundaries from the expert_config
@@ -221,7 +298,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         algorithm.strategy = 0                 # 0: medians, 1: landau fit
         algorithm.correctForward = True        # Correct default gains in forward regions due to low statistics
         algorithm.useChargeRatioHistogram = True  # Use Charge ratio histograms for the calibration
-        algorithm.setPrefix("PXDPerformanceCollector")
+        algorithm.setPrefix(collector_prefix)
         # algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config
         algorithms.append(algorithm)
 

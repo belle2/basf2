@@ -9,9 +9,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
@@ -134,7 +134,7 @@ namespace Belle2 {
     TH2F* m_effiYZ;
 
     //! hits2D StoreArray
-    StoreArray<BKLMHit2d> hits2D;
+    StoreArray<KLMHit2d> hits2D;
     //! extHits StoreArray
     StoreArray<ExtHit> extHits;
     //! tracks StoreArray

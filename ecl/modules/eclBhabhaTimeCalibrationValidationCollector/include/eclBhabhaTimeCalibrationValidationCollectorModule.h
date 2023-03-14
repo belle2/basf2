@@ -8,13 +8,17 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+/* ECL headers. */
 #include <ecl/utility/ECLChannelMapper.h>
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 class TTree ;
 
@@ -57,16 +61,21 @@ namespace Belle2 {
     /** If true, save TTree with more detailed event info */
     bool m_saveTree ;
 
-    /****** Parameters END ******/
-
-
     StoreArray<Track> tracks ; /**< Required input array of tracks */
     StoreArray<ECLCluster> m_eclClusterArray ; /**< Required input array of ECLClusters */
-    //StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of ECLDigits */
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
 
+    /**
+     * ECL object for keeping track of mapping between crystals
+     * and crates etc.
+     */
+    std::unique_ptr< Belle2::ECL::ECLChannelMapper> m_crystalMapper =
+      std::make_unique<Belle2::ECL::ECLChannelMapper>();
 
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0 so use that as presumably some code has been run to determine what the best t0 is to use.
      */
@@ -80,7 +89,7 @@ namespace Belle2 {
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evt_num = -1;    /**< Event number for debug TTree output*/
     int m_tree_run = -1;     /**< Run number for debug TTree output */
-    int m_tree_cid = -1;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_cid = -1;     /**< ECL Cell ID (1..ECLElementNumbers::c_NCrystals) for debug TTree output */
     double m_tree_dt99 = -1;  /**< dt99 for cluster */
     double m_tree_time = -1; /**< Calibrated time */
 
@@ -99,6 +108,9 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_CrateTimeDB; /**< database object */
     std::vector<float> m_CrateTime; /**< vector obtained from DB object */
     std::vector<float> m_CrateTimeUnc; /**< uncertainty vector obtained from DB object */
+
+    /** Mapper of ecl channels to various other objects, like crates */
+    DBObjPtr<Belle2::ECLChannelMap> m_channelMapDB; /**< database object */
 
     int     m_tree_crateid = -1;            /**< Crate ID for debug TTree output */
     double  m_tree_tcrate = -1;             /**< Crate time for debug TTree output */
@@ -120,6 +132,7 @@ namespace Belle2 {
     double m_looseTrkD0 ;   /**< Loose track d0 minimum cut*/
     double m_tightTrkD0 ;   /**< Tight track d0 minimum cut*/
 
+    bool skipTrgSel; /**< flag to skip the trigger skim selection in the module */
 
   } ;
 }

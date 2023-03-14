@@ -35,11 +35,13 @@ class CheckPayloadMetadata(b2.Module):
         '''Begin run.'''
         assert(self.beam_parameters.isValid())
         if self.use_testing_payloads:
+            assert('testingdb/testingdb.txt' in self.beam_parameters.getGlobaltag())
             assert(self.beam_parameters.getRevision() == 0)
             assert(os.path.basename(self.beam_parameters.getFilename()).startswith('dbstore'))
             assert(os.path.basename(self.beam_parameters.getFilename()).index(self.md5_revision) != -1)
             assert(self.beam_parameters.getIoV() == B2.IntervalOfValidity(0, 1, 2, 3))
         else:
+            assert(self.beam_parameters.getGlobaltag() == b2.conditions.default_globaltags[0])
             assert(self.beam_parameters.getRevision() > 0)
             assert(self.beam_parameters.getFilename().startswith('/cvmfs'))
             assert(self.beam_parameters.getIoV() == B2.IntervalOfValidity(0, 0, 0, -1))

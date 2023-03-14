@@ -118,7 +118,7 @@ def query(string):
     except BaseException:
         pass
 
-    failed = False
+    failed = False  # noqa
 
 
 def openlog():

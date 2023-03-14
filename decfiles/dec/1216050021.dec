@@ -1,0 +1,46 @@
+# EventType: 1216050021
+# Descriptor:  Y(4S) -> B-B+
+#                       B- -> D0 D_s-
+#                             D0 -> K- pi+
+#                             D_s- -> K- K*0
+#                                     K*0 -> K+ pi-
+#                       B+ -> anything
+# NickName: Bu_D0Ds-_K-pi+_K-Kst0_K+pi-
+# PhysicsWG: B2Hadronic
+# Reponsible: Valerio Bertacchi
+# Email:bertacchi@cppm.in2p3.fr
+# Cuts: None
+# Date: 2022-07-27
+
+# Aliases
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj anti-K*0sig K*0sig
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+Decay B-sig
+1.0 D0sig  D_s-sig PHSP;
+Enddecay
+
+Decay D0sig
+1.0 K-   pi+ PHSP;
+Enddecay
+
+Decay D_s-sig
+1.0 K*0sig K-  SVS;
+Enddecay
+
+Decay K*0sig
+1.0   K+  pi-  VSS;
+Enddecay
+
+CDecay B+sig
+CDecay anti-D0sig
+CDecay anti-K*0sig
+CDecay D_s+sig
+
+End

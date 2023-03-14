@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(AlignmentGenerator)
+REG_MODULE(AlignmentGenerator);
 
 //-----------------------------------------------------------------
 //                 Implementation

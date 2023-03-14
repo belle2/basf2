@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPChannelT0MC/TOPChannelT0MCModule.h>
 
 // framework - DataStore
@@ -24,10 +24,10 @@ using namespace std;
 
 namespace Belle2 {
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPChannelT0MC)
+  REG_MODULE(TOPChannelT0MC);
 
   //-----------------------------------------------------------------
   //                 Implementation

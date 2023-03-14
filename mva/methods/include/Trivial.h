@@ -47,6 +47,8 @@ namespace Belle2 {
       virtual std::string getMethod() const override { return "Trivial"; }
 
       double m_output = 0.5; /**< Output of the trivial method */
+      std::vector<double> m_multiple_output = {}; /**< Output of the trivial method */
+      bool m_passthrough = false; /**< Flag for passthrough setting */
     };
 
     /**
@@ -91,6 +93,12 @@ namespace Belle2 {
        * @param test_data dataset
        */
       virtual std::vector<float> apply(Dataset& test_data) const override;
+
+      /**
+       * Apply this expert onto a dataset
+       * @param test_data dataset
+       */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
 
     private:
       TrivialOptions m_specific_options; /**< Method specific options */

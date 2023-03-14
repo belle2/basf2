@@ -24,7 +24,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SeqRootInput)
+REG_MODULE(SeqRootInput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -37,7 +37,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
   setPropertyFlags(c_Input);
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName,
+  addParam("inputFileName", m_inputFileName,
            "Input file name. Can also be a gzip-compressed file (with suffix .gz). "
            "Parameter can be overridden using the -i argument to basf2.",
            string(""));

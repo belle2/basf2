@@ -47,6 +47,10 @@ C switch to initialize that all modes are represented equally.
       INTEGER IFEQUALBR
       DATA    IFEQUALBR /0/ 
       COMMON /IFEQUALBR/ IFEQUALBR
+C switch to generate charge conjugate taupair decays for alternate events
+      INTEGER CHCONJUGATE
+      DATA    CHCONJUGATE /0/
+      COMMON /CHCONJUGATE/ CHCONJUGATE
       
 C     FF2PIRHO ! switch for the two pion form factor
 C     = 0 CLEO parametrization
@@ -148,10 +152,11 @@ C  KeyA1 is used for formfactors actually not in use
       IFKPIPI   = XPAR(ITAUXPAR+904)
       IFCURR4PI = XPAR(ITAUXPAR+905)
       LAMDEC    = XPAR(ITAUXPAR+906)
-
+      CHCONJUGATE= XPAR(ITAUXPAR+909)
+      
 C     Print functional flags
-      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
-     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
+      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE = ',
+     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE
 
       AMINVI    = XPAR(ITAUXPAR+911)
       ISPNVI    = INT(XPAR(ITAUXPAR+912))
@@ -454,7 +459,7 @@ C initialize rchl_parameters first
 *     
 * IN-COMING / OUT-GOING  FERMION MASSES
       AMTAU  = xpar(656)
-      AMNUTA = 0.010
+      AMNUTA = xpar(666) ! 0.010
       AMEL   = xpar(616)
       AMNUE  = 0.0
       AMMU   = xpar(636)
@@ -889,6 +894,10 @@ C
          IPKDEF=ABS(IDENT)! f00(980)
       ELSEIF  (ABS(IDENT).EQ.94144) THEN
          IPKDEF=ABS(IDENT)! invi
+      ELSEIF  (ABS(IDENT).EQ.53) THEN
+         IPKDEF=ABS(IDENT)! hl
+      ELSEIF  (ABS(IDENT).EQ.26) THEN
+         IPKDEF=ABS(IDENT)! zp
       ELSE
         PRINT *, 'STOP IN IPKDEF, WRONG IDENT=',IDENT
         STOP

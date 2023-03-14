@@ -18,9 +18,6 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 
 #include <iostream>
-#include <TTree.h>
-#include <TH2F.h>
-#include <TFile.h>
 #include <TRandom.h>
 #include <TDirectory.h>
 
@@ -44,8 +41,6 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-#include <analysis/VariableManager/Manager.h>
-
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
@@ -56,7 +51,7 @@ using namespace TOP;
 using namespace Belle2::Variable;
 
 
-REG_MODULE(TOPRingPlotter)
+REG_MODULE(TOPRingPlotter);
 
 TOPRingPlotterModule::TOPRingPlotterModule() : Module()
 {
@@ -67,7 +62,7 @@ TOPRingPlotterModule::TOPRingPlotterModule() : Module()
   // Parameter definitions
   addParam("particleList", m_particleList, "List of particles to be used for plotting", std::string("pi+:all"));
   addParam("variables", m_variables, "List of variables to be saved", {});
-  addParam("pdgHyp", m_pdgHyp, "List of pdg codes for which the PDF is sampled ansd saved. Valid values are 11, 13, 211, 321, 2212.",
+  addParam("pdgHyp", m_pdgHyp, "List of pdg codes for which the PDF is sampled and saved. Valid values are 11, 13, 211, 321, 2212.",
            m_pdgHyp);
   addParam("outputName", m_outputName, "Name of the output file", std::string("TOPRings.root"));
   addParam("nToys", m_toyNumber,
@@ -180,8 +175,8 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
   // loop over the toys
   for (int iSim = 0; iSim < m_toyNumber; iSim++) {
     // tmp arrays. Before appending the PDF-based digits to the list, we want to be sure
-    // that their total number does not exceeds teh size of pixelArray and timeArray.
-    // We run the ful toy for an event storing the results here, and we copy them ro timeArray and pixelArray only
+    // that their total number does not exceeds the size of pixelArray and timeArray.
+    // We run the full toy for an event storing the results here, and we copy them to timeArray and pixelArray only
     // if there's enough room.
     std::vector<float> tmpTime;
     std::vector<short> tmpPixel;
@@ -219,8 +214,8 @@ void TOPRingPlotterModule::initialize()
 
   // Check the list of pdg hypotheses
   for (auto pdg : m_pdgHyp) {
-    if ((pdg != Const::electron.getPDGCode()) & (pdg != Const::pion.getPDGCode()) & (pdg != Const::kaon.getPDGCode()) &
-        (pdg != Const::muon.getPDGCode()) & (pdg != Const::proton.getPDGCode()))
+    if ((pdg != Const::electron.getPDGCode()) and (pdg != Const::pion.getPDGCode()) and (pdg != Const::kaon.getPDGCode()) and
+        (pdg != Const::muon.getPDGCode()) and (pdg != Const::proton.getPDGCode()))
       B2FATAL("Invalid PDG hypothesis for the PDF evaluation: " << pdg);
     short duplicateCount = 0;
     for (auto pdg2 : m_pdgHyp) {
@@ -312,7 +307,7 @@ void TOPRingPlotterModule::initialize()
   m_branchAddresses.resize(m_variables.size() + 1);
   size_t enumerate = 0;
   for (const std::string& varStr : m_variables) {
-    std::string branchName = makeROOTCompatible(varStr);
+    std::string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     m_tree->Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
@@ -438,7 +433,13 @@ void TOPRingPlotterModule::event()
 
     // Save the track variables from the VM
     for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-      m_branchAddresses[iVar] = m_functions[iVar](particle);
+      if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+        m_branchAddresses[iVar] = std::get<double>(m_functions[iVar](particle));
+      } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+        m_branchAddresses[iVar] = (double)std::get<int>(m_functions[iVar](particle));
+      } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+        m_branchAddresses[iVar] = (double)std::get<bool>(m_functions[iVar](particle));
+      }
     }
 
 

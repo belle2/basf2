@@ -8,12 +8,16 @@
 
 #include <analysis/modules/VariablesToHistogram/VariablesToHistogramModule.h>
 
+// analysis
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
+
+// framework
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 
 #include <memory>
@@ -22,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToHistogram)
+REG_MODULE(VariablesToHistogram);
 
 
 VariablesToHistogramModule::VariablesToHistogramModule() :
@@ -44,9 +48,12 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
            "List of variable pairs to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist_2d);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToHistogram.root"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
+           string("VariablesToHistogram.root"));
   addParam("directory", m_directory, "Directory for all histograms **inside** the file to allow for histograms from multiple "
            "particlelists in the same file without conflicts", m_directory);
+  addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
+           string(""));
 
   m_file = nullptr;
 }
@@ -56,13 +63,21 @@ void VariablesToHistogramModule::initialize()
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
-  // Check if we can acces the given file
+  // override the output file name with what's been provided with the -o option
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_fileName = outputFileArgument;
+
+  if (!m_fileNameSuffix.empty())
+    m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
+
+  // Check if we can access the given file
   m_file = RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) return;
   // Make sure we don't disturb the global directory for other modules, friggin side effects everywhere
   TDirectory::TContext directoryGuard(m_file.get());
   if (not m_directory.empty()) {
-    m_directory = makeROOTCompatible(m_directory);
+    m_directory = MakeROOTCompatible::makeROOTCompatible(m_directory);
     m_file->mkdir(m_directory.c_str());
     m_file->cd(m_directory.c_str());
   }
@@ -73,7 +88,7 @@ void VariablesToHistogramModule::initialize()
     float low = 0;
     float high = 0;
     std::tie(varStr, varNbins, low, high) = varTuple;
-    std::string compatibleName = makeROOTCompatible(varStr);
+    std::string compatibleName = MakeROOTCompatible::makeROOTCompatible(varStr);
 
     auto ptr = std::make_unique<StoreObjPtr<RootMergeable<TH1D>>>("", DataStore::c_Persistent);
     ptr->registerInDataStore(m_fileName + m_directory + varStr, DataStore::c_DontWriteOut);
@@ -99,8 +114,8 @@ void VariablesToHistogramModule::initialize()
     float low2 = 0;
     float high2 = 0;
     std::tie(varStr1, varNbins1, low1, high1, varStr2, varNbins2, low2, high2) = varTuple;
-    std::string compatibleName1 = makeROOTCompatible(varStr1);
-    std::string compatibleName2 = makeROOTCompatible(varStr2);
+    std::string compatibleName1 = MakeROOTCompatible::makeROOTCompatible(varStr1);
+    std::string compatibleName2 = MakeROOTCompatible::makeROOTCompatible(varStr2);
 
     auto ptr2d = std::make_unique<StoreObjPtr<RootMergeable<TH2D>>>("", DataStore::c_Persistent);
     ptr2d->registerInDataStore(m_fileName + m_directory + varStr1 + varStr2, DataStore::c_DontWriteOut);
@@ -137,12 +152,30 @@ void VariablesToHistogramModule::event()
 
   if (m_particleList.empty()) {
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      vars[iVar] = m_functions[iVar](nullptr);
+      if (std::holds_alternative<double>(m_functions[iVar](nullptr))) {
+        vars[iVar] = std::get<double>(m_functions[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_functions[iVar](nullptr))) {
+        vars[iVar] = std::get<int>(m_functions[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_functions[iVar](nullptr))) {
+        vars[iVar] = std::get<bool>(m_functions[iVar](nullptr));
+      }
       (*m_hists[iVar])->get().Fill(vars[iVar]);
     }
     for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
-      vars_2d_1[iVar] = m_functions_2d_1[iVar](nullptr);
-      vars_2d_2[iVar] = m_functions_2d_2[iVar](nullptr);
+      if (std::holds_alternative<double>(m_functions_2d_1[iVar](nullptr))) {
+        vars_2d_1[iVar] = std::get<double>(m_functions_2d_1[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_functions_2d_1[iVar](nullptr))) {
+        vars_2d_1[iVar] = std::get<int>(m_functions_2d_1[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_functions_2d_1[iVar](nullptr))) {
+        vars_2d_1[iVar] = std::get<bool>(m_functions_2d_1[iVar](nullptr));
+      }
+      if (std::holds_alternative<double>(m_functions_2d_2[iVar](nullptr))) {
+        vars_2d_2[iVar] = std::get<double>(m_functions_2d_2[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_functions_2d_2[iVar](nullptr))) {
+        vars_2d_2[iVar] = std::get<int>(m_functions_2d_2[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_functions_2d_2[iVar](nullptr))) {
+        vars_2d_2[iVar] = std::get<bool>(m_functions_2d_2[iVar](nullptr));
+      }
       (*m_2d_hists[iVar])->get().Fill(vars_2d_1[iVar], vars_2d_2[iVar]);
     }
 
@@ -152,12 +185,30 @@ void VariablesToHistogramModule::event()
     for (unsigned int iPart = 0; iPart < nPart; iPart++) {
       const Particle* particle = particlelist->getParticle(iPart);
       for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-        vars[iVar] = m_functions[iVar](particle);
+        if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+          vars[iVar] = std::get<double>(m_functions[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+          vars[iVar] = std::get<int>(m_functions[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+          vars[iVar] = std::get<bool>(m_functions[iVar](particle));
+        }
         (*m_hists[iVar])->get().Fill(vars[iVar]);
       }
       for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
-        vars_2d_1[iVar] = m_functions_2d_1[iVar](particle);
-        vars_2d_2[iVar] = m_functions_2d_2[iVar](particle);
+        if (std::holds_alternative<double>(m_functions_2d_1[iVar](particle))) {
+          vars_2d_1[iVar] = std::get<double>(m_functions_2d_1[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions_2d_1[iVar](particle))) {
+          vars_2d_1[iVar] = std::get<int>(m_functions_2d_1[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions_2d_1[iVar](particle))) {
+          vars_2d_1[iVar] = std::get<bool>(m_functions_2d_1[iVar](particle));
+        }
+        if (std::holds_alternative<double>(m_functions_2d_2[iVar](particle))) {
+          vars_2d_2[iVar] = std::get<double>(m_functions_2d_2[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions_2d_2[iVar](particle))) {
+          vars_2d_2[iVar] = std::get<int>(m_functions_2d_2[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions_2d_2[iVar](particle))) {
+          vars_2d_2[iVar] = std::get<bool>(m_functions_2d_2[iVar](particle));
+        }
         (*m_2d_hists[iVar])->get().Fill(vars_2d_1[iVar], vars_2d_2[iVar]);
       }
     }
@@ -184,7 +235,7 @@ void VariablesToHistogramModule::terminate()
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     m_file.reset();
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }

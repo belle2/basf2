@@ -19,7 +19,7 @@ def check_file(input_file_name):
     first event in ``input_file_name`` on the validation server"""
     input_file = b2tu.require_file(input_file_name, 'validation')
     pa = b2.Path()
-    ma.inputMdst("default", input_file, path=pa)
+    ma.inputMdst(input_file, path=pa)
     ma.printVariableValues(
         "", ["IPX", "IPY", "IPZ", "genIPX", "genIPY", "genIPZ"], path=pa)
     b2tu.safe_process(pa, 1)

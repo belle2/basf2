@@ -49,7 +49,7 @@ namespace Belle2 {
      * Run number.
      */
     const int c_run;
-    ClassDef(ECLLocalRunCalibRef, 1);
+    ClassDef(ECLLocalRunCalibRef, 1); /**< ClassDef */
   };
 }
 

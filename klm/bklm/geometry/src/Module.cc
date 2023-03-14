@@ -12,14 +12,13 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 /* C++ headers. */
 #include <iostream>
 
-using namespace std;
 using namespace Belle2::bklm;
 
 Module::Module() :

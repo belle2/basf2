@@ -59,6 +59,8 @@ namespace Belle2 {
       set(0, 0, 0, 0, 0, 0);
       m_copperid = 0;
       m_hslb = 0;
+      m_pcieid = 0;
+      m_pciechid = 0;
     }
 
     ARICHRawDigit(int type, int ver, int boardid, int febno, unsigned int length, unsigned int trgno = 0)
@@ -66,6 +68,8 @@ namespace Belle2 {
       set(type, ver, boardid, febno, length, trgno);
       m_copperid = 0;
       m_hslb = 0;
+      m_pcieid = 0;
+      m_pciechid = 0;
     }
 
     //! Destructor
@@ -79,6 +83,8 @@ namespace Belle2 {
   public:
     int getCopperId() { return m_copperid; }
     int getHslbId() { return m_hslb; }
+    int getPcieId() { return m_pcieid; }
+    int getPcieChId() { return m_pciechid; }
     int getType() const { return m_type; }
     int getVersion() const { return m_ver; }
     int getBoardId() const { return m_boardid; }
@@ -100,12 +106,16 @@ namespace Belle2 {
     }
     void setCopperId(int id) { m_copperid = id; }
     void setHslbId(int id) { m_hslb = id; }
+    void setPcieId(int id) { m_pcieid = id; }
+    void setPcieChId(int id) { m_pciechid = id; }
     const std::vector<FEBDigit>& getFEBs() const { return m_febs; }
     std::vector<FEBDigit>& getFEBs() { return m_febs; }
 
   private:
     int m_copperid;
     int m_hslb;
+    int m_pcieid;
+    int m_pciechid;
     int m_type;
     int m_ver;
     int m_boardid;
@@ -114,7 +124,7 @@ namespace Belle2 {
     unsigned int m_trgno;
     std::vector<FEBDigit> m_febs;
 
-    ClassDef(ARICHRawDigit, 1); /**< the class title */
+    ClassDef(ARICHRawDigit, 2); /**< the class title */
 
   };
 

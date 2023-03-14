@@ -15,7 +15,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Track.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <utility>
 
@@ -60,7 +60,8 @@ namespace Belle2 {
     void setFitterMode(int fitterMode);
 
     /// Fit V0 with given hypothesis and store if fit was successful.
-    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis, bool& isForceStored,
+                     bool&  isHitRemoved);
 
     /// Get track hypotheses for a given v0 hypothesis.
     std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;
@@ -84,7 +85,7 @@ namespace Belle2 {
     bool vertexFitWithRecoTracks(const Track* trackPlus, const Track* trackMinus,
                                  RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
                                  const Const::ParticleType& v0Hypothesis,
-                                 unsigned int& hasInnerHitStatus, TVector3& vertexPos,
+                                 unsigned int& hasInnerHitStatus, ROOT::Math::XYZVector& vertexPos,
                                  const bool forceStore);
 
     /** Create a copy of RecoTrack. Track fit should be executed in removeInnerHits function.
@@ -112,7 +113,7 @@ namespace Belle2 {
      * @return
      */
     bool removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
-                         const int trackPDG, const TVector3& vertexPosition);
+                         const int trackPDG, const ROOT::Math::XYZVector& vertexPosition);
 
     /** Compare innermost hits of daughter pairs to check if they are the same (shared) or not.
      * For SVD hits, compare U- and V- hit pair.
@@ -132,15 +133,12 @@ namespace Belle2 {
 
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
-                             const TVector3& vertexPosition);
+                             const ROOT::Math::XYZVector& vertexPosition);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     /// If the daughter tracks have hits inside the V0 vertex, bits in the hasInnerHiStatus variable are set.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
-                             const TVector3& vertexPosition, unsigned int& hasInnerHitStatus);
-
-    /// Getter for magnetic field in z direction at the vertex position.
-    double getBzAtVertex(const TVector3& vertexPosition);
+                             const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus);
 
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,

@@ -25,7 +25,7 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
-REG_MODULE(SVDDQMDose)
+REG_MODULE(SVDDQMDose);
 
 SVDDQMDoseModule::SVDDQMDoseModule() : HistoModule()
 {

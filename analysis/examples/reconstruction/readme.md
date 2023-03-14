@@ -1,3 +1,5 @@
-# FEI
+# Reconstruction
 
-The FEI (Full Event Interpretation) provides a powerful way to reconstruct B mesons. It is often used to tag your event (see ``../tagging``).
+In this directory you can find example scripts for inclusive reconstruction
+approaches, for the reconstruction of a decay chain containing a neutral
+hadron, and for MC-based reconstruction.

@@ -54,9 +54,9 @@ namespace Belle2 {
     RawSecMapRootInterface(const std::string& mapName,  const std::string& tag) :
       m_name(mapName),
       m_tree2Hit((m_name + std::string("2Hit")), DataStore::c_Persistent),
-      m_data2Hit( {}),
-                m_tree3Hit((m_name + std::string("3Hit")), DataStore::c_Persistent),
-                m_data3Hit({})
+      m_data2Hit({}),
+               m_tree3Hit((m_name + std::string("3Hit")), DataStore::c_Persistent),
+               m_data3Hit({})
 
     {
       // the "create" option results in the file not being opened if already existing

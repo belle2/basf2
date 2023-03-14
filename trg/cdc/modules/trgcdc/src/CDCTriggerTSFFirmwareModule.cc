@@ -33,7 +33,7 @@ using namespace std;
 using namespace CDCTrigger;
 using TSF = CDCTriggerTSFFirmwareModule;
 
-REG_MODULE(CDCTriggerTSFFirmware)
+REG_MODULE(CDCTriggerTSFFirmware);
 
 constexpr std::array<int, TSF::m_nSubModules> TSF::nAxialMergers;
 
@@ -90,7 +90,7 @@ Priority TSF::priority(int index)
 void TSF::write(const char* message, FILE* outstream)
 {
   // write input to TSF firmware
-  fprintf(outstream, "%s\n" , message);
+  fprintf(outstream, "%s\n", message);
   fflush(outstream);
 }
 
@@ -155,7 +155,7 @@ void TSF::initialize()
              to_string(nAxialMergers[i]).c_str(), nullptr);
       B2FATAL("The firmware simulation program didn't launch!");
     } else {
-      /* Parent process (BASF2) */
+      /* Parent process (basf2) */
       B2DEBUG(100, "parent " << i);
       m_pid[i] = pid;
       // Close the copy of the fds read/write end
@@ -435,7 +435,7 @@ void TSF::simulateMerger(unsigned iClock)
       case Priority::first: {
         // update priority time
         unsigned priTS = iCell % nSegmentsInMerger;
-        /* cppcheck-suppress variableScope */
+        // cppcheck-suppress variableScope
         timeVec& priorityTime = (get<MergerOut::priorityTime>(mergerData))[priTS];
         // when there is not already a (first priority) hit
         if (notHit(MergerOut::priorityTime, priTS, registeredCell)) {
@@ -480,7 +480,7 @@ void TSF::simulateMerger(unsigned iClock)
       pack<MergerOut::fastestTime, timeWidth> (input, nCellsInLayer, output);
       pack<MergerOut::secondPriorityHit, 1> (input, nCellsInLayer, output);
       pack<MergerOut::edgeTime, timeWidth> (input, nEdges, output);
-      /* cppcheck-suppress variableScope */
+      // cppcheck-suppress variableScope
       auto& outputAcrossClocks = dataAcrossClocks[2 * iAx][iMerger];
       if (get<MergerOut::hitmap>(output)[0].any()) {
         string priTime, fasTime, edgTime;
@@ -523,8 +523,10 @@ void TSF::pack(inputVector::reverse_iterator& input, unsigned number,
     if (width == 1)
     {
       return (get<field>(output)[0][i]) ? one_val : zero_val;
-    } else {
-      return (get<field>(output)[i / width][i % width]) ? one_val : zero_val;}});
+    } else
+    {
+      return (get<field>(output)[i / width][i % width]) ? one_val : zero_val;
+    }});
   input += number * width;
 }
 

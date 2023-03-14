@@ -42,8 +42,7 @@ import variables.utils as vu
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
+inputMdst(filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
           path=my_path)
 
 # Creates a list of good photon and muons
@@ -80,10 +79,7 @@ uvars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
 
 uvarsv = uvars + ['chiProb']
 
-uvars4c = uvars + vu.create_aliases(['OrcaKinFitProb',
-                                     'OrcaKinFitProb',
-                                     'OrcaKinFitChi2',
-                                     'OrcaKinFitErrorCode'], 'extraInfo({variable})', "") + \
+uvars4c = uvars + ['OrcaKinFitProb', 'OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode'] + \
     vu.create_aliases(['VertexFitChi2',
                        'VertexFitProb'], 'daughter(1, extraInfo({variable}))', "A")
 

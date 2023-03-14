@@ -9,10 +9,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -99,11 +98,8 @@ namespace Belle2 {
     /** KLM clusters. */
     StoreArray<KLMCluster> m_KLMClusters;
 
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_BKLMHit2ds;
-
-    /** EKLM 2d hits. */
-    StoreArray<EKLMHit2d> m_EKLMHit2ds;
+    /** Two-dimensional hits. */
+    StoreArray<KLMHit2d> m_Hit2ds;
 
   };
 

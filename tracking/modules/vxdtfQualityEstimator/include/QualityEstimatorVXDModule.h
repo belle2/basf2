@@ -33,6 +33,9 @@ namespace Belle2 {
     /** Initializes the Module. */
     void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
 
     /** Applies the selected quality estimation method for a given set of TCs */

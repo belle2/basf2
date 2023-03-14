@@ -7,15 +7,33 @@
  **************************************************************************/
 
 #pragma once
-#include <TCanvas.h>
-#include <TH1.h>
-#include <TLine.h>
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+
+#include <boost/format.hpp>
+#include <TROOT.h>
+
+#include "TLine.h"
+#include "TPaveText.h"
+#include "TStyle.h"
+#include "TGaxis.h"
+#include "TColor.h"
+
+#include "TF1.h"
+#include "TCanvas.h"
+#include "TH1.h"
+#include "TH2D.h"
+
+#include <dqm/core/DQMHistAnalysis.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisCDCDedxModule : public DQMHistAnalysisModule {
+  /**
+   * DQM analysis module grab canvases from DQM module and perform higher level
+   * operation like histogram fitting and add many useful cosmetic. Monitoring
+   * object/canvas are also saved for mirabelle.
+   */
+
+
+  class DQMHistAnalysisCDCDedxModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -28,64 +46,116 @@ namespace Belle2 {
     /**
     * destructor
     */
-    virtual ~DQMHistAnalysisCDCDedxModule();
+    ~DQMHistAnalysisCDCDedxModule();
 
     /**
     * init function for default values
     */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
     * begin each run
     */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
     * event by event function
     */
-    virtual void event() override;
+    void event() override final;
 
     /**
     * end of each run
     */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
     * terminating at the end of last run
     */
-    virtual void terminate() override;
+    void terminate() override final;
 
     /**
-    * funtion to compute mean and sigma of dEdx distribution
+    * funtion to get metadata from histogram
     */
-    void computedEdxMeanSigma();
+    void getMetadata();
 
     /**
-    * funtion to trending plots for mean and sigma of dEdx distribution
+    * funtion to draw dEdx+Fit
     */
-    void computedEdxBandPlot();
+    void drawDedxPR();
+
+    /**
+    * funtion to draw dEdx+Fit for run variation
+    */
+    void drawDedxIR();
+
+    /**
+    * funtion to draw ADC-based dead wire status of CDC
+    */
+    void drawWireStatus();
+
+    /**
+    * funtion to draw dEdx vs costh and phi
+    */
+    void drawDedxCosPhi();
+
+    /**
+    * funtion to dedx bands P
+    */
+    void drawBandPlot();
+
+    /**
+    * funtion to fit gaussian dist.
+    */
+    void fitHistogram(TH1D*& temphist, std::string& status);
+
+    /**
+    * funtion to add plot style
+    */
+    void setPlotStyle();
+
+    /**
+    * funtion to add text style
+    */
+    void setTextStyle(TPaveText*& obj);
+
+    /**
+    * funtion to reset pad margins
+    */
+    void setHistStyle(TH1* obj);
+
+    /**
+    * funtion to reset pad margins
+    */
+    void setPadStyle(double l, double r, double t, double b);
 
 
   private:
 
-    /** Save fitted mean and sigma for the 'dedx' values */
+    std::string m_iexprun{""}; /**<  info of exp/run */
+    std::string m_status{""}; /**<  fit status */
+    double m_mean{0.0}; /**< fit mean */
+    double m_sigma{0.0}; /**< fit sigma */
 
-    TCanvas* c_CDCdedxMean = nullptr; /**< canvas for dedx mean value */
-    TCanvas* c_CDCdedxSigma = nullptr; /**< canvas for dedx sigma value*/
+    int m_exp{0}; /**< exp number */
+    int m_run{0}; /**< run number */
+    double m_dbrg{0.}; /**< previous run gain */
+    int m_nallevt{0}; /**< all events */
+    int m_nbhabhaevt{0}; /**< bhabha events */
+    int m_nhadevt{0}; /**< hadron events */
 
-    TH1F* h_CDCdedxMean = nullptr; /**< histogram for dedx mean value*/
-    TH1F* h_CDCdedxSigma = nullptr; /**< histogram for dedx sigma value */
+    std::string mmode; /**< monitoring mode all/basic */
 
-    TF1* f_fGaus = nullptr; /**< Gaus fit function for dEdx dist*/
+    //DQM analysis and Mirabelle
+    TCanvas* c_pr_dedx = nullptr; /**< dedx dist+fit */
+    TCanvas* c_ir_dedx = nullptr; /**< intra-run dedx status */
 
-    TLine* tLine = nullptr; /**< Ref line for dEdx fit mean */
+    TF1* f_gaus = nullptr; /**< fit function */
+    TLine* l_line = nullptr; /**< line for dedx mean */
 
-    std::string runstatus; /**< Status of run quality */
-    std::string runnumber; /**< Current Run number */
+    unsigned first{0};/**< substring start value*/
+    unsigned last{0};/**< substring last value*/
 
-    double dedxmean; /**< fit value for dedx mean */
-    double dedxsigma; /**< fit value for dedx sigma */
-
+    MonitoringObject* m_monObj = NULL; /**< MonitoringObject for mirabelle*/
 
   };
 } // end namespace Belle2

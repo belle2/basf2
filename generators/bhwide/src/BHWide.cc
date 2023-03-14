@@ -10,7 +10,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -36,7 +36,7 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param lenght size of the array
    */
-  void varran_(double* drvec, int* lengt)
+  void varran_(double* drvec, const int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       do {
@@ -113,7 +113,7 @@ void BHWide::init()
 }
 
 
-void BHWide::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+void BHWide::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 0;
@@ -184,7 +184,8 @@ void BHWide::applySettings()
 }
 
 
-void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                           ROOT::Math::LorentzRotation boost,
                            bool isVirtual, bool isInitial)
 {
   //  //Create particle
@@ -218,19 +219,19 @@ void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4.SetPz(-1.0 * p4.Pz()); //BHWIDE uses other direction convention
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

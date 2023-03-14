@@ -14,6 +14,8 @@ import os
 
 # suppress messages and warnings during processing:
 # set_log_level(LogLevel.ERROR)
+basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
+
 # Register modules
 particlegun = b2.register_module('ParticleGun')
 # particlegun.param('randomSeed', 3452346)

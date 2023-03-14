@@ -26,7 +26,7 @@ from stdPi0s import stdPi0s
 
 mypath = basf2.create_path()
 testinput = basf2.find_file('analysis/tests/mdst.root')
-inputMdst("default", testinput, path=mypath)
+inputMdst(testinput, path=mypath)
 
 stdPi0s("all", path=mypath)
 stdE("loose", path=mypath)

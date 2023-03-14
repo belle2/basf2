@@ -14,30 +14,29 @@
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <TLorentzVector.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Helper function to extract a four vector out of an entity.
     template<class T>
-    inline TLorentzVector getFourVector(const T& item);
+    inline ROOT::Math::PxPyPzEVector getFourVector(const T& item);
 
     /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information.
     template<>
-    inline TLorentzVector getFourVector(const std::reference_wrapper<const ECLCluster>& cluster)
+    inline ROOT::Math::PxPyPzEVector getFourVector(const std::reference_wrapper<const ECLCluster>& cluster)
     {
       ClusterUtils C;
-      const TLorentzVector& v = C.Get4MomentumFromCluster(&(cluster.get()), ECLCluster::EHypothesisBit::c_nPhotons);
-      return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
+      const ROOT::Math::PxPyPzEVector& v = C.Get4MomentumFromCluster(&(cluster.get()), ECLCluster::EHypothesisBit::c_nPhotons);
+      return ROOT::Math::PxPyPzEVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
 
-    /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information and the pion mass.
+    /// Helper function to extract a four vector out of a RecoTrack by combining the momentum information and the pion mass.
     template<>
-    inline TLorentzVector getFourVector(const RecoTrack& track)
+    inline ROOT::Math::PxPyPzEVector getFourVector(const RecoTrack& track)
     {
-      const TVector3& positionSeed = track.getPositionSeed();
-      return TLorentzVector(positionSeed.X(), positionSeed.Y(), positionSeed.Z(),
-                            sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
+      const ROOT::Math::XYZVector& positionSeed = track.getPositionSeed();
+      return ROOT::Math::PxPyPzEVector(positionSeed.X(), positionSeed.Y(), positionSeed.Z(),
+                                       sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
     }
 
     /// Helper function to get "something" from a particle, where "something" depends on the different implementations.
@@ -73,8 +72,8 @@ namespace Belle2 {
         return -1;
       }
 
-      const TLorentzVector& fourVector = entity->get4Vector();
-      return PCmsLabTransform::labToCms(fourVector).Rho();
+      const ROOT::Math::PxPyPzEVector& fourVector = entity->get4Vector();
+      return PCmsLabTransform::labToCms(fourVector).P();
     }
 
     // Template specialization for ECLCluster
@@ -86,7 +85,7 @@ namespace Belle2 {
       }
 
       ClusterUtils C;
-      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity, ECLCluster::EHypothesisBit::c_nPhotons)).Rho();
+      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity, ECLCluster::EHypothesisBit::c_nPhotons)).P();
     }
 
     /**

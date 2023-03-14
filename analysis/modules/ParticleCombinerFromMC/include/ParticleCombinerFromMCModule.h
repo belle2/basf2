@@ -20,7 +20,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace Belle2 {
   class Particle;
@@ -65,20 +64,15 @@ namespace Belle2 {
 
     StoreArray<Particle> m_particles; /**< StoreArray of Particles */
 
-    int m_pdgCode;                /**< PDG code of the combined mother particle */
-
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the decay being reconstructed */
     std::unique_ptr<ParticleGenerator> m_generator; /**< Generates the combinations */
 
     std::string m_listName;   /**< output particle list name */
-    std::string m_antiListName;   /**< output anti-particle list name */
 
     int m_decayModeID; /**< user specified decay mode identifier */
 
     std::vector<std::string> m_vector_listName;   /**< vector of output particle list name */
-
-    bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
     std::string m_cutParameter;  /**< selection criteria */
 

@@ -21,7 +21,19 @@ SVD Tools
    :filename: svd/tools/b2svd-create-time-calib-sample
    :func: arg_parser
    :prog: b2svd-create-time-calib-sample
+   :nodefault:
+   :nogroupsections:
 
+
+``b2svd-import-CoGOnlyPositionError``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: svd/tools/b2svd-import-CoGOnlyPositionError
+   :func: arg_parser
+   :prog: b2svd-import-CoGOnlyPositionError
+   :nodefault:
+   :nogroupsections:
 
 ``b2svd-create-posErrScaleFactors``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

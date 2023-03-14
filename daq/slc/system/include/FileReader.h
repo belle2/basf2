@@ -21,8 +21,8 @@ namespace Belle2 {
     virtual ~FileReader() {}
 
   public:
-    virtual size_t read(void* v, size_t count) { return _fd.read(v, count); }
-    virtual bool available() { return _fd.select(); }
+    size_t read(void* v, size_t count) override { return _fd.read(v, count); }
+    bool available() override { return _fd.select(); }
 
   private:
     FD _fd;

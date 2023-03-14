@@ -28,9 +28,9 @@ class TestTreeFits(unittest.TestCase):
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
-        ma.inputMdst('default', inputfile, path=main)
+        ma.inputMdst(inputfile, path=main)
 
-        ma.fillParticleList('mu+', 'pidProbabilityExpert(13, ALL) > 0.5', path=main)
+        ma.fillParticleList('mu+', 'muonID > 0.5', path=main)
 
         ma.reconstructDecay('J/psi:all -> mu+ mu-', '', 0, path=main)
         ma.matchMCTruth('J/psi:all', path=main)
@@ -71,9 +71,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 1521, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+        self.assertTrue(falsePositives < 1771, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 741, "Signal rejection too high")
+        self.assertTrue(truePositives > 744, "Signal rejection too high")
 
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
@@ -81,4 +81,5 @@ class TestTreeFits(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

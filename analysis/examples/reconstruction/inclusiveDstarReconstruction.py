@@ -21,7 +21,6 @@ import stdPi0s
 main_path = basf2.create_path()
 
 mA.inputMdstList(
-    environmentType="default",
     filelist=[basf2.find_file("analysis/tests/mdst.root")],
     path=main_path,
 )

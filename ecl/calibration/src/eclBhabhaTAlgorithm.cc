@@ -6,22 +6,28 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/calibration/eclBhabhaTAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
 
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 
-#include "TH2F.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "TROOT.h"
+/* ROOT headers. */
+#include <TF1.h>
+#include <TFile.h>
+#include <TH2F.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +37,7 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   // Parameters
   CalibrationAlgorithm("ECLBhabhaTCollector"),
   cellIDLo(1),
-  cellIDHi(8736),
+  cellIDHi(ECLElementNumbers::c_NCrystals),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
   crateIDLo(1),
@@ -89,17 +95,17 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   // Define new plots to make
   // New calibration constant values minus older values from previous iteration plotted as a function of the crystal or crate id
   unique_ptr<TH1F> tsNew_MINUS_tsOld__cid(new TH1F("TsNew_MINUS_TsOld__cid",
-                                                   ";cell id; ts(new|bhabha) - ts(previous iteration|merged)  [ns]", 8736,
-                                                   1, 8736 + 1));
+                                                   ";cell id; ts(new|bhabha) - ts(previous iteration|merged)  [ns]", ECLElementNumbers::c_NCrystals,
+                                                   1, ECLElementNumbers::c_NCrystals + 1));
   unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld__crateID(new TH1F("tcrateNew_MINUS_tcrateOld__crateID",
                                                       ";crate id; tcrate(new | bhabha) - tcrate(previous iteration | merged)  [ns]",
                                                       52, 1, 52 + 1));
   unique_ptr<TH1F> tsNew_MINUS_tsCustomPrev__cid(new TH1F("TsNew_MINUS_TsCustomPrev__cid",
                                                           ";cell id; ts(new|bhabha) - ts(old = 'before 1st iter'|merged)  [ns]",
-                                                          8736, 1, 8736 + 1));
+                                                          ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1));
   unique_ptr<TH1F> tsNew_MINUS_tsOldBhabha__cid(new TH1F("TsNew_MINUS_TsOldBhabha__cid",
-                                                         ";cell id; ts(new|bhabha) - ts(previous iteration|bhabha)  [ns]", 8736,
-                                                         1, 8736 + 1));
+                                                         ";cell id; ts(new|bhabha) - ts(previous iteration|bhabha)  [ns]", ECLElementNumbers::c_NCrystals,
+                                                         1, ECLElementNumbers::c_NCrystals + 1));
 
 
   // Histogram of the new time constant values minus values from previous iteration
@@ -251,14 +257,14 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   //..Print out a few values for quality control
   B2INFO("Values read from database.  Write out for their values for comparison against those from tcol");
-  for (int ic = 0; ic < 8736; ic += 500) {
+  for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
     B2INFO("ts: cellID " << ic + 1 << " " << currentValuesCrys[ic] << " +/- " << currentUncCrys[ic]);
     B2INFO("tcrate: cellID " << ic + 1 << " " << currentValuesCrate[ic] << " +/- " << currentUncCrate[ic]);
   }
 
 
   //..Read in the previous crystal payload values
-  vector<float> prevValuesCrys(8736);
+  vector<float> prevValuesCrys(ECLElementNumbers::c_NCrystals);
   if (readPrevCrysPayload) {
     DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
     //..Get vectors of values from the payloads
@@ -266,7 +272,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     //..Print out a few values for quality control
     B2INFO("Previous values read from database.  Write out for their values for comparison against those from tcol");
-    for (int ic = 0; ic < 8736; ic += 500) {
+    for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
       B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic]);
     }
   }
@@ -281,7 +287,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   vector<float> currentBhabhaUncCrys = crystalBhabhaTimeObject->getCalibUncVector();
 
   //..Print out a few values for quality control
-  for (int ic = 0; ic < 8736; ic += 500) {
+  for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
     B2INFO("ts bhabha: cellID " << ic + 1 << " " << currentBhabhaValuesCrys[ic] << " +/- " << currentBhabhaUncCrys[ic]);
   }
 
@@ -294,7 +300,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   //    ts defined as zero.  The crystal id runs 1...8636, not starting at 0.
   B2INFO("Extract reference crystals from collector histogram.");
   vector <short> crystalIDreferenceUntested;
-  for (int bin = 1; bin <= 8736; bin++) {
+  for (int bin = 1; bin <= ECLElementNumbers::c_NCrystals; bin++) {
     if (refCrysIDzeroingCrate->GetBinContent(bin) > 0.5) {
       crystalIDreferenceUntested.push_back(bin);
     }
@@ -433,9 +439,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2INFO("hist_tmin = " << hist_tmin);
   B2INFO("hist_tmax = " << hist_tmax);
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-     Same for all crystals.  Proper accurate value*/
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals. */
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
   // The ts and tcrate database values are filled once per tcol instance so count the number of times that the database values
   //    were summed together by the histogram merging process and extract out the original values again.
@@ -446,7 +452,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   auto TsDatabase = getObjectPtr<TH1F>("TsDatabase");
   auto TsDatabaseUnc = getObjectPtr<TH1F>("TsDatabaseUnc");
-  for (int i = 1; i <= 8736; i++) {
+  for (int i = 1; i <= ECLElementNumbers::c_NCrystals; i++) {
     t_offsets.push_back(TsDatabase->GetBinContent(i) / numTimesFilled);
     t_offsets_prev.push_back(TsDatabase->GetBinContent(i) / numTimesFilled);
 
@@ -476,7 +482,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     B2INFO("Crystal id = " << crys_id);
 
 
-    vector<bool> ts_new_was_set(8736, false);
+    vector<bool> ts_new_was_set(ECLElementNumbers::c_NCrystals, false);
 
 
     /* Determining which bins to mask out for mean calculation
@@ -670,7 +676,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     }
 
     B2INFO("crystal times after shift wrt reference crystal");
-    for (int crys_id = 1; crys_id <= 8736; crys_id++) {
+    for (int crys_id = 1; crys_id <= ECLElementNumbers::c_NCrystals; crys_id++) {
       int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
       B2INFO("crystal time before shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
              t_offsets[crys_id - 1] << " +- " << t_offsets_unc[crys_id - 1] << " ticks");
@@ -815,7 +821,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   // Crate time calibration constants are saved per crystal so read them per crystal
   //    and save as one entry per crate in the array
-  for (int crys_id = 1; crys_id <= 8736; crys_id++) {
+  for (int crys_id = 1; crys_id <= ECLElementNumbers::c_NCrystals; crys_id++) {
     int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
     tcrate_mean_prev[crate_id_from_crystal - 1] = TcrateDatabase->GetBinContent(crys_id) / numTimesFilled;
   }
@@ -1025,13 +1031,13 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   vector<float> t_offsets_crate;
   // Vector of time offset uncertainties to be saved in the database.
   vector<float> t_offsets_crate_unc;
-  for (int i = 1; i <= 8736; i++) {
+  for (int i = 1; i <= ECLElementNumbers::c_NCrystals; i++) {
     t_offsets_crate.push_back(0);
     t_offsets_crate_unc.push_back(0);
   }
 
 
-  for (int crys_id = 1; crys_id <= 8736; crys_id++) {
+  for (int crys_id = 1; crys_id <= ECLElementNumbers::c_NCrystals; crys_id++) {
     int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
     if (tcrate_new_was_set[crate_id_from_crystal - 1]) {
       t_offsets_crate[crys_id - 1] = tcrate_mean_new[crate_id_from_crystal - 1] / TICKS_TO_NS;

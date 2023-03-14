@@ -15,8 +15,8 @@ class Basf2Calculation(Calculation):
     """
     Overloaded class with more functionality which is ipython_handler_basf2 specific:
       * Access the path and the module
-      * Create Basf2 calculations
-      * Use the Basf2 widgets
+      * Create basf2 calculations
+      * Use the basf2 widgets
     """
 
     def __init__(self):

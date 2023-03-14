@@ -64,7 +64,7 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   if (!fullname) library = "lib" + library + ".so";
 
   B2DEBUG(100, "Loading shared library " << library);
-  void* libPointer = dlopen(library.c_str() , RTLD_LAZY | RTLD_GLOBAL);
+  void* libPointer = dlopen(library.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 
   if (libPointer == nullptr) {
     B2ERROR("Could not open shared library file (error in dlopen) : " << dlerror());

@@ -19,7 +19,7 @@ namespace Belle2 {
 
     /// Constructor
     TRGGRLMATCHKLM(): m_dphi(-999.) {}
-    /// Desturctor
+    /// Destructor
     ~TRGGRLMATCHKLM() {}
 
     /**Get dphi*/
@@ -42,7 +42,7 @@ namespace Belle2 {
     double m_dphi;
 
     /**KLM sector id used for the matching*/
-    double m_sector;
+    double m_sector{ -1};
 
     /**! The Class title*/
     ClassDef(TRGGRLMATCHKLM, 3); /*< the class title */

@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ActivatePXDPixelMasker)
+REG_MODULE(ActivatePXDPixelMasker);
 
 ActivatePXDPixelMaskerModule::ActivatePXDPixelMaskerModule() : Module()
 {

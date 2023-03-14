@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 #include <TRandom3.h>
+#include <Math/Cartesian2D.h>
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
@@ -79,11 +80,11 @@ namespace {
 
       for (int i = 0; i < tracks.getEntries(); ++i) {
         int charge = (i % 2 == 0) ? +1 : -1;
-        TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-        TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-        TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+        ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
+        ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+        ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
         trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215, 0);
         tracks[i]->setTrackFitResultIndex(Const::pion, i);
       }
@@ -196,26 +197,26 @@ namespace {
 
     EXPECT_EQ(gammalist->getListSize(), 3);
 
-    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)), 3.0276606);
-    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)), 0.0);
-    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(1)), 1.6036042);
-    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(1)), -1.0607308);
-    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(2)), 2.7840068);
-    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(2)), -1.3155469);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(0))), 3.0276606);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(0))), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(1))), 1.6036042);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(1))), -1.0607308);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(2))), 2.7840068);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(2))), -1.3155469);
 
     // track (or anything without a cluster) should be nan
-    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(noclustertrack)));
-    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(noclustertrack)));
+    ASSERT_TRUE(std::isnan(std::get<double>(b2bClusterTheta->function(noclustertrack))));
+    ASSERT_TRUE(std::isnan(std::get<double>(b2bClusterPhi->function(noclustertrack))));
 
     // the "normal" (not cluster based) variables should be the same for photons
     // (who have no track information)
     const Manager::Var* b2bTheta = Manager::Instance().getVariable("b2bTheta");
     const Manager::Var* b2bPhi = Manager::Instance().getVariable("b2bPhi");
 
-    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)),
-                    b2bTheta->function(gammalist->getParticle(0)));
-    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)),
-                    b2bPhi->function(gammalist->getParticle(0)));
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(0))),
+                    std::get<double>(b2bTheta->function(gammalist->getParticle(0))));
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(0))),
+                    std::get<double>(b2bPhi->function(gammalist->getParticle(0))));
   }
 
   TEST_F(ECLVariableTest, clusterKinematicsTest)
@@ -255,14 +256,14 @@ namespace {
     const Manager::Var* clusterTheta = Manager::Instance().getVariable("clusterTheta");
     const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
 
-    EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(1)), 2.0);
-    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.042609);
-    EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(1)), 1.0);
-    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2599005);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterPhi->function(gammalist->getParticle(1))), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterPhiCMS->function(gammalist->getParticle(1))), 2.042609);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterTheta->function(gammalist->getParticle(1))), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterThetaCMS->function(gammalist->getParticle(1))), 1.2599005);
 
     // test cluster quantities directly (lab system only)
-    EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());
-    EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(0)), eclclusters[0]->getTheta());
+    EXPECT_FLOAT_EQ(std::get<double>(clusterPhi->function(gammalist->getParticle(0))), eclclusters[0]->getPhi());
+    EXPECT_FLOAT_EQ(std::get<double>(clusterTheta->function(gammalist->getParticle(0))), eclclusters[0]->getTheta());
   }
 
   TEST_F(ECLVariableTest, HypothesisVariables)
@@ -294,11 +295,11 @@ namespace {
 
     // check that the hypotheses are correctly propagated to the VM.
     for (size_t i = 0; i < gammalist->getListSize(); ++i) {
-      EXPECT_FLOAT_EQ(vHasNPhotons->function(gammalist->getParticle(i)), 1.0);
+      EXPECT_FLOAT_EQ(std::get<double>(vHasNPhotons->function(gammalist->getParticle(i))), 1.0);
       if (i == 2) { // third cluster arbitrarily chosen to test the behaviour of dual hypothesis clusters
-        EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 1.0);
+        EXPECT_FLOAT_EQ(std::get<double>(vHasNeutHadr->function(gammalist->getParticle(i))), 1.0);
       } else {
-        EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 0.0);
+        EXPECT_FLOAT_EQ(std::get<double>(vHasNeutHadr->function(gammalist->getParticle(i))), 0.0);
       }
     } // end loop over test list
   }
@@ -316,10 +317,10 @@ namespace {
     for (int i = 0; i < eclclusters.getEntries(); ++i)
       if (!eclclusters[i]->isTrack()) {
         const Particle* p = particles.appendNew(Particle(eclclusters[i]));
-        EXPECT_TRUE(vIsFromECL->function(p));
-        EXPECT_FALSE(vIsFromKLM->function(p));
-        EXPECT_FALSE(vIsFromTrack->function(p));
-        EXPECT_FALSE(vIsFromV0->function(p));
+        EXPECT_TRUE(std::get<bool>(vIsFromECL->function(p)));
+        EXPECT_FALSE(std::get<bool>(vIsFromKLM->function(p)));
+        EXPECT_FALSE(std::get<bool>(vIsFromTrack->function(p)));
+        EXPECT_FALSE(std::get<bool>(vIsFromV0->function(p)));
       }
   }
 
@@ -337,18 +338,18 @@ namespace {
 
     {
       clusters[0]->setMaxECellId(1);
-      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 0);
-      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 0);
+      EXPECT_FLOAT_EQ(std::get<double>(clusterThetaID->function(p)), 0);
+      EXPECT_FLOAT_EQ(std::get<double>(clusterPhiID->function(p)), 0);
     }
     {
       clusters[0]->setMaxECellId(6903);
-      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 52);
-      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 134);
+      EXPECT_FLOAT_EQ(std::get<double>(clusterThetaID->function(p)), 52);
+      EXPECT_FLOAT_EQ(std::get<double>(clusterPhiID->function(p)), 134);
     }
     {
       clusters[0]->setMaxECellId(8457);
-      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 65);
-      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 8);
+      EXPECT_FLOAT_EQ(std::get<double>(clusterThetaID->function(p)), 65);
+      EXPECT_FLOAT_EQ(std::get<double>(clusterPhiID->function(p)), 8);
     }
   }
 
@@ -405,13 +406,13 @@ namespace {
     // calculate the total neutral energy from the particle list --> VM
     double totalNeutralClusterE = 0.0;
     for (size_t i = 0; i < gammalist->getListSize(); ++i)
-      totalNeutralClusterE += vClusterE->function(gammalist->getParticle(i));
+      totalNeutralClusterE += std::get<double>(vClusterE->function(gammalist->getParticle(i)));
 
     // calculate the total track-matched cluster energy from the particle list --> VM
     double totalTrackClusterE = 0.0;
     for (size_t i = 0; i < pionslist->getListSize(); ++i) { // includes antiparticles
-      double clusterE = vClusterE->function(pionslist->getParticle(i));
-      double nOtherCl = vClNTrack->function(pionslist->getParticle(i));
+      double clusterE = std::get<double>(vClusterE->function(pionslist->getParticle(i)));
+      double nOtherCl = std::get<double>(vClNTrack->function(pionslist->getParticle(i)));
       if (nOtherCl > 0)
         totalTrackClusterE += clusterE / nOtherCl;
     }
@@ -442,8 +443,8 @@ namespace {
     float E_0, E_1;
     E_0 = sqrt(pow(px_0, 2) + pow(py_0, 2) + pow(pz_0, 2));
     E_1 = sqrt(pow(px_1, 2) + pow(py_1, 2) + pow(pz_1, 2));
-    TLorentzVector momentum;
-    TLorentzVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
+    ROOT::Math::PxPyPzEVector momentum;
+    ROOT::Math::PxPyPzEVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
 
     // add the two photons as the two daughters of some particle and create the latter
     Particle dau0_noclst(dau0_4vec, 22);
@@ -461,7 +462,7 @@ namespace {
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(par_noclst)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(par_noclst))));
 
     // set relations between particles and eclClusters
     ECLCluster* eclst0 = eclclusters_new.appendNew(ECLCluster());
@@ -488,7 +489,7 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(var->function(par), 0.73190731);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(par)), 0.73190731);
   }
 
   TEST_F(ECLVariableTest, averageECLTimeQuantities)
@@ -538,13 +539,13 @@ namespace {
     const Manager::Var* maxDist = Manager::Instance().getVariable("maxWeightedDistanceFromAverageECLTime");
 
     // particles without daughters should have NaN as weighted average
-    EXPECT_TRUE(std::isnan(weightedAverageECLTime->function(gammalist->getParticle(0))));
+    EXPECT_TRUE(std::isnan(std::get<double>(weightedAverageECLTime->function(gammalist->getParticle(0)))));
 
     // check that weighted average of first pi0 is correct
-    EXPECT_FLOAT_EQ(weightedAverageECLTime->function(pionslist->getParticle(0)), 1.2);
+    EXPECT_FLOAT_EQ(std::get<double>(weightedAverageECLTime->function(pionslist->getParticle(0))), 1.2);
 
     // check that maximal difference to weighted average in units of uncertainty is calculated correctly
-    EXPECT_FLOAT_EQ(maxDist->function(pionslist->getParticle(0)), 4.0);
+    EXPECT_FLOAT_EQ(std::get<double>(maxDist->function(pionslist->getParticle(0))), 4.0);
   }
 
   TEST_F(ECLVariableTest, photonHasOverlap)
@@ -569,6 +570,7 @@ namespace {
     // initialise the photon list
     gammalist.create();
     gammalist->initialize(22, gammalist.getName());
+    gammalist->setEditable(true);
 
     // make the photons from clusters
     for (int i = 0; i < eclclusters.getEntries(); ++i) {
@@ -577,6 +579,7 @@ namespace {
         gammalist->addParticle(p);
       }
     }
+    gammalist->setEditable(false);
 
     // initialize the pion lists
     pionlist.create();
@@ -584,29 +587,31 @@ namespace {
     piminuslist.create();
     piminuslist->initialize(-211, piminuslist.getName());
     piminuslist->bindAntiParticleList(*(pionlist));
+    pionlist->setEditable(true);
 
     // fill the pion list with the tracks
     for (int i = 0; i < tracks.getEntries(); ++i) {
       const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
       pionlist->addParticle(p);
     }
+    pionlist->setEditable(false);
 
     // check overlap without any arguments
     const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");
     // the track list e-:all is missing so NaN is returned
-    EXPECT_TRUE(std::isnan(photonHasOverlapNoArgs->function(particles[0])));
+    EXPECT_TRUE(std::isnan(std::get<double>(photonHasOverlapNoArgs->function(particles[0]))));
 
     // check overlap without any requirement on other photons
     const Manager::Var* photonHasOverlapAll = Manager::Instance().getVariable("photonHasOverlap(, gamma:all, pi+:all)");
     // cluster 3 and cluster 1 share the connected region
-    EXPECT_TRUE(photonHasOverlapAll->function(particles[0]));
+    EXPECT_TRUE(std::get<double>(photonHasOverlapAll->function(particles[0])));
     // photonHasOverlap is designed for photons, so calling it for a pion returns NaN
-    EXPECT_TRUE(std::isnan(photonHasOverlapAll->function(particles[3])));
+    EXPECT_TRUE(std::isnan(std::get<double>(photonHasOverlapAll->function(particles[3]))));
 
     // check overlap with photons in barrel
     const Manager::Var* photonHasOverlapBarrel = Manager::Instance().getVariable("photonHasOverlap(clusterReg==2, gamma:all, pi+:all)");
     // cluster 3 is in the forward end cap so it doesn't matter that it has the same connected region like cluster 1
-    EXPECT_FALSE(photonHasOverlapBarrel->function(particles[0]));
+    EXPECT_FALSE(std::get<double>(photonHasOverlapBarrel->function(particles[0])));
   }
 
   class KLMVariableTest : public ::testing::Test {
@@ -686,11 +691,11 @@ namespace {
 
     for (int i = 0; i < tracks.getEntries(); ++i) {
       int charge = (i % 2 == 0) ? +1 : -1;
-      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
+      ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
       trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215, 0);
       tracks[i]->setTrackFitResultIndex(Const::muon, i);
     }
@@ -761,13 +766,13 @@ namespace {
     // calculate the total KLM momentum from the KLong list --> VM
     double totalKLongMomentum = 0.0;
     for (size_t i = 0; i < kLongList->getListSize(); ++i)
-      totalKLongMomentum += vClusterP->function(kLongList->getParticle(i));
+      totalKLongMomentum += std::get<double>(vClusterP->function(kLongList->getParticle(i)));
 
     // calculate the total KLM momentum from muon-matched list --> VM
     double totalMuonMomentum = 0.0;
     for (size_t i = 0; i < muonsList->getListSize(); ++i) { // includes antiparticles
-      double muonMomentum = vClusterP->function(muonsList->getParticle(i));
-      double nOtherCl = vClNTrack->function(muonsList->getParticle(i));
+      double muonMomentum = std::get<double>(vClusterP->function(muonsList->getParticle(i)));
+      double nOtherCl = std::get<double>(vClNTrack->function(muonsList->getParticle(i)));
       if (nOtherCl > 0)
         totalMuonMomentum += muonMomentum / nOtherCl;
     }
@@ -784,8 +789,8 @@ namespace {
     StoreArray<KLMCluster> klmClusters;
 
     // add a TrackFitResult
-    TVector3 position(1.0, 0, 0);
-    TVector3 momentum(0, 1.0, 0);
+    ROOT::Math::XYZVector position(1.0, 0, 0);
+    ROOT::Math::XYZVector momentum(0, 1.0, 0);
     TMatrixDSym cov6(6);
     const int charge = 1;
     const float pValue = 0.5;
@@ -830,9 +835,9 @@ namespace {
     const Manager::Var* vClusterInnermostLayer = Manager::Instance().getVariable("klmClusterInnermostLayer");
     const Manager::Var* vClusterTrackDistance = Manager::Instance().getVariable("klmClusterTrackDistance");
 
-    EXPECT_POSITIVE(vTrNClusters->function(muon));
-    EXPECT_FLOAT_EQ(1.0, vClusterInnermostLayer->function(muon));
-    EXPECT_FLOAT_EQ(distance1, vClusterTrackDistance->function(muon));
+    EXPECT_POSITIVE(std::get<double>(vTrNClusters->function(muon)));
+    EXPECT_FLOAT_EQ(1.0, std::get<double>(vClusterInnermostLayer->function(muon)));
+    EXPECT_FLOAT_EQ(distance1, std::get<double>(vClusterTrackDistance->function(muon)));
 
     // add a Pion - no clusters matched here
     trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215, 0);
@@ -841,6 +846,6 @@ namespace {
     Track* pionTrack = tracks.appendNew(mySecondTrack);
     const Particle* pion = particles.appendNew(Particle(pionTrack, Const::pion));
 
-    EXPECT_FLOAT_EQ(0.0, vTrNClusters->function(pion));
+    EXPECT_FLOAT_EQ(0.0, std::get<double>(vTrNClusters->function(pion)));
   }
 }

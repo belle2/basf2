@@ -12,37 +12,38 @@ The basics.
 
     **Prerequisites**:
 
-        * An internet browser
-        * DESY accounts
-        * :ref:`onlinebook_collaborative_tools` lesson.
-        * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
-        * Basic bash
+    * An internet browser
+    * DESY accounts
+    * :ref:`onlinebook_collaborative_tools` lesson.
+    * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
+    * Basic bash
 
     **Questions**:
 
-        * What is basf2 and what does it do?
-        * What is a basf2 module, path, steering file?
-        * How can I get help?
+    * What is basf2 and what does it do?
+    * What is a basf2 module, path, steering file?
+    * How can I get help?
 
     **Objectives**:
 
-        * Correctly set up the Belle II environment.
-        * Find the right chapters in this documentation.
-        * Run basf2 and display a list of variables
-        * Run basf2 in interactive ipython shell mode.
-        * Access the help in 3 different ways.
-        * Confidently read the source code for a `modularAnalysis` convenience
-          function.
+    * Correctly set up the Belle II environment.
+    * Find the right chapters in this documentation.
+    * Run basf2 and display a list of variables
+    * Run basf2 in interactive ipython shell mode.
+    * Access the help in 3 different ways.
+    * Confidently read the source code for a `modularAnalysis` convenience
+      function.
 
 The Belle II software is called basf2.
 It is an abbreviation for "Belle II Analysis Software Framework".
-There is no set way to write it, you will see BASF2, Basf2 and basf2.
+You may see also "BASF2" or "Basf2" in some outdated documentation, but the
+official way for writing it is basf2, using only lower case letters.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
 than analysis)?
 Well historic reasons: Belle had BASF, we have basf2.
 
-Basf2 is used in all aspects of the data-processing chain at Belle II:
+basf2 is used in all aspects of the data-processing chain at Belle II:
 
 * generating simulated data,
 * unpacking of real raw data,
@@ -50,7 +51,7 @@ Basf2 is used in all aspects of the data-processing chain at Belle II:
 * and high-level "analysis" reconstruction (such as applying cuts,
   vertex-fitting, ...).
 
-Basf2 is not normally used for the final analysis steps (histogramming, fitting
+basf2 is not normally used for the final analysis steps (histogramming, fitting
 1D distributions, ...).
 These final steps are usually called the "offline" analysis and will be covered
 in later lessons :ref:`onlinebook_offline_analysis`.
@@ -95,10 +96,10 @@ There are some concepts we use in basf2, which you will definitely need to
 understand.
 These are:
 
-        * basf2 module,
-        * path,
-        * package,
-        * steering script / steering file.
+* basf2 module,
+* path,
+* package,
+* steering script / steering file.
 
 Most of the other jargon terms we use are generic software development terms
 (so you can search the internet).
@@ -120,7 +121,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 
      `Belle II Glossary <https://confluence.desy.de/display/BI/Main+Glossary>`_
 
-Basf2 modules
+basf2 modules
 ~~~~~~~~~~~~~
 
 A basf2 module is a piece of (usually) C++ code that does a specific "unit" of
@@ -199,7 +200,7 @@ You will meet this at the end of this lesson.
 .. admonition:: Solution
      :class: toggle solution
 
-     The source code is online `here <https://stash.desy.de/projects/B2/repos/basf2/browse>`_.
+     The source code is online `here <https://gitlab.desy.de/belle2/software/basf2>`_.
      The list of **packages** is simply the list of directories in the software
      directory.
 
@@ -492,10 +493,9 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Solution
      :class: toggle solution
 
-     1. Go to https://stash.desy.de/projects/B2/
-     2. Click on "source".
-     3. At the top it probably says "master". Choose the drop-down menu.
-     4. Click on "tags" and search for the release tag.
+     1. Go to https://gitlab.desy.de/belle2/software/basf2
+     2. From the left column, click on "Repository" and then "Tags.
+     3. Search for the release tag using the filters.
 
      .. image:: introduction/find_a_tag.png
          :width: 300px
@@ -553,7 +553,7 @@ Listing the basf2 variables
 
 In the next lessons, you will need to refer to physics quantities in plain
 text format.
-Basf2 defines many **variables** for you.
+basf2 defines many **variables** for you.
 These variables are collected in something called the
 :ref:`analysis_variablemanager_class`.
 
@@ -590,11 +590,11 @@ For now, you can list them all with:
 
 .. _onlinebook_basf2basics_b2help_particles:
 
-Basf2 particles
+basf2 particles
 ^^^^^^^^^^^^^^^
 
 Sometimes you will need to write particles' names in plain text format.
-Basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
+basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
 
 To show information about all the particles and properties known to basf2,
 there is a tool ``b2help-particles``.
@@ -726,7 +726,7 @@ We call software "external" if is not specific to Belle II but used *by* basf2.
 
     If you are interested, you can browse the list of everything included in
     the externals in `this README file
-    <https://stash.desy.de/projects/B2/repos/externals/browse/README.md>`_.
+    <https://gitlab.desy.de/belle2/software/externals/-/blob/main/README.md>`_.
 
 Some python packages that are useful for final offline analysis are also
 included in the externals for your convenience.
@@ -742,7 +742,7 @@ You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
     * ``b2help-releases``
     * ``b2setup <choose a release>``
     * ``b2help-particles``
-    * Basf2 has a python interface. You can use python tools to find help.
+    * basf2 has a python interface. You can use python tools to find help.
     * ``basf2`` without any tools gets you into a basf2-flavoured IPython shell.
 
 
@@ -786,7 +786,7 @@ post-reconstruction dataobjects.
 
      * You can look at the function source code for `mdst.add_mdst_output`.
      * You can browse the mdst/dataobjects directory in the basf2 source code:
-       https://stash.desy.de/projects/B2/repos/software/browse/mdst/dataobjects/include
+       https://gitlab.desy.de/belle2/software/basf2/-/tree/main/mdst/dataobjects/include
 
      The important mdst dataobjects are:
 
@@ -951,7 +951,7 @@ In pseudo-python you will see they are very often of the form:
      :class: toggle solution
 
      You want the `modularAnalysis.reconstructDecay` function.
-     You could either read the source code for that on stash,
+     You could either read the source code for that on GitLab,
      or find it here in this documentation and click "[source]".
 
 Congratulations!
@@ -962,11 +962,11 @@ Good luck.
 
     While the next sections will help you to understand the basics of steering
     files step by step, there are also some comple examples for steering files
-    `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
+    `in the main software repository <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-    Sam Cunliffe
+Sam Cunliffe

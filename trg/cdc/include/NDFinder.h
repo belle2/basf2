@@ -23,12 +23,12 @@ namespace Belle2 {
   /** Store track parameters of found tracks. */
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values, SimpleCluster cluster)
+    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster):
+      m_cluster(cluster)
     {
       m_omega = values[0];
       m_phi = values[1];
       m_cotTheta = values[2];
-      m_cluster = cluster;
     }
 
     /** Default destructor. */
@@ -152,7 +152,7 @@ namespace Belle2 {
      * */
     void init(int minweight, int minpts, bool diagonal,
               int minhits, int minhits_axial, double thresh, double minassign,
-              int mincells, bool verbose, std::string axialFile, std::string stereoFile);
+              int mincells, bool verbose, std::string& axialFile, std::string& stereoFile);
 
     /** Initialize the binnings and reserve the arrays */
     void initBins();
@@ -163,7 +163,7 @@ namespace Belle2 {
     void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
     /** Restore non-zero suppressed hit curves.
      * will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, c5array& compArray);
+    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
 
     /** Squeeze phi-axis in a 2D (omega,phi) plane
      * @param inparcels number of 1/32 sectors in input plane
@@ -229,7 +229,7 @@ namespace Belle2 {
     void addLookup(unsigned short ihit);
 
     /** In place array addition to houghmap Comp: A = A + B */
-    void addC3Comp(ushort hitr, ushort prio, c5array& hitsToTracks,
+    void addC3Comp(ushort hitr, ushort prio, const c5array& hitsToTracks,
                    short Dstart, ndbinning bins);
 
     /** Create hits to clusters confusion matrix */
@@ -237,7 +237,7 @@ namespace Belle2 {
                                             std::vector<SimpleCluster>& clusters);
 
     /** Peak cell in cluster */
-    cell_index getMax(std::vector<cell_index>&);
+    cell_index getMax(const std::vector<cell_index>&);
 
     /** Determine weight contribution of a single hit to a single cell.
      * Used to create the hitsVsClusters confusion matrix. */
@@ -324,7 +324,7 @@ namespace Belle2 {
     std::vector<short> m_vecDstart;
 
     /** Counter for the number of hits in the current event */
-    unsigned short m_nHits;
+    unsigned short m_nHits{0};
 
     /** Configuration parameters of the 3DFinder */
     ndparameters m_params;
@@ -343,25 +343,25 @@ namespace Belle2 {
     std::vector<ushort> m_planeShape;
 
     /** Default bins */
-    unsigned short m_nPhiFull;
-    unsigned short m_nPhiOne;
-    unsigned short m_nPhiComp;
-    unsigned short m_nPhiExp;
-    unsigned short m_nPhiUse;
-    unsigned short m_nOmega;
-    unsigned short m_nTheta;
+    unsigned short m_nPhiFull{0};
+    unsigned short m_nPhiOne{0};
+    unsigned short m_nPhiComp{0};
+    unsigned short m_nPhiExp{0};
+    unsigned short m_nPhiUse{0};
+    unsigned short m_nOmega{0};
+    unsigned short m_nTheta{0};
 
-    unsigned short m_nSL;
-    unsigned short m_nTS;
-    unsigned short m_nAx;
-    unsigned short m_nSt;
-    unsigned short m_nPrio;
+    unsigned short m_nSL{0};
+    unsigned short m_nTS{0};
+    unsigned short m_nAx{0};
+    unsigned short m_nSt{0};
+    unsigned short m_nPrio{0};
 
     /** Clustering module */
     Belle2::Clusterizend m_clusterer;
 
     /** Print Hough planes and verbose output */
-    bool m_verbose;
+    bool m_verbose{false};
   };
 }
 #endif

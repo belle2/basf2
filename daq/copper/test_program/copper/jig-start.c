@@ -94,146 +94,144 @@ show_intcsr(plx9054_intcsr csr)
 void
 check_pci_error(int plxfd)
 {
-    int ret;
-    plx9054_intcsr intcsr;
-    ret = ioctl(plxfd, PLXIOGET_INTCSR, &intcsr, sizeof(intcsr));
-    if (intcsr.bit.pci_error)
-	printf("pci_error (%08x)\n", intcsr.val);
-    intcsr.bit.pci_error = 1;
-    ret = ioctl(plxfd, PLXIOSET_INTCSR, &intcsr, sizeof(intcsr));
+  plx9054_intcsr intcsr;
+  ioctl(plxfd, PLXIOGET_INTCSR, &intcsr, sizeof(intcsr));
+  if (intcsr.bit.pci_error)
+    printf("pci_error (%08x)\n", intcsr.val);
+  intcsr.bit.pci_error = 1;
+  ioctl(plxfd, PLXIOSET_INTCSR, &intcsr, sizeof(intcsr));
 }
 
 #define	SETJIG(n, m)	change_jig_regs(jigfd, #n, FNIOSET_##n, FNIOGET_##n, m)
 
-main()
+int main()
 {
-    int jigfd[4];
-    int cprfd = open("/dev/copper/copper", O_RDONLY);
-    int plxfd = open("/dev/copper/plx9054", O_RDONLY);
-    int ret;
-    int rev = -1;
-    int cmd;
-    int start;
-    int i;
-    int val;
+  int jigfd[4];
+  int cprfd = open("/dev/copper/copper", O_RDONLY);
+  int plxfd = open("/dev/copper/plx9054", O_RDONLY);
+  int ret;
+  int rev = -1;
+  int i;
+  int val;
 
-    printf("cprfd = %d\n", cprfd);
-    printf("plxfd = %d\n", plxfd);
+  printf("cprfd = %d\n", cprfd);
+  printf("plxfd = %d\n", plxfd);
 
-    ret = ioctl(cprfd, CPRIO_INIT_RUN, 0);
-    printf("CPRIO_INIT_RUN ret = %d\n", ret);
+  ret = ioctl(cprfd, CPRIO_INIT_RUN, 0);
+  printf("CPRIO_INIT_RUN ret = %d\n", ret);
 
-    check_pci_error(plxfd);
+  check_pci_error(plxfd);
 
-    jigfd[0] = open("/dev/copper/jig:a",  O_RDONLY);
-    jigfd[1] = open("/dev/copper/jig:b",  O_RDONLY);
-    jigfd[2] = open("/dev/copper/jig:c",  O_RDONLY);
-    jigfd[3] = open("/dev/copper/jig:d",  O_RDONLY);
+  jigfd[0] = open("/dev/copper/jig:a",  O_RDONLY);
+  jigfd[1] = open("/dev/copper/jig:b",  O_RDONLY);
+  jigfd[2] = open("/dev/copper/jig:c",  O_RDONLY);
+  jigfd[3] = open("/dev/copper/jig:d",  O_RDONLY);
 
-    ret = ioctl(cprfd, CPRIOGET_VERSION, &val, sizeof(val));
-    printf("ret = %d version=%x(%d)\n", ret, val, val);
+  ret = ioctl(cprfd, CPRIOGET_VERSION, &val, sizeof(val));
+  printf("ret = %d version=%x(%d)\n", ret, val, val);
 
-    /* set clear flag on copper fifo (necessary) */
-    val = 0x1F;
-    ret = ioctl(cprfd, CPRIOSET_FF_RST, &val, sizeof(val));
-    printf("ret = %d set reset\n", ret);
+  /* set clear flag on copper fifo (necessary) */
+  val = 0x1F;
+  ret = ioctl(cprfd, CPRIOSET_FF_RST, &val, sizeof(val));
+  printf("ret = %d set reset\n", ret);
 
-    /* negate clear flag on copper fifo (necessary) */
-    val = 0;
-    ret = ioctl(cprfd, CPRIOSET_FF_RST, &val, sizeof(val));
-    printf("ret = %d clear reset\n", ret);
+  /* negate clear flag on copper fifo (necessary) */
+  val = 0;
+  ret = ioctl(cprfd, CPRIOSET_FF_RST, &val, sizeof(val));
+  printf("ret = %d clear reset\n", ret);
 
-    /* negate COPPER_FF_RW flag (necessary) */
-    val = 0;
-    ret = ioctl(cprfd, CPRIOSET_FF_RW, &val, sizeof(val));
-    printf("ret = %d clear FF_RW\n", ret);
+  /* negate COPPER_FF_RW flag (necessary) */
+  val = 0;
+  ret = ioctl(cprfd, CPRIOSET_FF_RW, &val, sizeof(val));
+  printf("ret = %d clear FF_RW\n", ret);
 
-    /* check copper FF_STA */
-    {
-	char * p = getenv("FINESSE_SLOT");
-	int val = 0;
-	if (p) {
-	    if (strchr(p, 'A') || strchr(p, 'a')) val |= 1;
-	    if (strchr(p, 'B') || strchr(p, 'b')) val |= 2;
-	    if (strchr(p, 'C') || strchr(p, 'c')) val |= 4;
-	    if (strchr(p, 'D') || strchr(p, 'd')) val |= 8;
-	} else {
-	    val = 0xF;
-	}
-	ret = ioctl(cprfd, CPRIOSET_FINESSE_STA, &val, sizeof(val));
+  /* check copper FF_STA */
+  {
+    char * p = getenv("FINESSE_SLOT");
+    int valNow = 0;
+    if (p) {
+      if (strchr(p, 'A') || strchr(p, 'a')) valNow |= 1;
+      if (strchr(p, 'B') || strchr(p, 'b')) valNow |= 2;
+      if (strchr(p, 'C') || strchr(p, 'c')) valNow |= 4;
+      if (strchr(p, 'D') || strchr(p, 'd')) valNow |= 8;
+    } else {
+      valNow = 0xF;
     }
+    ret = ioctl(cprfd, CPRIOSET_FINESSE_STA, &val, sizeof(val));
+  }
 
-    /* use LEF_TOTAL */
-    val = 1; /* use LEF_TOTAL(1) or LEF_AB(0) */
-    ret = ioctl(cprfd, CPRIOSET_LEF_READSEL, &val, sizeof(val));
+  /* use LEF_TOTAL */
+  val = 1; /* use LEF_TOTAL(1) or LEF_AB(0) */
+  ret = ioctl(cprfd, CPRIOSET_LEF_READSEL, &val, sizeof(val));
 
-    /* set length fifo interrupt theshold */
-    {
-	static const int regs[] = {
-	    CPRIOSET_LEF_WA_THR, CPRIOSET_LEF_WB_THR,
-	    CPRIOSET_LEF_WC_THR, CPRIOSET_LEF_WD_THR,
-	};
-	for (i=0; i<4; i++) {
-	    val = 1;
-	    ret = ioctl(cprfd, regs[i], &val, sizeof(val));
-	    printf("CPRIOSET_LEF %d\n", ret);
-	}
-    }
-
-    /* enable length fifo threshold interrupt */
-    val = 0x7;	/*	1(event fifo almost full)
-			2(length fifo almost full)
-			4(length fifo threshold)	*/
-    ret  = ioctl(cprfd, CPRIOSET_INT_MASK, &val, sizeof(val));
-    ret += ioctl(cprfd, CPRIOGET_INT_MASK, &val, sizeof(val));
-    printf("INT_MASK = %x/%d\n", val, ret);
-
-    check_pci_error(plxfd);
-
-    /* check jig revision (not necessary) */
+  /* set length fifo interrupt theshold */
+  {
+    static const int regs[] = {
+      CPRIOSET_LEF_WA_THR, CPRIOSET_LEF_WB_THR,
+      CPRIOSET_LEF_WC_THR, CPRIOSET_LEF_WD_THR,
+    };
     for (i=0; i<4; i++) {
-	if (jigfd[i] == -1)
-	    continue;
-	ret = ioctl(jigfd[i], FNIOGET_JIG_REV, &rev, sizeof(rev));
-	printf("ret = %d JIG_REV = %d\n", ret, rev);
+      val = 1;
+      ret = ioctl(cprfd, regs[i], &val, sizeof(val));
+      printf("CPRIOSET_LEF %d\n", ret);
     }
+  }
 
-    check_pci_error(plxfd);
+  /* enable length fifo threshold interrupt */
+  val = 0x7;	/*	1(event fifo almost full)
+                  2(length fifo almost full)
+                  4(length fifo threshold)	*/
+  ret  = ioctl(cprfd, CPRIOSET_INT_MASK, &val, sizeof(val));
+  ret += ioctl(cprfd, CPRIOGET_INT_MASK, &val, sizeof(val));
+  printf("INT_MASK = %x/%d\n", val, ret);
 
-    /* check jig FPGA version (not necessary) */
-    for (i=0; i<4; i++) {
-	if (jigfd[i] == -1)
-	    continue;
-	ret = ioctl(jigfd[i], FNIOGETGENFPGAVER, &rev, sizeof(rev));
-	printf("ret = %d FPGAVER = %d\n", ret, rev);
-    }
+  check_pci_error(plxfd);
 
-    check_pci_error(plxfd);
+  /* check jig revision (not necessary) */
+  for (i=0; i<4; i++) {
+    if (jigfd[i] == -1)
+      continue;
+    ret = ioctl(jigfd[i], FNIOGET_JIG_REV, &rev, sizeof(rev));
+    printf("ret = %d JIG_REV = %d\n", ret, rev);
+  }
 
-    /* set data pattern from jig */
-    SETJIG(JIG_CMD, JIGCMD_DATA_INCREMENT);
+  check_pci_error(plxfd);
 
-    check_pci_error(plxfd);
+  /* check jig FPGA version (not necessary) */
+  for (i=0; i<4; i++) {
+    if (jigfd[i] == -1)
+      continue;
+    ret = ioctl(jigfd[i], FNIOGETGENFPGAVER, &rev, sizeof(rev));
+    printf("ret = %d FPGAVER = %d\n", ret, rev);
+  }
 
-    /* set data size from jig */
-    {
-	char * p = getenv("FINESSE_MODE");
-	int finesse_mode = 0;
-	if (p)
-	    finesse_mode = strtol(p, 0, 0);
-	SETJIG(JIG_OUTD, finesse_mode * 0x10);
-    }
+  check_pci_error(plxfd);
 
-    check_pci_error(plxfd);
+  /* set data pattern from jig */
+  SETJIG(JIG_CMD, JIGCMD_DATA_INCREMENT);
 
-    /* start jig */
-    SETJIG(JIG_START, 1);
+  check_pci_error(plxfd);
 
-    check_pci_error(plxfd);
+  /* set data size from jig */
+  {
+    char * p = getenv("FINESSE_MODE");
+    int finesse_mode = 0;
+    if (p)
+      finesse_mode = strtol(p, 0, 0);
+    SETJIG(JIG_OUTD, finesse_mode * 0x10);
+  }
 
-    for (i=0; i<4; i++) {
-	if (jigfd[i] == -1)
-	    continue;
-	close(jigfd[i]);
-    }
+  check_pci_error(plxfd);
+
+  /* start jig */
+  SETJIG(JIG_START, 1);
+
+  check_pci_error(plxfd);
+
+  for (i=0; i<4; i++) {
+    if (jigfd[i] == -1)
+      continue;
+    close(jigfd[i]);
+  }
+  return 0;
 }

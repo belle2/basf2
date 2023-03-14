@@ -15,8 +15,6 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <TMatrixFSym.h>
-#include <TLorentzVector.h>
-
 
 #include <string>
 namespace TestUtilities {
@@ -40,7 +38,8 @@ namespace TestUtilities {
      * The decay string can have any complexity and all PDG codes of allowed
      * and charges  will be respected.
      */
-    const Belle2::Particle* produceParticle(const std::string& decayString, const TLorentzVector& momentum, const TVector3& vertex)
+    const Belle2::Particle* produceParticle(const std::string& decayString, const ROOT::Math::PxPyPzEVector& momentum,
+                                            const ROOT::Math::XYZVector& vertex)
     {
       Belle2::DecayDescriptor* decaydescriptor = new Belle2::DecayDescriptor();
       bool isString = decaydescriptor->init(decayString);
@@ -79,8 +78,8 @@ namespace TestUtilities {
     /**
      * This method is used for recursion.
      */
-    const Belle2::Particle* createParticle(const Belle2::DecayDescriptor* particleDescriptor, const TLorentzVector& momentum,
-                                           const TVector3& vertex)
+    const Belle2::Particle* createParticle(const Belle2::DecayDescriptor* particleDescriptor, const ROOT::Math::PxPyPzEVector& momentum,
+                                           const ROOT::Math::XYZVector& vertex)
     {
       Belle2::Particle::EParticleSourceObject type = getType(particleDescriptor->getMother());
       if (type == Belle2::Particle::EParticleSourceObject::c_Track) {
@@ -110,16 +109,15 @@ namespace TestUtilities {
     /**
      * Creates different photons for tests
      * */
-    const Belle2::Particle* createPhoton(const TLorentzVector& momentum)
+    const Belle2::Particle* createPhoton(const ROOT::Math::PxPyPzEVector& momentum)
     {
       Belle2::StoreArray<Belle2::ECLCluster> myECLClusters;
       Belle2::StoreArray<Belle2::Particle> myParticles;
       Belle2::ECLCluster myECL;
       myECL.setIsTrack(false);
       //TRandom3 generator;
-      float eclREC = momentum[3];
       myECL.setConnectedRegionId(m_photonIndex++);
-      myECL.setEnergy(eclREC);
+      myECL.setEnergy(momentum.E());
       myECL.setHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
       //This is necessary to avoid isCopyOf == true for Belle2::ECLClusters:
       myECL.setClusterId(m_photonIndex++);
@@ -137,11 +135,11 @@ namespace TestUtilities {
     /**
      * Creates different charged particles for tests
      * */
-    const Belle2::Particle* createCharged(const Belle2::DecayDescriptor* particleDescriptor,  const TLorentzVector& momentum,
-                                          const TVector3& vertex)
+    const Belle2::Particle* createCharged(const Belle2::DecayDescriptor* particleDescriptor,  const ROOT::Math::PxPyPzEVector& momentum,
+                                          const ROOT::Math::XYZVector& vertex)
     {
       auto* particleDescription = particleDescriptor->getMother();
-      TVector3 tmomentum(momentum[0], momentum[1], momentum[2]);
+      ROOT::Math::XYZVector tmomentum(momentum.X(), momentum.Y(), momentum.Z());
       const float pValue = 0.5;
       const float bField = 1.5;
       TMatrixDSym cov6(6);

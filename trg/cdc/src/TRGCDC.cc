@@ -14,6 +14,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <math.h>
+#include <TRandom.h>
 #include <iostream>
 #include <fstream>
 #include "framework/datastore/StoreArray.h"
@@ -41,7 +42,7 @@
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Relation.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"
@@ -57,6 +58,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TObjString.h>
 
 #define NOT_USE_SOCKETLIB
@@ -499,53 +501,53 @@ namespace Belle2 {
     const int shape[2][30] = {
       {
         -2, 0, // relative layer id, relative wire id
-        -1, -1, // assuming layer offset 0.0, not 0.5
-        -1, 0,
-        0, -1,
-        0, 0,
-        0, 1,
-        1, -2,
-        1, -1,
-        1, 0,
-        1, 1,
-        2, -2,
-        2, -1,
-        2, 0,
-        2, 1,
-        2, 2
-        //-2, 0, // relative layer id, relative wire id
-        //-1, 0, // assuming layer offset 0.5, not 0.0
-        //-1, 1,
-        //0, -1,
-        //0, 0,
-        //0, 1,
-        //1, -1,
-        //1, -0,
-        //1, 1,
-        //1, 2,
-        //2, -2,
-        //2, -1,
-        //2, 0,
-        //2, 1,
-        //2, 2
-      },
+          -1, -1, // assuming layer offset 0.0, not 0.5
+          -1, 0,
+          0, -1,
+          0, 0,
+          0, 1,
+          1, -2,
+          1, -1,
+          1, 0,
+          1, 1,
+          2, -2,
+          2, -1,
+          2, 0,
+          2, 1,
+          2, 2
+          //-2, 0, // relative layer id, relative wire id
+          //-1, 0, // assuming layer offset 0.5, not 0.0
+          //-1, 1,
+          //0, -1,
+          //0, 0,
+          //0, 1,
+          //1, -1,
+          //1, -0,
+          //1, 1,
+          //1, 2,
+          //2, -2,
+          //2, -1,
+          //2, 0,
+          //2, 1,
+          //2, 2
+        },
       {
         -2, -1,
-        -2, 0,
-        -2, 1,
-        -1, -1,
-        -1, 0,
-        0, 0,
-        1, -1,
-        1, 0,
-        2, -1,
-        2, 0,
-        2, 1,
-        0, 0,
-        0, 0,
-        0, 0,
-        0, 0
-      }
+          -2, 0,
+          -2, 1,
+          -1, -1,
+          -1, 0,
+          0, 0,
+          1, -1,
+          1, 0,
+          2, -1,
+          2, 0,
+          2, 1,
+          0, 0,
+          0, 0,
+          0, 0,
+          0, 0
+        }
     };
     const int layerOffset[2] = {5, 2};
     unsigned id = 0;
@@ -906,7 +908,7 @@ namespace Belle2 {
 // }
 
   const TCWire*
-  TRGCDC::wire(float , float) const
+  TRGCDC::wire(float, float) const
   {
     //...Not implemented yet...
     return _wires[0];
@@ -1029,7 +1031,7 @@ namespace Belle2 {
       //...Loop over CDCHits...
       for (unsigned i = 0; i < nHits; i++) {
         const CDCHit& h = *CDCHits[i];
-        double tmp = rand() / (double(RAND_MAX));
+        double tmp = gRandom->Uniform(0.0, 1.0) / (double(RAND_MAX));
         if (tmp < _inefficiency)
           continue;
 
@@ -1537,10 +1539,10 @@ namespace Belle2 {
       TRGState t_trgState(t_trgData, 1);
       trgData->set(t_trgState, iWindow);
     }
-    allTrgData->push_back(trgData);
-    // Clean up memory
     if (allTrgData) {
-      for (unsigned i = 0; i < allTrgData->size(); i++) delete(*allTrgData)[i];
+      allTrgData->push_back(trgData);
+      // Clean up memory
+      for (unsigned i = 0; i < allTrgData->size(); i++) delete (*allTrgData)[i];
       delete allTrgData;
     }
 
@@ -2166,20 +2168,20 @@ namespace Belle2 {
           const TCRelation& trackRelation = aTrack.relation();
           const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
           int mcCharge = trackMCParticle.getCharge();
-          double mcPt = trackMCParticle.getMomentum().Pt();
+          double mcPt = trackMCParticle.getMomentum().Rho();
           double mcPhi0 = 0.0;
           if (mcCharge > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
           if (mcCharge < 0) mcPhi0 = trackMCParticle.getMomentum().Phi() + M_PI / 2;
           // Change range to [0,2pi]
           if (mcPhi0 < 0) mcPhi0 += 2 * M_PI;
           // Calculated impact position
-          TVector3 vertex = trackMCParticle.getVertex();
-          TLorentzVector vector4 = trackMCParticle.get4Vector();
+          TVector3 vertex = B2Vector3D(trackMCParticle.getVertex());
+          ROOT::Math::PxPyPzEVector vector4 = trackMCParticle.get4Vector();
           TVector2 helixCenter;
           TVector3 impactPosition;
           Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);
           double mcZ0 = impactPosition.Z();
-          double mcCot = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+          double mcCot = trackMCParticle.getMomentum().z() / trackMCParticle.getMomentum().Rho();
           cout << TRGDebug::tab() << "Track[" << iTrack << "]: mcCharge=" << mcCharge
                << " mcPt=" << mcPt << " mcPhi_c=" << mcPhi0
                << " mcZ0=" << mcZ0 << " mcCot=" << mcCot << endl;
@@ -2514,7 +2516,7 @@ namespace Belle2 {
       if (! f) {
         newFrontEnd = true;
         const string name = "CDCFrontEnd" + TRGUtil::itostring(fid);
-        TCFrontEnd::boardType t = TCFrontEnd::unknown;
+        TCFrontEnd::boardType t;
         if (sl == 0) {
           if (_wires[wid]->localLayerId() < 5)
             t = TCFrontEnd::innerInside;
@@ -2539,7 +2541,7 @@ namespace Belle2 {
       // part, well, seems not good in coding
       //
       bool newMerger = false;
-      TCMerger* m = 0;
+      TCMerger* m = nullptr;
       if (newFrontEnd) {
         if (mid != 99999) {
           if (mid < _mergers.size())
@@ -2548,7 +2550,7 @@ namespace Belle2 {
             newMerger = true;
             const string name = "CDCMerger" + TRGUtil::itostring(sl) +
                                 "-" + TRGUtil::itostring(lastMergerLocalId);
-            TCMerger::unitType mt = TCMerger::unknown;
+            TCMerger::unitType mt;
             if (sl == 0)
               mt = TCMerger::innerType;
             else
@@ -2584,7 +2586,7 @@ namespace Belle2 {
             t = _tsfboards[tid];
           if (!t) {
             const string name = "CDCTSFBoard" + TRGUtil::itostring(tid);
-            TSFinder::boardType tt = TSFinder::unknown;
+            TSFinder::boardType tt;
             if (_wires[wid]->superLayerId() == 0)
               tt = TSFinder::innerType;
             else
@@ -2762,7 +2764,7 @@ namespace Belle2 {
       t_rootCDCHitInformation[2] = hitWiresFromCDC[iHit][2];
       t_rootCDCHitInformation[3] = hitWiresFromCDC[iHit][3];
       t_rootCDCHitInformation[4] = hitWiresFromCDC[iHit][4];
-      new(rootCDCHitInformation[iHit]) TVectorD(t_rootCDCHitInformation);
+      new (rootCDCHitInformation[iHit]) TVectorD(t_rootCDCHitInformation);
     } // End of hit loop
   }
 
@@ -2776,7 +2778,7 @@ namespace Belle2 {
       t_rootTRGHitInformation[1] = hitWiresFromTRG[iHit][1];
       t_rootTRGHitInformation[2] = hitWiresFromTRG[iHit][2];
       t_rootTRGHitInformation[3] = hitWiresFromTRG[iHit][3];
-      new(rootTRGHitInformation[iHit]) TVectorD(t_rootTRGHitInformation);
+      new (rootTRGHitInformation[iHit]) TVectorD(t_rootTRGHitInformation);
     } // End of hit loop
   }
 
@@ -2787,7 +2789,7 @@ namespace Belle2 {
     for (unsigned iWindow = 0; iWindow < trgInformations.size(); iWindow++) {
       TObjString t_rootTRGRawInformation;
       t_rootTRGRawInformation.SetString(trgInformations[iWindow].c_str());
-      new(rootTRGRawInformation[iWindow]) TObjString(t_rootTRGRawInformation);
+      new (rootTRGRawInformation[iWindow]) TObjString(t_rootTRGRawInformation);
     } // End of hit loop
   }
 

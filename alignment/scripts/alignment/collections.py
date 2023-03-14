@@ -145,7 +145,6 @@ def cosmicTracks(name="cosmicTracks",
         path,
         pruneTracks=False,
         skipGeometryAdding=True,
-        data_taking_period='early_phase3',
         merge_tracks=True,
         add_muid_hits=klm
     )

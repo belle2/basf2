@@ -1,0 +1,41 @@
+# EventType: 1146060000
+# Descriptor: [B0 -> D- D+ ]cc
+# NickName: Bd_D-_D+
+# Documentation: One of the neutral B decays needed for flavorTag validation and B lifetime studies on data
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Yoshiyuki Onuki
+# Email:  onuki@hep.phys.s.u-tokyo.ac.jp 
+# Cuts: None
+# Date: 20210511
+
+Alias K_S0sig K_S0
+
+Decay Upsilon(4S)
+1.000    B0sig anti-B0sig B0  anti-B0  VSS_BMIX dm;
+Enddecay
+
+# decay w/o CP violation
+#Decay B0sig
+#1.000    D-sig  D+sig  PHSP;
+#Enddecay
+
+# decay w/ CP violation
+Decay B0sig
+1.000    D-sig  D+sig  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;;
+Enddecay
+
+CDecay anti-B0sig
+
+Decay D-sig
+0.333    K_S0sig  pi-        PHSP;
+0.333    K+       pi-   pi-  D_DALITZ;
+0.333    K_S0sig  pi-   pi-  pi+     PHSP;
+Enddecay
+CDecay D+sig
+
+Decay K_S0sig
+1.000    pi- pi+ PHSP;
+Enddecay
+
+End

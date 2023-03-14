@@ -22,7 +22,7 @@ from ROOT import gSystem
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm
 from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SequentialBoundaries
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import reconstruction as recon
 from random import seed
 
@@ -31,7 +31,7 @@ ROOT.gROOT.SetBatch(True)
 
 settings = CalibrationSettings(
     name="CDC dedx",
-    expert_username="jikumar",
+    expert_username="renu",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib"],
@@ -44,13 +44,13 @@ settings = CalibrationSettings(
         "adjustment": 1.00798},
     input_data_filters={
         "bhabha_all_calib": [
-            input_data_filters['Run Type']['physics'],
-            input_data_filters['Data Tag']['bhabha_all_calib'],
-            input_data_filters['Data Quality Tag']['Good Or Recoverable'],
-            input_data_filters['Magnet']['On'],
-            input_data_filters['Beam Energy']['4S'],
-            input_data_filters['Beam Energy']['Continuum'],
-            input_data_filters['Beam Energy']['Scan']]},
+            INPUT_DATA_FILTERS['Run Type']['physics'],
+            INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib'],
+            INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable'],
+            INPUT_DATA_FILTERS['Magnet']['On'],
+            INPUT_DATA_FILTERS['Beam Energy']['4S'],
+            INPUT_DATA_FILTERS['Beam Energy']['Continuum'],
+            INPUT_DATA_FILTERS['Beam Energy']['Scan']]},
     depends_on=[])
 
 
@@ -224,7 +224,7 @@ def get_calibrations(input_data, **kwargs):
     Calibration_CC.depends_on(Calibration_RGPre)
     if expert_config["payload_boundaries"] is not None:
         Calibration_CC.strategies = SequentialBoundaries
-        basf2.B2INFO(f"Calibration_CC: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        basf2.B2INFO("Calibration_CC: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
         Calibration_CC.algorithms[0].params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
     else:
         Calibration_CC.algorithms[0].params = {"apply_iov": output_iov}
@@ -268,7 +268,7 @@ def get_calibrations(input_data, **kwargs):
     Calibration_WG.depends_on(Calibration_CC)
     if expert_config["payload_boundaries"] is not None:
         Calibration_WG.strategies = SequentialBoundaries
-        basf2.B2INFO(f"Calibration_WG: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        basf2.B2INFO("Calibration_WG: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
         Calibration_WG.algorithms[0].params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
     else:
         Calibration_WG.algorithms[0].params = {"apply_iov": output_iov}

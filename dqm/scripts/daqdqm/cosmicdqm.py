@@ -13,7 +13,7 @@
 from daqdqm.commondqm import add_common_dqm
 
 
-def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care"):
+def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
     """
     This function adds DQMs for CRT
 
@@ -32,15 +32,25 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+    @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
+                                         Should be True only when running on the HLT servers
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
 
     add_common_dqm(path, components=components, dqm_environment=dqm_environment,
-                   dqm_mode=dqm_mode)
+                   dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
             # need to be behind add_common_dqm as intercepts are calculated there
             # disable d0 and z0 cut for cosmics
-            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=-9999)
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=9999)
+
+    # KLM2 (requires mu+ particle list from add_analysis_dqm)
+    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:all',
+                        MinimalMatchingDigits=12,
+                        MinimalMatchingDigitsOuterLayers=0,
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")

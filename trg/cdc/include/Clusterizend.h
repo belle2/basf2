@@ -34,7 +34,7 @@ namespace Belle2 {
       setParams(3);
       initClCellsNew();
     }
-    SimpleCluster(cell_index entry)
+    explicit SimpleCluster(cell_index entry)
     {
       setParams(3);
       initClCellsNew();
@@ -113,9 +113,8 @@ namespace Belle2 {
     {
     }
     virtual ~Clusterizend() {}
-    Clusterizend(clusterer_params params)
+    explicit Clusterizend(const clusterer_params& params): m_params(params)
     {
-      m_params = params;
     }
 
     clusterer_params getParams()
@@ -191,7 +190,7 @@ namespace Belle2 {
     std::vector<ushort> m_valmax;
     ushort m_dimsize;
     boost::array<c3index, 3> m_c3shape =  {{ 40, 384, 9 }};
-    c3array* m_houghVals;
+    c3array* m_houghVals{0};
     c3array m_houghVisit = c3array(m_c3shape);
   };
 }

@@ -92,6 +92,13 @@ def get_argument_parser():
         help="Overwrite scripts in ``skim/validation/``.",
     )
 
+    parser.add_argument(
+        "--add-analysis-globaltag",
+        action="store_true",
+        help="If flag passed, the default analysis globaltag will be passed "
+             "to the skim constructor."
+    )
+
     return parser
 
 
@@ -204,6 +211,7 @@ def main():
             module=Registry.get_skim_module(skim),
             contact=get_contact(skim),
             output=get_output_validation_files(skim),
+            add_analysis_globaltag=args.add_analysis_globaltag
         )
 
         output(CodeString, directory=directory, skim=skim)

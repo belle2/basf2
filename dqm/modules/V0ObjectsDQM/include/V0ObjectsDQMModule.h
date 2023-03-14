@@ -21,15 +21,32 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Constructor.
+     */
     V0ObjectsDQMModule();
 
-  private:
-
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;;
 
+    /**
+     * Definition of the histograms.
+     */
     void defineHisto() override final;
+
+  private:
 
     /** x vs. y in slices of z */
     TH2F* m_h_xvsy[32] = {nullptr};

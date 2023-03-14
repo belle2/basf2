@@ -7,13 +7,14 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 PyConfig.StartGuiThread = False  # noqa
 
 import basf2
 from argparse import ArgumentParser
-from root_pandas import read_root
+import uproot
 import pandas as pd
 import numpy as np
 
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     choices = ["list", "categorized"]
     try:
         from tabulate import tabulate
-        choices += ['jira', 'grid', 'stash']
+        choices += ['github', 'gitlab', 'grid']
     except ImportError:
         pass
 
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
         basf2.process(path)
 
-    df = read_root(args.output)
+    df = uproot.open(args.output)["software_trigger_results"].arrays(library="pd")
 
     # Make sure to cope with strings rather than bools (which is a bit strange in pandas)
     df[["accept_or_reject", "prescaled", "cut"]] = df[["accept_or_reject", "prescaled", "cut"]].astype("str")
@@ -135,6 +136,7 @@ if __name__ == "__main__":
             local_print_function("QED / Control Samples", filter_categories.QED),
             local_print_function("Level 1 Passthrough ", filter_categories.LEVEL1),
             local_print_function("Prescaled Vetoes", filter_categories.VETOES),
+            local_print_function("Obsolete", filter_categories.OBSOLETE),
             local_print_function("Skims", [index for index in df_print.index if index.startswith("skim ")]),
         ])
 
@@ -144,9 +146,7 @@ if __name__ == "__main__":
 
         print(df_sorted)
 
-    elif args.format == "jira":
-        print(tabulate(df_print, tablefmt="jira", showindex=True, headers="keys"))
-    elif args.format == "stash":
-        print(tabulate(df_print, tablefmt="pipe", showindex=True, headers="keys"))
     elif args.format == "grid":
         print(tabulate(df_print, tablefmt="grid", showindex=True, headers="keys"))
+    elif args.format in ["github", "gitlab"]:
+        print(tabulate(df_print, tablefmt="github", showindex=True, headers="keys"))

@@ -33,7 +33,7 @@ EventSampler::EventSampler(vector<string> nodes, int port, string rbufname, int 
     }
     fflush(stdout);
   }
-  printf("EventSampler : init : socklist = %d\n", m_socklist.size());
+  printf("EventSampler : init : socklist = %lu\n", m_socklist.size());
   fflush(stdout);
 }
 
@@ -68,7 +68,7 @@ int EventSampler::server()
         return -1;
       }
       // Put the message in ring buffer. If full, just skip the event.
-      int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+      m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
       delete msg;
       nsample++;
       if (nsample % 1000 == 0)

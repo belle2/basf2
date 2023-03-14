@@ -6,7 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own header.
 #include <analysis/variables/BelleVariables.h>
+
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/variables/Variables.h>
@@ -32,25 +36,25 @@
 
 namespace Belle2 {
   namespace Variable {
-    double goodBelleKshort(const Particle* KS)
+    bool goodBelleKshort(const Particle* KS)
     {
       // check input
       if (KS->getNDaughters() != 2) {
         B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
-        return 0.0;
+        return false;
       }
       const Particle* d0 = KS->getDaughter(0);
       const Particle* d1 = KS->getDaughter(1);
       if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
         B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
-        return 0.0;
+        return false;
       }
       if (abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
         B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
 
       // If goodKs exists, return the value
       if (KS->hasExtraInfo("goodKs")) {
-        return KS->getExtraInfo("goodKs");
+        return bool(KS->getExtraInfo("goodKs"));
       }
 
       // Belle selection
@@ -67,9 +71,9 @@ namespace Belle2 {
       bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
 
       if (low || mid || high) {
-        return 1.0;
+        return true;
       } else
-        return 0.0;
+        return false;
     }
 
 
@@ -129,12 +133,12 @@ namespace Belle2 {
       return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
-    double goodBelleGamma(const Particle* particle)
+    bool goodBelleGamma(const Particle* particle)
     {
       double energy = eclClusterE(particle);
       int region = eclClusterDetectionRegion(particle);
 
-      return (double) isGoodBelleGamma(region, energy);
+      return isGoodBelleGamma(region, energy);
     }
 
     BelleTrkExtra* getBelleTrkExtraInfoFromParticle(Particle const* particle)
@@ -234,29 +238,115 @@ namespace Belle2 {
       return (invMass - nomMass) / sqrt(massErrSquared);
     }
 
+    double BelleTof(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTof();
+    }
+
+    double BelleTofQuality(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTofQuality();
+    }
+
+    double BelleTofSigma(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTofSigma();
+    }
+
+    double BellePathLength(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getPathLength();
+    }
+
+    double BelledEdx(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getdEdx();
+    }
+
+    double BelledEdxQuality(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getdEdxQuality();
+    }
+
+    double BelleACCnPe(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getACCPe();
+    }
+
+    double BelleACCQuality(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getACCQuality();
+    }
+
+
+
     VARIABLE_GROUP("Belle Variables");
 
     REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, R"DOC(
-[Legacy] GoodKs Returns 1.0 if a :math:`K_{S}^0\to\pi\pi` candidate passes the Belle algorithm: 
+[Legacy] GoodKs Returns true if a :math:`K_{S}^0\to\pi\pi` candidate passes the Belle algorithm: 
 a momentum-binned selection including requirements on impact parameter of, and
 angle between the daughter pions as well as separation from the vertex and 
 flight distance in the transverse plane.
+
+.. seealso:: `BELLE2-NOTE-PH-2018-017 <https://docs.belle2.org/record/957>`_
 )DOC");
 
     REGISTER_VARIABLE("goodBelleLambda", goodBelleLambda, R"DOC(
 [Legacy] Returns 2.0, 1.0, 0.0 as an indication of goodness of :math:`\Lambda^0` candidates, 
 based on:
 
-    * The distance of the two daughter tracks at their interception at z axis,
-    * the minimum distance of the daughter tracks and the IP in xy plane,
-    * the difference of the azimuthal angle of the vertex vector and the momentum vector,
-    * and the flight distance of the Lambda0 candidates in xy plane.
+* The distance of the two daughter tracks at their interception at z axis,
+* the minimum distance of the daughter tracks and the IP in xy plane,
+* the difference of the azimuthal angle of the vertex vector and the momentum vector,
+* and the flight distance of the Lambda0 candidates in xy plane.
 
 It reproduces the ``goodLambda()`` function in Belle.
 
-``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
-and ``goodBelleLambda`` selecton 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
-The former cut is looser than the latter.". 
+``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) maximizes the signal significance after applying
+``atcPIDBelle(4,2) > 0.6``, while ``goodBelleLambda`` selection 2 (``goodBelleLambda>1``) is tighter and maximizes the signal
+significance of a :math:`\Lambda^0` sample without any proton PID cut. However, it might still be beneficial to apply a proton PID
+cut on top of it. Which combination of proton PID cut and ``goodBelleLambda`` selection scenario is ideal, is probably
+analysis-dependent.
 
 .. warning:: ``goodBelleLambda`` is not optimized or tested on Belle II data.
 
@@ -269,39 +359,92 @@ See Also:
 )DOC");
 
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
-[Legacy] Returns 1.0 if photon candidate passes simple region dependent
-energy selection for Belle data and MC (50/100/150 MeV).
+[Legacy] Returns 1.0 if the photon candidate passes the simple region dependent
+energy selection for Belle data and MC.
+
+.. math::
+
+    E > 50 \textrm{ MeV; barrel}\\
+    E > 100 \textrm{ MeV; forward endcap}\\
+    E > 150 \textrm{ MeV; backward endcap}
 )DOC");
 
     REGISTER_VARIABLE("BelleFirstCDCHitX", BelleFirstCDCHitX, R"DOC(
 [Legacy] Returns x component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
-)DOC");
+
+)DOC","cm");
 
     REGISTER_VARIABLE("BelleFirstCDCHitY", BelleFirstCDCHitY, R"DOC(
 [Legacy] Returns y component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
-)DOC");
+
+)DOC","cm");
 
     REGISTER_VARIABLE("BelleFirstCDCHitZ", BelleFirstCDCHitZ, R"DOC(
 [Legacy] Returns z component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
-)DOC");
+
+)DOC","cm");
 
     REGISTER_VARIABLE("BelleLastCDCHitX", BelleLastCDCHitX, R"DOC(
 [Legacy] Returns x component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
-)DOC");
+
+)DOC","cm");
 
     REGISTER_VARIABLE("BelleLastCDCHitY", BelleLastCDCHitY, R"DOC(
 [Legacy] Returns y component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
-)DOC");
+
+)DOC","cm");
 
     REGISTER_VARIABLE("BelleLastCDCHitZ", BelleLastCDCHitZ, R"DOC(
 [Legacy] Returns z component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
-)DOC");
+
+)DOC","cm");
 
     REGISTER_VARIABLE("BellePi0SigM", BellePi0InvariantMassSignificance, R"DOC(
-      [Legacy] Returns the significance of the pi0 mass used in the FEI for B2BII.
-      The significance is calculated as the difference between the reconstructed and the nominal mass divided by the mass uncertainty.
-      Since the pi0's covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
+[Legacy] Returns the significance of the :math:`\pi^0` mass used in the FEI for B2BII.
+The significance is calculated as the difference between the reconstructed and the nominal mass divided by the mass uncertainty:
+
+.. math::
+      \frac{m_{\gamma\gamma} - m_{\pi^0}^\textrm{PDG}}{\sigma_{m_{\gamma\gamma}}}
+
+Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
       )DOC");
+
+    REGISTER_VARIABLE("BelleTof", BelleTof, R"DOC(
+[Legacy] Returns the time of flight of a track. (Belle only).
+
+)DOC", "ns");
+
+    REGISTER_VARIABLE("BelleTofQuality", BelleTofQuality, R"DOC(
+[Legacy] Returns the quality flag of the time of flight of a track. Original description from the panther table:  0 if consistency between z of hit by charge Q and corrected times, 1 if zhit from Q NOT consistent with zhit from and correct times. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleTofSigma", BelleTofSigma, R"DOC(
+[Legacy] Returns the expected resolution on the time of flight of a track. (Belle only).
+
+)DOC", "ns");
+
+    REGISTER_VARIABLE("BellePathLength", BellePathLength, R"DOC(
+[Legacy] Returns the track path length. This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
+
+)DOC", "cm");
+
+    REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
+[Legacy] Returns the dE/dx measured in the CDC. (Belle only).
+
+)DOC", "keV/cm");
+
+    REGISTER_VARIABLE("BelledEdxQuality", BelledEdxQuality, R"DOC(
+[Legacy] Returns the quality flag of the dE/dx measured in the CDC. Sadly no information about the code meaning is given in the original panther tables. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleACCnPe", BelleACCnPe, R"DOC(
+[Legacy] Returns the number of photo-electrons associated to the track in the ACC. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleACCQuality", BelleACCQuality, R"DOC(
+[Legacy] Returns the ACC quality flag. Original definition in the panther tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
+)DOC");
+
 
     // this is defined in ECLVariables.{h,cc}
     REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(

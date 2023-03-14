@@ -84,6 +84,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set max. allowed space resolution
+     */
+    void setMaxSpaceResol(float sigma)
+    {
+      m_maxSpaceResol = sigma;
+    }
+
+    /**
      * Set sigma parameters for the specified id. (=bin)
      */
     void setSigmaParams(const SigmaID sigmaID, const std::vector<float>& params)
@@ -190,6 +198,14 @@ namespace Belle2 {
     unsigned short getSigmaParamMode() const
     {
       return m_sigmaParamMode;
+    }
+
+    /**
+     * Get max. allowed space resolution
+     */
+    float getMaxSpaceResol() const
+    {
+      return m_maxSpaceResol;
     }
 
     /**
@@ -353,6 +369,8 @@ namespace Belle2 {
 
         fout << m_sigmaParamMode << "  " << m_nSigmaParams << std::endl;
 
+        fout << m_maxSpaceResol << std::endl;
+
         for (unsigned short iT = 0; iT < nThetaBins; ++iT) {
           for (unsigned short iA = 0; iA < nAlphaBins; ++iA) {
             for (unsigned short iCL = 0; iCL < c_nSLayers; ++iCL) {
@@ -376,12 +394,17 @@ namespace Belle2 {
   private:
     unsigned short m_sigmaParamMode;    /*!< Mode for sigma parameterization */
     unsigned short m_nSigmaParams;      /*!< no. of sigma parameters per bin */
+    float m_maxSpaceResol = 0.07;    /*!< max. space resol (cm) allowed */
     std::vector<array3> m_alphaBins; /*!< alpha bins for sigma (rad) */
     std::vector<array3> m_thetaBins; /*!< theta bins for sigma (rad) */
     std::map<SigmaID, std::vector<float>>
                                        m_sigmas;    /*!< Sigma coefficients for each layer, Left/Right, entrance angle and polar angle.  */
 
-    ClassDef(CDCSpaceResols, 1); /**< ClassDef */
+    ClassDef(CDCSpaceResols, 2); /**< ClassDef */
+    // Version histroy:
+    // v1: original.
+    // v2: added m_maxSpaceResol and related functions.
+    //     m_maxSpaceResol for an object with ver=1 is set in linkdef.h.
   };
 
 } // end namespace Belle2

@@ -21,23 +21,23 @@ import argparse
 import requests
 import getpass
 import readline  # wraps `input()` to have gnu readline functionality
-import terminal_utils
+from terminal_utils import InputEditor, ANSIColors
 from conditions_db import ConditionsDB
 
 
 def ask_new(data):
     """Request information in case of new payload classes"""
 
-    data['task'] = 'master'
+    data['task'] = 'main'
     data['request'] = 'New'
-    if input('\nIs the code for the new payload already in the master branch (y/n) [n]? ').lower() in ['n', '']:
+    if input('\nIs the code for the new payload already in the main branch (y/n) [n]? ').lower() in ['n', '']:
         data['pull-request'] = input('\nPlease give the number of the pull request that contains the new payload classes: ')
 
 
 def ask_modify(data):
     """Request information in case of modified payload classes"""
 
-    data['task'] = 'master'
+    data['task'] = 'main'
     data['request'] = 'Modification'
     data['pull-request'] = input('\nPlease give the number of the pull request that contains the modified payload classes: ')
     data['backward-compatibility'] = input('\nWhat happens if the old payload is encountered by the updated code? ')
@@ -55,7 +55,7 @@ def get_argument_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('--task', type=str, default=None,
-                        choices=['master', 'new', 'modify', 'validation', 'online', 'prompt', 'data', 'mc', 'analysis'],
+                        choices=['main', 'new', 'modify', 'validation', 'online', 'prompt', 'data', 'mc', 'analysis'],
                         help="""Type of global tag that should be updated.
                                 Use new/modify if the request contains new/modified payload classes.""")
     normalize_group = parser.add_mutually_exclusive_group()
@@ -132,19 +132,19 @@ if __name__ == "__main__":
     else:
         if input('\nDoes the request contain new or modified payloads classes (y/n) [n]? ').lower() in ['n', '']:
             data['request'] = 'Update'
-            print('\nFor which type of global tags is the request, mas[t]er, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
+            print('\nFor which type of global tags is the request, ma[i]n, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
             while True:
-                task = input('t/o/p/d/m/a: ').lower()
-                if task in ['t', 'v', 'o', 'p', 'd', 'm', 'a']:
+                task = input('i/o/p/d/m/a: ').lower()
+                if task in ['i', 'v', 'o', 'p', 'd', 'm', 'a']:
                     break
-            data['task'] = {'t': 'master', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
+            data['task'] = {'i': 'main', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
         else:
             if input('\nDo payloads of the given names already exist, but the class definition has changed (y/n) [n]? ').lower() in ['n', '']:
                 ask_new(data)
             else:
                 ask_modify(data)
-            # if there are new or modified payloads they first have to go to master
-            data['task'] = 'master'
+            # if there are new or modified payloads they first have to go to main
+            data['task'] = 'main'
 
     # release and reason
     data['release'] = args.release or input('\nThe new payloads require at least the following software release: ')
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     else:
         # For this multiline input, offer option to use temporary editor
         if input(f"\nUse editor (e) or command line (c) for entering detailed instructions for the global tag manager? [e] ").lower() != "c":
-            input_editor = terminal_utils.InputEditor(commentlines_start_with="#")
+            input_editor = InputEditor(commentlines_start_with="#")
             # define initial comment for the temporary input file to guide the user
             editor_help_comment = (
                 "\n# Enter detailed instructions for the global tag manager.\n"
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     if data['task'] == 'online':
         # For this multiline input, offer option to use temporary editor
         if input(f"\nUse editor (e) or command line (c) for entering detailed information about the impact of this online globaltag update request on the data taking conditions or the relevant changes to monitor on DQM histograms? [e] ").lower() != "c":
-            input_editor = terminal_utils.InputEditor(commentlines_start_with="#")
+            input_editor = InputEditor(commentlines_start_with="#")
             # define initial comment for the temporary input file to guide the user
             editor_help_comment = (
                 "\n# Enter detailed information about the impact of this online globaltag update request "
@@ -197,21 +197,24 @@ if __name__ == "__main__":
             data['data_taking'] = sys.stdin.readlines()
 
     # issue and time
-    data['issue'] = args.issue
-    if not args.confirm:
-        data['issue'] = input('\nIdentifier of existing jira issue, leave empty to take default: ')
+    if data['task'] == 'main':
+        if args.issue is not None:
+            print(f'\n{ANSIColors.fg("red")}You requested an update of the main globaltag, but you passed an existing jira issue ({args.issue}): this will be ignored and a new issue will be created and automatically assigned to the TUPPR manager{ANSIColors.reset()}')
+        data['issue'] = None
+    else:
+        data['issue'] = args.issue or input('\nIdentifier of existing jira issue, leave empty to take default: ')
     data['time'] = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
 
     # summarize request and ask for confirmation
     if not args.confirm:
-        master_info = ""
+        main_info = ""
         if data['request'] != 'Update':
-            master_info = f"  -> {data['request']}: "
-            master_info += f"PR #{data['pull-request']}" if 'pull-request' in data.keys() else "already in master"
+            main_info = f"  -> {data['request']}: "
+            main_info += f"PR #{data['pull-request']}" if 'pull-request' in data.keys() else "already in main"
         print(f"""\nSUMMARY:
 Payloads file       : {payloadsFile}
 Normalize payloads  : {normalize}
-Type of global tag  : {data['task']}{master_info}
+Type of global tag  : {data['task']}{main_info}
 Required release    : {data['release']}
 Request reason      : {data['reason']}
 Details:""")

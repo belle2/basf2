@@ -10,12 +10,11 @@
 ##########################################################################
 
 import basf2
+import basf2_mva
 import unittest
 import unittest.mock
+import b2test_utils
 import os
-import tempfile
-import atexit
-import shutil
 import ROOT
 
 import b2bii
@@ -25,7 +24,6 @@ from fei.config import Particle
 
 import numpy as np
 
-import basf2_mva
 import pdg
 
 # @cond
@@ -40,7 +38,7 @@ pybasf2.Path.__eq__ = lambda a, b: all(x == y for x, y in zip(a.modules(), b.mod
 
 def print_path(a, b):
     """
-    Print the parts of the pathes which are different
+    Print the parts of the paths which are different
     """
     for x, y in zip(a.modules(), b.modules()):
         if x.type() != y.type():
@@ -1216,14 +1214,8 @@ class TestGetPath(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # We have to call basf2_mva once, so that ROOT can load the dictionaries
-    # otherwise it will try to load them later after we changed the directory and it will fail to do so
-    basf2_mva.loadRootDictionary()
-    tempdir = tempfile.mkdtemp()
-    os.chdir(tempdir)
-    basf2.conditions.testing_payloads = ['localdb/database.txt']
-    # main() never returns, so install exit handler to do our cleanup
-    atexit.register(shutil.rmtree, tempdir)
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        basf2.conditions.testing_payloads = ['localdb/database.txt']
+        unittest.main()
 
 # @endcond

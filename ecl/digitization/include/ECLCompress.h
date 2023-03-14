@@ -132,7 +132,13 @@ namespace Belle2 {
      */
     class ECLDeltaCompress: public ECLCompress {
     public:
+      /**
+       * function to compress the ECL waveform with the DELTA algorithm
+       */
       void compress(BitStream& out, const int* adc) override;
+      /**
+       * function to decompress the ECL waveform with the DELTA algorithm
+       */
       void uncompress(BitStream& out, int* adc) override;
     };
 
@@ -144,11 +150,18 @@ namespace Belle2 {
       /** Constructor for DCT based compression algorithm
        *  @param scale scale factor for quantization.
        *  @param c0 average waveform amplitude.
+       *  @param w
        *  @w DCT coefficient probability density based bit widths for quantized coefficients
        */
       ECLDCTCompress(double scale, double c0, width_t* w);
+      /**
+       * function to compress
+       */
       void compress(BitStream& out, const int* adc) override;
-      void uncompress(BitStream& out, int* adc) override;
+      /**
+       * function to decompress
+       */
+      void uncompress(BitStream& in, int* adc) override;
     protected:
       const double m_scale; /**< Scale factor for quantization. */
       const double m_c0; /**< Average waveform amplitude */

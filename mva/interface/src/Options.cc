@@ -28,6 +28,8 @@ namespace Belle2 {
       ("target_variable", po::value<std::string>(&m_target_variable),
        "target variable used to distinguish between signal and background, isSignal is used as default.")
       ("signal_class", po::value<int>(&m_signal_class), "integer which identifies signal events")
+      ("nClasses", po::value<unsigned int>(&m_nClasses),
+       "number of classes under consideration. Must be supplied for multiclass classifications. Not all methods support multiclass classification.")
       ("weight_variable", po::value<std::string>(&m_weight_variable), "weight variable used to weight each event")
       ("max_events", po::value<unsigned int>(&m_max_events), "maximum number of events to process, 0 means all")
       ("method", po::value<std::string>(&m_method)->required(),
@@ -44,6 +46,7 @@ namespace Belle2 {
       m_weight_variable = pt.get<std::string>("weight_variable");
       m_signal_class = pt.get<int>("signal_class");
       m_max_events = pt.get<unsigned int>("max_events", 0u);
+      m_nClasses = pt.get<unsigned int>("nClasses", 2u);
 
       unsigned int numberOfFiles = pt.get<unsigned int>("number_data_files", 0);
       m_datafiles.resize(numberOfFiles);
@@ -73,6 +76,7 @@ namespace Belle2 {
       pt.put("weight_variable", m_weight_variable);
       pt.put("signal_class", m_signal_class);
       pt.put("max_events", m_max_events);
+      pt.put("nClasses", m_nClasses);
 
       pt.put("number_feature_variables", m_variables.size());
       for (unsigned int i = 0; i < m_variables.size(); ++i) {
@@ -100,11 +104,11 @@ namespace Belle2 {
        "Monte carlo files containing the discriminant variable with the mc truth")
       ("splot_combined", po::value<bool>(&m_splot_combined), "Combine sPlot training with PDF classifier for discriminating variable")
       ("splot_boosted", po::value<bool>(&m_splot_boosted), "Use boosted sPlot training (aPlot)")
-      ("use_sideband_substraction", po::value<bool>(&m_use_sideband_substraction), "whether to do a sideband substraction training")
+      ("use_sideband_subtraction", po::value<bool>(&m_use_sideband_subtraction), "whether to do a sideband subtraction training")
       ("sideband_mc_files", po::value<std::vector<std::string>>(&m_sideband_mc_files)->multitoken(),
        "Monte carlo files used to estimate the number of events in the different regions. (Must contain the same signal / background distribution as is expected in data)")
       ("sideband_variable", po::value<std::string>(&m_sideband_variable),
-       "Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband substraction")
+       "Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband subtraction")
       ("use_reweighting", po::value<bool>(&m_use_reweighting), "whether to do a reweighting pre training")
       ("reweighting_variable", po::value<std::string>(&m_reweighting_variable),
        "Variable defining for which events the reweighting should be used (1) or not used (0). If empty the reweighting is applied to all events")
@@ -130,7 +134,7 @@ namespace Belle2 {
         m_splot_mc_files[i] = pt.get<std::string>(std::string("splot_mc_file") + std::to_string(i));
       }
 
-      m_use_sideband_substraction = pt.get<bool>("use_sideband_substraction");
+      m_use_sideband_subtraction = pt.get<bool>("use_sideband_subtraction");
       m_sideband_variable = pt.get<std::string>("sideband_variable");
 
       unsigned int sideband_number_of_mc_files = pt.get<unsigned int>("sideband_number_of_mc_files", 0);
@@ -169,7 +173,7 @@ namespace Belle2 {
         pt.put(std::string("splot_mc_file") + std::to_string(i), m_splot_mc_files[i]);
       }
 
-      pt.put("use_sideband_substraction", m_use_sideband_substraction);
+      pt.put("use_sideband_subtraction", m_use_sideband_subtraction);
       pt.put("sideband_variable", m_sideband_variable);
 
       pt.put("sideband_number_of_mc_files", m_sideband_mc_files.size());

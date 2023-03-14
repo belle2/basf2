@@ -25,7 +25,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(SVDClusterEvaluationTrueInfo)
+REG_MODULE(SVDClusterEvaluationTrueInfo);
 
 
 SVDClusterEvaluationTrueInfoModule::SVDClusterEvaluationTrueInfoModule() : Module()
@@ -170,25 +170,25 @@ void SVDClusterEvaluationTrueInfoModule::initialize()
     NameOfHisto = "histo_THinCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
                      i) + ")";
-    m_histo_THinCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
+    m_histo_THinCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0, 15, "number of TH per cluster",
                                                m_histoList_THinCluster);
 
     NameOfHisto = "histo_THinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_THinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per TM cluster",
+    m_histo_THinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0, 15, "number of TH per TM cluster",
                                                  m_histoList_THinClusterTM);
 
     NameOfHisto = "histo_GoodTHinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of Good True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_GoodTHinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per TM cluster",
+    m_histo_GoodTHinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0, 15, "number of Good TH per TM cluster",
                                                      m_histoList_GoodTHinClusterTM);
 
     NameOfHisto = "histo_GoodTHinClusterTMGood_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of Good True Hits inside a Good Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_GoodTHinClusterTMGood[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per Good TM cluster",
+    m_histo_GoodTHinClusterTMGood[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0, 15, "number of Good TH per Good TM cluster",
                                                          m_histoList_GoodTHinClusterTMGood);
   }
 
@@ -223,7 +223,7 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
   //loop on ShaperDigits
   for (const SVDShaperDigit& shape : SVDShaperDigits) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(shape.getSensorID().getLayerNumber() , shape.getSensorID().getSensorNumber() ,
+    indexForHistosAndGraphs = indexFromLayerSensorSide(shape.getSensorID().getLayerNumber(), shape.getSensorID().getSensorNumber(),
                                                        shape.isUStrip());
 
     RelationVector<SVDRecoDigit> relatVectorShaperToReco = DataStore::getRelationsWithObj<SVDRecoDigit>(&shape);
@@ -237,7 +237,7 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
   //loop on RecoDigits
   for (const SVDRecoDigit& reco : SVDRecoDigits) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(reco.getSensorID().getLayerNumber() , reco.getSensorID().getSensorNumber() ,
+    indexForHistosAndGraphs = indexFromLayerSensorSide(reco.getSensorID().getLayerNumber(), reco.getSensorID().getSensorNumber(),
                                                        reco.isUStrip());
 
     RelationVector<SVDTrueHit> relatVectorRecoToTH = DataStore::getRelationsWithObj<SVDTrueHit>(&reco);
@@ -257,7 +257,7 @@ void SVDClusterEvaluationTrueInfoModule::event()
   for (const SVDTrueHit& trhi : SVDTrueHits) {
 
     if (goodTrueHit(&trhi)) { //enter only if the TH is related to a primary and charged MC particle
-      indexForHistosAndGraphs = indexFromLayerSensorSide(trhi.getSensorID().getLayerNumber() , trhi.getSensorID().getSensorNumber() , 1);
+      indexForHistosAndGraphs = indexFromLayerSensorSide(trhi.getSensorID().getLayerNumber(), trhi.getSensorID().getSensorNumber(), 1);
 
       RelationVector<SVDCluster> relatVectorTHToClus = DataStore::getRelationsWithObj<SVDCluster>(&trhi);
 
@@ -269,8 +269,8 @@ void SVDClusterEvaluationTrueInfoModule::event()
       bool hasV = false;
 
       for (int j = 0; j < (int) relatVectorTHToClus.size(); j ++) {
-        indexForHistosAndGraphs = indexFromLayerSensorSide(relatVectorTHToClus[j]->getSensorID().getLayerNumber() ,
-                                                           relatVectorTHToClus[j]->getSensorID().getSensorNumber() , relatVectorTHToClus[j]->isUCluster());
+        indexForHistosAndGraphs = indexFromLayerSensorSide(relatVectorTHToClus[j]->getSensorID().getLayerNumber(),
+                                                           relatVectorTHToClus[j]->getSensorID().getSensorNumber(), relatVectorTHToClus[j]->isUCluster());
 
         if (relatVectorTHToClus[j]->isUCluster() && ! hasU) {
           m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
@@ -286,7 +286,7 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
   //loop on Clusters
   for (const SVDCluster& clus : SVDClusters) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(clus.getSensorID().getLayerNumber() , clus.getSensorID().getSensorNumber() ,
+    indexForHistosAndGraphs = indexFromLayerSensorSide(clus.getSensorID().getLayerNumber(), clus.getSensorID().getSensorNumber(),
                                                        clus.isUCluster());
 
     RelationVector<SVDTrueHit> relatVectorClusToTH = DataStore::getRelationsWithObj<SVDTrueHit>(&clus);
@@ -327,12 +327,12 @@ void SVDClusterEvaluationTrueInfoModule::event()
         m_histo_ClusterUPositionPull[indexForHistosAndGraphs / 2]->Fill((clus.getPosition((relatVectorClusToTH[q])->getV()) -
             (relatVectorClusToTH[q])->getU()) / (clus.getPositionSigma()));
         m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition((relatVectorClusToTH[q])->getV()) -
-                                                               (relatVectorClusToTH[q])->getU()) , (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
+                                                               (relatVectorClusToTH[q])->getU()), (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
       } else {
         m_histo_ClusterVPositionResolution[(indexForHistosAndGraphs - 1) / 2]->Fill(clus.getPosition() - (relatVectorClusToTH[q])->getV());
         m_histo_ClusterVPositionPull[(indexForHistosAndGraphs - 1) / 2]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()) /
             (clus.getPositionSigma()));
-        m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()) ,
+        m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()),
                                                               (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
       }
     }
@@ -711,7 +711,7 @@ void SVDClusterEvaluationTrueInfoModule::createEfficiencyGraph(const char* name,
   t->SetTextFont(72);
   TString labels[m_Nsets] = {"3U", "3V", "456FU", "456FV", "456BU", "456BV"};
   for (Int_t i = 0; i < m_Nsets; i++) {
-    xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
+    xAxis->SetBinLabel(xAxis->FindBin(i + 1), labels[i].Data());
   }
 
   if (list)
@@ -751,7 +751,7 @@ void SVDClusterEvaluationTrueInfoModule::createArbitraryGraphError_Std(const cha
   t->SetTextFont(72);
   TString labels[m_Nsets] = {"3U", "3V", "456FU", "456FV", "456BU", "456BV"};
   for (Int_t i = 0; i < m_Nsets; i++) {
-    xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
+    xAxis->SetBinLabel(xAxis->FindBin(i + 1), labels[i].Data());
   }
 
   if (list)
@@ -780,7 +780,7 @@ void SVDClusterEvaluationTrueInfoModule::createArbitraryGraphError_Red(const cha
   t->SetTextFont(72);
   TString labels[m_NsetsRed] = {"3", "456F", "456B"};
   for (Int_t i = 0; i < m_NsetsRed; i++) {
-    xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
+    xAxis->SetBinLabel(xAxis->FindBin(i + 1), labels[i].Data());
   }
 
   if (list)

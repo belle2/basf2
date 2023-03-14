@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::expert(filenames, datafiles, treename, outputfile, 0, 0, 0, copy_target);
+  Belle2::MVA::Utility::expert(filenames, datafiles, treename, outputfile, 0, 0, 0, copy_target);
   return 0;
 
 }

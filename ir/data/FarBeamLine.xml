@@ -25,23 +25,23 @@
 
       <!-- limits -->
 
-      <TubeR>
+      <!--TubeR>
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">373.45</sec>
          <sec name="Z1" unit="cm">830.00</sec>
          <sec name="Z2" unit="cm">830.00</sec>
-         <!--Z1 unit="cm">392.00</Z1>
-
-		<Z2 unit="cm">392.00</Z2-->
          <sec name="Z3" unit="m">29.00</sec>
          <sec name="R0" unit="cm">37.0</sec>
          <sec name="R1" unit="cm">65.0</sec>
          <sec name="R2" unit="cm">300</sec>
          <sec name="R3" unit="cm">300</sec>
-         <sec name="r0" unit="cm">0.0</sec>
-         <sec name="r1" unit="cm">0.0</sec>
-         <sec name="r2" unit="cm">0.0</sec>
-         <sec name="r3" unit="cm">0.0</sec>
+      </TubeR-->
+      <TubeR>
+         <N desc="Number of planes">2</N>
+         <sec name="Z0" unit="cm">373.45</sec>
+         <sec name="Z1" unit="cm">830.00</sec>
+         <sec name="R0" unit="cm">300</sec>
+         <sec name="R1" unit="cm">300</sec>
       </TubeR>
       <TubeL>
          <N desc="Number of planes">4</N>
@@ -81,7 +81,7 @@
          <sec name="r" unit="cm">4.0</sec>
 	 <Material>Cu</Material>
          <Desc>Right HER far beam pipe straight part 2</Desc>
-         <Intersect>TubeR</Intersect>
+         <!--Intersect>TubeR</Intersect-->
       </Straight>
       <Straight type="pipe" name="LLR1">
          <sec name="X0" unit="m">0.0</sec>
@@ -133,7 +133,18 @@
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Right LER far beam pipe straight part 5</Desc>
-         <Intersect>TubeR</Intersect>
+         <!--Intersect>TubeR</Intersect-->
+      </Straight>
+      <Straight type="pipe" name="LLR6">
+         <sec name="X0" unit="m">-0.999</sec>
+         <sec name="Z0" unit="m">32.376</sec>
+         <sec name="L" unit="m">2.042</sec>
+         <sec name="PHI" unit="rad">-0.1198</sec>
+         <sec name="R" unit="cm">4.4</sec>
+         <sec name="r" unit="cm">4.0</sec>
+         <Material>Cu</Material>
+         <Desc>Right LER far beam pipe straight part 6</Desc>
+         <!--Intersect>TubeR</Intersect-->
       </Straight>
       <Straight type="pipe" name="LHL1">
          <sec name="X0" unit="m">0.0</sec>
@@ -149,9 +160,9 @@
       <Straight type="pipe" name="LHL2">
          <sec name="X0" unit="m">-0.449</sec>
          <sec name="Z0" unit="m">-11.098</sec>
-	 <!-- use shorter than actual length to fit inside +-29m -->
-	 <!-- <sec name="L" unit="m">24.980</sec> -->
-         <sec name="L" unit="m">14.980</sec>
+	 <!-- use shorter than actual length to fit inside +-30m -->
+	 <!--sec name="L" unit="m">24.980</sec-->
+	 <sec name="L" unit="m">18.980</sec>
          <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
@@ -204,15 +215,13 @@
       <Straight type="pipe" name="LLL5">
          <sec name="X0" unit="m">1.661</sec>
          <sec name="Z0" unit="m">-26.279</sec>
-	 <!-- use shorter than actual length to fit inside +-29m -->
-	 <!-- <sec name="L" unit="m">3.524</sec> -->
-	 <sec name="L" unit="m">2.524</sec>
+	 <sec name="L" unit="m">3.524</sec>
          <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left LER far beam pipe straight part 5</Desc>
-         <Intersect>TubeL</Intersect>
+         <!--Intersect>TubeL</Intersect-->
       </Straight>
 
       <!-- bending parts: pipes and magnets -->
@@ -1556,81 +1565,2155 @@
          <Desc>Magnet SLYTLP.1 yoke</Desc>
       </Straight>
 
+      <!-- magnets' mounts -->
+
+      <Shield name="BC1REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.564421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">14.3124</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC1RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC2REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.690421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">17.8594</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC2RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC3REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.876421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">23.0814</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC3RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC4REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.980421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">26.0004</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC4RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC1LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.570421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-14.4934</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC1LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC2LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.690421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-17.8604</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC2LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC3LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.872421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-22.9824</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC3LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC4LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.983421</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-26.1014</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC4LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKAREmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">100</sec>
+         <sec name="X0" unit="m">0.176136</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">4.26785</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">80</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKARE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC2REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.25316</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">6.11977</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC2RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKBREmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.282136</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">6.82085</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKBRE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKCREmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.473118</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">11.7729</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKCRE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC3REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.498138</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">12.4748</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC3RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC5REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.715138</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">18.5618</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC5RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC6REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.847138</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">22.2798</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC6RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC7REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.00514</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">26.7018</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC7RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="SLYTRE.2mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.03967</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">27.6818</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>SLYTRE.2 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLY2RE.2mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.07822</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">28.7609</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLY2RE.2 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKARPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.194892</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">4.79686</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-0.04008</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKARP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKBRPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.332522</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">11.229</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKBRP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC1RPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.326188</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">13.276</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC1RP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKCRPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.324522</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">14.034</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKCRP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC2RPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.310188</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">19.057</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC2RP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKDRPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.308522</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">19.806</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKDRP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKERPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.467055</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">25.4657</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKERP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC3RPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.534069</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">26.6125</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC3RP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="SLYTRP.2mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.584762</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">27.4697</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
+         <Material>SUS316L</Material>
+         <Desc>SLYTRP.2 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKALEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">100</sec>
+         <sec name="X0" unit="m">-0.191128</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">-4.61285</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">80</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKALE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC2LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.253148</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">-6.11977</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC2LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKBLEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.282128</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">-6.82185</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKBLE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKCLEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.473119</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-11.7739</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKCLE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC3LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.498139</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-12.4758</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC3LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC4LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.715139</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-18.5618</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC4LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC5LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.847139</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-22.2808</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC5LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC7LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-1.00814</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-26.8028</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC7LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="SLYTLE.1mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-1.04367</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-27.7828</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>SLYTLE.1 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLY1LE.1mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-1.08222</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-28.8619</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLY1LE.1 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKALPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">100</sec>
+         <sec name="X0" unit="m">0.203324</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">-4.79684</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">80</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.09900</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKALP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKBLPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.569283</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-10.4885</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKBLP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC1LPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.86155</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-14.2631</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC1LP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKCLPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.920283</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-15.0185</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKCLP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC2LPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.35555</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-20.6281</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC2LP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKDLPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.41328</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-21.3745</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKDLP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QKELPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.67144</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-27.03</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
+         <Material>SUS316L</Material>
+         <Desc>QKELP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="QLC3LPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.68814</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-28.179</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
+         <Material>SUS316L</Material>
+         <Desc>QLC3LP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="SLYTLP.1mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.70037</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-29.038</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
+         <Material>SUS316L</Material>
+         <Desc>SLYTLP.1 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC2REmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.383568</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">9.29702</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-0.03854</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC2RE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC1RPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">100</sec>
+         <sec name="X0" unit="m">-0.171051</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">4.16795</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">80</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.1008</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC1RP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLCWRPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.26502</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">6.64724</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.10943</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLCWRP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC1RPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.329236</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">9.37717</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.13086</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC1RP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC2RPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.306066</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">20.6526</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-0.00139</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC2RP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC2RP2mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.335028</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">22.732</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.11235</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC2RP2 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLY2RP.2mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.782442</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">30.307</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.05245</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLY2RP.2 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC1LEmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">-0.382782</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-9.29808</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0.0385176</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC1LE magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BC1LPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.174609</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">-4.1688</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.09955</sec>
+         <Material>SUS316L</Material>
+         <Desc>BC1LP magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC1LP1mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">440</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.270858</sec>
+         <sec name="Y0" unit="mm">-420</sec>
+         <sec name="Z0" unit="m">-6.28162</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">420</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.08664</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC1LP1 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC1LP2mount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">0.429336</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-8.64126</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">-3.06928</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC1LP2 magnet mount</Desc>
+      </Shield>
+
+      <Shield name="BLC2LPmount">
+         <sec name="W" unit="mm">400</sec>
+         <sec name="H" unit="mm">1330</sec>
+         <sec name="L" unit="mm">200</sec>
+         <sec name="X0" unit="m">1.59907</sec>
+         <sec name="Y0" unit="mm">-865</sec>
+         <sec name="Z0" unit="m">-24.2005</sec>
+         <sec name="holeW" unit="mm">380</sec>
+         <sec name="holeH" unit="mm">1310</sec>
+         <sec name="holeL" unit="mm">180</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">3.09585</sec>
+         <Material>SUS316L</Material>
+         <Desc>BLC2LP magnet mount</Desc>
+      </Shield>
+
 
       <!--
-
          Following geometry should be parallel to Gx, so we need to rotate by -8.5 mrad.
 
-          (except for the polyethylene shield attaching Belle-Endcap)
-
+          (except for the polyethylene shield and blocks attached to Belle-Endcap and service cryostats and pipes)
         -->
+
       <!-- concrete "mon-gata" gate-shaped shield -->
-      <GateShield>
-         <sec name="X" unit="m">2.7</sec>
-         <sec name="Y" unit="m">2.7</sec>
-         <sec name="Z" unit="m">27</sec>
-         <sec name="TUNX" unit="m">1.95</sec>
-         <sec name="TUNY" unit="m">1.95</sec>
-         <sec name="DETZ" unit="m">3.69</sec>
-         <sec name="DETDZ" unit="m">0.47</sec>
-         <sec name="ROT" unit="rad">-0.0085</sec>
+      <Shield name="GateShieldL">
+         <sec name="W" unit="m">5.4</sec>
+         <sec name="H" unit="m">5.45</sec>
+         <sec name="L" unit="m">12.473</sec>
+         <sec name="X0" unit="m">0.2016</sec>
+         <sec name="Y0" unit="m">-0.135</sec>
+         <sec name="Z0" unit="m">-9.5</sec>
+         <sec name="holeW" unit="m">3.9</sec>
+         <sec name="holeH" unit="m">3.37</sec>
+         <sec name="holeL" unit="m">13</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0.290</sec>
+         <sec name="holeDZ" unit="m">-0.1135</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
          <Material>G4_CONCRETE</Material>
-         <Desc>gate shield</Desc>
-      </GateShield>
-      <!-- polyethylene neutron shield -->
-      <PolyShieldR>
-         <sec name="Xp" unit="m">1.80</sec>
-         <sec name="Xm" unit="m">1.95</sec>
-         <sec name="Y" unit="m">1.87</sec>
-         <sec name="Z" unit="m">0.15</sec>
-         <sec name="DZ" unit="m">4.25</sec>
-         <!--r unit="m">0.85</r-->
-         <sec name="r" unit="m">1</sec>
-         <sec name="dx" unit="m">-0.145</sec>
+         <Desc>Gate shield left</Desc>
+      </Shield>
+      <Shield name="GateShieldR">
+         <sec name="W" unit="m">5.4</sec>
+         <sec name="H" unit="m">5.45</sec>
+         <sec name="L" unit="m">13.066</sec>
+         <sec name="X01" unit="m">0.001</sec>
+         <sec name="X0" unit="m">-0.0004</sec>
+         <sec name="Y0" unit="m">-0.135</sec>
+         <sec name="Z0" unit="m">10.733</sec>
+         <sec name="holeW" unit="m">3.9</sec>
+         <sec name="holeH" unit="m">3.37</sec>
+         <sec name="holeL" unit="m">14</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0.290</sec>
+         <sec name="holeDZ" unit="m">0.377</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Gate shield right</Desc>
+      </Shield>
+
+      <!-- polyethylene neutron shields -->
+      <Shield name="PolyShieldL">
+         <sec name="W" unit="m">4</sec>
+         <sec name="H" unit="m">3.83</sec>
+         <sec name="L" unit="m">0.08</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">0.455</sec>
+	 <sec name="Z0" unit="m">-3.2</sec>
+         <sec name="holeW" unit="m">2.52</sec>
+         <sec name="holeH" unit="m">2.85</sec>
+         <sec name="holeL" unit="m">0.100</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">-0.51</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
          <Material>G4_POLYETHYLENE</Material>
-         <Desc>Neutron shield</Desc>
-      </PolyShieldR>
-      <PolyShieldL>
-         <sec name="Xp" unit="m">2.02</sec>
-         <sec name="Xm" unit="m">1.73</sec>
-         <sec name="Y" unit="m">1.87</sec>
-         <sec name="Z" unit="m">0.15</sec>
-         <sec name="DZ" unit="m">-3.31</sec>
-         <!--r unit="m">0.85</r-->
-         <sec name="r" unit="m">1</sec>
-         <sec name="dx" unit="m">0.07</sec>
+         <Desc>Polyethylene neutron shield left</Desc>
+      </Shield>
+      <Shield name="PolyShieldR">
+         <sec name="W" unit="m">4</sec>
+         <sec name="H" unit="m">3.83</sec>
+         <sec name="L" unit="m">0.08</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">0.455</sec>
+         <sec name="Z0" unit="m">4.14</sec>
+         <sec name="holeW" unit="m">2.52</sec>
+         <sec name="holeH" unit="m">2.85</sec>
+         <sec name="holeL" unit="m">0.100</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">-0.51</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
          <Material>G4_POLYETHYLENE</Material>
-         <Desc>Neutron shield</Desc>
-      </PolyShieldL>
-      <!-- additional concrete shield -->
-      <ConcreteShieldR>
-         <sec name="X" unit="m">1.9</sec>
-         <sec name="Y" unit="m">1.9</sec>
-         <sec name="Z" unit="m">0.35</sec>
-         <sec name="DZ" unit="m">5.26</sec>
-         <!--x unit="m">0.8</x-->
-         <sec name="x" unit="m">0.9</sec>
-         <sec name="y" unit="m">1.45</sec>
-         <sec name="dx" unit="m">-0.1</sec>
-         <sec name="dy" unit="m">-0.45</sec>
-         <sec name="ROT" unit="rad">-0.0085</sec>
+         <Desc>Polyethylene neutron shield right</Desc>
+      </Shield>
+
+      <!-- polyethylene blocks -->
+      <Shield name="PolyBlocksL">
+         <sec name="W" unit="m">3.5</sec>
+         <sec name="H" unit="m">0.07</sec>
+         <sec name="L" unit="m">0.15</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">-1.495</sec>
+	 <sec name="Z0" unit="m">-3.235</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Polyethylene blocks left</Desc>
+      </Shield>
+      <Shield name="PolyBlocksR">
+         <sec name="W" unit="m">3.5</sec>
+         <sec name="H" unit="m">0.04</sec>
+         <sec name="L" unit="m">0.10</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">-1.51</sec>
+         <sec name="Z0" unit="m">4.15</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Polyethylene blocks right</Desc>
+      </Shield>
+
+      <!-- concrete end-of-tunnel shields -->
+      <Shield name="ConcreteShieldL">
+         <sec name="W" unit="m">3.899</sec>
+         <sec name="H" unit="m">3.3</sec>
+         <sec name="L" unit="m">0.6</sec>
+         <sec name="X0" unit="m">0.151</sec>
+         <sec name="Y0" unit="m">0.190</sec>
+         <sec name="Z0" unit="m">-3.574</sec>
+         <sec name="holeW" unit="m">1.68</sec>
+         <sec name="holeH" unit="m">2.85</sec>
+         <sec name="holeL" unit="m">0.9</sec>
+         <sec name="holeDX" unit="m">-0.150</sec>
+         <sec name="holeDY" unit="m">-0.245</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
          <Material>G4_CONCRETE</Material>
-         <Desc>Concrete shield</Desc>
-      </ConcreteShieldR>
-      <ConcreteShieldL>
-         <sec name="X" unit="m">1.9</sec>
-         <sec name="Y" unit="m">1.9</sec>
-         <sec name="Z" unit="m">0.35</sec>
-         <sec name="DZ" unit="m">-4.32</sec>
-         <!--x unit="m">0.8</x-->
-         <sec name="x" unit="m">0.9</sec>
-         <sec name="y" unit="m">1.45</sec>
-         <sec name="dx" unit="m">0.1</sec>
-         <sec name="dy" unit="m">-0.45</sec>
-         <sec name="ROT" unit="rad">-0.0085</sec>
+         <Desc>Concrete end-of-tunnel shield left</Desc>
+      </Shield>
+      <Shield name="ConcreteShieldR">
+         <sec name="W" unit="m">3.899</sec>
+         <sec name="H" unit="m">3.3</sec>
+         <sec name="L" unit="m">0.6</sec>
+         <sec name="X0" unit="m">0.052</sec>
+         <sec name="Y0" unit="m">0.190</sec>
+         <sec name="Z0" unit="m">4.516</sec>
+         <sec name="holeW" unit="m">1.68</sec>
+         <sec name="holeH" unit="m">2.85</sec>
+         <sec name="holeL" unit="m">0.9</sec>
+         <sec name="holeDX" unit="m">-0.05</sec>
+         <sec name="holeDY" unit="m">-0.245</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
          <Material>G4_CONCRETE</Material>
-         <Desc>Concrete shield</Desc>
-      </ConcreteShieldL>
+         <Desc>Concrete end-of-tunnel shield right</Desc>
+      </Shield>
+
+      <!-- accelerator tunnel -->
+      <Shield name="TunnelL">
+         <sec name="W" unit="m">12.7</sec>
+         <sec name="H" unit="m">9.62</sec>
+         <sec name="L" unit="m">15</sec>
+         <sec name="X0" unit="m">1.73</sec>
+         <sec name="Y0" unit="m">1.28</sec>
+         <sec name="Z0" unit="m">-23.23</sec>
+         <sec name="holeW" unit="m">8.7</sec>
+         <sec name="holeH" unit="m">5.62</sec>
+         <sec name="holeL" unit="m">16</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Accelerator tunnel left (to Nikko)</Desc>
+      </Shield>
+      <Shield name="TunnelR">
+         <sec name="W" unit="m">12.7</sec>
+	 <sec name="H" unit="m">9.62</sec>
+         <sec name="L" unit="m">15</sec>
+         <sec name="X0" unit="m">1.33</sec>
+         <sec name="Y0" unit="m">1.28</sec>
+         <sec name="Z0" unit="m">24.79</sec>
+         <sec name="holeW" unit="m">8.7</sec>
+         <sec name="holeH" unit="m">5.62</sec>
+         <sec name="holeL" unit="m">16</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Accelerator tunnel right (to Oho)</Desc>
+      </Shield>
+
+      <!-- accelerator tunnel end gate -->
+      <Shield name="TunnelGateL">
+         <sec name="W" unit="m">12.7</sec>
+         <sec name="H" unit="m">9.62</sec>
+         <sec name="L" unit="m">1</sec>
+         <sec name="X0" unit="m">1.67</sec>
+         <sec name="Y0" unit="m">1.28</sec>
+         <sec name="Z0" unit="m">-15.22</sec>
+         <sec name="holeW" unit="m">5.45</sec>
+         <sec name="holeH" unit="m">5.5</sec>
+	 <sec name="holeL" unit="m">2</sec>
+         <sec name="holeDX" unit="m">-1.42</sec>
+         <sec name="holeDY" unit="m">-1.415</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Accelerator tunnel gate left</Desc>
+      </Shield>
+      <Shield name="TunnelGateR">
+         <sec name="W" unit="m">12.7</sec>
+	 <sec name="H" unit="m">9.62</sec>
+         <sec name="L" unit="m">1</sec>
+         <sec name="X0" unit="m">1.39</sec>
+         <sec name="Y0" unit="m">1.28</sec>
+         <sec name="Z0" unit="m">16.79</sec>
+         <sec name="holeW" unit="m">5.45</sec>
+         <sec name="holeH" unit="m">5.5</sec>
+         <sec name="holeL" unit="m">2</sec>
+         <sec name="holeDX" unit="m">-1.44</sec>
+         <sec name="holeDY" unit="m">-1.415</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Accelerator tunnel gate right</Desc>
+      </Shield>
+
+      <!-- Service cryostats -->
+      <!-- Left SC: three nested boxes -->
+      <Shield name="ServiceCryostatL1">
+         <sec name="W" unit="m">0.86</sec>
+         <sec name="H" unit="m">0.91</sec>
+         <sec name="L" unit="m">2.76</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+	 <sec name="Z0" unit="m">-5.67</sec>
+         <sec name="holeW" unit="m">0.84</sec>
+         <sec name="holeH" unit="m">0.89</sec>
+         <sec name="holeL" unit="m">2.74</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left 1</Desc>
+      </Shield>
+      <Shield name="ServiceCryostatL2">
+         <sec name="W" unit="m">0.803</sec>
+         <sec name="H" unit="m">0.750</sec>
+         <sec name="L" unit="m">2.663</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+	 <sec name="Z0" unit="m">-5.67</sec>
+         <sec name="holeW" unit="m">0.791</sec>
+         <sec name="holeH" unit="m">0.738</sec>
+         <sec name="holeL" unit="m">2.651</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left 2</Desc>
+      </Shield>
+      <Shield name="ServiceCryostatL3">
+         <sec name="W" unit="m">0.770</sec>
+         <sec name="H" unit="m">0.735</sec>
+         <sec name="L" unit="m">2.626</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+	 <sec name="Z0" unit="m">-5.67</sec>
+         <sec name="holeW" unit="m">0.760</sec>
+         <sec name="holeH" unit="m">0.725</sec>
+         <sec name="holeL" unit="m">2.616</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left 3</Desc>
+      </Shield>
+      <!-- Helium very roughly described as box -->
+      <Shield name="ServiceCryostatL_He">
+         <sec name="W" unit="m">0.750</sec>
+         <sec name="H" unit="m">0.720</sec>
+         <sec name="L" unit="m">2.600</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+	 <sec name="Z0" unit="m">-5.67</sec>
+         <sec name="holeW" unit="m">0.736</sec>
+         <sec name="holeH" unit="m">0.706</sec>
+         <sec name="holeL" unit="m">2.586</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Service cryostat left helium</Desc>
+      </Shield>
+
+      <!-- Right SC: two nested boxes -->
+      <Shield name="ServiceCryostatR1">
+         <sec name="W" unit="m">0.86</sec>
+         <sec name="H" unit="m">0.91</sec>
+         <sec name="L" unit="m">2.76</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+         <sec name="Z0" unit="m">6.42</sec>
+         <sec name="holeW" unit="m">0.84</sec>
+         <sec name="holeH" unit="m">0.89</sec>
+         <sec name="holeL" unit="m">2.74</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right 1</Desc>
+      </Shield>
+      <Shield name="ServiceCryostatR2">
+         <sec name="W" unit="m">0.780</sec>
+         <sec name="H" unit="m">0.742</sec>
+         <sec name="L" unit="m">2.636</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+         <sec name="Z0" unit="m">6.42</sec>
+         <sec name="holeW" unit="m">0.770</sec>
+         <sec name="holeH" unit="m">0.732</sec>
+         <sec name="holeL" unit="m">2.626</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right 2</Desc>
+      </Shield>
+      <!-- Helium very roughly described as box -->
+      <Shield name="ServiceCryostatR_He">
+         <sec name="W" unit="m">0.750</sec>
+         <sec name="H" unit="m">0.720</sec>
+         <sec name="L" unit="m">2.600</sec>
+         <sec name="X0" unit="m">1.35</sec>
+         <sec name="Y0" unit="m">0.235</sec>
+         <sec name="Z0" unit="m">6.42</sec>
+         <sec name="holeW" unit="m">0.736</sec>
+         <sec name="holeH" unit="m">0.706</sec>
+         <sec name="holeL" unit="m">2.586</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Service cryostat right helium</Desc>
+      </Shield>
+
+      <!-- Service cryostats mounts -->
+      <Shield name="SCmountL1_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">-4.53</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 1_1</Desc>
+      </Shield>
+      <Shield name="SCmountL1_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">-4.53</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 1_2</Desc>
+      </Shield>
+      <Shield name="SCmountL2_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">-5.01</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 2_1</Desc>
+      </Shield>
+      <Shield name="SCmountL2_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">-5.01</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 2_2</Desc>
+      </Shield>
+      <Shield name="SCmountL3_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">-5.61</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 3_1</Desc>
+      </Shield>
+      <Shield name="SCmountL3_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">-5.61</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 3_2</Desc>
+      </Shield>
+      <Shield name="SCmountL4_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">-6.21</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 4_1</Desc>
+      </Shield>
+      <Shield name="SCmountL4_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">-6.21</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 4_2</Desc>
+      </Shield>
+      <Shield name="SCmountL5_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">-6.81</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 5_1</Desc>
+      </Shield>
+      <Shield name="SCmountL5_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">-6.81</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat left mount 5_2</Desc>
+      </Shield>
+
+      <Shield name="SCmountR1_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">5.28</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 1_1</Desc>
+      </Shield>
+      <Shield name="SCmountR1_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">5.28</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 1_2</Desc>
+      </Shield>
+      <Shield name="SCmountR2_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">5.76</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 2_1</Desc>
+      </Shield>
+      <Shield name="SCmountR2_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">5.76</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 2_2</Desc>
+      </Shield>
+      <Shield name="SCmountR3_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">6.36</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 3_1</Desc>
+      </Shield>
+      <Shield name="SCmountR3_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">6.36</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 3_2</Desc>
+      </Shield>
+      <Shield name="SCmountR4_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">6.96</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 4_1</Desc>
+      </Shield>
+      <Shield name="SCmountR4_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">6.96</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 4_2</Desc>
+      </Shield>
+      <Shield name="SCmountR5_1">
+         <sec name="W" unit="cm">9</sec>
+         <sec name="H" unit="cm">79</sec>
+         <sec name="L" unit="cm">6</sec>
+         <sec name="X0" unit="m">0.815</sec>
+         <sec name="Y0" unit="m">0.205</sec>
+         <sec name="Z0" unit="m">7.56</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 5_1</Desc>
+      </Shield>
+      <Shield name="SCmountR5_2">
+         <sec name="W" unit="cm">6</sec>
+         <sec name="H" unit="cm">25</sec>
+         <sec name="L" unit="cm">8</sec>
+         <sec name="X0" unit="m">0.89</sec>
+         <sec name="Y0" unit="m">0.475</sec>
+         <sec name="Z0" unit="m">7.56</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Service cryostat right mount 5_2</Desc>
+      </Shield>
+
+      <!-- Cryostat pipes -->
+      <!-- Two nested large pipes and two inner small pipes filled with helium -->
+      <Straight type="cryostat" name="CryostatPipeL1_Out">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.24</sec>
+         <sec name="Z0" unit="m">-3.35</sec>
+         <sec name="L" unit="m">0.51</sec>
+         <sec name="PHI" unit="rad">-3.1416</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">108.15</sec>
+         <sec name="r" unit="mm">104.15</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 1 outer</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL1_Int">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.24</sec>
+         <sec name="Z0" unit="m">-3.35</sec>
+         <sec name="L" unit="m">0.40</sec>
+         <sec name="PHI" unit="rad">-3.1416</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">88.5</sec>
+         <sec name="r" unit="mm">86.5</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 1 intermediate</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL1_In1">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.285</sec>
+         <sec name="Z0" unit="m">-3.35</sec>
+         <sec name="L" unit="m">0.40</sec>
+         <sec name="PHI" unit="rad">-3.1416</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 1 inner 1</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL1_In2">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.209</sec>
+         <sec name="Z0" unit="m">-3.35</sec>
+         <sec name="L" unit="m">0.40</sec>
+         <sec name="PHI" unit="rad">-3.1416</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 1 inner 2</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL1_He1">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.285</sec>
+         <sec name="Z0" unit="m">-3.35</sec>
+         <sec name="L" unit="m">0.40</sec>
+         <sec name="PHI" unit="rad">-3.1416</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">17.75</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 1 helium 1</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL1_He2">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.209</sec>
+         <sec name="Z0" unit="m">-3.35</sec>
+         <sec name="L" unit="m">0.40</sec>
+         <sec name="PHI" unit="rad">-3.1416</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 1 helium 2</Desc>
+      </Straight>
+
+      <Straight type="cryostat" name="CryostatPipeL2_Out">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.13</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.15</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">108.15</sec>
+         <sec name="r" unit="mm">104.15</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 2 outer</Desc>
+         <Subtract>CryostatPipeL1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL2_Int">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.13</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">0.93</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">88.5</sec>
+         <sec name="r" unit="mm">86.5</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 2 intermediate</Desc>
+         <Subtract>CryostatPipeL1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL2_In1">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.13</sec>
+         <sec name="Z0" unit="m">-3.815</sec>
+	 <sec name="L" unit="m">0.93</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 2 inner 1</Desc>
+         <Subtract>CryostatPipeL1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL2_In2">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.13</sec>
+         <sec name="Z0" unit="m">-3.891</sec>
+         <sec name="L" unit="m">0.93</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 2 inner 2</Desc>
+         <Subtract>CryostatPipeL1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL2_He1">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.13</sec>
+         <sec name="Z0" unit="m">-3.815</sec>
+         <sec name="L" unit="m">0.93</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">17.75</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 2 helium 1</Desc>
+         <Subtract>CryostatPipeL1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL2_He2">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">0.13</sec>
+         <sec name="Z0" unit="m">-3.891</sec>
+         <sec name="L" unit="m">0.93</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 2 helium 2</Desc>
+         <Subtract>CryostatPipeL1_Out</Subtract>
+      </Straight>
+
+      <Straight type="cryostat" name="CryostatPipeL3_Out">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">1.17</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.3</sec>
+         <sec name="PHI" unit="rad">2.1178</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">108.15</sec>
+         <sec name="r" unit="mm">105.15</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 3 outer</Desc>
+         <Subtract>CryostatPipeL2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL3_Int">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">1.17</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.2</sec>
+         <sec name="PHI" unit="rad">2.1178</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">88.5</sec>
+         <sec name="r" unit="mm">86.5</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 3 intermediate</Desc>
+         <Subtract>CryostatPipeL2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL3_In1">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">1.215</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.2</sec>
+         <sec name="PHI" unit="rad">2.1178</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 3 inner 1</Desc>
+         <Subtract>CryostatPipeL2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL3_In2">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">1.139</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.2</sec>
+         <sec name="PHI" unit="rad">2.1178</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 3 inner 2</Desc>
+         <Subtract>CryostatPipeL2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL3_He1">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">1.215</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.2</sec>
+         <sec name="PHI" unit="rad">2.1178</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">17.75</sec>
+	 <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 3 helium 1</Desc>
+         <Subtract>CryostatPipeL2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL3_He2">
+         <sec name="X0" unit="m">0.04</sec>
+	 <sec name="Y0" unit="m">1.139</sec>
+         <sec name="Z0" unit="m">-3.86</sec>
+         <sec name="L" unit="m">1.2</sec>
+         <sec name="PHI" unit="rad">2.1178</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 3 helium 2</Desc>
+         <Subtract>CryostatPipeL2_Out</Subtract>
+      </Straight>
+
+      <Straight type="cryostat" name="CryostatPipeL4_Out">
+         <sec name="X0" unit="m">1.225</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">-4.57</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">160</sec>
+         <sec name="r" unit="mm">156</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 4 outer</Desc>
+         <Subtract>CryostatPipeL3_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL4_Int">
+         <sec name="X0" unit="m">1.225</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">-4.57</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">90</sec>
+         <sec name="r" unit="mm">88</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 4 intermediate</Desc>
+         <Subtract>CryostatPipeL3_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL4_In1">
+         <sec name="X0" unit="m">1.270</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">-4.57</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 4 inner 1</Desc>
+         <Subtract>CryostatPipeL3_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL4_In2">
+         <sec name="X0" unit="m">1.194</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">-4.57</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat pipe 4 inner 2</Desc>
+         <Subtract>CryostatPipeL3_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL4_He1">
+         <sec name="X0" unit="m">1.270</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">-4.57</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">17.75</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 4 helium 1</Desc>
+         <Subtract>CryostatPipeL3_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeL4_He2">
+         <sec name="X0" unit="m">1.194</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">-4.57</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Left cryostat pipe 4 helium 2</Desc>
+         <Subtract>CryostatPipeL3_Out</Subtract>
+      </Straight>
+
+      <Straight type="cryostat" name="CryostatPipeR1_Out">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">0.22</sec>
+         <sec name="Z0" unit="m">4.03</sec>
+         <sec name="L" unit="m">1.12</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.0259</sec>
+         <sec name="R" unit="mm">108.15</sec>
+         <sec name="r" unit="mm">104.15</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 1 outer</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR1_Int">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">0.22</sec>
+         <sec name="Z0" unit="m">4.03</sec>
+         <sec name="L" unit="m">0.9</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.0259</sec>
+         <sec name="R" unit="mm">88.5</sec>
+         <sec name="r" unit="mm">86.5</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 1 intermediate</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR1_In1">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">0.243</sec>
+         <sec name="Z0" unit="m">3.992</sec>
+         <sec name="L" unit="m">1.01</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.0259</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 1 inner 1</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR1_In2">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">0.204</sec>
+         <sec name="Z0" unit="m">4.057</sec>
+         <sec name="L" unit="m">1.00</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.0259</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 1 inner 2</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR1_He1">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">0.243</sec>
+         <sec name="Z0" unit="m">3.992</sec>
+         <sec name="L" unit="m">1.01</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.0259</sec>
+         <sec name="R" unit="mm">17.75</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Right cryostat pipe 1 helium 1</Desc>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR1_He2">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">0.204</sec>
+         <sec name="Z0" unit="m">4.057</sec>
+         <sec name="L" unit="m">1.00</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.0259</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Right cryostat pipe 1 helium 2</Desc>
+      </Straight>
+
+      <Straight type="cryostat" name="CryostatPipeR2_Out">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">1.17</sec>
+         <sec name="Z0" unit="m">4.605</sec>
+         <sec name="L" unit="m">1.3</sec>
+         <sec name="PHI" unit="rad">1.0427</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">108.15</sec>
+         <sec name="r" unit="mm">104.15</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 2 outer</Desc>
+         <Subtract>CryostatPipeR1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR2_Int">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">1.17</sec>
+         <sec name="Z0" unit="m">4.605</sec>
+         <sec name="L" unit="m">0.98</sec>
+         <sec name="PHI" unit="rad">1.0427</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">88.5</sec>
+         <sec name="r" unit="mm">86.5</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 2 intermediate</Desc>
+         <Subtract>CryostatPipeR1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR2_In1">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">1.215</sec>
+         <sec name="Z0" unit="m">4.605</sec>
+         <sec name="L" unit="m">0.98</sec>
+         <sec name="PHI" unit="rad">1.0427</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 2 inner 1</Desc>
+         <Subtract>CryostatPipeR1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR2_In2">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">1.139</sec>
+         <sec name="Z0" unit="m">4.605</sec>
+         <sec name="L" unit="m">0.98</sec>
+         <sec name="PHI" unit="rad">1.0427</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 2 inner 2</Desc>
+         <Subtract>CryostatPipeR1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR2_He1">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">1.215</sec>
+         <sec name="Z0" unit="m">4.605</sec>
+         <sec name="L" unit="m">0.98</sec>
+         <sec name="PHI" unit="rad">1.0427</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">17.75</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Right cryostat pipe 2 helium 1</Desc>
+         <Subtract>CryostatPipeR1_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR2_He2">
+         <sec name="X0" unit="m">0.0</sec>
+	 <sec name="Y0" unit="m">1.139</sec>
+         <sec name="Z0" unit="m">4.605</sec>
+         <sec name="L" unit="m">0.98</sec>
+         <sec name="PHI" unit="rad">1.0427</sec>
+         <sec name="PHIYZ" unit="rad">0</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Right cryostat pipe 2 helium 2</Desc>
+         <Subtract>CryostatPipeR1_Out</Subtract>
+      </Straight>
+
+      <Straight type="cryostat" name="CryostatPipeR3_Out">
+         <sec name="X0" unit="m">1.225</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">5.32</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">160</sec>
+         <sec name="r" unit="mm">156</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 3 outer</Desc>
+         <Subtract>CryostatPipeR2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR3_Int">
+         <sec name="X0" unit="m">1.225</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">5.32</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">88.5</sec>
+         <sec name="r" unit="mm">86.5</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 3 intermediate</Desc>
+         <Subtract>CryostatPipeR2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR3_In1">
+         <sec name="X0" unit="m">1.270</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">5.32</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">21.35</sec>
+         <sec name="r" unit="mm">17.75</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 3 inner 1</Desc>
+         <Subtract>CryostatPipeR2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR3_In2">
+         <sec name="X0" unit="m">1.194</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">5.32</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">30.25</sec>
+         <sec name="r" unit="mm">26.35</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat pipe 3 inner 2</Desc>
+         <Subtract>CryostatPipeR2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR3_He1">
+         <sec name="X0" unit="m">1.270</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">5.32</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">17.75</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Right cryostat pipe 3 helium 1</Desc>
+         <Subtract>CryostatPipeR2_Out</Subtract>
+      </Straight>
+      <Straight type="cryostat" name="CryostatPipeR3_He2">
+         <sec name="X0" unit="m">1.194</sec>
+	 <sec name="Y0" unit="m">0.692</sec>
+         <sec name="Z0" unit="m">5.32</sec>
+         <sec name="L" unit="m">0.72</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="PHIYZ" unit="rad">-1.5708</sec>
+         <sec name="R" unit="mm">26.35</sec>
+         <sec name="r" unit="mm">0</sec>
+         <Material>Cryo_Liq_He</Material>
+         <Desc>Right cryostat pipe 3 helium 2</Desc>
+         <Subtract>CryostatPipeR2_Out</Subtract>
+      </Straight>
 
       <!-- Collimators -->
       <!-- Approximated as trapezoids -->
@@ -1667,29 +3750,41 @@
 
       <!-- Collimator Shields -->
 
-      <CollimatorShield name="FC29078.2">
-         <sec name="X0" unit="m">-1.064</sec>
-         <sec name="Z0" unit="m">-28.357</sec>
-         <sec name="PHI" unit="rad">-3.10601</sec>
+      <Shield name="FC29078.2">
          <sec name="W" unit="mm">460</sec>
          <sec name="H" unit="mm">330</sec>
          <sec name="L" unit="mm">250</sec>
-         <sec name="d" unit="mm">50</sec>
+         <sec name="X0" unit="m">-1.064</sec>
+         <sec name="Y0" unit="m">0</sec>
+         <sec name="Z0" unit="m">-28.357</sec>
+         <sec name="holeW" unit="mm">360</sec>
+         <sec name="holeH" unit="mm">330</sec>
+         <sec name="holeL" unit="mm">270</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="mm">-50</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <Material>Pb</Material>
          <Desc>Shield for collimator D01H4 part 2</Desc>
-      </CollimatorShield>
+      </Shield>
 
-      <CollimatorShield name="FC29078.3">
-         <sec name="X0" unit="m">-0.928</sec>
-         <sec name="Z0" unit="m">-24.541</sec>
-         <sec name="PHI" unit="rad">-3.10601</sec>
+      <Shield name="FC29078.3">
          <sec name="W" unit="mm">460</sec>
          <sec name="H" unit="mm">330</sec>
          <sec name="L" unit="mm">2620</sec>
-         <sec name="d" unit="mm">50</sec>
+         <sec name="X0" unit="m">-0.928</sec>
+         <sec name="Y0" unit="m">0</sec>
+         <sec name="Z0" unit="m">-24.541</sec>
+         <sec name="holeW" unit="mm">360</sec>
+         <sec name="holeH" unit="mm">330</sec>
+         <sec name="holeL" unit="mm">2640</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="mm">-50</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <Material>Pb</Material>
          <Desc>Shield for collimator D01H4 part 3</Desc>
-      </CollimatorShield>
+      </Shield>
 
    </Content>
 </DetectorComponent>

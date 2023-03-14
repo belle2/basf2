@@ -15,7 +15,7 @@
 
 #include <fstream>
 #include "trg/cdc/LUT.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Link.h"
 #include <cstdlib>
 #include <math.h>

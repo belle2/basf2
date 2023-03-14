@@ -25,6 +25,20 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
 {
   std::map<MCRecoTrackIndex, NMatches> matches;
 
+  // if the SVD and PXD cluster names have not been set by user, try to read them from the MCRecoTracks
+  if (m_clusterNamesNeedSetting) {
+    B2INFO("Trying to read StoreArray names for Clusters from first entry of " << m_mcRecoTracksStoreArrayName);
+
+    if (m_mcRecoTracks.getEntries() > 0) {
+      m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
+      m_pxdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
+      m_clusterNamesNeedSetting = false;
+    } else {
+      B2WARNING("No Entries in mcRecoTracksStoreArray: " << m_mcRecoTracksStoreArrayName <<
+                " The default names for the clusters are used");
+    }
+  }
+
   for (SpacePoint const* spacePoint : measurements) {
 
     for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {
@@ -73,7 +87,7 @@ QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::v
   QualityEstimatorBase::estimateQualityAndProperties(measurements);
   if (m_results.qualityIndicator != 0) {
     auto mcParticle = m_mcRecoTracks[m_match.first]->getRelated<MCParticle>();
-    m_results.p = mcParticle->getMomentum();
+    m_results.p = B2Vector3D(mcParticle->getMomentum());
     m_results.pt = mcParticle->get4Vector().Pt();
   }
   return m_results;

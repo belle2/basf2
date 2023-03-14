@@ -15,8 +15,6 @@
 //---------------------------------------------------------------
 // Description : TRG GDL Unpacker Module
 //---------------------------------------------------------------
-// 1.00 : 2017/07/26 : First version
-//---------------------------------------------------------------
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
@@ -100,8 +98,8 @@ void TRGGDLUnpackerModule::initialize()
 
     if (m_print_dbmap) {
 
-      int aBitMap[320][2] = {0};
-      int aBitMap_extra[100][3] = { -1};
+      int aBitMap[320][2] = {{0}};
+      int aBitMap_extra[100][3] = {{ -1}};
       for (int i = 0; i < n_leafsExtra; i++) {
         aBitMap_extra[i][0] = m_dbunpacker->getBitMap_extra(i, 0);
         aBitMap_extra[i][1] = m_dbunpacker->getBitMap_extra(i, 1);
@@ -155,16 +153,34 @@ void TRGGDLUnpackerModule::event()
   if (unpack_flag == 1) {
     StoreArray<RawTRG> raw_trgarray;
     for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+      // Check PCIe40 data or Copper data
+      if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+      else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+      else { B2FATAL("TRGGRLUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+      unsigned int node_id = 0;
+      unsigned int ch_id = 0;
+      if (m_pciedata) {
+        node_id = 0x10000001;
+        ch_id = 21;
+      } else {
+        node_id = 0x15000001;
+        ch_id = 0;
+      }
+
+
       for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
         if (! m_trgReadoutBoardSearch) {
-          if (raw_trgarray[i]->GetNodeID(j) == 0x15000001) {
-            int nword = raw_trgarray[i]->GetDetectorNwords(j, 0);
+          if (raw_trgarray[i]->GetNodeID(j) == node_id) {
+            int nword = raw_trgarray[i]->GetDetectorNwords(j, ch_id);
             if (nword > 0) {
-              fillTreeGDLDB(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+              fillTreeGDLDB(raw_trgarray[i]->GetDetectorBuffer(j, ch_id),
                             raw_trgarray[i]->GetEveNo(j));
             }
           }
-        } else {
+        } else if (!m_pciedata) {
+
           unsigned cprid = raw_trgarray[i]->GetNodeID(j);
           if ((0x15000001 <= cprid && cprid <= 0x15000002) ||
               (0x11000001 <= cprid && cprid <= 0x11000010)) {
@@ -182,7 +198,28 @@ void TRGGDLUnpackerModule::event()
               printf("\n");
             }
           }
+
+        } else {
+
+          unsigned pcie40id = raw_trgarray[i]->GetNodeID(j);
+          if (pcie40id == 0x10000001) {
+            int _exp = raw_trgarray[i]->GetExpNo(j);
+            int _run = raw_trgarray[i]->GetRunNo(j);
+            for (int hslb = 0; hslb < 48; hslb++) {
+              int nword = raw_trgarray[i]->GetDetectorNwords(j, hslb);
+              int* buf  = raw_trgarray[i]->GetDetectorBuffer(j, hslb);
+              printf("0x%x ch%c exp(%d), run(%d), nword(%d)",
+                     pcie40id, hslb, _exp, _run, nword);
+              if (nword > 2) {
+                printf(", 0x%x 0x%x 0x%x",
+                       buf[0], buf[1], buf[2]);
+              }
+              printf("\n");
+            }
+          }
+
         }
+
       }
     }
   }

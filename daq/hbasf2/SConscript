@@ -5,7 +5,7 @@ env['SUBLIB'] = True
 
 env['LIBS'] = [
     'framework',
-    'daq_dataobjects', 'daq', 'hlt_softwaretrigger_dataobjects',
+    'daq_dataobjects', 'daq', 'rawdata_dataobjects',
     'boost_python', 'boost_filesystem', 'boost_program_options',
     '$PYTHON_LIBS'
 ]

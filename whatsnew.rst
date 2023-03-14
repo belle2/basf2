@@ -14,8 +14,105 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-07
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-07-00.txt
+
+.. List of changes for the b2bii package
+
+.. include:: b2bii/doc/whatsnew-since/release-07-00.txt
+
+.. List of changes for the mva package
+
+.. include:: mva/doc/whatsnew-since/release-07-00.txt
+
+Changes since release-06
+========================
+
+.. rubric:: Simplified arguments to :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList`.
+
+The arguments of :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList` have been changed a little.
+You no longer need to specify "default", it's done automatically.
+
+The following code lines need to be changed from:
+
+.. code-block:: python
+
+   # old
+   import modularAnalysis as ma
+   ma.inputMdst("default", "/path/to/your/file.root", path=mypath)
+
+   # or
+   ma.inputMdst("Belle", "/path/to/your/file.root", path=mypath)
+
+To:
+
+.. code-block:: python
+
+     # new
+     import modularAnalysis as ma
+     ma.inputMdst("/path/to/your/file.root", path=mypath)
+
+     # or
+     ma.inputMdst("/path/to/your/file.root", path=mypath, environmentType="Belle")
+
+And similarly for :py:func:`modularAnalysis.inputMdstList`.
+
+.. warning:: We no longer support MC5-10 files.
+
+.. rubric:: Breaking of backward compatibility for kinematic variables
+
+The floating-point members of the Particle class (invariant mass, momentum and
+position components) are now stored as doubles and no longer as floats.
+Previously, in some edge cases like for ISR photons, in particular the energy
+calculation could suffer from a cancellation of significant digits. This
+change might slightly modify the values of (derived) kinematic variables,
+however it should be below most analysts sensitivity.
+
+.. rubric:: Track time
+
+When reconstructing data with release-07 the new variable `trackTime` becomes
+available, which is computed by the ``TrackTimeEstimatorModule``. This track
+time is the average time of the SVD clusters attached to the track minus the
+``SVDEventT0``.
+
+.. include:: analysis/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the framework package
+
+.. include:: framework/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the b2bii package
+
+.. include:: b2bii/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the mva package
+
+.. include:: mva/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the tracking package
+
+.. include:: tracking/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the svd package
+
+.. include:: svd/doc/whatsnew-since/release-06-00.txt
+
 Changes since release-05
 ========================
+
+.. only:: not light
+
+   .. rubric:: ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` modules do not anymore boost the ``MCParticles``
+
+   The modules ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` do not anymore boost the ``MCParticles``, and the
+   parameter ``boost2Lab`` is now removed from the modules. These modules can not read the ``BeamParameters``
+   payloads from the conditions database, so having the particles boosted correctly and in a reproducible way was
+   non-trivial.
+   A new module, ``BoostMCParticles``, is added for boosting into the laboratory frame the ``MCParticles`` using the
+   information stored in the conditions database. The module must be appended to the steering path just after the
+   ``HepMCInput``, ``HepevtInput`` or ``LHEInput`` module and before running the detector simulation.
 
 .. only:: not light
 
@@ -29,9 +126,11 @@ Changes since release-05
 
    .. rubric:: The L1 trigger simulation is included in :py:func:`simulation.add_simulation`
 
-   The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before SVD and PXD simulation but after the simulation of the rest of the subdetectors. For this reason, the python function ``add_tsim()`` is deprecated. If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.
-    If you do not have ``add_simulation``, and you need the L1 trigger simulation,\
-    please use :py:func:`L1trigger.add_trigger_simulation`.
+   The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before SVD and PXD simulation but
+   after the simulation of the rest of the subdetectors. For this reason, the python function ``add_tsim()`` is
+   deprecated. If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.
+   If you do not have ``add_simulation``, and you need the L1 trigger simulation, please use
+   :py:func:`L1trigger.add_trigger_simulation`.
 
 
 .. only:: not light
@@ -41,7 +140,7 @@ Changes since release-05
    The support of the ``fullFormat`` cDSTs is discontinued. :py:func:`reconstruction.add_cdst_output` does not store
    anymore additional branches when the option ``rawFormat=False`` is selected, being simply an alias of
    :py:func:`mdst.add_mdst_output`. The users have to explicitly define the additional branches they want to store
-   using the ``additionalBranches`` paramenter.
+   using the ``additionalBranches`` parameter.
 
    The only supported format is the ``rawFormat``, that is now extended to MC. If ``rawFormat=True`` and ``mc=False`` are
    selected, the rawdata + tracking data objects are stored, while with ``rawFormat=True`` and ``mc=True`` the digits +
@@ -54,7 +153,7 @@ This removal does not imply any functionality loss, since the users can use the 
 
 .. rubric:: Photons generated by PHOTOS in continuum events
 
-Fixed the issue where PHOTOS photons were not correctly flagged in continuum events, e.g., charm decays (:issue:`BII-5934`).
+Fixed the issue where PHOTOS photons were not correctly flagged in continuum events, e.g., charm decays (:issue:`5828`).
 This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
 .. rubric:: Unification of B2BII settings
@@ -69,8 +168,6 @@ No individual options have to be set in modular analysis functions.
 .. include:: analysis/doc/whatsnew-since/release-05-00.txt
 
 .. List of changes for the framework package
-
-.. include:: framework/doc/whatsnew-since/release-06-00.txt
 
 .. include:: framework/doc/whatsnew-since/release-05-01.txt
 
@@ -201,7 +298,7 @@ For now they are the values provided by the accelerator.
     This is no longer possible with the new structure.
     The definition of CMS is therefore slightly changed. The impact should be at the percent level.
 
-If you have a physics analysis sensitive to this change: please discuss with the software / performance groups and add a comment to :issue:`BII-4360`.
+If you have a physics analysis sensitive to this change: please discuss with the software / performance groups and add a comment to :issue:`4294`.
 
 .. seealso:: The beam information can be accessed with :b2:var:`Ecms`, :b2:var:`beamPx`,  :b2:var:`beamPy`,  :b2:var:`beamPz`, and  :b2:var:`beamE`.
 
@@ -249,7 +346,7 @@ We do not expect to *remove* it, but *do not recommend* its use for any real phy
 
 Instead we recommend you use either KFit (`vertex.kFit`) for fast/simple fits, or TreeFit (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
-If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
+If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_!
 
 .. warning:: The default fitter for `vertex.fitVertex` has been changed to KFit.
 

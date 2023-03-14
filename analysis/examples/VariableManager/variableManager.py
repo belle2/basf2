@@ -41,6 +41,6 @@ print("Result of evaluating the variable 'constant(123)' ", result)
 # You can get the branch-names outputted by modules like VariablesToHistogram, VariablesToNtuple and
 # VariablesToTree using the makeROOTCompatible function
 var = "extraInfo(SignalProbability)"
-print("Root Compatible name of ", var, " is ", ROOT.Belle2.makeROOTCompatible(var))
+print("Root Compatible name of ", var, " is ", ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(var))
 
 print("You can get a full list of all available variables using 'basf2 variables.py'")

@@ -7,32 +7,16 @@
  **************************************************************************/
 #include <tracking/modules/mcMatcher/MCRecoTracksMatcherModule.h>
 
-// datastore types
-#include <framework/datastore/StoreArray.h>
-
-#include <framework/gearbox/Const.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 // hit types
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <map>
 
 #include <Eigen/Dense>
-
-/* disables the false positive warning of Intel icc about iter_pair_range::epmty() being unused
-tracking/modules/mcMatcher/src/MCRecoTracksMatcherModule.cc:55: warning #177: function
-"::iter_pair_range::empty [with Iter=std::_Rb_tree_const_iterator::DetId={Belle2::Const::EDetector},
-::HitId={int}>, ::WeightedRecoTrackId>>]" was declared but never referenced
-bool empty() const
-*/
-#ifdef __INTEL_COMPILER
-#pragma warning disable 177
-#endif
 
 using namespace Belle2;
 
@@ -156,102 +140,99 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
   //Parameter definition
   // Inputs
   addParam("prRecoTracksStoreArrayName",
-           m_param_prRecoTracksStoreArrayName,
+           m_prRecoTracksStoreArrayName,
            "Name of the collection containing the tracks as generate a patter recognition algorithm to be evaluated ",
            std::string(""));
 
   addParam("mcRecoTracksStoreArrayName",
-           m_param_mcRecoTracksStoreArrayName,
+           m_mcRecoTracksStoreArrayName,
            "Name of the collection containing the reference tracks as generate by a Monte-Carlo-Tracker (e.g. MCTrackFinder)",
            std::string("MCGFTrackCands"));
 
+  addParam("TracksStoreArrayName",
+           m_TracksStoreArrayName,
+           "Name of the Tracks StoreArray to be used when checking fitted tracks.",
+           std::string(""));
+
   // Hit content to be evaluated
   addParam("UsePXDHits",
-           m_param_usePXDHits,
+           m_usePXDHits,
            "Set true if PXDHits or PXDClusters should be used in the matching in case they are present",
            true);
 
   addParam("UseSVDHits",
-           m_param_useSVDHits,
+           m_useSVDHits,
            "Set true if SVDHits or SVDClusters should be used in the matching in case they are present",
            true);
 
   addParam("UseCDCHits",
-           m_param_useCDCHits,
+           m_useCDCHits,
            "Set true if CDCHits should be used in the matching in case they are present",
            true);
 
   addParam("UseOnlyAxialCDCHits",
-           m_param_useOnlyAxialCDCHits,
+           m_useOnlyAxialCDCHits,
            "Set true if only the axial CDCHits should be used",
            false);
 
   addParam("MinimalPurity",
-           m_param_minimalPurity,
+           m_minimalPurity,
            "Minimal purity of a PRTrack to be considered matchable to a MCTrack. "
            "This number encodes how many correct hits are minimally need to compensate for a false hits. "
            "The default 2.0 / 3.0 suggests that for each background hit can be compensated by two correct hits.",
            2.0 / 3.0);
 
   addParam("MinimalEfficiency",
-           m_param_minimalEfficiency,
+           m_minimalEfficiency,
            "Minimal efficiency of a MCTrack to be considered matchable to a PRTrack. "
            "This number encodes which fraction of the true hits must at least be in the reconstructed track. "
            "The default 0.05 suggests that at least 5% of the true hits should have been picked up.",
            0.05);
+
+  addParam("useFittedTracks",
+           m_useFittedTracks,
+           "If true, it uses fitted tracks for matching. Note that the charge of the track can be different from\
+           the seed charge (that is provided by the pattern recognition) since the DAF can flip tracks.",
+           m_useFittedTracks);
 }
 
 void MCRecoTracksMatcherModule::initialize()
 {
-  // Check if there are MC Particles
-  StoreArray<MCParticle> storeMCParticles;
-
-  if (storeMCParticles.isOptional()) {
+  if (m_MCParticles.isOptional()) {
     m_mcParticlesPresent = true;
 
-    // Actually retrieve the StoreArrays
-    StoreArray<RecoTrack> storePRRecoTracks(m_param_prRecoTracksStoreArrayName);
-    StoreArray<RecoTrack> storeMCRecoTracks(m_param_mcRecoTracksStoreArrayName);
-
     // Require both RecoTrack arrays and the MCParticles to be present in the DataStore
-    storePRRecoTracks.isRequired();
-    storeMCRecoTracks.isRequired();
-    storeMCParticles.isRequired();
-
-    // Extract the default names for the case empty stings were given
-    m_param_prRecoTracksStoreArrayName = storePRRecoTracks.getName();
-    m_param_mcRecoTracksStoreArrayName = storeMCRecoTracks.getName();
+    m_MCParticles.isRequired();
+    m_PRRecoTracks.isRequired(m_prRecoTracksStoreArrayName);
+    m_MCRecoTracks.isRequired(m_mcRecoTracksStoreArrayName);
 
     // Purity relation - for each PRTrack to store the purest MCTrack
-    storePRRecoTracks.registerRelationTo(storeMCRecoTracks);
+    m_PRRecoTracks.registerRelationTo(m_MCRecoTracks);
 
     // Efficiency relation - for each MCTrack to store the most efficient PRTrack
-    storeMCRecoTracks.registerRelationTo(storePRRecoTracks);
+    m_MCRecoTracks.registerRelationTo(m_PRRecoTracks);
 
     // MCParticle matching relation - purity
-    storePRRecoTracks.registerRelationTo(storeMCParticles);
+    m_PRRecoTracks.registerRelationTo(m_MCParticles);
 
     // MCParticle matching relation - efficiency
-    storeMCParticles.registerRelationTo(storePRRecoTracks);
+    m_MCParticles.registerRelationTo(m_PRRecoTracks);
 
     // Announce optional store arrays to the hits or clusters in case they should be used
     // We make them optional in case of limited detector setup.
     // PXD
-    if (m_param_usePXDHits) {
-      StoreArray<PXDCluster> pxdClusters;
-      pxdClusters.isOptional();
+    if (m_usePXDHits) {
+      m_PXDClusters.isOptional();
     }
 
     // SVD
-    if (m_param_useSVDHits) {
-      StoreArray<SVDCluster> svdClusters;
-      svdClusters.isOptional();
+    if (m_useSVDHits) {
+      m_SVDClusters.isOptional();
     }
 
     // CDC
-    if (m_param_useCDCHits) {
-      StoreArray<CDCHit> cdcHits;
-      cdcHits.isOptional();
+    if (m_useCDCHits) {
+      m_CDCHits.isOptional();
     }
   }
 }
@@ -260,22 +241,17 @@ void MCRecoTracksMatcherModule::event()
 {
   // Skip in the case there are no MC particles present.
   if (not m_mcParticlesPresent) {
-    B2DEBUG(100, "Skipping MC Track Matcher as there are no MC Particles registered in the DataStore.");
+    B2DEBUG(23, "Skipping MC Track Matcher as there are no MC Particles registered in the DataStore.");
     return;
   }
 
-  B2DEBUG(100, "########## MCRecoTracksMatcherModule ############");
+  B2DEBUG(23, "########## MCRecoTracksMatcherModule ############");
 
-  // Fetch store array
-  StoreArray<RecoTrack> prRecoTracks(m_param_prRecoTracksStoreArrayName);
-  StoreArray<RecoTrack> mcRecoTracks(m_param_mcRecoTracksStoreArrayName);
-  StoreArray<MCParticle> mcParticles("");
+  int nMCRecoTracks = m_MCRecoTracks.getEntries();
+  int nPRRecoTracks = m_PRRecoTracks.getEntries();
 
-  int nMCRecoTracks = mcRecoTracks.getEntries();
-  int nPRRecoTracks = prRecoTracks.getEntries();
-
-  B2DEBUG(100, "Number patter recognition tracks is " << nPRRecoTracks);
-  B2DEBUG(100, "Number Monte-Carlo tracks is " << nMCRecoTracks);
+  B2DEBUG(23, "Number patter recognition tracks is " << nPRRecoTracks);
+  B2DEBUG(23, "Number Monte-Carlo tracks is " << nMCRecoTracks);
 
   if (not nMCRecoTracks or not nPRRecoTracks) {
     // Neither no pattern recognition tracks
@@ -286,7 +262,7 @@ void MCRecoTracksMatcherModule::event()
 
   // ### Build a detector_id hit_id to reco track map for easier lookup later ###
   std::multimap<DetHitIdPair, WeightedRecoTrackId > mcId_by_hitId;
-  fillIDsFromStoreArray(mcId_by_hitId, mcRecoTracks);
+  fillIDsFromStoreArray(mcId_by_hitId, m_MCRecoTracks);
 
   //  Use set instead of multimap to handel to following situation
   //  * One hit may be assigned to multiple tracks should contribute to the efficiency of both tracks
@@ -294,7 +270,7 @@ void MCRecoTracksMatcherModule::event()
   //  The first part is handled well by the multimap. But to enforce that one hit is also only assigned
   //  once to a track we use a set.
   std::set<std::pair<DetHitIdPair, WeightedRecoTrackId>> prId_by_hitId;
-  fillIDsFromStoreArray(prId_by_hitId, prRecoTracks);
+  fillIDsFromStoreArray(prId_by_hitId, m_PRRecoTracks);
 
   // ### Get the number of relevant hits for each detector ###
   // Since we are mostly dealing with indices in this module, this is all we need from the StoreArray
@@ -302,29 +278,18 @@ void MCRecoTracksMatcherModule::event()
   std::map<DetId, int> nHits_by_detId;
 
   // PXD
-  if (m_param_usePXDHits) {
-    StoreArray<PXDCluster> pxdClusters;
-    if (pxdClusters.isOptional()) {
-      int nHits = pxdClusters.getEntries();
-      nHits_by_detId[Const::PXD] = nHits;
-    }
+  if (m_usePXDHits) {
+    nHits_by_detId[Const::PXD] = m_PXDClusters.getEntries();
   }
 
   // SVD
-  if (m_param_useSVDHits) {
-    StoreArray<SVDCluster> svdClusters;
-    if (svdClusters.isOptional()) {
-      int nHits = svdClusters.getEntries();
-      nHits_by_detId[Const::SVD] = nHits;
-    }
+  if (m_useSVDHits) {
+    nHits_by_detId[Const::SVD] = m_SVDClusters.getEntries();
   }
 
   // CDC
-  if (m_param_useCDCHits) {
-    StoreArray<CDCHit> cdcHits;
-    if (cdcHits.isOptional()) {
-      nHits_by_detId[Const::CDC] = cdcHits.getEntries();
-    }
+  if (m_useCDCHits) {
+    nHits_by_detId[Const::CDC] = m_CDCHits.getEntries();
   }
 
   //### Build the confusion matrix ###
@@ -357,7 +322,7 @@ void MCRecoTracksMatcherModule::event()
     for (HitId hitId = 0; hitId < nHits; ++hitId) {
       DetHitIdPair detId_hitId_pair(detId, hitId);
 
-      if (m_param_useOnlyAxialCDCHits and detId == Const::CDC) {
+      if (m_useOnlyAxialCDCHits and detId == Const::CDC) {
         StoreArray<CDCHit> cdcHits;
         const CDCHit* cdcHit = cdcHits[hitId];
         if (cdcHit->getISuperLayer() % 2 != 0) {
@@ -388,8 +353,8 @@ void MCRecoTracksMatcherModule::event()
         totalWeight_by_mcId(mcId) += ndfForOneHit * mcWeight;
       } else {
         for (const auto& detId_hitId_pair_and_mcId : mcIds_for_detId_hitId_pair) {
-          WeightedRecoTrackId mcId = detId_hitId_pair_and_mcId.second;
-          double mcWeight = mcId.weight;
+          int mcId = detId_hitId_pair_and_mcId.second;
+          double mcWeight = detId_hitId_pair_and_mcId.second.weight;
           totalNDF_by_mcId(mcId) += ndfForOneHit;
           totalWeight_by_mcId(mcId) += ndfForOneHit * mcWeight;
         }
@@ -404,16 +369,16 @@ void MCRecoTracksMatcherModule::event()
 
       // Fill the confusion matrix
       for (const auto& detId_hitId_pair_and_prId : prIds_for_detId_hitId_pair) {
-        RecoTrackId prId = detId_hitId_pair_and_prId.second;
+        int prId = detId_hitId_pair_and_prId.second;
         if (mcIds_for_detId_hitId_pair.empty()) {
-          RecoTrackId mcId = mcBkgId;
+          int mcId = mcBkgId;
           double mcWeight = 1;
           confusionMatrix(prId, mcId) += ndfForOneHit;
           weightedConfusionMatrix(prId, mcId) += ndfForOneHit * mcWeight;
         } else {
           for (const auto& detId_hitId_pair_and_mcId : mcIds_for_detId_hitId_pair) {
-            WeightedRecoTrackId mcId = detId_hitId_pair_and_mcId.second;
-            double mcWeight = mcId.weight;
+            int mcId = detId_hitId_pair_and_mcId.second;
+            double mcWeight = detId_hitId_pair_and_mcId.second.weight;
             confusionMatrix(prId, mcId) += ndfForOneHit;
             weightedConfusionMatrix(prId, mcId) += ndfForOneHit * mcWeight;
           }
@@ -422,26 +387,26 @@ void MCRecoTracksMatcherModule::event()
     } // end for hitId
   } // end for detId
 
-  B2DEBUG(200, "Confusion matrix of the event : " << std::endl <<  confusionMatrix);
-  B2DEBUG(200, "Weighted confusion matrix of the event : " << std::endl <<  weightedConfusionMatrix);
+  B2DEBUG(24, "Confusion matrix of the event : " << std::endl <<  confusionMatrix);
+  B2DEBUG(24, "Weighted confusion matrix of the event : " << std::endl <<  weightedConfusionMatrix);
 
-  B2DEBUG(200, "totalNDF_by_mcId : " << std::endl << totalNDF_by_mcId);
-  B2DEBUG(200, "totalWeight_by_mcId : " << std::endl << totalWeight_by_mcId);
+  B2DEBUG(24, "totalNDF_by_mcId : " << std::endl << totalNDF_by_mcId);
+  B2DEBUG(24, "totalWeight_by_mcId : " << std::endl << totalWeight_by_mcId);
 
-  B2DEBUG(200, "totalNDF_by_prId : " << std::endl << totalNDF_by_prId);
+  B2DEBUG(24, "totalNDF_by_prId : " << std::endl << totalNDF_by_prId);
 
   Eigen::MatrixXd purityMatrix = confusionMatrix.array().colwise() / totalNDF_by_prId.array();
   Eigen::MatrixXd efficiencyMatrix = confusionMatrix.array().rowwise() / totalNDF_by_mcId.array();
   Eigen::MatrixXd weightedEfficiencyMatrix = weightedConfusionMatrix.array().rowwise() / totalWeight_by_mcId.array();
 
-  B2DEBUG(100, "Purities");
-  B2DEBUG(100, purityMatrix);
+  B2DEBUG(23, "Purities");
+  B2DEBUG(23, purityMatrix);
 
-  B2DEBUG(100, "Efficiencies");
-  B2DEBUG(100, efficiencyMatrix);
+  B2DEBUG(23, "Efficiencies");
+  B2DEBUG(23, efficiencyMatrix);
 
-  B2DEBUG(100, "Weighted efficiencies");
-  B2DEBUG(100, weightedEfficiencyMatrix);
+  B2DEBUG(23, "Weighted efficiencies");
+  B2DEBUG(23, weightedEfficiencyMatrix);
 
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
   // Weighted efficiency
@@ -465,7 +430,7 @@ void MCRecoTracksMatcherModule::event()
     Purity bestPurity = purityMatrix.row(0)(mcId);
 
     // Reject efficiency smaller than the minimal one
-    if (bestWeightedEfficiency < m_param_minimalEfficiency) {
+    if (bestWeightedEfficiency < m_minimalEfficiency) {
       bestWeightedEfficiency = 0;
     }
 
@@ -478,7 +443,7 @@ void MCRecoTracksMatcherModule::event()
       Purity currentPurity = purityRow(mcId);
 
       // Reject efficiency smaller than the minimal one
-      if (currentWeightedEfficiency < m_param_minimalEfficiency) {
+      if (currentWeightedEfficiency < m_minimalEfficiency) {
         currentWeightedEfficiency = 0;
       }
 
@@ -517,12 +482,12 @@ void MCRecoTracksMatcherModule::event()
   // Weighted efficiency
   {
     RecoTrackId mcId = -1;
-    B2DEBUG(200, "MCTrack to highest weighted efficiency PRTrack relation");
+    B2DEBUG(24, "MCTrack to highest weighted efficiency PRTrack relation");
     for (const auto& mostWeightEfficientPRId_for_mcId : mostWeightEfficientPRId_by_mcId) {
       ++mcId;
       const Efficiency& weightedEfficiency = mostWeightEfficientPRId_for_mcId.weightedEfficiency;
       const RecoTrackId& prId = mostWeightEfficientPRId_for_mcId.id;
-      B2DEBUG(200,
+      B2DEBUG(24,
               "mcId : " << mcId << " ->  prId : " << prId << " with weighted efficiency "
               << weightedEfficiency);
     }
@@ -532,24 +497,24 @@ void MCRecoTracksMatcherModule::event()
   // Unweighted purity
   {
     RecoTrackId prId = -1;
-    B2DEBUG(200, "PRTrack to highest purity MCTrack relation");
+    B2DEBUG(24, "PRTrack to highest purity MCTrack relation");
     for (const auto& mostPureMCId_for_prId : mostPureMCId_by_prId) {
       ++prId;
       const RecoTrackId& mcId = mostPureMCId_for_prId.id;
       const Purity& purity = mostPureMCId_for_prId.purity;
-      B2DEBUG(200, "prId : " << prId << " ->  mcId : " << mcId << " with purity " << purity);
+      B2DEBUG(24, "prId : " << prId << " ->  mcId : " << mcId << " with purity " << purity);
     }
   }
 
   // Count the categories
-  int nMatched{}, nBackground{}, nClones{}, nGhost{};
+  int nMatched{}, nWrongCharge{}, nBackground{}, nClones{}, nClonesWrongCharge{}, nGhost{};
 
   // ### Classify the patter recognition tracks ###
   // Means saving the highest purity relation to the data store
   // + setup the PRTrack to MCParticle relation
   // + save the set the MatchingStatus
   for (RecoTrackId prId = 0; prId < nPRRecoTracks; ++prId) {
-    RecoTrack* prRecoTrack = prRecoTracks[prId];
+    RecoTrack* prRecoTrack = m_PRRecoTracks[prId];
 
     const MostPureMCId& mostPureMCId = mostPureMCId_by_prId[prId];
 
@@ -557,10 +522,11 @@ void MCRecoTracksMatcherModule::event()
     const Purity& purity = mostPureMCId.purity;
 
     // GHOST
-    if (not(purity > 0) or not(purity >= m_param_minimalPurity)) {
+    if (not(purity > 0) or not(purity >= m_minimalPurity)) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
 
-      B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low purity");
+      B2DEBUG(23, "Stored PRTrack " << prId << " as ghost because of too low purity");
+      ++nGhost;
       continue;
     }
 
@@ -568,7 +534,7 @@ void MCRecoTracksMatcherModule::event()
     if (mcId == mcBkgId) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_background);
 
-      B2DEBUG(100, "Stored PRTrack " << prId << " as background because of too low purity.");
+      B2DEBUG(23, "Stored PRTrack " << prId << " as background because of too low purity.");
       ++nBackground;
       continue;
     }
@@ -578,8 +544,9 @@ void MCRecoTracksMatcherModule::event()
     // patter recognition track equal to this track.
     // All extra patter recognition tracks are marked as clones.
 
-    RecoTrack* mcRecoTrack = mcRecoTracks[mcId];
+    RecoTrack* mcRecoTrack = m_MCRecoTracks[mcId];
     MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
+
     B2ASSERT("No relation from MCRecoTrack to MCParticle.", mcParticle);
 
     const MostWeightEfficientPRId& mostWeightEfficientPRId_for_mcId =
@@ -589,22 +556,64 @@ void MCRecoTracksMatcherModule::event()
     const Efficiency& weightedEfficiency = mostWeightEfficientPRId_for_mcId.weightedEfficiency;
     // const Efficiency& efficiency = mostWeightEfficientPRId_for_mcId.efficiency;
 
+    // find the true charge and reconstructed charge
+    const short MCParticleTrackCharge = mcParticle->getCharge() > 0 ? 1 : -1;
+    short foundTrackCharge = prRecoTrack->getChargeSeed();
+    if (m_useFittedTracks) {
+      const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
+      short nPositiveCharges = 0;
+      short nNegativeCharges = 0;
+
+
+
+      if (fittedTracks.size() > 0) {
+
+        for (const auto& fittedTrack : fittedTracks) {
+
+          // catch rare case we track long lived non-chargedStable particles (e.g. Sigma)
+          try {
+            const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
+                                                     mcParticle->getPDG())));
+            trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+          } catch (...) {
+            const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::pion);
+            trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+          }
+        }
+      }
+      if (nPositiveCharges > 0 and nNegativeCharges > 0) {
+        B2DEBUG(23,
+                "There are different charges attributed to the same track, this shouldn't happen. Continue with the majority of positive or negative charges");
+      }
+      // Only use nPositiveCharges and nNegativeCharges to assign a new value to foundTrackCharge if at least one fitted Tracks exists
+      // and at least one of the two values is > 0
+      if (fittedTracks.size() > 0 and (nPositiveCharges > 0 or nNegativeCharges > 0)) {
+        foundTrackCharge = nPositiveCharges > nNegativeCharges ? 1 : -1;
+      }
+    }
+
     // Note : The matched category may also contain higher order clones recognisable by their low
     // absolute efficiency
 
     // MATCHED
     if (prId == mostWeightEfficientPRId) {
+      if (foundTrackCharge != MCParticleTrackCharge) {
+        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matchedWrongCharge);
+        ++nWrongCharge;
+      } else {
+        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+        ++nMatched;
+      }
       // Setup the relation purity relation
-      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+      // regardless of the charge matching
       prRecoTrack->addRelationTo(mcRecoTrack, purity);
 
       // Add the mc matching relation
       prRecoTrack->addRelationTo(mcParticle, purity);
 
-      B2DEBUG(100, "Stored PRTrack " << prId << " as matched.");
-      B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
-      B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
-      ++nMatched;
+      B2DEBUG(23, "Stored PRTrack " << prId << " as matched.");
+      B2DEBUG(23, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
+      B2DEBUG(23, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
       continue;
     }
 
@@ -612,37 +621,47 @@ void MCRecoTracksMatcherModule::event()
     // Pattern recognition track fails the minimal efficiency requirement to be matched.
     // We might want to introduce a different classification here, if we see problems
     // with too many ghosts and want to investigate the specific source of the mismatch.
-    if (not(weightedEfficiency >= m_param_minimalEfficiency)) {
+    if (not(weightedEfficiency >= m_minimalEfficiency)) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
-      B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
+      B2DEBUG(23, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
       ++nGhost;
       continue;
     }
 
     // Final category
     // CLONE
+    if (foundTrackCharge != MCParticleTrackCharge) {
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_cloneWrongCharge);
+      ++nClonesWrongCharge;
+    } else {
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
+      ++nClones;
+    }
     // Setup the relation purity relation
-    prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
+    // regardless whether the charge is correctly reconstructed or not
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
     prRecoTrack->addRelationTo(mcParticle, -purity);
     ++nClones;
 
     // Add the mc matching relation to the mc particle
-    B2DEBUG(100, "Stored PRTrack " << prId << " as clone.");
-    B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
-    B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
+    B2DEBUG(23, "Stored PRTrack " << prId << " as clone.");
+    B2DEBUG(23, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
+    B2DEBUG(23, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
   } // end for prId
 
 
-  B2DEBUG(100, "Number of matches " << nMatched);
-  B2DEBUG(100, "Number of clones " << nClones);
-  B2DEBUG(100, "Number of bkg " << nBackground);
-  B2DEBUG(100, "Number of ghost " << nGhost);
+
+  B2DEBUG(23, "Number of matches " << nMatched);
+  B2DEBUG(23, "Number of wrongCharge " << nWrongCharge);
+  B2DEBUG(23, "Number of clones " << nClones);
+  B2DEBUG(23, "Number of clones wrongCharge" << nClonesWrongCharge);
+  B2DEBUG(23, "Number of bkg " << nBackground);
+  B2DEBUG(23, "Number of ghost " << nGhost);
 
   // ### Classify the Monte-Carlo tracks ###
   // Meaning save the highest weighted efficiency relation to the data store.
   for (RecoTrackId mcId = 0; mcId < nMCRecoTracks; ++mcId) {
-    RecoTrack* mcRecoTrack = mcRecoTracks[mcId];
+    RecoTrack* mcRecoTrack = m_MCRecoTracks[mcId];
     MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
 
     const MostWeightEfficientPRId& mostWeightEfficiencyPRId = mostWeightEfficientPRId_by_mcId[mcId];
@@ -653,7 +672,7 @@ void MCRecoTracksMatcherModule::event()
 
     B2ASSERT("Index of pattern recognition tracks out of range.", prId < nPRRecoTracks and prId >= 0);
 
-    RecoTrack* prRecoTrack = prRecoTracks[prId];
+    RecoTrack* prRecoTrack = m_PRRecoTracks[prId];
 
     const MostPureMCId& mostPureMCId_for_prId = mostPureMCId_by_prId[prId];
     const RecoTrackId& mostPureMCId = mostPureMCId_for_prId.id;
@@ -661,11 +680,13 @@ void MCRecoTracksMatcherModule::event()
     // MATCHED
     if (mcId == mostPureMCId and
         (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
-         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone)) {
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matchedWrongCharge or
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone or
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_cloneWrongCharge)) {
       // Setup the relation with positive weighted efficiency for this case.
       mcRecoTrack->addRelationTo(prRecoTrack, weightedEfficiency);
       mcParticle->addRelationTo(prRecoTrack, weightedEfficiency);
-      B2DEBUG(100, "Efficiency rel: mcId " << mcId  << " -> prId " << prId << " : " << weightedEfficiency);
+      B2DEBUG(23, "Efficiency rel: mcId " << mcId  << " -> prId " << prId << " : " << weightedEfficiency);
       continue;
     }
 
@@ -674,31 +695,33 @@ void MCRecoTracksMatcherModule::event()
     // which in turn better describes a MCTrack different form this.
     // Setup the relation with negative weighted efficiency for this case.
     bool isMergedMCRecoTrack =
-      weightedEfficiency >= m_param_minimalEfficiency and
+      (weightedEfficiency >= m_minimalEfficiency) and
       (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
-       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone);
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matchedWrongCharge or
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone or
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_cloneWrongCharge);
 
     if (isMergedMCRecoTrack) {
       mcRecoTrack->addRelationTo(prRecoTrack, -weightedEfficiency);
       mcParticle->addRelationTo(prRecoTrack, -weightedEfficiency);
-      B2DEBUG(100, "Efficiency rel: mcId " << mcId << " -> prId " << prId << " : " << -weightedEfficiency);
+      B2DEBUG(23, "Efficiency rel: mcId " << mcId << " -> prId " << prId << " : " << -weightedEfficiency);
       continue;
     }
 
     // MISSING
     // No related pattern recognition track
     // Do not create a relation.
-    B2DEBUG(100, "mcId " << mcId << " is missing. No relation created.");
-    B2DEBUG(100, "is Primary" << mcRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
-    B2DEBUG(100, "best prId " << prId << " with purity " << mostPureMCId_for_prId.purity << " -> " << mostPureMCId);
-    B2DEBUG(100, "MC Total ndf " << totalNDF_by_mcId[mcId]);
-    B2DEBUG(100, "MC Total weight" << totalWeight_by_mcId[mcId]);
-    B2DEBUG(100, "MC Overlap ndf\n " << confusionMatrix.col(mcId).transpose());
-    B2DEBUG(100, "MC Overlap weight\n " << weightedConfusionMatrix.col(mcId).transpose());
-    B2DEBUG(100, "MC Efficiencies for the track\n" << efficiencyMatrix.col(mcId).transpose());
-    B2DEBUG(100, "MC Weighted efficiencies for the track\n" << weightedEfficiencyMatrix.col(mcId).transpose());
+    B2DEBUG(23, "mcId " << mcId << " is missing. No relation created.");
+    B2DEBUG(23, "is Primary" << m_MCRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
+    B2DEBUG(23, "best prId " << prId << " with purity " << mostPureMCId_for_prId.purity << " -> " << mostPureMCId);
+    B2DEBUG(23, "MC Total ndf " << totalNDF_by_mcId[mcId]);
+    B2DEBUG(23, "MC Total weight" << totalWeight_by_mcId[mcId]);
+    B2DEBUG(23, "MC Overlap ndf\n " << confusionMatrix.col(mcId).transpose());
+    B2DEBUG(23, "MC Overlap weight\n " << weightedConfusionMatrix.col(mcId).transpose());
+    B2DEBUG(23, "MC Efficiencies for the track\n" << efficiencyMatrix.col(mcId).transpose());
+    B2DEBUG(23, "MC Weighted efficiencies for the track\n" << weightedEfficiencyMatrix.col(mcId).transpose());
   } // end for mcId
 
-  B2DEBUG(100, "########## End MCRecoTracksMatcherModule ############");
+  B2DEBUG(23, "########## End MCRecoTracksMatcherModule ############");
 
 } //end event()

@@ -79,7 +79,7 @@ namespace Belle2 {
     boost::multi_index::indexed_by <
     boost::multi_index::ordered_non_unique <
     boost::multi_index::member<Element, const FROM*, &Element::from>
-    > ,
+    >,
     boost::multi_index::ordered_non_unique <
     boost::multi_index::member<Element, const TO*, &Element::to>
     >

@@ -6,23 +6,26 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// ECL
+/* Own header. */
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibratorModule.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLTrig.h>
 
-// ROOT
-#include "TFile.h"
+/* ROOT headers. */
+#include <TFile.h>
 
 using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLLocalRunCalibrator)
+REG_MODULE(ECLLocalRunCalibrator);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 // Number of cell ids.
-const int ECLLocalRunCalibratorModule::c_ncellids = 8736;
+const int ECLLocalRunCalibratorModule::c_ncellids = ECLElementNumbers::c_NCrystals;
 // Time payload name.
 const std::string
 ECLLocalRunCalibratorModule::c_timePayloadName = "ECLCalibTime";

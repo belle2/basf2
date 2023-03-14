@@ -12,10 +12,9 @@ main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdstList(
-    environmentType="default",
     filelist=[b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples")],
     path=main,
 )
 
-# Start the event loop (actually start processing things)
+# start the event loop (actually start processing things)
 b2.process(main)

@@ -19,7 +19,7 @@ namespace TreeFitter {
   public:
 
     /** constructor */
-    RecoResonance(Belle2::Particle* bc, const ParticleBase* mother);
+    RecoResonance(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config);
 
     /** init particle in case it has a mother */
     virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
@@ -30,7 +30,7 @@ namespace TreeFitter {
     /** destructor */
     virtual ~RecoResonance() {};
 
-    /** dimenstion of the vector */
+    /** dimension of the vector */
     virtual int dim() const override { return hasEnergy() ? 4 : 3;} // (px,py,pz,(E))
 
     /** project the constraint */
@@ -52,10 +52,12 @@ namespace TreeFitter {
     virtual std::string parname(int index) const override;
 
     /** add to the list of constraints */
-    virtual void addToConstraintList(constraintlist& list, int depth) const override
-    {
-      list.push_back(Constraint(this, Constraint::resonance, depth, dimM()));
-    }
+    virtual void addToConstraintList(constraintlist& list, int depth) const override;
+
+  private:
+    /** has mass constraint */
+    bool m_massconstraint;
+
 
   };
 

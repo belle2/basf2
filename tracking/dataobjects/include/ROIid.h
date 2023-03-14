@@ -22,17 +22,18 @@ namespace Belle2 {
 
   public:
 
-    /** Default constructor.
-     */
+    /** Default constructor. */
     ROIid();
 
     /** Constructor providing the ROI information */
     ROIid(int minUid, int maxUid, int minVid, int maxVid, VxdID sensorID) :
-      m_minUid(minUid), m_maxUid(maxUid), m_minVid(minVid), m_maxVid(maxVid), m_sensorID(sensorID) {}
+      m_minUid(minUid), m_maxUid(maxUid), m_minVid(minVid), m_maxVid(maxVid), m_sensorID(sensorID.getID()) {};
 
+    /** Constructor providing the ROI information */
+    ROIid(int minUid, int maxUid, int minVid, int maxVid, VxdID::baseType sensorID) :
+      m_minUid(minUid), m_maxUid(maxUid), m_minVid(minVid), m_maxVid(maxVid), m_sensorID(sensorID) {};
 
-    /** Destructor.
-     */
+    /** Destructor. */
     virtual ~ROIid();
 
     //some accessors
@@ -40,13 +41,14 @@ namespace Belle2 {
     int getMaxUid() const { return m_maxUid; } /**< return the maximum U id of the ROI*/
     int getMinVid() const { return m_minVid; } /**< return the minimum V id of the ROI*/
     int getMaxVid() const { return m_maxVid; } /**< return the maximum V id of the ROI*/
-    VxdID getSensorID() const { return m_sensorID; } /**< return the sensor ID of the ROI*/
+    VxdID getSensorID() const { return VxdID{m_sensorID}; } /**< return the sensor ID of the ROI*/
 
     void setMinUid(double user_minUid) { m_minUid = user_minUid; } /**< set the minimum U id of the ROI*/
     void setMaxUid(double user_maxUid) { m_maxUid = user_maxUid; } /**< set the maximum U id of the ROI*/
     void setMinVid(double user_minVid) { m_minVid = user_minVid; } /**< set the minimum V id of the ROI*/
     void setMaxVid(double user_maxVid) { m_maxVid = user_maxVid; } /**< set the maximum V id of the ROI*/
-    void setSensorID(VxdID user_sensorID) { m_sensorID = user_sensorID;} /**< set the sensor ID of the ROI*/
+    void setSensorID(VxdID::baseType user_sensorID) { m_sensorID = user_sensorID;} /**< set the sensor ID of the ROI*/
+    void setSensorID(VxdID user_sensorID) { m_sensorID = user_sensorID.getID();} /**< set the sensor ID of the ROI*/
 
     bool Contains(const Belle2::PXDRawHit& thePXDRawHit) const; /**< true if the ROI contains the thePXDRawHit*/
     bool Contains(const Belle2::PXDDigit& thePXDDigit) const; /**< true if the ROI contains the thePXDDigit*/

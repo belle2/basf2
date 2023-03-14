@@ -30,7 +30,7 @@
 # >>> vm.addAlias("isSignalAcceptMissingGammaAndDecayInFlight", "passesCut(unmask(mcErrors," +
 # ...             "%d) == %d)" % (c_MissGamma | c_DecayInFlight, c_Correct))
 # The full definition of mc match error flags could be found in:
-# https://b2-master.belle2.org/software/development/sphinx/analysis/doc/MCMatching.html#error-flags
+# https://software.belle2.org/development/sphinx/analysis/doc/MCMatching.html#error-flags
 #
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
@@ -49,7 +49,7 @@ import stdV0s
 mypath = b2.Path()
 
 # Add input file and ParticleLoader modules to the path
-ma.inputMdstList('default', [b2.find_file('analysis/tests/mdst.root')], path=mypath)
+ma.inputMdstList([b2.find_file('analysis/tests/mdst.root')], path=mypath)
 
 # Add ParticleLoader and ParticleCombiner modules to the path, reconstructing the process
 # Ds*+ -> pi+ D0

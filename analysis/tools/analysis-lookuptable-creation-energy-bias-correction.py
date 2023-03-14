@@ -17,7 +17,6 @@
 ##########################################################################
 
 import basf2 as b2
-import random
 import pandas as pd
 import argparse
 

@@ -192,10 +192,11 @@ class skimFineTRGEventsPyModule(b2.Module):
             self.return_value(0)
 
 
-class skimLowEventT0EventsPyModule(b2.Module):
+class skimLowHighEventT0EventsPyModule(b2.Module):
     """
-    returns True if :code:`abs(EventT0)` is smaller than a selected value
-    that can be set with :code:`set_maxEventT0(evtT0)`
+    returns True if (:code:`abs(EventT0)` is smaller than a selected value
+    that can be set with :code:`set_maxAbsEventT0(evtT0max)`)  AND (:code:`abs(EventT0)` is larger than a selected value
+    that can be set with :code:`set_minAbsEventT0(evtT0min)`)
     """
 
     def __init__(self):
@@ -203,13 +204,21 @@ class skimLowEventT0EventsPyModule(b2.Module):
 
         super().__init__()
 
-        #: maximum value of EventT0 allowed
+        #: maximum value of abs(EventT0) allowed
         self.maxEvtT0 = 10  # ns
 
-    def set_maxEventT0(self, user_maxEvtT0):
-        '''set the maximum EventT0, otherwise 10 ns'''
+        #: minimum value of abs(EventT0) allowed
+        self.minEvtT0 = 0  # ns
+
+    def set_maxAbsEventT0(self, user_maxEvtT0):
+        '''set the maximum abs(EventT0), otherwise 10 ns'''
 
         self.maxEvtT0 = user_maxEvtT0
+
+    def set_minAbsEventT0(self, user_minEvtT0):
+        '''set the minimum EventT0, otherwise 0 ns'''
+
+        self.minEvtT0 = user_minEvtT0
 
     def event(self):
         '''event'''
@@ -217,12 +226,18 @@ class skimLowEventT0EventsPyModule(b2.Module):
         eventT0 = Belle2.PyStoreObj('EventT0')
 
         if not eventT0.isValid():
+            b2.B2ERROR('No valid EventT0 - event ignored')
+            self.return_value(0)
+
+            return
+
+        if not eventT0.hasEventT0():
             b2.B2ERROR('No EventT0 - event ignored')
             self.return_value(0)
 
             return
 
-        if abs(eventT0.getEventT0()) < self.maxEvtT0:
+        if (abs(eventT0.getEventT0()) < self.maxEvtT0) and (abs(eventT0.getEventT0()) > self.minEvtT0):
             self.return_value(1)
         else:
             self.return_value(0)

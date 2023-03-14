@@ -15,7 +15,7 @@ In some situations, it is useful to make cuts on, and write out event-wise infor
 .. warning::
         Please note that this use model and the documentation are under development. 
 
-Please ask questions at `Belle II questions <https://questions.belle2.org/>`_ and report bugs using `JIRA <https://agira.desy.de/projects/BII/>`_. 
+Please ask questions at `Belle II questions <https://questions.belle2.org/>`_ and report bugs using `GitLab <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
 Be sure to tag your questions and bug reports as "analysis" and "event based" to help us find them.
 
 
@@ -51,11 +51,12 @@ Here is a simple example:
 
 .. code-block:: python
 
-    from modularAnalysis import applyEventCuts
+    from modularAnalysis import applyEventCuts, buildEventShape
     from stdCharged import stdPi
      
-    stdPi('all')
-    applyEventCuts('R2EventLevel < 0.3')
+    stdPi('all', path=mypath)
+    buildEventShape(path=mypath)
+    applyEventCuts('foxWolframR2 < 0.3', path=mypath)
 
 This builds the list of all pions but only processes events where the event-level R2 passes the cut. 
 

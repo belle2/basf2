@@ -13,10 +13,9 @@
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SegmentNetworkProducer)
+REG_MODULE(SegmentNetworkProducer);
 
 SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 {
@@ -35,12 +34,12 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
   addParam("NetworkOutputName",
            m_PARAMNetworkOutputName,
            "Unique name for the DirectedNodeNetworkContainer Store Object Pointer created and filled by this module.",
-           string(""));
+           std::string(""));
 
   addParam("EventLevelTrackingInfoName",
            m_PARAMEventLevelTrackingInfoName,
            "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
-           string("EventLevelTrackingInfo"));
+           std::string("EventLevelTrackingInfo"));
 
   addParam("addVirtualIP",
            m_PARAMAddVirtualIP,
@@ -83,12 +82,12 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMmaxNetworkSize);
 
   addParam("maxConnections",
-           m_PARAMmaxSegmentConnections ,
+           m_PARAMmaxSegmentConnections,
            "Maximal number of Segment connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxSegmentConnections);
 
   addParam("maxAddedConnections",
-           m_PARAMmaxSegmentAddedConnections ,
+           m_PARAMmaxSegmentAddedConnections,
            "Maximal number of added Segment connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxSegmentAddedConnections);
 
@@ -152,7 +151,7 @@ void SegmentNetworkProducerModule::event()
     m_network.create();
   }
 
-  vector<RawSectorData> collectedData = matchSpacePointToSectors();
+  std::vector<RawSectorData> collectedData = matchSpacePointToSectors();
 
   m_network->set_trackNodeConnections(0);
   m_network->set_activeSectorConnections(0);
@@ -198,14 +197,14 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
       // sector for SpacePoint exists:
       FullSecID foundSecID = sectorFound->getFullSecID();
 
-      vector<RawSectorData>::iterator iter =
+      std::vector<RawSectorData>::iterator iter =
         std::find_if(collectedData.begin(), collectedData.end(),
                      [&](const RawSectorData & entry) -> bool { return entry.secID == foundSecID; }
                     );
 
       // if secID not in collectedData:
       if (iter == collectedData.end()) {
-        collectedData.push_back({ foundSecID , false, nullptr, sectorFound, { & (trackNodes.back())}});
+        collectedData.push_back({ foundSecID, false, nullptr, sectorFound, { & (trackNodes.back())}});
         nCollected++;
       } else {
         iter->hits.push_back(&(trackNodes.back()));
@@ -249,7 +248,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
 
     for (const FullSecID& innerSecID : innerSecIDs) {
       std::int32_t innerEntryID = innerSecID;
-      vector<RawSectorData>::iterator innerRawSecPos =
+      std::vector<RawSectorData>::iterator innerRawSecPos =
         std::find_if(collectedData.begin(), collectedData.end(),
                      [&](const RawSectorData & entry) -> bool { return (entry.secID == innerSecID); }
                     );
@@ -321,7 +320,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
     if (outerSector->getInnerNodes().empty()) {
       continue;
     }
-    const vector<TrackNode*>& outerHits = outerSector->getEntry().getHits();
+    const std::vector<TrackNode*>& outerHits = outerSector->getEntry().getHits();
     if (outerHits.empty()) {
       continue;
     }
@@ -336,7 +335,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
     // loop over inner sectors to get their hits(->innerHits) and check their compatibility
     for (auto* innerSector : outerSector->getInnerNodes()) {
-      const vector<TrackNode*>& innerHits = innerSector->getEntry().getHits();
+      const std::vector<TrackNode*>& innerHits = innerSector->getEntry().getHits();
       if (innerHits.empty()) {
         continue;
       }
@@ -382,7 +381,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
             B2WARNING("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
-                      << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+                      << "! The event will be skipped and not be processed. The number of connections was = " << nLinked);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
@@ -390,7 +389,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
           if (nAdded > m_PARAMmaxTrackNodeAddedConnections) {
             B2WARNING("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
-                      << "! Processing of the event will be aborted. The number of connections was = " << nAdded);
+                      << "! The event will be skipped and not be processed. The number of connections was = " << nAdded);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
@@ -421,7 +420,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   unsigned int nLinked = 0, nAdded = 0;
 
   for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
-    const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
+    const std::vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
 
     if (centerHits.empty()) {
       continue;
@@ -436,7 +435,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
     }
 
     for (DirectedNode<TrackNode, VoidMetaInfo>* centerHit : centerHits) {
-      const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& innerHits = centerHit->getInnerNodes();
+      const std::vector<DirectedNode<TrackNode, VoidMetaInfo>*>& innerHits = centerHit->getInnerNodes();
       if (innerHits.empty()) {
         continue;
       }
@@ -507,7 +506,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         if (nLinked > m_PARAMmaxSegmentConnections) {
           B2WARNING("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
-                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+                    << ". VXDTF2 will skip the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);
@@ -516,7 +515,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         }
         if (nAdded > m_PARAMmaxSegmentAddedConnections) {
           B2WARNING("Number of added SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentAddedConnections
-                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+                    << ". VXDTF2 will skip the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);
@@ -526,7 +525,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (segments.size() > m_PARAMmaxNetworkSize) {
           B2WARNING("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
                     << ". Network size is " << segmentNetwork.size()
-                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+                    << ". VXDTF2 will skip the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);

@@ -11,26 +11,28 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <limits>
+#include <cmath>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   namespace TOP {
 
-    void HelixSwimmer::set(const TVector3& position, const TVector3& momentum, double charge, double Bz)
+    void HelixSwimmer::set(const XYZPoint& position, const XYZVector& momentum, double charge, double Bz)
     {
-      double p = momentum.Mag();
-      double pT = momentum.Perp();
+      double p = momentum.R();
+      double pT = momentum.Rho();
       double b = -Bz * charge * Const::speedOfLight;
-      if (abs(b / Unit::T) > pT) { // helix for R < 100 m
-        m_R = pT / abs(b);
+      if (std::abs(b / Unit::T) > pT) { // helix for R < 100 m
+        m_R = pT / std::abs(b);
         m_omega = b / p;
         m_kz = momentum.Z() / p;
         m_phi0 = momentum.Phi() - copysign(M_PI / 2, m_omega);
         m_xc = position.X() - m_R * cos(m_phi0);
         m_yc = position.Y() - m_R * sin(m_phi0);
         m_z0 = position.Z();
-        m_T0 = 2 * M_PI / abs(m_omega);
+        m_T0 = 2 * M_PI / std::abs(m_omega);
       } else { // straight line
         m_omega = 0; // distinguisher between straight line and helix
         x0 = position.X();
@@ -40,12 +42,6 @@ namespace Belle2 {
         ky = momentum.Y() / p;
         kz = momentum.Z() / p;
       }
-    }
-
-    void HelixSwimmer::setTransformation(const TRotation& rotation, const TVector3& translation)
-    {
-      m_rotationInv = rotation.Inverse();
-      m_translation = translation;
     }
 
     void HelixSwimmer::moveReferencePosition(double length)
@@ -60,38 +56,38 @@ namespace Belle2 {
       }
     }
 
-    TVector3 HelixSwimmer::getPosition(double length) const
+    XYZPoint HelixSwimmer::getPosition(double length) const
     {
       if (m_omega != 0) {
         double phi = m_phi0 + m_omega * length;
-        TVector3 vec(m_xc + m_R * cos(phi), m_yc + m_R * sin(phi), m_z0 + m_kz * length);
-        return m_rotationInv * (vec - m_translation);
+        XYZPoint vec(m_xc + m_R * cos(phi), m_yc + m_R * sin(phi), m_z0 + m_kz * length);
+        return m_transformInv * vec;
       } else {
-        TVector3 vec(x0 + kx * length, y0 + ky * length, z0 + kz * length);
-        return m_rotationInv * (vec - m_translation);
+        XYZPoint vec(x0 + kx * length, y0 + ky * length, z0 + kz * length);
+        return m_transformInv * vec;
       }
     }
 
-    TVector3 HelixSwimmer::getDirection(double length) const
+    XYZVector HelixSwimmer::getDirection(double length) const
     {
       if (m_omega != 0) {
         double phi = m_phi0 + m_omega * length;
         double k_T = m_omega * m_R;
-        TVector3 vec(-k_T * sin(phi), k_T * cos(phi), m_kz);
-        return m_rotationInv * vec;
+        XYZVector vec(-k_T * sin(phi), k_T * cos(phi), m_kz);
+        return m_transformInv * vec;
       } else {
-        TVector3 vec(kx, ky, kz);
-        return m_rotationInv * vec;
+        XYZVector vec(kx, ky, kz);
+        return m_transformInv * vec;
       }
     }
 
-    double HelixSwimmer::getDistanceToPlane(const TVector3& point, const TVector3& normal) const
+    double HelixSwimmer::getDistanceToPlane(const XYZPoint& point, const XYZVector& normal) const
     {
       if (m_omega != 0) {
-        auto r = point - TVector3(m_xc, m_yc, m_z0);
+        auto r = point - XYZPoint(m_xc, m_yc, m_z0);
         double phi = normal.Phi();
-        double s = r * normal;
-        if (abs(s) > m_R) return std::numeric_limits<double>::quiet_NaN(); // no solution
+        double s = r.Dot(normal);
+        if (std::abs(s) > m_R) return std::numeric_limits<double>::quiet_NaN(); // no solution
 
         double t = shortestDistance(s / m_R, phi);
         double v = m_kz * normal.Z();
@@ -101,7 +97,7 @@ namespace Belle2 {
         double dt_prev = 0;
         for (int i = 0; i < 100; i++) {
           double cosAlpha = (s - v * t) / m_R;
-          if (abs(cosAlpha) > 1) {
+          if (std::abs(cosAlpha) > 1) {
             return std::numeric_limits<double>::quiet_NaN(); // no solution
           }
           t = shortestDistance(cosAlpha, phi);
@@ -110,19 +106,19 @@ namespace Belle2 {
           t_prev = t;
           dt_prev = dt;
         }
-        if (abs(dt_prev) < 1e-6) {
-          B2WARNING("HelixSwimmer::getDistanceToPlane: not converged"
-                    << LogVar("v", v) << LogVar("dt", dt_prev));
+        if (std::abs(dt_prev) < 1e-6) {
+          B2DEBUG(20, "TOP::HelixSwimmer::getDistanceToPlane: not converged"
+                  << LogVar("v", v) << LogVar("dt", dt_prev));
           return t;
         } else {
-          B2ERROR("HelixSwimmer::getDistanceToPlane: not converged"
+          B2DEBUG(20, "TOP::HelixSwimmer::getDistanceToPlane: not converged"
                   << LogVar("v", v) << LogVar("dt", dt_prev));
           return std::numeric_limits<double>::quiet_NaN();
         }
       } else {
-        auto r = point - TVector3(x0, y0, z0);
-        auto v = TVector3(kx, ky, kz);
-        return (r * normal) / (v * normal);
+        auto r = point - XYZPoint(x0, y0, z0);
+        auto v = XYZVector(kx, ky, kz);
+        return r.Dot(normal) / v.Dot(normal);
       }
     }
 

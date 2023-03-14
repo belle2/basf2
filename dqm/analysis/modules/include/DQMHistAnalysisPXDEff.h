@@ -12,46 +12,63 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <TH2F.h>
 #include <TEfficiency.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
-  class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDEffModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDEffModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDEffModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDEffModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! Flag to trigger creation of additional histograms
-    bool m_singleHists;
     //! u binning for 2d plots
     int m_u_bins;
     //! v binning for 2d plots
@@ -90,6 +107,14 @@ namespace Belle2 {
     //! Final Canvas for Update
     TCanvas* m_cEffAllUpdate = nullptr;
 
+    //! Full Eff Map Inner Layer
+    TH2F* m_hInnerMap{};
+    //! Full Eff Map Outer Layer
+    TH2F* m_hOuterMap{};
+    //! Full Eff Map Inner Layer
+    TCanvas* m_cInnerMap{};
+    //! Full Eff Map Outer Layer
+    TCanvas* m_cOuterMap{};
 
     /** TLine object for warning limit */
     TH1F* m_hWarnLine{};
@@ -110,8 +135,9 @@ namespace Belle2 {
     bool m_useEpicsRO;
 
 #ifdef _BELLE2_EPICS
-    //! one EPICS PV
+    //! EPICS PVs for Status
     std::vector <chid>  mychid_status;
+    //! EPICS PVs for Efficiency
     std::map <VxdID, chid> mychid_eff;
 #endif
   };

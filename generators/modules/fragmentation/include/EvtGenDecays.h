@@ -1,11 +1,5 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * This file is a copy of Pythia8Plugins/EvtGen.h from Pythia 8 but       *
- * slightly modified for extended evtgen models                           *
- *                                                                        *
- * Adapted by: Martin Ritter                                              *
- *                                                                        *
- **************************************************************************/
+// This file is a copy of Pythia8Plugins/EvtGen.h from Pythia 8,
+// but slightly modified in basf2 for extended EvtGen models
 
 // EvtGen.h is a part of the PYTHIA event generator.
 // Copyright (C) 2016 Torbjorn Sjostrand.

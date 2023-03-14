@@ -47,7 +47,7 @@ namespace Belle2 {
 
     /**initialize the calibration scalar*/
     static void init(payloadContainerType& svdScalar, unsigned int /*layer*/,
-                     unsigned int /*ladder*/ , unsigned int /*sensor*/,
+                     unsigned int /*ladder*/, unsigned int /*sensor*/,
                      unsigned int /*side*/, const T& defaultT)
     {
       svdScalar = defaultT;

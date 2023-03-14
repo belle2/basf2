@@ -10,7 +10,6 @@
 ##########################################################################
 
 import basf2
-from ROOT import Belle2
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)

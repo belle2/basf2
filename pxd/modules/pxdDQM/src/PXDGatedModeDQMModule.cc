@@ -17,13 +17,13 @@ using namespace Belle2::VXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDGatedModeDQM)
+REG_MODULE(PXDGatedModeDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache::getInstance())
+PXDGatedModeDQMModule::PXDGatedModeDQMModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   //Set module properties
   setDescription("Monitor GatedMode");

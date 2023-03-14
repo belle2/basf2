@@ -14,7 +14,6 @@ import basf2_mva
 import os
 import tempfile
 import subprocess
-import sys
 import shutil
 from b2test_utils import skip_test
 

@@ -37,9 +37,9 @@ namespace Belle2 {
     if (fabs(diff) > s_doubleHitResolution) return DigitBase::c_Append; // no pile-up
 
     if (fabs(diff) < s_pileupTime) { // pile-up results in time averaging
-      double time[2] = {m_time, bgDigit->getTime()};
-      double rawTime[2] = {m_rawTime, bgDigit->getRawTime()};
-      int pulseHeight[2] = {m_pulseHeight, bgDigit->getPulseHeight()};
+      const double time[2] = {m_time, bgDigit->getTime()};
+      const double rawTime[2] = {m_rawTime, bgDigit->getRawTime()};
+      const int pulseHeight[2] = {m_pulseHeight, bgDigit->getPulseHeight()};
       double sum = pulseHeight[0] + pulseHeight[1];
       if (sum > 0) {
         m_time = (time[0] * pulseHeight[0] + time[1] * pulseHeight[1]) / sum;

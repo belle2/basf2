@@ -34,10 +34,10 @@ namespace Belle2 {
     virtual ~DeSerializerCOPPERModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    void event() override;
 
     /* #ifndef REDUCED_RAWCOPPER */
     /*     //! Fill RawHeader */
@@ -48,10 +48,10 @@ namespace Belle2 {
 
 #ifdef NONSTOP
     //! for nonstop DAQ
-    virtual void resumeRun();
+    void resumeRun() override;
 
     //! for nonstop DAQ
-    virtual void waitResume();
+    void waitResume() override;
 #endif
 
   protected:

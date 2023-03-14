@@ -254,8 +254,7 @@ def pre_collector_cr(max_events=None):
     add_cosmics_reconstruction(reco_path,
                                components=['CDC', 'ECL'],
                                merge_tracks=False,
-                               pruneTracks=False,
-                               data_taking_period='normal'
+                               pruneTracks=False
                                )
     return reco_path
 

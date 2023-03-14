@@ -88,39 +88,39 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
   // state is a genfit::MeasuredStateOnPlane.
   genfit::StateOnPlane st(state);
 
-  const TVector3& noSagWire1(s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID));
-  const TVector3& noSagWire2(s_cdcGeometryTranslator->getWireForwardPosition(m_wireID));
+  const B2Vector3D& noSagWire1(s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID));
+  const B2Vector3D& noSagWire2(s_cdcGeometryTranslator->getWireForwardPosition(m_wireID));
 
   // unit vector along the wire
-  TVector3 noSagWireDirection = noSagWire2 - noSagWire1;
+  B2Vector3D noSagWireDirection = noSagWire2 - noSagWire1;
   noSagWireDirection.SetMag(1.);
 
   // point of closest approach
   const genfit::AbsTrackRep* rep = state.getRep();
   rep->extrapolateToLine(st, noSagWire1, noSagWireDirection);
-  const TVector3& noSagPoca = rep->getPos(st);
+  const B2Vector3D& noSagPoca = rep->getPos(st);
 
   double zPOCA = (noSagWire1.Z()
                   + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection.Z());
 
   // Now re-extrapolate taking Z of trajectory into account.
-  const TVector3& wire1(s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID, zPOCA));
-  const TVector3& wire2(s_cdcGeometryTranslator->getWireForwardPosition(m_wireID, zPOCA));
+  const B2Vector3D& wire1(s_cdcGeometryTranslator->getWireBackwardPosition(m_wireID, zPOCA));
+  const B2Vector3D& wire2(s_cdcGeometryTranslator->getWireForwardPosition(m_wireID, zPOCA));
 
   // unit vector along the wire (will become V of plane)
-  TVector3 wireDirection = wire2 - wire1;
+  B2Vector3D wireDirection = wire2 - wire1;
   wireDirection.SetMag(1.);
 
   // point of closest approach
   rep->extrapolateToLine(st, wire1, wireDirection);
-  const TVector3& poca = rep->getPos(st);
-  TVector3 dirInPoca = rep->getMom(st);
+  const B2Vector3D& poca = rep->getPos(st);
+  B2Vector3D dirInPoca = rep->getMom(st);
   dirInPoca.SetMag(1.);
-  const TVector3& pocaOnWire = wire1 + wireDirection.Dot(poca - wire1) * wireDirection;
+  const B2Vector3D& pocaOnWire = wire1 + wireDirection.Dot(poca - wire1) * wireDirection;
   //temp
-  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).y() <<" "<< pocaOnWire.y() <<" " << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection - pocaOnWire).y() << std::endl;
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Y() <<" "<< pocaOnWire.Y() <<" " << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection - pocaOnWire).Y() << std::endl;
   //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Perp() <<" "<< pocaOnWire.Perp() << std::endl;
-  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).z() <<" "<< pocaOnWire.z() << std::endl;
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Z() <<" "<< pocaOnWire.Z() << std::endl;
 
   // check if direction is parallel to wire
   if (fabs(wireDirection.Angle(dirInPoca)) < 0.01) {
@@ -130,7 +130,7 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
   }
 
   // construct orthogonal (unit) vector
-  const TVector3& U = wireDirection.Cross(dirInPoca);
+  const B2Vector3D& U = wireDirection.Cross(dirInPoca);
 
   genfit::SharedPlanePtr pl = genfit::SharedPlanePtr(new genfit::DetPlane(pocaOnWire, U, wireDirection));
   //pl->Print();
@@ -140,7 +140,7 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
 std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   double z = state.getPos().Z();
-  const TVector3& p = state.getMom();
+  const B2Vector3D& p = state.getMom();
   // Calculate alpha and theta.  A description was given in
   // https://indico.mpp.mpg.de/getFile.py/access?contribId=5&sessionId=3&resId=0&materialId=slides&confId=3195
 
@@ -149,14 +149,14 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 //  double theta = CDCGeometryPar::Instance().getTheta(p);
 
 //N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
-  const double wx = state.getPlane()->getO().x();
-  const double wy = state.getPlane()->getO().y();
-  const double px = p.x();
-  const double py = p.y();
+  const double wx = state.getPlane()->getO().X();
+  const double wy = state.getPlane()->getO().Y();
+  const double px = p.X();
+  const double py = p.Y();
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
   double alpha = atan2(cross, dot);
-  double theta = atan2(p.Perp(), p.z());
+  double theta = atan2(p.Perp(), p.Z());
   /*
   double alpha0 =  CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
   double theta0 =  CDCGeometryPar::Instance().getTheta(p);
@@ -261,7 +261,7 @@ const genfit::HMatrixU* CDCRecoHit::constructHMatrix(const genfit::AbsTrackRep* 
 std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   double z = state.getPos().Z();
-  const TVector3& p = state.getMom();
+  const B2Vector3D& p = state.getMom();
   // Calculate alpha and theta.  A description was given by in
   // https://indico.mpp.mpg.de/getFile.py/access?contribId=5&sessionId=3&resId=0&materialId=slides&confId=3195
 
@@ -270,14 +270,14 @@ std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit:
 //  double theta = CDCGeometryPar::Instance().getTheta(p);
 
 //N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
-  const double wx = state.getPlane()->getO().x();
-  const double wy = state.getPlane()->getO().y();
-  const double px = p.x();
-  const double py = p.y();
+  const double wx = state.getPlane()->getO().X();
+  const double wy = state.getPlane()->getO().Y();
+  const double px = p.X();
+  const double py = p.Y();
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
   double alpha = atan2(cross, dot);
-  double theta = atan2(p.Perp(), p.z());
+  double theta = atan2(p.Perp(), p.Z());
   /*
   double alpha0 =  CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
   double theta0 =  CDCGeometryPar::Instance().getTheta(p);
@@ -298,12 +298,12 @@ std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit:
   // from CDCGeometryPar::getNewLeftRightRaw().
   auto fL = [&](const double & t) -> double {
     return s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, t,
-    false, //left
-    z, alpha, theta, m_adcCount); };
+                                                false, //left
+                                                z, alpha, theta, m_adcCount); };
   auto fR = [&](const double & t) -> double {
     return s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, t,
-    true, //right
-    z, alpha, theta, m_adcCount); };
+                                                true, //right
+                                                z, alpha, theta, m_adcCount); };
 
   // Calculate derivative for all left and right mirror hit.
   //

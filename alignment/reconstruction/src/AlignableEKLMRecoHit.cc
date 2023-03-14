@@ -12,9 +12,9 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
@@ -44,9 +44,9 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
     &(EKLMElementNumbers::Instance());
   const EKLM::TransformDataGlobalAligned* transformData =
     &(EKLM::TransformDataGlobalAligned::Instance());
-  RelationVector<EKLMHit2d> hit2ds = hit->getRelationsTo<EKLMHit2d>();
+  RelationVector<KLMHit2d> hit2ds = hit->getRelationsTo<KLMHit2d>();
   if (hit2ds.size() != 1)
-    B2FATAL("Incorrect number of related EKLMHit2ds.");
+    B2FATAL("Incorrect number of related KLMHit2ds.");
   RelationVector<KLMDigit> eklmDigits = hit2ds[0]->getRelationsTo<KLMDigit>();
   if (eklmDigits.size() != 2)
     B2FATAL("Incorrect number of related KLMDigits.");

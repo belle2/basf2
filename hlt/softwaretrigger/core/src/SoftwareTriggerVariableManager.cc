@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-
-#include <memory>
+#include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -26,6 +25,13 @@ namespace Belle2 {
         {variableName, std::shared_ptr<SoftwareTriggerVariable>(new SoftwareTriggerVariable(variableName))});
       }
       return lowerBoundIterator->second.get();
+    }
+
+    SoftwareTriggerVariableManager::SoftwareTriggerVariable* SoftwareTriggerVariableManager::getVariable(
+      const std::string& variableName, const std::vector<std::string>& arguments)
+    {
+      auto fullname = variableName + "(" + boost::algorithm::join(arguments, ", ") + ")";
+      return SoftwareTriggerVariableManager::getVariable(fullname);
     }
   }
 }

@@ -31,11 +31,9 @@ import modularAnalysis as ma
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 from vertex import TagV
-import glob
 import sys
-import numpy as np
 import variables as v
-from root_pandas import read_root
+import uproot
 
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
@@ -67,7 +65,7 @@ outfile = 'DNN_' + step + '.root'
 # Perform analysis.
 firstpath = basf2.Path()
 
-ma.inputMdstList('MC10', input_file_list, path=firstpath)
+ma.inputMdstList(input_file_list, path=firstpath)
 
 firstpath.add_module('ProgressBar')
 
@@ -197,8 +195,10 @@ print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
 try:
-    df = read_root(outfile)
+    with uproot.open(outfile) as outf:
+        df = outf['tree'].arrays(library='pd')
     df = df.sample(frac=1)
-    df.to_root(outfile, key='tree')
+    with uproot.recreate(outfile) as outf:
+        outf['tree'] = df
 except OSError as e:
     print(e)

@@ -15,6 +15,11 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
+#include <cdc/geometry/CDCGeometryParConstants.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <cdc/dbobjects/CDClayerTimeCut.h>
+
 #include <vector>
 #include <tuple>
 #include <string>
@@ -82,6 +87,9 @@ namespace Belle2 {
       /// Parameter : List of layers to be ignored in tracking e.g. for simulating too high occupancy
       std::vector<uint> m_param_ignoreLayers;
 
+      /// Parameter : Cut for approximate drift time (super-layer dependent)
+      std::vector<float> m_param_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
+
       /// Parameter : If true, the second hit information will be used to create Wire Hits
       bool m_param_useSecondHits = false;
 
@@ -98,6 +106,9 @@ namespace Belle2 {
       /// Geometry set to be used.
       EWirePosition m_wirePosition = EWirePosition::c_Base;
 
+      /// Cut for approximate drift time (super-layer dependent)
+      std::array<float, ISuperLayerUtil::c_N> m_maxDriftTimes = { -1, -1, -1, -1, -1, -1, -1, -1, -1};
+
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
 
@@ -108,8 +119,7 @@ namespace Belle2 {
       std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
 
       /// Bits for the used layers
-      /// ATTENTION: hardcoded value for number of layers
-      std::array<bool, 56> m_useLayers{};
+      std::array<bool, c_maxNSenseLayers> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
       std::array<Vector2D, 2> m_useSector{};
@@ -120,6 +130,9 @@ namespace Belle2 {
 
       /// ADC Count translator to be used to calculate the charge deposit in the drift cell
       std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator;
+
+      /// Cut for approximate drift time (super-layer dependent)
+      DBObjPtr<CDClayerTimeCut> m_DBCDClayerTimeCut;
     };
   }
 }

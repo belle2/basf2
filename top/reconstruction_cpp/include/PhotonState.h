@@ -10,7 +10,9 @@
 
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <top/reconstruction_cpp/func.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
+
 
 namespace Belle2 {
   namespace TOP {
@@ -43,7 +45,7 @@ namespace Belle2 {
        * @param position initial photon position (must be inside quartz)
        * @param direction initial direction vector (must be unit vector)
        */
-      PhotonState(const TVector3& position, const TVector3& direction);
+      PhotonState(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& direction);
 
       /**
        * Constructor with position vector and direction components
@@ -52,7 +54,7 @@ namespace Belle2 {
        * @param ky initial direction y-component (must be unit vector)
        * @param kz initial direction z-component (must be unit vector)
        */
-      PhotonState(const TVector3& position, double kx, double ky, double kz);
+      PhotonState(const ROOT::Math::XYZPoint& position, double kx, double ky, double kz);
 
       /**
        * Constructor with position, track direction and cerenkov angles
@@ -61,7 +63,7 @@ namespace Belle2 {
        * @param thc Cerenkov (polar) angle
        * @param fic Cerenkov azimuthal angle
        */
-      PhotonState(const TVector3& position, const TVector3& trackDir, double thc, double fic);
+      PhotonState(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& trackDir, double thc, double fic);
 
       /**
        * Changes sign of direction y component
@@ -78,7 +80,7 @@ namespace Belle2 {
        * Returns position as 3D vector.
        * @return position
        */
-      TVector3 getPosition() const {return TVector3(m_x, m_y, m_z);}
+      ROOT::Math::XYZPoint getPosition() const {return ROOT::Math::XYZPoint(m_x, m_y, m_z);}
 
       /**
        * Returns position in x.
@@ -134,7 +136,7 @@ namespace Belle2 {
        * Returns direction as 3D unit vector.
        * @return direction
        */
-      TVector3 getDirection() const {return TVector3(m_kx, m_ky, m_kz);}
+      ROOT::Math::XYZVector getDirection() const {return ROOT::Math::XYZVector(m_kx, m_ky, m_kz);}
 
       /**
        * Returns direction in x.

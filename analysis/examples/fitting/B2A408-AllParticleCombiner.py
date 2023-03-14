@@ -49,8 +49,7 @@ import variables.utils as vu
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('ccbar_sample_to_test.root', 'examples', False),
+inputMdst(filename=b2.find_file('ccbar_sample_to_test.root', 'examples', False),
           path=my_path)
 
 # use standard final state particle lists

@@ -42,6 +42,38 @@ def printHex(evt, wordwidth=32, linewidth=8, paraheight=4):
     print('\n\n'.join(paras))
 
 
+# example signal assignments
+signalstsf2 = """
+dddd(15 downto 0) & cntr125M(15 downto 0) &
+hitMapTsf(191 downto 0) & valid_tracker(0 downto 0) &
+unamed(23 downto 7) &
+tracker_out[0](428 downto 210) & ccSelf(8 downto 0) &
+unamed (77 downto 36) &
+mergers[5](255 downto 236) & mergers[5](235 downto 0) &
+mergers[4](255 downto 236) & mergers[4](235 downto 0) &
+mergers[3](255 downto 236) & mergers[3](235 downto 0) &
+mergers[2](255 downto 236) & mergers[2](235 downto 0) &
+mergers[1](255 downto 236) & mergers[1](235 downto 0) &
+mergers[0](255 downto 236) & mergers[0](235 downto 0)
+"""
+
+signalsnk = """
+ddd(15 downto 0) & cntr125M2D(15 downto 0) &
+"000" & TSF0_input(218 downto 210) &
+"000" & TSF2_input(218 downto 210) &
+"000" & TSF4_input(218 downto 210) &
+"000" & TSF6_input(218 downto 210) &
+"000" & TSF8_input(218 downto 210) &
+"0000" &
+""" + \
+    ''.join(["""TSF{sl:d}_input({high:d} downto {low:d}) &
+TSF{sl:d}_input({high2:d} downto {low2:d}) &
+""".format(sl=sl, high=h, low=h - 7, high2=h - 8, low2=h - 20) for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
+    """unamed(901 downto 0)
+"""
+
+signalsall = signalsnk + signalstsf2
+
 # supported operators
 operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
              ast.Div: op.truediv, ast.Pow: op.pow, ast.USub: op.neg}
@@ -126,7 +158,7 @@ def unpack(meta, headers, triggers, atlas, writer, evtsize):
     power = period.bit_length() - 1  # (marginal and ugly) speed optimization
     print('converting to waveform ...')
 
-    null = BitArray([0] * sum(evtsize))
+    # null = BitArray([0] * sum(evtsize))
 
     change = writer.change
     for trgInd, trg in enumerate(triggers):

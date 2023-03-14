@@ -8,11 +8,14 @@
 
 #pragma once
 
+#include <framework/geometry/B2Vector3.h>
+
 /* External headers. */
 #include <TMatrixDSym.h>
 #include <TMatrixD.h>
 #include <TVectorD.h>
 #include <TRotation.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -34,15 +37,18 @@ namespace Belle2 {
 
     /**
      * Construct rotation matrix describing
-     * rotation around Y-axis by angleY and then around Z-axis by angleZ
-     * @param[in] angleY angle in radians
-     * @param[in] angleZ angle in radians
+     * rotation from zAxis to axis zPrime
+     * @param[in] zPrime vector to which (0,0,1) vector is rotated
      */
-    inline TMatrixD getRotationMatrixYZ(double angleY, double angleZ)
+    inline TMatrixD getRotationMatrixZtoZp(ROOT::Math::XYZVector zPrime)
     {
+      ROOT::Math::XYZVector zAxis(0, 0, 1);
+      zPrime = zPrime.Unit();
+      ROOT::Math::XYZVector rotAxis = zAxis.Cross(zPrime);
+      double angle = asin(sqrt(rotAxis.Mag2()));
+
       TRotation r;
-      r.RotateY(angleY);
-      r.RotateZ(angleZ);
+      r.Rotate(angle, TVector3(rotAxis.x(), rotAxis.y(), rotAxis.z()));
       return toMatrix(r);
     }
 
@@ -69,9 +75,9 @@ namespace Belle2 {
      * @param[in] vTo  vector defining rotation
      * @param[in] orgMat tensor before rotation
      */
-    inline TMatrixD rotateTensor(const TVector3& vTo, const TMatrixD& orgMat)
+    inline TMatrixD rotateTensor(const B2Vector3D& vTo, const TMatrixD& orgMat)
     {
-      TMatrixD r = getRotationMatrixYZ(vTo.Theta(), vTo.Phi());
+      TMatrixD r = getRotationMatrixZtoZp(vTo);
       TMatrixD rT = r; rT.T();
       return r * orgMat * rT;
     }
@@ -82,9 +88,9 @@ namespace Belle2 {
      * @param[in] vTo  vector defining rotation
      * @param[in] orgMat tensor before rotation
      */
-    inline TMatrixD rotateTensorInv(const TVector3& vTo, const TMatrixD& orgMat)
+    inline TMatrixD rotateTensorInv(const ROOT::Math::XYZVector& vTo, const TMatrixD& orgMat)
     {
-      TMatrixD r = getRotationMatrixYZ(vTo.Theta(), vTo.Phi());
+      TMatrixD r = getRotationMatrixZtoZp(vTo);
       TMatrixD rT = r; rT.T();
       return rT * orgMat * r;
     }
@@ -108,21 +114,21 @@ namespace Belle2 {
 
 
     /**
-     * Convert TVector3 to TVectorD
+     * Convert B2Vector3D to TVectorD
      *
      */
-    inline TVectorD toVec(TVector3 v)
+    inline TVectorD toVec(B2Vector3D v)
     {
       return TVectorD(0, 2, v.X(), v.Y(), v.Z(), "END");
     }
 
     /**
-     * Get a vector orthogonal to v of the unit lenght
+     * Get a vector orthogonal to v of the unit length
      *
      */
-    TVector3 getUnitOrthogonal(TVector3 v)
+    B2Vector3D getUnitOrthogonal(B2Vector3D v)
     {
-      return TVector3(v.Z(), 0, -v.X()).Unit();
+      return B2Vector3D(v.Z(), 0, -v.X()).Unit();
     }
 
   }

@@ -18,7 +18,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 #include <TRandom.h>
 #include <cmath>
 
@@ -102,21 +103,21 @@ namespace Belle2 {
       double globalTime = PrePosition->GetGlobalTime();
       G4ThreeVector momentum = PrePosition->GetMomentum();
 
-      TVector3 TPosition(worldPosition.x(), worldPosition.y(), worldPosition.z());
-      TVector3 TMomentum(momentum.x(), momentum.y(), momentum.z());
-      TVector3 TOrigin(aTrack->GetVertexPosition().x(),
-                       aTrack->GetVertexPosition().y(),
-                       aTrack->GetVertexPosition().z());
+      ROOT::Math::XYZPoint TPosition(worldPosition.x(), worldPosition.y(), worldPosition.z());
+      ROOT::Math::XYZVector TMomentum(momentum.x(), momentum.y(), momentum.z());
+      ROOT::Math::XYZPoint TOrigin(aTrack->GetVertexPosition().x(),
+                                   aTrack->GetVertexPosition().y(),
+                                   aTrack->GetVertexPosition().z());
 
-      // convert to Basf2 units
+      // convert to basf2 units
       TPosition = TPosition * Unit::mm;
       TMomentum = TMomentum  * Unit::MeV;
       TOrigin = TOrigin * Unit::mm;
       tracklength = tracklength * Unit::mm;
 
       const auto& module = geo->getModule(moduleID);
-      TVector3 locPosition = module.pointToLocal(TPosition);
-      TVector3 locMomentum = module.momentumToLocal(TMomentum);
+      auto locPosition = module.pointToLocal(TPosition);
+      auto locMomentum = module.momentumToLocal(TMomentum);
       double theta = locMomentum.Theta();
       double phi = locMomentum.Phi();
 

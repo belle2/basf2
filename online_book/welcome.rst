@@ -6,4 +6,4 @@ Welcome!
 .. toctree::
 
    welcome/collaborative_tools
-   
+

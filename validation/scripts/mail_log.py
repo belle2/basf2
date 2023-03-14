@@ -139,6 +139,13 @@ class Mails:
             # this is called comparison_result but it is handled as error
             # type when composing mail
             failed_script["comparison_result"] = "script failed to execute"
+            # feat. adding links to plot/log files
+            failed_script["file_url"] = os.path.join(
+                'results',
+                self._validator.tag,
+                script.package,
+                script.name_not_sanitized
+            ) + ".log"
             # add contact of failed script to mail_log
             try:
                 for contact in parse_mail_address(script.contact):
@@ -168,7 +175,8 @@ class Mails:
                          "comparison_text": str,
                          "description": str,
                          "comparison_result": str,
-                         "warnings": str
+                         "warnings": str,
+                         "file_url": str
                      },
                  "title2": {...}
              },
@@ -205,6 +213,10 @@ class Mails:
                             list(
                                 set(plot["warnings"]) - {"No reference object"}
                             )
+                        ),
+                        "file_url": os.path.join(
+                            plot['plot_path'],
+                            plot['png_filename']
                         ),
                     }
                     # every contact gets an email
@@ -350,6 +362,7 @@ class Mails:
             warnings_str = ", ".join(plots[plot]["warnings"]).strip()
             if warnings_str:
                 body_plot += f"<b>Warnings:</b> {warnings_str}<br>"
+            body_plot += "<b>Error plot/log file:</b> <a href='{file_url}'>Click me</a><br>"
             # URLs are currently not working.
             # if plots[plot]["rootfile"] != "--":
             #     body_plot += '<a href="{url}#{package}-{rootfile}">' \
@@ -363,6 +376,7 @@ class Mails:
                 rootfile=plots[plot]["rootfile"],
                 description=plots[plot]["description"],
                 comparison_text=plots[plot]["comparison_text"],
+                file_url=url.split('static')[0]+plots[plot]["file_url"],
                 url=url,
             )
 
@@ -449,7 +463,8 @@ class Mails:
                         mood="happy",
                     )
 
-        print(f"Sent mails to the following people: {', '.join(recipients)}")
+        recipient_string = "\n".join([f"* {r}" for r in recipients])
+        print(f"Sent mails to the following people: \n{recipient_string}\n")
 
     def write_log(self):
         """

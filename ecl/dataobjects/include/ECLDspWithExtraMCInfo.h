@@ -84,7 +84,7 @@ namespace Belle2 {
     double m_timeshift{0};   /**< Time shift (weighted by true energy) */
     double m_timetosensor{0};   /**< time to sensor (weighted by true energy) */
 
-    ClassDef(ECLDspWithExtraMCInfo, 1);
+    ClassDef(ECLDspWithExtraMCInfo, 1); /**< ClassDef */
 
   };
 } // end namespace Belle2

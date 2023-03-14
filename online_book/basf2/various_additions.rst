@@ -12,22 +12,22 @@ Various additions
 
     **Prerequisites**:
 
-        * :ref:`onlinebook_first_steering_file`
+    * :ref:`onlinebook_first_steering_file`
 
     **Questions**:
 
-        * What is Bremsstrahlung radiation? Why do we care about it?
-        * How do we look for Bremsstrahlung photons?
-        * Why do we need to perform a best candidate selection?
-        * How can I correct for Bremsstrahlung?
-        * How can I perform a best candidate selection (BCS)?
+    * What is Bremsstrahlung radiation? Why do we care about it?
+    * How do we look for Bremsstrahlung photons?
+    * Why do we need to perform a best candidate selection?
+    * How can I correct for Bremsstrahlung?
+    * How can I perform a best candidate selection (BCS)?
 
     **Objectives**:
 
-        * Use the different Bremsstrahlung recovery strategies to correct the
-          momentum of the electrons in the
-          :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
-        * Perform a Best Candidate Selection
+    * Use the different Bremsstrahlung recovery strategies to correct the
+      momentum of the electrons in the
+      :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
+    * Perform a Best Candidate Selection
 
 What is Bremsstrahlung radiation?
 ---------------------------------
@@ -156,9 +156,9 @@ with the `passesCut` function.
 
    Create a particle list, called ``gamma:brems``, with photons following the next cuts:
 
-         1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
-         2. If they are in the barrel region, their energy should be larger than 50 MeV
-         3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
+   1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
+   2. If they are in the barrel region, their energy should be larger than 50 MeV
+   3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
 
    To do this, you need the `clusterReg` and `clusterE` variable.
    To keep everything neat and
@@ -185,15 +185,15 @@ with the `passesCut` function.
    This is the first one:
 
    .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 32-35
-           :lineno-start: 32
+           :start-at: S10
+           :end-at: E10
 
 .. admonition:: Solution
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 32-44
-           :lineno-start: 32
+           :start-at: S20
+           :end-at: E20
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
 Modular Analysis package.
@@ -218,8 +218,8 @@ one Bremsstrahlung photon was added to this particle.
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 46-47
-           :lineno-start: 46
+           :start-at: S30
+           :end-at: E30
 
 .. admonition:: Question
    :class: exercise stacked
@@ -270,8 +270,8 @@ variable by the `isSignalAcceptBremsPhotons` one, or add the ``?addbrems``
 marker to the decay string:
 
 .. literalinclude:: steering_files/039_various_additions.py
-   :lines: 49-54
-   :lineno-start: 49
+   :start-at: S40
+   :end-at: E40
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
@@ -307,8 +307,8 @@ Bremsstrahlung recovery?
     :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-      :lines: 112-114
-      :lineno-start: 112
+      :start-at: S50
+      :end-at: E50
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -387,7 +387,7 @@ Each one does exactly as its name indicates: they rank particles in descending
 variable provided as a parameter.
 They append to each particle an `extraInfo` field with the name
 ``${variable}_rank``, with the best candidate having the value one (1).
-Notice that *each particle/anti-particle list is sorted separately*, i.e.,if
+Notice that *each particle/anti-particle list is sorted separately*, i.e., if a
 certain event has multiple :math:`B^+` and :math:`B^-` candidates, and you apply
 the ranking function to any of the particle lists, each list will be ranked
 separately.
@@ -423,8 +423,8 @@ random seed.
    :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-       :lines: 73-75
-       :lineno-start: 73
+       :start-at: S60
+       :end-at: E60
 
 .. warning::
 
@@ -480,7 +480,7 @@ random seed.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-     Alejandro Mora,
-     Kilian Lieret
+Alejandro Mora,
+Kilian Lieret

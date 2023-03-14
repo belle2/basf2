@@ -25,8 +25,8 @@ whitespace, comma or semi-colon -->
 	<Material>HE3TUBE-Material</Material>
 	<MaterialTube>StainlessSteel304</MaterialTube>
 	<MaterialGas>HE3TUBE-Material</MaterialGas>
-	<x_he3tube unit="cm">22.7</x_he3tube>
-	<y_he3tube unit="cm">27.4</y_he3tube>
+	<x_he3tube unit="cm">35</x_he3tube>
+	<y_he3tube unit="cm">10</y_he3tube>
 	<z_he3tube unit="cm">192.9</z_he3tube>
 	<AngleX unit="deg">0.0</AngleX>
 	<AngleY unit="deg">0.0</AngleY>
@@ -68,7 +68,7 @@ whitespace, comma or semi-colon -->
 	<MaterialTube>StainlessSteel304</MaterialTube>
 	<MaterialGas>HE3TUBE-Material</MaterialGas>
 	<x_he3tube unit="cm">5</x_he3tube>
-	<y_he3tube unit="cm">-155</y_he3tube>
+	<y_he3tube unit="cm">-150</y_he3tube>
 	<z_he3tube unit="cm">1281.5</z_he3tube>
 	<AngleX unit="deg">0.0</AngleX>
 	<AngleY unit="deg">0.0</AngleY>

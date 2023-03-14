@@ -116,7 +116,8 @@ int main(int argc, char* argv[])
     prog::options_description generic("Generic options (to be used instead of steering file)");
     generic.add_options()
     ("help,h", "Print this help")
-    ("version,v", "Print version string")
+    ("version,v", "Print long and verbose version string")
+    ("version-short", "Print short version string")
     ("info", "Print information about basf2")
     ("license", "Print the short version of the basf2 license")
     ("modules,m", prog::value<string>()->implicit_value(""),
@@ -169,6 +170,8 @@ int main(int argc, char* argv[])
      "Create json file with metadata of output files and basf2 execution status.")
     ("realm", prog::value<string>(),
      "Set the realm of the basf2 execution (online or production).")
+    ("secondary-input", prog::value<vector<string>>(),
+     "Override name of input file for the secondary RootInput module used for the event embedding. Can be specified multiple times to use more than one file. Wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -194,6 +197,8 @@ int main(int argc, char* argv[])
       return 0;
     } else if (varMap.count("version")) {
       pythonFile = "basf2/version.py";
+    } else if (varMap.count("version-short")) {
+      pythonFile = "basf2/version_short.py";
     } else if (varMap.count("info")) {
       pythonFile = "basf2_cli/print_info.py";
     } else if (varMap.count("license")) {
@@ -398,6 +403,10 @@ int main(int argc, char* argv[])
       Environment::Instance().setRealm((LogConfig::ELogRealm)realm);
     }
 
+    if (varMap.count("secondary-input")) {
+      const auto& names = varMap["secondary-input"].as<vector<string>>();
+      Environment::Instance().setSecondaryInputFilesOverride(names);
+    }
 
   } catch (exception& e) {
     cerr << "error: " << e.what() << endl;

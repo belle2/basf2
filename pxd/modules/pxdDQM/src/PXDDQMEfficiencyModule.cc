@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiency)
+REG_MODULE(PXDDQMEfficiency);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -41,8 +41,8 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDEFF"));
-  addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
-  addParam("binsV", m_v_bins, "histogram bins in v direction", int(6));
+  addParam("binsU", m_u_bins, "histogram bins in u direction", int(16));
+  addParam("binsV", m_v_bins, "histogram bins in v direction", int(48));
   addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));
   addParam("pCut", m_pcut, "Set a cut on the track p-value", double(1e-20));
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(false));
@@ -58,7 +58,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
   addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negativ value eg -9999 disables)", double(-1));
   addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positiv value eg 9999 disables)", double(1));
-  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (and negativ value eg -9999 disables)", double(0.5));
+  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (large positiv value eg 9999 disables)", double(0.5));
   addParam("verboseHistos", m_verboseHistos, "Add more verbose histograms for cuts (not for ereoc)", bool(false));
 }
 
@@ -78,6 +78,7 @@ void PXDDQMEfficiencyModule::initialize()
 
 void PXDDQMEfficiencyModule::beginRun()
 {
+  if (m_h_combined) m_h_combined->Reset();
   for (auto& h : m_h_track_hits) if (h.second) h.second->Reset();
   for (auto& h : m_h_matched_cluster) if (h.second) h.second->Reset();
   for (auto& h : m_h_p) if (h.second) h.second->Reset();
@@ -143,8 +144,7 @@ void PXDDQMEfficiencyModule::event()
     // Vertex cut
     if (ptr2->getZ0() < m_z0minCut || ptr2->getZ0() > m_z0maxCut || fabs(ptr2->getD0()) > m_d0Cut) continue;
 
-    //loop over all PXD sensors to get the intersections
-    std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+    // Loop over all intercepts to sensors
     for (auto intercept : interceptList) {
       auto const aVxdID = intercept.getSensorID();
       auto&  info = m_vxdGeometry.getSensorInfo(aVxdID);
@@ -168,8 +168,9 @@ void PXDDQMEfficiencyModule::event()
         double u_fit = intercept.getCoorU();
         double v_fit = intercept.getCoorV();
 
-        int ucell_fit = info.getUCellID(u_fit); // check wie overflow!!!
-        int vcell_fit = info.getVCellID(v_fit); // Check wie overflow
+        // cell ID is not limited to sensor, can be <0 and >250,768
+        int ucell_fit = info.getUCellID(u_fit);
+        int vcell_fit = info.getVCellID(v_fit);
 
         if (m_cutBorders && isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
           continue;
@@ -184,7 +185,7 @@ void PXDDQMEfficiencyModule::event()
           //If not, even if measured the cluster was thrown away->Not PXD's fault
           bool fitInsideROI = false;
           for (auto& roit : m_ROIs) {
-            if (aVxdID != roit.getSensorID()) {
+            if (aVxdID != (roit.getSensorID()).getID()) {
               continue; //ROI on other sensor
             }
 
@@ -202,6 +203,8 @@ void PXDDQMEfficiencyModule::event()
 
         //This track should be on the sensor
         m_h_track_hits[aVxdID]->Fill(ucell_fit, vcell_fit);
+        auto sensor_index = revLUT[aVxdID];
+        m_h_combined->Fill(sensor_index * 2);
 
         //Now check if the sensor measured a hit here
 
@@ -214,6 +217,7 @@ void PXDDQMEfficiencyModule::event()
           TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
           if (dist_clus.Mag() <= m_distcut)  {
             m_h_matched_cluster[aVxdID]->Fill(ucell_fit, vcell_fit);
+            m_h_combined->Fill(sensor_index * 2 + 1);
             if (m_verboseHistos) {
               if (m_h_p2[aVxdID]) m_h_p2[aVxdID]->Fill(trackstate.getMom().Mag());
               if (m_h_pt2[aVxdID]) m_h_pt2[aVxdID]->Fill(trackstate.getMom().Pt());
@@ -237,10 +241,13 @@ void PXDDQMEfficiencyModule::defineHisto()
   }
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+  std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
+  int sensor_index = 0;
   for (VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors
+    revLUT[avxdid] = sensor_index++;
 
     TString buff = (std::string)avxdid;
     buff.ReplaceAll(".", "_");
@@ -265,6 +272,7 @@ void PXDDQMEfficiencyModule::defineHisto()
       m_h_sv2[avxdid] = new TH1F("sv2_" + buff, "sv2 " + buff, 1000, 0, 1);
     }
   }
+  m_h_combined = new TH1D("PXD_Eff_combined", "Efficiency combined", revLUT.size() * 2, 0, revLUT.size() * 2);
   // cd back to root directory
   oldDir->cd();
 }

@@ -31,6 +31,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
+    ApplyHLTHadronCut = False
 
     def __init__(self, prescale=1, **kwargs):
         """
@@ -130,6 +131,7 @@ class LowMassTwoTrack(BaseSkim):
 
     TestSampleProcess = "mumu"
     validation_sample = _VALIDATION_SAMPLE
+    ApplyHLTHadronCut = False
 
     def build_lists(self, path):
         label = "LowMassTwoTrack"
@@ -226,6 +228,7 @@ class SingleTagPseudoScalar(BaseSkim):
     __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
     __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -237,11 +240,11 @@ class SingleTagPseudoScalar(BaseSkim):
         label = "PseudoScalarSkim"
         TrackCuts = "abs(dz) < 2.0 and dr < 0.5 and pt > 0.15"
 
-        ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and electronID > 0.7", path=path)
-        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and electronID < 0.7", path=path)
+        ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and clusterEoP > 0.7", path=path)
+        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and [not isInList(e+:{label})]", path=path)
         ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path)
 
-        pi0MassWindow = "0.06 < InvM < 0.18"
+        pi0MassWindow = "0.04 < InvM < 0.4"
         etaMassWindow = "0.50 < InvM < 0.60"
         etapMassWindow = "0.91 < InvM < 1.10"
         ModesAndCuts = [

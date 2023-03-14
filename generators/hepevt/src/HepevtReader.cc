@@ -17,7 +17,7 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -50,12 +50,11 @@ int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     MCParticleGraph::GraphParticle& p = graph[first + i];
     readParticle(p);
 
-    //boost particles to lab frame:
-    TLorentzVector p4 = p.get4Vector();
-    if (m_wrongSignPz) // this means we have to mirror Pz
+    if (m_wrongSignPz) { // this means we have to mirror Pz
+      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
       p4.SetPz(-1.0 * p4.Pz());
-    p4 = m_labboost * p4;
-    p.set4Vector(p4);
+      p.set4Vector(p4);
+    }
 
     //Check for sensible daughter indices
     int d1 = p.getFirstDaughter();
@@ -177,7 +176,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setPDG(static_cast<int>(fields[1]));
       particle.setFirstDaughter(static_cast<int>(fields[2]));
       particle.setLastDaughter(static_cast<int>(fields[3]));
-      particle.setMomentum(TVector3(&fields[4]));
+      particle.setMomentum(ROOT::Math::XYZVector(fields[4], fields[5], fields[6]));
       particle.setMass(fields[7]);
       break;
     case 6:
@@ -185,7 +184,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setPDG(static_cast<int>(fields[5]));
       particle.setFirstDaughter(0);
       particle.setLastDaughter(0);
-      particle.setMomentum(TVector3(&fields[0]));
+      particle.setMomentum(ROOT::Math::XYZVector(fields[0], fields[1], fields[2]));
       particle.setMass(fields[4]);
       particle.setEnergy(fields[3]);
       break;
@@ -195,8 +194,8 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setPDG(static_cast<int>(fields[8]));
       particle.setFirstDaughter(0);
       particle.setLastDaughter(0);
-      particle.setProductionVertex(TVector3(&fields[0])*Unit::mm);
-      particle.setMomentum(TVector3(&fields[3]));
+      particle.setProductionVertex(ROOT::Math::XYZVector(fields[0], fields[1], fields[2])*Unit::mm);
+      particle.setMomentum(ROOT::Math::XYZVector(fields[3], fields[4], fields[5]));
       particle.setMass(fields[6]);
       particle.setEnergy(fields[7]);
       break;
@@ -206,10 +205,10 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setPDG(static_cast<int>(fields[1]));
       particle.setFirstDaughter(static_cast<int>(fields[4]));
       particle.setLastDaughter(static_cast<int>(fields[5]));
-      particle.setMomentum(TVector3(&fields[6]));
+      particle.setMomentum(ROOT::Math::XYZVector(fields[6], fields[7], fields[8]));
       //particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
-      particle.setProductionVertex(TVector3(&fields[11])*Unit::mm);
+      particle.setProductionVertex(ROOT::Math::XYZVector(fields[11], fields[12], fields[13])*Unit::mm);
       particle.setProductionTime(fields[14]*Unit::mm / Const::speedOfLight);
       particle.setValidVertex(true);
       {

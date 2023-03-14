@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -16,8 +15,7 @@ args = setup_basf2_and_db()
 
 path = start_path(args, location=constants.Location.hlt)
 add_hlt_processing(path, run_type=constants.RunTypes.cosmic,
-                   softwaretrigger_mode=constants.SoftwareTriggerModes.monitor,
-                   data_taking_period="early_phase3")
+                   softwaretrigger_mode=constants.SoftwareTriggerModes.monitor)
 finalize_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

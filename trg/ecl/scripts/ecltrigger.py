@@ -31,9 +31,10 @@ def add_ecl_trigger(path):
     trgecl.param('Clustering', 1)
     # The limit # of cluster in clustering logic
     trgecl.param('ClusterLimit', 6)
+
     # Theta ID region(low and high) of 3DBhabhaVetoInTrack
     trgecl.param('3DBhabhaVetoInTrackThetaRegion', [3, 15])
-    # taub2b 2 cluster angle selection in CM (degree)
+    # taub2b two cluster angle selection in CM (degree)
     # (phi low, phi high, theta low, theta high)
     trgecl.param('Taub2bAngleCut', [110, 250, 130, 230])
     # taub2b total energy cut in lab (GeV)
@@ -41,5 +42,30 @@ def add_ecl_trigger(path):
     # taub2b cluster energy selection in lab (GeV) : E(CL1) and E(CL2)
     trgecl.param('Taub2bClusterECut1', 1.9)
     trgecl.param('Taub2bClusterECut2', 999.0)
+
+    # taub2b2 two cluster angle selection in CM (degree)
+    # (phi low, phi high, theta low, theta high)
+    trgecl.param('Taub2b2AngleCut', [120, 240, 140, 220])
+    # taub2b2 total energy cut in lab (GeV)
+    trgecl.param('Taub2b2EtotCut', 7.0)
+    # taub2b2 cluster energy cut in lab (GeV) for cluseter in endcap
+    trgecl.param('Taub2b2CLEEndcapCut', 3.0)
+    # taub2b2 cluster energy selection in lab (GeV)
+    trgecl.param('Taub2b2CLECut', 0.162)
+
+    # taub2b3 two cluster angle selection in CM (degree)
+    # (phi low, phi high, theta low, theta high)
+    trgecl.param('Taub2b3AngleCut', [120, 240, 140, 220])
+    # taub2b3 total energy cut in lab (GeV)
+    trgecl.param('Taub2b3EtotCut', 7.0)
+    # taub2b3 cluster energy cut in lab (GeV) for one of b2b cluseter
+    trgecl.param('Taub2b3CLEb2bCut', 0.14)
+    # taub2b3 cluster energy low selection in lab (GeV) for all clusters
+    trgecl.param('Taub2b3CLELowCut', 0.12)
+    # taub2b3 cluster energy high selection in lab (GeV) for all clusters
+    trgecl.param('Taub2b3CLEHighCut', 4.5)
+
+    # angle selection for addition Bhabha veto
+    trgecl.param('3DBhabhaAddAngleCut', [150, 210, 160, 200])
     #
     path.add_module(trgecl)

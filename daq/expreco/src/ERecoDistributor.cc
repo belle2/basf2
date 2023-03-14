@@ -87,7 +87,7 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
   m_nnodes = 0;
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  //char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char* sender = m_conf->getconf("distributor", "sender", "script");
@@ -172,7 +172,7 @@ int ERecoDistributor::UnConfigure(NSMmsg*, NSMcontext*)
 
 int ERecoDistributor::Start(NSMmsg*, NSMcontext*)
 {
-  //  m_rbufin->clear();
+  m_rbufin->clear();
   return 0;
 }
 
@@ -202,7 +202,6 @@ void ERecoDistributor::server()
   m_flow->fillProcessStatus(GetNodeInfo());
 
   while (true) {
-    int sender_id = 0; // the only useage is commented below? do we need it?
     pid_t pid = m_proc->CheckProcess();
     if (pid > 0) {
       printf("ERecoDistributor : process dead. pid = %d\n", pid);
@@ -216,7 +215,6 @@ void ERecoDistributor::server()
         if (pid == m_pid_sender[i]) {
           m_log->Fatal("ERecoDistributor : sender process (%d) dead. pid=%d\n", i, m_pid_sender[i]);
           m_pid_sender[i] = 0;
-          sender_id = i;
         }
       }
     }

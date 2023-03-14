@@ -26,7 +26,6 @@ class versions and checksums
 import re
 import os
 import sys
-import ROOT
 from basf2 import B2INFO, B2ERROR, B2WARNING
 
 
@@ -58,6 +57,8 @@ def check_base_classes(tclass):
 
 def check_dictionary(classname):
     """Make sure we have a dictionary for the class and all its members"""
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
         raise ClassVersionError("Cannot find TClass object")
@@ -72,6 +73,8 @@ def check_dictionary(classname):
 
 def get_class_version(classname):
     """Get the Class version and checksum for a fully qualified C++ class name"""
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
         raise ClassVersionError("Cannot find TClass object")

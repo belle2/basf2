@@ -5,6 +5,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+
 def list_to_vector(lst):
     """
     Helper function to convert a python list into a std::vector of the same type.
@@ -164,7 +166,7 @@ def get_all_cuts():
             base_name=base_identifier, do_set_event_number=False)
         if not menu:
             continue
-        cuts = menu.getCutIdentifiers()
+        cuts = [str(cut) for cut in menu.getCutIdentifiers()]
         for cut_identifier in cuts:
             cut = download_cut_from_db(
                 base_name=base_identifier,

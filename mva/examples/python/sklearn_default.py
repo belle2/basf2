@@ -29,7 +29,7 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
     # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
@@ -53,5 +53,5 @@ if __name__ == "__main__":
     p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("SKLearn", training_time, inference_time, auc)

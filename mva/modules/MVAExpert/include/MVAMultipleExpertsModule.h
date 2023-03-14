@@ -17,10 +17,10 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/VariableManager/Manager.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 
@@ -56,26 +56,34 @@ namespace Belle2 {
     /**
      * Called at the end of the event processing.
      */
-    virtual void terminate() override
-    {
-      for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
-        m_experts[i].reset();
-        m_datasets[i].reset();
-      }
-    }
+    virtual void terminate() override;
 
   private:
     /**
      * Calculates expert output for given Particle pointer
      */
-    std::vector<float> analyse(Particle*);
+    std::vector<std::vector<float>> analyse(Particle*);
 
     /**
      * Initialize mva expert, dataset and features
-     * Called everytime the weightfile in the database changes in begin run
+     * Called every time the weightfile in the database changes in begin run
      */
     void init_mva(MVA::Weightfile& weightfile, unsigned int i);
 
+    /**
+     * Evaluate the variables and fill the Datasets to be used by the experts.
+     */
+    void fillDatasets(Particle*);
+
+    /**
+     * Set the extra info field.
+     */
+    void setExtraInfoField(Particle*, std::string, float, unsigned int);
+
+    /**
+     * Set the event extra info field.
+     */
+    void setEventExtraInfoField(StoreObjPtr<EventExtraInfo>, std::string, float, unsigned int);
 
   private:
 
@@ -99,6 +107,13 @@ namespace Belle2 {
     std::vector<std::unique_ptr<MVA::Expert>> m_experts; /**< Vector of pointers to the current MVA Experts */
 
     std::vector<std::unique_ptr<MVA::SingleDataset>> m_datasets; /**< Vector of pointers to the current input datasets */
+
+    std::vector<int>
+    m_overwriteExistingExtraInfo; /**< vector of -1/0/1/2: overwrite if lower/ don't overwrite / overwrite if higher/ always overwrite, in case the given extraInfo for the corresponding method is already defined. */
+    std::vector<bool> m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
+
+    std::vector<unsigned int>
+    m_nClasses; /**< number of classes (~outputs) of the MVA Experts. If m_nClasses==2 then only 1 output is expected. */
   };
 
 } // Belle2 namespace

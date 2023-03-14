@@ -30,7 +30,7 @@ class LeptonicUntagged(BaseSkim):
 
     Cuts applied
         * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
-        * :math:`\\text{electronID} > 0.5`
+        * :math:`\\text{electronID_noTOP} > 0.5`
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
@@ -53,7 +53,7 @@ class LeptonicUntagged(BaseSkim):
         ma.cutAndCopyList(
             "e-:LeptonicUntagged",
             "e-:all",
-            "useCMSFrame(p) > 2.0 and electronID > 0.5",
+            "useCMSFrame(p) > 2.0 and electronID_noTOP > 0.5",
             True,
             path=path,
         )
@@ -86,7 +86,7 @@ class LeptonicUntagged(BaseSkim):
             path=path,
         )
         vm.addAlias("d0_p", "daughter(0,p)")
-        vm.addAlias("d0_electronID", "daughter(0,electronID)")
+        vm.addAlias("d0_electronID_noTOP", "daughter(0,electronID_noTOP)")
         vm.addAlias("d0_muonID", "daughter(0,muonID)")
         vm.addAlias("MissP", "weMissP(basic,0)")
 
@@ -99,9 +99,9 @@ class LeptonicUntagged(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 4.0, 5.3, "Mbc", contact, "", ""),
                 ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
-                ("d0_electronID", 100, 0, 1, "electronID of signal-side lepton",
+                ("d0_electronID_noTOP", 100, 0, 1, "electronID_noTOP of signal-side lepton",
                  contact, "", ""),
-                ("d0_muonID", 100, 0, 1, "electronID of signal-side lepton", contact,
+                ("d0_muonID", 100, 0, 1, "electronID_noTOP of signal-side lepton", contact,
                  "", ""),
                 ("R2", 100, 0, 1, "R2", contact, "", ""),
                 ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
@@ -119,9 +119,9 @@ class LeptonicUntagged(BaseSkim):
 class dilepton(BaseSkim):
     """
     Reconstructed decays
-        * :math:`BBar \\to l^+l^-`
-        * :math:`BBar \\to l^+l^+`
-        * :math:`BBar \\to l^-l^-`
+        * :math:`B\\overline{B} \\to l^+l^-`
+        * :math:`B\\overline{B} \\to l^+l^+`
+        * :math:`B\\overline{B} \\to l^-l^-`
     """
     __authors__ = ["Alessandro Gaz, Chiara La Licata"]
     __contact__ = __liaison__
@@ -129,6 +129,8 @@ class dilepton(BaseSkim):
         "Inclusive dilepton skim"
     )
     __category__ = "physics, leptonic"
+
+    NoisyModules = ["EventShapeCalculator"]
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -138,7 +140,7 @@ class dilepton(BaseSkim):
         ma.cutAndCopyList(
             "e+:pid",
             "e+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID > 0.5",
+            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID_noTOP > 0.5",
             True,
             path=path,
         )
@@ -164,7 +166,7 @@ class dilepton(BaseSkim):
             checkForDuplicates=False,
             path=path)
 
-        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks > 3', path=path)
+        path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 3', path=path)
 
         ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
         ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)

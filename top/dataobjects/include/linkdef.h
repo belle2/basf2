@@ -11,11 +11,11 @@
 #pragma link C++ class Belle2::TOPDigit+; // checksum=0x43b82094, version=15
 #pragma link C++ class Belle2::TOPBarHit+; // checksum=0x88bd7661, version=3
 #pragma link C++ class Belle2::TOPLikelihood+; // checksum=0xd7c618b7, version=2
-#pragma link C++ class Belle2::TOPRecBunch+; // checksum=0xa16167cd, version=3
+#pragma link C++ class Belle2::TOPRecBunch+; // checksum=0xdb990202, version=5
 #pragma link C++ class Belle2::TOPRawWaveform+; // checksum=0x581d60d9, version=9
 #pragma link C++ class Belle2::TOPProductionEventDebug+; // checksum=0xfbeb4b5d, version=1
 #pragma link C++ class Belle2::TOPProductionHitDebug+; // checksum=0x32688835, version=1
-#pragma link C++ class Belle2::TOPTimeZero+; // checksum=0xb02c2f5a, version=3
+#pragma link C++ class Belle2::TOPTimeZero+; // checksum=0xf7afaec4, version=4
 #pragma link C++ class Belle2::TOPRawDigit+; // checksum=0xd13d975f, version=6
 #pragma link C++ class Belle2::TOPSlowData+; // checksum=0x879d972e, version=1
 #pragma link C++ class Belle2::TOPInterimFEInfo+; // checksum=0x740da743, version=1
@@ -23,13 +23,22 @@
 #pragma link C++ class Belle2::TOPTriggerDigit+; // checksum=0x1b8ad25b, version=1
 #pragma link C++ class Belle2::TOPTriggerMCInfo+; // checksum=0x75ce1ae2, version=1
 #pragma link C++ class Belle2::TOPPull+; // checksum=0x6aabd603, version=2
-#pragma link C++ class Belle2::TOPPDFCollection+; // checksum=0xa97488a7, version=3
+#pragma link C++ class Belle2::TOPPDFCollection+; // checksum=0x988e24cb, version=4
 #pragma link C++ class Belle2::TOPPixelLikelihood+; // checksum=0x3ac6e98b, version=3
 #pragma link C++ class Belle2::TOPAsicMask+; // checksum=0xacc40676, version=1
 #pragma link C++ class Belle2::TOPAssociatedPDF+; // checksum=0xc79734f7, version=2
 #pragma link C++ class Belle2::TOPLikelihoodScanResult+; // checksum=0x2835bf5d, version=1
 
 // schema evolution rules to allow reading of old class versions
+
+#pragma read sourceClass="Belle2::TOPPDFCollection" version="[3]" \
+  source="TVector3 m_localHitPosition" \
+  targetClass="Belle2::TOPPDFCollection" target="m_localHitPosition" \
+  code="{m_localHitPosition = ROOT::Math::XYZPoint(onfile.m_localHitPosition);}"
+#pragma read sourceClass="Belle2::TOPPDFCollection" version="[3]" \
+  source = "TVector3 m_localHitMomentum" \
+  targetClass = "Belle2::TOPPDFCollection" target = "m_localHitMomentum" \
+  code = "{m_localHitMomentum = ROOT::Math::XYZVector(onfile.m_localHitMomentum);}"
 
 #pragma read sourceClass="Belle2::TOPSimHit" version="[-2]" \
   source="int m_barID" \

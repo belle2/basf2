@@ -24,8 +24,11 @@ namespace Belle2 {
 
       /// Default constructor, needs to be public for initialization in CDCMCManager
       CDCMCSegment2DLookUp() = default;
+
       /// Singleton: Delete copy constructor and assignment operator,
       CDCMCSegment2DLookUp(CDCMCSegment2DLookUp&) = delete;
+
+      /// Operator =.
       CDCMCSegment2DLookUp& operator=(const CDCMCSegment2DLookUp&) = delete;
     };
   }

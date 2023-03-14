@@ -26,11 +26,12 @@
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
+#include <TMath.h>
 #include <map>
 
 using namespace Belle2;
 
-REG_MODULE(PhysicsObjectsMiraBelle)
+REG_MODULE(PhysicsObjectsMiraBelle);
 
 PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
 {
@@ -40,6 +41,7 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("MuPListName", m_muPListName, "Name of the muon particle list", std::string("mu+:physMiraBelle"));
+  addParam("MuMuPListName", m_mumuPListName, "Name of the di-muon particle list", std::string("Upsilon:physMiraBelle"));
 }
 
 void PhysicsObjectsMiraBelleModule::defineHisto()
@@ -67,13 +69,13 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_dZ0->SetXTitle("hist_dZ0");
   m_h_dPtcms = new TH1F("hist_dPtcms", "hist_dPtcms", 100, -0.5, 0.5);
   m_h_dPtcms->SetXTitle("hist_dPtcms");
-  m_h_nExtraCDCHits = new TH1F("hist_nExtraCDCHits", "hist_nExtraCDCHits", 100, 0, 1600);
+  m_h_nExtraCDCHits = new TH1F("hist_nExtraCDCHits", "hist_nExtraCDCHits", 500, 0, 5000);
   m_h_nExtraCDCHits->SetXTitle("hist_nExtraCDCHits");
   m_h_nECLClusters = new TH1F("hist_nECLClusters", "hist_nECLClusters", 100, 0, 60);
   m_h_nECLClusters->SetXTitle("hist_nECLClusters");
   m_h_muid = new TH1F("hist_muid", "hist_muid", 20, 0, 1);
   m_h_muid->SetXTitle("hist_muid");
-  m_h_inv_p = new TH1F("hist_inv_p", "hist_inv_p", 100, 8, 12);
+  m_h_inv_p = new TH1F("hist_inv_p", "hist_inv_p", 400, 8, 12);
   m_h_inv_p->SetXTitle("hist_inv_p");
   m_h_ndf = new TH1F("hist_ndf", "hist_ndf", 100, 0, 80);
   m_h_ndf->SetXTitle("hist_ndf");
@@ -81,9 +83,11 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_D0->SetXTitle("hist_D0");
   m_h_Z0 = new TH1F("hist_Z0", "hist_Z0", 100, -0.3, 0.3);
   m_h_Z0->SetXTitle("hist_Z0");
-  m_h_theta = new TH1F("hist_theta", "hist_theta", 36, 10, 170);
+  m_h_theta = new TH1F("hist_theta", "hist_theta in CMS", 32, 10, 170);
   m_h_theta->SetXTitle("hist_theta");
-  m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0", 72, -180, 180);
+  m_h_theta_lab = new TH1F("hist_theta_lab", "hist_theta in lab frame", 180, 0, 180);
+  m_h_theta_lab->SetXTitle("hist_theta_lab");
+  m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0 in lab frame", 72, -180, 180);
   m_h_Phi0->SetXTitle("hist_Phi0");
   m_h_Pt = new TH1F("hist_Pt", "hist_Pt", 100, 0, 10);
   m_h_Pt->SetXTitle("hist_Pt");
@@ -95,8 +99,10 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_klmTotalBarrelHits->SetXTitle("hist_klmTotalBarrelHits");
   m_h_klmTotalEndcapHits = new TH1F("hist_klmTotalEndcapHits", "hist_klmTotalEndcapHits", 16, 0, 16);
   m_h_klmTotalEndcapHits->SetXTitle("hist_klmTotalEndcapHits");
-  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms", 100, -1, 1);
+  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms: 180#circ - |#phi_{1} - #phi_{2}|", 100, -10, 10);
   m_h_dPhicms->SetXTitle("hist_dPhicms");
+  m_h_dThetacms = new TH1F("hist_dThetacms", "hist_dThetacms: |#theta_{1} + #theta_{2}| - 180#circ", 100, -10, 10);
+  m_h_dThetacms->SetXTitle("hist_dThetacms");
 
   oldDir->cd();
 }
@@ -130,6 +136,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_D0->Reset();
   m_h_Z0->Reset();
   m_h_theta->Reset();
+  m_h_theta_lab->Reset();
   m_h_Phi0->Reset();
   m_h_Pt->Reset();
   m_h_Mom->Reset();
@@ -137,6 +144,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_klmTotalBarrelHits->Reset();
   m_h_klmTotalEndcapHits->Reset();
   m_h_dPhicms->Reset();
+  m_h_dThetacms->Reset();
 }
 
 void PhysicsObjectsMiraBelleModule::event()
@@ -163,6 +171,16 @@ void PhysicsObjectsMiraBelleModule::event()
   double z0[2] = {};
   double ptcms[2] = {};
   double phicms[2] = {};
+  double thetacms[2] = {};
+
+  //get the di-muons for beam energy check
+  StoreObjPtr<ParticleList> UpsParticles(m_mumuPListName);
+  if (UpsParticles.isValid()) {
+    for (unsigned int i = 0; i < UpsParticles->getListSize(); i++) {
+      Particle* Ups = UpsParticles->getParticle(i);
+      m_h_inv_p->Fill(Ups->getMass());
+    }
+  }
 
   // get muons
   StoreObjPtr<ParticleList> muParticles(m_muPListName);
@@ -219,10 +237,12 @@ void PhysicsObjectsMiraBelleModule::event()
       m_h_Z0->Fill(z0[index]);
       // Momentum
       ptcms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Pt();//CMS
-      phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi();
+      phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi() * TMath::RadToDeg();
+      thetacms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg();
       m_h_Pt->Fill(fitresult->get4Momentum().Pt());//Lab
-      m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta());//CMS
-      m_h_Phi0->Fill(fitresult->get4Momentum().Phi());//Lab
+      m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg());//CMS
+      m_h_theta_lab->Fill(fitresult->get4Momentum().Theta() * TMath::RadToDeg());//Lab
+      m_h_Phi0->Fill(fitresult->get4Momentum().Phi() * TMath::RadToDeg());//Lab
       m_h_Mom->Fill(fitresult->get4Momentum().P());//Lab
     }
   }
@@ -231,6 +251,7 @@ void PhysicsObjectsMiraBelleModule::event()
   m_h_dZ0->Fill((z0[0] - z0[1]) / sqrt(2));
   m_h_dPtcms->Fill((ptcms[0] - ptcms[1]) / sqrt(2));
   m_h_dPhicms->Fill(180 - abs(phicms[0] - phicms[1]));
+  m_h_dThetacms->Fill(abs(thetacms[0] + thetacms[1]) - 180);
   // Event level information
   StoreObjPtr<EventLevelTrackingInfo> elti;
   if (elti) {

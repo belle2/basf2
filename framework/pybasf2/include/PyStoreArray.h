@@ -20,7 +20,7 @@ class TObject;
 #include <string>
 
 namespace Belle2 {
-  /** a (simplified) python wrapper for StoreArray.
+  /** A (simplified) python wrapper for StoreArray.
   *
   * Compared to StoreArray, PyStoreArray returns only TObject pointers (since
   * it doesn't use templates). Thanks to Python, you can still access all
@@ -39,13 +39,29 @@ namespace Belle2 {
      simhits = Belle2.PyStoreArray('PXDSimHits')
      # Alternative: simhits = Belle2.PyStoreArray(Belle2.PXDSimHits.Class())
      for hit in simhits:
-         part = hit.getRelatedFrom('MCParticles')
-         print("Edep: ", str(hit.getEnergyDep()))
-         print("Particle: ", str(part.getPDG()))
+       part = hit.getRelatedFrom('MCParticles')
+       print("Edep: ", str(hit.getEnergyDep()))
+       print("Particle: ", str(part.getPDG()))
     \endcode
   *
   * You can check the runtime type information of the returned objects by
   * using Python's built-in type() function.
+  *
+  * In case you want to access a named relation (for example, from "Tracks"
+  * to "KLMClusters" with a named relation "Secondary"), you can follow
+  * the following example:
+  *
+  * \code{.py}
+     from ROOT import Belle2
+     tracks = Belle2.PyStoreArray('Tracks')
+     for tracks in tracks:
+       clusters = track.getRelationsTo['KLMCluster']('KLMClusters', 'Secondary')
+       for cluster in clusters:
+         # Do something
+    \endcode
+  *
+  * The synthax is: `getRelationsTo['ClassName']('StoreArrayName', 'RelationName')`
+  * where `StoreArrayName` can be omitted in case of default store arrays.
   *
   * \sa PyStoreObj and the Conditions Data interface classes PyDBObj and PyDBArray
   */

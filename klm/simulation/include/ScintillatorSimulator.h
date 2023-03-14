@@ -9,15 +9,12 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <klm/time/KLMTime.h>
-
-/* Belle 2 headers. */
-#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
 
@@ -65,22 +62,13 @@ namespace Belle2 {
       ~ScintillatorSimulator();
 
       /**
-       * Simulate BKLM strip.
+       * Simulate a strip.
        * @param[in] firstHit First hit in this strip.
        * @param[in] end      End of hit range.
        */
       void simulate(
-        const std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator& firstHit,
-        const std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator& end);
-
-      /**
-       * Simulate EKLM strip.
-       * @param[in] firstHit First hit in this strip.
-       * @param[in] end      End of hit range.
-       */
-      void simulate(
-        const std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator& firstHit,
-        const std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator& end);
+        const std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator& firstHit,
+        const std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.

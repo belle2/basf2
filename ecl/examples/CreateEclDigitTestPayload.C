@@ -7,13 +7,16 @@
  **************************************************************************/
 
 int CreateEclDigitTestPayload(const std::string& outfile = "out.root", const std::string& type = "time"){
-  
+
   // Open output file
   TFile *file = new TFile(outfile.c_str(), "RECREATE");
-  
+
+  // Using return -1 to signify file == null pointer
+  if(!file) return -1;
+
   // Constants
   const int c_nCrystals = 8736;
-                          
+
   // Make calibration histograms
   if(type == "energy" ){
     TH1F* energy = new TH1F("energy", "energy", c_nCrystals, 0, c_nCrystals);
@@ -30,10 +33,11 @@ int CreateEclDigitTestPayload(const std::string& outfile = "out.root", const std
     }
   } //end time
   else return -1;
-  
+
   file->Write();
   file->Close();
-  if(file) delete file;
+
+  delete file;
 
   return 1;
 }

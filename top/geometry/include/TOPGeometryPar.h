@@ -61,7 +61,7 @@ namespace Belle2 {
       bool isValid() const {return m_valid;}
 
       /**
-       * Returns pointer to geometry object using Basf2 units
+       * Returns pointer to geometry object using basf2 units
        * @return pointer to geometry object
        */
       const TOPGeometry* getGeometry() const;

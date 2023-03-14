@@ -13,6 +13,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventT0.h>
+#include <limits>
 
 //ECL
 #include <ecl/dataobjects/ECLShower.h>
@@ -30,8 +31,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLFinalizer)
-REG_MODULE(ECLFinalizerPureCsI)
+REG_MODULE(ECLFinalizer);
+REG_MODULE(ECLFinalizerPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -174,8 +175,17 @@ void ECLFinalizerModule::event()
   if (!m_eventLevelClusteringInfo) {
     m_eventLevelClusteringInfo.create();
   }
+
+  if (rejectedShowersFwd > std::numeric_limits<int>::max())
+    rejectedShowersFwd = std::numeric_limits<int>::max();
   m_eventLevelClusteringInfo->setNECLShowersRejectedFWD(rejectedShowersFwd);
+
+  if (rejectedShowersBrl > static_cast<int>(std::numeric_limits<uint8_t>::max()))
+    rejectedShowersBrl = static_cast<int>(std::numeric_limits<uint8_t>::max());
   m_eventLevelClusteringInfo->setNECLShowersRejectedBarrel(rejectedShowersBrl);
+
+  if (rejectedShowersBwd > std::numeric_limits<int>::max())
+    rejectedShowersBwd = std::numeric_limits<int>::max();
   m_eventLevelClusteringInfo->setNECLShowersRejectedBWD(rejectedShowersBwd);
 
   B2DEBUG(35, "ECLFinalizerModule::event found " << rejectedShowersFwd << ", " << rejectedShowersBrl << ", " << rejectedShowersBwd
@@ -231,8 +241,8 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   };
   eclCluster->setCovarianceMatrix(covmat);
 
-  eclCluster->setAbsZernike40(eclShower->getAbsZernike40());
-  eclCluster->setAbsZernike51(eclShower->getAbsZernike51());
+  eclCluster->setAbsZernike40(eclShower->getAbsZernikeMoment(4, 0));
+  eclCluster->setAbsZernike51(eclShower->getAbsZernikeMoment(5, 1));
   eclCluster->setZernikeMVA(eclShower->getZernikeMVA());
   eclCluster->setE1oE9(eclShower->getE1oE9());
   eclCluster->setE9oE21(eclShower->getE9oE21());

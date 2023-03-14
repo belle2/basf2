@@ -5,18 +5,18 @@
 <header>
     <input>PhokharaEvtgenData.root</input>
     <output>PhokharaEvtgenAnalysis.root</output>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Analysis of e+ e- -> J/psi eta_c events.</description>
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 import ROOT
 import numpy
 from ROOT import Belle2
 
 
-class PhokharaEvtgenAnalysisModule(Module):
+class PhokharaEvtgenAnalysisModule(b2.Module):
     """ Analysis module for PhokharaEvtgen. """
 
     def __init__(self):
@@ -102,20 +102,21 @@ class PhokharaEvtgenAnalysisModule(Module):
 
 
 # Input.
-root_input = register_module('RootInput')
+root_input = b2.register_module('RootInput')
 root_input.param('inputFileName', 'PhokharaEvtgenData.root')
 
 # Analysis.
 phokhara_evtgen = PhokharaEvtgenAnalysisModule()
 
 # Create main path.
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(root_input)
 main.add_module(phokhara_evtgen)
 
+main.add_module('Progress')
 # Run.
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

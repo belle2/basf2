@@ -19,11 +19,6 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * Returns the reduced Fox-Wolfram moment R2, calculated at the event level.
-     */
-    double R2EventLevel(const Particle* particle);
-
-    /**
      * Returns the reduced Fox-Wolfram moment R2, calculated at the analysis level.
      */
     double R2(const Particle* particle);

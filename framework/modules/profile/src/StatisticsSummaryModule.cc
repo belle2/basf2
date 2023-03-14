@@ -15,7 +15,7 @@
 using namespace Belle2;
 
 // Register the Module
-REG_MODULE(StatisticsSummary)
+REG_MODULE(StatisticsSummary);
 
 
 StatisticsSummaryModule::StatisticsSummaryModule() : Module(), m_processStatistics("", DataStore::c_Persistent)

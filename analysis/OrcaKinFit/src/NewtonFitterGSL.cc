@@ -481,7 +481,7 @@ namespace Belle2 {
       return chi2;
     }
 
-    void NewtonFitterGSL::printMy(double Ma[], double yo[], int idime)
+    void NewtonFitterGSL::printMy(const double Ma[], const double yo[], int idime)
     {
       for (int i = 0; i < idime; ++i) {
         B2INFO(i << "  [ " << Ma[idime * i + 0]);
@@ -777,7 +777,7 @@ namespace Belle2 {
       }
 
       // Second, all terms d^2 chi^2/dlambda dx,
-      // i.e. the first derivatives of the contraints,
+      // i.e. the first derivatives of the constraints,
       // plus the second derivatives times the lambda values
       for (auto c : constraints) {
         assert(c);
@@ -879,7 +879,7 @@ namespace Belle2 {
         debug_print(grad, "grad");
       }
 
-      // Code adapted from Numerical Recipies (3rd ed), page 479
+      // Code adapted from Numerical Recipes (3rd ed), page 479
       // routine lnsrch
 
       int nite = 0;

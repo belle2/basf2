@@ -173,7 +173,7 @@ with b2test_utils.clean_working_directory():
     ntupleName = 'particleWeighting.root'
     treeName = 'pitree'
     inputfile = b2test_utils.require_file('analysis/tests/mdst.root')
-    ma.inputMdst("default", inputfile, path=main)
+    ma.inputMdst(inputfile, path=main)
 
     # use the MC truth information to generate pion lists
     ma.fillParticleListFromMC('pi+:gen', '', path=main)

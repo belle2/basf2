@@ -24,8 +24,8 @@ namespace Belle2 {
     {
       int version = pt.get<int>("TMVA_version");
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
       m_method = pt.get<std::string>("TMVA_method");
       m_type = pt.get<std::string>("TMVA_type");
@@ -115,17 +115,9 @@ namespace Belle2 {
     TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options) : Teacher(general_options),
       specific_options(_specific_options) { }
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
     Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, const std::string& jobName) const
-#else
-    Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, const std::string& jobName) const
-#endif
     {
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       data_loader.PrepareTrainingAndTestTree("", specific_options.m_prepareOption);
-#else
-      factory.PrepareTrainingAndTestTree("", specific_options.m_prepareOption);
-#endif
 
       if (specific_options.m_type == "Plugins") {
         auto base = std::string("TMVA@@MethodBase");
@@ -140,19 +132,15 @@ namespace Belle2 {
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
       }
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       if (!factory.BookMethod(&data_loader, specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
-#else
-      if (!factory.BookMethod(specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
-#endif
         B2ERROR("TMVA Method with name " + specific_options.m_method + " cannot be booked.");
       }
 
       Weightfile weightfile;
       std::string logfilename = weightfile.generateFileName(".log");
 
-      // Pipe stdout into a logfile to get TMVA output, which contains valueable information
-      // which cannot be retreived otherwise!
+      // Pipe stdout into a logfile to get TMVA output, which contains valuable information
+      // which cannot be retrieved otherwise!
       // Hence we do some black magic here
       // TODO Using ROOT_VERSION 6.08  this should be possible without this workaround
       auto logfile = open(logfilename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
@@ -196,7 +184,7 @@ namespace Belle2 {
           boost::split(strs, line, boost::is_any_of(":"));
           std::string variable = strs[2];
           boost::trim(variable);
-          variable = Belle2::invertMakeROOTCompatible(variable);
+          variable = Belle2::MakeROOTCompatible::invertMakeROOTCompatible(variable);
           float importance = std::stof(strs[3]);
           feature_importances[variable] = importance;
         }
@@ -226,6 +214,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -235,50 +224,36 @@ namespace Belle2 {
       classFile.cd();
 
       TMVA::Tools::Instance();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       TMVA::DataLoader data_loader(jobName);
-#endif
       TMVA::Factory factory(jobName, &classFile, specific_options.m_factoryOption);
 
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_variables) {
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-        data_loader.AddVariable(Belle2::makeROOTCompatible(var));
-#else
-        factory.AddVariable(Belle2::makeROOTCompatible(var));
-#endif
+        data_loader.AddVariable(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_spectators) {
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-        data_loader.AddSpectator(Belle2::makeROOTCompatible(var));
-#else
-        factory.AddSpectator(Belle2::makeROOTCompatible(var));
-#endif
+        data_loader.AddSpectator(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-      data_loader.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
-#else
-      factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
-#endif
+      data_loader.SetWeightExpression(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_weight_variable));
 
       auto* signal_tree = new TTree("signal_tree", "signal_tree");
       auto* background_tree = new TTree("background_tree", "background_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
-        signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
+        signal_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                             &training_data.m_input[iFeature]);
-        background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
+        background_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
       }
 
       for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
-        signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+        signal_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
                             &training_data.m_spectators[iSpectator]);
-        background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+        background_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
                                 &training_data.m_spectators[iSpectator]);
       }
 
@@ -294,15 +269,9 @@ namespace Belle2 {
         }
       }
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       data_loader.AddSignalTree(signal_tree);
       data_loader.AddBackgroundTree(background_tree);
       auto weightfile = trainFactory(factory, data_loader, jobName);
-#else
-      factory.AddSignalTree(signal_tree);
-      factory.AddBackgroundTree(background_tree);
-      auto weightfile = trainFactory(factory, jobName);
-#endif
 
       weightfile.addOptions(specific_options);
       weightfile.addSignalFraction(training_data.getSignalFraction());
@@ -325,6 +294,7 @@ namespace Belle2 {
     // Implement me!
     Weightfile TMVATeacherMulticlass::train(Dataset& training_data) const
     {
+      B2ERROR("Training TMVAMulticlass classifiers within the MVA package has not been implemented yet.");
       (void) training_data;
       return Weightfile();
     }
@@ -347,6 +317,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -356,47 +327,32 @@ namespace Belle2 {
       classFile.cd();
 
       TMVA::Tools::Instance();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       TMVA::DataLoader data_loader(jobName);
-#endif
       TMVA::Factory factory(jobName, &classFile, specific_options.m_factoryOption);
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_variables) {
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-        data_loader.AddVariable(Belle2::makeROOTCompatible(var));
-#else
-        factory.AddVariable(Belle2::makeROOTCompatible(var));
-#endif
+        data_loader.AddVariable(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_spectators) {
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-        data_loader.AddSpectator(Belle2::makeROOTCompatible(var));
-#else
-        factory.AddSpectator(Belle2::makeROOTCompatible(var));
-#endif
+        data_loader.AddSpectator(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-      data_loader.AddTarget(Belle2::makeROOTCompatible(m_general_options.m_target_variable));
-#else
-      factory.AddTarget(Belle2::makeROOTCompatible(m_general_options.m_target_variable));
-#endif
-
+      data_loader.AddTarget(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_target_variable));
 
       auto* regression_tree = new TTree("regression_tree", "regression_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
-        regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
+        regression_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
       }
       for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
-        regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+        regression_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
                                 &training_data.m_spectators[iSpectator]);
       }
-      regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(),
+      regression_tree->Branch(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_target_variable).c_str(),
                               &training_data.m_target);
 
       regression_tree->Branch("__weight__", &training_data.m_weight);
@@ -406,17 +362,10 @@ namespace Belle2 {
         regression_tree->Fill();
       }
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       data_loader.AddRegressionTree(regression_tree);
-      data_loader.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
+      data_loader.SetWeightExpression(Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
 
       auto weightfile = trainFactory(factory, data_loader, jobName);
-#else
-      factory.AddRegressionTree(regression_tree);
-      factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
-
-      auto weightfile = trainFactory(factory, jobName);
-#endif
       weightfile.addOptions(specific_options);
 
       delete regression_tree;
@@ -435,17 +384,17 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_expert = std::make_unique<TMVA::Reader>("!Color:!Silent");
+      m_expert = std::make_unique<TMVA::Reader>("!Color:Silent");
 
       GeneralOptions general_options;
       weightfile.getOptions(general_options);
       m_input_cache.resize(general_options.m_variables.size(), 0);
       for (unsigned int i = 0; i < general_options.m_variables.size(); ++i) {
-        m_expert->AddVariable(Belle2::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
+        m_expert->AddVariable(Belle2::MakeROOTCompatible::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
       }
       m_spectators_cache.resize(general_options.m_spectators.size(), 0);
       for (unsigned int i = 0; i < general_options.m_spectators.size(); ++i) {
-        m_expert->AddSpectator(Belle2::makeROOTCompatible(general_options.m_spectators[i]), &m_spectators_cache[i]);
+        m_expert->AddSpectator(Belle2::MakeROOTCompatible::makeROOTCompatible(general_options.m_spectators[i]), &m_spectators_cache[i]);
       }
 
       if (weightfile.containsElement("TMVA_Logfile")) {

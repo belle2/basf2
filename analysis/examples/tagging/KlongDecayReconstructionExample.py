@@ -23,12 +23,12 @@ from stdKlongs import stdKlongs
 import variables.collections as vc
 import variables.utils as vu
 from variables import variables
-from vertex import TagV
+from vertex import TagV, kFit
 
 
 main = basf2.create_path()
 
-ma.inputMdstList('default', [basf2.find_file('B02JpsiKL_Jpsi2mumu.root', 'examples', False)], path=main)
+ma.inputMdstList([basf2.find_file('B02JpsiKL_Jpsi2mumu.root', 'examples', False)], path=main)
 
 # Show progress of processing
 main.add_module('ProgressBar')
@@ -58,6 +58,15 @@ main.add_module(rmake)
 
 ma.buildRestOfEvent('B0', path=main)
 ma.matchMCTruth('B0', path=main)
+
+kFit(list_name='B0', conf_level=-1, fit_type='vertex', constraint='iptube',
+     decay_string='B0 -> [J/psi -> ^mu- ^mu+] K_L0',
+     daughtersUpdate=False,  # if true, kinematics of J/psi -> mu- mu+ will be updated
+     path=main)
+
+# The vertex fit changes the kinematics of the B-meson.
+# Re-calculate the kinematics with the same method
+ma.updateKlongKinematicsExpert('B0', path=main)
 
 TagV('B0', constraintType='tube', confidenceLevel=0.0001, path=main)
 

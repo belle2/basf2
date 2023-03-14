@@ -25,7 +25,7 @@
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/Circle.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/DisplayDrawingAreaRphi.h"
@@ -357,7 +357,7 @@ namespace Belle2 {
 
   void
   TRGCDCDisplayDrawingAreaRphi::drawCircle(const TCCircle& t,
-                                           int ,
+                                           int,
                                            Gdk::Color& c,
                                            Gdk::LineStyle)
   {

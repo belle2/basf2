@@ -19,18 +19,16 @@ REG_MODULE(V0Finder);
 
 V0FinderModule::V0FinderModule() : Module()
 {
-  setDescription("This is a simple V0 finder which matches all positive "
-                 "tracks with all negative tracks, fitting a vertex for each "
-                 "pair.  Depending on the outcome of each fit, a corresponding "
+  setDescription("This is a simple V0 finder for X = Ks, Lambda and converted fotons "
+                 "which matches all positive tracks with all negative tracks, "
+                 "fitting a vertex for each pair. "
+                 "Depending on the outcome of each fit, a corresponding "
                  "Belle2::V0 is stored or not.\n\n"
-
+                 "A loose cut on the invariant mass (``massRangeX``) is applied before the fit (not considering material effects), "
+                 "then a vertex fit is performed and only pairs passing a chi^2 (``vertexChi2CutOutside``) "
+                 "and a second cut on the invariant mass (``invMassRangeX``) are stored as Belle2::V0. \n\n"
                  "No V0s with vertex inside the beam pipe "
-                 "are saved. They are recovered in a following step.\n\n"
-
-                 "Outside the beam pipe only a chi^2 cut is applied "
-                 "('vertexChi2CutOutside').\n"
-                 "The value used as beam pipe radius is a parameter and "
-                 "can be changed.");
+                 "are saved as they can be recovered at analysis level. ");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -73,9 +71,9 @@ V0FinderModule::V0FinderModule() : Module()
 
   addParam("v0FitterMode", m_v0FitterMode,
            "designate which fitAndStore function is called in V0Fitter.\n"
-           "    0: store V0 at the first vertex fit, regardless of inner hits \n"
-           "    1: remove hits inside the V0 vertex position\n"
-           "    2: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair (default)",
+           "    0: store V0 at the first vertex fit, regardless of inner hits; \n"
+           "    1: remove hits inside the V0 vertex position;\n"
+           "    2: mode 2 + don't use SVD hits if there is only one available SVD hit-pair",
            1);
 
   addParam("massRangeKshort", m_preFilterMassRangeKshort,
@@ -130,7 +128,7 @@ void V0FinderModule::initialize()
 
 void V0FinderModule::event()
 {
-  B2DEBUG(200, m_tracks.getEntries() << " tracks in event.");
+  B2DEBUG(29, m_tracks.getEntries() << " tracks in event.");
 
   // Group tracks into positive and negative tracks.
   std::vector<const Track*> tracksPlus;
@@ -140,7 +138,7 @@ void V0FinderModule::event()
   tracksMinus.reserve(m_tracks.getEntries());
 
   for (const auto& track : m_tracks) {
-    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>();
+    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>(m_arrayNameRecoTrack);
     B2ASSERT("No RecoTrack available for given Track.", recoTrack);
 
     if (recoTrack->getChargeSeed() > 0) {
@@ -153,7 +151,7 @@ void V0FinderModule::event()
 
   // Reject boring events.
   if (tracksPlus.empty() || tracksMinus.empty()) {
-    B2DEBUG(200, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
+    B2DEBUG(29, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
     return;
   }
 
@@ -161,8 +159,13 @@ void V0FinderModule::event()
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
+      bool isForceStored, isHitRemoved;
       try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) {
+          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort, isForceStored, isHitRemoved);
+          m_nForceStored += isForceStored;
+          m_nHitRemoved += isHitRemoved;
+        }
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for Kshort hypothesis. " << LogVar("Genfit exception:", e.what()));
@@ -170,21 +173,31 @@ void V0FinderModule::event()
 
       try {
         // the pre-filter is not able to reject photons, so no need to apply pre filter for photons
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon, isForceStored, isHitRemoved);
+        m_nForceStored += isForceStored;
+        m_nHitRemoved += isHitRemoved;
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for photon hypothesis. " << LogVar("Genfit exception:", e.what()));
       }
 
       try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda)) {
+          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda, isForceStored, isHitRemoved);
+          m_nForceStored += isForceStored;
+          m_nHitRemoved += isHitRemoved;
+        }
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for Lambda hypothesis. " << LogVar("Genfit exception:", e.what()));
       }
 
       try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) {
+          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda, isForceStored, isHitRemoved);
+          m_nForceStored += isForceStored;
+          m_nHitRemoved += isHitRemoved;
+        }
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for anti-Lambda hypothesis. " << LogVar("Genfit exception:",
@@ -195,6 +208,13 @@ void V0FinderModule::event()
 
 }
 
+void V0FinderModule::terminate()
+{
+  B2INFO("===V0Finder summary=============================================================");
+  B2INFO("In total " << m_nHitRemoved + m_nForceStored << " saved V0s have inner hits.");
+  B2INFO("- Inner hits successfully removed in " << m_nHitRemoved << " V0s.");
+  B2INFO("- The hit removal failed in " << m_nForceStored << " V0s, instead V0s before removing inner hits saved.");
+}
 
 bool
 V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
@@ -216,12 +236,12 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
 
   // first track should always be the positve one
   double m_plus = trackHypotheses.first.getMass();
-  double p_plus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum().Mag();
+  double p_plus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum().R();
   double E_plus = sqrt(m_plus * m_plus + p_plus * p_plus);
 
   // second track is the negative
   double m_minus = trackHypotheses.second.getMass();
-  double p_minus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum().Mag();
+  double p_minus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum().R();
   double E_minus = sqrt(m_minus * m_minus + p_minus * p_minus);
 
   // now do the adding of the 4momenta

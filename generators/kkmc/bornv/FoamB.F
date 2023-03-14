@@ -344,7 +344,7 @@ c      STOP
       DOUBLE PRECISION   funW
       EXTERNAL           funW
       INTEGER            perm(m_NdiMax),mask,iCeNew,iCell
-      INTEGER            iCe,i,j,k,iVe,Vert(m_NdiMax),digit(m_NdiMax),factorial,NoMC !
+      INTEGER            iCe,i,j,k,iVe,Vert(m_NdiMax+1),digit(m_NdiMax),factorial,NoMC !
       DOUBLE PRECISION   HcPosi(m_KdiMax),   HcSize(m_KdiMax)
 *     -----------------------------------------------------------------------------
       DO j=1,m_kDim

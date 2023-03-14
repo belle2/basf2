@@ -106,68 +106,76 @@ def calculate_cdf_and_pdf(X):
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
 
-    tf.reset_default_graph()
-    x = tf.placeholder(tf.float32, [None, number_of_features], name='x')
-    y = tf.placeholder(tf.float32, [None, 1], name='y')
-    w = tf.placeholder(tf.float32, [None, 1], name='w')
+    @tf.function
+    def dense(x, W, b, activation_function):
+        return activation_function(tf.matmul(x, W) + b)
 
-    def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name):
-            weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
-            biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
-            layer = unit(tf.matmul(x, weights) + biases)
-        return layer
+    class my_model(tf.Module):
 
-    # Boost network
-    boost_hidden1 = layer(x, [number_of_features, 20], 'boost_hidden1')
-    boost_hidden2 = layer(boost_hidden1, [20, 20], 'boost_hidden2')
-    boost_hidden3 = layer(boost_hidden2, [20, 20], 'boost_hidden3')
-    boost_hidden4 = layer(boost_hidden3, [20, 20], 'boost_hidden4')
-    boost_activation = layer(boost_hidden4, [20, 1], 'boost_sigmoid', unit=tf.sigmoid)
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
 
-    epsilon = 1e-5
-    boost_loss = -tf.reduce_sum(y * w * tf.log(boost_activation + epsilon) +
-                                (1.0 - y) * w * tf.log(1 - boost_activation + epsilon)) / tf.reduce_sum(w)
+            self.boost_optimizer = tf.optimizers.Adam(0.01)
+            self.inference_optimizer = tf.optimizers.Adam(0.01)
 
-    boost_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-    boost_minimize = boost_optimizer.minimize(boost_loss)
+            def create_layer_variables(shape, name, activation_function):
+                weights = tf.Variable(
+                    tf.random.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))),
+                    name=f'{name}_weights')
+                biases = tf.Variable(tf.zeros(shape=[shape[1]]), name=f'{name}_biases')
+                return weights, biases, activation_function
 
-    # Inference network
-    inference_hidden1 = layer(x, [number_of_features, 20], 'inference_hidden1')
-    inference_hidden2 = layer(inference_hidden1, [20, 20], 'inference_hidden2')
-    inference_hidden3 = layer(inference_hidden2, [20, 20], 'inference_hidden3')
-    inference_hidden4 = layer(inference_hidden3, [20, 20], 'inference_hidden4')
-    inference_activation = layer(inference_hidden4, [20, 1], 'inference_sigmoid', unit=tf.sigmoid)
+            self.boost_layer_vars = []
+            self.boost_layer_vars.append(create_layer_variables([number_of_features, 20], 'boost_input', tf.nn.sigmoid))
+            for i in range(3):
+                self.boost_layer_vars.append(create_layer_variables([20, 20], f'boost_hidden{i}', tf.nn.sigmoid))
+            self.boost_layer_vars.append(create_layer_variables([20, 1], 'boost_output', tf.nn.sigmoid))
 
-    epsilon = 1e-5
-    inference_loss = -tf.reduce_sum(y * w * tf.log(inference_activation + epsilon) +
-                                    (1.0 - y) * w * tf.log(1 - inference_activation + epsilon)) / tf.reduce_sum(w)
+            self.inference_layer_vars = []
+            self.inference_layer_vars.append(create_layer_variables([number_of_features, 20], 'inference_input', tf.nn.sigmoid))
+            for i in range(3):
+                self.inference_layer_vars.append(create_layer_variables([20, 20], f'inference_hidden{i}', tf.nn.sigmoid))
+            self.inference_layer_vars.append(create_layer_variables([20, 1], 'inference_output', tf.nn.sigmoid))
 
-    inference_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-    inference_minimize = inference_optimizer.minimize(inference_loss)
+            self.n_boost_layers = len(self.boost_layer_vars)
+            self.n_inference_layers = len(self.inference_layer_vars)
 
-    init = tf.global_variables_initializer()
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def __call__(self, x):
+            for i in range(self.n_inference_layers):
+                x = dense(x, *self.inference_layer_vars[i])
+            return x
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
-    session.run(init)
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def boost(self, x):
+            for i in range(self.n_boost_layers):
+                x = dense(x, *self.boost_layer_vars[i])
+            return x
 
-    state = State(x, y, inference_activation, inference_loss, inference_minimize, session)
-    state.boost_cost = boost_loss
-    state.boost_optimizer = boost_minimize
-    state.boost_activation = inference_activation
-    state.w = w
+        @tf.function
+        def loss(self, predicted_y, target_y, w):
+            epsilon = 1e-5
+            diff_from_truth = tf.where(target_y == 1., predicted_y, 1. - predicted_y)
+            cross_entropy = - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
+            return cross_entropy
+
+    state = State(model=my_model())
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass received data to tensorflow session
     """
     prior = Prior(S[:, 0], y[:, 0])
     N = 100
     batch_size = 100
+
+    # make sure we have the epochs and batches set correctly.
+    assert epoch < 2, "There should only be two iterations, one for the boost training,"\
+        " one for the dplot training. Check the value of m_nIterations."
+    assert batch == 0, "All data should be passed to partial_fit on each call."\
+        " The mini batches are handled internally. Check that m_mini_batch_size=0."
 
     indices = np.arange(len(X))
     for i in range(N):
@@ -184,20 +192,30 @@ def partial_fit(state, X, S, y, w, epoch):
                 w_batch = prior.get_boost_weights(z_batch) * np.r_[w[index, 0], w[index, 0]]
                 y_batch = np.r_[np.ones(batch_size), np.zeros(batch_size)]
                 y_batch = np.reshape(y_batch, (-1, 1))
-                optimizer = state.boost_optimizer
-                cost = state.boost_cost
+                optimizer = state.model.boost_optimizer
+                name = 'boost'
             else:
-                p_batch = state.session.run(state.boost_activation, feed_dict={state.x: x_batch})
+                p_batch = state.model.boost(x_batch).numpy()
                 w_batch = prior.get_uncorrelation_weights(z_batch, p_batch.flatten()) * w[index, 0]
                 y_batch = y[index]
-                optimizer = state.optimizer
-                cost = state.cost
+                optimizer = state.model.inference_optimizer
+                name = 'inference'
 
-            w_batch = np.reshape(w_batch, (-1, 1))
-            feed_dict = {state.x: x_batch, state.y: y_batch, state.w: w_batch}
-            state.session.run(optimizer, feed_dict=feed_dict)
-        avg_cost = state.session.run(cost, feed_dict=feed_dict)
-        print("Epoch:", '%04d' % (i), "cost=", "{:.9f}".format(avg_cost))
+            w_batch = np.reshape(w_batch, (-1, 1)).astype(np.float32)
+
+            with tf.GradientTape() as tape:
+                if epoch == 0:
+                    y_predict_batch = state.model.boost(x_batch)
+                else:
+                    y_predict_batch = state.model(x_batch)
+
+                avg_cost = state.model.loss(y_predict_batch, y_batch, w_batch)
+                trainable_variables = [v for v in state.model.trainable_variables if name in v.name]
+                grads = tape.gradient(avg_cost, trainable_variables)
+
+            optimizer.apply_gradients(zip(grads, trainable_variables))
+
+        print("Internal Epoch:", '%04d' % (i), "cost=", "{:.9f}".format(avg_cost))
     return True
 
 
@@ -215,14 +233,14 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_spectators = basf2_mva.vector('M')
     general_options.m_target_variable = "isSignal"
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
-    specific_options.m_steering_file = 'mva/examples/tensorflow_dplot.py'
+    specific_options.m_steering_file = 'mva/examples/tensorflow/dplot.py'
     specific_options.m_nIterations = 2  # Feed data twice (first time for boost training, second time for dplot training)
-    specific_options.m_mini_batch_size = 0
+    specific_options.m_mini_batch_size = 0  # Pass all events each 'batch'
     basf2_mva.teacher(general_options, specific_options)

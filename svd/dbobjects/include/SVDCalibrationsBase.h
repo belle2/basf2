@@ -46,7 +46,7 @@ namespace Belle2 {
 
     /** This enumeration assure the same semantic of the
     isU methods defined by Peter Kv.*/
-    enum E_side { Vindex = 0 , Uindex = 1 };
+    enum E_side { Vindex = 0, Uindex = 1 };
 
     /** The default constructor initialize all the vectors
      */
@@ -64,9 +64,9 @@ namespace Belle2 {
           calibrations[layer][ladder].resize(sensorsOnLadder[ layer ]);
           for (unsigned int sensor = 1; sensor < calibrations[layer][ladder].size() ; sensor ++) {
             calibrations[layer][ladder][sensor].resize(2);
-            T::init(calibrations[layer][ladder][sensor][ Uindex ], layer, ladder, sensor, Uindex ,
+            T::init(calibrations[layer][ladder][sensor][ Uindex ], layer, ladder, sensor, Uindex,
                     defaultT);
-            T::init(calibrations[layer][ladder][sensor][ Vindex ], layer, ladder, sensor, Vindex ,
+            T::init(calibrations[layer][ladder][sensor][ Vindex ], layer, ladder, sensor, Vindex,
                     defaultT);
           }
         }
@@ -109,7 +109,7 @@ namespace Belle2 {
         B2FATAL("Sides vector is smaller than " << side);
       }
 
-      return T::get(sides[side] , strip);
+      return T::get(sides[side], strip);
     }
 
     /**
@@ -144,7 +144,7 @@ namespace Belle2 {
         B2FATAL("Sides vector is smaller than " << side);
       }
 
-      return T::getReference(sides[side] , strip);
+      return T::getReference(sides[side], strip);
     }
 
     /**
@@ -186,7 +186,7 @@ namespace Belle2 {
         B2FATAL("Sides vector is smaller than " << side);
       }
 
-      return T::set(sides[side] , strip, value);
+      return T::set(sides[side], strip, value);
     }
 
     /**

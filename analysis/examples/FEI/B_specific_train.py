@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Steering file to train the specfic FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
+# Steering file to train the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
 # This steering file is called several times (so-called stages) during the training process of the FEI.
 # For reference see Confluence and Thomas Keck's PhD thesis.
 #
@@ -24,8 +24,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.
@@ -62,7 +61,7 @@ ma.buildRestOfEvent('B+:sig', path=path)
 clean_roe_mask = (
     'CleanROE',
     'dr < 2 and abs(dz) < 4',
-    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.09 and trackMatchType==0')
+    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.09 and clusterTrackMatch==0')
 ma.appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 ma.applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
 
@@ -117,7 +116,7 @@ if feistate.stage == 0:
 else:
     # After stage 0, the training is done only on the written out rest of event.
     path = b2.create_path()
-    ma.inputMdstList('default', [], path)
+    ma.inputMdstList([], path)
     path.add_path(feistate.path)
     r1 = b2.register_module('RootOutput')
     r1.set_name('ROE_RootOutput')

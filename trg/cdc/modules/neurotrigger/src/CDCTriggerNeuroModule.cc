@@ -14,7 +14,7 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(CDCTriggerNeuro)
+REG_MODULE(CDCTriggerNeuro);
 
 CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
 {
@@ -64,7 +64,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "option on how to obtain the event time. When left blank, the value "
            "is loaded from the Conditions Database. Possibilities are: "
            "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
-           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
+           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d', 'etfcc' for the unpacked etf in the corresponding cc, 'etfcc_or_fastestpriority', 'etfcc_or_zero', 'etfhwin' for the recalculated time used in hw input. Last two options are only available for neurotrackinputode.",
            string(""));
   addParam("writeMLPinput", m_writeMLPinput,
            "if true, the MLP input vector will be written to the datastore "
@@ -147,9 +147,6 @@ CDCTriggerNeuroModule::event()
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
-    // get the complete hit pattern for debug purposes
-    unsigned long chitPattern =
-      m_NeuroTrigger.getCompleteHitPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
     // get the pure driftthreshold vector
     unsigned long puredriftth =
       m_NeuroTrigger.getPureDriftThreshold(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
@@ -182,9 +179,9 @@ CDCTriggerNeuroModule::event()
     int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
     double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
     bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
-    std::vector<bool> tsvector;
-    for (int k = 0; k < 9; k++) {
-      tsvector.push_back(bool ((chitPattern & (1 << k)) >> k));
+    std::vector<unsigned> tsvector(9, 0);
+    for (unsigned i = 0; i < hitIds.size(); ++i) {
+      tsvector[m_segmentHits[hitIds[i]]->getISuperLayer()] = m_segmentHits[hitIds[i]]->getLeftRight();
     }
     tsvector = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getTSVector() : tsvector;
     std::vector<bool> driftthreshold;
@@ -194,16 +191,19 @@ CDCTriggerNeuroModule::event()
     int expert = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getExpert() : isector;
     short quadrant = 0;
     double tphi = m_tracks2D[itrack]->getPhi0();
-    if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
-    else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }
-    else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 2; }
-    else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 3; }
+    if (m_neuroTrackInputMode) {
+      quadrant = m_tracks2D[itrack]->getQuadrant();
+    } else {
+      if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 3; }
+      else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 0; }
+      else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 1; }
+      else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 2; }
+    }
 
 
 
 
-
-    const CDCTriggerTrack* NNtrack =
+    CDCTriggerTrack* NNtrack =
       m_tracksNN.appendNew(m_tracks2D[itrack]->getPhi0(),
                            m_tracks2D[itrack]->getOmega(),
                            m_tracks2D[itrack]->getChi2D(),
@@ -214,10 +214,30 @@ CDCTriggerNeuroModule::event()
                            expert,
                            tsvector,
                            m_tracks2D[itrack]->getTime(),
-                           quadrant //quadrant simulated from phi
-                           - 1, //quadrant not known in simulation
+                           quadrant,   //quadrant simulated from phi
                            m_tracks2D[itrack]->getQualityVector()
                           );
+    std::stringstream intomega;
+    std::stringstream intphi;
+    std::stringstream intz;
+    std::stringstream inttheta;
+    intomega    << std::fixed << std::setprecision(0)   << NNtrack->getOmega() / Const::speedOfLight / 1.5e-4 * 0.3 * 34.;
+    intphi      << std::fixed << std::setprecision(0)   << (((NNtrack->getPhi0() - M_PI / 2.*NNtrack->getQuadrant()) - M_PI / 4.) * 2 *
+                                                            80 /
+                                                            M_PI);
+    std::vector<float> recalcsw(0.);
+    recalcsw = m_cdctriggerneuroconfig->getMLPs()[0].scaleTarget({static_cast<float>(NNtrack->getZ0()), static_cast<float>(NNtrack->getDirection().Theta())});
+    intz        << std::fixed << std::setprecision(0)   << recalcsw[0] * 4096;
+    inttheta    << std::fixed << std::setprecision(0)   << recalcsw[1] * 4096;
+
+    NNtrack->setRawOmega(std::stoi(intomega.str()));
+    NNtrack->setRawPhi0(std::stoi(intphi.str()));
+    NNtrack->setRawZ(std::stoi(intz.str()));
+    NNtrack->setRawTheta(std::stoi(inttheta.str()));
+    NNtrack->setHasETFTime(m_tracks2D[itrack]->getHasETFTime());
+    NNtrack->setETF_unpacked(m_tracks2D[itrack]->getETF_unpacked());
+    NNtrack->setETF_recalced(m_tracks2D[itrack]->getETF_recalced());
+
     m_tracks2D[itrack]->addRelationTo(NNtrack);
     if (m_neuroTrackInputMode) {
       m_tracks2D[itrack]->getRelatedFrom<CDCTriggerTrack>(m_realinputCollectionName)->addRelationTo(NNtrack);

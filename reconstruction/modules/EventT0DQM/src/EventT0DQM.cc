@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EventT0DQM)
+REG_MODULE(EventT0DQM);
 
 //---------------------------------
 EventT0DQMModule::EventT0DQMModule(): HistoModule(), m_L1TimingSrc(0)

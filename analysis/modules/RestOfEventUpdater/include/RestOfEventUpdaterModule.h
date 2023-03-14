@@ -69,7 +69,7 @@ namespace Belle2 {
      * @param roe Pointer to RestOfEvent object for update
      * @param particlesToUpdate Reference to composite particle collection
      */
-    void updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate);
+    void updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe, const std::vector<const Particle*>& particlesToUpdate);
   };
 }
 

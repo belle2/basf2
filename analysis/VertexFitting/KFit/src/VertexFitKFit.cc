@@ -16,7 +16,7 @@
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
-
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -53,7 +53,7 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-enum KFitError::ECode VertexFitKFit::setInitialVertex(const TVector3& v)
+enum KFitError::ECode VertexFitKFit::setInitialVertex(const B2Vector3D& v)
 {
   m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
   m_ErrorCode = KFitError::kNoError;
@@ -282,7 +282,7 @@ VertexFitKFit::doFit3() {
 
         HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
         HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
-        (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+                                        (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
         if (err_inverse) {
           m_ErrorCode = KFitError::kCannotGetMatrixInverse;
           KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -430,7 +430,7 @@ VertexFitKFit::doFit4() {
   m_v[2][0] = m_BeforeVertex.z();
 
   double tmp_each_chisq[KFitConst::kMaxTrackCount2];
-  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ complier requires the init-value.
+  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ compiler requires the init-value.
 
   // to avoid overestimation of vertex-z error.
   bool it_flag = false;
@@ -560,7 +560,7 @@ VertexFitKFit::doFit5() {
     for (int k = 0; k < m_TrackCount; k++) {
       HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
       HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
-      (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+                                      (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
       if (err_inverse) {
         m_ErrorCode = KFitError::kCannotGetMatrixInverse;
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -623,9 +623,9 @@ VertexFitKFit::prepareInputMatrix() {
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
-  } else {
-    if (m_TrackCount > KFitConst::kMaxTrackCount)
-    {
+  } else
+  {
+    if (m_TrackCount > KFitConst::kMaxTrackCount) {
       m_ErrorCode = KFitError::kBadTrackSize;
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
@@ -649,8 +649,7 @@ VertexFitKFit::prepareInputMatrix() {
     // charge , mass , a
     tmp_property[index][0] =  track.getCharge();
     tmp_property[index][1] =  track.getMass();
-    const double c = KFitConst::kLightSpeed; // C++ bug?
-    // tmp_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
+    const double c = Belle2::Const::speedOfLight * 1e-4;
     tmp_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }
@@ -719,17 +718,17 @@ VertexFitKFit::prepareOutputMatrix() {
     pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-      m_al_1[index * KFitConst::kNumber6 + 3][0],
-      m_al_1[index * KFitConst::kNumber6 + 4][0],
-      m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
+                        m_al_1[index * KFitConst::kNumber6 + 3][0],
+                        m_al_1[index * KFitConst::kNumber6 + 4][0],
+                        m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(makeError1(pdata.getMomentum(),
-    m_V_al_1.sub(
-      index    * KFitConst::kNumber6 + 1,
-      (index + 1)*KFitConst::kNumber6,
-      index    * KFitConst::kNumber6 + 1,
-      (index + 1)*KFitConst::kNumber6)),
-    KFitConst::kAfterFit);
+                              m_V_al_1.sub(
+                                index    * KFitConst::kNumber6 + 1,
+                                (index + 1)*KFitConst::kNumber6,
+                                index    * KFitConst::kNumber6 + 1,
+                                (index + 1)*KFitConst::kNumber6)),
+                   KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -764,8 +763,8 @@ VertexFitKFit::makeCoreMatrix() {
   // vertex fit
   for (int i = 0; i < m_TrackCount; i++)
   {
-    double B, S, U;
-    double sininv, sqrtag;
+    double S, U;
+    double sininv;
 
     double px = m_al_1[i * KFitConst::kNumber6 + 0][0];
     double py = m_al_1[i * KFitConst::kNumber6 + 1][0];
@@ -795,7 +794,7 @@ VertexFitKFit::makeCoreMatrix() {
 
     if (a != 0) { // charged
 
-      B = a * a2 * invPt2;
+      double B = a * a2 * invPt2;
       if (fabs(B) > 1) {
         m_ErrorCode = KFitError::kCannotGetARCSIN;
         B2DEBUG(10, "KFitError: Cannot calculate arcsin");
@@ -811,14 +810,13 @@ VertexFitKFit::makeCoreMatrix() {
         return m_ErrorCode;
       }
       // 1/sqrt(1-B^2)
-      sqrtag = 1.0 / sqrt(tmp0);
+      double sqrtag = 1.0 / sqrt(tmp0);
       S = sqrtag * invPt2;
       U = dlz - pz * sininv / a;
 
     } else { // neutral
-      B      = 0.0;
+
       sininv = 0.0;
-      sqrtag = 1.0;
       S = invPt2;
       U = dlz - pz * a2 * invPt2;
     }
@@ -934,8 +932,8 @@ enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
   }
 
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

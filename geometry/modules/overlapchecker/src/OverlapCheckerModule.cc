@@ -130,7 +130,8 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
         for (size_t i = 0; i < volume->GetMotherLogical()->GetNoDaughters(); ++i) {
           G4VPhysicalVolume* sister = volume->GetMotherLogical()->GetDaughter(i);
           // ignoring the ones which don't match the name
-          if (name != sister->GetName()) continue;
+          std::string sisterName{(sister->GetName()).data()};
+          if (name != sisterName) continue;
           // now transform the point into the coordinate system of the volume we actually look at
           G4AffineTransform trans_sister(sister->GetRotation(), sister->GetTranslation());
           G4ThreeVector posMother = trans_sister.TransformPoint(posLocal);
@@ -142,7 +143,7 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
             // so add the point to the display data
             G4AffineTransform t = m_nav.GetTopTransform().Inverse();
             G4ThreeVector global = t.TransformPoint(posMother);
-            m_displayData->addPoint(geant4Message, TVector3(global[0], global[1], global[2]) * Unit::mm);
+            m_displayData->addPoint(geant4Message, ROOT::Math::XYZVector(global[0], global[1], global[2]) * Unit::mm);
           }
         }
       } else {
@@ -152,7 +153,7 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
       // in case of overlap with mother the life is so much simpler: just convert the point to global and save it.
       G4AffineTransform t = m_nav.GetTopTransform().Inverse();
       G4ThreeVector global = t.TransformPoint(posLocal);
-      m_displayData->addPoint(geant4Message, TVector3(global[0], global[1], global[2]) * Unit::mm);
+      m_displayData->addPoint(geant4Message, ROOT::Math::XYZVector(global[0], global[1], global[2]) * Unit::mm);
     }
   }
   m_nav.NewLevel(volume);

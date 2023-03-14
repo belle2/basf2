@@ -12,15 +12,15 @@ Flavor tagging
 
     **Prerequisites**:
 
-    	* The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
+    * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
 
     **Objectives**:
 
-        * Perform flavor tagging
+    * Perform flavor tagging
 
 How can we distinguish between a :math:`B^0` and a :math:`\bar B^0`? This is not
 as simple as the case where we have a :math:`B^+` vs a :math:`B^-` and can just
@@ -42,10 +42,12 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Add a line to your previous steering file that adds the
-    ``analysis_tools_release-04-02`` global tag. For this you need to call the
+    Add a line to your previous steering file that adds the 
+    latest global tag. For this you need to call the
     `prepend_globaltag` method of the `basf2.conditions` object (which is an
     instance of the `ConditionsConfiguration <basf2.ConditionsConfiguration>` class).
+    To get the latest analysis global tag, you can call 
+    `modularAnalysis.getAnalysisGlobaltag`.
 
 .. admonition:: Solution
     :class: solution toggle
@@ -53,8 +55,8 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     Simply add this to the top of your steering file:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 15-16
-        :lineno-start: 15
+        :start-at: S10
+        :end-at: E10
 
 Good! Now we have the weights and we have already created the ROE, so we can
 start right away!
@@ -71,14 +73,14 @@ start right away!
     Remember to import the module:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 7
-        :lineno-start: 7
+        :start-at: S23
+        :end-at: E23
 
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 77-78
-        :lineno-start: 77
+        :start-at: S20
+        :end-at: E20
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -91,8 +93,8 @@ start right away!
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 105
-        :lineno-start: 105
+        :start-at: S43
+        :end-at: E43
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -177,6 +179,6 @@ it to ``FBDT_qrCombined``!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Kilian Lieret
+Kilian Lieret

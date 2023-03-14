@@ -18,7 +18,7 @@ namespace Belle2 {
     class QualityIndicatorFilter : public BasePathFilter {
     public:
       /// Return the weight based on the quality estimator.
-      /// Returns the QI value obtained from the fit with the chosen QualityEstimator if above the m_param_QIcut,
+      /// Returns the QI value obtained from the fit with the chosen QualityEstimator if above the m_QIcut,
       /// and NAN if the QI is below the cut.
       TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
@@ -32,16 +32,16 @@ namespace Belle2 {
     private:
       /// Identifier which estimation method to use. Valid identifiers are:
       /// mcInfo, circleFit, tripletFit, helixFit
-      std::string m_param_EstimationMethod = "tripletFit";
+      std::string m_EstimationMethod = "tripletFit";
       /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
-      std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
+      std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
       /// Only required for MCInfo method
-      bool m_param_MCStrictQualityEstimator = true;
+      bool m_MCStrictQualityEstimator = true;
       /// pointer to the selected QualityEstimator
       std::unique_ptr<QualityEstimatorBase> m_estimator;
 
       /// cut on quality indicator
-      double m_param_QIcut = 0.0;
+      double m_QIcut = 0.0;
     };
 
   }

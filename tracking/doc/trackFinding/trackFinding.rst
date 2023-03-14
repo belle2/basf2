@@ -1,7 +1,7 @@
 .. _tracking_trackFinding: 
 
 Track Finding Algorithms
-========================
+------------------------
 
 .. warning::
   This documentation is under construction!
@@ -19,3 +19,4 @@ We have three classes of algorithms for the hit finding:
     trackFindingSVD
     trackFindingCDC
     ckf
+    qualityIndicators

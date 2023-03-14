@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //ARICH
 #include <arich/utility/ARICHChannelHist.h>
@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisARICHModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisARICHModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -37,43 +37,30 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisARICHModule();
+    ~DQMHistAnalysisARICHModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
+    void initialize() override final;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
-
-    /**
-    * Find canvas by name
-    * @param cname Name of the canvas
-    * @return The pointer to the canvas, or nullptr if not found.
-    */
-    TCanvas* find_canvas(TString cname);
+    void terminate() override final;
 
   protected:
     bool m_debug;/**<debug*/

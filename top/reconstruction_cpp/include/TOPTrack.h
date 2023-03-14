@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <TVector3.h>
 #include <framework/gearbox/Const.h>
 #include <top/reconstruction_cpp/HelixSwimmer.h>
 #include <top/reconstruction_cpp/RaytracerBase.h>
@@ -56,20 +55,20 @@ namespace Belle2 {
          * Constructor from direction vector
          * @param direction track direction at photon emission (must be unit vector)
          */
-        explicit TrackAngles(const TVector3& direction);
+        explicit TrackAngles(const ROOT::Math::XYZVector& direction);
 
         /**
          * Returns direction vector
          * @return direction vector
          */
-        TVector3 getDirection() const {return TVector3(cosFi * sinTh, sinFi * sinTh, cosTh);}
+        ROOT::Math::XYZVector getDirection() const {return ROOT::Math::XYZVector(cosFi * sinTh, sinFi * sinTh, cosTh);}
       };
 
       /**
        * assumed photon emission point in local frame
        */
       struct AssumedEmission {
-        TVector3 position;  /**< position */
+        ROOT::Math::XYZPoint position;  /**< position */
         TrackAngles trackAngles; /**< sine and cosine of track polar and azimuthal angles */
         bool isSet = false; /**< flag */
       };
@@ -118,13 +117,12 @@ namespace Belle2 {
       /**
        * Overrides transformation from local to nominal frame, which is by default obtained from DB.
        * Needed for module alignment.
-       * @param rotation rotation matrix from local to nominal frame (rotation first ...)
-       * @param translation translation vector from local to nominal frame (... then translation)
+       * @param transform transformation from local to nominal frame
        * @return true if quartz bar intersection still exists
        */
-      bool overrideTransformation(const TRotation& rotation, const TVector3& translation)
+      bool overrideTransformation(const ROOT::Math::Transform3D& transform)
       {
-        m_valid = setHelix(rotation, translation);
+        m_valid = setHelix(transform);
         return m_valid;
       }
 
@@ -141,10 +139,16 @@ namespace Belle2 {
       int getModuleID() const {return m_moduleID;}
 
       /**
-       * Returns momentum magnitude
+       * Returns momentum magnitude (extrapolated to TOP)
        * @return momentum magnitude
        */
       double getMomentumMag() const {return m_momentum;}
+
+      /**
+       * Returns transverse momentum (at POCA)
+       * @return transverse momentum
+       */
+      double getTransverseMomentum() const {return m_pT;}
 
       /**
        * Returns charge
@@ -262,26 +266,25 @@ namespace Belle2 {
 
       /**
        * Sets helix (helix is given in nominal frame)
-       * @param rotation rotation matrix from local to nominal frame (rotation first ...)
-       * @param translation translation vector from local to nominal frame (... then translation)
+       * @param transform transformation from local to nominal frame
        * @return true if quartz bar intersection exists
        */
-      bool setHelix(const TRotation& rotation, const TVector3& translation);
+      bool setHelix(const ROOT::Math::Transform3D& transform);
 
       /**
        * Calculates intersection of trajectory with prism
        * @param lengths trajectory lengths relative to extHit position of intersection points [in/out]
        * @param positions positions of intersection points in module local frame [in/out]
        * @param prism prism geometry data
-       * @param rotation rotation matrix from local to nominal frame (rotation first ...)
-       * @param translation translation vector from local to nominal frame (... then translation)
+       * @param transform transformation from local to nominal frame
        * @return true if intersection exists
        */
-      bool xsecPrism(std::vector<double>& lengths, std::vector<TVector3>& positions,
-                     const RaytracerBase::Prism& prism, const TRotation& rotation, const TVector3& translation);
+      bool xsecPrism(std::vector<double>& lengths, std::vector<ROOT::Math::XYZPoint>& positions,
+                     const RaytracerBase::Prism& prism, const ROOT::Math::Transform3D& transform);
 
       int m_moduleID = 0;  /**< slot ID */
-      double m_momentum = 0; /**< track momentum magnitude */
+      double m_momentum = 0; /**< track momentum magnitude at TOP */
+      double m_pT = 0; /**< transverse momentum at POCA */
       double m_charge = 0;  /**< track charge in units of elementary charge */
       double m_TOFLength = 0; /**< trajectory length corresponding to TOF of extrapolated hit */
       double m_trackLength = 0;  /**< trajectory length from IP to average photon emission point */

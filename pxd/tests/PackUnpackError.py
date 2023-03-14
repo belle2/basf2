@@ -40,6 +40,7 @@ packer.param('dhe_to_dhc', [
 
 unpacker = b2.register_module('PXDUnpacker')
 unpacker.param('ContinueOnError', True)
+unpacker.param("overrideFirmwareVersion", 10)
 
 packercheck = b2.register_module('PXDPackerErr')
 packercheck.param('dhe_to_dhc', [

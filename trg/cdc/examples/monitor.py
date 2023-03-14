@@ -56,6 +56,11 @@ if not from_unpacked:
         [0x11000001, 0],
         [0x11000002, 0],
         [0x11000002, 1]])
+    unpacker.param('2DNodeId_pcie40', [
+        [0x10000001, 0],
+        [0x10000001, 1],
+        [0x10000001, 2],
+        [0x10000001, 3]])
 
     main.add_module(unpacker)
 

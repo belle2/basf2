@@ -24,13 +24,12 @@
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CurlTagger)
+REG_MODULE(CurlTagger);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -40,21 +39,26 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC("Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.")DOC");
+    R"DOC(Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.)DOC");
 
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists to check for curls or use for training");
   addParam("belle", m_BelleFlag, "flag to distinuguish Belle (true) from Belle II (false) data", false);
-  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.6);
+  addParam("ptCut", m_PtCut, "Preselection pt cut. Only consider tracks below threshold as candidates for curlers.", 0.5);
   addParam("selectorType", m_SelectorType,
            "the name of the selector to use when deciding if two reconstructed particles are the same true particle, available : 'cut', 'mva'",
            std::string("cut"));
   addParam("mcTruth", m_McStatsFlag,
-           "additionaly bundles the particles using their genParticleIndex and tags them with extraInfo(isTruthCurl) and extraInfo(truthBundleSize).",
+           "additionally bundles the particles using their genParticleIndex and tags them with extraInfo(isTruthCurl) and extraInfo(truthBundleSize).",
            false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
-
-  addParam("responseCut", m_ResponseCut, "minimum allowed selector response for a match.", 0.324);
+  addParam("usePayloadCut", m_payloadCutFlag, "flag for using the optimised cut value stored in the payload.", true);
+  addParam("responseCut", m_ResponseCut,
+           "minimum allowed selector response for a match. If usePayloadCut is true the value will be overwritten with the cut stored in the payload.",
+           0.5);
+  addParam("trainFilename", m_TrainFileName,
+           "EXPERT: the name of the output root file created when running in training mode.",
+           std::string("CurlTagger_Training.root"));
 }
 
 CurlTaggerModule::~CurlTaggerModule() = default;
@@ -78,17 +82,21 @@ void CurlTaggerModule::initialize()
     }
 
   } else if (m_SelectorType.compare("mva") == 0) {
-    m_Selector = new CurlTagger::SelectorMVA(m_BelleFlag, m_TrainFlag);
+    m_Selector = new CurlTagger::SelectorMVA(m_BelleFlag, m_TrainFlag, m_TrainFileName);
   } else {
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
   }
 
-  //initialse the selector if it has an initialize function
+  //initialise the selector if it has an initialize function
   m_Selector->initialize();
 }
 
 void CurlTaggerModule::beginRun()
 {
+  if (m_payloadCutFlag) {
+    // override the responseCut with the cut stored in the payload
+    m_ResponseCut = m_Selector->getOptimalResponseCut();
+  }
 }
 
 void CurlTaggerModule::event()

@@ -41,7 +41,7 @@ namespace Belle2 {
    * - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
    * - looseMCWrongDaughterN: number of daughters that don't originate from the most
    *                          common mother
-   * - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from
+   * - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from
    *                            the most common mother
    *                            (only if looseMCWrongDaughterN = 1)
    * - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background

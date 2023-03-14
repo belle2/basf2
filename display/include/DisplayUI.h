@@ -39,8 +39,9 @@ namespace Belle2 {
     /** Constructor.
      *
      * @param automatic if true, hide window and save events using automaticEvent()
+     * @param advance if true, start advancing through the events on startup.
      */
-    explicit DisplayUI(bool automatic = false);
+    explicit DisplayUI(bool automatic = false, bool advance = false);
 
     /** Destructor. */
     ~DisplayUI();
@@ -134,7 +135,7 @@ namespace Belle2 {
     void pollNewEvents();
 
     /** Close window and exit immediately. */
-    void exit();
+    void closeAndExit();
 
     /** Add user-defined data (histograms, etc.). */
     void showUserData(const DisplayData& displayData);
@@ -179,6 +180,9 @@ namespace Belle2 {
 
     /** If true, disable interactive control and call automaticEvent() instead. */
     bool m_automatic{false};
+
+    /** If true, start advancing through the events on startup. */
+    bool m_advance{false};
 
     /** If true, DisplayModule shouldn't clear previous data (i.e. we want to show multiple events) */
     bool m_cumulative{false};

@@ -37,10 +37,25 @@ namespace Belle2 {
       if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
     };
 
-    void initialize() override   ;
-    void beginRun() override     ;
-    void event() override        ;
-    void endRun() override       ;
+    /**
+     * Initializer.
+     */
+    void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override;
 
   private:
 

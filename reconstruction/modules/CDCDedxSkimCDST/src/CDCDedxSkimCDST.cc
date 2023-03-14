@@ -18,7 +18,7 @@
 using namespace Belle2;
 using namespace Dedx;
 
-REG_MODULE(CDCDedxSkimCDST)
+REG_MODULE(CDCDedxSkimCDST);
 
 CDCDedxSkimCDSTModule::CDCDedxSkimCDSTModule() : Module()
 {

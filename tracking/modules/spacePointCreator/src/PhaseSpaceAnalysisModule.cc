@@ -8,23 +8,15 @@
 
 #include <tracking/modules/spacePointCreator/PhaseSpaceAnalysisModule.h>
 
-#include <genfit/TrackCand.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <algorithm>
 #include <numeric>
-// #include <mdst/dataobjects/MCParticle.h> // already in header
 
-#include <TVector3.h> // COULDDO: B2Vector3.h
-
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(PhaseSpaceAnalysis)
+REG_MODULE(PhaseSpaceAnalysis);
 
 PhaseSpaceAnalysisModule::PhaseSpaceAnalysisModule() : Module()
 {
@@ -54,8 +46,7 @@ void PhaseSpaceAnalysisModule::initialize()
 {
   B2INFO("PhaseSpaceAnalysis ------------------------ initialize --------------------------");
 
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
+  m_MCParticles.isRequired();
 
   size_t nNames = m_PARAMcontainerNames.size();
   size_t nTypes = m_PARAMtrackCandTypes.size();
@@ -64,24 +55,22 @@ void PhaseSpaceAnalysisModule::initialize()
 
   for (size_t iName = 0; iName < nNames; ++iName) {
     size_t iType = iName < nTypes ? iName : nTypes - 1; // only acces values that are possible
-    string tcType = m_PARAMtrackCandTypes.at(iType);
-    if (tcType.compare(string("GFTC")) != 0 && tcType.compare(string("SPTC")) != 0) {
+    std::string tcType = m_PARAMtrackCandTypes.at(iType);
+    if (tcType.compare(std::string("GFTC")) != 0 && tcType.compare(std::string("SPTC")) != 0) {
       B2FATAL("Found id " << tcType << " in 'trackCandTypes' but only 'GFTC' and 'SPTC' are allowed!");
     }
 
-    string contName = m_PARAMcontainerNames.at(iName);
-    if (tcType.compare(string("GFTC")) == 0) {
-      StoreArray<genfit::TrackCand> trackCands(contName);
-      trackCands.isRequired();
-      m_tcStoreArrays.push_back(make_pair(trackCands, c_gftc));
+    std::string contName = m_PARAMcontainerNames.at(iName);
+    if (tcType.compare(std::string("GFTC")) == 0) {
+      m_GenfitTrackCands.isRequired(contName);
+      m_tcStoreArrays.push_back(std::make_pair(m_GenfitTrackCands, c_gftc));
     } else {
-      StoreArray<SpacePointTrackCand> trackCands(contName);
-      trackCands.isRequired();
-      m_tcStoreArrays.push_back(make_pair(trackCands, c_sptc));
+      m_SpacePointTrackCands.isRequired(contName);
+      m_tcStoreArrays.push_back(std::make_pair(m_SpacePointTrackCands, c_sptc));
     }
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
-      string output;
-      for (string id : m_PARAMrootFileName) {
+      std::string output;
+      for (std::string id : m_PARAMrootFileName) {
         output += "'" + id + "' ";
       }
       B2FATAL("PhaseSpaceAnalysis::initialize() : rootFileName is set wrong: entries are: " << output);
@@ -91,7 +80,7 @@ void PhaseSpaceAnalysisModule::initialize()
     if (m_PARAMdiffAnalysis && iName != 0) m_treeNames.push_back(contName + "_diff");
   }
 
-  initializeRootFile(m_PARAMrootFileName[0] + string(".root"), m_PARAMrootFileName[1], m_treeNames);
+  initializeRootFile(m_PARAMrootFileName[0] + std::string(".root"), m_PARAMrootFileName[1], m_treeNames);
   initializeCounters(m_treeNames.size());
 }
 
@@ -102,19 +91,18 @@ void PhaseSpaceAnalysisModule::event()
   // print out the number of the event in debug output
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
-  string arrayNames;
-  for (string name : m_PARAMcontainerNames) {
+  std::string arrayNames;
+  for (std::string name : m_PARAMcontainerNames) {
     arrayNames += " " + name;
   }
-  B2DEBUG(10, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
+  B2DEBUG(25, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
 
-  StoreArray<MCParticle> mcParticles;
-  const int nMCParticles = mcParticles.getEntries();
+  const int nMCParticles = m_MCParticles.getEntries();
   B2DEBUG(25, "Found " << nMCParticles << " MCParticles for this event");
 
-  vector<vector<int> > mcPartIds; // collect all mcParticle Ids of all trackCands
+  std::vector<std::vector<int> > mcPartIds; // collect all mcParticle Ids of all trackCands
 
-  for (pair<boost::any, e_trackCandType> storeArray : m_tcStoreArrays) {
+  for (std::pair<boost::any, e_trackCandType> storeArray : m_tcStoreArrays) {
     // COULDDO: wrap this in try-catch, but since it is known what has to be casted, nothing should really happen
     if (storeArray.second == c_gftc) {
       mcPartIds.push_back(getMCParticleIDs(boost::any_cast<StoreArray<genfit::TrackCand> >(storeArray.first)));
@@ -135,12 +123,13 @@ void PhaseSpaceAnalysisModule::event()
     m_rootVariables = RootVariables(); // clear root variables for each run
     for (int id : mcPartIds[iTree]) {
       if (id < 0) {
+        // cppcheck-suppress shiftNegative
         B2WARNING("Found a negative id in mcParticleId: " << id << \
                   ". It seems that it has not been set properly, I will skip this MC Particle");
         m_skippedTCsCtr++;
         continue;
       }
-      MCParticle* mcParticle = mcParticles[id];
+      MCParticle* mcParticle = m_MCParticles[id];
       if (mcParticle == nullptr) { // safety measure
         m_noMcPartCtr++;
         continue;
@@ -155,7 +144,7 @@ void PhaseSpaceAnalysisModule::event()
 // TODO: update to new version and new counters
 void PhaseSpaceAnalysisModule::terminate()
 {
-  stringstream furtherInfo;
+  std::stringstream furtherInfo;
   if (m_skippedTCsCtr || m_noMcPartCtr) {
     furtherInfo << " There were " << m_skippedTCsCtr << " negative mcParticle IDs and " << m_noMcPartCtr <<
                 " nullptr pointers to MCParticles";
@@ -166,10 +155,10 @@ void PhaseSpaceAnalysisModule::terminate()
          << furtherInfo.str());
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) {
-    stringstream output;
+    std::stringstream output;
     output << "tree-wise summary (no of mcParticles):";
     for (unsigned int ctr : m_mcPartCtr) output << " " << ctr;
-    B2DEBUG(1, output.str());
+    B2DEBUG(25, output.str());
   }
 
   // do ROOT stuff
@@ -183,7 +172,7 @@ void PhaseSpaceAnalysisModule::terminate()
 // ================================== initialize root ===============================
 void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames)
 {
-  B2DEBUG(10, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption);
+  B2DEBUG(25, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption);
   m_rootFilePtr = new TFile(fileName.c_str(), writeOption.c_str());
 
   for (size_t i = 0; i < treeNames.size(); ++i) {
@@ -212,32 +201,32 @@ void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::str
 // =============================== collect values for root ====================================
 void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, RootVariables& rootVariables)
 {
-  B2DEBUG(100, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
+  B2DEBUG(25, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
   // collect all the momentum
-  const TVector3 momentum = mcParticle->getMomentum();
+  const ROOT::Math::XYZVector momentum = mcParticle->getMomentum();
   rootVariables.MomX.push_back(momentum.X());
   rootVariables.MomY.push_back(momentum.Y());
   rootVariables.MomZ.push_back(momentum.Z());
 
-  rootVariables.pT.push_back(momentum.Pt());
+  rootVariables.pT.push_back(momentum.Rho());
   rootVariables.Eta.push_back(momentum.Eta());
 
-  B2DEBUG(499, "TVector3 momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
-          "). This leads to p_T = " << momentum.Pt() << " and eta = " << momentum.Eta());
+  B2DEBUG(25, "XYZVector momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
+          "). This leads to p_T = " << momentum.Rho() << " and eta = " << momentum.Eta());
 
-  const TVector3 vertex = mcParticle->getVertex();
+  const ROOT::Math::XYZVector vertex = mcParticle->getVertex();
   rootVariables.VertX.push_back(vertex.Y());
   rootVariables.VertY.push_back(vertex.Y());
   rootVariables.VertZ.push_back(vertex.Z());
 
-  B2DEBUG(499, "TVector3 vertex: (" << vertex.X() << "," << vertex.Y() << "," << vertex.Z() << ")");
+  B2DEBUG(25, "vertex: (" << vertex.X() << "," << vertex.Y() << "," << vertex.Z() << ")");
 
   rootVariables.Charge.push_back(mcParticle->getCharge());
   rootVariables.Energy.push_back(mcParticle->getEnergy());
   rootVariables.PDG.push_back(mcParticle->getPDG());
   rootVariables.Mass.push_back(mcParticle->getMass());
 
-  B2DEBUG(499, "Charge " << mcParticle->getCharge() << ", PDG code" << mcParticle->getPDG() << ", Energy " << \
+  B2DEBUG(25, "Charge " << mcParticle->getCharge() << ", PDG code" << mcParticle->getPDG() << ", Energy " << \
           mcParticle->getEnergy() << ", Mass " << mcParticle->getMass());
 }
 
@@ -258,13 +247,13 @@ std::vector<int> PhaseSpaceAnalysisModule::getMCParticleIDs(Belle2::StoreArray<T
 std::vector<std::vector<int> > PhaseSpaceAnalysisModule::getDiffIds(const std::vector<std::vector<int> >& allIDs)
 {
   if (allIDs.size() < 2) { // do nothing if there are less than two entries
-    B2DEBUG(50, "There are no more than 1 vectors passed to getDiffIds. No comparison possible. Returning passed vector");
+    B2DEBUG(25, "There are no more than 1 vectors passed to getDiffIds. No comparison possible. Returning passed vector");
     return allIDs;
   }
 
 //   // COULDDO: remove (left here for checking if working properly, simply prints out all the entries in the vector of vectors)
 //   if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1999, PACKAGENAME())) { // very verbose dev output
-//     stringstream output;
+//     std::stringstream output;
 //     output << "content of allIDs: " << endl;
 //     for(vector<int> vec: allIDs) {
 //       output << "vector: ";
@@ -274,15 +263,15 @@ std::vector<std::vector<int> > PhaseSpaceAnalysisModule::getDiffIds(const std::v
 //     B2DEBUG(1999, output.str())
 //   }
 
-  vector<vector<int> > diffIds;
-  vector<int> referenceIds = allIDs.at(0); // the first vector is the reference
+  std::vector<std::vector<int> > diffIds;
+  std::vector<int> referenceIds = allIDs.at(0); // the first vector is the reference
   diffIds.push_back(referenceIds);
 
   // loop over other vectors and look for missing IDs
   for (size_t iVec = 1; iVec < allIDs.size(); ++iVec) {
-    vector<int> compareIds = allIDs[iVec];
+    std::vector<int> compareIds = allIDs[iVec];
     diffIds.push_back(compareIds);
-    vector<int> notFoundIds;
+    std::vector<int> notFoundIds;
     for (int id : referenceIds) {
       if (find(compareIds.begin(), compareIds.end(), id) == compareIds.end()) { // not found
         notFoundIds.push_back(id);

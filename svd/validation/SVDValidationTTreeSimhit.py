@@ -11,12 +11,12 @@
 
 """
 <header>
-  <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>
     This module is used for the SVD validation.
     It gets information about truehits and  clusters, saving
     in a ttree in a ROOT file.
   </description>
+  <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 
@@ -96,16 +96,19 @@ class SVDValidationTTreeSimhit(b2.Module):
                 if not particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                     continue
 
-                length = (simhit.getPosOut() - simhit.getPosIn()).Mag()
+                length = (simhit.getPosOut() - simhit.getPosIn()).R()
                 # The deposited energy is the number of electrons multiplied
                 # by the energy required to create an electron-hole pair
                 energy = simhit.getElectrons() * Belle2.Const.ehEnergy
                 self.data.simhit_length = length
                 self.data.simhit_energy = energy
+                if (length == 0):
+                    continue
                 self.data.simhit_dEdx = energy / length
                 # A reasonable cut to see a nice Landau distribution
-                if self.data.simhit_dEdx > 0.015:
-                    continue
+                # remove this cut to be sensitive to delta rays
+                # if self.data.simhit_dEdx > 0.015:
+                #    continue
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()

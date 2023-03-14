@@ -23,6 +23,8 @@
 #include <G4PVPlacement.hh>
 
 //Shapes
+#include <G4Box.hh>
+#include <G4Trd.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
 #include <G4EllipticalTube.hh>
@@ -64,7 +66,7 @@ namespace Belle2 {
     void GeoCryostatCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
 
-      //######  L side index  ######
+      //######  R side index  ######
       //
       // +- A1spc1+A1spc2
       //    +- A2wal1
@@ -107,7 +109,7 @@ namespace Belle2 {
       //    +- C2spc3
       // +- C1wal2
       //
-      //######  R side index  ######
+      //######  L side index  ######
       //
       // +- D1spc1
       //    +- D2wal1
@@ -599,7 +601,130 @@ namespace Belle2 {
 
 
       //--------------
+      //-   Cryostats' supports
+
+      std::vector<std::string> supports;
+      boost::split(supports, m_config.getParameterStr("Support"), boost::is_any_of(" "));
+      for (const auto& name : supports) {
+        // storable element
+        CryostatElement sup;
+        prep = name + ".";
+
+        double box_W = m_config.getParameter(prep + "W") * unitFactor;
+        double box_H = m_config.getParameter(prep + "H") * unitFactor;
+        double box_L = m_config.getParameter(prep + "L") * unitFactor;
+        double box_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+        double box_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+        double box_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+
+        double trd_W1 = m_config.getParameter(prep + "trdW1") * unitFactor;
+        double trd_W2 = m_config.getParameter(prep + "trdW2") * unitFactor;
+        double trd_L = m_config.getParameter(prep + "trdL") * unitFactor;
+        double trd_H = m_config.getParameter(prep + "trdH") * unitFactor;
+        double trd_X0 = m_config.getParameter(prep + "trdX0") * unitFactor;
+        double trd_Y0 = m_config.getParameter(prep + "trdY0") * unitFactor;
+        double trd_Z0 = m_config.getParameter(prep + "trdZ0") * unitFactor;
+
+        double hole_W = m_config.getParameter(prep + "holeW") * unitFactor;
+        double hole_H = m_config.getParameter(prep + "holeH") * unitFactor;
+        double hole_L = m_config.getParameter(prep + "holeL") * unitFactor;
+        double hole_dX = m_config.getParameter(prep + "holeDX") * unitFactor;
+        double hole_dY = m_config.getParameter(prep + "holeDY") * unitFactor;
+        double hole_dZ = m_config.getParameter(prep + "holeDZ") * unitFactor;
+
+        double trd_hole_W = m_config.getParameter(prep + "trdHoleW") * unitFactor;
+        double trd_hole_H = m_config.getParameter(prep + "trdHoleH") * unitFactor;
+        double trd_hole_L = m_config.getParameter(prep + "trdHoleL") * unitFactor;
+        double trd_hole_dX = m_config.getParameter(prep + "trdHoleDX") * unitFactor;
+        double trd_hole_dY = m_config.getParameter(prep + "trdHoleDY") * unitFactor;
+        double trd_hole_dZ = m_config.getParameter(prep + "trdHoleDZ") * unitFactor;
+
+        double disk_r = m_config.getParameter(prep + "r") * unitFactor;
+        double disk_t = m_config.getParameter(prep + "t") * unitFactor;
+        double disk_dX = m_config.getParameter(prep + "diskDX") * unitFactor;
+        double disk_dY = m_config.getParameter(prep + "diskDY") * unitFactor;
+        double disk_dZ = m_config.getParameter(prep + "diskDZ") * unitFactor;
+
+        double cut_W = m_config.getParameter(prep + "cutW") * unitFactor;
+        double cut_H = m_config.getParameter(prep + "cutH") * unitFactor;
+        double cut_L = m_config.getParameter(prep + "cutL") * unitFactor;
+        double cut_dX = m_config.getParameter(prep + "cutDX") * unitFactor;
+        double cut_dY = m_config.getParameter(prep + "cutDY") * unitFactor;
+        double cut_dZ = m_config.getParameter(prep + "cutDZ") * unitFactor;
+        double cut_PHI = m_config.getParameter(prep + "cutPHI");
+
+        double sup_PHI = m_config.getParameter(prep + "PHI");
+
+        // tranformations
+        G4Transform3D transform_box = G4Translate3D(box_X0, box_Y0, box_Z0);
+        transform_box = transform_box * G4RotateY3D(sup_PHI / Unit::rad);
+
+        G4Transform3D transform_trd = G4Translate3D(trd_X0, trd_Y0, trd_Z0);
+        transform_trd = transform_trd * G4RotateY3D(sup_PHI / Unit::rad) * G4RotateX3D(M_PI / 2.0 / Unit::rad);
+
+        G4Transform3D transform_box_hole = G4Translate3D(hole_dX, hole_dY, hole_dZ);
+
+        G4Transform3D transform_trd_hole = G4Translate3D(trd_hole_dX, trd_hole_dY, trd_hole_dZ);
+
+        G4Transform3D transform_disk_hole = G4Translate3D(disk_dX, disk_dY, disk_dZ);
+
+        G4Transform3D transform_cut = G4Translate3D(cut_dX, cut_dY, cut_dZ);
+        transform_cut = transform_cut * G4RotateX3D(cut_PHI / Unit::rad);
+
+        //define geometry
+        string geo_box_name = "geo_" + name + "_box_name";
+        string geo_trd_name = "geo_" + name + "_trd_name";
+
+        string geo_box_hole_name = "geo_" + name + "_box_hole_name";
+        string geo_trd_hole_name = "geo_" + name + "_trd_hole_name";
+        string geo_disk_hole_name = "geo_" + name + "_disk_hole_name";
+        string geo_cut_name = "geo_" + name + "_cut_name";
+
+        string geo_sup4x_name = "geo_" + name + "xxxx_name";
+        string geo_supxxx_name = "geo_" + name + "xxx_name";
+        string geo_supxx_name = "geo_" + name + "xx_name";
+        string geo_supx_name = "geo_" + name + "x_name";
+        string geo_sup_name = "geo_" + name + "_name";
+
+        G4Box* geo_box = new G4Box(geo_box_name, box_W / 2.0, box_H / 2.0, box_L / 2.0);
+        G4Trd* geo_trd = new G4Trd(geo_trd_name, trd_W1 / 2.0, trd_W2 / 2.0, trd_L / 2.0, trd_L / 2.0, trd_H / 2.0);
+
+        G4Box* geo_box_hole = new G4Box(geo_box_hole_name, hole_W / 2.0, hole_H / 2.0, hole_L / 2.0);
+        G4Box* geo_trd_hole = new G4Box(geo_trd_hole_name, trd_hole_W / 2.0, trd_hole_H / 2.0, trd_hole_L / 2.0);
+        G4Tubs* geo_disk_hole = new G4Tubs(geo_disk_hole_name, 0.0, disk_r, disk_t, 0.0, 2.0 * M_PI);
+        G4Box* geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
+
+        G4UnionSolid* geo_sup4x = new G4UnionSolid(geo_sup4x_name, geo_box, geo_trd, transform_box.inverse() * transform_trd);
+
+        G4SubtractionSolid* geo_supxxx = new G4SubtractionSolid(geo_supxxx_name, geo_sup4x, geo_box_hole, transform_box_hole);
+        G4SubtractionSolid* geo_supxx = new G4SubtractionSolid(geo_supxx_name, geo_supxxx, geo_trd_hole, transform_trd_hole);
+        G4SubtractionSolid* geo_supx = new G4SubtractionSolid(geo_supx_name, geo_supxx, geo_disk_hole, transform_disk_hole);
+        G4SubtractionSolid* geo_sup = new G4SubtractionSolid(geo_sup_name, geo_supx, geo_cut, transform_cut);
+
+        sup.geo = geo_sup;
+        sup.transform = transform_box;
+
+        string strMat_sup = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_sup = Materials::get(strMat_sup);
+
+        string logi_sup_name = "logi_" + name + "_name";
+        G4LogicalVolume* logi_sup = new G4LogicalVolume(sup.geo, mat_sup, logi_sup_name);
+
+        sup.logi = logi_sup;
+
+        //put volume
+        setColor(*logi_sup, "#0000CC");
+        //setVisibility(*logi_sup, false);
+        string phys_sup_name = "phys_" + name + "_name";
+        new G4PVPlacement(sup.transform, sup.logi, phys_sup_name, &topVolume, false, 0);
+
+        elements[name] = sup;
+      }
+
+
+      //--------------
       //-   Rest of elements with typical geometry
+
       std::vector<std::string> straightSections;
       boost::split(straightSections, m_config.getParameterStr("Straight"), boost::is_any_of(" "));
       for (const auto& name : straightSections) {
@@ -677,6 +802,77 @@ namespace Belle2 {
 
         elements[name] = polycone;
       }
+
+
+      //--------------------------------------------------------------------------------------------
+      //-   Shields
+
+      std::vector<std::string> shields;
+      boost::split(shields, m_config.getParameterStr("Shield"), boost::is_any_of(" "));
+      for (const auto& name : shields) {
+        prep = name + ".";
+
+        //-   Shield made as box with optional subtracted box-shaped inner space (hole)
+
+        double shield_W = m_config.getParameter(prep + "W") * unitFactor;
+        double shield_H = m_config.getParameter(prep + "H") * unitFactor;
+        double shield_L = m_config.getParameter(prep + "L") * unitFactor;
+        double shield_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+        double shield_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+        double shield_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+
+        double shield_hole_W = m_config.getParameter(prep + "holeW", 0) * unitFactor;
+        double shield_hole_H = m_config.getParameter(prep + "holeH", 0) * unitFactor;
+        double shield_hole_L = m_config.getParameter(prep + "holeL", 0) * unitFactor;
+        double shield_hole_dX = m_config.getParameter(prep + "holeDX", 0) * unitFactor;
+        double shield_hole_dY = m_config.getParameter(prep + "holeDY", 0) * unitFactor;
+        double shield_hole_dZ = m_config.getParameter(prep + "holeDZ", 0) * unitFactor;
+
+        double shield_PHI = m_config.getParameter(prep + "PHI");
+
+        // storable element
+        CryostatElement shield;
+
+        shield.transform = G4Translate3D(shield_X0, shield_Y0, shield_Z0);
+        shield.transform = shield.transform * G4RotateY3D(shield_PHI / Unit::rad);
+
+        G4Transform3D transform_shield_hole = G4Translate3D(shield_hole_dX, shield_hole_dY, shield_hole_dZ);
+
+        //define geometry
+        string geo_shieldx_name = "geo_" + name + "x_name";
+        string geo_shield_hole_name = "geo_" + name + "_hole_name";
+        string geo_shield_name = "geo_" + name + "_name";
+
+        if (shield_hole_W == 0 || shield_hole_H == 0 || shield_hole_L == 0) {
+          G4Box* geo_shield = new G4Box(geo_shield_name, shield_W / 2.0, shield_H / 2.0, shield_L / 2.0);
+
+          shield.geo = geo_shield;
+        } else {
+          G4Box* geo_shieldx = new G4Box(geo_shieldx_name, shield_W / 2.0, shield_H / 2.0, shield_L / 2.0);
+          G4Box* geo_shield_hole = new G4Box(geo_shield_hole_name, shield_hole_W / 2.0, shield_hole_H / 2.0, shield_hole_L / 2.0);
+          G4SubtractionSolid* geo_shield = new G4SubtractionSolid(geo_shield_name, geo_shieldx, geo_shield_hole,
+                                                                  transform_shield_hole);
+
+          shield.geo = geo_shield;
+        }
+
+        string strMat_shield = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_shield = Materials::get(strMat_shield);
+
+        string logi_shield_name = "logi_" + name + "_name";
+        G4LogicalVolume* logi_shield = new G4LogicalVolume(shield.geo, mat_shield, logi_shield_name);
+
+        shield.logi = logi_shield;
+
+        //put volume
+        setColor(*logi_shield, "#0000CC");
+        //setVisibility(*logi_shield, false);
+        string phys_shield_name = "phys_" + name + "_name";
+        new G4PVPlacement(shield.transform, shield.logi, phys_shield_name, &topVolume, false, 0);
+
+        elements[name] = shield;
+      }
+
 
       // RVC connection structure (simplified shape)
       G4Tubs* geo_rvcR = new G4Tubs("geo_rvcR", 60, 60 + 60, (620 - 560) / 2., 0, 2 * M_PI);

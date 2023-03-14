@@ -38,13 +38,20 @@ namespace Belle2 {
      * In case of no intra-run dependence, the vector is empty
      * In general for n payloads there are n-1 boundaries
      */
-    std::vector<unsigned int> getEventNumbers() const { return m_eventNumbers;}
+    const std::vector<unsigned int>& getEventNumbers() const { return m_eventNumbers; }
 
     /**
      * Get the stored object according to indx
      * @param indx index which can have values from 0 to getEventNumbers() - 1
      */
     TObject* getObjectByIndex(int indx) const {return m_objects.At(indx);}
+
+    /**
+     * Get a vector with the intra-run boundaries (in this case, event numbers).
+     * In case of no intra-run dependence, the vector is empty.
+     * In general for n payloads there are n-1 boundaries.
+     */
+    const std::vector<unsigned int>& getBoundaries() const override { return getEventNumbers(); }
 
   protected:
     /**
@@ -53,8 +60,6 @@ namespace Belle2 {
      * @return        array index of the object valid for the given event.
      */
     virtual int getIndex(const EventMetaData& event) const override;
-
-
 
   private:
     /** Vector of event number boundaries. */

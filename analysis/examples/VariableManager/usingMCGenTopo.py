@@ -23,7 +23,7 @@ from variables.MCGenTopo import mc_gen_topo
 my_path = basf2.create_path()
 
 # load input ROOT file
-inputMdst('default', basf2.find_file('JPsi2ee_e2egamma.root', 'examples', False), path=my_path)
+inputMdst(basf2.find_file('JPsi2ee_e2egamma.root', 'examples', False), path=my_path)
 
 # create and fill ParticleList
 fillParticleList('e+', 'nTracks>=2 and abs(d0)<2 and abs(z0)<4 and clusterE>2', path=my_path)

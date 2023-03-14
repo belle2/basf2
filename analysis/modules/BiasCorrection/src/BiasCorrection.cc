@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
 #include <iostream>
 
@@ -14,6 +14,8 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
+
+#include <Math/Vector4D.h>
 
 #include <map>
 
@@ -57,7 +59,7 @@ WeightInfo EnergyBiasCorrectionModule::getInfo(const Particle* particle)
     if (!var) {
       B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
     }
-    values.insert(std::make_pair(i_variable, var->function(particle)));
+    values.insert(std::make_pair(i_variable, std::get<double>(var->function(particle))));
   }
 
   return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
@@ -116,14 +118,14 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
       pz += daughter->getPz();
       E  += daughter->getEnergy();
     }
-    const TLorentzVector vec(px, py, pz, E);
+    const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
              && particle->getPDGCode() == Const::photon.getPDGCode()) {
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {
-      particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+      particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
     particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
     particle->updateJacobiMatrix();

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ aopRootF = options.aopRootF
 home = os.environ['BELLE2_LOCAL_DIR']
 
 # More information about use_local_database please find here:
-# https://b2-master.belle2.org/software/development/sphinx/framework/doc/index-03-framework.html?highlight=use_local_database#basf2.use_local_database
+# https://software.belle2.org/development/sphinx/framework/doc/index-03-framework.html?highlight=use_local_database#basf2.use_local_database
 b2.use_local_database()
 # use_local_database("./ARICHdata/centraldb/database.txt", "./ARICHdata/centraldb/", False, LogLevel.ERROR, False)
 # use_local_database("./ARICH_db_Test/centraldb/database.txt", "", False, LogLevel.ERROR, False)
@@ -50,12 +49,12 @@ eventinfo.initialize()
 main = b2.create_path()
 main.add_module(eventinfo)
 
-# create a gearbox module to read read the aerogel data so it can be used
+# create a gearbox module to read the aerogel data so it can be used
 # it needs to open just the aerogel/AerogelData.xml which includes all other xml
 # files in that folder. What we do is that we set the backend to point to that
 # folder so that gearbox can find all files in there.
 
-if(ie == "import"):
+if ie == "import":
     paramloader = b2.register_module('Gearbox')
     pathname = 'file://%s/data/AllData/' % (os.getcwd())
     paramloader.param('backends', [pathname])
@@ -105,14 +104,14 @@ if(ie == "import"):
                 rootFilesFebTest.push_back(os.path.join(path, name))
     mypath = '%s/moduleTest/modules/' % (os.getcwd())
 
-if(ie == 'importAerogelInfoOnly'):
+elif ie == 'importAerogelInfoOnly':
     paramloader = b2.register_module('Gearbox')
     pathname = '/home/b-lab050/KEK/xmlarichdata/data/aerogel_xml_ver3_R/'
     paramloader.param('backends', [pathname])
     paramloader.param('fileName', 'AerogelData.xml')
     paramloader.initialize()
 
-if(ie == 'importAerogelRayleighScatteringFit'):
+elif ie == 'importAerogelRayleighScatteringFit':
     paramloader = b2.register_module('Gearbox')
     pathname = '/home/b-lab050/KEK/xmlarichdata/xmlData/aerogel_xml_ver3_L/'
     paramloader.param('backends', [pathname])
@@ -121,92 +120,92 @@ if(ie == 'importAerogelRayleighScatteringFit'):
 
 b2.process(main)
 
-if(ie == 'importAerogelInfoOnly'):
+if ie == 'importAerogelInfoOnly':
     dbImporter = ARICHDatabaseImporter()
     dbImporter.importAerogelInfo("Right")
 
-if(ie == 'importAerogelRayleighScatteringFit'):
+elif ie == 'importAerogelRayleighScatteringFit':
     dbImporter = ARICHDatabaseImporter()
     dbImporter.importAeroRayleighScatteringFit("Left")
 
 
 # and run the importer
-if(ie == 'import'):
+elif ie == 'import':
     dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsics, rootFilesHapdQE, rootFilesFebTest)
-    if(ieClass == 'aerogelInfo'):
+    if ieClass == 'aerogelInfo':
         dbImporter.importAerogelInfo()
-    if(ieClass == 'aerogelMap'):
+    elif ieClass == 'aerogelMap':
         dbImporter.importAerogelMap()
-    if(ieClass == 'aerogelTilesInfo'):
+    elif ieClass == 'aerogelTilesInfo':
         dbImporter.importAeroTilesInfo()
-    if(ieClass == 'hapdQA'):
+    elif ieClass == 'hapdQA':
         dbImporter.importHapdQA()
-    if(ieClass == 'hapdQE'):
+    elif ieClass == 'hapdQE':
         dbImporter.importHapdQE()
-    if(ieClass == 'hapdChipInfo'):
+    elif ieClass == 'hapdChipInfo':
         dbImporter.importHapdChipInfo()
-    if(ieClass == 'hapdInfo'):
+    elif ieClass == 'hapdInfo':
         dbImporter.importHapdInfo()
-    if(ieClass == 'hapd'):
+    elif ieClass == 'hapd':
         dbImporter.importHapdQA()
         dbImporter.importHapdQE()
         dbImporter.importHapdChipInfo()
         dbImporter.importHapdInfo()
-    if(ieClass == 'asicInfo'):
+    elif ieClass == 'asicInfo':
         dbImporter.importAsicInfo()
-    if(ieClass == 'febTest'):
+    elif ieClass == 'febTest':
         dbImporter.importFebTest()
-    if(ieClass == 'febInfo'):
+    elif ieClass == 'febInfo':
         dbImporter.importFEBoardInfo()
-    if(ieClass == 'moduleTest'):
+    elif ieClass == 'moduleTest':
         dbImporter.importModuleTest(mypath, hvtest)
-    if(ieClass == 'sensorInfo'):
+    elif ieClass == 'sensorInfo':
         dbImporter.importSensorModuleInfo()
-    if(ieClass == 'sensorMap'):
+    elif ieClass == 'sensorMap':
         dbImporter.importSensorModuleMap()
 
-if(ie == 'importAerogelTilesInfo'):
+elif ie == 'importAerogelTilesInfo':
     dbImporter = ARICHDatabaseImporter()
-    if(ieClass == 'aerogelTilesInfo'):
+    if ieClass == 'aerogelTilesInfo':
         dbImporter.importAeroTilesInfo()
 
-if(ie == 'export'):
+elif ie == 'export':
     dbImporter = ARICHDatabaseImporter()
-    if(ieClass == 'aerogelInfo'):
+    if ieClass == 'aerogelInfo':
         dbImporter.exportAerogelInfo()
-    if(ieClass == 'aerogelMap'):
+    elif ieClass == 'aerogelMap':
         dbImporter.exportAerogelMap()
-    if(ieClass == 'aerogelTilesInfo'):
+    elif ieClass == 'aerogelTilesInfo':
         dbImporter.printAeroTileInfo()
-    if(ieClass == 'dumpAerogelOpticalProperties'):
+    elif ieClass == 'dumpAerogelOpticalProperties':
         # dbImporter.dumpAerogelOpticalProperties()
         # dbImporter.dumpAerogelOpticalProperties("ARICH_AerogelOpticalProperties.root")
         dbImporter.dumpAerogelOpticalProperties(aopRootF)
         com = 'root -l ' + aopRootF + ' ' + home + '/arich/utility/scripts/plotTestARICHAerogelHist.C'
         os.system(com)
-    if(ieClass == 'hapdQA'):
+    elif ieClass == 'hapdQA':
         dbImporter.exportHapdQA()
-    if(ieClass == 'hapdQE'):
+    elif ieClass == 'hapdQE':
         dbImporter.exportHapdQE()
-    if(ieClass == 'hapdInfo'):
+    elif ieClass == 'hapdInfo':
         dbImporter.exportHapdInfo()
-    if(ieClass == 'hapdChipInfo'):
+    elif ieClass == 'hapdChipInfo':
         dbImporter.exportHapdChipInfo()
-    if(ieClass == 'hapd'):
+    elif ieClass == 'hapd':
         dbImporter.exportHapdQA()
         dbImporter.exportHapdQE()
         dbImporter.exportHapdInfo()
-    if(ieClass == 'asicInfo'):
+    elif ieClass == 'asicInfo':
         dbImporter.exportAsicInfo()
-    if(ieClass == 'febTest'):
+    elif ieClass == 'febTest':
         dbImporter.exportFebTest()
-    if(ieClass == 'febInfo'):
+    elif ieClass == 'febInfo':
         dbImporter.exportFEBoardInfo()
-    if(ieClass == 'moduleTest'):
+    elif ieClass == 'moduleTest':
         dbImporter.exportModuleTest(hvtest)
-    if(ieClass == 'sensorMap'):
+    elif ieClass == 'sensorMap':
         dbImporter.exportSensorModuleMap()
-    if(ieClass == 'all'):
+    elif ieClass == 'all':
         dbImporter.exportAll()
 
 

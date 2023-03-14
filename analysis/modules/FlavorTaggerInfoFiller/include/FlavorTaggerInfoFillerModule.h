@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -51,6 +51,8 @@ namespace Belle2 {
     bool m_FANNmlp; /**< Sets if FANN Combiner output will be saved or not **/
 
     bool m_TMVAfbdt; /**< Sets if FastBDT Combiner output will be saved or not **/
+
+    bool m_DNNmlp; /**< Sets if DNN tagger output will be saved or not **/
 
     bool m_qpCategories; /**< Sets if individual Categories output will be saved or not **/
 

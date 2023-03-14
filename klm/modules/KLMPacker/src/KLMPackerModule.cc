@@ -9,12 +9,12 @@
 /* Own header. */
 #include <klm/modules/KLMPacker/KLMPackerModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-REG_MODULE(KLMPacker)
+REG_MODULE(KLMPacker);
 
 KLMPackerModule::KLMPackerModule() :
   Module(),

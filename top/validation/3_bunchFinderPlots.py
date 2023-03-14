@@ -149,6 +149,7 @@ main.add_module('RootInput', inputFileNames=['../EvtGenSimRec_B2Kpi.root', '../E
 # Make plots
 main.add_module(MakePlots())
 
+main.add_module('Progress')
 # Process events
 process(main)
 

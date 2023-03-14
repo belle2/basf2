@@ -38,7 +38,7 @@ testFile = tempfile.NamedTemporaryFile()
 
 main = basf2.create_path()
 
-ma.inputMdst('default', b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
+ma.inputMdst(b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
 
 ma.fillParticleList('K-', '', path=main)
 ma.fillParticleList('pi+', '', path=main)

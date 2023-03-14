@@ -8,7 +8,9 @@
 
 #include <svd/modules/svdReconstruction/SVDRecoDigitCreatorModule.h>
 
+#include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/logging/LogConfig.h>
 #include <framework/logging/Logger.h>
 
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -26,7 +28,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDRecoDigitCreator)
+REG_MODULE(SVDRecoDigitCreator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -73,7 +75,7 @@ void SVDRecoDigitCreatorModule::beginRun()
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
     else
-      B2INFO("SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
     m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith6Samples();
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith3Samples();
@@ -147,7 +149,16 @@ void SVDRecoDigitCreatorModule::event()
   if (!temp_eventinfo.isValid())
     m_svdEventInfoName = "SVDEventInfoSim";
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
-  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  if (!eventinfo) {
+    if (Environment::Instance().getRealm() == LogConfig::c_Online) {
+      // If there is no SVDEventInfo and we are running online, it means that SVD is excluded: better to return
+      B2WARNING("No SVDEventInfo object in this event: SVD is excluded, so don't worry");
+      return;
+    } else {
+      // Otherwise, throw a FATAL
+      B2FATAL("No SVDEventInfo object in this event: something went wrong");
+    }
+  }
 
   int numberOfAcquiredSamples = eventinfo->getNSamples();
 

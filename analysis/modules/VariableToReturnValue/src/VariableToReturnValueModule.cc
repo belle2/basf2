@@ -8,7 +8,7 @@
 
 #include <analysis/modules/VariableToReturnValue/VariableToReturnValueModule.h>
 
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
@@ -17,7 +17,7 @@
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariableToReturnValue)
+REG_MODULE(VariableToReturnValue);
 
 
 VariableToReturnValueModule::VariableToReturnValueModule() :
@@ -43,5 +43,13 @@ void VariableToReturnValueModule::initialize()
 
 void VariableToReturnValueModule::event()
 {
-  this->setReturnValue(static_cast<int>(std::lround(m_function(nullptr))));
+  int returnValue = 0;
+  if (std::holds_alternative<double>(m_function(nullptr))) {
+    returnValue = std::get<double>(m_function(nullptr));
+  } else if (std::holds_alternative<int>(m_function(nullptr))) {
+    returnValue = std::get<int>(m_function(nullptr));
+  } else if (std::holds_alternative<bool>(m_function(nullptr))) {
+    returnValue = std::get<bool>(m_function(nullptr));
+  }
+  this->setReturnValue(returnValue);
 }

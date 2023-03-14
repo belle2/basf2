@@ -25,11 +25,10 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/utilities/TestHelpers.h>
 
-#include <TLorentzVector.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Variable;
+using namespace ROOT::Math;
 
 namespace {
   class ROEVariablesTest : public ::testing::Test {
@@ -71,15 +70,15 @@ namespace {
       PCmsLabTransform T;
 
       TestUtilities::TestParticleFactory factory;
-      TVector3 ipposition(0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
       double halfEcms = T.getCMSEnergy() / 2;
 
-      TLorentzVector e_momentum(0., 0,  halfEcms / 2,  halfEcms / 2);
+      PxPyPzEVector e_momentum(0., 0,  halfEcms / 2,  halfEcms / 2);
       e_momentum = T.rotateCmsToLab() * e_momentum;
-      TLorentzVector p_momentum(0., 0, -halfEcms / 2,  halfEcms / 2);
+      PxPyPzEVector p_momentum(0., 0, -halfEcms / 2,  halfEcms / 2);
       p_momentum = T.rotateCmsToLab() * p_momentum;
 
-      TLorentzVector b0_momentum(0, 0, 0, halfEcms);
+      PxPyPzEVector b0_momentum(0, 0, 0, halfEcms);
       b0_momentum = T.rotateCmsToLab() * b0_momentum;
       factory.produceParticle(string("^B0 -> e- e+"), b0_momentum, ipposition);
 
@@ -87,11 +86,11 @@ namespace {
       myParticles[1]->set4Vector(p_momentum);
 
       myParticles[0]->print(); // e-
-      TLorentzVector fsp1_momentum(0., 0, halfEcms / 4, halfEcms / 4);
+      PxPyPzEVector fsp1_momentum(0., 0, halfEcms / 4, halfEcms / 4);
       fsp1_momentum = T.rotateCmsToLab() * fsp1_momentum;
-      TLorentzVector fsp2_momentum(0., 0, -halfEcms / 4, halfEcms / 4);
+      PxPyPzEVector fsp2_momentum(0., 0, -halfEcms / 4, halfEcms / 4);
       fsp2_momentum = T.rotateCmsToLab() * fsp2_momentum;
-      TLorentzVector kl_momentum(0., 0, 0.1, 0.5);
+      PxPyPzEVector kl_momentum(0., 0, 0.1, 0.5);
       kl_momentum = T.rotateCmsToLab() * fsp2_momentum;
       factory.produceParticle(string("^B0 -> [pi0 -> gamma gamma] [K_S0 -> pi+ pi-]"), b0_momentum, ipposition);
       KLMCluster myROEKLM;
@@ -154,35 +153,43 @@ namespace {
     auto part = myParticles[2];  // B0
     auto* var = Manager::Instance().getVariable("nROE_Charged()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_Charged(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Charged(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_Charged(my_mask, 13)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
+
+    var = Manager::Instance().getVariable("nROE_Charged(all, 13)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
 
     var = Manager::Instance().getVariable("nROE_Charged(my_mask, 211)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("nROE_Photons()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_Photons(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("nROE_NeutralHadrons()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("nROE_NeutralHadrons(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
 
   }
   /*
@@ -195,31 +202,35 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("nROE_Tracks()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_Tracks(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Tracks(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_ECLClusters()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_ECLClusters(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("nROE_NeutralECLClusters()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 2.0);
 
     var = Manager::Instance().getVariable("nROE_NeutralECLClusters(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("nROE_KLMClusters");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
   }
   /*
    * Test ROE recoil frame variable
@@ -233,7 +244,7 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 5.2959199);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 5.2959199);
 
     DataStore::StoreEntry& roeobjptr = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at("RestOfEvent");
     roeobjptr.object = myROEs[0];
@@ -241,7 +252,7 @@ namespace {
 
     var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partNotROE), 2.8002837);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partNotROE)), 2.8002837);
 
     // Clear ptr at the end
     roeobjptr.object = nullptr;
@@ -256,17 +267,17 @@ namespace {
     auto part = myParticles[2];  // B0
 
     // Tag side 4 vector
-    TLorentzVector roe4Vec(0, 0, 0, 0);
+    PxPyPzEVector roe4Vec(0, 0, 0, 0);
     roe4Vec += myParticles[3]->get4Vector();
     roe4Vec += myParticles[4]->get4Vector();
     roe4Vec += myParticles[6]->get4Vector();
     roe4Vec += myParticles[7]->get4Vector();
     // Tag side 4 vector in mask
-    TLorentzVector mask4Vec(0, 0, 0, 0);
+    PxPyPzEVector mask4Vec(0, 0, 0, 0);
     mask4Vec += myParticles[3]->get4Vector();
     mask4Vec += myParticles[6]->get4Vector();
     // Signal side 4 vector
-    TLorentzVector  sig4Vec = part->get4Vector();
+    PxPyPzEVector  sig4Vec = part->get4Vector();
 
     PCmsLabTransform T;
     double E0 = T.getCMSEnergy() / 2;
@@ -276,83 +287,90 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("roeCharge()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
+
+    var = Manager::Instance().getVariable("roeCharge(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.0);
 
     var = Manager::Instance().getVariable("roeCharge(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("roeEextra()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), myParticles[3]->getEnergy() + myParticles[4]->getEnergy());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), myParticles[3]->getEnergy() + myParticles[4]->getEnergy());
 
     var = Manager::Instance().getVariable("roeE()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4Vec.E());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4Vec.E());
 
     var = Manager::Instance().getVariable("useCMSFrame(roeE())");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4VecCMS.E());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4VecCMS.E());
 
     var = Manager::Instance().getVariable("roeM()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4Vec.Mag());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4Vec.mag());
 
     var = Manager::Instance().getVariable("roeP()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4Vec.P());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4Vec.P());
 
     var = Manager::Instance().getVariable("useCMSFrame(roeP())");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4VecCMS.P());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4VecCMS.P());
 
     var = Manager::Instance().getVariable("roePTheta()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4Vec.Theta());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4Vec.Theta());
 
     var = Manager::Instance().getVariable("useCMSFrame(roePTheta())");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4VecCMS.Theta());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4VecCMS.Theta());
 
     var = Manager::Instance().getVariable("roeDeltae()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4VecCMS.E() - E0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), roe4VecCMS.E() - E0);
 
     var = Manager::Instance().getVariable("roeDeltae(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), mask4VecCMS.E() - E0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), mask4VecCMS.E() - E0);
 
     var = Manager::Instance().getVariable("roeMbc()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - roe4VecCMS.Vect().Mag2()));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - roe4VecCMS.P2()));
 
     var = Manager::Instance().getVariable("roeMbc(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - mask4VecCMS.Vect().Mag2()));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - mask4VecCMS.P2()));
 
     var = Manager::Instance().getVariable("weDeltae(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), mask4VecCMS.E() + sig4VecCMS.E() - E0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), mask4VecCMS.E() + sig4VecCMS.E() - E0);
 
     var = Manager::Instance().getVariable("weMbc(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - mask4VecCMS.Vect().Mag2()));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - mask4VecCMS.P2()));
 
-    TLorentzVector miss4VecCMS(0, 0, 0, 0);
-    miss4VecCMS.SetVect(- (sig4VecCMS.Vect() + mask4VecCMS.Vect()));
+    var = Manager::Instance().getVariable("weMbc(all,0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), TMath::Sqrt(E0 * E0 - roe4VecCMS.P2()));
+
+    PxPyPzEVector miss4VecCMS = - (sig4VecCMS + mask4VecCMS);
     miss4VecCMS.SetE(2 * E0 - (sig4VecCMS.E() + mask4VecCMS.E()));
 
     var = Manager::Instance().getVariable("weMissM2(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), miss4VecCMS.Mag2());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.mag2());
 
     var = Manager::Instance().getVariable("weMissP(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), miss4VecCMS.P());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.P());
 
     var = Manager::Instance().getVariable("weMissE(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), miss4VecCMS.E());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), miss4VecCMS.E());
 
   }
   /*
@@ -362,30 +380,24 @@ namespace {
   {
     StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
-    // Signal side 4 vector
-    TLorentzVector  sig4Vec = part->get4Vector();
 
-    auto* var = Manager::Instance().getVariable("bssMassDifference()");
+    auto* var = Manager::Instance().getVariable("weCosThetaEll()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), sig4Vec.M());
-
-    var = Manager::Instance().getVariable("weCosThetaEll()");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), -0.99858648);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -0.99858648);
 
     var = Manager::Instance().getVariable("weXiZ()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.31121328);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.31121328);
 
     var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), -2.1852231e-06);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -2.1316282e-14);
 
     // FIXME: This value is the same as for weQ2lnuSimple
     // More complicated test setup is required to pass abs(cos_angle_nu) < 1
     var = Manager::Instance().getVariable("weQ2lnu(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), -2.1852231e-06);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -2.1316282e-14);
   }
   /*
    * Test isInROE variables
@@ -410,47 +422,55 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE1), 1.0);
+    EXPECT_EQ(std::get<double>(var->function(partROE1)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE2), 1.0);
+    EXPECT_EQ(std::get<double>(var->function(partROE2)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE3), 1.0);
+    EXPECT_EQ(std::get<double>(var->function(partROE3)), 1);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partNotROE), 0.0);
+    EXPECT_EQ(std::get<double>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("isInRestOfEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partNotROE), 0.0);
+    EXPECT_EQ(std::get<double>(var->function(partNotROE)), 0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE1), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+
+    var = Manager::Instance().getVariable("passesROEMask(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
+
+    var = Manager::Instance().getVariable("passesROEMask(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partNotROE)), 0.0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROEnotFromMask), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROEnotFromMask)), 0.0);
 
     var = Manager::Instance().getVariable("nROE_ParticlesInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 1.0);
 
     var = Manager::Instance().getVariable("currentROEIsInList(B0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE1), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 1.0);
 
     var = Manager::Instance().getVariable("currentROEIsInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE1), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 0.0);
 
     var = Manager::Instance().getVariable("particleRelatedToCurrentROE(PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(partROE1), 511.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partROE1)), 511.0);
 
     // Clear ptr at the end
     roeobjptr.object = nullptr;

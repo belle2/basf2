@@ -9,16 +9,18 @@
 /* Own header. */
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+
+#include <Math/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(KoralWInput)
+REG_MODULE(KoralWInput);
 
 
 KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
@@ -41,31 +43,32 @@ void KoralWInputModule::initialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
-
-  //Beam Parameters, initial particle - KORALW cannot handle beam energy spread
+  // Initialize the InitialParticleGeneration utility
   m_initial.initialize();
+  const BeamParameters& beams = m_initial.getBeamParameters();
+  // Initialize the KoralW generator
+  m_generator.setCMSEnergy(beams.getMass());
+  m_generator.init(m_dataPath, m_userDataFile);
+  m_initialized = true;
 }
 
 void KoralWInputModule::event()
 {
-  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
-  if (m_beamParams.hasChanged()) {
-    if (!m_initialized) {
-      initializeGenerator();
-    } else {
-      B2FATAL("KoralWInputModule::event(): BeamParameters have changed within a job, this is not supported for KORALW!");
-    }
-  }
-
-  // initial particle from beam parameters
+  // Check if KoralW is properly initialized.
+  if (not m_initialized)
+    B2FATAL("KorlalW is not properly initialized.");
+  // Check if the BeamParameters have changed: if they do, abort the job, otherwise cross section calculation is a nightmare,
+  // but be lenient with the first event: BeamParameters may be changed because of some basf2 black magic.
+  if (m_beamParams.hasChanged() and not m_firstEvent)
+    B2FATAL("BeamParameters have changed within a job, this is not supported for KoralW.");
+  m_firstEvent = false;
   const MCInitialParticles& initial = m_initial.generate();
 
   // true boost
-  TLorentzRotation boost = initial.getCMSToLab();
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
-
+  ROOT::Math::XYZVector vertex = initial.getVertex();
   m_mcGraph.clear();
   m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
@@ -73,18 +76,8 @@ void KoralWInputModule::event()
 
 void KoralWInputModule::terminate()
 {
-  m_generator.term();
-
-  B2RESULT("Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb");
-}
-
-void KoralWInputModule::initializeGenerator()
-{
-  const BeamParameters& nominal = m_initial.getBeamParameters();
-  double ecm = nominal.getMass();
-  m_generator.setCMSEnergy(ecm);
-
-  m_generator.init(m_dataPath, m_userDataFile);
-
-  m_initialized = true;
+  if (m_initialized) {
+    m_generator.term();
+    B2RESULT("Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb");
+  }
 }

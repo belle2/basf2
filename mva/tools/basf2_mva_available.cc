@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  bool isAvailable = Belle2::MVA::available(identifier, experiment, run, event);
+  bool isAvailable = Belle2::MVA::Utility::available(identifier, experiment, run, event);
   return (isAvailable) ? 0 : 1;
 
 }

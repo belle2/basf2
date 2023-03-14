@@ -6,12 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/ROEVariables.h>
-#include <analysis/variables/Variables.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/variables/Variables.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -20,18 +18,21 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
 
 // utility
+#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>
 #include <TMath.h>
+#include <Math/AxisAngle.h>
 
 #include <iostream>
 
@@ -74,6 +75,7 @@ namespace Belle2 {
       }
       return 0.0;
     }
+
     double hasAncestorFromSignalSide(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe;
@@ -96,8 +98,6 @@ namespace Belle2 {
       }
       return 0.0;
     }
-
-
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
@@ -149,7 +149,16 @@ namespace Belle2 {
           B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
           return std::numeric_limits<float>::quiet_NaN();
         }
-        return var->function(particle);
+        if (std::holds_alternative<double>(var->function(particle)))
+        {
+          return std::get<double>(var->function(particle));
+        } else if (std::holds_alternative<int>(var->function(particle)))
+        {
+          return std::get<int>(var->function(particle));
+        } else if (std::holds_alternative<bool>(var->function(particle)))
+        {
+          return std::get<bool>(var->function(particle));
+        } else return std::numeric_limits<double>::quiet_NaN();
 
       };
       return func;
@@ -176,11 +185,19 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           }
           PCmsLabTransform T;
-          TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
+          ROOT::Math::PxPyPzEVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
           Particle tmp(pRecoil, 0);
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = var->function(particle);
-          return result;
+          if (std::holds_alternative<double>(var->function(particle)))
+          {
+            return std::get<double>(var->function(particle));
+          } else if (std::holds_alternative<int>(var->function(particle)))
+          {
+            return std::get<int>(var->function(particle));
+          } else if (std::holds_alternative<bool>(var->function(particle)))
+          {
+            return std::get<bool>(var->function(particle));
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -190,11 +207,11 @@ namespace Belle2 {
     }
 
     // only the helper function
-    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
+    int nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
-        return 0.0;
+        return 0;
       int n_roe_tracks = roe->getNTracks(maskName);
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
@@ -208,22 +225,20 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> int {
         return nRemainingTracksInROE(particle, maskName);
       };
       return func;
     }
 
-    double nROE_RemainingTracks(const Particle* particle)
+    int nROE_RemainingTracks(const Particle* particle)
     {
       return nRemainingTracksInROE(particle);
     }
@@ -249,11 +264,11 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
-      return frameMCRoe4Vector.Energy();
+      return frameMCRoe4Vector.energy();
     }
 
     double ROE_MC_P(const Particle* particle)
@@ -264,11 +279,11 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
-      return frameMCRoe4Vector.Vect().Mag();
+      return frameMCRoe4Vector.P();
     }
 
     double ROE_MC_Px(const Particle* particle)
@@ -279,12 +294,12 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return frameMCRoe4Vector.Vect().X();
+      return frameMCRoe4Vector.px();
     }
 
     double ROE_MC_Py(const Particle* particle)
@@ -295,12 +310,12 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return frameMCRoe4Vector.Vect().Y();
+      return frameMCRoe4Vector.py();
     }
 
     double ROE_MC_Pz(const Particle* particle)
@@ -311,12 +326,12 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return frameMCRoe4Vector.Vect().Z();
+      return frameMCRoe4Vector.pz();
     }
 
     double ROE_MC_Pt(const Particle* particle)
@@ -327,12 +342,12 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return frameMCRoe4Vector.Vect().Perp();
+      return frameMCRoe4Vector.pt();
     }
 
     double ROE_MC_PTheta(const Particle* particle)
@@ -343,7 +358,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -359,21 +374,19 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
 
-      return (boostvec - mcp->get4Vector()).Mag();
+      return (boostvec - mcp->get4Vector()).M();
     }
 
     Manager::FunctionPtr ROE_MC_MissingFlags(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -427,14 +440,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_Tracks(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -454,14 +465,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_ECLClusters(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROEECLClusters");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROEECLClusters");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -481,14 +490,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_NeutralECLClusters(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROENeutralECLClusters");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROENeutralECLClusters");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -508,13 +515,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_Photons(const std::vector<std::string>& arguments)
     {
-      std::string maskName = "";
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Photons");
+      } else if (arguments.size() > 1) {
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Photons");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -542,13 +548,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments)
     {
-      std::string maskName = "";
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 optional only) for meta function nROE_NeutralHadrons");
+      } else if (arguments.size() > 1) {
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_NeutralHadrons");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -568,12 +573,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_ChargedParticles(const std::vector<std::string>& arguments)
     {
-      std::string maskName = "";
+      std::string maskName = RestOfEvent::c_defaultMaskName;
       int pdgCode = 0;
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() == 2) {
+      } else if (arguments.size() == 2) {
         maskName = arguments[0];
         try {
           pdgCode = Belle2::convertString<int>(arguments[1]);
@@ -581,8 +585,7 @@ namespace Belle2 {
           B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
           return nullptr;
         }
-      }
-      if (arguments.size() > 2)  {
+      } else if (arguments.size() > 2)  {
         B2FATAL("Wrong number of arguments (2 optional) for meta function nROE_ChargedParticles");
       }
       auto func = [maskName, pdgCode](const Particle * particle) -> double {
@@ -603,13 +606,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_Composites(const std::vector<std::string>& arguments)
     {
-      std::string maskName = "";
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Composites");
+      } else if (arguments.size() > 1) {
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Composites");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -627,7 +629,7 @@ namespace Belle2 {
         for (auto roeParticle : particles)
         {
           if (roeParticle->getParticleSource() == Particle::c_Composite or
-          roeParticle->getParticleSource() == Particle::c_V0) {
+              roeParticle->getParticleSource() == Particle::c_V0) {
             result++;
           }
         }
@@ -636,20 +638,18 @@ namespace Belle2 {
       return func;
     }
 
-
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
       std::string pListName;
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         pListName = arguments[0];
-        maskName = "";
       } else if (arguments.size() == 2) {
         pListName = arguments[0];
         maskName = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_ParticlesInList");
+        B2FATAL("Wrong number of arguments (1 or 2 required) for meta function nROE_ParticlesInList");
 
       auto func = [pListName, maskName](const Particle * particle) -> double {
 
@@ -683,14 +683,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Charge(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROECharge");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROECharge");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -719,14 +717,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_ExtraEnergy(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function extraEnergy");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function extraEnergy");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -762,14 +758,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_NeutralExtraEnergy(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function extraEnergy");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function extraEnergy");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -782,27 +776,27 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
         auto roephotons = roe->getPhotons(maskName);
-        TLorentzVector total4vector;
+        ROOT::Math::PxPyPzEVector total4vector;
         for (auto* photon : roephotons)
         {
           total4vector += photon->get4Vector();
         }
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(total4vector);
-        return frameRoe4Vector.Energy();
+        return frameRoe4Vector.energy();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_E(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      std::string maskName = RestOfEvent::c_defaultMaskName;
+
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_E");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_E");
+
       auto func = [maskName](const Particle * particle) -> double {
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
         if (!roe)
@@ -812,21 +806,19 @@ namespace Belle2 {
         }
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
-        return frameRoe4Vector.Energy();
+        return frameRoe4Vector.energy();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_M(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_M");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_M");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -839,21 +831,19 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return roe->get4Vector(maskName).Mag();
+        return roe->get4Vector(maskName).M();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_P(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_P");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_P");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -868,21 +858,19 @@ namespace Belle2 {
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
-        return frameRoe4Vector.Vect().Mag();
+        return frameRoe4Vector.P();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_Px(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Px");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Px");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -897,21 +885,19 @@ namespace Belle2 {
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
-        return frameRoe4Vector.Vect().X();
+        return frameRoe4Vector.px();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_Py(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Py");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Py");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -926,21 +912,19 @@ namespace Belle2 {
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
-        return frameRoe4Vector.Vect().Y();
+        return frameRoe4Vector.py();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_Pt(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pt");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Pt");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -955,21 +939,19 @@ namespace Belle2 {
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
-        return frameRoe4Vector.Vect().Perp();
+        return frameRoe4Vector.pt();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_Pz(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pz");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Pz");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -984,21 +966,19 @@ namespace Belle2 {
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
-        return frameRoe4Vector.Vect().Z();
+        return frameRoe4Vector.pz();
       };
       return func;
     }
 
     Manager::FunctionPtr ROE_PTheta(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_PTheta");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_PTheta");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1020,14 +1000,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_DeltaE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_deltae");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_deltae");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1041,7 +1019,7 @@ namespace Belle2 {
         }
 
         PCmsLabTransform T;
-        TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
+        ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
         return vec.E() - T.getCMSEnergy() / 2;
       };
       return func;
@@ -1049,14 +1027,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Mbc(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_mbc");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_mbc");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1070,10 +1046,10 @@ namespace Belle2 {
         }
 
         PCmsLabTransform T;
-        TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
+        ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
 
         double E = T.getCMSEnergy() / 2;
-        double m2 = E * E - vec.Vect().Mag2();
+        double m2 = E * E - vec.P2();
         double mbc = m2 > 0 ? sqrt(m2) : 0;
 
         return mbc;
@@ -1083,23 +1059,21 @@ namespace Belle2 {
 
     Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function bssMassDifference");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function bssMassDifference");
 
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        TLorentzVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "6");
-        TLorentzVector sig4vec = particle->getDaughter(0)->get4Vector();
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "6");
+        ROOT::Math::PxPyPzEVector sig4vec = particle->getDaughter(0)->get4Vector();
 
-        TLorentzVector bsMom = neutrino4vec + sig4vec;
-        TLorentzVector bssMom = bsMom + particle->getDaughter(1)->get4Vector();
+        ROOT::Math::PxPyPzEVector bsMom = neutrino4vec + sig4vec;
+        ROOT::Math::PxPyPzEVector bssMom = bsMom + particle->getDaughter(1)->get4Vector();
 
         return bssMom.M() - bsMom.M();
       };
@@ -1112,7 +1086,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1123,18 +1097,18 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBeamFourMomentum();
-        TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        TLorentzVector sig4vecLAB = particle->get4Vector();
-        TLorentzVector neutrino4vec = missing4Vector(particle, maskName, "1");
-        TLorentzVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
+        ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
+        ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+        ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
+        ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "1");
+        ROOT::Math::PxPyPzEVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
         double deltaE = std::numeric_limits<float>::quiet_NaN();
 
         // Definition 0: CMS
         if (opt == "0")
         {
-          double totalSigEnergy = (sig4vec + neutrino4vec).Energy();
+          double totalSigEnergy = (sig4vec + neutrino4vec).energy();
           double E = T.getCMSEnergy() / 2;
           deltaE = totalSigEnergy - E;
         }
@@ -1144,7 +1118,7 @@ namespace Belle2 {
         {
           double Ecms = T.getCMSEnergy();
           double s = Ecms * Ecms;
-          deltaE = ((sig4vecLAB + neutrino4vecLAB) * boostvec - s / 2.0) / sqrt(s);
+          deltaE = ((sig4vecLAB + neutrino4vecLAB).Dot(boostvec) - s / 2.0) / sqrt(s);
         }
 
         else
@@ -1161,7 +1135,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1172,10 +1146,10 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBeamFourMomentum();
-        TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-        TLorentzVector sig4vecLAB = particle->get4Vector();
-        TLorentzVector neutrino4vec;
+        ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
+        ROOT::Math::PxPyPzEVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+        ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
+        ROOT::Math::PxPyPzEVector neutrino4vec;
 
         double mbc = std::numeric_limits<float>::quiet_NaN();
 
@@ -1183,7 +1157,7 @@ namespace Belle2 {
         if (opt == "0")
         {
           neutrino4vec = missing4Vector(particle, maskName, "1");
-          TVector3 bmom = (sig4vec + neutrino4vec).Vect();
+          B2Vector3D bmom = (sig4vec + neutrino4vec).Vect();
           double E = T.getCMSEnergy() / 2;
           double m2 = E * E - bmom.Mag2();
           mbc = m2 > 0 ? sqrt(m2) : 0;
@@ -1193,10 +1167,10 @@ namespace Belle2 {
         else if (opt == "1")
         {
           neutrino4vec = missing4Vector(particle, maskName, "6");
-          TVector3 bmom = (sig4vecLAB + neutrino4vec).Vect();
+          B2Vector3D bmom = (sig4vecLAB + neutrino4vec).Vect();
           double Ecms = T.getCMSEnergy();
           double s = Ecms * Ecms;
-          double m2 = pow((s / 2.0 + bmom * boostvec.Vect()) / boostvec.Energy(), 2.0) - bmom.Mag2();
+          double m2 = pow((s / 2.0 + bmom * B2Vector3D(boostvec.Vect())) / boostvec.energy(), 2.0) - bmom.Mag2();
           mbc = m2 > 0 ? sqrt(m2) : 0;
         }
 
@@ -1204,7 +1178,7 @@ namespace Belle2 {
         else if (opt == "2")
         {
           neutrino4vec = missing4Vector(particle, maskName, "7");
-          TVector3 bmom = (sig4vec + neutrino4vec).Vect();
+          B2Vector3D bmom = (sig4vec + neutrino4vec).Vect();
           double E = T.getCMSEnergy() / 2;
           double m2 = E * E - bmom.Mag2();
           mbc = m2 > 0 ? sqrt(m2) : 0;
@@ -1224,7 +1198,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1234,7 +1208,7 @@ namespace Belle2 {
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
-        return missing4Vector(particle, maskName, opt).Mag2();
+        return missing4Vector(particle, maskName, opt).M2();
       };
       return func;
     }
@@ -1245,7 +1219,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1275,7 +1249,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1294,7 +1268,7 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return missing4Vector(particle, maskName, opt).Vect().Mag();
+        return missing4Vector(particle, maskName, opt).P();
       };
       return func;
     }
@@ -1305,7 +1279,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1324,7 +1298,7 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return missing4Vector(particle, maskName, opt).Vect().Px();
+        return missing4Vector(particle, maskName, opt).Px();
       };
       return func;
     }
@@ -1335,7 +1309,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1354,7 +1328,7 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return missing4Vector(particle, maskName, opt).Vect().Py();
+        return missing4Vector(particle, maskName, opt).Py();
       };
       return func;
     }
@@ -1365,7 +1339,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1384,7 +1358,7 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return missing4Vector(particle, maskName, opt).Vect().Pz();
+        return missing4Vector(particle, maskName, opt).Pz();
       };
       return func;
     }
@@ -1395,7 +1369,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = "";
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1414,21 +1388,19 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return missing4Vector(particle, maskName, opt).Energy();
+        return missing4Vector(particle, maskName, opt).energy();
       };
       return func;
     }
 
     Manager::FunctionPtr WE_xiZ(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function xiZ");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function xiZ");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1469,14 +1441,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_MissM2OverMissE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function WE_MissM2OverMissE");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function WE_MissM2OverMissE");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1489,18 +1459,14 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        PCmsLabTransform T;
-        TLorentzVector missing4Momentum;
-        TLorentzVector boostvec = T.getBeamFourMomentum();
-
-        return missing4Vector(particle, maskName, "5").Mag2() / (2.0 * missing4Vector(particle, maskName, "5").Energy());
+        return missing4Vector(particle, maskName, "5").M2() / (2.0 * missing4Vector(particle, maskName, "5").energy());
       };
       return func;
     }
 
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
-      std::string maskName("");
+      std::string maskName(RestOfEvent::c_defaultMaskName);
       std::string option("1");
 
       if (arguments.size() == 1) {
@@ -1531,17 +1497,17 @@ namespace Belle2 {
         // Assumes lepton is the last particle in the reco decay chain!
         PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);
-        TLorentzVector lep4vec = T.rotateLabToCms() * lep->get4Vector();
-        TLorentzVector nu4vec = missing4Vector(particle, maskName, option);
+        ROOT::Math::PxPyPzEVector lep4vec = T.rotateLabToCms() * lep->get4Vector();
+        ROOT::Math::PxPyPzEVector nu4vec = missing4Vector(particle, maskName, option);
 
-        return (lep4vec + nu4vec).Mag2();
+        return (lep4vec + nu4vec).M2();
       };
       return func;
     }
 
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments)
     {
-      std::string maskName("");
+      std::string maskName(RestOfEvent::c_defaultMaskName);
       std::string option("7");
 
       if (arguments.size() == 1) {
@@ -1571,10 +1537,10 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);
-        TLorentzVector lep_cm = T.rotateLabToCms() * lep->get4Vector();
+        ROOT::Math::PxPyPzEVector lep_cm = T.rotateLabToCms() * lep->get4Vector();
 
-        TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
-        TLorentzVector neu_cm = missing4Vector(particle, maskName, option);
+        ROOT::Math::PxPyPzEVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
+        ROOT::Math::PxPyPzEVector neu_cm = missing4Vector(particle, maskName, option);
 
         double e_beam = T.getCMSEnergy() / 2.0;
 
@@ -1583,67 +1549,64 @@ namespace Belle2 {
         double pB2 = e_beam * e_beam - bmass * bmass;
 
         //angle between the Y and the neutrino, from the Mbc=M_B constraint
-        double cos_angle_nu = (pB2 - Y_cm.Vect().Mag2() - neu_cm.Vect().Mag2()) / (2.0 * Y_cm.Vect().Mag() * neu_cm.Vect().Mag());
+        double cos_angle_nu = (pB2 - Y_cm.P2() - neu_cm.P2()) / (2.0 * Y_cm.P() * neu_cm.P());
         if (abs(cos_angle_nu) > 1)
         {
-          return (lep_cm + neu_cm).Mag2();
+          return (lep_cm + neu_cm).M2();
         }
 
         double angle_nu = TMath::ACos(cos_angle_nu);
         //first get one random neutrino, on the allowed cone for the constraint
-        TLorentzVector rotated_neu(-1 * Y_cm.Vect(), Y_cm.E()); //first get reverse Y
+        ROOT::Math::PtEtaPhiEVector rotated_neu(-Y_cm); //first get reverse Y
+        rotated_neu.SetE(Y_cm.E());
 
-        double nu_theta = rotated_neu.Theta() + (TMath::Pi() - angle_nu);
-        double nu_phi = rotated_neu.Phi();
-        rotated_neu.SetTheta(nu_theta);
-        rotated_neu.SetPhi(nu_phi);
-        rotated_neu.SetRho(neu_cm.Rho());
+        double nu_eta = -log(tan((rotated_neu.Theta() + (TMath::Pi() - angle_nu)) / 2.));
+        rotated_neu.SetEta(nu_eta);
+        rotated_neu.SetPt(neu_cm.pt());
         rotated_neu.SetE(neu_cm.E());
 
-        TVector3 Yneu_norm = Y_cm.Vect().Cross(neu_cm.Vect());
-        TVector3 Yrot_norm = Y_cm.Vect().Cross(rotated_neu.Vect());
+        B2Vector3D Yneu_norm = Y_cm.Vect().Cross(neu_cm.Vect());
+        B2Vector3D Yrot_norm = Y_cm.Vect().Cross(rotated_neu.Vect());
         //angle between the two crossproducts -> angle between the two vectors perpendicular to the Y-p_inc and Y-B planes -> angle between the planes
         //this angle needs to come out as zero
 
         double rot_angle = Yneu_norm.Angle(Yrot_norm);
 
-        TLorentzVector rotated_neu2(rotated_neu);
+        ROOT::Math::PxPyPzEVector rotated_neu2(rotated_neu);
         //unfortunately don't -and probably can't- know in which direction to rotate without trying
         //so create a copy of the vector, and later choose the correct one
         //However, rotation by 180 degrees is never needed, direction of the cross-product vector assures that when after rotation
         //the B-vector is in the plane, it always is on the side closer to pcm_lv_inc.
         //rotate around Y into the Y-neutrino-plane
-        rotated_neu.Rotate(rot_angle, Y_cm.Vect());
-        rotated_neu2.Rotate(-rot_angle, Y_cm.Vect());
+        ROOT::Math::AxisAngle rotation(Y_cm.Vect(), rot_angle);
+        rotation(rotated_neu);
+        rotation.Invert();
+        rotation(rotated_neu2);
 
         double dot1 = rotated_neu.Vect().Dot(Yneu_norm);
         double dot2 = rotated_neu2.Vect().Dot(Yneu_norm);
 
         if (abs(dot2) < abs(dot1)) rotated_neu = rotated_neu2;
 
-        return (lep_cm + rotated_neu).Mag2();
+        return (lep_cm + rotated_neu).M2();
       };
       return func;
     }
 
     Manager::FunctionPtr WE_cosThetaEll(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function cosThetaEll");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function cosThetaEll");
 
       auto func = [maskName](const Particle * particle) -> double {
 
-        PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBeamFourMomentum();
-        TLorentzVector pNu = missing4Vector(particle, maskName, "6");
+        ROOT::Math::PxPyPzEVector pNu = missing4Vector(particle, maskName, "6");
 
-        TLorentzVector pLep;
+        ROOT::Math::PxPyPzEVector pLep;
         // TODO: avoid hardocoded values
         for (unsigned i = 0; i < particle->getNDaughters(); i++)
         {
@@ -1654,16 +1617,16 @@ namespace Belle2 {
           }
         }
 
-        TLorentzVector pW = pNu + pLep;
-        TLorentzVector pB = particle->get4Vector() + pNu;
+        ROOT::Math::PxPyPzEVector pW = pNu + pLep;
+        ROOT::Math::PxPyPzEVector pB = particle->get4Vector() + pNu;
 
         // boost lepton and B momentum to W frame
-        TVector3 boost2W = -(pW.BoostVector());
-        pLep.Boost(boost2W);
-        pB.Boost(boost2W);
+        B2Vector3D boost2W = pW.BoostToCM();
+        pLep = ROOT::Math::Boost(boost2W) * pLep;
+        pB = ROOT::Math::Boost(boost2W) * pB;
 
-        TVector3 lep3Vector     = pLep.Vect();
-        TVector3 B3Vector       = pB.Vect();
+        B2Vector3D lep3Vector     = pLep.Vect();
+        B2Vector3D B3Vector       = pB.Vect();
         double numerator   = lep3Vector.Dot(B3Vector);
         double denominator = (lep3Vector.Mag()) * (B3Vector.Mag());
 
@@ -1674,14 +1637,12 @@ namespace Belle2 {
 
     Manager::FunctionPtr passesROEMask(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function passesROEMask");
+      else if (arguments.size() > 1)
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function passesROEMask");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1708,9 +1669,39 @@ namespace Belle2 {
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
       } else roe->print();
-      return 0.0;
+      return 0;
     }
 
+    double hasCorrectROECombination(const Particle* particle)
+    {
+      unsigned nDaughters = particle->getNDaughters();
+      if (nDaughters < 2) {
+        B2ERROR("The particle must have at least two daughters.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
+
+        // Find a daughter that is loaded from a ROE object
+        auto daughter = particle->getDaughter(i);
+        auto roe = daughter->getRelatedFrom<RestOfEvent>();
+        if (!roe)
+          continue;
+
+        auto sourceParticle = roe->getRelatedFrom<Particle>();
+        for (unsigned j = 0; j < particle->getNDaughters(); j++) {
+          if (i == j) continue;
+          const auto anotherDaughter = particle->getDaughter(j);
+
+          if (anotherDaughter == sourceParticle)
+            return 1.0;
+        }
+        return 0.0;
+      }
+
+      B2ERROR("There is no daughter particle loaded from the ROE object.");
+      return std::numeric_limits<float>::quiet_NaN();
+    }
 
     Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments)
     {
@@ -1733,9 +1724,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "tight")
+        } else if (mode == "tight")
         {
           if (particle->hasExtraInfo("Pi0ProbTightEnergyThreshold")) {
             return particle->getExtraInfo("Pi0ProbTightEnergyThreshold");
@@ -1744,9 +1733,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "cluster")
+        } else if (mode == "cluster")
         {
           if (particle->hasExtraInfo("Pi0ProbLargeClusterSize")) {
             return particle->getExtraInfo("Pi0ProbLargeClusterSize");
@@ -1755,9 +1742,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "both")
+        } else if (mode == "both")
         {
           if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize")) {
             return particle->getExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize");
@@ -1766,9 +1751,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else
+        } else
         {
           return std::numeric_limits<float>::quiet_NaN();
         }
@@ -1797,9 +1780,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "tight")
+        } else if (mode == "tight")
         {
           if (particle->hasExtraInfo("EtaProbTightEnergyThreshold")) {
             return particle->getExtraInfo("EtaProbTightEnergyThreshold");
@@ -1808,9 +1789,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "cluster")
+        } else if (mode == "cluster")
         {
           if (particle->hasExtraInfo("EtaProbLargeClusterSize")) {
             return particle->getExtraInfo("EtaProbLargeClusterSize");
@@ -1819,9 +1798,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "both")
+        } else if (mode == "both")
         {
           if (particle->hasExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize")) {
             return particle->getExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize");
@@ -1830,9 +1807,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else
+        } else
         {
           return std::numeric_limits<float>::quiet_NaN();
         }
@@ -1844,80 +1819,79 @@ namespace Belle2 {
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
-    TLorentzVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt)
+    ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt)
     {
       // Get related ROE object
       const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
-        TLorentzVector empty;
+        ROOT::Math::PxPyPzEVector empty;
         return empty;
       }
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
 
-      TLorentzVector rec4vecLAB = particle->get4Vector();
-      TLorentzVector roe4vecLAB = roe->get4Vector(maskName);
+      ROOT::Math::PxPyPzEVector rec4vecLAB = particle->get4Vector();
+      ROOT::Math::PxPyPzEVector roe4vecLAB = roe->get4Vector(maskName);
 
-      TLorentzVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
-      TLorentzVector roe4vec = T.rotateLabToCms() * roe4vecLAB;
+      ROOT::Math::PxPyPzEVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
+      ROOT::Math::PxPyPzEVector roe4vec = T.rotateLabToCms() * roe4vecLAB;
 
-      TLorentzVector miss4vec;
+      ROOT::Math::PxPyPzEVector miss4vec;
       double E_beam_cms = T.getCMSEnergy() / 2.0;
 
       // Definition 0: CMS, use energy and momentum of tracks and clusters
       if (opt == "0") {
-        miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
+        miss4vec = - (rec4vec + roe4vec);
         miss4vec.SetE(2 * E_beam_cms - (rec4vec.E() + roe4vec.E()));
       }
 
       // Definition 1: CMS, same as 0, fix Emiss = pmiss
       else if (opt == "1") {
-        miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
-        miss4vec.SetE(miss4vec.Vect().Mag());
+        miss4vec = - (rec4vec + roe4vec);
+        miss4vec.SetE(miss4vec.P());
       }
 
       // Definition 2: CMS, same as 0, fix Eroe = Ecms/2
       else if (opt == "2") {
-        miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
+        miss4vec = - (rec4vec + roe4vec);
         miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
       // Definition 3: CMS, use only energy and momentum of signal side
       else if (opt == "3") {
-        miss4vec.SetVect(- rec4vec.Vect());
+        miss4vec = - rec4vec;
         miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
       // Definition 4: CMS, same as 3, update with direction of ROE momentum
       else if (opt == "4") {
-        TVector3 pB = - roe4vec.Vect();
+        B2Vector3D pB = - roe4vec.Vect();
         pB.SetMag(0.340);
-        miss4vec.SetVect(pB - rec4vec.Vect());
-        miss4vec.SetE(E_beam_cms - rec4vec.E());
+        pB -= rec4vec.Vect();
+        miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }
 
       // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event
       else if (opt == "5") {
-        miss4vec.SetVect(boostvec.Vect() - (rec4vecLAB.Vect() + roe4vecLAB.Vect()));
-        miss4vec.SetE(boostvec.E() - (rec4vecLAB.E() + roe4vecLAB.E()));
+        miss4vec = boostvec - (rec4vecLAB + roe4vecLAB);
       }
 
       // Definition 6: LAB, same as 5, fix Emiss = pmiss
       else if (opt == "6") {
-        miss4vec.SetVect(boostvec.Vect() - (rec4vecLAB.Vect() + roe4vecLAB.Vect()));
-        miss4vec.SetE(miss4vec.Vect().Mag());
+        miss4vec = boostvec - (rec4vecLAB + roe4vecLAB);
+        miss4vec.SetE(miss4vec.P());
       }
 
       // Definition 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)
       else if (opt == "7") {
-        miss4vec.SetVect(-(rec4vec.Vect() + roe4vec.Vect()));
-        miss4vec.SetE(miss4vec.Vect().Mag());
+        miss4vec = - (rec4vec + roe4vec);
+        miss4vec.SetE(miss4vec.P());
         double factorAlpha = (E_beam_cms - rec4vec.E()) / miss4vec.E();
-        miss4vec.SetRho(factorAlpha * miss4vec.Rho());
-        miss4vec.SetE(miss4vec.Rho());
+        miss4vec *= factorAlpha;
+        miss4vec.SetE(miss4vec.P());
       }
 
       return miss4vec;
@@ -2008,7 +1982,7 @@ namespace Belle2 {
           if (isInThisRestOfEvent(i, roe, maskName) == 0)
             return 0;
         }
-        return 1.0;
+        return 1;
       }
       return roe->hasParticle(particle, maskName);
     }
@@ -2026,10 +2000,10 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Rest Of Event");
 
-    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
-                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
-                      "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
-                      "E.g. ``useROERecoilFrame(E)`` returns the energy of a particle in the ROE recoil frame.");
+    REGISTER_METAVARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
+                          "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
+                          "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
+                          "E.g. ``useROERecoilFrame(E)`` returns the energy of a particle in the ROE recoil frame.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
@@ -2045,18 +2019,18 @@ namespace Belle2 {
                       "Requires generator information and truth-matching. "
                       "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
-                      "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
-                      "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.");
+    REGISTER_METAVARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
+                          "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
+                          "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("nROE_RemainingTracks", nROE_RemainingTracks,
                       "Returns number of tracks in ROE - number of tracks of given particle"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
-                      "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                      "Is required for the specific FEI. :noindex:");
+    REGISTER_METAVARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
+                          "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
+                          "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
+                          "Is required for the specific FEI. :noindex:", Manager::VariableDataType::c_int);
     // nROE_RemainingTracks is overloaded (two C++ functions sharing one
     // variable name) so one of the two needs to be made the indexed
     // variable in sphinx
@@ -2064,130 +2038,161 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
-                      "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
-                      "Second argument is a PDG code to count only one charged particle species, independently of charge. "
-                      "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
-                      "PDG code 0 is used to count all charged particles");
+    REGISTER_METAVARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
+                          "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
+                          "Second argument is a PDG code to count only one charged particle species, independently of charge. "
+                          "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
+                          "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
-                      "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
+    REGISTER_METAVARIABLE("nROE_Photons(maskName)", nROE_Photons,
+                          "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
-                      "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
+    REGISTER_METAVARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
+                          "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
-                      "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+    REGISTER_METAVARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
+                          "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
+                          "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("roeMC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n", "GeV");
 
     REGISTER_VARIABLE("roeMC_M", ROE_MC_M,
-                      "Returns true invariant mass of unused tracks and clusters in ROE");
+                      "Returns true invariant mass of unused tracks and clusters in ROE\n\n", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("roeMC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n", "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
-                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
-                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "rad");
 
-    REGISTER_VARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
-                      "Returns flags corresponding to missing particles on ROE side.");
+    REGISTER_METAVARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
+                          "Returns flags corresponding to missing particles on ROE side.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
-                      "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.");
+    REGISTER_METAVARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
+                          "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
-                      "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.");
+    REGISTER_METAVARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
+                          "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
-                      "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
+    REGISTER_METAVARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
+                          "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_Composites(maskName)", nROE_Composites,
-                      "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.");
+    REGISTER_METAVARIABLE("nROE_Composites(maskName)", nROE_Composites,
+                          "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
-                      "Returns the number of particles in ROE from the given particle list.\n"
-                      "Use of variable aliases is advised.");
+    REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName[, maskName])", nROE_ParticlesInList,
+                          "Returns the number of particles in ROE from the given particle list. If a mask name is provided the selection criteria are applied.\n"
+                          "Use of variable aliases is advised.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeCharge(maskName)", ROE_Charge,
-                      "Returns total charge of the related RestOfEvent object.");
+    REGISTER_METAVARIABLE("roeCharge(maskName)", ROE_Charge,
+                          "Returns total charge of the related RestOfEvent object. The unit of the charge is ``e`` ", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
-                      "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
+    REGISTER_METAVARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
+                          "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle. The unit of the energy is ``GeV`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
-                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
+                          "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function. The unit of the energy is ``GeV`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeE(maskName)", ROE_E,
-                      "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roeE(maskName)", ROE_E,
+                          "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the energy is ``GeV`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeM(maskName)", ROE_M,
-                      "Returns invariant mass of unused tracks and clusters in ROE");
+    REGISTER_METAVARIABLE("roeM(maskName)", ROE_M,
+                          "Returns invariant mass of unused tracks and clusters in ROE. The unit of the invariant mass is :math:`\\text{GeV/c}^2`",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeP(maskName)", ROE_P,
-                      "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roeP(maskName)", ROE_P,
+                          "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePt(maskName)", ROE_Pt,
-                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roePt(maskName)", ROE_Pt,
+                          "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePx(maskName)", ROE_Px,
-                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roePx(maskName)", ROE_Px,
+                          "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePy(maskName)", ROE_Py,
-                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roePy(maskName)", ROE_Py,
+                          "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePz(maskName)", ROE_Pz,
-                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roePz(maskName)", ROE_Pz,
+                          "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePTheta(maskName)", ROE_PTheta,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
+    REGISTER_METAVARIABLE("roePTheta(maskName)", ROE_PTheta,
+                          "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the angle is ``rad`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeDeltae(maskName)", ROE_DeltaE,
-                      "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.");
+    REGISTER_METAVARIABLE("roeDeltae(maskName)", ROE_DeltaE,
+                          "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the energy is ``GeV`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeMbc(maskName)", ROE_Mbc,
-                      "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.");
+    REGISTER_METAVARIABLE("roeMbc(maskName)", ROE_Mbc,
+                          "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
-                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.");
+    REGISTER_METAVARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
+                          "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the energy is ``GeV`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMbc(maskName, opt)", WE_Mbc,
-                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.");
+    REGISTER_METAVARIABLE("weMbc(maskName, opt)", WE_Mbc,
+                          "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options)");
+    REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2,
+                          "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the invariant mass squared is :math:`[\\text{GeV}/\\text{c}^2]^2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options)");
+    REGISTER_METAVARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
+                          "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options). The unit of the polar angle is ``rad`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options)");
+    REGISTER_METAVARIABLE("weMissP(maskName, opt)", WE_MissP,
+                          "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options). The unit of the magnitude of missing momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options)");
+    REGISTER_METAVARIABLE("weMissPx(maskName, opt)", WE_MissPx,
+                          "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the missing momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options)");
+    REGISTER_METAVARIABLE("weMissPy(maskName, opt)", WE_MissPy,
+                          "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the missing momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options)");
+    REGISTER_METAVARIABLE("weMissPz(maskName, opt)", WE_MissPz,
+                          "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the missing momentum is ``GeV/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
-                      R"DOC(Returns the energy of the missing momentum, possible options ``opt`` are the following:
+    REGISTER_METAVARIABLE("weMissE(maskName, opt)", WE_MissE,
+                          R"DOC(Returns the energy of the missing momentum. The unit of the Energy is ``GeV`` . Possible options ``opt`` are the following:
 
 - ``0``: CMS, use energy and momentum of charged particles and photons
 - ``1``: CMS, same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
@@ -2196,17 +2201,19 @@ namespace Belle2 {
 - ``4``: CMS, same as ``3``, update with direction of ROE momentum
 - ``5``: LAB, use energy and momentum of charged particles and photons from whole event
 - ``6``: LAB, same as ``5``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``
-- ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC");
+- ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
-                      "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
+    REGISTER_METAVARIABLE("weXiZ(maskName)", WE_xiZ,
+                          "Returns Xi_z in event (for Bhabha suppression and two-photon scattering). The unit of this variable is ``1/c`` ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
-                      "Bs* - Bs mass difference");
+    REGISTER_METAVARIABLE("bssMassDifference(maskName)", bssMassDifference,
+                          "Bs* - Bs mass difference. The unit of the mass is :math:`\\text{GeV/c}^2`.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+    REGISTER_METAVARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
 
-Returns the angle between :math:`M` and lepton in :math:`W` rest frame in the decays of the type:
+Returns the cosine of the angle between :math:`M` and lepton in :math:`W` rest frame in the decays of the type:
 :math:`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
 
 .. math::
@@ -2217,45 +2224,50 @@ The neutrino momentum is calculated from ROE taking into account the specified m
 .. math::
     E_{\nu} = |p_{miss}|.
     
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
+    REGISTER_METAVARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
-                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.");
+                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
+    REGISTER_METAVARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction. \n"
-                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.");
+                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
-                      "Returns missing mass squared over missing energy");
+    REGISTER_METAVARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
+                      "Returns missing mass squared over missing energy. The unit of the missing mass squared is :math:`\\text{GeV/c}^4`.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
-                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.");
+    REGISTER_METAVARIABLE("passesROEMask(maskName)", passesROEMask,
+                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
 
-    REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
+    REGISTER_VARIABLE("hasCorrectROECombination", hasCorrectROECombination,
+		      "Returns 1 if there is correct combination of daughter particles between the particle that is the basis of the ROE and the particle loaded from the ROE. "
+		      "Returns 0 if there is not correct combination. "
+		      "If there is no daughter particle loaded from the ROE, returns quiet NaN.");
+
+    REGISTER_METAVARIABLE("pi0Prob(mode)", pi0Prob,
                       "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n\n"
                       "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
-                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
+                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("etaProb(mode)", etaProb,
+    REGISTER_METAVARIABLE("etaProb(mode)", etaProb,
                       "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n\n"
                       "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
                       "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
-                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
+                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
   }
 }

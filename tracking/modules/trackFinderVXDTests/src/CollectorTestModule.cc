@@ -9,11 +9,10 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(CollectorTest)
+REG_MODULE(CollectorTest);
 
 CollectorTestModule::CollectorTestModule() : Module()
 {
@@ -32,6 +31,6 @@ void CollectorTestModule::event()
 
 void CollectorTestModule::terminate()
 {
-  cerr << "\n";
+  std::cerr << "\n";
 }
 

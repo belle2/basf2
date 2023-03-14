@@ -17,8 +17,6 @@
 ########################################################
 
 from basf2 import set_log_level, LogLevel, create_path, process, register_module, statistics
-import os
-import sys
 
 # suppress messages and during processing:
 set_log_level(LogLevel.INFO)

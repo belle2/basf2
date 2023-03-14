@@ -1,0 +1,25 @@
+# EventType: 2892420060
+# Descriptor: [e+ e- -> J/psi [-> mu+ mu-] eta_c(2S)]
+# NickName: ee_Jpsietac2s_mumu
+# Documentation: Double charmonium production.
+# Tested: Yes
+# PhysicsWG: Charmonium
+# Responsible: Kirill Chilikin
+# Email: chilikin@lebedev.ru
+# Cuts: None
+# Date: 20220113
+#
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
+
+Alias MyJ/psi J/psi
+
+Decay vpho
+1.0   MyJ/psi eta_c(2S)  PHSP;
+Enddecay
+
+Decay MyJ/psi
+1.0   mu+ mu-            PHOTOS PHSP;
+Enddecay
+End

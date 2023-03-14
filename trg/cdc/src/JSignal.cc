@@ -1291,7 +1291,7 @@ namespace Belle2 {
     second.checkInt("TRGCDCJSignal::matchUnit()::second");
   }
 
-  void TRGCDCJSignal::setName(string name)
+  void TRGCDCJSignal::setName(const string& name)
   {
     m_name = name;
   }
@@ -1342,7 +1342,7 @@ namespace Belle2 {
     }
   }
 
-  void TRGCDCJSignal::setVhdlOutputFile(string filename)
+  void TRGCDCJSignal::setVhdlOutputFile(const string& filename)
   {
     if (m_commonData) m_commonData->m_vhdlOutputFile = filename;
     else {
@@ -1674,6 +1674,7 @@ namespace Belle2 {
     int secondBitwidth = second.m_bitsize;
 
     if (operation == "+" || operation == "-") {
+      // cppcheck-suppress knownConditionTrueFalse
       if (first.m_type != 1 || second.m_type != 1) {
         type = -1;
         bitwidth = max(firstBitwidth, secondBitwidth);
@@ -1682,6 +1683,7 @@ namespace Belle2 {
         bitwidth = max(first.m_bitsize, second.m_bitsize);
       }
     } else if (operation == "*") {
+      // cppcheck-suppress knownConditionTrueFalse
       if (first.m_type != 1 || second.m_type != 1) {
         type = -1;
         bitwidth = firstBitwidth + secondBitwidth;
@@ -1772,7 +1774,7 @@ namespace Belle2 {
 
   }
 
-  void TRGCDCJSignal::vhdlCode(TRGCDCJSignal const& first, std::string operation, TRGCDCJSignal const& second,
+  void TRGCDCJSignal::vhdlCode(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second,
                                TRGCDCJSignal const& result, string& resultVhdlCode)
   {
     // Copy first and second for VHDL version.
@@ -1835,7 +1837,8 @@ namespace Belle2 {
     resultVhdlCode = resultCode;
   }
 
-  void TRGCDCJSignal::vhdlCode(std::string operation, TRGCDCJSignal const& first, TRGCDCJSignal const& result, string& resultVhdlCode)
+  void TRGCDCJSignal::vhdlCode(const std::string& operation, TRGCDCJSignal const& first, TRGCDCJSignal const& result,
+                               string& resultVhdlCode)
   {
     // Copy first for VHDL version.
     TRGCDCJSignal t_first(first);
@@ -1961,6 +1964,7 @@ namespace Belle2 {
       if (t_signals.find(target.m_name) == t_signals.end()) {
         //t_signals[target.m_name] = {target.m_type, target.m_bitsize};
         // From and target should be same.
+        // cppcheck-suppress stlFindInsert
         t_signals[target.m_name] = {from.m_type, from.m_bitsize};
       }
     }
@@ -2016,7 +2020,7 @@ namespace Belle2 {
                                                         t_reference.m_commonData->m_buffers);
 
     // Storage for used values.
-    map<signed long long, bool> t_used;
+    // map<signed long long, bool> t_used;
     // Create string for choice().
     stringstream t_vhdlCode;
     //t_vhdlCode<<"case to_integer("<<t_referenceVhdlCode<<") is"<<endl;

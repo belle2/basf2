@@ -16,7 +16,7 @@ We make it so that this calibration depends on the result of a completely
 different one 'example_simple'. Even though that calibration will not be run in this process, the automated
 system can discover this dependency and use it when submitting tasks."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 ##############################
 # REQUIRED VARIABLE #
@@ -36,19 +36,19 @@ settings = CalibrationSettings(name="Example Complex",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics", "cosmics", "Bcosmics"],
-                               input_data_filters={"physics": [f"NOT {input_data_filters['Magnet']['On']}",
-                                                               input_data_filters["Data Tag"]["hadron_calib"],
-                                                               input_data_filters["Data Quality Tag"]["Good"],
-                                                               input_data_filters["Beam Energy"]["4S"],
-                                                               input_data_filters["Run Type"]["physics"]],
-                                                   "cosmics": [input_data_filters['Magnet']['Off'],
-                                                               input_data_filters["Data Tag"]["cosmic_calib"],
-                                                               input_data_filters["Data Quality Tag"]["Bad For Alignment"],
-                                                               input_data_filters["Beam Energy"]["Continuum"],
-                                                               f"NOT {input_data_filters['Run Type']['physics']}"],
-                                                   "Bcosmics": [input_data_filters["Data Tag"]["cosmic_calib"],
-                                                                input_data_filters["Data Quality Tag"]["Good"],
-                                                                input_data_filters["Beam Energy"]["4S"]]},
+                               input_data_filters={"physics": [f"NOT {INPUT_DATA_FILTERS['Magnet']['On']}",
+                                                               INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                               INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                               INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                                               INPUT_DATA_FILTERS["Run Type"]["physics"]],
+                                                   "cosmics": [INPUT_DATA_FILTERS['Magnet']['Off'],
+                                                               INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
+                                                               INPUT_DATA_FILTERS["Data Quality Tag"]["Bad For Alignment"],
+                                                               INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                                               f"NOT {INPUT_DATA_FILTERS['Run Type']['physics']}"],
+                                                   "Bcosmics": [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
+                                                                INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                                INPUT_DATA_FILTERS["Beam Energy"]["4S"]]},
                                depends_on=[example_simple],
                                expert_config={
                                    "physics_prescale": 0.2,

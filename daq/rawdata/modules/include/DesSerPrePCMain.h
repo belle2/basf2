@@ -29,10 +29,10 @@ namespace Belle2 {
     virtual ~DesSerPrePCMainModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from main process
-    virtual void event();
+    void event() override;
 
   protected :
     //! hostname

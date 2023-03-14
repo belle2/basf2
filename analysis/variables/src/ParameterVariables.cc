@@ -6,8 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own header.
 #include <analysis/variables/ParameterVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -20,9 +24,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <TLorentzVector.h>
+#include <Math/Boost.h>
+#include <Math/Vector4D.h>
 #include <TVectorF.h>
-#include <TVector3.h>
 
 #include <cmath>
 
@@ -46,7 +50,7 @@ namespace Belle2 {
       return *it;
     }
 
-    double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdgs)
+    int NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdgs)
     {
       StoreArray<MCParticle> mcParticles;
       int counter = 0;
@@ -172,7 +176,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
       const auto& daughters = particle->getDaughters();
       int nDaughters = static_cast<int>(daughters.size());
 
@@ -192,7 +196,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
       const auto& daughters = particle->getDaughters();
       int nDaughters = static_cast<int>(daughters.size());
 
@@ -238,7 +242,7 @@ namespace Belle2 {
 
       float result = 0.0;
 
-      TLorentzVector thisDaughterMomentum = particle->getDaughter(daughter)->get4Vector();
+      ROOT::Math::PxPyPzEVector thisDaughterMomentum = particle->getDaughter(daughter)->get4Vector();
 
       TMatrixFSym thisDaughterCovM(Particle::c_DimMomentum);
       thisDaughterCovM = particle->getDaughter(daughter)->getMomentumErrorMatrix();
@@ -300,21 +304,21 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector m = - T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector m = - T.getBeamFourMomentum();
 
-      TLorentzVector motherMomentum = particle->get4Vector();
-      TVector3       motherBoost    = -(motherMomentum.BoostVector());
+      ROOT::Math::PxPyPzEVector motherMomentum = particle->get4Vector();
+      B2Vector3D                motherBoost    = motherMomentum.BoostToCM();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
         return std::numeric_limits<float>::quiet_NaN();
 
-      TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
-      daugMomentum.Boost(motherBoost);
+      ROOT::Math::PxPyPzEVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
+      daugMomentum = ROOT::Math::Boost(motherBoost) * daugMomentum;
 
-      m.Boost(motherBoost);
+      m = ROOT::Math::Boost(motherBoost) * m;
 
-      return daugMomentum.Angle(m.Vect());
+      return B2Vector3D(daugMomentum.Vect()).Angle(B2Vector3D(m.Vect()));
     }
 
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
@@ -329,13 +333,13 @@ namespace Belle2 {
       if (particle->getDaughter(daughter)->getNDaughters() < 2)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TVector3 productionVertex = particle->getVertex();
-      TVector3 decayVertex = particle->getDaughter(daughter)->getVertex();
+      B2Vector3D productionVertex = particle->getVertex();
+      B2Vector3D decayVertex = particle->getDaughter(daughter)->getVertex();
 
-      TVector3 vertexDiffVector = decayVertex - productionVertex;
+      B2Vector3D vertexDiffVector = decayVertex - productionVertex;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
+      B2Vector3D daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
 
       return daughterMomentumVector.Angle(vertexDiffVector);
     }
@@ -353,26 +357,26 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector m = T.getBeamFourMomentum();
-      TLorentzVector p = particle->get4Vector();
-      TLorentzVector d1 = particle->getDaughter(daughter1)->get4Vector();
-      TLorentzVector d2 = particle->getDaughter(daughter2)->get4Vector();
+      ROOT::Math::PxPyPzEVector m = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector p = particle->get4Vector();
+      ROOT::Math::PxPyPzEVector d1 = particle->getDaughter(daughter1)->get4Vector();
+      ROOT::Math::PxPyPzEVector d2 = particle->getDaughter(daughter2)->get4Vector();
 
-      TLorentzVector l;
-      l.SetX(p.Py() * (d1.Pz() * d2.E()  - d1.E()  * d2.Pz()) + p.Pz() * (d1.E()  * d2.Py() - d1.Py() * d2.E())
-             + p.E()  * (d1.Py() * d2.Pz() - d1.Pz() * d2.Py()));
-      l.SetY(p.Px() * (d1.E()  * d2.Pz() - d1.Pz() * d2.E())  + p.Pz() * (d1.Px() * d2.E()  - d1.E()  * d2.Px())
-             + p.E()  * (d1.Pz() * d2.Px() - d1.Px() * d2.Pz()));
-      l.SetZ(p.Px() * (d1.Py() * d2.E()  - d1.E()  * d2.Py()) + p.Py() * (d1.E()  * d2.Px() - d1.Px() * d2.E())
-             + p.E()  * (d1.Px() * d2.Py() - d1.Py() * d2.Px()));
+      ROOT::Math::PxPyPzEVector l;
+      l.SetPx(p.Py() * (d1.Pz() * d2.E()  - d1.E()  * d2.Pz()) + p.Pz() * (d1.E()  * d2.Py() - d1.Py() * d2.E())
+              + p.E()  * (d1.Py() * d2.Pz() - d1.Pz() * d2.Py()));
+      l.SetPy(p.Px() * (d1.E()  * d2.Pz() - d1.Pz() * d2.E())  + p.Pz() * (d1.Px() * d2.E()  - d1.E()  * d2.Px())
+              + p.E()  * (d1.Pz() * d2.Px() - d1.Px() * d2.Pz()));
+      l.SetPz(p.Px() * (d1.Py() * d2.E()  - d1.E()  * d2.Py()) + p.Py() * (d1.E()  * d2.Px() - d1.Px() * d2.E())
+              + p.E()  * (d1.Px() * d2.Py() - d1.Py() * d2.Px()));
       l.SetE(-(p.Px() * (d1.Pz() * d2.Py() - d1.Py() * d2.Pz()) + p.Py() * (d1.Px() * d2.Pz() - d1.Pz() * d2.Px())
                + p.Pz() * (d1.Py() * d2.Px() - d1.Px() * d2.Py())));
 
-      double m_times_p = m * p;
-      double m_times_l = m * l;
-      double m_times_d1 = m * d1;
-      double l_times_d1 = l * d1;
-      double d1_times_p = d1 * p;
+      double m_times_p = m.Dot(p);
+      double m_times_l = m.Dot(l);
+      double m_times_d1 = m.Dot(d1);
+      double l_times_d1 = l.Dot(d1);
+      double d1_times_p = d1.Dot(p);
       double m_abs = TMath::Sqrt(pow(m_times_p / p.M(), 2) - m.M2());
       double d1_abs = TMath::Sqrt(pow(d1_times_p / p.M(), 2) - d1.M2());
       double cos_phi = -m_times_l / (m_abs * TMath::Sqrt(-l.M2()));
@@ -390,8 +394,8 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("ParameterFunctions");
-    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent , R"DOC(
-                      Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.
+    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent, R"DOC(
+                      [Eventbased] Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.
 
                       Used in the FEI to determine to calculate reconstruction efficiencies.
 
@@ -410,56 +414,67 @@ namespace Belle2 {
                       Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
 
                       If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.)DOC");
-    REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , R"DOC(
-                      Returns invariant mass of the given daughter particles. E.g.:
+    REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass, R"DOC(
+Returns invariant mass of the given daughter particles. E.g.:
 
-                      * daughterInvariantMass(0, 1) returns the invariant mass of the first and second daughter.
-                      * daughterInvariantMass(0, 1, 2) returns the invariant mass of the first, second and third daughter.
+* daughterInvariantMass(0, 1) returns the invariant mass of the first and second daughter.
+* daughterInvariantMass(0, 1, 2) returns the invariant mass of the first, second and third daughter.
 
-                      Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.
+Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.
 
-                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
-    REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
-                      "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
-    REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
-                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter");
+Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= number of daughters).
+
+)DOC", "GeV/:math:`\\text{c}^2`");
+    MAKE_DEPRECATED("daughterInvariantMass", false, "light-2203-zeus", R"DOC(
+                     The variable `daughterInvM` provides exactly the same functionality.)DOC");
+    REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass, R"DOC(
+Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.
+
+)DOC", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle, R"DOC(
+Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter
+
+)DOC", "rad");
     REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
-                      Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
-                      This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
+Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
+This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.
+
+)DOC", "rad");
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(
-                      Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.
+Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.
 
-                      First we define the following symbols:
+First we define the following symbols:
 
-                      * P: four-momentum vector of decaying particle in whose decay plane the azimuthal angle is measured
-                      * M: "mother" of p, however not necessarily the direct mother but any higher state, here the CMS itself is chosen
-                      * D1: daughter for which the azimuthal angle is supposed to be calculated
-                      * D2: another daughter needed to span the decay plane
-                      * L: normal to the decay plane (four-component vector)
+* P: four-momentum vector of decaying particle in whose decay plane the azimuthal angle is measured
+* M: "mother" of p, however not necessarily the direct mother but any higher state, here the CMS itself is chosen
+* D1: daughter for which the azimuthal angle is supposed to be calculated
+* D2: another daughter needed to span the decay plane
+* L: normal to the decay plane (four-component vector)
 
-                      L can be defined via the following relation:
+L can be defined via the following relation:
 
-                      .. math:: L^{\sigma} = \delta^{\sigma\nu} \epsilon_{\mu\nu\alpha\beta} P^{\mu}D1^{\alpha}D2^{\beta}
+.. math:: L^{\sigma} = \delta^{\sigma\nu} \epsilon_{\mu\nu\alpha\beta} P^{\mu}D1^{\alpha}D2^{\beta}
 
-                      The azimuthal angle is given by
+The azimuthal angle is given by
 
-                      .. math:: \phi \equiv \cos^{-1} \left(\frac{-\vec{M_{\parallel}} \cdot \vec{D1}}{|\vec{M_{\parallel}}| \cdot |\vec{D1}|}\right)
+.. math:: \phi \equiv \cos^{-1} \left(\frac{-\vec{M_{\parallel}} \cdot \vec{D1}}{|\vec{M_{\parallel}}| \cdot |\vec{D1}|}\right)
 
-                      For a frame independent formulation the three component vectors need to be written via invariant four-momentum vectors.
+For a frame independent formulation the three component vectors need to be written via invariant four-momentum vectors.
 
-                      .. math::
+.. math::
 
-                        -\vec{M_{\parallel}} \cdot \vec{D1} &= \biggl[M - \frac{(M \cdot L)L}{L^2}\biggr] \cdot D1 - \frac{(M \cdot P)(D1 \cdot P)}{m^2_P}\\
-                        |\vec{M_{\parallel}}| &= |\vec{M}| \sqrt{1 - \cos^2 \psi}\\
-                        |\vec{M}| &= \sqrt{\frac{(M \cdot P)^2}{m^2_P} - m^2_M}\\
-                        \cos \psi &= \frac{\vec{M} \cdot \vec{L}}{|\vec{M}| \cdot |\vec{L}|} = \frac{-M \cdot L}{|\vec{M}| \cdot \sqrt{-L^2}}\\
-                        |\vec{D1}| &= \sqrt{\frac{(D1 \cdot P)^2}{m^2_P} - m^2_{D1}}
+  -\vec{M_{\parallel}} \cdot \vec{D1} &= \biggl[M - \frac{(M \cdot L)L}{L^2}\biggr] \cdot D1 - \frac{(M \cdot P)(D1 \cdot P)}{m^2_P}\\
+  |\vec{M_{\parallel}}| &= |\vec{M}| \sqrt{1 - \cos^2 \psi}\\
+  |\vec{M}| &= \sqrt{\frac{(M \cdot P)^2}{m^2_P} - m^2_M}\\
+  \cos \psi &= \frac{\vec{M} \cdot \vec{L}}{|\vec{M}| \cdot |\vec{L}|} = \frac{-M \cdot L}{|\vec{M}| \cdot \sqrt{-L^2}}\\
+  |\vec{D1}| &= \sqrt{\frac{(D1 \cdot P)^2}{m^2_P} - m^2_{D1}}
 
-                      )DOC");
+)DOC", "rad");
 
-    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter");
+    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter\n\n",
+                      "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError,
-                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter");
+                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance,
                       "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
 

@@ -716,7 +716,7 @@ class SystematicsJpsi(BaseSkim):
         ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
         ma.reconstructDecay(
             "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
-            f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
+            f'{Cuts} and [daughter(0,electronID_noTOP)>0.1 or daughter(1,electronID_noTOP)>0.1]',
             path=path)
         return "J/psi:systematics_ee"
 
@@ -736,7 +736,7 @@ class SystematicsKshort(BaseSkim):
 
     ApplyHLTHadronCut = True
 
-    def __init__(self, prescale=1, **kwargs):
+    def __init__(self, prescale=4, **kwargs):
         """
         Parameters:
             prescale (int): the global prescale for this skim.
@@ -806,14 +806,13 @@ class SystematicsBhabha(BaseSkim):
 
     def build_lists(self, path):
         goodtrack = "abs(dz) < 5 and abs(dr) < 2"
-        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
+        goodtrackwithPID = f"{goodtrack} and electronID_noTOP > 0.95 and clusterTheta > 0.59"\
             " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
         ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
         ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)
 
-        recoil = "m2Recoil < 10"
         ma.reconstructDecay(
-            "vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
+            "vpho:bhabha -> e+:tight e-:loose", "", path=path)
 
         event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"\
                      f" and eventRandom < {(1/self.prescale):.6f}"
@@ -843,7 +842,7 @@ class SystematicsCombinedHadronic(CombinedSkim):
 
     produces_mdst_by_default = True
 
-    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+    def __init__(self, prescale_kshort=4, mdstOutput=True, **kwargs):
         """ Initialiser.
 
         Args:
@@ -865,7 +864,7 @@ class SystematicsCombinedLowMulti(CombinedSkim):
           SystematicsFourLeptonFromHLTFlag,
           SystematicsRadmumuFromHLTFlag,
           SystematicsBhabha,
-          ThauThrust.
+          TauThrust.
 
       This is required for  technical (data production) reasons, as it keeps the number of files low.
       See the definitions of the individual skims for the details.
@@ -878,7 +877,7 @@ class SystematicsCombinedLowMulti(CombinedSkim):
 
     produces_mdst_by_default = True
 
-    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+    def __init__(self, mdstOutput=True, **kwargs):
         """ Initialiser.
 
         Args:

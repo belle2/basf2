@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file and https://doi.org/10.1007/s41781-018-0017-9."
+title: "Belle II Analysis Software Framework (basf2)"
+authors:
+  - name: "The Belle II Collaboration"
+license: LGPL-3.0-or-later
+doi: 10.5281/zenodo.5574115
+repository-code: "https://github.com/belle2/basf2"
+url: "https://software.belle2.org"

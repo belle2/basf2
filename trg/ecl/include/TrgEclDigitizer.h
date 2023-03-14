@@ -33,7 +33,7 @@ namespace Belle2 {
     /** fit method,    digi with 125ns interval */
     void digitization01(std::vector<std::vector<double>>&,
                         std::vector<std::vector<double>>&);
-    /** orignal no fit method, digi with 12ns interval */
+    /** original no fit method, digi with 12ns interval */
     void digitization02(std::vector<std::vector<double>>&,
                         std::vector<std::vector<double>>&);
     /** save fitting result into tables */
@@ -59,7 +59,7 @@ namespace Belle2 {
     double u_max(double, double);
 
   private:
-    /** time range(defult : -4000 ~ 4000 ns ) */
+    /** time range(default : -4000 ~ 4000 ns ) */
     double TimeRange;
     /** TC Energy converted from Xtarl Energy [GeV] */
     double TCEnergy[576][80];
@@ -72,14 +72,14 @@ namespace Belle2 {
 
     // background TC Energy [GeV]
     // double TCBGEnergy[576][80];
-    // backgrond TC Timing [GeV]
+    // background TC Timing [GeV]
     // double TCBGTiming[576][80];
 
     /** Input  TC energy[GeV] */
     double TCRawEnergy[576][60];
     /**Input  TC timing[ns]  */
     double TCRawTiming[576][60];
-    /**Input  Beambackgroun tag  */
+    /**Input  Beambackground tag  */
     double TCRawBkgTag[576][60];
 
     /** Object of TC Mapping */

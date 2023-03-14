@@ -23,10 +23,10 @@ namespace Belle2 {
     ~HistoManager();
 
     // Register histogram
-    bool add(std::string& subdir, std::string& name, int pid, TH1* histo);
-    bool update(std::string& subdir, std::string& name, int pid, TH1* histo);
+    bool add(std::string& subdir, const std::string& name, int pid, TH1* histo);
+    bool update(std::string& subdir, const std::string& name, int pid, TH1* histo);
 
-    TH1* get(std::string& subdir, std::string& name, int pid);
+    TH1* get(const std::string& subdir, const std::string& name, int pid);
 
     //    int remove ( std::string& name );
 

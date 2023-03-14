@@ -248,7 +248,7 @@ namespace Belle2 {
                              Gdk::JOIN_MITER);
     const vector<vector<unsigned> *>& regions = _hp->regions();
     for (unsigned i = 0; i < (unsigned) regions.size(); i++)
-      drawRegion(* regions[i]);
+      drawRegion(regions[i]);
 
     //...Draw text...
 //     _xPositionText = _hp->xMin() + _hp->xSize() * _hp->nX() * 0.1;

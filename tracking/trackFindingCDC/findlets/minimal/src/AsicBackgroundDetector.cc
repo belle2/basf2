@@ -27,7 +27,7 @@ void AsicBackgroundDetector::initialize()
   m_channelMapFromDB = std::make_unique<DBArray<CDCChannelMap>> ();
 
   if ((*m_channelMapFromDB).isValid()) {
-    B2DEBUG(100, "CDC Channel map is  valid");
+    B2DEBUG(25, "CDC Channel map is  valid");
   } else {
     B2FATAL("CDC Channel map is not valid");
   }
@@ -66,8 +66,8 @@ void AsicBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     auto asicID = pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
     groupedByAsic[asicID].push_back(&wireHit);
   };
-  for (auto& [asicID, asicList] :  groupedByAsic) {
-    applyAsicFilter(asicList);
+  for (auto& asicList :  groupedByAsic) {
+    applyAsicFilter(asicList.second);
   };
 
   return;
@@ -98,7 +98,21 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   };
 
   if (wireHits.size() > 8) {
-    B2ERROR("Number of hits per asic should not exceed 8, observe too many hits." << LogVar("nHits", wireHits.size()));
+    /// Extra information:
+    auto eWire = wireHits[0]->getWireID().getEWire();
+    auto board = m_map[eWire].first;
+
+    if (m_max_asic_error_messages > 0) {
+      B2ERROR("Number of hits per asic should not exceed 8, observe too many hits."
+              << LogVar("nHits", wireHits.size())
+              << LogVar("Board ID", board));
+      m_max_asic_error_messages -= 1;
+    } else {
+      B2WARNING("Number of hits per asic should not exceed 8, observe too many hits."
+                << LogVar("nHits", wireHits.size())
+                << LogVar("Board ID", board));
+    }
+
     /// This is abnormal situation, detected for few runs, related to CDC unpacker. Hits are to be marked as background.
     for (auto& hit : wireHits) {
       (*hit)->setBackgroundFlag();
@@ -106,9 +120,6 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
     }
     return;
   }
-
-  B2ASSERT("Number of hits per asic should be above 0 and can not exceed 8",
-           (wireHits.size() <= 8) && (wireHits.size() > 0));
 
   // compute median time:
   vector<short> times;
@@ -120,13 +131,12 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   int mid = times.size() / 2;
   double median = times.size() % 2 == 0 ? (times[mid] + times[mid - 1]) / 2 : times[mid];
 
-
   size_t nbg = 0;
   int adcOnMedian = 0;
   int adcOffMedian = 0;
   for (auto& hit : wireHits) {
     int adc = hit->getHit()->getADCCount();
-    if (abs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
+    if (fabs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
       nbg++;
       if (adc > adcOnMedian) adcOnMedian = adc;
     } else {
@@ -142,7 +152,7 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
 
     // mark hits too close to the median time as background:
     for (auto& hit : wireHits) {
-      if (abs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
+      if (fabs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
         (*hit)->setBackgroundFlag();
         (*hit)->setTakenFlag();
       }

@@ -16,7 +16,6 @@
 #include <TObject.h>
 
 /* C++ headers. */
-#include <cstdint>
 #include <map>
 
 namespace Belle2 {

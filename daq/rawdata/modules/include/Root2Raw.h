@@ -28,16 +28,16 @@ namespace Belle2 {
     virtual ~Root2RawModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    void event() override;
 
     //!
-    virtual void endRun();
+    void endRun() override;
 
     //!
-    virtual void terminate();
+    void terminate() override;
 
   protected :
     //!

@@ -17,6 +17,9 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/SubEventModule.h>
 #include <framework/core/SwitchDataStoreModule.h>
+#include <framework/core/MergeDataStoreModule.h>
+#include <framework/core/SteerRootInputModule.h>
+#include <framework/core/CreateConsistencyInfoModule.h>
 #include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
@@ -127,6 +130,49 @@ void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID
   addModule(switchStart);
   addPath(independent_path);
   addModule(switchEnd);
+}
+
+void Path::addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back,
+                                   std::string consistency_check, bool event_mixing, bool merge_same_file)
+{
+  if (ds_ID.empty()) {
+    static int dscount = 1;
+    ds_ID = "DS " + std::to_string(dscount++);
+  }
+  auto mergeBack = PyObjConvUtils::convertPythonObject(merge_back, std::vector<std::string>());
+  ModulePtr switchStart = ModuleManager::Instance().registerModule("MergeDataStore");
+  static_cast<MergeDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack);
+  ModulePtr switchEnd = ModuleManager::Instance().registerModule("MergeDataStore");
+  static_cast<MergeDataStoreModule&>(*switchEnd).init("", false, mergeBack);
+  switchStart->setName("MergeDataStore ('' -> '" + ds_ID + "')");
+  switchEnd->setName("MergeDataStore ('' <- '" + ds_ID + "')");
+
+  ModulePtr fillConsistencyInfo = ModuleManager::Instance().registerModule("CreateConsistencyInfo");
+  static_cast<CreateConsistencyInfoModule&>(*fillConsistencyInfo).init(consistency_check, event_mixing);
+
+  ModulePtr steerInput = ModuleManager::Instance().registerModule("SteerRootInput");
+  static_cast<SteerRootInputModule&>(*steerInput).init(event_mixing, merge_same_file);
+
+  //set c_ParallelProcessingCertified flag if _all_ modules have it set
+  auto flag = Module::c_ParallelProcessingCertified;
+  if (ModuleManager::allModulesHaveFlag(buildModulePathList(), flag)) {
+    switchStart->setPropertyFlags(flag);
+    switchEnd->setPropertyFlags(flag);
+  }
+
+  // switch to the second (empty) data store
+  addModule(switchStart);
+  // execute independent path
+  addPath(independent_path);
+  // do the merging
+  addModule(switchEnd);
+  // check events to be merged is consistent (typically charge)
+  addModule(fillConsistencyInfo);
+  // decide which events have to be processed next
+  addModule(steerInput);
+  // the current combination of events might not be sensible or unphysical
+  // in this case end path and try next combination
+  steerInput->if_value("==0", std::make_shared<Path>());
 }
 
 bool Path::contains(const std::string& moduleType) const
@@ -283,6 +329,7 @@ Parameters:
     the execution is aborted.
        )", (bparg("path"), bparg("condition") = "<1", bparg("max_iterations") = 10000))
   .def("_add_independent_path", &Path::addIndependentPath)
+  .def("_add_independent_merge_path", &Path::addIndependentMergePath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 
     >>> path = basf2.Path()

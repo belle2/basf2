@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <fstream>
+#include <numeric>
 
 namespace Belle2 {
   namespace MVA {
@@ -121,7 +122,7 @@ namespace Belle2 {
       }
 
       /**
-        Helper funtion which initializes array system of numpy.
+        Helper function which initializes array system of numpy.
         Since import_array is a weird macro we need this wrapper function
         to protect us from the return statement in this macro
       */
@@ -169,6 +170,12 @@ namespace Belle2 {
         batch_size = numberOfTrainingEvents;
       }
 
+      if (batch_size > numberOfTrainingEvents) {
+        B2WARNING("Mini batch size (" << batch_size << ") is larger than the number of training events (" << numberOfTrainingEvents << ")"\
+                  " The batch size has been set equal to the number of training events.");
+        batch_size = numberOfTrainingEvents;
+      };
+
       if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
         B2ERROR("Please provide a positive training fraction");
         throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
@@ -214,13 +221,11 @@ namespace Belle2 {
         auto weights = training_data.getWeights();
         for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
           double wSum = 0.0;
-          double wSum2 = 0.0;
           double mean = 0.0;
           double running_std = 0.0;
           auto feature = training_data.getFeature(iFeature);
           for (uint64_t i = 0; i < weights.size(); ++i) {
             wSum += weights[i];
-            wSum2 += weights[i] * weights[i];
             double meanOld = mean;
             mean += (weights[i] / wSum) * (feature[i] - meanOld);
             running_std += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);
@@ -267,19 +272,28 @@ namespace Belle2 {
         auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y_v, NPY_FLOAT32, y_v.get()));
         auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w_v, NPY_FLOAT32, w_v.get()));
 
-        auto state = framework.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v);
-
         uint64_t nBatches = std::floor(numberOfTrainingEvents / batch_size);
+
+        auto state = framework.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v, nBatches);
+
         bool continue_loop = true;
+
+        std::vector<uint64_t> iteration_index_vector(numberOfTrainingEvents);
+        std::iota(std::begin(iteration_index_vector), std::end(iteration_index_vector), 0);
+
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
+
+          // shuffle the indices on each iteration to get randomised batches
+          if (iIteration > 0) std::shuffle(std::begin(iteration_index_vector), std::end(iteration_index_vector), TRandomWrapper());
+
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
 
             // Release Global Interpreter Lock in python to allow multithreading while reading root files
             // also see: https://docs.python.org/3.5/c-api/init.html
             PyThreadState* m_thread_state =  PyEval_SaveThread();
             for (uint64_t iEvent = 0; iEvent < batch_size; ++iEvent) {
-              training_data.loadEvent(iEvent + iBatch * batch_size + numberOfValidationEvents);
+              training_data.loadEvent(iteration_index_vector.at(iEvent + iBatch * batch_size) + numberOfValidationEvents);
               if (m_specific_options.m_normalize) {
                 for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                   X[iEvent * numberOfFeatures + iFeature] = (training_data.m_input[iFeature] - means[iFeature]) / stds[iFeature];
@@ -302,7 +316,7 @@ namespace Belle2 {
             // Reactivate Global Interpreter Lock to safely execute python code
             PyEval_RestoreThread(m_thread_state);
             auto r = framework.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
-                                                   ndarray_w, iIteration * nBatches + iBatch);
+                                                   ndarray_w, iIteration, iBatch);
             boost::python::extract<bool> proxy(r);
             if (proxy.check())
               continue_loop = static_cast<bool>(proxy);
@@ -422,7 +436,7 @@ namespace Belle2 {
         }
       }
 
-      std::vector<float> probabilities(test_data.getNumberOfEvents());
+      std::vector<float> probabilities(test_data.getNumberOfEvents(), std::numeric_limits<float>::quiet_NaN());
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
@@ -432,6 +446,52 @@ namespace Belle2 {
           // to a PyObject but do not inherit from it!
           probabilities[iEvent] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),
                                                      iEvent)));
+        }
+      } catch (...) {
+        PyErr_Print();
+        PyErr_Clear();
+        B2ERROR("Failed calling applying PythonExpert");
+        throw std::runtime_error("Failed calling applying PythonExpert");
+      }
+
+      return probabilities;
+    }
+
+    std::vector<std::vector<float>> PythonExpert::applyMulticlass(Dataset& test_data) const
+    {
+
+      uint64_t numberOfFeatures = test_data.getNumberOfFeatures();
+      uint64_t numberOfEvents = test_data.getNumberOfEvents();
+
+      auto X = std::unique_ptr<float[]>(new float[numberOfEvents * numberOfFeatures]);
+      npy_intp dimensions_X[2] = {static_cast<npy_intp>(numberOfEvents), static_cast<npy_intp>(numberOfFeatures)};
+
+      for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
+        test_data.loadEvent(iEvent);
+        if (m_specific_options.m_normalize) {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X[iEvent * numberOfFeatures + iFeature] = (test_data.m_input[iFeature] - m_means[iFeature]) / m_stds[iFeature];
+        } else {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X[iEvent * numberOfFeatures + iFeature] = test_data.m_input[iFeature];
+        }
+      }
+
+      unsigned int nClasses = m_general_options.m_nClasses;
+      std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(nClasses,
+                                                    std::numeric_limits<float>::quiet_NaN()));
+
+      try {
+        auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
+        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+        for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
+          // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
+          // to a PyObject but do not inherit from it!
+          for (uint64_t iClass = 0; iClass < nClasses; ++iClass) {
+            probabilities[iEvent][iClass] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>
+                                                               (result.ptr()),
+                                                               iEvent, iClass)));
+          }
         }
       } catch (...) {
         PyErr_Print();

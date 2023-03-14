@@ -29,16 +29,12 @@ namespace TreeFitter {
   {
 
     if (config.m_ipConstraint && config.m_customOrigin) {
-      B2FATAL("Setup error. Cant have both custom origin and ip constraint.");
+      B2FATAL("Setup error. Can't have both custom origin and ip constraint.");
     }
     config.m_headOfTreePDG = std::abs(particle->getPDGCode());
     if (config.m_ipConstraint || config.m_customOrigin) {
-      m_headOfChain = ParticleBase::createOrigin(particle,
-                                                 config,
-                                                 forceFitAll
-                                                );
-    } else if ((!config.m_customOrigin) && (!config.m_ipConstraint)) {
-
+      m_headOfChain = ParticleBase::createOrigin(particle, config, forceFitAll);
+    } else {
       m_headOfChain = ParticleBase::createParticle(particle, nullptr, config, forceFitAll);
     }
 

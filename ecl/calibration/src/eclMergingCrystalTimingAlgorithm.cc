@@ -6,16 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
+/* Own header. */
 #include <ecl/calibration/eclMergingCrystalTimingAlgorithm.h>
+
+/* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include "TH1F.h"
-#include "TString.h"
-#include "TFile.h"
-#include "TDirectory.h"
+#include <ecl/utility/ECLChannelMapper.h>
+
+/* ROOT headers. */
+#include <TDirectory.h>
+#include <TFile.h>
+#include <TH1F.h>
+#include <TString.h>
 
 using namespace std;
 using namespace Belle2;
@@ -101,9 +105,9 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   }
 
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-     Same for all crystals.  Proper accurate value*/
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals.  */
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 
 
@@ -175,12 +179,12 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
   // Get the previous crystal payloads
   DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
-  vector<float> prevValuesCrys(8736);
-  vector<float> prevValuesCrysUnc(8736);
+  vector<float> prevValuesCrys(ECLElementNumbers::c_NCrystals);
+  vector<float> prevValuesCrysUnc(ECLElementNumbers::c_NCrystals);
 
   DBObjPtr<Belle2::ECLCrystalCalib> customPrevBhabhaCrystalTimeObject("ECLCrystalTimeOffsetBhabhaPreviousValues");
-  vector<float> prevBhabhaValuesCrys(8736);
-  vector<float> prevBhabhaValuesCrysUnc(8736);
+  vector<float> prevBhabhaValuesCrys(ECLElementNumbers::c_NCrystals);
+  vector<float> prevBhabhaValuesCrysUnc(ECLElementNumbers::c_NCrystals);
 
   if (readPrevCrysPayload) {
     //..Get vectors of values from the payloads
@@ -192,11 +196,11 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
     //..Print out a few values for quality control
     B2INFO("Previous values read from database.  Write out for their values for comparison");
-    for (int ic = 0; ic < 8736; ic += 500) {
+    for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
       B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic]);
     }
     B2INFO("Previous bhabha values read from database.  Write out for their values for comparison");
-    for (int ic = 0; ic < 8736; ic += 500) {
+    for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
       B2INFO("ts custom previous bhabha payload: cellID " << ic + 1 << " " << prevBhabhaValuesCrys[ic]);
     }
   }
@@ -217,7 +221,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
       Some of the conditions that define a bad fit in the bhabha
       calibrations.
 
-           (fit_mean_unc < 0.09ns)    <<--- uncertianty on mean
+           (fit_mean_unc < 0.09ns)    <<--- uncertainty on mean
            (fit_sigma < 0.1)     <<--- sigma, not uncertainty on mean
            (numEntries < 40 )
 

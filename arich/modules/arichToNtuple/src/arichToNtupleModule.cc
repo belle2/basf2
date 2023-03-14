@@ -35,11 +35,10 @@
 
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(arichToNtuple)
+REG_MODULE(arichToNtuple);
 
 
 arichToNtupleModule::arichToNtupleModule() :
@@ -49,7 +48,7 @@ arichToNtupleModule::arichToNtupleModule() :
   setDescription("Local arich extension of VariblesToNtuple module to append detailed arich information to reconstructed candidates in the analysis output Ntuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  vector<string> emptylist;
+  std::vector<std::string> emptylist;
   addParam("particleList", m_particleList,
            "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
            std::string(""));
@@ -62,8 +61,8 @@ arichToNtupleModule::arichToNtupleModule() :
            "List of aliases for particles to which arich info will be appended (used for tree branch names)",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("arichToNtuple.root"));
-  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output.", std::string("arichToNtuple.root"));
+  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", std::string("ntuple"));
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
   addParam("sampling", m_sampling,
@@ -143,9 +142,9 @@ void arichToNtupleModule::initialize()
   m_branchAddresses.resize(m_variables.size() + 1);
   m_tree->get().Branch("__weight__", &m_branchAddresses[0], "__weight__/D");
   size_t enumerate = 1;
-  for (const string& varStr : m_variables) {
+  for (const std::string& varStr : m_variables) {
 
-    string branchName = makeROOTCompatible(varStr);
+    std::string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     // also collection function pointers
@@ -159,8 +158,8 @@ void arichToNtupleModule::initialize()
   }
 
   // add arich related branches
-  for (const string& varStr : m_arichVariables) {
-    string branchName = makeROOTCompatible(varStr);
+  for (const std::string& varStr : m_arichVariables) {
+    std::string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     addARICHBranches(branchName);
   }
 
@@ -174,8 +173,8 @@ void arichToNtupleModule::initialize()
     if (m_sampling_variable == nullptr) {
       B2FATAL("Couldn't find sample variable " << m_sampling_name << " via the Variable::Manager. Check the name!");
     }
-    for (const auto& pair : m_sampling_rates)
-      m_sampling_counts[pair.first] = 0;
+    for (const auto& samplingPair : m_sampling_rates)
+      m_sampling_counts[samplingPair.first] = 0;
   } else {
     m_sampling_variable = nullptr;
   }
@@ -187,7 +186,14 @@ float arichToNtupleModule::getInverseSamplingRateWeight(const Particle* particle
   if (m_sampling_variable == nullptr)
     return 1.0;
 
-  long target = std::lround(m_sampling_variable->function(particle));
+  long target = 0;
+  if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_double) {
+    target = std::lround(std::get<double>(m_sampling_variable->function(particle)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_int) {
+    target = std::lround(std::get<int>(m_sampling_variable->function(particle)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_bool) {
+    target = std::lround(std::get<bool>(m_sampling_variable->function(particle)));
+  }
   if (m_sampling_rates.find(target) != m_sampling_rates.end() and m_sampling_rates[target] > 0) {
     m_sampling_counts[target]++;
     if (m_sampling_counts[target] % m_sampling_rates[target] != 0)
@@ -210,7 +216,13 @@ void arichToNtupleModule::event()
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddresses[0] > 0) {
       for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-        m_branchAddresses[iVar + 1] = m_functions[iVar](nullptr);
+        if (std::holds_alternative<double>(m_functions[iVar](nullptr))) {
+          m_branchAddresses[iVar + 1] = std::get<double>(m_functions[iVar](nullptr));
+        } else if (std::holds_alternative<int>(m_functions[iVar](nullptr))) {
+          m_branchAddresses[iVar + 1] = (double)std::get<int>(m_functions[iVar](nullptr));
+        } else if (std::holds_alternative<bool>(m_functions[iVar](nullptr))) {
+          m_branchAddresses[iVar + 1] = (double)std::get<bool>(m_functions[iVar](nullptr));
+        }
       }
       for (auto& arich : m_arich) arich->clear();
       m_tree->get().Fill();
@@ -226,7 +238,13 @@ void arichToNtupleModule::event()
       m_branchAddresses[0] = getInverseSamplingRateWeight(particle);
       if (m_branchAddresses[0] > 0) {
         for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-          m_branchAddresses[iVar + 1] = m_functions[iVar](particle);
+          if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+            m_branchAddresses[iVar + 1] = std::get<double>(m_functions[iVar](particle));
+          } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+            m_branchAddresses[iVar + 1] = (double)std::get<int>(m_functions[iVar](particle));
+          } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+            m_branchAddresses[iVar + 1] = (double)std::get<bool>(m_functions[iVar](particle));
+          }
         }
         for (auto& arich : m_arich) arich->clear();
         fillARICHTree(particle);

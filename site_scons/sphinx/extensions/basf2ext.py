@@ -242,7 +242,7 @@ class VariableListDirective(Directive):
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
-    """Provide Link to Stash Repository, see https://mg.pov.lt/blog/sphinx-edit-on-github.html
+    """Provide Link to GitLab Repository, see https://mg.pov.lt/blog/sphinx-edit-on-github.html
 
     this goes in conjunction with
     site_scons/sphinx/_sphinxtemplates/sourcelink.html and adds a link to our
@@ -258,21 +258,21 @@ def html_page_context(app, pagename, templatename, context, doctree):
         return
 
     commit = app.config.basf2_commitid
-    context["source_url"] = f"{repository}/browse/{path}"
+    context["source_url"] = f"{repository}/-/blob/main/{path}"
     if commit:
-        context["source_url"] += "?at=" + commit
+        context["source_url"] = f"{repository}/-/blob/{commit}/{path}"
 
 
-def jira_issue_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+def gitlab_issue_role(role, rawtext, text, lineno, inliner, options=None, content=None):
     if content is None:
         content = []
     if options is None:
         options = {}
-    jira_url = inliner.document.settings.env.app.config.basf2_jira
-    if not jira_url:
+    issue_url = inliner.document.settings.env.app.config.basf2_issues
+    if not issue_url:
         return [nodes.literal(rawtext, text=text, language=None)], []
 
-    url = f"{jira_url}/browse/{text}"
+    url = f"{issue_url}/{text}"
     return [nodes.reference(rawtext, text=text, refuri=url)], []
 
 
@@ -282,17 +282,17 @@ def setup(app):
 
     app.add_config_value("basf2_repository", "", True)
     app.add_config_value("basf2_commitid", "", True)
-    app.add_config_value("basf2_jira", "", True)
+    app.add_config_value("basf2_issues", "", True)
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)
     app.add_directive("docstring", RenderDocstring)
-    app.add_role("issue", jira_issue_role)
+    app.add_role("issue", gitlab_issue_role)
     app.connect('html-page-context', html_page_context)
 
     # Sadly sphinx does not seem to add labels to custom indices ... :/
-    StandardDomain.initial_data["labels"]["b2-modindex"] = ("b2-modindex", "", "Basf2 Module Index")
-    StandardDomain.initial_data["labels"]["b2-varindex"] = ("b2-varindex", "", "Basf2 Variable Index")
+    StandardDomain.initial_data["labels"]["b2-modindex"] = ("b2-modindex", "", "basf2 Module Index")
+    StandardDomain.initial_data["labels"]["b2-varindex"] = ("b2-varindex", "", "basf2 Variable Index")
     StandardDomain.initial_data["anonlabels"]["b2-modindex"] = ("b2-modindex", "")
     StandardDomain.initial_data["anonlabels"]["b2-varindex"] = ("b2-varindex", "")
     return {'version': 0.2}

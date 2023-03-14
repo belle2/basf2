@@ -14,6 +14,8 @@
 #include <mva/interface/Teacher.h>
 #include <mva/interface/Expert.h>
 
+#include <TRandom.h>
+
 /**
  * Python headers include some weird stuff which
  * we don't want to be seen by CLING, otherwise there are
@@ -37,6 +39,7 @@
 #else
 #pragma GCC diagnostic pop
 #endif
+
 
 namespace Belle2 {
   namespace MVA {
@@ -73,7 +76,7 @@ namespace Belle2 {
       std::string m_steering_file = ""; /**< steering file provided by the user to override the functions in the framework */
       std::string m_config = "null"; /**< Config string in json, which is passed to the get model function */
       unsigned int m_mini_batch_size = 0; /**< Mini batch size, 0 passes the whole data in one call */
-      unsigned int m_nIterations = 1; /**< Number of iterations trough the whole data */
+      unsigned int m_nIterations = 1; /**< Number of iterations through the whole data */
       double m_training_fraction = 1.0; /**< Fraction of data passed as training data, rest is passed as test data */
       bool m_normalize = false; /**< Normalize the inputs (shift mean to zero and std to 1) */
     };
@@ -100,6 +103,22 @@ namespace Belle2 {
 
     private:
       PythonOptions m_specific_options; /**< Method specific options */
+
+      //--- Structs to help simplify the process ------------------------------------------------------------------------
+      /** Wrap TRandom to be useable as a uniform random number generator with std algorithms like std::shuffle. */
+      struct TRandomWrapper {
+        /** Define the result type to be a normal unsigned int. */
+        typedef unsigned int result_type;
+
+        /** Minimum value returned by the random number generator. */
+        static constexpr result_type min() { return 0; }
+
+        /** Maximum value returned by the random number generator. */
+        static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
+
+        /** Return a random value in the range [min(), max()]. */
+        result_type operator()() { return gRandom->Integer(max()); }
+      };
     };
 
     /**
@@ -124,6 +143,12 @@ namespace Belle2 {
        * @param test_data dataset
        */
       virtual std::vector<float> apply(Dataset& test_data) const override;
+
+      /**
+       * Apply this expert onto a dataset for multiclass problem
+       * @param test_data dataset
+       */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
 
     protected:
       PythonOptions m_specific_options; /**< Method specific options */

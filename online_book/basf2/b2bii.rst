@@ -12,17 +12,17 @@ B2BII
 
    **Prerequisites**:
 
-       * First steering file
-       * Batch submission
+   * First steering file
+   * Batch submission
 
    **Questions**:
 
-       * Can I use basf2 to analysis Belle data?
-       * Why can't I use the same basf2 particle lists and variables in my b2bii analysis?
+   * Can I use basf2 to analysis Belle data?
+   * Why can't I use the same basf2 particle lists and variables in my b2bii analysis?
 
    **Objectives**:
 
-       * Process Belle data with basf2
+   * Process Belle data with basf2
 
 
 The ``b2bii`` package in basf2 converts Belle MDST files (basf data format) to
@@ -266,7 +266,7 @@ subdetector systems (CDC, ACC, TOF, ECL, KLM). The combination of individual
 likelihoods from each sub detector system is in some cases (eID) combined
 with the usage of external information, such as a priori probabilities of
 each particle type that is read from the Belle DB. Due to this fact the
-Belle-like PID probabilities can not be reproduced in BASF2 from the raw
+Belle-like PID probabilities can not be reproduced in basf2 from the raw
 likelihoods.
 
 Alternatively, we can use the following predefined Belle-style PID variables to
@@ -425,7 +425,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-   Chia-Ling Hsu
+Chia-Ling Hsu
 

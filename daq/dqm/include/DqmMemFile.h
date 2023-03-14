@@ -24,9 +24,9 @@ namespace Belle2 {
   class DqmMemFile {
   public:
     DqmMemFile(std::string name = "dqmhisto",
-               std::string mode = "readonly", int size = MEMFILESIZE);
+               const std::string& mode = "readonly", int size = MEMFILESIZE);
     DqmMemFile(int shm_id, int sem_id,
-               std::string mode = "readonly", int size = MEMFILESIZE);
+               const std::string& mode = "readonly", int size = MEMFILESIZE);
     ~DqmMemFile();
 
     // Sender function

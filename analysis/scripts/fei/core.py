@@ -18,7 +18,7 @@
   - It can be used for hadronic and semileptonic tagging.
   - The algorithm has to be trained on MC, and can afterwards be applied on data.
   - The training requires O(100) million MC events
-  - The weight files are stored in the Belle 2 Condition database
+  - The weight files are stored in the Belle II Condition database
 
  Read this file if you want to understand the technical details of the FEI.
 
@@ -45,17 +45,6 @@
  to train all the necessary multivariate classifiers.
 """
 
-# FEI defines own command line options, therefore we disable
-# the ROOT command line options, which otherwise interfere sometimes.
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True  # noqa
-
-# FEI uses multi-threading for parallel execution of tasks therefore
-# the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False  # noqa
-import ROOT
-from ROOT import Belle2
-
 # Import basf2
 import basf2
 from basf2 import B2INFO, B2WARNING
@@ -63,12 +52,10 @@ import pybasf2
 import modularAnalysis as ma
 import b2bii
 
-import basf2_mva
-
 # Should come after basf2 import
 import pdg
-
 from fei import config
+import basf2_mva
 
 # Standard python modules
 import collections
@@ -133,13 +120,13 @@ class TrainingDataInformation:
         Read out the number of MC particles from the file created by reconstruct
         """
         # Unique absolute pdg-codes of all particles
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         root_file = ROOT.TFile.Open(self.filename, 'read')
         mc_counts = {}
 
-        Belle2.Variable.Manager
-
         for key in root_file.GetListOfKeys():
-            variable = Belle2.invertMakeROOTCompatible(key.GetName())
+            variable = ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())
             pdg = abs(int(variable[len('NumberOfMCParticlesInEvent('):-len(")")]))
             hist = key.ReadObj()
             mc_counts[pdg] = {}
@@ -161,7 +148,7 @@ class FSPLoader:
     Steers the loading of FSP particles.
     This does NOT include RootInput, Geometry or anything required before loading FSPs,
     the user has to add this himself (because it depends on the MC campaign and if you want
-    to use Belle 1 or Belle 2).
+    to use Belle or Belle II).
     """
 
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
@@ -191,7 +178,7 @@ class FSPLoader:
         else:
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, loadPhotonBeamBackgroundMVA=False, path=path)
+                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
             ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
             ma.fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
@@ -264,7 +251,7 @@ class TrainingData:
                     hist_variables = ['mcErrors', 'mcParticleStatus'] + channel.mvaConfig.variables + spectators
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
-                    hist_filename = f'Monitor_TrainingData.root'
+                    hist_filename = 'Monitor_TrainingData.root'
                     ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                             filename=config.removeJPsiSlash(hist_filename),
@@ -332,7 +319,7 @@ class PreReconstruction:
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_BeforeRanking.root'
+                    filename = 'Monitor_PreReconstruction_BeforeRanking.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -354,7 +341,7 @@ class PreReconstruction:
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
                 if self.config.monitor:
-                    filename = f'Monitor_PreReconstruction_AfterRanking.root'
+                    filename = 'Monitor_PreReconstruction_AfterRanking.root'
                     hist_variables += ['extraInfo(preCut_rank)']
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
@@ -394,7 +381,7 @@ class PreReconstruction:
                     hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_AfterVertex.root'
+                    filename = 'Monitor_PreReconstruction_AfterVertex.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -481,7 +468,7 @@ class PostReconstruction:
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                    filename = f'Monitor_PostReconstruction_AfterMVA.root'
+                    filename = 'Monitor_PostReconstruction_AfterMVA.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -500,7 +487,7 @@ class PostReconstruction:
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                filename = f'Monitor_PostReconstruction_BeforePostCut.root'
+                filename = 'Monitor_PostReconstruction_BeforePostCut.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -512,7 +499,7 @@ class PostReconstruction:
             ma.applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
-                filename = f'Monitor_PostReconstruction_BeforeRanking.root'
+                filename = 'Monitor_PostReconstruction_BeforeRanking.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -530,7 +517,7 @@ class PostReconstruction:
                                       (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
-                filename = f'Monitor_PostReconstruction_AfterRanking.root'
+                filename = 'Monitor_PostReconstruction_AfterRanking.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -547,7 +534,7 @@ class PostReconstruction:
                 elif 'B' in particle.name:
                     variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
-                filename = f'Monitor_Final.root'
+                filename = 'Monitor_Final.root'
                 ma.variablesToNtuple(particle.identifier, variables, treename=config.removeJPsiSlash(
                     f'{particle.identifier} variables'), filename=config.removeJPsiSlash(filename), path=path)
         return path
@@ -634,6 +621,11 @@ class Teacher:
         """
         Do all trainings for which we find training data
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        # FEI uses multi-threading for parallel execution of tasks therefore
+        # the ROOT gui-thread is disabled, which otherwise interferes sometimes
+        ROOT.PyConfig.StartGuiThread = False
         job_list = []
         filename = 'training_input.root'
         if not os.path.isfile(filename):

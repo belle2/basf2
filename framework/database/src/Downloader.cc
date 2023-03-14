@@ -141,7 +141,7 @@ namespace Belle2::Conditions {
   std::string Downloader::escapeString(const std::string& text)
   {
     //make sure we have an active curl session ...
-    auto session = ensureSession();
+    auto session = ensureSession(); // cppcheck-suppress unreadVariable
     char* escaped = curl_easy_escape(m_session->curl, text.c_str(), text.size());
     if (!escaped) {
       throw std::runtime_error("Could not escape string");

@@ -8,6 +8,7 @@
 
 #include <top/reconstruction_cpp/FastRaytracer.h>
 #include <framework/logging/Logger.h>
+#include <cmath>
 
 namespace Belle2 {
   namespace TOP {
@@ -191,7 +192,7 @@ namespace Belle2 {
 
     int FastRaytracer::getNys() const
     {
-      int N = (m_Nye > 0) ? m_Nye / 2 : (abs(m_Nye) + 1) / 2;
+      int N = (m_Nye > 0) ? m_Nye / 2 : (std::abs(m_Nye) + 1) / 2;
       return N;
     }
 

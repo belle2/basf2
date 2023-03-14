@@ -24,10 +24,10 @@ namespace Belle2 {
     virtual ~DqmMasterCallback();
 
   public:
-    virtual void load(const DBObject& obj, const std::string& runtype);
-    virtual void start(int, int);
-    virtual void stop();
-    virtual void abort();
+    void load(const DBObject& obj, const std::string& runtype) override;
+    void start(int, int) override;
+    void stop() override;
+    void abort() override;
 
   private:
     int m_expno;

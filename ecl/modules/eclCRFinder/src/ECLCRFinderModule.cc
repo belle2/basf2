@@ -10,7 +10,9 @@
 #include <ecl/modules/eclCRFinder/ECLCRFinderModule.h>
 
 // FRAMEWORK
+#include <framework/core/Environment.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/LogConfig.h>
 #include <framework/logging/Logger.h>
 
 //ECL
@@ -21,14 +23,17 @@
 // MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
+// C++
+#include <algorithm>
+
 // NAMESPACE(S)
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLCRFinder)
-REG_MODULE(ECLCRFinderPureCsI)
+REG_MODULE(ECLCRFinder);
+REG_MODULE(ECLCRFinderPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -122,11 +127,17 @@ void ECLCRFinderModule::initialize()
   m_cellIdToTempCRIdVec.resize(8737); /**< cellid -> CR. */
   m_calDigitStoreArrPosition.resize(8737);
 
+  // Check if we are running this module online
+  m_isOnlineProcessing = (Environment::Instance().getRealm() == LogConfig::c_Online) ? true : false;
+  if (m_isOnlineProcessing) {
+    m_energyCut[1] = 1.5 * Belle2::Unit::MeV;
+    m_energyCutBkgd[1] = 1.5 * Belle2::Unit::MeV;
+  }
 }
 
 void ECLCRFinderModule::beginRun()
 {
-  ;
+
 }
 
 void ECLCRFinderModule::event()
@@ -134,14 +145,14 @@ void ECLCRFinderModule::event()
   B2DEBUG(200, "ECLCRFinderModule::event()");
 
   // Reset the vector(s).
-  memset(&m_cellIdToCheckVec[0], 0, m_cellIdToCheckVec.size() * sizeof m_cellIdToCheckVec[0]);
-  memset(&m_cellIdToSeedVec[0], 0, m_cellIdToSeedVec.size() * sizeof m_cellIdToSeedVec[0]);
-  memset(&m_cellIdToGrowthVec[0], 0, m_cellIdToGrowthVec.size() * sizeof m_cellIdToGrowthVec[0]);
-  memset(&m_cellIdToDigitVec[0], 0, m_cellIdToDigitVec.size() * sizeof m_cellIdToDigitVec[0]);
-  memset(&m_cellIdToTempCRIdVec[0], 0, m_cellIdToTempCRIdVec.size() * sizeof m_cellIdToTempCRIdVec[0]);
+  std::fill(m_cellIdToCheckVec.begin(), m_cellIdToCheckVec.end(), 0);
+  std::fill(m_cellIdToSeedVec.begin(), m_cellIdToSeedVec.end(), 0);
+  std::fill(m_cellIdToGrowthVec.begin(), m_cellIdToGrowthVec.end(), 0);
+  std::fill(m_cellIdToDigitVec.begin(), m_cellIdToDigitVec.end(), 0);
+  std::fill(m_cellIdToTempCRIdVec.begin(), m_cellIdToTempCRIdVec.end(), 0);
 
   // Fill a vector that can be used to map cellid -> store array position
-  memset(&m_calDigitStoreArrPosition[0], -1, m_calDigitStoreArrPosition.size() * sizeof m_calDigitStoreArrPosition[0]);
+  std::fill(m_calDigitStoreArrPosition.begin(), m_calDigitStoreArrPosition.end(), -1);
   for (int i = 0; i < m_eclCalDigits.getEntries(); i++) {
     m_calDigitStoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
   }
@@ -236,9 +247,14 @@ void ECLCRFinderModule::event()
 
   //-------------------------------------------------------
   // 'find" in a map is faster if the number of seeds is not too large, can be replaced easily once we know what seed cuts we want.
+  // This is weird: if we are running online, we use behaviour that was in place until release-05,
+  // otherwise we use the one implemented since release-06
+  // This is fundamental for avoiding a segfault error caused by veeery noisy ECL events,
+  // but note it is a temporary fix.
   for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
-    if (m_cellIdToSeedVec[pos] > 0 and m_cellIdToCheckVec[pos] == 0) {
-      m_cellIdToCheckVec[pos] = 1;
+    // check for m_isOnlineProcessing is for release-05 behaviour
+    if (m_cellIdToSeedVec[pos] > 0 and (m_cellIdToCheckVec[pos] == 0 or m_isOnlineProcessing)) {
+      if (!m_isOnlineProcessing) m_cellIdToCheckVec[pos] = 1; // release-06 and newer versions
       checkNeighbours(pos, m_tempCRId, 0);
       ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
     }
@@ -329,10 +345,19 @@ void ECLCRFinderModule::checkNeighbours(const int cellid, const int tempcrid, co
 
       B2DEBUG(300, "  --> ECLCRFinderModule::checkNeighbours(): m_cellIdToTempCRIdVec[" << neighbour << "] " <<
               m_cellIdToTempCRIdVec[neighbour]);
-      if (m_cellIdToCheckVec[neighbour] == 0) { // only check again if we have not looked at that digit before
-        m_cellIdToCheckVec[neighbour] = 1;
-        checkNeighbours(neighbour, tempcrid, 1);
-
+      // This is weird: if we are running online, we use behaviour that was in place until release-05,
+      // otherwise we use the one implemented since release-06
+      // This is fundamental for avoiding a segfault error caused by veeery noisy ECL events,
+      // but note it is a temporary fix.
+      if (m_isOnlineProcessing) { // release-05
+        if (m_cellIdToTempCRIdVec[neighbour] == 0) { // found
+          checkNeighbours(neighbour, tempcrid, 1);
+        }
+      } else { // release-06 and newer versions
+        if (m_cellIdToCheckVec[neighbour] == 0) { // only check again if we have not looked at that digit before
+          m_cellIdToCheckVec[neighbour] = 1;
+          checkNeighbours(neighbour, tempcrid, 1);
+        }
       }
     }
   }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@
 """
 <header>
     <output>muon-ExtMuidValidation.root</output>
-    <contact>depietro@infn.it</contact>
+    <contact>giacomo.pietro@kit.edu</contact>
     <description>Create events with 1 muon track for ext/muid validation.</description>
 </header>
 """
@@ -76,7 +75,7 @@ add_reconstruction(path)
 
 output = b2.register_module('RootOutput')
 output.param('outputFileName', output_filename)
-output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'BKLMHit2ds', 'EKLMHit2ds'])
+output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'KLMHit2ds'])
 path.add_module(output)
 
 b2.process(path)

@@ -1,3 +1,14 @@
+===================
+Conditions Database
+===================
+
+The conditions database is the place where we store additional data needed to
+interpret and analyse the data that can change over time, for example the
+detector configuration or calibration constants.
+
+In many cases it should not be necessary to change the configuration but except for
+maybe adding an extra globaltag to the list via `conditions.globaltags <ConditionsConfiguration.globaltags>`
+
 .. _conditionsdb_overview:
 
 Conditions Database Overview

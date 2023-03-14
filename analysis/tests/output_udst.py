@@ -21,7 +21,7 @@ import udst
 def create_udst():
     """Create a udst with one event in it."""
     pa = b2.create_path()
-    ma.inputMdst("default", b2.find_file("analysis/tests/mdst.root"), path=pa)
+    ma.inputMdst(b2.find_file("analysis/tests/mdst.root"), path=pa)
     ma.fillParticleList("pi+:all", "", path=pa)
     udst.add_udst_output(path=pa, filename="test.udst.root", particleLists=["pi+:all"])
     b2tu.safe_process(pa, 1)
@@ -31,7 +31,7 @@ def create_udst():
 def test_read_udst():
     """Check that the udst contains the particles storearray"""
     pa = b2.create_path()
-    ma.inputMdst("default", "test.udst.root", path=pa)
+    ma.inputMdst("test.udst.root", path=pa)
     ma.printDataStore(path=pa)
     b2tu.safe_process(path=pa)
     return

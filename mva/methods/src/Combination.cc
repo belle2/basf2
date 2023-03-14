@@ -18,8 +18,8 @@ namespace Belle2 {
     {
       int version = pt.get<int>("Combination_version");
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
 
       auto numberOfWeightfiles = pt.get<unsigned int>("Combination_number_of_weightfiles");

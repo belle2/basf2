@@ -112,7 +112,7 @@ void ParticleWeightingKeyMap::printKeyMap() const
     axes_names += "'" + i_axis.first + "' bin;";
     i_axis.second->printAxis();
   }
-  B2INFO("Bin map \n <" + axes_names + "> : <gobal ID>");
+  B2INFO("Bin map \n <" + axes_names + "> : <global ID>");
   for (const auto& i_bin : m_bins) {
     std::string binIDs = "";
     for (auto i_binid : i_bin.first) {

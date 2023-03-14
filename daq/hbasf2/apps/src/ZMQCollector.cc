@@ -88,7 +88,7 @@ void ZMQOutputAdapter::initialize()
   m_output.reset(new ZMQRawOutput(m_outputAddress, true, m_parent));
 }
 
-void ZMQOutputAdapter::handleExternalSignal(EMessageTypes type)
+void ZMQOutputAdapter::handleExternalSignal(EMessageTypes /*type*/)
 {
 }
 

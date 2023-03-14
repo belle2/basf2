@@ -25,7 +25,7 @@ namespace Belle2 {
       posV = pxdCluster.getV();
     }
 
-    RecoTrack* TrackPoint_t::setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName)
+    RecoTrack* TrackPoint_t::setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName, const double& mass)
     {
       // Construct VxdID from its baseType (unsigned short)
       VxdID sensorID(pxdIntercept.getSensorID());
@@ -44,20 +44,23 @@ namespace Belle2 {
       auto statePtr = getTrackStateOnModule(sensorInfo, *recoTracks[0]);
       if (statePtr == nullptr) return nullptr; // shouldn't happen.
       auto intersec = statePtr -> getPos();
+      auto localPoint = sensorInfo.pointToLocal(ROOT::Math::XYZVector(intersec), true);
       auto intersec_p = statePtr -> getMom();
-      auto local_p = sensorInfo.vectorToLocal(intersec_p, true);
+      auto local_p = sensorInfo.vectorToLocal(ROOT::Math::XYZVector(intersec_p), true);
 
+      //inside = sensorInfo.inside(localPoint.X(), localPoint.Y(), 0., 0.);
+      inside = sensorInfo.inside(localPoint.X(), localPoint.Y());
       x = intersec.X();
       y = intersec.Y();
       z = intersec.Z();
-      tol = local_p.CosTheta();
+      tol = cos(local_p.Theta());
 
       // Estimate the charge MPV (in ADU) of the hit.
       double length = sensorInfo.getThickness() / tol; // track path length
       auto ADUToEnergy = PXD::PXDGainCalibrator::getInstance().getADUToEnergy(sensorID,
                          sensorInfo.getUCellID(pxdIntercept.getCoorU()),
                          sensorInfo.getVCellID(pxdIntercept.getCoorV()));
-      chargeMPV = getDeltaP(intersec_p.Mag(), length) / ADUToEnergy;
+      chargeMPV = getDeltaP(intersec_p.Mag(), length, mass) / ADUToEnergy;
 
       // Return pointer of the relatd RecoTrack for accessing additional info.
       return recoTracks[0];
@@ -65,17 +68,20 @@ namespace Belle2 {
 
     RecoTrack* TrackCluster_t::setValues(const PXDIntercept& pxdIntercept,
                                          const std::string& recoTracksName,
-                                         const std::string& pxdTrackClustersName)
+                                         const std::string& pxdTrackClustersName,
+                                         const double& mass)
     {
-      auto recoTrackPtr = intersection.setValues(pxdIntercept, recoTracksName);
+      auto recoTrackPtr = intersection.setValues(pxdIntercept, recoTracksName, mass);
       // sensor ID from intersectioon
       //VxdID sensorID(pxdIntercept.getSensorID());
       if (!recoTrackPtr) return nullptr; // return nullptr
       // Always set cluster pxdID for saving module id of the intersection.
       cluster.pxdID = getPXDModuleID(VxdID(pxdIntercept.getSensorID()));
       RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(recoTrackPtr, pxdTrackClustersName);
-      // Return nullptr (false) as no clusters associated;
-      if (!pxdClusters.size()) return nullptr;
+      // Avoid returning nullptr (false) when no clusters associated,
+      // otherwise efficiency is overestimated!
+      // if (!pxdClusters.size()) return nullptr;
+      usedInTrack = false;
       for (auto& aCluster : pxdClusters) {
         if (aCluster.getSensorID().getID() == pxdIntercept.getSensorID()) {
           cluster.setValues(aCluster);

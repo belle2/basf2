@@ -29,7 +29,7 @@ namespace Belle2 {
       ;
     }
 
-// calulate current value of constraint function
+// calculate current value of constraint function
     double RecoilMassConstraint::getValue() const
     {
       double totE = 0.;
@@ -55,16 +55,15 @@ namespace Belle2 {
       const double recoilpz  = (m_beamPz - totpz);
       const double recoilpz2 = recoilpz * recoilpz;
       const double recoil2   = recoilE2 - recoilpx2 - recoilpy2 - recoilpz2;
-      const double recoil    = std::sqrt(std::fabs(recoil2));
-      const double result    = recoil - m_recoilMass;
+      const double result    = recoil2 - m_recoilMass * m_recoilMass;
       return result;
     }
 
-// calculate vector/array of derivatives of this contraint
+// calculate vector/array of derivatives of this constraint
 // w.r.t. to ALL parameters of all fitobjects
-// here: d RM /d par(j)
-//          = d RM /d p(i) * d p(i) /d par(j)
-//          =  +-1/RM * (p(i)-c(i)) * d p(i) /d par(j)
+// here: d RM2 /d par(j)
+//          = d RM2 /d p(i) * d p(i) /d par(j)
+//          =  -+2 * recoil_p(i) * d p(i) /d par(j)
 
     void RecoilMassConstraint::getDerivatives(int idim, double der[]) const
     {
@@ -84,18 +83,9 @@ namespace Belle2 {
       }
 
       const double recoilE   = (m_beamE - totE);
-      const double recoilE2  = recoilE * recoilE;
       const double recoilpx  = (m_beamPx - totpx);
-      const double recoilpx2 = recoilpx * recoilpx;
       const double recoilpy  = (m_beamPy - totpy);
-      const double recoilpy2 = recoilpy * recoilpy;
       const double recoilpz  = (m_beamPz - totpz);
-      const double recoilpz2 = recoilpz * recoilpz;
-      const double recoil2   = recoilE2 - recoilpx2 - recoilpy2 - recoilpz2;
-      const double recoil    = std::sqrt(std::fabs(recoil2));
-
-      double recoilmass_inv = 0.;
-      if (recoil > 1e-9)  recoilmass_inv = 1. / recoil;
 
       for (auto fitobject : fitobjects) {
         for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
@@ -109,7 +99,7 @@ namespace Belle2 {
                            + recoilpx * pfo->getDPx(ilocal)
                            + recoilpy * pfo->getDPy(ilocal)
                            + recoilpz * pfo->getDPz(ilocal);
-            der[iglobal] *= recoilmass_inv;
+            der[iglobal] *= 2;
           }
         }
       }
@@ -155,48 +145,21 @@ namespace Belle2 {
     {
       (void) i;
       (void) j;
-      double totE = 0.;
-      double totpx = 0.;
-      double totpy = 0.;
-      double totpz = 0.;
-
-      for (auto fitobject : fitobjects) {
-        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobject);
-        assert(pfo);
-        totE  += pfo->getE();
-        totpx += pfo->getPx();
-        totpy += pfo->getPy();
-        totpz += pfo->getPz();
-      }
-
-      const double recoilE   = (m_beamE - totE);
-      const double recoilE2  = recoilE * recoilE;
-      const double recoilpx  = (m_beamPx - totpx);
-      const double recoilpx2 = recoilpx * recoilpx;
-      const double recoilpy  = (m_beamPy - totpy);
-      const double recoilpy2 = recoilpy * recoilpy;
-      const double recoilpz  = (m_beamPz - totpz);
-      const double recoilpz2 = recoilpz * recoilpz;
-      const double recoil2   = recoilE2 - recoilpx2 - recoilpy2 - recoilpz2;
-      const double recoil    = sqrt(recoil2);
 
       assert(dderivatives);
       for (int k = 0; k < 16; ++k) dderivatives[k] = 0;
 
-      if (recoil > 1e-12)  {
-        double recoilmass_inv3 = 1. / (recoil * recoil * recoil);
 
-        dderivatives[4 * 0 + 0] = (recoil2 - recoilE2) * recoilmass_inv3;                  //dE^2
-        dderivatives[4 * 0 + 1] = dderivatives[4 * 1 + 0] =  recoilE * recoilpx * recoilmass_inv3; //dEdpx
-        dderivatives[4 * 0 + 2] = dderivatives[4 * 2 + 0] =  recoilE * recoilpy * recoilmass_inv3; //dEdpy
-        dderivatives[4 * 0 + 3] = dderivatives[4 * 3 + 0] =  recoilE * recoilpz * recoilmass_inv3; //dEdpz
-        dderivatives[4 * 1 + 1] =                       -(recoil2 + recoilpx2) * recoilmass_inv3; //dpx^2
-        dderivatives[4 * 1 + 2] = dderivatives[4 * 2 + 1] = -recoilpx * recoilpy * recoilmass_inv3; //dpxdpy
-        dderivatives[4 * 1 + 3] = dderivatives[4 * 3 + 1] = -recoilpx * recoilpz * recoilmass_inv3; //dpxdpz
-        dderivatives[4 * 2 + 2] =                       -(recoil2 + recoilpy2) * recoilmass_inv3; //dpy^2
-        dderivatives[4 * 2 + 3] = dderivatives[4 * 3 + 2] = -recoilpy * recoilpz * recoilmass_inv3; //dpydpz
-        dderivatives[4 * 3 + 3] =                       -(recoil2 + recoilpz2) * recoilmass_inv3; //dpz^2
-      }
+      dderivatives[4 * 0 + 0] = 2; //dE^2
+      dderivatives[4 * 0 + 1] = 0; //dEdpx
+      dderivatives[4 * 0 + 2] = 0; //dEdpy
+      dderivatives[4 * 0 + 3] = 0; //dEdpz
+      dderivatives[4 * 1 + 1] = -2;//dpx^2
+      dderivatives[4 * 1 + 2] = 0; //dpxdpy
+      dderivatives[4 * 1 + 3] = 0; //dpxdpz
+      dderivatives[4 * 2 + 2] = -2;//dpy^2
+      dderivatives[4 * 2 + 3] = 0; //dpydpz
+      dderivatives[4 * 3 + 3] = -2;//dpz^2
 
       return true;
 
@@ -221,21 +184,14 @@ namespace Belle2 {
       }
 
       const double recoilE   = (m_beamE - totE);
-      const double recoilE2  = recoilE * recoilE;
       const double recoilpx  = (m_beamPx - totpx);
-      const double recoilpx2 = recoilpx * recoilpx;
       const double recoilpy  = (m_beamPy - totpy);
-      const double recoilpy2 = recoilpy * recoilpy;
       const double recoilpz  = (m_beamPz - totpz);
-      const double recoilpz2 = recoilpz * recoilpz;
-      const double recoil2   = recoilE2 - recoilpx2 - recoilpy2 - recoilpz2;
-      const double recoil    = sqrt(recoil2);
 
-
-      dderivatives[0] = -recoilE / recoil;
-      dderivatives[1] = recoilpx / recoil;
-      dderivatives[2] = recoilpy / recoil;
-      dderivatives[3] = recoilpz / recoil;
+      dderivatives[0] = -2 * recoilE;
+      dderivatives[1] = 2 * recoilpx;
+      dderivatives[2] = 2 * recoilpy;
+      dderivatives[3] = 2 * recoilpz;
 
       return true;
     }

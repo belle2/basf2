@@ -12,18 +12,18 @@ Full Event Interpretation
 
     **Prerequisites**:
 
-    	* Lessons 1-2
+    * Lessons 1-2
 
     **Questions**:
 
-        * What are tagged analyses?
-        * How can I reconstruct a generic B meson?
-        * How can I use information from **both** B mesons for my analysis?
+    * What are tagged analyses?
+    * How can I reconstruct a generic B meson?
+    * How can I use information from **both** B mesons for my analysis?
 
     **Objectives**:
 
-        * Learn how to use the FEI in your steering file
-        * Understand the output from the FEI
+    * Learn how to use the FEI in your steering file
+    * Understand the output from the FEI
 
 
 Introduction
@@ -49,14 +49,14 @@ involving neutrinos, referred to as B\ :sub:`sig`.
 .. admonition:: Exercise
      :class: exercise stacked
 
-      Find the documentation of the FEI and look up "hadronic tagging" and
-      "semileptonic tagging".
-      What is the difference between both analysis strategies? What are advantages and disadvantages?
+     Find the documentation of the FEI and look up "hadronic tagging" and
+     "semileptonic tagging".
+     What is the difference between both analysis strategies? What are advantages and disadvantages?
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     The documentation can be found in the :ref:`analysis/doc/index-01-analysis:Advanced Topics` section of the analysis module.
+     The documentation can be found in the :ref:`analysis/doc/AdvancedTopics:Advanced Topics` section of the analysis module.
      The definitions can be found in the section titled ``Hadronic, Semileptonic and Inclusive Tagging``.
 
 .. admonition:: Solution
@@ -92,14 +92,14 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
     Then create a path and
     load input data from an ``mdst`` file.
 
-    You can again use mdst files from ``/group/belle2/users/tenchini/prerelease-05-00-00a/charged/`` on KEKCC.
+    You can again use mdst files from ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021``.
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: -20
+        :end-at: E13
 
 Now we need the Global Tag in which the weight files for the FEI can be found. This can change once a new central
 training of the FEI is released, so please check the recommended versions.
@@ -136,7 +136,8 @@ There is also a convenience function for that!
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 24
+        :start-at: S23
+        :end-at: E23
 
 
 Configuring the FEI
@@ -152,8 +153,9 @@ As only charged B mesons are reconstructed in this exercise, the ``chargedB`` ar
 and the ``neutralB`` argument to False.
 The same applies to the ``hadronic`` and ``semileptonic`` arguments, set ``hadronic=True`` and ``semileptonic=False``
 as you will only reconstruct B mesons in hadronic decay channels.
-You should also enable B meson decay channels involving baryons with the ``baryonic=True`` argument as this increases
-efficiency.
+
+B meson decay channels involving baryons are a rather new feature that increase efficiency. They are turned on by
+default and can be controlled with the argument ``baryonic``.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -165,14 +167,15 @@ efficiency.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 28-34
+        :start-at: S10
+        :end-at: E10
 
 
 The `fei.FeiConfiguration` class controls the other configuration options of the FEI.
 Here, the FEI monitoring should be disabled with the appropriate argument (``monitor=False``) as we are not interested in
 the internal performance characteristics of the FEI stages.
 We also have to specify the FEI prefix argument here. This prefix allows distinguishing between different trainings
-in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for the current central training.
+in a single Global Tag and is ``prefix=FEIv4_2021_MC14_release_05_01_12`` for the current central training.
 
 
 .. admonition:: Exercise
@@ -185,7 +188,8 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 35-38
+        :start-at: S20
+        :end-at: E20
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -209,7 +213,8 @@ to the main path with the `basf2.Path.add_path` method.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 41-45
+        :start-at: S30
+        :end-at: E30
 
 
 You have now successfully added the FEI to the main path. The FEI will add a particle list
@@ -249,9 +254,20 @@ You should already be familiar with these topics from the previous exercises.
 .. admonition:: Solution
     :class: toggle solution
 
+    MC matching:
+
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 49-50, 60-71, 73-77
+        :start-at: S40
+        :end-at: E40
+
+    Alias creation and output (leave out the line with ``FEIProbRank``, this gets defined in the next
+    exercise):
+
+    .. literalinclude:: steering_files/070_fei.py
+        :language: python
+        :start-at: S41
+        :end-at: E41
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the
@@ -281,7 +297,8 @@ candidate.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 51-77
+        :start-at: S50
+        :end-at: E50
 
 You can now execute your steering file which should look somewhat like this:
 
@@ -307,7 +324,9 @@ indicator for the quality of the B mesons we have reconstructed.
     :class: exercise stacked
 
     Load your ntuple file into python, either using ``root_pandas`` or ``uproot``.
-    Then, plot the distribution of `Mbc` from 5.15 -- 5.3 GeV.
+    The latter is strongly recommended since ``root_pandas`` is deprecated and unmaintained.
+    For instructions on the basic usage of ``uproot`` see the `Getting started guide <https://uproot.readthedocs.io/en/latest/basic.html>`_.
+    After loading your ntuple, plot the distribution of `Mbc` from 5.15 -- 5.3 GeV.
 
     You should see broad peak with a sharp drop-off below 5.2 GeV.
     This drop-off is caused by a fixed pre-cut in the FEI. Candidates below this threshold are rejected before
@@ -322,9 +341,10 @@ indicator for the quality of the B mesons we have reconstructed.
         %matplotlib inline
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('B_charged_hadronic.root')
+        import uproot
+        
+        # To load a root tree with uproot.open, the argument has to be in the form 'filename:treename'
+        df = uproot.open('B_charged_hadronic.root:variables').arrays(['Mbc'], library='pd')
 
         fig, ax = plt.subplots()
         n, bins, patches = ax.hist(df['Mbc'], bins=30, range=(5.15, 5.3))
@@ -372,9 +392,9 @@ indicator for the quality of the B mesons we have reconstructed.
         %matplotlib inline
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('B_charged_hadronic.root')
+        import uproot
+        
+        df = uproot.open('B_charged_hadronic.root:variables').arrays(['Mbc', 'SigProb', 'FEIProbRank'], library='pd')
 
         fig, ax = plt.subplots()
 
@@ -410,7 +430,7 @@ preprocessed datasets are called *skims*.
 We will be using a FEI-skimmed file in this exercise in which the ``B0:generic`` particle list already exists.
 If you would like to know more about skimming, you can have a look into :ref:`onlinebook_skim`.
 
-The input file we will be using, found at ``/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root``, only
+The input file we will be using, found at ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021/fei_skimmed_xulnu.udst.root``, only
 contains decays of B0 mesons to a light lepton and a charged pi or rho meson. This way we don't have to process
 as much data as we would have to for a  file containing decays in all B decay channels.
 
@@ -425,7 +445,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
     Start a new steering file.
     In this file, you won't need the ``fei`` package so you can skip this import.
     Create a path and load the udst file
-    ``/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root``.
+    ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021/fei_skimmed_xulnu.udst.root``.
 
     **NOTE**: You can still use `modularAnalysis.inputMdst` to do this, even though it's a ``udst`` file.
 
@@ -444,7 +464,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 1-20
+        :end-at: E60
 
 
 ϒ(4S) Reconstruction
@@ -459,7 +479,7 @@ This leads to a discrepancy between the simulated decay and the reconstructed de
 causing the `isSignal` variable to always be zero.
 
 To solve this you can tell the MC matching algorithm to accept missing neutrinos by using the ``?nu`` flag,
-similiar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
+similar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
 Just add this flag to the end of the decay string in `modularAnalysis.reconstructDecay`. [#f1]_
 
 
@@ -474,7 +494,8 @@ Just add this flag to the end of the decay string in `modularAnalysis.reconstruc
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 22
+        :start-at: S113
+        :end-at: E113
 
 
 So far, we have not used the FEI. Now, we will use the B\ :sub:`tag` in the udst file and combine it with the
@@ -512,7 +533,8 @@ B\ :sub:`sig` we have just created.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 24-37
+        :start-at: S70
+        :end-at: E70
 
 
 Now that we have reconstructed the full ϒ(4S), we will create a Rest of Event.
@@ -543,7 +565,8 @@ value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaIn
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 39-43
+        :start-at: S80
+        :end-at: E80
 
 
 Writing out the nTuple
@@ -599,7 +622,8 @@ This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defi
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 45-70
+        :start-at: S90
+        :end-at: E90
 
 You can now execute your steering file which should look somewhat like this:
 
@@ -642,9 +666,13 @@ an MC sample with only four decay channels.
         %matplotlib inline
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
+        import uproot
 
-        df = read_root('Upsilon4S.root')
+        df = uproot.open('Upsilon4S.root:variables').arrays(['Bsig_isSignal',
+                                                             'm2RecoilSignalSide',
+                                                             'Btag_SigProb',
+                                                             'nCharged'],
+                                                            library='pd')
 
         fig, ax = plt.subplots()
 
@@ -685,11 +713,12 @@ and explanations on the code structure.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-    Moritz Bauer
+Moritz Bauer
 
 .. rubric:: Footnotes
 
 .. [#f1] Alternatively, you can also use the `isSignalAcceptMissingNeutrino` variable instead of `isSignal`
             but we will be going with the ``?nu`` flag and `isSignal` in our example.
+

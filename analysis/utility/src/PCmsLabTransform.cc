@@ -10,13 +10,25 @@
 
 using namespace Belle2;
 
-TLorentzVector PCmsLabTransform::labToCms(const TLorentzVector& vector)
+ROOT::Math::PxPyPzMVector PCmsLabTransform::labToCms(const ROOT::Math::PxPyPzMVector& vector)
 {
   PCmsLabTransform T;
   return T.rotateLabToCms() * vector;
 }
 
-TLorentzVector PCmsLabTransform::cmsToLab(const TLorentzVector& vector)
+ROOT::Math::PxPyPzMVector PCmsLabTransform::cmsToLab(const ROOT::Math::PxPyPzMVector& vector)
+{
+  PCmsLabTransform T;
+  return T.rotateCmsToLab() * vector;
+}
+
+ROOT::Math::PxPyPzEVector PCmsLabTransform::labToCms(const ROOT::Math::PxPyPzEVector& vector)
+{
+  PCmsLabTransform T;
+  return T.rotateLabToCms() * vector;
+}
+
+ROOT::Math::PxPyPzEVector PCmsLabTransform::cmsToLab(const ROOT::Math::PxPyPzEVector& vector)
 {
   PCmsLabTransform T;
   return T.rotateCmsToLab() * vector;

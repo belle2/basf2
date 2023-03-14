@@ -36,7 +36,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  void ftd_0_01(bool* b, bool* i);
+  void ftd_0_01(bool* b, const bool* i);
   /**do the final trigger decision*/
   //void dotrigger(std::vector<int>& res, std::vector<int> ob);
 
@@ -44,7 +44,7 @@ namespace Belle2 {
   TRGGDL::_gdl = 0;
 
   void
-  (* TRGGDL::_ftd)(bool* b, bool* i) = 0;
+  (* TRGGDL::_ftd)(bool* b, const bool* i) = 0;
 
   string
   TRGGDL::name(void) const
@@ -293,10 +293,8 @@ namespace Belle2 {
       std::string str;
       std::vector<std::string> algs;
       std::ifstream isload(_algFilePath.c_str(), std::ios::in);
-      int index = 0;
       while (std::getline(isload, str)) {
         algs.push_back(str);
-        index++;
       }
       isload.close();
 
@@ -435,10 +433,8 @@ namespace Belle2 {
         std::string str;
         std::vector<std::string> algs;
         std::ifstream isload(_algFilePath.c_str(), std::ios::in);
-        int index = 0;
         while (std::getline(isload, str)) {
           algs.push_back(str);
-          index++;
         }
         isload.close();
 
@@ -584,22 +580,22 @@ namespace Belle2 {
     //...Clear signal bundles...
     if (_isb) {
       for (unsigned i = 0; i < _isb->size(); i++)
-        delete(* _isb)[i];
+        delete (* _isb)[i];
       delete _isb;
     }
     if (_osb) {
       for (unsigned i = 0; i < _osb->size(); i++)
-        delete(* _osb)[i];
+        delete (* _osb)[i];
       delete _osb;
     }
     if (_tsb) {
       for (unsigned i = 0; i < _tsb->size(); i++)
-        delete(* _tsb)[i];
+        delete (* _tsb)[i];
       delete _tsb;
     }
     if (_tosb) {
       for (unsigned i = 0; i < _tosb->size(); i++)
-        delete(* _tosb)[i];
+        delete (* _tosb)[i];
       delete _tosb;
     }
 
@@ -756,7 +752,6 @@ namespace Belle2 {
     }
 
     char b[800];
-    unsigned lines = 0;
     while (! ifs.eof()) {
       ifs.getline(b, 800);
 
@@ -769,8 +764,6 @@ namespace Belle2 {
 
       if (w1.size())
         _input.push_back(w1);
-
-      ++lines;
     }
 
   }
@@ -784,7 +777,6 @@ namespace Belle2 {
     }
 
     char b[800];
-    unsigned lines = 0;
     while (! ifs.eof()) {
       ifs.getline(b, 800);
 
@@ -797,8 +789,6 @@ namespace Belle2 {
 
       if (w1.size())
         _output.push_back(w1);
-
-      ++lines;
     }
 
   }
@@ -812,7 +802,6 @@ namespace Belle2 {
     }
 
     char b[800];
-    unsigned lines = 0;
     while (! ifs.eof()) {
       ifs.getline(b, 800);
 
@@ -829,8 +818,6 @@ namespace Belle2 {
 
       if (w2.size())
         _algorithm.push_back(w2);
-
-      ++lines;
     }
 
   }

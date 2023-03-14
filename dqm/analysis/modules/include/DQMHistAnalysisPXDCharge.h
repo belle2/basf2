@@ -12,41 +12,61 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
 #include <TF1.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
-  class DQMHistAnalysisPXDChargeModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDChargeModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDChargeModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDChargeModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDChargeModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
 
+  private:
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;

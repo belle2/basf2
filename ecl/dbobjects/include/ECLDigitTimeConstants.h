@@ -6,8 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLDIGITTIMECONSTANTS_H
-#define ECLDIGITTIMECONSTANTS_H
+# pragma once
+
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {
@@ -45,12 +46,12 @@ namespace Belle2 {
     int getCellID() const {return m_cellID; };
 
     /** Set calibration offset
-     * @param calibration offset
+     * @param offset calibration offset
      */
     void setOffset(float offset) {m_offset = offset; };
 
     /** Set cell ID
-     * @param cell ID
+     * @param cellid cell ID
      */
     void setCellID(int cellid) {m_cellID = cellid; };
 
@@ -62,4 +63,3 @@ namespace Belle2 {
     ClassDef(ECLDigitTimeConstants, 2); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

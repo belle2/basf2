@@ -5,35 +5,34 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDigitCalibration/ECLDigitCalibratorModule.h>
 
-//STL
-#include <unordered_map>
-
-// ROOT
-#include "TH1F.h"
-#include "TFile.h"
-
-// ECL
-#include <ecl/dataobjects/ECLDigit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <ecl/dataobjects/ECLPureCsIInfo.h>
+#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/utility/utilityFunctions.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/digitization/EclConfiguration.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/utility/utilityFunctions.h>
 
-// FRAMEWORK
+/* Basf2 headers. */
+#include <framework/core/Environment.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <framework/geometry/B2Vector3.h>
-#include <framework/core/Environment.h>
-
-//MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1F.h>
+
+/* C++ headers. */
+#include <unordered_map>
 
 using namespace std;
 using namespace Belle2;
@@ -42,8 +41,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitCalibrator)
-REG_MODULE(ECLDigitCalibratorPureCsI)
+REG_MODULE(ECLDigitCalibrator);
+REG_MODULE(ECLDigitCalibratorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -103,8 +102,8 @@ ECLDigitCalibratorModule::~ECLDigitCalibratorModule()
 void ECLDigitCalibratorModule::initializeCalibration()
 {
 
-  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) *
-                       1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.
+  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
   m_pureCsIEnergyCalib = 0.00005; //conversion factor from ADC counts to GeV
   m_pureCsITimeCalib = 0.1; //conversion factor from eclPureCsIDigitizer to ns
   m_pureCsITimeOffset = 0.31; //ad-hoc offset correction for pureCsI timing
@@ -292,7 +291,7 @@ void ECLDigitCalibratorModule::event()
       if (!m_IsMCFlag) {
         double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
                                  m_timeInverseSlope ;
-        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude *
+        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude*
                 v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
                 energyTimeShift << " ns") ;
         calibratedTime -= energyTimeShift ;
@@ -303,7 +302,7 @@ void ECLDigitCalibratorModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     //Calibrating offline fit results
-    ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
+    ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
     aECLCalDigit->setTwoComponentChi2(-1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
@@ -319,7 +318,7 @@ void ECLDigitCalibratorModule::event()
         const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];
         const double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid -
-                                                          1] *
+                                                                 1] *
                                                           v_calibrationCrystalEnergy[cellid - 1];
         const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];

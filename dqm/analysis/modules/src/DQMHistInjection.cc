@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistInjection)
+REG_MODULE(DQMHistInjection);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -33,7 +33,7 @@ DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
 
 //   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed", std::string("PXDINJ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistInjection: Constructor done.");
 }
 
@@ -71,38 +71,38 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionHERARICH = new TCanvas("ARICH/c_InjectionHERARICH");
   m_cInjectionHERKLM = new TCanvas("KLM/c_InjectionHERKLM");
 
-  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "PXD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
-                                   0 , 20000);
-  m_hInjectionLERSVD = new TH1F("HitInjectionLERSVD", "SVD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+                                   0, 20000);
+  m_hInjectionLERSVD = new TH1F("HitInjectionLERSVD", "SVD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hInjectionLERSVDOcc = new TH1F("HitInjectionSVDLEROcc", "SVD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
-                                   0 , 20000);
-  m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "ECL Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+                                   0, 20000);
+  m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "ECL Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hBurstLERECL = new TH1F("BurstInjectionLERECL", "ECL Bursts after LER Injection;Time in #mus;Suppressions/event (1 #mus bins)",
-                            20000, 0 , 20000);
-  m_hInjectionLERTOP = new TH1F("HitInjectionLERTOP", "TOP Occ after LER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
+                            20000, 0, 20000);
+  m_hInjectionLERTOP = new TH1F("HitInjectionLERTOP", "TOP Occ after LER Injection;Time in #mus;Mean Occ in % /event", 4000, 0,
                                 20000);
-  m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
+  m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0,
                                   20000);
   m_hInjectionLERKLM = new TH1F("HitInjectionLERKLM",
-                                "KLM occupancy after LER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0 ,
+                                "KLM occupancy after LER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0,
                                 20000);
 
-  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
-                                   0 , 20000);
-  m_hInjectionHERSVD = new TH1F("HitInjectionHERSVD", "SVD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+                                   0, 20000);
+  m_hInjectionHERSVD = new TH1F("HitInjectionHERSVD", "SVD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hInjectionHERSVDOcc = new TH1F("HitInjectionSVDHEROcc", "SVD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
-                                   0 , 20000);
-  m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+                                   0, 20000);
+  m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   m_hBurstHERECL = new TH1F("BurstInjectionHERECL", "ECL Bursts after HER Injection;Time in #mus;Suppressions/event (1 #mus bins)",
-                            20000, 0 , 20000);
-  m_hInjectionHERTOP = new TH1F("HitInjectionHERTOP", "TOP Occ after HER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
+                            20000, 0, 20000);
+  m_hInjectionHERTOP = new TH1F("HitInjectionHERTOP", "TOP Occ after HER Injection;Time in #mus;Mean Occ in % /event", 4000, 0,
                                 20000);
-  m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
+  m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0,
                                   20000);
   m_hInjectionHERKLM = new TH1F("HitInjectionHERKLM",
-                                "KLM occupancy after HER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0 ,
+                                "KLM occupancy after HER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0,
                                 20000);
 
 #ifdef _BELLE2_EPICS
@@ -170,9 +170,7 @@ void DQMHistInjectionModule::event()
   m_histogramDirectoryName = "PXDINJ";
 
   locationHits = "PXDOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
+  locationHits = m_histogramDirectoryName + "/" + locationHits;
   Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "PXDEOccInjLER";
   if (m_histogramDirectoryName != "") {
@@ -225,9 +223,7 @@ void DQMHistInjectionModule::event()
   m_histogramDirectoryName = "SVDInjection";
 
   locationHits = "SVDOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
+  locationHits = m_histogramDirectoryName + "/" + locationHits;
   Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "SVDTrgOccInjLER";
   if (m_histogramDirectoryName != "") {
@@ -281,9 +277,7 @@ void DQMHistInjectionModule::event()
   m_histogramDirectoryName = "ECLINJ";
 
   locationHits = "ECLHitsInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
+  locationHits = m_histogramDirectoryName + "/" + locationHits;
   Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "ECLEHitsInjLER";
   if (m_histogramDirectoryName != "") {
@@ -375,9 +369,7 @@ void DQMHistInjectionModule::event()
   m_histogramDirectoryName = "TOP";
 
   locationHits = "TOPOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
+  locationHits = m_histogramDirectoryName + "/" + locationHits;
   Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "TOPEOccInjLER";
   if (m_histogramDirectoryName != "") {
@@ -418,9 +410,7 @@ void DQMHistInjectionModule::event()
   m_histogramDirectoryName = "ARICH";
 
   locationHits = "ARICHOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
+  locationHits = m_histogramDirectoryName + "/" + locationHits;
   Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "ARICHEOccInjLER";
   if (m_histogramDirectoryName != "") {
@@ -459,9 +449,7 @@ void DQMHistInjectionModule::event()
   m_histogramDirectoryName = "KLM";
 
   locationHits = "KLMOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
+  locationHits = m_histogramDirectoryName + "/" + locationHits;
   Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "KLMTrigInjLER";
   if (m_histogramDirectoryName != "") {

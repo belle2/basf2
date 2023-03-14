@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPWaveformFeatureExtractor/TOPWaveformFeatureExtractorModule.h>
 
 // framework - DataStore
@@ -28,10 +28,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPWaveformFeatureExtractor)
+  REG_MODULE(TOPWaveformFeatureExtractor);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -127,7 +127,7 @@ namespace Belle2 {
     }
 
     int finalSize = rawDigits.getEntries();
-    B2DEBUG(100, "TOPWaveformFeatureExtractor: appended " << finalSize - initSize
+    B2DEBUG(20, "TOPWaveformFeatureExtractor: appended " << finalSize - initSize
             << " raw digits to initial " << initSize);
 
   }

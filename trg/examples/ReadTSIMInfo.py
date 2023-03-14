@@ -37,7 +37,6 @@ def Count_mcpart(parts):
     for part in parts:
         pdglist = [11, 13, 2212, 321, 211]
         pdg = math.fabs(part.getPDG())
-        charge = part.getCharge()
         theta = part.getMomentum().Theta() * Fac
         if theta > dec_cdc[0] and theta < dec_cdc[1]:
             if pdg in pdglist:
@@ -78,49 +77,26 @@ def NeutralCluster(clusters):
     return neutral_cluster
 
 
-def Vec_Cluster(cluster, CMS=False):
+def Vec_Cluster(cluster):
     x = cluster.getPositionX()
     y = cluster.getPositionY()
     z = cluster.getPositionZ()
     e = cluster.getEnergyDep()
     vec = ROOT.TVector3(x, y, z)
-    vec_unit = vec.Unit()
-    vec_unit *= e
-    v_mom = ROOT.TLorentzVector(vec_unit, e)
-    if CMS:
-        new_vec = trans.rotateLabToCms() * v_mom
-    else:
-        new_vec = v_mom
-    new_theta = new_vec.Theta() * Fac
-    new_phi = new_vec.Phi() * Fac
+    v_mom = e * ROOT.Math.PxPyPzEVector(x / vec.Mag(), y / vec.Mag(), z / vec.Mag(), 1)
+    new_theta = v_mom.Theta() * Fac
+    new_phi = v_mom.Phi() * Fac
     if(new_phi < 0):
         new_phi += 2 * PI
-    new_e = new_vec.E()
+    new_e = v_mom.E()
     NVC = [new_e, new_theta, new_phi]
     return NVC
-
-
-def MatchTrk_Info(matchtrk, clusters):
-    RV = [0., 0., 0., 0., 0., 0.]
-    RV[0] = matchtrk.getPt()
-    RV[1] = matchtrk.getPz()
-    RV[2] = (PI - matchtrk.getTheta()) * Fac
-    RV[3] = matchtrk.getPhi() * Fac
-    clusterId = matchtrk.getECLClusterId()
-    for cluster in clusters:
-        clusterId2 = cluster.getClusterId()
-        if clusterId == clusterId2:
-            vec_ = Vec_Cluster(cluster, False)
-            vec_cms = Vec_Cluster(cluster, False)
-            RV[4] = vec_[0]
-            RV[5] = vec_cms[0]
-    return RV
 
 
 def Max_Cluster(neuclus, CMS, n):
     E = []
     for neuclu in neuclus:
-        NV = Vec_Cluster(neuclu, CMS)
+        NV = Vec_Cluster(neuclu)
         E.append(NV)
     if E and len(E) >= (n + 1):
         seqen = nlargest(n + 1, E, key=lambda item: item[0])
@@ -301,7 +277,7 @@ def Cluster_Threshold(clusters, threshold, CMS):
     for cluster in clusters:
         eng = 0
         if CMS:
-            newv = Vec_Cluster(cluster, CMS)
+            newv = Vec_Cluster(cluster)
             eng = newv[0]
         else:
             eng = cluster.getEnergyDep()
@@ -314,14 +290,14 @@ def Back_to_Back(clusters1, clusters2):
     npai = 0
     for cluster1 in clusters1:
         cid1 = cluster1.getClusterId()
-        vec1 = Vec_Cluster(cluster1, False)
+        vec1 = Vec_Cluster(cluster1)
         theta1 = vec1[1]
         phi1 = vec1[2]
         for cluster2 in clusters2:
             cid2 = cluster2.getClusterId()
             if cid1 == cid2:
                 continue
-            vec2 = Vec_Cluster(cluster2, False)
+            vec2 = Vec_Cluster(cluster2)
             theta2 = vec2[1]
             phi2 = vec2[2]
             delttheta = math.fabs(theta1 + theta2 - 180)
@@ -540,8 +516,6 @@ class CreateLogics(b2.Module):
             if i < 100:
                 self.time_cluster_t[i] = time_clu_list[i]
 
-        clusters_100 = Cluster_Threshold(clusters, 0.1, False)
-        clusters_100_cms = Cluster_Threshold(clusters, 0.1, False)
         clusters_300_cms = Cluster_Threshold(clusters, 0.3, False)
         clusters_400_cms = Cluster_Threshold(clusters, 0.4, False)
         clusters_500_cms = Cluster_Threshold(clusters, 0.5, False)
@@ -575,14 +549,14 @@ class CreateLogics(b2.Module):
 
         neutral_clusters = NeutralCluster(clusters)
         self.ncluster_neutral_t[0] = len(neutral_clusters)
-        max_cluster_neu = Max_Cluster(neutral_clusters, False, 0)
-        max_cluster = Max_Cluster(clusters, False, 0)
-        # max_cms_cluster_neu = Max_Cluster(neutral_clusters, False, 0)
-        # max_cms_cluster = Max_Cluster(clusters, False, 0)
-        smax_cluster_neu = Max_Cluster(neutral_clusters, False, 1)
-        smax_cluster = Max_Cluster(clusters, False, 1)
-        # smax_cms_cluster_neu = Max_Cluster(neutral_clusters, False, 1)
-        # smax_cms_cluster = Max_Cluster(clusters, False, 1)
+        max_cluster_neu = Max_Cluster(neutral_clusters, 0)
+        max_cluster = Max_Cluster(clusters, 0)
+        # max_cms_cluster_neu = Max_Cluster(neutral_clusters, 0)
+        # max_cms_cluster = Max_Cluster(clusters, 0)
+        smax_cluster_neu = Max_Cluster(neutral_clusters, 1)
+        smax_cluster = Max_Cluster(clusters, 1)
+        # smax_cms_cluster_neu = Max_Cluster(neutral_clusters, 1)
+        # smax_cms_cluster = Max_Cluster(clusters, 1)
         for i in range(self.ncomp_clu):
             self.max_cluster_neutral_t[i] = max_cluster_neu[i]
             # self.max_cms_cluster_neutral_t[i] = max_cms_cluster_neu[i]
@@ -646,7 +620,7 @@ class CreateLogics(b2.Module):
 
 if __name__ == "__main__":
     main = b2.create_path()
-    ma.inputMdst('default', argvs[1], main)
+    ma.inputMdst(argvs[1], main)
     main.add_module(CreateLogics())
     EffCalculation(main)
     b2.process(main)

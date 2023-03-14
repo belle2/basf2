@@ -1,0 +1,22 @@
+# EventType: 1160000002
+# Descriptor: [B0 -> K0star nu anti-nu]cc
+# NickName: Bd_K0starnunubar
+# Documentation: Rare b->s nu anti-nu process
+# Tested: Yes 
+# PhysicsWG: EWP 
+# Responsible: Junewoo Park
+# Email: purol@yonsei.ac.kr
+# Cuts: None
+# Date: 20211213
+
+Decay Upsilon(4S)
+1.00 B0sig anti-B0sig B0 anti-B0         VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 K*0 nu_e anti-nu_e                   KSTARNUNU_REV;
+Enddecay
+CDecay anti-B0sig
+
+End
+

@@ -9,24 +9,17 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 // Monitoring
 #include <dqm/dataobjects/DQMFileMetaData.h>
-#include <dqm/dataobjects/MonitoringObject.h>
-
-#include <vector>
-
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TH2Poly.h>
 
 namespace Belle2 {
 
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisMiraBelleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisMiraBelleModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -38,43 +31,36 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisMiraBelleModule();
+    ~DQMHistAnalysisMiraBelleModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
-
-    /**
-    * Find canvas by name
-    * @param cname Name of the canvas
-    * @return The pointer to the canvas, or nullptr if not found.
-    */
-    TCanvas* find_canvas(TString cname);
+    void terminate() override final;
 
   protected:
     bool m_debug;/**<debug*/
@@ -82,7 +68,7 @@ namespace Belle2 {
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */
     Belle2::DQMFileMetaData* dqm_data = nullptr; /**< DQM file meta data */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
-    Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for mumu events */
+    Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
 
     // TCanvases for mumu
     TCanvas* mumu_main = nullptr; /**< TCanvas object for main display */

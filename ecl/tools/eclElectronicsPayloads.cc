@@ -6,18 +6,26 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* Basf2 headers. */
+#include <framework/database/Configuration.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Configuration.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/LogSystem.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <iostream>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TH1F.h>
+
+/* C++ headers. */
+#include <iostream>
 
 using namespace Belle2;
 
@@ -125,7 +133,7 @@ int main(int argc, char** argv)
   //..Calculate the new values for requested payload
   std::vector<float> newValues;
   std::vector<float> newUnc;
-  for (int ic = 0; ic < 8736; ic++) {
+  for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic++) {
     if (payloadName == "ECLCrystalElectronics") {
       newValues.push_back(refAmplNom[ic] / refAmpl[ic]);
       newUnc.push_back(newValues[ic]*refAmplUnc[ic] / refAmpl[ic]);
@@ -161,11 +169,11 @@ int main(int argc, char** argv)
   TFile hfile(fname, "recreate");
   TString htitle = payloadTitle;
   htitle += " existing calibration values;cellID";
-  TH1F* existingCalib = new TH1F("existingCalib", htitle, 8736, 1, 8737);
+  TH1F* existingCalib = new TH1F("existingCalib", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " new calibration values;cellID";
-  TH1F* newCalib = new TH1F("newCalib", htitle, 8736, 1, 8737);
+  TH1F* newCalib = new TH1F("newCalib", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " ratio";
@@ -177,17 +185,17 @@ int main(int argc, char** argv)
 
   htitle = payloadTitle;
   htitle += " reference";
-  TH1F* refValues = new TH1F("refValues", htitle, 8736, 1, 8737);
+  TH1F* refValues = new TH1F("refValues", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " ratio vs cellID;cellID;new/old";
-  TH1F* ratioVsCellID = new TH1F("ratioVsCellID", htitle, 8736, 1, 8737);
+  TH1F* ratioVsCellID = new TH1F("ratioVsCellID", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " diff vs cellID;cellID;new - old";
-  TH1F* diffVsCellID = new TH1F("diffVsCellID", htitle, 8736, 1, 8737);
+  TH1F* diffVsCellID = new TH1F("diffVsCellID", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     float oldValue = currentValues[cellID - 1];
     float newValue = newValues[cellID - 1];
     float ratio = 9999.;

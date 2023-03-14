@@ -13,7 +13,7 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 
 /* ROOT headers. */

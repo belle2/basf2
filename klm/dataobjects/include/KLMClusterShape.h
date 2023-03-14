@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 /* ROOT headers. */

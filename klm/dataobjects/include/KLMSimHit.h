@@ -12,7 +12,7 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <simulation/dataobjects/SimHitBase.h>
 
 /* ROOT headers. */

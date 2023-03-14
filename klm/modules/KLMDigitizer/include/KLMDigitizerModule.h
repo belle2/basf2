@@ -17,10 +17,11 @@
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/rawdata/RawData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <klm/time/KLMTime.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -156,6 +157,9 @@ namespace Belle2 {
     /** Efficiency determination mode (converted from the string parameter). */
     EfficiencyMode m_EfficiencyMode;
 
+    /** Whether to create multi-strip digits. */
+    bool m_CreateMultiStripDigits;
+
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
@@ -167,6 +171,17 @@ namespace Belle2 {
 
     /** Simulation hit map (by ASIC). */
     std::multimap<KLMElectronicsChannel, const KLMSimHit*> m_MapAsicSimHit;
+
+    /** Digits corresponding to ASIC channels. */
+    KLMDigit* m_AsicDigits[KLM::c_NChannelsAsic];
+
+    /** Simulation hits lower bound for ASIC digit. */
+    std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+    m_AsicDigitSimHitsLowerBound[KLM::c_NChannelsAsic];
+
+    /** Simulation hits upper bound for ASIC digit. */
+    std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+    m_AsicDigitSimHitsUpperBound[KLM::c_NChannelsAsic];
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

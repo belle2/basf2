@@ -8,21 +8,26 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <string>
-#include <vector>
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TProfile.h"
-#include "TProfile2D.h"
+// TOP headers.
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 
-// dataobject classes
+// Basf2 headers.
+#include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <top/dataobjects/TOPDigit.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <top/dataobjects/TOPRecBunch.h>
 #include <mdst/dataobjects/Track.h>
+
+// ROOT headers.
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TProfile.h>
+#include <TProfile2D.h>
+
+// C++ headers.
+#include <string>
+#include <vector>
 
 namespace Belle2 {
 

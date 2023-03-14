@@ -9,7 +9,7 @@
 /* Own header. */
 #include <generators/koralw/KoralW.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 

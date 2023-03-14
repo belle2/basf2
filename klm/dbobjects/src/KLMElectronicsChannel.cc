@@ -9,6 +9,9 @@
 /* Own header. */
 #include <klm/dbobjects/KLMElectronicsChannel.h>
 
+/* KLM headers. */
+#include <klm/rawdata/RawData.h>
+
 using namespace Belle2;
 
 bool KLMElectronicsChannel::operator<(
@@ -35,6 +38,6 @@ bool KLMElectronicsChannel::operator<(
 
 KLMElectronicsChannel KLMElectronicsChannel::getAsic() const
 {
-  int asic = (m_Channel - 1) / 15;
+  int asic = (m_Channel - 1) / KLM::c_NChannelsAsic;
   return KLMElectronicsChannel(m_Copper, m_Slot, m_Lane, m_Axis, asic);
 }

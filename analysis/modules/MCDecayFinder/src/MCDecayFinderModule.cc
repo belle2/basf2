@@ -258,8 +258,13 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
 void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
 {
-  if (MCMatching::isFSP(gen->getPDG()))
-    return; //stop at the bottom of the MC decay tree (ignore secondaries)
+  if (MCMatching::isFSP(gen->getPDG())) {
+    if (gen->getPDG() != Const::Kshort.getPDGCode()) // exception for K_S0
+      return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+    // Currently the decay of "FSP" cannot be specified except for K_S0,
+    // e.g. photon-conversion: gamma -> e+ e-, decay-in-flight: K+ -> mu+ nu_mu
+  }
 
   const vector<MCParticle*>& genDaughters = gen->getDaughters();
   for (auto daug : genDaughters) {
@@ -359,8 +364,7 @@ Particle* MCDecayFinderModule::buildParticleFromDecayTree(const DecayTree<MCPart
 
     Particle* partDaughter = buildParticleFromDecayTree(decayDaughters[index_decayDaughter], dd->getDaughter(iDD));
 
-    int daughterProperty = dd->getDaughter(iDD)->getProperty();
-    property |= dd->getDaughter(iDD)->getMother()->getProperty();
+    int daughterProperty = dd->getDaughter(iDD)->getMother()->getProperty();
     newParticle->appendDaughter(partDaughter, false, daughterProperty);
   }
 

@@ -84,7 +84,7 @@ if __name__ == "__main__":
             command = command_dict[daughter_name].replace(daughter_name + '.*;', daughter_name + '.*' + daughter_name + '.*;')
         else:
             # line of decay description ends with ';'
-            command = 'grep ' + daughter_name + '.*;'
+            command = 'grep "' + daughter_name + '.*;"'
 
         command_dict[daughter_name] = command
 

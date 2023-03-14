@@ -1,5 +1,10 @@
 .. _convertedobjects:
 
+Converted data objects and other information
+============================================
+This section briefly describes what is converted, in what way, and how the
+converted objects should be used in the analysis.
+
 -----------------------------
 Charged Final State Particles
 -----------------------------
@@ -65,25 +70,36 @@ reproduce them:
 Neutral Final State Particles
 -----------------------------
 When it comes to ECL related objects the BASF and basf2 MDST data formats differ
-substantially which makes one-to-one conversion impossible. The reconstructed
+substantially, which makes one-to-one conversion impossible. The reconstructed
 ``ECL clusters``, both charged (with matched charged track) and neutral
 (without matched charged track), are in BASF stored as ``Mdst_ecl`` (and ``Mdst_ecl_aux``)
-and in BASF2 as ECLCLusters. These two datatypes match quite good.
-However, BASF MDST format has two additional data types: ``Mdst_Gamma`` and ``Mdst_Pi0``,
-for which there exist no equivalent data type in the BASF2 MDST format.
+and in BASF2 as ECLClusters. These two data types match quite well.
+However, the BASF MDST format has two additional data types: ``Mdst_Gamma`` and ``Mdst_Pi0``,
+for which there is no equivalent data type in the BASF2 MDST format.
 Instead, the B2BII converter by default creates ``gamma:mdst`` and ``pi0:mdst``
 ParticleLists, which are filled with particle objects created for each
 ``Mdst_Gamma`` and ``Mdst_Pi0`` entry.
 
 .. warning::
    Use ``gamma:mdst`` and ``pi0:mdst`` ParticleLists.
-   Don't use ``fillParticleList(...)`` to create photon candidates or don't
-   reconstruct ``pi0`` candidate from pairs of two photons by yourself.
+   Don't use ``fillParticleList(...)`` to create photon candidates and don't
+   reconstruct ``pi0`` candidates from pairs of two photons by yourself.
 
 .. note::
-   Mass-constraint fit has been applied to ``pi0`` candidates in ``Mdst_Pi0``.
-   However, covariance matrix is not stored in panther tables. If you need
-   this information in the analysis, you can redo the mass constraint fit in basf2.
+   A mass-constrained fit has been applied to ``pi0`` candidates in ``Mdst_Pi0``.
+   However, the covariance matrix is not stored in panther tables. If you need
+   this information in the analysis, you can redo the mass-constrained fit in basf2.
+
+You can also set the argument ``convertNbar`` of `convertBelleMdstToBelleIIMdst` to ``true`` to copy Particles with an energy
+above 500 MeV in ``gamma:mdst`` and create a ParticleList ``anti-n0:mdst``. In the steering file,
+you should use the module ``BelleNbarMVA`` to evaluate an MVA dedicated to the separation of
+anti-neutrons from photons. Assuming that you have appended the globaltag ``BellePID``,
+the call would be ``your_path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')``,
+where the identifier is a pre-trained model stored in ``BellePID`` and illustrated in `BN1592`_.
+As for the kinematic variable, you are advised to use ``reconstructDecayWithNeutralHadron`` to
+reconstruct the neutral hadron's 4-momentum with mother mass constraint.
+
+.. _BN1592: https://belle.kek.jp/secured/belle_note/gn1592/bn1592_v3.0.pdf
 
 ------------
 V0 Particles

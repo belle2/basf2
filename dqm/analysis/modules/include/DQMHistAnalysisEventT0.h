@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /** Class definition */
-  class DQMHistAnalysisEventT0Module : public DQMHistAnalysisModule {
+  class DQMHistAnalysisEventT0Module final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -25,19 +25,19 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisEventT0Module();
     /** Destructor */
-    virtual ~DQMHistAnalysisEventT0Module();
+    ~DQMHistAnalysisEventT0Module();
 
     /** create TCanvas and MonitoringObject */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /** clear TCanvas */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /** fit the histograms */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /** delete pointers */
-    virtual void terminate() override;
+    void terminate() override final;
 
     std::string m_prefixCanvas; /**< prefix to be added to canvas name when saved as pdf*/
     bool m_printCanvas; /**< if true print the pdf of the canvases */
@@ -49,13 +49,15 @@ namespace Belle2 {
      * fitting with two gaussians
      * filling the MonitoringObject
      * @param h EventT0 histogram
-     * @param fitf fit function
      * @param tag to distinguish results
      * @return false if the histogram is not found or the fit is not converged
      **/
     bool processHistogram(TH1* h, TString tag);
 
-    /** double gaussian fitting function for the jitter distribution*/
+    /** double gaussian fitting function for the jitter distribution
+     * @param x Data used to fit double gaussians
+     * @param par Normalization + fraction + double gaussian parameters (mu, sigma)
+    */
     static double fDoubleGaus(double* x, double* par);
 
     TCanvas* m_cECLTRG = nullptr; /**< TOP EventT0 for ECLTRG plots canvas */

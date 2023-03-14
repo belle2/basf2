@@ -358,7 +358,6 @@ void TrackingPerformanceEvaluationModule::event()
 
     int nFittedTracksMCRT = 0;
     int nFittedTracks = 0;
-    int nFittedTrackswPXDHits = 0;
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
@@ -429,7 +428,6 @@ void TrackingPerformanceEvaluationModule::event()
 
           if (fitResult->getHitPatternVXD().getNPXDHits() > 0) {
             m_h3_TrackswPXDHitsPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
-            nFittedTrackswPXDHits++;
           }
 
           m_h3_TracksPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -527,7 +525,6 @@ void TrackingPerformanceEvaluationModule::event()
 
   for (const RecoTrack& mcRecoTrack : m_MCRecoTracks) {
 
-    int nRecoTrack = 0;
     bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
@@ -549,7 +546,6 @@ void TrackingPerformanceEvaluationModule::event()
       for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
         if (!hasRecoTrack) {
           hasRecoTrack = true;
-          nRecoTrack++;
         }
 
     }
@@ -849,7 +845,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           B2WARNING(" No KalmanFitterInfo associated to the TrackPoint!");
 
         double detId(-999);
-        TVector3 globalHit(-999, -999, -999);
+        ROOT::Math::XYZVector globalHit(-999, -999, -999);
 
         PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
         SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
@@ -874,7 +870,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
 
           const PXDCluster* pxdcl = pxdHit->getCluster();
@@ -913,7 +909,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
         } else if (svdHit) {
 
@@ -935,7 +931,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
         } else if (cdcHit) {
 
           if (kalmanInfo)
@@ -957,7 +953,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
         m_h2_VXDhitsPR_xy->Fill(globalHit.X(), globalHit.Y());
 
-        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Perp());
+        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Rho());
 
       }
 

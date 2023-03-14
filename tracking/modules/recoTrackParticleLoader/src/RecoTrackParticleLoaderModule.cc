@@ -7,6 +7,7 @@
  **************************************************************************/
 #include <tracking/modules/recoTrackParticleLoader/RecoTrackParticleLoaderModule.h>
 
+#include <framework/geometry/B2Vector3.h>
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
@@ -60,7 +61,7 @@ void RecoTrackParticleLoaderModule::event()
     auto firstHit = recoTrack.getMeasuredStateOnPlaneFromFirstHit(rep);
     genfit::MeasuredStateOnPlane extrapolatedMSoP = firstHit;
     try {
-      extrapolatedMSoP.extrapolateToLine(TVector3(0.0, 0.0, 0.0), TVector3(0.0, 0.0, 1.0));
+      extrapolatedMSoP.extrapolateToLine(B2Vector3D(0.0, 0.0, 0.0), B2Vector3D(0.0, 0.0, 1.0));
     } catch (...) {
       B2WARNING("Could not extrapolate the fit result for pdg " << pdg <<
                 " to the IP. Why, I don't know.");

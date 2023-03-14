@@ -85,6 +85,9 @@ namespace Belle2 {
       m_NumberOfHadronDigits(0.0),             /**< Shower Number of hadron digits*/
       m_numberOfCrystalsForEnergy(0.0),        /**< number of crystals used for energy calculation*/
       m_nominalNumberOfCrystalsForEnergy(0.0), /**< nominal number of crystals used for energy calculation*/
+      m_nOptimalGroupIndex(-1),                /**< index of group of crystals used to find m_nominalNumberOfCrystalsForEnergy */
+      m_nOptimalEnergyBin(-1),                      /**< energy bin used to find m_nominalNumberOfCrystalsForEnergy */
+      m_nOptimalEnergy(0.0),                    /**< energy used to find nOptimalEnergyBin in ECLSplitterN1 */
       m_listOfCrystalsForEnergy{},             /**< list of cell ids used for energy calculation*/
       m_listOfCrystalEnergyRankAndQuality{}    /**< list of ECLCalDigit indices sorted by online energy*/
 
@@ -217,6 +220,18 @@ namespace Belle2 {
     /*! Set nominal number of crystals used for energy calculation
      */
     void setNominalNumberOfCrystalsForEnergy(double nominalNumberOfCrystalsForEnergy) { m_nominalNumberOfCrystalsForEnergy = nominalNumberOfCrystalsForEnergy; }
+
+    /*! Set group number used to find nominalNumberOfCrystalsForEnergy
+     */
+    void setNOptimalGroupIndex(int nOptimalGroupIndex) { m_nOptimalGroupIndex = nOptimalGroupIndex; }
+
+    /*! Set energy bin number used to find nominalNumberOfCrystalsForEnergy
+     */
+    void setNOptimalEnergyBin(int nOptimalEnergyBin) { m_nOptimalEnergyBin = nOptimalEnergyBin; }
+
+    /*! Set energy used to find nOptimalEnergyBin
+     */
+    void setNOptimalEnergy(double nOptimalEnergy) { m_nOptimalEnergy = nOptimalEnergy; }
 
     /*! Set list of cell ids used for energy calculation
      */
@@ -397,6 +412,21 @@ namespace Belle2 {
      */
     double getNominalNumberOfCrystalsForEnergy() const { return m_nominalNumberOfCrystalsForEnergy; }
 
+    /*! Get index of group of crystals used to find nominalNumberOfCrystalsForEnergy
+     * @return m_nOptimalGroupIndex
+     */
+    int getNOptimalGroupIndex() const { return m_nOptimalGroupIndex; }
+
+    /*! Get energy bin used to find nominalNumberOfCrystalsForEnergy
+     * @return m_nOptimalEnergyBin
+     */
+    int getNOptimalEnergyBin() const { return m_nOptimalEnergyBin; }
+
+    /*! Get energy used to find nOptimalEnergyBin
+     * @return m_nOptimalEnergy
+     */
+    double getNOptimalEnergy() const { return m_nOptimalEnergy; }
+
     /*! Get list of cellids used for energy calculation
      * @return m_listOfCrystalsForEnergy
      */
@@ -523,6 +553,9 @@ namespace Belle2 {
     m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
     Double32_t m_numberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
     Double32_t m_nominalNumberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
+    int m_nOptimalGroupIndex; /**< group (of crystals) number used to find nominalNumberOfCrystalsForEnergy (CH) */
+    int m_nOptimalEnergyBin; /**< energy bin used to find nominalNumberOfCrystalsForEnergy (CH) */
+    Double32_t m_nOptimalEnergy; /**< energy used in ECLSplitterN1 to find nOptimalEnergyBin (CH) */
     std::vector<unsigned int> m_listOfCrystalsForEnergy; /**< list of cell ids used for energy calculation (TF)*/
     std::vector<std::pair<unsigned int, bool>>
                                             m_listOfCrystalEnergyRankAndQuality; /**< list of indices of related ECLCalDigits by energy. Also stores a quality flag for each digit denoting whether the PSD information can be used for charged particle ID. Cached here to avoid resorting the ECLCalDigit vector 90 times per track.*/
@@ -542,7 +575,8 @@ namespace Belle2 {
     // 14: added m_numberOfCrystalsForEnergy of crystals for energy determination
     // 15: added m_listOfCrystalsForEnergy, m_nominalNumberOfCrystalsForEnergy
     // 16: removed m_absZernike40 and 51, added m_absZernikeMoments, m_listOfCrystalEnergyRankAndQuality (MH)
-    ClassDef(ECLShower, 16);/**< ClassDef */
+    // 17: added m_nOptimalGroupIndex, m_nOptimalEnergyBin, and m_nOptimalEnergy (CH)
+    ClassDef(ECLShower, 17);/**< ClassDef */
 
   };
 

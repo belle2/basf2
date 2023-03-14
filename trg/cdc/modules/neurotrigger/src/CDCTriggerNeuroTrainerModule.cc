@@ -329,7 +329,7 @@ CDCTriggerNeuroTrainerModule::event()
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
           genfit::MeasuredStateOnPlane state =
-            recoTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), reps[irep]);
+            recoTrack->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), reps[irep]);
           reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
           // flip tracks if necessary, such that trigger tracks and reco tracks
           // point in the same direction

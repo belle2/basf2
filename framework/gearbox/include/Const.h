@@ -660,6 +660,7 @@ namespace Belle2 {
     static const ParticleType photon;    /**< photon particle */
     static const ParticleType pi0;       /**< neutral pion particle */
     static const ParticleType neutron;   /**< neutron particle */
+    static const ParticleType antiNeutron;   /**< Anti-neutron particle */
     static const ParticleType Kshort;    /**< K^0_S particle */
     static const ParticleType Klong;     /**< K^0_L particle */
     static const ParticleType Lambda;    /**< Lambda particle */

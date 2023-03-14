@@ -111,6 +111,6 @@ More advanced examples
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-   Pascal Schmolz
+Pascal Schmolz

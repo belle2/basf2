@@ -99,10 +99,7 @@ namespace TreeFitter {
     int index() const { return m_index ; }
 
     /** getMother() / hasMother() */
-    const ParticleBase* mother() const;
-
-    /**  get name of the particle */
-    const std::string& name() const { return m_name ; }
+    const ParticleBase* mother() const { return m_mother; };
 
     /**  project geometrical constraint */
     virtual ErrCode projectGeoConstraint(const FitParams&, Projection&) const ;
@@ -147,20 +144,16 @@ namespace TreeFitter {
     /**  get chi2 */
     virtual double chiSquare(const FitParams&) const;
 
-    /** get pdg mass  */
-    double pdgMass() const { return m_pdgMass ; }
-
-    /** get pdg width */
-    double pdgWidth() const { return m_pdgWidth ; }
-
-    /**  get pdg lifetime */
-    double pdgLifeTime() const { return m_pdgLifeTime ; }
-
-    /** get Tau */
-    double pdgTime() const { return m_pdgMass > 0 ? m_pdgLifeTime : 0; }
-
     /**  get charge */
-    int charge() const { return m_charge ; }
+    int charge() const
+    {
+      if (m_particle->getPDGCode()) {
+        double fltcharge = m_particle->getCharge();
+        return fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5);
+      } else {
+        return m_particle->getCharge() > 0 ? 1 : (m_particle->getCharge() < 0 ? -1 : 0);
+      }
+    }
 
     /** add daughter  */
     virtual ParticleBase* addDaughter(Belle2::Particle*, const ConstraintConfiguration& config, bool forceFitAll = false);
@@ -183,16 +176,10 @@ namespace TreeFitter {
     /** number of charged candidates */
     virtual int nFinalChargedCandidates() const;
 
-    /** set the relation to basf2 particle type */
-    void setParticle(Belle2::Particle* particle) { m_particle = particle ; }
-
   protected:
 
     /** just an alias */
     typedef std::vector<ParticleBase*> ParticleContainer;
-
-    /** get pdg lifetime */
-    static double pdgLifeTime(Belle2::Particle* particle)  ;
 
     /** controls if a particle is treated as a resonance(lifetime=0) or a particle that has a finite lifetime.
      * A finite life time means it will register a geo constraint for this particle
@@ -223,18 +210,6 @@ namespace TreeFitter {
   private:
     /** index */
     int m_index;
-
-    /** pdg mass  */
-    const double m_pdgMass;
-
-    /**  particle width */
-    double m_pdgWidth;
-
-    /** lifetime in cm  */
-    const double m_pdgLifeTime;
-
-    /** charge  */
-    int m_charge;
 
     /** name  */
     std::string m_name;

@@ -210,7 +210,7 @@ void DQMEventProcessorBase::ComputeCommonVariables()
 {
   auto sensorInfo = &VXD::GeoCache::get(m_sensorID);
   m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
-  TVector3 globalPosition = sensorInfo->pointToGlobal(m_position, true);
+  ROOT::Math::XYZVector globalPosition = sensorInfo->pointToGlobal(m_position, true);
 
   m_phi_deg = globalPosition.Phi() / Unit::deg;
   m_theta_deg = globalPosition.Theta() / Unit::deg;

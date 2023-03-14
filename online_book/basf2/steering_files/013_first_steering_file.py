@@ -37,7 +37,7 @@ ma.reconstructDecay(
     path=main,
 )
 #  [E30]
-# Save variables to an output file (ntuple)
+# save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
     variables=['Mbc'],
@@ -46,7 +46,7 @@ ma.variablesToNtuple(
     path=main,
 )
 
-# Start the event loop (actually start processing things)
+# start the event loop (actually start processing things)
 b2.process(main)
 
 # print out the summary

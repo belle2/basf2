@@ -344,7 +344,7 @@ namespace Belle2 {
       if (found == false and m_config.pdgCodesAllowed.empty() == false) return false;
 
       // check if momentum of TC is within range:
-      auto pT = tc.getMomSeed().Perp();
+      auto pT = tc.getMomSeed().Rho();
       B2DEBUG(20, "SecMapTrainer::storeTC: pT/thresholdmin/-max: " << pT << "/" << m_config.pTmin << "/" <<
               m_config.pTmax);
       if (m_config.pTmin > pT or m_config.pTmax < pT) return false;
@@ -392,7 +392,7 @@ namespace Belle2 {
       }
 
 
-      convertSP2TC(goodSPs, iD, tc.getMomSeed().Perp(), tc.getPdgCode());
+      convertSP2TC(goodSPs, iD, tc.getMomSeed().Rho(), tc.getPdgCode());
 
       return true;
     }

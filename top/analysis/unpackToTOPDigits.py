@@ -16,8 +16,9 @@
 
 import basf2 as b2
 
-# Define a global tag (note: the one given bellow will become out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+# Define a global tag
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
@@ -40,10 +41,9 @@ main.add_module(converter)
 
 # output
 output = b2.register_module('RootOutput')
-output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPInterimFEInfos',
-                             'TOPRawDigitsToTOPInterimFEInfos',
-                             # 'TOPRawWaveforms', 'TOPRawWaveformsToTOPInterimFEInfos',
-                             # 'TOPRawDigitsToTOPRawWaveforms',
+output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPProductionEventDebugs',
+                             'TOPProductionHitDebugs', 'TOPRawDigitsToTOPProductionHitDebugs',
+                             # 'TOPRawWaveforms', 'TOPRawDigitsToTOPRawWaveforms',
                              ])
 main.add_module(output)
 

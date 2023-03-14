@@ -127,8 +127,6 @@ class BaseFEISkim(BaseSkim):
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4~{\\rm GeV}`
-        * :math:`2~{\\rm GeV}<E_{\\text{cleaned tracks & clusters in
-          ECL}}<7~{\\rm GeV}`
 
         We define "cleaned" tracks and clusters as:
 
@@ -145,7 +143,7 @@ class BaseFEISkim(BaseSkim):
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)
         ma.fillParticleList(decayString="gamma:FEI_cleaned",
-                            cut=CleanedClusterCuts, path=path, loadPhotonBeamBackgroundMVA=False)
+                            cut=CleanedClusterCuts, path=path)
 
         ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
                                                 "gamma:FEI_cleaned"],
@@ -156,7 +154,6 @@ class BaseFEISkim(BaseSkim):
                 f"nCleanedTracks({CleanedTrackCuts})>=3",
                 f"nCleanedECLClusters({CleanedClusterCuts})>=3",
                 "visibleEnergyOfEventCMS>4",
-                "2<E_ECL_FEI<7",
             ]
         )
 

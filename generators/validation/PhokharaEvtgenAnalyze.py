@@ -5,7 +5,7 @@
 <header>
     <input>PhokharaEvtgenData.root</input>
     <output>PhokharaEvtgenAnalysis.root</output>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Analysis of e+ e- -> J/psi eta_c events.</description>
 </header>
 """

@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include "tracking/vxdCaTracking/ThreeHitFilters.h"
 
 
 
 namespace Belle2 {
 
-  /** The class 'FourHitFilters' bundles filter methods using 4 hits which are stored in TVector3s. */
+  /** The class 'FourHitFilters' bundles filter methods using 4 hits which are stored in B2Vector3Ds. */
   class FourHitFilters {
 
   public:
@@ -26,8 +26,8 @@ namespace Belle2 {
       m_radiusBCD(0.),
       m_circleCalculated(false) {}
 
-    /** Constructor. expects 4 hits in TVector3 format, first parameter is outer hit, second is outerCenter hit, third is innercenter hit, last one is the innermost hit, optional parameter sets strength of magnetic field (standard is 1.5T)*/
-    FourHitFilters(const TVector3& outer, const TVector3& outerCenter, const TVector3& innerCenter, const TVector3& inner,
+    /** Constructor. expects 4 hits in B2Vector3D format, first parameter is outer hit, second is outerCenter hit, third is innercenter hit, last one is the innermost hit, optional parameter sets strength of magnetic field (standard is 1.5T)*/
+    FourHitFilters(const B2Vector3D& outer, const B2Vector3D& outerCenter, const B2Vector3D& innerCenter, const B2Vector3D& inner,
                    const double magneticFieldStrength = 1.5):
       m_hitA(outer),
       m_hitB(outerCenter),
@@ -42,7 +42,7 @@ namespace Belle2 {
     ~FourHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(const TVector3& outer, const TVector3& outerCenter, const TVector3& innerCenter, const TVector3& inner)
+    void resetValues(const B2Vector3D& outer, const B2Vector3D& outerCenter, const B2Vector3D& innerCenter, const B2Vector3D& inner)
     {
       m_hitA = outer;
       m_hitB = outerCenter;
@@ -84,12 +84,12 @@ namespace Belle2 {
       m_circleCalculated = true;
     }
 
-    TVector3 m_hitA; /**< outer hit (position relevant for useful filter calculation) used for the filter calculation */
-    TVector3 m_hitB; /**< outerCenter hit (position relevant for useful filter calculation) used for the filter calculation */
-    TVector3 m_hitC; /**< innerCenter hit (position relevant for useful filter calculation) used for the filter calculation */
-    TVector3 m_hitD;  /**< inner hit (position relevant for useful filter calculation) used for the filter calculation */
-    TVector3 m_centerABC;  /**< estimation of a circleCenterPosition using hits A, B & C */
-    TVector3 m_centerBCD; /**< estimation of a circleCenterPosition using hitsBA, C & D */
+    B2Vector3D m_hitA; /**< outer hit (position relevant for useful filter calculation) used for the filter calculation */
+    B2Vector3D m_hitB; /**< outerCenter hit (position relevant for useful filter calculation) used for the filter calculation */
+    B2Vector3D m_hitC; /**< innerCenter hit (position relevant for useful filter calculation) used for the filter calculation */
+    B2Vector3D m_hitD;  /**< inner hit (position relevant for useful filter calculation) used for the filter calculation */
+    B2Vector3D m_centerABC;  /**< estimation of a circleCenterPosition using hits A, B & C */
+    B2Vector3D m_centerBCD; /**< estimation of a circleCenterPosition using hitsBA, C & D */
     double m_radiusABC; /**< estimation of the radius of the circle using hits A, B & C */
     double m_radiusBCD; /**< estimation of a radius of the circle using hitsBA, C & D */
     ThreeHitFilters m_threeHitFilter;  /**< instance of ThreeHitFilters-class used for some internal calculations */

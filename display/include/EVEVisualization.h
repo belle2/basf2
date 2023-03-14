@@ -18,9 +18,8 @@
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -149,14 +148,16 @@ namespace Belle2 {
     /** Add a SVDSimHit. */
     void addSimHit(const SVDSimHit* hit, const MCParticle* particle);
 
-    /** Add a BKLMSimHit. */
-    void addSimHit(const BKLMSimHit* hit, const MCParticle* particle);
-
-    /** Add a EKLMSimHit. */
-    void addSimHit(const EKLMSimHit* hit, const MCParticle* particle);
+    /** Add a KLMSimHit. */
+    void addSimHit(const KLMSimHit* hit, const MCParticle* particle);
 
     /** Add simhit as a simple point. */
     void addSimHit(const TVector3& v, const MCParticle* particle);
+    /** Add simhit as a simple point. */
+    inline void addSimHit(const ROOT::Math::XYZVector& v, const MCParticle* particle)
+    {
+      addSimHit(TVector3(v.X(), v.Y(), v.Z()), particle);
+    }
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet.
      *
@@ -289,9 +290,9 @@ namespace Belle2 {
     {
       static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-      const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+      const ROOT::Math::XYZVector local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
       const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
-      const TVector3 global_pos = sensor.pointToGlobal(local_pos);
+      const ROOT::Math::XYZVector global_pos = sensor.pointToGlobal(local_pos);
       lines->AddMarker(global_pos.X(), global_pos.Y(), global_pos.Z());
 
       m_shownRecohits.insert(hit);

@@ -5,11 +5,13 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef CLAW_SENSITIVEDETECTOR_H
-#define CLAW_SENSITIVEDETECTOR_H
+
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <G4EmSaturation.hh>
+
+#include <TVector3.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the CLAW detector */
@@ -78,5 +80,3 @@ namespace Belle2 {
 
   } //claw namespace
 } //Belle2 namespace
-
-#endif

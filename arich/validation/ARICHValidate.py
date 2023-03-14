@@ -21,7 +21,8 @@ validation plots.
 import basf2 as b2
 from optparse import OptionParser
 from simulation import add_simulation
-from reconstruction import add_mc_reconstruction
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
 
 # Options from command line
 parser = OptionParser()
@@ -68,7 +69,6 @@ particlegun.param('yVertexParams', [0.0, 0.0])
 particlegun.param('zVertexParams', [0.0, 0.0])
 particlegun.param('independentVertices', False)
 # Print the parameters of the particle gun
-b2.print_params(particlegun)
 main.add_module(particlegun)
 
 # Add simulation
@@ -77,7 +77,15 @@ add_simulation(main)
 # add_simulation(main, components, bkgfiles=glob.glob('/sw/belle2/bkg/ARICH*.root'))
 
 # Add reconstruction
-add_mc_reconstruction(main)
+add_pxd_reconstruction(main)
+add_svd_reconstruction(main)
+main.add_module('SetupGenfitExtrapolation')
+main.add_module('TrackFinderMCTruthRecoTracks', RecoTracksStoreArrayName='RecoTracks',
+                UseSecondCDCHits=False, UsePXDHits=True, UseSVDHits=True, UseCDCHits=True)
+main.add_module('TrackCreator', recoTrackColName='RecoTracks',  pdgCodes=[211, 321, 2212])
+main.add_module('Ext')
+main.add_module('ARICHFillHits')
+main.add_module('ARICHReconstructor', storePhotons=1)
 
 # Add module fpr ARICH efficiency analysis
 arichEfficiency = b2.register_module('ARICHNtuple')

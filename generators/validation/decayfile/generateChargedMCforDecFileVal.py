@@ -18,27 +18,22 @@
 
 import basf2 as b2
 import generators as ge
-import simulation as si
-import reconstruction as re
+
+b2.set_random_seed('charged')
 
 # create path
 main = b2.create_path()
 
-# default to early phase 3 (exp=1003), run 0, number of events = 2000
-main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=2000)
+# default to early phase 3 (exp=1003), run 0, number of events = 100000
+main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=100000)
 
 # generate BBbar events
 ge.add_evtgen_generator(path=main, finalstate='charged')
 
-# detector simulation
-si.add_simulation(path=main)
-
-# reconstruction
-re.add_reconstruction(path=main, reconstruct_cdst='rawFormat')
-
 # finally add cdst output
 main.add_module('RootOutput', outputFileName='../charged.cdst.root')
 
+main.add_module('Progress')
 # process events and print call statistics
 b2.process(path=main)
 print(b2.statistics)

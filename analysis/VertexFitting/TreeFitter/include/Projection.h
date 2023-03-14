@@ -50,7 +50,7 @@ namespace TreeFitter {
     void resetProjection();
 
     /**  get offset (for mergedcosntraints)*/
-    unsigned int getOffset() { return m_offset; }
+    unsigned int getOffset() const { return m_offset; }
 
     /** increment offset */
     void incrementOffset(unsigned int i) { m_offset += i; }

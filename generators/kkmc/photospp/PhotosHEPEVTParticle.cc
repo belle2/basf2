@@ -330,7 +330,7 @@ namespace Photospp {
     Log::Warning() << "PhotosParticle::createHistoryEntry() not implemented for HEPEVT." << endl;
   }
 
-  void PhotosHEPEVTParticle::createSelfDecayVertex(PhotosParticle* out)
+  void PhotosHEPEVTParticle::createSelfDecayVertex([[maybe_unused]] PhotosParticle* out)
   {
     Log::Warning() << "PhotosHEPEVTParticle::createSelfDecayVertex() not implemented for HEPEVT." << endl;
   }

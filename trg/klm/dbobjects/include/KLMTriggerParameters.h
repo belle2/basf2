@@ -8,7 +8,7 @@
 
 #pragma once
 
-/** Belle2 headers. */
+/** Basf2 headers. */
 #include <framework/logging/Logger.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 

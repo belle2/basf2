@@ -17,6 +17,7 @@
 #include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/dataobjects/Helix.h>
 
 #include <TRandom.h>
@@ -120,6 +121,14 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "\"is:X\" where X is a PDG code: particle must have this code. "
            "\"from:X\" any of the particles's ancestors must have this (X) code",
            std::vector<std::string>(1, "primary"));
+  addParam("onlyCheckDirectParentPdgCode",
+           m_onlyCheckDirectParentPdgCode,
+           "To be used together with WhichParticles to select the ancestor and daughters. "
+           "If true, only check the direct parent to be contained in the list of possible ancestors. "
+           "If false, check all ancestors in in the list of possible ancestors. "
+           "This could be used to e.g. only create MCRecoTracks for slow pions from D* decays instead of creating an MCRecoTrack "
+           "for every pion as long as the D* is one of its ancestors.",
+           m_onlyCheckDirectParentPdgCode);
 
   addParam("EnergyCut",
            m_energyCut,
@@ -133,7 +142,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 
   addParam("MergeDecayInFlight",
            m_mergeDecayInFlight,
-           "Merge decay in flights that produce a single charged particle to the mother particle",
+           "Merge decay in flights that produce a single charged particle to the parent particle",
            bool(false));
 
   addParam("SetTimeSeed",
@@ -391,7 +400,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     MCParticle* aMcParticlePtr = m_MCParticles[iPart];
     // Ignore particles that didn't propagate significantly, they cannot make tracks.
-    if ((aMcParticlePtr->getDecayVertex() - B2Vector3D(aMcParticlePtr->getProductionVertex())).Mag() < 1 * Unit::cm) {
+    if ((aMcParticlePtr->getDecayVertex() - aMcParticlePtr->getProductionVertex()).R() < 1 * Unit::cm) {
       B2DEBUG(20, "Particle that did not propagate significantly cannot make track.");
       continue;
     }
@@ -455,21 +464,31 @@ void TrackFinderMCTruthRecoTracksModule::event()
     //check if particle has an ancestor selected by the user. If user did not set any pdg code every code is fine for track candidate creation
     const int nFromPdgCodes = m_fromPdgCodes.size();
     if (nFromPdgCodes not_eq 0) {
-      MCParticle* currentMother = aMcParticlePtr->getMother();
+      MCParticle* currentParent = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
-      while (currentMother not_eq nullptr) {
-        int currentMotherPdgCode = currentMother->getPDG();
+      bool foundParent = false;
+      while (currentParent not_eq nullptr) {
+        int currentParentPdgCode = currentParent->getPDG();
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
-          if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
+          if (m_fromPdgCodes[i] not_eq currentParentPdgCode) {
             ++nFalsePdgCodes;
+          } else {
+            foundParent = true;
+            // if (m_onlyCheckDirectParentPdgCode) {
+            //   break;
+            // }
           }
         }
 
-        currentMother = currentMother->getMother();
-        ++nAncestor;
+        if (m_onlyCheckDirectParentPdgCode) {
+          currentParent = nullptr;
+        } else {
+          currentParent = currentParent->getMother();
+          ++nAncestor;
+        }
       }
-      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes)) {
+      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes) or not(m_onlyCheckDirectParentPdgCode and foundParent)) {
         B2DEBUG(20, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
         continue; //goto next mcParticle, do not make track candidate
       }
@@ -813,13 +832,13 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
 
     //set track parameters from MCParticle information
-    B2Vector3D positionTrue = aMcParticlePtr->getProductionVertex();
-    TVector3 momentumTrue = aMcParticlePtr->getMomentum();
+    ROOT::Math::XYZVector positionTrue = aMcParticlePtr->getProductionVertex();
+    ROOT::Math::XYZVector momentumTrue = aMcParticlePtr->getMomentum();
     double timeTrue = aMcParticlePtr->getProductionTime();
 
     // if no kind of smearing is activated the initial values (seeds) for track fit will be the simulated truth
-    TVector3 momentum = momentumTrue;
-    TVector3 position = positionTrue;
+    ROOT::Math::XYZVector momentum = momentumTrue;
+    ROOT::Math::XYZVector position = positionTrue;
     double time = timeTrue;
     TVectorD stateSeed(6); //this will
     TMatrixDSym covSeed(6);
@@ -871,7 +890,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
         time = std::get<0>(hitInformationVector.at(0));
         const double deltaT = time - aMcParticlePtr->getProductionTime();
         const double energy = sqrt(momentum.Mag2() + aMcParticlePtr->get4Vector().M() * aMcParticlePtr->get4Vector().M());
-        const double beta_xy = momentum.Perp() / energy;
+        const double beta_xy = momentum.Rho() / energy;
         // calculate arclength in 2D of the track
         const double arclength2D = beta_xy * Const::speedOfLight * deltaT;
 
@@ -882,7 +901,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
 
 
-      RecoTrack* newRecoTrack = m_RecoTracks.appendNew(position, momentum, charge);
+      RecoTrack* newRecoTrack = m_RecoTracks.appendNew(B2Vector3D(position), B2Vector3D(momentum), charge);
       if (m_setTimeSeed) {
         newRecoTrack->setTimeSeed(time);
       }
@@ -905,9 +924,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
 
           //now determine the correct sign to resolve the left right ambiguity in the fitter
-          TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
-          TVector3 simMom = aCDCSimHitPtr->getMomentum();
-          TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
+          ROOT::Math::XYZVector simHitPos = aCDCSimHitPtr->getPosTrack();
+          ROOT::Math::XYZVector simMom = aCDCSimHitPtr->getMomentum();
+          ROOT::Math::XYZVector simHitPosOnWire = aCDCSimHitPtr->getPosWire();
 
           CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
           const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);
@@ -960,7 +979,7 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
   // for particles produced at times t' > t0
   const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
   const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
-  const float absMom3D = mcParticle->getMomentum().Mag();
+  const float absMom3D = mcParticle->getMomentum().R();
 
   const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
   const double loopTOF =  loopLength / speed;

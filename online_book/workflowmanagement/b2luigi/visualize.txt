@@ -1,0 +1,8 @@
+tmux #open a new tmux session
+source /cvmfs/belle.cern.ch/tools/b2setup <release> #setup basf2
+~/.local/bin/luigid --port <ssh port> #start the luigi scheduler
+Ctrl + b + d #detach the tmux session
+
+source /cvmfs/belle.cern.ch/tools/b2setup <release> #setup basf2
+python3 main.py --batch --scheduler-host localhost --scheduler-port <ssh port> #start workflow
+firefox localhost:<ssh port> #view scheduler on your local machine

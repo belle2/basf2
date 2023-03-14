@@ -15,10 +15,7 @@
 #include <genfit/FitStatus.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <framework/gearbox/Const.h>
-#include <root/TVector3.h>
-#include <limits>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
@@ -100,7 +97,7 @@ namespace Belle2 {
               m_variables.at(m_prefix + "px_variance") = cov6(3, 3);
               m_variables.at(m_prefix + "pz_estimate") = mom.Z();
               m_variables.at(m_prefix + "p_value") = trackFitResult->getPValue();
-              m_variables.at(m_prefix + "pt_estimate") = mom.Perp();
+              m_variables.at(m_prefix + "pt_estimate") = mom.Rho();
               m_variables.at(m_prefix + "y_estimate") = pos.Y();
               m_variables.at(m_prefix + "d0_estimate") = trackFitResult->getD0();
               m_variables.at(m_prefix + "x_estimate") = pos.X();
@@ -111,7 +108,7 @@ namespace Belle2 {
               m_variables.at(m_prefix + "z_variance") = cov6(2, 2);
               m_variables.at(m_prefix + "omega_estimate") = trackFitResult->getOmega();
               m_variables.at(m_prefix + "quality_flip_indicator") = recoTrack.getFlipQualityIndicator();
-              float pt_estimate = mom.Perp();
+              float pt_estimate = mom.Rho();
               float pt_variance = (pow(mom.X(), 2) * cov6(3, 3) + pow(mom.Y(), 2) * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3,
                                    4)) / mom.Perp2();
               float pt_resolution = pt_variance / pt_estimate;

@@ -1,5 +1,5 @@
 Systematics skims
-~~~~~~~~~~~~~~~~~
+=================
 
 .. automodule:: skim.WGs.systematics
     :members:

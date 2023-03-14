@@ -512,7 +512,7 @@ void EffPlotsModule::beginRun()
 void EffPlotsModule::event()
 {
 
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
+  ROOT::Math::XYZVector magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(29, "+++++ 1. loop on MCParticles");
   for (const MCParticle& mcParticle : m_MCParticles) {
@@ -555,75 +555,75 @@ void EffPlotsModule::event()
     MCParticleInfo mcParticleInfo_dau0(*m_MCDaughter0, magField);
     MCParticleInfo mcParticleInfo_dau1(*m_MCDaughter1, magField);
 
-    const TVector3& MC_vtx = mcParticle.getDecayVertex();
+    const ROOT::Math::XYZVector& MC_vtx = mcParticle.getDecayVertex();
 
     float MC_transDist = sqrt(MC_vtx.X() * MC_vtx.X() + MC_vtx.Y() * MC_vtx.Y());
-    float MC_pt = mcParticle.getMomentum().Pt();
-    float MC_p = mcParticle.getMomentum().Mag();
+    float MC_pt = mcParticle.getMomentum().Rho();
+    float MC_p = mcParticle.getMomentum().R();
     float MC_phi = mcParticle.getMomentum().Phi();
     float MC_theta = mcParticle.getMomentum().Theta();
-    float MC_costheta = mcParticle.getMomentum().CosTheta();
+    float MC_costheta = cos(mcParticle.getMomentum().Theta());
 
     m_h1_MC_dau0_d0->Fill(mcParticleInfo_dau0.getD0());
     m_h1_MC_dau0_z0->Fill(mcParticleInfo_dau0.getZ0());
     m_h1_MC_dau0_RMother->Fill(MC_transDist);
-    m_h3_MC_dau0->Fill(m_MCDaughter0->getMomentum().Pt(), m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Phi());
-    m_h1_MC_dau0_pt->Fill(m_MCDaughter0->getMomentum().Pt());
-    m_h1_MC_dau0_pz->Fill(m_MCDaughter0->getMomentum().Pz());
-    m_h1_MC_dau0_p->Fill(m_MCDaughter0->getMomentum().Mag());
+    m_h3_MC_dau0->Fill(m_MCDaughter0->getMomentum().Rho(), m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Phi());
+    m_h1_MC_dau0_pt->Fill(m_MCDaughter0->getMomentum().Rho());
+    m_h1_MC_dau0_pz->Fill(m_MCDaughter0->getMomentum().z());
+    m_h1_MC_dau0_p->Fill(m_MCDaughter0->getMomentum().R());
     m_h1_MC_dau0_phi->Fill(m_MCDaughter0->getMomentum().Phi());
     m_h1_MC_dau0_theta->Fill(m_MCDaughter0->getMomentum().Theta());
-    m_h1_MC_dau0_costheta->Fill(m_MCDaughter0->getMomentum().CosTheta());
-    m_h1_MC_dau0_Mother_cosAngle->Fill(mcParticle.getMomentum() * m_MCDaughter0->getMomentum() / mcParticle.getMomentum().Mag() /
-                                       m_MCDaughter0->getMomentum().Mag());
+    m_h1_MC_dau0_costheta->Fill(cos(m_MCDaughter0->getMomentum().Theta()));
+    m_h1_MC_dau0_Mother_cosAngle->Fill(mcParticle.getMomentum().Dot(m_MCDaughter0->getMomentum()) / mcParticle.getMomentum().R() /
+                                       m_MCDaughter0->getMomentum().R());
 
     m_h1_MC_dau0_thetaMother->Fill(MC_theta);
     m_h1_MC_dau0_ptMother->Fill(MC_pt);
 
     m_h1_MC_dau0_phiMother_total->Fill(MC_phi);
-    m_h2_MC_dau0_2D->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Pt());
+    m_h2_MC_dau0_2D->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Rho());
     m_h2_MC_dau0_2DMother->Fill(MC_theta, MC_pt);
-    m_h2_MC_dau0_pVScostheta->Fill(m_MCDaughter0->getMomentum().CosTheta(), m_MCDaughter0->getMomentum().Mag());
+    m_h2_MC_dau0_pVScostheta->Fill(cos(m_MCDaughter0->getMomentum().Theta()), m_MCDaughter0->getMomentum().R());
     m_h1_MC_dau0_PDG->Fill(m_MCDaughter0->getPDG());
 
     m_h1_MC_dau1_d0->Fill(mcParticleInfo_dau1.getD0());
     m_h1_MC_dau1_z0->Fill(mcParticleInfo_dau1.getZ0());
     m_h1_MC_dau1_RMother->Fill(MC_transDist);
-    m_h3_MC_dau1->Fill(m_MCDaughter1->getMomentum().Pt(), m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Phi());
-    m_h1_MC_dau1_pt->Fill(m_MCDaughter1->getMomentum().Pt());
-    m_h1_MC_dau1_pz->Fill(m_MCDaughter1->getMomentum().Pz());
-    m_h1_MC_dau1_p->Fill(m_MCDaughter1->getMomentum().Mag());
+    m_h3_MC_dau1->Fill(m_MCDaughter1->getMomentum().Rho(), m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Phi());
+    m_h1_MC_dau1_pt->Fill(m_MCDaughter1->getMomentum().Rho());
+    m_h1_MC_dau1_pz->Fill(m_MCDaughter1->getMomentum().z());
+    m_h1_MC_dau1_p->Fill(m_MCDaughter1->getMomentum().R());
     m_h1_MC_dau1_phi->Fill(m_MCDaughter1->getMomentum().Phi());
     m_h1_MC_dau1_theta->Fill(m_MCDaughter1->getMomentum().Theta());
-    m_h1_MC_dau1_costheta->Fill(m_MCDaughter1->getMomentum().CosTheta());
-    m_h1_MC_dau1_Mother_cosAngle->Fill(mcParticle.getMomentum() * m_MCDaughter1->getMomentum() / mcParticle.getMomentum().Mag() /
-                                       m_MCDaughter1->getMomentum().Mag());
+    m_h1_MC_dau1_costheta->Fill(cos(m_MCDaughter1->getMomentum().Theta()));
+    m_h1_MC_dau1_Mother_cosAngle->Fill(mcParticle.getMomentum().Dot(m_MCDaughter1->getMomentum()) / mcParticle.getMomentum().R() /
+                                       m_MCDaughter1->getMomentum().R());
 
     m_h1_MC_dau1_thetaMother->Fill(MC_theta);
     m_h1_MC_dau1_ptMother->Fill(MC_pt);
 
     m_h1_MC_dau1_phiMother_total->Fill(MC_phi);
-    m_h2_MC_dau1_2D->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Pt());
+    m_h2_MC_dau1_2D->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Rho());
     m_h2_MC_dau1_2DMother->Fill(MC_theta, MC_pt);
-    m_h2_MC_dau1_pVScostheta->Fill(m_MCDaughter1->getMomentum().CosTheta(), m_MCDaughter1->getMomentum().Mag());
+    m_h2_MC_dau1_pVScostheta->Fill(cos(m_MCDaughter1->getMomentum().Theta()), m_MCDaughter1->getMomentum().R());
     m_h1_MC_dau1_PDG->Fill(m_MCDaughter1->getPDG());
 
     m_h1_MC_Mother_RMother->Fill(MC_transDist);
     m_h3_MC_Mother->Fill(MC_pt, MC_theta, MC_phi);
     m_h1_MC_Mother_pt->Fill(MC_pt);
-    m_h1_MC_Mother_pz->Fill(mcParticle.getMomentum().Pz());
-    m_h1_MC_Mother_p->Fill(mcParticle.getMomentum().Mag());
+    m_h1_MC_Mother_pz->Fill(mcParticle.getMomentum().z());
+    m_h1_MC_Mother_p->Fill(mcParticle.getMomentum().R());
     m_h1_MC_Mother_phi->Fill(MC_phi);
     m_h1_MC_Mother_theta->Fill(MC_theta);
-    m_h1_MC_Mother_costheta->Fill(mcParticle.getMomentum().CosTheta());
+    m_h1_MC_Mother_costheta->Fill(cos(mcParticle.getMomentum().Theta()));
     m_h2_MC_Mother_2D->Fill(MC_theta, MC_pt);
     m_h2_MC_Mother_pVScostheta->Fill(MC_costheta, MC_p);
     m_h1_MC_Mother_PDG->Fill(mcParticle.getPDG());
 
     //beam pipe
     if (MC_transDist < 1.) {
-      m_h2_MC_dau0_2D_BP->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Pt());
-      m_h2_MC_dau1_2D_BP->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Pt());
+      m_h2_MC_dau0_2D_BP->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Rho());
+      m_h2_MC_dau1_2D_BP->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Rho());
       m_h2_MC_Mother_2D_BP->Fill(MC_theta, MC_pt);
     }
 
@@ -662,27 +662,28 @@ void EffPlotsModule::event()
       m_h1_RecoTrack_dau0_d0->Fill(mcParticleInfo_dau0.getD0());
       m_h1_RecoTrack_dau0_z0->Fill(mcParticleInfo_dau0.getZ0());
       m_h1_RecoTrack_dau0_RMother->Fill(MC_transDist);
-      m_h3_RecoTrack_dau0->Fill(m_MCDaughter0->getMomentum().Pt(), m_MCDaughter0->getMomentum().Theta(),
+      m_h3_RecoTrack_dau0->Fill(m_MCDaughter0->getMomentum().Rho(), m_MCDaughter0->getMomentum().Theta(),
                                 m_MCDaughter0->getMomentum().Phi());
-      m_h1_RecoTrack_dau0_pt->Fill(m_MCDaughter0->getMomentum().Pt());
-      m_h1_RecoTrack_dau0_pz->Fill(m_MCDaughter0->getMomentum().Pz());
-      m_h1_RecoTrack_dau0_p->Fill(m_MCDaughter0->getMomentum().Mag());
+      m_h1_RecoTrack_dau0_pt->Fill(m_MCDaughter0->getMomentum().Rho());
+      m_h1_RecoTrack_dau0_pz->Fill(m_MCDaughter0->getMomentum().z());
+      m_h1_RecoTrack_dau0_p->Fill(m_MCDaughter0->getMomentum().R());
       m_h1_RecoTrack_dau0_phi->Fill(m_MCDaughter0->getMomentum().Phi());
       m_h1_RecoTrack_dau0_theta->Fill(m_MCDaughter0->getMomentum().Theta());
-      m_h1_RecoTrack_dau0_costheta->Fill(m_MCDaughter0->getMomentum().CosTheta());
-      m_h1_RecoTrack_dau0_Mother_cosAngle->Fill(mcParticle.getMomentum() * m_MCDaughter0->getMomentum() / mcParticle.getMomentum().Mag() /
-                                                m_MCDaughter0->getMomentum().Mag());
+      m_h1_RecoTrack_dau0_costheta->Fill(cos(m_MCDaughter0->getMomentum().Theta()));
+      m_h1_RecoTrack_dau0_Mother_cosAngle->Fill(mcParticle.getMomentum().Dot(m_MCDaughter0->getMomentum()) /
+                                                mcParticle.getMomentum().R() /
+                                                m_MCDaughter0->getMomentum().R());
 
       m_h1_RecoTrack_dau0_thetaMother->Fill(MC_theta);
       m_h1_RecoTrack_dau0_ptMother->Fill(MC_pt);
 
       m_h1_RecoTrack_dau0_phiMother_total->Fill(MC_phi);
-      m_h2_RecoTrack_dau0_2D->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Pt());
+      m_h2_RecoTrack_dau0_2D->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Rho());
       m_h2_RecoTrack_dau0_2DMother->Fill(MC_theta, MC_pt);
-      m_h2_RecoTrack_dau0_pVScostheta->Fill(m_MCDaughter0->getMomentum().CosTheta(), m_MCDaughter0->getMomentum().Mag());
+      m_h2_RecoTrack_dau0_pVScostheta->Fill(cos(m_MCDaughter0->getMomentum().Theta()), m_MCDaughter0->getMomentum().R());
 
       if (MC_transDist < 1.) {
-        m_h2_RecoTrack_dau0_2D_BP->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Pt());
+        m_h2_RecoTrack_dau0_2D_BP->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Rho());
       }
 
       if (m_MCDaughter0->getMomentum().Theta() > (120 * TMath::Pi() / 180.)) m_h1_RecoTrack_dau0_phi_BW->Fill(
@@ -700,11 +701,11 @@ void EffPlotsModule::event()
         m_h1_RecoTrack_Mother_RMother->Fill(MC_transDist);
         m_h3_RecoTrack_Mother->Fill(MC_pt, MC_theta, MC_phi);
         m_h1_RecoTrack_Mother_pt->Fill(MC_pt);
-        m_h1_RecoTrack_Mother_pz->Fill(mcParticle.getMomentum().Pz());
-        m_h1_RecoTrack_Mother_p->Fill(mcParticle.getMomentum().Mag());
+        m_h1_RecoTrack_Mother_pz->Fill(mcParticle.getMomentum().z());
+        m_h1_RecoTrack_Mother_p->Fill(mcParticle.getMomentum().R());
         m_h1_RecoTrack_Mother_phi->Fill(MC_phi);
         m_h1_RecoTrack_Mother_theta->Fill(MC_theta);
-        m_h1_RecoTrack_Mother_costheta->Fill(mcParticle.getMomentum().CosTheta());
+        m_h1_RecoTrack_Mother_costheta->Fill(cos(mcParticle.getMomentum().Theta()));
 
         m_h1_RecoTrack_Mother_pt->Fill(MC_pt);
         m_h2_RecoTrack_Mother_2D->Fill(MC_theta, MC_pt);
@@ -726,27 +727,28 @@ void EffPlotsModule::event()
       m_h1_RecoTrack_dau1_d0->Fill(mcParticleInfo_dau1.getD0());
       m_h1_RecoTrack_dau1_z0->Fill(mcParticleInfo_dau1.getZ0());
       m_h1_RecoTrack_dau1_RMother->Fill(MC_transDist);
-      m_h3_RecoTrack_dau1->Fill(m_MCDaughter1->getMomentum().Pt(), m_MCDaughter1->getMomentum().Theta(),
+      m_h3_RecoTrack_dau1->Fill(m_MCDaughter1->getMomentum().Rho(), m_MCDaughter1->getMomentum().Theta(),
                                 m_MCDaughter1->getMomentum().Phi());
-      m_h1_RecoTrack_dau1_pt->Fill(m_MCDaughter1->getMomentum().Pt());
-      m_h1_RecoTrack_dau1_pz->Fill(m_MCDaughter1->getMomentum().Pz());
-      m_h1_RecoTrack_dau1_p->Fill(m_MCDaughter1->getMomentum().Mag());
+      m_h1_RecoTrack_dau1_pt->Fill(m_MCDaughter1->getMomentum().Rho());
+      m_h1_RecoTrack_dau1_pz->Fill(m_MCDaughter1->getMomentum().z());
+      m_h1_RecoTrack_dau1_p->Fill(m_MCDaughter1->getMomentum().R());
       m_h1_RecoTrack_dau1_phi->Fill(m_MCDaughter1->getMomentum().Phi());
       m_h1_RecoTrack_dau1_theta->Fill(m_MCDaughter1->getMomentum().Theta());
-      m_h1_RecoTrack_dau1_costheta->Fill(m_MCDaughter1->getMomentum().CosTheta());
-      m_h1_RecoTrack_dau1_Mother_cosAngle->Fill(mcParticle.getMomentum() * m_MCDaughter1->getMomentum() / mcParticle.getMomentum().Mag() /
-                                                m_MCDaughter1->getMomentum().Mag());
+      m_h1_RecoTrack_dau1_costheta->Fill(cos(m_MCDaughter1->getMomentum().Theta()));
+      m_h1_RecoTrack_dau1_Mother_cosAngle->Fill(mcParticle.getMomentum().Dot(m_MCDaughter1->getMomentum()) /
+                                                mcParticle.getMomentum().R() /
+                                                m_MCDaughter1->getMomentum().R());
 
       m_h1_RecoTrack_dau1_thetaMother->Fill(MC_theta);
       m_h1_RecoTrack_dau1_ptMother->Fill(MC_pt);
 
       m_h1_RecoTrack_dau1_phiMother_total->Fill(MC_phi);
-      m_h2_RecoTrack_dau1_2D->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Pt());
+      m_h2_RecoTrack_dau1_2D->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Rho());
       m_h2_RecoTrack_dau1_2DMother->Fill(MC_theta, MC_pt);
-      m_h2_RecoTrack_dau1_pVScostheta->Fill(m_MCDaughter1->getMomentum().CosTheta(), m_MCDaughter1->getMomentum().Mag());
+      m_h2_RecoTrack_dau1_pVScostheta->Fill(cos(m_MCDaughter1->getMomentum().Theta()), m_MCDaughter1->getMomentum().R());
 
       if (MC_transDist < 1.) {
-        m_h2_RecoTrack_dau1_2D_BP->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Pt());
+        m_h2_RecoTrack_dau1_2D_BP->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Rho());
 
         if (m_MCDaughter1->getMomentum().Theta() > (120 * TMath::Pi() / 180.)) m_h1_RecoTrack_dau1_phi_BW->Fill(
             m_MCDaughter1->getMomentum().Phi());
@@ -771,27 +773,27 @@ void EffPlotsModule::event()
       m_h1_track_dau0_d0->Fill(mcParticleInfo_dau0.getD0());
       m_h1_track_dau0_z0->Fill(mcParticleInfo_dau0.getZ0());
       m_h1_track_dau0_RMother->Fill(MC_transDist);
-      m_h3_track_dau0->Fill(m_MCDaughter0->getMomentum().Pt(), m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Phi());
-      m_h1_track_dau0_pt->Fill(m_MCDaughter0->getMomentum().Pt());
-      m_h1_track_dau0_pz->Fill(m_MCDaughter0->getMomentum().Pz());
-      m_h1_track_dau0_p->Fill(m_MCDaughter0->getMomentum().Mag());
+      m_h3_track_dau0->Fill(m_MCDaughter0->getMomentum().Rho(), m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Phi());
+      m_h1_track_dau0_pt->Fill(m_MCDaughter0->getMomentum().Rho());
+      m_h1_track_dau0_pz->Fill(m_MCDaughter0->getMomentum().z());
+      m_h1_track_dau0_p->Fill(m_MCDaughter0->getMomentum().R());
       m_h1_track_dau0_phi->Fill(m_MCDaughter0->getMomentum().Phi());
       m_h1_track_dau0_theta->Fill(m_MCDaughter0->getMomentum().Theta());
-      m_h1_track_dau0_costheta->Fill(m_MCDaughter0->getMomentum().CosTheta());
-      m_h1_track_dau0_Mother_cosAngle->Fill(mcParticle.getMomentum() * m_MCDaughter0->getMomentum() / mcParticle.getMomentum().Mag() /
-                                            m_MCDaughter0->getMomentum().Mag());
+      m_h1_track_dau0_costheta->Fill(cos(m_MCDaughter0->getMomentum().Theta()));
+      m_h1_track_dau0_Mother_cosAngle->Fill(mcParticle.getMomentum().Dot(m_MCDaughter0->getMomentum()) / mcParticle.getMomentum().R() /
+                                            m_MCDaughter0->getMomentum().R());
 
       m_h1_track_dau0_thetaMother->Fill(MC_theta);
       m_h1_track_dau0_ptMother->Fill(MC_pt);
 
       m_h1_track_dau0_phiMother_total->Fill(MC_phi);
 
-      m_h2_track_dau0_2D->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Pt());
+      m_h2_track_dau0_2D->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Rho());
       m_h2_track_dau0_2DMother->Fill(MC_theta, MC_pt);
-      m_h2_track_dau0_pVScostheta->Fill(m_MCDaughter0->getMomentum().CosTheta(), m_MCDaughter0->getMomentum().Mag());
+      m_h2_track_dau0_pVScostheta->Fill(cos(m_MCDaughter0->getMomentum().Theta()), m_MCDaughter0->getMomentum().R());
 
       if (MC_transDist < 1.)
-        m_h2_track_dau0_2D_BP->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Pt());
+        m_h2_track_dau0_2D_BP->Fill(m_MCDaughter0->getMomentum().Theta(), m_MCDaughter0->getMomentum().Rho());
 
       if (MC_theta > (120 * TMath::Pi() / 180.)) { //BW
         m_h1_track_dau0_phiMother_BW->Fill(MC_phi);
@@ -809,27 +811,27 @@ void EffPlotsModule::event()
       m_h1_track_dau1_d0->Fill(mcParticleInfo_dau1.getD0());
       m_h1_track_dau1_z0->Fill(mcParticleInfo_dau1.getZ0());
       m_h1_track_dau1_RMother->Fill(MC_transDist);
-      m_h3_track_dau1->Fill(m_MCDaughter1->getMomentum().Pt(), m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Phi());
-      m_h1_track_dau1_pt->Fill(m_MCDaughter1->getMomentum().Pt());
-      m_h1_track_dau1_pz->Fill(m_MCDaughter1->getMomentum().Pz());
-      m_h1_track_dau1_p->Fill(m_MCDaughter1->getMomentum().Mag());
+      m_h3_track_dau1->Fill(m_MCDaughter1->getMomentum().Rho(), m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Phi());
+      m_h1_track_dau1_pt->Fill(m_MCDaughter1->getMomentum().Rho());
+      m_h1_track_dau1_pz->Fill(m_MCDaughter1->getMomentum().z());
+      m_h1_track_dau1_p->Fill(m_MCDaughter1->getMomentum().R());
       m_h1_track_dau1_phi->Fill(m_MCDaughter1->getMomentum().Phi());
       m_h1_track_dau1_theta->Fill(m_MCDaughter1->getMomentum().Theta());
-      m_h1_track_dau1_costheta->Fill(m_MCDaughter1->getMomentum().CosTheta());
-      m_h1_track_dau1_Mother_cosAngle->Fill(mcParticle.getMomentum() * m_MCDaughter1->getMomentum() / mcParticle.getMomentum().Mag() /
-                                            m_MCDaughter1->getMomentum().Mag());
+      m_h1_track_dau1_costheta->Fill(cos(m_MCDaughter1->getMomentum().Theta()));
+      m_h1_track_dau1_Mother_cosAngle->Fill(mcParticle.getMomentum().Dot(m_MCDaughter1->getMomentum()) / mcParticle.getMomentum().R() /
+                                            m_MCDaughter1->getMomentum().R());
 
       m_h1_track_dau1_thetaMother->Fill(MC_theta);
       m_h1_track_dau1_ptMother->Fill(MC_pt);
 
       m_h1_track_dau1_phiMother_total->Fill(MC_phi);
 
-      m_h2_track_dau1_2D->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Pt());
+      m_h2_track_dau1_2D->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Rho());
       m_h2_track_dau1_2DMother->Fill(MC_theta, MC_pt);
-      m_h2_track_dau1_pVScostheta->Fill(m_MCDaughter1->getMomentum().CosTheta(), m_MCDaughter1->getMomentum().Mag());
+      m_h2_track_dau1_pVScostheta->Fill(cos(m_MCDaughter1->getMomentum().Theta()), m_MCDaughter1->getMomentum().R());
 
       if (MC_transDist < 1.)
-        m_h2_track_dau1_2D_BP->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Pt());
+        m_h2_track_dau1_2D_BP->Fill(m_MCDaughter1->getMomentum().Theta(), m_MCDaughter1->getMomentum().Rho());
 
       if (MC_theta > (120 * TMath::Pi() / 180.)) { //BW
         m_h1_track_dau1_phiMother_BW->Fill(MC_phi);
@@ -864,7 +866,7 @@ void EffPlotsModule::event()
       m_h1_V0_p->Fill(mcParticleInfo.getP());
       m_h1_V0_phi->Fill(mcParticleInfo.getPphi());
       m_h1_V0_theta->Fill(mcParticleInfo.getPtheta());
-      m_h1_V0_costheta->Fill(mcParticle.getMomentum().CosTheta());
+      m_h1_V0_costheta->Fill(cos(mcParticle.getMomentum().Theta()));
       m_h2_V0_Mother_2D->Fill(MC_theta, MC_p);
       m_h2_V0_Mother_pVScostheta->Fill(MC_costheta, MC_p);
 

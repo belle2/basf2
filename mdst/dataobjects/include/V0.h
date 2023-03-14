@@ -77,5 +77,7 @@ namespace Belle2 {
 
     /** Macro for ROOTification. */
     ClassDef(V0, 3);
+
+    friend class FixMergedObjectsModule;
   };
 }

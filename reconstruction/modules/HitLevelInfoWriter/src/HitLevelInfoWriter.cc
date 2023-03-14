@@ -100,7 +100,7 @@ void HitLevelInfoWriterModule::event()
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
+        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
         m_e = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
         m_e1_9 = eclCluster->getE1oE9();
         m_e9_21 = eclCluster->getE9oE21();
@@ -185,7 +185,7 @@ void HitLevelInfoWriterModule::event()
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
+        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
 
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
@@ -220,9 +220,9 @@ void HitLevelInfoWriterModule::terminate()
 void
 HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
 {
-  TVector3 trackMom = fitResult->getMomentum();
-  m_p = trackMom.Mag();
-  m_pt = trackMom.Pt();
+  ROOT::Math::XYZVector trackMom = fitResult->getMomentum();
+  m_p = trackMom.R();
+  m_pt = trackMom.Rho();
   m_phi = trackMom.Phi();
 
   m_theta = trackMom.Theta() * 180. / TMath::Pi(); //in degree
@@ -234,10 +234,10 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
     m_pt *= -1;
   }
 
-  TVector3 trackPos = fitResult->getPosition();
-  m_vx0 = trackPos.x();
-  m_vy0 = trackPos.y();
-  m_vz0 = trackPos.z();
+  ROOT::Math::XYZVector trackPos = fitResult->getPosition();
+  m_vx0 = trackPos.X();
+  m_vy0 = trackPos.Y();
+  m_vz0 = trackPos.Z();
 
   m_d0 = fitResult->getD0();
   m_z0 = fitResult->getZ0();
@@ -249,7 +249,7 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   static DBObjPtr<BeamSpot> beamSpotDB;
   const auto& frame = ReferenceFrame::GetCurrent();
   UncertainHelix helix = fitResult->getUncertainHelix();
-  helix.passiveMoveBy(beamSpotDB->getIPPosition());
+  helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
   m_dr = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Rho();
   m_dphi = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Phi();
   m_dz = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Z();

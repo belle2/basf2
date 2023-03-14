@@ -14,7 +14,7 @@
 import basf2 as b2
 
 from ROOT import Belle2
-from ROOT import TVector3
+from ROOT.Math import XYZVector
 import ROOT
 
 
@@ -33,21 +33,21 @@ class DisplayDataTest(b2.Module):
         displayData.create()
 
         # you can put a label at arbitrary points
-        displayData.obj().addLabel("Origin", TVector3(0, 0, 0))
+        displayData.obj().addLabel("Origin", XYZVector(0, 0, 0))
 
         # or simple points (grouped into sets)
         for i in range(10):
-            displayData.obj().addPoint("set 1", TVector3(15, 15, 10 * i))
+            displayData.obj().addPoint("set 1", XYZVector(15, 15, 10 * i))
         for i in range(10):
-            displayData.obj().addPoint("set 2", TVector3(10 * i, 0, 50))
+            displayData.obj().addPoint("set 2", XYZVector(10 * i, 0, 50))
 
         # you can add arrows
-        pos = TVector3(0, 0, 100)
-        displayData.obj().addArrow("x", pos, pos + TVector3(50, 0, 0))
-        displayData.obj().addArrow("y", pos, pos + TVector3(0, 50, 0))
-        displayData.obj().addArrow("z", pos, pos + TVector3(0, 0, 50))
+        pos = XYZVector(0, 0, 100)
+        displayData.obj().addArrow("x", pos, pos + XYZVector(50, 0, 0))
+        displayData.obj().addArrow("y", pos, pos + XYZVector(0, 50, 0))
+        displayData.obj().addArrow("z", pos, pos + XYZVector(0, 0, 50))
 
-        displayData.obj().addArrow("z=-2m", TVector3(100, 100, -200), TVector3(0, 0, -200), ROOT.kGray)
+        displayData.obj().addArrow("z=-2m", XYZVector(100, 100, -200), XYZVector(0, 0, -200), ROOT.kGray)
 
         # highlight the first MCParticle
         mcparticles = Belle2.PyStoreArray('MCParticles')

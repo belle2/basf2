@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/ROEVariables.h>
 
 #include <analysis/variables/Variables.h>
@@ -1871,7 +1871,7 @@ namespace Belle2 {
         B2Vector3D pB = - roe4vec.Vect();
         pB.SetMag(0.340);
         pB -= rec4vec.Vect();
-        miss4vec.SetPxPyPzE(pB.x(), pB.y(), pB.z(), E_beam_cms - rec4vec.E());
+        miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }
 
       // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event
@@ -2057,29 +2057,33 @@ namespace Belle2 {
                           "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("roeMC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV");
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n", "GeV");
 
     REGISTER_VARIABLE("roeMC_M", ROE_MC_M,
-                      "Returns true invariant mass of unused tracks and clusters in ROE", "GeV/:math:`\\text{c}^2`");
+                      "Returns true invariant mass of unused tracks and clusters in ROE\n\n", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("roeMC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n", "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
-                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
                       "GeV/c");
 
     REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
-                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "rad");
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "rad");
 
     REGISTER_METAVARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
                           "Returns flags corresponding to missing particles on ROE side.", Manager::VariableDataType::c_double);

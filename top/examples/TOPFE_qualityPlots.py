@@ -283,7 +283,12 @@ class WaveformAnalyzer(b2.Module):
 
 
 # Set the log level to show only error and fatal messages
-# set_log_level(LogLevel.ERROR)
+# b2.set_log_level(b2.LogLevel.ERROR)
+
+# Database
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
+
 # Create path
 main = b2.create_path()
 reader = b2.register_module('SeqRootInput')
@@ -295,14 +300,8 @@ main.add_module(reader)
 converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 
-# geometry parameters
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry (only TOP needed)
-geometry = b2.register_module('Geometry')
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
 unpack = b2.register_module('TOPUnpacker')

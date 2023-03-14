@@ -48,8 +48,6 @@ from a different directory.
 import sys
 import os
 import glob
-import pathlib
-import shutil
 import subprocess
 import difflib
 from concurrent.futures import ThreadPoolExecutor
@@ -60,12 +58,12 @@ from nbconvert.preprocessors.execute import CellExecutionError
 import argparse
 import re
 import datetime
+import tempfile
 import timeit
 import xml.etree.cElementTree as ET
 from collections import defaultdict
 from functools import partial
-from basf2 import find_file
-from b2test_utils import is_ci
+from b2test_utils import is_ci, temporary_set_environment
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -127,10 +125,11 @@ def format_output(name, out, err):
     return "".join(output)
 
 
-def report_test_result(result, extra, name, message):
+def report_test_result(result, extra, name, message, time):
     """ print out the result of one test"""
     result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
-    print(f"{extra}finished test {name}\n     -> {result_message}: {message}", flush=True)
+    print(f"{extra}finished test {name}\n     -> {result_message}: {message}\n     -> exec. time: {int(time)}s",
+          flush=True)
 
 
 def run_test(prepare_step, argument):
@@ -191,7 +190,7 @@ def run_test_ipynb(argument):
     time = timeit.default_timer() - time_start
 
     with print_lock:
-        report_test_result(result, extra, name, message)
+        report_test_result(result, extra, name, message, time)
 
     return (result, message, time, extra)
 
@@ -255,7 +254,7 @@ def run_test_py(argument, prepare_step=False):
                 # Format diff of output
                 output_diff = "\n".join(e for e in log_tests if e is not None)
 
-        report_test_result(result, extra, name, message)
+        report_test_result(result, extra, name, message, time)
 
     # we didn't want to print the diff in full but we want to return it if it
     # exists so let's replace the extra
@@ -430,7 +429,7 @@ def executor(options, prepare_step):
                     failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
                                             type="FAILED" if passed is False else "SKIPPED")
                     if output is not None:
-                        failure.text = output
+                        failure.text = re.sub('\033\\[[0-9;]*m', '', output)
 
         tree = ET.ElementTree(root_el)
         tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
@@ -455,19 +454,17 @@ if __name__ == "__main__":
 
     options = get_argument_parser().parse_args()
 
-    # prepare step
-    prepare_path = find_file("prepare_tests", "", silent=True)
-    if prepare_path == "":
-        parent_path = pathlib.Path(find_file('framework')).parent.absolute()
-        prepare_path = os.path.join(parent_path, "prepare_tests")
-        os.mkdir(prepare_path)
-    os.environ["BELLE2_PREPARE_PATH"] = str(prepare_path)
-    exit_code = executor(options, prepare_step=True)
-    if exit_code > 0:
-        shutil.rmtree(prepare_path)
-        sys.exit(exit_code)
+    # create a temporary directory where to store the files created during the prepare step
+    with tempfile.TemporaryDirectory() as prepare_path:
+        os.chmod(prepare_path, 0o744)  # necessary for the buildbot
+        # and temporary set the BELLE2_PREPARE_PATH variable
+        with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
 
-    # test step
-    exit_code = executor(options, prepare_step=False)
-    shutil.rmtree(prepare_path)
-    sys.exit(exit_code)
+            # prepare step
+            exit_code = executor(options, prepare_step=True)
+            if exit_code > 0:  # if everything is fine, do not exit immediately!
+                sys.exit(exit_code)
+
+            # test step
+            exit_code = executor(options, prepare_step=False)
+            sys.exit(exit_code)

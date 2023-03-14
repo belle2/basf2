@@ -7,14 +7,16 @@
  **************************************************************************/
 
 #pragma once
-#ifndef GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H
-#define GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/MultivariateNormalGenerator.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/dataobjects/MCInitialParticles.h>
+
+#include <framework/utilities/ConditionalGaussGenerator.h>
+
+#include <TMatrixDSym.h>
 
 namespace Belle2 {
 
@@ -37,6 +39,9 @@ namespace Belle2 {
     /** Generate a new event */
     MCInitialParticles& generate();
 
+    /** Generate vertex position and possibly update the generator of Lorentz transformation */
+    ROOT::Math::XYZVector getVertexConditional();
+
     /** Update the vertex position:
      *
      * 1. If there is no initial particles object generate a new one with nominal values
@@ -54,7 +59,7 @@ namespace Belle2 {
      * @param force if true the vertex will be regenerated even if vertex smearing
      *              was already applied.
      */
-    TVector3 updateVertex(bool force = false);
+    ROOT::Math::XYZVector updateVertex(bool force = false);
 
     /** Return reference to nominal beam parameters */
     const BeamParameters& getBeamParameters() const { return *m_beamParams; }
@@ -68,6 +73,19 @@ namespace Belle2 {
       m_allowedFlags = allowedFlags | MCInitialParticles::c_generateCMS;
     }
 
+    /** Initialize the conditional generator using HER & LER 4-vectors and HER & LER covariance matrices describing spread */
+    ConditionalGaussGenerator initConditionalGenerator(const ROOT::Math::PxPyPzEVector& pHER,  const ROOT::Math::PxPyPzEVector& pLER,
+                                                       const TMatrixDSym& covHER, const TMatrixDSym& covLER);
+
+    /** Get the CMS energy of collisions */
+    double getNominalEcms()       { return m_beamParams->getMass(); }
+
+    /** Get spread of CMS collision energy calculated from beam parameters */
+    double getNominalEcmsSpread() { return  m_generateLorentzTransformation.getX0spread(); }
+
+    /** Get the generator for the Lorentz transformation */
+    const ConditionalGaussGenerator& getLorentzGenerator() { return m_generateLorentzTransformation; }
+
   private:
 
     /**
@@ -76,12 +94,17 @@ namespace Belle2 {
      */
     MCInitialParticles& generate(int allowedFlags);
 
+    /** adjust smearing covariance matrix based on the generation flags */
+    TMatrixDSym adjustCovMatrix(TMatrixDSym cov) const;
+
+
     /** generate the vertex
      * @param initial nominal vertex position
      * @param cov covariance of the vertex position
      * @param gen multivariate normal generator to be used
      */
-    TVector3 generateVertex(const TVector3& initial, const TMatrixDSym& cov, MultivariateNormalGenerator& gen) const;
+    ROOT::Math::XYZVector generateVertex(const ROOT::Math::XYZVector& initial, const TMatrixDSym& cov,
+                                         MultivariateNormalGenerator& gen) const;
     /** generate 4 vector for one beam
      * @param initial beam
      * @param cov covariance of the beam momentum (E, theta_x, theta_y)
@@ -99,10 +122,13 @@ namespace Belle2 {
     MultivariateNormalGenerator m_generateLER;
     /** Generator for Vertex */
     MultivariateNormalGenerator m_generateVertex;
+
+    /** Generator of the Lorentz transformation */
+    ConditionalGaussGenerator m_generateLorentzTransformation;
+
     /** Allowed generation flags */
     int m_allowedFlags;
   };
 
 
 } //Belle2 namespace
-#endif // GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H

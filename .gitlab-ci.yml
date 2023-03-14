@@ -1,5 +1,5 @@
 stages:
-  - check-librarians
+  - prepare-pipeline
   - build-gcc
   - run-tests
   - build-clang
@@ -9,12 +9,9 @@ variables:
   # GitLab specific variables
   GITLAB_BELLE2_TOOLS_B2SETUP: "/cvmfs/belle.cern.ch/tools/b2setup"
   GITLAB_BELLE2_EXTERNALS_TOPDIR: "/belle2/externals"
+  GITLAB_IS_FIRST_STAGE: "no"
   GITLAB_FORCE_RUNNING_PIPELINE: "no"
-  # basf2/tests specific variables
-  BELLE2_NO_TOOLS_CHECK: "yes"
-  BELLE2_MAX_BUILDS: "NCPUS"
-  SKIP_EXPENSIVE_TESTS: "yes"
-  BELL2_IS_CI: "yes"
+  # The BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
 
 default:
   image: belle2/externals-ubuntu2004:v01-12-01
@@ -32,14 +29,26 @@ default:
       - include/
       - lib/
       - modules/
-      - pipeline.json
+      - target_head_hash.txt
   before_script:
+    # Preliminary operations with Git
+    - git config user.email "something@something.com"
+    - git config user.name "someone"
+    - git config --global --add safe.directory $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
+        if [ "${GITLAB_IS_FIRST_STAGE}" != "yes" ]; then
+            echo "Merging the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} up to commit $(< target_head_hash.txt) into this branch"
+            git fetch --all && git merge $(< target_head_hash.txt) --allow-unrelated-histories --strategy-option ours
+        fi
+      fi
+    # Preliminary operations necessary for basf2
     - unset DISPLAY
     - if [ ! -f .release ]; then echo "head" > .release; fi
     - rm -rf .git/hooks && ln -sf $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})/hooks .git/hooks
     - ln -fs site_scons/SConstruct
-    - git config --global --add safe.directory $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})
     - source ${GITLAB_BELLE2_TOOLS_B2SETUP}
+    # Use the externals installed in the docker image
     - export BELLE2_EXTERNALS_TOPDIR=${GITLAB_BELLE2_EXTERNALS_TOPDIR}
 
 workflow:
@@ -48,19 +57,23 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/
     - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
 
-check-librarians:
-  stage: check-librarians
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
+prepare-pipeline:
+  stage: prepare-pipeline
   needs: []
+  variables:
+    GITLAB_IS_FIRST_STAGE: "yes"
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - python3 /gitlab-scripts/notify_librarians.py
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
+        git rev-parse origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} > target_head_hash.txt
+        echo "The current HEAD of the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} is $(< target_head_hash.txt)"
+      fi
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 build-gcc:
   stage: build-gcc
-  needs: []
+  needs: [prepare-pipeline]
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - b2code-option opt
@@ -85,7 +98,7 @@ run-tests:
     - b2code-option opt
     - b2setup
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
-    - b2test-scripts -j $(nproc) --exclude "framework/tests/foreach.py" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
+    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
     - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 1200
     - echo "stage stop time -> $(date +%H:%M:%S)"
 

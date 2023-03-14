@@ -69,7 +69,7 @@ b2.B2INFO(f"Steering file args = {args}")
 
 if args.test:
     b2.set_log_level(b2.LogLevel.DEBUG)
-    b2.set_debug_level(1)
+    b2.set_debug_level(21)
 
 
 outputFileTag = ""
@@ -95,15 +95,15 @@ maxTime = 160.
 sigLoc = 0
 sigMin = -50
 sigMax = 50
+if args.is3sample:
+    sigMin = -25
+    sigMax = 25
 if args.isRawTime:
     minTime = -20.
     maxTime = 200.
     sigLoc = 100
     sigMin = 70
     sigMax = 130
-if args.is3sample:
-    sigMin = -50
-    sigMax = 50
 
 
 class SVDGroupingPerformance(b2.Module):

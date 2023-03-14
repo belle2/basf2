@@ -106,7 +106,7 @@ void SVDTimeGroupingModule::initialize()
   if (m_rebinningFactor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
-  B2DEBUG(1, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());
+  B2DEBUG(20, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());
 }
 
 
@@ -172,7 +172,7 @@ void SVDTimeGroupingModule::createAndFillHistorgram(TH1D& hist)
   if (nBin < 1) nBin = 1;
   nBin *= m_rebinningFactor;
   if (nBin < 2) nBin = 2;
-  B2DEBUG(1, "tRange: [" << tRangeLow << "," << tRangeHigh << "], nBin: " << nBin);
+  B2DEBUG(21, "tRange: [" << tRangeLow << "," << tRangeHigh << "], nBin: " << nBin);
 
   hist = TH1D("h_clsTime", "h_clsTime", nBin, tRangeLow, tRangeHigh);
   hist.GetXaxis()->SetLimits(tRangeLow, tRangeHigh);
@@ -269,7 +269,7 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
 
       // store group information (integral, position, width)
       groupInfoVector.push_back(GroupInfo(pars[0], pars[1], pars[2]));
-      B2DEBUG(1, " group " << int(groupInfoVector.size())
+      B2DEBUG(21, " group " << int(groupInfoVector.size())
               << " pars[0] " << pars[0] << " pars[1] " << pars[1] << " pars[2] " << pars[2]);
 
       if (int(groupInfoVector.size()) >= m_maxGroups) { amDone = true; continue;}
@@ -377,7 +377,7 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
     double highestAcceptedTime = pars[1] + m_acceptSigmaN * pars[2];
     if (lowestAcceptedTime < tRangeLow)   lowestAcceptedTime  = tRangeLow;
     if (highestAcceptedTime > tRangeHigh) highestAcceptedTime = tRangeHigh;
-    B2DEBUG(1, " group " << ij
+    B2DEBUG(21, " group " << ij
             << " lowestAcceptedTime " << lowestAcceptedTime
             << " highestAcceptedTime " << highestAcceptedTime);
 
@@ -400,13 +400,13 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
         if (m_writeGroupInfo)
           m_svdClusters[jk]->setTimeGroupInfo().push_back(GroupInfo(pars[0], pars[1], pars[2]));
 
-        B2DEBUG(1, "   accepted cluster " << jk
+        B2DEBUG(29, "   accepted cluster " << jk
                 << " clsTime " << clsTime
                 << " GroupId " << m_svdClusters[jk]->getTimeGroupId().back());
 
       } else {
 
-        B2DEBUG(1, "     rejected cluster " << jk
+        B2DEBUG(29, "     rejected cluster " << jk
                 << " clsTime " << clsTime);
 
         if (ij == int(groupInfoVector.size()) - 1 && // we are now at the last loop
@@ -420,7 +420,7 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
             m_svdClusters[jk]->setTimeGroupId().push_back(-1);               // orphan
 
 
-          B2DEBUG(1, "     leftover cluster " << jk
+          B2DEBUG(29, "     leftover cluster " << jk
                   << " GroupId " << m_svdClusters[jk]->getTimeGroupId().back());
 
         }

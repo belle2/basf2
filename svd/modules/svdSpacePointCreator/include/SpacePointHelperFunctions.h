@@ -94,17 +94,17 @@ namespace Belle2 {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
       if (! hitTimeCut.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
-        B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
+        B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
         if (! hitTimeCut.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
-          B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
+          B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
 
         if (! hitTimeCut.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
-          B2DEBUG(1, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
+          B2DEBUG(29, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
                   ") is incompatible with Cluster time V (" << vCluster->getClsTime() << ")");
           continue;
         }
@@ -123,7 +123,7 @@ namespace Belle2 {
             }
 
             if (isContinue) {
-              B2DEBUG(1, "Cluster combination rejected due to different time-group Id.");
+              B2DEBUG(29, "Cluster combination rejected due to different time-group Id.");
               continue;
             }
           }
@@ -242,7 +242,7 @@ namespace Belle2 {
 
 
     if (chargeProbError == 0) {
-      B2DEBUG(1, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
+      B2DEBUG(21, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();

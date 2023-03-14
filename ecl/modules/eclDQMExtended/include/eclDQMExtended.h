@@ -8,30 +8,26 @@
 
 #pragma once
 
-// Module manager
+/* ECL headers. */
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLDspData.h>
+#include <ecl/utility/ECLChannelMapper.h>
+
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
-
-//STL
-#include <map>
-#include <vector>
-#include <string>
-
-//FRAMEWORK
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dbobjects/ECLDspData.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/utility/ECLChannelMapper.h>
-
-//TRG
 #include <mdst/dataobjects/TRGSummary.h>
+
+/* C++ headers. */
+#include <map>
+#include <string>
+#include <vector>
 
 class TH1F;
 class TH2F;

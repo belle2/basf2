@@ -5,19 +5,21 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own headers. */
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
 
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-//ECL
-#include <ecl/dataobjects/ECLHit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+
+/* Basf2 headers. */
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
@@ -74,8 +76,8 @@ void MCMatcherECLClustersModule::event()
   }
 
   //CalDigits
-  short int Index[8736];
-  std::fill_n(Index, 8736, -1);
+  short int Index[ECLElementNumbers::c_NCrystals];
+  std::fill_n(Index, ECLElementNumbers::c_NCrystals, -1);
   const TClonesArray* cd = m_eclCalDigits.getPtr();
   TObject** ocd = cd->GetObjectRef();
   for (int i = 0, imax = cd->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
@@ -142,7 +144,7 @@ void MCMatcherECLClustersModule::event()
   }
 
   // reuse Index
-  std::fill_n(Index, 8736, -1);
+  std::fill_n(Index, ECLElementNumbers::c_NCrystals, -1);
   const TClonesArray* ed = m_eclDigits.getPtr();
   TObject** oed = ed->GetObjectRef();
   for (int i = 0, imax = ed->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function

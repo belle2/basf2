@@ -657,20 +657,23 @@ namespace {
   }
 
 
-  TEST(DatasetTest, ROOTDatasetDouble)
+  TEST(DatasetTest, ROOTDatasetMixedTypes)
   {
 
     TestHelpers::TempDirCreator tmp_dir;
     TFile file("datafile.root", "RECREATE");
     file.cd();
     TTree tree("tree", "TreeTitle");
-    double a, b, c, d, e, f, g, v, w = 0;
+    double a, c, d, g, v, w = 0;
+    float b = 0.0f;
+    int e = 0;
+    bool f = false;
     tree.Branch("a", &a, "a/D");
-    tree.Branch("b", &b, "b/D");
+    tree.Branch("b", &b, "b/F");
     tree.Branch("c", &c, "c/D");
     tree.Branch("d", &d, "d/D");
-    tree.Branch("e__bo__bc", &e, "e__bo__bc/D");
-    tree.Branch("f__bo__bc", &f, "f__bo__bc/D");
+    tree.Branch("e__bo__bc", &e, "e__bo__bc/I");
+    tree.Branch("f__bo__bc", &f, "f__bo__bc/O");
     tree.Branch("g", &g, "g/D");
     tree.Branch("__weight__", &c, "__weight__/D");
     tree.Branch("v__bo__bc", &v, "v__bo__bc/D");
@@ -681,8 +684,8 @@ namespace {
       b = i + 1.1;
       c = i + 1.2;
       d = i + 1.3;
-      e = i + 1.4;
-      f = i + 1.5;
+      e = i + 1;
+      f = i % 2 == 0;
       g = float(i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
@@ -711,8 +714,8 @@ namespace {
     EXPECT_EQ(x.m_input.size(), 4);
     EXPECT_FLOAT_EQ(x.m_input[0], 1.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 1.1);
-    EXPECT_FLOAT_EQ(x.m_input[2], 1.4);
-    EXPECT_FLOAT_EQ(x.m_input[3], 1.5);
+    EXPECT_EQ(x.m_input[2], 1);
+    EXPECT_EQ(x.m_input[3], true);
     EXPECT_EQ(x.m_spectators.size(), 2);
     EXPECT_FLOAT_EQ(x.m_spectators[0], 1.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 1.7);
@@ -724,8 +727,8 @@ namespace {
     EXPECT_EQ(x.m_input.size(), 4);
     EXPECT_FLOAT_EQ(x.m_input[0], 2.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 2.1);
-    EXPECT_FLOAT_EQ(x.m_input[2], 2.4);
-    EXPECT_FLOAT_EQ(x.m_input[3], 2.5);
+    EXPECT_EQ(x.m_input[2], 2);
+    EXPECT_EQ(x.m_input[3], false);
     EXPECT_EQ(x.m_spectators.size(), 2);
     EXPECT_FLOAT_EQ(x.m_spectators[0], 2.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 2.7);
@@ -737,8 +740,8 @@ namespace {
     EXPECT_EQ(x.m_input.size(), 4);
     EXPECT_FLOAT_EQ(x.m_input[0], 3.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 3.1);
-    EXPECT_FLOAT_EQ(x.m_input[2], 3.4);
-    EXPECT_FLOAT_EQ(x.m_input[3], 3.5);
+    EXPECT_EQ(x.m_input[2], 3);
+    EXPECT_EQ(x.m_input[3], true);
     EXPECT_EQ(x.m_spectators.size(), 2);
     EXPECT_FLOAT_EQ(x.m_spectators[0], 3.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 3.7);
@@ -750,8 +753,8 @@ namespace {
     EXPECT_EQ(x.m_input.size(), 4);
     EXPECT_FLOAT_EQ(x.m_input[0], 4.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 4.1);
-    EXPECT_FLOAT_EQ(x.m_input[2], 4.4);
-    EXPECT_FLOAT_EQ(x.m_input[3], 4.5);
+    EXPECT_EQ(x.m_input[2], 4);
+    EXPECT_EQ(x.m_input[3], false);
     EXPECT_EQ(x.m_spectators.size(), 2);
     EXPECT_FLOAT_EQ(x.m_spectators[0], 4.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 4.7);
@@ -763,8 +766,8 @@ namespace {
     EXPECT_EQ(x.m_input.size(), 4);
     EXPECT_FLOAT_EQ(x.m_input[0], 5.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 5.1);
-    EXPECT_FLOAT_EQ(x.m_input[2], 5.4);
-    EXPECT_FLOAT_EQ(x.m_input[3], 5.5);
+    EXPECT_EQ(x.m_input[2], 5);
+    EXPECT_EQ(x.m_input[3], true);
     EXPECT_EQ(x.m_spectators.size(), 2);
     EXPECT_FLOAT_EQ(x.m_spectators[0], 5.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 5.7);

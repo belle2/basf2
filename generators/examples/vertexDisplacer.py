@@ -13,7 +13,8 @@ import os
 import sys
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 import modularAnalysis as ma
 
 main = b2.create_path()

@@ -7,8 +7,8 @@
  **************************************************************************/
 /*
   <header>
-  <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <input>ParticleGunSimRec_dedx.root</input>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>Check some internals of the module</description>
   </header>
 */
@@ -68,5 +68,5 @@ void dedx4_internals()
 {
   gROOT->SetStyle("Plain");
   
-  plot("../EvtGenSimRec_dedx.root");
+  plot("../ParticleGunSimRec_dedx.root");
 }

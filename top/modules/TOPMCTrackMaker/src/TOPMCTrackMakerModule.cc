@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPMCTrackMaker/TOPMCTrackMakerModule.h>
 
 // framework - DataStore
@@ -126,8 +126,8 @@ namespace Belle2 {
                                        EXT_ENTER,
                                        false,
                                        tof,
-                                       barHit->getPositionTVector3(),
-                                       barHit->getMomentumTVector3(),
+                                       barHit->getPosition(),
+                                       barHit->getMomentum(),
                                        cov);
       track->addRelationTo(extHit);
     }

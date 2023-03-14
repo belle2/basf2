@@ -25,6 +25,20 @@ def argparser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
+    parser.add_argument("--release",
+                        type=int,
+                        default=5,
+                        help="The major release number associated to the corrections that are being applied.\n"
+                        "Default: %(default)s.")
+    parser.add_argument("--global_tag_append",
+                        type=str,
+                        nargs="+",
+                        default=['analysis_tools_light-2302-genetta'],
+                        help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
+                        "NB: these GTs will have lowest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
+                        "Pass a space-separated list of names.\n"
+                        "Default: %(default)s.")
     parser.add_argument("--lid_weights_gt",
                         type=str,
                         default="leptonid_Moriond2022_Official_rel5_v1a",
@@ -43,17 +57,16 @@ def main():
 
     import basf2 as b2
     import modularAnalysis as ma
-    from variables import variables
+    from variables import variables as vm
     import variables.utils as vu
     import variables.collections as vc
     from stdCharged import stdE, stdMu
 
     b2.set_log_level(b2.LogLevel.INFO)
 
-    # Append the analysis GT. Needed to run the ChargedPidMVA BDT.
-    analysis_gt = ma.getAnalysisGlobaltag()
-    b2.B2INFO(f"Appending analysis GT: {analysis_gt}")
-    b2.conditions.append_globaltag(analysis_gt)
+    for tag in args.global_tag_append:
+        b2.conditions.append_globaltag(tag)
+    print(f"Appending GTs:\n{args.global_tag_append}")
 
     path = b2.create_path()
 
@@ -62,13 +75,13 @@ def main():
     # ----------
 
     ma.inputMdst(environmentType="default",
-                 filename=b2.find_file("mdst13.root", "validation"),
+                 filename=b2.find_file("mdst14.root", "validation"),
                  entrySequence="0:10000",
                  path=path)
 
-    # ----------------------------------
-    # Fill example standard lepton list.
-    # ----------------------------------
+    # ----------------------------------------------
+    # Define preselected particle lists for leptons.
+    # ----------------------------------------------
 
     # For electrons, we show the case in which a Bremsstrahlung correction
     # is applied first to get the 4-momentum right,
@@ -84,10 +97,39 @@ def main():
                          gammaListName="gamma:bremsinput",
                          path=path)
 
+    ma.fillParticleList("mu+:presel",
+                        cut="dr < 2 and abs(dz) < 4",  # NB: whichever cut is set here, will be inherited by the std muons.
+                        path=path)
+
+    # -------------------------------------------------------------
+    # Calculate track isolation variables on the preselected lists.
+    # NB: this must be done *before* the sdtLep lists are defined!
+    # -------------------------------------------------------------
+
+    # Reference list for isolation variables' calculation.
+    ma.fillParticleList("pi+:ref", "inCDCAcceptance", path=path)
+
+    # Define alias for isolation score. Needed to get the correct bin in the payload.
+    vm.addAlias("minET2ETIsoScore", "minET2ETIsoScore(pi+:ref, 1, CDC, TOP, ARICH, ECL, KLM)")
+
+    _ = ma.calculateTrackIsolation("e+:corrected",
+                                   path,
+                                   *["CDC", "TOP", "ARICH", "ECL", "KLM"],
+                                   reference_list_name="pi+:ref")
+
+    _ = ma.calculateTrackIsolation("mu+:presel",
+                                   path,
+                                   *["CDC", "TOP", "ARICH", "ECL", "KLM"],
+                                   reference_list_name="pi+:ref")
+
+    # ----------------------------------
+    # Fill example standard lepton list.
+    # ----------------------------------
+
     electrons_fixed09 = "lh_B_fixed09"
     electrons_wp = "FixedThresh09"
     electron_id_var, electron_id_weights = stdE(electrons_wp, "likelihood", "binary", args.lid_weights_gt,
-                                                release=5,
+                                                release=args.release,
                                                 inputListName="e+:corrected",
                                                 outputListLabel=electrons_fixed09,
                                                 path=path)
@@ -95,7 +137,8 @@ def main():
     muons_uniform90 = "bdt_G_uniform90"
     muons_wp = "UniformEff90"
     muon_id_var, muon_id_weights = stdMu(muons_wp, "bdt", "global", args.lid_weights_gt,
-                                         release=5,
+                                         release=args.release,
+                                         inputListName="mu+:presel",
                                          outputListLabel=muons_uniform90,
                                          path=path)
 
@@ -134,8 +177,8 @@ def main():
     variables_jpsi += vc.kinematics
     variables_jpsi += vc.inv_mass
 
-    variables_e += vc.kinematics
-    variables_mu += vc.kinematics
+    variables_e += (vc.kinematics + ["theta", "charge", "minET2ETIsoScore"])
+    variables_mu += (vc.kinematics + ["theta", "charge", "minET2ETIsoScore"])
 
     cms_kinematics = vu.create_aliases(vc.kinematics, "useCMSFrame({variable})", "CMS")
 
@@ -166,7 +209,7 @@ def main():
         f"J/psi:mumu -> ^mu+:{muons_uniform90} ^mu-:{muons_uniform90}",
         use_names=True)
 
-    variables.printAliases()
+    vm.printAliases()
 
     output_file = "jpsill_LID_weights.root"
 

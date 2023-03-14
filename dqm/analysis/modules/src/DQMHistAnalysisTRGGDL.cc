@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisTRGGDL.h>
 
 #include <TH1F.h>
@@ -116,9 +116,6 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisTRGGDL: initialized.");
 }
 
-void DQMHistAnalysisTRGGDLModule::beginRun()
-{
-}
 
 void DQMHistAnalysisTRGGDLModule::event()
 {

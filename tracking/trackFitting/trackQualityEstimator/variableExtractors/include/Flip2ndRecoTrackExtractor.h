@@ -15,10 +15,7 @@
 #include <genfit/FitStatus.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <framework/gearbox/Const.h>
-#include <root/TVector3.h>
-#include <limits>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichNtuple/ARICHNtupleModule.h>
 
 // Hit classes
@@ -35,8 +35,6 @@
 #include <TVector3.h>
 #include <vector>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
@@ -57,7 +55,7 @@ namespace Belle2 {
     setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
 
     // Add parameters
-    addParam("outputFile", m_outputFile, "ROOT output file name", string("ARICHNtuple.root"));
+    addParam("outputFile", m_outputFile, "ROOT output file name", std::string("ARICHNtuple.root"));
   }
 
   ARICHNtupleModule::~ARICHNtupleModule()
@@ -131,10 +129,6 @@ namespace Belle2 {
     StoreArray<ARICHHit> arichHits;
     arichHits.isRequired();
 
-  }
-
-  void ARICHNtupleModule::beginRun()
-  {
   }
 
   void ARICHNtupleModule::event()
@@ -271,7 +265,6 @@ namespace Belle2 {
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
       m_arich.nRec = photons.size();
-      int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
         if (iph.getHitID() < arichHits.getEntries()) {
@@ -282,7 +275,6 @@ namespace Belle2 {
           iph.setHitID(chid);
         }
         m_arich.photons.push_back(iph);
-        nphot++;
       }
 
       TVector3 recPos = arichTrack.getPosition();
@@ -335,12 +327,6 @@ namespace Belle2 {
       }
       m_tree->Fill();
     }
-  }
-
-
-
-  void ARICHNtupleModule::endRun()
-  {
   }
 
   void ARICHNtupleModule::terminate()

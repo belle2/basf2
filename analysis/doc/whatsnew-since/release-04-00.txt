@@ -39,14 +39,14 @@ Variables
   The new variable returns the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables
   ``FBDT_qrCombined`` and ``FANN_qrCombined`` do.
   Now we can evaluate the output of both taggers in the same way.
-* Bug fix to guard against range exceptions in :b2:var:`KSFWVariables` (see :issue:`BII-6138`).
+* Bug fix to guard against range exceptions in :b2:var:`KSFWVariables` (see :issue:`6026`).
 
 Modules
 +++++++
 
 * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result the
   propagated error was slightly overestimated.
-* Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
+* Fix to nested RestOfEvent objects (see :issue:`5560`)
 * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`.
   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
   But still the module has some bugs if one uses K_S0.

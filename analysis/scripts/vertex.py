@@ -249,6 +249,14 @@ def treeFit(
       reconstructDecay('B0:treefit -> pi+:my pi-:my pi0:A ', '', path=mypath)
       treeFit('B0:treefit', ipConstraint=True, path=mypath)
 
+
+    .. note::
+        The Particle object loaded from the KLMCluster does not have proper covariance matrix yet (by release-06 at least).
+        The performance of TreeFit with these particles is not guaranteed.
+        Alternatively, one can perform the TreeFit ignoring these particles from the vertex fit with
+        the option ``ignoreFromVertexFit``.
+
+
     Parameters:
         list_name (str):     name of the input ParticleList
         conf_level (float):  minimum value of the confidence level to accept the fit.

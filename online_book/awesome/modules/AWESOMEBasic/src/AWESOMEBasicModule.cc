@@ -9,7 +9,7 @@
 /* Own header. */
 #include <online_book/awesome/modules/AWESOMEBasic/AWESOMEBasicModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* --------- WARNING ------------------------------------------------------

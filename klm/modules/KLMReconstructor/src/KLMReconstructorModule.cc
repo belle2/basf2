@@ -13,7 +13,7 @@
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 

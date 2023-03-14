@@ -4,16 +4,15 @@ Changes in the b2bii package since release-06-00
 Conversion
 ++++++++++
 
- * Added ``tof``, ``sigma_tof``, ``path_length`` and ``quality`` from the ``Mdst_tof`` table. They are stored in ``BelleTrkExtra``
-   and are not converted by default.
- * Added ``dedx``and ``dedx_quality`` from the ``Mdst_trk`` table. They are stored in ``BelleTrkExtra`` and are not converted by
-   default.
- * Added ``photo_electrons`` and ``quality`` from ``Mdst_acc`` table. They are stored in ``BelleTrkExtra`` and are not converted by
-   default.
+* Added ``tof``, ``sigma_tof``, ``path_length`` and ``quality`` from the ``Mdst_tof`` table. They are stored in ``BelleTrkExtra``
+  and are not converted by default.
+* Added ``dedx``and ``dedx_quality`` from the ``Mdst_trk`` table. They are stored in ``BelleTrkExtra`` and are not converted by
+  default.
+* Added ``photo_electrons`` and ``quality`` from ``Mdst_acc`` table. They are stored in ``BelleTrkExtra`` and are not converted by
+  default.
 
 Variables
 +++++++++
 
- * Added `BelleTof`, `BellePathLength`, `BelleTofQuality`, `BelleTofSigma`, `BelledEdx`, `BelledEdxQuality`, `BelleACCnPe`, and
-   `BelleACCQuality` to store PID-related detector information.
-
+* Added `BelleTof`, `BellePathLength`, `BelleTofQuality`, `BelleTofSigma`, `BelledEdx`, `BelledEdxQuality`, `BelleACCnPe`, and
+  `BelleACCQuality` to store PID-related detector information.

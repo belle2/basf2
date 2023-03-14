@@ -9,7 +9,7 @@
 /* Own header. */
 #include <b2bii/modules/BelleMCOutput/BelleMCOutputModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 

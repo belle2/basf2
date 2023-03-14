@@ -14,7 +14,7 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>

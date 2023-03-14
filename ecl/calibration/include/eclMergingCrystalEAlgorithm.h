@@ -7,9 +7,14 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/database/DBObjPtr.h>
-#include <calibration/CalibrationAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* Basf2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -47,7 +52,7 @@ namespace Belle2 {
       DBObjPtr<ECLCrystalCalib> m_existing;
 
       /** Number of Crystals expected */
-      const int m_numCrystals = 8736;
+      const int m_numCrystals = ECLElementNumbers::c_NCrystals;
     };
   }
 } // namespace Belle2

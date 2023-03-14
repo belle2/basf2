@@ -6,17 +6,23 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/modules/eclNOptimalCollector/eclNOptimalCollectorModule.h>
+
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLNeighbours.h>
 
+/* Basf2 headers. */
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-#include <iostream>
+/* ROOT headers. */
+#include <TH2F.h>
 
-#include "TH2F.h"
+/* C++ headers. */
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -136,7 +142,7 @@ void eclNOptimalCollectorModule::prepare()
     iGroupOfCrystal[iCrysID] = iGroupOfCrystal[iFirstCellId - 1];
   }
 
-  for (int ic = iLastCellId + 1; ic <= 8736; ic++) {
+  for (int ic = iLastCellId + 1; ic <= ECLElementNumbers::c_NCrystals; ic++) {
     const int iCrysID = ic - 1;
     iGroupOfCrystal[iCrysID] = iGroupOfCrystal[iLastCellId - 1];
   }
@@ -151,7 +157,8 @@ void eclNOptimalCollectorModule::prepare()
   registerObject<TH1F>("inputParameters", inputParameters);
 
   //..Store group number for each crystal
-  auto groupNumberOfEachCellID = new TH1F("groupNumberOfEachCellID", "group number of each cellID;cellID", 8736, 1, 8737);
+  auto groupNumberOfEachCellID = new TH1F("groupNumberOfEachCellID", "group number of each cellID;cellID",
+                                          ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("groupNumberOfEachCellID", groupNumberOfEachCellID);
 
   //-----------------------------------------------------------------
@@ -260,9 +267,9 @@ void eclNOptimalCollectorModule::collect()
 
   //..ECL region forward/barrel/backward
   int iRegion = 1;
-  if (iCellId < iFirstBarrel) {
+  if (ECLElementNumbers::isForward(iCellId)) {
     iRegion = 0;
-  } else if (iCellId > iLastBarrel) {
+  } else if (ECLElementNumbers::isBackward(iCellId)) {
     iRegion = 2;
   }
 

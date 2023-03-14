@@ -6,10 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/PIDVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
@@ -300,11 +301,16 @@ namespace Belle2 {
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
+
         double LogL = 0;
         for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
           if (detectorSet.contains(detector))
-            LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
+            LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector, p, theta);
         }
         return LogL;
       };
@@ -340,6 +346,11 @@ namespace Belle2 {
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
+
         double LogL[Const::ChargedStable::c_SetSize];
         double LogL_max = 0;
         bool hasMax = false;
@@ -350,7 +361,7 @@ namespace Belle2 {
           LogL[index_pdg] = 0;
           for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
             if (detectorSet.contains(detector))
-              LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector);
+              LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector, p, theta);
           }
 
           if (!hasMax || (LogL[index_pdg] > LogL_max)) {
@@ -409,12 +420,17 @@ namespace Belle2 {
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
+
         double LogL_hypType(0), LogL_testType(0);
         for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
           if (detectorSet.contains(detector)) {
-            LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
-            LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector);
+            LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector, p, theta);
+            LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector, p, theta);
           }
         }
 
@@ -1000,9 +1016,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
-    - 1  signal(antineutron) like
-    - 0  background like
-    - -1 invalid using this PID due to some ECL variables used unavailable
+- 1  signal(antineutron) like
+- 0  background like
+- -1 invalid using this PID due to some ECL variables used unavailable
 
 This PID is only for antineutron. Neutron is also considered as background.
 The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,

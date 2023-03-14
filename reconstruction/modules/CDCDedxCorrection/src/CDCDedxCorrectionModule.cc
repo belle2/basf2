@@ -7,14 +7,9 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxCorrection/CDCDedxCorrectionModule.h>
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <cmath>
-#include <algorithm>
-#include "TMath.h"
 
 using namespace Belle2;
+using namespace CDC;
 using namespace Dedx;
 
 REG_MODULE(CDCDedxCorrection);
@@ -52,7 +47,7 @@ void CDCDedxCorrectionModule::initialize()
   }
 
   // wire gains
-  for (unsigned int i = 0; i < 14336; ++i) {
+  for (unsigned int i = 0; i < c_nSenseWires; ++i) {
     if (m_DBWireGains->getWireGain(i) == 0)
       B2WARNING("Wire gain is zero for this wire: " << i);
   }
@@ -72,7 +67,28 @@ void CDCDedxCorrectionModule::initialize()
       m_hadronpars.push_back(0.0);
     m_hadronpars.push_back(1.0);
   } else m_hadronpars = m_DBHadronCor->getHadronPars();
+
+  int jwire = -1;
+  B2INFO("Creating CDCGeometryPar object");
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
+  for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
+    int activewires = 0;
+    m_lgainavg[il] = 0.0;
+
+    for (unsigned int iw = 0; iw < cdcgeo.nWiresInLayer(il); ++iw) {
+      jwire++;
+      if (m_DBWireGains->getWireGain(jwire) > 0.) {
+        //active wire only
+        m_lgainavg[il] += m_DBWireGains->getWireGain(jwire);
+        activewires++;
+      }
+    }
+    if (activewires > 0) m_lgainavg[il] /= activewires;
+    else m_lgainavg[il] = 1.0;
+  }
 }
+
 
 void CDCDedxCorrectionModule::event()
 {
@@ -173,7 +189,7 @@ void CDCDedxCorrectionModule::RunGainCorrection(double& dedx) const
   } else dedx = 0;
 }
 
-void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
+void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx, int layer) const
 {
   double gain = m_DBWireGains->getWireGain(wireID);
   if (gain != 0) dedx = dedx / gain;
@@ -181,6 +197,9 @@ void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
     //rel-abs method needs all wire for cal but w/ this method post calis (e.g.final RG)
     //will also see all hitdedx but that is not an issue for track level calibration
     if (m_relative)dedx = 0;
+    else {
+      if (m_lgainavg.at(layer) > 0)dedx = dedx / m_lgainavg.at(layer);
+    }
   }
 }
 
@@ -240,7 +259,7 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
     RunGainCorrection(dedx);
 
   if (m_wireGain)
-    WireGainCorrection(wireID, dedx);
+    WireGainCorrection(wireID, dedx, layer);
 
   if (m_cosineCor)
     CosineCorrection(costheta, dedx);
@@ -254,7 +273,6 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
 
   if (m_oneDCell)
     OneDCorrection(layer, enta, dedx);
-
 }
 
 
@@ -320,10 +338,16 @@ double CDCDedxCorrectionModule::I2D(const double cosTheta, const double I) const
     return I;
   }
 
-  double D = (a != 0) ? (-b + sqrt(b * b - 4.0 * a * c)) / (2.0 * a) : -c / b;
+  double discr = b * b - 4.0 * a * c;
+  if (discr < 0) {
+    B2WARNING("negative discriminant; return uncorrectecd value");
+    return I;
+  }
+
+  double D = (a != 0) ? (-b + sqrt(discr)) / (2.0 * a) : -c / b;
   if (D < 0) {
     B2WARNING("D is less 0! will try another solution");
-    D = (a != 0) ? (-b - sqrt(b * b + 4.0 * a * c)) / (2.0 * a) : -c / b;
+    D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
     if (D < 0) {
       B2WARNING("D is still less 0! just return uncorrectecd value");
       return I;

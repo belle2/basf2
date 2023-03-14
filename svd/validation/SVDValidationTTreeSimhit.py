@@ -11,12 +11,12 @@
 
 """
 <header>
-  <contact>SVD Software Group, svd-software@belle2.org</contact>
   <description>
     This module is used for the SVD validation.
     It gets information about truehits and  clusters, saving
     in a ttree in a ROOT file.
   </description>
+  <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 
@@ -96,7 +96,7 @@ class SVDValidationTTreeSimhit(b2.Module):
                 if not particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                     continue
 
-                length = (simhit.getPosOut() - simhit.getPosIn()).Mag()
+                length = (simhit.getPosOut() - simhit.getPosIn()).R()
                 # The deposited energy is the number of electrons multiplied
                 # by the energy required to create an electron-hole pair
                 energy = simhit.getElectrons() * Belle2.Const.ehEnergy

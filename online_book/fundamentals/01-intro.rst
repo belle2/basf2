@@ -10,13 +10,13 @@ Introduction
 
     **Prerequisites**:
 
-        * What is a B factory?
+    * What is a B factory?
 
     **Objectives**:
 
-        * Understand what is meant by signal and background
-        * What is a cut.
-        * What different background types are there.
+    * Understand what is meant by signal and background
+    * What is a cut.
+    * What different background types are there.
 
 Almost regardless of the quantity you are going to measure in your analysis, you
 will have to face some basic problems:
@@ -203,10 +203,10 @@ You do not need to reject the whole event just because of some beam background.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

@@ -15,18 +15,18 @@
 
     **Prerequisites**:
 
-        * Basic bash knowledge
+    * Basic bash knowledge
 
     **Questions**:
 
-        * How to collaboratively develop software?
-        * How to keep different versions of my code?
-        * How to synchronize my code between servers?
+    * How to collaboratively develop software?
+    * How to keep different versions of my code?
+    * How to synchronize my code between servers?
 
     **Objectives**:
 
-        * Learn to use the world's most successful version control system
-        * Get ready to contribute to Belle 2 software
+    * Learn to use the world's most successful version control system
+    * Get ready to contribute to Belle II software
 
 Creating a physics analysis or developing a piece of software is not a straight
 forward process without errors. There will be a lot of changes to the scripts,
@@ -89,11 +89,11 @@ Belle II Specifics
 In Belle II we use Bitbucket Server by Atlassian for our git repositories. While
 this is rather similar to github in some regards. It is strongly advised to use
 ``ssh`` as access protocol and for that you need to upload your public key to
-https://stash.desy.de.
+https://gitlab.desy.de.
 
 You should already have a ssh key (see :ref:`onlinebook_ssh`) and you should copy the the contents of the
 public key file and upload it `here
-<https://stash.desy.de/plugins/servlet/ssh/account/keys>`__.
+<https://gitlab.desy.de/-/profile/keys>`__.
 
 You should also make sure that you configure your git to username and email to
 something your Collaborators can recognize. The best is to use the email address
@@ -319,7 +319,7 @@ to continue your training even after the StarterKit. It will not be time wasted!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-     Kilian Lieret,
-     Martin Ritter
+Kilian Lieret,
+Martin Ritter

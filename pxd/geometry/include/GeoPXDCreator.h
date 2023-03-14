@@ -47,7 +47,8 @@ namespace Belle2 {
       virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
       {
         DBImportObjPtr<PXDGeometryPar> importObj;
-        importObj.construct(createConfiguration(content));
+        PXDGeometryPar config = createConfiguration(content);
+        importObj.construct(config);
         importObj.import(iov);
       }
 

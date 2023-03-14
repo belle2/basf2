@@ -106,18 +106,9 @@ namespace TreeFitter {
     positionAndMom.segment(3, 3) = fitparams.getStateVector().segment(momindex, 3);
     Eigen::Matrix<double, 5, 6> jacobian = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
 
-    Belle2::Helix helix = Belle2::Helix(
-                            ROOT::Math::XYZVector(
-                              positionAndMom(0),
-                              positionAndMom(1),
-                              positionAndMom(2)),
-                            ROOT::Math::XYZVector(
-                              positionAndMom(3),
-                              positionAndMom(4),
-                              positionAndMom(5)),
-                            charge(),
-                            m_bfield
-                          );
+    const Belle2::Helix helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMom(0), positionAndMom(1), positionAndMom(2)),
+                                              ROOT::Math::XYZVector(positionAndMom(3), positionAndMom(4), positionAndMom(5)),
+                                              charge(), m_bfield);
 
     HelixUtils::getJacobianToCartesianFrameworkHelix(jacobian,
                                                      positionAndMom(0),

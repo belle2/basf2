@@ -32,16 +32,16 @@ void DAQMonitorModule::defineHisto()
   oldDir->mkdir("DAQ");
   oldDir->cd("DAQ");
   h_nEvt = new TH1F("Nevent", "Total Number of Events", 3, 0.0, 2.0);
-  h_pxdSize = new TH1F("PXDDataSize", "PXD Data Size;Size [kB];", 100, 0.0, 100.0);
-  h_svdSize = new TH1F("SVDDataSize", "SVD Data Size;Size [kB];", 100, 0.0, 100.0);
+  h_pxdSize = new TH1F("PXDDataSize", "PXD Data Size;Size [kB];", 200, 0.0, 1000.0);
+  h_svdSize = new TH1F("SVDDataSize", "SVD Data Size;Size [kB];", 100, 0.0, 300.0);
   h_cdcSize = new TH1F("CDCDataSize", "CDC Data Size;Size [kB];", 100, 0.0, 100.0);
   h_topSize = new TH1F("TOPDataSize", "TOP Data Size;Size [kB];", 100, 0.0, 100.0);
   h_arichSize = new TH1F("ARICHDataSize", "ARICH Data Size;Size [kB];", 100, 0.0, 40.0);
   h_eclSize = new TH1F("ECLDataSize", "ECL Data Size;Size [kB];", 100, 0.0, 100.0);
   h_klmSize = new TH1F("KLMDataSize", "KLM Data Size;Size [kB];", 100, 0.0, 40.0);
   h_trgSize = new TH1F("TRGDataSize", "TRG Data Size;Size [kB];", 100, 0.0, 40.0);
-  h_hltSize = new TH1F("HLTDataSize", "HLT (Total - PXD) Data Size;Size [kB];", 100, 0.0, 300.0);
-  h_totalSize = new TH1F("TotalDataSize", "Total (HLT + PXD) Data Size;Size [kB];", 100, 0.0, 300.0);
+  h_hltSize = new TH1F("HLTDataSize", "HLT (Total - PXD) Data Size;Size [kB];", 200, 0.0, 1000.0);
+  h_totalSize = new TH1F("TotalDataSize", "Total (HLT + PXD) Data Size;Size [kB];", 200, 0.0, 2000.0);
   h_runNr = new TH1F("hRunnr", "Run Number", 1, 0, 1); // define with a dummy bin, set correct range on first event
 
   oldDir->cd();

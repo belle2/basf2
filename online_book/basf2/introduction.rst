@@ -12,27 +12,27 @@ The basics.
 
     **Prerequisites**:
 
-        * An internet browser
-        * DESY accounts
-        * :ref:`onlinebook_collaborative_tools` lesson.
-        * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
-        * Basic bash
+    * An internet browser
+    * DESY accounts
+    * :ref:`onlinebook_collaborative_tools` lesson.
+    * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
+    * Basic bash
 
     **Questions**:
 
-        * What is basf2 and what does it do?
-        * What is a basf2 module, path, steering file?
-        * How can I get help?
+    * What is basf2 and what does it do?
+    * What is a basf2 module, path, steering file?
+    * How can I get help?
 
     **Objectives**:
 
-        * Correctly set up the Belle II environment.
-        * Find the right chapters in this documentation.
-        * Run basf2 and display a list of variables
-        * Run basf2 in interactive ipython shell mode.
-        * Access the help in 3 different ways.
-        * Confidently read the source code for a `modularAnalysis` convenience
-          function.
+    * Correctly set up the Belle II environment.
+    * Find the right chapters in this documentation.
+    * Run basf2 and display a list of variables
+    * Run basf2 in interactive ipython shell mode.
+    * Access the help in 3 different ways.
+    * Confidently read the source code for a `modularAnalysis` convenience
+      function.
 
 The Belle II software is called basf2.
 It is an abbreviation for "Belle II Analysis Software Framework".
@@ -96,10 +96,10 @@ There are some concepts we use in basf2, which you will definitely need to
 understand.
 These are:
 
-        * basf2 module,
-        * path,
-        * package,
-        * steering script / steering file.
+* basf2 module,
+* path,
+* package,
+* steering script / steering file.
 
 Most of the other jargon terms we use are generic software development terms
 (so you can search the internet).
@@ -200,7 +200,7 @@ You will meet this at the end of this lesson.
 .. admonition:: Solution
      :class: toggle solution
 
-     The source code is online `here <https://stash.desy.de/projects/B2/repos/basf2/browse>`_.
+     The source code is online `here <https://gitlab.desy.de/belle2/software/basf2>`_.
      The list of **packages** is simply the list of directories in the software
      directory.
 
@@ -493,10 +493,9 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Solution
      :class: toggle solution
 
-     1. Go to https://stash.desy.de/projects/B2/
-     2. Click on "source".
-     3. At the top it probably says "master". Choose the drop-down menu.
-     4. Click on "tags" and search for the release tag.
+     1. Go to https://gitlab.desy.de/belle2/software/basf2
+     2. From the left column, click on "Repository" and then "Tags.
+     3. Search for the release tag using the filters.
 
      .. image:: introduction/find_a_tag.png
          :width: 300px
@@ -727,7 +726,7 @@ We call software "external" if is not specific to Belle II but used *by* basf2.
 
     If you are interested, you can browse the list of everything included in
     the externals in `this README file
-    <https://stash.desy.de/projects/B2/repos/externals/browse/README.md>`_.
+    <https://gitlab.desy.de/belle2/software/externals/-/blob/main/README.md>`_.
 
 Some python packages that are useful for final offline analysis are also
 included in the externals for your convenience.
@@ -787,7 +786,7 @@ post-reconstruction dataobjects.
 
      * You can look at the function source code for `mdst.add_mdst_output`.
      * You can browse the mdst/dataobjects directory in the basf2 source code:
-       https://stash.desy.de/projects/B2/repos/basf2/browse/mdst/dataobjects/include
+       https://gitlab.desy.de/belle2/software/basf2/-/tree/main/mdst/dataobjects/include
 
      The important mdst dataobjects are:
 
@@ -952,7 +951,7 @@ In pseudo-python you will see they are very often of the form:
      :class: toggle solution
 
      You want the `modularAnalysis.reconstructDecay` function.
-     You could either read the source code for that on stash,
+     You could either read the source code for that on GitLab,
      or find it here in this documentation and click "[source]".
 
 Congratulations!
@@ -963,11 +962,11 @@ Good luck.
 
     While the next sections will help you to understand the basics of steering
     files step by step, there are also some comple examples for steering files
-    `in the main software repository <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples>`_.
+    `in the main software repository <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-    Sam Cunliffe
+Sam Cunliffe

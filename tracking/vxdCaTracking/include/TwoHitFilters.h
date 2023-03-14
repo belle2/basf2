@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <math.h>
 
 
 
 namespace Belle2 {
-  /** The class 'TwoHitFilters' bundles filter methods using 2 hits which are stored in TVector3s. */
+  /** The class 'TwoHitFilters' bundles filter methods using 2 hits which are stored in B2Vector3Ds. */
   class TwoHitFilters {
   public:
 
@@ -29,8 +29,8 @@ namespace Belle2 {
       m_hitB.SetXYZ(0., 0., 0.);
     }
 
-    /** Constructor. needs the first parameter is outer hit, second is inner hit. Parameters in TVector3-format*/
-    TwoHitFilters(const TVector3& outerHit, const TVector3& innerHit):
+    /** Constructor. needs the first parameter is outer hit, second is inner hit. Parameters in B2Vector3D-format*/
+    TwoHitFilters(const B2Vector3D& outerHit, const B2Vector3D& innerHit):
       m_hitA(outerHit),
       m_hitB(innerHit) { initializeMe(outerHit, innerHit); }
 
@@ -39,7 +39,7 @@ namespace Belle2 {
     ~TwoHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(const TVector3& outerHit, const TVector3& innerHit)
+    void resetValues(const B2Vector3D& outerHit, const B2Vector3D& innerHit)
     {
       m_hitA = outerHit;
       m_hitB = innerHit;
@@ -86,7 +86,7 @@ namespace Belle2 {
   protected:
 
     /** initializer function, sets values */
-    void initializeMe(const TVector3& outerHit, const TVector3& innerHit)
+    void initializeMe(const B2Vector3D& outerHit, const B2Vector3D& innerHit)
     {
       m_x2 = outerHit[0] - innerHit[0]; // not x2 yet, reusing member
       m_y2 = outerHit[1] - innerHit[1];
@@ -97,8 +97,10 @@ namespace Belle2 {
       m_z2 = m_dz * m_dz;
     }
 
-    TVector3 m_hitA; /**< outer hit (position relevant for useful filter calculation, e.g. calcDist3D) used for the filter calculation */
-    TVector3 m_hitB; /**< inner hit (position relevant for useful filter calculation, e.g. calcDist3D) used for the filter calculation */
+    B2Vector3D
+    m_hitA; /**< outer hit (position relevant for useful filter calculation, e.g. calcDist3D) used for the filter calculation */
+    B2Vector3D
+    m_hitB; /**< inner hit (position relevant for useful filter calculation, e.g. calcDist3D) used for the filter calculation */
     double m_x2; /**< internal intermediate value storing x^2, no enduser-relevance */
     double m_y2; /**< internal intermediate value storing y^2, no enduser-relevance */
     double m_z2; /**< internal intermediate value storing z^2, no enduser-relevance */

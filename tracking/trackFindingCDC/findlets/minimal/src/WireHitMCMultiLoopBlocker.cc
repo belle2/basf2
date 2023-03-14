@@ -23,8 +23,6 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <root/TVector3.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

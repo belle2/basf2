@@ -128,8 +128,8 @@ void CosmicsAlignmentValidationModule::event()
         "[CosmicsAlignmentValidationModule] Fit Results are from the same track!");
 
     if (fitResult1 != NULL) { // valid TrackFitResult found
-      t_p1 = fitResult1->getMomentum().Mag();
-      t_pt1 = fitResult1->getMomentum().Pt();
+      t_p1 = fitResult1->getMomentum().R();
+      t_pt1 = fitResult1->getMomentum().Rho();
       t_x1 = fitResult1->getPosition().X();
       t_y1 = fitResult1->getPosition().Y();
       t_z1 = fitResult1->getPosition().Z();
@@ -144,8 +144,8 @@ void CosmicsAlignmentValidationModule::event()
       t_cotTheta1 = fitResult1->getCotTheta();
     }
     if (fitResult2 != NULL) { // valid TrackFitResult found
-      t_p2 = fitResult2->getMomentum().Mag();
-      t_pt2 = fitResult2->getMomentum().Pt();
+      t_p2 = fitResult2->getMomentum().R();
+      t_pt2 = fitResult2->getMomentum().Rho();
       t_x2 = fitResult2->getPosition().X();
       t_y2 = fitResult2->getPosition().Y();
       t_z2 = fitResult2->getPosition().Z();
@@ -160,7 +160,7 @@ void CosmicsAlignmentValidationModule::event()
       t_cotTheta2 = fitResult2->getCotTheta();
     }
 
-    t_p1MC = m_MCParticles[0]->getMomentum().Mag();
+    t_p1MC = m_MCParticles[0]->getMomentum().R();
 
     if (fitResult2 != NULL && fitResult1 != NULL) {
       t_dz = fitResult1->getPosition().Z()

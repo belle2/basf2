@@ -70,7 +70,7 @@
 #   Added decay table for sigma_0 particle (f_0(500) in the PDG)
 #
 # Sept.-Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
-#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://agira.desy.de/browse/BII-7249.
+#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://gitlab.desy.de/belle2/software/basf2/-/issues/7124.
 #   Further updates and corrections applied in https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview.
 #   Added the remaining rare decays from the Belle mixedrare.dec and chargedrare.dec files.
 #   Pythia hadron contributions rescaled by S. Duell (https://stash.desy.de/projects/B2/repos/software/pull-requests/6690/overview)
@@ -86,7 +86,7 @@
 # December 2021, V. Bertacchi (bertacchi@cppm.in2p3.fr)
 #   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
 #   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
-#   https://stash.desy.de/projects/B2/repos/basf2/pull-requests/581/overview
+#   https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/581
 #
 # March 2022, H. Svidras (henrikas.svidras@desy.de)
 #   Corrected the BTOXSGAMMA model branching fraction to the correct inclusive B->Xs gamma decay branching fraction in the PDG
@@ -806,8 +806,9 @@ Decay B0
 0.000145000   pi-  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000294000   rho-  e+  nu_e                               BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
-0.000294000   rho-  mu+  nu_mu                             BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000294000   rho-  e+  nu_e                               BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000294000   rho-  mu+  nu_mu                             BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 
 0.000000000   D(2S)-  e+  nu_e                             ISGW2;
 0.000000000   D(2S)-  mu+  nu_mu                           ISGW2;
@@ -816,8 +817,8 @@ Decay B0
 0.001701000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000094227   pi-  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000156755   rho-  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000094227   pi-  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000156755   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000090000   a_1-  tau+  nu_tau                           ISGW2;
 0.000008000   b_1-  tau+  nu_tau                           ISGW2;
 0.000008000   a_0-  tau+  nu_tau                           ISGW2;
@@ -2595,8 +2596,9 @@ Decay anti-B0
 0.000145000   pi+  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000294000   rho+  e-  anti-nu_e                          BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
-0.000294000   rho+  mu-  anti-nu_mu                        BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000294000   rho+  e-  anti-nu_e                          BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000294000   rho+  mu-  anti-nu_mu                        BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 
 0.000000000   D(2S)+  e-  anti-nu_e                        ISGW2;
 0.000000000   D(2S)+  mu-  anti-nu_mu                      ISGW2;
@@ -2605,8 +2607,8 @@ Decay anti-B0
 0.001701000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000094227   pi+  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000156755   rho+  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000094227   pi+  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000156755   rho+  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000090000   a_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   b_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   a_0+  tau-  anti-nu_tau                      ISGW2;
@@ -4278,10 +4280,11 @@ Decay B+
 0.000038000   eta  mu+  nu_mu                              ISGW2; #[PDG2017]
 
 # rho0, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000158000   rho0  e+  nu_e                               BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000158000   rho0  mu+  nu_mu                             BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000119000   omega  e+  nu_e                              BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
-0.000119000   omega  mu+  nu_mu                            BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000158000   rho0  e+  nu_e                               BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000158000   rho0  mu+  nu_mu                             BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000119000   omega  e+  nu_e                              BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
+0.000119000   omega  mu+  nu_mu                            BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
 0.000023000   eta'  e+  nu_e                               ISGW2; #[PDG2017]
 0.000023000   eta'  mu+  nu_mu                             ISGW2; #[PDG2017]
@@ -4292,9 +4295,9 @@ Decay B+
 0.001724000   Xu0  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000050804   pi0  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000084530   rho0  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
-0.000064974   omega  tau+  nu_tau                          ISGW2; #Assuming R_om  = 0.546 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000050804   pi0  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000084530   rho0  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000064974   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000012000   eta  tau+  nu_tau                            ISGW2;
 0.000018000   eta'  tau+  nu_tau                           ISGW2;
 0.000046000   a_10  tau+  nu_tau                           ISGW2;
@@ -5777,10 +5780,11 @@ Decay B-
 0.000038000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2017]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000158000   rho0  e-  anti-nu_e                          BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000158000   rho0  mu-  anti-nu_mu                        BCL -0.861 1.444 0.266 0.378  0.165 0.291 0.718  0.384 0.331 -0.876 1.907;
-0.000119000   omega  e-  anti-nu_e                         BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
-0.000119000   omega  mu-  anti-nu_mu                       BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000158000   rho0  e-  anti-nu_e                          BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000158000   rho0  mu-  anti-nu_mu                        BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000119000   omega  e-  anti-nu_e                         BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
+0.000119000   omega  mu-  anti-nu_mu                       BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
 0.000023000   eta'  e-  anti-nu_e                          ISGW2; #[PDG2017]
 0.000023000   eta'  mu-  anti-nu_mu                        ISGW2; #[PDG2017]
@@ -5791,9 +5795,9 @@ Decay B-
 0.001724000   Xu0  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000050804   pi0  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000084530   rho0  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
-0.000064974   omega  tau-  anti-nu_tau                     ISGW2; #Assuming R_om  = 0.546 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000050804   pi0  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000084530   rho0  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000064974   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000012000   eta  tau-  anti-nu_tau                       ISGW2;
 0.000018000   eta'  tau-  anti-nu_tau                      ISGW2;
 0.000046000   a_10  tau-  anti-nu_tau                      ISGW2;
@@ -11557,108 +11561,133 @@ Enddecay
 #####################################################################
 # Lambda_c+
 Decay Lambda_c+
-0.021000000   e+  nu_e  Lambda0                            PYTHIA 22; #[Reconstructed PDG2011]
-0.005000000   e+  nu_e  Sigma0                             PYTHIA 22;
-0.005000000   e+  nu_e  Sigma*0                            PYTHIA 22;
-0.003000000   e+  nu_e  n0                                 PYTHIA 22;
-0.002000000   e+  nu_e  Delta0                             PYTHIA 22;
-0.006000000   e+  nu_e  p+  pi-                            PYTHIA 22;
-0.006000000   e+  nu_e  n0  pi0                            PYTHIA 22;
-0.020000000   mu+  nu_mu  Lambda0                          PYTHIA 22; #[Reconstructed PDG2011]
-0.005000000   mu+  nu_mu  Sigma0                           PYTHIA 22;
-0.005000000   mu+  nu_mu  Sigma*0                          PYTHIA 22;
-0.003000000   mu+  nu_mu  n0                               PYTHIA 22;
-0.002000000   mu+  nu_mu  Delta0                           PYTHIA 22;
-0.006000000   mu+  nu_mu  p+  pi-                          PYTHIA 22;
-0.006000000   mu+  nu_mu  n0  pi0                          PYTHIA 22;
-0.008600000   Delta++  K-                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.025000000   Delta++  K*-                                 PYTHIA  0;
-0.023000000   p+  anti-K0                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.016000000   p+  anti-K*0                                 PYTHIA  0; #[Reconstructed PDG2011]
-0.005000000   Delta+  anti-K0                              PYTHIA  0;
-0.005000000   Delta+  anti-K*0                             PYTHIA  0;
-0.010700000   Lambda0  pi+                                 PYTHIA  0; #[Reconstructed PDG2011]
-0.005000000   Lambda0  rho+                                PYTHIA  0;
-0.010500000   Sigma0  pi+                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.004000000   Sigma0  rho+                                 PYTHIA  0;
-0.004000000   Sigma*0  pi+                                 PYTHIA  0;
-0.004000000   Sigma*0  rho+                                PYTHIA  0;
-0.010000000   Sigma+  pi0                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.005500000   Sigma+  eta                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.002000000   Sigma+  eta'                                 PYTHIA  0;
-0.004000000   Sigma+  rho0                                 PYTHIA  0;
-0.027000000   Sigma+  omega                                PYTHIA  0; #[Reconstructed PDG2011]
-0.003000000   Sigma*+  pi0                                 PYTHIA  0;
-0.008500000   Sigma*+  eta                                 PYTHIA  0; #[Reconstructed PDG2011]
-0.003000000   Sigma*+  rho0                                PYTHIA  0;
-0.003000000   Sigma*+  omega                               PYTHIA  0;
-0.003900000   Xi0  K+                                      PYTHIA  0; #[Reconstructed PDG2011]
-0.002000000   Xi0  K*+                                     PYTHIA  0;
-0.002600000   Xi*0  K+                                     PYTHIA  0; #[Reconstructed PDG2011]
-0.001000000   Delta++  pi-                                 PYTHIA  0;
-0.001000000   Delta++  rho-                                PYTHIA  0;
-0.002000000   p+  pi0                                      PYTHIA  0;
-0.001000000   p+  eta                                      PYTHIA  0;
-0.001000000   p+  eta'                                     PYTHIA  0;
-0.002000000   p+  rho0                                     PYTHIA  0;
-0.002000000   p+  omega                                    PYTHIA  0;
-0.000820000   p+  phi                                      PYTHIA  0; #[Reconstructed PDG2011]
-0.002800000   p+  f_0                                      PYTHIA  0; #[Reconstructed PDG2011]
-0.001000000   Delta+  pi0                                  PYTHIA  0;
-0.001000000   Delta+  eta                                  PYTHIA  0;
-0.001000000   Delta+  eta'                                 PYTHIA  0;
-0.001000000   Delta+  rho0                                 PYTHIA  0;
-0.001000000   Delta+  omega                                PYTHIA  0;
-0.003000000   n0  pi+                                      PYTHIA  0;
-0.003000000   n0  rho+                                     PYTHIA  0;
-0.003000000   Delta0  pi+                                  PYTHIA  0;
-0.003000000   Delta0  rho+                                 PYTHIA  0;
-0.005000000   Lambda0  K+                                  PYTHIA  0;
-0.005000000   Lambda0  K*+                                 PYTHIA  0;
-0.002000000   Sigma0  K+                                   PYTHIA  0;
-0.002000000   Sigma0  K*+                                  PYTHIA  0;
-0.001000000   Sigma*0  K+                                  PYTHIA  0;
-0.001000000   Sigma*0  K*+                                 PYTHIA  0;
-0.002000000   Sigma+  K0                                   PYTHIA  0;
-0.002800000   Sigma+  K*0                                  PYTHIA  0; #[Reconstructed PDG2011]
-0.001000000   Sigma*+  K0                                  PYTHIA  0;
-0.001000000   Sigma*+  K*0                                 PYTHIA  0;
-0.064091000   u  anti-d  d  su_0                           PYTHIA 43; #[Reconstructed PDG2011]
-0.028103000   u  anti-d  d  su_1                           PYTHIA 43; #[Reconstructed PDG2011]
-0.017256000   u  anti-s  d  su_0                           PYTHIA 43; #[Reconstructed PDG2011]
-0.017256000   u  anti-d  d  ud_0                           PYTHIA 43; #[Reconstructed PDG2011]
-0.046838000   s  uu_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.069025000   u  su_0                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.069025000   u  su_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.014794000   d  uu_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.007396000   u  ud_0                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.007396000   u  ud_1                                      PYTHIA 43; #[Reconstructed PDG2011]
-0.025400000   p+  K-  pi+                                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.033000000   p+  anti-K0  pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.012000000   p+  anti-K0  eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.026000000   p+  anti-K0  pi+  pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.023000000   p+  K-  pi+  pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.011000000   p+  K*-  pi+                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001100000   p+  K-  pi+  pi+  pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.008000000   p+  K-  pi+  pi0  pi0                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000700000   p+  pi+  pi-                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001800000   p+  pi+  pi+  pi-  pi-                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   p+  K+  K-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.036000000   Lambda0  pi+  pi0                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.015000000   Lambda0  pi+  pi+  pi-                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.011000000   Lambda0  pi+  rho0                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.009500000   Lambda0  pi+  eta                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.012000000   Lambda0  pi+  omega                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.004700000   Lambda0  K+  anti-K0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.036000000   Sigma+  pi+  pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.017000000   Sigma-  pi+  pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.018000000   Sigma0  pi+  pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.008300000   Sigma0  pi+  pi+  pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   Sigma+  K+  K-                               PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.003100000   Sigma+  phi                                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.002500000   Xi-  K+  pi+                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000000   Sigma+  K+  pi-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+# Note that PDG 2021 numbers are normalized to a pKpi branching fraction of a guess of 0.0664
+# For isospin model, see Gronau and Rosner, Phys. Rev. D 98, 030001 and references therein
+0.038060000   e+  nu_e  Lambda0                            PYTHIA         22; # [PDG2021]
+0.000530000   e+  nu_e  Sigma0                             PYTHIA         22; # All other e modes are small PDG2021
+0.000530000   e+  nu_e  Sigma*0                            PYTHIA         22;
+0.000530000   e+  nu_e  n0                                 PYTHIA         22;
+0.000530000   e+  nu_e  Delta0                             PYTHIA         22;
+0.000530000   e+  nu_e  p+  pi-                            PYTHIA         22;
+0.000530000   e+  nu_e  n0  pi0                            PYTHIA         22;
+0.036989630   mu+  nu_mu  Lambda0                          PYTHIA         22; # [PDG2021]
+0.000530000   mu+  nu_mu  Sigma0                           PYTHIA         22; # All other mu modes are small PDG2021
+0.000530000   mu+  nu_mu  Sigma*0                          PYTHIA         22;
+0.000530000   mu+  nu_mu  n0                               PYTHIA         22;
+0.000530000   mu+  nu_mu  Delta0                           PYTHIA         22;
+0.000530000   mu+  nu_mu  p+  pi-                          PYTHIA         22;
+0.000530000   mu+  nu_mu  n0  pi0                          PYTHIA         22;
+0.011420000   Delta++  K-                                  PYTHIA         0; # [PDG2021]
+# Contributes 0.01142 to pK-pi+
+0.026440000   Delta++  K*-                                 PYTHIA         0;
+# Contributes 0.025*0.66 = 0.0166 to pK0pi-pi+  and 0.0083 to pKpi0pi+
+0.033620000   p+  anti-K0                                  PYTHIA         0; # [PDG2021]
+0.020730000   p+  anti-K*0                                 PYTHIA         0; # [PDG2021]
+# Contributes 0.0207*0.665 = 0.01376 to pKpi+ and 0.0207*0.333 = 0.0689 to pK0pi0 
+0.005290000   Delta+  anti-K0                              PYTHIA         0; # [produces ppi0K0 and npiK0]
+0.005290000   Delta+  anti-K*0                             PYTHIA         0;
+0.013750000   Lambda0  pi+                                 PYTHIA         0; # [PDG2021]
+0.006340000   Lambda0  rho+                                PYTHIA         0; # [ESTIMATE goes into L0pipi0] 
+0.013650000   Sigma0  pi+                                  PYTHIA         0; # [PDG2021]
+0.005290000   Sigma0  rho+                                 PYTHIA         0; # [ESTIMATE goes into S0pipi0]
+0.004220000   Sigma*0  pi+                                 PYTHIA         0;
+# Contributes 0.00371 to Lambda pi0 pi+ 
+0.004230000   Sigma*0  rho+                                PYTHIA         0;
+0.013210000   Sigma+  pi0                                  PYTHIA         0; # [PDG2021]
+0.004650000   Sigma+  eta                                  PYTHIA         0; # [PDG2021]
+0.015860000   Sigma+  eta'                                 PYTHIA         0; # [PDG2021]
+0.004230000   Sigma+  rho0                                 PYTHIA         0; # [goes into Sigma+ pi+pi-]
+0.017980000   Sigma+  omega                                PYTHIA         0; # [PDG2021]
+0.003170000   Sigma*+  pi0                                 PYTHIA         0;
+# 0.00279 to Lambda pi+ pi0
+0.008990000   Sigma*+  eta                                 PYTHIA         0; # [PDG2011]
+# Contributes 0.0791 To Lambda  pi eta
+0.000630000   Sigma*+  rho0                                PYTHIA         0; # [PDG2021 contributes to L(3pi)]]
+0.003170000   Sigma*+  omega                               PYTHIA         0;
+0.005810000   Xi0  K+                                      PYTHIA         0; # [PDG2021]
+0.002110000   Xi0  K*+                                     PYTHIA         0;
+0.004540000   Xi*0  K+                                     PYTHIA         0; # [PDG2021]
+0.001140000   Delta++  pi-                                 PYTHIA         0; # [PDG2021]
+0.001060000   Delta++  rho-                                PYTHIA         0;
+0.000080000   p+  pi0                                      PYTHIA         0; # [Theory - Cheng, Kang, Xu, Phys. Rev D 97, 074028 ]
+0.000500000   p+  eta'                                     PYTHIA         0; # [Belle2022]
+0.002110000   p+  rho0                                     PYTHIA         0;
+0.002110000   p+  omega                                    PYTHIA         0;
+0.001120000   p+  phi                                      PYTHIA         0; # [PDG2021]
+0.002960000   p+  f_0                                      PYTHIA         0; # [PDG2021]
+0.001060000   Delta+  pi0                                  PYTHIA         0;
+0.001060000   Delta+  eta                                  PYTHIA         0;
+0.001060000   Delta+  eta'                                 PYTHIA         0;
+0.001060000   Delta+  rho0                                 PYTHIA         0;
+0.001060000   Delta+  omega                                PYTHIA         0;
+0.003170000   n0  pi+                                      PYTHIA         0;
+0.003170000   n0  rho+                                     PYTHIA         0;
+0.003170000   Delta0  pi+                                  PYTHIA         0;
+0.003170000   Delta0  rho+                                 PYTHIA         0;
+0.006450000   Lambda0  K+                                  PYTHIA         0; # [PDG2021]
+0.005280000   Lambda0  K*+                                 PYTHIA         0;
+0.000530000   Sigma0  K+                                   PYTHIA         0; # [PDG2021]
+0.002110000   Sigma0  K*+                                  PYTHIA         0;
+0.001060000   Sigma*0  K+                                  PYTHIA         0;
+0.001060000   Sigma*0  K*+                                 PYTHIA         0;
+0.002110000   Sigma+  K0                                   PYTHIA         0;
+0.003700000   Sigma+  K*0                                  PYTHIA         0; # [PDG2021]
+0.001060000   Sigma*+  K0                                  PYTHIA         0;
+0.001060000   Sigma*+  K*0                                 PYTHIA         0;
+0.035850000   p+  K-  pi+                                  PHSP;  # [Adjusted PDG2021 such that total is 0.0664]
+0.034780000   p+  anti-K0  pi0                             PHSP;  # [PDG2021 corrected for pKstar (2*1.97 - 0.33*1.96)]
+0.008670000   p+  anti-K0  eta                             PHSP;  # [PDG2021 *2]
+0.033850000   p+  anti-K0  pi+  pi-                        PHSP;  # [PDG2021 *2 ]
+0.037220000   p+  K-  pi+  pi0                             PHSP;  # [PDG2021 - 0.666*0.014 from pK*- pi+]
+0.014800000   p+  K*-  pi+                                 PHSP;  # [PDG2021]
+0.001770000   p+  K-  pi+  pi+  pi-                        PHSP;  # Use isopin model rather than PDG for pK(3pi)
+0.001240000   p+  K-  pi+  pi0  pi0                        PHSP;  # Use isospin model rather than PDG for pK(3pi)
+0.002820000   p+  anti-K0  pi+ pi-  pi0                    PHSP;  #    
+0.001240000   n0  anti-K0  pi+  pi0  pi0                   PHSP;  #  
+0.001410000   n0 K- pi+ pi+ pi0                            PHSP;  # 
+0.001760000   n0 anti-K0 pi+ pi+ pi-                       PHSP;  # 
+0.001310000   p+ eta                                       PHSP;  # [PDG2021]
+0.004860000   p+  pi+  pi-                                 PHSP;  # [PDG2021]    
+0.004860000   p+  pi0  pi0                                 PHSP;  # [Isospin model]
+0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG2021]
+0.001690000   p+  pi+  pi-  pi0  pi0                       PHSP;  # [Isospin model]
+0.001160000   p+  pi0  pi0  pi0  pi0                       PHSP;  # [Isospin model]		
+0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addtion to pphi mode]
+0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]  
+0.002430000   n0  pi+  pi0  pi+  pi-                       PHSP;  # [Isospin model]
+0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]
+0.000530000   n0  K+  K0                                   PHSP;  # [PDG2021]
+0.038490000   n0 anti-K0 pi+                               PHSP;  # [PDG2021]
+0.062180000   Lambda0  pi+  pi0                            PHSP;  # [PDG2021]
+# In addition there is 0.00634 from rho and 0.00371 from Sigma*0 pi+ and 0.00279 from Sigma*+ pi0
+# Lambda0  pi+  pi+  pi-                                   PHSP;  # [No non-resonant decays in PDG2021]
+0.015860000   Lambda0  pi+  rho0                           PHSP;  # [PDG2021; goes to Lambda pi+pi-pi+]
+0.027320110   Lambda0  pi+ pi0 pi0                         PHSP;  # Isospin model guess
+0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  # [No non-resonant decays in PDG 2021] 
+0.019450000   Lambda0  pi+  eta                            PHSP;  # [PDG2021; contributes to L0 4pi]
+0.015890000   Lambda0  pi+  omega                          PHSP;  # [PDG2021; contributes to L0 4pi]
+0.006020000   Lambda0  K+  anti-K0                         PHSP;  # [PDG2021]
+0.047580000   Sigma+  pi+  pi-                             PHSP;  # [PDG2021 - resonances not measured]
+0.016390000   Sigma+  pi0  pi0                             PHSP;  # [PDG2021 - resonances not measured]	
+0.019780000   Sigma-  pi+  pi+                             PHSP;  # [PDG2021]
+0.037000000   Sigma0  pi+  pi0                             PHSP;  # [PDG2021]
+0.011740000   Sigma0  pi+  pi+  pi-                        PHSP;  # [PDG2021]
+0.011740000   Sigma0  pi+  pi0  pi0                        PHSP;  # not measured
+0.022210000   Sigma-  pi+  pi+  pi0                        PHSP;  # [PDG2021]
+0.011740000   Sigma+  pi+  pi-  pi0                        PHSP;  # not measured
+0.011630000   Sigma+  pi0  pi0  pi0                        PHSP;  # not measured
+0.001590000   Sigma+  K+  K-                               PHSP;  # [PDG2021 - Sigma+phi]
+0.004120000   Sigma+  phi                                  PHSP;  # [PDG2021 contributes to Sigma+ K+K-] 
+0.003700000   Sigma+  K0 anti-K0                           PHSP;  # [From phase-space model]
+0.003700000   Sigma0  K+ anti-K0                           PHSP;  # [From phase-space model]	
+0.004650000   Xi-  K+  pi+                                 PHSP;  # [PDG2021 - subtracted for Xi(1530)K]
+0.006030000   Xi0  K+  pi0                                 PHSP;  # [Isospin model subtracted for Xi(1530)K]
+0.006550000   Xi0  K0  pi+                                 PHSP;  # [Isospin model]		
+0.000000000   Sigma+  K+  pi-                              PHSP;  # [PDG2021 only decays resonantly]
+0.023260000   Lambda(1520)0 pi+                            PHSP;  # [PDG2021]
+# Contributes 0.00534 to pKpi, 0.00534 to nK0bar pi, 0.00324 to Sigma+pipi 0.00324 to Sigma-pipi
+# 0.0015 to Lambda 3pi
+0.000110000   p+ K+ pi-                                    PHSP;  # [PDG2021]
 Enddecay
 CDecay anti-Lambda_c-
 

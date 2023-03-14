@@ -70,7 +70,7 @@ void SignalSideVariablesToExtraInfoModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    auto* signalSide = roe->getRelated<Particle>();
+    auto* signalSide = roe->getRelatedFrom<Particle>();
 
     const unsigned int nVars = m_functions.size();
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {

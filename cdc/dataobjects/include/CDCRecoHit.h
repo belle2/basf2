@@ -9,9 +9,9 @@
 #pragma once
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/ADCCountTranslatorBase.h>
-#include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+#include <cdc/translators/ADCCountTranslatorBase.h>
+#include <cdc/translators/CDCGeometryTranslatorBase.h>
+#include <cdc/translators/TDCCountTranslatorBase.h>
 
 #include <genfit/AbsMeasurement.h>
 #include <genfit/MeasurementOnPlane.h>

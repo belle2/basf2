@@ -49,7 +49,7 @@ namespace Belle2 {
   VariableTBranch<Variable>::VariableTBranch(TTree* tree)
   {
     if (tree != nullptr && tree -> GetBranch(Variable::name().c_str()) == nullptr)
-      m_branch = tree->Branch(Variable::name().c_str() , & m_storedValue,
+      m_branch = tree->Branch(Variable::name().c_str(), & m_storedValue,
                               TBranchLeafType(m_storedValue));
   }
 }

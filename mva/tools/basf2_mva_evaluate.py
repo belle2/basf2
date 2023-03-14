@@ -151,8 +151,8 @@ if __name__ == '__main__':
     for datafile in datafiles:
         rootchain.Add(datafile)
 
-    variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, list(variable_abbreviations.values()))
-    spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
+    variables_data = basf2_mva_util.chain2dict(rootchain, root_variables, list(variable_abbreviations.values()))
+    spectators_data = basf2_mva_util.chain2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
 
     if args.fillnan:
         for column in variable_abbreviations.values():
@@ -196,6 +196,11 @@ if __name__ == '__main__':
             This section contains an overview of the importance and correlation of the variables used by the classifiers.
             And distribution plots of the variables on the independent dataset. The distributions are normed for signal and
             background separately, and only the region +- 3 sigma around the mean is shown.
+
+            The importance scores shown are based on the variable importance as estimated by each MVA method internally.
+            This means the variable with the lowest importance will have score 0, and the variable
+            with the highest importance will have score 100. If the method does not provide such a ranking, all
+            importances will be 0.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of variables", "{name} & {abbr}", r"Variable & Abbreviation")

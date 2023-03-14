@@ -331,5 +331,46 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=None):
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
 
+def _add_independent_merge_path(
+        self,
+        skim_path,
+        ds_ID='',
+        merge_back_event=None,
+        consistency_check=None,
+        event_mixing=False,
+        merge_same_file=False):
+    """
+    Merge specified content of DataStore of independent path into DataStore of main path
+    on a per event level (add tracks/cluster from both events,...).
+
+    Parameters:
+      skim_path: independent path to be merged
+      ds_ID: can be specified to give a defined ID to the temporary DataStore,
+        otherwise, a random name will be generated (option for developers).
+      merge_back_event: is a list of object/array names (of event durability)
+        that will be merged back into the main path.
+      consistency_check: perform additional consistency checks on the objects from two paths.
+        If they are not satisfied, the skim_path proceeds to the next event on the path.
+        Currently supported value is "charge" that uses EventExtraInfo "charge" of the two paths,
+        that must be specified by the user, ensuring correct configuration of the combined event.
+        See CheckMergingConsistencyModule for more details.
+      event_mixing: apply event mixing (merge each event from first path with each event of second path)
+      merge_same_file: merge events from single file (useful for mixing)
+    """
+    if merge_back_event is None:
+        merge_back_event = []
+    if consistency_check is None:
+        consistency_check = ""
+    if merge_same_file:
+        if not event_mixing:
+            pybasf2.B2INFO("add_independent_merge_path: merge_same_file requires event_mixing, setting it to True")
+        event_mixing = True
+    for module in skim_path.modules():
+        if module.type() == "RootInput":
+            module.param("isSecondaryInput", True)
+    self._add_independent_merge_path(skim_path, ds_ID, merge_back_event, consistency_check, event_mixing, merge_same_file)
+
+
 pybasf2.Path.add_module = _add_module
 pybasf2.Path.add_independent_path = _add_independent_path
+pybasf2.Path.add_independent_merge_path = _add_independent_merge_path

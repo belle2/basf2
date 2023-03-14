@@ -15,8 +15,9 @@
 #include <top/dbobjects/TOPGeoPMTArray.h>
 #include <top/dbobjects/TOPGeoPMTArrayDisplacement.h>
 #include <top/dbobjects/TOPGeoModuleDisplacement.h>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Transform3D.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
 namespace Belle2 {
 
@@ -315,60 +316,80 @@ namespace Belle2 {
     double getInnerRadius() const {return getRadius() - getBarThickness() / 2;}
 
     /**
+     * Returns transformation from internal (= nominal & displaced) to Belle II frame
+     * @return transformation
+     */
+    const ROOT::Math::Transform3D& getTransformation() const
+    {
+      if (not m_transform) setTransformation();
+      return *m_transform;
+    }
+
+    /**
+     * Returns transformation from nominal to Belle II frame
+     * @return transformation
+     */
+    const ROOT::Math::Transform3D& getTransformationNominal() const
+    {
+      if (not m_transformNominal) setTransformation();
+      return *m_transformNominal;
+    }
+
+    /**
      * Transforms 3D point from Belle II to module internal (= nominal & displaced) frame
      * @param point 3D point in Belle II frame (basf2 units!)
      * @return 3D point in module internal frame (basf2 units!)
      */
-    TVector3 pointToLocal(const TVector3& point) const;
+    ROOT::Math::XYZPoint pointToLocal(const ROOT::Math::XYZPoint& point) const;
 
     /**
      * Transforms momentum vector from Belle II to module internal (= nominal & displaced) frame
      * @param momentum momentum vector in Belle II frame
      * @return momentum vector in module internal frame
      */
-    TVector3 momentumToLocal(const TVector3& momentum) const;
+    ROOT::Math::XYZVector momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
 
     /**
      * Transforms 3D point from module internal (= nominal & displaced) frame to Belle II frame
      * @param point 3D point in module internal frame (basf2 units!)
      * @return 3D point in Belle II frame (basf2 units!)
      */
-    TVector3 pointToGlobal(const TVector3& point) const;
+    ROOT::Math::XYZPoint pointToGlobal(const ROOT::Math::XYZPoint& point) const;
 
     /**
      * Transforms momentum vector from module internal (= nominal & displaced) frame to Belle II frame
      * @param momentum momentum vector in module internal frame
      * @return momentum vector in Belle II frame
      */
-    TVector3 momentumToGlobal(const TVector3& momentum) const;
+    ROOT::Math::XYZVector momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
 
     /**
      * Transforms 3D point from Belle II to module nominal frame
      * @param point 3D point in Belle II frame (basf2 units!)
      * @return 3D point in module nominal frame (basf2 units!)
      */
-    TVector3 pointGlobalToNominal(const TVector3& point) const;
+    ROOT::Math::XYZPoint pointGlobalToNominal(const ROOT::Math::XYZPoint& point) const;
 
     /**
      * Transforms momentum vector from Belle II to module nominal frame
      * @param momentum momentum vector in Belle II frame
      * @return momentum vector in module nominal frame
      */
-    TVector3 momentumGlobalToNominal(const TVector3& momentum) const;
+    ROOT::Math::XYZVector momentumGlobalToNominal(const ROOT::Math::XYZVector& momentum) const;
 
     /**
      * Transforms 3D point from module nominal frame to Belle II frame
      * @param point 3D point in module nominal frame (basf2 units!)
      * @return 3D point in Belle II frame (basf2 units!)
      */
-    TVector3 pointNominalToGlobal(const TVector3& point) const;
+    ROOT::Math::XYZPoint pointNominalToGlobal(const ROOT::Math::XYZPoint& point) const;
 
     /**
      * Transforms momentum vector from module nominal frame to Belle II frame
      * @param momentum momentum vector in module nominal frame
      * @return momentum vector in Belle II frame
      */
-    TVector3 momentumNominalToGlobal(const TVector3& momentum) const;
+    ROOT::Math::XYZVector momentumNominalToGlobal(const ROOT::Math::XYZVector& momentum) const;
 
     /**
      * Check for consistency of data members
@@ -404,19 +425,10 @@ namespace Belle2 {
     TOPGeoPMTArrayDisplacement m_arrayDisplacement;  /**< PMT array displacement */
     TOPGeoModuleDisplacement m_moduleDisplacement;   /**< module displacement */
 
-    /** cache for rotation matrix from internal (= nominal & displaced) to Belle II frame */
-    mutable TRotation* m_rotation = 0;    //! do not write out
-    /** cache for inverse rotation matrix */
-    mutable TRotation* m_rotationInverse = 0;    //! do not write out
-    /** cache for translation vector from internal (= nominal & displaced) to Belle II frame */
-    mutable TVector3* m_translation = 0;  //! do not write out
-
-    /** cache for rotation matrix from nominal to Belle II frame */
-    mutable TRotation* m_rotationNominal = 0;    //! do not write out
-    /** cache for inverse rotation matrix */
-    mutable TRotation* m_rotationNominalInverse = 0;    //! do not write out
-    /** cache for translation vector from nominal to Belle II frame */
-    mutable TVector3* m_translationNominal = 0;  //! do not write out
+    /** cache for transformation from internal (= nominal & displaced) to Belle II frame */
+    mutable ROOT::Math::Transform3D* m_transform = 0;  //! do not write out
+    /** cache for transformation from nominal to Belle II frame */
+    mutable ROOT::Math::Transform3D* m_transformNominal = 0;  //! do not write out
 
     ClassDefOverride(TOPGeoModule, 3); /**< ClassDef */
 

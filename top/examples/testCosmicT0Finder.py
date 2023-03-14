@@ -18,9 +18,10 @@
 import basf2 as b2
 from ROOT import Belle2
 from ROOT import TH1F
-from ROOT import gROOT, AddressOf
+from ROOT import gROOT, addressof
 import math
 import ROOT
+from ROOT.Math import XYZVector
 
 timeShift = 100  # ns (can be arbitrary chosen)
 
@@ -81,7 +82,7 @@ class Ntuple(b2.Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
         #: histogram of t0 residuals
         self.reso = TH1F('reso', 'T0 residuals', 200, -1.0, 1.0)
@@ -94,6 +95,7 @@ class Ntuple(b2.Module):
 
         mcParticles = Belle2.PyStoreArray('MCParticles')
         timeZeros = Belle2.PyStoreArray('TOPTimeZeros')
+        geo = Belle2.TOP.TOPGeometryPar.Instance().getGeometry()
         for timeZero in timeZeros:
             extHit = timeZero.getRelated('ExtHits')
             if not extHit:
@@ -119,25 +121,22 @@ class Ntuple(b2.Module):
             self.data.nfot = timeZero.getNumPhotons()
             self.data.pdg = barHit.getPDG()
             pos = barHit.getLocalPosition()
-            self.data.x = pos.x()
-            self.data.y = pos.y()
-            self.data.z = pos.z()
+            self.data.x = pos.X()
+            self.data.y = pos.Y()
+            self.data.z = pos.Z()
             self.data.t = barHit.getTime()
-            phiBar = math.pi / 2 - math.pi / 8 * (moduleID - 0.5)
-            mom = barHit.getMomentum()
-            mom.RotateZ(phiBar)
-            self.data.p = mom.Mag()
+            module = geo.getModule(moduleID)
+            mom = module.momentumToLocal(barHit.getMomentum())
+            self.data.p = mom.R()
             self.data.theta = math.degrees(mom.Theta())
             self.data.phi = math.degrees(mom.Phi())
-            dr = extHit.getPosition() - barHit.getPosition()
-            dr.RotateZ(phiBar)
-            self.data.dx = dr.x()
-            self.data.dy = dr.y()
-            self.data.dz = dr.z()
+            dr = module.momentumToLocal(extHit.getPosition() - XYZVector(barHit.getPosition()))
+            self.data.dx = dr.X()
+            self.data.dy = dr.Y()
+            self.data.dz = dr.Z()
             self.data.dt = extHit.getTOF() - self.data.t
-            momExt = extHit.getMomentum()
-            momExt.RotateZ(phiBar)
-            self.data.dp = momExt.Mag() - self.data.p
+            momExt = module.momentumToLocal(extHit.getMomentum())
+            self.data.dp = momExt.R() - self.data.p
             self.data.dtheta = math.degrees(momExt.Theta()) - self.data.theta
             self.data.dphi = math.degrees(momExt.Phi()) - self.data.phi
             self.data.t0 = timeZero.getTime()
@@ -163,9 +162,6 @@ class Ntuple(b2.Module):
 
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.WARNING)
-
-# Define a global tag (note: the one given bellow will become out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
 main = b2.create_path()

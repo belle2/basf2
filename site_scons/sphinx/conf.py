@@ -45,6 +45,7 @@ extensions = [
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
 
@@ -90,9 +91,9 @@ author = 'Belle II Software Group'
 # The short X.Y version.
 version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 # Used for links to the repository
-basf2_repository = "https://stash.desy.de/projects/B2/repos/basf2"
+basf2_repository = "https://gitlab.desy.de/belle2/software/basf2/"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
-basf2_jira = "https://agira.desy.de"
+basf2_issues = "https://gitlab.desy.de/belle2/software/basf2/-/issues/"
 
 # The full version, including alpha/beta/rc tags.
 release = os.environ.get('BELLE2_RELEASE', 'development')
@@ -139,7 +140,7 @@ if tags.has('light'):  # noqa
 # now we need to exclude everything in the build dir except for the tools_doc
 # sub dir but there's no negative exclusion pattern so do it manually
 exclude_patterns.remove("build")
-exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*']
+exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*', 'build/belle2_tools']
 # Ignore jupyter notebooks by default, we only want the ones meant for documentation
 exclude_patterns += ['**/*.ipynb', '*.ipynb']
 
@@ -179,7 +180,7 @@ numfig = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -295,7 +296,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'Belle 2 Software Documentation',
+    (master_doc, 'basf2.tex', 'Belle II Software Documentation',
      author, 'manual'),
 ]
 
@@ -359,7 +360,11 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 # allow to have links to python documentation
-intersphinx_mapping = {'python': ('https://docs.python.org/3.6', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
+                       'numpy': ('https://numpy.org/doc/stable/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+                       'pandas': ('https://pandas.pydata.org/docs/', None),
+                       'matplotlib': ('https://matplotlib.org/stable/', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):

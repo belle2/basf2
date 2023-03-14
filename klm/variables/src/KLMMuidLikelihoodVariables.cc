@@ -9,12 +9,10 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/Track.h>
-
-using namespace std;
 
 namespace Belle2 {
   namespace Variable {

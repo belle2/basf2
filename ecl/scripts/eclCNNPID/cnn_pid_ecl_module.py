@@ -51,7 +51,6 @@ class CNN_PID_ECL(b2.Module):
 
     def __init__(
         self,
-        particleList,
         path,
         image_length=7,
         threshold=0.001,
@@ -60,17 +59,12 @@ class CNN_PID_ECL(b2.Module):
     ):
         super().__init__()
 
-        self.particleList = particleList
-        if self.particleList.split(':')[0] not in self.chargedStable_name_list():
-            b2.B2WARNING('Particle is not a charged stable one.')
-
         self.image_length = image_length
         self.threshold = threshold
         self.thetaId_range = thetaId_range
         self.pt_range = pt_range
         self.path = path
 
-        torch.manual_seed(1234)
         self.device = torch.device('cpu')
 
     def initialize(self):
@@ -78,6 +72,19 @@ class CNN_PID_ECL(b2.Module):
 
         self.eclCalDigits = self.Belle2.PyStoreArray('ECLCalDigits')
         self.mapping = self.Belle2.PyStoreObj('ECLCellIdMapping')
+        self.eclCnnMuon = self.Belle2.PyStoreArray(self.Belle2.ECLCNNPid.Class())
+        self.eclCnnMuon.registerInDataStore()
+        self.tracks = self.Belle2.PyStoreArray('Tracks')
+        self.tracks.registerRelationTo(self.eclCnnMuon)
+
+    def beginRun(self):
+        """ Read CNN payloads which include weights and biases """
+
+        self.charge = 'plus'
+        self.model_plus = self.read_model()
+
+        self.charge = 'minus'
+        self.model_minus = self.read_model()
 
     def event(self):
         """ Event processing
@@ -90,26 +97,29 @@ class CNN_PID_ECL(b2.Module):
         muon- or pion-like.
         """
 
-        pList = self.Belle2.PyStoreObj(self.particleList)
-        variable_pion = 'cnn_pid_ecl_pion'
         variable_muon = 'cnn_pid_ecl_muon'
 
-        for i, particle in enumerate(pList.obj()):
+        for track in self.tracks:
 
-            track = particle.getTrack()
+            fit_result = track.getTrackFitResultWithClosestMass(self.Belle2.Const.pion)
+            if not fit_result:
+                continue
 
-            if (track and self.getExtCell(track)):
-                extHit_dict = self.getExtCell(track)
+            charge = fit_result.getChargeSign()
+            if charge == 0:
+                continue
+
+            extHit_dict = self.getExtCell(track)
+
+            if (track and extHit_dict):
                 maxCellId = extHit_dict['cellid']
                 self.pt = extHit_dict['pt']
                 self.pt = np.array([self.pt])
 
-                self.charge = particle.getCharge()
-
-                if self.charge == -1.0:
-                    self.charge = 'minus'
-                elif self.charge == 1.0:
-                    self.charge = 'plus'
+                if charge == -1.0:
+                    model = self.model_minus
+                elif charge == 1.0:
+                    model = self.model_plus
 
                 self.extThetaId = self.mapping.getCellIdToThetaId(maxCellId)
                 self.extThetaId = np.array([self.extThetaId])
@@ -118,7 +128,6 @@ class CNN_PID_ECL(b2.Module):
 
                 if maxCellId < 0:
                     b2.B2WARNING('maxCellId is less 0.')
-                    return(np.nan, np.nan)
                 else:
                     # Since CNN can only predict PID of the tracks inside the barrel,
                     # there are two hard-coded numbers in the __init__ (13 and 58),
@@ -143,16 +152,16 @@ class CNN_PID_ECL(b2.Module):
 
                         self.energy_array = np.array(energy_list)
 
-                        prob_CNN_dict = self.extract_cnn_value()
-                        prob_CNN_pion = prob_CNN_dict['cnn_pion']
+                        prob_CNN_dict = self.extract_cnn_value(model)
                         prob_CNN_muon = prob_CNN_dict['cnn_muon']
 
-                        particle.addExtraInfo(variable_pion, prob_CNN_pion)
-                        particle.addExtraInfo(variable_muon, prob_CNN_muon)
-                        b2.B2DEBUG(11, f'{variable_pion}: {prob_CNN_pion}, {variable_muon}: {prob_CNN_muon}')
+                        eclCnnMuon = self.eclCnnMuon.appendNew()
+                        eclCnnMuon.setEclCnnMuon(prob_CNN_muon)
+                        track.addRelationTo(eclCnnMuon)
+
+                        b2.B2DEBUG(22, f'{variable_muon}: {prob_CNN_muon}')
                     else:
-                        b2.B2DEBUG(11, 'Track is either outside ECL Barrel or Pt is outside [0.2, 1.0] GeV/c. No CNN value.')
-                        return(np.nan, np.nan)
+                        b2.B2DEBUG(22, 'Track is either outside ECL Barrel or Pt is outside [0.2, 1.0] GeV/c. No CNN value.')
 
     def getExtCell(self, track):
         """ Extract cellId and pt of an extrapolated track
@@ -191,7 +200,7 @@ class CNN_PID_ECL(b2.Module):
 
             return(extHit_dict)
 
-    def extract_cnn_value(self):
+    def extract_cnn_value(self, model):
         """ Extract CNN values for an extrapolated track
 
         The output of this function is dictionary
@@ -204,7 +213,6 @@ class CNN_PID_ECL(b2.Module):
         """
 
         test_loader = self.prepare_images()
-        model = self.read_model()
         model.eval()
 
         with torch.no_grad():
@@ -299,24 +307,5 @@ class CNN_PID_ECL(b2.Module):
         model.load_state_dict(torch.load(checkpoint))
 
         return(model)
-
-    def chargedStable_name_list(self):
-        """ Create list of particle names
-
-        The output is ['e-', 'e+', 'mu-', ...] which
-        includes names of all charged stable particles
-        with their corresponding anti-particles.
-        """
-
-        chargedStable_pdg_list = []
-
-        for idx in range(len(self.Belle2.Const.chargedStableSet)):
-            particle = self.Belle2.Const.chargedStableSet.at(idx)
-            pdgId = particle.getPDGCode()
-            chargedStable_pdg_list.extend([pdgId, -pdgId])
-
-        chargedStable_name_list = self.pdg.to_names(chargedStable_pdg_list)
-
-        return(chargedStable_name_list)
 
 # @endcond

@@ -17,13 +17,13 @@
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Common Modes */
 
-  class DQMHistAnalysisRunNrModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisRunNrModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

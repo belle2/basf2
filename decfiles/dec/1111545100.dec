@@ -1,6 +1,6 @@
 # EventType: 1111545100
 # Descriptor: [B0 -> chi_c1 [-> J/psi [-> e+ e-] gamma] pi0 [-> gamma gamma] pi0 [-> gamma gamma] K_S0 [-> pi+ pi-]]
-# NickName: Bu_chic1pipiK_Jpsigamma_ee
+# NickName: Bu_chic1pipiKS_Jpsigamma_ee
 # Documentation: B -> charmonium decays.
 # Tested: Yes
 # PhysicsWG: Charmonium

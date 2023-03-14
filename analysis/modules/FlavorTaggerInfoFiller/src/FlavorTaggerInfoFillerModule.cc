@@ -86,7 +86,7 @@ void FlavorTaggerInfoFillerModule::event()
 
   if (m_DNNmlp) {
     FlavorTaggerInfoMap* infoMapsDNN = flavorTaggerInfo -> getMethodMap("DNN");
-    const Particle* particle = m_roe->getRelated<Particle>();
+    const Particle* particle = m_roe->getRelatedFrom<Particle>();
     float B0Probability = particle->getExtraInfo("dnn_output");
     float B0barProbability = 1 - B0Probability;
     float qrCombined = 2 * (B0Probability - 0.5);

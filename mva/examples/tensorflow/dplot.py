@@ -163,13 +163,19 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass received data to tensorflow session
     """
     prior = Prior(S[:, 0], y[:, 0])
     N = 100
     batch_size = 100
+
+    # make sure we have the epochs and batches set correctly.
+    assert epoch < 2, "There should only be two iterations, one for the boost training,"\
+        " one for the dplot training. Check the value of m_nIterations."
+    assert batch == 0, "All data should be passed to partial_fit on each call."\
+        " The mini batches are handled internally. Check that m_mini_batch_size=0."
 
     indices = np.arange(len(X))
     for i in range(N):
@@ -209,7 +215,7 @@ def partial_fit(state, X, S, y, w, epoch):
 
             optimizer.apply_gradients(zip(grads, trainable_variables))
 
-        print("Epoch:", '%04d' % (i), "cost=", "{:.9f}".format(avg_cost))
+        print("Internal Epoch:", '%04d' % (i), "cost=", "{:.9f}".format(avg_cost))
     return True
 
 

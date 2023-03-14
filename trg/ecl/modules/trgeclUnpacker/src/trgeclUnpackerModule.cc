@@ -339,22 +339,22 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
       cl_energy[2] = (sum_info[j][7] >>  6) & 0xFFF;
       cl_time[2]   = (sum_info[j][7] >> 18) & 0xFF;
       cl_phi[2]    = ((sum_info[j][8] & 0x3) << 6) + ((sum_info[j][7] >> 26) & 0x3F);
-      cl_theta[2]  = (sum_info[j][8] >>  2) & 0x3F;
+      cl_theta[2]  = (sum_info[j][8] >>  2) & 0x7F;
 
       cl_energy[3] = (sum_info[j][8] >>  9) & 0xFFF;
       cl_time[3]   = (sum_info[j][8] >> 21) & 0xFF;
       cl_phi[3]    = ((sum_info[j][9] & 0x1F) << 3) + ((sum_info[j][8] >> 29) & 0x7);
-      cl_theta[3]  = (sum_info[j][9] >>  5) & 0x3F;
+      cl_theta[3]  = (sum_info[j][9] >>  5) & 0x7F;
 
       cl_energy[4] = (sum_info[j][ 9] >> 12) & 0xFFF;
       cl_time[4]   = (sum_info[j][ 9] >> 24) & 0xFF;
       cl_phi[4]    = (sum_info[j][10]) & 0xFF;
-      cl_theta[4]  = (sum_info[j][10] >>  8) & 0x3F;
+      cl_theta[4]  = (sum_info[j][10] >>  8) & 0x7F;
 
       cl_energy[5] = (sum_info[j][10] >> 15) & 0xFFF;
       cl_time[5]   = ((sum_info[j][11] & 0x7) << 5) + ((sum_info[j][10] >> 27) & 0x1F);
       cl_phi[5]    = (sum_info[j][11] >>  3) & 0xFF;
-      cl_theta[5]  = (sum_info[j][11] >> 11) & 0x3F;
+      cl_theta[5]  = (sum_info[j][11] >> 11) & 0x7F;
       // CL others
       for (int k = 0; k < 6; k++) {
         cl_1gev[k] = (sum_info[j][12] >>  k) & 0x1;

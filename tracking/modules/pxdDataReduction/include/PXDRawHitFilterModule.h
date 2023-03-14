@@ -11,6 +11,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {
 
@@ -30,22 +31,24 @@ namespace Belle2 {
 
   private:
 
-    /**  */
+    /** Initialize all necessary variables */
     void initialize() override final;
 
 
-    /**  */
+    /** Event function */
     void event() override final;
 
+    StoreArray<ROIid> m_ROIs;   /**< ROIs StoreArray */
+    StoreArray<PXDRawHit> m_PXDRawHits;   /**< PXDRawHits StoreArray */
+
+    SelectSubset< PXDRawHit > m_selectorIN; /**< selector of the subset of PXDRawHits contained in the ROIs*/
+    SelectSubset< PXDRawHit > m_selectorOUT; /**< selector of the subset of PXDRawHits NOT contained in the ROIs*/
 
     bool m_CreateOutside; /**< if set, create list of outside pixels, too */
     std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be filtered */
     std::string m_PXDRawHitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDRawHits */
     std::string m_PXDRawHitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDRawHits */
     std::string m_ROIidsName;  /**< The name of the StoreArray of ROIs */
-
-    SelectSubset< PXDRawHit > m_selectorIN; /**< selector of the subset of PXDRawHits contained in the ROIs*/
-    SelectSubset< PXDRawHit > m_selectorOUT; /**< selector of the subset of PXDRawHits NOT contained in the ROIs*/
 
   };
 }

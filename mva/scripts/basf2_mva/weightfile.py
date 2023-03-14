@@ -15,5 +15,6 @@ def Weightfile():
     '''
     Wrapper around Weightfile Belle2::MVA:Weightfile().
     '''
+    # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
     return ROOT.Belle2.MVA.Weightfile()

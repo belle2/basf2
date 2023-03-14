@@ -51,7 +51,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return MyFancyClassifier(parameters)
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Is called once per training after get_model.
     You can initialize your training here.
@@ -61,6 +61,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     @param Stest numpy array containing the spectators of the validation sample
     @param ytest numpy array containing the target values of the validation sample
     @param wtest numpy array containing the weights of the validation sample
+    @param nBatches int containing the number of batches that will be passed to partial_fit in each epoch.
 
     Since our method does not support out-of-core fitting, the usual thing is to add
     some arrays which collect the data passed to partial_fit.
@@ -71,7 +72,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Can be called multiple times per training depending on the user configuration:
     If m_nIterations == 1 and m_mini_batch_size == 0 (these are the default values)
@@ -92,7 +93,8 @@ def partial_fit(state, X, S, y, w, epoch):
     @param S numpy array containing the spectators of the training sample
     @param y numpy array containing the target values of the training sample
     @param w numpy array containing the weights of the training sample
-    @param epoch the total number of previous calls to partial_fit
+    @param epoch the index of the current iteration through the total data set.
+    @param batch the index of the current mini batch passed to partial_fit
 
     Since our method doesn't use the streaming capability,
     we just collect the data in our state object.

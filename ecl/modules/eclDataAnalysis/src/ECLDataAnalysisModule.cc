@@ -1974,8 +1974,8 @@ void ECLDataAnalysisModule::event()
     m_eclShowerMinTrkDistance->push_back(aECLShowers->getMinTrkDistance());
     m_eclShowerTrkDepth->push_back(aECLShowers->getTrkDepth());
     m_eclShowerShowerDepth->push_back(aECLShowers->getShowerDepth());
-    m_eclShowerAbsZernike40->push_back(aECLShowers->getAbsZernike40());
-    m_eclShowerAbsZernike51->push_back(aECLShowers->getAbsZernike51());
+    m_eclShowerAbsZernike40->push_back(aECLShowers->getAbsZernikeMoment(4, 0));
+    m_eclShowerAbsZernike51->push_back(aECLShowers->getAbsZernikeMoment(5, 1));
     m_eclShowerZernikeMVA->push_back(aECLShowers->getZernikeMVA());
     m_eclShowerSecondMoment->push_back(aECLShowers->getSecondMoment());
     m_eclShowerE1oE9->push_back(aECLShowers->getE1oE9());
@@ -2347,7 +2347,7 @@ void ECLDataAnalysisModule::event()
       m_trkPx->push_back(atrk->getMomentum().X());
       m_trkPy->push_back(atrk->getMomentum().Y());
       m_trkPz->push_back(atrk->getMomentum().Z());
-      m_trkP->push_back(atrk->getMomentum().Mag());
+      m_trkP->push_back(atrk->getMomentum().R());
       m_trkTheta->push_back(atrk->getMomentum().Theta());
       m_trkPhi->push_back(atrk->getMomentum().Phi());
       m_trkX->push_back(atrk->getPosition().X());

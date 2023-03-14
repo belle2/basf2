@@ -6,7 +6,7 @@
 # Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
 #   First commit.
 #   Includes rare decays in DECAY_BELLE2.DEC.
-#   https://agira.desy.de/browse/BII-7607
+#   https://gitlab.desy.de/belle2/software/basf2/-/issues/7478
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview
 #   Channels with BFs reported by PDG have been updated to the PDGLive value.
 
@@ -36,8 +36,9 @@ Decay B0Rare
 0.000145000   pi-  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000294000   rho-  e+  nu_e                               BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
-0.000294000   rho-  mu+  nu_mu                             BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000294000   rho-  e+  nu_e                               BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000294000   rho-  mu+  nu_mu                             BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 
 0.000000000   D(2S)-  e+  nu_e                             ISGW2;
 0.000000000   D(2S)-  mu+  nu_mu                           ISGW2;
@@ -46,8 +47,8 @@ Decay B0Rare
 0.001701000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000094227   pi-  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000156755   rho-  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000094227   pi-  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000156755   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000090000   a_1-  tau+  nu_tau                           ISGW2;
 0.000008000   b_1-  tau+  nu_tau                           ISGW2;
 0.000008000   a_0-  tau+  nu_tau                           ISGW2;
@@ -1346,8 +1347,9 @@ Decay anti-B0Rare
 0.000145000   pi+  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
-0.000294000   rho+  e-  anti-nu_e                          BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
-0.000294000   rho+  mu-  anti-nu_mu                        BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907;
+# fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
+0.000294000   rho+  e-  anti-nu_e                          BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000294000   rho+  mu-  anti-nu_mu                        BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 
 0.000000000   D(2S)+  e-  anti-nu_e                        ISGW2;
 0.000000000   D(2S)+  mu-  anti-nu_mu                      ISGW2;
@@ -1356,8 +1358,8 @@ Decay anti-B0Rare
 0.001701000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000094227   pi+  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
-0.000156755   rho+  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000094227   pi+  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
+0.000156755   rho+  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000090000   a_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   b_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   a_0+  tau-  anti-nu_tau                      ISGW2;

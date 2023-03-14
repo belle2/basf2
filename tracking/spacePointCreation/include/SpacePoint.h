@@ -75,7 +75,7 @@ namespace Belle2 {
      */
     SpacePoint(const B2Vector3<double>& pos, const B2Vector3<double>& posError, std::pair<double, double> normalizedLocal,
                std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
-               double UClusterTime = 0. , double VClusterTime = 0.) :
+               double UClusterTime = 0., double VClusterTime = 0.) :
       m_position(pos), m_positionError(posError),
       m_normalizedLocal(normalizedLocal),
       m_UClusterTime(UClusterTime), m_VClusterTime(VClusterTime),
@@ -318,14 +318,9 @@ namespace Belle2 {
     void setPositionError(double uSigma, double vSigma, const VXD::SensorInfoBase* aSensorInfo)
     {
       //As only variances, but not the sigmas transform linearly, we need to use some acrobatics.
-      m_positionError = aSensorInfo->vectorToGlobal(
-                          TVector3(
-                            uSigma * uSigma,
-                            vSigma * vSigma,
-                            0
-                          ),
-                          true // use alignment in transformation
-                        );
+      m_positionError = aSensorInfo->vectorToGlobal(ROOT::Math::XYZVector(uSigma * uSigma, vSigma * vSigma, 0),
+                                                    true // use alignment in transformation
+                                                   );
       m_positionError.Sqrt();
     }
 

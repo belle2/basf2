@@ -12,22 +12,22 @@ Various additions
 
     **Prerequisites**:
 
-        * :ref:`onlinebook_first_steering_file`
+    * :ref:`onlinebook_first_steering_file`
 
     **Questions**:
 
-        * What is Bremsstrahlung radiation? Why do we care about it?
-        * How do we look for Bremsstrahlung photons?
-        * Why do we need to perform a best candidate selection?
-        * How can I correct for Bremsstrahlung?
-        * How can I perform a best candidate selection (BCS)?
+    * What is Bremsstrahlung radiation? Why do we care about it?
+    * How do we look for Bremsstrahlung photons?
+    * Why do we need to perform a best candidate selection?
+    * How can I correct for Bremsstrahlung?
+    * How can I perform a best candidate selection (BCS)?
 
     **Objectives**:
 
-        * Use the different Bremsstrahlung recovery strategies to correct the
-          momentum of the electrons in the
-          :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
-        * Perform a Best Candidate Selection
+    * Use the different Bremsstrahlung recovery strategies to correct the
+      momentum of the electrons in the
+      :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
+    * Perform a Best Candidate Selection
 
 What is Bremsstrahlung radiation?
 ---------------------------------
@@ -156,9 +156,9 @@ with the `passesCut` function.
 
    Create a particle list, called ``gamma:brems``, with photons following the next cuts:
 
-         1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
-         2. If they are in the barrel region, their energy should be larger than 50 MeV
-         3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
+   1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
+   2. If they are in the barrel region, their energy should be larger than 50 MeV
+   3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
 
    To do this, you need the `clusterReg` and `clusterE` variable.
    To keep everything neat and
@@ -480,7 +480,7 @@ random seed.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-     Alejandro Mora,
-     Kilian Lieret
+Alejandro Mora,
+Kilian Lieret

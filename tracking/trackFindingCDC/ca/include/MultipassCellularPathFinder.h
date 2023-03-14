@@ -101,7 +101,7 @@ namespace Belle2 {
           cellHolder->unsetAndForwardMaskedFlag();
         }
 
-        B2DEBUG(100, "Apply multipass cellular automat");
+        B2DEBUG(25, "Apply multipass cellular automat");
         do {
           m_cellularAutomaton.applyTo(cellHolders, cellHolderRelations);
 

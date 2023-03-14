@@ -60,8 +60,8 @@ namespace Belle2 {
          # Do something
     \endcode
   *
-  * The synthax is: getRelationsTo['ClassName']('StoreArrayName', 'RelationName')
-  * where 'StoreArrayName' can be omitted in case of default store arrays.
+  * The synthax is: `getRelationsTo['ClassName']('StoreArrayName', 'RelationName')`
+  * where `StoreArrayName` can be omitted in case of default store arrays.
   *
   * \sa PyStoreObj and the Conditions Data interface classes PyDBObj and PyDBArray
   */

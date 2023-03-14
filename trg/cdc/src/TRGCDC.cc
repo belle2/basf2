@@ -14,6 +14,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <math.h>
+#include <TRandom.h>
 #include <iostream>
 #include <fstream>
 #include "framework/datastore/StoreArray.h"
@@ -57,6 +58,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TObjString.h>
 
 #define NOT_USE_SOCKETLIB
@@ -1029,7 +1031,7 @@ namespace Belle2 {
       //...Loop over CDCHits...
       for (unsigned i = 0; i < nHits; i++) {
         const CDCHit& h = *CDCHits[i];
-        double tmp = rand() / (double(RAND_MAX));
+        double tmp = gRandom->Uniform(0.0, 1.0) / (double(RAND_MAX));
         if (tmp < _inefficiency)
           continue;
 
@@ -2166,7 +2168,7 @@ namespace Belle2 {
           const TCRelation& trackRelation = aTrack.relation();
           const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
           int mcCharge = trackMCParticle.getCharge();
-          double mcPt = trackMCParticle.getMomentum().Pt();
+          double mcPt = trackMCParticle.getMomentum().Rho();
           double mcPhi0 = 0.0;
           if (mcCharge > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
           if (mcCharge < 0) mcPhi0 = trackMCParticle.getMomentum().Phi() + M_PI / 2;
@@ -2179,7 +2181,7 @@ namespace Belle2 {
           TVector3 impactPosition;
           Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);
           double mcZ0 = impactPosition.Z();
-          double mcCot = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+          double mcCot = trackMCParticle.getMomentum().z() / trackMCParticle.getMomentum().Rho();
           cout << TRGDebug::tab() << "Track[" << iTrack << "]: mcCharge=" << mcCharge
                << " mcPt=" << mcPt << " mcPhi_c=" << mcPhi0
                << " mcZ0=" << mcZ0 << " mcCot=" << mcCot << endl;
@@ -2514,7 +2516,7 @@ namespace Belle2 {
       if (! f) {
         newFrontEnd = true;
         const string name = "CDCFrontEnd" + TRGUtil::itostring(fid);
-        TCFrontEnd::boardType t = TCFrontEnd::unknown;
+        TCFrontEnd::boardType t;
         if (sl == 0) {
           if (_wires[wid]->localLayerId() < 5)
             t = TCFrontEnd::innerInside;
@@ -2539,7 +2541,7 @@ namespace Belle2 {
       // part, well, seems not good in coding
       //
       bool newMerger = false;
-      TCMerger* m = 0;
+      TCMerger* m = nullptr;
       if (newFrontEnd) {
         if (mid != 99999) {
           if (mid < _mergers.size())
@@ -2548,7 +2550,7 @@ namespace Belle2 {
             newMerger = true;
             const string name = "CDCMerger" + TRGUtil::itostring(sl) +
                                 "-" + TRGUtil::itostring(lastMergerLocalId);
-            TCMerger::unitType mt = TCMerger::unknown;
+            TCMerger::unitType mt;
             if (sl == 0)
               mt = TCMerger::innerType;
             else
@@ -2584,7 +2586,7 @@ namespace Belle2 {
             t = _tsfboards[tid];
           if (!t) {
             const string name = "CDCTSFBoard" + TRGUtil::itostring(tid);
-            TSFinder::boardType tt = TSFinder::unknown;
+            TSFinder::boardType tt;
             if (_wires[wid]->superLayerId() == 0)
               tt = TSFinder::innerType;
             else

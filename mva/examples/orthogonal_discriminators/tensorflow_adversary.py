@@ -136,10 +136,13 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             return inference_loss - self.lam * adversary_loss
 
     state = State(model=adversarial_model())
+
+    state.epoch = 0
+    state.avg_costs = []  # keeps track of the avg costs per batch over an epoch
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass batches of received data to tensorflow
     """
@@ -160,9 +163,15 @@ def partial_fit(state, X, S, y, w, epoch):
 
     state.model.optimizer.apply_gradients(zip(grads, trainable_vars))
 
-    # epoch = i_epoch * nBatches + iBatch
-    if epoch % 1000 == 0:
-        print(f"Epoch: {epoch:04d} cost= {cost:.9f}")
+    if batch == 0 and epoch == 0:
+        state.avg_costs = [cost]
+    elif batch != state.nBatches-1:
+        state.avg_costs.append(cost)
+    else:
+        # end of the epoch, print summary results, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [cost]
+
     if epoch == 100000:
         return False
     return True

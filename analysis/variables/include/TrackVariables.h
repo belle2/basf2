@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
@@ -199,6 +200,18 @@ namespace Belle2 {
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars);
 
     /**
+    * returns extrapolated theta position based on helix parameters
+    * parameter is the name of the detector surface until where the track is extrapolated
+    */
+    Manager::FunctionPtr trackHelixExtThetaOnDet(const std::vector<std::string>& arguments);
+
+    /**
+    * returns extrapolated phi position based on helix parameters
+    * parameter is the name of the detector surface until where the track is extrapolated
+    */
+    Manager::FunctionPtr trackHelixExtPhiOnDet(const std::vector<std::string>& arguments);
+
+    /**
      * returns the PDG code of the track fit hypothesis actually used for the particle
      */
     double trackFitHypothesisPDG(const Particle* part);
@@ -220,6 +233,13 @@ namespace Belle2 {
 
     /** helper function to get the position on the Helix */
     B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
+
+    /** 1 if the track that has been flipped and refitted in the refining step */
+    double isTrackFlippedAndRefitted(const Particle* part);
+
+    /** return the SVD Track time */
+    double getTrackTime(const Particle* part);
+
   }
 } // Belle2 namespace
 

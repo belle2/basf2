@@ -81,6 +81,8 @@ namespace Belle2 {
     int m_fullBkgdCount; /**< Number of expected background digits at full background. TODO move to DB*/
 
     /** Other variables. */
+    bool m_isOnlineProcessing{false}; /**< flag for identifying the online processing. */
+
     double m_energyCutMod[3] {}; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
     int m_tempCRId = -1; /**< Temporary CR ID*/
 
@@ -90,7 +92,7 @@ namespace Belle2 {
     std::vector <int>  m_cellIdToGrowthVec; /**< cellid -> growth digits. */
     std::vector <int>  m_cellIdToDigitVec; /**< cellid -> above threshold digits. */
 
-    /** vector (8736+1 entries) with cell id to store array positions */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_calDigitStoreArrPosition;
 
     // USE POSITION IN STORE ARRAY!!!

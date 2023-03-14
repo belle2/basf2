@@ -10,7 +10,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/BFieldManager.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <math.h>
 
 using namespace std;
@@ -44,77 +44,77 @@ double SensorInfo::getHoleMobility(double E) const
           / (pow(1. + pow((fabs(E) / EcHole), betaHole), (1. / betaHole))));
 }
 
-const TVector3 SensorInfo::getEField(const TVector3& point) const
+const ROOT::Math::XYZVector SensorInfo::getEField(const ROOT::Math::XYZVector& point) const
 {
 
-  TVector3 E(0, 0,
-             + 2.0 * m_depletionVoltage / m_thickness
-             * ((+point.Z() - 0.5 * m_thickness) / m_thickness)
-             - (m_biasVoltage - m_depletionVoltage) / m_thickness);
+  ROOT::Math::XYZVector E(0, 0,
+                          + 2.0 * m_depletionVoltage / m_thickness
+                          * ((+point.Z() - 0.5 * m_thickness) / m_thickness)
+                          - (m_biasVoltage - m_depletionVoltage) / m_thickness);
 
   return E;
 }
 
-const TVector3& SensorInfo::getBField(const TVector3& point) const
+const ROOT::Math::XYZVector& SensorInfo::getBField(const ROOT::Math::XYZVector& point) const
 {
   //  useful just for testing:
-  //  static TVector3 noBfield(0,0,0);
+  //  static ROOT::Math::XYZVector noBfield(0,0,0);
   //  return noBfield;
 
-  static TVector3 oldPoint(0, 0, 1000 * Unit::cm);
-  static TVector3 oldField(0, 0, 0);
+  static ROOT::Math::XYZVector oldPoint(0, 0, 1000 * Unit::cm);
+  static ROOT::Math::XYZVector oldField(0, 0, 0);
   static double bRadius = 0.5 * Unit::cm;
-  if (TVector3(point - oldPoint).Mag() > bRadius) { // renew if far point
-    TVector3 pointGlobal = pointToGlobal(point, true);
-    TVector3 bGlobal = BFieldManager::getField(pointGlobal);
-    TVector3 bLocal = vectorToLocal(bGlobal, true);
+  if ((point - oldPoint).R() > bRadius) { // renew if far point
+    ROOT::Math::XYZVector pointGlobal = pointToGlobal(point, true);
+    ROOT::Math::XYZVector bGlobal = BFieldManager::getField(pointGlobal);
+    ROOT::Math::XYZVector bLocal = vectorToLocal(bGlobal, true);
     oldPoint = point;
     oldField = bLocal;
   }
   return oldField;
 }
 
-const TVector3 SensorInfo::getVelocity(CarrierType carrier,
-                                       const TVector3& point) const
+const ROOT::Math::XYZVector
+SensorInfo::getVelocity(CarrierType carrier, const ROOT::Math::XYZVector& point) const
 {
-  TVector3 E = getEField(point);
+  ROOT::Math::XYZVector E = getEField(point);
   // This is what makes the digitizer slow.
-  TVector3 B = getBField(point);
+  ROOT::Math::XYZVector B = getBField(point);
   // Set mobility parameters
   double mobility = 0;
   double hallFactor = getHallFactor(carrier);
 
   if (carrier == electron) {
-    mobility = -getElectronMobility(E.Mag());
+    mobility = -getElectronMobility(E.R());
   } else {
-    mobility = getHoleMobility(E.Mag());
+    mobility = getHoleMobility(E.R());
   }
 
   double mobilityH = hallFactor * fabs(mobility);
 
   // Calculate products
-  TVector3 EcrossB = E.Cross(B);
-  TVector3 BEdotB = E.Dot(B) * B;
-  TVector3 velocity = mobility * E + mobility * mobilityH * EcrossB
-                      + mobility * mobilityH * mobilityH * BEdotB;
+  ROOT::Math::XYZVector EcrossB = E.Cross(B);
+  ROOT::Math::XYZVector BEdotB = E.Dot(B) * B;
+  ROOT::Math::XYZVector velocity = mobility * E + mobility * mobilityH * EcrossB
+                                   + mobility * mobilityH * mobilityH * BEdotB;
   velocity *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
   return velocity;
 }
 
-const TVector3& SensorInfo::getLorentzShift(double uCoord, double vCoord) const
+const ROOT::Math::XYZVector& SensorInfo::getLorentzShift(double uCoord, double vCoord) const
 {
-  static TVector3 result;
+  static ROOT::Math::XYZVector result;
   double distanceToFrontPlane = 0.5 * m_thickness;
   double distanceToBackPlane = 0.5 * m_thickness;
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
-  TVector3 v_e = getVelocity(electron, TVector3(uCoord, vCoord, +0.5 * distanceToFrontPlane));
-  TVector3 v_h = getVelocity(hole, TVector3(uCoord, vCoord, -0.5 * distanceToBackPlane));
+  ROOT::Math::XYZVector v_e = getVelocity(electron, ROOT::Math::XYZVector(uCoord, vCoord, +0.5 * distanceToFrontPlane));
+  ROOT::Math::XYZVector v_h = getVelocity(hole, ROOT::Math::XYZVector(uCoord, vCoord, -0.5 * distanceToBackPlane));
 
   // Calculate drift directions
-  TVector3 center_e = fabs(distanceToFrontPlane / v_e.Z()) * v_e;
-  TVector3 center_h = fabs(distanceToBackPlane / v_h.Z()) * v_h;
+  ROOT::Math::XYZVector center_e = fabs(distanceToFrontPlane / v_e.Z()) * v_e;
+  ROOT::Math::XYZVector center_h = fabs(distanceToBackPlane / v_h.Z()) * v_h;
   result.SetXYZ(center_h.X(), center_e.Y(), 0.0);
   return result;
 }

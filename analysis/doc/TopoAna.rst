@@ -18,7 +18,7 @@ Thus, ``MCGenTopo`` is the interface of ``basf2`` to ``TopoAna``.
 .. note::
 
    Apart from the interface, this section only introduces the ``TopoAna``
-   resources outside the Belle 2 Software Documentation.
+   resources outside the Belle II software documentation.
    Inside the documentation, please see :numref:`onlinebook_topoana` for the
    online textbook on ``TopoAna``.
    It is a good idea to start learning the usage of ``TopoAna`` with this online

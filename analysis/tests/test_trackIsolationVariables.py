@@ -34,39 +34,48 @@ for idx in range(len(Belle2.Const.chargedStableSet)):
     pdgId = Belle2.Const.chargedStableSet.at(idx).getPDGCode()
     chargedStableList.extend([pdgId, -pdgId])
 
-for pname in pdg.to_names(chargedStableList):
+for pname, pdgId in zip(pdg.to_names(chargedStableList), chargedStableList):
 
     plist = f"{pname}:ref"
 
     ma.fillParticleList(plist, "[pt > 0.1] and [thetaInCDCAcceptance]", path=path)
 
-    ntup_vars = ma.calculateTrackIsolation(plist,
-                                           path,
-                                           *detectors)
+    track_iso_vars = ma.calculateTrackIsolation(plist,
+                                                path,
+                                                *detectors,
+                                                exclude_pid_det_weights=True)
 
-    ma.printList(plist, full=True, path=path)
-    ma.printVariableValues(plist, ntup_vars, path=path)
+    ma.printVariableValues(plist, track_iso_vars[pdgId], path=path)
     ma.variablesToNtuple(plist,
-                         ntup_vars,
+                         track_iso_vars[pdgId],
                          treename=pname,
-                         filename="TrackIsolationVariables.root", path=path)
-v0_types = ['Lambda0:merged', 'K_S0:merged']
+                         filename="TrackIsolationVariables.root",
+                         path=path)
+
+v0_types = ["Lambda0:merged", "K_S0:merged"]
 v0_functions = [stdv0.stdLambdas, stdv0.stdKshorts]
-v0_decays = [' -> ^p+ ^pi-', ' -> ^pi+ ^pi-']
+v0_decays = [" -> ^p+ ^pi-", " -> ^pi+ ^pi-"]
+
 for v0_type, v0_function, v0_decay in zip(v0_types, v0_functions, v0_decays):
+
     v0_function(path=path)
 
-    ntup_vars = ma.calculateTrackIsolation(v0_type+v0_decay,
-                                           path,
-                                           *detectors)
-    track_vars = vu.create_aliases_for_selected(list_of_variables=ntup_vars,
-                                                decay_string=v0_type+v0_decay)
-    ma.printList(v0_type, full=True, path=path)
-    ma.printVariableValues(v0_type, track_vars, path=path)
+    track_iso_vars = ma.calculateTrackIsolation(v0_type+v0_decay,
+                                                path,
+                                                *detectors,
+                                                exclude_pid_det_weights=True)
+
+    ntup_vars_aliases = []
+    for ivars in track_iso_vars.values():
+        ntup_vars_aliases += vu.create_aliases_for_selected(list_of_variables=ivars,
+                                                            decay_string=v0_type+v0_decay)
+
+    ma.printVariableValues(v0_type, ntup_vars_aliases, path=path)
     ma.variablesToNtuple(v0_type,
-                         track_vars,
+                         ntup_vars_aliases,
                          treename=f"{v0_type.split(':')[0]}",
                          filename="TrackIsolationVariables.root", path=path)
+
 with b2test_utils.clean_working_directory():
     with b2test_utils.set_loglevel(b2.LogLevel.INFO):
         b2.process(path)

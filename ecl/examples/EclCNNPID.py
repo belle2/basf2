@@ -119,15 +119,15 @@ if __name__ == '__main__':
     # Add ECLFillCellIdMapping module
     mainPath.add_module('ECLFillCellIdMapping')
 
+    # CNN_PID_ECL module
+    mainPath.add_module(CNN_PID_ECL(path=mainPath))
+
     name = 'pi+:particles'
     ma.fillParticleList(name, '', path=mainPath)
 
-    # CNN_PID_ECL module
-    mainPath.add_module(CNN_PID_ECL(particleList=name, path=mainPath))
-
     ma.variablesToNtuple(
         decayString=name,
-        variables=['cnn_pid_ecl_pion', 'cnn_pid_ecl_muon'],
+        variables=['cnn_pid_ecl_muon'],
         treename='particles',
         filename='test_chargedStable_particles_cnn_output.root',
         path=mainPath

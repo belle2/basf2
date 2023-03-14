@@ -201,11 +201,9 @@ Parser(ifstream& ifs)
 
   //...Main loop...
   char b[800];
-  unsigned lines = 0;
   bool beginConversion = false;
   bool endConversion = false;
   while (! ifs.eof()) {
-    ++lines;
     ifs.getline(b, 800);
     string l(b);
 

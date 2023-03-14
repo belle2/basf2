@@ -8,6 +8,7 @@
 
 import basf2
 from ROOT import Belle2
+import nntd
 
 ################################################################################
 # Defining some standard names for trigger tracks here:
@@ -71,6 +72,52 @@ class nnt_eventfilter(basf2.Module):
                 isgoodquality = False
                 break
         return isgoodquality
+
+
+class randommaker(basf2.Module):
+    def initialize(self):
+        self.counter = 0
+
+    def event(self):
+        print("counter is " + str(self.counter))
+        if self.counter % 1000 == 0:
+            print("case 0")
+            self.return_value(0)
+        elif self.counter % 3 == 0:
+            print("case 1")
+            self.return_value(1)
+        elif self.counter % 3 == 1:
+            print("case 2")
+            self.return_value(2)
+        elif self.counter % 3 == 2:
+            print("case 3")
+            self.return_value(3)
+        else:
+            print("some kind of error")
+        self.counter += 1
+
+
+def add_train_output(path, baseOutputFileName, baseAnaFileName, excludeBranchNames=[], branchNames=[]):
+    # create 4 output paths:
+    outpaths = []
+    for x in range(4):
+        outpaths.append([".random_"+str(x), basf2.create_path()])
+    # add the randommaker module:
+    rm = basf2.register_module(randommaker())
+    path.add_module(rm)
+
+    # also add nnta module:
+
+    rm.if_value('==0', outpaths[0][1])
+    rm.if_value('==1', outpaths[1][1])
+    rm.if_value('==2', outpaths[2][1])
+    rm.if_value('==3', outpaths[3][1])
+    for p in outpaths:
+        nnta = basf2.register_module(nntd.nntd())
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
+                        p[0]+".root", excludeBranchNames=excludeBranchNames, branchNames=branchNames)
+        p[1].add_module(nnta)
 
 
 def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):

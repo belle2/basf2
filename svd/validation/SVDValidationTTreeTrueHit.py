@@ -11,11 +11,11 @@
 
 """
 <header>
-    <contact> SVD Software Group, svd-software@belle2.org </contact>
     <description>
     This module is used for the SVD validation.
     It gets information about truehits, saving in a ttree in a ROOT file.
     </description>
+    <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 import basf2 as b2
@@ -33,6 +33,7 @@ gROOT.ProcessLine('struct EventDataTrueHit {\
     int sensor;\
     int sensor_type;\
     int strip_dir;\
+    int reconstructed;\
     };')
 
 from ROOT import EventDataTrueHit  # noqa
@@ -65,7 +66,9 @@ class SVDValidationTTreeTrueHit(b2.Module):
         svdtruehits = Belle2.PyStoreArray('SVDTrueHits')
         for truehit in svdtruehits:
             clusters = truehit.getRelationsFrom('SVDClusters')
+
             if len(clusters) == 0:
+                self.data.reconstructed = 0
                 # Sensor identification
                 sensorID = truehit.getSensorID()
                 self.data.sensor_id = int(sensorID)
@@ -89,6 +92,7 @@ class SVDValidationTTreeTrueHit(b2.Module):
                 self.tree.Fill()
             else:
                 for cluster in clusters:
+                    self.data.reconstructed = 1
                     # Sensor identification
                     sensorID = truehit.getSensorID()
                     self.data.sensor_id = int(sensorID)

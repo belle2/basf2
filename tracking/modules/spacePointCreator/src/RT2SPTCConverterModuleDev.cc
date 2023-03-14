@@ -7,17 +7,11 @@
  **************************************************************************/
 
 #include <tracking/modules/spacePointCreator/RT2SPTCConverterModuleDev.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <algorithm> // find
-
-#include <svd/dataobjects/SVDCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
 
 using namespace Belle2;
 using ConversionState = std::bitset<2>;
@@ -95,35 +89,29 @@ void RT2SPTCConverterModule::initialize()
   initializeCounters();
 
   // check if all required StoreArrays are here
-  StoreArray<SVDCluster> SVDClusters; SVDClusters.isRequired(m_SVDClusterName);
+  m_SVDClusters.isRequired(m_SVDClusterName);
   if (m_pxdSpacePointsStoreArrayName) {
-    StoreArray<SpacePoint> spacePoints;
-    spacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
+    m_PXDSpacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
   }
   if (m_svdSpacePointsStoreArrayName) {
-    StoreArray<SpacePoint> spacePoints;
-    spacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
+    m_SVDSpacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
   }
 
-
-  StoreArray<RecoTrack> recoTracks(m_RecoTracksName);
-  recoTracks.isRequired(m_RecoTracksName);
+  m_RecoTracks.isRequired(m_RecoTracksName);
 
   // registering StoreArray for SpacePointTrackCand
-  StoreArray<SpacePointTrackCand> spTrackCand(m_SPTCName);
-  spTrackCand.registerInDataStore(m_SPTCName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_SpacePointTrackCands.registerInDataStore(m_SPTCName, DataStore::c_ErrorIfAlreadyRegistered);
 
-  StoreArray<MCParticle> mcparticles;
-  if (mcparticles.isOptional()) {
+  if (m_MCParticles.isOptional()) {
     m_mcParticlesPresent = true;
   }
 
   if (m_useTrueHits) {
-    StoreArray<SVDTrueHit> SVDTrueHit; SVDTrueHit.isRequired();
+    m_SVDTrueHit.isRequired();
   }
 
   // register Relation to RecoTrack
-  spTrackCand.registerRelationTo(recoTracks);
+  m_SpacePointTrackCands.registerRelationTo(m_RecoTracks);
 
   m_trackSel = new NoKickRTSel(m_noKickCutsFile, m_noKickOutput);
 
@@ -136,12 +124,7 @@ void RT2SPTCConverterModule::event()
   const int eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(20, "RT2SPTCConverter::event(). Processing event " << eventCounter << " --------");
 
-  StoreArray<RecoTrack> m_recoTracks(m_RecoTracksName);
-  StoreArray<SpacePointTrackCand> spacePointTrackCands(m_SPTCName); // output StoreArray
-
-  StoreArray<SVDCluster> svdClusters(m_SVDClusterName);
-
-  for (auto& recoTrack : m_recoTracks) {
+  for (auto& recoTrack : m_RecoTracks) {
 
     // if corresponding flag is set only use fitted tracks
     if (m_convertFittedOnly and not recoTrack.wasFitSuccessful()) continue;
@@ -217,16 +200,16 @@ void RT2SPTCConverterModule::event()
     }
 
     // convert momentum and position seed into a single 6D seed
-    TVector3 momentumSeed = recoTrack.getMomentumSeed();
-    TVector3 positionSeed = recoTrack.getPositionSeed();
+    const ROOT::Math::XYZVector& momentumSeed = recoTrack.getMomentumSeed();
+    const ROOT::Math::XYZVector& positionSeed = recoTrack.getPositionSeed();
 
     TVectorD seed6D(6);
-    seed6D[0] = positionSeed.x();
-    seed6D[1] = positionSeed.y();
-    seed6D[2] = positionSeed.z();
-    seed6D[3] = momentumSeed.Px();
-    seed6D[4] = momentumSeed.Py();
-    seed6D[5] = momentumSeed.Pz();
+    seed6D[0] = positionSeed.X();
+    seed6D[1] = positionSeed.Y();
+    seed6D[2] = positionSeed.Z();
+    seed6D[3] = momentumSeed.X();
+    seed6D[4] = momentumSeed.Y();
+    seed6D[5] = momentumSeed.Z();
     spacePointTC.set6DSeed(seed6D);
     spacePointTC.setCovSeed(recoTrack.getSeedCovariance());
 
@@ -235,7 +218,7 @@ void RT2SPTCConverterModule::event()
       if (m_markRecoTracks) recoTrack.setDirtyFlag(false);
     }
 
-    spacePointTrackCands.appendNew(spacePointTC)->addRelationTo(&recoTrack);
+    m_SpacePointTrackCands.appendNew(spacePointTC)->addRelationTo(&recoTrack);
   } // end RecoTrack loop
 }
 

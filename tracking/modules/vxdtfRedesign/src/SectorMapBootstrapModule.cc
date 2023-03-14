@@ -30,7 +30,6 @@
 
 
 using namespace Belle2;
-using namespace std;
 
 REG_MODULE(SectorMapBootstrap);
 
@@ -220,13 +219,13 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   // TO DO: All these informations must be retrieved from the geometry
   CompactSecIDs compactSecIds;
 
-  vector< double > uDividersMinusLastOne = config.uSectorDivider;
+  std::vector< double > uDividersMinusLastOne = config.uSectorDivider;
   uDividersMinusLastOne.pop_back();
-  vector< double > vDividersMinusLastOne = config.vSectorDivider;
+  std::vector< double > vDividersMinusLastOne = config.vSectorDivider;
   vDividersMinusLastOne.pop_back();
 
 
-  vector< vector< FullSecID > > sectors;
+  std::vector< std::vector< FullSecID > > sectors;
 
   sectors.resize(config.uSectorDivider.size());
   unsigned nSectorsInU = config.uSectorDivider.size(),
@@ -372,7 +371,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
 
-    string setupKeyNameStd = string(setupKeyName->Data());
+    std::string setupKeyNameStd = std::string(setupKeyName->Data());
     segmentFilters->retrieveFromRootFile(setupKeyName);
 
     // if the m_twoHitFilterAdjustFunctions m_threeHitFilterAdjustFunctions are non empty filters will be altered

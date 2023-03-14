@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBunchFinder/TOPBunchFinderModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
@@ -254,6 +256,7 @@ namespace Belle2 {
       int simBunchNumber = round(simTime / m_bunchTimeSep);
       m_recBunch->setSimulated(simBunchNumber, simTime);
     }
+    m_isMC = m_recBunch->isSimulated();
 
     // set revo9 counter from the first raw digit if available (all should be the same)
 
@@ -393,8 +396,9 @@ namespace Belle2 {
 
     double timeMin = TOPRecoManager::getMinTime() + timeSeed.t0;
     double timeMax = TOPRecoManager::getMaxTime() + timeSeed.t0;
-    double t0min = timeSeed.t0 - m_timeRangeFine / 2;
-    double t0max = timeSeed.t0 + m_timeRangeFine / 2;
+    double timeRangeFine = std::max(m_timeRangeFine, timeSeed.sigma * 6);
+    double t0min = timeSeed.t0 - timeRangeFine / 2;
+    double t0max = timeSeed.t0 + timeRangeFine / 2;
 
     for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
       finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
@@ -491,8 +495,8 @@ namespace Belle2 {
     double bunchTime = bunchNo * m_bunchTimeSep;
     m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error, m_runningOffset, m_runningError, timeSeed.detector);
     m_recBunch->setMinChi2(T0.chi2);
-    double cdcOffset = m_eventT0Offset.isValid() ? m_eventT0Offset->get(Const::CDC).offset : 0;
-    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime + cdcOffset, error, Const::TOP, "bunchFinder"));
+    double svdOffset = m_eventT0Offset.isValid() and not m_isMC ? m_eventT0Offset->get(Const::SVD).offset : 0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime + svdOffset, error, Const::TOP, "bunchFinder"));
     m_success++;
 
     // store T0 of single tracks relative to bunchTime
@@ -647,7 +651,7 @@ namespace Belle2 {
         if (detector == Const::CDC and eventT0s.back().algorithm != "chi2") continue;
         double t0 = eventT0s.back().eventT0;
         if (std::abs(t0) > m_timeRangeCoarse / 2) continue;
-        timeSeed.t0 = t0 - m_eventT0Offset->get(detector).offset;
+        timeSeed.t0 = m_isMC ? t0 : t0 - m_eventT0Offset->get(detector).offset;
         timeSeed.sigma = m_eventT0Offset->get(detector).sigma;
         timeSeed.detector = detector;
         break;
@@ -670,7 +674,8 @@ namespace Belle2 {
     // corresponding bucket number
 
     auto RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
-    int bucket = (bunchNo + m_revo9Counter * 4 - m_fillPatternOffset->get()) % RFBuckets;
+    int offset = m_isMC ? 0 : m_fillPatternOffset->get();
+    int bucket = (bunchNo + m_revo9Counter * 4 - offset) % RFBuckets;
     if (bucket < 0) bucket += RFBuckets;
 
     return m_bunchStructure->getBucket(bucket);

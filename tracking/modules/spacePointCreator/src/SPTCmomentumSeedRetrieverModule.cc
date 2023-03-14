@@ -10,7 +10,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
 
-// using namespace std;
 using namespace Belle2;
 
 
@@ -37,7 +36,7 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
   m_estimator = QualityEstimatorRiemannHelixFit();
   m_estimator.setMagneticFieldStrength(bFieldZ);
 
-  B2DEBUG(1, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
+  B2DEBUG(20, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
 }
 
 
@@ -45,14 +44,14 @@ void SPTCmomentumSeedRetrieverModule::event()
 {
   m_eventCounter++;
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
-  B2DEBUG(1, "\n" << "SPTCmomentumSeedRetrieverModule:event: event " << m_eventCounter << ", got " <<
+  B2DEBUG(20, "\n" << "SPTCmomentumSeedRetrieverModule:event: event " << m_eventCounter << ", got " <<
           m_spacePointTrackCands.getEntries() << " TCs\n");
 
   // create momentum seed for each given SpacePointTrackCand
-  B2DEBUG(1, "Number of TCs in Event = " << m_spacePointTrackCands.getEntries()); // demoted to a B2DEBUG, has been a warning
+  B2DEBUG(20, "Number of TCs in Event = " << m_spacePointTrackCands.getEntries()); // demoted to a B2DEBUG, has been a warning
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     if (!aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) continue;
-    B2DEBUG(1, "\n" << "SPTCmomentumSeedRetrieverModule:event: this TC has got " << aTC.size() << " hits\n");
+    B2DEBUG(20, "\n" << "SPTCmomentumSeedRetrieverModule:event: this TC has got " << aTC.size() << " hits\n");
     createSPTCmomentumSeed(aTC);
   }
 

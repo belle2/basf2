@@ -24,7 +24,6 @@
 #include <TRotation.h>
 #include <TRandom3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {
@@ -173,13 +172,13 @@ namespace Belle2 {
     }
 
     bool reflok = false; bool refl = false;
-    double path = (z[0] - r.z()) / dirf.z();
+    double path = (z[0] - r.Z()) / dirf.Z();
     r   += dirf * path;
     for (int a = 1; a <= n + 1 ; a++) {
       double rind = refractiveInd[a] / refractiveInd[a - 1];
       dirf = Refraction(dirf, rind);
       if (dirf.Mag() == 0) return TVector3();
-      path = (z[a] - r.z()) / dirf.z();
+      path = (z[a] - r.Z()) / dirf.Z();
       TVector3 r0 = r;
       if (a == n && opt == 1) {
         if (m_arichgp->getAerogelPlane().getAerogelTileID(r.X(), r.Y()) != tileID) return TVector3();
@@ -205,7 +204,7 @@ namespace Belle2 {
           double s1 = (mirpoint - r0) * mirnorm;
           r = r0 + s1 / s * dirf;
           dirf = dirf - 2 * (dirf * mirnorm) * mirnorm;
-          path = (z[a] - r.z()) / dirf.z();
+          path = (z[a] - r.Z()) / dirf.Z();
           r += dirf * path;
           reflok = true;
           break;
@@ -308,12 +307,12 @@ namespace Belle2 {
         dirf0[a] = Refraction(dirf0[a + 1], rind);
       }
 
-      double path = (z[0] - r.z()) / dirf0[0].z();
-      double x1 = rf0[1].x();
-      double y1 = rf0[1].y();
+      double path = (z[0] - r.Z()) / dirf0[0].Z();
+      double x1 = rf0[1].X();
+      double y1 = rf0[1].Y();
       for (int a = 0; a < n ; a++) {
         rf0[a + 1] = rf0[a] + dirf0[a] * path;
-        path = (z[a + 1] - rf0[a + 1].z()) / dirf0[a + 1].z();
+        path = (z[a + 1] - rf0[a + 1].Z()) / dirf0[a + 1].Z();
       }
 
       Refraction(dirf0[n], norm, refractiveInd0, dirw);
@@ -323,7 +322,7 @@ namespace Belle2 {
       path = dwin / (dirw * norm);
       rh1 = rh - dirw * path;
 
-      double d2 = (rf0[1].x() - x1) * (rf0[1].x() - x1) + (rf0[1].y() - y1) * (rf0[1].y() - y1);
+      double d2 = (rf0[1].X() - x1) * (rf0[1].X() - x1) + (rf0[1].Y() - y1) * (rf0[1].Y() - y1);
 
       if ((d2 < dmin) && (iter)) {
 
@@ -369,7 +368,7 @@ namespace Belle2 {
 
     // reconstructed track direction
     TVector3 edir = arichTrack.getDirection();
-    if (edir.z() < 0) return 0;
+    if (edir.Z() < 0) return 0;
     double momentum = arichTrack.getMomentum();
 
     double thcResolution = m_recPars->getThcResolution(momentum);
@@ -558,8 +557,8 @@ namespace Belle2 {
             TVector3  photonDirection1 = setThetaPhi(thetaCh[iHyp][iAerogel], fi_cer);  // particle system
             photonDirection1 = TransformFromFixed(edirr) * photonDirection1;  // global system
             int ifi = int (fi_cer * 20 / 2. / M_PI);
-            TVector3  photonAtAerogelExit = photonDirection1 * (m_thickness[iAerogel] / photonDirection1.z());
-            TVector3  trackAtAerogelExit = edirr * (m_thickness[iAerogel] / edirr.z());
+            TVector3  photonAtAerogelExit = photonDirection1 * (m_thickness[iAerogel] / photonDirection1.Z());
+            TVector3  trackAtAerogelExit = edirr * (m_thickness[iAerogel] / edirr.Z());
             TVector3  dtrackphoton = photonAtAerogelExit - trackAtAerogelExit;
             TVector3 detector_position;
 
@@ -570,8 +569,8 @@ namespace Belle2 {
             double   path              = meanr.Mag();
             meanr                      = meanr.Unit();
 
-            double   detector_sigma    = thcResolution * path / meanr.z();
-            double wide_sigma = wideGaussSigma * path / meanr.z();
+            double   detector_sigma    = thcResolution * path / meanr.Z();
+            double wide_sigma = wideGaussSigma * path / meanr.Z();
             // calculate pad orientation and distance relative to that photon
             double modphi =  m_arichgp->getDetectorPlane().getSlotPhi(modID);
 

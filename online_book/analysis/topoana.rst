@@ -140,29 +140,31 @@ into highly readable symbolic expressions of physics processes
 
 Generally, the functionalities of the program are as follows.
 
-  1. The program recognizes, categorizes, and counts physics processes in each
-     event of the samples.
+1. The program recognizes, categorizes, and counts physics processes in each
+   event of the samples.
 
-  2. It tags the physics processes in the corresponding entry of the output root
-     files.
+2. It tags the physics processes in the corresponding entry of the output root
+   files.
 
-     .. tip:: Except for the tags, the input ``TTree`` object in the output root
-              files is entirely the same as that in the input root files.
+   .. tip::
 
-  3. After processing the events, the program exports the obtained topology
-     information at the sample level (topology maps) to the output plain text,
-     tex source, and pdf files.
+     Except for the tags, the input ``TTree`` object in the output root
+     files is entirely the same as that in the input root files.
 
-    .. tip::
+3. After processing the events, the program exports the obtained topology
+   information at the sample level (topology maps) to the output plain text,
+   tex source, and pdf files.
 
-       * Although the files are in different formats, they have the same
-         information.
+.. tip::
 
-       * The pdf file is the easiest to read. It is converted from the tex source
-         file by the ``pdflatex`` command.
+   * Although the files are in different formats, they have the same
+     information.
 
-       * The plain text file is convenient to be checked with text processing
-         commands as well as text editors.
+   * The pdf file is the easiest to read. It is converted from the tex source
+     file by the ``pdflatex`` command.
+
+   * The plain text file is convenient to be checked with text processing
+     commands as well as text editors.
 
 .. note::
 
@@ -170,70 +172,71 @@ Generally, the functionalities of the program are as follows.
    program and the :ref:`mcmatching` module in ``basf2``, namely
    :b2:mod:`MCMatcherParticles`.
 
-     1. As we introduce in :numref:`TopologyAnalysis`, ``TopoAna`` is an offline
-        tool independent of ``basf2``. It gets the human-friendly topology
-        information on its own from the raw MC truth information obtained with
-        the interface ``MCGenTopo``. Obviously, it does not rely on
-        :b2:mod:`MCMatcherParticles`.
+   1. As we introduce in :numref:`TopologyAnalysis`, ``TopoAna`` is an offline
+      tool independent of ``basf2``. It gets the human-friendly topology
+      information on its own from the raw MC truth information obtained with
+      the interface ``MCGenTopo``. Obviously, it does not rely on
+      :b2:mod:`MCMatcherParticles`.
 
-     2. On the other hand, in order to analyze some backgrounds more effectively,
-        a series of newly developed parameters in a few functionality items in
-        ``TopoAna`` can make use of the MC matching results obtained with
-        :b2:mod:`MCMatcherParticles`. For more details, please see Section 5.2.3
-        (titled **Reconstruction restrictions on truth particles**) in the user
-        guide we introduce in :numref:`TopologyAnalysis`.
+   2. On the other hand, in order to analyze some backgrounds more effectively,
+      a series of newly developed parameters in a few functionality items in
+      ``TopoAna`` can make use of the MC matching results obtained with
+      :b2:mod:`MCMatcherParticles`. For more details, please see Section 5.2.3
+      (titled **Reconstruction restrictions on truth particles**) in the user
+      guide we introduce in :numref:`TopologyAnalysis`.
 
-     3. In addition, there are some functionality overlaps between ``TopoAna``
-        and :b2:mod:`MCMatcherParticles`. If highly needed, in the future we could
-        also develop some new functionalities in ``TopoAna`` for the cross-checks
-        of the MC matching results obtained with :b2:mod:`MCMatcherParticles`.
+   3. In addition, there are some functionality overlaps betweeen ``TopoAna``
+      and :b2:mod:`MCMatcherParticles`. If highly needed, in the future we could
+      also develop some new functionalities in ``TopoAna`` for the cross-checks
+      of the MC matching results obtained with :b2:mod:`MCMatcherParticles`.
 
 Install the software
 --------------------
 
 Please follow the steps below to install the software.
 
-  1. Set up ``basf2`` (see :numref:`cvmfs_setup`) if you have not
+1. Set up ``basf2`` (see :numref:`cvmfs_setup`) if you have not
 
-     .. note::
+ .. note::
 
-        This guarantees you have ``ROOT`` installed in your environment.
-        It does not mean ``TopoAna`` is a software based on ``basf2``.
-        Instead, the software is only based on ``ROOT``.
+    This guarantees you have ``ROOT`` installed in your environment.
+    It does not mean ``TopoAna`` is a software based on ``basf2``.
+    Instead, the software is only based on ``ROOT``.
 
-  2. ``cd yourDirectoryForTopoAna``
+2. ``cd yourDirectoryForTopoAna``
 
-  3. Clone the ``TopoAna`` repository from Stash with
-     ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``
+3. Clone the ``TopoAna`` repository from Stash with
+   ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``
 
-  4. ``cd topoana``
+4. ``cd topoana``
 
-  5. Switch to the latest release with ``git checkout vxx-yy-zz``
+5. Switch to the latest release with ``git checkout vxx-yy-zz``
 
-     .. note::
-        Please replace it with the concrete version number, which you can find
-        with ``git tag | tail -1``.
+  .. note::
 
-  6. Configure the package path with ``./Configure``
+    Please replace it with the concrete version number, which you can find
+    with ``git tag | tail -1``.
 
-     .. note::
+6. Configure the package path with ``./Configure``
 
-        You need to manually set up the environment variable ``PATH`` according
-        to the guidelines printed out by the command.
+ .. note::
 
-  7. Compile and link the program with ``make``
+    You need to manually set up the environment variable ``PATH`` according
+    to the guidelines printed out by the command.
 
-     .. tip::
+7. Compile and link the program with ``make``
 
-        The installation succeeds if you see the following line: ``"topoana.exe"
-        installed successfully!``
+ .. tip::
 
-  8. Set up the experiment name with ``./Setup Belle_II``
+    The installation succeeds if you see the following line: ``"topoana.exe"
+    installed successfully!``
 
-     .. note::
+8. Set up the experiment name with ``./Setup Belle_II``
 
-        If you want to try the program with examples under the directory
-        ``examples``, please execute ``./Setup Example``.
+ .. note::
+
+    If you want to try the program with examples under the directory
+    ``examples``, please execute ``./Setup Example``.
 
 Get the input data
 ------------------
@@ -243,24 +246,24 @@ As we mention in :numref:`TopologyAnalysis`, ``MCGenTopo`` is the interface of
 In the following we introduce the steps to get the input data to ``TopoAna``
 with the interface.
 
-  1. Append the following statement at the beginning part of your python
-     steering script
+1. Append the following statement at the beginning part of your python
+   steering script
 
-     .. code-block:: python
+ .. code-block:: python
 
-        from variables.MCGenTopo import mc_gen_topo
+    from variables.MCGenTopo import mc_gen_topo
 
-  2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the
-     steering function ``variablesToNtuple`` as follow
+2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the
+   steering function ``variablesToNtuple`` as follow
 
-     .. code-block:: python
+ .. code-block:: python
 
-        variablesToNtuple(particleList, yourOwnVariableList + mc_gen_topo(n), treeName, fieName, path)
+    variablesToNtuple(particleList, yourOwnVariableList + mc_gen_topo(n), treeName, fieName, path)
 
-     Here, ``n`` is the number of ``MCGenPDG_i``/``MCGenMothIndex_i`` variables,
-     and its default value is 200.
+ Here, ``n`` is the number of ``MCGenPDG_i``/``MCGenMothIndex_i`` variables,
+ and its default value is 200.
 
-  3. Run your python steering script with ``basf2``
+3. Run your python steering script with ``basf2``
 
 Below is an example of the python steering script.
 
@@ -275,14 +278,14 @@ Below is an example of the python steering script.
 
 After the following steps:
 
-  1. ``mkdir test`` under the ``TopoAna`` package.
+1. ``mkdir test`` under the ``TopoAna`` package.
 
-  2. ``cd test``
+2. ``cd test``
 
-  3. Create a new python steering script named ``MCGenTopo.py``, and copy and
-     paste the content of the script above into it.
+3. Create a new python steering script named ``MCGenTopo.py``, and copy and
+   paste the content of the script above into it.
 
-  4. ``basf2 MCGenTopo.py``
+4. ``basf2 MCGenTopo.py``
 
 you get a root file ``MCGenTopo.root`` containing a ``TTree`` object ``MCGenTopo``,
 which in return contains the MC truth information for topology analysis.
@@ -383,50 +386,50 @@ and the last one sets the name of the program's output.
 
 Below are some detailed explanations on these setting items.
 
-  * The first item sets the names of the input root files.
+* The first item sets the names of the input root files.
 
-    .. tip::
+.. tip::
 
-       1. The names ought to be input one per line without tailing characters,
-          such as comma, semicolon, and period.
+   1. The names ought to be input one per line without tailing characters,
+      such as comma, semicolon, and period.
 
-       2. In the names, both the absolute and relative paths are allowed and
-          wildcards ``[]``, ``?``, and ``*`` are supported, just like those in
-          the root file names input to the method ``Add()`` of the class ``TChain``.
+   2. In the names, both the absolute and relative paths are allowed and
+      wildcards ``[]``, ``?``, and ``*`` are supported, just like those in
+      the root file names input to the method ``Add()`` of the class ``TChain``.
 
-  * The second item specifies the ``TTree`` name.
+* The second item specifies the ``TTree`` name.
 
-    .. note::
+.. note::
 
-       Here, the ``TTree`` object should contain the following variables:
-       ``nMCGen``, ``MCGenPDG_i``, and ``MCGenMothIndex_i`` (``i = 0, 1, 2 ...``).
+   Here, the ``TTree`` object should contain the following variables:
+   ``nMCGen``, ``MCGenPDG_i``, and ``MCGenMothIndex_i`` (``i = 0, 1, 2 ...``).
 
-  * The third item sets the basic functionality of the program, namely the
-    component analysis over decay trees.
-    With the second parameter ``100`` in the item, the maximum number of output
-    components is set to 100.
+* The third item sets the basic functionality of the program, namely the
+  component analysis over decay trees.
+  With the second parameter ``100`` in the item, the maximum number of output
+  components is set to 100.
 
-    .. note::
+.. note::
 
-       1. The item can be replaced or co-exist with other functionality items.
+   1. The item can be replaced or co-exist with other functionality items.
 
-       2. At least one functionality item has to be specified explicitly in the
-          card file, otherwise the program will terminate soon after its start
-          because no topology analysis task to be performed is set up.
+   2. At least one functionality item has to be specified explicitly in the
+      card file, otherwise the program will terminate soon after its start
+      because no topology analysis task to be performed is set up.
 
-  * The fourth item specifies the common name of the output files.
-    The files will be described in the next part of this section.
-    Though in different formats, they are denominated with the same name for the
-    sake of uniformity.
+* The fourth item specifies the common name of the output files.
+  The files will be described in the next part of this section.
+  Though in different formats, they are denominated with the same name for the
+  sake of uniformity.
 
-    .. tip::
+.. tip::
 
-       * This item is optional, with the name of the card file as its default
-         input value.
+   * This item is optional, with the name of the card file as its default
+     input value.
 
-       * It is a good practice to first denominate the card file with the desired
-         common name of the output files and then remove this item or leave it
-         empty.
+   * It is a good practice to first denominate the card file with the desired
+     common name of the output files and then remove this item or leave it
+     empty.
 
 Run the program
 ---------------
@@ -440,26 +443,26 @@ its default value is ``topoana.card``.
 
 After the following steps:
 
-  1. Create a new card file named ``topoana.card`` under the ``test`` directory
-     we made above, and copy and paste the content of the card file above into it.
+1. Create a new card file named ``topoana.card`` under the ``test`` directory
+   we made above, and copy and paste the content of the card file above into it.
 
-  2. ``topoana.exe topoana.card``
+2. ``topoana.exe topoana.card``
 
-     .. tip::
+ .. tip::
 
-        * Since the name of the card file is the default one, you can just execute
-          ``topoana.exe``.
+    * Since the name of the card file is the default one, you can just execute
+      ``topoana.exe``.
 
-        * If you encounter the following error,
+    * If you encounter the following error,
 
-          .. code-block:: none
+      .. code-block:: none
 
-             topoana.exe: error while loading shared libraries: libCore.so: cannot open shared object
-             file: No such file or directory
+         topoana.exe: error while loading shared libraries: libCore.so: cannot open shared object
+         file: No such file or directory
 
-          setting up ``basf2`` before executing the command solves the problem,
-          in cases that you installed ``TopoAna`` in the ``basf2`` environment
-          previously.
+      setting up ``basf2`` before executing the command solves the problem, 
+      in cases that you installed ``TopoAna`` in the ``basf2`` environment
+      previously.
 
 you can get the following four output files: ``topoana.txt``, ``topoana.tex``,
 ``topoana.pdf``, and ``topoana.root``.
@@ -473,10 +476,10 @@ You can check and see them.
    If you are working on a remote server, you have two options to take a look at
    the pdf file:
 
-     1. Copy the pdf file to your computer with ``scp`` (see :ref:`onlinebook_ssh`),
+   1. Copy the pdf file to your computer with ``scp`` (see :ref:`onlinebook_ssh`),
 
-     2. Start a jupyter server with ``jupyter notebook`` and open the pdf file
-        in the browser with the web interface (see :ref:`onlinebook_python`).
+   2. Start a jupyter server with ``jupyter notebook`` and open the pdf file
+      in the browser with the web interface (see :ref:`onlinebook_python`).
 
 Below is only the screenshot of the first part of the table in the pdf file.
 
@@ -765,6 +768,6 @@ setting items in the quick-start tutorial or the user guide we introduce in
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-   Xing-Yu Zhou
+Xing-Yu Zhou

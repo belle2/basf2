@@ -10,8 +10,10 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 #include <TMatrixDSym.h>
+#include <TVector3.h>
 #include <G4ThreeVector.hh>
 #include <G4ErrorSymMatrix.hh>
 
@@ -41,7 +43,7 @@ namespace Belle2 {
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
     ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, bool backwardPropagation, double t,
-           const TVector3& r, const TVector3& p, const TMatrixDSym& e);
+           const ROOT::Math::XYZPoint& r, const ROOT::Math::XYZVector& p, const TMatrixDSym& e);
 
     //! Constructor with initial values
     //! @param pdgCode PDG hypothesis used for this extrapolation
@@ -84,7 +86,7 @@ namespace Belle2 {
     void setTOF(double tof) { m_TOF = tof; }
 
     //! Set position of this extrapolation hit
-    void setPosition(const TVector3& position)
+    void setPosition(const ROOT::Math::XYZVector& position)
     {
       m_Position[0] = position.x();
       m_Position[1] = position.y();
@@ -92,7 +94,7 @@ namespace Belle2 {
     }
 
     //! Set momentum at this extrapolation hit
-    void setMomentum(const TVector3& momentum)
+    void setMomentum(const ROOT::Math::XYZVector& momentum)
     {
       m_Momentum[0] = momentum.x();
       m_Momentum[1] = momentum.y();
@@ -136,11 +138,31 @@ namespace Belle2 {
 
     //! Get position of this extrapolation hit
     //! @return position (cm) of this extrapolation hit
-    TVector3 getPosition() const { return TVector3(m_Position[0], m_Position[1], m_Position[2]); }
+    ROOT::Math::XYZVector getPosition() const
+    {
+      return ROOT::Math::XYZVector(m_Position[0], m_Position[1], m_Position[2]);
+    }
+
+    //! Get position of this extrapolation hit
+    //! @return position (cm) of this extrapolation hit
+    TVector3 getPositionTVector3() const
+    {
+      return TVector3(m_Position[0], m_Position[1], m_Position[2]);
+    }
 
     //! Get momentum at this extrapolation hit
     //! @return momentum (GeV/c) at this extrapolation hit
-    TVector3 getMomentum() const { return TVector3(m_Momentum[0], m_Momentum[1], m_Momentum[2]); }
+    ROOT::Math::XYZVector getMomentum() const
+    {
+      return ROOT::Math::XYZVector(m_Momentum[0], m_Momentum[1], m_Momentum[2]);
+    }
+
+    //! Get momentum at this extrapolation hit
+    //! @return momentum (GeV/c) at this extrapolation hit
+    TVector3 getMomentumTVector3() const
+    {
+      return TVector3(m_Momentum[0], m_Momentum[1], m_Momentum[2]);
+    }
 
     //! Get phase-space covariance at this extrapolation hit
     //! @return phase-space covariance (symmetric 6x6: position & momentum in cm & GeV/c) at this extrapolation hit

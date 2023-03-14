@@ -11,99 +11,98 @@
 
 #include <algorithm>
 
-using namespace std;
 using namespace Belle2;
 
 // 2hit:
-const string FilterID::nameDistance3D = "distance3D";
-const string FilterID::nameDistanceXY = "distanceXY";
-const string FilterID::nameDistanceZ = "distanceZ";
-const string FilterID::nameSlopeRZ = "slopeRZ";
-const string FilterID::nameNormedDistance3D = "normedDistance3D";
+const std::string FilterID::nameDistance3D = "distance3D";
+const std::string FilterID::nameDistanceXY = "distanceXY";
+const std::string FilterID::nameDistanceZ = "distanceZ";
+const std::string FilterID::nameSlopeRZ = "slopeRZ";
+const std::string FilterID::nameNormedDistance3D = "normedDistance3D";
 
 
 //2+1hit:
-const string FilterID::nameAnglesHighOccupancy3D  = "HioCangles3D"; // HioC means high occupancy
-const string FilterID::nameAnglesHighOccupancyXY = "HioCanglesXY";
-const string FilterID::nameAnglesHighOccupancyRZ  = "HioCanglesRZ";
-const string FilterID::nameDistanceHighOccupancy2IP = "HioCdistance2IP";
-const string FilterID::nameDeltaSlopeHighOccupancyRZ = "HioCdeltaSlopeRZ";
-const string FilterID::namePTHighOccupancy = "HioCpT";
-const string FilterID::nameHelixParameterHighOccupancyFit = "HioChelixFit";
+const std::string FilterID::nameAnglesHighOccupancy3D  = "HioCangles3D"; // HioC means high occupancy
+const std::string FilterID::nameAnglesHighOccupancyXY = "HioCanglesXY";
+const std::string FilterID::nameAnglesHighOccupancyRZ  = "HioCanglesRZ";
+const std::string FilterID::nameDistanceHighOccupancy2IP = "HioCdistance2IP";
+const std::string FilterID::nameDeltaSlopeHighOccupancyRZ = "HioCdeltaSlopeRZ";
+const std::string FilterID::namePTHighOccupancy = "HioCpT";
+const std::string FilterID::nameHelixParameterHighOccupancyFit = "HioChelixFit";
 
 
 //3hit:
-const string FilterID::nameAngles3D = "angles3D";
-const string FilterID::nameAnglesRZ = "anglesRZ";
-const string FilterID::nameAnglesXY = "anglesXY";
-const string FilterID::nameDeltaSlopeRZ = "deltaSlopeRZ";
-const string FilterID::namePT = "pT";
-const string FilterID::nameDistance2IP = "distance2IP";
-const string FilterID::nameHelixParameterFit = "helixParameterFit";
-const string FilterID::nameDeltaSOverZ = "deltaSOverZ";
-const string FilterID::nameDeltaSlopeZOverS = "deltaSlopeZOverS";
+const std::string FilterID::nameAngles3D = "angles3D";
+const std::string FilterID::nameAnglesRZ = "anglesRZ";
+const std::string FilterID::nameAnglesXY = "anglesXY";
+const std::string FilterID::nameDeltaSlopeRZ = "deltaSlopeRZ";
+const std::string FilterID::namePT = "pT";
+const std::string FilterID::nameDistance2IP = "distance2IP";
+const std::string FilterID::nameHelixParameterFit = "helixParameterFit";
+const std::string FilterID::nameDeltaSOverZ = "deltaSOverZ";
+const std::string FilterID::nameDeltaSlopeZOverS = "deltaSlopeZOverS";
 
 
 //3+1hit:
-const string FilterID::nameDeltapTHighOccupancy  = "HioCdeltaPt";
-const string FilterID::nameDeltaDistanceHighOccupancy2IP  = "HioCdeltaDistance2IP";
+const std::string FilterID::nameDeltapTHighOccupancy  = "HioCdeltaPt";
+const std::string FilterID::nameDeltaDistanceHighOccupancy2IP  = "HioCdeltaDistance2IP";
 
 
 //4hit:
-const string FilterID::nameDeltapT = "deltaPt";
-const string FilterID::nameDeltaDistance2IP = "deltaDistance2IP";
+const std::string FilterID::nameDeltapT = "deltaPt";
+const std::string FilterID::nameDeltaDistance2IP = "deltaDistance2IP";
 
 
 //Collector FilterIDs
-const string FilterID::nameNbFinderLost  = "NbFinderLost";
-const string FilterID::nameCellularAutomaton  = "CellularAutomaton";
+const std::string FilterID::nameNbFinderLost  = "NbFinderLost";
+const std::string FilterID::nameCellularAutomaton  = "CellularAutomaton";
 
 
 // trackletFilters:
-const string FilterID::nameZiggZaggXY = "ZiggZaggXY";
-const string FilterID::nameZiggZaggXYWithSigma = "ZiggZaggXYWithSigma";
-const string FilterID::nameZiggZaggRZ = "ZiggZaggRZ";
-const string FilterID::nameCirclefit = "Circlefit";
-const string FilterID::nameHelixfit = "Helixfit";
-const string FilterID::nameSimpleLineFit3D = "SimpleLineFit3D";
+const std::string FilterID::nameZiggZaggXY = "ZiggZaggXY";
+const std::string FilterID::nameZiggZaggXYWithSigma = "ZiggZaggXYWithSigma";
+const std::string FilterID::nameZiggZaggRZ = "ZiggZaggRZ";
+const std::string FilterID::nameCirclefit = "Circlefit";
+const std::string FilterID::nameHelixfit = "Helixfit";
+const std::string FilterID::nameSimpleLineFit3D = "SimpleLineFit3D";
 
 
 //TF-steps:
-const string FilterID::nameHopfield = "Hopfield";
-const string FilterID::nameGreedy = "Greedy";
-const string FilterID::nameTcDuel = "TcDuel";
-const string FilterID::nameTcFinderCurr = "TcFinderCurr";
-const string FilterID::nameCalcQIbyKalman = "CalcQIbyKalman";
-const string FilterID::nameOverlapping = "Overlapping";
+const std::string FilterID::nameHopfield = "Hopfield";
+const std::string FilterID::nameGreedy = "Greedy";
+const std::string FilterID::nameTcDuel = "TcDuel";
+const std::string FilterID::nameTcFinderCurr = "TcFinderCurr";
+const std::string FilterID::nameCalcQIbyKalman = "CalcQIbyKalman";
+const std::string FilterID::nameOverlapping = "Overlapping";
 /// WARNING FIXME TODO some things are missing here (calcQIbyLineFit) and similar stuff
 
 
 // for display: silent kills
-const string FilterID::nameSilentTcc = "SilentTcc";
-const string FilterID::nameSilentHitFinder = "SilentHitFinder";
-const string FilterID::nameSilentSegFinder = "SilentSegFinder";
+const std::string FilterID::nameSilentTcc = "SilentTcc";
+const std::string FilterID::nameSilentHitFinder = "SilentHitFinder";
+const std::string FilterID::nameSilentSegFinder = "SilentSegFinder";
 
 
 // tests which are only for debugging and validation processes
-const string FilterID::nameAlwaysTrue2Hit = "alwaysTrue2Hit";
-const string FilterID::nameAlwaysFalse2Hit = "alwaysFalse2Hit";
-const string FilterID::nameAlwaysTrue3Hit = "alwaysTrue3Hit";
-const string FilterID::nameAlwaysFalse3Hit = "alwaysFalse3Hit";
-const string FilterID::nameAlwaysTrue4Hit = "alwaysTrue4Hit";
-const string FilterID::nameAlwaysFalse4Hit = "alwaysFalse4Hit";
-const string FilterID::nameRandom2Hit = "random2Hit";
-const string FilterID::nameRandom3Hit = "random3Hit";
-const string FilterID::nameRandom4Hit = "random4Hit";
+const std::string FilterID::nameAlwaysTrue2Hit = "alwaysTrue2Hit";
+const std::string FilterID::nameAlwaysFalse2Hit = "alwaysFalse2Hit";
+const std::string FilterID::nameAlwaysTrue3Hit = "alwaysTrue3Hit";
+const std::string FilterID::nameAlwaysFalse3Hit = "alwaysFalse3Hit";
+const std::string FilterID::nameAlwaysTrue4Hit = "alwaysTrue4Hit";
+const std::string FilterID::nameAlwaysFalse4Hit = "alwaysFalse4Hit";
+const std::string FilterID::nameRandom2Hit = "random2Hit";
+const std::string FilterID::nameRandom3Hit = "random3Hit";
+const std::string FilterID::nameRandom4Hit = "random4Hit";
 
 
 // other stuff
-const string FilterID::nameOverHighestAllowedLayer = "overHighestAllowedLayer";
-const string FilterID::nameOutOfSectorRange = "outOfSectorRange";
+const std::string FilterID::nameOverHighestAllowedLayer = "overHighestAllowedLayer";
+const std::string FilterID::nameOutOfSectorRange = "outOfSectorRange";
 
 
 
 
-const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
+const boost::array<std::string, FilterID::numFilters> FilterID::nameVector = { {
     // 2hit:
     nameDistance3D,
     nameDistanceXY,
@@ -403,7 +402,7 @@ FilterID::filterTypes FilterID::getFilterType(const std::string& filterString)
   {return outOfSectorRange;}
 
   else {
-    B2WARNING(" FilterID::getFilterType. Input string is out of range, please check that...");
+    B2WARNING(" FilterID::getFilterType. Input std::string is out of range, please check that...");
     return numFilters;
   }
 }
@@ -431,7 +430,7 @@ std::string FilterID::getFilterString(int filterType)
 }
 
 
-/** for given FilterID the corresponding string-name will be returned. For invalid types, UnknownType will be passed */
+/** for given FilterID the corresponding std::string-name will be returned. For invalid types, UnknownType will be passed */
 std::string FilterID::getTypeName(FilterID::filterTypes type)
 {
   /// TODO

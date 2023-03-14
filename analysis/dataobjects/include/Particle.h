@@ -212,22 +212,6 @@ namespace Belle2 {
 
     /**
      * Constructor from a reconstructed Track given as TrackFitResult.
-     * To be used to create Particle objects from V0 daughters.
-     * @param trackArrayIndex track StoreArray index
-     * @param trackFit pointer to TrackFitResult object
-     * @param chargedStable Type of charged particle
-     * @param chargedStableUsedForFit Type of particle which has been used in the track fit.
-     *        This can be different as chargedStable as we don't fit all tracks with
-     *        all hypothesis.
-     */
-    [[deprecated("Please use the constructor without the chargedStableUsedForFit")]]
-    Particle(const int trackArrayIndex,
-             const TrackFitResult* trackFit,
-             const Const::ChargedStable& chargedStable,
-             const Const::ChargedStable& chargedStableUsedForFit);
-
-    /**
-     * Constructor from a reconstructed Track given as TrackFitResult.
      * To be used to create Particle objects from tracks with full control over
      * the hypothesis (e.g. V0 daughters).
      * @param trackArrayIndex track StoreArray index
@@ -419,7 +403,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughter(const Particle* oldDaughter, Particle* newDaughter);
 
     /**
      * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
@@ -427,7 +411,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    bool replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter);
 
     // getters
 

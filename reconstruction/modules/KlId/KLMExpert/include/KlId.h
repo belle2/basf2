@@ -15,7 +15,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>

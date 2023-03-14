@@ -90,7 +90,7 @@ double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower
   Const::ChargedStable hypothesis = Const::pion;
   int pdgCode = abs(hypothesis.getPDGCode());
   for (const auto& track : tracks) {
-    ROOT::Math::XYZVector trkpos(0, 0, 0);
+    ROOT::Math::XYZVector trkpos;
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
       if (abs(extHit.getPdgCode()) != pdgCode) continue;
       if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;

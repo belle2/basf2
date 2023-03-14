@@ -25,6 +25,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
+/* ROOT headers. */
+#include <Math/VectorUtil.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -504,11 +507,11 @@ namespace Belle2 {
           (crystalCenterPosition - extHitPosition).Dot(
             crystalOrientation.Unit()) * crystalOrientation.Unit();
         if (varid == varType::phiOffset) {
-          return TVector2::Phi_mpi_pi(extHitPosition.Phi() - crystalPositionOnSurface.Phi());
+          return ROOT::Math::VectorUtil::Phi_mpi_pi(extHitPosition.Phi() - crystalPositionOnSurface.Phi());
         } else if (varid == varType::thetaOffset) {
           return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
         } else if (varid == varType::phiPointing) {
-          return TVector2::Phi_mpi_pi(trackPointing.Phi() - crystalOrientation.Phi());
+          return ROOT::Math::VectorUtil::Phi_mpi_pi(trackPointing.Phi() - crystalOrientation.Phi());
         } else if (varid == varType::thetaPointing) {
           return trackPointing.Theta() - crystalOrientation.Theta();
         }

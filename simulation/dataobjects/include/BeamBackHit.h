@@ -10,7 +10,6 @@
 
 #include <Math/Vector3D.h>
 #include <TObject.h>
-#include <TVector3.h>
 #include <TString.h>
 
 namespace Belle2 {
@@ -27,7 +26,8 @@ namespace Belle2 {
 
     //! Default constructor
     BeamBackHit(): m_subDet(0), m_identifier(0), m_PDG(0), m_trackID(0),
-      m_position(0., 0., 0.), m_momentum(0., 0., 0.), m_t(0.), m_E_start(0.),
+      m_positionX(0.), m_positionY(0.), m_positionZ(0.), m_momentumX(0.),
+      m_momentumY(0.), m_momentumZ(0.), m_t(0.), m_E_start(0.),
       m_E_end(0.), m_energyDeposit(0), m_trackLength(0.), m_neutronWeight(0.)
     {}
 
@@ -90,13 +90,13 @@ namespace Belle2 {
     //! Get global position of the particle hit
     ROOT::Math::XYZVector getPosition() const
     {
-      return ROOT::Math::XYZVector(m_position.X(), m_position.Y(), m_position.Z());
+      return ROOT::Math::XYZVector(m_positionX, m_positionY, m_positionZ);
     }
 
     //! Get momentum of the particle hit
     ROOT::Math::XYZVector getMomentum() const
     {
-      return ROOT::Math::XYZVector(m_momentum.X(), m_momentum.Y(), m_momentum.Z());
+      return ROOT::Math::XYZVector(m_momentumX, m_momentumY, m_momentumZ);
     }
 
     //! Get the time at which the hit occured
@@ -132,17 +132,17 @@ namespace Belle2 {
     //! Set global position of the particle hit
     void setPosition(ROOT::Math::XYZVector position)
     {
-      m_position.SetX(position.X());
-      m_position.SetY(position.Y());
-      m_position.SetZ(position.Z());
+      m_positionX = position.X();
+      m_positionY = position.Y();
+      m_positionZ = position.Z();
     }
 
     //! Set momentum of the particle hit
     void setMomentum(ROOT::Math::XYZVector momentum)
     {
-      m_momentum.SetX(momentum.X());
-      m_momentum.SetY(momentum.Y());
-      m_momentum.SetZ(momentum.Z());
+      m_momentumX = momentum.X();
+      m_momentumY = momentum.Y();
+      m_momentumZ = momentum.Z();
     }
 
     //! Set the time at which the hit occured
@@ -167,20 +167,57 @@ namespace Belle2 {
     void shiftInTime(double time) { m_t += time; }
 
   private:
-    int m_subDet;               /**< The name of the subdetector */
-    int m_identifier;           /**< The identifier of subdetector component */
-    int m_PDG;                  /**< The PDG code of the particle that hit the sensitive area */
-    int m_trackID;                /**< the trackID of the hit */
-    TVector3 m_position;        /**< global position of the hit */
-    TVector3 m_momentum;        /**< momentum of the hit */
-    double m_t;                 /**< time at which the hit occured */
-    double m_E_start;           /**< energy of particle at entrance into the volume*/
-    double m_E_end;             /**< energy of the particle when leaving the volume */
-    double m_energyDeposit;     /**< energy deposited in sensitive volume */
-    double m_trackLength;       /**< length of the track in the volume */
-    double m_neutronWeight;     /**< the effective neutron weight */
 
-    ClassDef(BeamBackHit, 1);   /**< the class title */
+    /** The name of the subdetector. */
+    int m_subDet;
+
+    /** The identifier of subdetector component. */
+    int m_identifier;
+
+    /** The PDG code of the particle that hit the sensitive area. */
+    int m_PDG;
+
+    /** The trackID of the hit. */
+    int m_trackID;
+
+    /** Global position of the hit (X coordinate). */
+    float m_positionX;
+
+    /** Global position of the hit (Y coordinate). */
+    float m_positionY;
+
+    /** Global position of the hit (Z coordinate). */
+    float m_positionZ;
+
+    /** Momentum of the hit (X coordinate). */
+    float m_momentumX;
+
+    /** Momentum of the hit (Y coordinate). */
+    float m_momentumY;
+
+    /** Momentum of the hit (Z coordinate). */
+    float m_momentumZ;
+
+    /** Time at which the hit occured. */
+    float m_t;
+
+    /** Energy of particle at entrance into the volume. */
+    float m_E_start;
+
+    /** Energy of the particle when leaving the volume. */
+    float m_E_end;
+
+    /** Energy deposited in sensitive volume. */
+    float m_energyDeposit;
+
+    /** Length of the track in the volume. */
+    float m_trackLength;
+
+    /** The effective neutron weight. */
+    float m_neutronWeight;
+
+    /** Class version. */
+    ClassDef(BeamBackHit, 2);
 
   };
 

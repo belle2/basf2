@@ -16,6 +16,7 @@
 #include <analysis/dataobjects/TauPairDecay.h>
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -783,11 +784,8 @@ namespace Belle2 {
         weightsAndIndices.emplace_back(mcps.weight(i), i);
 
       // sort descending by weight
-      std::sort(
-        weightsAndIndices.begin(), weightsAndIndices.end(),
-      [](const std::pair<double, int>& l, const std::pair<double, int>& r) {
-        return l.first > r.first;
-      });
+      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+                ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
       // cppcheck-suppress containerOutOfBounds
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }

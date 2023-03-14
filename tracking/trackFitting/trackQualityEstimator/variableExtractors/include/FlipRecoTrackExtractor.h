@@ -17,8 +17,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <framework/gearbox/Const.h>
-#include <root/TVector3.h>
-#include <limits>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
@@ -114,9 +112,10 @@ namespace Belle2 {
         auto svdcdc_mom = svdcdc_recoTrack->getMomentumSeed();
         auto svdcdc_pos = svdcdc_recoTrack->getPositionSeed();
         auto svdcdc_charge_sign = svdcdc_recoTrack->getChargeSeed() > 0 ? 1 : -1;
-        auto svdcdc_b_field = BFieldManager::getField(svdcdc_pos).Z() / Unit::T;
+        auto svdcdc_b_field = BFieldManager::getFieldInTesla(svdcdc_pos).Z();
         const uint16_t svdcdc_NDF = 0xffff;
-        auto svdcdc_FitResult = TrackFitResult(svdcdc_pos, svdcdc_mom, svdcdc_cov, svdcdc_charge_sign, Const::pion, 0, svdcdc_b_field, 0, 0,
+        auto svdcdc_FitResult = TrackFitResult(svdcdc_pos, svdcdc_mom, svdcdc_cov,
+                                               svdcdc_charge_sign, Const::pion, 0, svdcdc_b_field, 0, 0,
                                                svdcdc_NDF);
 
         m_variables.at(m_prefix + "seed_pz_variance") = svdcdc_cov(5, 5);
@@ -124,7 +123,7 @@ namespace Belle2 {
         m_variables.at(m_prefix + "seed_z_estimate") = svdcdc_pos.Z() ;
         m_variables.at(m_prefix + "seed_tan_lambda_estimate") = svdcdc_FitResult.getCotTheta();
 
-        float seed_pt_estimate = svdcdc_mom.Perp();
+        float seed_pt_estimate = svdcdc_mom.Rho();
         float seed_pt_variance = (pow(svdcdc_mom.X(), 2) * svdcdc_cov(3, 3) + pow(svdcdc_mom.Y(), 2) * svdcdc_cov(4,
                                   4) - 2 * svdcdc_mom.X() * svdcdc_mom.Y() * svdcdc_cov(3, 4)) / svdcdc_mom.Perp2();
         float seed_pt_resolution = seed_pt_variance / seed_pt_estimate;

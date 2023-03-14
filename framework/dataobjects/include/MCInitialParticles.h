@@ -8,14 +8,14 @@
 
 #pragma once
 
+#include <framework/gearbox/Const.h>
+
 #include <TLorentzVector.h>
 #include <Math/AxisAngle.h>
 #include <Math/Boost.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-
-#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 
@@ -70,7 +70,7 @@ namespace Belle2 {
 #if defined(MCP_DBL_CMP) || defined(MCP_VEC3_CMP) || defined(MCP_VEC4_CMP)
 #error Macro already defined, cannot continue
 #endif
-#define MCP_DBL_CMP(a,b,x) ((a.x()==b.x())||(std::abs(a.x()-b.x())<1e-10))
+#define MCP_DBL_CMP(a,b,x) ((a.X()==b.X())||(std::abs(a.X()-b.X())<1e-10))
 #define MCP_VEC3_CMP(a,b) (MCP_DBL_CMP(a,b,X) && MCP_DBL_CMP(a,b,Y) && MCP_DBL_CMP(a,b,Z))
 #define MCP_VEC4_CMP(a,b) (MCP_VEC3_CMP(a,b) && MCP_DBL_CMP(a,b,E))
       return MCP_VEC4_CMP(m_her, b.m_her) && MCP_VEC4_CMP(m_ler, b.m_ler) && MCP_VEC3_CMP(m_vertex, b.m_vertex)
@@ -90,13 +90,44 @@ namespace Belle2 {
      * @param ler 4vector of the low energy beam
      * @param vertex position of the actual collision vertex
      */
-    void set(const ROOT::Math::PxPyPzEVector& her, const ROOT::Math::PxPyPzEVector& ler, const B2Vector3D& vertex)
+    void set(const ROOT::Math::PxPyPzEVector& her, const ROOT::Math::PxPyPzEVector& ler, const ROOT::Math::XYZVector& vertex)
     {
       m_her = her;
       m_ler = ler;
       m_vertex = vertex;
       m_validFlag = true;
       resetBoost();
+    }
+
+    /** Initialize the event values from CMS energy and parameters of the Lorentz transformation between LAB and CMS.
+     *  In addition the vertex is also initialized.
+     * @param Ecms     centre-of-mass energy of the collision
+     * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param angleXZ  angle in the XZ plane of the collision axis in the CM system obtained by pure boost
+     * @param angleYZ  angle in the YZ plane of the collision axis in the CM system obtained by pure boost
+     * @param vertex   position of the actual collision vertex
+     */
+    void setByLorentzTransformation(double Ecms, double bX, double bY, double bZ, double angleXZ, double angleYZ,
+                                    const ROOT::Math::XYZVector& vertex)
+    {
+      if (m_labToCMS) delete m_labToCMS;
+      if (m_CMSToLab) delete m_CMSToLab;
+
+      m_invariantMass = Ecms;
+      m_CMSToLab      = new ROOT::Math::LorentzRotation();
+      m_labToCMS      = new ROOT::Math::LorentzRotation();
+      *m_CMSToLab     = cmsToLab(bX, bY, bZ, angleXZ, angleYZ);
+      *m_labToCMS     = m_CMSToLab->Inverse();
+
+      const double me = Const::electron.getMass();
+      double p = sqrt(Ecms * Ecms / 4 - me * me);
+      m_her = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0,  p, Ecms / 2);
+      m_ler = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0, -p, Ecms / 2);
+
+      m_vertex = vertex;
+      m_validFlag = true;
     }
 
     /** Set the High Energy Beam 4-momentum */
@@ -114,7 +145,7 @@ namespace Belle2 {
     }
 
     /** Set the vertex position */
-    void setVertex(const B2Vector3D& vertex)
+    void setVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_vertex = vertex;
     }
@@ -132,7 +163,7 @@ namespace Belle2 {
     const ROOT::Math::PxPyPzEVector& getLER() const { return m_ler; }
 
     /** Get the position of the collision */
-    const B2Vector3D& getVertex() const { return m_vertex; }
+    const ROOT::Math::XYZVector& getVertex() const { return m_vertex; }
 
     /** Get collison time */
     double getTime() const {return m_time;}
@@ -168,6 +199,17 @@ namespace Belle2 {
      * @param separator separation string to be put between flags */
     std::string getGenerationFlagString(const std::string& separator = " ") const;
 
+
+    /** Return the LorentzRotation from CMS to LAB based on the following parameters
+     * @param Ecms     centre-of-mass energy of the collision
+     * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param angleXZ  angle in the XZ plane of the collision axis in the CM system obtained by pure boost
+     * @param angleYZ  angle in the YZ plane of the collision axis in the CM system obtained by pure boost
+     */
+    static ROOT::Math::LorentzRotation cmsToLab(double bX, double bY, double bZ, double angleXZ, double angleYZ);
+
   private:
 
     /** Calculate the boost if necessary */
@@ -179,7 +221,7 @@ namespace Belle2 {
     /** LER 4vector */
     ROOT::Math::PxPyPzEVector m_ler;
     /** collision position */
-    B2Vector3D m_vertex;
+    ROOT::Math::XYZVector m_vertex;
     /** collision time */
     double m_time = 0;
     /** Boost from Lab into CMS. (calculated on first use, not saved to file) */
@@ -199,7 +241,7 @@ namespace Belle2 {
   private:
 
     /** ROOT Dictionary */
-    ClassDef(MCInitialParticles, 4);
+    ClassDef(MCInitialParticles, 5);
   };
 
   inline void MCInitialParticles::calculateBoost() const
@@ -233,6 +275,10 @@ namespace Belle2 {
     //cache derived quantities
     m_CMSToLab = new ROOT::Math::LorentzRotation(m_labToCMS->Inverse());
   }
+
+
+
+
 
   inline void MCInitialParticles::resetBoost()
   {

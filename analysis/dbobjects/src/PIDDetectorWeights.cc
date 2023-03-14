@@ -88,8 +88,7 @@ void PIDDetectorWeights::fillWeightsTablePerHypoFromRDF()
       }
 
       // Store the vector (column) of weights per detector.
-      for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
-        const auto det =  Const::PIDDetectors::c_set[iDet];
+      for (const Const::EDetector& det : Const::PIDDetectorSet::set()) {
         auto detName = Const::parseDetectors(det);
         auto colName = "ablat_s_" + detName;
         auto weights = filteredRDF.Take<double>(colName.c_str()).GetValue();

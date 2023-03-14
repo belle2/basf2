@@ -761,7 +761,7 @@ class ConditionsDB:
           data (dict): a dictionary with the information provided by the user:
 
             * task: category of globaltag, either main, online, prompt, data, mc, or analysis
-            * tag: the globaltage name
+            * tag: the globaltag name
             * request: type of request, either Update, New, or Modification. The latter two imply task == main because
               if new payload classes are introduced or payload classes are modified then they will first be included in
               the main globaltag. Here a synchronization of code and payload changes has to be managed.

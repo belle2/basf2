@@ -200,16 +200,16 @@ void RT2SPTCConverterModule::event()
     }
 
     // convert momentum and position seed into a single 6D seed
-    const TVector3& momentumSeed = recoTrack.getMomentumSeed();
-    const TVector3& positionSeed = recoTrack.getPositionSeed();
+    const ROOT::Math::XYZVector& momentumSeed = recoTrack.getMomentumSeed();
+    const ROOT::Math::XYZVector& positionSeed = recoTrack.getPositionSeed();
 
     TVectorD seed6D(6);
-    seed6D[0] = positionSeed.x();
-    seed6D[1] = positionSeed.y();
-    seed6D[2] = positionSeed.z();
-    seed6D[3] = momentumSeed.Px();
-    seed6D[4] = momentumSeed.Py();
-    seed6D[5] = momentumSeed.Pz();
+    seed6D[0] = positionSeed.X();
+    seed6D[1] = positionSeed.Y();
+    seed6D[2] = positionSeed.Z();
+    seed6D[3] = momentumSeed.X();
+    seed6D[4] = momentumSeed.Y();
+    seed6D[5] = momentumSeed.Z();
     spacePointTC.set6DSeed(seed6D);
     spacePointTC.setCovSeed(recoTrack.getSeedCovariance());
 

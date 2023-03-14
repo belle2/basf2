@@ -8,11 +8,12 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 /* ROOT headers. */
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 
 /* C++ headers. */
 #include <string>
@@ -57,7 +58,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
+    void generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -94,7 +95,7 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex,
+    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, ROOT::Math::XYZVector vertex,
                        ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 

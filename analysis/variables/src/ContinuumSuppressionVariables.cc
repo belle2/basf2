@@ -10,7 +10,7 @@
 
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -398,12 +398,12 @@ namespace Belle2 {
             newZ = qq->getThrustO();
 
           ROOT::Math::XYZVector newY(0, 0, 0);
-          if (newZ.z() == 0 and newZ.y() == 0)
+          if (newZ.Z() == 0 and newZ.Y() == 0)
             newY.SetX(1);
           else
           {
-            newY.SetY(newZ.z());
-            newY.SetZ(-newZ.y());
+            newY.SetY(newZ.Z());
+            newY.SetZ(-newZ.Y());
           }
           ROOT::Math::XYZVector newX = newY.Cross(newZ);
 

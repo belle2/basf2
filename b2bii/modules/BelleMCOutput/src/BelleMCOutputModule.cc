@@ -9,7 +9,7 @@
 /* Own header. */
 #include <b2bii/modules/BelleMCOutput/BelleMCOutputModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -128,7 +128,7 @@ void BelleMCOutputModule::beginRun()
    * The vertex parameters are in cm, as in basf2.
    * The unit is not the same as for particles in GEN_HEPEVT.
    */
-  TVector3 vertex = m_BeamParameters->getVertex();
+  ROOT::Math::XYZVector vertex = m_BeamParameters->getVertex();
   beam.ip_x(vertex.X());
   beam.ip_y(vertex.Y());
   beam.ip_z(vertex.Z());
@@ -231,7 +231,7 @@ void BelleMCOutputModule::event()
     hepevt.PZ(momentum.Pz());
     hepevt.E(momentum.E());
     hepevt.M(particle.getMass());
-    B2Vector3D vertex = particle.getVertex();
+    ROOT::Math::XYZVector vertex = particle.getVertex();
     hepevt.VX(vertex.X() / Unit::mm);
     hepevt.VY(vertex.Y() / Unit::mm);
     hepevt.VZ(vertex.Z() / Unit::mm);

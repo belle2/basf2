@@ -20,7 +20,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TDirectory.h>
 #include <Math/Boost.h>
 #include <math.h>
@@ -520,16 +520,16 @@ void OverlapResidualsModule::event()
           const double res_V_2 = resUnBias_PXD_2.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
           const float over_U_PXD = res_U_2 - res_U_1;
           const float over_V_PXD = res_V_2 - res_V_1;
-          const TVector3 pxdLocal_1(pxd_1->getU(), pxd_1->getV(), 0.);
-          const TVector3 pxdLocal_2(pxd_2->getU(), pxd_2->getV(), 0.);
+          const ROOT::Math::XYZVector pxdLocal_1(pxd_1->getU(), pxd_1->getV(), 0.);
+          const ROOT::Math::XYZVector pxdLocal_2(pxd_2->getU(), pxd_2->getV(), 0.);
           const VXD::SensorInfoBase& pxdSensor_1 = geo.get(pxd_id_1);
           const VXD::SensorInfoBase& pxdSensor_2 = geo.get(pxd_id_2);
-          const TVector3& pxdGlobal_1 = pxdSensor_1.pointToGlobal(pxdLocal_1);
-          const TVector3& pxdGlobal_2 = pxdSensor_2.pointToGlobal(pxdLocal_2);
-          double pxdPhi_1 = atan2(pxdGlobal_1(1), pxdGlobal_1(0));
-          double pxdPhi_2 = atan2(pxdGlobal_2(1), pxdGlobal_2(0));
-          double pxdZ_1 = pxdGlobal_1(2);
-          double pxdZ_2 = pxdGlobal_2(2);
+          const ROOT::Math::XYZVector& pxdGlobal_1 = pxdSensor_1.pointToGlobal(pxdLocal_1);
+          const ROOT::Math::XYZVector& pxdGlobal_2 = pxdSensor_2.pointToGlobal(pxdLocal_2);
+          double pxdPhi_1 = atan2(pxdGlobal_1.Y(), pxdGlobal_1.X());  // maybe use pxdGlobal_1.Phi() instead
+          double pxdPhi_2 = atan2(pxdGlobal_2.Y(), pxdGlobal_2.X());  // maybe use pxdGlobal_2.Phi() instead
+          double pxdZ_1 = pxdGlobal_1.Z();
+          double pxdZ_2 = pxdGlobal_2.Z();
           B2DEBUG(29, "PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
           //Fill PXD tree for overlaps if required by the user
           if (m_ExpertLevel) {
@@ -600,7 +600,7 @@ void OverlapResidualsModule::event()
     if (tfr) {
       svdTrkd0 = tfr->getD0();
       svdTrkz0 = tfr->getZ0();
-      svdTrkpT = tfr->getMomentum().Perp();
+      svdTrkpT = tfr->getMomentum().Rho();
       ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
       ROOT::Math::BoostZ boost(3. / 11);
       pStar = boost(pStar);
@@ -675,16 +675,16 @@ void OverlapResidualsModule::event()
             const double res_U_1 = resUnBias_SVD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const double res_U_2 = resUnBias_SVD_2.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const float over_U_SVD = res_U_2 - res_U_1;
-            const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
-            const TVector3 svdLocal_2(svd_2->getPosition(), svd_predIntersect_2[4], 0.);
+            const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
+            const ROOT::Math::XYZVector svdLocal_2(svd_2->getPosition(), svd_predIntersect_2[4], 0.);
             const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
             const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
-            const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-            const TVector3& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
-            double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-            double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
-            double svdZ_1 = svdGlobal_1(2);
-            double svdZ_2 = svdGlobal_2(2);
+            const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+            const ROOT::Math::XYZVector& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
+            double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi() instead
+            double svdPhi_2 = atan2(svdGlobal_2.Y(), svdGlobal_2.X());  // maybe use svdGlobal_2.Phi() instead
+            double svdZ_1 = svdGlobal_1.Z();
+            double svdZ_2 = svdGlobal_2.Z();
             B2DEBUG(29, "SVD: difference of u-residuals =========> " << over_U_SVD);
             //Fill SVD tree for u-overlaps if required by the user
             if (m_ExpertLevel) {
@@ -858,16 +858,16 @@ void OverlapResidualsModule::event()
             const double res_V_1 = resUnBias_SVD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const double res_V_2 = resUnBias_SVD_2.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const float over_V_SVD = res_V_2 - res_V_1;
-            const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
-            const TVector3 svdLocal_2(svd_predIntersect_2[3], svd_2->getPosition(), 0.);
+            const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
+            const ROOT::Math::XYZVector svdLocal_2(svd_predIntersect_2[3], svd_2->getPosition(), 0.);
             const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
             const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
-            const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-            const TVector3& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
-            double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-            double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
-            double svdZ_1 = svdGlobal_1(2);
-            double svdZ_2 = svdGlobal_2(2);
+            const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+            const ROOT::Math::XYZVector& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
+            double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi() instead
+            double svdPhi_2 = atan2(svdGlobal_2.Y(), svdGlobal_2.X());  // maybe use svdGlobal_2.Phi() instead
+            double svdZ_1 = svdGlobal_1.Z();
+            double svdZ_2 = svdGlobal_2.Z();
             B2DEBUG(29, "SVD: difference of v-residuals =========> " << over_V_SVD);
             //Fill SVD tree for v-overlaps if required by the user
             if (m_ExpertLevel) {

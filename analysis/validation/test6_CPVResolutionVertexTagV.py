@@ -50,11 +50,11 @@ outputNtuple = ROOT.TNtuple(
     "mu_DT_PXD2:sigma_DT_PXD2:mu_DZsig_PXD2:sigma_DZsig_PXD2:mu_DZtag_PXD2:sigma_DZtag_PXD2:PXD2_PXD0_Eff")
 
 outputNtuple.SetAlias('Description', "These are the weighted averages of the mean and the standard deviation " +
-                      "of the residuals for DeltaT, DeltaZsig and DeltaZtag. The fit is performed with 3 Gaussian functions." +
+                      "of the residuals for DeltaT, DeltaZsig and DeltaZtag. The fit is performed with 3 Gaussian functions. " +
                       "The units are ps for DeltaT and microns for DeltaZ.")
 outputNtuple.SetAlias(
     'Check',
-    "These parameters should not change drastically. Since the nightly reconstruction validation runs" +
+    "These parameters should not change drastically. Since the nightly reconstruction validation runs " +
     "on the same input file (which changes only from release to release), the values between builds should be the same.")
 outputNtuple.SetAlias('Contact', "yosato@post.kek.jp")
 
@@ -124,6 +124,9 @@ for VXDReq in VXDReqs:
         cut = cut + "&& (Jpsi_mu_0_SVDHits> 0 || Jpsi_mu_1_nSVDHits> 0) "
     if VXDReq == 'SVD2':
         cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
+
+    ROOT.gROOT.SetBatch(True)
+    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
 
     tdat.Draw("DeltaT - mcDeltaT >> B0_DeltaT_" + VXDReq, cut)
     tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
@@ -198,6 +201,8 @@ for VXDReq in VXDReqs:
     histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_DeltaZTag.Write()
 
+    c1.Clear()
+
     argSet = ROOT.RooArgSet(
         # B0_mcTagPDG,
         B0_DeltaT,
@@ -238,12 +243,15 @@ for VXDReq in VXDReqs:
 
     if VXDReq == 'PXD1' or VXDReq == 'PXD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr),
+            f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
     elif VXDReq == 'SVD1' or VXDReq == 'SVD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr),
+            f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
     else:
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr), cut)
+        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr),
+                                       f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
 
     # fitData.append(data)
 
@@ -278,16 +286,16 @@ for VXDReq in VXDReqs:
     fitDataTagZ.Print()
     numberOfEntries.append(data.numEntries())
 
-# Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
+    # Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
 
     Mu1 = ROOT.RooRealVar("Mu1", "Mu1", 0., -limDeltaT, limDeltaT)
     Mu2 = ROOT.RooRealVar("Mu2", "Mu2", 0., -limDeltaT, limDeltaT)
     Mu3 = ROOT.RooRealVar("Mu3", "Mu3", 0., -limDeltaT, limDeltaT)
-    Sigma1 = ROOT.RooRealVar("Sigma1", "Sigma1", 1.88046e+00, 0., limDeltaT)
-    Sigma2 = ROOT.RooRealVar("Sigma2", "Sigma2", 3.40331e+00, 0., limDeltaT)
-    Sigma3 = ROOT.RooRealVar("Sigma3", "Sigma3", 8.23171e-01, 0., limDeltaT)
-    frac1 = ROOT.RooRealVar("frac1", "frac1", 5.48703e-01, 0.0, 1.)
-    frac2 = ROOT.RooRealVar("frac2", "frac2", 2.60604e-01, 0.0, 1.)
+    Sigma1 = ROOT.RooRealVar("Sigma1", "Sigma1", 0.4, 0., limDeltaT)
+    Sigma2 = ROOT.RooRealVar("Sigma2", "Sigma2", 2.4, 0., limDeltaT)
+    Sigma3 = ROOT.RooRealVar("Sigma3", "Sigma3", 0.8, 0., limDeltaT)
+    frac1 = ROOT.RooRealVar("frac1", "frac1", 0.6, 0.0, 1.)
+    frac2 = ROOT.RooRealVar("frac2", "frac2", 0.1, 0.0, 1.)
 
     g1 = ROOT.RooGaussModel("g1", "g1", DT, Mu1, Sigma1)
     g2 = ROOT.RooGaussModel("g2", "g2", DT, Mu2, Sigma2)
@@ -301,10 +309,7 @@ for VXDReq in VXDReqs:
 
     DT.setRange("fitRange", -limDeltaT, limDeltaT)
 
-    fitRes = model.fitTo(
-        fitDataDT,
-        ROOT.RooFit.Minos(ROOT.kFALSE), ROOT.RooFit.Extended(ROOT.kFALSE),
-        ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
+    fitRes = model.fitTo(fitDataDT, ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
 
     fitRes.Print("v")
 
@@ -313,21 +318,21 @@ for VXDReq in VXDReqs:
     resFrame = DT.frame()
     fitDataDT.plotOn(resFrame)
 
-    meanCBS = ROOT.RooRealVar("meanCBS", "meanCBS", 5.37602e-01, 0.5, 1, "ps")
-    sigmaCBS = ROOT.RooRealVar("sigmaCBS", "sigmaCBS", 8.16334e-02, 0, 0.1, "ps")
-    alphaCBS = ROOT.RooRealVar("alphaCBS", "alphaCBS", -4.85571e-01, -1, 0, "")
-    nCBS = ROOT.RooRealVar("nCBS", "nCBS", 1.86325e+00, 0.5, 3, "")
+    meanCBS = ROOT.RooRealVar("meanCBS", "meanCBS", 0.4, 0.3, 1, "ps")
+    sigmaCBS = ROOT.RooRealVar("sigmaCBS", "sigmaCBS", 0.03, 0.01, 0.1, "ps")
+    alphaCBS = ROOT.RooRealVar("alphaCBS", "alphaCBS", -0.4, -1, 0, "")
+    nCBS = ROOT.RooRealVar("nCBS", "nCBS", 3, 0.5, 5, "")
     dtErrCBS = ROOT.RooCBShape("dtErrGen", "dtErrGen", deltaTErr, meanCBS, sigmaCBS, alphaCBS, nCBS)
 
-    MuErr1 = ROOT.RooRealVar("MuErr1", "MuErr1", 4.12399e-01, 0.3, 0.6, "ps")
-    SigmaErr1 = ROOT.RooRealVar("SigmaErr1", "SigmaErr1", 5.41152e-02, 0. - 1, 0.07, "ps")
+    MuErr1 = ROOT.RooRealVar("MuErr1", "MuErr1", 0.3, 0.2, 0.6, "ps")
+    SigmaErr1 = ROOT.RooRealVar("SigmaErr1", "SigmaErr1", 0.03, 0.01, 0.07, "ps")
     gErr1 = ROOT.RooGaussModel("gErr1", "gErr1", deltaTErr, MuErr1, SigmaErr1)
-    fracErr1 = ROOT.RooRealVar("fracErr1", "fracErr1", 7.50810e-01, 0.0, 1.)
+    fracErr1 = ROOT.RooRealVar("fracErr1", "fracErr1", 0.45, 0.0, 0.7)
 
-    MuErr2 = ROOT.RooRealVar("MuErr2", "MuErr2", 3.26658e-01, 0.2, 0.4, "ps")
-    SigmaErr2 = ROOT.RooRealVar("SigmaErr2", "SigmaErr2", 3.66794e-02, 0.01, 0.08, "ps")
+    MuErr2 = ROOT.RooRealVar("MuErr2", "MuErr2", 0.24, 0.2, 0.4, "ps")
+    SigmaErr2 = ROOT.RooRealVar("SigmaErr2", "SigmaErr2", 0.03, 0.01, 0.08, "ps")
     gErr2 = ROOT.RooGaussModel("gErr2", "gErr2", deltaTErr, MuErr2, SigmaErr2)
-    fracErr2 = ROOT.RooRealVar("fracErr2", "fracErr2", 1.82254e-01, 0.0, 1.)
+    fracErr2 = ROOT.RooRealVar("fracErr2", "fracErr2", 0.2, 0.0, 0.5)
 
     modelTErr = ROOT.RooAddModel(
         "modelErr", "modelErr", ROOT.RooArgList(
@@ -335,10 +340,8 @@ for VXDReq in VXDReqs:
             fracErr1, fracErr2))
 
     if VXDReq == 'PXD0' or VXDReq == 'PXD1' or VXDReq == 'PXD2':
-        CBSFitRes = modelTErr.fitTo(
-            fitDataDTErr,
-            ROOT.RooFit.Minos(ROOT.kFALSE), ROOT.RooFit.Extended(ROOT.kFALSE),
-            ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
+        CBSFitRes = modelTErr.fitTo(fitDataDTErr, ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
+        CBSFitRes.Print("v")
 
     dtErrCBS.Print()
 
@@ -410,7 +413,6 @@ for VXDReq in VXDReqs:
 
     Numbr = '{:d}'.format(int((f1 + f2) * fitDataDT.numEntries()))
 
-    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
@@ -420,10 +422,8 @@ for VXDReq in VXDReqs:
     resFrame.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(shift) + '}{    #pm ' +
-                    '{:4.2f}'.format(shiftErr) + ' ps}')
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(resolution) + '}{    #pm ' +
-                    '{:4.2f}'.format(resolutionErr) + ' ps}')
+    legend.AddEntry(0, f'#splitline{{#mu_{{#Delta t}} = {shift:4.2f}}}{{    #pm {shiftErr:4.2f} ps}}')
+    legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta t}} = {resolution:4.2f}}}{{    #pm {resolutionErr:4.2f} ps}}')
     legend.SetTextSize(0.054)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
@@ -432,8 +432,8 @@ for VXDReq in VXDReqs:
     c1.SaveAs(nPlot)
     c1.Clear()
 
-    iResult.append(['mu = ' + '{: 4.2f}'.format(shift) + ' +- ' + '{:4.2f}'.format(shiftErr) + ' ps',
-                    'sigma =' + '{: 4.2f}'.format(resolution) + ' +- ' + '{:4.2f}'.format(resolutionErr) + ' ps'])
+    iResult.append([f'mu = {shift:4.2f} +- {shiftErr:4.2f} ps',
+                    f'sigma = {resolution:4.2f} +- {resolutionErr:4.2f} ps'])
     fitResultsForNtuple.append(shift)
     fitResultsForNtuple.append(resolution)
 
@@ -446,7 +446,6 @@ for VXDReq in VXDReqs:
     resFrameDtErr.GetYaxis().SetTitleOffset(1.5)
     resFrameDtErr.GetYaxis().SetLabelSize(0.045)
 
-    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
@@ -456,10 +455,10 @@ for VXDReq in VXDReqs:
     resFrameDtErr.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(meanCBS.getVal()) + '}{    #pm ' +
-                    '{:4.2f}'.format(meanCBS.getError()) + ' ps}')  # '{:>6}'.format(Shift)
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(sigmaCBS.getVal()) +
-                    '}{    #pm ' + '{:4.2f}'.format(sigmaCBS.getError()) + ' ps}')  # '{:>4}'.format(Resol)
+    legend.AddEntry(0, f'#splitline{{#mu_{{#Delta t}} = {meanCBS.getVal():4.2f}}}{{    #pm '
+                    f'{meanCBS.getError():4.2f} ps}}')  # '{:>6}'.format(Shift)
+    legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta t}} = {sigmaCBS.getVal():4.2f}}}'
+                    f'{{    #pm {sigmaCBS.getError():4.2f} ps}}')  # '{:>4}'.format(Resol)
     legend.SetTextSize(0.054)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     # legend.Draw()
@@ -473,14 +472,14 @@ for VXDReq in VXDReqs:
 
     # Fit of Delta Z for B0_sig
 
-    Mu1SigZ = ROOT.RooRealVar("Mu1SigZ", "Mu1SigZ", -6.03806e-06, -limZSig, limZSig)
-    Mu2SigZ = ROOT.RooRealVar("Mu2SigZ", "Mu2SigZ", 1.45755e-05, -limZSig, limZSig)
-    Mu3SigZ = ROOT.RooRealVar("Mu3SigZ", "Mu3SigZ", -1.84464e-04, -limZSig, limZSig)
-    Sigma1SigZ = ROOT.RooRealVar("Sigma1SigZ", "Sigma1SigZ", 4.03530e-03, 0., limZSig)
-    Sigma2SigZ = ROOT.RooRealVar("Sigma2SigZ", "Sigma2SigZ", 1.73995e-03, 0., limZSig)
-    Sigma3SigZ = ROOT.RooRealVar("Sigma3SigZ", "Sigma3SigZ", 2.18176e-02, 0., limZSig)
-    frac1SigZ = ROOT.RooRealVar("frac1SigZ", "frac1SigZ", 2.08032e-01, 0.0, 1.)
-    frac2SigZ = ROOT.RooRealVar("frac2SigZ", "frac2SigZ", 7.80053e-01, 0.0, 1.)
+    Mu1SigZ = ROOT.RooRealVar("Mu1SigZ", "Mu1SigZ", -9e-06, -limZSig, limZSig)
+    Mu2SigZ = ROOT.RooRealVar("Mu2SigZ", "Mu2SigZ", -1.8e-05, -limZSig, limZSig)
+    Mu3SigZ = ROOT.RooRealVar("Mu3SigZ", "Mu3SigZ", 6e-05, -limZSig, limZSig)
+    Sigma1SigZ = ROOT.RooRealVar("Sigma1SigZ", "Sigma1SigZ", 3e-03, 1e-6, limZSig)
+    Sigma2SigZ = ROOT.RooRealVar("Sigma2SigZ", "Sigma2SigZ", 1.4e-03, 1e-6, limZSig)
+    Sigma3SigZ = ROOT.RooRealVar("Sigma3SigZ", "Sigma3SigZ", 0.01, 1e-6, limZSig)
+    frac1SigZ = ROOT.RooRealVar("frac1SigZ", "frac1SigZ", 0.2, 0.0, 0.5)
+    frac2SigZ = ROOT.RooRealVar("frac2SigZ", "frac2SigZ", 0.75, 0.5, 1.)
 
     g1SigZ = ROOT.RooGaussian("g1", "g1", DSigZ, Mu1SigZ, Sigma1SigZ)
     g2SigZ = ROOT.RooGaussian("g2", "g2", DSigZ, Mu2SigZ, Sigma2SigZ)
@@ -496,9 +495,9 @@ for VXDReq in VXDReqs:
 
     DSigZ.setRange("fitRange", -limZSig, limZSig)
 
-    fitResSigZ = modelSigZ.fitTo(
-        fitDataSigZ, ROOT.RooFit.Minos(ROOT.kFALSE),
-        ROOT.RooFit.Extended(ROOT.kFALSE), ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
+    fitResSigZ = modelSigZ.fitTo(fitDataSigZ, ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
+
+    fitResSigZ.Print("v")
 
     resFrameSigZ = DSigZ.frame()
 
@@ -548,8 +547,7 @@ for VXDReq in VXDReqs:
     resolutionErrSigZ = math.sqrt((Sigma1SigZ.getError() * f1SigZ)**2 + (Sigma2SigZ.getError() * f2SigZ)**2 +
                                   (Sigma3SigZ.getError() * f3SigZ)**2) * 10000
 
-    cSig = ROOT.TCanvas("c1", "c1", 1400, 1100)
-    cSig.cd()
+    c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
     Pad.SetBottomMargin(0.15)
@@ -562,32 +560,26 @@ for VXDReq in VXDReqs:
 
     legend.AddEntry(
         0,
-        '#splitline{#mu_{#Delta z} =' +
-        '{: 1.1f}'.format(shiftSigZ) +
-        '}{    #pm ' +
-        '{:1.1f}'.format(shiftErrSigZ) +
-        ' #mum}')
+        f'#splitline{{#mu_{{#Delta z}} = {shiftSigZ:1.1f}}}'
+        f'{{    #pm {shiftErrSigZ:1.1f} #mum}}')
     legend.AddEntry(
         0,
-        '#splitline{#sigma_{#Delta z} =' +
-        '{: 1.1f}'.format(resolutionSigZ) +
-        '}{    #pm ' +
-        '{:1.1f}'.format(resolutionErrSigZ) +
-        ' #mum}')
+        f'#splitline{{#sigma_{{#Delta z}} = {resolutionSigZ:1.1f}}}'
+        f'{{    #pm {resolutionErrSigZ:1.1f} #mum}}')
 
     legend.SetTextSize(0.05)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaZsig" + VXDReq + ".pdf"
-    cSig.SaveAs(nPlot)
-    cSig.Clear()
+    c1.SaveAs(nPlot)
+    c1.Clear()
 
     fitResSigZ.Clear()
     modelSigZ.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftSigZ) + ' +- ' + '{:^4.1f}'.format(shiftErrSigZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionSigZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrSigZ) + ' mum'])
+    iResult.append([f'mu = {shiftSigZ:4.1f}  +- {shiftErrSigZ:3.1f}  mum',
+                    f'sigma = {resolutionSigZ:4.1f} +- {resolutionErrSigZ:3.1f}  mum'])
     fitResultsForNtuple.append(shiftSigZ)
     fitResultsForNtuple.append(resolutionSigZ)
 
@@ -596,9 +588,9 @@ for VXDReq in VXDReqs:
     Mu1TagZ = ROOT.RooRealVar("Mu1TagZ", "Mu1TagZ", 0., -limZTag, limZTag)
     Mu2TagZ = ROOT.RooRealVar("Mu2TagZ", "Mu2TagZ", 0., -limZTag, limZTag)
     Mu3TagZ = ROOT.RooRealVar("Mu3TagZ", "Mu3TagZ", 0., -limZTag, limZTag)
-    Sigma1TagZ = ROOT.RooRealVar("Sigma1TagZ", "Sigma1TagZ", 2.51877e-02, 0., limZTag)
-    Sigma2TagZ = ROOT.RooRealVar("Sigma2TagZ", "Sigma2TagZ", 1.54011e-02, 0., limZTag)
-    Sigma3TagZ = ROOT.RooRealVar("Sigma3TagZ", "Sigma3TagZ", 1.61081e-02, 0., limZTag)
+    Sigma1TagZ = ROOT.RooRealVar("Sigma1TagZ", "Sigma1TagZ", 2.51877e-02, 1e-6, limZTag)
+    Sigma2TagZ = ROOT.RooRealVar("Sigma2TagZ", "Sigma2TagZ", 1.54011e-02, 1e-6, limZTag)
+    Sigma3TagZ = ROOT.RooRealVar("Sigma3TagZ", "Sigma3TagZ", 1.61081e-02, 1e-6, limZTag)
     frac1TagZ = ROOT.RooRealVar("frac1TagZ", "frac1TagZ", 1.20825e-01, 0.0, 1.)
     frac2TagZ = ROOT.RooRealVar("frac2TagZ", "frac2TagZ", 1.10840e-01, 0.0, 1.)
 
@@ -615,12 +607,9 @@ for VXDReq in VXDReqs:
 
     DTagZ.setRange("fitRange", -limZTag, limZTag)
 
-    fitResTagZ = modelTagZ.fitTo(
-        fitDataTagZ, ROOT.RooFit.Minos(
-            ROOT.kFALSE), ROOT.RooFit.Extended(
-            ROOT.kFALSE), ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
-
+    fitResTagZ = modelTagZ.fitTo(fitDataTagZ, ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
     fitResTagZ.Print("v")
+
     resFrameTagZ = DTagZ.frame()
 
     f1TagZ = frac1TagZ.getVal()
@@ -672,8 +661,7 @@ for VXDReq in VXDReqs:
     resolutionErrTagZ = math.sqrt((Sigma1TagZ.getError() * f1TagZ)**2 + (Sigma2TagZ.getError() * f2TagZ)**2 +
                                   (Sigma3TagZ.getError() * f3TagZ)**2) * 10000
 
-    cTag = ROOT.TCanvas("c1", "c1", 1400, 1100)
-    cTag.cd()
+    c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
     Pad.SetBottomMargin(0.15)
@@ -684,20 +672,20 @@ for VXDReq in VXDReqs:
     # NumbrTagZ = '{:d}'.format(int((f1+f2)*fitDataTagZ.numEntries()))
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrTagZ))
 
-    legend.AddEntry(0, '#splitline{#mu_{#Delta z} =' + '{: 1.1f}'.format(shiftTagZ) +
-                    '}{  #pm ' + '{: 1.1f}'.format(shiftErrTagZ) + ' #mum}')
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta z} =' + '{: 1.1f}'.format(resolutionTagZ) +
-                    '}{  #pm ' + '{: 1.1f}'.format(resolutionErrTagZ) + ' #mum}')
+    legend.AddEntry(0, f'#splitline{{#mu_{{#Delta z}} = {shiftTagZ:1.1f}'
+                    f'}}{{  #pm {shiftErrTagZ:1.1f} #mum}}')
+    legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta z}} = {resolutionTagZ:1.1f}'
+                    f'}}{{  #pm {resolutionErrTagZ:1.1f} #mum}}')
     legend.SetTextSize(0.05)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaZtag" + VXDReq + ".pdf"
-    cTag.SaveAs(nPlot)
-    cTag.Clear()
+    nPlot = PATH + f"/test6_CPVResDeltaZtag{VXDReq}.pdf"
+    c1.SaveAs(nPlot)
+    c1.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftTagZ) + ' +- ' + '{:^4.1f}'.format(shiftErrTagZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionTagZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrTagZ) + ' mum'])
+    iResult.append([f'mu = {shiftTagZ:4.1f}  +- {shiftErrTagZ:3.1f}  mum',
+                    f'sigma = {resolutionTagZ:4.1f} +- {resolutionErrTagZ:3.1f}  mum'])
     fitResultsForNtuple.append(shiftTagZ)
     fitResultsForNtuple.append(resolutionTagZ)
 
@@ -731,8 +719,8 @@ print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
 print('*                                                             *')
 print('* Efficiency                                                  *')
 print('*                                                             *')
-print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
-      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%             *')
+print(f'* N_{VXDReqs[1]}/N_{VXDReqs[0]} = {numberOfEntries[1]}/{numberOfEntries[0]} = '
+      f'{(numberOfEntries[1] / numberOfEntries[0]) * 100:3.2f}%                          *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

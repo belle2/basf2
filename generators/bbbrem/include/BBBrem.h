@@ -11,6 +11,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -88,7 +89,7 @@ namespace Belle2 {
      * @param boost Lorentz boost vector.
      * @return Returns the weight of the event.
      */
-    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
     /** Returns the total cross section of the generated process in millibarn.
      * @return The total cross section.
@@ -163,7 +164,8 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                       ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:

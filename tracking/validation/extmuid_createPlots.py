@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@
 <header>
     <input>muon-ExtMuidValidation.root,
            pion-ExtMuidValidation.root</input>
-    <contact>depietro@infn.it</contact>
+    <contact>giacomo.pietro@kit.edu</contact>
     <description>Create validation plots for Ext and Muid</description>
 </header>
 """
@@ -39,7 +38,7 @@ from optparse import OptionParser
 # contact person information
 # is added to the plot descriptions
 CONTACT_PERSON = {'Name': 'Giacomo De Pietro',
-                  'Email': 'depietro@infn.it'}
+                  'Email': 'giacomo.pietro@kit.edu'}
 
 
 def main():
@@ -90,7 +89,7 @@ def draw_exthits(file_chain):
     Draw the ExtHit-related distributions.
     """
 
-    contact_mail = "depietro@infn.it"
+    contact_mail = "giacomo.pietro@kit.edu"
 
     # NOTE: *.Draw() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     detectorID = TH1F('DetectorID', 'Detector ID for ExtHits', 8, -0.5, 7.5)
@@ -222,7 +221,7 @@ def draw_likelihoods(file_chain):
     Draw the Muid likelihood-based distributions.
     """
 
-    contact_mail = "depietro@infn.it"
+    contact_mail = "giacomo.pietro@kit.edu"
 
     outcome = TH1F('Outcome', 'Outcome', 5, -0.5, 4.5)
 
@@ -306,7 +305,7 @@ def draw_likelihoods(file_chain):
                 rchisq = -1.0
                 if ndof > 0:
                     rchisq = chisq / ndof
-                p = momentum.Mag()
+                p = momentum.R()
                 theta = momentum.Theta() * 180.0 / np.pi
                 phi = momentum.Phi() * 180.0 / np.pi
                 if phi < 0.0:

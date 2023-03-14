@@ -202,6 +202,11 @@ namespace Belle2 {
        */
       void clearAliases();
 
+      /** Resolve alias
+       * Return original variable name
+       */
+      std::string resolveAlias(const std::string& alias);
+
       /** Add collection
        * Return true if the collection was successfully added
        */

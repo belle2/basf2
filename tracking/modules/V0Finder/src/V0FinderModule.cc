@@ -236,12 +236,12 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
 
   // first track should always be the positve one
   double m_plus = trackHypotheses.first.getMass();
-  double p_plus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum().Mag();
+  double p_plus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum().R();
   double E_plus = sqrt(m_plus * m_plus + p_plus * p_plus);
 
   // second track is the negative
   double m_minus = trackHypotheses.second.getMass();
-  double p_minus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum().Mag();
+  double p_minus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum().R();
   double E_minus = sqrt(m_minus * m_minus + p_minus * p_minus);
 
   // now do the adding of the 4momenta

@@ -222,34 +222,6 @@ Particle::Particle(const int trackArrayIndex,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
-//FIXME: Deprecated, to be removed after release-05
-Particle::Particle(const int trackArrayIndex,
-                   const TrackFitResult* trackFit,
-                   const Const::ChargedStable& chargedStable,
-                   const Const::ChargedStable& chargedStableUsedForFit) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
-{
-  if (!trackFit) return;
-
-  m_flavorType = c_Flavored; //tracks are charged
-  m_particleSource = c_Track;
-
-  setMdstArrayIndex(trackArrayIndex);
-
-  m_pdgCodeUsedForFit = chargedStableUsedForFit.getPDGCode();
-  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
-
-  // set mass
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
-    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
-  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
-
-  // set momentum, position and error matrix
-  setMomentumPositionErrorMatrix(trackFit);
-}
-
-
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
@@ -362,9 +334,9 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   // mass and momentum
   m_mass = mcParticle->getMass();
-  m_px = mcParticle->getMomentum().Px();
-  m_py = mcParticle->getMomentum().Py();
-  m_pz = mcParticle->getMomentum().Pz();
+  m_px = mcParticle->getMomentum().X();
+  m_py = mcParticle->getMomentum().Y();
+  m_pz = mcParticle->getMomentum().Z();
   // production vertex
   // TODO: good only for FS particles, for composite we must use decay vertex
   setVertex(mcParticle->getVertex());
@@ -522,7 +494,7 @@ double Particle::getCosHelicity(const Particle* mother) const
       PxPyPzEVector pDaughter1 = boost * getDaughter(1)->get4Vector();
 
       XYZVector pDaughterNormal(pDaughter0.Vect().Cross(pDaughter1.Vect()));
-      pDaughter.SetPxPyPzE(pDaughterNormal.x(), pDaughterNormal.y(), pDaughterNormal.z(), 0); // energy doesn't matter
+      pDaughter.SetPxPyPzE(pDaughterNormal.X(), pDaughterNormal.Y(), pDaughterNormal.Z(), 0); // energy doesn't matter
     }
   }
 
@@ -642,6 +614,15 @@ double Particle::getPDGMass() const
   return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
 }
 
+double Particle::getPDGLifetime() const
+{
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
+    B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+    return 0.0;
+  }
+  return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Lifetime();
+}
+
 double Particle::getCharge() const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
@@ -696,8 +677,7 @@ std::vector<int> Particle::getMdstArrayIndices(EParticleSourceObject source) con
   return mdstIndices;
 }
 
-
-void Particle::appendDaughter(const Particle* daughter, const bool updateType)
+void Particle::appendDaughter(const Particle* daughter, const bool updateType, const int daughterProperty)
 {
   if (updateType) {
     // is it a composite particle or fsr corrected?
@@ -706,7 +686,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
-  m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+  m_daughterProperties.push_back(daughterProperty);
 }
 
 void Particle::removeDaughter(const Particle* daughter, const bool updateType)
@@ -726,7 +706,7 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
     m_particleSource = c_Undefined;
 }
 
-void Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+bool Particle::replaceDaughter(const Particle* oldDaughter, Particle* newDaughter)
 {
   int index = oldDaughter->getArrayIndex();
 
@@ -736,9 +716,27 @@ void Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newD
       m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
       auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
       m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+
+      newDaughter->writeExtraInfo("original_index", index);
+      return true;
     }
   }
+  return false;
 }
+
+bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter)
+{
+  bool isReplaced = this->replaceDaughter(oldDaughter, newDaughter);
+  if (isReplaced)
+    return true;
+  for (auto& daughter : this->getDaughters()) {
+    isReplaced = daughter->replaceDaughterRecursively(oldDaughter, newDaughter);
+    if (isReplaced)
+      return true;
+  }
+  return false;
+}
+
 
 bool Particle::overlapsWith(const Particle* oParticle) const
 {
@@ -1007,12 +1005,12 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
   // set momentum
-  m_px = trackFit->getMomentum().Px();
-  m_py = trackFit->getMomentum().Py();
-  m_pz = trackFit->getMomentum().Pz();
+  m_px = trackFit->getMomentum().X();
+  m_py = trackFit->getMomentum().Y();
+  m_pz = trackFit->getMomentum().Z();
 
   // set position at which the momentum is given (= POCA)
-  setVertex(XYZVector(trackFit->getPosition().x(), trackFit->getPosition().y(), trackFit->getPosition().z()));
+  setVertex(trackFit->getPosition());
 
   // set Chi^2 probability
   m_pValue = trackFit->getPValue();
@@ -1229,14 +1227,14 @@ std::string Particle::getInfoHTML() const
   stream << " <b>mass</b>=" << m_mass;
   stream << "<br>";
 
-  stream << " <b>momentum</b>=" << HTML::getString(B2Vector3D(getPx(), getPy(), getPz()));
+  stream << " <b>momentum</b>=" << HTML::getString(ROOT::Math::XYZVector(getPx(), getPy(), getPz()));
   stream << " <b>p</b>=" << getP();
   stream << "<br>";
 
   stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
-  stream << " <b>position</b>=" << HTML::getString(B2Vector3D(m_x, m_y, m_z));
+  stream << " <b>position</b>=" << HTML::getString(ROOT::Math::XYZVector(m_x, m_y, m_z));
   stream << "<br>";
 
   stream << " <b>p-value of fit</b> (if done): ";

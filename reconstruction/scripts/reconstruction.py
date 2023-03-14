@@ -33,8 +33,6 @@ from softwaretrigger.path_utils import (
     add_skim_software_trigger
 )
 
-import mdst
-
 
 CDST_TRACKING_OBJECTS = (
     'EventLevelTrackingInfo',
@@ -532,25 +530,23 @@ def add_prefilter_posttracking_reconstruction(path,
     path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
 
 
-def add_mdst_output(
-    path,
-    mc=True,
-    filename='mdst.root',
-    additionalBranches=[],
-    dataDescription=None,
-):
+def add_mdst_output(*args, **kwargs):
     """
-    This function adds the MDST output modules to a path, saving only objects defined as part of the MDST data format.
+        .. deprecated:: release-08-00-00
 
-    @param path Path to add modules to
-    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
-    @param filename Output file name.
-    @param additionalBranches Additional objects/arrays of event durability to save
-    @param dataDescription Additional key->value pairs to be added as data description
-           fields to the output FileMetaData
+    This function simply returns a FATAL message.
+
+    Please use the equivalent function from the mdst package if you want to store
+    the output in a mDST file:
+
+    .. code-block:: python
+
+        import mdst
+        mdst.add_mdst_output(path=mypath)
     """
 
-    return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
+    basf2.B2FATAL("This function is deprecated and it will be removed in release-09.\n"
+                  "Please use the equivalent function from the mdst package.")
 
 
 def add_cdst_output(

@@ -11,12 +11,10 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <simulation/background/BkgSensitiveDetector.h>
 
 /* Geant4 headers. */
@@ -43,19 +41,10 @@ SensitiveDetector::SensitiveDetector(
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
   m_HitTimeMax = m_SimPar->getHitTimeMax();
-  DBObjPtr<EKLMSimulationParameters> simPar;
-  if (!simPar.isValid())
-    B2FATAL("EKLM simulation parameters are not available.");
-  m_ThresholdHitTime = simPar->getHitTimeThreshold();
   m_MCParticles.isOptional();
-  m_BKLMSimHits.registerInDataStore();
-  m_EKLMSimHits.registerInDataStore();
-  m_BKLMSimHitPositions.registerInDataStore();
-  m_MCParticlesToBKLMSimHits.registerInDataStore();
-  m_MCParticlesToEKLMSimHits.registerInDataStore();
-  registerMCParticleRelation(m_MCParticlesToBKLMSimHits);
-  registerMCParticleRelation(m_MCParticlesToEKLMSimHits);
-  m_BKLMSimHitPositions.registerRelationTo(m_BKLMSimHits);
+  m_KLMSimHits.registerInDataStore();
+  m_MCParticlesToKLMSimHits.registerInDataStore();
+  registerMCParticleRelation(m_MCParticlesToKLMSimHits);
 }
 
 bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
@@ -90,18 +79,24 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
     return false;
   const G4Track& track = * aStep->GetTrack();
   const G4double hitTime = track.GetGlobalTime();
-  /* No time cut for background studies. */
-  if (hitTime > m_ThresholdHitTime) {
-    B2INFO("EKLMSensitiveDetector: "
-           " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
+  if (hitTime > m_HitTimeMax)
     return false;
-  }
   /* Hit position. */
   gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                 aStep->GetPreStepPoint()->GetPosition());
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
-  EKLMSimHit* hit = m_EKLMSimHits.appendNew();
+  KLMSimHit* hit = m_KLMSimHits.appendNew();
+  hit->setSubdetector(KLMElementNumbers::c_EKLM);
+  hit->setSection(section);
+  hit->setSector(sector);
+  hit->setLayer(layer);
+  hit->setPlane(plane);
+  hit->setStrip(strip);
+  hit->setLastStrip(strip);
+  // hit->setPropagationTime();
+  hit->setTime(hitTime);
+  hit->setEnergyDeposit(eDep);
   CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
   hit->setMomentum(ROOT::Math::PxPyPzEVector(trackMomentum.x(), trackMomentum.y(),
                                              trackMomentum.z(), track.GetTotalEnergy()));
@@ -113,16 +108,9 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
   hit->setPosition(gpos.x() / CLHEP::mm * Unit::mm,
                    gpos.y() / CLHEP::mm * Unit::mm,
                    gpos.z() / CLHEP::mm * Unit::mm);
-  hit->setEnergyDeposit(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
-  hit->setTime(hitTime);
-  hit->setStrip(strip);
-  hit->setPlane(plane);
-  hit->setSector(sector);
-  hit->setLayer(layer);
-  hit->setSection(section);
   hit->setVolumeID(stripGlobal);
-  m_MCParticlesToEKLMSimHits.add(track.GetTrackID(), hit->getArrayIndex());
+  m_MCParticlesToKLMSimHits.add(track.GetTrackID(), hit->getArrayIndex());
   return true;
 }
 
@@ -134,9 +122,6 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
     m_GeoPar = bklm::GeometryPar::instance();
     if (m_GeoPar->doBeamBackgroundStudy())
       m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
-    if (!m_SimPar.isValid())
-      B2FATAL("BKLM simulation parameters are not available.");
-    m_HitTimeMax = m_SimPar->getHitTimeMax();
     if (!gRandom)
       B2FATAL("gRandom is not initialized; please set up gRandom first");
   }
@@ -158,7 +143,7 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
   G4StepPoint* postStep = step->GetPostStepPoint();
   G4Track*     track    = step->GetTrack();
 
-  // Record a BKLMSimHit for a charged track that deposits some energy.
+  // Record a KLMSimHit for a charged track that deposits some energy.
   if ((eDep > 0.0) && (postStep->GetCharge() != 0.0)) {
     const G4VTouchable* hist = preStep->GetTouchable();
     int depth = hist->GetHistoryDepth();
@@ -172,18 +157,12 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
     int layer = hist->GetCopyNumber(depth - m_DepthLayer);
     int sector = hist->GetCopyNumber(depth - m_DepthSector);
     int section = hist->GetCopyNumber(depth - m_DepthSection);
-    int moduleID =
-      int(BKLMElementNumbers::moduleNumber(section, sector, layer));
     double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
     if (time > m_HitTimeMax)
       return false;
     const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
     const bklm::Module* m = m_GeoPar->findModule(section, sector, layer);
     const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
-    if (postStep->GetProcessDefinedStep() != 0) {
-      if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay)
-        moduleID |= BKLM_DECAYED_MASK;
-    }
     int trackID = track->GetTrackID();
     if (m->hasRPCs()) {
       const CLHEP::Hep3Vector propagationTimes =
@@ -194,45 +173,60 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
       int zStripUpper = -1;
       convertHitToRPCStrips(localPosition, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
       if (zStripLower > 0) {
-        int moduleIDZ = moduleID;
-        BKLMElementNumbers::setPlaneInModule(
-          moduleIDZ, BKLMElementNumbers::c_ZPlane);
-        BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
-        BKLMStatus::setMaximalStrip(moduleIDZ, zStripUpper);
-        BKLMSimHit* simHit = m_BKLMSimHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
-        m_MCParticlesToBKLMSimHits.add(trackID, simHit->getArrayIndex());
-        BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
-        simHitPosition->addRelationTo(simHit);
+        KLMSimHit* simHit = m_KLMSimHits.appendNew();
+        simHit->setSubdetector(KLMElementNumbers::c_BKLM);
+        simHit->setSection(section);
+        simHit->setSector(sector);
+        simHit->setLayer(layer);
+        simHit->setPlane(BKLMElementNumbers::c_ZPlane);
+        simHit->setStrip(zStripLower);
+        simHit->setLastStrip(zStripUpper);
+        simHit->setPropagationTime(propagationTimes.z());
+        simHit->setTime(time);
+        simHit->setEnergyDeposit(eDep);
+        simHit->setPosition(globalPosition.x(), globalPosition.y(),
+                            globalPosition.z());
+        m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
       }
       if (phiStripLower > 0) {
-        BKLMElementNumbers::setPlaneInModule(
-          moduleID, BKLMElementNumbers::c_PhiPlane);
-        BKLMElementNumbers::setStripInModule(moduleID, phiStripLower);
-        BKLMStatus::setMaximalStrip(moduleID, phiStripUpper);
-        BKLMSimHit* simHit = m_BKLMSimHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
-        m_MCParticlesToBKLMSimHits.add(trackID, simHit->getArrayIndex());
-        BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
-        simHitPosition->addRelationTo(simHit);
+        KLMSimHit* simHit = m_KLMSimHits.appendNew();
+        simHit->setSubdetector(KLMElementNumbers::c_BKLM);
+        simHit->setSection(section);
+        simHit->setSector(sector);
+        simHit->setLayer(layer);
+        simHit->setPlane(BKLMElementNumbers::c_PhiPlane);
+        simHit->setStrip(phiStripLower);
+        simHit->setLastStrip(phiStripUpper);
+        simHit->setPropagationTime(propagationTimes.y());
+        simHit->setTime(time);
+        simHit->setEnergyDeposit(eDep);
+        simHit->setPosition(globalPosition.x(), globalPosition.y(),
+                            globalPosition.z());
+        m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
       }
     } else {
       int scint = hist->GetCopyNumber(depth - m_DepthScintillator);
       bool phiPlane = (plane == BKLM_INNER);
       double propagationTime =
         m->getPropagationTime(localPosition, scint, phiPlane);
-      BKLMElementNumbers::setStripInModule(moduleID, scint);
-      BKLMStatus::setMaximalStrip(moduleID, scint);
+      KLMSimHit* simHit = m_KLMSimHits.appendNew();
+      simHit->setSubdetector(KLMElementNumbers::c_BKLM);
+      simHit->setSection(section);
+      simHit->setSector(sector);
+      simHit->setLayer(layer);
       if (phiPlane) {
-        BKLMElementNumbers::setPlaneInModule(
-          moduleID, BKLMElementNumbers::c_PhiPlane);
+        simHit->setPlane(BKLMElementNumbers::c_PhiPlane);
       } else {
-        BKLMElementNumbers::setPlaneInModule(
-          moduleID, BKLMElementNumbers::c_ZPlane);
+        simHit->setPlane(BKLMElementNumbers::c_ZPlane);
       }
-      BKLMSimHit* simHit = m_BKLMSimHits.appendNew(moduleID, propagationTime, time,
-                                                   eDep);
-      m_MCParticlesToBKLMSimHits.add(trackID, simHit->getArrayIndex());
-      BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
-      simHitPosition->addRelationTo(simHit);
+      simHit->setStrip(scint);
+      simHit->setLastStrip(scint);
+      simHit->setPropagationTime(propagationTime);
+      simHit->setTime(time);
+      simHit->setEnergyDeposit(eDep);
+      simHit->setPosition(globalPosition.x(), globalPosition.y(),
+                          globalPosition.z());
+      m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
     }
     return true;
   }

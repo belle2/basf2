@@ -24,8 +24,8 @@ saving out only the information necessary for training. This is done with severa
 methods that are provided in the ``pidDataUtils`` module.
 
 1. Read your data into a DataFrame. We provide a ``read_root()`` method to do
-   this (it is just a wrapper around the root_pandas method of the same name,
-   but it can read several files and automatically concatenate them all
+   this (it is just a wrapper around the uproot.concatenate method,
+   which can read several files and automatically concatenate them all
    together.) You can use whatever method you like, though. All that is required
    is that your DataFrame **must** contain momentum ('p'), cosine-theta
    ('cosTheta'), phi ('phi'), and detector log-likelihood data for any particles

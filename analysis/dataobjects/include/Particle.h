@@ -211,22 +211,6 @@ namespace Belle2 {
 
     /**
      * Constructor from a reconstructed Track given as TrackFitResult.
-     * To be used to create Particle objects from V0 daughters.
-     * @param trackArrayIndex track StoreArray index
-     * @param trackFit pointer to TrackFitResult object
-     * @param chargedStable Type of charged particle
-     * @param chargedStableUsedForFit Type of particle which has been used in the track fit.
-     *        This can be different as chargedStable as we don't fit all tracks with
-     *        all hypothesis.
-     */
-    [[deprecated("Please use the constructor without the chargedStableUsedForFit")]]
-    Particle(const int trackArrayIndex,
-             const TrackFitResult* trackFit,
-             const Const::ChargedStable& chargedStable,
-             const Const::ChargedStable& chargedStableUsedForFit);
-
-    /**
-     * Constructor from a reconstructed Track given as TrackFitResult.
      * To be used to create Particle objects from tracks with full control over
      * the hypothesis (e.g. V0 daughters).
      * @param trackArrayIndex track StoreArray index
@@ -267,6 +251,15 @@ namespace Belle2 {
     // setters
 
     /**
+     * Sets PDG code
+     * @param pdg PDG code
+     */
+    void setPDGCode(const int pdg)
+    {
+      m_pdgCode = pdg;
+    }
+
+    /**
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
@@ -275,6 +268,18 @@ namespace Belle2 {
       m_px = p4.Px();
       m_py = p4.Py();
       m_pz = p4.Pz();
+      m_mass = p4.M();
+    }
+
+    /**
+     * Sets Lorentz vector dividing by the momentum scaling factor
+     * @param p4 Lorentz vector
+     */
+    void set4VectorDividingByMomentumScaling(const ROOT::Math::PxPyPzEVector& p4)
+    {
+      m_px = p4.Px() / m_momentumScale;
+      m_py = p4.Py() / m_momentumScale;
+      m_pz = p4.Pz() / m_momentumScale;
       m_mass = p4.M();
     }
 
@@ -366,8 +371,9 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      * @param updateType bool to set whether particle type should be updated
+     * @param daughterProperty property of the daughter particle
      */
-    void appendDaughter(const Particle* daughter, const bool updateType = true);
+    void appendDaughter(const Particle* daughter, const bool updateType = true, const int daughterProperty = c_Ordinary);
 
     /**
      * Appends index of daughter to daughters index array
@@ -381,7 +387,7 @@ namespace Belle2 {
         m_particleSource = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
-      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+      m_daughterProperties.push_back(c_Ordinary);
     }
 
     /**
@@ -392,11 +398,19 @@ namespace Belle2 {
     void removeDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
-     * Replace index of given daughter with new daughter
+     * Replace index of given daughter with new daughter, return true if a replacement is made
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    void replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughter(const Particle* oldDaughter, Particle* newDaughter);
+
+    /**
+     * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
+     * it, return true if a replacement is made
+     * @param oldDaughter pointer to the daughter that will be removed
+     * @param newDaughter pointer to the particle that will be added as a daughter
+     */
+    bool replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter);
 
     // getters
 
@@ -474,6 +488,12 @@ namespace Belle2 {
      * @return nominal mass
      */
     double getPDGMass(void) const;
+
+    /**
+     * Returns particle nominal lifetime
+     * @return nominal lifetime [sec]
+     */
+    double getPDGLifetime() const;
 
     /**
      * Returns total energy
@@ -964,6 +984,23 @@ namespace Belle2 {
      */
     void updateJacobiMatrix();
 
+    /**
+     * Fill final state particle daughters into a vector
+     *
+     * Function is called recursively
+     * @param fspDaughters vector of daughter particles
+     */
+    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+
+    /**
+     * Fill all generations' daughters into a vector
+     *
+     * Function is called recursively
+     * @param allDaughters vector of daughter particles
+     */
+    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
+
+
   private:
 
     // persistent data members
@@ -1043,20 +1080,6 @@ namespace Belle2 {
      * @param jacobiMatrix 4x6 error matrix
      */
     void storeJacobiMatrix(const TMatrixF& jacobiMatrix);
-    /**
-     * Fill final state particle daughters into a vector
-     *
-     * Function is called recursively
-     * @param fspDaughters vector of daughter particles
-     */
-    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
-    /**
-     * Fill all generations' daughters into a vector
-     *
-     * Function is called recursively
-     * @param allDaughters vector of daughter particles
-     */
-    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
 
     /**
      * Fill vector with (PDGCode, MdstSource) pairs for the entire decay chain.

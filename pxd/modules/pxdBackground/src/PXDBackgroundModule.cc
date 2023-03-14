@@ -72,18 +72,18 @@ PXDBackgroundModule::PXDBackgroundModule() :
   addParam("outputDirectory", m_outputDirectoryName, "Name of output directory", m_outputDirectoryName);
 }
 
-const TVector3& PXDBackgroundModule::pointToGlobal(VxdID sensorID, const TVector3& local)
+const ROOT::Math::XYZVector& PXDBackgroundModule::pointToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local)
 {
-  static TVector3 result(0, 0, 0);
+  static ROOT::Math::XYZVector result(0, 0, 0);
 
   const PXD::SensorInfo& info = getInfo(sensorID);
   result = info.pointToGlobal(local);
   return result;
 }
 
-const TVector3& PXDBackgroundModule::vectorToGlobal(VxdID sensorID, const TVector3& local)
+const ROOT::Math::XYZVector& PXDBackgroundModule::vectorToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local)
 {
-  static TVector3 result(0, 0, 0);
+  static ROOT::Math::XYZVector result(0, 0, 0);
 
   const PXD::SensorInfo& info = getInfo(sensorID);
   result = info.vectorToGlobal(local);
@@ -194,10 +194,10 @@ void PXDBackgroundModule::event()
       // Exposition in GeV/cm2/s
       m_sensorData[currentSensorID].m_expo += hitEnergy / currentSensorArea / (currentComponentTime / Unit::s);
       if (m_doseReportingLevel == c_reportNTuple) {
-        const TVector3 localPos = hit.getPosIn();
-        const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
+        const ROOT::Math::XYZVector localPos = hit.getPosIn();
+        const ROOT::Math::XYZVector globalPos = pointToGlobal(currentSensorID, localPos);
         float globalPosXYZ[3];
-        globalPos.GetXYZ(globalPosXYZ);
+        globalPos.GetCoordinates(globalPosXYZ);
         storeEnergyDeposits.appendNew(
           sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
           hit.getPDGcode(), hit.getGlobalTime(),
@@ -223,9 +223,9 @@ void PXDBackgroundModule::event()
         currentSensorArea = getSensorArea(currentSensorID);
       }
       // J(TrueHit) = abs(step)/thickness * correctionFactor;
-      TVector3 entryPos(hit.getEntryU(), hit.getEntryV(), hit.getEntryW());
-      TVector3 exitPos(hit.getExitU(), hit.getExitV(), hit.getExitW());
-      double stepLength = (exitPos - entryPos).Mag();
+      ROOT::Math::XYZVector entryPos(hit.getEntryU(), hit.getEntryV(), hit.getEntryW());
+      ROOT::Math::XYZVector exitPos(hit.getExitU(), hit.getExitV(), hit.getExitW());
+      double stepLength = (exitPos - entryPos).R();
       // Identify what particle we've got. We need type and kinetic energy.
       // TODO: TrueHit must carry pdg or SimHit must carry energy.
       // NOTE: MCParticles may get remapped, then SimHits still carry correct pdg.
@@ -233,7 +233,7 @@ void PXDBackgroundModule::event()
       if (!simhit) { //either something is very wrong, or we just don't have the relation. Try to find an appropriate SimHit manually.
         double minDistance = 1.0e10;
         for (const PXDSimHit& related : storeSimHits) {
-          double distance = (entryPos - related.getPosIn()).Mag();
+          double distance = (entryPos - related.getPosIn()).R();
           if (distance < minDistance) {
             minDistance = distance;
             simhit = &related;
@@ -244,7 +244,7 @@ void PXDBackgroundModule::event()
       // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.
       // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.
       // Special treatment of corrupt p's in TrueHits:
-      TVector3 hitMomentum(hit.getMomentum());
+      ROOT::Math::XYZVector hitMomentum(hit.getMomentum());
       hitMomentum.SetX(std::isfinite(hitMomentum.X()) ? hitMomentum.X() : 0.0);
       hitMomentum.SetY(std::isfinite(hitMomentum.Y()) ? hitMomentum.Y() : 0.0);
       hitMomentum.SetZ(std::isfinite(hitMomentum.Z()) ? hitMomentum.Z() : 0.0);
@@ -283,14 +283,14 @@ void PXDBackgroundModule::event()
 
       // Store data in a PXDNeutronFluxEvent object
       if (m_nfluxReportingLevel == c_reportNTuple) {
-        TVector3 localPos(hit.getU(), hit.getV(), hit.getW());
-        const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
+        ROOT::Math::XYZVector localPos(hit.getU(), hit.getV(), hit.getW());
+        const ROOT::Math::XYZVector globalPos = pointToGlobal(currentSensorID, localPos);
         float globalPosXYZ[3];
-        globalPos.GetXYZ(globalPosXYZ);
-        TVector3 localMom = hit.getMomentum();
-        const TVector3 globalMom = vectorToGlobal(currentSensorID, localMom);
+        globalPos.GetCoordinates(globalPosXYZ);
+        ROOT::Math::XYZVector localMom = hit.getMomentum();
+        const ROOT::Math::XYZVector globalMom = vectorToGlobal(currentSensorID, localMom);
         float globalMomXYZ[3];
-        globalMom.GetXYZ(globalMomXYZ);
+        globalMom.GetCoordinates(globalMomXYZ);
         storeNeutronFluxes.appendNew(
           sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
           simhit->getPDGcode(), simhit->getGlobalTime(),

@@ -49,7 +49,7 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDat
 
 
 # Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
-flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB',
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB', 'qrGNN',
                   'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
                   'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
                   'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',
@@ -75,6 +75,8 @@ def add_default_FlavorTagger_aliases():
     variables.variables.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
     variables.variables.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
 
+    variables.variables.addAlias('qrGNN', 'extraInfo(qrGNN)')
+
     for iCategory in AvailableCategories:
         aliasForQp = 'qp' + iCategory
         aliasForTrueTarget = 'hasTrueTarget' + iCategory
@@ -89,6 +91,38 @@ def add_default_FlavorTagger_aliases():
 def set_FlavorTagger_pid_aliases():
     """
     This function adds the pid aliases needed by the flavor tagger.
+    """
+    variables.variables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
+    variables.variables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
+    variables.variables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+
+    variables.variables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
+    variables.variables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
+    variables.variables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+
+    variables.variables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
+    variables.variables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
+
+    variables.variables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
+    variables.variables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
+
+    if getBelleOrBelle2() == "Belle":
+        variables.variables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+    else:
+        variables.variables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC)')
+        variables.variables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC)')
+        variables.variables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC)')
+        variables.variables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC)')
+
+
+def set_FlavorTagger_pid_aliases_legacy():
+    """
+    This function adds the pid aliases needed by the flavor tagger trained for MC13.
     """
     variables.variables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
     variables.variables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
@@ -117,6 +151,60 @@ def set_FlavorTagger_pid_aliases():
         variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC), 0.5)')
         variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC), 0.5)')
         variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
+
+
+def set_GNNFlavorTagger_aliases(categories):
+    """
+    This function adds aliases for the GNN-based flavor tagger.
+    """
+
+    # will be used for target variable 0:B0bar, 1:B0
+    variables.variables.addAlias('qrCombined_bit', '(qrCombined+1)/2')
+    alias_list = ['qrCombined_bit']
+
+    var_dict = {
+        # position
+        'dx': 'dx',
+        'dy': 'dy',
+        'dz': 'dz',
+        # mask
+        'E': 'E',
+        # charge,
+        'charge': 'charge',
+        # feature
+        'px_c': 'px*charge',
+        'py_c': 'py*charge',
+        'pz_c': 'pz*charge',
+        'electronID_c': 'electronID*charge',
+        'muonID_c': 'muonID*charge',
+        'pionID_c': 'pionID*charge',
+        'kaonID_c': 'kaonID*charge',
+        'protonID_c': 'protonID*charge',
+        'deuteronID_c': 'deuteronID*charge',
+        'electronID_noSVD_noTOP_c': 'electronID_noSVD_noTOP*charge',
+    }
+
+    # 16 charged particles are used at most
+    for rank in range(1, 17):
+
+        for cat in categories:
+            listName = AvailableCategories[cat].particleList
+            varName = f'QpTrack({listName}, isRightCategory({cat}), isRightCategory({cat}))'
+
+            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, FT_p, {varName}, {rank}), 0)'
+            aliasWithRank = f'{cat}_rank{rank}'
+
+            variables.variables.addAlias(aliasWithRank, varWithRank)
+            alias_list.append(aliasWithRank)
+
+        for alias, var in var_dict.items():
+            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, FT_p, {var}, {rank}), 0)'
+            aliasWithRank = f'{alias}_rank{rank}'
+
+            variables.variables.addAlias(aliasWithRank, varWithRank)
+            alias_list.append(aliasWithRank)
+
+    return alias_list
 
 
 def setInputVariablesWithMask(maskName='all'):
@@ -966,6 +1054,8 @@ def flavorTagger(
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
     prefix='MC15ri_light-2207-bengal_0',
+    useGNN=False,
+    identifierGNN='',
     path=None,
 ):
     """
@@ -1018,6 +1108,10 @@ def flavorTagger(
       @param prefix                            Prefix of weight files.
                                                ``MC15ri_light-2207-bengal_0`` (default): Weight files trained for MC15ri samples.
                                                ``''``: Weight files trained for MC13 samples.
+      @param useGNN                            Use GNN-based Flavor Tagger in addition with FastBDT-based one.
+                                               Please specify the weight file with the option ``identifierGNN``.
+                                               [Expert] In the sampler mode, training files for GNN-based Flavor Tagger is produced.
+      @param identifierGNN                     The name of weight file of the GNN-based Flavor Tagger.
       @param path                              Modules are added to this path
 
     """
@@ -1047,6 +1141,10 @@ def flavorTagger(
             B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
                     '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", '
                     '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
+
+    if mode == 'Expert' and useGNN and identifierGNN == '':
+        B2FATAL('The weight file of GNN-based Flavor Tagger is not set as default yet. '
+                'Please specify the name of the weight file with ``identifierGNN``')
 
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
@@ -1093,7 +1191,16 @@ def flavorTagger(
     B2INFO(' ')
 
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
-    set_FlavorTagger_pid_aliases()
+
+    if prefix == '':
+        set_FlavorTagger_pid_aliases_legacy()
+    else:
+        set_FlavorTagger_pid_aliases()
+
+    alias_list_for_GNN = []
+    if useGNN:
+        alias_list_for_GNN = set_GNNFlavorTagger_aliases(categories)
+
     setInputVariablesWithMask()
     if prefix != '':
         weightFiles = prefix + '_' + weightFiles
@@ -1147,15 +1254,28 @@ def flavorTagger(
 
         FillParticleLists(maskName, categories, roe_path)
 
-        if eventLevel(mode, weightFiles, categories, roe_path):
-            combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
+        if useGNN:
+            if eventLevel('Expert', weightFiles, categories, roe_path):
+
+                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
+                                 outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
+                ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
+                ma.variablesToNtuple('vpho:dummy',
+                                     alias_list_for_GNN,
+                                     treename='tree',
+                                     filename=f'{filesDirectory}/FlavorTagger_GNN_sampled{fileId}.root',
+                                     signalSideParticleList=particleLists[0],
+                                     path=roe_path)
+
+        else:
+            if eventLevel(mode, weightFiles, categories, roe_path):
+                combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Expert':
         # If trigger returns 1 jump into empty path skipping further modules in roe_path
         # run filter with no cut first to get rid of ROEs that are missing the mask of the signal particle
-        ma.signalSideParticleListsFilter(particleLists, '', roe_path, deadEndPath)
         ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
 
         # Initialization of flavorTaggerInfo dataObject needs to be done in the main path
@@ -1178,6 +1298,18 @@ def flavorTagger(
             flavorTaggerInfoFiller.param('trackPointers', False)
             roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
             add_default_FlavorTagger_aliases()
+
+            if useGNN:
+                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
+                                 outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
+                ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
+                roe_path.add_module('MVAExpert',
+                                    listNames='vpho:dummy',
+                                    extraInfoName='qrGNN_raw',  # the range of qrGNN_raw is [0,1]
+                                    identifier=identifierGNN)
+
+                ma.variableToSignalSideExtraInfo('vpho:dummy', {'extraInfo(qrGNN_raw)*2-1': 'qrGNN'},
+                                                 path=roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

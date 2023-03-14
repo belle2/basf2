@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisMiraBelle.h>
 
 #include <TROOT.h>
@@ -159,6 +159,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float rms_dd0 = hist_dD0->GetRMS();
   float rms_dz0 = hist_dZ0->GetRMS();
   float rms_dpt = hist_dPtcms->GetRMS();
+  float sigma68_dd0 = getSigma68(hist_dD0);
+  float sigma68_dz0 = getSigma68(hist_dZ0);
+  float sigma68_dpt = getSigma68(hist_dPtcms);
   int ntot = hist_nsvd->GetEntries();
   float neve_mumu = ntot;
   float goodmu_frac = hist_muid->GetBinContent(20) / (float)ntot;
@@ -207,6 +210,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("rms_dd0", rms_dd0);
   mon_mumu->setVariable("rms_dz0", rms_dz0);
   mon_mumu->setVariable("rms_dpt", rms_dpt);
+  mon_mumu->setVariable("sigma68_dd0", sigma68_dd0);
+  mon_mumu->setVariable("sigma68_dz0", sigma68_dz0);
+  mon_mumu->setVariable("sigma68_dpt", sigma68_dpt);
   mon_mumu->setVariable("neve_mumu", neve_mumu);
   mon_mumu->setVariable("goodmu_frac", goodmu_frac);
   mon_mumu->setVariable("goodmu_o_badmu", goodmu_o_badmu);

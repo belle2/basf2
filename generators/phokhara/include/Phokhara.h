@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef PHOKHARA_H
-#define PHOKHARA_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 #include <utility>
 
 namespace Belle2 {
@@ -187,7 +187,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -251,7 +251,8 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                       ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:
@@ -260,6 +261,3 @@ namespace Belle2 {
     double m_xpar[100];  /**< Double parameters for PHOKHARA */
   };
 }
-
-
-#endif /* PHOKHARA_H */

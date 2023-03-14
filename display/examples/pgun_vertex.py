@@ -15,7 +15,7 @@
 import basf2 as b2
 
 from ROOT import Belle2
-from ROOT import TVector3
+from ROOT.Math import XYZVector
 
 # Setting the parameters for random generation of the event vertex Three
 # different distributions can be used: - fixed:     always use the exact same
@@ -42,25 +42,25 @@ class VisualizeVertex(b2.Module):
         displayData = Belle2.PyStoreObj("DisplayData")
         displayData.create()
 
-        displayData.obj().addLabel("Origin", TVector3(0, 0, 0))
-        displayData.obj().addLabel("0,0,10", TVector3(0, 0, 10))
+        displayData.obj().addLabel("Origin", XYZVector(0, 0, 0))
+        displayData.obj().addLabel("0,0,10", XYZVector(0, 0, 10))
 
         # visualize extent of vertex
         global vertexparams
-        displayData.obj().addPoint("Vertex", TVector3(vertexparams[0][0],
-                                                      vertexparams[1][0],
-                                                      vertexparams[2][0]))
+        displayData.obj().addPoint("Vertex", XYZVector(vertexparams[0][0],
+                                                       vertexparams[1][0],
+                                                       vertexparams[2][0]))
         for d in range(3):
             sigma = vertexparams[d][1]
             # add points at +-sigma on both sides of Vertex
             vertexparams[d][0] -= sigma
-            displayData.obj().addPoint("Width", TVector3(vertexparams[0][0],
-                                                         vertexparams[1][0],
-                                                         vertexparams[2][0]))
+            displayData.obj().addPoint("Width", XYZVector(vertexparams[0][0],
+                                                          vertexparams[1][0],
+                                                          vertexparams[2][0]))
             vertexparams[d][0] += 2 * sigma
-            displayData.obj().addPoint("Width", TVector3(vertexparams[0][0],
-                                                         vertexparams[1][0],
-                                                         vertexparams[2][0]))
+            displayData.obj().addPoint("Width", XYZVector(vertexparams[0][0],
+                                                          vertexparams[1][0],
+                                                          vertexparams[2][0]))
             vertexparams[d][0] -= sigma
 
 

@@ -174,6 +174,49 @@ std::string Const::parseDetectors(EDetector det)
   return "INVALID";
 }
 
+Const::DetectorSet::Iterator& Const::DetectorSet::Iterator::operator++()
+{
+  while (1) {
+    m_SetBit = m_SetBit << 1;
+    if (m_SetBit >= 0x1000) {
+      m_SetBit = invalidDetector;
+      return *this;
+    }
+    if ((m_DetectorSetBits & m_SetBit) != 0)
+      break;
+  }
+  m_Index++;
+  return *this;
+}
+
+bool Const::DetectorSet::Iterator::operator==(
+  const Const::DetectorSet::Iterator& iterator)
+{
+  return m_SetBit == iterator.m_SetBit;
+}
+
+bool Const::DetectorSet::Iterator::operator!=(
+  const Const::DetectorSet::Iterator& iterator)
+{
+  return m_SetBit != iterator.m_SetBit;
+}
+
+Const::DetectorSet::Iterator Const::DetectorSet::begin() const
+{
+  uint16_t setBit = 1;
+  while ((m_bits & setBit) == 0) {
+    setBit = setBit << 1;
+    if (setBit >= 0x1000)
+      return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
+  }
+  return Const::DetectorSet::Iterator(0, m_bits, setBit);
+}
+
+Const::DetectorSet::Iterator Const::DetectorSet::end() const
+{
+  return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
+}
+
 Const::DetectorSet operator + (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)
 {
   Const::DetectorSet set(firstSet);
@@ -238,16 +281,6 @@ int Const::DetectorSet::getIndex(EDetector det) const
   return index;
 }
 
-Const::EDetector Const::DetectorSet::operator [](int index) const
-{
-  if (index < 0) return Const::invalidDetector;
-  for (unsigned short setBit = 1; setBit < 0x1000; setBit *= 2) {
-    if ((m_bits & setBit) != 0) --index;
-    if (index < 0) return getDetector(setBit);
-  }
-  return Const::invalidDetector;
-}
-
 size_t Const::DetectorSet::size() const
 {
   int size = 0;
@@ -257,7 +290,7 @@ size_t Const::DetectorSet::size() const
   return size;
 }
 
-std::string Const::DetectorSet::__repr__() const
+std::string Const::DetectorSet::__str__() const
 {
   std::string result = "<set: ";
   const std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
@@ -354,6 +387,7 @@ const Const::Cluster Const::clusterjunk = Const::clusterSet.find(9900001);
 const Const::ParticleType Const::photon = Const::ParticleType(22);
 const Const::ParticleType Const::pi0 = Const::ParticleType(111);
 const Const::ParticleType Const::neutron = Const::ParticleType(2112);
+const Const::ParticleType Const::antiNeutron = Const::ParticleType(-2112);
 const Const::ParticleType Const::Kshort = Const::ParticleType(310);
 const Const::ParticleType Const::Klong = Const::ParticleType(130);
 const Const::ParticleType Const::Lambda = Const::ParticleType(3122);

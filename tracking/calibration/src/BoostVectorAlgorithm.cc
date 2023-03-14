@@ -32,7 +32,7 @@ BoostVectorAlgorithm::BoostVectorAlgorithm() : CalibrationAlgorithm("BoostVector
 static TObject* getBoostVectorObj(Vector3d vBoost, Matrix3d  vBoostUnc, Matrix3d /*vBoostSpread*/)
 {
   auto payload = new CollisionBoostVector();
-  payload->setBoost(toTVector3(vBoost), toTMatrixDSym(vBoostUnc));
+  payload->setBoost(toB2Vector3(vBoost), toTMatrixDSym(vBoostUnc));
   TObject* obj  = static_cast<TObject*>(payload);
   return obj;
 }

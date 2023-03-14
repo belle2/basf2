@@ -1,34 +1,35 @@
 # EventType: 1263732000
-# Descriptor: [B- -> [D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-)] e(mu) nu]cc
-# NickName: Bu_D0taunu
-# Documentation: B- -> D0 e(mu) nu, D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), signal mode for inclusive tagging R(D(*)).
+# Descriptor: [B- -> [D0 -> K- pi+ (K- pi+ pi0)] e(mu) nu]cc
+# NickName: Bu_D0lnu
+# Documentation: B- -> D0 e(mu) nu, D0 -> K- pi+ (K- pi+ pi0), signal mode for inclusive tagging R(D(*)).
 # Dominant channel: B- -> D0(-> K- pi+ pi0) l- anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane
 # Email: tcrane@hawaii.edu 
 # Cuts: None
-# Date: 20220914
+# Date: 20221018
 
 yesPhotos
 
 Decay Upsilon(4S)
-0.5 B+ B-sig VSS;
-0.5 B- B+sig VSS;
+0.5            B+ B-sig                                          VSS;
+0.5            B- B+sig                                          VSS;
 Enddecay
 
+
 Decay B-sig
-0.023100000   D0  e-  anti-nu_e                            BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
-0.023100000   D0  mu-  anti-nu_mu                          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
+0.023100000    D0sig  e-  anti-nu_e                              BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
+0.023100000    D0sig  mu-  anti-nu_mu                            BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
 Enddecay
 CDecay B+sig
 
 
 Decay D0sig
-0.039500000   K-  pi+                                      PHSP;
-0.144000000   K-  pi+  pi0                                 D_DALITZ;
-0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.039500000    K-  pi+                                           PHSP;
+0.144000000    K-  pi+  pi0                                      D_DALITZ;
 Enddecay
 CDecay anti-D0sig
+
 
 End

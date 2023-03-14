@@ -6,7 +6,7 @@ Physics skims
 .. _skim_physics_btocharm:
 
 B → charm skims
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. automodule:: skim.WGs.btocharm
     :members:
@@ -15,7 +15,7 @@ B → charm skims
 .. _skim_physics_btocharmless:
 
 B → charmless skims
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: skim.WGs.btocharmless
     :members:
@@ -106,7 +106,7 @@ Time-dependent CP-violation (TDCPV) analysis skims
 .. _skim_physics_tau:
 
 Tau-pair skims
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. automodule:: skim.WGs.taupair
     :members:

@@ -54,6 +54,10 @@ if __name__ == "__main__":
 
         "The following variables have been renamed since release-06:\n"
         "old: beamBackgroundProbabilityMVA --> new: beamBackgroundSuppression\n"
+
+        "The following variables have been renamed since release-07:\n"
+        "old: hadronicSplitOffSuppression --> new: fakePhotonSuppression\n"
+
     )
     if args.pager:
         with Pager(r'Available variables in Variable\:\:Manager'):

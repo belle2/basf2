@@ -74,8 +74,8 @@ void EventShapeCalculatorModule::event()
 
   if (!m_eventShapeContainer) m_eventShapeContainer.create();
 
-  parseParticleLists(m_particleListNames);
-
+  const int nPart = parseParticleLists(m_particleListNames);
+  if (nPart == 0) return;
 
   // --------------------
   // Calculates the FW moments
@@ -223,7 +223,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
   unsigned short nParticleLists = particleListNames.size();
   if (nParticleLists == 0)
-    B2ERROR("No particle lists found. EventShape calculation not performed.");
+    B2WARNING("No particle lists found. EventShape calculation not performed.");
 
   // This vector temporary stores the mdstSource of particle objects
   // that have been processed so far (not only the momenta)

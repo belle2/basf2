@@ -11,14 +11,14 @@
 
 
 Decay vpho
-1.0   Upsilon(3S)sig gamma  VECTORISR 1.0 1.0;
+1.0   Upsilon(3S) gamma  VECTORISR 1.0 1.0;
 Enddecay
 
-Decay Upsilon(3S)sig
-1.0   Upsilon(2S)sig pi+ pi-  YMSTOYNSPIPICLEOBOOST -0.395 0.001;
+Decay Upsilon(3S)
+1.0   Upsilon(2S) pi+ pi-  YMSTOYNSPIPICLEOBOOST -0.395 0.001;
 Enddecay
 
-Decay Upsilon(2S)sig
+Decay Upsilon(2S)
 1.0   e+ e-  PHSP;
 Enddecay
 End

@@ -34,7 +34,7 @@ REG_MODULE(ParticleWeighting);
 ParticleWeightingModule::ParticleWeightingModule() : Module()
 
 {
-  setDescription("Weights particles according to LookUp table");
+  setDescription("Append weights from the database into the extraInfo of Particles.");
   addParam("tableName", m_tableName, "ID of table used for reweighing");
   addParam("particleList", m_inputListName, "Name of the ParticleList to reduce to the best candidates");
 }

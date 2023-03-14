@@ -19,7 +19,7 @@
 import basf2 as b2
 from ROOT import Belle2
 import ROOT
-from ROOT import gStyle, gROOT, AddressOf, TH2F
+from ROOT import gStyle, gROOT, addressof, TH2F
 import sys
 
 
@@ -81,7 +81,7 @@ class Ntuple(b2.Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
         ''' Event processor: fill the tree and scatter plots '''

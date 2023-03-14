@@ -6,7 +6,7 @@
 # Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
 #   First commit.
 #   Includes rare decays in DECAY_BELLE2.DEC.
-#   https://agira.desy.de/browse/BII-7607
+#   https://gitlab.desy.de/belle2/software/basf2/-/issues/7478
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview
 #   Channels with BFs reported by PDG have been updated to the PDGLive value.
 

@@ -1,0 +1,7 @@
+Changes in the b2bii package since release-07-00
+------------------------------------------------
+
+Conversion
+++++++++++
+
+* Added an option to copy ``anti-n0:mdst` from ``gamma:mdst``

@@ -6,11 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Module manager
-#include <framework/core/HistoModule.h>
-
-// Own include
+// Own header.
 #include <top/modules/TOPDQM/TOPDQMModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
@@ -124,8 +123,6 @@ namespace Belle2 {
     // Histograms from TOPDataQualtiyOnline
     m_goodHits = new TH1F("goodHits", "Number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_badHits = new TH1F("badHits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-    m_goodHits->SetOption("LIVE");
-    m_badHits->SetOption("LIVE");
     m_goodHits->SetMinimum(0);
     m_badHits->SetMinimum(0);
 
@@ -139,28 +136,23 @@ namespace Belle2 {
                                 16, 0.5, 16.5, 512, 0, 512);
     m_window_vs_slot->SetXTitle("slot number");
     m_window_vs_slot->SetYTitle("window number w.r.t reference window");
-    m_window_vs_slot->SetOption("LIVE");
     m_window_vs_slot->SetStats(kFALSE);
 
     m_bunchOffset = new TH1F("bunchOffset", "Reconstructed bunch: current offset",
                              100, -bunchTimeSep / 2, bunchTimeSep / 2);
     m_bunchOffset->SetXTitle("offset [ns]");
     m_bunchOffset->SetYTitle("events/bin");
-    m_bunchOffset->SetOption("LIVE");
     m_bunchOffset->SetMinimum(0);
 
     m_time = new TH1F("goodHitTimes", "Time distribution of good hits",
                       1000, -20, 80);
     m_time->SetXTitle("time [ns]");
     m_time->SetYTitle("hits/bin");
-    m_time->SetOption("LIVE");
     m_time->SetMinimum(0);
 
     int MaxEvents(1000);
     m_goodHitsPerEventAll = new TH1F("goodHitsPerEventAll", "Number of good hits per event", MaxEvents, 0, MaxEvents);
     m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of bad hits per event", MaxEvents, 0, MaxEvents);
-    m_goodHitsPerEventAll->SetOption("LIVE");
-    m_badHitsPerEventAll->SetOption("LIVE");
     m_goodHitsPerEventAll->SetMinimum(0);
     m_badHitsPerEventAll->SetMinimum(0);
     m_goodHitsPerEventAll->GetXaxis()->SetTitle("hits / event");
@@ -174,21 +166,18 @@ namespace Belle2 {
                             BinNumRT, 0, MaxRawTime);
     m_goodTDCAll->SetXTitle("raw time [samples]");
     m_goodTDCAll->SetYTitle("hits / sample");
-    m_goodTDCAll->SetOption("LIVE");
     m_goodTDCAll->SetMinimum(0);
 
     m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of bad hits",
                            BinNumRT, 0, MaxRawTime);
     m_badTDCAll->SetXTitle("raw time [samples]");
     m_badTDCAll->SetYTitle("hits / sample");
-    m_badTDCAll->SetOption("LIVE");
     m_badTDCAll->SetMinimum(0);
 
     m_goodHitsPerEventProf = new TProfile("goodHitsPerEventProf", "Good hits per event vs. slot number",
                                           16, 0.5, 16.5, 0, MaxEvents);
     m_goodHitsPerEventProf->SetXTitle("slot number");
     m_goodHitsPerEventProf->SetYTitle("hits per event");
-    m_goodHitsPerEventProf->SetOption("LIVE");
     m_goodHitsPerEventProf->SetStats(kFALSE);
     m_goodHitsPerEventProf->SetMinimum(0);
 
@@ -196,7 +185,6 @@ namespace Belle2 {
                                          16, 0.5, 16.5, 0, MaxEvents);
     m_badHitsPerEventProf->SetXTitle("slot number");
     m_badHitsPerEventProf->SetYTitle("hits per event");
-    m_badHitsPerEventProf->SetOption("LIVE");
     m_badHitsPerEventProf->SetStats(kFALSE);
     m_badHitsPerEventProf->SetMinimum(0);
 
@@ -215,7 +203,6 @@ namespace Belle2 {
       name = str(format("window_vs_asic_%1%") % (module));
       title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 512, 0, 512);
-      h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
       h2->SetXTitle("ASIC number");
       h2->SetYTitle("window number w.r.t reference window");
@@ -225,7 +212,6 @@ namespace Belle2 {
       name = str(format("good_hits_xy_%1%") % (module));
       title = str(format("Number of good hits in x-y for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
-      h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("pixel column");
       h2->GetYaxis()->SetTitle("pixel row");
@@ -235,7 +221,6 @@ namespace Belle2 {
       name = str(format("bad_hits_xy_%1%") % (module));
       title = str(format("Number of bad hits in x-y for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
-      h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("pixel column");
       h2->GetYaxis()->SetTitle("pixel row");
@@ -245,7 +230,6 @@ namespace Belle2 {
       name = str(format("good_hits_asics_%1%") % (module));
       title = str(format("Number of good hits for asics for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
-      h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("ASIC number");
       h2->GetYaxis()->SetTitle("ASIC channel");
@@ -255,7 +239,6 @@ namespace Belle2 {
       name = str(format("bad_hits_asics_%1%") % (module));
       title = str(format("Number of bad hits for asics for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
-      h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("ASIC number");
       h2->GetYaxis()->SetTitle("ASIC channel");
@@ -265,7 +248,6 @@ namespace Belle2 {
       name = str(format("good_TDC_%1%") % (module));
       title = str(format("Raw time distribution of good hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), BinNumRT, 0, MaxRawTime);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("raw time [samples]");
       h1->GetYaxis()->SetTitle("hits per sample");
       h1->SetMinimum(0);
@@ -274,7 +256,6 @@ namespace Belle2 {
       name = str(format("bad_TDC_%1%") % (module));
       title = str(format("Raw time distribution of bad hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), BinNumRT, 0, MaxRawTime);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("raw time [samples]");
       h1->GetYaxis()->SetTitle("hits per sample");
       h1->SetMinimum(0);
@@ -283,7 +264,6 @@ namespace Belle2 {
       name = str(format("good_timing_%1%") % (module));
       title = str(format("Timing distribution of good hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 100, -20, 80);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("time [ns]");
       h1->GetYaxis()->SetTitle("hits per time bin");
       h1->SetMinimum(0);
@@ -293,7 +273,6 @@ namespace Belle2 {
       title = str(format("Number of good hits by channel for slot #%1%") % (module));
       int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("channel number");
       h1->GetYaxis()->SetTitle("hits pre channel");
       h1->SetMinimum(0);
@@ -302,7 +281,6 @@ namespace Belle2 {
       name = str(format("bad_channel_hits_%1%") % (module));
       title = str(format("Number of bad hits by channel for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("channel number");
       h1->GetYaxis()->SetTitle("hits pre channel");
       h1->SetMinimum(0);
@@ -311,7 +289,6 @@ namespace Belle2 {
       name = str(format("good_hits_per_event%1%") % (module));
       title = str(format("Number of good hits per event for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), MaxEvents, 0, MaxEvents);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("hits / event");
       h1->SetMinimum(0);
       m_goodHitsPerEvent.push_back(h1);
@@ -319,7 +296,6 @@ namespace Belle2 {
       name = str(format("bad_hits_per_event%1%") % (module));
       title = str(format("Number of bad hits per event for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), MaxEvents, 0, MaxEvents);
-      h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("hits / event");
       h1->SetMinimum(0);
       m_badHitsPerEvent.push_back(h1);
@@ -327,7 +303,6 @@ namespace Belle2 {
       name = str(format("good_hits_xy_track_%1%") % (module));
       title = str(format("Hits per track, each channel, slot #%1%") % (module));
       h3 = new TProfile2D(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5, 0, 1000);
-      h3->SetOption("LIVE");
       h3->SetStats(kFALSE);
       h3->GetXaxis()->SetTitle("pixel column");
       h3->GetYaxis()->SetTitle("pixel row");
@@ -337,7 +312,6 @@ namespace Belle2 {
       name = str(format("good_hits_xy_track_bkg_%1%") % (module));
       title = str(format("Hits per bkg track, each channel, slot #%1%") % (module));
       h3 = new TProfile2D(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5, 0, 1000);
-      h3->SetOption("LIVE");
       h3->SetStats(kFALSE);
       h3->GetXaxis()->SetTitle("pixel column");
       h3->GetYaxis()->SetTitle("pixel row");

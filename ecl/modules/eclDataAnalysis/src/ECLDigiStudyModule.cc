@@ -13,24 +13,22 @@
  *                                                                        *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclDataAnalysis/ECLDigiStudyModule.h>
 
-// STL
-#include <algorithm>
-
-//ROOT
-#include <TTree.h>
-#include <TFile.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
 
+/* C++ headers. */
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -72,7 +70,7 @@ void ECLDigiStudyModule::initialize()
 
   m_rootFile = new TFile(dataFileName.c_str(), "RECREATE");
   m_tree     = new TTree("m_tree", "EclCovMatrixNtuple tree");
-  m_nhits = 8736;
+  m_nhits = ECLElementNumbers::c_NCrystals;
 
   m_tree->Branch("nhits",      &m_nhits,      "nhits/I");
   m_tree->Branch("cellid",     m_cellId,      "cellid[nhits]/I");
@@ -117,31 +115,31 @@ void ECLDigiStudyModule::event()
 
   int i;
   m_neclhits = m_eclHitsArray.getEntries();
-  fill_n(m_cellId, 8736, 0);
-  fill_n(m_energy, 8736, 0);
-  fill_n(m_allenergy, 8736, 0);
-  fill_n(m_time, 8736, 0);
-  fill_n(m_theta, 8736, 0);
-  fill_n(m_phi, 8736, 0);
+  fill_n(m_cellId, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_energy, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_allenergy, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_time, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_theta, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_phi, ECLElementNumbers::c_NCrystals, 0);
 
-  for (int j = 0; j < 8736; j++) {
+  for (int j = 0; j < ECLElementNumbers::c_NCrystals; j++) {
     fill_n(m_DspHit1[j], 31, 0);
     fill_n(m_DspHit2[j], 31, 0);
     fill_n(m_baseline1[j], 16, 0);
     fill_n(m_baseline2[j], 16, 0);
   }
 
-  fill_n(m_baselineAvg1, 8736, 0);
-  fill_n(m_baselineAvg2, 8736, 0);
-  fill_n(m_maxVal1, 8736, 0);
-  fill_n(m_maxVal2, 8736, 0);
+  fill_n(m_baselineAvg1, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_baselineAvg2, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_maxVal1, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_maxVal2, ECLElementNumbers::c_NCrystals, 0);
 
-  fill_n(m_digiTime1, 8736, 0);
-  fill_n(m_digiTime2, 8736, 0);
-  fill_n(m_digiE1, 8736, 0);
-  fill_n(m_digiE2, 8736, 0);
-  fill_n(m_digiQual1, 8736, 0);
-  fill_n(m_digiQual2, 8736, 0);
+  fill_n(m_digiTime1, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_digiTime2, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_digiE1, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_digiE2, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_digiQual1, ECLElementNumbers::c_NCrystals, 0);
+  fill_n(m_digiQual2, ECLElementNumbers::c_NCrystals, 0);
 
   m_trig1 = m_eclTrigArray[0]->getTimeTrig();
   m_trig2 = 0;

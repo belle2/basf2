@@ -93,8 +93,8 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 
   // Create and append new RecoTrack
   RecoTrack* newRecoTrack = m_recoTracks.appendNew(position, momentum, charge,
-                                                   "", m_param_svdHitsStoreArrayName,
-                                                   m_param_pxdHitsStoreArrayName, "", "", m_param_recoHitInformationStoreArrayName);
+                                                   m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName,
+                                                   "", "", "", m_param_recoHitInformationStoreArrayName);
 
   // Set information not required by constructor
   newRecoTrack->setSeedCovariance(covSeed);

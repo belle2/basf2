@@ -5,23 +5,23 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclCosmicECollector/eclCosmicECollectorModule.h>
 
-//Root
-#include <TH2F.h>
-
-//Framework
-#include <framework/dataobjects/EventMetaData.h>
-
-// ECL
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/geometry/ECLNeighbours.h>
 
-//Trigger
+/* Basf2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
 #include <trg/ecl/TrgEclMapping.h>
+
+/* ROOT headers. */
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -63,47 +63,58 @@ void eclCosmicECollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  auto EnvsCrysSameRing = new TH2F("EnvsCrysSameRing", "Normalized energy vs crystal ID, same theta ring;crystal ID;E/Expected", 8736,
-                                   0, 8736, 99, .025, 2.5);
+  auto EnvsCrysSameRing = new TH2F("EnvsCrysSameRing", "Normalized energy vs crystal ID, same theta ring;crystal ID;E/Expected",
+                                   ECLElementNumbers::c_NCrystals,
+                                   0, ECLElementNumbers::c_NCrystals, 99, .025, 2.5);
   registerObject<TH2F>("EnvsCrysSameRing", EnvsCrysSameRing);
 
   auto EnvsCrysDifferentRing = new TH2F("EnvsCrysDifferentRing",
-                                        "Normalized energy vs crystal ID, different theta rings;crystal ID;E/Expected", 8736, 0, 8736, 99, .025, 2.5);
+                                        "Normalized energy vs crystal ID, different theta rings;crystal ID;E/Expected", ECLElementNumbers::c_NCrystals, 0,
+                                        ECLElementNumbers::c_NCrystals, 99, .025, 2.5);
   registerObject<TH2F>("EnvsCrysDifferentRing", EnvsCrysDifferentRing);
 
   auto ExpEvsCrysSameRing = new TH1F("ExpEvsCrysSameRing",
-                                     "Sum expected energy vs crystal ID, same theta ring;crystal ID;Energy (GeV)", 8736, 0, 8736);
+                                     "Sum expected energy vs crystal ID, same theta ring;crystal ID;Energy (GeV)", ECLElementNumbers::c_NCrystals, 0,
+                                     ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ExpEvsCrysSameRing", ExpEvsCrysSameRing);
 
   auto ExpEvsCrysDifferentRing = new TH1F("ExpEvsCrysDifferentRing",
-                                          "Sum expected energy vs crystal ID, different theta rings;crystal ID;Energy (GeV)", 8736, 0, 8736);
+                                          "Sum expected energy vs crystal ID, different theta rings;crystal ID;Energy (GeV)", ECLElementNumbers::c_NCrystals, 0,
+                                          ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ExpEvsCrysDifferentRing", ExpEvsCrysDifferentRing);
 
   auto ElecCalibvsCrysSameRing = new TH1F("ElecCalibvsCrysSameRing",
-                                          "Sum electronics calib const vs crystal ID, same theta ring;crystal ID", 8736, 0, 8736);
+                                          "Sum electronics calib const vs crystal ID, same theta ring;crystal ID", ECLElementNumbers::c_NCrystals, 0,
+                                          ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ElecCalibvsCrysSameRing", ElecCalibvsCrysSameRing);
 
   auto ElecCalibvsCrysDifferentRing = new TH1F("ElecCalibvsCrysDifferentRing",
-                                               "Sum electronics calib const vs crystal ID, different theta rings;crystal ID", 8736, 0, 8736);
+                                               "Sum electronics calib const vs crystal ID, different theta rings;crystal ID", ECLElementNumbers::c_NCrystals, 0,
+                                               ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ElecCalibvsCrysDifferentRing", ElecCalibvsCrysDifferentRing);
 
   auto InitialCalibvsCrysSameRing = new TH1F("InitialCalibvsCrysSameRing",
-                                             "Sum initial cosmic calib const vs crystal ID, same theta ring;crystal ID", 8736, 0, 8736);
+                                             "Sum initial cosmic calib const vs crystal ID, same theta ring;crystal ID", ECLElementNumbers::c_NCrystals, 0,
+                                             ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("InitialCalibvsCrysSameRing", InitialCalibvsCrysSameRing);
 
   auto InitialCalibvsCrysDifferentRing = new TH1F("InitialCalibvsCrysDifferentRing",
-                                                  "Sum initial cosmic calib const vs crystal ID, different theta rings;crystal ID", 8736, 0, 8736);
+                                                  "Sum initial cosmic calib const vs crystal ID, different theta rings;crystal ID", ECLElementNumbers::c_NCrystals, 0,
+                                                  ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("InitialCalibvsCrysDifferentRing", InitialCalibvsCrysDifferentRing);
 
   auto CalibEntriesvsCrysSameRing = new TH1F("CalibEntriesvsCrysSameRing",
-                                             "Entries in calib vs crys histograms, same theta ring;crystal ID;Entries per crystal", 8736, 0, 8736);
+                                             "Entries in calib vs crys histograms, same theta ring;crystal ID;Entries per crystal", ECLElementNumbers::c_NCrystals, 0,
+                                             ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("CalibEntriesvsCrysSameRing", CalibEntriesvsCrysSameRing);
 
   auto CalibEntriesvsCrysDifferentRing = new TH1F("CalibEntriesvsCrysDifferentRing",
-                                                  "Entries in calib vs crys histograms, different theta rings;crystal ID;Entries per crystal", 8736, 0, 8736);
+                                                  "Entries in calib vs crys histograms, different theta rings;crystal ID;Entries per crystal", ECLElementNumbers::c_NCrystals, 0,
+                                                  ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("CalibEntriesvsCrysDifferentRing", CalibEntriesvsCrysDifferentRing);
 
-  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude", 8736, 0, 8736, 100, 0,
+  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude",
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 100, 0,
                                     2000);
   registerObject<TH2F>("RawDigitAmpvsCrys", RawDigitAmpvsCrys);
 
@@ -115,10 +126,10 @@ void eclCosmicECollectorModule::prepare()
 
   /** Resize vectors */
   FirstSet.resize(8737);
-  EperCrys.resize(8736);
-  HitCrys.resize(8736);
+  EperCrys.resize(ECLElementNumbers::c_NCrystals);
+  HitCrys.resize(ECLElementNumbers::c_NCrystals);
   EnergyPerTC.resize(576);
-  TCperCrys.resize(8736);
+  TCperCrys.resize(ECLElementNumbers::c_NCrystals);
 
 
   /**----------------------------------------------------------------------------------------*/
@@ -135,7 +146,7 @@ void eclCosmicECollectorModule::prepare()
   }
 
   /** Verify that we have valid values for the starting calibrations */
-  for (int ic = 0; ic < 8736; ic++) {
+  for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic++) {
     if (ElectronicsCalib[ic] <= 0) {B2FATAL("eclCosmicECollector: ElectronicsCalib = " << ElectronicsCalib[ic] << " for crysID = " << ic);}
     if (ExpCosmicESame[ic] == 0) {B2FATAL("eclCosmicECollector: ExpCosmicESame = 0 for crysID = " << ic);}
     if (ExpCosmicEDifferent[ic] == 0) {B2FATAL("eclCosmicECollector: ExpCosmicEDifferent = 0 for crysID = " << ic);}
@@ -155,8 +166,8 @@ void eclCosmicECollectorModule::prepare()
   for (int it = 1; it < 69; it++) {firstCrystal[it] = firstCrystal[it - 1] + m_crystalsPerRing[it - 1];}
 
   /** ThetaID and PhiID of each crystal */
-  std::vector<short int> ThetaIDCrys(8736);
-  std::vector<short int> PhiIDCrys(8736);
+  std::vector<short int> ThetaIDCrys(ECLElementNumbers::c_NCrystals);
+  std::vector<short int> PhiIDCrys(ECLElementNumbers::c_NCrystals);
   int cID = 0;
   for (int it = 0; it < 69; it++) {
     for (int ic = 0; ic < m_crystalsPerRing[it]; ic++) {
@@ -169,7 +180,7 @@ void eclCosmicECollectorModule::prepare()
   /**----------------------------------------------------------------------------------------*/
   /** Find the trigger cell (TC) number for every crystal. TC is numbered from 1-576, so subtract 1 */
   TrgEclMapping* trgecl_obj = new TrgEclMapping();
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     TCperCrys[crysID] = trgecl_obj->getTCIdFromXtalId(crysID + 1) - 1;
   }
   /**----------------------------------------------------------------------------------------*/
@@ -277,7 +288,7 @@ void eclCosmicECollectorModule::prepare()
   }
 
   /** convenient to record the total number of triplets selected in the FirstSet vector */
-  FirstSet[8736] = CenterCrys.size();
+  FirstSet[ECLElementNumbers::c_NCrystals] = CenterCrys.size();
 }
 
 
@@ -289,7 +300,7 @@ void eclCosmicECollectorModule::collect()
   /**----------------------------------------------------------------------------------------*/
   /** Record the input database constants for the first call */
   if (iEvent == 0) {
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       getObjectPtr<TH1F>("ExpEvsCrysSameRing")->Fill(crysID + 0.001, ExpCosmicESame[crysID]);
       getObjectPtr<TH1F>("ElecCalibvsCrysSameRing")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
       getObjectPtr<TH1F>("InitialCalibvsCrysSameRing")->Fill(crysID + 0.001, CosmicECalib[crysID]);
@@ -330,7 +341,7 @@ void eclCosmicECollectorModule::collect()
     EnergyPerTC[TCperCrys[crysID]] += EperCrys[crysID];
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
   }
-  for (int crysID = 0; crysID < 8736; crysID++) {HitCrys[crysID] = EperCrys[crysID] > m_minCrysE;}
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {HitCrys[crysID] = EperCrys[crysID] > m_minCrysE;}
 
   /**----------------------------------------------------------------------------------------*/
   /** If requested, require a minimum energy in a trigger cell */
@@ -345,7 +356,7 @@ void eclCosmicECollectorModule::collect()
 
   /**----------------------------------------------------------------------------------------*/
   /** Record signal if both neighbours are hit. The first set of neighbours for a particular crystal is in the same theta ring. Signal for theta neighbours is recorded separately from the case where the neighbours are in the adjacent theta rings. */
-  for (int i = 0; i < FirstSet[8736]; i++) {
+  for (int i = 0; i < FirstSet[ECLElementNumbers::c_NCrystals]; i++) {
     if (HitCrys[NeighbourA[i]] && HitCrys[NeighbourB[i]]) {
       int crysID = CenterCrys[i];
       if (i == FirstSet[crysID]) {

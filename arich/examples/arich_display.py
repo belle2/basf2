@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@
 #
 # two parameters (MinHits and MaxHits) are available for DQM module (check below)
 # only events with number of hits within the range are included in DQM histograms
-# and shown in the event display (set to 5 and 40, but change accoring your need)
+# and shown in the event display (set to 5 and 40, but change according to your need)
 
 import basf2 as b2
 import os
@@ -52,8 +51,7 @@ main.add_module(histo)
 
 # build geometry if display option
 if int(options.display):
-    gearbox = b2.register_module('Gearbox')
-    main.add_module(gearbox)
+    main.add_module('Gearbox')
     geometry = b2.register_module('Geometry')
     geometry.param('components', ['ARICH', 'MagneticField'])
     main.add_module(geometry)
@@ -84,7 +82,7 @@ if int(options.display):
     display = b2.register_module('Display')
     # show arich hits
     display.param('showARICHHits', True)
-    # show reconstruced tracks
+    # show reconstructed tracks
     display.param('showRecoTracks', True)
     # show full geometry
     display.param('fullGeometry', True)
@@ -92,8 +90,7 @@ if int(options.display):
 
 
 # show progress
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 arichHists.if_value('==1', displ)
 

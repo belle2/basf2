@@ -9,13 +9,12 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
+#include <klm/dataobjects/KLMSimHit.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
@@ -33,23 +32,17 @@ namespace Belle2 {
     KLMDigit();
 
     /**
-     * Constructor for EKLM simulation.
-     * @param[in] simHit EKLM simulation hit.
+     * Constructor for scintillator simulation.
+     * @param[in] simHit Simulation hit.
      */
-    explicit KLMDigit(const EKLMSimHit* simHit);
+    explicit KLMDigit(const KLMSimHit* simHit);
 
     /**
-     * Constructor for BKLM RPC simulation.
-     * @param[in] simHit BKLM simulation hit.
+     * Constructor for RPC simulation.
+     * @param[in] simHit Simulation hit.
      * @param[in] strip  Strip.
      */
-    KLMDigit(const BKLMSimHit* simHit, int strip);
-
-    /**
-     * Constructor for BKLM RPC simulation.
-     * @param[in] simHit BKLM simulation hit.
-     */
-    explicit KLMDigit(const BKLMSimHit* simHit);
+    KLMDigit(const KLMSimHit* simHit, int strip);
 
     /**
      * Destructor.
@@ -300,7 +293,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set EnergyDeposit.
+     * Set energy deposit.
      * @param[in] eDep Energy deposit.
      */
     void setEnergyDeposit(float eDep)

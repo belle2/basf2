@@ -554,7 +554,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::getSampleTimeCalibrationInfo()
+  void TOPDatabaseImporter::printSampleTimeCalibrationInfo()
   {
     DBObjPtr<TOPCalTimebase> timeBase;
     if (!timeBase.isValid()) {
@@ -581,11 +581,12 @@ namespace Belle2 {
           if (timeBase->isAvailable(scrodID[bs], channel)) ncal[bs]++;
         }
       }
-      if (ncal[0] + ncal[1] + ncal[2] + ncal[3] == 0) continue;
 
       cout << "Slot " << moduleID << endl;
       for (int bs = 0; bs < 4; bs++) {
-        cout << "  scrodID " << scrodID[bs] << ": " << ncal[bs] << "/128" << endl;
+        cout << "  scrodID " << scrodID[bs] << ": " << ncal[bs] << "/128";
+        if (ncal[bs] < 128) cout << " (" << 128 - ncal[bs] << " missing)";
+        cout << endl;
       }
     }
 

@@ -9,9 +9,9 @@
 import os
 import ROOT
 import numpy
-import root_numpy
 from array import array
 from ROOT import TCanvas, TH1F, TLine
+from hist_utils import hist2array
 
 
 '''Takes the output of combined OverlapResiduals and HistoManager modules,
@@ -127,8 +127,8 @@ def Median_plots_phi(filename, lyr_num, phi_bins, phi_inf, phi_sup):
         l_V_median_pos.append(median_pos_V)
         h_U.GetYaxis().SetTitle('counts')
         h_V.GetYaxis().SetTitle('counts')
-        meas_U = root_numpy.hist2array(h_U)
-        meas_V = root_numpy.hist2array(h_V)
+        meas_U = hist2array(h_U)
+        meas_V = hist2array(h_V)
         bs_U = numpy.random.poisson(1., (len(meas_U), Nrs))
         bs_V = numpy.random.poisson(1., (len(meas_V), Nrs))
         for j in range(Nrs):
@@ -265,8 +265,8 @@ def Median_plots_z(filename, lyr_num, z_bins, z_inf, z_sup):
         l_V_median_pos.append(median_pos_V)
         h_U.GetYaxis().SetTitle('counts')
         h_V.GetYaxis().SetTitle('counts')
-        meas_U = root_numpy.hist2array(h_U)
-        meas_V = root_numpy.hist2array(h_V)
+        meas_U = hist2array(h_U)
+        meas_V = hist2array(h_V)
         bs_U = numpy.random.poisson(1., (len(meas_U), Nrs))
         bs_V = numpy.random.poisson(1., (len(meas_V), Nrs))
         for j in range(Nrs):

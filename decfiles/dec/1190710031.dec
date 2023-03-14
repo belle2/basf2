@@ -21,8 +21,8 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-0.002050   Xu-    e+    nu_e      VUB_BLNP 4.2281 0.7535 0.4366 1.5 1.5 1 1 1 1 1; #[para. central values based on arxiv:2206.07501]
-0.002050   Xu-    mu+   nu_mu     VUB_BLNP 4.2281 0.7535 0.4366 1.5 1.5 1 1 1 1 1; #[para. central values based on arxiv:2206.07501]
+0.002050   Xu-    e+    nu_e      PHOTOS VUB_BLNP 4.2281 0.7535 0.4366 1.5 1.5 1 1 1 1 1; #[para. central values based on arxiv:2206.07501]
+0.002050   Xu-    mu+   nu_mu     PHOTOS VUB_BLNP 4.2281 0.7535 0.4366 1.5 1.5 1 1 1 1 1; #[para. central values based on arxiv:2206.07501]
 Enddecay
 CDecay anti-B0sig
 #

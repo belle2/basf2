@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
@@ -57,6 +59,8 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Suffix to be appended to the output file name. */
+    std::string m_fileNameSuffix;
     /** Size of TBaskets in the output ROOT file in bytes. */
     int m_basketsize;
 
@@ -91,5 +95,10 @@ namespace Belle2 {
 
     std::string m_MCDecayString; /**< MC decay string to be filled */
     StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
+
+    std::string m_signalSideParticleList;      /**< Name of signal-side particle list  */
+    int m_signalSideCandidate{-1};             /**< signal-side candidate counter */
+    unsigned int m_nSignalSideCandidates{0};   /**< total n signal-side candidates */
+    StoreObjPtr<RestOfEvent> m_roe;            /**< ROE object */
   };
 } // end namespace Belle2

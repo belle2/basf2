@@ -51,7 +51,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "max_events_per_run": 10000,
+                                   "max_events_per_run": 50000,
                                    "isMC": False,
                                })
 
@@ -219,7 +219,7 @@ def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000
 
     if not isMC:
         # run tracking reconstruction
-        add_tracking_reconstruction(path, use_cdc_full_grid_eventt0=True)
+        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True)
         path = remove_module(path, "V0Finder")
         if not is_validation:
             b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)

@@ -68,6 +68,7 @@ main.add_module("Profile")
 # output
 main.add_module("RootOutput", outputFileName="../BabayagaNLOBhabhaSimRec.root")
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics

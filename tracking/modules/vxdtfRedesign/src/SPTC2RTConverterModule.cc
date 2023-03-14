@@ -85,16 +85,16 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 {
 
   // Determine the tracking parameters
-  const TVector3& position = spacePointTC.getPosSeed();
-  const TVector3& momentum = spacePointTC.getMomSeed();
+  const ROOT::Math::XYZVector& position = spacePointTC.getPosSeed();
+  const ROOT::Math::XYZVector& momentum = spacePointTC.getMomSeed();
   const short int charge = spacePointTC.getChargeSeed();
   const TMatrixDSym& covSeed = spacePointTC.getCovSeed();
   const float qi = spacePointTC.getQualityIndicator();
 
   // Create and append new RecoTrack
   RecoTrack* newRecoTrack = m_recoTracks.appendNew(position, momentum, charge,
-                                                   "", m_param_svdHitsStoreArrayName,
-                                                   m_param_pxdHitsStoreArrayName, "", "", m_param_recoHitInformationStoreArrayName);
+                                                   m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName,
+                                                   "", "", "", m_param_recoHitInformationStoreArrayName);
 
   // Set information not required by constructor
   newRecoTrack->setSeedCovariance(covSeed);

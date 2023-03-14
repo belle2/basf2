@@ -7,8 +7,8 @@
  **************************************************************************/
 /*
   <header>
-  <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <input>ParticleGunSimRec_dedx.root</input>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>Check some internals of the module</description>
   </header>
 */
@@ -57,7 +57,7 @@ void plot(const TString &input_filename)
   hist->SetTitle("layer ID for each dE/dx measurement;Layer # (-ive VXD, +ive CDC); entries");
   hist->GetListOfFunctions()->Add(new TNamed("Description", "layer ID for each dE/dx measurement (negative values for PXD/SVD)"));
   hist->GetListOfFunctions()->Add(new TNamed("Check", "Smooth distribution for values > 0, VXD measurements (< 0) at around the same level (in particular, should not be twice as high). Gap at -1, -2 indicates PXD is not being used (=default)."));
-  hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact","Renu Garg: renu2@andrew.cmu.edu"));
   hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,nostats,pvalue-warn=0.10,pvalue-error=0.005"));
   hist->Write();
   
@@ -68,5 +68,5 @@ void dedx4_internals()
 {
   gROOT->SetStyle("Plain");
   
-  plot("../EvtGenSimRec_dedx.root");
+  plot("../ParticleGunSimRec_dedx.root");
 }

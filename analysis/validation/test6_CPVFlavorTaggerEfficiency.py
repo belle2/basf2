@@ -102,9 +102,6 @@ for branch in tree.GetListOfBranches():
 if 'FBDT_qrCombined' in totalBranches:
     methods.append("FBDT")
 
-if 'FANN_qrCombined' in totalBranches:
-    methods.append("FANN")
-
 usedCategories = []
 for cat in categories:
     catBranch = 'qp' + cat
@@ -123,7 +120,7 @@ outputFile = ROOT.TFile("test6_CPVFlavorTaggerEfficiency.root", "RECREATE")
 outputNtuple = ROOT.TNtuple(
     "FT_Efficiencies",
     "Effective efficiencies of the flavor tagger combiners as well as of the individual tagging categories.",
-    "Eff_FBDT:DeltaEff_FBDT:Eff_FANN:DeltaEff_FANN:" + categoriesNtupleList)
+    "Eff_FBDT:DeltaEff_FBDT:" + categoriesNtupleList)
 
 outputNtuple.SetAlias('Description', "These are the effective efficiencies of the flavor tagger combiners as well as of " +
                       "the individual tagging efficiencies.")
@@ -138,24 +135,24 @@ efficienciesForNtuple = []
 YmaxForQrPlot = 0
 
 for method in methods:
-    # histogram contains the average r in each of 6 bins -> calculation see below
-    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', 6,
+    # histogram contains the average r in each of 7 bins -> calculation see below
+    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 7 bins (B0 and B0bar)', 7,
                             r_subsample)
-    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 6 bins (B0)', 6,
+    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 7 bins (B0)', 7,
                               r_subsample)
-    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 6 bins (B0bar)', 6,
+    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 7 bins (B0bar)', 7,
                                  r_subsample)
     # histogram with number of entries in for each bin
     histo_entries_per_bin = ROOT.TH1F(
         'entries_per_bin',
         'Events binned in r_subsample according to their r-value for B0 and B0bar prob',
-        6,
+        7,
         r_subsample)
     histo_entries_per_binB0 = ROOT.TH1F('entries_per_binB0', 'Events binned in r_subsample according '
-                                        'to their r-value for B0 prob', 6, r_subsample)
+                                        'to their r-value for B0 prob', 7, r_subsample)
     histo_entries_per_binB0bar = ROOT.TH1F('entries_per_binB0bar',
                                            'Events binned in r_subsample according to their r-value '
-                                           'for B0bar prob', 6, r_subsample)
+                                           'for B0bar prob', 7, r_subsample)
     # histogram network output (not qr and not r) for true B0 (signal) - not necessary
     histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0', 'Combiner network output [not equal to r] '
                                      'for true B0 (binning 100)', 100, 0.0, 1.0)
@@ -218,7 +215,7 @@ for method in methods:
     tree.Draw(method + '_qrCombined>>BellePlot_B0_m2',
               'qrMC == -1 && ' + method + '_qrCombined>0 ')
 
-    # filling with abs(qr) in one of 6 bins with its weight
+    # filling with abs(qr) in one of 7 bins with its weight
     # separate calculation for B0 and B0bar
 
     tree.Project('Average_r', 'abs(' + method + '_qrCombined)',
@@ -226,7 +223,7 @@ for method in methods:
     tree.Project('Average_rB0', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==1)')
     tree.Project('Average_rB0bar', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==-1)')
 
-    # filling with abs(qr) in one of 6 bins
+    # filling with abs(qr) in one of 7 bins
     tree.Project('entries_per_bin', 'abs(' + method + '_qrCombined)', 'abs(qrMC) == 1')
     tree.Project('entries_per_binB0', 'abs(' + method + '_qrCombined)', 'qrMC == 1')
     tree.Project('entries_per_binB0bar', 'abs(' + method + '_qrCombined)', 'qrMC == -1')
@@ -618,15 +615,15 @@ for category in usedCategories:
     hist_qpB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qp (B0bar) (' +
                              category + ')', 50, -1.0, 1.0)
     # histogram for abs(qp), i.e. this histogram contains the r-values -> transformation below
-    # also used to get the number of entries, sorted into 6 bins
-    hist_absqpB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qp)(B0) (' + category + ')', 6, r_subsample)
-    hist_absqpB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qp) (B0bar) (' + category + ')', 6, r_subsample)
+    # also used to get the number of entries, sorted into 7 bins
+    hist_absqpB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qp)(B0) (' + category + ')', 7, r_subsample)
+    hist_absqpB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qp) (B0bar) (' + category + ')', 7, r_subsample)
     # histogram contains at the end the average r values -> calculation below
-    # sorted into 6 bins
+    # sorted into 7 bins
     hist_aver_rB0 = ROOT.TH1F('AverageRB0_' + category, 'A good one (B0)' +
-                              category, 6, r_subsample)
+                              category, 7, r_subsample)
     hist_aver_rB0bar = ROOT.TH1F('AverageRB0bar_' + category, 'A good one (B0bar)' +
-                                 category, 6, r_subsample)
+                                 category, 7, r_subsample)
     # ****** TEST OF CALIBRATION ******
     # for calibration plot we want to have
     hist_all = ROOT.TH1F('All_' + category, 'Input Signal (B0) and Background (B0Bar)' +

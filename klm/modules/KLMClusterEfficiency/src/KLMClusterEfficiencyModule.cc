@@ -12,10 +12,11 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMHit2d.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 
 /* ROOT headers. */
+#include <Math/VectorUtil.h>
 #include <TCanvas.h>
 #include <TH2F.h>
 #include <TMarker.h>
@@ -101,7 +102,8 @@ void KLMClusterEfficiencyModule::event()
   char str[128];
   int i1, i2, i3, n1, n2, n3;
   int bs1, bs2, es1, es2;
-  TVector3 decayVertex, clusterPosition, hitPosition;
+  TVector3 clusterPosition;
+  ROOT::Math::XYZVector decayVertex, hitPosition;
   float angle;
   /* cppcheck-suppress variableScope */
   bool haveKL0;
@@ -202,7 +204,7 @@ void KLMClusterEfficiencyModule::event()
     n2 = mcKLMHit2ds.size();
     for (i2 = 0; i2 < n2; i2++) {
       hitPosition = mcKLMHit2ds[i2]->getPosition();
-      angle = decayVertex.Angle(hitPosition);
+      angle = ROOT::Math::VectorUtil::Angle(decayVertex, hitPosition);
       if (angle > m_MaxDecayVertexHitAngle)
         m_MaxDecayVertexHitAngle = angle;
     }
@@ -295,7 +297,7 @@ void KLMClusterEfficiencyModule::event()
         n3 = klmHit2ds.size();
         for (i3 = 0; i3 < n3; i3++) {
           hitPosition = klmHit2ds[i3]->getPosition();
-          angle = clusterPosition.Angle(hitPosition);
+          angle = ROOT::Math::VectorUtil::Angle(clusterPosition, hitPosition);
           if (angle > m_MaxClusterHitAngle)
             m_MaxClusterHitAngle = angle;
         }

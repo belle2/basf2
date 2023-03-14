@@ -1,0 +1,7 @@
+{
+    "_Preamble__" :
+    {
+	"Allowed values" : "Maximum drift time vales, -1 stands for no cut."
+    },
+    "LayerTimeCut" : [-1,-1,-1,-1,-1,-1,-1,-1,-1]
+}

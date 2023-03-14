@@ -56,7 +56,7 @@ namespace Belle2 {
       leafList += variableName;
       leafList += "_min/";
       leafList += TBranchLeafType(m_min);
-      TBranch* branch = new TBranch(t, branchName.c_str() , & m_min, leafList.c_str());
+      TBranch* branch = new TBranch(t, branchName.c_str(), & m_min, leafList.c_str());
       t->GetListOfBranches()->Add(branch);
     }
 

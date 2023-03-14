@@ -93,6 +93,22 @@ namespace Belle2 {
       }
     }
 
+    void RaytracerBase::setMirrorCenter(double xc, double yc)
+    {
+      m_mirror.xc = xc;
+      m_mirror.yc = yc;
+
+      double zc = m_mirror.zc;
+      double R = m_mirror.R;
+      double zb = zc + R;
+      double Ah = m_bars.back().A / 2;
+      double Bh = m_bars.back().B / 2;
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc - Ah, 2) - pow(yc - Bh, 2)));
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc + Ah, 2) - pow(yc - Bh, 2)));
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc - Ah, 2) - pow(yc + Bh, 2)));
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc + Ah, 2) - pow(yc + Bh, 2)));
+      m_mirror.zb = zb;
+    }
 
 
   } // TOP

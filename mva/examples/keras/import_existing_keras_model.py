@@ -22,7 +22,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return State(load_model(parameters['file_path']))
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     This should be empty, because our model is already fitted.
     """
@@ -32,7 +32,7 @@ def partial_fit(state, X, S, y, w, epoch):
 if __name__ == "__main__":
     import os
     import pandas
-    from root_pandas import to_root
+    import uproot
     import tempfile
     import json
     import numpy as np
@@ -80,7 +80,8 @@ if __name__ == "__main__":
         dic.update({'isSignal': data[:, -1]})
 
         df = pandas.DataFrame(dic, dtype=np.float64)
-        to_root(df, os.path.join(path, 'data.root'), key='tree')
+        with uproot.recreate(os.path.join(path, 'data.root')) as outfile:
+            outfile['tree'] = df
 
         # Saving keras training model
         model.save(os.path.join(path, 'example_existing_model'))

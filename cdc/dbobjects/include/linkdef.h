@@ -39,11 +39,12 @@
 #pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=3
 #pragma link C++ class Belle2::CDCWireHitRequirements+; // checksum=0x4c504d88, version=2
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
+#pragma link C++ class Belle2::CDCCorrToThresholds+; // checksum=0xbea4131b, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1
 
 #pragma link C++ class Belle2::asicChannel+; // checksum=0x7a22a583, implicit, version=-1
 #pragma link C++ class Belle2::adcAsicTuple+; // checksum=0x953c3230, implicit, version=-1
-
+#pragma link C++ class Belle2::CDClayerTimeCut+; // checksum=0x6821631B, version=1
 
 #pragma link C++ class std::map <unsigned short, float>+; // checksum=0x868d8139, version=6
 #pragma link C++ class std::vector<float>+; // checksum=0x55a169b, version=6

@@ -26,7 +26,7 @@ namespace Belle2 {
    * ATTENTION: in contrast to the Two- Three- and FourHit-filters, the TrackletFilters do _NOT_ expect Hits, but a Container with pointers to Hits (e.g. Vector of hits or a SpacePointTrackCandidate, These filters therefore apply to arbitrary numbers of hits in that container.
    * */
   template <typename PointType, typename PointContainerType >
-  class ZIGGZAGGRZ_NAME : public SelectionVariable< PointContainerType , 0, int > {
+  class ZIGGZAGGRZ_NAME : public SelectionVariable< PointContainerType, 0, int > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(ZIGGZAGGRZ_NAME);
@@ -44,7 +44,7 @@ namespace Belle2 {
       std::vector<B2Vector3D> vecRZ;
       vecRZ.reserve(nHits);
       for (const auto* hit : hitContainer) { // collect RZ-Vrsions of the hits:
-        vecRZ.push_back(B2Vector3D(Helper::calcPerp(*hit) , hit->Z(), 0.));
+        vecRZ.push_back(B2Vector3D(Helper::calcPerp(*hit), hit->Z(), 0.));
       }
 
       std::vector<int> chargeSigns;

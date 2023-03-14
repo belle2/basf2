@@ -21,7 +21,8 @@ class PythonVariableManager(object):
         '''
         Return an instance to the variable manager.
         '''
-        import ROOT
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         instance = ROOT.Belle2.Variable.Manager.Instance()
         return instance
 
@@ -61,6 +62,13 @@ class PythonVariableManager(object):
         '''
         instance = PythonVariableManager._instance()
         instance.clearAliases()
+
+    def resolveAlias(self, alias):
+        '''
+        Wrapper around Manager::resolveAlias(const std::string& alias).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.resolveAlias(alias)
 
     def addCollection(self, *args):
         '''
@@ -127,7 +135,8 @@ def std_vector(*args):
     """
     Creates an std::vector which can be passed to pyROOT
     """
-    import ROOT
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
     v = ROOT.std.vector(type(args[0]))()
     for x in args:
         v.push_back(x)
@@ -170,7 +179,8 @@ def getAllTrgNames():
     """
     Return all PSNM trigger bit names
     """
-    import ROOT
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
     bits = ROOT.Belle2.PyDBObj('TRGGDLDBFTDLBits')
     evt = ROOT.Belle2.EventMetaData()
     ROOT.Belle2.DBStore.Instance().update(evt)

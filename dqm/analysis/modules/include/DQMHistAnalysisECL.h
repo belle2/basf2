@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //ROOT
 #include <TCanvas.h>
@@ -25,7 +25,7 @@ namespace Belle2 {
    * This module is for analysis of ECL DQM histograms.
    */
 
-  class DQMHistAnalysisECLModule : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
+  class DQMHistAnalysisECLModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
   public:
 
@@ -33,18 +33,18 @@ namespace Belle2 {
     DQMHistAnalysisECLModule();
 
     /** Destructor. */
-    virtual ~DQMHistAnalysisECLModule();
+    ~DQMHistAnalysisECLModule();
 
     /** Initialize the module. */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Call when a run begins. */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Event processor. */
-    virtual void event() override;
+    void event() override final;
     /** Call when a run ends. */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Terminate. */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 

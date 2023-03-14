@@ -11,7 +11,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------

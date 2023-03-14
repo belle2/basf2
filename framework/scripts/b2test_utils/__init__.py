@@ -208,7 +208,7 @@ def local_software_directory():
     try:
         directory = os.environ["BELLE2_LOCAL_DIR"]
     except KeyError:
-        raise RuntimeError("Cannot find local Belle 2 software directory, "
+        raise RuntimeError("Cannot find local Belle II software directory, "
                            "have you setup the software correctly?")
 
     with working_directory(directory):
@@ -310,7 +310,8 @@ def get_streamer_checksums(objects):
 
     Returns a dictionary object name -> (version, checksum).
     """
-    import ROOT
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
 
     # Write out the objects to a mem file
     f = ROOT.TMemFile("test_mem_file", "RECREATE")
@@ -341,7 +342,7 @@ def get_object_with_name(object_name, root=None):
     If not, the object is extracted via a getattr call.
     """
     if root is None:
-        from ROOT import Belle2
+        from ROOT import Belle2  # noqa
         root = Belle2
 
     if "." in object_name:
@@ -375,6 +376,31 @@ def print_belle2_environment():
     for key, value in sorted(dict(os.environ).items()):
         if 'BELLE2' in key.upper():
             print(f'  {key}={value}')
+
+
+@contextmanager
+def temporary_set_environment(**environ):
+    """
+    Temporarily set the process environment variables.
+    Inspired by https://stackoverflow.com/a/34333710
+
+    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
+    ...   "BELLE2_TEMP_DIR" in os.environ
+    True
+
+    >>> "BELLE2_TEMP_DIR" in os.environ
+    False
+
+    Arguments:
+        environ(dict): Dictionary of environment variables to set
+    """
+    old_environ = dict(os.environ)
+    os.environ.update(environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_environ)
 
 
 def is_ci() -> bool:

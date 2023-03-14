@@ -56,6 +56,6 @@
 #pragma link C++ class Belle2::TOPFrontEndSetting+; // checksum=0x32197236, version=1
 #pragma link C++ class Belle2::TOPCalTimeWalk+; // checksum=0x5f64cf54, version=1
 #pragma link C++ class Belle2::TOPCalEventT0Offset+; // checksum=0x115ee83c, version=1
-#pragma link C++ class Belle2::TOPCalFillPatternOffset+; // checksum=0x16a8fa8a, version=1
+#pragma link C++ class Belle2::TOPCalFillPatternOffset+; // checksum=0x2130d86c, version=2
 
 #endif

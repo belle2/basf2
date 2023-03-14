@@ -139,7 +139,7 @@ void MonitorDataCOPPERModule::event()
 
       if (j == 0 && i == 0) {
         temp_rawcopper.GetTTTimeVal(i, &m_tv);
-        int utime = temp_rawcopper.GetTTUtime(i);
+        //int utime = temp_rawcopper.GetTTUtime(i);
         if (m_loop == 0) {
           m_start_time = (double)m_tv.tv_sec;
         }

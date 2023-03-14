@@ -7,29 +7,27 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDCM.h
-// Description : DAQM Analysis for PXD Common Modes
+// Description : DQM Analysis for PXD Common Modes
 //-
 
 #pragma once
+
+#include <dqm/core/DQMHistAnalysis.h>
 
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
-#include <map>
 #include <TH2.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Common Modes */
 
-  class DQMHistAnalysisPXDCMModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDCMModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -85,44 +83,25 @@ namespace Belle2 {
     /** threshold level/line for outside fraction */
     int m_upperLineAdhoc{};
 
-    /** warn level for mean adhoc plot */
-    double m_warnMeanFull{};
-    /** error level for mean adhoc plot */
-    double m_errorMeanFull{};
-    /** warn level for outside fraction */
-    double m_warnOutsideFull{};
-    /** error level for outside fraction */
-    double m_errorOutsideFull{};
-    /** threshold level/line for outside fraction */
-    int m_upperLineFull{};
-
-    //! Module list for mask
-    std::vector <std::string> m_par_module_list;
-    //! Double-gate list for mask
-    std::vector <std::vector<int>> m_par_gate_list;
+    //! Module list for masking
+    std::vector <std::string> m_parModuleList;
+    //! Gate list for masking
+    std::vector <std::vector<int>> m_parGateList;
 
     //! Module wise gate masking in CM plot and alarm
-    std::map <VxdID, std::vector<int>> m_masked_gates;
+    std::map <VxdID, std::vector<int>> m_maskedGates;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
-    TH2D* m_hCommonMode = nullptr;
-    //! histogram covering all modules
     TH2D* m_hCommonModeDelta = nullptr;
-    //! histogram covering all modules
-    TH2D* m_hCommonModeOld = nullptr;
-    //! Final Canvas
-    TCanvas* m_cCommonMode = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonModeDelta = nullptr;
     //! Line in the Canvas to guide the eye
     TLine* m_line1 = nullptr;
     //! Line in the Canvas to guide the eye
     TLine* m_lineA = nullptr;
-    //! Line in the Canvas to guide the eye
-    TLine* m_lineF = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

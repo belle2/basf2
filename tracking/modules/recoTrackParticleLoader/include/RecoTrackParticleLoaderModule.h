@@ -8,6 +8,12 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <string>
 
@@ -43,5 +49,9 @@ namespace Belle2 {
 
     /// PDG code of the hypothesis of the output Particles
     int m_pdgCode = 211;
+
+    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTracks StoreArray */
+    StoreArray<Particle> m_Particles; /**< Particles StoreArray */
+    StoreObjPtr<ParticleList> m_ParticleList; /**< ParticleList StoreObjPtr */
   };
 }

@@ -8,7 +8,6 @@
 #include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisValidationModule.h>
 
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -186,8 +185,8 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       for (const auto& track : particle.getRelationsFrom<Track>()) {
         const auto fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
         if (!fitRes) continue;
-        if (fitRes->getMomentum().Mag() > p_max) {
-          p_max = fitRes->getMomentum().Mag();
+        if (fitRes->getMomentum().R() > p_max) {
+          p_max = fitRes->getMomentum().R();
           itrack_max = itrack;
         }
         itrack++;

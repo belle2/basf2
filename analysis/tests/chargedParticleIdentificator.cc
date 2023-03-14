@@ -35,24 +35,19 @@ namespace Belle2 {
     Const::ChargedStable m_testHypo = Const::electron;
 
     /**
-     * The (clusterTheta, p, charge) grid for which xml files are stored in the payload.
-     */
-    std::unique_ptr<TH3F> m_grid;
-
-    /**
      * The clusterTheta bin edges in [rad].
      */
-    std::vector<float> m_thetabins = {0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057};
+    std::vector<double> m_thetabins = {0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057};
 
     /**
      * The p bin edges in [GeV/c].
      */
-    std::vector<float> m_pbins = {0.2, 0.6, 0.75, 1.0, 3.0, 7.0};
+    std::vector<double> m_pbins = {0.2, 0.6, 0.75, 1.0, 3.0, 7.0};
 
     /**
      * The charge bin edges.
      */
-    std::vector<float> m_chbins = { -1.5, -0.5, 0.5, 1.5};
+    std::vector<double> m_chbins = { -1.5, -0.5, 0.5, 1.5};
 
     /**
      * Base common name for all dummy weight files.
@@ -74,16 +69,9 @@ namespace Belle2 {
     void SetUp() override
     {
 
-      m_grid = std::make_unique<TH3F>("theta_p_charge_binsgrid",
-                                      ";ECL cluster #theta;p_{lab}; Q",
-                                      m_thetabins.size() - 1,
-                                      m_thetabins.data(),
-                                      m_pbins.size() - 1,
-                                      m_pbins.data(),
-                                      m_chbins.size() - 1,
-                                      m_chbins.data());
-
-      m_dbrep.setWeightCategories(m_grid.get());
+      m_dbrep.setWeightCategories(m_thetabins.data(), m_thetabins.size() - 1,
+                                  m_pbins.data(), m_pbins.size() - 1,
+                                  m_chbins.data(), m_chbins.size() - 1);
 
       std::vector<std::tuple<double, double, double>> gridBinCentres;
 
@@ -148,9 +136,9 @@ namespace Belle2 {
     int binz = binz_idx_distr(rd);
 
     // Pick each axis' bin centre as a test value for (clusterTheta, p, charge).
-    auto theta = m_grid->GetXaxis()->GetBinCenter(binx);
-    auto p = m_grid->GetYaxis()->GetBinCenter(biny);
-    auto charge = m_grid->GetZaxis()->GetBinCenter(binz);
+    auto theta = m_dbrep.getWeightCategories()->GetXaxis()->GetBinCenter(binx);
+    auto p = m_dbrep.getWeightCategories()->GetYaxis()->GetBinCenter(biny);
+    auto charge = m_dbrep.getWeightCategories()->GetZaxis()->GetBinCenter(binz);
 
     int jth, ip, kch;
     auto jik = m_dbrep.getMVAWeightIdx(theta, p, charge, jth, ip, kch);

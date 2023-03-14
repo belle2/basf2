@@ -77,7 +77,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 }
 
 
-double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+double BBBrem::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
 
   if (m_unweighted) {
@@ -379,7 +379,8 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 }
 
 
-void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                           ROOT::Math::LorentzRotation boost,
                            bool isVirtual, bool isInitial)
 {
 
@@ -403,14 +404,15 @@ void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], -mom[2])); //Switch direction, because electrons fly into the +z direction at Belle II
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1],
+                                         -mom[2])); //Switch direction, because electrons fly into the +z direction at Belle II
   part.setEnergy(mom[3]);
   part.setMassFromPDG();
 //   part.setDecayVertex(0.0, 0.0, 0.0);
 
   //set the production vertex of non initial particles
   if (!isInitial) {
-    B2Vector3D v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

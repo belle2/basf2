@@ -1,7 +1,20 @@
+.. _analysis_variables:
+
+Variables
+=========
+
+While ``basf2`` operates on `ParticleList <https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html>`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+
+In ``basf2`` analysis, variables are handled by the `VariableManager`.
+There are many variables available for use in analysis.
+Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
+
+You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
+
 .. _analysis_variablemanager_class:
 
 VariableManager
-===============
+---------------
 
 The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
@@ -42,10 +55,10 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
 
       Example:
 
-          Aliases to a verbose variable may be set with:
+      Aliases to a verbose variable may be set with:
 
-          >>> from variables import variables as vm
-          >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+      >>> from variables import variables as vm
+      >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
 
       .. seealso::
 
@@ -106,7 +119,7 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
 .. _variablesByGroup:
 
 Variables by group
-==================
+------------------
 
 Here is a categorised list of variables known to ``basf2``.
 You can also look at the alphabetical index: :ref:`b2-varindex`.
@@ -156,9 +169,8 @@ Here is a list of particle identification variables:
   against the pion likelihood alone, or the kaon in the case of the pion itself.
   Namely the pair probability (also known as the binary probability) was returned:
 
-    * for all particles: :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/\mathcal{L}_\pi`, where :math:`\text{<Part>}\in[e,\mu,K,p,d]`.
-
-    * for pions: :math:`\text{PionID}=\mathcal{L}_\pi/\mathcal{L}_K`.
+  * for all particles: :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/\mathcal{L}_\pi`, where :math:`\text{<Part>}\in[e,\mu,K,p,d]`.
+  * for pions: :math:`\text{PionID}=\mathcal{L}_\pi/\mathcal{L}_K`.
 
   In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
   the pion-proton or pion-muon mis-identification.
@@ -199,11 +211,11 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
     All floating type variables in the mdst dataobject ECLCluster use ROOT Double32_t types with
     specific range declaration to save disk storage. This has two important consequences for a user:
 
-        - All ECL cluster variables have a limited precision. This precision is always better than
-          the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
-          binning effects are likely.
-        - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
-          these boundaries will be set to the lower (upper) bound.
+    - All ECL cluster variables have a limited precision. This precision is always better than
+      the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
+      binning effects are likely.
+    - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
+      these boundaries will be set to the lower (upper) bound.
 
     Lower and upper limits, and precision of these variables are mentioned inside the note box below them.
     One should note this in the context of binning effects.
@@ -225,6 +237,8 @@ Here is a list of variables for acceptance cuts:
 .. b2-variables::
    :group: Acceptance
 
+.. _variables_trigger:
+
 Trigger
 ~~~~~~~
 
@@ -233,6 +247,11 @@ Here is a list of trigger variables:
 .. b2-variables::
    :group: L1 Trigger
 
+.. tip::
+  Please see the `Trigger Bits section
+  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  for further details.
+  
 .. b2-variables::
    :group: Software Trigger
 
@@ -509,7 +528,7 @@ New variables seem to be found to address this problem.
    :group: FEIVariables
 
 Collections and Lists
-=====================
+---------------------
 
 To avoid very long lists of variable names in `variablesToNtuple <modularAnalysis.variablesToNtuple>`,
 it is possible to use collections of variables or lists of variables instead.
@@ -542,7 +561,7 @@ For each predefined list, there is a collection with the same name:
 
 
 Operations with variable lists
-==============================
+------------------------------
 
 It is possible to create new variable lists using meta-variables.  For example,
 one can define list of kinematic variables in LAB frame and create another
@@ -572,7 +591,7 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_isSignal_alias
 
 Miscellaneous helpers for using variables
-=========================================
+-----------------------------------------
 
 .. autofunction:: variables.getAllTrgNames
 .. autofunction:: variables.std_vector
@@ -580,7 +599,7 @@ Miscellaneous helpers for using variables
 
 
 Writing your own variable
-=========================
+-------------------------
 
 The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a pull request. Then your variables will be made available in a central release to many people.
 
@@ -636,9 +655,9 @@ Step 2. Add function definition in the header file
 
 Here we define a method helicityAngle that has 3 arguments:
 
-  * pointer to a Particle
-  * index of the daughter Particle
-  * index of the granddaughter (daughter's daughter) Particle
+* pointer to a Particle
+* index of the daughter Particle
+* index of the granddaughter (daughter's daughter) Particle
 
 in the ``AngularVariable.h`` header file. The return value of every variable has to be double.
 
@@ -653,9 +672,9 @@ in the ``AngularVariable.h`` header file. The return value of every variable has
 Step 3. Implement the function in the source file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  * Info on getters for the Particle class
-  * Info on getters for the LorentzVector class
-  * Pictorial definition of the helicity angle
+* Info on getters for the Particle class
+* Info on getters for the LorentzVector class
+* Pictorial definition of the helicity angle
 
 .. figure:: figs/hel_simple_model_def.jpg
   :align: center
@@ -731,14 +750,14 @@ You can use your variable in the same way as you use standard variables.
 How to use my variable at grid?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  * Prepare the environment with the ``b2analysis-create`` tool.
+* Prepare the environment with the ``b2analysis-create`` tool.
 
 >>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00>
 >>> cd myanalysis
->>> setupana
+>>> b2setup
 
-  * Define the new variables/functions in a .cc and register them with the variable manager.
-    This means that in the new .cc you should add:
+* Define the new variables/functions in a .cc and register them with the variable manager.
+  This means that in the new .cc you should add:
 
 .. code:: C++
 
@@ -759,9 +778,9 @@ How to use my variable at grid?
 
 Then:
 
-  * Run scons and you will get a ``.so`` and a ``.b2modmap`` files in ``modules/Linux_x86_64/opt``.
+* Run scons and you will get a ``.so`` and a ``.b2modmap`` files in ``modules/Linux_x86_64/opt``.
 
-  * Load the libraries and make the variables available you need to add these lines to your steering file:
+* Load the libraries and make the variables available you need to add these lines to your steering file:
 
 .. code:: python
 

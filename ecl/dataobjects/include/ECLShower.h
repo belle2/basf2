@@ -75,8 +75,7 @@ namespace Belle2 {
       m_trkDepth(0.0),                         /**< Path on track extrapolation to POCA to average cluster direction   */
       m_showerDepth(0.0),                      /**< Same as above, but on the cluster average direction */
       m_numberOfCrystals(0.0),                 /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernike40(0.0),                     /**< Shower shape variable, absolute value of Zernike Moment 40 */
-      m_absZernike51(0.0),                     /**< Shower shape variable, absolute value of Zernike Moment 51 */
+      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 10 to 55 */
       m_zernikeMVA(0.0),                       /**< Shower shape variable, Zernike MVA output */
       m_secondMoment(0.0),                     /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9(0.0),                            /**< Shower shape variable, E1oE9 */
@@ -86,9 +85,11 @@ namespace Belle2 {
       m_NumberOfHadronDigits(0.0),             /**< Shower Number of hadron digits*/
       m_numberOfCrystalsForEnergy(0.0),        /**< number of crystals used for energy calculation*/
       m_nominalNumberOfCrystalsForEnergy(0.0), /**< nominal number of crystals used for energy calculation*/
-      m_listOfCrystalsForEnergy{}              /**< list of cell ids used for energy calculation*/
-
-
+      m_nOptimalGroupIndex(-1),                /**< index of group of crystals used to find m_nominalNumberOfCrystalsForEnergy */
+      m_nOptimalEnergyBin(-1),                      /**< energy bin used to find m_nominalNumberOfCrystalsForEnergy */
+      m_nOptimalEnergy(0.0),                    /**< energy used to find nOptimalEnergyBin in ECLSplitterN1 */
+      m_listOfCrystalsForEnergy{},             /**< list of cell ids used for energy calculation*/
+      m_listOfCrystalEnergyRankAndQuality{}    /**< list of ECLCalDigit indices sorted by online energy*/
 
     { }
 
@@ -180,13 +181,9 @@ namespace Belle2 {
      */
     void setNumberOfCrystals(double nofCrystals) { m_numberOfCrystals = nofCrystals; }
 
-    /*! Set absolute value of Zernike moment 40
+    /*! Set absolute value of Zernike Moment nm, for nm between 10 and 55
      */
-    void setAbsZernike40(double absZernike40) { m_absZernike40 = absZernike40; }
-
-    /*! Set absolute value of Zernike moment 51
-     */
-    void setAbsZernike51(double absZernike51) { m_absZernike51 = absZernike51; }
+    void setAbsZernikeMoment(unsigned int n, unsigned int m, double absZernikeMoment) { m_absZernikeMoments[(n * (n + 1)) / 2 + m - 1] = absZernikeMoment; }
 
     /*! SetZernike MVA value
      */
@@ -224,10 +221,26 @@ namespace Belle2 {
      */
     void setNominalNumberOfCrystalsForEnergy(double nominalNumberOfCrystalsForEnergy) { m_nominalNumberOfCrystalsForEnergy = nominalNumberOfCrystalsForEnergy; }
 
+    /*! Set group number used to find nominalNumberOfCrystalsForEnergy
+     */
+    void setNOptimalGroupIndex(int nOptimalGroupIndex) { m_nOptimalGroupIndex = nOptimalGroupIndex; }
+
+    /*! Set energy bin number used to find nominalNumberOfCrystalsForEnergy
+     */
+    void setNOptimalEnergyBin(int nOptimalEnergyBin) { m_nOptimalEnergyBin = nOptimalEnergyBin; }
+
+    /*! Set energy used to find nOptimalEnergyBin
+     */
+    void setNOptimalEnergy(double nOptimalEnergy) { m_nOptimalEnergy = nOptimalEnergy; }
+
     /*! Set list of cell ids used for energy calculation
      */
     void setListOfCrystalsForEnergy(const std::vector<unsigned int>& listofcrystals) { m_listOfCrystalsForEnergy = listofcrystals;}
 
+    /*! Set list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
+     */
+    void setListOfCrystalEnergyRankAndQuality(std::vector<std::pair<unsigned int, bool>>
+                                              listOfCrystalEnergyRankAndQuality) {m_listOfCrystalEnergyRankAndQuality = listOfCrystalEnergyRankAndQuality;}
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -349,15 +362,10 @@ namespace Belle2 {
      */
     double getNumberOfCrystals() const { return m_numberOfCrystals; }
 
-    /*! Get absolute value of Zernike moment 40
-     * @return Absolute value of Zernike moment 40
+    /*! Get absolute value of Zernike Moment nm
+     * @return Absolute Value of Zernike Moment nm, for nm between 10 and 55
      */
-    double getAbsZernike40() const { return m_absZernike40; }
-
-    /*! Get absolute value of Zernike moment 51
-     * @return Absolute value of Zernike moment 51
-     */
-    double getAbsZernike51() const { return m_absZernike51; }
+    double getAbsZernikeMoment(unsigned int n, unsigned int m) const { return m_absZernikeMoments[(n * (n + 1)) / 2 + m - 1]; }
 
     /*! Get Zernike MVA
     * @return Zernike MVA
@@ -404,10 +412,30 @@ namespace Belle2 {
      */
     double getNominalNumberOfCrystalsForEnergy() const { return m_nominalNumberOfCrystalsForEnergy; }
 
+    /*! Get index of group of crystals used to find nominalNumberOfCrystalsForEnergy
+     * @return m_nOptimalGroupIndex
+     */
+    int getNOptimalGroupIndex() const { return m_nOptimalGroupIndex; }
+
+    /*! Get energy bin used to find nominalNumberOfCrystalsForEnergy
+     * @return m_nOptimalEnergyBin
+     */
+    int getNOptimalEnergyBin() const { return m_nOptimalEnergyBin; }
+
+    /*! Get energy used to find nOptimalEnergyBin
+     * @return m_nOptimalEnergy
+     */
+    double getNOptimalEnergy() const { return m_nOptimalEnergy; }
+
     /*! Get list of cellids used for energy calculation
      * @return m_listOfCrystalsForEnergy
      */
     std::vector<unsigned int>& getListOfCrystalsForEnergy()  { return m_listOfCrystalsForEnergy; }
+
+    /*! Get list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
+     *  @return m_listOfCrystalEnergyRankAndQuality
+     */
+    std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality() {return m_listOfCrystalEnergyRankAndQuality; }
 
 
 
@@ -512,8 +540,7 @@ namespace Belle2 {
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
     Double32_t m_numberOfCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernike40;      /**< Shower shape variable, absolute value of Zernike Moment 40 (TF) */
-    Double32_t m_absZernike51;      /**< Shower shape variable, absolute value of Zernike Moment 51 (TF) */
+    Double32_t m_absZernikeMoments[20];  /**< Shower shape variables, absolute values of Zernike Moments (MH) */
     Double32_t m_zernikeMVA;        /**< Shower shape variable, zernike MVA output */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
@@ -526,7 +553,12 @@ namespace Belle2 {
     m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
     Double32_t m_numberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
     Double32_t m_nominalNumberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
+    int m_nOptimalGroupIndex; /**< group (of crystals) number used to find nominalNumberOfCrystalsForEnergy (CH) */
+    int m_nOptimalEnergyBin; /**< energy bin used to find nominalNumberOfCrystalsForEnergy (CH) */
+    Double32_t m_nOptimalEnergy; /**< energy used in ECLSplitterN1 to find nOptimalEnergyBin (CH) */
     std::vector<unsigned int> m_listOfCrystalsForEnergy; /**< list of cell ids used for energy calculation (TF)*/
+    std::vector<std::pair<unsigned int, bool>>
+                                            m_listOfCrystalEnergyRankAndQuality; /**< list of indices of related ECLCalDigits by energy. Also stores a quality flag for each digit denoting whether the PSD information can be used for charged particle ID. Cached here to avoid resorting the ECLCalDigit vector 90 times per track.*/
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -542,7 +574,9 @@ namespace Belle2 {
     // 13: made enums strongly typed
     // 14: added m_numberOfCrystalsForEnergy of crystals for energy determination
     // 15: added m_listOfCrystalsForEnergy, m_nominalNumberOfCrystalsForEnergy
-    ClassDef(ECLShower, 15);/**< ClassDef */
+    // 16: removed m_absZernike40 and 51, added m_absZernikeMoments, m_listOfCrystalEnergyRankAndQuality (MH)
+    // 17: added m_nOptimalGroupIndex, m_nOptimalEnergyBin, and m_nOptimalEnergy (CH)
+    ClassDef(ECLShower, 17);/**< ClassDef */
 
   };
 

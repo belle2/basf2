@@ -13,7 +13,6 @@
 #include <fstream>
 
 using namespace Belle2;
-using namespace std;
 
 REG_MODULE(MLSegmentNetworkProducer);
 
@@ -29,7 +28,7 @@ MLSegmentNetworkProducerModule::MLSegmentNetworkProducerModule() : Module()
            "Name of the StoreObjPtr where the network container used in this module is stored", std::string(""));
 
   addParam("sectorMapName", m_PARAMsecMapName,
-           "The name of the SectorMap used for this instance.", string("testMap"));
+           "The name of the SectorMap used for this instance.", std::string("testMap"));
 
   addParam("cutValue", m_PARAMcutVal,
            "Cut value to be used for dividing the classifier output into signal (above) and background (below)",
@@ -71,7 +70,7 @@ void MLSegmentNetworkProducerModule::event()
           const auto& sp3 = outerHit->getEntry().m_spacePoint;
           std::array<double, 9> coords{{ sp1->X(), sp1->Y(), sp1->Z(), sp2->X(), sp2->Y(), sp2->Z(), sp3->X(), sp3->Y(), sp3->Z() }};
           double classOut = m_classifier->analyze(coords);
-          B2DEBUG(499, "Classifier output: " << classOut << ", cutValue: " << m_PARAMcutVal);
+          B2DEBUG(25, "Classifier output: " << classOut << ", cutValue: " << m_PARAMcutVal);
         }
 
         if (!accepted) { nRejected++; continue; } // don't store combinations which have not been accepted
@@ -83,7 +82,7 @@ void MLSegmentNetworkProducerModule::event()
                               &innerHit->getEntry());
         Segment<TrackNode>* innerSegmentPointer = &segments.back();
 
-        B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegmentPointer->getName());
+        B2DEBUG(29, "buildSegmentNetwork: innerSegment: " << innerSegmentPointer->getName());
         DirectedNode<Segment<TrackNode>, CACell>* tempInnerSegmentnode = segmentNetwork.getNode(innerSegmentPointer->getID());
         if (tempInnerSegmentnode == nullptr) {
           segmentNetwork.addNode(innerSegmentPointer->getID(), segments.back());
@@ -99,7 +98,7 @@ void MLSegmentNetworkProducerModule::event()
                                 &outerHit->getEntry(),
                                 &centerHit->getEntry());
           Segment<TrackNode>* outerSegmentPointer = &segments.back();
-          B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegmentPointer->getName() <<
+          B2DEBUG(29, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegmentPointer->getName() <<
                   " to be linked with inner segment: " << innerSegmentPointer->getName());
 
           DirectedNode<Segment<TrackNode>, CACell>* tempOuterSegmentnode = segmentNetwork.getNode(outerSegmentPointer->getID());
@@ -110,7 +109,7 @@ void MLSegmentNetworkProducerModule::event()
             segments.pop_back();
           }
 
-          B2DEBUG(999, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegmentPointer->getName() <<
+          B2DEBUG(29, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegmentPointer->getName() <<
                   " to be linked with inner segment: " << innerSegmentPointer->getName());
           segmentNetwork.linkNodes(outerSegmentPointer->getID(), innerSegmentPointer->getID());
           nLinked++;
@@ -125,7 +124,7 @@ void MLSegmentNetworkProducerModule::event()
   } // end outer loop
 
 
-  B2DEBUG(10, "MLSegmentNetworkProducerModule::buildSegmentNetwork(): nAccepted/nRejected: " << nAccepted << "/" << nRejected <<
+  B2DEBUG(20, "MLSegmentNetworkProducerModule::buildSegmentNetwork(): nAccepted/nRejected: " << nAccepted << "/" << nRejected <<
           ", size of nLinked/hitNetwork: " << nLinked << "/" << segmentNetwork.size());
 
 }
@@ -138,7 +137,7 @@ void MLSegmentNetworkProducerModule::terminate()
 
 void MLSegmentNetworkProducerModule::setupClassifier(const std::string& filename)
 {
-  ifstream filestr(filename);
+  std::ifstream filestr(filename);
   if (!filestr.is_open())  {
     B2FATAL("Could not open file: " << filename << " for reading in a FBDTClassifier");
   }

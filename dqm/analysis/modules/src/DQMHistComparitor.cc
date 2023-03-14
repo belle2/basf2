@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
-#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
@@ -51,43 +50,13 @@ DQMHistComparitorModule::~DQMHistComparitorModule()
 #endif
 }
 
-TH1* DQMHistComparitorModule::find_histo_in_canvas(TString histo_name)
-{
-  StringList s = StringUtil::split(histo_name.Data(), '/');
-  std::string dirname = s[0];
-  std::string hname = s[1];
-  std::string canvas_name = dirname + "/c_" + hname;
-
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  if (cobj == NULL) return NULL;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj = NULL;
-
-  while ((obj = (TObject*)nextkey())) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return (TH1*)obj;
-    }
-  }
-  return NULL;
-}
-
 TH1* DQMHistComparitorModule::GetHisto(TString histoname)
 {
   TH1* hh1;
   gROOT->cd();
   hh1 = findHist(histoname.Data());
   if (hh1 == NULL) {
-    B2DEBUG(20, "findHisto failed " << histoname << " not in memfile");
+    B2DEBUG(20, "findHist failed " << histoname << " not in memfile");
 
     // first search reference root file ... if ther is one
     if (m_refFile && m_refFile->IsOpen()) {
@@ -242,7 +211,7 @@ void DQMHistComparitorModule::event()
     TH1* hist1, *hist2;
 
     B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = find_histo_in_canvas(it->histo1);
+    hist1 = findHistInCanvas(it->histo1.Data());
     if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
     hist2 = GetHisto(it->histo2);
     if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);

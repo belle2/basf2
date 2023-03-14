@@ -10,8 +10,9 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/utilities/Utils.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/geometry/B2Vector3.h>
 
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 #include <TFile.h>
 #include <TH2D.h>
 #include <TTree.h>
@@ -137,7 +138,7 @@ void CreateFieldMapModule::beginRun()
     all_values->Branch("by", &field_point.by, "by/F");
     all_values->Branch("bz", &field_point.bz, "bz/F");
   }
-  auto fillTree = [&](const B2Vector3D & p, const B2Vector3D & b) {
+  auto fillTree = [&](const ROOT::Math::XYZVector & p, const ROOT::Math::XYZVector & b) {
     if (!all_values) return;
     field_point.x = p.X();
     field_point.y = p.Y();
@@ -160,15 +161,15 @@ void CreateFieldMapModule::beginRun()
         const double v = h_b->GetYaxis()->GetBinCenter(iV + 1);
         //Determine global coordinates
         for (int iPhi = 0; iPhi < m_nPhi; ++iPhi) {
-          B2Vector3D pos(v, 0, u);
-          pos.RotateZ(2 * M_PI * iPhi / m_nPhi);
+          ROOT::Math::XYZVector pos(v, 0, u);
+          pos = ROOT::Math::VectorUtil::RotateZ(pos, 2 * M_PI * iPhi / m_nPhi);
           //Obtain magnetic field
-          B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
+          ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
           //And fill histograms
           if (save) {
-            h_br->Fill(u, v, bfield.Perp());
+            h_br->Fill(u, v, bfield.Rho());
             h_bz->Fill(u, v, bfield.Z());
-            h_b->Fill(u, v, bfield.Mag());
+            h_b->Fill(u, v, bfield.R());
             fillTree(pos, bfield);
           }
           showProgress();
@@ -193,7 +194,7 @@ void CreateFieldMapModule::beginRun()
     //Loop over all bins
     for (int iU = 0; iU < m_nU; ++iU) {
       for (int iV = 0; iV < m_nV; ++iV) {
-        B2Vector3D pos(0, 0, 0);
+        ROOT::Math::XYZVector pos(0, 0, 0);
         //find value for first and second coordinate
         const double u = h_bx->GetXaxis()->GetBinCenter(iU + 1);
         const double v = h_bx->GetYaxis()->GetBinCenter(iV + 1);
@@ -211,15 +212,15 @@ void CreateFieldMapModule::beginRun()
           default:
             break;
         }
-        pos.RotateZ(m_phi);
+        pos = ROOT::Math::VectorUtil::RotateZ(pos, m_phi);
         //Obtain magnetic field
-        B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
+        ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
         //And fill histograms
         if (save) {
           h_bx->Fill(u, v, bfield.X());
           h_by->Fill(u, v, bfield.Y());
           h_bz->Fill(u, v, bfield.Z());
-          h_b->Fill(u, v, bfield.Mag());
+          h_b->Fill(u, v, bfield.R());
           fillTree(pos, bfield);
         }
         showProgress();

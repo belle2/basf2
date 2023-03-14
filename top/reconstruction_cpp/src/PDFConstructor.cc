@@ -785,9 +785,9 @@ namespace Belle2 {
       const auto& prism = m_inverseRaytracer->getPrism();
       const auto& win = prism.unfoldedWindows[k];
       double dz = std::abs(prism.zD - prism.zFlat);
-      TVector3 rD(func::unfold(pixel.xc, nx, prism.A),
-                  pixel.yc * win.sy + win.y0 + win.ny * dz,
-                  pixel.yc * win.sz + win.z0 + win.nz * dz);
+      ROOT::Math::XYZPoint rD(func::unfold(pixel.xc, nx, prism.A),
+                              pixel.yc * win.sy + win.y0 + win.ny * dz,
+                              pixel.yc * win.sz + win.z0 + win.nz * dz);
 
       double L = 0;
       for (int iter = 0; iter < 100; iter++) {
@@ -801,7 +801,7 @@ namespace Belle2 {
     }
 
 
-    PDFConstructor::PrismSolution PDFConstructor::prismSolution(const TVector3& rD, double L)
+    PDFConstructor::PrismSolution PDFConstructor::prismSolution(const ROOT::Math::XYZPoint& rD, double L)
     {
       const auto& emi = m_track.getEmissionPoint(L);
 
@@ -837,10 +837,7 @@ namespace Belle2 {
         return LogL(0);
       }
 
-      double expectedPhot = m_signalPhotons + m_bkgPhotons;
-      if (m_deltaPDFOn) expectedPhot += m_deltaPhotons;
-
-      LogL LL(expectedPhot);
+      LogL LL(getExpectedPhotons());
       for (const auto& hit : m_selectedHits) {
         if (hit.time < m_minTime or hit.time > m_maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time, hit.timeErr);
@@ -867,7 +864,7 @@ namespace Belle2 {
         return LogL(0);
       }
 
-      LogL LL(expectedPhotons(minTime - t0, maxTime - t0));
+      LogL LL(getExpectedPhotons(minTime - t0, maxTime - t0));
       for (const auto& hit : m_selectedHits) {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
@@ -947,30 +944,22 @@ namespace Belle2 {
       return m_pixelLLs;
     }
 
-    double PDFConstructor::expectedPhotons(double minTime, double maxTime) const
-    {
-      double ps = 0;
-      for (const auto& signalPDF : m_signalPDFs) {
-        ps += signalPDF.getIntegral(minTime, maxTime);
-      }
-      double pd = m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) : 0.0;
-      double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
-
-      return ps * m_signalPhotons + pd * m_deltaPhotons + pb * m_bkgPhotons;
-    }
-
     void PDFConstructor::initializePixelLogLs(double minTime, double maxTime) const
     {
       m_pixelLLs.clear();
 
-      double pd = m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) : 0.0;
       double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
-      double bfot = pd * m_deltaPhotons + pb * m_bkgPhotons;
+      double bfot = pb * m_bkgPhotons + getExpectedDeltaPhotons(minTime, maxTime);
+      for (const auto* other : m_pdfOtherTracks) bfot += other->getExpectedDeltaPhotons(minTime, maxTime);
+
       const auto& pixelPDF = m_backgroundPDF->getPDF();
       for (const auto& signalPDF : m_signalPDFs) {
-        double ps = signalPDF.getIntegral(minTime, maxTime);
         unsigned k = signalPDF.getPixelID() - 1;
-        double phot = ps * m_signalPhotons + bfot * pixelPDF[k];
+        double phot = signalPDF.getIntegral(minTime, maxTime) * m_signalPhotons + bfot * pixelPDF[k];
+        for (const auto* other : m_pdfOtherTracks) {
+          const auto& otherPDFs = other->getSignalPDF();
+          phot += otherPDFs[k].getIntegral(minTime, maxTime) * other->getExpectedSignalPhotons();
+        }
         m_pixelLLs.push_back(LogL(phot));
       }
     }

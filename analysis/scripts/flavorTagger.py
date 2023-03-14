@@ -49,7 +49,7 @@ def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDat
 
 
 # Default list of aliases that should be used to save the flavor tagging information using VariablesToNtuple
-flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB',
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC', 'mcFlavorOfOtherB', 'qrGNN',
                   'qpElectron', 'hasTrueTargetElectron', 'isRightCategoryElectron',
                   'qpIntermediateElectron', 'hasTrueTargetIntermediateElectron', 'isRightCategoryIntermediateElectron',
                   'qpMuon', 'hasTrueTargetMuon', 'isRightCategoryMuon',
@@ -75,6 +75,8 @@ def add_default_FlavorTagger_aliases():
     variables.variables.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
     variables.variables.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
 
+    variables.variables.addAlias('qrGNN', 'extraInfo(qrGNN)')
+
     for iCategory in AvailableCategories:
         aliasForQp = 'qp' + iCategory
         aliasForTrueTarget = 'hasTrueTarget' + iCategory
@@ -89,6 +91,38 @@ def add_default_FlavorTagger_aliases():
 def set_FlavorTagger_pid_aliases():
     """
     This function adds the pid aliases needed by the flavor tagger.
+    """
+    variables.variables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
+    variables.variables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
+    variables.variables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+
+    variables.variables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
+    variables.variables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
+    variables.variables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+
+    variables.variables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
+    variables.variables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
+
+    variables.variables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
+    variables.variables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
+
+    if getBelleOrBelle2() == "Belle":
+        variables.variables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+    else:
+        variables.variables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC)')
+        variables.variables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC)')
+        variables.variables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC)')
+        variables.variables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC)')
+
+
+def set_FlavorTagger_pid_aliases_legacy():
+    """
+    This function adds the pid aliases needed by the flavor tagger trained for MC13.
     """
     variables.variables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
     variables.variables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
@@ -119,6 +153,60 @@ def set_FlavorTagger_pid_aliases():
         variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
+def set_GNNFlavorTagger_aliases(categories):
+    """
+    This function adds aliases for the GNN-based flavor tagger.
+    """
+
+    # will be used for target variable 0:B0bar, 1:B0
+    variables.variables.addAlias('qrCombined_bit', '(qrCombined+1)/2')
+    alias_list = ['qrCombined_bit']
+
+    var_dict = {
+        # position
+        'dx': 'dx',
+        'dy': 'dy',
+        'dz': 'dz',
+        # mask
+        'E': 'E',
+        # charge,
+        'charge': 'charge',
+        # feature
+        'px_c': 'px*charge',
+        'py_c': 'py*charge',
+        'pz_c': 'pz*charge',
+        'electronID_c': 'electronID*charge',
+        'muonID_c': 'muonID*charge',
+        'pionID_c': 'pionID*charge',
+        'kaonID_c': 'kaonID*charge',
+        'protonID_c': 'protonID*charge',
+        'deuteronID_c': 'deuteronID*charge',
+        'electronID_noSVD_noTOP_c': 'electronID_noSVD_noTOP*charge',
+    }
+
+    # 16 charged particles are used at most
+    for rank in range(1, 17):
+
+        for cat in categories:
+            listName = AvailableCategories[cat].particleList
+            varName = f'QpTrack({listName}, isRightCategory({cat}), isRightCategory({cat}))'
+
+            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, FT_p, {varName}, {rank}), 0)'
+            aliasWithRank = f'{cat}_rank{rank}'
+
+            variables.variables.addAlias(aliasWithRank, varWithRank)
+            alias_list.append(aliasWithRank)
+
+        for alias, var in var_dict.items():
+            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, FT_p, {var}, {rank}), 0)'
+            aliasWithRank = f'{alias}_rank{rank}'
+
+            variables.variables.addAlias(aliasWithRank, varWithRank)
+            alias_list.append(aliasWithRank)
+
+    return alias_list
+
+
 def setInputVariablesWithMask(maskName='all'):
     """
     Set aliases for input variables with ROE mask.
@@ -135,7 +223,6 @@ def getFastBDTCategories():
     Helper function for getting the FastBDT categories.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     fastBDTCategories = basf2_mva.FastBDTOptions()
     fastBDTCategories.m_nTrees = 500
     fastBDTCategories.m_nCuts = 8
@@ -150,7 +237,6 @@ def getFastBDTCombiner():
     Helper function for getting the FastBDT combiner.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     fastBDTCombiner = basf2_mva.FastBDTOptions()
     fastBDTCombiner.m_nTrees = 500
     fastBDTCombiner.m_nCuts = 8
@@ -165,7 +251,6 @@ def getMlpFANNCombiner():
     Helper function for getting the MLP FANN combiner.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     mlpFANNCombiner = basf2_mva.FANNOptions()
     mlpFANNCombiner.m_max_epochs = 10000
     mlpFANNCombiner.m_hidden_layers_architecture = "3*N"
@@ -947,7 +1032,7 @@ def flavorTagger(
     mode='Expert',
     weightFiles='B2nunubarBGx1',
     workingDirectory='.',
-    combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
+    combinerMethods=['TMVA-FBDT'],
     categories=[
         'Electron',
         'IntermediateElectron',
@@ -962,13 +1047,15 @@ def flavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
-    maskName='all',
+    maskName='FTDefaultMask',
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
     downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
-    prefix='',
+    prefix='MC15ri_light-2207-bengal_0',
+    useGNN=False,
+    identifierGNN='',
     path=None,
 ):
     """
@@ -994,11 +1081,20 @@ def flavorTagger(
                                                :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
                                                BGx1 stays for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT` (default).
+                                               ``FANN-MLP`` is available only with ``prefix=''`` (MC13 weight files).
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
-                                               ``all`` (default): all ROE particles are used.
-                                               ``_FTDefaultMask``: tentative mask definition that will be created automatically.
+                                               ``FTDefaultMask`` (default): tentative mask definition that will be created
+                                               automatically. The definition is as follows:
+
+                                               - Track (pion): thetaInCDCAcceptance and dr<1 and abs(dz)<3
+                                               - ECL-cluster (gamma): thetaInCDCAcceptance and clusterNHits>1.5 and \
+                                               [[clusterReg==1 and E>0.08] or [clusterReg==2 and E>0.03] or \
+                                               [clusterReg==3 and E>0.06]] \
+                                               (Same as gamma:pi0eff30_May2020 and gamma:pi0eff40_May2020)
+
+                                               ``all``: all ROE particles are used.
                                                Or one can give any mask name defined before calling this function.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
@@ -1010,9 +1106,18 @@ def flavorTagger(
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
       @param prefix                            Prefix of weight files.
+                                               ``MC15ri_light-2207-bengal_0`` (default): Weight files trained for MC15ri samples.
+                                               ``''``: Weight files trained for MC13 samples.
+      @param useGNN                            Use GNN-based Flavor Tagger in addition with FastBDT-based one.
+                                               Please specify the weight file with the option ``identifierGNN``.
+                                               [Expert] In the sampler mode, training files for GNN-based Flavor Tagger is produced.
+      @param identifierGNN                     The name of weight file of the GNN-based Flavor Tagger.
       @param path                              Modules are added to this path
 
     """
+
+    if (not isinstance(particleLists, list)):
+        particleLists = [particleLists]  # in case user inputs a particle list as string
 
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
         B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')
@@ -1036,6 +1141,10 @@ def flavorTagger(
             B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
                     '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", '
                     '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
+
+    if mode == 'Expert' and useGNN and identifierGNN == '':
+        B2FATAL('The weight file of GNN-based Flavor Tagger is not set as default yet. '
+                'Please specify the name of the weight file with ``identifierGNN``')
 
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
@@ -1082,9 +1191,19 @@ def flavorTagger(
     B2INFO(' ')
 
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
-    set_FlavorTagger_pid_aliases()
+
+    if prefix == '':
+        set_FlavorTagger_pid_aliases_legacy()
+    else:
+        set_FlavorTagger_pid_aliases()
+
+    alias_list_for_GNN = []
+    if useGNN:
+        alias_list_for_GNN = set_GNNFlavorTagger_aliases(categories)
+
     setInputVariablesWithMask()
-    weightFiles = prefix + weightFiles
+    if prefix != '':
+        weightFiles = prefix + '_' + weightFiles
 
     # Create configuration lists and code-name for given category's list
     trackLevelParticleLists = []
@@ -1112,14 +1231,14 @@ def flavorTagger(
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
     # Create default ROE-mask
-    if maskName == '_FTDefaultMask':
-        _FTDefaultMask = (
-            '_FTDefaultMask',
+    if maskName == 'FTDefaultMask':
+        FTDefaultMask = (
+            'FTDefaultMask',
             'thetaInCDCAcceptance and dr<1 and abs(dz)<3',
             'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
                             [E>0.06 and clusterReg==3]]')
         for name in particleLists:
-            ma.appendROEMasks(list_name=name, mask_tuples=[_FTDefaultMask], path=path)
+            ma.appendROEMasks(list_name=name, mask_tuples=[FTDefaultMask], path=path)
 
     # Start ROE-routine
     roe_path = basf2.create_path()
@@ -1135,15 +1254,28 @@ def flavorTagger(
 
         FillParticleLists(maskName, categories, roe_path)
 
-        if eventLevel(mode, weightFiles, categories, roe_path):
-            combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
+        if useGNN:
+            if eventLevel('Expert', weightFiles, categories, roe_path):
+
+                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
+                                 outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
+                ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
+                ma.variablesToNtuple('vpho:dummy',
+                                     alias_list_for_GNN,
+                                     treename='tree',
+                                     filename=f'{filesDirectory}/FlavorTagger_GNN_sampled{fileId}.root',
+                                     signalSideParticleList=particleLists[0],
+                                     path=roe_path)
+
+        else:
+            if eventLevel(mode, weightFiles, categories, roe_path):
+                combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Expert':
         # If trigger returns 1 jump into empty path skipping further modules in roe_path
         # run filter with no cut first to get rid of ROEs that are missing the mask of the signal particle
-        ma.signalSideParticleListsFilter(particleLists, '', roe_path, deadEndPath)
         ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
 
         # Initialization of flavorTaggerInfo dataObject needs to be done in the main path
@@ -1166,6 +1298,18 @@ def flavorTagger(
             flavorTaggerInfoFiller.param('trackPointers', False)
             roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
             add_default_FlavorTagger_aliases()
+
+            if useGNN:
+                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
+                                 outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
+                ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
+                roe_path.add_module('MVAExpert',
+                                    listNames='vpho:dummy',
+                                    extraInfoName='qrGNN_raw',  # the range of qrGNN_raw is [0,1]
+                                    identifier=identifierGNN)
+
+                ma.variableToSignalSideExtraInfo('vpho:dummy', {'extraInfo(qrGNN_raw)*2-1': 'qrGNN'},
+                                                 path=roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

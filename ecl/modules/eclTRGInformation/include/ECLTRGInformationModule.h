@@ -5,8 +5,10 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -51,7 +53,7 @@ namespace Belle2 {
     typedef std::map <unsigned, float> tcmap;
 
 
-    /** vector (8736+1 entries) with cell id to store array positions */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_calDigitStoreArrPosition;
 
     /** vector (576+1 entries) with TC id to store array positions */

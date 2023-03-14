@@ -9,7 +9,7 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
@@ -31,7 +31,7 @@ namespace Belle2 {
   /**
    * Analysis of KLM DQM histograms.
    */
-  class DQMHistAnalysisKLM2Module : public DQMHistAnalysisModule {
+  class DQMHistAnalysisKLM2Module final : public DQMHistAnalysisModule {
 
   public:
 
@@ -48,27 +48,23 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    void endRun() override;
+    void endRun() override final;
 
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
 
   private:
 
@@ -119,6 +115,9 @@ namespace Belle2 {
 
     /** Histogram for EKLM sector efficiency. */
     TCanvas* m_c_eff_eklm_sector = NULL;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
 
 
     /** EKLM element numbers. */

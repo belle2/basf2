@@ -76,7 +76,7 @@ namespace Belle2 {
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
-                  << "r/z = " << result.front().getSeed()->getPositionSeed().Perp() << "; " << result.front().getSeed()->getPositionSeed().Z());
+                  << "r/z = " << result.front().getSeed()->getPositionSeed().Rho() << "; " << result.front().getSeed()->getPositionSeed().Z());
         }
       }
 
@@ -114,7 +114,7 @@ namespace Belle2 {
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
-                  << "r/z = " << result.front().getSeed()->getPositionSeed().Perp() << "; " << result.front().getSeed()->getPositionSeed().Z());
+                  << "r/z = " << result.front().getSeed()->getPositionSeed().Rho() << "; " << result.front().getSeed()->getPositionSeed().Z());
         }
       }
 
@@ -167,7 +167,7 @@ namespace Belle2 {
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
-                  << "r/z = " << result.front().getSeed()->getPositionSeed().Perp() << "; " << result.front().getSeed()->getPositionSeed().Z());
+                  << "r/z = " << result.front().getSeed()->getPositionSeed().Rho() << "; " << result.front().getSeed()->getPositionSeed().Z());
         }
       }
     }

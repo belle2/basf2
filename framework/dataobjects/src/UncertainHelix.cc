@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <framework/dataobjects/UncertainHelix.h>
 
-#include <TVector3.h>
+#include <TMatrixD.h>
 
 #include <cassert>
 
@@ -21,13 +21,13 @@ UncertainHelix::UncertainHelix() :
 {
 }
 
-UncertainHelix::UncertainHelix(const TVector3& position,
-                               const TVector3& momentum,
+UncertainHelix::UncertainHelix(const ROOT::Math::XYZVector& position,
+                               const ROOT::Math::XYZVector& momentum,
                                const short int charge,
                                const double bZ,
                                const TMatrixDSym& cartesianCovariance,
                                const double pValue) :
-  Helix(TVector3(0.0, 0.0, position.Z()), momentum, charge, bZ),
+  Helix(ROOT::Math::XYZVector(0.0, 0.0, position.Z()), momentum, charge, bZ),
   m_covariance(cartesianCovariance), // Initialize the covariance matrix to the 6x6 covariance and reduce it afterwards
   m_pValue(pValue)
 {

@@ -182,7 +182,7 @@ void SVDB4CommissioningPlotsModule::event()
     const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
-      m_mom->Fill(tfr->getMomentum().Mag());
+      m_mom->Fill(tfr->getMomentum().R());
       m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
     }
 

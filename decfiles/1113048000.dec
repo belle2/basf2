@@ -9,27 +9,13 @@
 # Responsible: Vismaya
 # Email: ph20resch11010@iith.ac.in
 # Cuts: None
-# Date: 14/03/23
+# Date: 15/03/23
 
 #
 # Aliases
 #
 
-Alias B0sig B0
-Alias anti-B0sig anti-B0
-ChargeConj B0sig anti-B0sig
-
-Alias D*+sig D*+
-Alias D*-sig D*-
-ChargeConj D*+sig D*-sig
-
-Alias D0sig D0
-Alias anti-D0sig anti-D0
-ChargeConj D0sig anti-D0sig
-
 Alias etasig eta
-Alias anti-etasig eta
-ChargeConj etasig anti-etasig
 
 #
 # Y(4S) -> B0 anti-B0 
@@ -73,6 +59,6 @@ CDecay D0sig
 Decay etasig
 1.0000 gamma gamma PHSP;
 Enddecay
-CDecay anti-etasig
+CDecay etasig
 
 End

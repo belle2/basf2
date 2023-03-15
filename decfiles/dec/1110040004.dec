@@ -1,0 +1,23 @@
+# EventType: 1110040004
+# Descriptor: [B0 -> pi+ pi- pi+ pi-] cc 
+# NickName: Bd_pippimpippim
+# Documentation:    peaking background for B0 to rho0 rho0
+# Reponsible: J. Skorupa
+# Email: jskorupa@mpp.mpg.de
+# Tested: No 
+# PhysicsWG: BToHadronic
+# Cuts: None
+# Date: 15/03/2023
+#
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0  pi+ pi- pi+ pi-       PHSP;
+Enddecay
+CDecay anti-B0sig
+
+End

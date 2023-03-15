@@ -15,6 +15,7 @@ import subprocess
 import basf2
 from tracking import add_track_finding
 from tracking.path_utils import add_hit_preparation_modules
+from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 import background
 import simulation
 from packaging import version
@@ -712,6 +713,141 @@ class CKFResultFilterTeacherTask(Basf2Task):
         )
 
 
+class ValidationAndOptimisationTask(Basf2PathTask):
+    experiment_number = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+    n_events_testing = b2luigi.IntParameter()
+    state_filter_cut = b2luigi.FloatParameter()
+    use_n_best_states = b2luigi.IntParameter()
+    result_filter_cut = b2luigi.FloatParameter()
+    use_n_best_results = b2luigi.IntParameter()
+
+    def output(self):
+        yield self.add_to_output("cdc_to_svd_spacepoint_ckf_validation.root")
+
+    def requires(self):
+        yield CKFResultFilterTeacherTask(
+            result_filter_records_name="filter_records.root",
+            experiment_number=self.experiment_number,
+            n_events_training=self.n_events_training,
+        )
+        yield SplitNMergeSimTask(
+            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            experiment_number=self.experiment_number,
+            n_events=self.n_events_testing,
+            random_seed="optimisation",
+        )
+        filter_numbers = [1, 2, 3]
+        for filter_number in filter_numbers:
+            yield self.clone(
+                CKFStateFilterTeacherTask,
+                filter_number=filter_number,
+                n_events_training=self.n_events_training,
+                experiment_number=self.experiment_number,
+            )
+
+    def create_optimisation_and_validation_path(self):
+        path = basf2.create_path()
+
+        file_list = []
+        for _, file_name in self.get_input_file_names().items():
+            print(f"{file_name}")
+            file_list.append(*file_name)
+        print("\n\n\n")
+        print("#####"*20)
+        print(f"{file_list}")
+        file_list = [x for x in file_list if ("optimisation" in x and ".root" in x)]
+        path.add_module("RootInput", inputFileNames=file_list)
+
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        path.add_module("SetupGenfitExtrapolation")
+
+        add_hit_preparation_modules(path, components=["SVD"])
+
+        add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], prune_temporary_tracks=False)
+
+        # path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
+
+        path.add_module("CDCToSVDSpacePointCKF",
+                        minimalPtRequirement=0,
+                        minimalHitRequirement=1,
+
+                        useAssignedHits=False,
+
+                        inputRecoTrackStoreArrayName="CDCRecoTracks",
+                        outputRecoTrackStoreArrayName="VXDRecoTracks",
+                        outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
+                        hitFilter="sensor",
+                        seedFilter="distance",
+
+                        relationCheckForDirection="backward",
+                        reverseSeed=False,
+                        writeOutDirection="backward",
+
+                        firstHighFilter="mva",
+                        firstHighFilterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_1.weights.xml")[0],
+                            "cut": self.state_filter_cut},
+                        firstHighUseNStates=self.use_n_best_states,
+
+                        advanceHighFilter="advance",
+
+                        secondHighFilter="mva",
+                        secondHighFilterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_2.weights.xml")[0],
+                            "cut": self.state_filter_cut},
+                        secondHighUseNStates=self.use_n_best_states,
+
+                        updateHighFilter="fit",
+
+                        thirdHighFilter="mva",
+                        thirdHighFilterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_3.weights.xml")[0],
+                            "cut": self.state_filter_cut},
+                        thirdHighUseNStates=self.use_n_best_states,
+
+                        filter="mva",
+                        filterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointRedultFilter.weights.xml")[0],
+                            "cut": self.result_filter_cut},
+                        useBestNInSeed=self.use_n_best_results,
+
+                        exportTracks=True,
+
+                        enableOverlapResolving=True)
+
+        path.add_module('RelatedTracksCombiner',
+                        VXDRecoTracksStoreArrayName="VXDRecoTracks",
+                        CDCRecoTracksStoreArrayName="CDCRecoTracks",
+                        recoTracksStoreArrayName="RecoTracks")
+
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName="MCRecoTracks",
+                        WhichParticles=[],
+                        UsePXDHits=True,
+                        UseSVDHits=True,
+                        UseCDCHits=True)
+
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName="RecoTracks")
+
+        path.add_module(
+            CombinedTrackingValidationModule(
+                output_file_name=self.get_output_file_name("cdc_to_svd_spacepoint_ckf_validation.root"),
+                reco_tracks_name="RecoTracks",
+                mc_reco_tracks_name="MCRecoTracks",
+                name="",
+                contact="",
+                expert_level=200))
+
+        return path
+
+    def create_path(self):
+        return self.create_optimisation_and_validation_path()
+
+
 class MainTask(b2luigi.WrapperTask):
     """
     Wrapper task that needs to finish for b2luigi to finish running this steering file.
@@ -817,11 +953,30 @@ class MainTask(b2luigi.WrapperTask):
             #         experiment_number=experiment_number,
             # )
 
-            yield CKFResultFilterTeacherTask(
-                    result_filter_records_name="filter_records.root",
-                    n_events_training=self.n_events_training,
-                    experiment_number=experiment_number,
-            )
+            # yield CKFResultFilterTeacherTask(
+            #         result_filter_records_name="filter_records.root",
+            #         n_events_training=self.n_events_training,
+            #         experiment_number=experiment_number,
+            # )
+
+            state_filter_cuts = [0.1, 0.2]
+            n_best_states_list = [3, 5, 10]
+            result_filter_cuts = [0.1, 0.2]
+            n_best_results_list = [3, 5, 10]
+            for state_filter_cut in state_filter_cuts:
+                for n_best_states in n_best_states_list:
+                    for result_filter_cut in result_filter_cuts:
+                        for n_best_results in n_best_results_list:
+                            yield self.clone(
+                                ValidationAndOptimisationTask,
+                                experiment_number=experiment_number,
+                                n_events_training=self.n_events_training,
+                                n_events_testing=self.n_events_testing,
+                                state_filter_cut=state_filter_cut,
+                                use_n_best_states=n_best_states,
+                                result_filter_cut=result_filter_cut,
+                                use_n_best_results=n_best_results
+                            )
 
 
 if __name__ == "__main__":

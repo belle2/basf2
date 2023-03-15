@@ -751,11 +751,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         file_list = []
         for _, file_name in self.get_input_file_names().items():
-            print(f"{file_name}")
             file_list.append(*file_name)
-        print("\n\n\n")
-        print("#####"*20)
-        print(f"{file_list}")
         file_list = [x for x in file_list if ("optimisation" in x and ".root" in x)]
         path.add_module("RootInput", inputFileNames=file_list)
 
@@ -764,10 +760,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         path.add_module("SetupGenfitExtrapolation")
 
         add_hit_preparation_modules(path, components=["SVD"])
-
         add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], prune_temporary_tracks=False)
-
-        # path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
 
         path.add_module("CDCToSVDSpacePointCKF",
                         minimalPtRequirement=0,
@@ -901,63 +894,6 @@ class MainTask(b2luigi.WrapperTask):
         for experiment_number, fast_bdt_option in itertools.product(
                 experiment_numbers, fast_bdt_options
         ):
-
-            # yield SplitNMergeSimTask(
-            #     # bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
-            #     # random_seed=self.random_seed,
-            #     # n_events=self.n_events,
-            #     # experiment_number=self.experiment_number,
-            #     bkgfiles_dir=MainTask.bkgfiles_by_exp[experiment_number],
-            #     random_seed="self.random_seed",
-            #     n_events=self.n_events_training,
-            #     experiment_number=experiment_number,
-            # )
-
-            # for layer in [3, 4, 5, 6, 7]:
-            #     yield self.clone(
-            #         StateRecordingTask,
-            #         layer=layer,
-            #         experiment_number=experiment_number,
-            #         n_events_training=self.n_events_training
-            #     )
-            # #yield self.clone(
-            # #    StateRecordingTask,
-            # #    layer=7,
-            # #    experiment_number=experiment_number,
-            # #    n_events_training=self.n_events_training
-            # #)
-
-            # record_files = ["records1.root", "records2.root", "records3.root"]
-            # tree_names = ["records1", "records2", "records3"]
-            # for file, tree in zip(record_files, tree_names):
-            #     yield self.clone(
-            #         CKFStateFilterTeacherTask,
-            #         records_file_name=file,
-            #         tree_name=tree,
-            #         n_events_training=self.n_events_training,
-            #         experiment_number=experiment_number,
-            #     )
-
-            # filter_numbers = [1, 2, 3]
-            # for filter_number in filter_numbers:
-            #     yield self.clone(
-            #         CKFStateFilterTeacherTask,
-            #         filter_number=filter_number,
-            #         n_events_training=self.n_events_training,
-            #         experiment_number=experiment_number,
-            #     )
-
-            # yield ResultRecordingTask(
-            #         result_filter_records_name="filter_records.root",
-            #         n_events_training=self.n_events_training,
-            #         experiment_number=experiment_number,
-            # )
-
-            # yield CKFResultFilterTeacherTask(
-            #         result_filter_records_name="filter_records.root",
-            #         n_events_training=self.n_events_training,
-            #         experiment_number=experiment_number,
-            # )
 
             state_filter_cuts = [0.1, 0.2]
             n_best_states_list = [3, 5, 10]

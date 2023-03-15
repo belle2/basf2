@@ -1,0 +1,31 @@
+# EventType: 1270730000
+# Descriptor: [B+ -> Xu0 l+ nu]cc
+# NickName: Bu_Xulnu=cocktail
+# Documentation: Not yet measured semileptonic B decays with dipion resonances (ISGW2 model).
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Moritz Bauer 
+# Email: moritz.bauer@kit.edu 
+# Cuts: None
+# Date: 20230315
+#
+
+Decay Upsilon(4S)
+0.500 B-sig B+  VSS;
+0.500 B+sig B-  VSS;
+Enddecay
+
+# All branching fractions here are guesses
+Decay B-sig
+0.2   f_2       e-   anti-nu_e   ISGW2;
+0.2   f_2       mu-  anti-nu_mu  ISGW2;
+0.1   sigma_0   e-   anti-nu_e   ISGW2;
+0.1   sigma_0   mu-  anti-nu_mu  ISGW2;
+0.1   rho(2S)0  e-   anti-nu_e   ISGW2;
+0.1   rho(2S)0  mu-  anti-nu_mu  ISGW2;
+0.1   f_0       e-   anti-nu_e   ISGW2;
+0.1   f_0       mu-  anti-nu_mu  ISGW2;
+Enddecay
+CDecay B+sig
+
+End

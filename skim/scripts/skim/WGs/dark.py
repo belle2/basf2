@@ -634,3 +634,35 @@ class BtoKplusLLP(BaseSkim):
                             kinematicCuts, path=path)
 
         return ["B+:b" + btoksLbl]
+
+
+@fancy_skim_header
+class AA2uuuu(BaseSkim):
+    """
+    Searching the dark sector through U(1) kinetic mixing.
+
+    Reconstructed 2 muons to a dark photon.
+    """
+    __description__ = ":math:`ee\\to A^{\\prime}A^{\\prime}\\nu_{D}\\nu_{D}\\to \\mu\\mu\\mu\\mu`"
+    __category__ = "physics, dark sector"
+    __authors__ = ["Chanyoung LEE"]
+    __contact__ = __liaison__
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        muon_cuts = """[muonID_noSVD > 0.8]
+        and [inKLMAcceptance == 1] and [inCDCAcceptance == 1]
+        and [nCDCHits > 4]"""
+        track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
+
+        path = self.skim_event_cuts(f"nCleanedTracks({track_cuts}) >= 4", path=path)
+
+        ma.cutAndCopyList("mu+:ll", "mu+:all", muon_cuts, path=path)
+        ma.reconstructDecay(decayString="vpho:ll -> mu+:ll mu-:ll", cut="", path=path)
+        vertex.treeFit(list_name="vpho:ll", conf_level=0, path=path)
+
+        return ["vpho:ll"]

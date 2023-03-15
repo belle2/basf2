@@ -16,14 +16,15 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B-sig
-0.2  f_2       e-   anti-nu_e   PHSP;
-0.2  f_2       mu-  anti-nu_mu  PHSP;
-0.1  sigma_0   e-   anti-nu_e   PHSP;
-0.1  sigma_0   mu-  anti-nu_mu  PHSP;
-0.1  rho(2S)0  e-   anti-nu_e   PHSP;
-0.1  rho(2S)0  mu-  anti-nu_mu  PHSP;
-0.1  f_0       e-   anti-nu_e   PHSP;
-0.1  f_0       mu-  anti-nu_mu  PHSP;
+0.2   f_2       e-   anti-nu_e   PHSP;
+0.1   sigma_0   e-   anti-nu_e   PHSP;
+0.1   rho(2S)0  e-   anti-nu_e   PHSP;
+0.1   f_0       e-   anti-nu_e   PHSP;
+
+0.2   f_2       mu-  anti-nu_mu  PHSP;
+0.1   sigma_0   mu-  anti-nu_mu  PHSP;
+0.1   rho(2S)0  mu-  anti-nu_mu  PHSP;
+0.1   f_0       mu-  anti-nu_mu  PHSP;
 Enddecay
 CDecay B+sig
 

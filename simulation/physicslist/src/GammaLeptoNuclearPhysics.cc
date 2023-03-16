@@ -23,16 +23,25 @@
 #include "G4QGSMFragmentation.hh"
 #include "G4GeneratorPrecompoundInterface.hh"
 
+#include "G4PhotoNuclearCrossSection.hh"
+#include "G4GammaNuclearXS.hh"
+
+#include "G4HadronicParameters.hh"
+
+#include "G4CrossSectionDataSetRegistry.hh"
+
 #include "G4SystemOfUnits.hh"
 
 using namespace Belle2;
 using namespace Simulation;
 
 
-GammaLeptoNuclearPhysics::GammaLeptoNuclearPhysics()
+GammaLeptoNuclearPhysics::GammaLeptoNuclearPhysics(const G4int verbosityLevel)
   : m_qgsp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
-    m_fragModel(nullptr), m_preCompoundModel(nullptr)
-{}
+    m_fragModel(nullptr), m_preCompoundModel(nullptr), m_useGammaNuclearXS(false)
+{
+  G4HadronicParameters::Instance()->SetVerboseLevel(verbosityLevel);
+}
 
 
 GammaLeptoNuclearPhysics::~GammaLeptoNuclearPhysics()

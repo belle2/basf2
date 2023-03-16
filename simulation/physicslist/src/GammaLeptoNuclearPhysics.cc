@@ -83,6 +83,16 @@ void GammaLeptoNuclearPhysics::ConstructProcess()
   // Gamma
   procMan = G4Gamma::Gamma()->GetProcessManager();
   G4HadronInelasticProcess* pnProc = new G4HadronInelasticProcess("photonNuclear", G4Gamma::Definition());
+  auto xsreg = G4CrossSectionDataSetRegistry::Instance();
+  G4VCrossSectionDataSet* xs = nullptr;
+  if (m_useGammaNuclearXS) {
+    xs = xsreg->GetCrossSectionDataSet("GammaNuclearXS");
+    if (nullptr == xs) xs = new G4GammaNuclearXS();
+  } else {
+    xs = xsreg->GetCrossSectionDataSet("PhotoNuclearXS");
+    if (nullptr == xs) xs = new G4PhotoNuclearCrossSection();
+  }
+  pnProc->AddDataSet(xs);
   pnProc->RegisterMe(theGammaReaction);
   pnProc->RegisterMe(m_qgsp);
   procMan->AddDiscreteProcess(pnProc);

@@ -200,7 +200,7 @@ void FullSimModule::initialize()
 
   if (m_physicsList == "Belle2") {
     // Use Belle2PhysicsList
-    Belle2PhysicsList* physicsList = new Belle2PhysicsList(m_physicsList);
+    Belle2PhysicsList* physicsList = new Belle2PhysicsList(m_physicsList, m_hadronProcessVerbosity);
     physicsList->SetVerbosity(m_runEventVerbosity);
     physicsList->UseStandardEMPhysics(m_standardEM);
     physicsList->UseOpticalPhysics(m_optics);

@@ -35,12 +35,11 @@ default:
     - git config user.email "something@something.com"
     - git config user.name "someone"
     - git config --global --add safe.directory $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})
-    - git status && git restore . && git status
     - |
       if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
         if [ "${GITLAB_IS_FIRST_STAGE}" != "yes" ]; then
             echo "Merging the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} up to commit $(< target_head_hash.txt) into this branch"
-            git fetch --all && git merge $(< target_head_hash.txt) --strategy-option ours
+            git fetch --all && git merge $(< target_head_hash.txt) --allow-unrelated-histories --strategy-option ours
         fi
       fi
     # Preliminary operations necessary for basf2

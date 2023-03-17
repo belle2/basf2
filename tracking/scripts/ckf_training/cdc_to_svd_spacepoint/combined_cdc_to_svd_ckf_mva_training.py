@@ -952,8 +952,8 @@ class MainTask(b2luigi.WrapperTask):
         """
 
         fast_bdt_options = []
-        # fast_bdt_options.append([50, 8, 3, 0.1])
-        # fast_bdt_options.append([100, 8, 3, 0.1])
+        fast_bdt_options.append([50, 8, 3, 0.1])
+        fast_bdt_options.append([100, 8, 3, 0.1])
         fast_bdt_options.append([200, 8, 3, 0.1])
 
         experiment_numbers = b2luigi.get_setting("experiment_numbers")
@@ -963,10 +963,10 @@ class MainTask(b2luigi.WrapperTask):
                 experiment_numbers, fast_bdt_options, fast_bdt_options
         ):
 
-            state_filter_cuts = [0.05]  # , 0.1, 0.2]
-            n_best_states_list = [3]  # , 5, 10]
-            result_filter_cuts = [0.05]  # , 0.1, 0.2]
-            n_best_results_list = [3]  # , 5, 10]
+            state_filter_cuts = [0.05, 0.1, 0.2]
+            n_best_states_list = [3, 5, 10]
+            result_filter_cuts = [0.05, 0.1, 0.2]
+            n_best_results_list = [3, 5, 10]
             for state_filter_cut in state_filter_cuts:
                 for n_best_states in n_best_states_list:
                     for result_filter_cut in result_filter_cuts:

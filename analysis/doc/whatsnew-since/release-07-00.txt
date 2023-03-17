@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2303-iriomote
+------------------------------------------------------
+Modules
++++++++
+* Fixed a bug on the `EventShapeCalculator` and `modularAnalysis.buildEventShape` that provide meaningless values on the
+  event-shape variables introduced in the ``light-2302-genetta``.
+
+
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 

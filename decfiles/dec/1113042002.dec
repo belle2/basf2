@@ -9,7 +9,7 @@
 # Responsible: Vismaya
 # Email: ph20resch11010@iith.ac.in
 # Cuts: None
-# Date: 17/03/23
+# Date: 18/03/23
 
 #
 # Aliases
@@ -59,7 +59,6 @@ CDecay D0sig
 Decay pi0sig
 1.0000 gamma gamma PHSP;
 Enddecay
-CDecay pi0sig
 
 End
                                                                                                                                                                      35,1          All

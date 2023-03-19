@@ -94,14 +94,17 @@ void PIDNeuralNetworkParametersCreatorModule::initialize()
     isValid = false;
   }
 
-  for (auto const& [index, _] : m_handleMissingInputs) {
+  for (auto const& index_value : m_handleMissingInputs) {
+    const auto [index, _] = index_value;
     if (index >= nInputs) {
       std::cout << "Index " << index << " of handleMissingInputs out of range!" << std::endl;
       isValid = false;
     }
   }
 
-  for (auto const& [inputSetIndex, inputCutIndex, _, _2, _3] : m_inputsToCut) {
+  for (auto const& inputToCut : m_inputsToCut) {
+    const size_t inputSetIndex = std::get<0>(inputToCut);
+    const size_t inputCutIndex = std::get<1>(inputToCut);
     if (inputSetIndex >= nInputs) {
       std::cout << "inputSetIndex " << inputSetIndex << " of handleMissingInputs out of range!" << std::endl;
       isValid = false;

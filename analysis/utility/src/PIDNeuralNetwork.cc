@@ -35,8 +35,8 @@ double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
 
   // apply cuts, ie. overwrite certain input values with index `inputSetIndex` with the value `setValue`
   // if the input with index `inputCutIndex` is in the range (`rangeStart`, `rangeEnd`)
-  for (auto const& [inputSetIndex, inputCutIndex, rangeStart, rangeEnd,
-                                   setValue] : (*m_pidNeuralNetworkParametersDB)->getInputsToCut()) {
+  for (auto const& inputToCut : (*m_pidNeuralNetworkParametersDB)->getInputsToCut()) {
+    const auto [inputSetIndex, inputCutIndex, rangeStart, rangeEnd, setValue] = inputToCut;
     if (!std::isnan(rangeStart) and !std::isnan(rangeEnd)) {
       if (input[inputCutIndex] >= rangeStart and input[inputCutIndex] <= rangeEnd)
         input[inputSetIndex] = setValue;
@@ -57,7 +57,10 @@ double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
   }
 
   // handle missing information
-  for (auto const& [index, value] : (*m_pidNeuralNetworkParametersDB)->getHandleMissingInputs()) {
+  for (auto const& index_value : (*m_pidNeuralNetworkParametersDB)->getHandleMissingInputs()) {
+    const auto [index, value] = index_value;
+    // const size_t index = index_value[0];
+    // const float value = index_value[1];
     if (std::isnan(input[index])) input[index] = value;
   }
 

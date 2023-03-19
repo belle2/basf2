@@ -33,14 +33,13 @@ namespace Belle2 {
 
     std::string m_neuralNetworkParametersName;  /**< Name of the set of parameters */
 
-    // see PIDNeuralNetwork.h for an explanation of these parameters
-    std::vector<std::string> m_inputNames;
-    std::string m_modelDefinition;
-    std::vector<int> m_outputSpeciesPdg;
-    std::vector<float> m_meanValues;
-    std::vector<float> m_standardDeviations;
-    PIDNNMissingInputs m_handleMissingInputs;
-    PIDNNInputsToCut m_inputsToCut;
+    std::vector<std::string> m_inputNames;     /**< list if input names*/
+    std::string m_modelDefinition;             /**< neural network string for frugaly-deep*/
+    std::vector<int> m_outputSpeciesPdg;       /**< PDG codes of hypotheses of neural-network output*/
+    std::vector<float> m_meanValues;           /**< mean values of inputs*/
+    std::vector<float> m_standardDeviations;   /**< standard deviations of inputs*/
+    PIDNNMissingInputs m_handleMissingInputs;  /**< handling of NaN inputs*/
+    PIDNNInputsToCut m_inputsToCut;            /**< overwrite certain input variables*/
 
     int m_experimentLow; /**< Lowest valid experiment # */
     int m_experimentHigh; /**< Highest valid experiment # */

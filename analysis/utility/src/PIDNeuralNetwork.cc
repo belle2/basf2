@@ -8,6 +8,8 @@
 
 #include <analysis/utility/PIDNeuralNetwork.h>
 
+#include <cmath>
+
 
 using namespace Belle2;
 
@@ -35,13 +37,13 @@ double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
   // if the input with index `inputCutIndex` is in the range (`rangeStart`, `rangeEnd`)
   for (auto const& [inputSetIndex, inputCutIndex, rangeStart, rangeEnd,
                                    setValue] : (*m_pidNeuralNetworkParametersDB)->getInputsToCut()) {
-    if (!isnan(rangeStart) and !isnan(rangeEnd)) {
+    if (!std::isnan(rangeStart) and !std::isnan(rangeEnd)) {
       if (input[inputCutIndex] >= rangeStart and input[inputCutIndex] <= rangeEnd)
         input[inputSetIndex] = setValue;
-    } else if (!isnan(rangeStart)) {
+    } else if (!std::isnan(rangeStart)) {
       if (input[inputCutIndex] >= rangeStart)
         input[inputSetIndex] = setValue;
-    } else if (!isnan(rangeEnd)) {
+    } else if (!std::isnan(rangeEnd)) {
       if (input[inputCutIndex] <= rangeEnd)
         input[inputSetIndex] = setValue;
     }
@@ -56,7 +58,7 @@ double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
 
   // handle missing information
   for (auto const& [index, value] : (*m_pidNeuralNetworkParametersDB)->getHandleMissingInputs()) {
-    if (isnan(input[index])) input[index] = value;
+    if (std::isnan(input[index])) input[index] = value;
   }
 
   // apply neural network

@@ -657,9 +657,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     # Combine segments with axial tracks
     path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.74},
+                    segmentTrackFilterParameters={"cut": 0.74, 'DBPayloadName': 'SegmentTrackFilterParameters'},
                     trackFilter="mva",
-                    trackFilterParameters={"cut": 0.1})
+                    trackFilterParameters={"cut": 0.1, 'DBPayloadName': 'TrackFilterParameters'})
 
     output_tracks = "CDCTrackVector"
 

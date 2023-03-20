@@ -53,3 +53,17 @@ if __name__ == "__main__":
                                              (1002, 0, 1002, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
     write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
                                              (1003, 0, 1003, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
+
+    write_tracking_mva_filter_payloads_to_db("SegmentTrackFilterParameters",
+                                             (0,    0,    0, -1), "trackfindingcdc_SegmentTrackFilter", 0.74)
+    write_tracking_mva_filter_payloads_to_db("SegmentTrackFilterParameters",
+                                             (1002, 0, 1002, -1), "trackfindingcdc_SegmentTrackFilter", 0.74)
+    write_tracking_mva_filter_payloads_to_db("SegmentTrackFilterParameters",
+                                             (1003, 0, 1003, -1), "trackfindingcdc_SegmentTrackFilter", 0.74)
+
+    write_tracking_mva_filter_payloads_to_db("TrackFilterParameters",
+                                             (0,    0,    0, -1), "trackfindingcdc_TrackFilter", 0.1)
+    write_tracking_mva_filter_payloads_to_db("TrackFilterParameters",
+                                             (1002, 0, 1002, -1), "trackfindingcdc_TrackFilter", 0.1)
+    write_tracking_mva_filter_payloads_to_db("TrackFilterParameters",
+                                             (1003, 0, 1003, -1), "trackfindingcdc_TrackFilter", 0.1)

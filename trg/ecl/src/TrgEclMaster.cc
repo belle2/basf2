@@ -1299,7 +1299,6 @@ TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId,
   int _n2GeV117 = 0;
   int _n1GeV415 = 0;
   int _n1GeV2316 = 0;
-  int _n1GeV117 = 0;
   int _nClust216 = 0;
   int _n500MeV216 = 0;
   int _n500MeV611 = 0;
@@ -1325,7 +1324,6 @@ TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId,
     if (clusterenergy[ic] * 100 > thresh * m_LowMultiThreshold[0]) { // 100 MeV
       if (thetaid >= 4 && thetaid <= 15) {_n1GeV415++;}
       if (thetaid == 2 || thetaid == 3 || thetaid == 16) {_n1GeV2316++;}
-      if (thetaid == 1 || thetaid == 17) {_n1GeV117++;}
     }
   }
   //---------------------------------------------------------------------

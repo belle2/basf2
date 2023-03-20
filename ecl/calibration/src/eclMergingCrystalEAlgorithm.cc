@@ -5,12 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/calibration/eclMergingCrystalEAlgorithm.h>
+
+/* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include "TH1F.h"
-#include "TString.h"
-#include "TFile.h"
-#include "TDirectory.h"
+
+/* ROOT headers. */
+#include <TDirectory.h>
+#include <TFile.h>
+#include <TH1F.h>
+#include <TString.h>
 
 using namespace std;
 using namespace Belle2;

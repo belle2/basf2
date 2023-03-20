@@ -8,10 +8,17 @@
 
 #pragma once
 
-#include <cassert>
-#include <vector>
-#include <utility>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* ROOT headers. */
 #include <TObject.h>
+
+/* C++ headers. */
+#include <array>
+#include <cassert>
+#include <utility>
+#include <vector>
 
 namespace Belle2 {
 
@@ -219,7 +226,7 @@ namespace Belle2 {
   class ECLLookupTable : public TObject {
   public:
     /** Constructor */
-    ECLLookupTable() : m_content(8736, 0) {}
+    ECLLookupTable() : m_content(ECLElementNumbers::c_NCrystals, 0) {}
 
     /** Array-like access operator */
     unsigned int operator[](unsigned int key) const

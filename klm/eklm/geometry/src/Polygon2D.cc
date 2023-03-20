@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/eklm/geometry/Polygon2D.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/RandomNumbers.h>
 
 using namespace Belle2;

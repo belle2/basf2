@@ -5,7 +5,7 @@
 # Reponsible: J. Skorupa
 # Email: jskorupa@mpp.mpg.de
 # Tested: No 
-# PhysicsWG: BToHadrnoic
+# PhysicsWG: BHADRONIC
 # Cuts: None
 # Date: 15/03/2023
 #
@@ -19,7 +19,6 @@ Decay B0sig
 0.5  b_1+ pi-	SVS;
 0.5  b_1- pi+	SVS;
 Enddecay
-
 CDecay anti-B0sig
 ###
 ###

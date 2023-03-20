@@ -17,14 +17,14 @@ def write_tracking_mva_filter_payloads_to_db(dbobj_name: str = None,
                                              weightfile_identifier: str = None,
                                              cut_value: float = None):
     """
-    This function creates a database entry for the DBObject dbobj for MVA weightfiles with a given set of IoVs etc.
-    :param dbobj DBObject type that should be created
+    This function creates a database entry for a DBObject for MVA weightfiles with a given set of IoVs etc.
     :param dbobj_name Name of the DBObject to identify it in the DB
     :param iovList List of IoVs for which the payload is valid
     :param weightfile_identifier Name of the weightfile which already is on the DB
     :param cut_value Cut value
     """
 
+    # Create the DBObject
     dbobj = Belle2.TrackingMVAFilterParameters()
     # Just a small sanity check for a valid IoV (expLow, runLow, expHigh, runHigh) and valid parameters
     if (dbobj_name is None) or \

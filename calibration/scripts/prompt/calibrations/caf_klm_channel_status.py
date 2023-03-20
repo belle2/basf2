@@ -31,7 +31,7 @@ from prompt.utils import events_in_basf2_file
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name='KLM channel status',
-    expert_username='zhai',
+    expert_username='sayan97',
     description=__doc__,
     input_data_formats=['raw'],
     input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],

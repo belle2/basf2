@@ -115,8 +115,8 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     }
     Bz = Bz / 10.; // In SI-Units
 
-    const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack);
-    const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(recoTrack);
+    const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack, trackRep);
+    const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(recoTrack, trackRep);
 
     const auto newTrackFitResult = trackFitResults.appendNew(
                                      ROOT::Math::XYZVector(poca), ROOT::Math::XYZVector(dirInPoca), cov, charge, particleType, pValue, Bz,
@@ -147,7 +147,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 }
 
 
-uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
+uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation)
 {
   HitPatternVXD hitPatternVXD;
 
@@ -159,7 +159,7 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo();
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
 
       if (kalmanInfo) {
         const double weight = kalmanInfo->getWeights().at(measurementId);
@@ -204,7 +204,7 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
 }
 
 
-uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack)
+uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation)
 {
   HitPatternCDC hitPatternCDC;
 
@@ -218,7 +218,7 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack)
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo();
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
 
       if (kalmanInfo) {
         const double weight = kalmanInfo->getWeights().at(measurementId);

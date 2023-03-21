@@ -2,10 +2,9 @@ Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------
 Modules
 +++++++
-
 * Fixed a bug in the `EventShapeCalculator` module and `modularAnalysis.buildEventShape` that was introduced in
   ``light-2302-genetta``. Meaningless values were provided for the event-shape variables.
-
+* Fixed a bug on the `findMCDecay` that creates duplicated particles which differ only in the order of their daughters.
 
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------

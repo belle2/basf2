@@ -14,7 +14,7 @@ variables:
   # The BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
 
 default:
-  image: belle2/externals-ubuntu2004:v01-10-02
+  image: gitlab.desy.de:5555/belle2/software/basf2/externals-ubuntu2004:v01-10-02
   tags:
     - extagent8
   cache:

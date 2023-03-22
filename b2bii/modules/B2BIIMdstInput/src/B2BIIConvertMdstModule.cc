@@ -1876,19 +1876,17 @@ double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster
 
   // get cluster info
   const int reg = eclCluster->getDetectorRegion();
-  double eclClusterR_surface(999.);
+  double eclClusterR_surface = m_extRadius / sin(eclCluster->getTheta());
   if (reg == 1) {eclClusterR_surface = m_extZFWD / cos(eclCluster->getTheta());}
   else if (reg == 3) {eclClusterR_surface = m_extZBWD / cos(eclCluster->getTheta());}
-  else {eclClusterR_surface = m_extRadius / sin(eclCluster->getTheta());}
 
   ROOT::Math::XYZVector eclCluster_surface_position(0, 0, 0);
   VectorUtil::setMagThetaPhi(eclCluster_surface_position, eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
-  //eclCluster_surface_position.SetMagThetaPhi(eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
 
   for (const auto& track : m_tracks) {
     const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::ChargedStable(Const::pion));
-    //const TrackFitResult* trackFit = track.getTrackFitResult(Const::ChargedStable(Const::pion));
 
+    if (trackFit == NULL) {continue;}
     // get the track parameters
     const double z0        = trackFit->getZ0();
     const double tanlambda = trackFit->getTanLambda();
@@ -1910,12 +1908,10 @@ double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster
 
     B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
 
-    double helixExtR_surface(999.);
-
     ROOT::Math::XYZVector ext_helix = h.getPositionAtArcLength2D(l);
-    if (l == lHelixRadius) {helixExtR_surface = m_extRadius / sin(ext_helix.Theta());}
-    else if (l == lFWD) {helixExtR_surface = m_extZFWD / cos(ext_helix.Theta());}
-    else if (l == lBWD) {helixExtR_surface = m_extZBWD / cos(ext_helix.Theta());}
+    double helixExtR_surface = m_extRadius / sin(ext_helix.Theta());
+    if (l == lFWD) { helixExtR_surface = m_extZFWD / cos(ext_helix.Theta());}
+    else if (l == lBWD) { helixExtR_surface = m_extZBWD / cos(ext_helix.Theta());}
 
     ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
     VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());

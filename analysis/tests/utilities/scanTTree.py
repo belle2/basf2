@@ -16,10 +16,9 @@ def scanTTree(filename):
     print(f"TFile: {filename}")
 
     # get lists of TTree in the filename
-    ttrees = [key for key in tfile.GetListOfKeys() if key.GetClassName() == "TTree"]
+    ttrees = [key.GetName() for key in tfile.GetListOfKeys() if key.GetClassName() == "TTree"]
 
-    for ttree_key in ttrees:
-        ttree_name = ttree_key.GetName()
+    for ttree_name in ttrees:
         print(f"TTree: {ttree_name}")
 
         # get TTree object

@@ -293,7 +293,7 @@ namespace TreeFitter {
     double z1, z2;
     bool first = true;
     int ibest = 0;
-    const int nturnsmax = 100; // Max number of turns we try backwards and forwards
+    const int nturnsmax = 10; // Max number of turns we try backwards and forwards
 
     // Loop on all xy-plane solutions
     for (int i = 0; i < nsolutions; ++i) {

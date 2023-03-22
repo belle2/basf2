@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/dbobjects/eklm/EKLMGeometry.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -341,7 +341,7 @@ EKLMGeometry::getSegmentSupportPosition(int plane, int support) const
   m_ElementNumbers->checkPlane(plane);
   checkSegmentSupport(support);
   return &m_SegmentSupportPosition[(plane - 1) * (m_NSegments + 1) +
-                                   support - 1];
+                                               support - 1];
 }
 
 const EKLMGeometry::ElementPosition*

@@ -13,7 +13,7 @@
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 

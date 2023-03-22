@@ -44,23 +44,6 @@ namespace TreeFitter {
     }
   }
 
-  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
-    m_particle(particle),
-    m_mother(mother),
-    m_isStronglyDecayingResonance(false),
-    m_config(nullptr),
-    m_index(0),
-    m_name("Unknown")
-  {
-    if (particle) {
-      m_isStronglyDecayingResonance = isAResonance(particle);
-      const int pdgcode = particle->getPDGCode();
-      if (pdgcode) { // PDG code != 0
-        m_name = particle->getName();
-      }
-    }
-  }
-
   ParticleBase::ParticleBase(const std::string& name) :
     m_particle(nullptr),
     m_mother(nullptr),

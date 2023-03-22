@@ -1960,7 +1960,6 @@ double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster
 
     ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
     VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
-    //helixExt_surface_position.SetMagThetaPhi(helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
 
     double distance = (eclCluster_surface_position - helixExt_surface_position).R();
     if (distance < minDist) {minDist = distance;}

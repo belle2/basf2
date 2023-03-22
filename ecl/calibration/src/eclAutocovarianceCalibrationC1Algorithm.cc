@@ -30,7 +30,7 @@ eclAutocovarianceCalibrationC1Algorithm::eclAutocovarianceCalibrationC1Algorithm
     "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
   );
 
-  m_lowestEnergyFraction = 0.75;
+  m_lowestEnergyFraction = 0.5;
 }
 
 CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate()

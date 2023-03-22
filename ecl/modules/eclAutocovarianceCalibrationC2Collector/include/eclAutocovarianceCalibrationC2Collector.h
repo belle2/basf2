@@ -19,7 +19,6 @@
 
 namespace Belle2 {
 
-  class ECLDigit;
   class ECLDsp;
   class ECLCrystalCalib;
 
@@ -42,16 +41,15 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold; /**< peak to peak noise threshold computed from step C1 */
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
 
-    float myHist[8736][32];
+    float myHist[8736][32];  /**< container for histogram values  */
 
-    TH2F* m_BaselineInfoVsCrysID;
+    TH2F* m_BaselineInfoVsCrysID; /**< final histogram returned by collector  */
 
   };
 } // end Belle2 namespace

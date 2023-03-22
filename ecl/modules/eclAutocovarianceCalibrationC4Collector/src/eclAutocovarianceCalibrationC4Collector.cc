@@ -16,7 +16,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 //ECL
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
@@ -38,7 +37,7 @@ eclAutocovarianceCalibrationC4CollectorModule::eclAutocovarianceCalibrationC4Col
   m_ECLAutocovarianceCalibrationC3Autocovariances("ECLAutocovarianceCalibrationC3Autocovariances")
 {
   // Set module properties
-  setDescription("Module to export histogram of noise in waveforms from random trigger events");
+  setDescription("Module to test covariance matrix calibrations using waveforms from random trigger events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -58,28 +57,23 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
 
   m_eclDsps.registerInDataStore();
-  m_eclDigits.registerInDataStore();
 
   constexpr int N = 31;
   std::vector<double> buf(N);
 
-  m_NoiseMatrix.resize(8736);
+  m_NoiseMatrix.resize(ECLElementNumbers::c_NCrystals);
 
-  for (int id = 0; id < 8736; id++) {
+  for (int id = 0; id < ECLElementNumbers::c_NCrystals; id++) {
     m_ECLAutocovarianceCalibrationC3Autocovariances->getAutoCovariance(id + 1, buf.data());
     m_NoiseMatrix[id].ResizeTo(31, 31);
     for (int i = 0; i < 31; i++) {
       for (int j = 0; j < 31; j++) {
         m_NoiseMatrix[id](i, j) = buf[abs(i - j)];
-        //B2INFO(m_NoiseMatrix[id](i, j));
       }
     }
     TDecompChol dc(m_NoiseMatrix[id]);
     bool InvertStatus = dc.Invert(m_NoiseMatrix[id]);
 
-    //m_NoiseMatrix[id].Print();
-
-    //B2INFO("InvertStatus "<<InvertStatus);
     if (InvertStatus == 0) {
       B2INFO("Invert Failed for " << id);
     }
@@ -94,25 +88,15 @@ void eclAutocovarianceCalibrationC4CollectorModule::collect()
 
   const int NumDsp = m_eclDsps.getEntries();
 
-  //Random Trigger Event
-  if (NumDsp == 8736) {
+  //Random Trigger Events have waveform for each crystal
+  if (NumDsp == ECLElementNumbers::c_NCrystals) {
 
     for (auto& aECLDsp : m_eclDsps) {
 
       const int id = aECLDsp.getCellId() - 1;
 
-      int minADC = aECLDsp.getDspA()[0];
-      int maxADC = minADC;
-
-      for (int i = 1; i < 31; i++) {
-
-        int value = aECLDsp.getDspA()[i];
-        if (value < minADC) minADC = value;
-        if (value > maxADC) maxADC = value;
-
-      }
-
-      int PeakToPeak = maxADC - minADC;
+      //Peak to peak amplitude used to gauge noise level
+      float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
       if (PeakToPeak < m_PeakToPeakThresholds[id]) {
 
@@ -139,7 +123,7 @@ void eclAutocovarianceCalibrationC4CollectorModule::collect()
 
 void eclAutocovarianceCalibrationC4CollectorModule::closeRun()
 {
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     for (int j = 0; j < 1000; j++) {
       getObjectPtr<TH2>("Chi2VsCrysID")->SetBinContent(i + 1, j + 1, Chi2VsCrysID->GetBinContent(i + 1, j + 1));
     }

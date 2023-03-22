@@ -14,7 +14,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 //ECL
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
@@ -35,14 +34,12 @@ eclAutocovarianceCalibrationC3CollectorModule::eclAutocovarianceCalibrationC3Col
   m_ECLAutocovarianceCalibrationC2Baseline("ECLAutocovarianceCalibrationC2Baseline")
 {
   // Set module properties
-  setDescription("Module to export histogram of noise in waveforms from random trigger events");
+  setDescription("Module to compute covarience matrix using waveforms from random trigger events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 {
-
-  count = 0;
 
   /**----------------------------------------------------------------------------------------*/
   B2INFO("eclAutocovarianceCalibrationC3Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
@@ -50,7 +47,8 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  CovarianceMatrixInfoVsCrysID = new TH2F("CovarianceMatrixInfoVsCrysID", "", 8736, 0, 8736, 32, 0, 32);
+  CovarianceMatrixInfoVsCrysID = new TH2F("CovarianceMatrixInfoVsCrysID", "", ECLElementNumbers::c_NCrystals, 0,
+                                          ECLElementNumbers::c_NCrystals, 32, 0, 32);
   registerObject<TH2F>("CovarianceMatrixInfoVsCrysID", CovarianceMatrixInfoVsCrysID);
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
@@ -58,9 +56,8 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
 
   m_eclDsps.registerInDataStore();
-  m_eclDigits.registerInDataStore();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     for (int j = 0; j < 32; j++) myHist[i][j] = 0.0;
 
@@ -73,27 +70,15 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
 
   const int NumDsp = m_eclDsps.getEntries();
 
-  //Random Trigger Event
-  //if (NumDsp == 8736 and count<100) {
-  if (NumDsp == 8736) {
+  //Random Trigger Events have waveform for each crystal
+  if (NumDsp == ECLElementNumbers::c_NCrystals) {
 
     for (auto& aECLDsp : m_eclDsps) {
 
       const int id = aECLDsp.getCellId() - 1;
 
-      int minADC = aECLDsp.getDspA()[0];
-      int maxADC = minADC;
-
-      for (int i = 1; i < 31; i++) {
-
-        int value = aECLDsp.getDspA()[i];
-        if (value < minADC) minADC = value;
-        if (value > maxADC) maxADC = value;
-
-      }
-
-      int PeakToPeak = maxADC - minADC;
-
+      //Peak to peak amplitude used to gauge noise level
+      float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
       if (PeakToPeak < m_PeakToPeakThresholds[id]) {
 
@@ -119,8 +104,6 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
     }
   }
 
-  count++;
-  if (count % 10 == 0) std::cout << count << std::endl;;
 }
 
 void eclAutocovarianceCalibrationC3CollectorModule::closeRun()

@@ -22,7 +22,6 @@
 
 namespace Belle2 {
 
-  class ECLDigit;
   class ECLDsp;
   class ECLCrystalCalib;
   class ECLAutoCovariance;
@@ -46,7 +45,6 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 

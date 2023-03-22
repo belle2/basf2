@@ -184,6 +184,24 @@ namespace Belle2 {
       return m_DspAVector;
     }
 
+    /*! Compute maximum peak to peak value
+     * @return maximum peak to peak value
+     */
+    int computePeaktoPeakAmp() const
+    {
+      int minADC = m_DspAVector[0];
+      int maxADC = minADC;
+      for (unsigned int i = 1; i < m_DspAVector.size(); i++) {
+
+        int value = m_DspAVector[i];
+        if (value < minADC) minADC = value;
+        if (value > maxADC) maxADC = value;
+
+      }
+
+      return (maxADC - minADC);
+    }
+
     /*! Get number of ADC points
      * @return number of ADC points
      */
@@ -218,7 +236,8 @@ namespace Belle2 {
     /** 4 Add diode and pile-up photon offline fit hypothesis*/
     /** 5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
     /** 6 removed IsData member */
-    ClassDef(ECLDsp, 6);
+    /** 7 Added computePeaktoPeakAmp function*/
+    ClassDef(ECLDsp, 7);
 
   };
 

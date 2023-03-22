@@ -13,7 +13,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 //ECL
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
@@ -33,7 +32,7 @@ eclAutocovarianceCalibrationC2CollectorModule::eclAutocovarianceCalibrationC2Col
   m_ECLAutocovarianceCalibrationC1Threshold("ECLAutocovarianceCalibrationC1Threshold")
 {
   // Set module properties
-  setDescription("Module to export histogram of noise in waveforms from random trigger events");
+  setDescription("Module to export histogram corresponding to sum of waveforms from random trigger events. Used to compute baseline");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -46,13 +45,14 @@ void eclAutocovarianceCalibrationC2CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  m_BaselineInfoVsCrysID = new TH2F("BaselineInfoVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)", 8736, 0, 8736,
+  m_BaselineInfoVsCrysID = new TH2F("BaselineInfoVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)",
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals,
                                     32, 0, 32);
   registerObject<TH2F>("m_BaselineInfoVsCrysID", m_BaselineInfoVsCrysID);
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     for (int j = 0; j < 32; j++) myHist[i][j] = 0.0;
 
@@ -60,7 +60,6 @@ void eclAutocovarianceCalibrationC2CollectorModule::prepare()
   }
 
   m_eclDsps.registerInDataStore();
-  m_eclDigits.registerInDataStore();
 
 }
 
@@ -70,28 +69,20 @@ void eclAutocovarianceCalibrationC2CollectorModule::collect()
 
   const int NumDsp = m_eclDsps.getEntries();
 
-  //Random Trigger Event
-  if (NumDsp == 8736) {
+  //Random Trigger Events have waveform for each crystal
+  if (NumDsp == ECLElementNumbers::c_NCrystals) {
 
     for (auto& aECLDsp : m_eclDsps) {
 
       const int id = aECLDsp.getCellId() - 1;
 
-      int minADC = aECLDsp.getDspA()[0];
-      int maxADC = minADC;
-
-      for (int i = 1; i < 31; i++) {
-
-        int value = aECLDsp.getDspA()[i];
-        if (value < minADC) minADC = value;
-        if (value > maxADC) maxADC = value;
-
-      }
-
-      int PeakToPeak = maxADC - minADC;
+      //Peak to peak amplitude used to gauge noise level
+      float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
       if (PeakToPeak < m_PeakToPeakThresholds[id]) {
+
         for (int i = 0; i < 31; i++) myHist[id][i] += aECLDsp.getDspA()[i];
+
         myHist[id][31]++;
 
       }
@@ -104,7 +95,7 @@ void eclAutocovarianceCalibrationC2CollectorModule::closeRun()
 {
   for (int i = 0; i < 8736; i++) {
     for (int j = 0; j < 32; j++) {
-      getObjectPtr<TH2>("m_BaselineInfoVsCrysID")->SetBinContent(i + 1, j + 1, myHist[i][j]); //m_BaselineInfoVsCrysID->Fill(i,j,0));
+      getObjectPtr<TH2>("m_BaselineInfoVsCrysID")->SetBinContent(i + 1, j + 1, myHist[i][j]);
       B2INFO(i << " " << j << " " << getObjectPtr<TH2>("m_BaselineInfoVsCrysID")->GetBinContent(i + 1, j + 1));
     }
   }

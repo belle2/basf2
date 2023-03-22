@@ -19,7 +19,6 @@
 
 namespace Belle2 {
 
-  class ECLDigit;
   class ECLDsp;
   class ECLCrystalCalib;
 
@@ -38,11 +37,11 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
+    /** Transfer fom array container to ROOT histogram */
     void closeRun() override;
 
   private:
 
-    StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
@@ -51,10 +50,9 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline;
     std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
     std::vector<float> m_tempArray; /**< vector of thresholds obtained from DB object */
-    TH2F* CovarianceMatrixInfoVsCrysID;
-    int count;
+    TH2F* CovarianceMatrixInfoVsCrysID;  /**< result returned by collector that contains the coveriance matrix for each crystal  */
 
-    float myHist[8736][32];
+    float myHist[8736][32]; /**< container for coveriance matrix  */
 
   };
 } // end Belle2 namespace

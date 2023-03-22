@@ -20,10 +20,9 @@
 
 namespace Belle2 {
 
-  class ECLDigit;
   class ECLDsp;
 
-  /** Calibration collector module that uses delayed Bhabha to compute coveriance matrix */
+  /** Calibration collector module to estimate noise level of delayed Bhabha waveforms. First step to use delayed Bhabha to compute coveriance matrix */
   class eclAutocovarianceCalibrationC1CollectorModule : public CalibrationCollectorModule {
 
   public:
@@ -42,11 +41,11 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
+
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    TH2F* PPVsCrysID;
+    TH2F* PPVsCrysID; /**< histogram of Cell ID vs. Peak to Peak amplitude*/
 
   };
 } // end Belle2 namespace

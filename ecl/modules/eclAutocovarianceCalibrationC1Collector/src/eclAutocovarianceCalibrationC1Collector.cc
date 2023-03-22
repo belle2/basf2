@@ -32,7 +32,7 @@ REG_MODULE(eclAutocovarianceCalibrationC1Collector)
 eclAutocovarianceCalibrationC1CollectorModule::eclAutocovarianceCalibrationC1CollectorModule()
 {
   // Set module properties
-  setDescription("Module to export histogram of noise in waveforms from random trigger events");
+  setDescription("Module to export histogram of noise level of ECL waveforms in random trigger events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -45,42 +45,31 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)", 8736, 0,
-                        8736, 2000, 0, 2000);
+  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)",
+                        ECLElementNumbers::c_NCrystals, 0,
+                        ECLElementNumbers::c_NCrystals, 2000, 0, 2000);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);
 
   m_eclDsps.registerInDataStore();
-  m_eclDigits.registerInDataStore();
 }
+
 
 
 void eclAutocovarianceCalibrationC1CollectorModule::collect()
 {
 
+  //Checking how many waveforms saved in event
   const int NumDsp = m_eclDsps.getEntries();
 
-  //Random Trigger Event
-  if (NumDsp == 8736) {
-    //if (NumDsp >0) {
+  //Random Trigger Events have waveform for each crystal
+  if (NumDsp == ECLElementNumbers::c_NCrystals) {
 
     for (auto& aECLDsp : m_eclDsps) {
 
       const int id = aECLDsp.getCellId() - 1;
 
-      int minADC = aECLDsp.getDspA()[0];
-      int maxADC = minADC;
-
-      for (int i = 1; i < 31; i++) {
-
-        int value = aECLDsp.getDspA()[i];
-        if (value < minADC) minADC = value;
-        if (value > maxADC) maxADC = value;
-
-      }
-
-      float PeakToPeak = maxADC - minADC;
-
-      //B2INFO(PeakToPeak<<" "<<PeakToPeakf);
+      //Peak to peak amplitude used to gauge noise level
+      float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
       PPVsCrysID->Fill(id, PeakToPeak);
 
@@ -90,7 +79,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::collect()
 
 void eclAutocovarianceCalibrationC1CollectorModule::closeRun()
 {
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     for (int j = 0; j < 2000; j++) {
       getObjectPtr<TH2>("PPVsCrysID")->SetBinContent(i + 1, j + 1, PPVsCrysID->GetBinContent(i + 1, j + 1));
     }

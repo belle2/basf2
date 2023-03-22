@@ -16,14 +16,14 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.0  f_0sig f_0sig        PHSP;
+1.0  f_0 f_0        PHSP;
 Enddecay
 CDecay anti-B0sig
 
-Decay f_0sig
+Decay f_0
 1.0  pi+ pi-    PHSP;
 Enddecay
-CDecay anti-f_0sig
+CDecay anti-f_0
 ###
 ###
 ###

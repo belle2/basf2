@@ -365,17 +365,6 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  void inline setExtraInfo(Belle2::Particle* part, const std::string& name, const double value)
-  {
-    if (part) {
-      if (part->hasExtraInfo(name)) {
-        part->setExtraInfo(name, value);
-      } else {
-        part->addExtraInfo(name, value);
-      }
-    }
-  }
-
   ErrCode ParticleBase::projectMassConstraintDaughters(const FitParams& fitparams,
                                                        Projection& p) const
   {

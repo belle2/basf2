@@ -23,12 +23,10 @@ CDecay anti-B0sig
 Decay rho0
 1.0  pi+ pi-	VSS;
 Enddecay
-CDecay anti-rho0
 
 Decay f_0
 1.0  pi+ pi-    PHSP;
 Enddecay
-CDecay anti-f_0
 ###
 ###
 ###

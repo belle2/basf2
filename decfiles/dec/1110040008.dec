@@ -23,7 +23,6 @@ CDecay anti-B0sig
 Decay f_0
 1.0  pi+ pi-    PHSP;
 Enddecay
-CDecay anti-f_0
 ###
 ###
 ###

@@ -16,7 +16,7 @@ import unittest
 import glob
 from basf2 import find_file
 from b2test_utils import clean_working_directory, configure_logging_for_tests
-from utilities.scanTTree import scanTTree
+from b2test_utils_analysis import scanTTree
 
 
 class TutorialsTest(unittest.TestCase):

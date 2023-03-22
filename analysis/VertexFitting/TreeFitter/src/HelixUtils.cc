@@ -14,6 +14,10 @@
 
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
+#include <algorithm>
+#include <initializer_list>
+#include <vector>
+
 namespace TreeFitter {
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
@@ -229,7 +233,7 @@ namespace TreeFitter {
     const double r_1 = 1 / omega_1 ;
     const double r_2 = 1 / omega_2 ;
 
-    // First look at the transverse plane, where the helix projection is a circle
+    // 1) First look at the transverse plane, where the helix projection is a circle
     // Coordinates of the centers of the circles
     const double x0_1 = (r_1 + d0_1) * sin(phi0_1) ;
     const double y0_1 = -(r_1 + d0_1) * cos(phi0_1) ;
@@ -289,36 +293,68 @@ namespace TreeFitter {
       y2[i] = -r_2 * cos(phi2[i]) + y0_2 ;
     }
 
-    // Find the best solution for z by running multiples of 2pi from the xy intersection(s)
+    // 2) Find the best solution for z by running multiples of 2pi from the xy intersection(s)
     double z1, z2;
     bool first = true;
     int ibest = 0;
-    const int ncirc = 10; // TODO This is the number of rotations we try, and can be improved
+    const int nturnsmax = 100; // Max number of turns we try backwards and forwards
 
+    // Loop on all xy-plane solutions
     for (int i = 0; i < nsolutions; ++i) {
       const double l1 = helix1.getArcLength2DAtXY(x1[i], y1[i]);
       const double l2 = helix2.getArcLength2DAtXY(x2[i], y2[i]);
 
-      for (int n1 = 1 - ncirc; n1 <= 1 + ncirc ; ++n1) {
-        const double tmpz1 = helix1.getPositionAtArcLength2D(l1 + n1 * TMath::TwoPi() / omega_1).Z();
-        if (n1 != 0 && fabs(tmpz1) > 100)
-          continue; // Skip points outside the detector, but try at least one
-
-        for (int n2 = 1 - ncirc ; n2 <= 1 + ncirc; ++n2) {
-          const double tmpz2 = helix1.getPositionAtArcLength2D(l2 + n2 * TMath::TwoPi() / omega_2).Z();
-          if (n2 != 0 && fabs(tmpz2) > 100)
-            continue; // Skip points outside the detector, but try at least one
-
-          // Keep the solution where the z distance of closest approach is minimum
-          if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
-            ibest = i ;
-            first = false ;
-            z1 = tmpz1 ;
-            z2 = tmpz2 ;
-            flt1 = l1 / cosdip_1 ; // TODO Is this correct?
-            flt2 = l2 / cosdip_2 ; // TODO Is this correct?
+      // Loop on helix1 turns, save corresponding z positions
+      std::vector<double> z1s;
+      for (int n1 = 0; n1 <= nturnsmax; ++n1) {
+        bool added = false;
+        // Try forwards and backwards
+        for (int sn1 : {n1, -n1}) {
+          const double tmpz1 = helix1.getPositionAtArcLength2D(l1 + sn1 * TMath::TwoPi() / omega_1).Z();
+          if (sn1 == 0 || (-82 <= tmpz1 && tmpz1 <= 158)) {
+            // Only keep the 0th turn and those inside CDC volume
+            z1s.push_back(tmpz1);
+            added = true;
           }
+          if (sn1 == 0)
+            break; // Do not store 0th turn twice
         }
+        // If we did not add any point we are already outside CDC volume both backwards and forwards
+        if (!added)
+          break;
+      }
+
+      // Loop on helix2 turns, find closest approach to one of helix1 points
+      for (int n2 = 0; n2 <= nturnsmax; ++n2) {
+        bool tried = false;
+        // Try forwards and backwards
+        for (int sn2 : {n2, -n2}) {
+          const double tmpz2 = helix2.getPositionAtArcLength2D(l2 + sn2 * TMath::TwoPi() / omega_2).Z();
+          if (sn2 == 0 || (-82 <= tmpz2 && tmpz2 <= 158)) {
+            // Only keep the 0th turn and those inside CDC volume
+            tried = true;
+            // Find the tmpz1 closest to tmpz2
+            const auto i1best = std::min_element(
+            z1s.cbegin(), z1s.cend(), [&tmpz2](const double & z1a, const double & z1b) {
+              return fabs(z1a - tmpz2) < fabs(z1b - tmpz2);
+            });
+            const double tmpz1 = *i1best;
+            // Keep the solution where the z distance of closest approach is minimum
+            if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
+              ibest = i;
+              first = false;
+              z1 = tmpz1;
+              z2 = tmpz2;
+              flt1 = l1 / cosdip_1; // TODO Is this what is supposed to end up in m_flt?
+              flt2 = l2 / cosdip_2; // TODO Is this what is supposed to end up in m_flt?
+            }
+          }
+          if (n2 == 0)
+            break; // Do not try 0th turn twice
+        }
+        // If we did not try any point we are already outside CDC volume both backwards and forwards
+        if (!tried)
+          break;
       }
     }
 

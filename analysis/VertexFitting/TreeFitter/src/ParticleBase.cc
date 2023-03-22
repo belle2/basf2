@@ -13,7 +13,7 @@
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
-#include <analysis/VertexFitting/TreeFitter/RecoComposite.h>
+#include <analysis/VertexFitting/TreeFitter/Composite.h>
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 
@@ -125,7 +125,7 @@ namespace TreeFitter {
       rc = new InternalParticle(particle, nullptr, config, forceFitAll);
     } else if (particle->hasExtraInfo("bremsCorrected") // Has Bremsstrahlungs-recovery
                && particle->getExtraInfo("bremsCorrected") != 0) { // No gammas assigned -> simple track
-      rc = new RecoComposite(particle, mother, config, true);
+      rc = new Composite(particle, mother, config, true);
     } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")
                && particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) { // dummy particles with invisible flag
       rc = new RecoResonance(particle, mother, config);

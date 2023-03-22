@@ -29,7 +29,7 @@ namespace TreeFitter {
     /** particle types  */
     enum TFParticleType {kInteractionPoint,
                          kOrigin,
-                         kRecoComposite,
+                         kComposite,
                          kRecoResonance,
                          kInternalParticle,
                          kRecoTrack,

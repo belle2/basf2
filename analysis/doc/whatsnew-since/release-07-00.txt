@@ -1,3 +1,12 @@
+Changes in the analysis package in light-2303-iriomote
+------------------------------------------------------
+Modules
++++++++
+
+* Fixed a bug in the `EventShapeCalculator` module and `modularAnalysis.buildEventShape` that was introduced in
+  ``light-2302-genetta``. Meaningless values were provided for the event-shape variables.
+
+
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 
@@ -70,8 +79,6 @@ Modules
 * New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
   The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available both in the
   ``for_each`` loop over the ROEs (e.g. ``roe_path``) and the main path if the signal side ParticleList has only one candidate.
-* Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its
-  momentum.
 * Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle, a DNN trained with ECLCluster variables for discrimination of
   anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to
   0.

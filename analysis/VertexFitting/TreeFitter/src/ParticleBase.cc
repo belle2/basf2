@@ -121,65 +121,27 @@ namespace TreeFitter {
   {
     ParticleBase* rc = nullptr;
 
-    if (!mother) { // 'head of tree' particles
-      if (!particle->getMdstArrayIndex()) { //0 means it's a composite
-        rc = new InternalParticle(particle, nullptr, config, forceFitAll);
-
-      } else {
-
-        rc = new InternalParticle(particle, nullptr, config,
-                                  forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
-
-      }
-    } else if (particle->hasExtraInfo("bremsCorrected")) { // Has Bremsstrahlungs-recovery
-      if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> simple track
-        rc = new RecoTrack(particle, mother);
-      } else { // Got gammas -> composite particle
-        rc = new RecoComposite(particle, mother, config, true);
-      }
+    if (!mother) { // If there is no mother, this is the 'head of tree' particle (is never a resonance)
+      rc = new InternalParticle(particle, nullptr, config, forceFitAll);
+    } else if (particle->hasExtraInfo("bremsCorrected") // Has Bremsstrahlungs-recovery
+               && particle->getExtraInfo("bremsCorrected") != 0) { // No gammas assigned -> simple track
+      rc = new RecoComposite(particle, mother, config, true);
     } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")
                && particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) { // dummy particles with invisible flag
       rc = new RecoResonance(particle, mother, config);
-
-    } else if (particle->getMdstArrayIndex() ||
-               particle->getTrack() ||
-               particle->getECLCluster() ||
-               particle->getKLMCluster()) { // external particles and final states
-      if (particle->getTrack()) {
-        rc = new RecoTrack(particle, mother);
-      } else if (particle->getECLCluster()) {
-        rc = new RecoPhoton(particle, mother);
-
-      } else if (particle->getKLMCluster()) {
-        rc = new RecoKlong(particle, mother);
-
-      } else if (isAResonance(particle)) {
-        rc = new RecoResonance(particle, mother, config);
-
-      }  else {
-        rc = new InternalParticle(particle, mother, config, forceFitAll);
-
-      }
-
+    } else if (particle->getTrack()) { // external reconstructed track
+      rc = new RecoTrack(particle, mother);
+    } else if (particle->getECLCluster()) { // external reconstructed photon
+      rc = new RecoPhoton(particle, mother);
+    } else if (particle->getKLMCluster()) { // external reconstructed klong
+      rc = new RecoKlong(particle, mother);
+    } else if (particle->getMdstArrayIndex()) { // external composite e.g. V0
+      rc = new InternalParticle(particle, mother, config, forceFitAll);
     } else { // 'internal' particles
-
-      if (false) {   // fitted composites //JFK::eventually implement prefitting mechanic to prefit composites with other fitters
-        if (isAResonance(particle)) {
-
-          rc = new RecoResonance(particle, mother, config);
-
-        } else {
-          rc = new RecoComposite(particle, mother, config);
-        }
-
-      } else {         // unfitted composites
-
-        if (isAResonance(particle)) {
-          rc = new Resonance(particle, mother, config, forceFitAll);
-
-        } else {
-          rc = new InternalParticle(particle, mother, config, forceFitAll);
-        }
+      if (isAResonance(particle)) {
+        rc = new Resonance(particle, mother, config, forceFitAll);
+      } else {
+        rc = new InternalParticle(particle, mother, config, forceFitAll);
       }
     }
     return rc;

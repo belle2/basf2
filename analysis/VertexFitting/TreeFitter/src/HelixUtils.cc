@@ -220,14 +220,10 @@ namespace TreeFitter {
     const double d0_1     = helix1.getD0();
     const double phi0_1   = helix1.getPhi0();
     const double omega_1  = helix1.getOmega();
-    const double tandip_1 = helix1.getTanLambda();
-    const double cosdip_1 = 1.0 / hypot(1.0, tandip_1);
 
     const double d0_2     = helix2.getD0();
     const double phi0_2   = helix2.getPhi0();
     const double omega_2  = helix2.getOmega();
-    const double tandip_2 = helix2.getTanLambda();
-    const double cosdip_2 = 1.0 / hypot(1.0, tandip_2);
 
     // These radii have a sign, like omega (negative for negative charge)
     const double r_1 = 1 / omega_1 ;
@@ -345,8 +341,8 @@ namespace TreeFitter {
               first = false;
               z1 = tmpz1;
               z2 = tmpz2;
-              flt1 = l1 / cosdip_1; // TODO Is this what is supposed to end up in m_flt?
-              flt2 = l2 / cosdip_2; // TODO Is this what is supposed to end up in m_flt?
+              flt1 = l1;
+              flt2 = l2;
             }
           }
           if (n2 == 0)

@@ -316,9 +316,9 @@ class StateRecordingTask(Basf2PathTask):
     def requires(self):
         yield SplitNMergeSimTask(
             bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            experiment_number=self.experiment_number,
             random_seed=self.random_seed,
             n_events=self.n_events,
-            experiment_number=self.experiment_number,
         )
 
     def create_state_recording_path(self, layer, records1_fname, records2_fname, records3_fname):
@@ -327,6 +327,7 @@ class StateRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -425,7 +426,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(
         #: \cond
-        hashed=True, default=[200, 8, 3, 0.1]
+        hashed=True, default=[50, 8, 3, 0.1]
         #: \endcond
     )
     #: Number of the filter for which the records files are to be processed
@@ -498,7 +499,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         """
         Generate list of luigi Tasks that this Task depends on.
         """
-        for layer in [3, 4, 5, 6, 7]:
+        for layer in [3, 4, 5, 6]:  # , 7]:
             yield self.clone(
                 StateRecordingTask,
                 experiment_number=self.experiment_number,
@@ -547,7 +548,7 @@ class ResultRecordingTask(Basf2PathTask):
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(
         #: \cond
-        hashed=True, default=[200, 8, 3, 0.1]
+        hashed=True, default=[50, 8, 3, 0.1]
         #: \endcond
     )
     #: Name of the records file for training the final result filter
@@ -559,9 +560,9 @@ class ResultRecordingTask(Basf2PathTask):
     def requires(self):
         yield SplitNMergeSimTask(
             bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            experiment_number=self.experiment_number,
             random_seed=self.random_seed,
             n_events=self.n_events,
-            experiment_number=self.experiment_number,
         )
         filter_numbers = [1, 2, 3]
         for filter_number in filter_numbers:
@@ -571,6 +572,7 @@ class ResultRecordingTask(Basf2PathTask):
                 random_seed=self.random_seed,
                 n_events=self.n_events,
                 filter_number=filter_number,
+                fast_bdt_option=self.fast_bdt_option
             )
 
     def create_result_recording_path(self, result_filter_records_name):
@@ -579,7 +581,7 @@ class ResultRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if ".root" in x]
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -676,7 +678,13 @@ class CKFResultFilterTeacherTask(Basf2Task):
     #: Number of events to generate for the training data set.
     n_events = b2luigi.IntParameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[50, 8, 3, 0.1]
+        #: \endcond
+    )
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option_result_filter = b2luigi.ListParameter(
         #: \cond
         hashed=True, default=[200, 8, 3, 0.1]
         #: \endcond
@@ -713,9 +721,10 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Generate list of luigi Tasks that this Task depends on.
         """
         yield ResultRecordingTask(
-                n_events=self.n_events,
                 experiment_number=self.experiment_number,
                 random_seed=self.random_seed,
+                n_events=self.n_events,
+                fast_bdt_option=self.fast_bdt_option_state_filter,
                 result_filter_records_name=self.result_filter_records_name,
         )
 
@@ -744,7 +753,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
             weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
-            fast_bdt_option=self.fast_bdt_option,
+            fast_bdt_option=self.fast_bdt_option_result_filter,
         )
 
 
@@ -783,11 +792,13 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             f"cdc_to_svd_spacepoint_ckf_validation{fbdt_state_filter_string}{fbdt_result_filter_string}.root")
 
     def requires(self):
+        fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         yield CKFResultFilterTeacherTask(
-            result_filter_records_name="filter_records.root",
+            result_filter_records_name=f"filter_records{fbdt_state_filter_string}.root",
             experiment_number=self.experiment_number,
             n_events=self.n_events_training,
-            fast_bdt_option=self.fast_bdt_option_result_filter,
+            fast_bdt_option_state_filter=self.fast_bdt_option_state_filter,
+            fast_bdt_option_result_filter=self.fast_bdt_option_result_filter,
             random_seed='training'
         )
         yield SplitNMergeSimTask(
@@ -813,7 +824,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if ("optimisation" in x and ".root" in x)]
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "optimisation" in x and ".root" in x)]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")

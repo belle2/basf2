@@ -10,17 +10,18 @@
 # Date: 15/03/2023
 #
 #
+Alias rho0sig rho0
 #
 Decay Upsilon(4S)
 1.0     B0sig anti-B0sig B0 anti-B0                     VSS_BMIX dm;
 Enddecay
 
 Decay B0sig
-1.0  rho0 pi+ pi-          PHSP;
+1.0  rho0sig pi+ pi-          PHSP;
 Enddecay
 CDecay anti-B0sig
 
-Decay rho0
+Decay rho0sig
 1.0  pi+ pi-    VSS;
 Enddecay
 ###

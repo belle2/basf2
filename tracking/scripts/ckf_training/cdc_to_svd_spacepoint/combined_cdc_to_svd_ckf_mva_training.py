@@ -354,8 +354,6 @@ class StateRecordingTask(Basf2PathTask):
                         inputRecoTrackStoreArrayName="CDCRecoTracks",
                         outputRecoTrackStoreArrayName="VXDRecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
-                        hitFilter="sensor",
-                        seedFilter="distance",
 
                         relationCheckForDirection="backward",
                         reverseSeed=False,
@@ -614,8 +612,6 @@ class ResultRecordingTask(Basf2PathTask):
                         inputRecoTrackStoreArrayName="CDCRecoTracks",
                         outputRecoTrackStoreArrayName="VXDRecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
-                        hitFilter="sensor",
-                        seedFilter="distance",
 
                         relationCheckForDirection="backward",
                         reverseSeed=False,
@@ -841,9 +837,6 @@ class ValidationAndOptimisationTask(Basf2PathTask):
                         inputRecoTrackStoreArrayName="CDCRecoTracks",
                         outputRecoTrackStoreArrayName="VXDRecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
-
-                        hitFilter="sensor",
-                        seedFilter="distance",
 
                         relationCheckForDirection="backward",
                         reverseSeed=False,

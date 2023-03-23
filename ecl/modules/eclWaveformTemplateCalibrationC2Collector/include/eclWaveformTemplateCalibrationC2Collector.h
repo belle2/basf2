@@ -52,6 +52,8 @@ namespace Belle2 {
 
     double m_MinEnergyThreshold;
     double m_MaxEnergyThreshold;
+    int m_MinCellID;
+    int m_MaxCellID;
     std::vector<float> m_MaxVarX;
 
     /** Crystal electronics. */

@@ -36,6 +36,8 @@ eclWaveformTemplateCalibrationC2CollectorModule::eclWaveformTemplateCalibrationC
   setDescription("Module to export histogram of noise in waveforms from random trigger events");
   addParam("MinEnergyThreshold", m_MinEnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 2.0);
   addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 4.0);
+  addParam("MinCellID", m_MinCellID, "", 0);
+  addParam("MaxCellID", m_MaxCellID, "", 0);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -114,6 +116,9 @@ void eclWaveformTemplateCalibrationC2CollectorModule::collect()
 
     const int id = aECLDsp.getCellId() - 1;
 
+    if ((id + 1) < m_MinCellID)  continue;
+    if ((id + 1) > m_MaxCellID)  continue;
+
     //setting relation of eclDSP to aECLDigit
     const ECLDigit* d = nullptr;
     for (const auto& aECLDigit : m_eclDigits) {
@@ -133,6 +138,12 @@ void eclWaveformTemplateCalibrationC2CollectorModule::collect()
     float baseline = 0.0;
     for (int i = 0; i < m_baselineLimit; i++) baseline += aECLDsp.getDspA()[i];
     baseline /= ((float) m_baselineLimit);
+
+    bool skipWaveform = false;
+    for (int i = 0; i < 31; i++) {
+      if (aECLDsp.getDspA()[i] < 10) skipWaveform = true;
+    }
+    if (skipWaveform) continue;
 
     std::vector<float> baselineSubtracted(m_baselineLimit);
     for (int i = 0; i < m_baselineLimit; i++) baselineSubtracted[i] = (aECLDsp.getDspA()[i] - baseline);

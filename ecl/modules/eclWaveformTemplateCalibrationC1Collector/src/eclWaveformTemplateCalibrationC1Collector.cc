@@ -53,7 +53,6 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
   m_eclDsps.registerInDataStore();
   m_eclDigits.registerInDataStore();
 
-
   m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);
   if (m_CrystalElectronics.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
@@ -63,7 +62,6 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
   }
-
 
 }
 

@@ -30,7 +30,7 @@ eclWaveformTemplateCalibrationC1Algorithm::eclWaveformTemplateCalibrationC1Algor
     "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
   );
 
-  m_lowestEnergyFraction = 0.1;
+  m_lowestEnergyFraction = 0.2;
 }
 
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibrate()

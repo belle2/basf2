@@ -68,21 +68,35 @@ def get_calibrations(input_data, **kwargs):
 
     cal_ecl_Wave_C1.pre_collector_path = gamma_gamma_pre_path
 
-    # ..Algorithm
-    algo_C2 = Belle2.ECL.eclWaveformTemplateCalibrationC2Algorithm()
+    calibrations_C2 = []
+    algos_C2 = []
+    collectors_C2 = []
 
-    # ..The calibration
-    collector_C2 = basf2.register_module("eclWaveformTemplateCalibrationC2Collector")
+    for i in range(0, 88):
 
-    cal_ecl_Wave_C2 = Calibration("ecl_Wave_C2",
-                                  collector=collector_C2,
-                                  algorithms=[algo_C2],
-                                  input_files=input_files,
-                                  )
+        lowLimit = (100*i)+1
+        highLimit = (100*(i+1))
 
-    cal_ecl_Wave_C2.pre_collector_path = gamma_gamma_pre_path
+        if(highLimit > 8736):
+            highLimit = 8736
 
-    cal_ecl_Wave_C2.depends_on(cal_ecl_Wave_C1)
+        # print(lowLimit,highLimit)
+
+        # ..Algorithm
+        algos_C2.append(Belle2.ECL.eclWaveformTemplateCalibrationC2Algorithm())
+        algos_C2[-1].setFirstCellID(lowLimit)
+        algos_C2[-1].setLastCellID(highLimit)
+
+        collectors_C2.append(basf2.register_module("eclWaveformTemplateCalibrationC2Collector"))
+        collectors_C2[-1].pre_collector_path = gamma_gamma_pre_path
+        collectors_C2[-1].param('MinCellID', lowLimit)
+        collectors_C2[-1].param('MaxCellID', highLimit)
+
+        # ..The calibration
+        calibrations_C2.append(Calibration("ecl_Wave_C2_"+str(lowLimit)+"_"+str(highLimit),
+                               collector=collectors_C2[-1], algorithms=[algos_C2[-1]], input_files=input_files))
+        calibrations_C2[-1].pre_collector_path = gamma_gamma_pre_path
+        calibrations_C2[-1].depends_on(cal_ecl_Wave_C1)
 
     # --------------------------------------------------------------
     # ..Force the output iovs to be open
@@ -90,9 +104,11 @@ def get_calibrations(input_data, **kwargs):
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     for algorithm in cal_ecl_Wave_C1.algorithms:
         algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal_ecl_Wave_C2.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+    for C2 in calibrations_C2:
+        for algorithm in C2.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
 
     # --------------------------------------------------------------
     # ..Return the calibrations
-    return [cal_ecl_Wave_C1, cal_ecl_Wave_C2]
+    calList = [cal_ecl_Wave_C1] + calibrations_C2
+    return calList

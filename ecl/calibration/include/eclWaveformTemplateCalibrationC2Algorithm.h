@@ -10,9 +10,11 @@
 
 /* ECL headers. */
 #include <ecl/calibration/eclWaveformTemplateCalibrationC2Algorithm.h>
+#include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -45,6 +47,9 @@ namespace Belle2 {
       /** Getter for m_lowestEnergyFraction */
       float getLowestEnergyFraction() {return m_lowestEnergyFraction;}
 
+      void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
+      void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
+
     protected:
 
       /**..Run algorithm on events */
@@ -55,7 +60,11 @@ namespace Belle2 {
       std::string m_outputName = "eclWaveformTemplateCalibrationC2Algorithm.root"; /**< file name for histogram output */
       int m_minEntries = 1000;  /**<  Minimum entries to fit a crystal */
       float m_lowestEnergyFraction; /**<  m_lowestEnergyFraction */
+      int m_firstCellID;
+      int m_lastCellID;
 
+      /** Waveform parameters. */
+      DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;
     };
   }
 } // namespace Belle2

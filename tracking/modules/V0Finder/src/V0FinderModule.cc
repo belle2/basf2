@@ -58,7 +58,7 @@ V0FinderModule::V0FinderModule() : Module()
            1.);
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
-           "Maximum chi² for the vertex fit (NDF = 1)", 10000.);
+           "Maximum chi^2 for the vertex fit (NDF = 1)", 10000.);
 
   addParam("invMassRangeKshort", m_invMassRangeKshort,
            "mass range in GeV for reconstructed Kshort after removing material effects and inner hits", m_invMassRangeKshort);
@@ -82,6 +82,10 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("massRangeLambda", m_preFilterMassRangeLambda,
            "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
            " (to be chosen loosely as used momenta ignore material effects)", m_preFilterMassRangeLambda);
+  addParam("precutRho", m_precutRho, "preselection cut on the transverse radius of the point-of-closest-approach of track pair. "
+           "Set value to 0 to accept all.", 0.5);
+  addParam("precutCosAlpha", m_precutCosAlpha, "preselection cut on the cosine of opening angle between two tracks. "
+           "Those above this cut are always accepted.", 0.9);
 }
 
 
@@ -159,6 +163,9 @@ void V0FinderModule::event()
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
+
+      if (not isTrackPairSelected(trackPlus, trackMinus)) continue;
+
       bool isForceStored, isHitRemoved;
       try {
         if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) {
@@ -255,4 +262,37 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
   bool in_range = candmass_max2 > *range_m2_min and candmass_min2 < *range_m2_max;
 
   return in_range;
+}
+
+
+bool V0FinderModule::isTrackPairSelected(const Track* trk1, const Track* trk2)
+{
+  if (m_precutRho <= 0) return true;
+
+  auto* fit1 = trk1->getTrackFitResultWithClosestMass(Belle2::Const::pion);
+  if (not fit1) return false;
+  auto r1 = fit1->getPosition();
+  auto k1 = fit1->getMomentum().Unit();
+
+  auto* fit2 = trk2->getTrackFitResultWithClosestMass(Belle2::Const::pion);
+  if (not fit2) return false;
+  auto r2 = fit2->getPosition();
+  auto k2 = fit2->getMomentum().Unit();
+
+  double cosAlpha = k1.Dot(k2);  // cosine of opening angle between two tracks
+  if (cosAlpha > m_precutCosAlpha) return true;
+
+  double D = cosAlpha * cosAlpha - 1;
+  if (D == 0) return true;
+
+  auto dr = r2 - r1;
+  double b1 = dr.Dot(k1);
+  double b2 = dr.Dot(k2);
+  double lam1 = (-b1 + b2 * cosAlpha) / D;
+  double lam2 = (b2 - b1 * cosAlpha) / D;
+  auto rr1 = r1 + k1 * lam1;
+  auto rr2 = r2 + k2 * lam2;
+  auto r = (rr1 + rr2) / 2;  // POCA of two tracks
+
+  return r.Rho() > m_precutRho;
 }

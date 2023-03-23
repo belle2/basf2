@@ -87,6 +87,18 @@ namespace Belle2 {
     /// Default range set to nominal Lambda mass +/- 0.03
     std::tuple<double, double> m_preFilterMassRangeLambda = { Const::Lambda.getMass() - 0.03, Const::Lambda.getMass() + 0.03 };
 
+    double m_precutRho;      ///< preselection cut on transverse radius of the track pair POCA
+    double m_precutCosAlpha; ///< preselection cut on opening angle of the track pair
+
+    /**
+     * Track pair preselection based on a point-of-closest-approach of two tracks.
+     * Tracks are approximated with staright lines using their perigee parameters.
+     * @param trk1 first track
+     * @param trk2 second track
+     * @return true, if preselection criteria are satisfied.
+     */
+    bool isTrackPairSelected(const Track* trk1, const Track* trk2);
+
     /** helper function that gets the approximate mass range for the two given tracks and rejects candidates which
       do not fall into a user given mass range for lambda and Kshort.
       @param trackPlus: the track for the positively charged candidate
@@ -94,6 +106,7 @@ namespace Belle2 {
       @param v0Hypothesis: the hypothesis for the V0 (Lambda, or Kshort, for all others nothing happens)
     */
     bool preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+
     // buffer some variables to speed up time, actual values will be calculated at initialization
     double m_mKshortMin2 = 0; ///< pre-calculated mininum Kshort mass squared
     double m_mKshortMax2 = 0; ///< pre-calculated maximum Kshort mass squared

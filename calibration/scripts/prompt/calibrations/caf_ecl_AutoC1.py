@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""ECL single crystal energy calibration using three control samples."""
+"""ECL ECLAutoCovariance calibration."""
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
@@ -18,11 +18,11 @@ settings = CalibrationSettings(
     name="ecl_AutoC1",
     expert_username="longos",
     description=__doc__,
-    input_data_formats=["cdst"],
-    input_data_names=["gamma_gamma_calib"],
+    input_data_formats=["raw"],
+    input_data_names=["delayedbhabha"],
     input_data_filters={
-        "gamma_gamma_calib": [
-            INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
+        "delayedbhabha": [
+            INPUT_DATA_FILTERS["Data Tag"]["delayedbhabha"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
@@ -45,12 +45,11 @@ def get_calibrations(input_data, **kwargs):
     # ..gamma gamma
 
     # ..Input data
-    file_to_iov_gamma_gamma = input_data["gamma_gamma_calib"]
+    file_to_iov_gamma_gamma = input_data["delayedbhabha"]
     input_files = list(file_to_iov_gamma_gamma.keys())
 
     # ..Algorithm
     algo_C1 = Belle2.ECL.eclAutocovarianceCalibrationC1Algorithm()
-    # algo_gamma_gamma.setOutputName("eclGammaGammaE_algorithm.root")
 
     # ..The calibration
     collector_C1 = basf2.register_module("eclAutocovarianceCalibrationC1Collector")

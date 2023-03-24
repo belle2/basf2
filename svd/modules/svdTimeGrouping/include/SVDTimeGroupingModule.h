@@ -21,7 +21,7 @@
 namespace Belle2 {
 
 
-  /*! typedef to be used to store Gauss paramerers (integral, center, sigma) */
+  /*! typedef to be used to store Gauss parameters (integral, center, sigma) */
   typedef std::tuple<double, double, double> GroupInfo;
 
 
@@ -113,13 +113,13 @@ namespace Belle2 {
      */
     void createAndFillHistorgram(TH1D& hist);
 
-    /** Find Gaussian compoments in a Histogram
+    /** Find Gaussian components in a Histogram
      *
      * 1. Highest peak is found
      * 2. It is fitted in a given range
-     * 3. Fit paramter is stored
+     * 3. Fit parameters are stored
      * 4. Gaus peak is removed from histogram
-     * 5. Process is repeated until a few criterias are met.
+     * 5. Process is repeated until a few criteria are met.
      */
     void searchGausPeaksInHistogram(TH1D& hist, std::vector<GroupInfo>& groupInfoVector);
 

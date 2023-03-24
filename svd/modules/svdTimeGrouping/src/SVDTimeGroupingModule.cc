@@ -126,7 +126,7 @@ void SVDTimeGroupingModule::event()
 
   // now we search for peaks and when we find one we remove it from the distribution, one by one.
 
-  std::vector<GroupInfo> groupInfoVector; // Gauss paramerers (integral, center, sigma)
+  std::vector<GroupInfo> groupInfoVector; // Gauss parameters (integral, center, sigma)
 
   // performing the search
   searchGausPeaksInHistogram(h_clsTime, groupInfoVector);

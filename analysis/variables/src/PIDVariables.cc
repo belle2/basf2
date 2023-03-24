@@ -1019,37 +1019,43 @@ namespace Belle2 {
     Manager::FunctionPtr electronIDNN(std::vector<std::string> arguments)
     {
       arguments.insert(arguments.begin(), "11");
-      return pidNeuralNetworkValueExpert(arguments);
+      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
+      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
     }
 
     Manager::FunctionPtr muonIDNN(std::vector<std::string> arguments)
     {
       arguments.insert(arguments.begin(), "13");
-      return pidNeuralNetworkValueExpert(arguments);
+      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
+      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
     }
 
     Manager::FunctionPtr pionIDNN(std::vector<std::string> arguments)
     {
       arguments.insert(arguments.begin(), "211");
-      return pidNeuralNetworkValueExpert(arguments);
+      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
+      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
     }
 
     Manager::FunctionPtr kaonIDNN(std::vector<std::string> arguments)
     {
       arguments.insert(arguments.begin(), "321");
-      return pidNeuralNetworkValueExpert(arguments);
+      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
+      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
     }
 
     Manager::FunctionPtr protonIDNN(std::vector<std::string> arguments)
     {
       arguments.insert(arguments.begin(), "2212");
-      return pidNeuralNetworkValueExpert(arguments);
+      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
+      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
     }
 
     Manager::FunctionPtr deuteronIDNN(std::vector<std::string> arguments)
     {
       arguments.insert(arguments.begin(), "1000010020");
-      return pidNeuralNetworkValueExpert(arguments);
+      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
+      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
     }
 
 

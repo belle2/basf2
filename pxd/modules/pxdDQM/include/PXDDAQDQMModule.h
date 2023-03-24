@@ -45,7 +45,7 @@ namespace Belle2 {
       /** Input array for SVD/x-check HLT EODB . */
       StoreArray<RawSVD> m_rawSVD;
 
-      /** Output object for TTD mdst object */
+      /** Object for TTD mdst object */
       StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
       /** the geometry */

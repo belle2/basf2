@@ -46,7 +46,7 @@ namespace Belle2 {
       bool m_createMaxHist{false};///< create max hits histogram, not multi processing save!!
       bool m_createGateHist{false};///< create per gate hits 2d histogram
 
-      /** Output object for TTD mdst object */
+      /** Object for TTD mdst object */
       StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
       /** Input array for PXD Raw Hits. */

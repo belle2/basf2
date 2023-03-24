@@ -45,7 +45,7 @@ namespace Belle2 {
       int m_chargeCut; /**< minimum charge cut in ADU */
       int m_chargeCutHigh; /**< minimum charge cut for second set of histograms in ADU */
 
-      /** Output object for TTD mdst object */
+      /** Object for TTD mdst object */
       StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
       /** Input array for PXD Raw Hits. */

@@ -35,7 +35,7 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
-      /** Output object for TTD mdst object */
+      /** Object for TTD mdst object */
       StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
       /** Input array for DAQ Status. */

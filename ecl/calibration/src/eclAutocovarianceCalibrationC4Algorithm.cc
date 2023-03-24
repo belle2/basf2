@@ -30,7 +30,7 @@ eclAutocovarianceCalibrationC4Algorithm::eclAutocovarianceCalibrationC4Algorithm
   CalibrationAlgorithm("eclAutocovarianceCalibrationC4Collector")
 {
   setDescription(
-    "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
+    "Perform validation of coveriance matrix calibration"
   );
 }
 
@@ -44,7 +44,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
   int m_CountLimit = 1000;
 
   ///**-----------------------------------------------------------------------------------------------*/
-  ///** Histograms containing the data collected by eclGammaGammaECollectorModule */
+  ///** Histograms containing the data collected by eclAutocovarianceCalibrationC4Collector */
   auto Chi2VsCrysID = getObjectPtr<TH2F>("Chi2VsCrysID");
 
   std::vector<double> cryIDs;
@@ -63,14 +63,12 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
              totalCounts << " " << m_CountLimit);
     }
 
-    //float mean = hChi2->GetMean();
+    float mean = hChi2->GetMean();
 
     cryIDs.push_back(crysID + 1);
-    means.push_back(hChi2->GetMean());
+    means.push_back(mean);
     RMSs.push_back(hChi2->GetRMS());
     counts.push_back(totalCounts);
-
-    //B2INFO("eclAutocovarianceCalibrationC4Algorithm: crysID mean "<<crysID<<" "<<mean);
 
   }
 
@@ -85,6 +83,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
   auto gCountsVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), counts.data());
   gCountsVsCrysID->SetName("gCountsVsCrysID");
   gCountsVsCrysID->SetMarkerStyle(20);
+
   /** Write out the basic histograms in all cases */
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
@@ -92,11 +91,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
   gRMSVsCrysID->Write();
   gCountsVsCrysID->Write();
   Chi2VsCrysID->Write();
-
-
-  //ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  //PPThreshold->setCalibVector(cryIDs, baselines);
-  //saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC4Baseline");
 
   return c_OK;
 }

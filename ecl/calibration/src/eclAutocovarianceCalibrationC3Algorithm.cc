@@ -46,7 +46,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   int m_CountLimit = 1000;
 
   ///**-----------------------------------------------------------------------------------------------*/
-  ///** Histograms containing the data collected by eclGammaGammaECollectorModule */
+  ///** Histogram containing the data collected by eclAutocovarianceCalibrationC3Collector*/
   auto CovarianceMatrixInfoVsCrysID = getObjectPtr<TH2F>("CovarianceMatrixInfoVsCrysID");
 
   ECLAutoCovariance* Autocovariances = new ECLAutoCovariance();
@@ -59,8 +59,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
       B2INFO("eclAutocovarianceCalibrationC3Algorithm: Warning Below Count Limit: crysID totalCounts m_CountLimit: " << crysID << " " <<
              totalCounts << " " << m_CountLimit);
     }
-
-    //B2INFO("CEKCK: "<<CovarianceMatrixInfoVsCrysID->GetBinContent(crysID + 1,1));
 
     TMatrixDSym NoiseMatrix;
     NoiseMatrix.ResizeTo(31, 31);
@@ -77,8 +75,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
     for (int i = 0; i < 31; i++) tempAutoCov[i] = NoiseMatrix(0, i);
     Autocovariances->setAutoCovariance(crysID + 1, tempAutoCov);
 
-    //NoiseMatrix.Print();
-
     TDecompChol dc(NoiseMatrix);
     bool InvertStatus = dc.Invert(NoiseMatrix);
     if (InvertStatus == false)  B2INFO("eclAutocovarianceCalibrationC3Algorithm crysID InvertStatus [0][0] totalCounts: " << crysID <<
@@ -86,18 +82,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
 
   }
 
+  /** Saving Calibration Results */
   saveCalibration(Autocovariances, "ECLAutocovarianceCalibrationC3Autocovariances");
-
-  /** Write out the basic histograms in all cases */
-  //TString fName = m_outputName;
-  //TFile* histfile = new TFile(fName, "recreate");
-
-  //CovarianceMatrixInfoVsCrysID->Write();
-  //gBaselineVsCrysID->Write();
-
-  //ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  //PPThreshold->setCalibVector(cryIDs, baselines);
-  //saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC3Baseline");
 
   return c_OK;
 }

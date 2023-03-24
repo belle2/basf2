@@ -16,7 +16,7 @@
 /* ROOT headers. */
 #include <TFile.h>
 #include <TGraph.h>
-#include <TH2I.h>
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -27,7 +27,7 @@ eclAutocovarianceCalibrationC2Algorithm::eclAutocovarianceCalibrationC2Algorithm
   CalibrationAlgorithm("eclAutocovarianceCalibrationC2Collector")
 {
   setDescription(
-    "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
+    "Determine baseline for waveforms to be used in computing the coveriance matrix"
   );
 }
 
@@ -56,7 +56,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
     baseline /= 31.0;
     baseline /= totalCounts;
 
-    B2INFO(crysID << " baseline: " << baseline);
+    B2INFO("crysID " << crysID << " baseline: " << baseline);
 
     cryIDs.push_back(crysID + 1);
     baselines.push_back(baseline);
@@ -68,13 +68,14 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
   auto gBaselineVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), baselines.data());
   gBaselineVsCrysID->SetName("gBaselineVsCrysID");
 
-  /** Write out the basic histograms in all cases */
+  /** Write out the baseline results */
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
 
   m_BaselineInfoVsCrysID->Write();
   gBaselineVsCrysID->Write();
 
+  /** Saving baseline results to db for access in stage C3 */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
   PPThreshold->setCalibVector(baselines, cryIDs);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC2Baseline");

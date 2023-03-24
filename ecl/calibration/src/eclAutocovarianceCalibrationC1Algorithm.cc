@@ -27,10 +27,8 @@ eclAutocovarianceCalibrationC1Algorithm::eclAutocovarianceCalibrationC1Algorithm
   CalibrationAlgorithm("eclAutocovarianceCalibrationC1Collector")
 {
   setDescription(
-    "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
+    "Determine noise threshold for waveforms to be used in computing the coveriance matrix"
   );
-
-  m_lowestEnergyFraction = 0.5;
 }
 
 CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate()
@@ -40,7 +38,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   gROOT->SetBatch();
 
   /**-----------------------------------------------------------------------------------------------*/
-  /** Histograms containing the data collected by eclGammaGammaECollectorModule */
+  /** Histograms containing the data collected by eclAutocovarianceCalibrationC1Collector*/
   auto PPVsCrysID = getObjectPtr<TH2F>("PPVsCrysID");
 
   std::vector<float> cryIDs;
@@ -66,55 +64,25 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
     B2INFO("eclAutocovarianceCalibrationC1Algorithm: crysID counter fraction Total " << crysID << " " << counter << " " << fraction <<
            " " << Total);
+
+    if (Total < 100)  B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries is only: " << Total);
   }
 
+  /** Write out the noise threshold vs Crystal ID*/
   auto gPPVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), PPamps.data());
   gPPVsCrysID->SetName("gPPVsCrysID");
 
-  /** Write out the basic histograms in all cases */
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
-
-  //histfile->cd();
   PPVsCrysID->Write();
   gPPVsCrysID->Write();
-  //histfile->Close();
 
+  /**-----------------------------------------------------------------------------------------------*/
+  /** Write output to DB if requested and successful */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
   PPThreshold->setCalibVector(PPamps, cryIDs);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC1Threshold");
   B2INFO("eclAutocovarianceCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
-//
-//  /**-----------------------------------------------------------------------------------------------*/
-//  /** Write output to DB if requested and successful */
-//  //bool DBsuccess = false;
-//  //if (m_storeConst == 0 || (m_storeConst == 1 && allFitsOK)) {
-//  //  DBsuccess = true;
-//  //  /** Store expected energies */
-//  //  std::vector<float> tempE;
-//  //  std::vector<float> tempUnc;
-//  //  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
-//  //    tempE.push_back(ExpEnergyperCrys->GetBinContent(crysID + 1));
-//  //    tempUnc.push_back(ExpEnergyperCrys->GetBinError(crysID + 1));
-//  //  }
-//  //  ECLCrystalCalib* ExpectedE = new ECLCrystalCalib();
-//  //  ExpectedE->setCalibVector(tempE, tempUnc);
-//  //  saveCalibration(ExpectedE, "ECLExpGammaGammaE");
-//  //  B2INFO("eclCosmicEAlgorithm: successfully stored expected energies ECLExpGammaGammaE");
-//  //}
-//
-//  //hEnergy->Write();
-//
-//  /**-----------------------------------------------------------------------------------------------*/
-//  /** Clean up histograms in case Algorithm is called again */
-//  TH2I* dummy;
-//  dummy = (TH2I*)gROOT->FindObject("PeakVsCrysID"); delete dummy;
-//
-//  /**-----------------------------------------------------------------------------------------------*/
-//  /** Set the return code appropriately */
-//  //if (m_storeConst == -1) {
-//  //  B2INFO("eclGammaGammaEAlgorithm performed fits but was not asked to store contants");
-//  //  return c_Failure;
-//  //}
+
   return c_OK;
 }

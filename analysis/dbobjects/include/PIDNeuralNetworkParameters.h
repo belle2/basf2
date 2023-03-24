@@ -47,7 +47,8 @@ namespace Belle2 {
     /**
      * Construct with individual neural-network parameters
      */
-    PIDNeuralNetworkParameters(const std::vector<std::string>& inputNames,
+    PIDNeuralNetworkParameters(const std::string& description,
+                               const std::vector<std::string>& inputNames,
                                const std::string& modelDefinition,
                                const std::vector<int>& outputSpeciesPdg,
                                const std::vector<float>& meanValues,
@@ -55,6 +56,7 @@ namespace Belle2 {
                                const PIDNNMissingInputs& handleMissingInputs,
                                const PIDNNInputsToCut& inputsToCut
                               ):
+      m_description(description),
       m_inputNames(inputNames),
       m_modelDefinition(modelDefinition),
       m_outputSpeciesPdg(outputSpeciesPdg),
@@ -115,8 +117,15 @@ namespace Belle2 {
      */
     size_t getInputIndex(const std::string& name) const;
 
+    /**
+     * Get neural network description
+     * @return const std::string&  neural network description
+     */
+    const std::string& getDescription() const {return m_description;}
+
   private:
 
+    std::string m_description;                 /**< description of neural network parameters*/
     std::vector<std::string> m_inputNames;     /**< list if input names*/
     std::string m_modelDefinition;             /**< neural network string for frugaly-deep*/
     std::vector<int> m_outputSpeciesPdg;       /**< PDG codes of hypotheses of neural-network output*/

@@ -16,6 +16,6 @@
 #pragma link C++ class Belle2::PIDCalibrationWeight+; // checksum=0x45237beb, version=1
 #pragma link C++ class Belle2::PIDDetectorWeights+; // checksum=0x738b4284, version=4
 #pragma link C++ class Belle2::PIDDetectorWeights::WeightsTable+; // checksum=0x284bab5, version=1
-#pragma link C++ class Belle2::PIDNeuralNetworkParameters+; // checksum=0x52061a00, version=1
+#pragma link C++ class Belle2::PIDNeuralNetworkParameters+; // checksum=0x1bd6b119, version=1
 
 #endif

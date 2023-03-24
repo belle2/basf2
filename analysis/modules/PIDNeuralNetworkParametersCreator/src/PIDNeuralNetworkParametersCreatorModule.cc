@@ -28,6 +28,7 @@ PIDNeuralNetworkParametersCreatorModule::PIDNeuralNetworkParametersCreatorModule
 
   // Parameter definitions
   addParam("neuralNetworkParametersName", m_neuralNetworkParametersName, "Name of the set of parameters");
+  addParam("description", m_description, "Description of the neural network");
 
   addParam("inputNames", m_inputNames, "List of name of input variables in the required order");
   addParam("modelDefinition", m_modelDefinition, "Keras string encoding the neural-network model and parameters");
@@ -120,6 +121,7 @@ void PIDNeuralNetworkParametersCreatorModule::initialize()
 
   Belle2::DBImportObjPtr<Belle2::PIDNeuralNetworkParameters> importer{m_neuralNetworkParametersName};
   importer.construct(
+    m_description,
     m_inputNames,
     m_modelDefinition,
     m_outputSpeciesPdg,

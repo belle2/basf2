@@ -386,21 +386,25 @@ namespace Belle2 {
 
     Manager::FunctionPtr pidNeuralNetworkValueExpert(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2) {
-        B2ERROR("Need pdg code and PIDNeuralNetworkParameters name for pidNeuralNetworkValueExpert");
+      if (arguments.size() == 0) {
+        B2ERROR("Need pdg code for pidNeuralNetworkValueExpert");
         return nullptr;
       }
-      std::string parameterSetName = arguments[0];
-
       int pdgCode;
       try {
-        pdgCode = abs(Belle2::convertString<int>(arguments[1]));
+        pdgCode = abs(Belle2::convertString<int>(arguments[0]));
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidNeuralNetworkValueExpert must be a PDG code");
         return nullptr;
       }
 
-      auto neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>(parameterSetName);
+      std::shared_ptr<PIDNeuralNetwork> neuralNetworkPtr;
+      if (arguments.size() >= 2) {
+        std::string parameterSetName = arguments[1];
+        neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>(parameterSetName);
+      } else {
+        neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>();
+      }
 
       /**
        * Input mapping:
@@ -1011,6 +1015,45 @@ namespace Belle2 {
       return func;
     };
 
+
+    Manager::FunctionPtr electronIDNN(std::vector<std::string> arguments)
+    {
+      arguments.insert(arguments.begin(), "11");
+      return pidNeuralNetworkValueExpert(arguments);
+    }
+
+    Manager::FunctionPtr muonIDNN(std::vector<std::string> arguments)
+    {
+      arguments.insert(arguments.begin(), "13");
+      return pidNeuralNetworkValueExpert(arguments);
+    }
+
+    Manager::FunctionPtr pionIDNN(std::vector<std::string> arguments)
+    {
+      arguments.insert(arguments.begin(), "211");
+      return pidNeuralNetworkValueExpert(arguments);
+    }
+
+    Manager::FunctionPtr kaonIDNN(std::vector<std::string> arguments)
+    {
+      arguments.insert(arguments.begin(), "321");
+      return pidNeuralNetworkValueExpert(arguments);
+    }
+
+    Manager::FunctionPtr protonIDNN(std::vector<std::string> arguments)
+    {
+      arguments.insert(arguments.begin(), "2212");
+      return pidNeuralNetworkValueExpert(arguments);
+    }
+
+    Manager::FunctionPtr deuteronIDNN(std::vector<std::string> arguments)
+    {
+      arguments.insert(arguments.begin(), "1000010020");
+      return pidNeuralNetworkValueExpert(arguments);
+    }
+
+
+
     //*************
     // B2BII
     //*************
@@ -1212,6 +1255,44 @@ One can provide the name of the weight matrix as the argument.
 )DOC",
                           Manager::VariableDataType::c_double);
 
+
+    REGISTER_METAVARIABLE("electronIDNN(PIDNeuralNetworkName)", electronIDNN,
+			  R"DOC(
+electron identification probability as calculated from the PID neural network.
+One can provide the name of the neural network to be used.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("muonIDNN(PIDNeuralNetworkName)", muonIDNN,
+			  R"DOC(
+muon identification probability as calculated from the PID neural network.
+One can provide the name of the neural network to be used.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pionIDNN(PIDNeuralNetworkName)", pionIDNN,
+			  R"DOC(
+pion identification probability as calculated from the PID neural network.
+One can provide the name of the neural network to be used.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("kaonIDNN(PIDNeuralNetworkName)", kaonIDNN,
+			  R"DOC(
+kaon identification probability as calculated from the PID neural network.
+One can provide the name of the neural network to be used.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("protonIDNN(PIDNeuralNetworkName)", protonIDNN,
+			  R"DOC(
+proton identification probability as calculated from the PID neural network.
+One can provide the name of the neural network to be used.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("deuteronIDNN(PIDNeuralNetworkName)", deuteronIDNN,
+			  R"DOC(
+deuteron identification probability as calculated from the PID neural network.
+One can provide the name of the neural network to be used.
+)DOC",
+                          Manager::VariableDataType::c_double);
+
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");
     REGISTER_METAVARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
@@ -1256,7 +1337,7 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           ":math:`\\log\\mathcal{\\tilde{L}}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`. "
                           "The :math:`\\mathcal{L}_{ij}` is the original likelihood and :math:`\\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidNeuralNetworkValueExpert(PIDNeuralNetworksParametersName, pdgCodeHyp)",
+    REGISTER_METAVARIABLE("pidNeuralNetworkValueExpert(pdgCodeHyp, PIDNeuralNetworkName)",
                           pidNeuralNetworkValueExpert,
                           "Probability for the pdgCodeHype calculated from a neural network, which uses high-level information as inputs,  "
                           "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "

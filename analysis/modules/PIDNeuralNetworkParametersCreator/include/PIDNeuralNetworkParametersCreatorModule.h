@@ -33,6 +33,7 @@ namespace Belle2 {
 
     std::string m_neuralNetworkParametersName;  /**< Name of the set of parameters */
 
+    std::string m_description;                 /**< description of neural network parameters*/
     std::vector<std::string> m_inputNames;     /**< list if input names*/
     std::string m_modelDefinition;             /**< neural network string for frugaly-deep*/
     std::vector<int> m_outputSpeciesPdg;       /**< PDG codes of hypotheses of neural-network output*/

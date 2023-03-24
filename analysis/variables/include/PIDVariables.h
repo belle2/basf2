@@ -283,10 +283,10 @@ namespace Belle2 {
     /**
      * @return neural-network based PID likelihood
      * For expert's use only!!
-     * The first argument should be the db object name of the neural network parameters.
-     * The second argument is the particle hypothesis as string
+     * The first argument is the particle hypothesis as string
+     * The second argument is the db object name of the neural network parameters (optional).
      * Examples:
-     * pi probability =  pidNeuralNetworkValueExpert(PIDNeuralNetworkParameters, 211);
+     * pi probability =  pidNeuralNetworkValueExpert(211, PIDNeuralNetworkParameters);
      */
     Manager::FunctionPtr pidNeuralNetworkValueExpert(const std::vector<std::string>& arguments);
 
@@ -332,6 +332,37 @@ namespace Belle2 {
      * @return weighted deuteron ID to be used in the physics analyses
      */
     Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments);
+
+
+    /**
+     * @return electron ID from Neural Network to be used in the physics analyses
+     */
+    Manager::FunctionPtr electronIDNN(std::vector<std::string> arguments);
+
+    /**
+     * @return muon ID from Neural Network to be used in the physics analyses
+     */
+    Manager::FunctionPtr muonIDNN(std::vector<std::string> arguments);
+
+    /**
+     * @return pion ID from Neural Network to be used in the physics analyses
+     */
+    Manager::FunctionPtr pionIDNN(std::vector<std::string> arguments);
+
+    /**
+     * @return kaon ID from Neural Network to be used in the physics analyses
+     */
+    Manager::FunctionPtr kaonIDNN(std::vector<std::string> arguments);
+
+    /**
+     * @return proton ID from Neural Network to be used in the physics analyses
+     */
+    Manager::FunctionPtr protonIDNN(std::vector<std::string> arguments);
+
+    /**
+     * @return deuteron ID from Neural Network to be used in the physics analyses
+     */
+    Manager::FunctionPtr deuteronIDNN(std::vector<std::string> arguments);
 
     /**
      * Parses the detector list for the PID metafunctions.

@@ -155,20 +155,19 @@ void PXDGatedModeDQMModule::beginRun()
 void PXDGatedModeDQMModule::event()
 {
   // And check if the stored data is valid
-  if (m_EventLevelTriggerTimeInfo->isValid()) {
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
     // check time overflow, too long ago
     if (m_EventLevelTriggerTimeInfo->hasInjection()) {
       // get last injection time
-      auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
       auto isher = m_EventLevelTriggerTimeInfo->isHER();
-      float diff2 = difference / (508.877 / 4.); //  127MHz clock ticks to us, inexact rounding
+      float difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection() / 127. ; //  127MHz clock ticks to us, inexact rounding
       int bunch_trg = m_EventLevelTriggerTimeInfo->getBunchNumber();
       int time_inj  = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
       int bunch_inj = (bunch_trg - time_inj) % 1280;
       if (bunch_inj < 0) bunch_inj += 1280;
       int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
-      if ((isher && diff2 >= m_minTimeCutHER && diff2 <= m_maxTimeCutHER) ||
-          (!isher && diff2 >= m_minTimeCutLER && diff2 <= m_maxTimeCutLER)
+      if ((isher && difference >= m_minTimeCutHER && difference <= m_maxTimeCutHER) ||
+          (!isher && difference >= m_minTimeCutLER && difference <= m_maxTimeCutLER)
          ) { // be sure that we fill only in gating region
         hBunchTrg->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber() & 0x7FF);
         if (isher) hBunchInjHER->Fill(bunch_inj);
@@ -271,7 +270,7 @@ void PXDGatedModeDQMModule::event()
             }
           }
         }
-      } else if (diff2 > m_outsideTimeCut) {
+      } else if (difference > m_outsideTimeCut) {
         rgate = 96;
         for (auto& p : m_storeRawHits) {
           if (isher) {

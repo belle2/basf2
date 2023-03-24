@@ -280,7 +280,7 @@ void PXDDAQDQMModule::event()
 
 
   // And check if the stored data is valid
-  if (m_EventLevelTriggerTimeInfo->isValid()) {
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
 
     double lasttrig = m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.; //  127MHz clock ticks to us, inexact rounding
     if (eodbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
@@ -291,45 +291,44 @@ void PXDDAQDQMModule::event()
     // check time overflow, too long ago
     if (m_EventLevelTriggerTimeInfo->hasInjection()) {
       // get last injection time
-      auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
-      double diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      double difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection() / 127.; //  127MHz clock ticks to us, inexact rounding
       if (m_EventLevelTriggerTimeInfo->isHER()) {
         if (eodbFlag) {
-          if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(diff2);
+          if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(difference);
         }
         if (cm63Flag) {
           hDAQStat->Fill(5); // sum CM63 after HER
-          if (diff2 > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
-          if (hCM63AfterInjHER) hCM63AfterInjHER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
+          if (hCM63AfterInjHER) hCM63AfterInjHER->Fill(difference);
         }
         if (truncFlag) {
           hDAQStat->Fill(2); // sum truncs after HER
-          if (diff2 > 1000) hDAQStat->Fill(9); // sum truncs after HER, but outside injections, 1ms
-          if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(9); // sum truncs after HER, but outside injections, 1ms
+          if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(difference);
         }
         if (missingFlag) {
           hDAQStat->Fill(15); // sum missframe after HER
-          if (diff2 > 1000) hDAQStat->Fill(17); // sum missframe after HER, but outside injections, 1ms
-          if (hMissAfterInjHER) hMissAfterInjHER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(17); // sum missframe after HER, but outside injections, 1ms
+          if (hMissAfterInjHER) hMissAfterInjHER->Fill(difference);
         }
       } else {
         if (eodbFlag) {
-          if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(diff2);
+          if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(difference);
         }
         if (cm63Flag) {
           hDAQStat->Fill(6); // sum CM63 after LER
-          if (diff2 > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
-          if (hCM63AfterInjLER) hCM63AfterInjLER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
+          if (hCM63AfterInjLER) hCM63AfterInjLER->Fill(difference);
         }
         if (truncFlag) {
           hDAQStat->Fill(3); // sum truncs after LER
-          if (diff2 > 1000) hDAQStat->Fill(10); // sum truncs after LER, but outside injections, 1ms
-          if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(10); // sum truncs after LER, but outside injections, 1ms
+          if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(difference);
         }
         if (missingFlag) {
           hDAQStat->Fill(16); // sum missframe after LER
-          if (diff2 > 1000) hDAQStat->Fill(18); // sum missframe after LER, but outside injections, 1ms
-          if (hMissAfterInjLER) hMissAfterInjLER->Fill(diff2);
+          if (difference > 1000) hDAQStat->Fill(18); // sum missframe after LER, but outside injections, 1ms
+          if (hMissAfterInjLER) hMissAfterInjLER->Fill(difference);
         }
       }
     }

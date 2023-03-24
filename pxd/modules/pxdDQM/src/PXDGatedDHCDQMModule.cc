@@ -61,21 +61,20 @@ void PXDGatedDHCDQMModule::event()
 {
 
   // And check if the stored data is valid
-  if (m_EventLevelTriggerTimeInfo->isValid()) {
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
 
     // check time overflow, too long ago
     if (m_EventLevelTriggerTimeInfo->hasInjection()) {
       // get last injection time
-      auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
-      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      float difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection() / 127.; //  127MHz clock ticks to us, inexact rounding
       bool isher = m_EventLevelTriggerTimeInfo->isHER();
       for (auto& pkt : *m_storeDAQEvtStats) {
         for (auto& dhc : pkt) {
           int value = dhc.getDHCID() * 4 + dhc.getGatedFlag() * 2 + dhc.getGatedHER();
           if (isher) {
-            hGateAfterInjHER->Fill(diff2, value);
+            hGateAfterInjHER->Fill(difference, value);
           } else {
-            hGateAfterInjLER->Fill(diff2, value);
+            hGateAfterInjLER->Fill(difference, value);
           }
         }
       }

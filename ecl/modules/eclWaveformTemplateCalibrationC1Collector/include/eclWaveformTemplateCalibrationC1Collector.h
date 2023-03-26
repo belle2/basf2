@@ -48,20 +48,20 @@ namespace Belle2 {
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    TH2F* varXvsCrysID;
+    int m_baselineLimit; /**< Number of ADC points used to define baseline. */
 
-    std::vector<float> m_ADCtoEnergy;
+    TH2F* varXvsCrysID; /**< Histogram to store collector output. */
 
-    double m_MinEnergyThreshold;
-    double m_MaxEnergyThreshold;
+    std::vector<float> m_ADCtoEnergy; /**< Crystal calibration constants. */
+
+    double m_MinEnergyThreshold; /**< Minimum energy threshold of online fit result for Fitting Waveforms */
+    double m_MaxEnergyThreshold; /**< Maximum energy threshold of online fit result for Fitting Waveforms */
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
 
     /** Crystal energy. */
     DBObjPtr<ECLCrystalCalib> m_CrystalEnergy{"ECLCrystalEnergy"};
-
-    std::vector<float> m_MaxVarX;
 
   };
 } // end Belle2 namespace

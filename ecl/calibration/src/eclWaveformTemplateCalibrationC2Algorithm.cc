@@ -34,7 +34,6 @@ eclWaveformTemplateCalibrationC2Algorithm::eclWaveformTemplateCalibrationC2Algor
     "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
   );
 
-  m_lowestEnergyFraction = 0.1;
 }
 
 
@@ -74,6 +73,11 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
 
+  TFile* f = new TFile(Form("PhotonShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID), "RECREATE");
+  TTree* mtree = new TTree("mtree", "");
+  std::vector<double> PhotonWaveformArray(100000);
+  mtree->Branch("PhotonArray", PhotonWaveformArray.data(), "PhotonWaveformArray[100000]/D");
+
   auto tree = getObjectPtr<TTree>("tree");
   int CellID;
   tree->SetBranchAddress("CellID", &CellID);
@@ -94,7 +98,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
   ECLDigitWaveformParameters* PhotonParameters = new ECLDigitWaveformParameters();
 
-  for (int id = m_firstCellID; id <= m_lastCellID; id++) {
+  for (int cellid = m_firstCellID; cellid <= m_lastCellID; cellid++) {
 
     std::vector<int> EntriesToSkip;
     double maxResidual = 10.0;
@@ -123,7 +127,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
         tree->GetEntry(i);
 
-        if (CellID != id) continue;
+        if (CellID != cellid) continue;
 
         double maxval = 0;
         double maxIndex = 0;
@@ -145,16 +149,16 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         if (counterWaveforms == CollectorLimit)  break;
       }
 
-      B2INFO("CellID " << id << " counterWaveforms = " << counterWaveforms);
+      B2INFO("CellID " << cellid << " counterWaveforms = " << counterWaveforms);
 
       auto gWaveformToFit = new TGraph(xValuesToFit.size(), xValuesToFit.data(), yValuesToFit.data());
-      gWaveformToFit->SetName(Form("gWaveformToFit_%d", int(id)));
+      gWaveformToFit->SetName(Form("gWaveformToFit_%d", int(cellid)));
 
       //preparing fit function
 
       // ParMin11t defined below represents typical fit parameters for barrel and endcaps.  Note these are only used as the inital guess for the fit.
       double ParMin11t[11];
-      if (id > 7776 || id < 1153) {
+      if (cellid > 7776 || cellid < 1153) {
         ParMin11t[0] = 20.3216;
         ParMin11t[1] = -0.0206266;
         ParMin11t[2] = 0.313928;
@@ -237,7 +241,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
       // Checking if fit matches the data.
       if (maxResidual > resLimit) {
 
-        B2INFO("FAIL: id " << id << " maxResidual " << maxResidual << " removing entry: " << NtupleEntries[maxResidualWaveformID] <<
+        B2INFO("FAIL: cellid " << cellid << " maxResidual " << maxResidual << " removing entry: " << NtupleEntries[maxResidualWaveformID] <<
                " which was waveform number " << maxResidualWaveformID << " resLimit was " << resLimit);
 
         EntriesToSkip.push_back(NtupleEntries[maxResidualWaveformID]);
@@ -271,7 +275,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
       } else {
 
-        B2INFO("PASS: id " << id << " maxResidual " << maxResidual << " number of waveforms used was " << counterWaveforms <<
+        B2INFO("PASS: cellid " << cellid << " maxResidual " << maxResidual << " number of waveforms used was " << counterWaveforms <<
                " resLimit was " << resLimit);
 
         PASS = true;
@@ -280,22 +284,51 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         resLimit = 1.01;
 
         auto gFitResult = new TGraph(FitResultX.size(), FitResultX.data(), FitResultY.data());
-        gFitResult->SetName(Form("gFitResult_%d", int(id)));
+        gFitResult->SetName(Form("gFitResult_%d", int(cellid)));
 
-        cellIDArray.push_back(id);
+        cellIDArray.push_back(cellid);
         maxResidualArray.push_back(maxResidual);
 
         histfile->cd();
         gWaveformToFit->Write();
         gFitResult->Write();
-        TotalFitFunction->Delete() ;
 
         float tempPhotonPar11[11];
-        for (unsigned int k = 0; k < 11; k++) {
-          tempPhotonPar11[k] = k;
+        tempPhotonPar11[0] = ParMin11t[0];
+        for (unsigned int k = 0; k < 10; k++) {
+          tempPhotonPar11[k + 1] = TotalFitFunction->GetParameter((3 * FFsize) + k);
         }
-        PhotonParameters->setTemplateParameters(id, tempPhotonPar11, tempPhotonPar11, tempPhotonPar11);
 
+        //Defining a single normalized function with final parameters
+        FitFunctions[0]->SetParameter(0, 0);
+        FitFunctions[0]->SetParameter(1, 0);
+        FitFunctions[0]->SetParameter(2, 1);
+        for (int k = 0; k < 10; k++) {
+          FitFunctions[0]->SetParameter(4 + k, tempPhotonPar11[k + 1]);
+          FitFunctions[0]->SetParameter(10 + 4 + k, tempPhotonPar11[k + 1]);
+        }
+        FitFunctions[0]->FixParameter(24, ParMin11t[0]);
+        FitFunctions[0]->FixParameter(25, 1);
+
+        //Computing normalization parameter
+        double MaxVal = -1.0;
+        const double cnpts = 2000;
+        for (int k = 0; k < cnpts; k++) {
+          double xVal = (k * 31.0 / cnpts);
+          double yVal = FitFunctions[0]->Eval(xVal);
+          if (yVal > MaxVal) MaxVal = yVal;
+        }
+        B2INFO("MaxVal " << MaxVal);
+        tempPhotonPar11[0] /= MaxVal;
+        FitFunctions[0]->FixParameter(24, tempPhotonPar11[0]);
+
+        PhotonParameters->setTemplateParameters(cellid, tempPhotonPar11, tempPhotonPar11, tempPhotonPar11);
+
+        for (unsigned int k = 0; k < PhotonWaveformArray.size();
+             k++) PhotonWaveformArray[k] = FitFunctions[0]->Eval(((double)k) * (1. / 1000.)) ;
+        mtree->Fill();
+
+        TotalFitFunction->Delete() ;
       }
     }
   }
@@ -303,6 +336,8 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   auto gmaxResidual = new TGraph(cellIDArray.size(), cellIDArray.data(), maxResidualArray.data());
   gmaxResidual->SetName("gmaxResidual");
   gmaxResidual->Write();
+  f->cd();
+  mtree->Write();
 
   saveCalibration(PhotonParameters, Form("PhotonParameters_CellID%d_CellID%d", m_firstCellID, m_lastCellID));
   B2INFO("eclWaveformTemplateCalibrationC2Algorithm: successfully stored " << Form("PhotonParameters_CellID%d_CellID%d",

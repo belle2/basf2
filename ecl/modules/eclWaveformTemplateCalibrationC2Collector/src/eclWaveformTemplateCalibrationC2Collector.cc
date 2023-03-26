@@ -69,6 +69,7 @@ void eclWaveformTemplateCalibrationC2CollectorModule::prepare()
       m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
   }
 
+
   auto tree = new TTree("tree", "");
   tree->Branch("CellID", &m_CellID,      "m_CellID/I");
   tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");

@@ -32,9 +32,12 @@ REG_MODULE(eclWaveformTemplateCalibrationC1Collector)
 eclWaveformTemplateCalibrationC1CollectorModule::eclWaveformTemplateCalibrationC1CollectorModule()
 {
   // Set module properties
-  setDescription("Module to export histogram of noise in waveforms from random trigger events");
-  addParam("MinEnergyThreshold", m_MinEnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 2.0);
-  addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 4.0);
+  setDescription("Module to export histogram of baseline noise of energetic waveforms from ee->gg events.  First step in photon template calculation.");
+  addParam("MinEnergyThreshold", m_MinEnergyThreshold, "Minimum energy threshold of online fit result for Fitting Waveforms (GeV).",
+           2.0);
+  addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Maximum energy threshold of online fit result for Fitting Waveforms (GeV).",
+           4.0);
+  addParam("baselineLimit", m_baselineLimit, "Number of ADC points used to define baseline.", 12);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -53,6 +56,7 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
   m_eclDsps.registerInDataStore();
   m_eclDigits.registerInDataStore();
 
+  // Loading crystal calibration constants from database
   m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);
   if (m_CrystalElectronics.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
@@ -69,8 +73,6 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
 void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 {
 
-  int m_baselineLimit = 12;
-
   for (auto& aECLDsp : m_eclDsps) {
 
     const int id = aECLDsp.getCellId() - 1;
@@ -86,25 +88,29 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
     }
     if (d == nullptr) continue;
 
+    //estimating crystal energy
     double energy = d->getAmp() * m_ADCtoEnergy[id];
 
+    // only select high energy crystals
     if (energy < m_MinEnergyThreshold)  continue;
     if (energy > m_MaxEnergyThreshold)  continue;
 
+    //compute mean of baseline
     float baseline = 0.0;
     for (int i = 0; i < m_baselineLimit; i++) baseline += aECLDsp.getDspA()[i];
     baseline /= ((float) m_baselineLimit);
 
+    //compute baseline values minus baseline mean
     std::vector<float> baselineSubtracted(m_baselineLimit);
     for (int i = 0; i < m_baselineLimit; i++) baselineSubtracted[i] = (aECLDsp.getDspA()[i] - baseline);
 
+    //compute varience of baseline
     float varX = 0.0;
     for (int i = 0; i < m_baselineLimit; i++) varX += (baselineSubtracted[i] * baselineSubtracted[i]);
     varX /= m_baselineLimit - 1;
 
+    //save result to histogram
     varXvsCrysID->Fill(id, varX);
-
-    //B2INFO(varX);
 
   }
 

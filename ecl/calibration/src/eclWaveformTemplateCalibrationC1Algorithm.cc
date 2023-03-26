@@ -27,10 +27,8 @@ eclWaveformTemplateCalibrationC1Algorithm::eclWaveformTemplateCalibrationC1Algor
   CalibrationAlgorithm("eclWaveformTemplateCalibrationC1Collector")
 {
   setDescription(
-    "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
+    "Used to determine the baseline noise level of crystals in e+e- --> gamma gamma"
   );
-
-  m_lowestEnergyFraction = 0.2;
 }
 
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibrate()
@@ -47,9 +45,9 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
   std::vector<float> Varxs;
   std::vector<float> Counts;
 
-  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
+  for (int id = 0; id < ECLElementNumbers::c_NCrystals; id++) {
 
-    TH1F* hVarx = (TH1F*)varXvsCrysID->ProjectionY("hVarx", crysID + 1, crysID + 1);
+    TH1F* hVarx = (TH1F*)varXvsCrysID->ProjectionY("hVarx", id + 1, id + 1);
 
     int Total = hVarx->GetEntries();
     int subTotal = 0;
@@ -62,12 +60,14 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
       counter++;
     }
 
-    cryIDs.push_back(crysID + 1);
+    cryIDs.push_back(id + 1);
     Varxs.push_back(counter);
     Counts.push_back(Total);
 
-    B2INFO("eclWaveformTemplateCalibrationC1Algorithm: crysID counter fraction Total " << crysID << " " << counter << " " << fraction <<
+    B2INFO("eclWaveformTemplateCalibrationC1Algorithm: id counter fraction Total " << id << " " << counter << " " << fraction <<
            " " << Total);
+
+    hVarx->Delete();
   }
 
   auto gvarXvsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), Varxs.data());

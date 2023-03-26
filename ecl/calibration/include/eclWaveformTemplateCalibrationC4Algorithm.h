@@ -9,7 +9,7 @@
 #pragma once
 
 /* ECL headers. */
-#include <ecl/calibration/eclWaveformTemplateCalibrationC2Algorithm.h>
+#include <ecl/calibration/eclWaveformTemplateCalibrationC4Algorithm.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 
 /* Basf2 headers. */
@@ -20,14 +20,14 @@ namespace Belle2 {
   namespace ECL {
 
     /** Calibrate ecl crystals using gamma pair events */
-    class eclWaveformTemplateCalibrationC2Algorithm : public CalibrationAlgorithm {
+    class eclWaveformTemplateCalibrationC4Algorithm : public CalibrationAlgorithm {
     public:
 
       /**..Constructor */
-      eclWaveformTemplateCalibrationC2Algorithm();
+      eclWaveformTemplateCalibrationC4Algorithm();
 
       /**..Destructor */
-      virtual ~eclWaveformTemplateCalibrationC2Algorithm() {}
+      virtual ~eclWaveformTemplateCalibrationC4Algorithm() {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
@@ -36,6 +36,7 @@ namespace Belle2 {
       std::string getOutputName() {return m_outputName;}
 
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
+
       void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
 
     protected:
@@ -45,12 +46,15 @@ namespace Belle2 {
 
     private:
 
-      std::string m_outputName = "eclWaveformTemplateCalibrationC2Algorithm.root"; /**< file name for histogram output */
+      std::string m_outputName = "eclWaveformTemplateCalibrationC4Algorithm.root"; /**< file name for histogram output */
+
       int m_firstCellID;
       int m_lastCellID;
 
+      //DBObjPtr<ECLDigitWaveformParameters> m_existingPhotonWaveformParameters;
+      //DBObjPtr<ECLDigitWaveformParameters> m_existingHadronDiodeWaveformParameters;
       /** Waveform parameters. */
-      DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;
+      //DBObjPtr<ECLDigitWaveformParameters> m_PhotonHadronDiodeWaveformParameters;
     };
   }
 } // namespace Belle2

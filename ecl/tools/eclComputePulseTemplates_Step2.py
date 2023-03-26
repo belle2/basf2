@@ -102,7 +102,7 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
         return Time_us, ShaperDSP_output_array
 
 
-OutputDirectory = ""
+OutputDirectory = "./"
 if(OutputDirectory == ""):
     print("Error set ouput directory")
     sys.exit()

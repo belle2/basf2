@@ -51,12 +51,12 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
 
   ECLAutoCovariance* Autocovariances = new ECLAutoCovariance();
 
-  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
+  for (int ID = 0; ID < ECLElementNumbers::c_NCrystals; ID++) {
 
-    float totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(crysID + 1, 32));
+    float totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1, 32));
 
     if (totalCounts < m_CountLimit) {
-      B2INFO("eclAutocovarianceCalibrationC3Algorithm: Warning Below Count Limit: crysID totalCounts m_CountLimit: " << crysID << " " <<
+      B2INFO("eclAutocovarianceCalibrationC3Algorithm: Warning Below Count Limit: ID totalCounts m_CountLimit: " << ID << " " <<
              totalCounts << " " << m_CountLimit);
     }
 
@@ -65,7 +65,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
     for (int i = 0; i < 31; i++) {
       for (int j = 0; j < 31; j++) {
         int index = abs(i - j);
-        NoiseMatrix(i, j) = float(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(crysID + 1,
+        NoiseMatrix(i, j) = float(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
                                   index + 1))) / totalCounts / (float(31.0 - index));
       }
     }
@@ -73,11 +73,11 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
     double tempAutoCov[31];
 
     for (int i = 0; i < 31; i++) tempAutoCov[i] = NoiseMatrix(0, i);
-    Autocovariances->setAutoCovariance(crysID + 1, tempAutoCov);
+    Autocovariances->setAutoCovariance(ID + 1, tempAutoCov);
 
     TDecompChol dc(NoiseMatrix);
     bool InvertStatus = dc.Invert(NoiseMatrix);
-    if (InvertStatus == false)  B2INFO("eclAutocovarianceCalibrationC3Algorithm crysID InvertStatus [0][0] totalCounts: " << crysID <<
+    if (InvertStatus == false)  B2INFO("eclAutocovarianceCalibrationC3Algorithm ID InvertStatus [0][0] totalCounts: " << ID <<
                                          " " << InvertStatus << " " << NoiseMatrix(0, 0) << " " << totalCounts);
 
   }

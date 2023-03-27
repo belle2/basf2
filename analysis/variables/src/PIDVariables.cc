@@ -467,8 +467,10 @@ namespace Belle2 {
         const auto mom = frame.getMomentum(part);
         for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
-          for (const auto& hypeType : Const::chargedStableSet) {
-            inputsAll.push_back(pid->getLogL(hypeType, detector));
+          for (const auto& hypType : Const::chargedStableSet) {
+            const float logL = pid->getLogL(hypType, detector);
+            if (logL == 0) inputsAll.push_back(std::numeric_limits<float>::quiet_NaN());
+            else inputsAll.push_back(logL);
           }
         }
         inputsAll.push_back(mom.P());

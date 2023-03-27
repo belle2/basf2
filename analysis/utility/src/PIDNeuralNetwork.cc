@@ -32,6 +32,10 @@ void PIDNeuralNetwork::loadParametersFromDB()
 double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
 {
   const int outputIndex = (*m_pidNeuralNetworkParametersDB)->pdg2OutputIndex(pdg);
+  // {
+  // const auto inputFdeep = fdeep::tensor(fdeep::tensor_shape(input.size()), input);
+  // std::cout << "Original input: " << fdeep::show_tensor(inputFdeep) << std::endl;
+  // }
 
   // apply cuts, ie. overwrite certain input values with index `inputSetIndex` with the value `setValue`
   // if the input with index `inputCutIndex` is in the range (`rangeStart`, `rangeEnd`)

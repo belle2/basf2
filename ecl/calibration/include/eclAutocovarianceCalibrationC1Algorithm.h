@@ -33,6 +33,12 @@ namespace Belle2 {
       /** Getter for m_outputName */
       std::string getOutputName() {return m_outputName;}
 
+      /** Setter for m_lowestEnergyFraction */
+      void setLowestEnergyFraction(float lowestEnergyFraction) {m_lowestEnergyFraction = lowestEnergyFraction;}
+
+      /** Getter for m_lowestEnergyFraction */
+      float getLowestEnergyFraction() {return m_lowestEnergyFraction;}
+
     protected:
 
       /**..Run algorithm on events */
@@ -41,6 +47,8 @@ namespace Belle2 {
     private:
 
       std::string m_outputName = "eclAutocovarianceCalibrationC1Algorithm.root"; /**< file name for histogram output */
+
+      float m_lowestEnergyFraction = 0.75;  /**< Fraction of noise waveforms to use */
 
     };
   }

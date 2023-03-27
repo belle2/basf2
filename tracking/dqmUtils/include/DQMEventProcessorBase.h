@@ -11,6 +11,7 @@
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <tracking/dataobjects/RecoHitInformation.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /**

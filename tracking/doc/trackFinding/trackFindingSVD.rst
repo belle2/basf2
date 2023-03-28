@@ -1,4 +1,4 @@
-.. _tracking_trackFindingSVD: 
+.. _tracking_trackFindingSVD:
 
 SVD Track Finding
 ^^^^^^^^^^^^^^^^^
@@ -57,7 +57,7 @@ Variables used in the filters are geometric (distances, slopes) or properties of
 +----------------------------+------------------------------------------------------------------------------------+
 |time difference U-U         | time difference of the two u-side clusters of the SpacePoints                      |
 +----------------------------+------------------------------------------------------------------------------------+
-|time difference V-V         | time difference of the two v-side clusters of the SpacePoints                      |      
+|time difference V-V         | time difference of the two v-side clusters of the SpacePoints                      |
 +----------------------------+------------------------------------------------------------------------------------+
 
 The allowed range for each filter is learned from simulation, filling the distribution of the variable during the training and defining threshold as max and min of the distribution (or 0.1% and 99.9% quantile?).
@@ -82,7 +82,7 @@ A Cellular Automaton which uses segments as cells is run to gather the longest p
 .. figure:: figures/cellularautomaton.png
    :align: center
 
-Best Candidate Selection 
+Best Candidate Selection
 """"""""""""""""""""""""
 
 Finally, a best candidate selection is performed by looking at a simple quality indicator:

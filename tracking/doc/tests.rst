@@ -1,4 +1,4 @@
-.. _tracking_tests: 
+.. _tracking_tests:
 
 Tests for the tracking package
 ==============================

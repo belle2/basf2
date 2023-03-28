@@ -84,6 +84,9 @@ variables = [
     "p",  # momentum (of the B0)
     "mcP",  # generated momentum
     "pErr",  # momentum uncertainty taking the full px, py, pz covariance into account
+
+    "daughter(0, E)",  # momentum of the D0 that is updated if updateAllDaughters=True.
+    "originalDaughter(0, E)",  # momentum of the original D0.
 ]
 
 # safe the output

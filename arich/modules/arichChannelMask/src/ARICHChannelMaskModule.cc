@@ -12,7 +12,6 @@
 
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module

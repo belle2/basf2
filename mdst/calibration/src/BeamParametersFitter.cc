@@ -9,7 +9,7 @@
 /* Own header. */
 #include <mdst/calibration/BeamParametersFitter.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/Database.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBStore.h>

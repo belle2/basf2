@@ -5,19 +5,21 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclHitDebug/ECLHitDebugModule.h>
 
-//Root
-#include <TVector3.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLDebugHit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 
-//ECL
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLDebugHit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+/* ROOT headers. */
+#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -67,10 +69,10 @@ void ECLHitDebugModule::event()
 
   int const Nbin = 80;
   int const interval = 8000 / Nbin;
-  static float E_cell[8736][Nbin];
-  static float Tof_ave[8736][Nbin];
-  memset(E_cell, 0, sizeof(float) * 8736 * Nbin);
-  memset(Tof_ave, 0, sizeof(float) * 8736 * Nbin);
+  static float E_cell[ECLElementNumbers::c_NCrystals][Nbin];
+  static float Tof_ave[ECLElementNumbers::c_NCrystals][Nbin];
+  memset(E_cell, 0, sizeof(float) * ECLElementNumbers::c_NCrystals * Nbin);
+  memset(Tof_ave, 0, sizeof(float) * ECLElementNumbers::c_NCrystals * Nbin);
 
   // Get instance of ecl geometry parameters
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -100,7 +102,7 @@ void ECLHitDebugModule::event()
   }//for nHit
 
 
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+  for (int iECLCell = 0; iECLCell < ECLElementNumbers::c_NCrystals; iECLCell++) {
     for (int  TimeIndex = 0; TimeIndex < Nbin; TimeIndex++) {
 
       if (E_cell[iECLCell][TimeIndex] > 0) {

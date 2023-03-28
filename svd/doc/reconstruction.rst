@@ -38,7 +38,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    .. math::
 
-      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)} 
+      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)}
 
    is computed with a simple system of equations:
 
@@ -54,7 +54,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    All three algorithms are implemented in the ``svd/reconstruction/SVDClusterCharge`` class.
 
-.. _MaxSum: 
+.. _MaxSum:
 
 **The MaxSum Algorithm**:
 
@@ -80,7 +80,7 @@ where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV rea
 
 The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject, see :ref:`svdtimecalib` for more details on the calibration.
 
-We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. 
+We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``.
 
 #. ``CoG6``: the cluster time is the average of the strips time weighted with the strip charge. The raw strip time is computed as the average of the sample time weighted with the sample amplitude:
 
@@ -212,7 +212,7 @@ The charge and time algorithm available for clusters are also available for stri
 Reconstruction Modules
 ----------------------
 
-This is a list of the ``svd`` modules used for reconstruction. 
+This is a list of the ``svd`` modules used for reconstruction.
 
 .. b2-modules::
    :package: svd

@@ -16,6 +16,8 @@
 #include "boost/iostreams/filtering_stream.hpp"
 #include "trg/cdc/NDFinder.h"
 
+#include <TMath.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -527,9 +529,9 @@ float NDFinder::transformVar(float estVal, int idx)
     if (estVal > 180) {
       phiMod -= 360.;
     }
-    return phiMod * m_pi_deg;
+    return phiMod * TMath::DegToRad();
   } else { // theta
-    float thetRad = estVal * m_pi_deg;
+    float thetRad = estVal * TMath::DegToRad();
     return cos(thetRad) / sin(thetRad);
   }
 }

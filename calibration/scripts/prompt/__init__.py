@@ -67,7 +67,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
     Parameters:
         name (str): The unique calibration name, not longer than 64 characters.
 
-        expert_username (str): The JIRA username of the expert to contact about this script.
+        expert_username (str): The GitLab username of the expert to contact about this script.
             This username will be used to assign the default responsible person for submitting and checking prompt
             calibration jobs.
 

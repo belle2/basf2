@@ -39,14 +39,14 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Histograms containing the data collected by eclAutocovarianceCalibrationC1Collector*/
-  auto PPVsCrysID = getObjectPtr<TH2F>("PPVsCrysID");
+  auto PPVsCellID = getObjectPtr<TH2F>("PPVsCellID");
 
   std::vector<float> cellIDs;
   std::vector<float> PPamps;
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    TH1F* hPP = (TH1F*)PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
+    TH1F* hPP = (TH1F*)PPVsCellID->ProjectionY("hPP", crysID + 1, crysID + 1);
 
     int Total = hPP->GetEntries();
     int subTotal = 0;
@@ -68,14 +68,14 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
     if (Total < 100)  B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries is only: " << Total);
   }
 
-  /** Write out the noise threshold vs Crystal ID*/
-  auto gPPVsCrysID = new TGraph(cellIDs.size(), cellIDs.data(), PPamps.data());
-  gPPVsCrysID->SetName("gPPVsCrysID");
+  /** Write out the noise threshold vs Celltal ID*/
+  auto gPPVsCellID = new TGraph(cellIDs.size(), cellIDs.data(), PPamps.data());
+  gPPVsCellID->SetName("gPPVsCellID");
 
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
-  PPVsCrysID->Write();
-  gPPVsCrysID->Write();
+  PPVsCellID->Write();
+  gPPVsCellID->Write();
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Write output to DB */

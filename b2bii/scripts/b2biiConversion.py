@@ -57,6 +57,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     Args:
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
+        saveResultExtraInfo (bool): Save B2BIIFixMdst module return value as EventExtraInfo.
         useBelleDBServer (str): None to use the recommended BelleDB server.
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.

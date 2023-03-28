@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/Unit.h>
 #include <analysis/dbobjects/PIDNeuralNetworkParameters.h>
 
+#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 

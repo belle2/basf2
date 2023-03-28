@@ -24,7 +24,7 @@ REG_MODULE(PIDNeuralNetworkParametersCreator);
 PIDNeuralNetworkParametersCreatorModule::PIDNeuralNetworkParametersCreatorModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC(Module that creates PID neural network parameters and uploads it to the DB)DOC");
+  setDescription(R"DOC(Module that creates PID neural network parameters and uploads them to the DB)DOC");
 
   // Parameter definitions
   addParam("neuralNetworkParametersName", m_neuralNetworkParametersName, "Name of the set of parameters");
@@ -32,16 +32,16 @@ PIDNeuralNetworkParametersCreatorModule::PIDNeuralNetworkParametersCreatorModule
 
   addParam("inputNames", m_inputNames, "List of name of input variables in the required order");
   addParam("modelDefinition", m_modelDefinition, "Keras string encoding the neural-network model and parameters");
-  addParam("ouputSpeciesPdg", m_outputSpeciesPdg,
-           "List of PDG codes of the hypotheses the correspond to the neural network output probabilities");
+  addParam("outputSpeciesPdg", m_outputSpeciesPdg,
+           "List of PDG codes of the hypotheses that correspond to the neural network output probabilities");
   addParam("meanValues", m_meanValues, "List of mean values of input variables for normalization");
   addParam("standardDeviations", m_standardDeviations, "List of standard deviations of input variables for normalization");
   addParam("handleMissingInputs", m_handleMissingInputs,
            "List of indices and values set if the variable defined by the index is NaN");
   addParam("inputsToCut", m_inputsToCut, "List of input values that are cut if another input value is in a given range");
 
-  addParam("experimentLow", m_experimentLow, "Interval of validity, ex.low");
-  addParam("experimentHigh", m_experimentHigh, "Interval of validity, ex.high");
+  addParam("experimentLow", m_experimentLow, "Interval of validity, exp low");
+  addParam("experimentHigh", m_experimentHigh, "Interval of validity, exp high");
   addParam("runLow", m_runLow, "Interval of validity, run low");
   addParam("runHigh", m_runHigh, "Interval of validity, run high");
 }

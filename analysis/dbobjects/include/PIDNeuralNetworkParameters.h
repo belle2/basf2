@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * Stores information how to handle missing inputs, i.e. inputs that are NaN
+   * Stores information on how to handle missing inputs, i.e. inputs that are NaN
    * It is a vector of tuples of two elements, where
    * the first element is the index i of the input variable and the
    * second element is the value to which input i is set if it is NaN.
@@ -24,7 +24,7 @@ namespace Belle2 {
   typedef std::vector<std::tuple<size_t, float>> PIDNNMissingInputs;
 
   /**
-   * Stores information when to overwrite certain inputs.
+   * Stores information on whether and how to overwrite certain inputs.
    * It is a vector of tuples of 5 elements:
    *  - Element 0: Index i of input to be overwritten
    *  - Element 1: Index j of input that defines if i is overwritten
@@ -68,14 +68,14 @@ namespace Belle2 {
 
 
     /**
-     * Convert pdg code to the index of the neural-network output that represents the correspondign probability
-     * @param pdg PDG code for particle-species hypotheses
+     * Convert pdg code to the index of the neural-network output that represents the corresponding probability
+     * @param pdg PDG code for particle-species hypothesis
      * @return int Index of neural-network output
      */
     int pdg2OutputIndex(const int pdg) const;
 
     /**
-     * Get the neural network odel-definition string for frugaly-deep
+     * Get the neural network model-definition string for frugally-deep
      * @return const std::string& model-definition string
      */
     const std::string& getModelDefinition() const {return m_modelDefinition;}
@@ -90,13 +90,12 @@ namespace Belle2 {
      */
     const std::vector<float>& getStandardDeviations() const {return m_standardDeviations;}
     /**
-     * Get vector of input indices and corresponding values that are set if the coresponding input is NaN
-     * @return const PIDNNMissingInputs&  missing input handeling information
+     * Get vector of input indices and corresponding values that are set if the corresponding input is NaN
+     * @return const PIDNNMissingInputs&  missing input handnling information
      */
     const PIDNNMissingInputs& getHandleMissingInputs() const {return m_handleMissingInputs;}
     /**
-     * Get vector of input indices, whoes values are overwritten if ohter input variables are in a certain range.
-     *
+     * Get vector of input indices, whose values are overwritten if other input variables are in a certain range.
      * @return const PIDNNInputsToCut& overwrite inputs information
      */
     const PIDNNInputsToCut& getInputsToCut() const {return m_inputsToCut;}
@@ -126,8 +125,8 @@ namespace Belle2 {
   private:
 
     std::string m_description;                 /**< description of neural network parameters*/
-    std::vector<std::string> m_inputNames;     /**< list if input names*/
-    std::string m_modelDefinition;             /**< neural network string for frugaly-deep*/
+    std::vector<std::string> m_inputNames;     /**< list of input names*/
+    std::string m_modelDefinition;             /**< neural network string for frugally-deep*/
     std::vector<int> m_outputSpeciesPdg;       /**< PDG codes of hypotheses of neural-network output*/
     std::vector<float> m_meanValues;           /**< mean values of inputs*/
     std::vector<float> m_standardDeviations;   /**< standard deviations of inputs*/

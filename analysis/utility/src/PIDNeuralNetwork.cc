@@ -24,7 +24,7 @@ void PIDNeuralNetwork::loadParametersFromDB()
 
   m_model = std::make_unique<fdeep::model>(fdeep::read_model_from_string((*m_pidNeuralNetworkParametersDB)->getModelDefinition(),
                                            false,
-  [](const std::string&) {}  // diable logger
+  [](const std::string&) {}  // disable logger
                                                                         ));
 }
 
@@ -32,10 +32,6 @@ void PIDNeuralNetwork::loadParametersFromDB()
 double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
 {
   const int outputIndex = (*m_pidNeuralNetworkParametersDB)->pdg2OutputIndex(pdg);
-  // {
-  // const auto inputFdeep = fdeep::tensor(fdeep::tensor_shape(input.size()), input);
-  // std::cout << "Original input: " << fdeep::show_tensor(inputFdeep) << std::endl;
-  // }
 
   // apply cuts, ie. overwrite certain input values with index `inputSetIndex` with the value `setValue`
   // if the input with index `inputCutIndex` is in the range (`rangeStart`, `rangeEnd`)
@@ -70,8 +66,6 @@ double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
 
   // apply neural network
   const auto inputFdeep = fdeep::tensor(fdeep::tensor_shape(input.size()), input);
-  // std::cout << "Input: " << fdeep::show_tensor(inputFdeep) << std::endl;
   const auto result = m_model->predict({inputFdeep});
-  // std::cout << "Output: " << fdeep::show_tensors(result) << std::endl;
   return result.front().get(fdeep::tensor_pos(outputIndex));
 }

@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   /**
-   * Module that creates PID neural network parameters and uploads it to the DB
+   * Module that creates PID neural network parameters and uploads them to the DB
    */
   class PIDNeuralNetworkParametersCreatorModule : public Module {
 
@@ -34,8 +34,8 @@ namespace Belle2 {
     std::string m_neuralNetworkParametersName;  /**< Name of the set of parameters */
 
     std::string m_description;                 /**< description of neural network parameters*/
-    std::vector<std::string> m_inputNames;     /**< list if input names*/
-    std::string m_modelDefinition;             /**< neural network string for frugaly-deep*/
+    std::vector<std::string> m_inputNames;     /**< list of input names*/
+    std::string m_modelDefinition;             /**< neural network string for frugally-deep*/
     std::vector<int> m_outputSpeciesPdg;       /**< PDG codes of hypotheses of neural-network output*/
     std::vector<float> m_meanValues;           /**< mean values of inputs*/
     std::vector<float> m_standardDeviations;   /**< standard deviations of inputs*/

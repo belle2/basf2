@@ -390,6 +390,10 @@ namespace Belle2 {
         B2ERROR("Need pdg code for pidNeuralNetworkValueExpert");
         return nullptr;
       }
+      if (arguments.size() > 2) {
+        B2ERROR("pidNeuralNetworkValueExpert expects at most two arguments, i.e. the pdg code and the pidNeuralNetworkName");
+        return nullptr;
+      }
       int pdgCode;
       try {
         pdgCode = abs(Belle2::convertString<int>(arguments[0]));
@@ -399,7 +403,7 @@ namespace Belle2 {
       }
 
       std::shared_ptr<PIDNeuralNetwork> neuralNetworkPtr;
-      if (arguments.size() >= 2) {
+      if (arguments.size() == 2) {
         std::string parameterSetName = arguments[1];
         neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>(parameterSetName);
       } else {
@@ -408,16 +412,16 @@ namespace Belle2 {
 
       /**
        * Input mapping:
-       * Preparing the set if input variables is done by first creating a
+       * Preparing the set of input variables is done by first creating a
        * list `inputsAll` of all possible input variables in an order defined by this function.
        * Then only those variables that are needed by the used neural network are selected
        * and ordered accordingly. This allows to employ different neural networks with different
        * inputs using the same code. For performance reasons, we first create a mapping between the
-       * index in the enural-network input array and the inputsAll here once, as this requires
+       * index in the neural-network input array and the inputsAll here once, as this requires
        * time-consuming string comparisons, and then use this mapping in the code that collects the inputs
        * for each track below.
-       * CAUTION: If you change the list of inputsAll here, you have to change it also the loop the collects
-       *          the input variables of each track in the code below.
+       * CAUTION: If you change the list of inputsAll here, you have to change it also in the loop that
+       *          collects the input variables of each track in the code below.
        */
       // build list of all input names
       std::vector<std::string> inputsAllNames;
@@ -1018,46 +1022,40 @@ namespace Belle2 {
     };
 
 
-    Manager::FunctionPtr electronIDNN(std::vector<std::string> arguments)
+    double electronIDNN(const Particle* particle)
     {
-      arguments.insert(arguments.begin(), "11");
-      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
-      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
+      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"11"});
+      return std::get<double>(func(particle));
     }
 
-    Manager::FunctionPtr muonIDNN(std::vector<std::string> arguments)
+    double muonIDNN(const Particle* particle)
     {
-      arguments.insert(arguments.begin(), "13");
-      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
-      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
+      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"13"});
+      return std::get<double>(func(particle));
     }
 
-    Manager::FunctionPtr pionIDNN(std::vector<std::string> arguments)
+    double pionIDNN(const Particle* particle)
     {
-      arguments.insert(arguments.begin(), "211");
-      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
-      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
+      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"211"});
+      return std::get<double>(func(particle));
     }
 
-    Manager::FunctionPtr kaonIDNN(std::vector<std::string> arguments)
+    double kaonIDNN(const Particle* particle)
     {
-      arguments.insert(arguments.begin(), "321");
-      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
-      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
+      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"321"});
+      return std::get<double>(func(particle));
     }
 
-    Manager::FunctionPtr protonIDNN(std::vector<std::string> arguments)
+    double protonIDNN(const Particle* particle)
     {
-      arguments.insert(arguments.begin(), "2212");
-      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
-      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
+      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"2212"});
+      return std::get<double>(func(particle));
     }
 
-    Manager::FunctionPtr deuteronIDNN(std::vector<std::string> arguments)
+    double deuteronIDNN(const Particle* particle)
     {
-      arguments.insert(arguments.begin(), "1000010020");
-      Manager::FunctionPtr func = pidNeuralNetworkValueExpert(arguments);
-      return [func](const Particle * particle) -> double {return std::get<double>(func(particle));};
+      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"1000010020"});
+      return std::get<double>(func(particle));
     }
 
 
@@ -1264,42 +1262,36 @@ One can provide the name of the weight matrix as the argument.
                           Manager::VariableDataType::c_double);
 
 
-    REGISTER_METAVARIABLE("electronIDNN(PIDNeuralNetworkName)", electronIDNN,
+    REGISTER_VARIABLE("electronIDNN", electronIDNN,
 			  R"DOC(
 electron identification probability as calculated from the PID neural network.
 One can provide the name of the neural network to be used.
-)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("muonIDNN(PIDNeuralNetworkName)", muonIDNN,
+)DOC");
+    REGISTER_VARIABLE("muonIDNN", muonIDNN,
 			  R"DOC(
 muon identification probability as calculated from the PID neural network.
 One can provide the name of the neural network to be used.
-)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pionIDNN(PIDNeuralNetworkName)", pionIDNN,
+)DOC");
+    REGISTER_VARIABLE("pionIDNN", pionIDNN,
 			  R"DOC(
 pion identification probability as calculated from the PID neural network.
 One can provide the name of the neural network to be used.
-)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("kaonIDNN(PIDNeuralNetworkName)", kaonIDNN,
+)DOC");
+    REGISTER_VARIABLE("kaonIDNN", kaonIDNN,
 			  R"DOC(
 kaon identification probability as calculated from the PID neural network.
 One can provide the name of the neural network to be used.
-)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("protonIDNN(PIDNeuralNetworkName)", protonIDNN,
+)DOC");
+    REGISTER_VARIABLE("protonIDNN", protonIDNN,
 			  R"DOC(
 proton identification probability as calculated from the PID neural network.
 One can provide the name of the neural network to be used.
-)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("deuteronIDNN(PIDNeuralNetworkName)", deuteronIDNN,
+)DOC");
+    REGISTER_VARIABLE("deuteronIDNN", deuteronIDNN,
 			  R"DOC(
 deuteron identification probability as calculated from the PID neural network.
 One can provide the name of the neural network to be used.
-)DOC",
-                          Manager::VariableDataType::c_double);
+)DOC");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

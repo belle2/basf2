@@ -61,8 +61,8 @@ namespace Belle2 {
     }
 
     /**
-     * Predict neural-network output for hypotheses `pdg` using the given inputs
-     * @param pdg PDG code of particle-species hypothisis for wich the probability is calculated
+     * Predict neural-network output for hypothesis `pdg` using the given inputs
+     * @param pdg PDG code of particle-species hypothesis for which the probability is calculated
      * @param inputs  set of input variables
      * @return double probability of the asked particle-species hypothesis
      */
@@ -98,7 +98,7 @@ namespace Belle2 {
     std::unique_ptr<DBObjPtr<PIDNeuralNetworkParameters>>
                                                        m_pidNeuralNetworkParametersDB; /**< db object for the parameter set */
 
-    std::unique_ptr<const fdeep::model> m_model; /**< frugaly-deep neural network */
+    std::unique_ptr<const fdeep::model> m_model; /**< frugally-deep neural network */
 
   };
 

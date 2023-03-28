@@ -337,32 +337,32 @@ namespace Belle2 {
     /**
      * @return electron ID from Neural Network to be used in the physics analyses
      */
-    Manager::FunctionPtr electronIDNN(std::vector<std::string> arguments);
+    double electronIDNN(const Particle* particle);
 
     /**
      * @return muon ID from Neural Network to be used in the physics analyses
      */
-    Manager::FunctionPtr muonIDNN(std::vector<std::string> arguments);
+    double muonIDNN(const Particle* particle);
 
     /**
      * @return pion ID from Neural Network to be used in the physics analyses
      */
-    Manager::FunctionPtr pionIDNN(std::vector<std::string> arguments);
+    double pionIDNN(const Particle* particle);
 
     /**
      * @return kaon ID from Neural Network to be used in the physics analyses
      */
-    Manager::FunctionPtr kaonIDNN(std::vector<std::string> arguments);
+    double kaonIDNN(const Particle* particle);
 
     /**
      * @return proton ID from Neural Network to be used in the physics analyses
      */
-    Manager::FunctionPtr protonIDNN(std::vector<std::string> arguments);
+    double protonIDNN(const Particle* particle);
 
     /**
      * @return deuteron ID from Neural Network to be used in the physics analyses
      */
-    Manager::FunctionPtr deuteronIDNN(std::vector<std::string> arguments);
+    double deuteronIDNN(const Particle* particle);
 
     /**
      * Parses the detector list for the PID metafunctions.

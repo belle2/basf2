@@ -1,0 +1,17 @@
+[INFO] Steering file: tutorials_B2A4XX.py
+TFile: B2A400-TreeFit.root
+TTree: B0
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 11
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __weight__, 1.0
+TBranch: isSignal, 1.0
+TBranch: chiProb, 0.5428992332429923
+TBranch: p, 1.5482727804000864
+TBranch: mcP, 1.4384695989250262
+TBranch: pErr, 0.03398140032399363
+TBranch: daughter__bo0__cm__spE__bc, 2.780530251871189
+TBranch: originalDaughter__bo0__cm__spE__bc, 2.7906391023489405

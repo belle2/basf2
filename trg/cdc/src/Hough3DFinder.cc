@@ -65,7 +65,7 @@ namespace Belle2 {
     m_mBool["debugEfficiency"] = 1;
     m_mBool["debugNTs"] = 1;
 
-    m_mConstD["Trg_PI"] = 3.141592653589793;
+    m_mConstD["Trg_PI"] = M_PI;
     // Get rr,zToStraw,angleSt,nWire
     const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);

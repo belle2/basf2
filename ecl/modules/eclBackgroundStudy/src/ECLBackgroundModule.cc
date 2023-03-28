@@ -25,6 +25,7 @@
 /* ROOT headers. */
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TMath.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -350,8 +351,7 @@ void ECLBackgroundModule::event()
     //get number of background showers with energy above 20MeV
     if (Energy > 0.02) {
       h_Shower->Fill(Energy);
-      h_ShowerVsTheta->Fill(Energy, theta * 180 / M_PI);
-
+      h_ShowerVsTheta->Fill(Energy, theta * TMath::RadToDeg());
     }
   }
 
@@ -491,7 +491,7 @@ int ECLBackgroundModule::SetPosHistos(TH1F* h, TH2F* hFWD, TH2F* hBAR, TH2F* hBW
       hBWD->Fill(floor(Crystal[i]->GetX()), floor(Crystal[i]->GetY()), value);
 
     } else
-      hBAR->Fill(floor(Crystal[i]->GetZ()), floor(Crystal[i]->GetR() * (Crystal[i]->GetPhi() - 180) * M_PI / 180), value);
+      hBAR->Fill(floor(Crystal[i]->GetZ()), floor(Crystal[i]->GetR() * (Crystal[i]->GetPhi() - 180) * TMath::DegToRad()), value);
   }
 
   return 1;

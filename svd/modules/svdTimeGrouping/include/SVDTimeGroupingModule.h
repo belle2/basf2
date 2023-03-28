@@ -41,13 +41,16 @@ namespace Belle2 {
 
 
     /** Init the module.
-    *
-    * prepares all store- and relationArrays.
-    */
+     *
+     * prepares all store- and relationArrays.
+     */
     virtual void initialize() override;
 
 
-    /** eventWise jobs (e.g. storing spacepoints */
+    /** EventWise jobs
+     *
+     * Grouping of SVD Clusters is performed here
+     */
     virtual void event() override;
 
 

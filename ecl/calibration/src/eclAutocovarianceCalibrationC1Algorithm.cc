@@ -41,7 +41,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   /** Histograms containing the data collected by eclAutocovarianceCalibrationC1Collector*/
   auto PPVsCrysID = getObjectPtr<TH2F>("PPVsCrysID");
 
-  std::vector<float> cryIDs;
+  std::vector<float> cellIDs;
   std::vector<float> PPamps;
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
@@ -59,7 +59,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
       counter++;
     }
 
-    cryIDs.push_back(crysID + 1);
+    cellIDs.push_back(crysID + 1);
     PPamps.push_back(counter);
 
     B2INFO("eclAutocovarianceCalibrationC1Algorithm: crysID counter fraction Total " << crysID << " " << counter << " " << fraction <<
@@ -69,7 +69,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   }
 
   /** Write out the noise threshold vs Crystal ID*/
-  auto gPPVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), PPamps.data());
+  auto gPPVsCrysID = new TGraph(cellIDs.size(), cellIDs.data(), PPamps.data());
   gPPVsCrysID->SetName("gPPVsCrysID");
 
   TString fName = m_outputName;
@@ -78,9 +78,9 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   gPPVsCrysID->Write();
 
   /**-----------------------------------------------------------------------------------------------*/
-  /** Write output to DB if requested and successful */
+  /** Write output to DB */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(PPamps, cryIDs);
+  PPThreshold->setCalibVector(PPamps, cellIDs);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC1Threshold");
   B2INFO("eclAutocovarianceCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 

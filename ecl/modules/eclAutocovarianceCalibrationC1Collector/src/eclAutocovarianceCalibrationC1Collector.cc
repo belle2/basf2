@@ -71,6 +71,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::collect()
       //Peak to peak amplitude used to gauge noise level
       float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
+      // I avoid using getObjectPtr<TH2>("PPVsCrysID")->Fill(id, PeakToPeak); to improve on run time as getObjectPtr is  very slow
       PPVsCrysID->Fill(id, PeakToPeak);
 
     }

@@ -44,6 +44,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   std::vector<float> cellIDs;
   std::vector<float> PPamps;
 
+  std::vector<int> cellIDsWithLowEntries;
+
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
     TH1F* hPP = (TH1F*)PPVsCellID->ProjectionY("hPP", crysID + 1, crysID + 1);
@@ -65,7 +67,19 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
     B2INFO("eclAutocovarianceCalibrationC1Algorithm: crysID counter fraction Total " << crysID << " " << counter << " " << fraction <<
            " " << Total);
 
-    if (Total < 100)  B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries is only: " << Total);
+    if (Total < 100) {
+      B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries is only: " << Total);
+      cellIDsWithLowEntries.push_back(crysID + 1);
+    }
+  }
+
+  if (cellIDsWithLowEntries.size() > 10) {
+
+    B2INFO("eclAutocovarianceCalibrationC1Algorithm: The following Cell ID's did not have enough entries:");
+    for (int i = 0; i < cellIDsWithLowEntries.size(); i++)  B2INFO("Cell ID: " << cellIDsWithLowEntries[i]);
+    B2INFO("eclAutocovarianceCalibrationC1Algorithm will return c_NotEnoughData");
+    return c_NotEnoughData;
+
   }
 
   /** Write out the noise threshold vs Celltal ID*/

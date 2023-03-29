@@ -46,7 +46,7 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    TH2F* PPVsCrysID; /**< histogram of Cell ID vs. Peak to Peak amplitude*/
+    TH2F* PPVsCrysID; /**< histogram of peak-to-peak amplitude vs crystalID (cellID-1) */
 
   };
 } // end Belle2 namespace

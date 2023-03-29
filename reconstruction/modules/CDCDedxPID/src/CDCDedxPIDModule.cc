@@ -603,7 +603,7 @@ void CDCDedxPIDModule::event()
 
     // save the PID information for both lookup tables and parameterized means and resolutions
     saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_pCDC, dedxTrack->m_dedxAvgTruncated,
-                 std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
+                 std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed, dedxTrack->m_timeReso);
     if (!m_useIndividualHits)
       saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_pCDC, dedxTrack->m_dedxAvgTruncated);
 
@@ -883,7 +883,7 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
 
 void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
                                     double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
-                                    double sin, int nhit) const
+                                    double sin, int nhit, double timereso) const
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
@@ -892,7 +892,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 
     // determine the predicted mean and resolution
     double mean = getMean(bg);
-    double sigma = getSigma(mean, nhit, sin);
+    double sigma = getSigma(mean, nhit, sin) * timereso;
 
     predmean[pdgIter.getIndex()] = mean;
     predsigma[pdgIter.getIndex()] = sigma;

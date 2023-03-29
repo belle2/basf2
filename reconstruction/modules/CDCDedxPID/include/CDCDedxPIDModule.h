@@ -131,7 +131,7 @@ namespace Belle2 {
      * @param nhit      number of hits used for this track
      * */
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
-                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
+                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit, double timereso) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.

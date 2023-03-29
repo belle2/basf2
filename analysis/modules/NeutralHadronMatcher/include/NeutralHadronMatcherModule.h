@@ -32,7 +32,9 @@ namespace Belle2 {
     double m_effcorr;
     /** 3d matching parameter */
     double m_distance;
-    /** extra info variable extension */
+    /** extra info variable for distance */
     std::string m_infoName;
+    /** extra info variable for matched MC */
+    std::string m_matchedId;
   };
 }

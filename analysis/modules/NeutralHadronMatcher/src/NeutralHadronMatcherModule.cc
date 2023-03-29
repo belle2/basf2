@@ -25,8 +25,10 @@ void NeutralHadronMatcherModule::initialize()
 {
   if (mcPDG == 130) {
     m_infoName = "mcdistanceKL";
+    m_matchedId = "mdstIndexTruthKL";
   } else if (abs(mcPDG) == 2112) {
     m_infoName = "mcdistanceNeutron";
+    m_matchedId = "mdstIndexTruthNeutron";
   } else {
     B2FATAL("Unsupported mcPDG value: " << mcPDG);
   }
@@ -48,6 +50,7 @@ void NeutralHadronMatcherModule::event()
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
       particle->addExtraInfo(m_infoName, 1.e10);
+      particle->addExtraInfo(m_matchedId, -1);
     }
   }
 
@@ -63,7 +66,7 @@ void NeutralHadronMatcherModule::event()
 
   // loop over MC particles first
   for (MCParticle& mcPart : mcparticles) {
-    if (abs(mcPart.getPDG()) == mcPDG) {
+    if (mcPart.isPrimaryParticle() && abs(mcPart.getPDG()) == mcPDG) {
 
       bool AddInefficiency = (gRandom->Uniform() > m_effcorr);
       auto vtx = mcPart.getProductionVertex();
@@ -106,7 +109,9 @@ void NeutralHadronMatcherModule::event()
             }
 
             particle->setExtraInfo(m_infoName, distMin);
-
+            if ((distMin < m_distance) & (distMin > 0)) {
+              particle->setExtraInfo(m_matchedId, mcPart.getArrayIndex());
+            }
           }
         }
       }

@@ -66,13 +66,21 @@ namespace Belle2 {
       m_inputsToCut(inputsToCut)
     {}
 
-
     /**
      * Convert pdg code to the index of the neural-network output that represents the corresponding probability
      * @param pdg PDG code for particle-species hypothesis
-     * @return int Index of neural-network output
+     * @param throwException throw exception of pdg code is not predicted
+     * @return int Index of neural-network output. -1 if pdg code not predicted by neural network
      */
-    int pdg2OutputIndex(const int pdg) const;
+    int pdg2OutputIndex(const int pdg, const bool throwException = true) const;
+
+    /**
+     * @param pdg pdg code of hypothesis
+     * @param throwException throw exception of pdg code is not predicted
+     * @return true  if neural network predicts probability for the given hypothesis
+     * @return false if neural network does not predicts probability for the given hypothesis
+     */
+    bool hasPdgCode(const int pdg, const bool throwException = false) const {return pdg2OutputIndex(pdg, throwException) >= 0;}
 
     /**
      * Get the neural network model-definition string for frugally-deep

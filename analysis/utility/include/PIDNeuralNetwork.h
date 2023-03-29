@@ -99,6 +99,14 @@ namespace Belle2 {
      */
     const std::string& getPIDNeuralNetworkParametersName() const {return m_pidNeuralNetworkParametersName;}
 
+    /**
+     * @param pdg pdg code of hypothesis
+     * @param throwException throw exception of pdg code is not predicted
+     * @return true  if neural network predicts probability for the given hypothesis
+     * @return false if neural network does not predicts probability for the given hypothesis
+     */
+    bool hasPdgCode(const int pdg, const bool throwException = false) const {return (*m_pidNeuralNetworkParametersDB)->hasPdgCode(pdg, throwException);}
+
   private:
 
     /**

@@ -16,11 +16,15 @@
 using namespace Belle2;
 
 
-int PIDNeuralNetworkParameters::pdg2OutputIndex(const int pdg) const
+int PIDNeuralNetworkParameters::pdg2OutputIndex(const int pdg, const bool throwException) const
 {
   const auto itr = std::find(m_outputSpeciesPdg.begin(), m_outputSpeciesPdg.end(), pdg);
-  if (itr == m_outputSpeciesPdg.end()) B2FATAL("Invalid particle species: " << pdg
-                                                 << ". PID neural network not trained for this particle species");
+  if (itr == m_outputSpeciesPdg.end()) {
+    if (throwException)
+      B2FATAL("Invalid particle-species hypothesis: " << pdg
+              << ". PID neural network is not trained for this particle-species hypothesis");
+    return -1;
+  }
   return static_cast<size_t>(itr - m_outputSpeciesPdg.begin());
 }
 

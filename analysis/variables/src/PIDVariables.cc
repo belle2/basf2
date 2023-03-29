@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -448,8 +449,18 @@ namespace Belle2 {
         mapInputsNN2InputsAll.push_back(static_cast<size_t>(itr - inputsAllNames.begin()));
       }
 
+      // std::map<int, std::string> extraInfoNames; // mapping from pdg code to extra info names
+      // for (const auto outputPdgCode: neuralNetworkPtr->getOutputSpeciesPdg())
+      // {
+      //   extraInfoNames[outputPdgCode] = "pidNeuralNetworkValueExpert("+std::to_string(outputPdgCode) + "," + neuralNetworkPtr->getPIDNeuralNetworkParametersName()+")";
+      // }
+
 
       auto func = [neuralNetworkPtr, pdgCode, mapInputsNN2InputsAll, inputsAllSize](const Particle * part) -> double {
+        // const std::string extraInfoName = extraInfoNames.at(pdgCode);
+        // if (part->hasExtraInfo(extraInfoName))
+        //   return part->getExtraInfo(extraInfoName);
+
         const auto& neuralNetwork = *neuralNetworkPtr;
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
@@ -460,6 +471,7 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
         }
 
+
         /**
          * prepare inputs
          * CAUTION: If you change the inputs stored in `inputsAll` or their order,
@@ -467,8 +479,7 @@ namespace Belle2 {
          */
         std::vector<float> inputsAll;
         inputsAll.reserve(inputsAllSize);
-        const auto& frame = ReferenceFrame::GetCurrent();
-        const auto mom = frame.getMomentum(part);
+        const auto mom = part->getTrackFitResult()->getMomentum();
         for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
           for (const auto& hypType : Const::chargedStableSet) {
@@ -477,7 +488,7 @@ namespace Belle2 {
             else inputsAll.push_back(logL);
           }
         }
-        inputsAll.push_back(mom.P());
+        inputsAll.push_back(sqrt(mom.Mag2()));
         inputsAll.push_back(cos(mom.Theta()));
         inputsAll.push_back(mom.Phi());
         inputsAll.push_back(part->getCharge());
@@ -490,7 +501,16 @@ namespace Belle2 {
           inputsNN.push_back(inputsAll[indexAll]);
         }
 
-        return neuralNetwork.predict(pdgCode, inputsNN);
+        const auto probabilities = neuralNetwork.predict(inputsNN);
+
+        // store all probabilities for all hypotheses in extraInfo
+        // for(const auto element: probabilities)
+        // {
+        //   const auto [pdgCodeElement, probability] = element;
+        //   part->addExtraInfo(extraInfoNames.at(pdgCodeElement), probability);
+        // }
+
+        return probabilities.at(pdgCode);
       };
 
       return func;
@@ -1024,37 +1044,37 @@ namespace Belle2 {
 
     double electronIDNN(const Particle* particle)
     {
-      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"11"});
+      static auto func = pidNeuralNetworkValueExpert({"11"});
       return std::get<double>(func(particle));
     }
 
     double muonIDNN(const Particle* particle)
     {
-      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"13"});
+      static auto func = pidNeuralNetworkValueExpert({"13"});
       return std::get<double>(func(particle));
     }
 
     double pionIDNN(const Particle* particle)
     {
-      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"211"});
+      static auto func = pidNeuralNetworkValueExpert({"211"});
       return std::get<double>(func(particle));
     }
 
     double kaonIDNN(const Particle* particle)
     {
-      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"321"});
+      static auto func = pidNeuralNetworkValueExpert({"321"});
       return std::get<double>(func(particle));
     }
 
     double protonIDNN(const Particle* particle)
     {
-      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"2212"});
+      static auto func = pidNeuralNetworkValueExpert({"2212"});
       return std::get<double>(func(particle));
     }
 
     double deuteronIDNN(const Particle* particle)
     {
-      static Manager::FunctionPtr func = pidNeuralNetworkValueExpert({"1000010020"});
+      static auto func = pidNeuralNetworkValueExpert({"1000010020"});
       return std::get<double>(func(particle));
     }
 

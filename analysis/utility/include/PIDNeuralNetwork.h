@@ -61,12 +61,12 @@ namespace Belle2 {
     }
 
     /**
-     * Predict neural-network output for hypothesis `pdg` using the given inputs
-     * @param pdg PDG code of particle-species hypothesis for which the probability is calculated
+     * Predict neural-network output for all implemented hypotheses using the given inputs
      * @param inputs  set of input variables
      * @return double probability of the asked particle-species hypothesis
+     * @return std::map<int, double> map of pdg codes to the corresponding probabilities
      */
-    double predict(int pdg, std::vector<float> inputs) const;
+    std::map<int, double> predict(std::vector<float> inputs) const;
 
     /**
      * Get number of inputs
@@ -86,6 +86,18 @@ namespace Belle2 {
      */
     const std::vector<std::string>& getInputNames() const { return (*m_pidNeuralNetworkParametersDB)->getInputNames(); }
 
+    /**
+     * Get the list of pdg codes of species hypotheses, for which the network predicts
+     * the probability in the order defined by the network output layer
+     * @return const std::vector<int>&  list of pdg codes of hypotheses predicted by the network
+     */
+    const std::vector<int>& getOutputSpeciesPdg() const {return (*m_pidNeuralNetworkParametersDB)->getOutputSpeciesPdg();}
+
+    /**
+     * Get the name of the used neural network
+     * @return const std::string& name of the used neural network
+     */
+    const std::string& getPIDNeuralNetworkParametersName() const {return m_pidNeuralNetworkParametersName;}
 
   private:
 

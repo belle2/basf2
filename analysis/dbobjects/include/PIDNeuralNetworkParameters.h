@@ -122,6 +122,13 @@ namespace Belle2 {
      */
     const std::string& getDescription() const {return m_description;}
 
+    /**
+     * Get the list of pdg codes of species hypotheses, for which the network predicts
+     * the probability in the order defined by the network output layer
+     * @return const std::vector<int>&  list of pdg codes of hypotheses predicted by the network
+     */
+    const std::vector<int>& getOutputSpeciesPdg() const {return m_outputSpeciesPdg;}
+
   private:
 
     std::string m_description;                 /**< description of neural network parameters*/

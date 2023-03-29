@@ -29,9 +29,8 @@ void PIDNeuralNetwork::loadParametersFromDB()
 }
 
 
-double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
+std::map<int, double> PIDNeuralNetwork::predict(std::vector<float> input) const
 {
-  const int outputIndex = (*m_pidNeuralNetworkParametersDB)->pdg2OutputIndex(pdg);
 
   // apply cuts, ie. overwrite certain input values with index `inputSetIndex` with the value `setValue`
   // if the input with index `inputCutIndex` is in the range (`rangeStart`, `rangeEnd`)
@@ -67,5 +66,11 @@ double PIDNeuralNetwork::predict(const int pdg, std::vector<float> input) const
   // apply neural network
   const auto inputFdeep = fdeep::tensor(fdeep::tensor_shape(input.size()), input);
   const auto result = m_model->predict({inputFdeep});
-  return result.front().get(fdeep::tensor_pos(outputIndex));
+
+  std::map<int, double> probabilities;
+  for (const auto pdgCode : getOutputSpeciesPdg()) {
+    const int outputIndex = (*m_pidNeuralNetworkParametersDB)->pdg2OutputIndex(pdgCode);
+    probabilities[pdgCode] = result.front().get(fdeep::tensor_pos(outputIndex));
+  }
+  return probabilities;
 }

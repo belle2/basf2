@@ -411,7 +411,7 @@ namespace Belle2 {
         neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>();
       }
 
-      neuralNetworkPtr->hasPdgCode(pdgCode, true); // raise exception of pdg code is not predicted
+      neuralNetworkPtr->hasPdgCode(pdgCode, true); // raise exception if pdg code is not predicted
 
       /**
        * Input mapping:

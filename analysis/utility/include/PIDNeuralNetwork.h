@@ -101,9 +101,9 @@ namespace Belle2 {
 
     /**
      * @param pdg pdg code of hypothesis
-     * @param throwException throw exception of pdg code is not predicted
+     * @param throwException throw exception if pdg code is not predicted
      * @return true  if neural network predicts probability for the given hypothesis
-     * @return false if neural network does not predicts probability for the given hypothesis
+     * @return false if neural network does not predict probability for the given hypothesis
      */
     bool hasPdgCode(const int pdg, const bool throwException = false) const {return (*m_pidNeuralNetworkParametersDB)->hasPdgCode(pdg, throwException);}
 

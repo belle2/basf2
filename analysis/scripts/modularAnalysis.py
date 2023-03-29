@@ -3285,6 +3285,37 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                     Belle1=b2bii.isB2BII())
 
 
+def getNeutralHadronGeomMatches(
+        particleLists,
+        addKL=True,
+        addNeutrons=False,
+        efficiencyCorrectionKl=0.83,
+        efficiencyCorrectionNeutrons=1.0,
+        path=None):
+    """
+    For an based ECL list, assign the mcdistanceKL and mcdistanceNeutron variables that correspond
+    to the distance to the closest MC KL and neutron, respectively.
+    @param particleLists the input ParticleLists, must be an ECL-based lists (e.g. photons)
+    @param addKL (default True) add distance to MC KL
+    @param addNeutrons (default Falst) add distance to MC neutrons
+    @param efficiencyCorrectionKl (default 0.83) apply overall efficiency correction
+    @param efficiencyCorrectionNeutrons (default 1,) apply overall efficiency correction
+    @param path    modules are added to this path
+    """
+    if addKL:
+        path.add_module(
+            "NeutralHadronMatcher",
+            particleLists=particleLists,
+            mcPDGcode=130,
+            efficiencyCorrection=efficiencyCorrectionKl)
+    if addNeutrons:
+        path.add_module(
+            "NeutralHadronMatcher",
+            particleLists=particleLists,
+            mcPDGcode=2112,
+            efficiencyCorrection=efficiencyCorrectionNeutrons)
+
+
 def getBeamBackgroundProbability(particleList, weight, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)

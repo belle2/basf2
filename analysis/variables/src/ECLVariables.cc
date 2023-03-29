@@ -35,6 +35,29 @@
 
 namespace Belle2 {
   namespace Variable {
+    double distanceToMcKl(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mcdistanceKL")) {
+        return particle->getExtraInfo("mcdistanceKL");
+      } else {
+        B2WARNING("The extraInfo mcdistanceKL is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double distanceToMcNeutron(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mcdistanceNeutron")) {
+        return particle->getExtraInfo("mcdistanceNeutron");
+      } else {
+        B2WARNING("The extraInfo mcdistanceNeutron is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+
     double beamBackgroundSuppression(const Particle* particle)
     {
       if (particle->hasExtraInfo("beamBackgroundSuppression")) {
@@ -1504,6 +1527,20 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
 This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
 
 )DOC","GeV");
+
+    REGISTER_VARIABLE("distanceToMcKl",distanceToMcKl,R"DOC(
+      Returns the distance to the nearest truth KL particle, extrapolated to the cluster radius. To use
+      this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+      negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+      to MC difference in KL efficiency.  
+)DOC");
+
+    REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
+      Returns the distance to the nearest truth (anti)neutron, extrapolated to the cluster radius. To use
+      this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+      negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+      to MC difference in KL efficiency.  
+)DOC");
 
   }
 }

@@ -41,6 +41,7 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
+    /** Transfer fom array container to ROOT histogram */
     void closeRun() override;
 
   private:
@@ -48,15 +49,15 @@ namespace Belle2 {
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;  /**< thresholds obtained from C1 stage */
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline; /**< baselines obtained from C2 stage */
     std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
-    DBObjPtr<ECLAutoCovariance> m_ECLAutocovarianceCalibrationC3Autocovariances;
+    DBObjPtr<ECLAutoCovariance> m_ECLAutocovarianceCalibrationC3Autocovariances; /**< Autocovariances obtained from C3 stage */
 
-    TH2F* Chi2VsCrysID;
+    TH2F* Chi2VsCrysID; /**< Store fit chi2 vs. crystal ID for validation */
 
-    std::vector<TMatrixDSym> m_NoiseMatrix;
+    std::vector<TMatrixDSym> m_NoiseMatrix; /**< Stores noise matrix derived from  the input Autocovariances */
 
   };
 } // end Belle2 namespace

@@ -27,8 +27,7 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor.
-     */
+    /** Constructor. */
     eclAutocovarianceCalibrationC3CollectorModule();
 
     /** Define histograms and read payloads from DB */
@@ -44,14 +43,12 @@ namespace Belle2 {
 
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
-
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;  /**< thresholds obtained from C1 stage */
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline; /**< baselines obtained from C2 stage */
     std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
     std::vector<float> m_tempArray; /**< vector of thresholds obtained from DB object */
     TH2F* CovarianceMatrixInfoVsCrysID;  /**< result returned by collector that contains the coveriance matrix for each crystal  */
-
     float myHist[8736][32]; /**< container for coveriance matrix  */
 
   };

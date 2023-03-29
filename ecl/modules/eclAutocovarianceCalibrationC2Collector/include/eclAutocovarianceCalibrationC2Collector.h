@@ -37,6 +37,7 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
+    /** save histograms */
     void closeRun() override;
 
   private:

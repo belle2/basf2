@@ -3,7 +3,7 @@
 # NickName: Bu_DMK+_DMtopi-pi0
 # Documentation: Control mode
 # Tested: Yes
-# PhysicsWG: BTOHADRONIC 
+# PhysicsWG: BHADRONIC
 # Responsible: Markus Reif
 # Email: mreif@mpp.mpg.de
 # Cuts: None
@@ -14,13 +14,13 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.0 D- K+ PHOTOS PHSP;
+1.0 D-sig K+ PHOTOS PHSP;
 Enddecay
 CDecay anti-B0sig
 
-Decay D-
+Decay D-sig
 1.000 pi- pi0 PHOTOS PHSP;
 Enddecay
-CDecay D+
+CDecay D+sig
 
 End

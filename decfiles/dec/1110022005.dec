@@ -3,7 +3,7 @@
 # NickName: Bd_K+pi-pi0
 # Documentation: BToHadronic for [B0 -> K+ pi- pi0] Dalitz reweighting
 # Tested: Yes
-# PhysicsWG: BTOHADRONIC
+# PhysicsWG: BHADRONIC
 # Responsible: Markus Reif
 # Email: mreif@mpp.mpg.de
 # Cuts: None
@@ -13,8 +13,8 @@ Alias pi(2S)+sig pi(2S)+
 Alias pi(2S)-sig pi(2S)-
 ChargeConj pi(2S)+sig pi(2S)-sig
 
-Alias pi(2S)+sigK pi(2S)+ 
-Alias pi(2S)-sigK pi(2S)- 
+Alias pi(2S)+sigK pi(2S)+
+Alias pi(2S)-sigK pi(2S)-
 ChargeConj pi(2S)+sigK pi(2S)-sigK
 
 Alias pi(2S)0sigK pi(2S)0 

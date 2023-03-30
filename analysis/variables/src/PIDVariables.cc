@@ -399,7 +399,7 @@ namespace Belle2 {
       try {
         pdgCode = abs(Belle2::convertString<int>(arguments[0]));
       } catch (std::invalid_argument& e) {
-        B2ERROR("Second argument of pidNeuralNetworkValueExpert must be a PDG code");
+        B2ERROR("First argument of pidNeuralNetworkValueExpert must be a PDG code");
         return nullptr;
       }
 
@@ -1299,32 +1299,26 @@ One can provide the name of the weight matrix as the argument.
     REGISTER_VARIABLE("electronIDNN", electronIDNN,
 			  R"DOC(
 electron identification probability as calculated from the PID neural network.
-One can provide the name of the neural network to be used.
 )DOC");
     REGISTER_VARIABLE("muonIDNN", muonIDNN,
 			  R"DOC(
 muon identification probability as calculated from the PID neural network.
-One can provide the name of the neural network to be used.
 )DOC");
     REGISTER_VARIABLE("pionIDNN", pionIDNN,
 			  R"DOC(
 pion identification probability as calculated from the PID neural network.
-One can provide the name of the neural network to be used.
 )DOC");
     REGISTER_VARIABLE("kaonIDNN", kaonIDNN,
 			  R"DOC(
 kaon identification probability as calculated from the PID neural network.
-One can provide the name of the neural network to be used.
 )DOC");
     REGISTER_VARIABLE("protonIDNN", protonIDNN,
 			  R"DOC(
 proton identification probability as calculated from the PID neural network.
-One can provide the name of the neural network to be used.
 )DOC");
     REGISTER_VARIABLE("deuteronIDNN", deuteronIDNN,
 			  R"DOC(
 deuteron identification probability as calculated from the PID neural network.
-One can provide the name of the neural network to be used.
 )DOC");
 
     // Metafunctions for experts to access the basic PID quantities
@@ -1373,7 +1367,7 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidNeuralNetworkValueExpert(pdgCodeHyp, PIDNeuralNetworkName)",
                           pidNeuralNetworkValueExpert,
-                          "Probability for the pdgCodeHype calculated from a neural network, which uses high-level information as inputs,  "
+                          "Probability for the particle hypothesis pdgCodeHype calculated from a neural network, which uses high-level information as inputs,  "
                           "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);

@@ -343,7 +343,7 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   if (enableHitLevel) {
     for (int ihit = 0; ihit < h_nhits; ++ihit) {
 
-      //if (nodeadwire && m_DBWireGains->getWireGain(dedxTrack->getWire(ihit)) == 0)continue;
+      if (nodeadwire && m_DBWireGains->getWireGain(dedxTrack->getWire(ihit)) == 0)continue;
 
       h_lwire[ihit] = dedxTrack->getWireInLayer(ihit);
       h_wire[ihit] = dedxTrack->getWire(ihit);

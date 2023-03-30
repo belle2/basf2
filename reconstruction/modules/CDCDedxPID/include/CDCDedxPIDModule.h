@@ -129,6 +129,7 @@ namespace Belle2 {
      * @param dedx      dE/dx value
      * @param sin       track sin(theta)
      * @param nhit      number of hits used for this track
+     * @param timereso  time resolution from database
      * */
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
                       double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit, double timereso) const;

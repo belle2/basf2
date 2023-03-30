@@ -137,6 +137,9 @@ namespace Belle2 {
     /** Return the run gain for this track */
     double getRunGain() const { return m_runGain; }
 
+    /** Return the scale factor for this track */
+    double getScaleFactor() const { return m_scale; }
+
     /** Return the injection gain for this track */
     double getTimeMean() const { return m_timeGain; }
 

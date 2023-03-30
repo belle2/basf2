@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -48,6 +48,8 @@ KLMDigitizerModule::KLMDigitizerModule() :
   addParam("Efficiency", m_Efficiency,
            "Efficiency determination mode (\"Strip\" or \"Plane\").",
            std::string("Plane"));
+  addParam("CreateMultiStripDigits", m_CreateMultiStripDigits,
+           "Whether to create multi-strip digits.", false);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
@@ -153,7 +155,6 @@ void KLMDigitizerModule::digitizeRPC()
     lowerBound = it;
     upperBound = m_MapChannelSimHit.upper_bound(it->first);
     it = upperBound;
-    const KLMSimHit* simHit = lowerBound->second;
     if (m_EfficiencyMode == c_Strip) {
       float efficiency = m_StripEfficiency->getEfficiency(lowerBound->first);
       if (!efficiencyCorrection(efficiency))
@@ -174,7 +175,11 @@ void KLMDigitizerModule::digitizeRPC()
       ++it2;
     }
     KLMDigit* digit = m_Digits.appendNew(hit, strip);
-    digit->addRelationTo(simHit);
+    it2 = lowerBound;
+    while (it2 != upperBound) {
+      digit->addRelationTo(it2->second);
+      ++it2;
+    }
   }
 }
 
@@ -187,6 +192,8 @@ void KLMDigitizerModule::digitizeScintillator()
   const KLMScintillatorFEEData* FEEData;
   std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
   it, lowerBound, upperBound;
+  for (int i = 0; i < KLM::c_NChannelsAsic; ++i)
+    m_AsicDigits[i] = nullptr;
   it = m_MapChannelSimHit.begin();
   while (it != m_MapChannelSimHit.end()) {
     lowerBound = it;
@@ -207,8 +214,14 @@ void KLMDigitizerModule::digitizeScintillator()
     simulator.simulate(lowerBound, upperBound);
     if (simulator.getNGeneratedPhotoelectrons() == 0)
       continue;
-    KLMDigit* digit = m_Digits.appendNew(simHit);
-    digit->addRelationTo(simHit);
+    const KLMElectronicsChannel* electronicsChannel =
+      m_ElectronicsMap->getElectronicsChannel(lowerBound->first);
+    int channel = (electronicsChannel->getChannel() - 1) %
+                  KLM::c_NChannelsAsic;
+    KLMDigit* digit = new KLMDigit(simHit);
+    m_AsicDigits[channel] = digit;
+    m_AsicDigitSimHitsLowerBound[channel] = lowerBound;
+    m_AsicDigitSimHitsUpperBound[channel] = upperBound;
     digit->setMCTime(simulator.getMCTime());
     digit->setSiPMMCTime(simulator.getSiPMMCTime());
     digit->setNGeneratedPhotoelectrons(
@@ -239,6 +252,7 @@ void KLMDigitizerModule::digitizeAsic()
 {
   std::multimap<KLMElectronicsChannel, const KLMSimHit*>::iterator
   it, it2, upperBound;
+  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it3;
   it = m_MapAsicSimHit.begin();
   while (it != m_MapAsicSimHit.end()) {
     upperBound = m_MapAsicSimHit.upper_bound(it->first);
@@ -253,6 +267,94 @@ void KLMDigitizerModule::digitizeAsic()
         std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
     }
     digitizeScintillator();
+    if (m_CreateMultiStripDigits) {
+      int nDigits = 0;
+      for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
+        if (m_AsicDigits[i] != nullptr)
+          nDigits += 1;
+      }
+      bool multiStripMode = (nDigits >= 2);
+      int i = 0;
+      while (i < KLM::c_NChannelsAsic) {
+        KLMDigit* digit = m_AsicDigits[i];
+        if (digit == nullptr) {
+          ++i;
+          continue;
+        }
+        int minGroupChannel, maxGroupChannel;
+        if (i < 4) {
+          minGroupChannel = 1;
+          maxGroupChannel = 4;
+        } else if (i < 8) {
+          minGroupChannel = 5;
+          maxGroupChannel = 8;
+        } else if (i < 12) {
+          minGroupChannel = 9;
+          maxGroupChannel = 12;
+        } else {
+          minGroupChannel = 13;
+          maxGroupChannel = KLM::c_NChannelsAsic;
+        }
+        KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
+        KLMElectronicsChannel electronicsChannel(it->first);
+        int asic = electronicsChannel.getChannel();
+        bool connectedChannelFound = false;
+        int minStrip, maxStrip;
+        for (int j = minGroupChannel; j <= maxGroupChannel; ++j) {
+          electronicsChannel.setChannel(KLM::c_NChannelsAsic * asic + j);
+          const KLMChannelNumber* detectorChannel =
+            m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
+          if (detectorChannel != nullptr) {
+            int subdetector, section, sector, layer, plane, strip;
+            m_ElementNumbers->channelNumberToElementNumbers(
+              *detectorChannel, &subdetector, &section, &sector, &layer,
+              &plane, &strip);
+            if (!connectedChannelFound) {
+              connectedChannelFound = true;
+              minStrip = strip;
+              maxStrip = strip;
+            } else {
+              if (strip < minStrip)
+                minStrip = strip;
+              if (strip > maxStrip)
+                maxStrip = strip;
+            }
+          }
+        }
+        /* This should never happen. */
+        if (!connectedChannelFound)
+          B2FATAL("Cannot find connected electronics channels.");
+        if (multiStripMode) {
+          arrayDigit->setStrip(minStrip);
+          arrayDigit->setLastStrip(maxStrip);
+        }
+        for (int j = i; j < maxGroupChannel; ++j) {
+          if (m_AsicDigits[j] == nullptr)
+            continue;
+          for (it3 = m_AsicDigitSimHitsLowerBound[j];
+               it3 != m_AsicDigitSimHitsUpperBound[j]; ++it3) {
+            arrayDigit->addRelationTo(it3->second);
+          }
+        }
+        i = maxGroupChannel;
+      }
+      for (i = 0; i < KLM::c_NChannelsAsic; ++i) {
+        if (m_AsicDigits[i] != nullptr)
+          delete m_AsicDigits[i];
+      }
+    } else {
+      for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
+        KLMDigit* digit = m_AsicDigits[i];
+        if (digit == nullptr)
+          continue;
+        KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
+        for (it3 = m_AsicDigitSimHitsLowerBound[i];
+             it3 != m_AsicDigitSimHitsUpperBound[i]; ++it3) {
+          arrayDigit->addRelationTo(it3->second);
+        }
+        delete digit;
+      }
+    }
     it = upperBound;
   }
 }

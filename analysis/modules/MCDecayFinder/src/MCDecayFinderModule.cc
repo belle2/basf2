@@ -111,18 +111,18 @@ void MCDecayFinderModule::event()
             newParticle->appendDaughter(partDaughter, /* updateType = */ false); // particleSource remain c_MCParticle
           }
         }
-        m_outputList->addParticle(newParticle);
+        addUniqueParticleToList(newParticle);
 
       } else if (arrayIndex == -1) {
         // Particle is not created when no daughter is described in decayString
         Particle* newParticle = m_particles.appendNew(mcp);
         newParticle->addRelationTo(mcp);
 
-        m_outputList->addParticle(newParticle);
-
+        addUniqueParticleToList(newParticle);
       } else {
         // Particle is already created
-        m_outputList->addParticle(m_particles[arrayIndex]);
+        addUniqueParticleToList(m_particles[arrayIndex]);
+
       }
 
     }
@@ -258,8 +258,13 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
 void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
 {
-  if (MCMatching::isFSP(gen->getPDG()))
-    return; //stop at the bottom of the MC decay tree (ignore secondaries)
+  if (MCMatching::isFSP(gen->getPDG())) {
+    if (gen->getPDG() != Const::Kshort.getPDGCode()) // exception for K_S0
+      return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+    // Currently the decay of "FSP" cannot be specified except for K_S0,
+    // e.g. photon-conversion: gamma -> e+ e-, decay-in-flight: K+ -> mu+ nu_mu
+  }
 
   const vector<MCParticle*>& genDaughters = gen->getDaughters();
   for (auto daug : genDaughters) {
@@ -359,8 +364,7 @@ Particle* MCDecayFinderModule::buildParticleFromDecayTree(const DecayTree<MCPart
 
     Particle* partDaughter = buildParticleFromDecayTree(decayDaughters[index_decayDaughter], dd->getDaughter(iDD));
 
-    int daughterProperty = dd->getDaughter(iDD)->getProperty();
-    property |= dd->getDaughter(iDD)->getMother()->getProperty();
+    int daughterProperty = dd->getDaughter(iDD)->getMother()->getProperty();
     newParticle->appendDaughter(partDaughter, false, daughterProperty);
   }
 
@@ -381,4 +385,15 @@ Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, 
   }
 
   return newParticle;
+}
+
+void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
+{
+
+  for (auto existingParticle : *m_outputList) {
+    if (existingParticle.isCopyOf(newParticle))
+      return;
+  }
+
+  m_outputList->addParticle(newParticle);
 }

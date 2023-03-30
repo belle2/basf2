@@ -5,8 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef DEFREC_H
-#define DEFREC_H
+#pragma once
 
 enum { EVENT_RECORD_TYPE, BEGIN_RECORD_TYPE, PAUSE_RECORD_TYPE,
        RESUME_RECORD_TYPE, END_RECORD_TYPE
@@ -59,5 +58,4 @@ struct EndRec {
 //! Reserved - unused
   unsigned int reserve1;
 };
-
-#endif
+#pragma once

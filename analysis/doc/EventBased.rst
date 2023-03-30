@@ -15,7 +15,7 @@ In some situations, it is useful to make cuts on, and write out event-wise infor
 .. warning::
         Please note that this use model and the documentation are under development. 
 
-Please ask questions at `Belle II questions <https://questions.belle2.org/>`_ and report bugs using `JIRA <https://agira.desy.de/projects/BII/>`_. 
+Please ask questions at `Belle II questions <https://questions.belle2.org/>`_ and report bugs using `GitLab <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
 Be sure to tag your questions and bug reports as "analysis" and "event based" to help us find them.
 
 

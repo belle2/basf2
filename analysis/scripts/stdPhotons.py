@@ -14,8 +14,8 @@ import modularAnalysis as ma
 def stdPhotons(
         listtype='loose',
         path=None,
-        loadPhotonBeamBackgroundMVA=False,
-        loadPhotonHadronicSplitOffMVA=False,
+        beamBackgroundMVAWeight="",
+        fakePhotonMVAWeight="",
         biasCorrectionTable=""):
     """
     Function to prepare one of several standardized types of photon lists:
@@ -38,8 +38,20 @@ def stdPhotons(
     Parameters:
         listtype (str): name of standard list
         path (basf2.Path):           modules are added to this path
-        loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
+        beamBackgroundMVAWeight (str): type of weight file for beam background MVA; if empty, beam background MVA will not be used
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the beam background MVA.
+
+        fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the fake photon MVA.
+
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
 
                           .. tip::
@@ -50,9 +62,7 @@ def stdPhotons(
 
     # all photons (all neutral ECLClusters that have the c_nPhotons hypothesis)
     if listtype == 'all':
-        ma.fillParticleList('gamma:all', '', writeOut=True, path=path,
-                            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-                            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA)
+        ma.fillParticleList('gamma:all', '', writeOut=True, path=path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
@@ -60,16 +70,14 @@ def stdPhotons(
             'gamma:cdc',
             'inCDCAcceptance',
             writeOut=True,
-            path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
+            path=path
         )
     # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficiency cut
     # is already applied on mdst level for photons with E < 50 MeV.
     elif listtype == 'loose':
         stdPhotons('cdc', path,
-                   loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-                   loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA,
+                   beamBackgroundMVAWeight=beamBackgroundMVAWeight,
+                   fakePhotonMVAWeight=fakePhotonMVAWeight,
                    biasCorrectionTable=biasCorrectionTable)
         ma.cutAndCopyList(
             'gamma:loose',
@@ -80,8 +88,8 @@ def stdPhotons(
     # additional region dependent energy cuts
     elif listtype == 'tight':
         stdPhotons('loose', path,
-                   loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-                   loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA,
+                   beamBackgroundMVAWeight=beamBackgroundMVAWeight,
+                   fakePhotonMVAWeight=fakePhotonMVAWeight,
                    biasCorrectionTable=biasCorrectionTable)
         ma.cutAndCopyList(
             'gamma:tight',
@@ -95,9 +103,7 @@ def stdPhotons(
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180]] and [clusterE1E9>0.5]',
             writeOut=True,
-            path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
+            path=path
         )
     elif listtype == 'pi0eff20_May2020':
         ma.fillParticleList(
@@ -105,9 +111,7 @@ def stdPhotons(
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080]] and [clusterE1E9>0.4]',
             writeOut=True,
-            path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
+            path=path
         )
     elif listtype == 'pi0eff30_May2020' or listtype == 'pi0eff40_May2020':
         ma.fillParticleList(
@@ -115,9 +119,7 @@ def stdPhotons(
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]]',
             writeOut=True,
-            path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
+            path=path
         )
     elif listtype == 'pi0eff50_May2020':
         ma.fillParticleList(
@@ -125,9 +127,7 @@ def stdPhotons(
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
             [[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]',
             writeOut=True,
-            path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
+            path=path
         )
     elif listtype == 'pi0eff60_May2020':
         ma.fillParticleList(
@@ -135,15 +135,18 @@ def stdPhotons(
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
             writeOut=True,
-            path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
+            path=path
         )
     else:
         raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of photon lists!")
 
-    if biasCorrectionTable and listtype not in ['loose', 'tight']:
-        ma.correctEnergyBias(inputListNames=[f'gamma:{listtype}'], tableName=biasCorrectionTable, path=path)
+    if listtype not in ['loose', 'tight']:
+        if beamBackgroundMVAWeight:
+            ma.getBeamBackgroundProbability(particleList=f'gamma:{listtype}', weight=beamBackgroundMVAWeight, path=path)
+        if fakePhotonMVAWeight:
+            ma.getFakePhotonProbability(particleList=f'gamma:{listtype}', weight=fakePhotonMVAWeight, path=path)
+        if biasCorrectionTable:
+            ma.correctEnergyBias(inputListNames=[f'gamma:{listtype}'], tableName=biasCorrectionTable, path=path)
 
 # Used in skimming code
 

@@ -5,8 +5,7 @@ Modules
 * Fixed a bug in the `EventShapeCalculator` module and `modularAnalysis.buildEventShape` that was introduced in
   ``light-2302-genetta``. Meaningless values were provided for the event-shape variables.
 * Fixed a bug on the `findMCDecay` that creates duplicated particles which differ only in the order of their daughters.
-* Added new charged PID variables ``<hypothesis>IDNN``, where <hypothesis> is one of the six particle-species hypotheses,
-  e.g. `pionIDNN` or `kaonIDNN`. These charged PID variables represent the probability for the given hypothesis, calculated
+* Added new charged PID variables `kaonIDNN` and `pionIDNN` representing the probability for the given hypothesis, calculated
   from a neural network that uses high-level information such as PID likelihoods, track momentum and charge.
   The probabilities are unaffected by momentum updates in vertex fits or the application of the track momentum scale correction.
 

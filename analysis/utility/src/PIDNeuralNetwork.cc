@@ -58,8 +58,6 @@ std::map<int, double> PIDNeuralNetwork::predict(std::vector<float> input) const
   // handle missing information
   for (auto const& index_value : (*m_pidNeuralNetworkParametersDB)->getHandleMissingInputs()) {
     const auto [index, value] = index_value;
-    // const size_t index = index_value[0];
-    // const float value = index_value[1];
     if (std::isnan(input[index])) input[index] = value;
   }
 

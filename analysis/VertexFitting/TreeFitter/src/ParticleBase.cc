@@ -107,8 +107,9 @@ namespace TreeFitter {
     if (!mother) { // If there is no mother, this is the 'head of tree' particle (is never a resonance)
       rc = new InternalParticle(particle, nullptr, config, forceFitAll);
     } else if (particle->hasExtraInfo("bremsCorrected") // Has Bremsstrahlungs-recovery
-               && particle->getExtraInfo("bremsCorrected") != 0) { // No gammas assigned -> simple track
+               && particle->getExtraInfo("bremsCorrected") != 0) { // and gammas are attached
       rc = new Composite(particle, mother, config, true);
+      // if no gamma is attached, it is treated as a RecoTrack
     } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")
                && particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) { // dummy particles with invisible flag
       rc = new RecoResonance(particle, mother, config);

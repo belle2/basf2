@@ -290,7 +290,7 @@ namespace TreeFitter {
     }
 
     // 2) Find the best solution for z by running multiples of 2pi from the xy intersection(s)
-    double z1, z2;
+    double z1(0), z2(0);
     bool first = true;
     int ibest = 0;
     const int nturnsmax = 10; // Max number of turns we try backwards and forwards

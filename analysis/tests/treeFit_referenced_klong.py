@@ -70,8 +70,8 @@ class TestTreeFits(unittest.TestCase):
         print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
-        self.assertTrue(falsePositives == 1252, "Background rejection too small.")
-        self.assertTrue(truePositives == 322, "Signal rejection too high")
+        self.assertTrue(falsePositives == 1255, "Background rejection too small.")
+        self.assertTrue(truePositives == 317, "Signal rejection too high")
 
         self.assertTrue(SigDeltaEReasonable == 276, "Signal kinematics is wrongly reconstructed too much")
 

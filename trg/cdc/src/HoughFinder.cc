@@ -872,7 +872,7 @@ namespace Belle2 {
       trackList2DFitted.push_back(& aTrack);
 
       CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
-      double phi02D, Trg_PI;
+      double phi02D;
       vector<double> nWires(9);
       vector<double> rr(9);
       vector<double> rr2D;
@@ -888,7 +888,6 @@ namespace Belle2 {
       driftPhi2DError[2] = 0.0025806;
       driftPhi2DError[3] = 0.0019084;
       driftPhi2DError[4] = 0.001514;
-      Trg_PI = 3.141592653589793;
       // Check if all superlayers have one TS
       bool trackFull = 1;
       for (unsigned iSL = 0; iSL < _cdc.nSuperLayers(); iSL = iSL + 2) {
@@ -953,7 +952,7 @@ namespace Belle2 {
       for (unsigned iSL = 0; iSL < 9; iSL = iSL + 2) {
         const vector<TCLink*>& links = aTrack.links(iSL);
         const TCSegment* _segment = dynamic_cast<const TCSegment*>(& links[0]->hit()->cell());
-        wirePhi[iSL] =  _segment->localId() / nWires[iSL] * 4 * Trg_PI;
+        wirePhi[iSL] =  _segment->localId() / nWires[iSL] * 4 * M_PI;
         lutLR[iSL] = _segment->LUT()->getValue(_segment->lutPattern());
         mcLR[iSL] = _segment->hit()->mcLR();
         driftLength[iSL] = _segment->hit()->drift();
@@ -966,8 +965,8 @@ namespace Belle2 {
       // 2D fit values from IW 2D fitter
       phi02D = aTrack.helix().phi0();
       if (aTrack.charge() < 0) {
-        phi02D = phi02D - Trg_PI;
-        if (phi02D < 0) phi02D = phi02D + 2 * Trg_PI;
+        phi02D = phi02D - M_PI;
+        if (phi02D < 0) phi02D = phi02D + 2 * M_PI;
       }
       // Get 2D fit values from JB 2D fitter
       // Set phi2DError for 2D fit

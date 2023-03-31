@@ -21,7 +21,9 @@ namespace Belle2 {
   class NeutralHadronMatcherModule : public Module {
   public:
     NeutralHadronMatcherModule();
+    /** Overridden initialize method */
     virtual void initialize() override final;
+    /** Overridden event method */
     virtual void event() override final;
   private:
     /** input mcPDG value */

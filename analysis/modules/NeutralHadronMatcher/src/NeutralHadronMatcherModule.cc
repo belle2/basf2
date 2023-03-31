@@ -10,13 +10,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(NeutralHadronMatcher)
+REG_MODULE(NeutralHadronMatcher);
 
 NeutralHadronMatcherModule::NeutralHadronMatcherModule() : Module()
 {
   setDescription("Perform geometrical match between MC neutral hadron (given by mcPDG) and ECL clusters from the particleLists");
   addParam("particleLists", m_ParticleLists, "Input particle list");
-  addParam("efficiencyCorrection", m_effcorr, "1-data/mc efficiency correction factor", 0.83);
+  addParam("efficiencyCorrection", m_effcorr, "data/mc efficiency ratio", 0.83);
   addParam("distanceCut", m_distance, "Matching distance", 15.0);
   addParam("mcPDGcode", mcPDG, "MC PDG code of the neutral hadron", 130);
 }

@@ -67,13 +67,14 @@ namespace Belle2 {
      */
     StoreArray<SVDCluster> m_svdClusters;
 
-    bool   m_useClusterRawTime  = false; /**< Prepare module to work in raw-time if this
+    bool   m_useDB              = true;  /**< if true takes the configuration from the DB objects. */
+    bool   m_useClusterRawCoG3Time = false; /**< Prepare module to work in raw-time (CoG3) if this
       parameter is set. */
+    bool   m_isDisabled         = false; /**< Disables the module if true. */
 
     double m_tRangeLow          = -160.; /**< Expected low range of time histogram [ns]. */
     double m_tRangeHigh         =  160.; /**< Expected high range of time histogram [ns]. */
-    int    m_rebinningFactor    =   2; /**< Time bin width is 1/m_rebinningFactor ns. Also disables
-            the module if zero. */
+    int    m_rebinningFactor    = 2; /**< Time bin width is 1/m_rebinningFactor [ns]. */
     double m_fillSigmaN         = 3.; /**< Number of Gaussian sigmas (= hardcoded resolutions) used
            to fill the time histogram for each cluster. */
     double m_minSigma           = 1.; /**< Lower limit of cluster time sigma for the fit for the

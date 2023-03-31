@@ -23,9 +23,14 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
   setDescription("Assigns the time-group Id to SVD clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  // 1. Collections.
+  // 1a. Collections.
   addParam("SVDClusters", m_svdClustersName, "SVDCluster collection name", std::string(""));
-  addParam("useClusterRawTime", m_useClusterRawTime, "Group on the basis of the raw time", bool(false));
+
+  // 2b. Module Configuration
+  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
+  addParam("useClusterRawCoG3Time", m_useClusterRawCoG3Time,
+           "Group on the basis of the raw time (CoG3)", bool(false));
+  addParam("isDisabled", m_isDisabled, "if true, module is disabled", bool(false));
 
   // 2. Fill time Histogram:
   addParam("tRangeLow", m_tRangeLow, "This sets the x- range of histogram [ns].",
@@ -103,7 +108,7 @@ void SVDTimeGroupingModule::initialize()
 
   if (m_numberOfSignalGroups != m_maxGroups) m_includeOutOfRangeClusters = false;
 
-  if (m_rebinningFactor <= 0) B2WARNING("Module is ineffective.");
+  if (!m_isDisabled) B2WARNING("Module is active.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(20, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());
@@ -113,8 +118,8 @@ void SVDTimeGroupingModule::initialize()
 
 void SVDTimeGroupingModule::event()
 {
-  int totClusters = m_svdClusters.getEntries();
-  if (m_rebinningFactor <= 0 || totClusters < 10) return;
+  if (m_isDisabled) return;
+  if (int(m_svdClusters.getEntries()) < 10) return;
 
 
   // declare and fill the histogram shaping each cluster with a normalised gaussian

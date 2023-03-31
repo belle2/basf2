@@ -708,12 +708,12 @@ for moda in main.modules():
             moda.param("expectedSignalTimeCenter",    sigLoc)
             moda.param('expectedSignalTimeMin',  sigMin)
             moda.param('expectedSignalTimeMax', sigMax)
-            moda.param("rebinningFactor", 2)
+            moda.param("isDisabled", False)
             moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
             moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
             moda.param("signalLifetime", args.signalLifetime)
         else:
-            moda.param("rebinningFactor", 0)
+            moda.param("isDisabled", True)
     if moda.name() == 'SVDSpacePointCreator':
         moda.param("useSVDGroupInfo", args.useSVDGroupInfo)
 

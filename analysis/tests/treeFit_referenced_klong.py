@@ -23,6 +23,7 @@ class TestTreeFits(unittest.TestCase):
     def testFit(self):
         """Run the test fit"""
 
+        basf2.set_random_seed('klong')
         testFile = tempfile.NamedTemporaryFile()
 
         main = basf2.create_path()
@@ -69,11 +70,12 @@ class TestTreeFits(unittest.TestCase):
 
         print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
+        print(f"True fit survivors with reasonable deltaE: {SigDeltaEReasonable}")
 
-        self.assertTrue(falsePositives == 1255, "Background rejection too small.")
+        self.assertTrue(falsePositives == 1254, "Background rejection too small.")
         self.assertTrue(truePositives == 317, "Signal rejection too high")
 
-        self.assertTrue(SigDeltaEReasonable == 276, "Signal kinematics is wrongly reconstructed too much")
+        self.assertTrue(SigDeltaEReasonable == 268, "Signal kinematics is wrongly reconstructed too much")
 
         print("Test passed, cleaning up.")
 

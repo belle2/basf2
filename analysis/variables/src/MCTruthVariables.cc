@@ -137,6 +137,30 @@ namespace Belle2 {
       return curMCParticle->getArrayIndex();
     }
 
+    //debug
+    double genNthBDaughterQ2(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getMCParticle();
+      if (!mcparticle) return realNaN;
+
+      const MCParticle* curMotherB = mcparticle;
+      int mcMotherPDG = 0;
+      while (mcMotherPDG != 511 and mcMotherPDG != 521) {
+        curMotherB = curMotherB->getMother();
+        if (!curMotherB) return realNaN;
+        mcMotherPDG = abs(curMotherB->getPDG());
+      }
+
+      auto daughtersB = curMotherB->getDaughters();
+      unsigned int nthDaughter = args.empty() ? 0 : args[0];
+      if (nthDaughter >= daughtersB.size()) return realNaN;
+
+      auto p4Daughter = daughtersB[nthDaughter]->get4Vector();
+      auto p4B = curMotherB->get4Vector();
+
+      return (p4B - p4Daughter).mag2();
+    }
+
     double genMotherPDG(const Particle* part)
     {
       return genNthMotherPDG(part, {});
@@ -876,6 +900,9 @@ namespace Belle2 {
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
+
+    REGISTER_VARIABLE("genNthBDaughterQ2", genNthBDaughterQ2,
+                      "fill me :");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");

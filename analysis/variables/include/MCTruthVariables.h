@@ -117,6 +117,11 @@ namespace Belle2 {
     double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
+     * Calculate the q2 of the Nth daughter with respect to the B meson from which the particle originates
+     */
+    double genNthBDaughterQ2(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
      * check the PDG code of a particles MC mother
      */
     double genMotherPDG(const Particle* particle);

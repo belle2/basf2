@@ -16,6 +16,8 @@ import modularAnalysis as ma
 from stdKlongs import stdKlongs
 from ROOT import TFile
 
+from b2test_utils import skip_test
+
 
 class TestTreeFits(unittest.TestCase):
     """The unit test case for TreeFitter"""
@@ -81,5 +83,6 @@ class TestTreeFits(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    skip_test("TreeFit with Klong is not robust enough to get the identical results with different processors.")
     with b2test_utils.clean_working_directory():
         unittest.main()

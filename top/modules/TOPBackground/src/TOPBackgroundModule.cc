@@ -258,7 +258,7 @@ namespace Belle2 {
       if (subdet != 5) continue;
 
       auto pos = tophit->getPosition();
-      double phi = ROOT::Math::VectorUtil::Phi_0_2pi(pos.Phi()) * TMath::RadToDeg;
+      double phi = ROOT::Math::VectorUtil::Phi_0_2pi(pos.Phi()) * TMath::RadToDeg();
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {
         barID = 0;

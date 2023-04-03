@@ -82,17 +82,12 @@ namespace Belle2 {
     std::string m_pListReferenceName;
 
     /**
-     * The name of the detector at whose inner (cylindrical) surface we extrapolate each track's polar and azimuthal angle.
+     * The list of names of the detectors at whose inner (cylindrical) surface we extrapolate each track's polar and azimuthal angle.
      */
-    std::string m_detName;
+    std::vector<std::string> m_detNames;
 
     /**
-     * The number of layers for the input detector.
-     */
-    unsigned int m_nLayers;
-
-    /**
-     * Map that associates to each detector layer the name of the variable
+     * Map that associates to each detector layer (e.g., 'CDC6') the name of the variable
      * representing the distance to the closest particle in the reference list,
      * based on the track helix extrapolation.
      * Each variable is added as particle extraInfo.
@@ -100,18 +95,23 @@ namespace Belle2 {
     std::unordered_map<std::string, std::string>  m_detLayerToDistVariable;
 
     /**
-     * Map that associates to each detector layer the name of the variable
-     * representing the  mdst array index of the closest particle in the reference list.
+     * Map that associates to each detector layer (e.g, 'CDC6') the name of the variable
+     * representing the mdst array index of the closest particle in the reference list.
      * Each variable is added as particle extraInfo.
      */
     std::unordered_map<std::string, std::string>  m_detLayerToRefPartIdxVariable;
 
     /**
-     * The name of the variable
-     * representing the track isolation score in this detector.
+     * The name of the variable representing the track isolation score.
      * Added as particle extraInfo.
      */
     std::string m_isoScoreVariable;
+
+    /**
+     * The name of the variable representing the track isolation score.
+     * Added as particle extraInfo.
+     */
+    std::string m_isoScoreVariableAsWeightedAvg;
 
     /**
      * Threshold values for the distance (in [cm]) to closest ext. helix to define isolated particles.
@@ -182,22 +182,42 @@ namespace Belle2 {
     double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle, const std::string& detLayerName) const;
 
     /**
-     * Define a semi-continuous variable to quantify the isolation of a standard charged particle
-     * in the given detector \f$d\f$ with \f$N_{d}\f$ layers in total.
-     * The definition of the score is based on the counting of layers \f$n_{d}\f$ where a close-enough particle is found,
-     * and also (if `m_excludePIDDetWeights = true`) on the weight \f$w_{d}\f$ that each sub-detector
-     * has on the PID of the given particle hypothesis:
+     * Get the PID weight, \f$w_{d} \in [-1, 0]\f$, for this particle and detector reading it from the payload, if selected.
+     * Otherwise return a default weight of -1.
+     */
+    double getDetectorWeight(const Particle* iParticle, const std::string& detName) const;
+
+    /**
+     * Get the sum of layers with a close-by track, divided by the total number of layers,
+     * for the given detector \f$d\f$, weighted by the PID detector separation score (if requested):
 
      \f{equation}{
        s_{d} = 1 - \left(-w_{d} \cdot \frac{n_{d}}{N_{d}}\right).
      \f}
 
+     * where \f$n_{d}\f$ is the number of layers where a close-enough particle is found,
+     * and \f$w_{d}\f$ is the weight that each sub-detector
+     * has on the PID of the given particle hypothesis (if `m_excludePIDDetWeights = true`):
+     *
      * The distance to closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.
      * Note that if the PID detector weighting is switched off, \f$w_{d} = -1\f$.
-     *
-     * The per-detector score is normalised in \f$s_{d}\in [0, 1]\f$: values closer to 1 indicate well-isolated particles.
      */
-    double getIsoScore(const Particle* iParticle) const;
+    double getWeightedSumNonIsoLayers(const Particle* iParticle, const std::string& detName, const float detWeight) const;
+
+    /**
+     * Get the sum of the inverse (scaled) minimum distances
+     * over the given detector \f$d\f$ layers, weighted by the PID detector separation score (if requested):
+
+     \f{equation}{
+       S_{d} = \sum_{d} w_{d} * \frac{D_{d}^{thresh}}{D_{d}}
+     \f}
+
+     * The distance \f$D_{d}\f$ to the closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.
+     * The scaling at the numerator is the threshold distance for this detector to define close-by tracks.
+     * Note that if the PID detector weighting is switched off, \f$w_{d} = -1\f$.
+     * By construction, \f$S_{d}\f$ is a negative number.
+     */
+    double getWeightedSumInvDists(const Particle* iParticle, const std::string& detName, const float detWeight) const;
 
     /**
      * Get the threshold value per detctor layer for the distance to closest ext. helix

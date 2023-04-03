@@ -6,9 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
 
+// TOP headers.
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPSimHit.h>
@@ -32,6 +33,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <Math/VectorUtil.h>
+#include <TMath.h>
 
 #include <geometry/Materials.h>
 #include <G4Material.hh>
@@ -256,7 +258,7 @@ namespace Belle2 {
       if (subdet != 5) continue;
 
       auto pos = tophit->getPosition();
-      double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) / 3.14159265358979 * 180.;
+      double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) * TMath::RadToDeg();
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {
         barID = 0;

@@ -106,7 +106,7 @@ namespace Belle2 {
     double  m_n0[c_noOfAerogels];  /**< number of emmited photons per unit length */
     TVector3 m_anorm[c_noOfAerogels]; /**< normal vector of the aerogle plane */
     int m_storePhot; /**< set to 1 to store individual reconstructed photon information */
-    double m_tilePars[124][2] = {0};
+    double m_tilePars[124][2] = {{0}};
 
     //! Returns 1 if vector "a" lies on "copyno"-th detector active surface of detector and 0 else.
     int InsideDetector(TVector3 a, int copyno);

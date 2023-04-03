@@ -45,3 +45,27 @@ class ExamplesTest(unittest.TestCase):
                         # done like this since we don't want to decode/encode utf8
                         sys.stdout.buffer.write(result.stdout)
                     self.assertEqual(result.returncode, 0)
+
+
+def scanTTree(filename):
+    from ROOT import TFile
+
+    tfile = TFile(filename, "READ")
+    print(f"TFile: {filename}")
+
+    # get lists of TTree in the filename
+    ttrees = [key.GetName() for key in tfile.GetListOfKeys() if key.GetClassName() == "TTree"]
+
+    for ttree_name in ttrees:
+        print(f"TTree: {ttree_name}")
+
+        # get TTree object
+        ttree = tfile.Get(ttree_name)
+        ttree.GetEntry(0)
+        # print name and value of all TBranch in the TTree
+        for branch in ttree.GetListOfBranches():
+            branch_name = branch.GetName()
+            branch_value = getattr(ttree, branch.GetName())
+            print(f"TBranch: {branch_name}, {branch_value}")
+
+    tfile.Close()

@@ -69,6 +69,7 @@
 #pragma link C++ class Belle2::SVDGlobalConfigParameters +; // , checksum=0x1694a3c, version=3
 
 #pragma link C++ class Belle2::SVDRecoConfiguration +; // checksum=0xc7b6bb94, version=2
+#pragma link C++ class Belle2::SVDTimeGroupingConfiguration +; // checksum=0x2cf4fcb0, version=1
 
 #endif
 

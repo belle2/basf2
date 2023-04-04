@@ -32,7 +32,10 @@ namespace Belle2 {
       , m_stripTimeRecoWith3Samples("CoG3")
       , m_stripChargeRecoWith6Samples("MaxSample")
       , m_stripChargeRecoWith3Samples("MaxSample")
-    {};
+    {
+      setStateOfSVDTimeGroup(false);
+      setUseOfSVDGroupInfoInSPCreator(false);
+    };
 
     /**
      * Returns the TString corresponding to the algorithm to be used
@@ -90,6 +93,33 @@ namespace Belle2 {
      **/
     TString getStripChargeRecoWith3Samples() const { return m_stripChargeRecoWith3Samples; };
 
+
+    /**
+     * Returns the parameter which turns On/Off SVD cluster grouping
+     * in 3/6-sample acquisition mode
+     */
+    Bool_t getStateOfSVDTimeGroup(const Int_t& mode) const
+    {
+      if (mode == 6)
+        return m_assignSVDGroupIn6Samples;
+      else if (mode == 3)
+        return m_assignSVDGroupIn3Samples;
+      else
+        return false;
+    }
+    /**
+     * Returns the parameter which turns On/Off usage of SVD cluster grouping
+     * in the SVDSpacePointCreator for 3/6-sample acquisition mode
+     */
+    Bool_t getUseOfSVDGroupInfoInSPCreator(const Int_t& mode) const
+    {
+      if (mode == 6)
+        return m_useSVDGroupInfoInSPfor6Samples;
+      else if (mode == 3)
+        return m_useSVDGroupInfoInSPfor3Samples;
+      else
+        return false;
+    }
 
     /**
      * Set the algorithm to be used for
@@ -178,6 +208,35 @@ namespace Belle2 {
     }
 
     /**
+     * Set the parameter which turns On/Off SVD cluster grouping
+     * in 3/6-sample acquisition mode
+     */
+    void setStateOfSVDTimeGroup(const Int_t& mode, const Bool_t& state = false)
+    {
+      if (!mode) {
+        m_assignSVDGroupIn3Samples = false;
+        m_assignSVDGroupIn6Samples = false;
+      } else if (mode == 3)
+        m_assignSVDGroupIn3Samples = state;
+      else if (mode == 6)
+        m_assignSVDGroupIn6Samples = state;
+    }
+    /**
+     * Set the parameter which turns On/Off usage of SVD cluster grouping
+     * in the SVDSpacePointCreator for 3/6-sample acquisition mode
+     */
+    void setUseOfSVDGroupInfoInSPCreator(const Int_t& mode, const Bool_t& state = false)
+    {
+      if (!mode) {
+        m_useSVDGroupInfoInSPfor3Samples = false;
+        m_useSVDGroupInfoInSPfor6Samples = false;
+      } else if (mode == 3)
+        m_useSVDGroupInfoInSPfor3Samples = state;
+      else if (mode == 6)
+        m_useSVDGroupInfoInSPfor6Samples = state;
+    }
+
+    /**
      * Get the unique ID  of the calibration
      */
     TString get_uniqueID() const {return m_uniqueID;}
@@ -214,7 +273,16 @@ namespace Belle2 {
     /** strip charge reconstruction algorithm used in 3-sample acquisition mode */
     TString m_stripChargeRecoWith3Samples;
 
-    ClassDef(SVDRecoConfiguration, 1); /**< needed by root*/
+    /** Assign groupId to SVD clusters in 6-sample acquisition mode */
+    Bool_t m_assignSVDGroupIn6Samples;
+    /** Assign groupId to SVD clusters in 3-sample acquisition mode */
+    Bool_t m_assignSVDGroupIn3Samples;
+    /** Use SVD clusters groupId in SVDSpacePointCreator for 6-sample acquisition mode */
+    Bool_t m_useSVDGroupInfoInSPfor6Samples;
+    /** Use SVD clusters groupId in SVDSpacePointCreator for 3-sample acquisition mode */
+    Bool_t m_useSVDGroupInfoInSPfor3Samples;
+
+    ClassDef(SVDRecoConfiguration, 2); /**< needed by root*/
 
   };
 

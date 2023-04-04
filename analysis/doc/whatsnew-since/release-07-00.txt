@@ -15,6 +15,13 @@ Variables
   from a neural network that uses high-level information such as PID likelihoods, track momentum and charge.
   The probabilities are unaffected by momentum updates in vertex fits or the application of the track momentum scale correction.
 
+Command line tool
++++++++++++++++++
+* New command line :ref:`b2help-variable-type <b2help-variable-type>` to get the data type of the return value of the provided
+  variables, e.g. ``b2help-variable-type M Mbc isSignal``.
+
+This returns the data type of the return value of the provided variables. 
+
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 

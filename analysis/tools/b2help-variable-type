@@ -17,7 +17,7 @@ from variables import printVariableType
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(description="""
-This returns the data type of the return type of the return value of the provided variables.
+This returns the data type of the return value of the provided variables.
 
 Usage:
     ``b2help-variable-type M E isSignal``

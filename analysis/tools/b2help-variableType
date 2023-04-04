@@ -9,16 +9,15 @@
 ##########################################################################
 
 """
-You can run ``b2help-variableType`` to show the type of input variables.
+You can run ``b2help-variableType`` to show the return type of the provided variables.
 """
 import argparse
-# from terminal_utils import Pager
 from variables import printVariableType
 
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(description="""
-This returns the variable type of the given input variables.
+This returns the data type of the return type of the return value of the provided variables.
 
 Usage:
     ``b2help-variableType M E isSignal``

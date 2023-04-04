@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+You can run ``b2help-variableType`` to show the type of input variables.
+"""
+import argparse
+# from terminal_utils import Pager
+from variables import printVariableType
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description="""
+This returns the variable type of the given input variables.
+
+Usage:
+    ``b2help-variableType M E isSignal``
+""")
+
+    parser.add_argument('variables', nargs='+', default=None, 
+                        help='input variables')
+    return parser
+
+
+if __name__ == "__main__":
+    args = get_argument_parser().parse_args()
+
+    printVariableType(args.variables)

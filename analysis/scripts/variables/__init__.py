@@ -175,6 +175,18 @@ def printVars(changedVariableNames=None):
     b2utils.pretty_print_description_list(rows)
 
 
+def printVariableType(listVars=None):
+
+    if isinstance(listVars, str):
+        listVars = [listVars]
+
+    dict_VariableDataType = {0: 'double', 1: 'int', 2: 'bool'}
+
+    for var_name in listVars:
+        var = variables.getVariable(var_name)
+        print(f"{var_name}: {dict_VariableDataType[var.variabletype]}")
+
+
 def getAllTrgNames():
     """
     Return all PSNM trigger bit names

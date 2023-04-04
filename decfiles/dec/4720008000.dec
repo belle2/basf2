@@ -9,11 +9,13 @@
 # Email: boschett@to.infn.it
 # Date: 20230401
 
+Alias myEta eta
+
 Decay vpho
-1.000 eta h_b  PARTWAVE 1. 0. 0. 0. 0. 0.;
+1.000 myEta h_b  PARTWAVE 1. 0. 0. 0. 0. 0.;
 Enddecay
 
-Decay eta
+Decay myEta
 1.000 gamma gamma PHSP;
 Enddecay
 End

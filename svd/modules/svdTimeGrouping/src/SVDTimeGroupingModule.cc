@@ -28,74 +28,78 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
   // 2b. Module Configuration
   addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
-  addParam("useClusterRawCoG3Time", m_useClusterRawCoG3Time,
-           "Group on the basis of the raw time (CoG3)", bool(false));
+  addParam("useClusterRawTime", m_useClusterRawTime,
+           "Group on the basis of the raw time", bool(false));
   addParam("isDisabled", m_isDisabled, "if true, module is disabled", bool(false));
 
   // 2. Fill time Histogram:
-  addParam("tRangeLow", m_tRangeLow, "This sets the x- range of histogram [ns].",
-           double(-160.));
-  addParam("tRangeHigh", m_tRangeHigh, "This sets the x+ range of histogram [ns].",
-           double(160.));
-  addParam("rebinningFactor", m_rebinningFactor,
+  addParam("tRangeLow", m_usedPars.tRange[0], "This sets the x- range of histogram [ns].",
+           float(-160.));
+  addParam("tRangeHigh", m_usedPars.tRange[1], "This sets the x+ range of histogram [ns].",
+           float(160.));
+  addParam("rebinningFactor", m_usedPars.rebinningFactor,
            "Time bin width is 1/rebinningFactor ns. Disables the module if set zero",
            int(2));
-  addParam("fillSigmaN", m_fillSigmaN,
+  addParam("fillSigmaN", m_usedPars.fillSigmaN,
            "Number of Gaussian sigmas (= hardcoded resolutions) used to fill the time histogram for each cluster.",
-           double(3.));
+           float(3.));
 
   // 3. Search peaks:
-  addParam("minSigma", m_minSigma,
+  addParam("minSigma", m_usedPars.limitSigma[0],
            "Lower limit of cluster time sigma for the fit for the peak-search [ns].",
-           double(1.));
-  addParam("maxSigma", m_maxSigma,
+           float(1.));
+  addParam("maxSigma", m_usedPars.limitSigma[1],
            "Upper limit of cluster time sigma for the fit for the peak-search [ns].",
-           double(15.));
-  addParam("fitRangeHalfWidth", m_fitRangeHalfWidth,
+           float(15.));
+  addParam("fitRangeHalfWidth", m_usedPars.fitRangeHalfWidth,
            "half width of the range in which the fit for the peak-search is performed [ns].",
-           double(5.));
-  addParam("removeSigmaN", m_removeSigmaN,
+           float(5.));
+  addParam("removeSigmaN", m_usedPars.removeSigmaN,
            "Evaluate and remove gauss upto N sigma.",
-           double(5.));
-  addParam("fracThreshold", m_fracThreshold,
+           float(5.));
+  addParam("fracThreshold", m_usedPars.fracThreshold,
            "Minimum fraction of candidates in a peak (wrt to the highest peak) considered for fitting in the peak-search.",
-           double(0.05));
-  addParam("maxGroups", m_maxGroups,
+           float(0.05));
+  addParam("maxGroups", m_usedPars.maxGroups,
            "Maximum number of groups to be accepted.",
            int(20));
 
   // 4. Sort groups:
-  addParam("expectedSignalTimeCenter", m_expectedSignalTimeCenter,
+  addParam("expectedSignalTimeCenter", m_usedPars.expectedSignalTime[1],
            "Expected time of the signal [ns].",
-           double(0.));
-  addParam("expectedSignalTimeMin", m_expectedSignalTimeMin,
+           float(0.));
+  addParam("expectedSignalTimeMin", m_usedPars.expectedSignalTime[0],
            "Expected low range of signal hits [ns].",
-           double(-50.));
-  addParam("expectedSignalTimeMax", m_expectedSignalTimeMax,
+           float(-50.));
+  addParam("expectedSignalTimeMax", m_usedPars.expectedSignalTime[2],
            "Expected high range of signal hits [ns].",
-           double(50.));
-  addParam("signalLifetime", m_signalLifetime,
+           float(50.));
+  addParam("signalLifetime", m_usedPars.signalLifetime,
            "Group prominence is weighted with exponential weight with a lifetime defined by this parameter [ns].",
-           double(30.));
+           float(30.));
 
   // 5. Signal group selection:
-  addParam("numberOfSignalGroups", m_numberOfSignalGroups,
+  addParam("numberOfSignalGroups", m_usedPars.numberOfSignalGroups,
            "Number of groups expected to contain the signal clusters.",
            int(1));
-  addParam("formSingleSignalGroup", m_formSingleSignalGroup,
+  addParam("formSingleSignalGroup", m_usedPars.formSingleSignalGroup,
            "Form a single super-group.",
            bool(false));
-  addParam("acceptSigmaN", m_acceptSigmaN,
+  addParam("acceptSigmaN", m_usedPars.acceptSigmaN,
            "Accept clusters upto N sigma.",
-           double(5.));
-  addParam("writeGroupInfo", m_writeGroupInfo,
+           float(5.));
+  addParam("writeGroupInfo", m_usedPars.writeGroupInfo,
            "Write group info into SVDClusters.",
            bool(true));
 
   // 6. Hande out of range clusters:
-  addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
+  addParam("includeOutOfRangeClusters", m_usedPars.includeOutOfRangeClusters,
            "Assign groups to under and overflow.",
            bool(true));
+
+
+  m_usedPars.clsSigma[0][0] = {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805};
+  m_usedPars.clsSigma[0][1] = {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485};
 
 }
 
@@ -106,9 +110,9 @@ void SVDTimeGroupingModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_numberOfSignalGroups != m_maxGroups) m_includeOutOfRangeClusters = false;
+  if (m_usedPars.numberOfSignalGroups != m_usedPars.maxGroups) m_usedPars.includeOutOfRangeClusters = false;
 
-  if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
+  if (m_usedPars.tRange[1] - m_usedPars.tRange[0] < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(20, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());
 }
@@ -142,7 +146,8 @@ void SVDTimeGroupingModule::event()
   sortSignalGroups(groupInfoVector);
 
   // only select few signal groups
-  if (m_numberOfSignalGroups < int(groupInfoVector.size())) groupInfoVector.resize(m_numberOfSignalGroups);
+  if (m_usedPars.numberOfSignalGroups < int(groupInfoVector.size()))
+    groupInfoVector.resize(m_usedPars.numberOfSignalGroups);
 
   // assign the groupID to clusters
   assignGroupIdsToClusters(h_clsTime, groupInfoVector);
@@ -167,14 +172,14 @@ void SVDTimeGroupingModule::createAndFillHistorgram(TH1D& hist)
     if (std::isnan(tmpRange[0]) || clsTime > tmpRange[0]) tmpRange[0] = clsTime;
     if (std::isnan(tmpRange[1]) || clsTime < tmpRange[1]) tmpRange[1] = clsTime;
   }
-  double tRangeHigh = m_tRangeHigh;
-  double tRangeLow  = m_tRangeLow;
+  double tRangeHigh = m_usedPars.tRange[1];
+  double tRangeLow  = m_usedPars.tRange[0];
   if (tRangeHigh > tmpRange[0]) tRangeHigh = tmpRange[0];
   if (tRangeLow  < tmpRange[1]) tRangeLow  = tmpRange[1];
 
   int nBin = tRangeHigh - tRangeLow;
   if (nBin < 1) nBin = 1;
-  nBin *= m_rebinningFactor;
+  nBin *= m_usedPars.rebinningFactor;
   if (nBin < 2) nBin = 2;
   B2DEBUG(21, "tRange: [" << tRangeLow << "," << tRangeHigh << "], nBin: " << nBin);
 
@@ -184,12 +189,12 @@ void SVDTimeGroupingModule::createAndFillHistorgram(TH1D& hist)
   for (int ij = 0; ij < totClusters; ij++) {
     double clsSize = m_svdClusters[ij]->getSize();
     bool   isUcls  = m_svdClusters[ij]->isUCluster();
-    double gSigma  = (clsSize >= int(m_clsSizeVsSigma[isUcls].size()) ?
-                      m_clsSizeVsSigma[isUcls].back() : m_clsSizeVsSigma[isUcls][clsSize - 1]);
+    double gSigma  = (clsSize >= int(m_usedPars.clsSigma[0][isUcls].size()) ?
+                      m_usedPars.clsSigma[0][isUcls].back() : m_usedPars.clsSigma[0][isUcls][clsSize - 1]);
     double gCenter = m_svdClusters[ij]->getClsTime();
 
     // adding/filling a gauss to histogram
-    addGausToHistogram(hist, 1., gCenter, gSigma, m_fillSigmaN);
+    addGausToHistogram(hist, 1., gCenter, gSigma, m_usedPars.fillSigmaN);
   }
 
 } // end of createAndFillHistorgram
@@ -212,10 +217,10 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
 
     // Set maxPeak for the first time
     if (maxPeak == 0 &&
-        maxBinCenter > m_expectedSignalTimeMin && maxBinCenter < m_expectedSignalTimeMax)
+        maxBinCenter > m_usedPars.expectedSignalTime[0] && maxBinCenter < m_usedPars.expectedSignalTime[2])
       maxPeak = maxBinContent;
     // we are done if the the height of the this peak is below threshold
-    if (maxPeak != 0 && maxBinContent < maxPeak * m_fracThreshold) { amDone = true; continue;}
+    if (maxPeak != 0 && maxBinContent < maxPeak * m_usedPars.fracThreshold) { amDone = true; continue;}
 
 
 
@@ -224,25 +229,25 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
               hist.GetXaxis()->GetXmin(), hist.GetXaxis()->GetXmax(), 3);
 
     // setting the parameters according to the maxBinCenter and maxBinContnet
-    double maxPar0 = maxBinContent * 2.50662827463100024 * m_fitRangeHalfWidth;
+    double maxPar0 = maxBinContent * 2.50662827463100024 * m_usedPars.fitRangeHalfWidth;
     ngaus.SetParameter(0, maxBinContent);
     ngaus.SetParLimits(0,
                        maxPar0 * 0.01,
                        maxPar0 * 2.);
     ngaus.SetParameter(1, maxBinCenter);
     ngaus.SetParLimits(1,
-                       maxBinCenter - m_fitRangeHalfWidth * 0.2,
-                       maxBinCenter + m_fitRangeHalfWidth * 0.2);
-    ngaus.SetParameter(2, m_fitRangeHalfWidth);
+                       maxBinCenter - m_usedPars.fitRangeHalfWidth * 0.2,
+                       maxBinCenter + m_usedPars.fitRangeHalfWidth * 0.2);
+    ngaus.SetParameter(2, m_usedPars.fitRangeHalfWidth);
     ngaus.SetParLimits(2,
-                       m_minSigma,
-                       m_maxSigma);
+                       m_usedPars.limitSigma[0],
+                       m_usedPars.limitSigma[1]);
 
 
     // fitting the gauss at the peak the in range [-fitRangeHalfWidth, fitRangeHalfWidth]
     int status = hist.Fit("ngaus", "NQ0", "",
-                          maxBinCenter - m_fitRangeHalfWidth,
-                          maxBinCenter + m_fitRangeHalfWidth);
+                          maxBinCenter - m_usedPars.fitRangeHalfWidth,
+                          maxBinCenter + m_usedPars.fitRangeHalfWidth);
 
 
     if (!status) {    // if fit converges
@@ -255,33 +260,33 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
 
       // fit converges but paramters are at limit
       // Do a rough cleaning
-      if (pars[2] <= m_minSigma + 0.01 || pars[2] >= m_maxSigma - 0.01) {
+      if (pars[2] <= m_usedPars.limitSigma[0] + 0.01 || pars[2] >= m_usedPars.limitSigma[1] - 0.01) {
         // subtract the faulty part from the histogram
-        subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN);
-        if (roughCleaningCounter++ > m_maxGroups) amDone = true;
+        subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_usedPars.fitRangeHalfWidth, m_usedPars.removeSigmaN);
+        if (roughCleaningCounter++ > m_usedPars.maxGroups) amDone = true;
         continue;
       }
 
       // Set maxIntegral for the first time
       if (maxPeak != 0 && maxIntegral == 0) maxIntegral = pars[0];
       // we are done if the the integral of the this peak is below threshold
-      if (maxIntegral != 0 && pars[0] < maxIntegral * m_fracThreshold) { amDone = true; continue;}
+      if (maxIntegral != 0 && pars[0] < maxIntegral * m_usedPars.fracThreshold) { amDone = true; continue;}
 
 
       // now subtract the fitted gaussian from the histogram
-      subtractGausFromHistogram(hist, pars[0], pars[1], pars[2], m_removeSigmaN);
+      subtractGausFromHistogram(hist, pars[0], pars[1], pars[2], m_usedPars.removeSigmaN);
 
       // store group information (integral, position, width)
       groupInfoVector.push_back(GroupInfo(pars[0], pars[1], pars[2]));
       B2DEBUG(21, " group " << int(groupInfoVector.size())
               << " pars[0] " << pars[0] << " pars[1] " << pars[1] << " pars[2] " << pars[2]);
 
-      if (int(groupInfoVector.size()) >= m_maxGroups) { amDone = true; continue;}
+      if (int(groupInfoVector.size()) >= m_usedPars.maxGroups) { amDone = true; continue;}
 
     } else {    // fit did not converges
       // subtract the faulty part from the histogram
-      subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN);
-      if (roughCleaningCounter++ > m_maxGroups) amDone = true;
+      subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_usedPars.fitRangeHalfWidth, m_usedPars.removeSigmaN);
+      if (roughCleaningCounter++ > m_usedPars.maxGroups) amDone = true;
       continue;
     }
   }
@@ -299,7 +304,7 @@ void SVDTimeGroupingModule::sortBackgroundGroups(std::vector<GroupInfo>& groupIn
     double keyGroupCenter = std::get<1>(keyGroup);
     bool isKeyGroupSignal = true;
     if (keyGroupIntegral != 0. &&
-        (keyGroupCenter < m_expectedSignalTimeMin || keyGroupCenter > m_expectedSignalTimeMax))
+        (keyGroupCenter < m_usedPars.expectedSignalTime[0] || keyGroupCenter > m_usedPars.expectedSignalTime[2]))
       isKeyGroupSignal = false;
     if (isKeyGroupSignal) continue; // skip if signal
 
@@ -309,7 +314,7 @@ void SVDTimeGroupingModule::sortBackgroundGroups(std::vector<GroupInfo>& groupIn
       double otherGroupCenter = std::get<1>(groupInfoVector[kj]);
       bool isOtherGroupSignal = true;
       if (otherGroupIntegral != 0. &&
-          (otherGroupCenter < m_expectedSignalTimeMin || otherGroupCenter > m_expectedSignalTimeMax))
+          (otherGroupCenter < m_usedPars.expectedSignalTime[0] || otherGroupCenter > m_usedPars.expectedSignalTime[2]))
         isOtherGroupSignal = false;
       if (!isOtherGroupSignal && (otherGroupIntegral > keyGroupIntegral)) break;
       groupInfoVector[kj - 1] = groupInfoVector[kj];
@@ -322,7 +327,7 @@ void SVDTimeGroupingModule::sortBackgroundGroups(std::vector<GroupInfo>& groupIn
 
 void SVDTimeGroupingModule::sortSignalGroups(std::vector<GroupInfo>& groupInfoVector)
 {
-  if (m_signalLifetime > 0.) {
+  if (m_usedPars.signalLifetime > 0.) {
     GroupInfo keyGroup;
     for (int ij = 1; ij < int(groupInfoVector.size()); ij++) {
       keyGroup = groupInfoVector[ij];
@@ -331,16 +336,18 @@ void SVDTimeGroupingModule::sortSignalGroups(std::vector<GroupInfo>& groupInfoVe
       double keyGroupCenter = std::get<1>(keyGroup);
       bool isKeyGroupSignal = true;
       if (keyGroupIntegral > 0 &&
-          (keyGroupCenter < m_expectedSignalTimeMin || keyGroupCenter > m_expectedSignalTimeMax))
+          (keyGroupCenter < m_usedPars.expectedSignalTime[0] || keyGroupCenter > m_usedPars.expectedSignalTime[2]))
         isKeyGroupSignal = false;
       if (!isKeyGroupSignal) break; // skip the backgrounds
 
-      double keyWt = keyGroupIntegral * TMath::Exp(-std::fabs(keyGroupCenter - m_expectedSignalTimeCenter) / m_signalLifetime);
+      double keyWt = keyGroupIntegral * TMath::Exp(-std::fabs(keyGroupCenter - m_usedPars.expectedSignalTime[1]) /
+                                                   m_usedPars.signalLifetime);
       int kj = ij - 1;
       while (kj >= 0) {
         double otherGroupIntegral = std::get<0>(groupInfoVector[kj]);
         double otherGroupCenter = std::get<1>(groupInfoVector[kj]);
-        double grWt = otherGroupIntegral * TMath::Exp(-std::fabs(otherGroupCenter - m_expectedSignalTimeCenter) / m_signalLifetime);
+        double grWt = otherGroupIntegral * TMath::Exp(-std::fabs(otherGroupCenter - m_usedPars.expectedSignalTime[1]) /
+                                                      m_usedPars.signalLifetime);
         if (grWt > keyWt) break;
         groupInfoVector[kj + 1] = groupInfoVector[kj];
         kj--;
@@ -377,8 +384,8 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
     // we assign the group Id to leftover clusters at the last loop.
 
     // for this group, accept the clusters falling within 5(default) sigma of group center
-    double lowestAcceptedTime  = pars[1] - m_acceptSigmaN * pars[2];
-    double highestAcceptedTime = pars[1] + m_acceptSigmaN * pars[2];
+    double lowestAcceptedTime  = pars[1] - m_usedPars.acceptSigmaN * pars[2];
+    double highestAcceptedTime = pars[1] + m_usedPars.acceptSigmaN * pars[2];
     if (lowestAcceptedTime < tRangeLow)   lowestAcceptedTime  = tRangeLow;
     if (highestAcceptedTime > tRangeHigh) highestAcceptedTime = tRangeHigh;
     B2DEBUG(21, " group " << ij
@@ -392,7 +399,7 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
       if (pars[2] != 0 &&   // if the last group is dummy, we straight go to leftover clusters
           clsTime >= lowestAcceptedTime && clsTime <= highestAcceptedTime) {
 
-        if (m_formSingleSignalGroup) {
+        if (m_usedPars.formSingleSignalGroup) {
           if (int(m_svdClusters[jk]->getTimeGroupId().size()) == 0)
             m_svdClusters[jk]->setTimeGroupId().push_back(0);
         } else      // assigning groupId starting from 0
@@ -401,7 +408,7 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
         // writing group info to clusters.
         // this is independent of group id, that means,
         // group info is correctly associated even if formSingleSignalGroup flag is on.
-        if (m_writeGroupInfo)
+        if (m_usedPars.writeGroupInfo)
           m_svdClusters[jk]->setTimeGroupInfo().push_back(GroupInfo(pars[0], pars[1], pars[2]));
 
         B2DEBUG(29, "   accepted cluster " << jk
@@ -416,10 +423,10 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
         if (ij == int(groupInfoVector.size()) - 1 && // we are now at the last loop
             int(m_svdClusters[jk]->getTimeGroupId().size()) == 0) { // leftover clusters
 
-          if (m_includeOutOfRangeClusters && clsTime < tRangeLow)
-            m_svdClusters[jk]->setTimeGroupId().push_back(m_maxGroups + 1);  // underflow
-          else if (m_includeOutOfRangeClusters && clsTime > tRangeHigh)
-            m_svdClusters[jk]->setTimeGroupId().push_back(m_maxGroups + 2);  // overflow
+          if (m_usedPars.includeOutOfRangeClusters && clsTime < tRangeLow)
+            m_svdClusters[jk]->setTimeGroupId().push_back(m_usedPars.maxGroups + 1);  // underflow
+          else if (m_usedPars.includeOutOfRangeClusters && clsTime > tRangeHigh)
+            m_svdClusters[jk]->setTimeGroupId().push_back(m_usedPars.maxGroups + 2);  // overflow
           else
             m_svdClusters[jk]->setTimeGroupId().push_back(-1);               // orphan
 

@@ -3495,6 +3495,54 @@
          <Desc>Right support mount</Desc>
       </Shield>
 
+      <APSR9>
+         <Enable>0</Enable>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield around FWD QCS (outer layer, part 1)</Desc>
+      </APSR9>
+
+      <APSR10>
+         <Enable>0</Enable>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield around FWD QCS (outer layer, part 2)</Desc>
+      </APSR10>
+
+      <APSL9>
+         <Enable>0</Enable>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield around BWD QCS (outer layer, part 1)</Desc>
+      </APSL9>
+
+      <APSL10>
+         <Enable>0</Enable>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield around BWD QCS (outer layer, part 2)</Desc>
+      </APSL10>
+
+      <APSR11>
+         <Enable>0</Enable>
+         <Material>SWX-238</Material>
+         <Desc>Additional polyethylene shield around FWD QCS (inner layer, part 1)</Desc>
+      </APSR11>
+
+      <APSR12>
+         <Enable>0</Enable>
+         <Material>SWX-238</Material>
+         <Desc>Additional polyethylene shield around FWD QCS (inner layer, part 2)</Desc>
+      </APSR12>
+
+      <APSL11>
+         <Enable>0</Enable>
+         <Material>SWX-238</Material>
+         <Desc>Additional polyethylene shield around BWD QCS (inner layer, part 1)</Desc>
+      </APSL11>
+
+      <APSL12>
+         <Enable>0</Enable>
+         <Material>SWX-238</Material>
+         <Desc>Additional polyethylene shield around BWD QCS (inner layer, part 2)</Desc>
+      </APSL12>
+
    </Content>
 </DetectorComponent>
 <!--

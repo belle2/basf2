@@ -20,6 +20,8 @@
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 
+#include <simulation/background/BkgSensitiveDetector.h>
+
 //Shapes
 #include <G4Box.hh>
 #include <G4Trd.hh>
@@ -1012,6 +1014,460 @@ namespace Belle2 {
        logi_F7lyr4   ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 202));
        logi_F7lyr5   ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 203));
       */
+
+      //--------------------------- QCS shielding ---------------------------//
+      //--- FWD + BWD QCS volme to be sutracted from the shielding volume
+      G4UnionSolid* qcs_solid_cut = new G4UnionSolid("qcs_solid_cut", geo_F1wal1xxx, geo_C1wal1xxx);
+
+      //--- Inner layer of the shielding
+      // FWD part 1
+      CryostatElement APSR9;
+      std::string name = "APSR9";
+      prep = name + ".";
+      int apsr9_En = int(m_config.getParameter(prep + "Enable"));
+      int apsr9_N = 2;
+      std::vector<double> apsr9_Z(apsr9_N);
+      std::vector<double> apsr9_R(apsr9_N);
+      std::vector<double> apsr9_r(apsr9_N);
+
+      apsr9_Z[0] = 1049.99 + 580.0 + 330.0;
+      apsr9_Z[1] = 1049.99 + 580.0 + 330.0 + 351.0;
+      apsr9_R[0] = 290.0;
+      apsr9_R[1] = 290.0;
+      apsr9_r[0] = 0;
+      apsr9_r[1] = 0;
+
+      // rotation matrix
+      G4RotationMatrix* Rotation1 = new G4RotationMatrix();
+      Rotation1->rotateY(M_PI_2 / Unit::rad);
+      Rotation1->rotateX(M_PI_4 / Unit::rad);
+      G4RotationMatrix* Rotation2 = new G4RotationMatrix();
+      Rotation2->rotateY(M_PI_2 / Unit::rad);
+      Rotation2->rotateX(-M_PI_4 / Unit::rad);
+
+      APSR9.transform = G4Translate3D(0, 0, 0);
+
+      G4Polycone* geo_apsr9x1 = new G4Polycone("geo_apsr9x1", 0.0, 2.0 * M_PI, apsr9_N, &(apsr9_Z[0]), &(apsr9_r[0]), &(apsr9_R[0]));
+      G4Tubs* geo_apsr9xx1 = new G4Tubs("geo_apsr9xx1", 0, 56.50, 573.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr9x2 = new G4SubtractionSolid("geo_apsr9x2", geo_apsr9x1, geo_apsr9xx1, Rotation1, G4ThreeVector(0, 0,
+                                                               1049.99 + 580.0 + 330.0 + 351.0 - 54.0));
+      G4SubtractionSolid* geo_apsr9x3 = new G4SubtractionSolid("geo_apsr9x3", geo_apsr9x2, geo_apsr9xx1, Rotation2, G4ThreeVector(0, 0,
+                                                               1049.99 + 580.0 + 330.0 + 350.0 - 54.0));
+      G4Box* geo_apsr9xx2 = new G4Box("geo_apsr9xx2", 300. / 2, 100. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsr9x4 = new G4SubtractionSolid("geo_apsr9x4", geo_apsr9x3, geo_apsr9xx2, 0, G4ThreeVector(-290., -30.0,
+                                                               1049.99 + 580.0 + 330.0 + 351.0 / 2));
+      G4SubtractionSolid* geo_apsr9x5 = new G4SubtractionSolid("geo_apsr9x5", geo_apsr9x4, geo_apsr9xx2, 0, G4ThreeVector(290., 30.0,
+                                                               1049.99 + 580.0 + 330.0 + 351.0 / 2));
+      G4Box* geo_apsr9xx3 = new G4Box("geo_apsr9xx3", 100. / 2, 300. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsr9x6 = new G4SubtractionSolid("geo_apsr9x6", geo_apsr9x5, geo_apsr9xx3, 0, G4ThreeVector(0, 290,
+                                                               1049.99 + 580.0 + 330.0 + 351.0 / 2));
+      G4VSolid* geo_apsr9 = new G4SubtractionSolid("geo_apsr9", geo_apsr9x6, qcs_solid_cut);
+
+      APSR9.geo = geo_apsr9;
+
+      string strMat_apsr9 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr9 = Materials::get(strMat_apsr9);
+      G4LogicalVolume* logi_apsr9 = new G4LogicalVolume(geo_apsr9, mat_apsr9, "logi_apsr9");
+      setColor(*logi_apsr9, "#00CC00");
+      setVisibility(*logi_apsr9, false);
+
+      APSR9.logi = logi_apsr9;
+
+      if (apsr9_En == 1) {
+        new G4PVPlacement(APSR9.transform, APSR9.logi, "phys_apsr9", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsr9->GetName() << " : mass = " << logi_apsr9->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsr9->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSR9;
+
+      // FWD part 2
+      CryostatElement APSR10;
+      name = "APSR10";
+      prep = name + ".";
+      int apsr10_En = int(m_config.getParameter(prep + "Enable"));
+      int apsr10_N = 3;
+      std::vector<double> apsr10_Z(apsr10_N);
+      std::vector<double> apsr10_R(apsr10_N);
+      std::vector<double> apsr10_r(apsr10_N);
+
+      apsr10_Z[0] = 1049.99;
+      apsr10_Z[1] = 1049.99 + 22.41;
+      apsr10_Z[2] = 1049.99 + 580.0;
+      apsr10_R[0] = 278.15;
+      apsr10_R[1] = 285.0;
+      apsr10_R[2] = 285.0;
+      apsr10_r[0] = 0;
+      apsr10_r[1] = 0;
+      apsr10_r[2] = 0;
+
+      // transform matrix
+      G4Transform3D Transform1 = G4RotateZ3D((M_PI_2 * 0 + M_PI_4) / Unit::rad) * G4Translate3D(0, 285.0, 1049.99);
+      G4Transform3D Transform2 = G4RotateZ3D((M_PI_2 * 1 + M_PI_4) / Unit::rad) * G4Translate3D(0, 285.0, 1049.99);
+      G4Transform3D Transform3 = G4RotateZ3D((M_PI_2 * 2 + M_PI_4) / Unit::rad) * G4Translate3D(0, 285.0, 1049.99);
+      G4Transform3D Transform4 = G4RotateZ3D((M_PI_2 * 3 + M_PI_4) / Unit::rad) * G4Translate3D(0, 285.0, 1049.99);
+
+      APSR10.transform = G4Translate3D(0, 0, 0);
+
+      G4Polycone* geo_apsr10x1 = new G4Polycone("geo_apsr10x1", 0.0, 2.0 * M_PI, apsr10_N, &(apsr10_Z[0]), &(apsr10_r[0]),
+                                                &(apsr10_R[0]));
+      G4Tubs* geo_apsr10xx1 = new G4Tubs("geo_apsr10xx1", 0, 56.50, 540.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr10x2 = new G4SubtractionSolid("geo_apsr10x2", geo_apsr10x1, geo_apsr10xx1, Rotation1, G4ThreeVector(0,
+                                                                0, 1049.99 + 16.0 + 56.50));
+      G4SubtractionSolid* geo_apsr10x3 = new G4SubtractionSolid("geo_apsr10x3", geo_apsr10x2, geo_apsr10xx1, Rotation2, G4ThreeVector(0,
+                                                                0, 1049.99 + 16.0 + 56.50));
+      G4Box* geo_apsr10xx2 = new G4Box("geo_apsr10xx2", 300. / 2, 90. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsr10x4 = new G4SubtractionSolid("geo_apsr10x4", geo_apsr10x3, geo_apsr10xx2, 0, G4ThreeVector(-300., -20,
+                                                                1049.99 + 580.0 / 2));
+      G4SubtractionSolid* geo_apsr10x5 = new G4SubtractionSolid("geo_apsr10x5", geo_apsr10x4, geo_apsr10xx2, 0, G4ThreeVector(300., 20,
+                                                                1049.99 + 580.0 / 2));
+      G4Box* geo_apsr10xx3 = new G4Box("geo_apsr10xx3", 100. / 2, 300. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsr10x6 = new G4SubtractionSolid("geo_apsr10x6", geo_apsr10x5, geo_apsr10xx3, 0, G4ThreeVector(0, 300,
+                                                                1049.99 + 580.0 / 2));
+      G4Tubs* geo_apsr10xx4 = new G4Tubs("geo_apsr10xx4", 0, 41.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr10x7 = new G4SubtractionSolid("geo_apsr10x7", geo_apsr10x6, geo_apsr10xx4, Rotation1, G4ThreeVector(0,
+                                                                0, 1049.99 + 283.50));
+      G4SubtractionSolid* geo_apsr10x8 = new G4SubtractionSolid("geo_apsr10x8", geo_apsr10x7, geo_apsr10xx4, Rotation2, G4ThreeVector(0,
+                                                                0, 1049.99 + 283.50));
+      G4Box* geo_apsr10xx5 = new G4Box("geo_apsr10xx5", 41., 9.45, 283.50);
+      G4SubtractionSolid* geo_apsr10x9 = new G4SubtractionSolid("geo_apsr10x9", geo_apsr10x8, geo_apsr10xx5, Transform1);
+      G4SubtractionSolid* geo_apsr10x10 = new G4SubtractionSolid("geo_apsr10x10", geo_apsr10x9, geo_apsr10xx5, Transform2);
+      G4SubtractionSolid* geo_apsr10x11 = new G4SubtractionSolid("geo_apsr10x11", geo_apsr10x10, geo_apsr10xx5, Transform3);
+      G4SubtractionSolid* geo_apsr10x12 = new G4SubtractionSolid("geo_apsr10x12", geo_apsr10x11, geo_apsr10xx5, Transform4);
+      G4VSolid* geo_apsr10 = new G4SubtractionSolid("geo_apsr10", geo_apsr10x12, qcs_solid_cut);
+
+      APSR10.geo = geo_apsr10;
+
+      string strMat_apsr10 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr10 = Materials::get(strMat_apsr10);
+      G4LogicalVolume* logi_apsr10 = new G4LogicalVolume(geo_apsr10, mat_apsr10, "logi_apsr10");
+      setColor(*logi_apsr10, "#00CC00");
+      setVisibility(*logi_apsr10, false);
+
+      APSR10.logi = logi_apsr10;
+
+      if (apsr10_En == 1) {
+        new G4PVPlacement(APSR10.transform, APSR10.logi, "phys_apsr10", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsr10->GetName() << " : mass = " << logi_apsr10->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsr10->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSR10;
+
+      // BWD part 1
+      CryostatElement APSL9;
+      name = "APSL9";
+      prep = name + ".";
+      int apsl9_En = int(m_config.getParameter(prep + "Enable"));
+      int apsl9_N = 2;
+      std::vector<double> apsl9_Z(apsl9_N);
+      std::vector<double> apsl9_R(apsl9_N);
+      std::vector<double> apsl9_r(apsl9_N);
+
+      apsl9_Z[0] = -(628.01 + 363.8 + 20);
+      apsl9_Z[1] = -(628.01 + 363.8 + 20 + 316.2);
+      apsl9_R[0] = 255.0;
+      apsl9_R[1] = 255.0;
+      apsl9_r[0] = 0;
+      apsl9_r[1] = 0;
+
+      APSL9.transform = G4Translate3D(0, 0, 0);
+
+      G4Polycone* geo_apsl9x1 = new G4Polycone("geo_apsl9x", 0.0, 2.0 * M_PI, apsl9_N, &(apsl9_Z[0]), &(apsl9_r[0]), &(apsl9_R[0]));
+      G4Box* geo_apsl9xx1 = new G4Box("geo_apsl9xx1", 300. / 2, 60. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsl9x2 = new G4SubtractionSolid("geo_apsl9x2", geo_apsl9x1, geo_apsl9xx1, 0, G4ThreeVector(-255., 5.,
+                                                               -(628.01 + 363.8 + 20 + 316.2 / 2)));
+      G4SubtractionSolid* geo_apsl9x3 = new G4SubtractionSolid("geo_apsl9x3", geo_apsl9x2, geo_apsl9xx1, 0, G4ThreeVector(255., -5.,
+                                                               -(628.01 + 363.8 + 20 + 316.2 / 2)));
+      G4Box* geo_apsl9xx2 = new G4Box("geo_apsl9xx2", 100. / 2, 300. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsl9x4 = new G4SubtractionSolid("geo_apsl9x4", geo_apsl9x3, geo_apsl9xx2, 0, G4ThreeVector(0, 255.0,
+                                                               -(628.01 + 363.8 + 20 + 316.2 / 2)));
+      G4VSolid* geo_apsl9 = new G4SubtractionSolid("geo_apsl9", geo_apsl9x4, qcs_solid_cut);
+
+      APSL9.geo = geo_apsl9;
+
+      string strMat_apsl9 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl9 = Materials::get(strMat_apsl9);
+      G4LogicalVolume* logi_apsl9 = new G4LogicalVolume(geo_apsl9, mat_apsl9, "logi_apsl9");
+      setColor(*logi_apsl9, "#00CC00");
+      setVisibility(*logi_apsl9, false);
+
+      APSL9.logi = logi_apsl9;
+
+      if (apsl9_En == 1) {
+        new G4PVPlacement(APSL9.transform, APSL9.logi, "phys_apsl9", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsl9->GetName() << " : mass = " << logi_apsl9->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsl9->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSL9;
+
+      // BWD part 2
+      CryostatElement APSL10;
+      name = "APSL10";
+      prep = name + ".";
+      int apsl10_En = int(m_config.getParameter(prep + "Enable"));
+      int apsl10_N = 3;
+      std::vector<double> apsl10_Z(apsl10_N);
+      std::vector<double> apsl10_R(apsl10_N);
+      std::vector<double> apsl10_r(apsl10_N);
+
+      apsl10_Z[0] = -(628.01);
+      apsl10_Z[1] = -(628.01 + 100);
+      apsl10_Z[2] = -(628.01 + 363.8);
+      apsl10_R[0] = 170.0;
+      apsl10_R[1] = 250.0;
+      apsl10_R[2] = 250.0;
+      apsl10_r[0] = 0;
+      apsl10_r[1] = 0;
+      apsl10_r[2] = 0;
+
+      APSL10.transform = G4Translate3D(0, 0, 0);
+
+      G4Polycone* geo_apsl10x1 = new G4Polycone("geo_apsl10x1", 0.0, 2.0 * M_PI, apsl10_N, &(apsl10_Z[0]), &(apsl10_r[0]),
+                                                &(apsl10_R[0]));
+      G4Tubs* geo_apsl10xx1 = new G4Tubs("geo_apsl10xx1", 0, 40.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl10x2 = new G4SubtractionSolid("geo_apsl10x2", geo_apsl10x1, geo_apsl10xx1, Rotation1, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0));
+      G4SubtractionSolid* geo_apsl10x3 = new G4SubtractionSolid("geo_apsl10x3", geo_apsl10x2, geo_apsl10xx1, Rotation2, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0));
+      G4Tubs* geo_apsl10xx2 = new G4Tubs("geo_apsl10xx2", 0, 50.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl10x4 = new G4SubtractionSolid("geo_apsl10x4", geo_apsl10x3, geo_apsl10xx2, Rotation1, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0 + 104.0));
+      G4SubtractionSolid* geo_apsl10x5 = new G4SubtractionSolid("geo_apsl10x5", geo_apsl10x4, geo_apsl10xx2, Rotation2, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0 + 104.0));
+      G4Tubs* geo_apsl10xx3 = new G4Tubs("geo_apsl10xx3", 0, 64.5, 250.0 - 17.0, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl10x6 = new G4SubtractionSolid("geo_apsl10x6", geo_apsl10x5, geo_apsl10xx3, Rotation1, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0 + 104.0));
+      G4SubtractionSolid* geo_apsl10x7 = new G4SubtractionSolid("geo_apsl10x7", geo_apsl10x6, geo_apsl10xx3, Rotation2, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0 + 104.0));
+      G4Box* geo_apsl10xx4 = new G4Box("geo_apsl10xx4", 300. / 2, 60. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsl10x8 = new G4SubtractionSolid("geo_apsl10x8", geo_apsl10x7, geo_apsl10xx4, 0, G4ThreeVector(-250., 5,
+                                                                -(628.01 + 363.8 / 2)));
+      G4SubtractionSolid* geo_apsl10x9 = new G4SubtractionSolid("geo_apsl10x9", geo_apsl10x8, geo_apsl10xx4, 0, G4ThreeVector(250., -5,
+                                                                -(628.01 + 363.8 / 2)));
+      G4Box* geo_apsl10xx5 = new G4Box("geo_apsl10xx5", 100. / 2, 300. / 2, 1000.0 / 2);
+      G4SubtractionSolid* geo_apsl10x10 = new G4SubtractionSolid("geo_apsl10x10", geo_apsl10x9, geo_apsl10xx5, 0, G4ThreeVector(0, 250.,
+                                                                 -(628.01 + 363.8 / 2)));
+      G4VSolid* geo_apsl10 = new G4SubtractionSolid("geo_apsl10", geo_apsl10x10, qcs_solid_cut);
+
+      APSL10.geo = geo_apsl10;
+
+      string strMat_apsl10 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl10 = Materials::get(strMat_apsl10);
+      G4LogicalVolume* logi_apsl10 = new G4LogicalVolume(geo_apsl10, mat_apsl10, "logi_apsl10");
+      setColor(*logi_apsl10, "#00CC00");
+      setVisibility(*logi_apsl10, false);
+
+      APSL10.logi = logi_apsl10;
+
+      if (apsl10_En == 1) {
+        new G4PVPlacement(APSL10.transform, APSL10.logi, "phys_apsl10", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsl10->GetName() << " : mass = " << logi_apsl10->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsl10->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSL10;
+
+      //-- Outer layer of the shielding
+      // FWD part 1
+      CryostatElement APSR11;
+      name = "APSR11";
+      prep = name + ".";
+      int apsr11_En = int(m_config.getParameter(prep + "Enable"));
+      int apsr11_N = 2;
+      std::vector<double> apsr11_Z(apsr11_N);
+      std::vector<double> apsr11_R(apsr11_N);
+      std::vector<double> apsr11_r(apsr11_N);
+
+      apsr11_Z[0] = 1049.99 + 580.0 + 330.0 + 351.0 - 640.0 - 11.0;
+      apsr11_Z[1] = 1049.99 + 580.0 + 330.0 + 351.0 - 11.0;
+      apsr11_R[0] = 290.0 + 3.2;
+      apsr11_R[1] = 290.0 + 3.2;
+      apsr11_r[0] = 290.0;
+      apsr11_r[1] = 290.0;
+
+      APSR11.transform = G4Translate3D(0, 0, 0);
+
+      G4VSolid* geo_apsr11 = new G4Polycone("geo_apsr11", 0.0, 2.0 * M_PI, apsr11_N, &(apsr11_Z[0]), &(apsr11_r[0]), &(apsr11_R[0]));
+
+      APSR11.geo = geo_apsr11;
+
+      string strMat_apsr11 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr11 = Materials::get(strMat_apsr11);
+      G4LogicalVolume* logi_apsr11 = new G4LogicalVolume(geo_apsr11, mat_apsr11, "logi_apsr11");
+      setColor(*logi_apsr11, "#00CC00");
+      setVisibility(*logi_apsr11, false);
+
+      APSR11.logi = logi_apsr11;
+
+      if (apsr11_En == 1) {
+        new G4PVPlacement(APSR11.transform, APSR11.logi, "phys_apsr11", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsr11->GetName() << " : mass = " << logi_apsr11->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsr11->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSR11;
+
+      // FWD part 2
+      CryostatElement APSR12;
+      name = "APSR12";
+      prep = name + ".";
+      int apsr12_En = int(m_config.getParameter(prep + "Enable"));
+      int apsr12_N = 2;
+      std::vector<double> apsr12_Z(apsr12_N);
+      std::vector<double> apsr12_R(apsr12_N);
+      std::vector<double> apsr12_r(apsr12_N);
+
+      apsr12_Z[0] = 1049.99 - 20.0;
+      apsr12_Z[1] = 1049.99 + 580.0;
+      apsr12_R[0] = 285.0 + 3.2;
+      apsr12_R[1] = 285.0 + 3.2;
+      apsr12_r[0] = 285.0;
+      apsr12_r[1] = 285.0;
+
+      APSR12.transform = G4Translate3D(0, 0, 0);
+
+      G4Polycone* geo_apsr12x1 = new G4Polycone("geo_apsr12x1", 0.0, 2.0 * M_PI, apsr12_N, &(apsr12_Z[0]), &(apsr12_r[0]),
+                                                &(apsr12_R[0]));
+      G4Tubs* geo_apsr12xx1 = new G4Tubs("geo_apsr12xx1", 0, 41.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr12x2 = new G4SubtractionSolid("geo_apsr12x2", geo_apsr12x1, geo_apsr12xx1, Rotation1, G4ThreeVector(0,
+                                                                0, 1049.99 + 283.50));
+      G4SubtractionSolid* geo_apsr12x3 = new G4SubtractionSolid("geo_apsr12x3", geo_apsr12x2, geo_apsr12xx1, Rotation2, G4ThreeVector(0,
+                                                                0, 1049.99 + 283.50));
+      G4Box* geo_apsr12xx2 = new G4Box("geo_apsr12xx2", 41., (285.0 - 278.15), 283.50);
+      G4SubtractionSolid* geo_apsr12x4 = new G4SubtractionSolid("geo_apsr12x4", geo_apsr12x3, geo_apsr12xx2, Transform1);
+      G4SubtractionSolid* geo_apsr12x5 = new G4SubtractionSolid("geo_apsr12x5", geo_apsr12x4, geo_apsr12xx2, Transform2);
+      G4SubtractionSolid* geo_apsr12x6 = new G4SubtractionSolid("geo_apsr12x6", geo_apsr12x5, geo_apsr12xx2, Transform3);
+      G4VSolid* geo_apsr12 = new G4SubtractionSolid("geo_apsr12", geo_apsr12x6, geo_apsr12xx2, Transform4);
+
+      APSR12.geo = geo_apsr12;
+
+      string strMat_apsr12 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr12 = Materials::get(strMat_apsr12);
+      G4LogicalVolume* logi_apsr12 = new G4LogicalVolume(geo_apsr12, mat_apsr12, "logi_apsr12");
+      setColor(*logi_apsr12, "#00CC00");
+      setVisibility(*logi_apsr12, false);
+
+      APSR12.logi = logi_apsr12;
+
+      if (apsr12_En == 1) {
+        new G4PVPlacement(APSR12.transform, APSR12.logi, "phys_apsr12", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsr12->GetName() << " : mass = " << logi_apsr12->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsr12->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSR12;
+
+      // BWD part 1
+      CryostatElement APSL11;
+      name = "APSL11";
+      prep = name + ".";
+      int apsl11_En = int(m_config.getParameter(prep + "Enable"));
+      int apsl11_N = 2;
+      std::vector<double> apsl11_Z(apsl11_N);
+      std::vector<double> apsl11_R(apsl11_N);
+      std::vector<double> apsl11_r(apsl11_N);
+
+      apsl11_Z[0] = -(628.01 + 363.8 + 20);
+      apsl11_Z[1] = -(628.01 + 363.8 + 20 + 316.2 + 84.0);
+      apsl11_R[0] = 255.0 + 3.2;
+      apsl11_R[1] = 255.0 + 3.2;
+      apsl11_r[0] = 255.0;
+      apsl11_r[1] = 255.0;
+
+      APSL11.transform = G4Translate3D(0, 0, 0);
+
+      G4VSolid* geo_apsl11 = new G4Polycone("geo_apsl11", 0.0, 2.0 * M_PI, apsl11_N, &(apsl11_Z[0]), &(apsl11_r[0]), &(apsl11_R[0]));
+
+      APSL11.geo = geo_apsl11;
+
+      string strMat_apsl11 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl11 = Materials::get(strMat_apsl11);
+      G4LogicalVolume* logi_apsl11 = new G4LogicalVolume(geo_apsl11, mat_apsl11, "logi_apsl11");
+      setColor(*logi_apsl11, "#00CC00");
+      setVisibility(*logi_apsl11, false);
+
+      APSL11.logi = logi_apsl11;
+
+      if (apsl11_En == 1) {
+        new G4PVPlacement(APSL11.transform, APSL11.logi, "phys_apsl11", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsl11->GetName() << " : mass = " << logi_apsl11->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsl11->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSL11;
+
+      // BWD part 2
+      CryostatElement APSL12;
+      name = "APSL12";
+      prep = name + ".";
+      int apsl12_En = int(m_config.getParameter(prep + "Enable"));
+      int apsl12_N = 3;
+      std::vector<double> apsl12_Z(apsl12_N);
+      std::vector<double> apsl12_R(apsl12_N);
+      std::vector<double> apsl12_r(apsl12_N);
+
+      apsl12_Z[0] = -(628.01);
+      apsl12_Z[1] = -(628.01 + 100);
+      apsl12_Z[2] = -(628.01 + 363.8);
+      apsl12_R[0] = 170.0 + 3.2;
+      apsl12_R[1] = 250.0 + 3.2;
+      apsl12_R[2] = 250.0 + 3.2;
+      apsl12_r[0] = 170.0;
+      apsl12_r[1] = 250.0;
+      apsl12_r[2] = 250.0;
+
+      // transform matrix
+      G4Transform3D Transform5 = G4RotateZ3D((M_PI_2 * 0 + M_PI_4) / Unit::rad) * G4Translate3D(0, 250.0 + 3.2, -(628.01 + 100));
+      G4Transform3D Transform6 = G4RotateZ3D((M_PI_2 * 1 + M_PI_4) / Unit::rad) * G4Translate3D(0, 250.0 + 3.2, -(628.01 + 100));
+      G4Transform3D Transform7 = G4RotateZ3D((M_PI_2 * 2 + M_PI_4) / Unit::rad) * G4Translate3D(0, 250.0 + 3.2, -(628.01 + 100));
+      G4Transform3D Transform8 = G4RotateZ3D((M_PI_2 * 3 + M_PI_4) / Unit::rad) * G4Translate3D(0, 250.0 + 3.2, -(628.01 + 100));
+
+      APSL12.transform = G4Translate3D(0, 0, 0);
+
+      G4Polycone* geo_apsl12x1 = new G4Polycone("geo_apsl12x1", 0.0, 2.0 * M_PI, apsl12_N, &(apsl12_Z[0]), &(apsl12_r[0]),
+                                                &(apsl12_R[0]));
+      G4Tubs* geo_apsl12xx1 = new G4Tubs("geo_apsl12xx1", 0, 40.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl12x2 = new G4SubtractionSolid("geo_apsl12x2", geo_apsl12x1, geo_apsl12xx1, Rotation1, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0));
+      G4SubtractionSolid* geo_apsl12x3 = new G4SubtractionSolid("geo_apsl12x3", geo_apsl12x2, geo_apsl12xx1, Rotation2, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0));
+      G4Box* geo_apsl12xx2 = new G4Box("geo_apsl12xx2", 40.0, 10.0, 363.8 - 100.0 - 12.0 - 40.0);
+      G4SubtractionSolid* geo_apsl12x4 = new G4SubtractionSolid("geo_apsl12x4", geo_apsl12x3, geo_apsl12xx2, Transform5);
+      G4SubtractionSolid* geo_apsl12x5 = new G4SubtractionSolid("geo_apsl12x5", geo_apsl12x4, geo_apsl12xx2, Transform6);
+      G4SubtractionSolid* geo_apsl12x6 = new G4SubtractionSolid("geo_apsl12x6", geo_apsl12x5, geo_apsl12xx2, Transform7);
+      G4VSolid* geo_apsl12 = new G4SubtractionSolid("geo_apsl12", geo_apsl12x6, geo_apsl12xx2, Transform8);
+
+      APSL12.geo = geo_apsl12;
+
+      string strMat_apsl12 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl12 = Materials::get(strMat_apsl12);
+      G4LogicalVolume* logi_apsl12 = new G4LogicalVolume(geo_apsl12, mat_apsl12, "logi_apsl12");
+      setColor(*logi_apsl12, "#00CC00");
+      setVisibility(*logi_apsl12, false);
+
+      APSL12.logi = logi_apsl12;
+
+      if (apsl12_En == 1) {
+        new G4PVPlacement(APSL12.transform, APSL12.logi, "phys_apsl12", &topVolume, false, 0);
+        G4cout << "_____________" << G4endl << logi_apsl12->GetName() << " : mass = " << logi_apsl12->GetMass() / CLHEP::kg <<
+               " | materials : " << logi_apsl12->GetMaterial() << G4endl << "_____________" << G4endl;
+      }
+
+      elements[name] = APSL12;
+
+      //---------------------------
+      // dose calculation
+      //---------------------------
+      if (elements.count("APSR9") && apsr9_En == 1) elements["APSR9"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5001));
+      if (elements.count("APSR10") && apsr10_En == 1) elements["APSR10"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5002));
+      if (elements.count("APSR11") && apsr11_En == 1) elements["APSR11"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5003));
+      if (elements.count("APSR12") && apsr12_En == 1) elements["APSR12"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5004));
+      if (elements.count("APSL9") && apsl9_En == 1) elements["APSL9"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5005));
+      if (elements.count("APSL10") && apsl10_En == 1) elements["APSL10"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5006));
+      if (elements.count("APSL11") && apsl11_En == 1) elements["APSL11"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5007));
+      if (elements.count("APSL12") && apsl12_En == 1) elements["APSL12"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 5008));
 
     }
   }

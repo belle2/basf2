@@ -40,4 +40,17 @@ Tools which will provide you help
     :nogroupsections:
 
 
+.. _b2help-variable-type:
+
+``b2help-variable-type``: Data type of the return value of the provided variables
+---------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: analysis/tools/b2help-variable-type
+    :func: get_argument_parser
+    :prog: b2help-variable-type
+    :nodefault:
+    :nogroupsections:
+
+
 .. include:: ../../../decfiles/doc/decfiles-tools.rstinclude

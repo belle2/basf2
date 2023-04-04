@@ -9,7 +9,7 @@
 ##########################################################################
 
 """
-You can run ``b2help-variableType`` to show the return type of the provided variables.
+You can run ``b2help-variable-type`` to show the return type of the provided variables.
 """
 import argparse
 from variables import printVariableType
@@ -20,7 +20,7 @@ def get_argument_parser():
 This returns the data type of the return type of the return value of the provided variables.
 
 Usage:
-    ``b2help-variableType M E isSignal``
+    ``b2help-variable-type M E isSignal``
 """)
 
     parser.add_argument('variables', nargs='+', default=None, 

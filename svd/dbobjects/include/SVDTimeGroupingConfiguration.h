@@ -54,11 +54,11 @@ namespace Belle2 {
     Bool_t  includeOutOfRangeClusters;
     /**
      * Cls-time resolution based on sensor side and type,
-     * sides -> 0: V, 1: U,
      * types -> 0: L3, 1: Barrel, 2: Forward.
+     * sides -> 0: V, 1: U,
      * vector elements are sigmas wrt cls-size.
      */
-    std::vector<Float_t> m_clsSigma[2][3];
+    std::vector<Float_t> clsSigma[3][2];
 
     ClassDef(SVDTimeGroupingParameters, 1); /**< needed by root*/
   };
@@ -84,11 +84,11 @@ namespace Belle2 {
     /**
      * Returns the reference to the parameters
      */
-    const struct SVDTimeGroupingParameters& getTimeGroupingParameters(const TString& alg,
-        const Int_t& mode,
-        const Bool_t& isRawTime = false) const {
-      if (!isRawTime)
-      {
+    const SVDTimeGroupingParameters& getTimeGroupingParameters(const TString& alg,
+                                                               const Int_t& mode,
+                                                               const Bool_t& isRawTime = false) const
+    {
+      if (!isRawTime) {
         if (mode == 6) {
           if (alg == "CoG3")
             return m_parsForCoG3In6Samples;
@@ -104,8 +104,7 @@ namespace Belle2 {
           else if (alg == "CoG6")
             return m_parsForCoG6In3Samples;
         }
-      } else
-      {
+      } else {
         if (mode == 6) {
           if (alg == "CoG3")
             return m_rawtimeParsForCoG3In6Samples;
@@ -130,7 +129,7 @@ namespace Belle2 {
     /**
      * Sets all the parameters
      */
-    struct SVDTimeGroupingParameters& setTimeGroupingParameters(const TString& alg, const Int_t& mode, const Bool_t& isRawTime = false)
+    SVDTimeGroupingParameters& setTimeGroupingParameters(const TString& alg, const Int_t& mode, const Bool_t& isRawTime = false)
     {
       if (!isRawTime) {
         if (mode == 6) {

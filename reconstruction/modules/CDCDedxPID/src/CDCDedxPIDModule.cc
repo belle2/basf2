@@ -594,7 +594,7 @@ void CDCDedxPIDModule::event()
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_pCDC / dedxTrack->m_mcmass);
       double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed,
-                              std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta)) * dedxTrack->m_timeReso;
+                              std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_timeReso);
       dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_simDedx < 0)
         dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
@@ -853,7 +853,7 @@ double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) c
 }
 
 
-double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
+double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin, double timereso) const
 {
   if (nhit < 5) nhit = 5;
   if (sin > 0.99) sin = 0.99;
@@ -879,7 +879,7 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
   x[0] = sin;
   double corSin = sigmaCurve(x, sinpar, 0);
 
-  return (corDedx * corSin * corNHit);
+  return (corDedx * corSin * corNHit * timereso);
 }
 
 void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
@@ -893,7 +893,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 
     // determine the predicted mean and resolution
     double mean = getMean(bg);
-    double sigma = getSigma(mean, nhit, sin) * timereso;
+    double sigma = getSigma(mean, nhit, sin, timereso);
 
     predmean[pdgIter.getIndex()] = mean;
     predsigma[pdgIter.getIndex()] = sigma;

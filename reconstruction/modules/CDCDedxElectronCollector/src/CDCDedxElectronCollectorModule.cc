@@ -43,6 +43,7 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("isDocaRS", m_isDocaRS, "true for adding doca tree branch. ", false);
   addParam("isEntaRS", m_isEntaRS, "true for adding enta tree branch. ", false);
   addParam("isDedxhit", m_isDedxhit, "true for adding dedxhit tree branch. ", false);
+  addParam("isADCcorr", m_isADCcorr, "true for adding adc tree branch. ", false);
   addParam("isBhabha", m_isBhabha, "true for bhabha events", true);
   addParam("isRadee", m_isRadee, "true for radee events", false);
   addParam("isTrgSel", m_isTrgSel, "true to enable trigger sel inside module", false);
@@ -100,6 +101,7 @@ void CDCDedxElectronCollectorModule::prepare()
   if (m_isDocaRS)ttree->Branch("docaRS", &m_docaRS);
   if (m_isEntaRS)ttree->Branch("entaRS", &m_entaRS);
   if (m_isDedxhit)ttree->Branch("dedxhit", &m_dedxhit);
+  if (m_isADCcorr)ttree->Branch("adccorr", &m_adccorr);
 
   // Collector object registration
   registerObject<TH1D>("means", means);
@@ -264,6 +266,7 @@ void CDCDedxElectronCollectorModule::collect()
     if (m_isDocaRS)m_docaRS.clear();
     if (m_isEntaRS)m_entaRS.clear();
     if (m_isDedxhit)m_dedxhit.clear();
+    if (m_isADCcorr)m_adccorr.clear();
 
     // Simple numbers don't need to be cleared
     // make sure to use the truncated mean without the hadron saturation correction
@@ -277,6 +280,7 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_isDocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
       if (m_isEntaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
       if (m_isDedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
+      if (m_isADCcorr)m_adccorr.push_back(dedxTrack->getADCCount(i));
     }
 
     // Track and/or hit information filled as per config

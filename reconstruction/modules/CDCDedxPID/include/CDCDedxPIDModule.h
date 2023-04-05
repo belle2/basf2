@@ -103,7 +103,7 @@ namespace Belle2 {
     double sigmaCurve(double* x, const double* par, int version) const;
 
     /** calculate the predicted resolution using the parameterized resolution */
-    double getSigma(double dedx, double nhit, double sin) const;
+    double getSigma(double dedx, double nhit, double sin, double timereso) const;
 
     /** hadron saturation parameterization part 1 */
     double I2D(double cosTheta, double I) const;

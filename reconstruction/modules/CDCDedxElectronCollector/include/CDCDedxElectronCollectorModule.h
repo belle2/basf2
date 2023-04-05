@@ -91,6 +91,7 @@ namespace Belle2 {
     std::vector<double> m_docaRS;    /**< rescaled distance of closest approach for the hit */
     std::vector<double> m_entaRS;    /**< rescaled entrance angle for the hit */
     std::vector<double> m_dedxhit; /**< dE/dx for the hit */
+    std::vector<double> m_adccorr; /**< adc corrected for the hit */
 
     bool m_isCosth;         /**< flag to write costh in tree  */
     bool m_isMom;           /**< flag to write momentum in treet */
@@ -103,6 +104,7 @@ namespace Belle2 {
     bool m_isDocaRS;        /**< flag to write rescaled doca in tree */
     bool m_isEntaRS;        /**< flag to write rescaled enta in tree */
     bool m_isDedxhit;       /**< flag to write dedxhits in tree */
+    bool m_isADCcorr;       /**< flag to write adc corrected in tree */
     bool m_isBhabha;     /**< flag to select bhabha event */
     bool m_isRadee;  /**< flag to select radee event */
     bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */

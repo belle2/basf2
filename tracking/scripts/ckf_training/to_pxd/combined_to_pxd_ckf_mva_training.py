@@ -15,6 +15,7 @@ import subprocess
 import basf2
 from tracking import add_track_finding
 from tracking.path_utils import add_hit_preparation_modules
+from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 import background
 import simulation
 from packaging import version
@@ -123,6 +124,14 @@ def my_basf2_mva_teacher(
     basf2_mva.teacher(general_options, fastbdt_options)
 
 
+def create_fbdt_option_string(fast_bdt_option):
+    """
+    returns a readable string created by the fast_bdt_option array
+    """
+    return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
+        str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
+
+
 class GenerateSimTask(Basf2PathTask):
     """
     Generate simulated Monte Carlo with background overlay.
@@ -134,11 +143,11 @@ class GenerateSimTask(Basf2PathTask):
 
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Number of events to generate.
-    n_events = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: Number of events to generate.
+    n_events = b2luigi.IntParameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(
         #: \cond
@@ -211,11 +220,11 @@ class SplitNMergeSimTask(Basf2Task):
 
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Number of events to generate.
-    n_events = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: Number of events to generate.
+    n_events = b2luigi.IntParameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(
         #: \cond
@@ -292,11 +301,13 @@ class SplitNMergeSimTask(Basf2Task):
 class StateRecordingTask(Basf2PathTask):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Number of events to generate.
-    n_events_training = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: Number of events to generate.
+    n_events = b2luigi.IntParameter()
+
+    #: Layer on which to toggle for recording the information for training.
     layer = b2luigi.IntParameter()
 
     def output(self):
@@ -307,7 +318,7 @@ class StateRecordingTask(Basf2PathTask):
         yield SplitNMergeSimTask(
             bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
             experiment_number=self.experiment_number,
-            n_events=self.n_events_training,
+            n_events=self.n_events,
             random_seed=self.random_seed,
         )
 
@@ -317,8 +328,8 @@ class StateRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        path.add_module("RootInput",
-                        inputFileNames=file_list)
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
+        path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
         path.add_module("Geometry")
@@ -410,11 +421,17 @@ class CKFStateFilterTeacherTask(Basf2Task):
 
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Number of events to generate for the training data set.
-    n_events_training = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: Number of events to generate for the training data set.
+    n_events = b2luigi.IntParameter()
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
     #: Number of the filter for which the records files are to be processed
     filter_number = b2luigi.IntParameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
@@ -430,20 +447,17 @@ class CKFStateFilterTeacherTask(Basf2Task):
         hashed=True, default=[]
         #: \endcond
     )
-    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
-        #: \cond
-        hashed=True, default=[200, 8, 3, 0.1]
-        #: \endcond
-    )
 
     def get_weightfile_xml_identifier(self, fast_bdt_option=None, filter_number=1):
         """
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
         """
-        weightfile_name = f"trk_ToPXDStateFilter_{filter_number}.xml"
-        return weightfile_name
+        if fast_bdt_option is None:
+            fast_bdt_option = self.fast_bdt_option
+        fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
+        weightfile_name = f"trk_ToPXDStateFilter_{filter_number}" + fast_bdt_string
+        return weightfile_name + ".xml"
 
     def requires(self):
         """
@@ -453,7 +467,8 @@ class CKFStateFilterTeacherTask(Basf2Task):
             yield self.clone(
                 StateRecordingTask,
                 experiment_number=self.experiment_number,
-                n_events_training=self.n_events_training,
+                n_events_training=self.n_events,
+                random_seed="training",
                 layer=layer
             )
 
@@ -489,11 +504,18 @@ class CKFStateFilterTeacherTask(Basf2Task):
 class ResultRecordingTask(Basf2PathTask):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Number of events to generate.
-    n_events_training = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: Number of events to generate.
+    n_events_training = b2luigi.IntParameter()
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
+    #: Name of the records file for training the final result filter
     result_filter_records_name = b2luigi.Parameter()
 
     def output(self):
@@ -522,7 +544,7 @@ class ResultRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if ("training" in x and ".root" in x)]
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -547,6 +569,7 @@ class ResultRecordingTask(Basf2PathTask):
 
         path.add_module("PXDSpacePointCreator")
 
+        fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option)
         path.add_module("ToPXDCKF",
                         minimalPtRequirement=0,
                         minimalHitRequirement=1,
@@ -565,7 +588,7 @@ class ResultRecordingTask(Basf2PathTask):
 
                         firstHighFilter="mva",
                         firstHighFilterParameters={
-                            "identifier": self.get_input_file_names("trk_ToPXDStateFilter_1.xml")[0],
+                            "identifier": self.get_input_file_names(f"trk_ToPXDStateFilter_1{fast_bdt_string}.xml")[0],
                             "cut": 0.0001},
                         firstHighUseNStates=10,
 
@@ -573,7 +596,7 @@ class ResultRecordingTask(Basf2PathTask):
 
                         secondHighFilter="mva",
                         secondHighFilterParameters={
-                            "identifier": self.get_input_file_names("trk_ToPXDStateFilter_2.xml")[0],
+                            "identifier": self.get_input_file_names(f"trk_ToPXDStateFilter_2{fast_bdt_string}.xml")[0],
                             "cut": 0.0001},
                         secondHighUseNStates=10,
 
@@ -581,7 +604,7 @@ class ResultRecordingTask(Basf2PathTask):
 
                         thirdHighFilter="mva",
                         thirdHighFilterParameters={
-                            "identifier": self.get_input_file_names("trk_ToPXDStateFilter_3.xml")[0],
+                            "identifier": self.get_input_file_names(f"trk_ToPXDStateFilter_3{fast_bdt_string}.xml")[0],
                             "cut": 0.0001},
                         thirdHighUseNStates=10,
 
@@ -612,11 +635,11 @@ class CKFResultFilterTeacherTask(Basf2Task):
     """
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Number of events to generate for the training data set.
-    n_events_training = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: Number of events to generate for the training data set.
+    n_events = b2luigi.IntParameter()
     #: Name of the input file name
     result_filter_records_name = b2luigi.Parameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
@@ -644,18 +667,22 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
         """
-        weightfile_name = "trk_CDCToSVDSpacePointRedultFilter.weights.xml"
-        return weightfile_name
+        if fast_bdt_option is None:
+            fast_bdt_option = self.fast_bdt_option
+        fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
+        weightfile_name = "trk_ToPXDResultFilter" + fast_bdt_string
+        return weightfile_name + ".xml"
 
     def requires(self):
         """
         Generate list of luigi Tasks that this Task depends on.
         """
         yield ResultRecordingTask(
-                n_events_training=self.n_events_training,
                 experiment_number=self.experiment_number,
+                random_seed=self.random_seed,
+                n_events=self.n_events,
+                fast_bdt_option=self.fast_bdt_option,
                 result_filter_records_name=self.result_filter_records_name,
-                random_seed=self.random_seed
         )
 
     def output(self):
@@ -685,6 +712,180 @@ class CKFResultFilterTeacherTask(Basf2Task):
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option,
         )
+
+
+class ValidationAndOptimisationTask(Basf2PathTask):
+    #: Experiment number of the conditions database, e.g. defines simulation geometry.
+    experiment_number = b2luigi.IntParameter()
+    #: Number of events to generate for the training data set.
+    n_events_training = b2luigi.IntParameter()
+    # #: FastBDT option to use to train the StateFilters
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
+        # #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        # #: \endcond
+    )
+    # #: FastBDT option to use to train the Result Filter
+    fast_bdt_option_result_filter = b2luigi.ListParameter(
+        # #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        # #: \endcond
+    )
+    #: Number of events to generate for the testing, validation, and optimisation data set.
+    n_events_testing = b2luigi.IntParameter()
+    #: Value of the cut on the MVA classifier output for accepting a state during CKF tracking.
+    state_filter_cut = b2luigi.FloatParameter()
+    #: How many states should be kept at maximum in the combinatorial part of the CKF tree search.
+    use_n_best_states = b2luigi.IntParameter()
+    #: Value of the cut on the MVA classifier output for a result candidate.
+    result_filter_cut = b2luigi.FloatParameter()
+    #: How many results should be kept at maximum to search for overlaps.
+    use_n_best_results = b2luigi.IntParameter()
+
+    def output(self):
+        fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
+        fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
+        yield self.add_to_output(
+            f"cdc_to_svd_spacepoint_ckf_validation{fbdt_state_filter_string}{fbdt_result_filter_string}.root")
+
+    def requires(self):
+        yield CKFResultFilterTeacherTask(
+            result_filter_records_name="filter_records.root",
+            experiment_number=self.experiment_number,
+            n_events=self.n_events_training,
+            fast_bdt_option=self.fast_bdt_option_result_filter,
+            random_seed='training'
+        )
+        yield SplitNMergeSimTask(
+            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            experiment_number=self.experiment_number,
+            n_events=self.n_events_testing,
+            random_seed="optimisation",
+        )
+        filter_numbers = [1, 2, 3]
+        for filter_number in filter_numbers:
+            yield self.clone(
+                CKFStateFilterTeacherTask,
+                experiment_number=self.experiment_number,
+                random_seed="training",
+                n_events=self.n_events_training,
+                filter_number=filter_number,
+                fast_bdt_option=self.fast_bdt_option_state_filter
+            )
+
+    def create_optimisation_and_validation_path(self):
+        path = basf2.create_path()
+
+        file_list = []
+        for _, file_name in self.get_input_file_names().items():
+            file_list.append(*file_name)
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "optimisation" in x and ".root" in x)]
+        path.add_module("RootInput", inputFileNames=file_list)
+
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        path.add_module("SetupGenfitExtrapolation")
+
+        add_hit_preparation_modules(path, components=["SVD", "PXD"])
+
+        add_track_finding(path, reco_tracks="CDCSVDRecoTracks", components=["CDC", "SVD"], prune_temporary_tracks=False)
+
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName="MCRecoTracks",
+                        WhichParticles=[],
+                        UsePXDHits=True,
+                        UseSVDHits=True,
+                        UseCDCHits=True)
+
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName="CDCSVDRecoTracks")
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCSVDRecoTracks")
+
+        path.add_module("PXDSpacePointCreator")
+
+        fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
+        fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
+        path.add_module("ToPXDCKF",
+
+                        inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
+                        outputRecoTrackStoreArrayName="PXDRecoTracks",
+                        outputRelationRecoTrackStoreArrayName="CDCSVDRecoTracks",
+
+                        # hitFilter="sensor",
+                        # seedFilter="distance",
+
+                        relationCheckForDirection="backward",
+                        reverseSeed=False,
+                        writeOutDirection="backward",
+
+                        firstHighFilter="mva_with_direction_check",
+                        firstHighFilterParameters={
+                            "identifier": self.get_input_file_names(
+                                f"trk_ToPXDStateFilter_1{fbdt_state_filter_string}.xml")[0],
+                            "cut": self.state_filter_cut,
+                            "direction": "backward"},
+                        firstHighUseNStates=self.use_n_best_states,
+
+                        advanceHighFilter="advance",
+                        advanceHighFilterParameters={"direction": "backward"},
+
+                        secondHighFilter="mva",
+                        secondHighFilterParameters={
+                            "identifier": self.get_input_file_names(
+                                f"trk_ToPXDStateFilter_2{fbdt_state_filter_string}.xml")[0],
+                            "cut": self.state_filter_cut},
+                        secondHighUseNStates=self.use_n_best_states,
+
+                        updateHighFilter="fit",
+
+                        thirdHighFilter="mva",
+                        thirdHighFilterParameters={
+                            "identifier": self.get_input_file_names(
+                                f"trk_ToPXDStateFilter_3{fbdt_state_filter_string}.xml")[0],
+                            "cut": self.state_filter_cut},
+                        thirdHighUseNStates=self.use_n_best_states,
+
+                        filter="mva",
+                        filterParameters={
+                            "identifier": self.get_input_file_names(
+                                f"trk_ToPXDResultFilter{fbdt_result_filter_string}.xml")[0],
+                            "cut": self.result_filter_cut},
+                        useBestNInSeed=self.use_n_best_results,
+
+                        exportTracks=True,
+                        enableOverlapResolving=True)
+
+        path.add_module('RelatedTracksCombiner',
+                        VXDRecoTracksStoreArrayName="PXDRecoTracks",
+                        CDCRecoTracksStoreArrayName="CDCSVDRecoTracks",
+                        recoTracksStoreArrayName="RecoTracks")
+
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName="MCRecoTracks",
+                        WhichParticles=[],
+                        UsePXDHits=True,
+                        UseSVDHits=True,
+                        UseCDCHits=True)
+
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=True, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName="RecoTracks")
+
+        path.add_module(
+            CombinedTrackingValidationModule(
+                output_file_name=self.get_output_file_name(
+                    f"to_svd_ckf_validation{fbdt_state_filter_string}{fbdt_result_filter_string}.root"),
+                reco_tracks_name="RecoTracks",
+                mc_reco_tracks_name="MCRecoTracks",
+                name="",
+                contact="",
+                expert_level=200))
+
+        return path
+
+    def create_path(self):
+        return self.create_optimisation_and_validation_path()
 
 
 class MainTask(b2luigi.WrapperTask):
@@ -732,21 +933,37 @@ class MainTask(b2luigi.WrapperTask):
         """
 
         fast_bdt_options = []
+        fast_bdt_options.append([50, 8, 3, 0.1])
+        fast_bdt_options.append([100, 8, 3, 0.1])
         fast_bdt_options.append([200, 8, 3, 0.1])
 
         experiment_numbers = b2luigi.get_setting("experiment_numbers")
 
         # iterate over all possible combinations of parameters from the above defined parameter lists
-        for experiment_number, fast_bdt_option in itertools.product(
-                experiment_numbers, fast_bdt_options
+        for experiment_number, fast_bdt_option_state_filter, fast_bdt_option_result_filter in itertools.product(
+                experiment_numbers, fast_bdt_options, fast_bdt_options
         ):
 
-            yield CKFResultFilterTeacherTask(
-                    result_filter_records_name="filter_records.root",
-                    n_events_training=self.n_events_training,
-                    experiment_number=experiment_number,
-                    random_seed="training"
-            )
+            state_filter_cuts = [0.01, 0.03, 0.05, 0.1]
+            n_best_states_list = [3, 5, 10]
+            result_filter_cuts = [0.05, 0.1, 0.2]
+            n_best_results_list = [2, 3, 5, 10]
+            for state_filter_cut in state_filter_cuts:
+                for n_best_states in n_best_states_list:
+                    for result_filter_cut in result_filter_cuts:
+                        for n_best_results in n_best_results_list:
+                            yield self.clone(
+                                ValidationAndOptimisationTask,
+                                experiment_number=experiment_number,
+                                n_events_training=self.n_events_training,
+                                n_events_testing=self.n_events_testing,
+                                state_filter_cut=state_filter_cut,
+                                use_n_best_states=n_best_states,
+                                result_filter_cut=result_filter_cut,
+                                use_n_best_results=n_best_results,
+                                fast_bdt_option_state_filter=fast_bdt_option_state_filter,
+                                fast_bdt_option_result_filter=fast_bdt_option_result_filter,
+                            )
 
 
 if __name__ == "__main__":

@@ -6,11 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+
 #include <svd/modules/svdSpacePointCreator/SVDSpacePointCreatorModule.h>
 #include <svd/modules/svdSpacePointCreator/SpacePointHelperFunctions.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,6 +36,8 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "SpacePoints collection name", string("SVDSpacePoints"));
   addParam("EventLevelTrackingInfoName", m_eventLevelTrackingInfoName,
            "EventLevelTrackingInfo collection name", string(""));
+  addParam("EventInfo", m_svdEventInfoName,
+           "SVDEventInfo collection name.", string("SVDEventInfo"));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -58,9 +63,31 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("useSVDGroupInfo", m_useSVDGroupInfo,
            "Use SVD group info to reject combinations from clusters belonging to different groups",
            bool(false));
+  addParam("useSVDGroupInfoIn6Sample", m_useSVDGroupInfoIn6Sample,
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode",
+           bool(true));
+  addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode",
+           bool(true));
+
+  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
 
 }
 
+
+
+void SVDSpacePointCreatorModule::beginRun()
+{
+  if (m_useDB) {
+    if (!m_recoConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+
+    m_useSVDGroupInfoIn6Sample = m_recoConfig->getUseOfSVDGroupInfoInSPCreator(6);
+    m_useSVDGroupInfoIn3Sample = m_recoConfig->getUseOfSVDGroupInfoInSPCreator(3);
+  }
+}
 
 
 void SVDSpacePointCreatorModule::initialize()
@@ -106,13 +133,28 @@ void SVDSpacePointCreatorModule::event()
 {
 
 
+  bool useSVDGroupInfo = m_useSVDGroupInfo;
+  if (useSVDGroupInfo) {
+    // first take Event Informations:
+    StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
+    if (!temp_eventinfo.isValid())
+      m_svdEventInfoName = "SVDEventInfoSim";
+    StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+    if (!eventinfo) B2ERROR("No SVDEventInfo!");
+    int numberOfAcquiredSamples = eventinfo->getNSamples();
+    // then use the respective parameters
+    if (numberOfAcquiredSamples == 6)
+      useSVDGroupInfo = m_useSVDGroupInfoIn6Sample;
+    else if (numberOfAcquiredSamples == 3)
+      useSVDGroupInfo = m_useSVDGroupInfoIn3Sample;
+  }
 
   if (m_onlySingleClusterSpacePoints == true) {
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, m_useSVDGroupInfo);
+                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo);
   }
 
 

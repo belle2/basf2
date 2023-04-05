@@ -71,7 +71,8 @@ namespace Belle2 {
     DBObjPtr<SVDTimeGroupingConfiguration> m_groupingConfig; /**< SVDTimeGrouping Configuration payload*/
 
     // Data members
-    std::string m_svdClustersName = "SVDClusters"; /**< SVDCluster collection name */
+    std::string m_svdClustersName; /**< SVDCluster collection name */
+    std::string m_svdEventInfoName; /**< Name of the collection to use for the SVDEventInfo */
 
     /**
      * the storeArray for svdClusters as member,

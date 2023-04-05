@@ -8,9 +8,15 @@
 
 #include <svd/modules/svdTimeGrouping/SVDTimeGroupingModule.h>
 
+// framework
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
+// svd
+#include <svd/geometry/SensorInfo.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+
+// root
 #include <TString.h>
 
 using namespace Belle2;
@@ -27,6 +33,8 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
   // 1a. Collections.
   addParam("SVDClusters", m_svdClustersName, "SVDCluster collection name", std::string(""));
+  addParam("EventInfo", m_svdEventInfoName,
+           "SVDEventInfo collection name.", std::string("SVDEventInfo"));
 
   // 2b. Module Configuration
   addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
@@ -116,6 +124,8 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
 }
 
+
+
 void SVDTimeGroupingModule::beginRun()
 {
   if (m_useDB) {
@@ -147,6 +157,8 @@ void SVDTimeGroupingModule::beginRun()
   }
 }
 
+
+
 void SVDTimeGroupingModule::initialize()
 {
   // prepare all store:
@@ -165,6 +177,24 @@ void SVDTimeGroupingModule::event()
 {
   if (m_isDisabled) return;
   if (int(m_svdClusters.getEntries()) < 10) return;
+
+
+  // first take Event Informations:
+  StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
+  if (!temp_eventinfo.isValid())
+    m_svdEventInfoName = "SVDEventInfoSim";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  int numberOfAcquiredSamples = eventinfo->getNSamples();
+
+  // then use the respective parameters
+  if (numberOfAcquiredSamples == 6) {
+    if (m_isDisabledIn6Samples) return;
+    m_usedPars = m_usedParsIn6Samples;
+  } else if (numberOfAcquiredSamples == 3) {
+    if (m_isDisabledIn3Samples) return;
+    m_usedPars = m_usedParsIn3Samples;
+  }
 
 
   // declare and fill the histogram shaping each cluster with a normalised gaussian

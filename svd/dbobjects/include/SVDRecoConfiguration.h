@@ -33,7 +33,7 @@ namespace Belle2 {
       , m_stripChargeRecoWith6Samples("MaxSample")
       , m_stripChargeRecoWith3Samples("MaxSample")
     {
-      setStateOfSVDTimeGroup(false);
+      setStateOfSVDTimeGrouping(false);
       setUseOfSVDGroupInfoInSPCreator(false);
     };
 
@@ -98,7 +98,7 @@ namespace Belle2 {
      * Returns the parameter which turns On/Off SVD cluster grouping
      * in 3/6-sample acquisition mode
      */
-    Bool_t getStateOfSVDTimeGroup(const Int_t& mode) const
+    Bool_t getStateOfSVDTimeGrouping(const Int_t& mode) const
     {
       if (mode == 6)
         return m_assignSVDGroupIn6Samples;
@@ -211,7 +211,7 @@ namespace Belle2 {
      * Set the parameter which turns On/Off SVD cluster grouping
      * in 3/6-sample acquisition mode
      */
-    void setStateOfSVDTimeGroup(const Int_t& mode, const Bool_t& state = false)
+    void setStateOfSVDTimeGrouping(const Int_t& mode, const Bool_t& state = false)
     {
       if (!mode) {
         m_assignSVDGroupIn3Samples = false;

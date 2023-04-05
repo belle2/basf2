@@ -134,8 +134,8 @@ void SVDTimeGroupingModule::beginRun()
     else
       B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
-    m_isDisabledIn6Samples = m_recoConfig->getStateOfSVDTimeGroup(6);
-    m_isDisabledIn3Samples = m_recoConfig->getStateOfSVDTimeGroup(3);
+    m_isDisabledIn6Samples = m_recoConfig->getStateOfSVDTimeGrouping(6);
+    m_isDisabledIn3Samples = m_recoConfig->getStateOfSVDTimeGrouping(3);
 
     TString timeRecoWith6SamplesAlgorithm;
     TString timeRecoWith3SamplesAlgorithm;

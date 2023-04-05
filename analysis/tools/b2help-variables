@@ -13,18 +13,28 @@ You can run ``b2help-variables`` to list all available variables.
 """
 import argparse
 from terminal_utils import Pager
-from variables import printVars
+from variables import printVars, printVariableType
 
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(description="""
-This returns all variables which are available in the `analysis` package of basf2.
+This returns the description of variables whixh are available in the `analysis` package of basf2.
 
-Usage:
+- Display all available variables
     ``b2help-variables``
+
+- Description of the provided variables
+    ``b2help-variables --variables M Mbc isSignal``
+
+- Only the data type of the provided variables
+    ``b2help-variables --variables M Mbc isSignal --only_type``
 """)
     parser.add_argument('--no-pager', dest='pager', default=True, action='store_false',
                         help='Use a pager to show output or print to terminal.')
+    parser.add_argument('--variables', nargs='+', default=None, 
+                        help='Input variables to be displayed.')
+    parser.add_argument('--only_type', default=False, action='store_true', 
+                        help='Show only the data type of variable. This option requires the variable names with ``--variables``')
     return parser
 
 
@@ -59,8 +69,12 @@ if __name__ == "__main__":
         "old: hadronicSplitOffSuppression --> new: fakePhotonSuppression\n"
 
     )
-    if args.pager:
-        with Pager(r'Available variables in Variable\:\:Manager'):
-            printVars(warning)
+
+    if args.only_type:
+        printVariableType(args.variables)
     else:
-        printVars(warning)
+        if args.pager:
+            with Pager(r'Available variables in Variable\:\:Manager'):
+                printVars(warning, args.variables)
+        else:
+            printVars(warning, args.variables)

@@ -152,7 +152,7 @@ def getCommandLineOptions():
     return args
 
 
-def printVars(changedVariableNames=None):
+def printVars(changedVariableNames=None, listVars=None):
     """
     Print list of all available variables.
     """
@@ -160,18 +160,26 @@ def printVars(changedVariableNames=None):
     if changedVariableNames:
         print(changedVariableNames)
     print('Available variables in Variable::Manager:')
-    allVars = variables.getVariables()
+
+    if listVars is None:
+        listVars = variables.getVariables()
+    else:
+        listVars = [variables.getVariable(name) for name in listVars]
+
+    dict_VariableDataType = {0: 'double', 1: 'int', 2: 'bool'}
+
     vars = []
-    for v in allVars:
-        vars.append((v.group, v.name, v.description))
+    for v in listVars:
+        vars.append((v.group, v.name, v.description,
+                     dict_VariableDataType[v.variabletype]))
 
     rows = []
     current_group = ''
-    for (group, name, description) in sorted(vars):
+    for (group, name, description, vartype) in sorted(vars):
         if current_group != group:
             current_group = group
             rows.append([group])
-        rows.append([name, description])
+        rows.append([name, description, vartype])
     b2utils.pretty_print_description_list(rows)
 
 

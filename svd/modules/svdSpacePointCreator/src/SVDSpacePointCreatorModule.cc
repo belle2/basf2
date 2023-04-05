@@ -62,7 +62,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
   addParam("useSVDGroupInfo", m_useSVDGroupInfo,
            "Use SVD group info to reject combinations from clusters belonging to different groups",
-           bool(false));
+           bool(true));
   addParam("useSVDGroupInfoIn6Sample", m_useSVDGroupInfoIn6Sample,
            "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode",
            bool(true));
@@ -87,6 +87,18 @@ void SVDSpacePointCreatorModule::beginRun()
     m_useSVDGroupInfoIn6Sample = m_recoConfig->getUseOfSVDGroupInfoInSPCreator(6);
     m_useSVDGroupInfoIn3Sample = m_recoConfig->getUseOfSVDGroupInfoInSPCreator(3);
   }
+
+  if (m_useSVDGroupInfo) {
+    if (m_useSVDGroupInfoIn6Sample)
+      B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 6-sample DAQ mode.");
+    else
+      B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 6-sample DAQ mode.");
+    if (m_useSVDGroupInfoIn3Sample)
+      B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 3-sample DAQ mode.");
+    else
+      B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
+  } else
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used while forming cluster combinations.");
 }
 
 
@@ -119,9 +131,6 @@ void SVDSpacePointCreatorModule::initialize()
     if (!m_calibrationFile->IsOpen())
       B2FATAL("Couldn't open pdf file:" << m_inputPDF);
   }
-
-  if (m_useSVDGroupInfo) B2INFO("SVDSpacePointCreator : SVDCluster groupId is used while forming cluster combinations.");
-  else B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used while forming cluster combinations.");
 
   // set some counters for output:
   InitializeCounters();

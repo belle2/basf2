@@ -134,8 +134,8 @@ void SVDTimeGroupingModule::beginRun()
     else
       B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
-    m_isDisabledIn6Samples = m_recoConfig->getStateOfSVDTimeGrouping(6);
-    m_isDisabledIn3Samples = m_recoConfig->getStateOfSVDTimeGrouping(3);
+    m_isDisabledIn6Samples = !m_recoConfig->getStateOfSVDTimeGrouping(6);
+    m_isDisabledIn3Samples = !m_recoConfig->getStateOfSVDTimeGrouping(3);
 
     TString timeRecoWith6SamplesAlgorithm;
     TString timeRecoWith3SamplesAlgorithm;
@@ -153,7 +153,7 @@ void SVDTimeGroupingModule::beginRun()
       B2DEBUG(20, "SVDTimeGroupingConfiguration: from now on we are using " << m_groupingConfig->get_uniqueID());
 
     m_usedParsIn6Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 6, m_useClusterRawTime);
-    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 3, m_useClusterRawTime);
+    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith3SamplesAlgorithm, 3, m_useClusterRawTime);
   }
 }
 
@@ -163,10 +163,6 @@ void SVDTimeGroupingModule::initialize()
 {
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
-
-  if (m_usedPars.numberOfSignalGroups != m_usedPars.maxGroups) m_usedPars.includeOutOfRangeClusters = false;
-
-  if (m_usedPars.tRange[1] - m_usedPars.tRange[0] < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(20, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());
 }
@@ -195,6 +191,8 @@ void SVDTimeGroupingModule::event()
     if (m_isDisabledIn3Samples) return;
     m_usedPars = m_usedParsIn3Samples;
   }
+  if (m_usedPars.numberOfSignalGroups != m_usedPars.maxGroups)
+    m_usedPars.includeOutOfRangeClusters = false;
 
 
   // declare and fill the histogram shaping each cluster with a normalised gaussian

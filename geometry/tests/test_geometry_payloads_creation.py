@@ -10,9 +10,9 @@
 Test if the creation of the geometry payloads works fine.
 '''
 
-
-import basf2 as b2
 import b2test_utils as b2tu
+b2tu.skip_test_if_light()  # light builds don't contain full geometry # noqa
+import basf2 as b2
 
 
 # We will test few configurations

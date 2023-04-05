@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/bklm/modules/bklmAna/BKLMAnaModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>

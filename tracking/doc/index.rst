@@ -35,6 +35,7 @@ Use :ref:`add_tracking_reconstruction<tracking_addtrkreconstruction>` to append 
    trackFinding/trackFinding
    trackFitting
    specials
+   trackRefining
    trackMatching
    eventTimeExtraction
    pxdDataReduction

@@ -151,20 +151,14 @@ Here are several notes while using ``BelleMCOutput``.
 
 .. rubric:: Beam energy for MC generation
 
-The default global tag for MC generation is set to be the default gt for MC jobs,
-``B2BII_MC``. The beam energy spread is not considered when the payloads were
-created from the Belle DB; therefore, if you would like to include the energy
-spread in MC generation, please modify the prepended global tag:
-``b2bii_beamParameters_with_smearing``.
+The default global tag for analysis jobs is ``B2BII_MC``; however, this does not take into 
+account beam smearing. 
+Therefore, for the MC generation one must use ``b2bii_beamParameters_with_smearing``.
 
 .. code-block:: python
 
    # Use B2BII global tag.
    basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
-
-
-.. warning::
-   To generate run-independent MC, one must use ``B2BII_MC`` for now.
 
 
 .. rubric:: Run dependent MC

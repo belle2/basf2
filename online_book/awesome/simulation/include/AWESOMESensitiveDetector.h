@@ -11,7 +11,7 @@
 /* AWESOME headers. */
 #include <online_book/awesome/dataobjects/AWESOMESimHit.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/MCParticle.h>

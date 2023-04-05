@@ -6,9 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPNtuple/TOPNtupleModule.h>
 
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
@@ -140,7 +141,15 @@ namespace Belle2 {
       const TOPBarHit* barHit = top->getRelated<TOPBarHit>();
       const MCParticle* mcParticle = track.getRelated<MCParticle>();
       const MCParticle* mother = 0;
-      if (mcParticle) mother = mcParticle->getMother();
+      if (mcParticle) {
+        mother = mcParticle->getMother();
+        if (not barHit) { // Track MC matching probably done after TOPReconstructor so no relation from TOPLikelihood
+          const auto barHits = mcParticle->getRelationsWith<TOPBarHit>();
+          for (const auto& bHit : barHits) {
+            if (bHit.getModuleID() == extHit->getCopyID()) barHit = &bHit;
+          }
+        }
+      }
 
       m_top.clear();
 

@@ -19,7 +19,7 @@
 """
 <header>
     <output>pion-ExtMuidValidation.root</output>
-    <contact>depietro@infn.it</contact>
+    <contact>giacomo.pietro@kit.edu</contact>
     <description>Create events with 1 pion track for ext/muid validation.</description>
 </header>
 """

@@ -18,23 +18,24 @@ from variables import printVars, printVariableType
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(description="""
-This returns the description of variables whixh are available in the `analysis` package of basf2.
+This command returns a description of the variables which are available in the `analysis` package of basf2.
 
-- Display all available variables
+- To display all available variables,
     ``b2help-variables``
 
-- Description of the provided variables
+- To get a description of specific variables,
     ``b2help-variables --variables M Mbc isSignal``
 
-- Only the data type of the provided variables
+- To get only the data type of the variables,
     ``b2help-variables --variables M Mbc isSignal --only_type``
 """)
     parser.add_argument('--no-pager', dest='pager', default=True, action='store_false',
                         help='Use a pager to show output or print to terminal.')
     parser.add_argument('--variables', nargs='+', default=None, 
                         help='Input variables to be displayed.')
-    parser.add_argument('--only_type', default=False, action='store_true', 
-                        help='Show only the data type of variable. This option requires the variable names with ``--variables``')
+    parser.add_argument(
+        '--only_type', action='store_true', default=False,
+        help='Show only the data type of the variable. This option requires the variable names with the ``--variables`` option.')
     return parser
 
 

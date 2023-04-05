@@ -84,9 +84,9 @@ namespace Belle2 {
     /**
      * Returns the reference to the parameters
      */
-    const SVDTimeGroupingParameters& getTimeGroupingParameters(const TString& alg,
-                                                               const Int_t& mode,
-                                                               const Bool_t& isRawTime = false) const
+    SVDTimeGroupingParameters getTimeGroupingParameters(const TString& alg,
+                                                        const Int_t& mode,
+                                                        const Bool_t& isRawTime = false) const
     {
       if (!isRawTime) {
         if (mode == 6) {

@@ -11,6 +11,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
+#include <TString.h>
+
 using namespace Belle2;
 
 
@@ -28,9 +30,20 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
   // 2b. Module Configuration
   addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
+  addParam("isDisabled", m_isDisabled, "if true, module is disabled", bool(false));
+  addParam("isDisabledIn6Samples", m_isDisabledIn6Samples,
+           "if true, module is disabled for 6-sample DAQ mode", bool(false));
+  addParam("isDisabledIn3Samples", m_isDisabledIn3Samples,
+           "if true, module is disabled for 3-sample DAQ mode", bool(false));
+
   addParam("useClusterRawTime", m_useClusterRawTime,
            "Group on the basis of the raw time", bool(false));
-  addParam("isDisabled", m_isDisabled, "if true, module is disabled", bool(false));
+  addParam("rawtimeRecoWith6SamplesAlgorithm", m_rawtimeRecoWith6SamplesAlgorithm,
+           "Time algorithm to use if rawtime is computed for 6-sample DAQ mode",
+           std::string("CoG3"));
+  addParam("rawtimeRecoWith3SamplesAlgorithm", m_rawtimeRecoWith3SamplesAlgorithm,
+           "Time algorithm to use if rawtime is computed for 3-sample DAQ mode",
+           std::string("CoG3"));
 
   // 2. Fill time Histogram:
   addParam("tRangeLow", m_usedPars.tRange[0], "This sets the x- range of histogram [ns].",
@@ -103,7 +116,36 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
 }
 
+void SVDTimeGroupingModule::beginRun()
+{
+  if (m_useDB) {
+    if (!m_recoConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
+    m_isDisabledIn6Samples = m_recoConfig->getStateOfSVDTimeGroup(6);
+    m_isDisabledIn3Samples = m_recoConfig->getStateOfSVDTimeGroup(3);
+
+    TString timeRecoWith6SamplesAlgorithm;
+    TString timeRecoWith3SamplesAlgorithm;
+    if (!m_useClusterRawTime) {
+      timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+      timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
+    } else {
+      timeRecoWith6SamplesAlgorithm = m_rawtimeRecoWith6SamplesAlgorithm;
+      timeRecoWith3SamplesAlgorithm = m_rawtimeRecoWith3SamplesAlgorithm;
+    }
+
+    if (!m_groupingConfig.isValid())
+      B2FATAL("no valid configuration found for SVDTimeGrouping");
+    else
+      B2DEBUG(20, "SVDTimeGroupingConfiguration: from now on we are using " << m_groupingConfig->get_uniqueID());
+
+    m_usedParsIn6Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 6, m_useClusterRawTime);
+    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 3, m_useClusterRawTime);
+  }
+}
 
 void SVDTimeGroupingModule::initialize()
 {

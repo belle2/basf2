@@ -10,9 +10,11 @@
 
 // framework
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 // svd
+#include <svd/dbobjects/SVDRecoConfiguration.h>
 #include <svd/dbobjects/SVDTimeGroupingConfiguration.h>
 #include <svd/dataobjects/SVDCluster.h>
 
@@ -53,6 +55,8 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** configure */
+    void beginRun() override;
 
     /** EventWise jobs
      *
@@ -63,6 +67,8 @@ namespace Belle2 {
 
   protected:
 
+    DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
+    DBObjPtr<SVDTimeGroupingConfiguration> m_groupingConfig; /**< SVDTimeGrouping Configuration payload*/
 
     // Data members
     std::string m_svdClustersName = "SVDClusters"; /**< SVDCluster collection name */
@@ -73,16 +79,33 @@ namespace Belle2 {
      */
     StoreArray<SVDCluster> m_svdClusters;
 
-    bool   m_isDisabled         = false; /**< Disables the module if true. */
     bool   m_useDB              = true;  /**< if true takes the configuration from the DB objects. */
-    bool   m_useClusterRawTime  = false; /**< Prepare module to work in raw-time if this parameter is set. */
+    bool   m_isDisabled         = false; /**< Disables the module if true. */
+    bool   m_isDisabledIn6Samples = false; /**< Disables the module if true for 6-sample DAQ mode. */
+    bool   m_isDisabledIn3Samples = false; /**< Disables the module if true for 3-sample DAQ mode. */
+
+    /** Prepare module to work in raw-time if this parameter is set. */
+    bool   m_useClusterRawTime  = false;
+    /** Time algorithm to use if rawtime is computed for 6-sample DAQ mode. */
+    std::string m_rawtimeRecoWith6SamplesAlgorithm  = "CoG3";
+    /** Time algorithm to use if rawtime is computed for 3-sample DAQ mode. */
+    std::string  m_rawtimeRecoWith3SamplesAlgorithm  = "CoG3";
 
     /**
-     * all the parameter values to be used to be used in this module.
-     * if usedDB=true, then its values are taken from the SVDTimeGroupingConfiguration dbobject
+     * module parameter values for 6-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
+     */
+    SVDTimeGroupingParameters m_usedParsIn6Samples;
+
+    /**
+     * module parameter values for 3-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
+     */
+    SVDTimeGroupingParameters m_usedParsIn3Samples;
+
+    /**
+     * module parameter values used.
+     * if usedDB=true, then its values are taken from the SVDTimeGroupingConfiguration dbobject,
      */
     SVDTimeGroupingParameters m_usedPars;
-
 
     // helper functions
 

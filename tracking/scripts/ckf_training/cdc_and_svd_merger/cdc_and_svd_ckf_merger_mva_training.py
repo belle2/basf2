@@ -255,7 +255,7 @@ class SplitNMergeSimTask(Basf2Task):
 
     def requires(self):
         """
-        Generate list of luigi Tasks that this Task depends on.
+        This task requires several GenerateSimTask to be finished so that he required number of events is created.
         """
         n_events_per_task = MainTask.n_events_per_task
         quotient, remainder = divmod(self.n_events, n_events_per_task)
@@ -299,6 +299,11 @@ class SplitNMergeSimTask(Basf2Task):
 
 
 class ResultRecordingTask(Basf2PathTask):
+    """
+    Task to record data for the final result filter. This only requires found and MC-matched SVD and CDC tracks that need to be
+    merged, all state filters are set to "all"
+    """
+
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Number of events to generate.
@@ -307,12 +312,20 @@ class ResultRecordingTask(Basf2PathTask):
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
 
+    #: Name of the records file for training the final result filter
     result_filter_records_name = b2luigi.Parameter()
 
     def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
         yield self.add_to_output(self.result_filter_records_name)
 
     def requires(self):
+        """
+        This task requires that the training SplitMergeSimTask is finished.
+        """
         yield SplitNMergeSimTask(
             bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
             random_seed=self.random_seed,
@@ -321,6 +334,12 @@ class ResultRecordingTask(Basf2PathTask):
         )
 
     def create_result_recording_path(self, result_filter_records_name):
+        """
+        Create a path for the recording of the result filter. This file is then used to train the result filter.
+
+        :param result_filter_records_name: Name of the recording file.
+        """
+
         path = basf2.create_path()
 
         file_list = []
@@ -381,6 +400,9 @@ class ResultRecordingTask(Basf2PathTask):
         return path
 
     def create_path(self):
+        """
+        Create basf2 path to process with event generation and simulation.
+        """
         return self.create_result_recording_path(
             result_filter_records_name=self.get_output_file_name(self.result_filter_records_name),
         )
@@ -476,11 +498,15 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
 
 class ValidationAndOptimisationTask(Basf2PathTask):
+    """
+    Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
+    the states, the number of best candidates kept after each filter, and similar for the result filter.
+    """
     #: Experiment number of the conditions database, e.g. defines simulation geometry.
     experiment_number = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
-    # #: FastBDT option to use to train the StateFilters
+    #: FastBDT option to use to train the StateFilters
     fast_bdt_option = b2luigi.ListParameter(
         # #: \cond
         hashed=True, default=[200, 8, 3, 0.1]
@@ -492,11 +518,19 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     result_filter_cut = b2luigi.FloatParameter()
 
     def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
         yield self.add_to_output(
             f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root")
 
     def requires(self):
+        """
+        This task requires trained result filters, and that an independent data set for validation was created using the
+        ``SplitMergeSimTask`` with the random seed optimisation.
+        """
         yield CKFResultFilterTeacherTask(
             result_filter_records_name="filter_records.root",
             experiment_number=self.experiment_number,
@@ -512,6 +546,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         )
 
     def create_optimisation_and_validation_path(self):
+        """
+        Create a path to validate the trained filters.
+        """
         path = basf2.create_path()
 
         file_list = []
@@ -591,6 +628,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         return path
 
     def create_path(self):
+        """
+        Create basf2 path to process with event generation and simulation.
+        """
         return self.create_optimisation_and_validation_path()
 
 

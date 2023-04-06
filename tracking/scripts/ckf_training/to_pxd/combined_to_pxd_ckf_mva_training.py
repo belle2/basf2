@@ -357,8 +357,10 @@ class StateRecordingTask(Basf2PathTask):
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
                         outputRecoTrackStoreArrayName="RecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCSVDRecoTracks",
-                        # hitFilter="sensor",
-                        # seedFilter="distance",
+                        hitFilter="distance",
+                        seedFilter="distance",
+                        preSeedFilter='all',
+                        preHitFilter='all',
 
                         relationCheckForDirection="backward",
                         reverseSeed=False,
@@ -366,8 +368,7 @@ class StateRecordingTask(Basf2PathTask):
 
                         firstHighFilter="truth",
                         firstEqualFilter="recording",
-                        firstEqualFilterParameters={"treeName": "records1", "rootFileName":
-                                                    records1_fname, "returnWeight": 1.0},
+                        firstEqualFilterParameters={"treeName": "records1", "rootFileName": records1_fname, "returnWeight": 1.0},
                         firstLowFilter="none",
                         firstHighUseNStates=0,
                         firstToggleOnLayer=layer,
@@ -376,8 +377,7 @@ class StateRecordingTask(Basf2PathTask):
 
                         secondHighFilter="truth",
                         secondEqualFilter="recording",
-                        secondEqualFilterParameters={"treeName": "records2", "rootFileName":
-                                                     records2_fname, "returnWeight": 1.0},
+                        secondEqualFilterParameters={"treeName": "records2", "rootFileName": records2_fname, "returnWeight": 1.0},
                         secondLowFilter="none",
                         secondHighUseNStates=0,
                         secondToggleOnLayer=layer,
@@ -429,7 +429,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(
         #: \cond
-        hashed=True, default=[200, 8, 3, 0.1]
+        hashed=True, default=[50, 8, 3, 0.1]
         #: \endcond
     )
     #: Number of the filter for which the records files are to be processed
@@ -533,9 +533,10 @@ class ResultRecordingTask(Basf2PathTask):
             yield self.clone(
                 CKFStateFilterTeacherTask,
                 experiment_number=self.experiment_number,
-                n_events_training=self.n_events_training,
+                n_events=self.n_events_training,
                 random_seed=self.random_seed,
                 filter_number=filter_number,
+                fast_bdt_option=self.fast_bdt_option
             )
 
     def create_result_recording_path(self, result_filter_records_name):
@@ -571,16 +572,9 @@ class ResultRecordingTask(Basf2PathTask):
 
         fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option)
         path.add_module("ToPXDCKF",
-                        minimalPtRequirement=0,
-                        minimalHitRequirement=1,
-
-                        useAssignedHits=False,
-
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
                         outputRecoTrackStoreArrayName="RecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCSVDRecoTracks",
-                        hitFilter="sensor",
-                        seedFilter="distance",
 
                         relationCheckForDirection="backward",
                         reverseSeed=False,
@@ -589,7 +583,7 @@ class ResultRecordingTask(Basf2PathTask):
                         firstHighFilter="mva",
                         firstHighFilterParameters={
                             "identifier": self.get_input_file_names(f"trk_ToPXDStateFilter_1{fast_bdt_string}.xml")[0],
-                            "cut": 0.0001},
+                            "cut": 0.01},
                         firstHighUseNStates=10,
 
                         advanceHighFilter="advance",
@@ -597,7 +591,7 @@ class ResultRecordingTask(Basf2PathTask):
                         secondHighFilter="mva",
                         secondHighFilterParameters={
                             "identifier": self.get_input_file_names(f"trk_ToPXDStateFilter_2{fast_bdt_string}.xml")[0],
-                            "cut": 0.0001},
+                            "cut": 0.01},
                         secondHighUseNStates=10,
 
                         updateHighFilter="fit",
@@ -605,7 +599,7 @@ class ResultRecordingTask(Basf2PathTask):
                         thirdHighFilter="mva",
                         thirdHighFilterParameters={
                             "identifier": self.get_input_file_names(f"trk_ToPXDStateFilter_3{fast_bdt_string}.xml")[0],
-                            "cut": 0.0001},
+                            "cut": 0.01},
                         thirdHighUseNStates=10,
 
                         filter="recording",
@@ -640,6 +634,18 @@ class CKFResultFilterTeacherTask(Basf2Task):
     random_seed = b2luigi.Parameter()
     #: Number of events to generate for the training data set.
     n_events = b2luigi.IntParameter()
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[50, 8, 3, 0.1]
+        #: \endcond
+    )
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option_result_filter = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
     #: Name of the input file name
     result_filter_records_name = b2luigi.Parameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
@@ -655,12 +661,6 @@ class CKFResultFilterTeacherTask(Basf2Task):
         hashed=True, default=[]
         #: \endcond
     )
-    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
-        #: \cond
-        hashed=True, default=[200, 8, 3, 0.1]
-        #: \endcond
-    )
 
     def get_weightfile_xml_identifier(self, fast_bdt_option=None):
         """
@@ -668,7 +668,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         It is subsequently used as a local weightfile in the following validation tasks.
         """
         if fast_bdt_option is None:
-            fast_bdt_option = self.fast_bdt_option
+            fast_bdt_option = self.fast_bdt_option_result_filter
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = "trk_ToPXDResultFilter" + fast_bdt_string
         return weightfile_name + ".xml"
@@ -679,9 +679,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
         """
         yield ResultRecordingTask(
                 experiment_number=self.experiment_number,
+                n_events_training=self.n_events,
                 random_seed=self.random_seed,
-                n_events=self.n_events,
-                fast_bdt_option=self.fast_bdt_option,
+                fast_bdt_option=self.fast_bdt_option_state_filter,
                 result_filter_records_name=self.result_filter_records_name,
         )
 
@@ -710,7 +710,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
             weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
-            fast_bdt_option=self.fast_bdt_option,
+            fast_bdt_option=self.fast_bdt_option_result_filter,
         )
 
 
@@ -746,14 +746,16 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
         yield self.add_to_output(
-            f"cdc_to_svd_spacepoint_ckf_validation{fbdt_state_filter_string}{fbdt_result_filter_string}.root")
+            f"cdc_to_svd_spacepoint_ckf_validation{fbdt_state_filter_string}_{fbdt_result_filter_string}.root")
 
     def requires(self):
+        fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         yield CKFResultFilterTeacherTask(
-            result_filter_records_name="filter_records.root",
+            result_filter_records_name=f"filter_records{fbdt_state_filter_string}.root",
             experiment_number=self.experiment_number,
             n_events=self.n_events_training,
-            fast_bdt_option=self.fast_bdt_option_result_filter,
+            fast_bdt_option_state_filter=self.fast_bdt_option_state_filter,
+            fast_bdt_option_result_filter=self.fast_bdt_option_result_filter,
             random_seed='training'
         )
         yield SplitNMergeSimTask(
@@ -767,8 +769,8 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             yield self.clone(
                 CKFStateFilterTeacherTask,
                 experiment_number=self.experiment_number,
-                random_seed="training",
                 n_events=self.n_events_training,
+                random_seed="training",
                 filter_number=filter_number,
                 fast_bdt_option=self.fast_bdt_option_state_filter
             )
@@ -790,16 +792,6 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         add_track_finding(path, reco_tracks="CDCSVDRecoTracks", components=["CDC", "SVD"], prune_temporary_tracks=False)
 
-        path.add_module('TrackFinderMCTruthRecoTracks',
-                        RecoTracksStoreArrayName="MCRecoTracks",
-                        WhichParticles=[],
-                        UsePXDHits=True,
-                        UseSVDHits=True,
-                        UseCDCHits=True)
-
-        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
-                        mcRecoTracksStoreArrayName="MCRecoTracks",
-                        prRecoTracksStoreArrayName="CDCSVDRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCSVDRecoTracks")
 
         path.add_module("PXDSpacePointCreator")
@@ -807,13 +799,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
         path.add_module("ToPXDCKF",
-
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
                         outputRecoTrackStoreArrayName="PXDRecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCSVDRecoTracks",
-
-                        # hitFilter="sensor",
-                        # seedFilter="distance",
 
                         relationCheckForDirection="backward",
                         reverseSeed=False,
@@ -875,7 +863,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         path.add_module(
             CombinedTrackingValidationModule(
                 output_file_name=self.get_output_file_name(
-                    f"to_svd_ckf_validation{fbdt_state_filter_string}{fbdt_result_filter_string}.root"),
+                    f"to_pxd_ckf_validation{fbdt_state_filter_string}_{fbdt_result_filter_string}.root"),
                 reco_tracks_name="RecoTracks",
                 mc_reco_tracks_name="MCRecoTracks",
                 name="",
@@ -944,10 +932,10 @@ class MainTask(b2luigi.WrapperTask):
                 experiment_numbers, fast_bdt_options, fast_bdt_options
         ):
 
-            state_filter_cuts = [0.01, 0.03, 0.05, 0.1]
+            state_filter_cuts = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2]
             n_best_states_list = [3, 5, 10]
             result_filter_cuts = [0.05, 0.1, 0.2]
-            n_best_results_list = [2, 3, 5, 10]
+            n_best_results_list = [2, 3, 5]
             for state_filter_cut in state_filter_cuts:
                 for n_best_states in n_best_states_list:
                     for result_filter_cut in result_filter_cuts:

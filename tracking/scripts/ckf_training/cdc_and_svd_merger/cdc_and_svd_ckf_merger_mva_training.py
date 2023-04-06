@@ -15,6 +15,7 @@ import subprocess
 import basf2
 # from tracking import add_track_finding
 from tracking.path_utils import add_hit_preparation_modules, add_cdc_track_finding, add_svd_standalone_tracking
+from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 import background
 import simulation
 from packaging import version
@@ -121,6 +122,14 @@ def my_basf2_mva_teacher(
     fastbdt_options.m_shrinkage = fast_bdt_option[3]
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
     basf2_mva.teacher(general_options, fastbdt_options)
+
+
+def create_fbdt_option_string(fast_bdt_option):
+    """
+    returns a readable string created by the fast_bdt_option array
+    """
+    return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
+        str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
 
 
 class GenerateSimTask(Basf2PathTask):
@@ -317,7 +326,7 @@ class ResultRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if "training" in x]
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -327,36 +336,36 @@ class ResultRecordingTask(Basf2PathTask):
         add_hit_preparation_modules(path, components=["SVD"])
 
         # MCTrackFinding
-        mc_reco_tracks_name = "MCRecoTracks"
+        mc_reco_tracks = "MCRecoTracks"
         path.add_module('TrackFinderMCTruthRecoTracks',
-                        RecoTracksStoreArrayName=mc_reco_tracks_name)
+                        RecoTracksStoreArrayName=mc_reco_tracks)
 
         # CDC track finding and MC matching
-        cdc_reco_tracks_name = "CDCRecoTracks"
-        add_cdc_track_finding(path, output_reco_tracks=cdc_reco_tracks_name)
+        cdc_reco_tracks = "CDCRecoTracks"
+        add_cdc_track_finding(path, output_reco_tracks=cdc_reco_tracks)
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False, UseCDCHits=True,
-                        mcRecoTracksStoreArrayName=mc_reco_tracks_name,
-                        prRecoTracksStoreArrayName=cdc_reco_tracks_name)
+                        mcRecoTracksStoreArrayName=mc_reco_tracks,
+                        prRecoTracksStoreArrayName=cdc_reco_tracks)
 
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks_name)
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
 
         # SVD track finding and MC matching
-        svd_reco_tracks_name = "SVDRecoTracks"
-        add_svd_standalone_tracking(path, reco_tracks=svd_reco_tracks_name)
+        svd_reco_tracks = "SVDRecoTracks"
+        add_svd_standalone_tracking(path, reco_tracks=svd_reco_tracks)
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=False,
-                        mcRecoTracksStoreArrayName="MCRecoTracks",
-                        prRecoTracksStoreArrayName=svd_reco_tracks_name)
+                        mcRecoTracksStoreArrayName=mc_reco_tracks,
+                        prRecoTracksStoreArrayName=svd_reco_tracks)
 
         direction = "backward"
         path.add_module("CDCToSVDSeedCKF",
-                        inputRecoTrackStoreArrayName=cdc_reco_tracks_name,
+                        inputRecoTrackStoreArrayName=cdc_reco_tracks,
 
-                        fromRelationStoreArrayName=cdc_reco_tracks_name,
-                        toRelationStoreArrayName=svd_reco_tracks_name,
+                        fromRelationStoreArrayName=cdc_reco_tracks,
+                        toRelationStoreArrayName=svd_reco_tracks,
 
-                        relatedRecoTrackStoreArrayName=svd_reco_tracks_name,
-                        cdcTracksStoreArrayName=cdc_reco_tracks_name,
-                        vxdTracksStoreArrayName=svd_reco_tracks_name,
+                        relatedRecoTrackStoreArrayName=svd_reco_tracks,
+                        cdcTracksStoreArrayName=cdc_reco_tracks,
+                        vxdTracksStoreArrayName=svd_reco_tracks,
 
                         relationCheckForDirection=direction,
                         reverseSeed=False,
@@ -367,7 +376,7 @@ class ResultRecordingTask(Basf2PathTask):
                         endEarly=False,
 
                         filter="recording_with_relations",
-                        filterParameters={"rootFileName": self.get_output_file_name(self.result_filter_records_name)})
+                        filterParameters={"rootFileName": result_filter_records_name})
 
         return path
 
@@ -392,6 +401,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
     experiment_number = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
+    #: Random basf2 seed. It is further used to read of the production process to preserve
+    # clearness in the b2luigi output.
+    random_seed = b2luigi.Parameter()
     #: Name of the input file name
     result_filter_records_name = b2luigi.Parameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
@@ -419,8 +431,11 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
         """
-        weightfile_name = "trk_CDCToSVDSeedResultFilter.xml"
-        return weightfile_name
+        if fast_bdt_option is None:
+            fast_bdt_option = self.fast_bdt_option
+        fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
+        weightfile_name = "trk_CDCToSVDSeedResultFilter" + fast_bdt_string
+        return weightfile_name + ".xml"
 
     def requires(self):
         """
@@ -430,7 +445,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
                 experiment_number=self.experiment_number,
                 n_events_training=self.n_events_training,
                 result_filter_records_name=self.result_filter_records_name,
-                random_seed="training"
+                random_seed=self.random_seed
         )
 
     def output(self):
@@ -449,17 +464,134 @@ class CKFResultFilterTeacherTask(Basf2Task):
         is inherited from ``Basf2Task``.
         """
         records_files = self.get_input_file_names(self.result_filter_records_name)
-        tree_name = "records"
-        print(f"Processed records files for result filter training: {records_files=},\nfeature tree name: {tree_name=}")
 
         my_basf2_mva_teacher(
             records_files=records_files,
-            tree_name=tree_name,
+            tree_name="records",
             weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option,
         )
+
+
+class ValidationAndOptimisationTask(Basf2PathTask):
+    #: Experiment number of the conditions database, e.g. defines simulation geometry.
+    experiment_number = b2luigi.IntParameter()
+    #: Number of events to generate for the training data set.
+    n_events_training = b2luigi.IntParameter()
+    # #: FastBDT option to use to train the StateFilters
+    fast_bdt_option = b2luigi.ListParameter(
+        # #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        # #: \endcond
+    )
+    #: Number of events to generate for the testing, validation, and optimisation data set.
+    n_events_testing = b2luigi.IntParameter()
+    #: Value of the cut on the MVA classifier output for a result candidate.
+    result_filter_cut = b2luigi.FloatParameter()
+
+    def output(self):
+        fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
+        yield self.add_to_output(
+            f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root")
+
+    def requires(self):
+        yield CKFResultFilterTeacherTask(
+            result_filter_records_name="filter_records.root",
+            experiment_number=self.experiment_number,
+            n_events_training=self.n_events_training,
+            fast_bdt_option=self.fast_bdt_option,
+            random_seed='training'
+        )
+        yield SplitNMergeSimTask(
+            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            experiment_number=self.experiment_number,
+            n_events=self.n_events_testing,
+            random_seed="optimisation",
+        )
+
+    def create_optimisation_and_validation_path(self):
+        path = basf2.create_path()
+
+        file_list = []
+        for _, file_name in self.get_input_file_names().items():
+            file_list.append(*file_name)
+        file_list = [x for x in file_list if ("generated_mc_N" in x and "optimisation" in x and ".root" in x)]
+        path.add_module("RootInput", inputFileNames=file_list)
+
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        path.add_module("SetupGenfitExtrapolation")
+
+        add_hit_preparation_modules(path, components=["SVD"])
+
+        cdc_reco_tracks = "CDCRecoTracks"
+        svd_reco_tracks = "SVDRecoTracks"
+        reco_tracks = "RecoTracks"
+        mc_reco_tracks = "MCRecoTracks"
+
+        # CDC track finding and MC matching
+        add_cdc_track_finding(path, output_reco_tracks=cdc_reco_tracks)
+
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
+        # SVD track finding and MC matching
+        add_svd_standalone_tracking(path, reco_tracks=svd_reco_tracks)
+
+        direction = "backward"
+        fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
+        path.add_module(
+            "CDCToSVDSeedCKF",
+            inputRecoTrackStoreArrayName=cdc_reco_tracks,
+            fromRelationStoreArrayName=cdc_reco_tracks,
+            toRelationStoreArrayName=svd_reco_tracks,
+            relatedRecoTrackStoreArrayName=svd_reco_tracks,
+            cdcTracksStoreArrayName=cdc_reco_tracks,
+            vxdTracksStoreArrayName=svd_reco_tracks,
+            relationCheckForDirection=direction,
+            reverseSeed=False,
+            firstHighFilterParameters={
+                "direction": direction},
+            advanceHighFilterParameters={
+                "direction": direction},
+            writeOutDirection=direction,
+            endEarly=False,
+            filter='mva_with_relations',
+            filterParameters={
+                "identifier": self.get_input_file_names(f"trk_CDCToSVDSeedResultFilter{fbdt_string}.xml")[0],
+                "cut": self.result_filter_cut})
+
+        path.add_module('RelatedTracksCombiner',
+                        VXDRecoTracksStoreArrayName=svd_reco_tracks,
+                        CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+                        recoTracksStoreArrayName=reco_tracks)
+
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName=mc_reco_tracks,
+                        WhichParticles=[],
+                        UsePXDHits=True,
+                        UseSVDHits=True,
+                        UseCDCHits=True)
+
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName=mc_reco_tracks,
+                        prRecoTracksStoreArrayName=reco_tracks)
+
+        path.add_module(
+            CombinedTrackingValidationModule(
+                output_file_name=self.get_output_file_name(
+                    f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root"),
+                reco_tracks_name=reco_tracks,
+                mc_reco_tracks_name=mc_reco_tracks,
+                name="",
+                contact="",
+                expert_level=200))
+
+        return path
+
+    def create_path(self):
+        return self.create_optimisation_and_validation_path()
 
 
 class MainTask(b2luigi.WrapperTask):
@@ -507,19 +639,25 @@ class MainTask(b2luigi.WrapperTask):
         """
 
         fast_bdt_options = []
+        fast_bdt_options.append([50, 8, 3, 0.1])
+        fast_bdt_options.append([100, 8, 3, 0.1])
         fast_bdt_options.append([200, 8, 3, 0.1])
+        cut_values = []
+        for i in range(4):
+            cut_values.append((i+1) * 0.2)
 
         experiment_numbers = b2luigi.get_setting("experiment_numbers")
 
         # iterate over all possible combinations of parameters from the above defined parameter lists
-        for experiment_number, fast_bdt_option in itertools.product(
-                experiment_numbers, fast_bdt_options
+        for experiment_number, fast_bdt_option, cut_value in itertools.product(
+                experiment_numbers, fast_bdt_options, cut_values
         ):
-
-            yield CKFResultFilterTeacherTask(
-                    experiment_number=experiment_number,
-                    n_events_training=self.n_events_training,
-                    result_filter_records_name="filter_records.root",
+            yield ValidationAndOptimisationTask(
+                experiment_number=experiment_number,
+                n_events_training=self.n_events_training,
+                fast_bdt_option=fast_bdt_option,
+                n_events_testing=self.n_events_testing,
+                result_filter_cut=cut_value,
             )
 
 

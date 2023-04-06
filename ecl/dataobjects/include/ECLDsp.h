@@ -189,17 +189,8 @@ namespace Belle2 {
      */
     int computePeaktoPeakAmp() const
     {
-      int minADC = m_DspAVector[0];
-      int maxADC = minADC;
-      for (unsigned int i = 1; i < m_DspAVector.size(); i++) {
-
-        int value = m_DspAVector[i];
-        if (value < minADC) minADC = value;
-        if (value > maxADC) maxADC = value;
-
-      }
-
-      return (maxADC - minADC);
+      const auto [min, max] = std::minmax_element(m_DspAVector.begin(), m_DspAVector.end());
+      return *max - *min;
     }
 
     /*! Get number of ADC points

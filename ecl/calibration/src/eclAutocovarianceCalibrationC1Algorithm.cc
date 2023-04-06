@@ -39,7 +39,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Histograms containing the data collected by eclAutocovarianceCalibrationC1Collector*/
-  auto PPVsCellID = getObjectPtr<TH2F>("PPVsCellID");
+  auto PPVsCrysID = getObjectPtr<TH2F>("PPVsCrysID");
 
   std::vector<float> cellIDs;
   std::vector<float> PPamps;
@@ -48,7 +48,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    TH1F* hPP = (TH1F*)PPVsCellID->ProjectionY("hPP", crysID + 1, crysID + 1);
+    TH1F* hPP = (TH1F*)PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
 
     int Total = hPP->GetEntries();
     int subTotal = 0;
@@ -88,7 +88,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
-  PPVsCellID->Write();
+  PPVsCrysID->Write();
   gPPVsCellID->Write();
 
   /**-----------------------------------------------------------------------------------------------*/

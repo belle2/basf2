@@ -21,7 +21,7 @@ namespace Belle2 {
    * structure containing the relevant informations
    * of SVDTimeGrouping module
    */
-  struct SVDTimeGroupingParameters {
+  struct SVDTimeGroupingParameters: public TObject {
     /** Expected range of time histogram [ns]. */
     Float_t tRange[2];
     /** Time bin width is 1/rebinningFactor [ns]. */

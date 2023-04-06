@@ -77,7 +77,7 @@ class timeGroupingConfigurationImporter(b2.Module):
         payload.setTimeGroupingParameters("CoG3", 6, False).expectedSignalTime[1] = 0
         payload.setTimeGroupingParameters("CoG3", 6, False).expectedSignalTime[2] = 50
         payload.setTimeGroupingParameters("CoG3", 6, False).signalLifetime = 30
-        payload.setTimeGroupingParameters("CoG3", 6, False).numberOfSignalGroups = 20
+        payload.setTimeGroupingParameters("CoG3", 6, False).numberOfSignalGroups = 1
         payload.setTimeGroupingParameters("CoG3", 6, False).formSingleSignalGroup = False
         payload.setTimeGroupingParameters("CoG3", 6, False).acceptSigmaN = 5
         payload.setTimeGroupingParameters("CoG3", 6, False).writeGroupInfo = True

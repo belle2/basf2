@@ -255,7 +255,7 @@ class SplitNMergeSimTask(Basf2Task):
 
     def requires(self):
         """
-        Generate list of luigi Tasks that this Task depends on.
+        This task requires several GenerateSimTask to be finished so that he required number of events is created.
         """
         n_events_per_task = MainTask.n_events_per_task
         quotient, remainder = divmod(self.n_events, n_events_per_task)
@@ -299,6 +299,12 @@ class SplitNMergeSimTask(Basf2Task):
 
 
 class StateRecordingTask(Basf2PathTask):
+    """
+    Record the data for the three state filters for the ToPXDCKF.
+
+    This task requires that the events used for training have been simulated before, which is done using the
+    ``SplitMergeSimTask``.
+    """
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
@@ -311,10 +317,17 @@ class StateRecordingTask(Basf2PathTask):
     layer = b2luigi.IntParameter()
 
     def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
         for record_fname in ["records1.root", "records2.root", "records3.root"]:
             yield self.add_to_output(record_fname)
 
     def requires(self):
+        """
+        This task only requires that the input files have been created.
+        """
         yield SplitNMergeSimTask(
             bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
             experiment_number=self.experiment_number,
@@ -323,6 +336,16 @@ class StateRecordingTask(Basf2PathTask):
         )
 
     def create_state_recording_path(self, layer, records1_fname, records2_fname, records3_fname):
+        """
+        Create a path for the recording. To record the data for the PXD state filters, CDC+SVD tracks are required, and these
+        must be truth matched before. The data have to recorded for each layer of the PXD, i.e. layers 1 and 2, but also an
+        artificial layer 3.
+
+        :param layer: The layer for which the data are recorded,
+        :param records1_fname: Name of the records1 file.
+        :param records2_fname: Name of the records2 file.
+        :param records3_fname: Name of the records3 file.
+        """
         path = basf2.create_path()
 
         file_list = []
@@ -399,6 +422,9 @@ class StateRecordingTask(Basf2PathTask):
         return path
 
     def create_path(self):
+        """
+        Create basf2 path to process with event generation and simulation.
+        """
         return self.create_state_recording_path(
             layer=self.layer,
             records1_fname=self.get_output_file_name("records1.root"),
@@ -412,11 +438,8 @@ class CKFStateFilterTeacherTask(Basf2Task):
     A teacher task runs the basf2 mva teacher on the training data provided by a
     data collection task.
 
-    Since teacher tasks are needed for all quality estimators covered by this
-    steering file and the only thing that changes is the required data
-    collection task and some training parameters, I decided to use inheritance
-    and have the basic functionality in this base class/interface and have the
-    specific teacher tasks inherit from it.
+    In this task the three state filters are trained, each with the corresponding recordings from the different layers.
+    It will be executed for each FastBDT option defined in the MainTask.
     """
 
     #: Experiment number of the conditions database, e.g. defines simulation geometry
@@ -461,7 +484,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
 
     def requires(self):
         """
-        Generate list of luigi Tasks that this Task depends on.
+        This task requires that the recordings for the state filters.
         """
         for layer in [1, 2, 3]:
             yield self.clone(
@@ -502,6 +525,12 @@ class CKFStateFilterTeacherTask(Basf2Task):
 
 
 class ResultRecordingTask(Basf2PathTask):
+    """
+    Task to record data for the final result filter. This requires trained state filters.
+    The cuts on the state filter classifiers are set to rather low values to ensure that all signal is contained in the recorded
+    file. Also, the values for XXXXXHighUseNStates are chosen conservatively, i.e. rather on the high side.
+    """
+
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
@@ -519,9 +548,17 @@ class ResultRecordingTask(Basf2PathTask):
     result_filter_records_name = b2luigi.Parameter()
 
     def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
         yield self.add_to_output(self.result_filter_records_name)
 
     def requires(self):
+        """
+        This task requires that the training SplitMergeSimTask is finished, as well as that the state filters are trained using
+        the CKFStateFilterTeacherTask..
+        """
         yield SplitNMergeSimTask(
             bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
             experiment_number=self.experiment_number,
@@ -540,6 +577,12 @@ class ResultRecordingTask(Basf2PathTask):
             )
 
     def create_result_recording_path(self, result_filter_records_name):
+        """
+        Create a path for the recording of the result filter. This file is then used to train the result filter.
+
+        :param result_filter_records_name: Name of the recording file.
+        """
+
         path = basf2.create_path()
 
         file_list = []
@@ -611,6 +654,9 @@ class ResultRecordingTask(Basf2PathTask):
         return path
 
     def create_path(self):
+        """
+        Create basf2 path to process with event generation and simulation.
+        """
         return self.create_result_recording_path(
             result_filter_records_name=self.get_output_file_name(self.result_filter_records_name),
         )
@@ -618,15 +664,9 @@ class ResultRecordingTask(Basf2PathTask):
 
 class CKFResultFilterTeacherTask(Basf2Task):
     """
-    A teacher task runs the basf2 mva teacher on the training data provided by a
-    data collection task.
-
-    Since teacher tasks are needed for all quality estimators covered by this
-    steering file and the only thing that changes is the required data
-    collection task and some training parameters, I decided to use inheritance
-    and have the basic functionality in this base class/interface and have the
-    specific teacher tasks inherit from it.
+    A teacher task runs the basf2 mva teacher on the training data for the result filter.
     """
+
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed. It is further used to read of the production process to preserve
@@ -715,17 +755,21 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
 
 class ValidationAndOptimisationTask(Basf2PathTask):
+    """
+    Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
+    the states, the number of best candidates kept after each filter, and similar for the result filter.
+    """
     #: Experiment number of the conditions database, e.g. defines simulation geometry.
     experiment_number = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
-    # #: FastBDT option to use to train the StateFilters
+    #: FastBDT option to use to train the StateFilters
     fast_bdt_option_state_filter = b2luigi.ListParameter(
         # #: \cond
         hashed=True, default=[200, 8, 3, 0.1]
         # #: \endcond
     )
-    # #: FastBDT option to use to train the Result Filter
+    #: FastBDT option to use to train the Result Filter
     fast_bdt_option_result_filter = b2luigi.ListParameter(
         # #: \cond
         hashed=True, default=[200, 8, 3, 0.1]
@@ -743,12 +787,20 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     use_n_best_results = b2luigi.IntParameter()
 
     def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
         yield self.add_to_output(
             f"cdc_to_svd_spacepoint_ckf_validation{fbdt_state_filter_string}_{fbdt_result_filter_string}.root")
 
     def requires(self):
+        """
+        This task requires trained result filters, trained state filters, and that an independent data set for validation was
+        created using the SplitMergeSimTask with the random seed optimisation.
+        """
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         yield CKFResultFilterTeacherTask(
             result_filter_records_name=f"filter_records{fbdt_state_filter_string}.root",
@@ -776,6 +828,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             )
 
     def create_optimisation_and_validation_path(self):
+        """
+        Create a path to validate the trained filters.
+        """
         path = basf2.create_path()
 
         file_list = []
@@ -873,6 +928,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         return path
 
     def create_path(self):
+        """
+        Create basf2 path to process with event generation and simulation.
+        """
         return self.create_optimisation_and_validation_path()
 
 

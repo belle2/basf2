@@ -1,10 +1,9 @@
 {
     "result_path": "output/",
-    "batch_system": "htcondor",
     "n_events_training": 1000,
     "n_events_testing": 500,
     "n_events_per_task": 100,
-    "workers": 500,
+    "workers": 1000,
     "basf2_processes_per_worker": 0,
     "globaltags": [],
     "experiment_numbers": [0],

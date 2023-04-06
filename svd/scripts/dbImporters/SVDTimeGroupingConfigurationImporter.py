@@ -63,29 +63,29 @@ class timeGroupingConfigurationImporter(b2.Module):
         payload = Belle2.SVDTimeGroupingConfiguration("SVDTimeGroupingConfiguration_default_3=6_" +
                                                       str(now.isoformat()))
 
-        payload.setTimeGroupingParameters("CoG3", 6, False).tRange[0] = -160
-        payload.setTimeGroupingParameters("CoG3", 6, False).tRange[1] = 160
-        payload.setTimeGroupingParameters("CoG3", 6, False).rebinningFactor = 2
-        payload.setTimeGroupingParameters("CoG3", 6, False).fillSigmaN = 3
-        payload.setTimeGroupingParameters("CoG3", 6, False).limitSigma[0] = 1
-        payload.setTimeGroupingParameters("CoG3", 6, False).limitSigma[1] = 15
-        payload.setTimeGroupingParameters("CoG3", 6, False).fitRangeHalfWidth = 5
-        payload.setTimeGroupingParameters("CoG3", 6, False).removeSigmaN = 5
-        payload.setTimeGroupingParameters("CoG3", 6, False).fracThreshold = 0.05
-        payload.setTimeGroupingParameters("CoG3", 6, False).maxGroups = 20
-        payload.setTimeGroupingParameters("CoG3", 6, False).expectedSignalTime[0] = -50
-        payload.setTimeGroupingParameters("CoG3", 6, False).expectedSignalTime[1] = 0
-        payload.setTimeGroupingParameters("CoG3", 6, False).expectedSignalTime[2] = 50
-        payload.setTimeGroupingParameters("CoG3", 6, False).signalLifetime = 30
-        payload.setTimeGroupingParameters("CoG3", 6, False).numberOfSignalGroups = 1
-        payload.setTimeGroupingParameters("CoG3", 6, False).formSingleSignalGroup = False
-        payload.setTimeGroupingParameters("CoG3", 6, False).acceptSigmaN = 5
-        payload.setTimeGroupingParameters("CoG3", 6, False).writeGroupInfo = True
-        payload.setTimeGroupingParameters("CoG3", 6, False).includeOutOfRangeClusters = True
+        payload.setTimeGroupingParameters("CoG3", 6).tRange[0] = -160
+        payload.setTimeGroupingParameters("CoG3", 6).tRange[1] = 160
+        payload.setTimeGroupingParameters("CoG3", 6).rebinningFactor = 2
+        payload.setTimeGroupingParameters("CoG3", 6).fillSigmaN = 3
+        payload.setTimeGroupingParameters("CoG3", 6).limitSigma[0] = 1
+        payload.setTimeGroupingParameters("CoG3", 6).limitSigma[1] = 15
+        payload.setTimeGroupingParameters("CoG3", 6).fitRangeHalfWidth = 5
+        payload.setTimeGroupingParameters("CoG3", 6).removeSigmaN = 5
+        payload.setTimeGroupingParameters("CoG3", 6).fracThreshold = 0.05
+        payload.setTimeGroupingParameters("CoG3", 6).maxGroups = 20
+        payload.setTimeGroupingParameters("CoG3", 6).expectedSignalTime[0] = -50
+        payload.setTimeGroupingParameters("CoG3", 6).expectedSignalTime[1] = 0
+        payload.setTimeGroupingParameters("CoG3", 6).expectedSignalTime[2] = 50
+        payload.setTimeGroupingParameters("CoG3", 6).signalLifetime = 30
+        payload.setTimeGroupingParameters("CoG3", 6).numberOfSignalGroups = 1
+        payload.setTimeGroupingParameters("CoG3", 6).formSingleSignalGroup = False
+        payload.setTimeGroupingParameters("CoG3", 6).acceptSigmaN = 5
+        payload.setTimeGroupingParameters("CoG3", 6).writeGroupInfo = True
+        payload.setTimeGroupingParameters("CoG3", 6).includeOutOfRangeClusters = True
         for item in [3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805]:
-            payload.setTimeGroupingParameters("CoG3", 6, False).clsSigma[0][0].push_back(item)
+            payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][0].push_back(item)
         for item in [6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485]:
-            payload.setTimeGroupingParameters("CoG3", 6, False).clsSigma[0][1].push_back(item)
+            payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][1].push_back(item)
 
         Belle2.Database.Instance().storeData(Belle2.SVDTimeGroupingConfiguration.name, payload, iov)
 

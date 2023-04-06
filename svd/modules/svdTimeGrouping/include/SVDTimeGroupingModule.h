@@ -85,13 +85,6 @@ namespace Belle2 {
     bool   m_isDisabledIn6Samples = false; /**< Disables the module if true for 6-sample DAQ mode. */
     bool   m_isDisabledIn3Samples = false; /**< Disables the module if true for 3-sample DAQ mode. */
 
-    /** Prepare module to work in raw-time if this parameter is set. */
-    bool   m_useClusterRawTime  = false;
-    /** Time algorithm to use if rawtime is computed for 6-sample DAQ mode. */
-    std::string m_rawtimeRecoWith6SamplesAlgorithm  = "CoG3";
-    /** Time algorithm to use if rawtime is computed for 3-sample DAQ mode. */
-    std::string  m_rawtimeRecoWith3SamplesAlgorithm  = "CoG3";
-
     /**
      * module parameter values for 6-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
      */

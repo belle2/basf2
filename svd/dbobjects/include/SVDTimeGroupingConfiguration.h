@@ -85,41 +85,22 @@ namespace Belle2 {
      * Returns the reference to the parameters
      */
     SVDTimeGroupingParameters getTimeGroupingParameters(const TString& alg,
-                                                        const Int_t& mode,
-                                                        const Bool_t& isRawTime = false) const
+                                                        const Int_t& mode) const
     {
-      if (!isRawTime) {
-        if (mode == 6) {
-          if (alg == "CoG3")
-            return m_parsForCoG3In6Samples;
-          else if (alg == "ELS3")
-            return m_parsForELS3In6Samples;
-          else if (alg == "CoG6")
-            return m_parsForCoG6In6Samples;
-        } else if (mode == 3) {
-          if (alg == "CoG3")
-            return m_parsForCoG3In3Samples;
-          else if (alg == "ELS3")
-            return m_parsForELS3In3Samples;
-          else if (alg == "CoG6")
-            return m_parsForCoG6In3Samples;
-        }
-      } else {
-        if (mode == 6) {
-          if (alg == "CoG3")
-            return m_rawtimeParsForCoG3In6Samples;
-          else if (alg == "ELS3")
-            return m_rawtimeParsForELS3In6Samples;
-          else if (alg == "CoG6")
-            return m_rawtimeParsForCoG6In6Samples;
-        } else if (mode == 3) {
-          if (alg == "CoG3")
-            return m_rawtimeParsForCoG3In3Samples;
-          else if (alg == "ELS3")
-            return m_rawtimeParsForELS3In3Samples;
-          else if (alg == "CoG6")
-            return m_rawtimeParsForCoG6In3Samples;
-        }
+      if (mode == 6) {
+        if (alg == "CoG3")
+          return m_parsForCoG3In6Samples;
+        else if (alg == "ELS3")
+          return m_parsForELS3In6Samples;
+        else if (alg == "CoG6")
+          return m_parsForCoG6In6Samples;
+      } else if (mode == 3) {
+        if (alg == "CoG3")
+          return m_parsForCoG3In3Samples;
+        else if (alg == "ELS3")
+          return m_parsForELS3In3Samples;
+        else if (alg == "CoG6")
+          return m_parsForCoG6In3Samples;
       }
       B2FATAL("This state is forbidden");
     };
@@ -129,40 +110,22 @@ namespace Belle2 {
     /**
      * Sets all the parameters
      */
-    SVDTimeGroupingParameters& setTimeGroupingParameters(const TString& alg, const Int_t& mode, const Bool_t& isRawTime = false)
+    SVDTimeGroupingParameters& setTimeGroupingParameters(const TString& alg, const Int_t& mode)
     {
-      if (!isRawTime) {
-        if (mode == 6) {
-          if (alg == "CoG3")
-            return m_parsForCoG3In6Samples;
-          else if (alg == "ELS3")
-            return m_parsForELS3In6Samples;
-          else if (alg == "CoG6")
-            return m_parsForCoG6In6Samples;
-        } else if (mode == 3) {
-          if (alg == "CoG3")
-            return m_parsForCoG3In3Samples;
-          else if (alg == "ELS3")
-            return m_parsForELS3In3Samples;
-          else if (alg == "CoG6")
-            return m_parsForCoG6In3Samples;
-        }
-      } else {
-        if (mode == 6) {
-          if (alg == "CoG3")
-            return m_rawtimeParsForCoG3In6Samples;
-          else if (alg == "ELS3")
-            return m_rawtimeParsForELS3In6Samples;
-          else if (alg == "CoG6")
-            return m_rawtimeParsForCoG6In6Samples;
-        } else if (mode == 3) {
-          if (alg == "CoG3")
-            return m_rawtimeParsForCoG3In3Samples;
-          else if (alg == "ELS3")
-            return m_rawtimeParsForELS3In3Samples;
-          else if (alg == "CoG6")
-            return m_rawtimeParsForCoG6In3Samples;
-        }
+      if (mode == 6) {
+        if (alg == "CoG3")
+          return m_parsForCoG3In6Samples;
+        else if (alg == "ELS3")
+          return m_parsForELS3In6Samples;
+        else if (alg == "CoG6")
+          return m_parsForCoG6In6Samples;
+      } else if (mode == 3) {
+        if (alg == "CoG3")
+          return m_parsForCoG3In3Samples;
+        else if (alg == "ELS3")
+          return m_parsForELS3In3Samples;
+        else if (alg == "CoG6")
+          return m_parsForCoG6In3Samples;
       }
       B2FATAL("This state is forbidden");
     };
@@ -188,21 +151,6 @@ namespace Belle2 {
     SVDTimeGroupingParameters m_parsForCoG3In3Samples;
     /** parameters for ELS3 time-algorithm in 3-sample DAQ mode */
     SVDTimeGroupingParameters m_parsForELS3In3Samples;
-
-
-    /** rawtime (calibration) parameters for CoG6 time-algorithm in 6-sample DAQ mode */
-    SVDTimeGroupingParameters m_rawtimeParsForCoG6In6Samples;
-    /** rawtime (calibration) parameters for CoG3 time-algorithm in 6-sample DAQ mode */
-    SVDTimeGroupingParameters m_rawtimeParsForCoG3In6Samples;
-    /** rawtime (calibration) parameters for ELS3 time-algorithm in 6-sample DAQ mode */
-    SVDTimeGroupingParameters m_rawtimeParsForELS3In6Samples;
-
-    /** rawtime (calibration) parameters for CoG6 time-algorithm in 3-sample DAQ mode */
-    SVDTimeGroupingParameters m_rawtimeParsForCoG6In3Samples;
-    /** rawtime (calibration) parameters for CoG3 time-algorithm in 3-sample DAQ mode */
-    SVDTimeGroupingParameters m_rawtimeParsForCoG3In3Samples;
-    /** rawtime (calibration) parameters for ELS3 time-algorithm in 3-sample DAQ mode */
-    SVDTimeGroupingParameters m_rawtimeParsForELS3In3Samples;
 
     ClassDef(SVDTimeGroupingConfiguration, 1); /**< needed by root*/
 

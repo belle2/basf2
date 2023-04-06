@@ -44,15 +44,6 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
   addParam("isDisabledIn3Samples", m_isDisabledIn3Samples,
            "if true, module is disabled for 3-sample DAQ mode", bool(false));
 
-  addParam("useClusterRawTime", m_useClusterRawTime,
-           "Group on the basis of the raw time", bool(false));
-  addParam("rawtimeRecoWith6SamplesAlgorithm", m_rawtimeRecoWith6SamplesAlgorithm,
-           "Time algorithm to use if rawtime is computed for 6-sample DAQ mode",
-           std::string("CoG3"));
-  addParam("rawtimeRecoWith3SamplesAlgorithm", m_rawtimeRecoWith3SamplesAlgorithm,
-           "Time algorithm to use if rawtime is computed for 3-sample DAQ mode",
-           std::string("CoG3"));
-
   // 2. Fill time Histogram:
   addParam("tRangeLow", m_usedPars.tRange[0], "This sets the x- range of histogram [ns].",
            float(-160.));
@@ -137,23 +128,16 @@ void SVDTimeGroupingModule::beginRun()
     m_isDisabledIn6Samples = !m_recoConfig->getStateOfSVDTimeGrouping(6);
     m_isDisabledIn3Samples = !m_recoConfig->getStateOfSVDTimeGrouping(3);
 
-    TString timeRecoWith6SamplesAlgorithm;
-    TString timeRecoWith3SamplesAlgorithm;
-    if (!m_useClusterRawTime) {
-      timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
-      timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
-    } else {
-      timeRecoWith6SamplesAlgorithm = m_rawtimeRecoWith6SamplesAlgorithm;
-      timeRecoWith3SamplesAlgorithm = m_rawtimeRecoWith3SamplesAlgorithm;
-    }
+    TString timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+    TString timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
 
     if (!m_groupingConfig.isValid())
       B2FATAL("no valid configuration found for SVDTimeGrouping");
     else
       B2DEBUG(20, "SVDTimeGroupingConfiguration: from now on we are using " << m_groupingConfig->get_uniqueID());
 
-    m_usedParsIn6Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 6, m_useClusterRawTime);
-    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith3SamplesAlgorithm, 3, m_useClusterRawTime);
+    m_usedParsIn6Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 6);
+    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith3SamplesAlgorithm, 3);
   }
 }
 
@@ -331,6 +315,8 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
       // fit converges but paramters are at limit
       // Do a rough cleaning
       if (pars[2] <= m_usedPars.limitSigma[0] + 0.01 || pars[2] >= m_usedPars.limitSigma[1] - 0.01) {
+        B2WARNING("Sigma in limit : maxPeak " << maxPeak << " peak " << maxBinContent << " (frac) " << maxBinContent / maxPeak <<
+                  " at Group " << int(groupInfoVector.size()));
         // subtract the faulty part from the histogram
         subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_usedPars.fitRangeHalfWidth, m_usedPars.removeSigmaN);
         if (roughCleaningCounter++ > m_usedPars.maxGroups) amDone = true;
@@ -354,6 +340,8 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
       if (int(groupInfoVector.size()) >= m_usedPars.maxGroups) { amDone = true; continue;}
 
     } else {    // fit did not converges
+      B2WARNING("Fit failed : maxPeak " << maxPeak << " peak " << maxBinContent << " (frac) " << maxBinContent / maxPeak << " at Group "
+                << int(groupInfoVector.size()));
       // subtract the faulty part from the histogram
       subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_usedPars.fitRangeHalfWidth, m_usedPars.removeSigmaN);
       if (roughCleaningCounter++ > m_usedPars.maxGroups) amDone = true;

@@ -29,7 +29,10 @@ namespace Belle2 {
 
     /** Constructor. */
     explicit SVDEventInfo(SVDModeByte mode = SVDModeByte(), SVDTriggerType type = SVDTriggerType()):
-      m_modeByte(mode.getID()), m_triggerType(type.getType()) {m_ModeByteMatch = true; m_TriggerTypeMatch = true; m_Xtalk = false; m_relativeTimeShift = 0;}
+      m_modeByte(mode.getID()), m_triggerType(type.getType())
+    {
+      m_ModeByteMatch = true; m_TriggerTypeMatch = true; m_Xtalk = false; m_relativeTimeShift = 0;
+    }
 
     /** Destructor. */
     ~SVDEventInfo() {}
@@ -136,6 +139,20 @@ namespace Belle2 {
       return time_in_SVD + getSamplingDelayInNs() + getSVD2FTSWTimeShift(firstFrame);
     }
 
+    /** sets the APV clock period. This operation can be done only in an event().
+    * return false if the HardwareClockSettings DBObject is not valid,
+    * in this case the APV clock period is set to be 16000. / 509.;
+    * returns true when the operation is successfull.
+    */
+    bool setAPVClock(DBObjPtr<HardwareClockSettings> hwClock)
+    {
+      if (hwClock.isValid())
+        m_apvClockPeriod = 1. / hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+      else
+        return false;
+
+      return true;
+    }
 
     /** getTimeInSVDReference
      * it takes the cluster time in FTSW reference and provides
@@ -197,11 +214,8 @@ namespace Belle2 {
     int m_relativeTimeShift = 0; /**< relative shift in units of APV-clock/4 between 3- and 6-sample acquired events */
     int m_nAPVsamples = 0; /**< number of acquired samples */
 
-    /** Hardware Clocks*/
-    DBObjPtr<HardwareClockSettings> m_hwClock;
-
     /** APV clock period*/
-    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+    double m_apvClockPeriod = 16000. / 509.;
 
     /**class def needed by root*/
     ClassDef(SVDEventInfo, 3);

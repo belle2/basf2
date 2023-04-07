@@ -174,6 +174,7 @@ void ECLDigitCalibratorModule::initialize()
     B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p5 = " << m_energyDependenceTimeOffsetFitParam_p5);
     B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p6 = " << m_energyDependenceTimeOffsetFitParam_p6);
 
+    ECLTimeUtil->setLoadFromDatabase(false);
     ECLTimeUtil->setTimeWalkFuncParams(m_energyDependenceTimeOffsetFitParam_p1,
                                        m_energyDependenceTimeOffsetFitParam_p2,
                                        m_energyDependenceTimeOffsetFitParam_p3,

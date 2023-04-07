@@ -57,10 +57,27 @@ namespace Belle2 {
       m_par = new_params;
     }
 
+    /**
+     * Get parameter format ID
+     */
+    int getParamFormat()
+    {
+      return m_par_format;
+    }
+
+    /**
+     * Set parameter format ID
+     */
+    void setParamFormat(int newval)
+    {
+      m_par_format = newval;
+    }
+
   private:
     /**
      * Format of the correction parameters
      * 0 - same set of parameters for all Cell IDs
+     * (for now, only 0 is supported)
      */
     int m_par_format = 0;
     /** List of time walk correction parameters */

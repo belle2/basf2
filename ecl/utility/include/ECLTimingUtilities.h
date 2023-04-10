@@ -60,6 +60,7 @@ namespace Belle2 {
       // Parameters of the energy dependent time walk function
       //   Default values measured by Alex Kuzmin based on local testpulse calibration
       //   2023.02 Updated to the new version by Alex Bobrov based on Bhabha skim data (exp 24)
+      //   By default, new coefficients are now loaded from the database.
       double energyDependenceTimeOffsetFitParam_p0 = -1.966 ;      /**< p0 in "energy dependence equation" */
       double energyDependenceTimeOffsetFitParam_p1 = 46350. ;      /**< p1 in "energy dependence equation" */
       double energyDependenceTimeOffsetFitParam_p2 = 264600.;      /**< p2 in "energy dependence equation" */
@@ -67,7 +68,7 @@ namespace Belle2 {
       double energyDependenceTimeOffsetFitParam_p4 = 7.532  ;      /**< p4 in "energy dependence equation" */
       double energyDependenceTimeOffsetFitParam_p5 = 428.3  ;      /**< p5 in "energy dependence equation" */
 
-      bool m_loadFromDB = true;
+      bool m_loadFromDB = true; /**< If true, load time walk parameters from the database */
 
     }; // ECLTimingUtilities class
   } // namespace ECL

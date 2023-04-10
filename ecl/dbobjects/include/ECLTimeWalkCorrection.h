@@ -46,12 +46,20 @@ namespace Belle2 {
       m_par[n] = newval;
     }
 
-    /** */
+    /**
+     * Return std::vector containing all parameters of the time walk correction function
+     * @see m_par
+     * @see m_par_format
+     */
     std::vector<double> getParams() const
     {
       return m_par;
     }
-    /** */
+    /**
+     * Set std::vector containing all parameters of the time walk correction function
+     * @see m_par
+     * @see m_par_format
+     */
     void setParams(const std::vector<double>& new_params)
     {
       m_par = new_params;

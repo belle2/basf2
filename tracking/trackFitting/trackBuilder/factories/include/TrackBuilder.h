@@ -9,6 +9,7 @@
 
 #include <string>
 #include <framework/geometry/B2Vector3.h>
+#include <genfit/AbsTrackRep.h>
 
 namespace Belle2 {
 
@@ -73,9 +74,9 @@ namespace Belle2 {
                                  const bool useClosestHitToIP = false, const bool useBFieldAtHit = false);
 
     /// Get the HitPattern in the VXD.
-    static uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack);
+    static uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation = nullptr);
     /// Get the HitPattern in the CDC.
-    static uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack);
+    static uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation = nullptr);
 
   private:
     /// TrackColName (output).

@@ -281,6 +281,16 @@ namespace Belle2 {
     Manager::FunctionPtr pidWeightedPairProbabilityExpert(const std::vector<std::string>& arguments);
 
     /**
+     * @return neural-network based PID likelihood
+     * For expert's use only!!
+     * The first argument is the particle hypothesis as string
+     * The second argument is the db object name of the neural network parameters (optional).
+     * Examples:
+     * pi probability =  pidNeuralNetworkValueExpert(211, PIDNeuralNetworkParameters);
+     */
+    Manager::FunctionPtr pidNeuralNetworkValueExpert(const std::vector<std::string>& arguments);
+
+    /**
     * @return  weighted posterior probability for a certain mass hypothesis, taking into account all the possible alternatives. Any set of detectors can be used to calculate the likelihood ratios.
     * For expert's use only!!
     * The first argument should be the db object name of the calibration weight matrix.
@@ -322,6 +332,16 @@ namespace Belle2 {
      * @return weighted deuteron ID to be used in the physics analyses
      */
     Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return pion ID from Neural Network to be used in the physics analyses
+     */
+    double pionIDNN(const Particle* particle);
+
+    /**
+     * @return kaon ID from Neural Network to be used in the physics analyses
+     */
+    double kaonIDNN(const Particle* particle);
 
     /**
      * Parses the detector list for the PID metafunctions.

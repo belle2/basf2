@@ -200,15 +200,14 @@ def clean_working_directory():
 @contextmanager
 def local_software_directory():
     """Context manager to make sure we are executed in the top software
-    directory by switching to $BELLE2_LOCAL_DIR.
+    directory by switching to $BELLE2_LOCAL_DIR or $BELLE2_RELEASE_DIR.
 
     >>> with local_software_directory():
     >>>    assert(os.listdir().contains("analysis"))
     """
-    try:
-        directory = os.environ["BELLE2_LOCAL_DIR"]
-    except KeyError:
-        raise RuntimeError("Cannot find local Belle II software directory, "
+    directory = os.environ.get("BELLE2_LOCAL_DIR", os.environ.get("BELLE2_RELEASE_DIR", None))
+    if directory is None:
+        raise RuntimeError("Cannot find Belle II software directory, "
                            "have you setup the software correctly?")
 
     with working_directory(directory):
@@ -251,10 +250,6 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
     In case there is some output left, then prints the error message and exits
     (failing the test).
 
-    The test is only executed for a full local checkout: If the ``BELLE2_RELEASE_DIR``
-    environment variable is set or if ``BELLE2_LOCAL_DIR`` is unset the test is
-    skipped: The program exits with an appropriate message.
-
     Warnings:
         If the test is skipped or the test contains errors this function does
         not return but will directly end the program.
@@ -268,10 +263,8 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
         toolopts(list(str)): extra options to pass to the tool.
     """
 
-    if "BELLE2_RELEASE_DIR" in os.environ:
-        skip_test("Central release is setup")
-    if "BELLE2_LOCAL_DIR" not in os.environ:
-        skip_test("No local release is setup")
+    if "BELLE2_LOCAL_DIR" not in os.environ and "BELLE2_RELEASE_DIR" not in os.environ:
+        skip_test("No release is setup")
 
     args = [tool]
     if toolopts:

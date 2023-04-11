@@ -33,7 +33,7 @@ namespace {
   class TestEventListener: public ::testing::EmptyTestEventListener {
   public:
     /** Constructor to choose log level */
-    TestEventListener(bool debug): ::testing::EmptyTestEventListener(), m_enableDebug{debug} {}
+    explicit TestEventListener(bool debug): ::testing::EmptyTestEventListener(), m_enableDebug{debug} {}
   private:
     /** Set the random state before the test is run.
      * Also provide a constant magnetic field everywhere until the tests which

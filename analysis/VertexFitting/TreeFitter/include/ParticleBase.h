@@ -29,7 +29,7 @@ namespace TreeFitter {
     /** particle types  */
     enum TFParticleType {kInteractionPoint,
                          kOrigin,
-                         kRecoComposite,
+                         kComposite,
                          kRecoResonance,
                          kInternalParticle,
                          kRecoTrack,
@@ -40,13 +40,9 @@ namespace TreeFitter {
                         };
 
     /** default constructor  */
-    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) ;
+    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config = nullptr) ;
 
-    /** constructor used for final states */
-    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) ;
-
-
-    /** constructor only used by inter action point (ip constraint)  */
+    /** constructor only used by interaction point (ip constraint)  */
     ParticleBase(const std::string& name);
 
     /** destructor, actually does something  */

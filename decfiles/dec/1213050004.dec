@@ -1,0 +1,58 @@
+# EventType: 1213050004
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> [anti-D0 -> K+ pi-] [a_1+ -> pi+ pi- pi+]]
+#                      B- -> anything
+# NickName: Bu_D0a1+_K+pi-_a1+to3pi
+
+# Tested: Yes
+# PhysicsWG: BHADRONIC
+# Responsible: Shubhajit Sana
+# Email: ph18b004@smail.iitm.ac.in
+# Cuts: None
+# Date: 09/03/23
+
+#
+# Aliases
+#
+
+Alias      a_1+sig    a_1+
+Alias      a_1-sig    a_1-
+ChargeConj a_1+sig    a_1-sig
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-    VSS; 
+0.5 B+ B-sig    VSS;
+Enddecay
+
+#
+# B+ -> anti-D0 a_1+
+#
+
+Decay B+sig
+1.0 a_1+sig anti-D0sig     SVS;
+Enddecay
+CDecay B-sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0 K+ pi-  PHSP;
+Enddecay
+CDecay D0sig
+
+#
+# a_1+ -> pi+ pi- pi+
+#
+
+Decay a_1+sig
+1.0 pi+ pi- pi+ PHSP;
+Enddecay
+CDecay a_1-sig
+
+End

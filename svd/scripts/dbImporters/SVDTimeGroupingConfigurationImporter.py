@@ -16,42 +16,6 @@ import datetime
 now = datetime.datetime.now()
 
 
-class recoConfigurationImporter(b2.Module):
-    ''' importer of the SVD Reconstruction Configuration'''
-
-    def beginRun(self):
-        '''begin run'''
-
-        iov = Belle2.IntervalOfValidity.always()
-
-        payload = Belle2.SVDRecoConfiguration("SVDRecoConfiguration_default_3=6_" +
-                                              str(now.isoformat()) + "_INFO:" +
-                                              "_" + "CoG3" + "Time" +
-                                              "_" + "MaxSample" + "Charge" +
-                                              "_" + "CoGOnly" + "Position")
-
-        # cluster time
-        payload.setTimeRecoWith6Samples("CoG3")
-        payload.setTimeRecoWith3Samples("CoG3")
-        # cluster position
-        payload.setPositionRecoWith6Samples("CoGOnly")
-        payload.setPositionRecoWith3Samples("CoGOnly")
-        # cluster charge
-        payload.setChargeRecoWith6Samples("MaxSample")
-        payload.setChargeRecoWith3Samples("MaxSample")
-        # strip time
-        payload.setStripTimeRecoWith6Samples("dontdo")
-        payload.setStripTimeRecoWith3Samples("dontdo")
-        # strip charge
-        payload.setStripChargeRecoWith6Samples("MaxSample")
-        payload.setStripChargeRecoWith3Samples("MaxSample")
-        # grouping
-        payload.setStateOfSVDTimeGrouping(6, True)
-        payload.setUseOfSVDGroupInfoInSPCreator(6, True)
-
-        Belle2.Database.Instance().storeData(Belle2.SVDRecoConfiguration.name, payload, iov)
-
-
 class timeGroupingConfigurationImporter(b2.Module):
     ''' importer of the SVDTimeGrouping Configuration'''
 
@@ -82,11 +46,14 @@ class timeGroupingConfigurationImporter(b2.Module):
         payload.setTimeGroupingParameters("CoG3", 6).acceptSigmaN = 5
         payload.setTimeGroupingParameters("CoG3", 6).writeGroupInfo = True
         payload.setTimeGroupingParameters("CoG3", 6).includeOutOfRangeClusters = True
-        for item in [3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805]:
-            payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][0].push_back(item)
-        for item in [6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485]:
-            payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][1].push_back(item)
+        # sigma : CoG3 on V side
+        payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][0].assign(
+            [3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805])
+        # sigma : CoG3 on U side
+        payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][1].assign(
+            [6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485])
 
+        # write out the payload to localdb directory
         Belle2.Database.Instance().storeData(Belle2.SVDTimeGroupingConfiguration.name, payload, iov)
 
 
@@ -97,8 +64,6 @@ eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-
-main.add_module(recoConfigurationImporter())
 main.add_module(timeGroupingConfigurationImporter())
 
 main.add_module('Progress')

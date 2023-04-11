@@ -74,7 +74,45 @@ namespace Belle2 {
      */
     SVDTimeGroupingConfiguration(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
-    {};
+    {
+
+      setTimeGroupingParameters("CoG3", 6).tRange[0] = -160;
+      setTimeGroupingParameters("CoG3", 6).tRange[1] = 160;
+      setTimeGroupingParameters("CoG3", 6).rebinningFactor = 2;
+      setTimeGroupingParameters("CoG3", 6).fillSigmaN = 3;
+      setTimeGroupingParameters("CoG3", 6).limitSigma[0] = 1;
+      setTimeGroupingParameters("CoG3", 6).limitSigma[1] = 15;
+      setTimeGroupingParameters("CoG3", 6).fitRangeHalfWidth = 5;
+      setTimeGroupingParameters("CoG3", 6).removeSigmaN = 5;
+      setTimeGroupingParameters("CoG3", 6).fracThreshold = 0.05;
+      setTimeGroupingParameters("CoG3", 6).maxGroups = 20;
+      setTimeGroupingParameters("CoG3", 6).expectedSignalTime[0] = -50;
+      setTimeGroupingParameters("CoG3", 6).expectedSignalTime[1] = 0;
+      setTimeGroupingParameters("CoG3", 6).expectedSignalTime[2] = 50;
+      setTimeGroupingParameters("CoG3", 6).signalLifetime = 30;
+      setTimeGroupingParameters("CoG3", 6).numberOfSignalGroups = 1;
+      setTimeGroupingParameters("CoG3", 6).formSingleSignalGroup = false;
+      setTimeGroupingParameters("CoG3", 6).acceptSigmaN = 5;
+      setTimeGroupingParameters("CoG3", 6).writeGroupInfo = true;
+      setTimeGroupingParameters("CoG3", 6).includeOutOfRangeClusters = true;
+      setTimeGroupingParameters("CoG3", 6).clsSigma[0][0] = {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805};
+      setTimeGroupingParameters("CoG3", 6).clsSigma[0][1] = {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485};
+      setTimeGroupingParameters("CoG3", 6).clsSigma[1][0] = {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805};
+      setTimeGroupingParameters("CoG3", 6).clsSigma[1][1] = {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485};
+      setTimeGroupingParameters("CoG3", 6).clsSigma[2][0] = {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805};
+      setTimeGroupingParameters("CoG3", 6).clsSigma[2][1] = {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485};
+
+
+      // initialize all other algorithms same as CoG3-6sample.
+      // values must be checked in the globaltag before use
+
+      setTimeGroupingParameters("ELS3", 6) = getTimeGroupingParameters("CoG3", 6);
+      setTimeGroupingParameters("CoG6", 6) = getTimeGroupingParameters("CoG3", 6);
+
+      setTimeGroupingParameters("CoG3", 3) = getTimeGroupingParameters("CoG3", 6);
+      setTimeGroupingParameters("ELS3", 3) = getTimeGroupingParameters("CoG3", 6);
+      setTimeGroupingParameters("CoG6", 3) = getTimeGroupingParameters("CoG3", 6);
+    };
 
     /**
      * Get the unique ID  of the calibration

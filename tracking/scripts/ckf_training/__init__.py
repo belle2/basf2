@@ -22,7 +22,7 @@ def my_basf2_mva_teacher(
     fast_bdt_option=[200, 8, 3, 0.1]
 ):
     """
-    Custom wrapper for basf2 mva teacher.  Adapted from code in ``trackfindingcdc_teacher``.
+    Custom wrapper for basf2 mva teacher. Adapted from code in ``trackfindingcdc_teacher``.
 
     :param records_files: List of files with collected ("recorded") variables to use as training data for the MVA.
     :param tree_name: Name of the TTree in the ROOT file from the ``data_collection_task``

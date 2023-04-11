@@ -2100,12 +2100,12 @@ void ECLDataAnalysisModule::event()
           if (px > 0)
             pPhi = TMath::ATan(py / px);
           if (px < 0)
-            pPhi = TMath::ATan(py / px) + 3.1415;
+            pPhi = TMath::ATan(py / px) + M_PI;
         } else {
           if (px > 0)
             pPhi = TMath::ATan(py / px) ;
           if (px < 0)
-            pPhi = TMath::ATan(py / px) - 3.1415;
+            pPhi = TMath::ATan(py / px) - M_PI;
         }
         if ((TMath::Sqrt(vtxx * vtxx + vtxy * vtxy) > 118) || (vtxz > 196.16) || (vtxz < -102.16)) {
           if (TMath::Abs(aECLShowers->getTheta() - pTheta) < 0.05 && TMath::Abs(aECLShowers->getPhi() - pPhi) < 0.05)
@@ -2127,12 +2127,12 @@ void ECLDataAnalysisModule::event()
           if (px > 0)
             pPhi = TMath::ATan(py / px);
           if (px < 0)
-            pPhi = TMath::ATan(py / px) + 3.1415;
+            pPhi = TMath::ATan(py / px) + M_PI;
         } else {
           if (px > 0)
             pPhi = TMath::ATan(py / px) ;
           if (px < 0)
-            pPhi = TMath::ATan(py / px) - 3.1415;
+            pPhi = TMath::ATan(py / px) - M_PI;
         }
         if ((TMath::Sqrt(vtxx * vtxx + vtxy * vtxy) > 118) || (vtxz > 196.16) || (vtxz < -102.16)) {
           if (TMath::Abs(aECLShowers->getTheta() - pTheta) < 0.05 && TMath::Abs(aECLShowers->getPhi() - pPhi) < 0.05)

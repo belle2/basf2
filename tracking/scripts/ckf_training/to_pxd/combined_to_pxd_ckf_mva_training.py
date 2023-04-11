@@ -794,7 +794,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
         yield self.add_to_output(
-            f"cdc_to_svd_spacepoint_ckf_validation{fbdt_state_filter_string}_{fbdt_result_filter_string}.root")
+            f"to_pxd_ckf_validation{fbdt_state_filter_string}_{fbdt_result_filter_string}.root")
 
     def requires(self):
         """

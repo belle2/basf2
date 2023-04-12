@@ -42,7 +42,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     """
     # Fill one list from V0
     ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', True, path=path)
-    ma.cutAndCopyList('K_S0:V0_MassWindow', 'K_S0:V0', '0.3 < M < 0.7', path=path)
+    ma.cutAndCopyList('K_S0:V0_MassWindow', 'K_S0:V0', '', path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
@@ -142,7 +142,7 @@ def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
     scaler_V0.param('z0MomentumThreshold', z0MomThr_V0)
     path.add_module(scaler_V0)
 
-    ma.applyCuts('K_S0:V0_scaled', '0.3 < M < 0.7', path=path)
+    ma.applyCuts('K_S0:V0_scaled', '', path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:V0_scaled', conf_level=0.0, path=path)
@@ -208,7 +208,7 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     """
     # Fill one list from V0
     ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', True, path=path)
-    ma.cutAndCopyList('Lambda0:V0_MassWindow', 'Lambda0:V0', '0.9 < M < 1.3', path=path)
+    ma.cutAndCopyList('Lambda0:V0_MassWindow', 'Lambda0:V0', '', path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)

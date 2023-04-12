@@ -7,13 +7,60 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+#                                                                        #
+# Usage: basf2 <script> -- -j ../../data/SVDTimeGrouping.json            #
 ##########################################################################
+
 
 import basf2 as b2
 from ROOT import Belle2
 import datetime
+import json
+import argparse
 
 now = datetime.datetime.now()
+
+
+def arg_parser():
+    """ argument parser """
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-j', '--json',
+                        type=str,
+                        help='input json file',
+                        metavar='JSON')
+    return parser
+
+
+def import_parameters_to_payload(payload, alg, mode):
+    """ import parameters to payload """
+
+    jsonVar = param["parsFor" + str(alg) + "In" + str(mode) + "Samples"]
+    print(jsonVar)
+
+    payload.setTimeGroupingParameters(alg, mode).tRange[0] = jsonVar["tRange"][0]
+    payload.setTimeGroupingParameters(alg, mode).tRange[1] = jsonVar["tRange"][1]
+    payload.setTimeGroupingParameters(alg, mode).rebinningFactor = jsonVar["rebinningFactor"]
+    payload.setTimeGroupingParameters(alg, mode).fillSigmaN = jsonVar["fillSigmaN"]
+    payload.setTimeGroupingParameters(alg, mode).limitSigma[0] = jsonVar["limitSigma"][0]
+    payload.setTimeGroupingParameters(alg, mode).limitSigma[1] = jsonVar["limitSigma"][1]
+    payload.setTimeGroupingParameters(alg, mode).fitRangeHalfWidth = jsonVar["fitRangeHalfWidth"]
+    payload.setTimeGroupingParameters(alg, mode).removeSigmaN = jsonVar["removeSigmaN"]
+    payload.setTimeGroupingParameters(alg, mode).fracThreshold = jsonVar["fracThreshold"]
+    payload.setTimeGroupingParameters(alg, mode).maxGroups = jsonVar["maxGroups"]
+    payload.setTimeGroupingParameters(alg, mode).expectedSignalTime[0] = jsonVar["expectedSignalTime"][0]
+    payload.setTimeGroupingParameters(alg, mode).expectedSignalTime[1] = jsonVar["expectedSignalTime"][1]
+    payload.setTimeGroupingParameters(alg, mode).expectedSignalTime[2] = jsonVar["expectedSignalTime"][2]
+    payload.setTimeGroupingParameters(alg, mode).signalLifetime = jsonVar["signalLifetime"]
+    payload.setTimeGroupingParameters(alg, mode).numberOfSignalGroups = jsonVar["numberOfSignalGroups"]
+    payload.setTimeGroupingParameters(alg, mode).formSingleSignalGroup = jsonVar["formSingleSignalGroup"]
+    payload.setTimeGroupingParameters(alg, mode).acceptSigmaN = jsonVar["acceptSigmaN"]
+    payload.setTimeGroupingParameters(alg, mode).writeGroupInfo = jsonVar["writeGroupInfo"]
+    payload.setTimeGroupingParameters(alg, mode).includeOutOfRangeClusters = jsonVar["includeOutOfRangeClusters"]
+    sigmas = jsonVar["clsSigma"]
+    for stype in range(len(sigmas)):
+        for side in [0, 1]:     # 0:V, 1:U
+            payload.setTimeGroupingParameters(alg, mode).clsSigma[stype][side].assign(sigmas[stype][side])
 
 
 class timeGroupingConfigurationImporter(b2.Module):
@@ -22,42 +69,32 @@ class timeGroupingConfigurationImporter(b2.Module):
     def beginRun(self):
         '''begin run'''
 
+        print("--> json INFO:")
+        print("              "+str(param["_COMMENT"]))
+        print("")
+
         iov = Belle2.IntervalOfValidity.always()
 
-        payload = Belle2.SVDTimeGroupingConfiguration("SVDTimeGroupingConfiguration_default_3=6_" +
+        payload = Belle2.SVDTimeGroupingConfiguration("SVDTimeGroupingConfiguration_" +
                                                       str(now.isoformat()))
 
-        payload.setTimeGroupingParameters("CoG3", 6).tRange[0] = -160
-        payload.setTimeGroupingParameters("CoG3", 6).tRange[1] = 160
-        payload.setTimeGroupingParameters("CoG3", 6).rebinningFactor = 2
-        payload.setTimeGroupingParameters("CoG3", 6).fillSigmaN = 3
-        payload.setTimeGroupingParameters("CoG3", 6).limitSigma[0] = 1
-        payload.setTimeGroupingParameters("CoG3", 6).limitSigma[1] = 15
-        payload.setTimeGroupingParameters("CoG3", 6).fitRangeHalfWidth = 5
-        payload.setTimeGroupingParameters("CoG3", 6).removeSigmaN = 5
-        payload.setTimeGroupingParameters("CoG3", 6).fracThreshold = 0.05
-        payload.setTimeGroupingParameters("CoG3", 6).maxGroups = 20
-        payload.setTimeGroupingParameters("CoG3", 6).expectedSignalTime[0] = -50
-        payload.setTimeGroupingParameters("CoG3", 6).expectedSignalTime[1] = 0
-        payload.setTimeGroupingParameters("CoG3", 6).expectedSignalTime[2] = 50
-        payload.setTimeGroupingParameters("CoG3", 6).signalLifetime = 30
-        payload.setTimeGroupingParameters("CoG3", 6).numberOfSignalGroups = 1
-        payload.setTimeGroupingParameters("CoG3", 6).formSingleSignalGroup = False
-        payload.setTimeGroupingParameters("CoG3", 6).acceptSigmaN = 5
-        payload.setTimeGroupingParameters("CoG3", 6).writeGroupInfo = True
-        payload.setTimeGroupingParameters("CoG3", 6).includeOutOfRangeClusters = True
-        # sigma : CoG3 on V side
-        payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][0].assign(
-            [3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805])
-        # sigma : CoG3 on U side
-        payload.setTimeGroupingParameters("CoG3", 6).clsSigma[0][1].assign(
-            [6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485])
+        for alg in ["CoG3", "ELS3", "CoG6"]:
+            for mode in [3, 6]:
+                import_parameters_to_payload(payload, alg, mode)
 
         # write out the payload to localdb directory
         Belle2.Database.Instance().storeData(Belle2.SVDTimeGroupingConfiguration.name, payload, iov)
 
 
 main = b2.create_path()
+
+# Argument parsing
+args = arg_parser().parse_args()
+
+# open json file
+f = open(args.json)
+param = json.load(f)
+
 
 # Event info setter - execute single event
 eventinfosetter = b2.register_module('EventInfoSetter')

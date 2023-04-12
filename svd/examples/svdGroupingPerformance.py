@@ -638,6 +638,7 @@ if args.isMC:
             if m.name() == "SVDEventInfoSetter":
                 m.param("daqMode", 1)
                 m.param("relativeShift", 7)
+                m.param("useDB", False)
 
 
 else:

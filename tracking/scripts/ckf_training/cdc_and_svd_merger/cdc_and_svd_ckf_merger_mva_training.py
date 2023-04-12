@@ -6,6 +6,139 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+"""
+cdc_and_svd_ckf_merger_mva_training
+-----------------------------------------
+
+Purpose of this script
+~~~~~~~~~~~~~~~~~~~~~~
+
+This python script is used for the training and validation of the classifier of
+the MVA-based result filter of the CDCToSVDSeedCKF, which combines tracks that
+were found by the CDC and SVD standalone tracking algorithms.
+
+To avoid mistakes, b2luigi is used to create a task chain for a combined training and
+validation of all classifiers.
+
+The order of the b2luigi tasks in this script is as follows (top to bottom):
+* Two tasks to create input samples for training and testing (``GenerateSimTask`` and
+``SplitNMergeSimTask``). The ``SplitNMergeSimTask`` takes a number of events to be
+generated and a number of events per task to reduce runtime. It then divides the total
+number of events by the number of events per task and creates as ``GenerateSimTask`` as
+needed, each with a specific random seed, so that in the end the total number of
+training and testing events are simulated. The individual files are then combined
+by the SplitNMergeSimTask into one file each for training and testing.
+* The ``ResultRecordingTask`` writes out the data used for training of the MVA.
+* The ``CKFResultFilterTeacherTask`` trains the MVA, FastBDT per default, with a
+given set of FastBDT options.
+* The ``ValidationAndOptimisationTask`` uses the trained weight files and cut values
+provided to run the tracking chain with the weight file under test, and also
+runs the tracking validation.
+* Finally, the ``MainTask`` is the "brain" of the script. It invokes the
+``ValidationAndOptimisationTask`` with the different combinations of FastBDT options
+and cut values on the MVA classifier output.
+
+Due to the dependencies, the calls of the task are reversed. The MainTask
+calls the ``ValidationAndOptimisationTask`` with different FastBDT options and cut
+values, and the ``ValidationAndOptimisationTask`` itself calls the required teacher,
+training, and simulation tasks.
+
+b2luigi: Understanding the steering file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All trainings and validations are done in the correct order in this steering
+file. For the purpose of creating a dependency graph, the `b2luigi
+<https://b2luigi.readthedocs.io>`_ python package is used, which extends the
+`luigi <https://luigi.readthedocs.io>`_ package developed by spotify.
+
+Each task that has to be done is represented by a special class, which defines
+which defines parameters, output files and which other tasks with which
+parameters it depends on.  For example a teacher task, which runs
+``basf2_mva_teacher.py`` to train the classifier, depends on a data collection
+task which runs a reconstruction and writes out track-wise variables into a root
+file for training.  An evaluation/validation task for testing the classifier
+requires both the teacher task, as it needs the weightfile to be present, and
+also a data collection task, because it needs a dataset for testing classifier.
+
+The final task that defines which tasks need to be done for the steering file to
+finish is the ``MainTask``. When you only want to run parts of the
+training/validation pipeline, you can comment out requirements in the Master
+task or replace them by lower-level tasks during debugging.
+
+Requirements
+~~~~~~~~~~~~
+
+This steering file relies on b2luigi_ for task scheduling. It can be installed
+via pip::
+
+    python3 -m pip install [--user] b2luigi
+
+Use the ``--user`` option if you have not rights to install python packages into
+your externals (e.g. because you are using cvmfs) and install them in
+``$HOME/.local`` instead.
+
+Configuration
+~~~~~~~~~~~~~
+
+Instead of command line arguments, the b2luigi script is configured via a
+``settings.json`` file. Open it in your favorite text editor and modify it to
+fit to your requirements.
+
+Usage
+~~~~~
+
+You can test the b2luigi without running it via::
+
+    python3 cdc_and_svd_ckf_merger_mva_training.py --dry-run
+    python3 cdc_and_svd_ckf_merger_mva_training.py --show-output
+
+This will show the outputs and show potential errors in the definitions of the
+luigi task dependencies.  To run the the steering file in normal (local) mode,
+run::
+
+    python3 cdc_and_svd_ckf_merger_mva_training.py
+
+One can use the interactive luigi web interface via the central scheduler
+which visualizes the task graph while it is running. Therefore, the scheduler
+daemon ``luigid`` has to run in the background, which is located in
+``~/.local/bin/luigid`` in case b2luigi had been installed with ``--user``. For
+example, run::
+
+    luigid --port 8886
+
+Then, execute your steering (e.g. in another terminal) with::
+
+    python3 cdc_and_svd_ckf_merger_mva_training.py --scheduler-port 8886
+
+To view the web interface, open your webbrowser enter into the url bar::
+
+    localhost:8886
+
+If you don't run the steering file on the same machine on which you run your web
+browser, you have two options:
+
+    1. Run both the steering file and ``luigid`` remotely and use
+       ssh-port-forwarding to your local host. Therefore, run on your local
+       machine::
+
+           ssh -N -f -L 8886:localhost:8886 <remote_user>@<remote_host>
+
+    2. Run the ``luigid`` scheduler locally and use the ``--scheduler-host <your
+       local host>`` argument when calling the steering file
+
+Accessing the results / output files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All output files are stored in a directory structure in the ``result_path``. The
+directory tree encodes the used b2luigi parameters. This ensures reproducibility
+and makes parameter searches easy. Sometimes, it is hard to find the relevant
+output files. You can view the whole directory structure by running ``tree
+<result_path>``. Ise the unix ``find`` command to find the files that interest
+you, e.g.::
+
+    find <result_path> -name "*.root" # find all ROOT files
+"""
+
 import itertools
 import os
 import subprocess

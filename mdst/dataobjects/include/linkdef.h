@@ -167,7 +167,12 @@
   }                 \
   }"
 
-#pragma read sourceClass="Belle2::TrackFitResult" version="[-9]" \
+#pragma read sourceClass="Belle2::TrackFitResult" version="[-7]" \
+  source="" \
+  targetClass="Belle2::TrackFitResult" target="m_NDF100" \
+  code="{m_NDF100 = 0xFFFF;}"
+
+#pragma read sourceClass="Belle2::TrackFitResult" version="[8-9]" \
   source="uint16_t m_NDF" \
   targetClass="Belle2::TrackFitResult" target="m_NDF100" \
   code="{m_NDF100 = onfile.m_NDF*100;}"

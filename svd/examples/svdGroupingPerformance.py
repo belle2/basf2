@@ -655,8 +655,6 @@ else:
 
     MCTracking = False
 
-
-if not args.isMC:
     if args.test:
         main.add_module('RootInput', entrySequences=['0:100'])
     else:

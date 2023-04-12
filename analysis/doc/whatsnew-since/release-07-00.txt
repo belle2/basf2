@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2305-korat
+---------------------------------------------------
+Command line tools
+++++++++++++++++++
+* The command line tool :ref:`b2help-variables <b2help-variables>` is extended to get a description of specific variables and to
+  display only their data.
+
+
 Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------
 Modules

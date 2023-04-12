@@ -1,3 +1,10 @@
+Changes in the analysis package in light-2305-korat
+---------------------------------------------------
+Variables
++++++++++
+* Added new variable `trackLength` that returns the arc length from the track origin to the last CDC layer associated to the track.
+
+
 Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------
 Modules

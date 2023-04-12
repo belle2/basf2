@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #

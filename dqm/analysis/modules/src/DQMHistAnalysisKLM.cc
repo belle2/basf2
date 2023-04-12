@@ -46,6 +46,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            50);
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
+  addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
@@ -110,21 +111,21 @@ void DQMHistAnalysisKLMModule::beginRun()
 void DQMHistAnalysisKLMModule::endRun()
 {
   int hist_max_bin; double max_position;
-  TH1* time_rpc = findHist("KLM/time_rpc");
+  TH1* time_rpc = findHist(m_histogramDirectoryName + "/time_rpc");
   if (time_rpc) {
     hist_max_bin = time_rpc->GetMaximumBin();
     max_position = time_rpc->GetXaxis()->GetBinCenter(hist_max_bin);
     m_monObj->setVariable("RPC_Time_Peak", max_position);
   }
 
-  TH1* time_scint_bklm = findHist("KLM/time_scintillator_bklm");
+  TH1* time_scint_bklm = findHist(m_histogramDirectoryName + "/time_scintillator_bklm");
   if (time_scint_bklm) {
     hist_max_bin = time_scint_bklm->GetMaximumBin();
     max_position = time_scint_bklm->GetXaxis()->GetBinCenter(hist_max_bin);
     m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
   }
 
-  TH1* time_scint_eklm = findHist("KLM/time_scintillator_bklm");
+  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_bklm");
   if (time_scint_eklm) {
     hist_max_bin = time_scint_eklm->GetMaximumBin();
     max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
@@ -351,14 +352,14 @@ void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
 void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
   const std::string& histName)
 {
-  TH1* histogram = findHist("KLM/" + histName);
+  TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
   if (histogram == nullptr) {
-    B2ERROR("KLM DQM histogram KLM/" << histName << " is not found.");
+    B2ERROR("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
     return;
   }
-  TCanvas* canvas = findCanvas("KLM/c_" + histName);
+  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
   if (canvas == nullptr) {
-    B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
+    B2ERROR("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   }
   histogram->Clear();
@@ -392,14 +393,14 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
   double xAlarm = 0.15;
   double yAlarm = 0.8;
-  TH1* histogram = findHist("KLM/" + histName);
+  TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
   if (histogram == nullptr) {
-    B2ERROR("KLM DQM histogram KLM/" << histName << " is not found.");
+    B2ERROR("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
     return;
   }
-  TCanvas* canvas = findCanvas("KLM/c_" + histName);
+  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
   if (canvas == nullptr) {
-    B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
+    B2ERROR("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   }
   canvas->Clear();
@@ -491,7 +492,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
 void DQMHistAnalysisKLMModule::event()
 {
   /* If KLM is not included, stop here and return. */
-  TH1* daqInclusion = findHist("KLM/daq_inclusion");
+  TH1* daqInclusion = findHist(m_histogramDirectoryName + "/daq_inclusion");
   if (not(daqInclusion == nullptr)) {
     int isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
     if (isKlmIncluded == 0)
@@ -519,8 +520,8 @@ void DQMHistAnalysisKLMModule::event()
             "_section_" + std::to_string(klmSector.getSection()) +
             "_sector_" + std::to_string(klmSector.getSector()) +
             "_" + std::to_string(j);
-      histogramName = "KLM/" + str;
-      canvasName = "KLM/c_" + str;
+      histogramName = m_histogramDirectoryName + "/" + str;
+      canvasName = m_histogramDirectoryName + "/c_" + str;
       TH1* histogram = findHist(histogramName);
       if (histogram == nullptr) {
         B2ERROR("KLM DQM histogram " << histogramName << " is not found.");
@@ -548,8 +549,8 @@ void DQMHistAnalysisKLMModule::event()
         str = "spatial_2d_hits_subdetector_" + std::to_string(subdetector) +
               "_section_" + std::to_string(section) +
               "_layer_" + std::to_string(j);
-        histogramName = "KLM/" + str;
-        canvasName = "KLM/c_" + str;
+        histogramName = m_histogramDirectoryName + "/" + str;
+        canvasName = m_histogramDirectoryName + "/c_" + str;
         TH2F* histogram = static_cast<TH2F*>(findHist(histogramName));
         if (histogram == nullptr) {
           B2ERROR("KLM DQM histogram " << histogramName << " is not found.");

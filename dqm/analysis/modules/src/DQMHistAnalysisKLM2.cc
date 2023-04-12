@@ -24,6 +24,9 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),
     m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
+  setDescription("Module used to analyze KLM Efficiency DQM histograms.");
+  addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
+
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -42,33 +45,33 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_monObj = getMonitoringObject("klm");
 
   gROOT->cd();
-  m_c_eff_bklm = new TCanvas("KLMEfficiencyDQM/c_eff_bklm_plane");
-  m_c_eff_eklm = new TCanvas("KLMEfficiencyDQM/c_eff_eklm_plane");
-  m_c_eff_bklm_sector = new TCanvas("KLMEfficiencyDQM/c_eff_bklm_sector");
-  m_c_eff_eklm_sector = new TCanvas("KLMEfficiencyDQM/c_eff_eklm_sector");
+  m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());
+  m_c_eff_eklm = new TCanvas((m_histogramDirectoryName + "/c_eff_eklm_plane").data());
+  m_c_eff_bklm_sector = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_sector").data());
+  m_c_eff_eklm_sector = new TCanvas((m_histogramDirectoryName + "/c_eff_eklm_sector").data());
 
-  m_eff_bklm = new TH1F("KLMEfficiencyDQM/eff_bklm_plane",
+  m_eff_bklm = new TH1F((m_histogramDirectoryName + "/eff_bklm_plane").data(),
                         "Plane Efficiency in BKLM",
                         BKLMElementNumbers::getMaximalLayerGlobalNumber(), 0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
   m_eff_bklm->GetXaxis()->SetTitle("Layer number");
   m_eff_bklm->SetStats(false);
   m_eff_bklm->SetOption("HIST");
 
-  m_eff_eklm = new TH1F("KLMEfficiencyDQM/eff_eklm_plane",
+  m_eff_eklm = new TH1F((m_histogramDirectoryName + "/eff_eklm_plane").data(),
                         "Plane Efficiency in EKLM",
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber(), 0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
   m_eff_eklm->GetXaxis()->SetTitle("Plane number");
   m_eff_eklm->SetStats(false);
   m_eff_eklm->SetOption("HIST");
 
-  m_eff_bklm_sector = new TH1F("KLMEfficiencyDQM/eff_bklm_sector",
+  m_eff_bklm_sector = new TH1F((m_histogramDirectoryName + "/eff_bklm_sector").data(),
                                "Sector Efficiency in BKLM",
                                BKLMElementNumbers::getMaximalSectorGlobalNumber(), 0.5, BKLMElementNumbers::getMaximalSectorGlobalNumber() + 0.5);
   m_eff_bklm_sector->GetXaxis()->SetTitle("Sector number");
   m_eff_bklm_sector->SetStats(false);
   m_eff_bklm_sector->SetOption("HIST");
 
-  m_eff_eklm_sector = new TH1F("KLMEfficiencyDQM/eff_eklm_sector",
+  m_eff_eklm_sector = new TH1F((m_histogramDirectoryName + "/eff_eklm_sector").data(),
                                "Sector Efficiency in EKLM",
                                EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(), 0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
   m_eff_eklm_sector->GetXaxis()->SetTitle("Sector number");
@@ -139,9 +142,9 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
   const std::string& histName, TH1* histogram)
 {
   std::string name;
-  TCanvas* canvas = findCanvas("KLMEfficiencyDQM/c_" + histName);
+  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
   if (canvas == NULL) {
-    B2ERROR("KLMDQM2 histogram canvas KLMEfficiencyDQM/c_" << histName << " is not found.");
+    B2ERROR("KLMDQM2 histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   }
   canvas->Clear();
@@ -213,18 +216,18 @@ void DQMHistAnalysisKLM2Module::event()
   m_eff_eklm_sector->Reset();
 
   /* Obtain plots necessary for efficiency plots */
-  TH1F* all_ext_bklm = (TH1F*)findHist("KLMEfficiencyDQM/all_ext_hitsBKLM");
-  TH1F* matched_hits_bklm = (TH1F*)findHist("KLMEfficiencyDQM/matched_hitsBKLM");
+  TH1F* all_ext_bklm = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsBKLM");
+  TH1F* matched_hits_bklm = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsBKLM");
 
-  TH1F* all_ext_eklm = (TH1F*)findHist("KLMEfficiencyDQM/all_ext_hitsEKLM");
-  TH1F* matched_hits_eklm = (TH1F*)findHist("KLMEfficiencyDQM/matched_hitsEKLM");
+  TH1F* all_ext_eklm = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsEKLM");
+  TH1F* matched_hits_eklm = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsEKLM");
 
 
-  TH1F* all_ext_bklm_sector = (TH1F*)findHist("KLMEfficiencyDQM/all_ext_hitsBKLMSector");
-  TH1F* matched_hits_bklm_sector = (TH1F*)findHist("KLMEfficiencyDQM/matched_hitsBKLMSector");
+  TH1F* all_ext_bklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsBKLMSector");
+  TH1F* matched_hits_bklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsBKLMSector");
 
-  TH1F* all_ext_eklm_sector = (TH1F*)findHist("KLMEfficiencyDQM/all_ext_hitsEKLMSector");
-  TH1F* matched_hits_eklm_sector = (TH1F*)findHist("KLMEfficiencyDQM/matched_hitsEKLMSector");
+  TH1F* all_ext_eklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsEKLMSector");
+  TH1F* matched_hits_eklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsEKLMSector");
 
   /* Check if efficiency histograms exist*/
   if ((all_ext_bklm == nullptr || matched_hits_bklm == nullptr) && (m_IsPhysicsRun)) {

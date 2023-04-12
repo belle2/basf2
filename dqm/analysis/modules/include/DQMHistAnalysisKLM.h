@@ -139,6 +139,9 @@ namespace Belle2 {
     /** Minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessages;
 
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
+
     /** Reference Histogram Root file name */
     std::string m_refFileName;
 

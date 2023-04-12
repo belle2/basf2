@@ -123,6 +123,9 @@ namespace Belle2 {
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_EklmElementNumbers;
 
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
+
 
   };
 

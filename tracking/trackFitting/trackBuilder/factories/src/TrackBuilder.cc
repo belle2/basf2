@@ -104,7 +104,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
     const int charge = recoTrack.getTrackFitStatus(trackRep)->getCharge();
     const double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
-    const int nDF = recoTrack.getTrackFitStatus(trackRep)->getNdf();
+    const double nDF = recoTrack.getTrackFitStatus(trackRep)->getNdf();
 
     double Bx, By, Bz;  // In cgs units
     if (useBFieldAtHit) {

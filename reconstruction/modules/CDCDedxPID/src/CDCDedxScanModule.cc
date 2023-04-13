@@ -98,7 +98,7 @@ void CDCDedxScanModule::event()
     for (int j = 0; j < 100; ++j) {
       for (int k = 0; k < 100; ++k) {
         double doca = j * cellHalfWidth / 50.0 - cellHalfWidth;
-        double entAng = k * 3.14159265 / 100.0 - 3.14159265 / 2.0;
+        double entAng = k * M_PI / 100.0 - M_PI_2;
 
         // re-scaled (RS) doca and entAng variable: map to square cell
         double cellR = 2 * cellHalfWidth / cellHeight;

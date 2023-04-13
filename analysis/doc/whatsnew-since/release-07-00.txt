@@ -2,11 +2,11 @@ Changes in the analysis package in light-2305-korat
 ---------------------------------------------------
 Reconstruction of V0s
 +++++++++++++++++++++
-* `stdKshorts` and `stdLambdas`: removed a pre-vertex-fit cut on the invariant mass of ``K_S0``/``Lambda``
+* `stdKshorts` and `stdLambdas`: removed a pre-vertex-fit cut on the invariant mass of ``K_S0``/``Lambda0``
   candidates found by the ``V0Finder`` module. The cut was not useful, as ``V0Finder`` already applies a cut
   on its candidates, and could discard signal candidates with very displaced vertex due to the
-  ``K_S0``/``Lamda`` vertex being assumed at the origin before the fit, affecting the invariant mass computation.
-  The post-fit cut on the invariant mass is still present. Cuts on ``K_S0`` candidates found by reconstructDecay
+  ``K_S0``/``Lambda0`` vertex being assumed at the origin before the fit, affecting the invariant mass computation.
+  The post-fit cut on the invariant mass is still present. Cuts on ``K_S0/Lambda0`` candidates found by reconstructDecay
   are still the same as before.
 
 Changes in the analysis package in light-2303-iriomote

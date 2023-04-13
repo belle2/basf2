@@ -46,6 +46,8 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            50);
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
+  addParam("MinEntries", m_minEntries,
+           "Minimal number for delta histogram updates", 100000.);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
@@ -78,6 +80,27 @@ void DQMHistAnalysisKLMModule::initialize()
   if (m_refFileName != "") {
     m_refFile = TFile::Open(m_refFileName.data(), "READ");
   }
+
+  // register plots for delta histogramming
+  std::string str;
+  KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmIndex) {
+    int nHistograms;
+    if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
+      nHistograms = 2;
+    else
+      nHistograms = 3;
+    for (int j = 0; j < nHistograms; j++) {
+      str = "strip_hits_subdetector_" +
+            std::to_string(klmSector.getSubdetector()) +
+            "_section_" + std::to_string(klmSector.getSection()) +
+            "_sector_" + std::to_string(klmSector.getSector()) +
+            "_" + std::to_string(j);
+      addDeltaPar(m_histogramDirectoryName, str, HistDelta::c_Entries, m_minEntries, 1);
+
+    }
+  }
+
 
   //search for reference
   if (m_refFile && m_refFile->IsOpen()) {
@@ -163,6 +186,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   histogram->SetStats(false);
   histogram->Draw();
   n = histogram->GetXaxis()->GetNbins();
+
+  /* calling on delta histogram*/
+  auto delta = getDelta("", histogram->GetName());
 
   TH1* ref_histogram = nullptr;
   float ref_average = 0;
@@ -270,8 +296,11 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
         m_ElectronicsMap->getElectronicsChannel(channelNumber);
       if (electronicsChannel == nullptr)
         B2FATAL("Incomplete BKLM electronics map.");
-      if (channelStatus == "Masked")
+      if (channelStatus == "Masked") {
         histogram->SetBinContent(i, 0);
+        if (delta != nullptr)
+          delta->SetBinContent(i, 0);
+      }
       str = channelStatus + " channel: ";
       str += ("L" + std::to_string(electronicsChannel->getLane()) +
               " A" + std::to_string(electronicsChannel->getAxis()) +
@@ -330,6 +359,17 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   }
   canvas->Modified();
   canvas->Update();
+
+  if (delta != nullptr) {
+    auto scale = delta->Integral();
+    bool update = delta->GetEntries() >= m_minEntries ; // filter initial sampling
+    if (scale > 0. && histogram->Integral() > 0) scale = histogram->Integral() / delta->Integral();
+    else scale = 1.0;
+    delta->Scale(scale);
+    if (update) {
+      delta->Draw("SAME");
+    }
+  }
 }
 
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(

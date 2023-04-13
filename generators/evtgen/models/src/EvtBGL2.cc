@@ -21,19 +21,18 @@
 
 B2_EVTGEN_REGISTER_MODEL(EvtBGL2);
 
-using std::endl;
 
 EvtBGL2::EvtBGL2():
-  bgl2ffmodel(0)
-  , calcamp(0)
+  m_bgl2ffmodel(nullptr)
+  , m_calcamp(nullptr)
 {}
 
 EvtBGL2::~EvtBGL2()
 {
-  delete bgl2ffmodel;
-  bgl2ffmodel = 0;
-  delete calcamp;
-  calcamp = 0;
+  delete m_bgl2ffmodel;
+  m_bgl2ffmodel = nullptr;
+  delete m_calcamp;
+  m_calcamp = nullptr;
 }
 
 std::string EvtBGL2::getName()
@@ -57,7 +56,7 @@ void EvtBGL2::decay(EvtParticle* p)
 {
 
   p->initializePhaseSpace(getNDaug(), getDaugs());
-  calcamp->CalcAmp(p, _amp2, bgl2ffmodel);
+  m_calcamp->CalcAmp(p, _amp2, m_bgl2ffmodel);
 
 }
 
@@ -71,8 +70,8 @@ void EvtBGL2::initProbMax()
   lnum = getDaug(1);
   nunum = getDaug(2);
 
-  double mymaxprob = calcamp->CalcMaxProb(parnum, mesnum,
-                                          lnum, nunum, bgl2ffmodel);
+  double mymaxprob = m_calcamp->CalcMaxProb(parnum, mesnum,
+                                            lnum, nunum, m_bgl2ffmodel);
 
   // Leptons
   static EvtId EM = EvtPDL::getId("e-");
@@ -111,16 +110,16 @@ void EvtBGL2::init()
   EvtSpinType::spintype d1type = EvtPDL::getSpinType(getDaug(0));
   if (d1type == EvtSpinType::SCALAR) {
     if (getNArg() == 8) {
-      bgl2ffmodel = new EvtBGL2FF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5), getArg(6), getArg(7));
-      calcamp = new EvtSemiLeptonicScalarAmp;
+      m_bgl2ffmodel = new EvtBGL2FF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5), getArg(6), getArg(7));
+      m_calcamp = new EvtSemiLeptonicScalarAmp;
     } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 (N=3) model for scalar meson daughters needs 8 arguments. Sorry." << endl;
+      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 (N=3) model for scalar meson daughters needs 8 arguments. Sorry." << std::endl;
 
       ::abort();
     }
   }  else {
     EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 model handles only scalar meson daughters. Use the EvtBGL class for vector mesons." <<
-                                         endl;
+                                         std::endl;
     ::abort();
   }
 

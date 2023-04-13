@@ -16,8 +16,6 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
-
 #include "generators/evtgen/models/EvtBGL2FF.h"
 
 // BGL (N=3) for scalar meson i.e. B->Dlv  (l=e,mu,tau)
@@ -105,7 +103,7 @@ void EvtBGL2FF::getvectorff(EvtId parent, EvtId, double t, double mass, double* 
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getvectorff in EvtBGL2FF. Use EvtBGLFF instead.\n";
-  ::abort();
+  std::abort();
 
 }
 
@@ -114,7 +112,7 @@ void EvtBGL2FF::gettensorff(EvtId, EvtId, double, double, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :gettensorff in EvtBGL2FF.\n";
-  ::abort();
+  std::abort();
 
 }
 
@@ -125,7 +123,7 @@ void EvtBGL2FF::getbaryonff(EvtId, EvtId, double, double, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getbaryonff in EvtBGL2FF.\n";
-  ::abort();
+  std::abort();
 
 }
 
@@ -134,7 +132,7 @@ void EvtBGL2FF::getdiracff(EvtId, EvtId, double, double, double*, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getdiracff in EvtBGL2FF.\n";
-  ::abort();
+  std::abort();
 
 }
 
@@ -143,6 +141,6 @@ void EvtBGL2FF::getraritaff(EvtId, EvtId, double, double, double*, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getraritaff in EvtBGL2FF.\n";
-  ::abort();
+  std::abort();
 
 }

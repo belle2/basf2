@@ -19,33 +19,35 @@ class EvtBGL2FF : public EvtSemiLeptonicFF {
 public:
 
   /** Default constructor */
+  // 8 parameters a_plus and a_0 of the B -> D l nu BGL form factor expansion at N=3
   EvtBGL2FF(double bglap_0, double bglap_1, double bglap_2, double bglap_3, double bgla0_0, double bgla0_1, double bgla0_2,
             double bgla0_3);
 
   /** Default constructor */
   EvtBGL2FF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, double bglc_1, double bglc_2);
 
-  /** Returns scalar ffs */
+  /** Returns scalar form factors */
+  // from arxiv:1606.08030; t = q^2, mass is the mass of the meson, fp and f0 are the two B -> D l nu form factors
   void getscalarff(EvtId parent, EvtId daught,
                    double t, double mass, double* fp, double* f0);
 
-  /** Returns vector ffs */
+  /** Returns vector form factors */
   void getvectorff(EvtId, EvtId, double, double, double*,
                    double*, double*, double*);
 
-  /** Returns tensor ffs */
+  /** Returns tensor form factors */
   void gettensorff(EvtId, EvtId, double, double, double*,
                    double*, double*, double*);
 
-  /** Returns baryon ffs */
+  /** Returns baryon form factors */
   void getbaryonff(EvtId, EvtId, double, double, double*,
                    double*, double*, double*);
 
-  /** Returns dirac ffs */
+  /** Returns dirac form factors */
   void getdiracff(EvtId, EvtId, double, double, double*, double*,
                   double*, double*, double*, double*);
 
-  /** Returns tarita ffs */
+  /** Returns tarita form factors */
   void getraritaff(EvtId, EvtId, double, double, double*, double*,
                    double*, double*, double*, double*, double*, double*);
 

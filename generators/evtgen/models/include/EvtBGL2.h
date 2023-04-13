@@ -43,13 +43,10 @@ public:
 
 private:
 
-  /** Pointers needed for FFs */
-  EvtSemiLeptonicFF* bgl2ffmodel;
+  /** Pointers needed for form factors */
+  EvtSemiLeptonicFF* m_bgl2ffmodel = nullptr;
 
   /** Pointers needed to calculate amplitude */
-  EvtSemiLeptonicAmp* calcamp;
+  EvtSemiLeptonicAmp* m_calcamp = nullptr;
 
 };
-
-
-

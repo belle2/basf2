@@ -63,7 +63,8 @@ namespace Belle2 {
                              It is assumed, that the B-field is parallel to the z-Axis.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
-     *  @param NDF  number of degrees of freedom for the fit
+     *  @param NDF           number of degrees of freedom for the fit
+     *                       (float since DAF provides decimal weights which can be less than 1)
      */
     TrackFitResult(const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum,
                    const TMatrixDSym& covariance, const short int charge,
@@ -82,7 +83,8 @@ namespace Belle2 {
      *  @param pValue        p-value of the corresponding track fit.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
-     *  @param NDF  number of degrees of freedom for the fit
+     *  @param NDF           number of degrees of freedom for the fit
+     *                       (float since DAF provides decimal weights which can be less than 1)
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,

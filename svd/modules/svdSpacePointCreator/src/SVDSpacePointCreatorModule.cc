@@ -60,15 +60,12 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created",
            unsigned(m_numMaxSpacePoints));
 
-  addParam("useSVDGroupInfo", m_useSVDGroupInfo,
-           "Use SVD group info to reject combinations from clusters belonging to different groups",
-           bool(true));
   addParam("useSVDGroupInfoIn6Sample", m_useSVDGroupInfoIn6Sample,
            "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode",
-           bool(true));
+           bool(false));
   addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
            "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode",
-           bool(true));
+           bool(false));
 
   addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
 
@@ -84,21 +81,19 @@ void SVDSpacePointCreatorModule::beginRun()
     else
       B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
-    m_useSVDGroupInfoIn6Sample = m_recoConfig->getUseOfSVDGroupInfoInSPCreator(6);
-    m_useSVDGroupInfoIn3Sample = m_recoConfig->getUseOfSVDGroupInfoInSPCreator(3);
+    m_useSVDGroupInfoIn6Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(6);
+    m_useSVDGroupInfoIn3Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(3);
   }
 
-  if (m_useSVDGroupInfo) {
-    if (m_useSVDGroupInfoIn6Sample)
-      B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 6-sample DAQ mode.");
-    else
-      B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 6-sample DAQ mode.");
-    if (m_useSVDGroupInfoIn3Sample)
-      B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 3-sample DAQ mode.");
-    else
-      B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
-  } else
-    B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used while forming cluster combinations.");
+  if (m_useSVDGroupInfoIn6Sample)
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 6-sample DAQ mode.");
+  else
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 6-sample DAQ mode.");
+
+  if (m_useSVDGroupInfoIn3Sample)
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 3-sample DAQ mode.");
+  else
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
 }
 
 
@@ -141,8 +136,7 @@ void SVDSpacePointCreatorModule::initialize()
 void SVDSpacePointCreatorModule::event()
 {
 
-
-  bool useSVDGroupInfo = m_useSVDGroupInfo;
+  bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
   if (useSVDGroupInfo) {
     // first take Event Informations:
     StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);

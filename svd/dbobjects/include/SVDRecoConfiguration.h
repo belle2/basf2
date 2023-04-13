@@ -98,7 +98,7 @@ namespace Belle2 {
      * Returns the parameter which turns On/Off SVD cluster grouping
      * in 3/6-sample acquisition mode
      */
-    Bool_t getStateOfSVDTimeGrouping(const Int_t& mode) const
+    Bool_t isSVDTimeGroupingEnabled(const Int_t& mode) const
     {
       if (mode == 6)
         return m_assignSVDGroupIn6Samples;
@@ -111,7 +111,7 @@ namespace Belle2 {
      * Returns the parameter which turns On/Off usage of SVD cluster grouping
      * in the SVDSpacePointCreator for 3/6-sample acquisition mode
      */
-    Bool_t getUseOfSVDGroupInfoInSPCreator(const Int_t& mode) const
+    Bool_t isSVDGroupInfoUsedInSPCreator(const Int_t& mode) const
     {
       if (mode == 6)
         return m_useSVDGroupInfoInSPfor6Samples;

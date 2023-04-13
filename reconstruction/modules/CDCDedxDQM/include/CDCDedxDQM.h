@@ -27,7 +27,9 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
+#include <cmath>
 #include <TMath.h>
 #include <TH1D.h>
 #include <TH2D.h>
@@ -82,6 +84,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_MetaDataPtr; /**< Store array for metadata info*/
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
+    StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;  /**< Store array for injection time info */
 
     int m_exp{ -1}; /**< exp number */
     int m_run{ -1}; /**< run number */
@@ -91,8 +94,8 @@ namespace Belle2 {
     int m_nBEvt{ 0}; /**< bhabha events  */
     int m_nHEvt{0}; /**< hadron events  */
 
-    double m_rungain{-99.0}; /**< previous rungain */
-    std::vector <double> m_adc[c_nSenseWires]; /**< adc per wire for wire status */
+    double m_rungain{ -99.0}; /**< previous rungain */
+    std::array<std::vector<double>, c_nSenseWires> m_adc; /**< adc per wire for wire status */
 
     std::string mmode; /**< monitoring mode all/basic */
 

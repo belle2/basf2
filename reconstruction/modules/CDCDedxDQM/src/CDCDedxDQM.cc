@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxDQM/CDCDedxDQM.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TDirectory.h>
 
@@ -52,8 +51,8 @@ void CDCDedxDQMModule::defineHisto()
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
 
   hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 250, 0., 2.5);
-  hinjtimeHer = new TH2D("hinjtimeHer", ";injection time (#mu s); CDC dE/dx", 160, 0, 80e3, 250, 0, 2.5);
-  hinjtimeLer = new TH2D("hinjtimeLer", ";injection time (#mu s); CDC dE/dx", 160, 0, 80e3, 250, 0, 2.5);
+  hinjtimeHer = new TH2D("hinjtimeHer", ";injection time (#mu s); CDC dE/dx", 40, 0, 80e3, 50, 0, 2.5);
+  hinjtimeLer = new TH2D("hinjtimeLer", ";injection time (#mu s); CDC dE/dx", 40, 0, 80e3, 50, 0, 2.5);
   hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 800, 0.35, 20.35);
   hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
   hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
@@ -203,7 +202,6 @@ void CDCDedxDQMModule::event()
       m_event = int(m_event / 5e5);
       hdEdxvsEvt->Fill(m_event, dedxnosat);
 
-      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         if (TTDInfo->isHER())

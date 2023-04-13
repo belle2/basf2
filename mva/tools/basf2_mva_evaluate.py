@@ -222,8 +222,6 @@ if __name__ == '__main__':
             table.add(name=format.string(v), abbr=format.string(variable_abbreviations[v]))
         o += table.finish()
 
-        spectators
-
         o += b2latex.SubSection("Importance")
         graphics = b2latex.Graphics()
         p = plotting.Importance()

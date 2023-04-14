@@ -60,8 +60,8 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
   const double tp = (mass + mb) * (mass + mb);
   const double tm = (mass - mb) * (mass - mb);
   const double sqrttpt0 = sqrt(tp - tm); // t0 = tm (see Bigi, Gambino paper)
-  vector<double> BcStatesp = {6.329, 6.920, 7.020}; //GeV
-  vector<double> BcStates0 = {6.716, 7.121}; //GeV
+  std::vector<double> BcStatesp = {6.329, 6.920, 7.020}; //GeV
+  std::vector<double> BcStates0 = {6.716, 7.121}; //GeV
 
   double Pp = 1.;
   for (size_t n = 0; n < BcStatesp.size(); ++n) {
@@ -103,7 +103,7 @@ void EvtBGL2FF::getvectorff(EvtId parent, EvtId, double t, double mass, double* 
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getvectorff in EvtBGL2FF. Use EvtBGLFF instead.\n";
-  abort();
+  ::abort();
 
 }
 
@@ -112,7 +112,7 @@ void EvtBGL2FF::gettensorff(EvtId, EvtId, double, double, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :gettensorff in EvtBGL2FF.\n";
-  abort();
+  ::abort();
 
 }
 
@@ -123,7 +123,7 @@ void EvtBGL2FF::getbaryonff(EvtId, EvtId, double, double, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getbaryonff in EvtBGL2FF.\n";
-  abort();
+  ::abort();
 
 }
 
@@ -132,7 +132,7 @@ void EvtBGL2FF::getdiracff(EvtId, EvtId, double, double, double*, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getdiracff in EvtBGL2FF.\n";
-  abort();
+  ::abort();
 
 }
 
@@ -141,6 +141,6 @@ void EvtBGL2FF::getraritaff(EvtId, EvtId, double, double, double*, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getraritaff in EvtBGL2FF.\n";
-  abort();
+  ::abort();
 
 }

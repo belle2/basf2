@@ -58,7 +58,18 @@ void GeneratorFilteringModule::event()
   double missingP = pow(pow(m_missingPx, 2) + pow(m_missingPy, 2) + pow(m_missingPz, 2), 0.5);
   double U = m_missingE - missingP;
 
-  if (m_nSignalLepton == 1 && m_nTauLepton > 0 && U > m_UMin && U < m_UMax) calculate();
+  if (m_nSignalLepton == 1 && m_nTauLepton > 0 && U > m_UMin && U < m_UMax) {
+    for (int i = 0; i < m_nTauLepton; i++) {
+      double dotProduct = m_signalLeptonPVec.Dot(m_tauLeptonPVecs[i]);
+      double signalLeptonPCMS = sqrt(m_signalLeptonPVec.Mag2());
+      double tauLeptonPCMS = sqrt(m_tauLeptonPVecs[i].Mag2());
+      double angle = dotProduct / (signalLeptonPCMS * tauLeptonPCMS);
+      double projection = dotProduct / signalLeptonPCMS;
+      double zDiff = m_signalLeptonZ - m_tauLeptonZs[i];
+      if (angle > m_angleMin && angle < m_angleMax && projection > m_projectionMin && projection < m_projectionMax && zDiff > m_zDiffMin
+          && zDiff < m_zDiffMax) m_goodEvent = 1;
+    }
+  }
 
   int retvalue = 0;
   if (m_goodEvent == 1) retvalue = 1;
@@ -95,28 +106,6 @@ void GeneratorFilteringModule::checkParticle(const MCParticle& mc)
     m_missingPy += vec.Py();
     m_missingPz += vec.Pz();
     m_missingE += vec.E();
-  }
-
-}
-
-void GeneratorFilteringModule::calculate()
-{
-  double dotProduct = 0.0;
-  double signalLeptonPCMS = 0.0;
-  double tauLeptonPCMS = 0.0;
-  double angle = 0.0;
-  double projection = 0.0;
-  double zDiff = 0.0;
-
-  for (int i = 0; i < m_nTauLepton; i++) {
-    dotProduct = m_signalLeptonPVec.Dot(m_tauLeptonPVecs[i]);
-    signalLeptonPCMS = sqrt(m_signalLeptonPVec.Mag2());
-    tauLeptonPCMS = sqrt(m_tauLeptonPVecs[i].Mag2());
-    angle = dotProduct / (signalLeptonPCMS * tauLeptonPCMS);
-    projection = dotProduct / signalLeptonPCMS;
-    zDiff = m_signalLeptonZ - m_tauLeptonZs[i];
-    if (angle > m_angleMin && angle < m_angleMax && projection > m_projectionMin && projection < m_projectionMax && zDiff > m_zDiffMin
-        && zDiff < m_zDiffMax) m_goodEvent = 1;
   }
 
 }

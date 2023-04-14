@@ -31,26 +31,23 @@ namespace Belle2 {
     /** Called for each particle, performs basic cut checks */
     void checkParticle(const MCParticle& mc);
 
-    /** Performs additional cut checks */
-    void calculate();
-
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< Store array for the MCParticles */
     StoreObjPtr<MCInitialParticles> m_initial; /**< Pointer to the actual beam parameters */
 
   private:
-    int m_nSignalLepton; /**< Number of good signal leptons */
-    int m_nTauLepton; /**< Number of good tau leptons counted */
-    int m_goodEvent; /**< Flag indicating if event should be retained */
+    int m_nSignalLepton = 0; /**< Number of good signal leptons */
+    int m_nTauLepton = 0; /**< Number of good tau leptons counted */
+    int m_goodEvent = 0; /**< Flag indicating if event should be retained */
 
-    double m_missingPx; /**< Sum of px components for neutrinos in event */
-    double m_missingPy; /**< Sum of py components for neutrinos in event */
-    double m_missingPz; /**< Sum of pz components for neutrinos in event */
-    double m_missingE; /**< Sum of energy for neutrinos in event */
+    double m_missingPx = 0.0; /**< Sum of px components for neutrinos in event */
+    double m_missingPy = 0.0; /**< Sum of py components for neutrinos in event */
+    double m_missingPz = 0.0; /**< Sum of pz components for neutrinos in event */
+    double m_missingE = 0.0; /**< Sum of energy for neutrinos in event */
 
     TVector3 m_signalLeptonPVec; /**< Vector storing momentum components of signal lepton */
     std::vector<TVector3> m_tauLeptonPVecs; /**< Vector of momentum vectors for tau leptons */
-    double m_signalLeptonZ; /**< Storing the production vertex z-component for signal lepton */
+    double m_signalLeptonZ = 0.0; /**< Storing the production vertex z-component for signal lepton */
     std::vector<double> m_tauLeptonZs; /**< Vector of production vertex z-components for tau leptons */
 
     double m_signalLeptonPDG; /**< PDG code of the signal lepton. */

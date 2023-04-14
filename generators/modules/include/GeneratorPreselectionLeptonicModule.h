@@ -13,13 +13,13 @@ namespace Belle2 {
    * generator filtering
    *
    */
-  class GeneratorFilteringModule : public Module {
+  class GeneratorPreselectionLeptonicModule : public Module {
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    GeneratorFilteringModule();
+    GeneratorPreselectionLeptonicModule();
 
     /** Initialise the parameters */
     void initialize() override;

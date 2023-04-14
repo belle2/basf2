@@ -1,4 +1,4 @@
-#include <generators/modules/GeneratorFilteringModule.h>
+#include <generators/modules/GeneratorPreselectionLeptonicModule.h>
 #include <framework/gearbox/Unit.h>
 #include <TVector3.h>
 #include <numeric>
@@ -6,9 +6,9 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(GeneratorFiltering);
+REG_MODULE(GeneratorPreselectionLeptonic);
 
-GeneratorFilteringModule::GeneratorFilteringModule() : Module()
+GeneratorPreselectionLeptonicModule::GeneratorPreselectionLeptonicModule() : Module()
 {
   // Set module properties
   setDescription("Filtering based on generator truth information. Returns 0 if cuts have not been pased, 1 only if all cuts are passed.");
@@ -34,13 +34,13 @@ GeneratorFilteringModule::GeneratorFilteringModule() : Module()
            10.0);
 }
 
-void GeneratorFilteringModule::initialize()
+void GeneratorPreselectionLeptonicModule::initialize()
 {
   m_mcparticles.isRequired(m_particleList);
   m_initial.isRequired();
 }
 
-void GeneratorFilteringModule::event()
+void GeneratorPreselectionLeptonicModule::event()
 {
   m_nSignalLepton = 0;
   m_nTauLepton = 0;
@@ -78,7 +78,7 @@ void GeneratorFilteringModule::event()
 
 }
 
-void GeneratorFilteringModule::checkParticle(const MCParticle& mc)
+void GeneratorPreselectionLeptonicModule::checkParticle(const MCParticle& mc)
 {
   if (!mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
   if (mc.hasStatus(MCParticle::c_Initial) or mc.hasStatus(MCParticle::c_IsVirtual)) return;

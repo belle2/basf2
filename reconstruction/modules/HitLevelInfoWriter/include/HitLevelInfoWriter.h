@@ -28,7 +28,7 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-#include <reconstruction/dbobjects/CDCDedxInjectTime.h>
+#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
@@ -223,7 +223,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains;      /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain;         /**< Run gain DB object */
-    DBObjPtr<CDCDedxInjectTime> m_DBInjectTime; /**< time gain/reso DB object */
+    DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< time gain/reso DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor;     /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */

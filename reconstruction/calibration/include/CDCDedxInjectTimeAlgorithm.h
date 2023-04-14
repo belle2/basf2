@@ -22,7 +22,7 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-#include <reconstruction/dbobjects/CDCDedxInjectTime.h>
+#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 
 // namespace constants
 namespace numdedx {
@@ -236,6 +236,6 @@ namespace Belle2 {
 
     std::vector<std::vector<double>> m_vinjPayload; /**< vector to store payload values*/
 
-    DBObjPtr<CDCDedxInjectTime> m_DBInjectTime; /**< Injection time DB object */
+    DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< Injection time DB object */
   };
 } // namespace Belle2

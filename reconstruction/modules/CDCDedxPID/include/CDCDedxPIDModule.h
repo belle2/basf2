@@ -34,7 +34,7 @@
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
-#include <reconstruction/dbobjects/CDCDedxInjectTime.h>
+#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
 #include <vector>
@@ -140,7 +140,6 @@ namespace Belle2 {
      * @param logl  array of log-likelihood to be modified
      * @param p     track momentum
      * @param dedx  dE/dx value
-     * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
     void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
 
@@ -169,7 +168,7 @@ namespace Belle2 {
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxInjectTime> m_DBInjectTime; /**< time gain/reso DB object */
+    DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< time gain/reso DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */

@@ -8,7 +8,7 @@
  **************************************************************************/
 
 
-#include <analysis/VertexFitting/TreeFitter/RecoComposite.h>
+#include <analysis/VertexFitting/TreeFitter/Composite.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 #include <TMatrixFSym.h>
@@ -16,19 +16,19 @@
 
 namespace TreeFitter {
 
-  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
-                               bool massConstraint)
+  Composite::Composite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
+                       bool massConstraint)
     : ParticleBase(particle, mother, &config), m_params(), m_hasEnergy(true), m_massconstraint(massConstraint)
   {
     updateParams();
   }
 
-  ErrCode RecoComposite::initParticleWithMother(FitParams& fitparams)
+  ErrCode Composite::initParticleWithMother(FitParams& fitparams)
   {
     return initTau(fitparams);
   }
 
-  ErrCode RecoComposite::initMotherlessParticle(FitParams& fitparams)
+  ErrCode Composite::initMotherlessParticle(FitParams& fitparams)
   {
     const int posindex = posIndex();
     const int momindex = momIndex();
@@ -40,7 +40,7 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success) ;
   }
 
-  void RecoComposite::updateParams()
+  void Composite::updateParams()
   {
     const ROOT::Math::XYZVector pos = particle()->getVertex();
     const ROOT::Math::XYZVector mom = particle()->getMomentum();
@@ -72,7 +72,7 @@ namespace TreeFitter {
     }
   }
 
-  ErrCode RecoComposite::projectRecoComposite(const FitParams& fitparams, Projection& p) const
+  ErrCode Composite::projectComposite(const FitParams& fitparams, Projection& p) const
   {
     const int posindex = posIndex() ;
     const int momindex = momIndex() ;
@@ -94,7 +94,7 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success) ;
   }
 
-  ErrCode RecoComposite::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
+  ErrCode Composite::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {
     ErrCode status;
     switch (type) {
@@ -102,7 +102,7 @@ namespace TreeFitter {
         status |= projectMassConstraint(fitparams, p);
         break;
       case Constraint::composite:
-        status |= projectRecoComposite(fitparams, p);
+        status |= projectComposite(fitparams, p);
         break ;
       case Constraint::geometric:
         status |= projectGeoConstraint(fitparams, p);

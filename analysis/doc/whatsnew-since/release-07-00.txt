@@ -1,3 +1,20 @@
+Changes in the analysis package in light-2303-iriomote
+------------------------------------------------------
+Modules
++++++++
+* Fixed a bug in the `EventShapeCalculator` module and `modularAnalysis.buildEventShape` that was introduced in
+  ``light-2302-genetta``. Meaningless values were provided for the event-shape variables.
+* Fixed a bug on the `findMCDecay` that creates duplicated particles which differ only in the order of their daughters.
+* Fixed a bug of the TreeFit that affected the initialization of vertex position that is calculated from two track helices.
+  This bug mainly affected particles that decay far from the IP, specifically ``V0`` particles such as ``K_S0``.
+  The bugfix recovers the inefficiency of those particles.
+
+Variables
++++++++++
+* Added new charged PID variables `kaonIDNN` and `pionIDNN` representing the probability for the given hypothesis, calculated
+  from a neural network that uses high-level information such as PID likelihoods, track momentum and charge.
+  The probabilities are unaffected by momentum updates in vertex fits or the application of the track momentum scale correction.
+
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 
@@ -70,8 +87,6 @@ Modules
 * New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
   The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available both in the
   ``for_each`` loop over the ROEs (e.g. ``roe_path``) and the main path if the signal side ParticleList has only one candidate.
-* Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its
-  momentum.
 * Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle, a DNN trained with ECLCluster variables for discrimination of
   anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to
   0.

@@ -137,6 +137,8 @@ void SVDTimeGroupingModule::beginRun()
     else
       B2INFO("SVDTimeGrouping : SVDCluster groupId is not assigned for 3-sample DAQ mode.");
 
+    if (!m_isEnabledIn6Samples && !m_isEnabledIn3Samples) return;
+
     TString timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
     TString timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
 
@@ -324,8 +326,6 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
       // fit converges but paramters are at limit
       // Do a rough cleaning
       if (pars[2] <= m_usedPars.limitSigma[0] + 0.01 || pars[2] >= m_usedPars.limitSigma[1] - 0.01) {
-        B2WARNING("Sigma in limit : maxPeak " << maxPeak << " peak " << maxBinContent << " (frac) " << maxBinContent / maxPeak <<
-                  " at Group " << int(groupInfoVector.size()));
         // subtract the faulty part from the histogram
         subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_usedPars.fitRangeHalfWidth, m_usedPars.removeSigmaN);
         if (roughCleaningCounter++ > m_usedPars.maxGroups) amDone = true;
@@ -349,8 +349,6 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
       if (int(groupInfoVector.size()) >= m_usedPars.maxGroups) { amDone = true; continue;}
 
     } else {    // fit did not converges
-      B2WARNING("Fit failed : maxPeak " << maxPeak << " peak " << maxBinContent << " (frac) " << maxBinContent / maxPeak << " at Group "
-                << int(groupInfoVector.size()));
       // subtract the faulty part from the histogram
       subtractGausFromHistogram(hist, maxPar0, maxBinCenter, m_usedPars.fitRangeHalfWidth, m_usedPars.removeSigmaN);
       if (roughCleaningCounter++ > m_usedPars.maxGroups) amDone = true;

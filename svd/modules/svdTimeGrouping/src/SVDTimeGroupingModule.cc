@@ -126,18 +126,20 @@ void SVDTimeGroupingModule::beginRun()
 
     m_isEnabledIn6Samples = m_recoConfig->isSVDTimeGroupingEnabled(6);
     m_isEnabledIn3Samples = m_recoConfig->isSVDTimeGroupingEnabled(3);
+  }
 
-    if (m_isEnabledIn6Samples)
-      B2INFO("SVDTimeGrouping : SVDCluster groupId is assigned for 6-sample DAQ mode.");
-    else
-      B2INFO("SVDTimeGrouping : SVDCluster groupId is not assigned for 6-sample DAQ mode.");
+  if (m_isEnabledIn6Samples)
+    B2INFO("SVDTimeGrouping : SVDCluster groupId is assigned for 6-sample DAQ mode.");
+  else
+    B2INFO("SVDTimeGrouping : SVDCluster groupId is not assigned for 6-sample DAQ mode.");
 
-    if (m_isEnabledIn3Samples)
-      B2INFO("SVDTimeGrouping : SVDCluster groupId is assigned for 3-sample DAQ mode.");
-    else
-      B2INFO("SVDTimeGrouping : SVDCluster groupId is not assigned for 3-sample DAQ mode.");
+  if (m_isEnabledIn3Samples)
+    B2INFO("SVDTimeGrouping : SVDCluster groupId is assigned for 3-sample DAQ mode.");
+  else
+    B2INFO("SVDTimeGrouping : SVDCluster groupId is not assigned for 3-sample DAQ mode.");
 
-    if (!m_isEnabledIn6Samples && !m_isEnabledIn3Samples) return;
+  if (m_useDB &&
+      (m_isEnabledIn6Samples || m_isEnabledIn3Samples)) {
 
     TString timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
     TString timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
@@ -181,10 +183,10 @@ void SVDTimeGroupingModule::event()
   // then use the respective parameters
   if (numberOfAcquiredSamples == 6) {
     if (!m_isEnabledIn6Samples) return;
-    m_usedPars = m_usedParsIn6Samples;
+    else if (m_useDB) m_usedPars = m_usedParsIn6Samples;
   } else if (numberOfAcquiredSamples == 3) {
     if (!m_isEnabledIn3Samples) return;
-    m_usedPars = m_usedParsIn3Samples;
+    else if (m_useDB) m_usedPars = m_usedParsIn3Samples;
   }
   if (m_usedPars.numberOfSignalGroups != m_usedPars.maxGroups)
     m_usedPars.includeOutOfRangeClusters = false;

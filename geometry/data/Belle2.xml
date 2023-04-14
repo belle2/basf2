@@ -124,7 +124,7 @@
   <DetectorComponent name="MICROTPC" isDefault="false">
     <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
-  <DetectorComponent name="BEAMABORT" isDefault="false">
+  <DetectorComponent name="BEAMABORT" isDefault="true">
     <xi:include href="../beast/beamabort/BEAMABORT.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="HE3TUBE" isDefault="false">

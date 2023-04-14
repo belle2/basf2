@@ -638,7 +638,7 @@ if args.isMC:
             if m.name() == "SVDEventInfoSetter":
                 m.param("daqMode", 1)
                 m.param("relativeShift", 7)
-
+                m.param("useDB", False)
 
 else:
     # setup database
@@ -703,19 +703,21 @@ for moda in main.modules():
         moda.param("returnClusterRawTime", args.isRawTime)
     if moda.name() == 'SVDTimeGrouping':
         if args.doSVDGrouping:
+            moda.param("useDB", False)
             moda.param('tRangeLow',  minTime)
             moda.param('tRangeHigh', maxTime)
             moda.param("expectedSignalTimeCenter",    sigLoc)
             moda.param('expectedSignalTimeMin',  sigMin)
             moda.param('expectedSignalTimeMax', sigMax)
-            moda.param("isDisabled", False)
+            moda.param("isEnabledIn6Samples", True)
+            moda.param("isEnabledIn3Samples", True)
             moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
             moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
             moda.param("signalLifetime", args.signalLifetime)
-        else:
-            moda.param("isDisabled", True)
     if moda.name() == 'SVDSpacePointCreator':
-        moda.param("useSVDGroupInfo", args.useSVDGroupInfo)
+        moda.param("useDB", False)
+        moda.param("useSVDGroupInfoIn6Sample", args.useSVDGroupInfo)
+        moda.param("useSVDGroupInfoIn3Sample", args.useSVDGroupInfo)
 
 
 if args.executionTime:

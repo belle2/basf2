@@ -103,7 +103,7 @@ void EvtBGL2FF::getvectorff(EvtId parent, EvtId, double t, double mass, double* 
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getvectorff in EvtBGL2FF. Use EvtBGLFF instead.\n";
-  std::abort();
+  abort();
 
 }
 
@@ -112,7 +112,7 @@ void EvtBGL2FF::gettensorff(EvtId, EvtId, double, double, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :gettensorff in EvtBGL2FF.\n";
-  std::abort();
+  abort();
 
 }
 
@@ -123,7 +123,7 @@ void EvtBGL2FF::getbaryonff(EvtId, EvtId, double, double, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getbaryonff in EvtBGL2FF.\n";
-  std::abort();
+  abort();
 
 }
 
@@ -132,7 +132,7 @@ void EvtBGL2FF::getdiracff(EvtId, EvtId, double, double, double*, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getdiracff in EvtBGL2FF.\n";
-  std::abort();
+  abort();
 
 }
 
@@ -141,6 +141,6 @@ void EvtBGL2FF::getraritaff(EvtId, EvtId, double, double, double*, double*,
 {
 
   EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Not implemented :getraritaff in EvtBGL2FF.\n";
-  std::abort();
+  abort();
 
 }

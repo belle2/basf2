@@ -71,9 +71,9 @@ V0FinderModule::V0FinderModule() : Module()
 
   addParam("v0FitterMode", m_v0FitterMode,
            "designate which fitAndStore function is called in V0Fitter.\n"
-           "    0: store V0 at the first vertex fit, regardless of inner hits; \n"
-           "    1: remove hits inside the V0 vertex position;\n"
-           "    2: mode 2 + don't use SVD hits if there is only one available SVD hit-pair",
+           "0: store V0 at the first vertex fit, regardless of inner hits; \n"
+           "1: remove hits inside the V0 vertex position;\n"
+           "2: mode 1 + don't use SVD hits if there is only one available SVD hit-pair",
            1);
 
   addParam("massRangeKshort", m_preFilterMassRangeKshort,
@@ -86,6 +86,7 @@ V0FinderModule::V0FinderModule() : Module()
            "Set value to 0 to accept all.", 0.5);
   addParam("precutCosAlpha", m_precutCosAlpha, "preselection cut on the cosine of opening angle between two tracks. "
            "Those above this cut are always accepted.", 0.9);
+  addParam("useNewV0Fitter", m_useNewV0Fitter, "on true use new V0 fitter, othewise use the old one", false);
 }
 
 
@@ -95,13 +96,22 @@ void V0FinderModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
   m_tracks.requireRelationTo(recoTracks);
   //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
-  m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
-                                          m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
-                                          m_arrayNameCopiedRecoTrack, m_validation);
 
-  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
-                             m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
-  m_v0Fitter->setFitterMode(m_v0FitterMode);
+  if (m_useNewV0Fitter) {
+    m_newV0Fitter = std::make_unique<NewV0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
+                                                  m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
+                                                  m_arrayNameCopiedRecoTrack, m_validation);
+    m_newV0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
+                                  m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
+    m_newV0Fitter->setFitterMode(m_v0FitterMode);
+  } else {
+    m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
+                                            m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
+                                            m_arrayNameCopiedRecoTrack, m_validation);
+    m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
+                               m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
+    m_v0Fitter->setFitterMode(m_v0FitterMode);
+  }
 
   // safeguard for users that try to break the code
   if (std::get<0>(m_preFilterMassRangeKshort) > std::get<1>(m_preFilterMassRangeKshort)) {
@@ -154,71 +164,31 @@ void V0FinderModule::event()
   }
 
   // Reject boring events.
-  if (tracksPlus.empty() || tracksMinus.empty()) {
+  if (tracksPlus.empty() or tracksMinus.empty()) {
     B2DEBUG(29, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
     return;
   }
 
-
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-
       if (not isTrackPairSelected(trackPlus, trackMinus)) continue;
 
-      bool isForceStored, isHitRemoved;
-      try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) {
-          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort, isForceStored, isHitRemoved);
-          m_nForceStored += isForceStored;
-          m_nHitRemoved += isHitRemoved;
-        }
-      } catch (const genfit::Exception& e) {
-        // genfit exception raised, skip this track pair for this hypothesis
-        B2WARNING("Genfit exception caught. Skipping this track pair for Kshort hypothesis. " << LogVar("Genfit exception:", e.what()));
-      }
-
-      try {
-        // the pre-filter is not able to reject photons, so no need to apply pre filter for photons
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon, isForceStored, isHitRemoved);
-        m_nForceStored += isForceStored;
-        m_nHitRemoved += isHitRemoved;
-      } catch (const genfit::Exception& e) {
-        // genfit exception raised, skip this track pair for this hypothesis
-        B2WARNING("Genfit exception caught. Skipping this track pair for photon hypothesis. " << LogVar("Genfit exception:", e.what()));
-      }
-
-      try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda)) {
-          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda, isForceStored, isHitRemoved);
-          m_nForceStored += isForceStored;
-          m_nHitRemoved += isHitRemoved;
-        }
-      } catch (const genfit::Exception& e) {
-        // genfit exception raised, skip this track pair for this hypothesis
-        B2WARNING("Genfit exception caught. Skipping this track pair for Lambda hypothesis. " << LogVar("Genfit exception:", e.what()));
-      }
-
-      try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) {
-          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda, isForceStored, isHitRemoved);
-          m_nForceStored += isForceStored;
-          m_nHitRemoved += isHitRemoved;
-        }
-      } catch (const genfit::Exception& e) {
-        // genfit exception raised, skip this track pair for this hypothesis
-        B2WARNING("Genfit exception caught. Skipping this track pair for anti-Lambda hypothesis. " << LogVar("Genfit exception:",
-                  e.what()));
-      }
+      if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) fitAndStore(trackPlus, trackMinus, Const::Kshort);
+      if (preFilterTracks(trackPlus, trackMinus, Const::Lambda)) fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      // the pre-filter is not able to reject photons, so no need to apply pre filter for photons
+      fitAndStore(trackPlus, trackMinus, Const::photon);
     }
   }
 
 }
 
+
 void V0FinderModule::terminate()
 {
   B2INFO("===V0Finder summary=============================================================");
-  B2INFO("In total " << m_nHitRemoved + m_nForceStored << " saved V0s have inner hits.");
+  B2INFO("In total " << m_nHitRemoved + m_nForceStored << " of " << m_allStored << " saved V0s have inner hits.");
   B2INFO("- Inner hits successfully removed in " << m_nHitRemoved << " V0s.");
   B2INFO("- The hit removal failed in " << m_nForceStored << " V0s, instead V0s before removing inner hits saved.");
 }
@@ -239,7 +209,8 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
     return true;
   }
 
-  const auto trackHypotheses = m_v0Fitter->getTrackHypotheses(v0Hypothesis);
+  const auto trackHypotheses = m_newV0Fitter ? m_newV0Fitter->getTrackHypotheses(v0Hypothesis) : m_v0Fitter->getTrackHypotheses(
+                                 v0Hypothesis);
 
   // first track should always be the positve one
   double m_plus = trackHypotheses.first.getMass();
@@ -296,3 +267,26 @@ bool V0FinderModule::isTrackPairSelected(const Track* trk1, const Track* trk2)
 
   return r.Rho() > m_precutRho;
 }
+
+
+void V0FinderModule::fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
+{
+  try {
+    bool isForceStored = false, isHitRemoved = false;
+    if (m_newV0Fitter) {
+      bool ok = m_newV0Fitter->fitAndStore(trackPlus, trackMinus, v0Hypothesis, isForceStored, isHitRemoved);
+      if (ok) m_allStored++;
+    } else {
+      bool ok = m_v0Fitter->fitAndStore(trackPlus, trackMinus, v0Hypothesis, isForceStored, isHitRemoved);
+      if (ok) m_allStored++;
+    }
+    m_nForceStored += isForceStored;
+    m_nHitRemoved += isHitRemoved;
+  } catch (const genfit::Exception& e) {
+    // genfit exception raised, skip this track pair for this hypothesis
+    B2WARNING("Genfit exception caught. Skipping this track pair"
+              << LogVar("V0 hypothesis PDG", v0Hypothesis.getPDGCode())
+              << LogVar("Genfit exception:", e.what()));
+  }
+}
+

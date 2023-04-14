@@ -492,6 +492,9 @@ namespace Belle2 {
       return m_genfitTrack.getStateSeed();
     }
 
+    /// Return genfit track.
+    const genfit::Track& getGenfitTrack() const {return m_genfitTrack;}
+
     /// Return the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
     short int getChargeSeed() const { return m_charge; }
 

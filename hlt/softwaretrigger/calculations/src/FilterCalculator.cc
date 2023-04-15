@@ -14,6 +14,11 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+
+#include <framework/logging/Logger.h>
+
 #include <numeric>
 #include <stdexcept>
 #include <optional>
@@ -142,6 +147,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["selectmumu"] = 0;
   calculationResult["singleMuon"] = 0;
   calculationResult["cosmic"] = 0;
+  calculationResult["displacedVertex"] = 0;
   calculationResult["eeFlat0"] = 0;
   calculationResult["eeFlat1"] = 0;
   calculationResult["eeFlat2"] = 0;
@@ -889,6 +895,49 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         }
       }
     }
+  }
+
+  //..Displaced vertex
+  if (maximumPtTracksWithoutZCut.at(-1) and maximumPtTracksWithoutZCut.at(1)) {
+
+    //..Make particles of the two highest pt tracks (without IP cut)
+    const auto nTrack = maximumPtTracksWithoutZCut.at(-1)->track;
+    Particle* nParticle = new Particle(nTrack, Const::pion);
+
+    const auto pTrack = maximumPtTracksWithoutZCut.at(1)->track;
+    Particle* pParticle = new Particle(pTrack, Const::pion);
+
+    //..Make a vertex of these two
+    Belle2::analysis::VertexFitKFit* vertexFit = new Belle2::analysis::VertexFitKFit();
+    vertexFit->addParticle(nParticle);
+    vertexFit->addParticle(pParticle);
+    vertexFit->doFit();
+
+    //..Vertex properties
+    const double chisq = vertexFit->getCHIsq();
+    const int ndf = vertexFit->getNDF();
+    const double vertexProb = TMath::Prob(chisq, ndf);
+    const auto vertexLocation = vertexFit->getVertex();
+    const double vertexXY = vertexLocation.perp();
+    const double vertexTheta = vertexLocation.theta() * TMath::RadToDeg();
+
+    //..Angular differance of two tracks to reject cosmics
+    const ROOT::Math::PxPyPzEVector& momentumLabNeg(maximumPtTracksWithoutZCut.at(-1)->p4Lab);
+    const ROOT::Math::PxPyPzEVector& momentumLabPos(maximumPtTracksWithoutZCut.at(1)->p4Lab);
+    const double thetaSumLab = (momentumLabNeg.Theta() + momentumLabPos.Theta()) * TMath::RadToDeg();
+    double dPhiLab = std::abs(momentumLabNeg.Phi() - momentumLabPos.Phi()) * TMath::RadToDeg();
+    if (dPhiLab > 180) {
+      dPhiLab = 360 - dPhiLab;
+    }
+    const bool backToBackLab = std::abs(thetaSumLab - 180.) < 10. and std::abs(dPhiLab - 180.) < 10.;
+
+    //..Displaced vertex
+    if (vertexProb > 0.005 and vertexXY > 3. and vertexXY < 60. and vertexTheta > 30. and vertexTheta < 120.
+        and not backToBackLab) {calculationResult["displacedVertex"] = 1;}
+    delete nParticle;
+    delete pParticle;
+    delete vertexFit;
+
   }
 
 }

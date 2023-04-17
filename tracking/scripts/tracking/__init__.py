@@ -668,9 +668,8 @@ def add_vxd_standalone_cosmics_finder(
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    sp_creator_pxd = b2.register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
-    path.add_module(sp_creator_pxd)
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
+        path.add_module('PXDSpacePointCreator', SpacePoints=pxd_spacepoints_name)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 

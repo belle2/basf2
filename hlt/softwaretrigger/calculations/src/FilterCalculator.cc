@@ -305,7 +305,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
     //..New tighter track definitions.
     //  We can use pCMS and charge from above, because every looseB track is also a loose track
-    if (trackFitResult->getHitPatternCDC().getNHits() >= 10) {
+    if (trackFitResult->getHitPatternCDC().getNHits() >= 5) {
       if (std::abs(z0) < 1.) {calculationResult["nTrkTightB"] += 1;}
       if (std::abs(z0) < 5.) {
         calculationResult["nTrkLooseB"] += 1;

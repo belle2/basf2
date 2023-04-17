@@ -8,6 +8,11 @@ Reconstruction of V0s
   ``K_S0``/``Lambda0`` vertex being assumed at the origin before the fit, affecting the invariant mass computation.
   The post-fit cut on the invariant mass is still present. Cuts on ``K_S0``/``Lambda0`` candidates found by `reconstructDecay`
   are still the same as before.
+Command line tools
+++++++++++++++++++
+* The command line tool :ref:`b2help-variables <b2help-variables>` is extended to get a description of specific variables and to
+  display only their data.
+
 
 Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------
@@ -25,6 +30,7 @@ Variables
 * Added new charged PID variables `kaonIDNN` and `pionIDNN` representing the probability for the given hypothesis, calculated
   from a neural network that uses high-level information such as PID likelihoods, track momentum and charge.
   The probabilities are unaffected by momentum updates in vertex fits or the application of the track momentum scale correction.
+
 
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------

@@ -62,6 +62,7 @@ namespace Belle2 {
     float m_svdClCharge = 0;      /**< cluster charge */
     float m_svdClSNR = 0;      /**< cluster SNR */
     float m_svdClTime = 0;      /**< cluster time */
+    float m_svdClTimeErr = 0;      /**< cluster time error*/
     float m_svdClTime_6SRF = 0;      /**< cluster time in the 6-sample SVD ref frame*/
     float m_svdClTime_3SRF = 0;      /**< cluster time in the 3-sample SVD ref frame*/
     float m_svdRes = 0;   /**< residual computed by genfit */

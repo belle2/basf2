@@ -73,6 +73,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_U->Branch("svdStrip6Samples", &m_svdStrip6Samples);
   m_t_U->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
+  m_t_U->Branch("svdClTimeErr", &m_svdClTimeErr, "svdClTimeErr/F");
   m_t_U->Branch("svdClTime_6SRF", &m_svdClTime_6SRF, "svdClTime_6SRF/F");
   m_t_U->Branch("svdClTime_3SRF", &m_svdClTime_3SRF, "svdClTime_3SRF/F");
   m_t_U->Branch("svdFF", &m_svdFF, "svdFF/i");
@@ -123,6 +124,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_V->Branch("svdStrip6Samples", &m_svdStrip6Samples);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
+  m_t_V->Branch("svdClTimeErr", &m_svdClTimeErr, "svdClTimeErr/F");
   m_t_V->Branch("svdClTime_6SRF", &m_svdClTime_6SRF, "svdClTime_6SRF/F");
   m_t_V->Branch("svdClTime_3SRF", &m_svdClTime_3SRF, "svdClTime_3SRF/F");
   m_t_V->Branch("svdFF", &m_svdFF, "svdFF/i");
@@ -278,6 +280,7 @@ void SVDPerformanceTTreeModule::event()
           //Fill SVD tree for u-overlaps if required by the user
           m_svdRes = res_U_1;
           m_svdClTime = svd_1->getClsTime();
+          m_svdClTimeErr = svd_1->getClsTimeSigma();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
           m_svdClPosErr = svd_1->getPositionSigma();
@@ -355,6 +358,7 @@ void SVDPerformanceTTreeModule::event()
 
           m_svdRes = res_V_1;
           m_svdClTime = svd_1->getClsTime();
+          m_svdClTimeErr = svd_1->getClsTimeSigma();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
           m_svdClPosErr = svd_1->getPositionSigma();

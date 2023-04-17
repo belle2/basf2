@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 
 // svd
+#include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 #include <svd/dbobjects/SVDTimeGroupingConfiguration.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -196,7 +197,20 @@ namespace Belle2 {
     addGausToHistogram(hist, integral, center, sigma, sigmaN, false);
   }
 
-
+  /** Get Sensor Type of SVD sensors */
+  inline int getSensorType(const VxdID& sensorID)
+  {
+    int layer  = sensorID.getLayerNumber();
+    int sensor = sensorID.getSensorNumber();
+    if (layer == 3)
+      return 0;
+    else {
+      if (sensor == 1)
+        return 1;
+      else
+        return 2;
+    }
+  }
 
 
 } // end namespace Belle2

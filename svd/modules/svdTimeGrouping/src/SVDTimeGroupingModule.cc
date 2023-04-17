@@ -108,9 +108,13 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            "Assign groups to under and overflow.",
            bool(true));
 
-  // 7. sigmas are hard-coded.
-  m_usedPars.clsSigma[0][0] = {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805};
-  m_usedPars.clsSigma[0][1] = {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485};
+  // 7. svd time resolution for 3 sensor types and U/ side, w.r.t. clsSize
+  m_usedPars.clsSigma[0][0] = {2.0416991166691236, 2.360613688987707, 2.1914497716857984, 1.981012966278192, 1.8042171065257078, 1.6204728453169297};
+  m_usedPars.clsSigma[0][1] = {3.58804699995663, 3.4525792094377556, 2.9363106432863266, 2.6833549427992787, 2.5342069757206476, 2.2895310103309585};
+  m_usedPars.clsSigma[1][0] = {2.1069499260943383, 2.052958357534184, 1.9895505851645279, 1.8720107614588672, 1.6452598699302612, 1.5904707325176404};
+  m_usedPars.clsSigma[1][1] = {3.391858274539902, 2.2280311319034154, 2.117726943320176, 2.085184228466165, 1.9967582125806562, 1.9913973265497624};
+  m_usedPars.clsSigma[2][0] = {1.686329885823116, 1.9919508170100562, 1.8497745504283956, 1.77372921564042, 1.632046322040563, 1.562953208594513};
+  m_usedPars.clsSigma[2][1] = {3.2798393192895317, 3.2242993072920645, 2.9404385195553937, 2.7911493057272807, 2.6331351001027175, 2.566566502477274};
 
 }
 
@@ -256,8 +260,10 @@ void SVDTimeGroupingModule::createAndFillHistorgram(TH1D& hist)
   for (int ij = 0; ij < totClusters; ij++) {
     double clsSize = m_svdClusters[ij]->getSize();
     bool   isUcls  = m_svdClusters[ij]->isUCluster();
-    double gSigma  = (clsSize >= int(m_usedPars.clsSigma[0][isUcls].size()) ?
-                      m_usedPars.clsSigma[0][isUcls].back() : m_usedPars.clsSigma[0][isUcls][clsSize - 1]);
+    int    sType   = getSensorType(m_svdClusters[ij]->getSensorID());
+    double gSigma  = (clsSize >= int(m_usedPars.clsSigma[sType][isUcls].size()) ?
+                      m_usedPars.clsSigma[sType][isUcls].back() :
+                      m_usedPars.clsSigma[sType][isUcls][clsSize - 1]);
     double gCenter = m_svdClusters[ij]->getClsTime();
 
     // adding/filling a gauss to histogram

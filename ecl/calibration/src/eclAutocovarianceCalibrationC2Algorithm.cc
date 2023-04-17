@@ -71,6 +71,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
   /** Write out the baseline results */
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
+  histfile->cd();
 
   m_BaselineInfoVsCrysID->Write();
   gBaselineVsCrysID->Write();

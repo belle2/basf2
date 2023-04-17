@@ -88,6 +88,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
+  histfile->cd();
   PPVsCrysID->Write();
   gPPVsCellID->Write();
 

@@ -66,6 +66,7 @@ TF1* FitPulse(TGraph* gin, int ShapeFlag, double* pulseInputPara)
   int Attempt = 0;
   //keep fitting until residual is less than 1%
   std::cout << nFits << " " << Check << std::endl;
+  //while (false){
   while ((Check > 0.01) && nFits < 20) {
     //
     ShpFloat->SetParameter(24, ParMin11[0] * (1.0 + (0.01 * nFits)));
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
       TempDiodePar11_A[l] = 0;
       TempHadronPar11_A[l] = 0;
     }
-    int CellID = ((int)jentry) + LowCellID + 1;
+    int CellID = ((int)jentry) + LowCellID;
     //
     if (TimeAll_A[0] > -100) {
       //
@@ -183,7 +184,8 @@ int main(int argc, char* argv[])
       WaveformParametersTree->Fill();
       //
       //Set to true to draw fit results in output file
-      if (false) {
+      //if (false) {
+      if (true) {
         G2_A->SetMarkerColor(kBlue);
         G3_A->SetMarkerColor(kRed);
         G1_A->GetYaxis()->SetRangeUser(-0.5, 2);
@@ -225,6 +227,7 @@ int main(int argc, char* argv[])
     }
   }
   //
+  std::cout << "eclComputePulseTemplates_Step3:  Writing File " << f->GetName() << std::endl;
   f->cd();
   WaveformParametersTree->Write();
   for (unsigned int k = 0; k < AllFits.size(); k++)  AllFits[k]->Write();

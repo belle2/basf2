@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(eclAutocovarianceCalibrationC3Collector)
+REG_MODULE(eclAutocovarianceCalibrationC3Collector);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------

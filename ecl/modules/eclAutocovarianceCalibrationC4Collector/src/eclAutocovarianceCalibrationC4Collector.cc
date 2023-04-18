@@ -25,7 +25,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(eclAutocovarianceCalibrationC4Collector)
+REG_MODULE(eclAutocovarianceCalibrationC4Collector);
+
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------

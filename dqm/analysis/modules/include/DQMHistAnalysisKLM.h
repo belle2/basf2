@@ -106,17 +106,32 @@ namespace Belle2 {
       uint16_t section, TH2F* histogram, TCanvas* canvas);
 
     /**
+     * Process histogram containing the hit times.
+     * @param[in]  histName  Histogram name.
+     */
+    void processTimeHistogram(const std::string& histName);
+
+    /**
      * Process histogram containing the number of hits in plane.
      * @param[in]  histName  Histogram name.
      * @param[out] latex     TLatex to draw messages.
      */
     void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
+
     /**
      * Fill histogram containing masked channels per sector.
      * @param[in] histName  Histogram name.
      */
     void fillMaskedChannelsHistogram(const std::string& histName);
+
+    /**
+     * Scales and draws desired delta histogram for current canvas.
+     * @param[in] delta  Delta histogram.
+     * @param[in] histogram  Base histogram (for normalization).
+     * @param[in] canvas  Canvas with delta histogram.
+     */
+    void deltaDrawer(TH1* deltaHist, TH1* histogram, TCanvas* canvas);
 
     /** Number of processed events. */
     double m_ProcessedEvents;

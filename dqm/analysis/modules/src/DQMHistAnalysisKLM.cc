@@ -82,6 +82,10 @@ void DQMHistAnalysisKLMModule::initialize()
   }
 
   // register plots for delta histogramming
+  addDeltaPar(m_histogramDirectoryName, "time_rpc", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
+
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
@@ -166,6 +170,20 @@ double DQMHistAnalysisKLMModule::getProcessedEvents()
     return 0.;
   }
   return histogram->GetEntries();
+}
+
+void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas)
+{
+  if (delta != nullptr) {
+    auto scale = delta->Integral();
+    if (scale > 0. && histogram->Integral() > 0) scale = histogram->Integral() / delta->Integral();
+    else scale = 1.0;
+
+    // delta != nullptr should take care of whether update condition is met.
+    delta->DrawNormalized("SAME", scale);
+    canvas->Modified();
+    canvas->Update();
+  }
 }
 
 void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
@@ -360,16 +378,10 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->Modified();
   canvas->Update();
 
-  if (delta != nullptr) {
-    auto scale = delta->Integral();
-    bool update = delta->GetEntries() >= m_minEntries ; // filter initial sampling
-    if (scale > 0. && histogram->Integral() > 0) scale = histogram->Integral() / delta->Integral();
-    else scale = 1.0;
-    delta->Scale(scale);
-    if (update) {
-      delta->Draw("SAME");
-    }
-  }
+  // delta histogram
+  UpdateCanvas(canvas->GetName(), delta != nullptr);
+  if (delta != nullptr)
+    deltaDrawer(delta, histogram, canvas);
 }
 
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
@@ -387,6 +399,32 @@ void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
     m_2DHitsLine.DrawLine(-110, 80, 110, 80);
   }
   canvas->Modified();
+}
+
+void DQMHistAnalysisKLMModule::processTimeHistogram(
+  const std::string& histName)
+{
+  TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
+  if (histogram == nullptr) {
+    B2ERROR("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
+    return;
+  }
+
+  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
+  if (canvas == nullptr) {
+    B2ERROR("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
+    return;
+  }
+
+  canvas->Clear();
+  canvas->cd();
+  histogram->Draw();
+
+  /* calling on delta histogram*/
+  auto delta = getDelta(m_histogramDirectoryName, histName);
+  UpdateCanvas(canvas->GetName(), delta != nullptr);
+  if (delta != nullptr)
+    deltaDrawer(delta, histogram, canvas);
 }
 
 void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
@@ -612,4 +650,9 @@ void DQMHistAnalysisKLMModule::event()
   processPlaneHistogram("plane_bklm_phi", latex);
   processPlaneHistogram("plane_bklm_z", latex);
   processPlaneHistogram("plane_eklm", latex);
+
+  processTimeHistogram("time_rpc");
+  processTimeHistogram("time_scintillator_bklm");
+  processTimeHistogram("time_scintillator_eklm");
+
 }

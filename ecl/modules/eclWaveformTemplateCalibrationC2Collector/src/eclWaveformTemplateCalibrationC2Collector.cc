@@ -23,21 +23,23 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(eclWaveformTemplateCalibrationC2Collector)
+REG_MODULE(eclWaveformTemplateCalibrationC2Collector);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 // constructor
 eclWaveformTemplateCalibrationC2CollectorModule::eclWaveformTemplateCalibrationC2CollectorModule() : CalibrationCollectorModule(),
-  m_eclWaveformTemplateCalibrationC1VarSq("eclWaveformTemplateCalibrationC1VarSq")
+  m_eclWaveformTemplateCalibrationC1MaxResLimit("eclWaveformTemplateCalibrationC1MaxResLimit")
 {
   // Set module properties
   setDescription("Module to export histogram of noise in waveforms from random trigger events");
-  addParam("MinEnergyThreshold", m_MinEnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 2.0);
-  addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 4.0);
-  addParam("MinCellID", m_MinCellID, "", 0);
-  addParam("MaxCellID", m_MaxCellID, "", 0);
+  addParam("MinEnergyThreshold", m_MinEnergyThreshold, "Minimum energy threshold of online fit result for Fitting Waveforms (GeV).",
+           2.0);
+  addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Maximum energy threshold of online fit result for Fitting Waveforms (GeV).",
+           4.0);
+  addParam("MinCellID", m_MinCellID, "Minimum CellID to run collector on", 0);
+  addParam("MaxCellID", m_MaxCellID, "Maximum CellID to run collector on", 0);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -48,17 +50,14 @@ void eclWaveformTemplateCalibrationC2CollectorModule::prepare()
   B2INFO("eclWaveformTemplateCalibrationC2Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
          m_evtMetaData->getRun());
 
-  /**----------------------------------------------------------------------------------------*/
-  /** Create the histograms and register them in the data store */
-  varXvsCrysID = new TH2F("varXvsCrysID", "", 8736, 0, 8736, 1000, 0, 1000);
-  registerObject<TH2F>("varXvsCrysID", varXvsCrysID);
 
   m_eclDsps.registerInDataStore();
   m_eclDigits.registerInDataStore();
 
-  m_MaxVarX = m_eclWaveformTemplateCalibrationC1VarSq->getCalibVector();
+  // Loading results from C1 stage of the calibration
+  m_maxResLimit = m_eclWaveformTemplateCalibrationC1MaxResLimit->getCalibVector();
 
-
+  // Loading constants to calibrate crystal energy
   m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);
   if (m_CrystalElectronics.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
@@ -69,7 +68,8 @@ void eclWaveformTemplateCalibrationC2CollectorModule::prepare()
       m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
   }
 
-
+  /**----------------------------------------------------------------------------------------*/
+  /** Create the tree and register in the data store */
   auto tree = new TTree("tree", "");
   tree->Branch("CellID", &m_CellID,      "m_CellID/I");
   tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");
@@ -115,47 +115,48 @@ void eclWaveformTemplateCalibrationC2CollectorModule::collect()
 
   for (auto& aECLDsp : m_eclDsps) {
 
-    const int id = aECLDsp.getCellId() - 1;
+    const int CellId = aECLDsp.getCellId();
+    if (CellId < m_MinCellID)  continue;
+    if (CellId > m_MaxCellID)  continue;
 
-    if ((id + 1) < m_MinCellID)  continue;
-    if ((id + 1) > m_MaxCellID)  continue;
+    const int id = CellId - 1;
 
-    //setting relation of eclDSP to aECLDigit
-    const ECLDigit* d = nullptr;
+    //get energy
+    double energy = 0.0;
     for (const auto& aECLDigit : m_eclDigits) {
       if (aECLDigit.getCellId() - 1 == id) {
-        d = &aECLDigit;
-        aECLDsp.addRelationTo(&aECLDigit);
+        energy = aECLDigit.getAmp() *  m_ADCtoEnergy[id];
         break;
       }
     }
-    if (d == nullptr) continue;
 
-    double energy = d->getAmp() * m_ADCtoEnergy[id];
-
+    // estimate crystal energy, only select high energy crystals
     if (energy < m_MinEnergyThreshold)  continue;
     if (energy > m_MaxEnergyThreshold)  continue;
 
-    float baseline = 0.0;
-    for (int i = 0; i < m_baselineLimit; i++) baseline += aECLDsp.getDspA()[i];
-    baseline /= ((float) m_baselineLimit);
-
+    // check if waveform has energy below 10 (indicates waveform hit ADC floor)
     bool skipWaveform = false;
     for (int i = 0; i < 31; i++) {
       if (aECLDsp.getDspA()[i] < 10) skipWaveform = true;
     }
     if (skipWaveform) continue;
 
-    std::vector<float> baselineSubtracted(m_baselineLimit);
-    for (int i = 0; i < m_baselineLimit; i++) baselineSubtracted[i] = (aECLDsp.getDspA()[i] - baseline);
+    //compute mean of baseline
+    float baseline = 0.0;
+    for (int i = 0; i < m_baselineLimit; i++) baseline += aECLDsp.getDspA()[i];
+    baseline /= ((float) m_baselineLimit);
 
-    float varX = 0.0;
-    for (int i = 0; i < m_baselineLimit; i++) varX += (baselineSubtracted[i] * baselineSubtracted[i]);
-    varX /= m_baselineLimit - 1;
+    //compute max residual in baseline
+    float maxRes = 0.0;
+    for (int i = 0; i < m_baselineLimit; i++) {
+      float temp = fabs(aECLDsp.getDspA()[i] - baseline);
+      if (temp > maxRes)  maxRes = temp;
+    }
 
-    if (varX > m_MaxVarX[id])  continue;
-    // save to tree
+    // proceed only in below noise limit computed in C1 stage.
+    if (maxRes > m_maxResLimit[id])  continue;
 
+    // saving minimal information needed for fits to tree
     m_CellID = id + 1;
 
     m_ADC0 = aECLDsp.getDspA()[0];

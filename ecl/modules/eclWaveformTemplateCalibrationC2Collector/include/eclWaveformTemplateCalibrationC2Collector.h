@@ -15,10 +15,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+//ECL
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-
-//Root
-#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -41,20 +39,16 @@ namespace Belle2 {
     void collect() override;
 
   private:
-
     StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    TH2F* varXvsCrysID;
+    std::vector<float> m_ADCtoEnergy; /**< Crystal energy calibration constants */
 
-    std::vector<float> m_ADCtoEnergy;
-
-    double m_MinEnergyThreshold;
-    double m_MaxEnergyThreshold;
-    int m_MinCellID;
-    int m_MaxCellID;
-    std::vector<float> m_MaxVarX;
+    double m_MinEnergyThreshold; /**< Minimum energy threshold  */
+    double m_MaxEnergyThreshold; /**< Maximum energy threshold  */
+    int m_MinCellID; /**< Minimum Cell ID  */
+    int m_MaxCellID; /**< Maximum Cell ID  */
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
@@ -62,7 +56,11 @@ namespace Belle2 {
     /** Crystal energy. */
     DBObjPtr<ECLCrystalCalib> m_CrystalEnergy{"ECLCrystalEnergy"};
 
-    DBObjPtr<ECLCrystalCalib> m_eclWaveformTemplateCalibrationC1VarSq;
+    /** Baseline noise thresholds compute in stage C1. */
+    DBObjPtr<ECLCrystalCalib> m_eclWaveformTemplateCalibrationC1MaxResLimit;
+
+    /** Vector to store baseline noise thresholds compute in stage C1. */
+    std::vector<float> m_maxResLimit;
 
     int m_CellID; /**< To read ntuple branch, waveform ECL crystal cell ID > */
     int m_ADC0; /**< To read ntuple branch, ith ADC value of waveform > */

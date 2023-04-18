@@ -26,6 +26,8 @@ using namespace Belle2;
 using namespace ECL;
 using namespace Calibration;
 
+
+//CalibrationAlgorithm("DummyCollector")
 /**-----------------------------------------------------------------------------------------------*/
 eclWaveformTemplateCalibrationC4Algorithm::eclWaveformTemplateCalibrationC4Algorithm():
   CalibrationAlgorithm("eclWaveformTemplateCalibrationC2Collector")
@@ -45,7 +47,10 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
 
   int batchsize = 100;
 
-  for (int i = 0; i < 87; i++) {
+  int experimentNumber = -999;
+
+  for (int i = 0; i < 88; i++) {
+    //for (int i = 0; i < 2; i++) {
 
     int firstCellID = (i * batchsize) + 1;
     int lastCellID = ((i + 1) * batchsize);
@@ -66,8 +71,10 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
     B2INFO("merging using the ExpRun (" << chosenRun.second << "," << chosenRun.first << ")");
     // After here your DBObjPtrs are correct
     updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
+    experimentNumber = chosenRun.first;
+    //updateDBObjPtrs(1, 0,20);
 
-    for (int j = firstCellID; j < lastCellID; j++) {
+    for (int j = firstCellID; j <= lastCellID; j++) {
       B2INFO("Check Norm Parms CellID " << j);
       B2INFO("P " << j << " " << tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
       B2INFO("H " << j << " " << tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[0]);
@@ -77,9 +84,9 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
       float tempDiodeWaveformParameters[11];
 
       for (int k = 0; k < 11; k++) {
-        tempPhotonWaveformParameters[k] = PhotonHadronDiodeParameters->getPhotonParameters(j)[k];
-        tempHadronWaveformParameters[k] = PhotonHadronDiodeParameters->getHadronParameters(j)[k];
-        tempDiodeWaveformParameters[k] = PhotonHadronDiodeParameters->getDiodeParameters(j)[k];
+        tempPhotonWaveformParameters[k] = tempexistingPhotonWaveformParameters->getPhotonParameters(j)[k];
+        tempHadronWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[k];
+        tempDiodeWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[k];
       }
       checkID[j - 1] = true;
       PhotonHadronDiodeParameters->setTemplateParameters(j, tempPhotonWaveformParameters, tempHadronWaveformParameters,
@@ -98,7 +105,12 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
 
   }
 
-  if (Pass == true)  saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters");
+  if (Pass == true) {
+
+    B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload, chosenRun.second = " << experimentNumber);
+    saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters", IntervalOfValidity(experimentNumber, -1,
+                    experimentNumber, -1));
+  }
 
   return c_OK;
 }

@@ -30,24 +30,25 @@ eclWaveformTemplateCalibrationC3Algorithm::eclWaveformTemplateCalibrationC3Algor
   CalibrationAlgorithm("eclWaveformTemplateCalibrationC2Collector")
 {
   setDescription(
-    "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
+    "Perform the hadron and diode template shape calibration using photon template shapes from stage C2"
   );
 }
 
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibrate()
 {
 
-  //DBObjPtr<ECLDigitWaveformParameters> PhotonParameters(Form("PhotonParameters_CellID%d_CellID%d", m_firstCellID, m_lastCellID));
-
   B2INFO("Working Directory");
   system("pwd");
   system("cp ../../../../eclComputePulseTemplates_Step2.py .");
 
   B2INFO("RUNNING eclComputePulseTemplates_Step2.py");
-  system(Form("basf2 eclComputePulseTemplates_Step2.py %d %d", m_firstCellID, m_lastCellID));
+  system(Form("basf2 eclComputePulseTemplates_Step2.py %d %d", (m_firstCellID), (m_lastCellID)));
 
   B2INFO("RUNNING eclComputePulseTemplates_Step3");
   system(Form("eclComputePulseTemplates_Step3 %d %d", m_firstCellID, m_lastCellID));
+
+  //system(Form("rm -f HadronShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID));
+  //system(Form("rm -f PhotonShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID));
 
   //save to db
   ECLDigitWaveformParameters* HadronDiodeParameters = new ECLDigitWaveformParameters();
@@ -68,9 +69,9 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibra
   TempTree->SetBranchAddress("MaxValHadron_A", &tMaxValHadron_A);
 
   int batch = m_lastCellID - m_firstCellID;
-  for (int j = 0; j < batch; j++) {
+  for (int j = 0; j <= batch; j++) {
     int tCellID = m_firstCellID + j;
-    if (tCellID >= ECLElementNumbers::c_NCrystals)continue;
+    if (tCellID > ECLElementNumbers::c_NCrystals)continue;
     TempTree->GetEntry(j);
     float tHadronShapePars_float[11];
     float tDiodeShapePars_float[11];
@@ -85,6 +86,8 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibra
       tDiodeShapePars_float[p] = (float)tDiodeShapePars_A[p];
 
     }
+
+    B2INFO("tCellID tHadronShapePars_float[0]" << tCellID << " " << tHadronShapePars_float[0]);
 
     HadronDiodeParameters->setTemplateParameters(tCellID, tHadronShapePars_float, tHadronShapePars_float, tDiodeShapePars_float);
   }

@@ -36,29 +36,36 @@ REG_MODULE(eclWaveformCalibCollector);
 
 //-----------------------------------------------------------------------------------------------------
 
-eclWaveformCalibCollectorModule::eclWaveformCalibCollectorModule() : CalibrationCollectorModule()
+eclWaveformCalibCollectorModule::eclWaveformCalibCollectorModule() : Module()
 {
   // Set module properties
   setDescription("Module to export waveforms to ntuple for template calibration.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("outputFileName", m_dataOutFileName, "Output root file name of this module", string("digistudy"));
   addParam("LowEnergyThresholdGeV", m_LowEnergyThresholdGeV, "Low Energy Threshold in GeV.", 1.0);
   addParam("HighEnergyThresholdGeV", m_HighEnergyThresholdGeV, "High Energy Threshold in GeV.", 5.5);
   addParam("IncludeWaveforms", m_includeWaveforms, "Flag to save ADC information.", true);
+  addParam("selectCellID", m_selectCellID, "High Energy Threshold in GeV.", -1);
 }
 
 
 
 /**----------------------------------------------------------------------------------------*/
 /**----------------------------------------------------------------------------------------*/
-void eclWaveformCalibCollectorModule::prepare()
+void eclWaveformCalibCollectorModule::initialize()
 {
+  // Initializing the output root file
+  string dataFileName = m_dataOutFileName + ".root";
+  m_rootFile = new TFile(dataFileName.c_str(), "RECREATE");
 
   // ECL dataobjects
   m_eclDSPs.registerInDataStore();
   m_eclDigits.registerInDataStore();
 
-  auto tree = new TTree("tree", "");
+  tree = new TTree("tree", "");
   tree->Branch("CellID", &m_CellID,      "m_CellID/I");
+  tree->Branch("runNum", &m_runNum,      "m_runNum/I");
+  tree->Branch("expNum", &m_expNum,      "m_expNum/I");
   tree->Branch("OnlineE", &m_OnlineE,      "m_OnlineE/F");
   tree->Branch("OfflineE", &m_OfflineE,      "m_OfflineE/F");
   tree->Branch("OfflineHadE", &m_OfflineHadE,      "m_OfflineHadE/F");
@@ -104,11 +111,7 @@ void eclWaveformCalibCollectorModule::prepare()
     tree->Branch("ADC29", &m_ADC29,      "m_ADC29/I");
     tree->Branch("ADC30", &m_ADC30,      "m_ADC30/I");
   }
-  registerObject<TTree>("tree", tree);
-}
 
-void eclWaveformCalibCollectorModule::startRun()
-{
   //called at beginning of run
   //used to convert ADC to GeV
   DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
@@ -117,16 +120,27 @@ void eclWaveformCalibCollectorModule::startRun()
   if (Aen) for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
 }
 
+void eclWaveformCalibCollectorModule::terminate()
+{
+  m_rootFile->cd();
+  tree->Write();
+  m_rootFile->Close();
+}
 
 /**----------------------------------------------------------------------------------------*/
 /**----------------------------------------------------------------------------------------*/
-void eclWaveformCalibCollectorModule::collect()
+void eclWaveformCalibCollectorModule::event()
 {
   //intended to run over gamma gamma cdst skim.
+
+  m_runNum = m_EventMetaData->getRun();
+  m_expNum = m_EventMetaData->getExperiment();
 
   for (auto& aECLDigit : m_eclDigits) {
 
     int cellid = aECLDigit.getCellId();
+
+    if (m_selectCellID > 0 && cellid != m_selectCellID)  continue;
 
     const int amplitude = aECLDigit.getAmp();
 
@@ -195,7 +209,7 @@ void eclWaveformCalibCollectorModule::collect()
             m_ADC30 = aECLDsp.getDspA()[30];
           }
 
-          getObjectPtr<TTree>("tree")->Fill();
+          tree->Fill();
         }
       }
     }

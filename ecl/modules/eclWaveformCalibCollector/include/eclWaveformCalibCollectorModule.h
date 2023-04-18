@@ -13,35 +13,45 @@
 #include <ecl/dataobjects/ECLDsp.h>
 
 /* Basf2 headers. */
-#include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+
+#include <TFile.h>
+#include <TTree.h>
 
 namespace Belle2 {
 
   /** Store information needed to calculate ECL waveform template shapes */
-  class eclWaveformCalibCollectorModule : public CalibrationCollectorModule {
+  class eclWaveformCalibCollectorModule : public Module {
 
   public:
 
     /** Constructor: Sets the description, the properties and the parameters of the module */
     eclWaveformCalibCollectorModule();
 
-    /** Define ttree and read payloads from DB */
-    void prepare() override;
+    /** Initializes the module. */
+    virtual void initialize() override;
 
-    /** beginRun equivalent. used to load ADC to GeV calibration constants*/
-    void startRun() override;
+    /** terminate */
+    virtual void terminate() override;
 
-    /** Select events and crystals and accumulate histograms */
-    void collect() override;
+    /** Method is called for each event. */
+    virtual void event() override;
 
   private:
+    int m_selectCellID;
+    std::string m_dataOutFileName;  /**< Root file name for saving the output */
+    TTree* tree{nullptr};  /**< Root tree for saving the output */
+    TFile* m_rootFile{nullptr};  /**< Root file for saving the output */
+
     StoreArray<ECLDsp> m_eclDSPs;  /**< StoreArray ECLDsp */
 
     StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
     std::vector<float> m_ADCtoEnergy;  /**< calibration vector from adc to energy*/
+
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
 
@@ -50,6 +60,8 @@ namespace Belle2 {
     bool m_includeWaveforms; /**< Flag to save ADC information. >*/
 
     int m_CellID; /**< To read ntuple branch, waveform ECL crystal cell ID > */
+    int m_runNum; /**< To read ntuple branch, waveform ECL crystal cell ID > */
+    int m_expNum; /**< To read ntuple branch, waveform ECL crystal cell ID > */
     float m_OnlineE; /**< To read ntuple branch, waveform energy measured online by FPGA > */
     float m_OfflineE;  /**< To read ntuple branch, waveform energy measure offline with multi-template fit > */
     float m_OfflineHadE; /**< To read ntuple branch, waveform hadron energy measure offline with multi-template fit > */

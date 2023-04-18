@@ -9,6 +9,7 @@
 #include <tracking/modules/svdROIFinder/SVDROIDQMModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
@@ -49,6 +50,8 @@ SVDROIDQMModule::SVDROIDQMModule()
 
   addParam("SVDShaperDigitsName", m_SVDShaperDigitsName,
            "name of the list of SVDShaperDigits", std::string(""));
+  addParam("SVDRecoDigitsName", m_SVDRecoDigitsName,
+           "name of the list of SVDRecoDigits", std::string(""));
   addParam("SVDClustersName", m_SVDClustersName,
            "name of the list of SVDClusters", std::string(""));
 
@@ -60,6 +63,9 @@ SVDROIDQMModule::SVDROIDQMModule()
 
   addParam("Layer", m_specificLayer,
            "Layer number, if you want the plots only for a specific SVD layer", m_specificLayer);
+
+  addParam("plotRecoDigits", m_plotRecoDigits,
+           "Set true to produce the plots for RecoDigits (false by default)", m_plotRecoDigits);
 
 }
 
@@ -97,6 +103,7 @@ void SVDROIDQMModule::initialize()
   REG_HISTOGRAM
 
   m_SVDShaperDigits.isOptional(m_SVDShaperDigitsName);
+  m_SVDRecoDigits.isOptional(m_SVDRecoDigitsName);
   m_SVDClusters.isOptional(m_SVDClustersName);
   m_ROIs.isRequired(m_ROIsName);
   m_Intercepts.isRequired(m_InterceptsName);
@@ -392,6 +399,57 @@ void SVDROIDQMModule::createHistosDictionaries()
                                );
 
 
+        // RecoDigits
+        //residual vs charge
+        if (m_plotRecoDigits) {
+          name = "hResidU_vs_charge_" + sensorid;
+          title = "U residual (cm) vs charge " + sensorid;
+          tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
+          tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+          tmp2D->GetXaxis()->SetTitle("charge");
+          hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                  (
+                                    (Belle2::VxdID)*itSvdSensors,
+                                    InterHistoAndFill(
+                                      tmp2D,
+          [this](TH1 * hPtr, const SVDIntercept * inter) {
+            StoreArray<SVDRecoDigit> SVDRecoDigits(this->m_SVDRecoDigitsName);
+
+            for (auto& it : SVDRecoDigits)
+              if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
+                const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
+                double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
+                hPtr->Fill(it.getCharge(), resid);
+              }
+          }
+                                    )
+                                  )
+                                 );
+
+          name = "hResidV_vs_charge_" + sensorid;
+          title = "V residual (cm) vs charge " + sensorid;
+          tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
+          tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+          tmp2D->GetXaxis()->SetTitle("charge");
+          hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                  (
+                                    (Belle2::VxdID)*itSvdSensors,
+                                    InterHistoAndFill(
+                                      tmp2D,
+          [this](TH1 * hPtr, const SVDIntercept * inter) {
+            StoreArray<SVDRecoDigit> SVDRecoDigits(this->m_SVDRecoDigitsName);
+
+            for (auto& it : SVDRecoDigits)
+              if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
+                const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
+                double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
+                hPtr->Fill(it.getCharge(), resid);
+              }
+          }
+                                    )
+                                  )
+                                 );
+        }
 
         // 1D residual for clusters
         name = "hClusterResidU_" + sensorid;

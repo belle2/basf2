@@ -14,8 +14,8 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 
@@ -45,11 +45,11 @@ namespace Belle2 {
   private:
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
-    std::string m_SVDClustersName; /**< cluster list name*/
     std::string m_SVDRecoDigitsName; /**< reco digit list name*/
+    std::string m_SVDClustersName; /**< cluster list name*/
 
     StoreArray<ROIid> m_ROIs; /**< ROis store array*/
-    StoreArray<SVDIntercept> m_Intercepts; /**< SVDINtercept Store Arrays*/
+    StoreArray<SVDIntercept> m_Intercepts; /**< SVDIntercept Store Arrays*/
     StoreArray<SVDShaperDigit> m_SVDShaperDigits; /**< shaper digit store array */
     StoreArray<SVDRecoDigit> m_SVDRecoDigits; /**< reco digit store array */
     StoreArray<SVDCluster> m_SVDClusters; /**< svd cluster store array*/
@@ -89,6 +89,7 @@ namespace Belle2 {
 
     int m_numModules; /**< number of hardware modules*/
     int m_specificLayer = -1; /**< specific layer selected for which to produce the plots */
+    bool m_plotRecoDigits = false; /**< Produce plots for SVDRecoDigits when True */
 
     TH1F* hnROIs; /**< number of ROIs*/
     TH1F* hnInter; /**< number of intercpets*/

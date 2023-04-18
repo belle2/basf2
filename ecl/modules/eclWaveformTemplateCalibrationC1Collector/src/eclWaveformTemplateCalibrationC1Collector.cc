@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(eclWaveformTemplateCalibrationC1Collector)
+REG_MODULE(eclWaveformTemplateCalibrationC1Collector);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -50,8 +50,8 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  varXvsCrysID = new TH2F("varXvsCrysID", "", 8736, 0, 8736, 1000, 0, 1000);
-  registerObject<TH2F>("varXvsCrysID", varXvsCrysID);
+  maxResvsCrysID = new TH2F("maxResvsCrysID", "", 8736, 0, 8736, 1000, 0, 100);
+  registerObject<TH2F>("maxResvsCrysID", maxResvsCrysID);
 
   m_eclDsps.registerInDataStore();
   m_eclDigits.registerInDataStore();
@@ -77,19 +77,14 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 
     const int id = aECLDsp.getCellId() - 1;
 
-    //setting relation of eclDSP to aECLDigit
-    const ECLDigit* d = nullptr;
+    //estimating crystal energy
+    double energy = 0.0;
     for (const auto& aECLDigit : m_eclDigits) {
       if (aECLDigit.getCellId() - 1 == id) {
-        d = &aECLDigit;
-        aECLDsp.addRelationTo(&aECLDigit);
+        energy = aECLDigit.getAmp() *  m_ADCtoEnergy[id];
         break;
       }
     }
-    if (d == nullptr) continue;
-
-    //estimating crystal energy
-    double energy = d->getAmp() * m_ADCtoEnergy[id];
 
     // only select high energy crystals
     if (energy < m_MinEnergyThreshold)  continue;
@@ -100,17 +95,29 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
     for (int i = 0; i < m_baselineLimit; i++) baseline += aECLDsp.getDspA()[i];
     baseline /= ((float) m_baselineLimit);
 
-    //compute baseline values minus baseline mean
-    std::vector<float> baselineSubtracted(m_baselineLimit);
-    for (int i = 0; i < m_baselineLimit; i++) baselineSubtracted[i] = (aECLDsp.getDspA()[i] - baseline);
+    //compute max residual in baseline
+    float maxRes = 0.0;
+    //float min = aECLDsp.getDspA()[0];
+    //float max = min;
+    //float StdDev = 0.0;
+    for (int i = 0; i < m_baselineLimit; i++) {
+      float temp = fabs(aECLDsp.getDspA()[i] - baseline);
+      float tempSq = temp * temp;
+      if (temp > maxRes)  maxRes = temp;
+      //if(min>aECLDsp.getDspA()[i]) min=aECLDsp.getDspA()[i];
+      //if(max<aECLDsp.getDspA()[i]) max=aECLDsp.getDspA()[i];
+      //StdDev+=tempSq;
+    }
+    //StdDev/=(float)(m_baselineLimit-1);
+    //StdDev=sqrt(StdDev);
 
-    //compute varience of baseline
-    float varX = 0.0;
-    for (int i = 0; i < m_baselineLimit; i++) varX += (baselineSubtracted[i] * baselineSubtracted[i]);
-    varX /= m_baselineLimit - 1;
+    //B2INFO("maxRes maxPP StdDev "<<maxRes<<" "<<StdDev <<" "<<(max-min));
+    //StdDev
+    //maxPP
+    //MaxRes
 
     //save result to histogram
-    varXvsCrysID->Fill(id, varX);
+    maxResvsCrysID->Fill(id, maxRes);
 
   }
 
@@ -120,7 +127,7 @@ void eclWaveformTemplateCalibrationC1CollectorModule::closeRun()
 {
   for (int i = 0; i < 8736; i++) {
     for (int j = 0; j < 1000; j++) {
-      getObjectPtr<TH2>("varXvsCrysID")->SetBinContent(i + 1, j + 1, varXvsCrysID->GetBinContent(i + 1, j + 1));
+      getObjectPtr<TH2>("maxResvsCrysID")->SetBinContent(i + 1, j + 1, maxResvsCrysID->GetBinContent(i + 1, j + 1));
     }
   }
 }

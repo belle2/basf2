@@ -41,17 +41,17 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
     """
     # Fill one list from V0
-    ma.fillParticleList('K_S0:V0_MassWindow -> pi+ pi-', '', True, path=path)
+    ma.fillParticleList('K_S0:V0_ToFit -> pi+ pi-', '', True, path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
+        vertex.treeFit('K_S0:V0_ToFit', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
     elif fitter == 'KFit':
-        vertex.kFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
+        vertex.kFit('K_S0:V0_ToFit', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
     elif fitter == 'Rave':
-        vertex.raveFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
+        vertex.raveFit('K_S0:V0_ToFit', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     else:
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    ma.applyCuts('K_S0:V0_MassWindow', '0.450 < M < 0.550', path=path)
+    ma.applyCuts('K_S0:V0_ToFit', '0.450 < M < 0.550', path=path)
     # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
     ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
@@ -64,7 +64,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         vertex.raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     ma.applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
-    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0_MassWindow', 'K_S0:RD'],
+    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0_ToFit', 'K_S0:RD'],
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
@@ -205,20 +205,20 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         beam axis.
     """
     # Fill one list from V0
-    ma.fillParticleList('Lambda0:V0_MassWindow -> p+ pi-', '', True, path=path)
+    ma.fillParticleList('Lambda0:V0_ToFit -> p+ pi-', '', True, path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
+        vertex.treeFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
     elif fitter == 'KFit':
-        vertex.kFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
+        vertex.kFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
     elif fitter == 'Rave':
-        vertex.raveFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
+        vertex.raveFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     else:
         B2ERROR("Valid fitter options for Lambdas are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    ma.applyCuts('Lambda0:V0_MassWindow', '1.10 < M < 1.13', path=path)
+    ma.applyCuts('Lambda0:V0_ToFit', '1.10 < M < 1.13', path=path)
     # Find V0 duplicate with better vertex fit quality
-    ma.markDuplicate('Lambda0:V0_MassWindow', False, path=path)
-    ma.applyCuts('Lambda0:V0_MassWindow', 'extraInfo(highQualityVertex)', path=path)
+    ma.markDuplicate('Lambda0:V0_ToFit', False, path=path)
+    ma.applyCuts('Lambda0:V0_ToFit', 'extraInfo(highQualityVertex)', path=path)
     # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
     stdPr('all', path=path)  # no quality cuts
@@ -234,5 +234,5 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     # Find RD duplicate with better vertex fit quality
     ma.markDuplicate('Lambda0:RD', False, path=path)
     ma.applyCuts('Lambda0:RD', 'extraInfo(highQualityVertex)', path=path)
-    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0_MassWindow', 'Lambda0:RD'],
+    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0_ToFit', 'Lambda0:RD'],
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)

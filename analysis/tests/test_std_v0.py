@@ -30,7 +30,7 @@ class TestStdV0(unittest.TestCase):
                 "TreeFitter",
                 "ParticleSelector",
                 "ParticleListManipulator"],
-            expected_lists=['V0_MassWindow', 'V0_MassWindow', 'all', 'RD', 'merged']):
+            expected_lists=['V0_ToFit', 'V0_ToFit', 'all', 'RD', 'merged']):
         """check that a given function works"""
         testpath = create_path()
         std_function(path=testpath)
@@ -90,7 +90,7 @@ class TestStdV0(unittest.TestCase):
                             "DuplicateVertexMarker",
                             "ParticleSelector",
                             "ParticleListManipulator"]
-        expected_lists = ['V0_MassWindow', 'V0_MassWindow', 'all', 'all', 'RD', 'merged']
+        expected_lists = ['V0_ToFit', 'V0_ToFit', 'all', 'all', 'RD', 'merged']
         self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
 
 

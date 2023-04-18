@@ -92,9 +92,9 @@
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
-[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO] ParticleSelector: Lambda0:V0_ToFit
 [INFO]    -> With cuts  : 1.10 < M < 1.13
-[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO] ParticleSelector: Lambda0:V0_ToFit
 [INFO]    -> With cuts  : extraInfo(highQualityVertex)
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
@@ -113,7 +113,7 @@
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
-[INFO] ParticleSelector: K_S0:V0_MassWindow
+[INFO] ParticleSelector: K_S0:V0_ToFit
 [INFO]    -> With cuts  : 0.450 < M < 0.550
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
@@ -5927,7 +5927,7 @@
 [INFO] [40;97m      (_)                 (_)                                                   [0m
 [INFO] [40;97m                                                                                [0m
 [INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
-[INFO] [1;39mTarget particle list: K_S0:V0_MassWindow[0m
+[INFO] [1;39mTarget particle list: K_S0:V0_ToFit[0m
 [INFO] [1;39mCandidates before fit: 1[0m
 [INFO] [1;39mCandidates after fit:  1[0m
 [INFO] [1;39mA total of 0 candidates were removed during the fit.[0m

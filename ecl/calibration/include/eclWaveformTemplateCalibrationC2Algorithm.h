@@ -35,7 +35,10 @@ namespace Belle2 {
       /** Getter for m_outputName */
       std::string getOutputName() {return m_outputName;}
 
+      /** Setter for m_firstCellID */
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
+
+      /** Getter for m_firstCellID */
       void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
 
     protected:
@@ -46,11 +49,10 @@ namespace Belle2 {
     private:
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC2Algorithm.root"; /**< file name for histogram output */
-      int m_firstCellID;
-      int m_lastCellID;
 
-      /** Waveform parameters. */
-      DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;
+      int m_firstCellID; /** First crystal to calibrate */
+      int m_lastCellID; /** Last crystal to calibrate */
+
     };
   }
 } // namespace Belle2

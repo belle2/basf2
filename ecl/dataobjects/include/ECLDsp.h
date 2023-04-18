@@ -227,8 +227,7 @@ namespace Belle2 {
     /** 4 Add diode and pile-up photon offline fit hypothesis*/
     /** 5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
     /** 6 removed IsData member */
-    /** 7 Added computePeaktoPeakAmp function*/
-    ClassDef(ECLDsp, 7);
+    ClassDef(ECLDsp, 6);
 
   };
 

@@ -29,6 +29,9 @@ eclWaveformTemplateCalibrationC1Algorithm::eclWaveformTemplateCalibrationC1Algor
   setDescription(
     "Used to determine the baseline noise level of crystals in e+e- --> gamma gamma"
   );
+
+  //m_lowestEnergyFraction=0.25;
+  m_lowestEnergyFraction = 0.5;
 }
 
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibrate()
@@ -38,57 +41,62 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
   gROOT->SetBatch();
 
   /**-----------------------------------------------------------------------------------------------*/
-  /** Histograms containing the data collected by eclGammaGammaECollectorModule */
-  auto varXvsCrysID = getObjectPtr<TH2F>("varXvsCrysID");
+  /** Histograms containing the data collected by eclWaveformTemplateCalibrationC1Collector */
+  auto maxResvsCrysID = getObjectPtr<TH2F>("maxResvsCrysID");
 
-  std::vector<float> cryIDs;
-  std::vector<float> Varxs;
+  std::vector<float> cellIDs;
+  std::vector<float> maxResiduals;
   std::vector<float> Counts;
 
   for (int id = 0; id < ECLElementNumbers::c_NCrystals; id++) {
 
-    TH1F* hVarx = (TH1F*)varXvsCrysID->ProjectionY("hVarx", id + 1, id + 1);
+    TH1F* hMaxResx = (TH1F*)maxResvsCrysID->ProjectionY("hMaxResx", id + 1, id + 1);
 
-    int Total = hVarx->GetEntries();
+    int Total = hMaxResx->GetEntries();
     int subTotal = 0;
     float fraction = 0.0;
     int counter = 0;
 
-    while (fraction < m_lowestEnergyFraction) {
-      subTotal += hVarx->GetBinContent(counter);
+    float fractionLimit = m_lowestEnergyFraction;
+
+    // If number of waveforms is low use most of them
+    if (Total < 10) fractionLimit = 0.9;
+
+    while (fraction < fractionLimit) {
+      subTotal += hMaxResx->GetBinContent(counter);
       fraction = ((float)subTotal) / ((float)Total);
       counter++;
     }
 
-    cryIDs.push_back(id + 1);
-    Varxs.push_back(counter);
+    cellIDs.push_back(id + 1);
+    maxResiduals.push_back(hMaxResx->GetBinCenter(counter + 1));
     Counts.push_back(Total);
 
-    B2INFO("eclWaveformTemplateCalibrationC1Algorithm: id counter fraction Total " << id << " " << counter << " " << fraction <<
-           " " << Total);
+    B2INFO("eclWaveformTemplateCalibrationC1Algorithm: id counter fraction Total maxResiduals[id]" << id << " " << counter << " " <<
+           fraction <<
+           " " << Total << " " << maxResiduals[id]);
 
-    hVarx->Delete();
+    hMaxResx->Delete();
   }
 
-  auto gvarXvsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), Varxs.data());
-  gvarXvsCrysID->SetName("gvarXvsCrysID");
-  auto gTotalvsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), Counts.data());
-  gTotalvsCrysID->SetName("gTotalvsCrysID");
+  /** Saving thresholds to database */
+  ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
+  PPThreshold->setCalibVector(maxResiduals, cellIDs);
+  saveCalibration(PPThreshold, "eclWaveformTemplateCalibrationC1MaxResLimit");
+  B2INFO("eclWaveformTemplateCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 
   /** Write out the basic histograms in all cases */
+  auto gmaxResvsCrysID = new TGraph(cellIDs.size(), cellIDs.data(), maxResiduals.data());
+  gmaxResvsCrysID->SetName("gmaxResvsCrysID");
+  auto gTotalvsCrysID = new TGraph(cellIDs.size(), cellIDs.data(), Counts.data());
+  gTotalvsCrysID->SetName("gTotalvsCrysID");
+
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
-
-  //histfile->cd();
-  gvarXvsCrysID->Write();
-  varXvsCrysID->Write();
+  histfile->cd();
+  gmaxResvsCrysID->Write();
+  maxResvsCrysID->Write();
   gTotalvsCrysID->Write();
-  //histfile->Close();
-
-  ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(Varxs, cryIDs);
-  saveCalibration(PPThreshold, "eclWaveformTemplateCalibrationC1VarSq");
-  B2INFO("eclWaveformTemplateCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 
   return c_OK;
 }

@@ -54,11 +54,12 @@ def get_calibrations(input_data, **kwargs):
     # ..The calibration
     collector_C1 = basf2.register_module("eclWaveformTemplateCalibrationC1Collector")
 
-    cal_ecl_Wave_C1 = Calibration("ecl_Wave_C1",
-                                  collector=collector_C1,
-                                  algorithms=[algo_C1],
-                                  input_files=input_files,
-                                  )
+    cal_ecl_Wave_C1 = Calibration(
+        "ecl_Wave_C1",
+        collector=collector_C1,
+        algorithms=[algo_C1],
+        input_files=input_files,
+        max_files_per_collector_job=4)
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     gamma_gamma_pre_path = basf2.create_path()
@@ -73,14 +74,12 @@ def get_calibrations(input_data, **kwargs):
     algos_C3 = []
     collectors_C2 = []
 
-    # for i in range(0, 88):
-    for i in range(0, 2):
+    # keep option to run in parallel
+    for i in range(0, 1):
 
-        # lowLimit = (100*i)+1
-        lowLimit = (10*i)+1
+        lowLimit = (10000*i)+1
 
-        # highLimit = (100*(i+1))
-        highLimit = (10*(i+1))
+        highLimit = (10000*(i+1))
 
         if(highLimit > 8736):
             highLimit = 8736
@@ -103,7 +102,11 @@ def get_calibrations(input_data, **kwargs):
 
         # ..The calibration
         calibrations_C2.append(Calibration("ecl_Wave_C2_"+str(lowLimit)+"_"+str(highLimit),
-                               collector=collectors_C2[-1], algorithms=[algos_C2[-1], algos_C3[-1]], input_files=input_files))
+                                           collector=collectors_C2[-1],
+                                           algorithms=[algos_C2[-1],
+                                                       algos_C3[-1]],
+                                           input_files=input_files,
+                                           max_files_per_collector_job=4))
         calibrations_C2[-1].pre_collector_path = gamma_gamma_pre_path
         calibrations_C2[-1].depends_on(cal_ecl_Wave_C1)
 

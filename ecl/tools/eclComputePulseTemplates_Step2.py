@@ -11,9 +11,12 @@ import ROOT
 from ROOT import TFile
 import sys
 from array import array
-#
-# See eclComputePulseTemplates_Step0.cc for README instructions.
-#
+import argparse
+
+'''
+Third step in waveform template calibrations.  Computes hadron pulse shape using photon template input.
+See eclComputePulseTemplates_Step0.cc for README instructions.
+'''
 
 
 def EvalGamComp(tin, ttrg):
@@ -61,15 +64,15 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
     Ns = 100000
     TLen = 100000.
     to_ns = TLen/Ns
-    #
+
     PMT_trigger_time = 1000. * to_ns
-    #
+
     Time = []
     TimeShp = []
     ShaperDSP_output_muon_array = []
     PMT_output_muon_array = []
     PMT_output_array = []
-    #
+
     for i in range(0, Ns):
         t = i * to_ns
         Time.append(t)
@@ -81,7 +84,7 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
         else:
             PMT_output_array.append((2 - ratio) * EvalGamComp(t, PMT_trigger_time) +
                                     (ratio - 1) * (EvalAnyComp(t, PMT_trigger_time, 10)))
-    #
+
     if(flg == 0):
         return Time, PMT_output_array
     if(flg == 1):
@@ -106,18 +109,29 @@ OutputDirectory = "./"
 if(OutputDirectory == ""):
     print("Error set ouput directory")
     sys.exit()
-#
-Low = int(sys.argv[1])
-High = int(sys.argv[2])
-#
+
+
+def argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('Low', type=int, help='First CellID to be processed')
+    parser.add_argument('High', type=int, help='Last CellID to be processed')
+    return parser
+
+
+args = argument_parser().parse_args()
+Low = args.Low
+High = args.High
+
+print(Low, High)
+
 f1 = ROOT.TFile(OutputDirectory + "PhotonShapes_Low" + str(Low) + "_High" + str(High) + ".root", "update")
 f1.cd()
 mt = f1.Get("mtree")
 entries = mt.GetEntries()
 print(entries)
-#
+
 TFactor = 30
-#
+
 outFile = TFile(OutputDirectory + "HadronShapes_Low" + str(Low) + "_High" + str(High) + ".root", "RECREATE")
 outTree = ROOT.TTree("HadronTree", "")
 TimeAll_A = array('d', 1000 * [0.])

@@ -15,7 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
-    name="ecl_AutoC1",
+    name="ecl_AutoC4",
     expert_username="longos",
     description=__doc__,
     input_data_formats=["raw"],
@@ -57,8 +57,7 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_Auto_C1 = Calibration("ecl_Auto_C1",
                                   collector=collector_C1,
                                   algorithms=[algo_C1],
-                                  input_files=input_files,
-                                  )
+                                  input_files=input_files, max_files_per_collector_job=4)
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     gamma_gamma_pre_path = basf2.create_path()
@@ -77,8 +76,7 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_Auto_C2 = Calibration("ecl_Auto_C2",
                                   collector=collector_C2,
                                   algorithms=[algo_C2],
-                                  input_files=input_files,
-                                  )
+                                  input_files=input_files, max_files_per_collector_job=4)
 
     cal_ecl_Auto_C2.pre_collector_path = gamma_gamma_pre_path
 
@@ -93,8 +91,7 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_Auto_C3 = Calibration("ecl_Auto_C3",
                                   collector=collector_C3,
                                   algorithms=[algo_C3],
-                                  input_files=input_files,
-                                  )
+                                  input_files=input_files, max_files_per_collector_job=4)
 
     cal_ecl_Auto_C3.pre_collector_path = gamma_gamma_pre_path
 
@@ -109,8 +106,7 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_Auto_C4 = Calibration("ecl_Auto_C4",
                                   collector=collector_C4,
                                   algorithms=[algo_C4],
-                                  input_files=input_files,
-                                  )
+                                  input_files=input_files, max_files_per_collector_job=4)
 
     cal_ecl_Auto_C4.pre_collector_path = gamma_gamma_pre_path
 

@@ -15,7 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
-    name="ecl_AutoC1",
+    name="ecl_AutoC2",
     expert_username="longos",
     description=__doc__,
     input_data_formats=["raw"],

@@ -37,18 +37,11 @@ eclWaveformTemplateCalibrationC3Algorithm::eclWaveformTemplateCalibrationC3Algor
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibrate()
 {
 
-  B2INFO("Working Directory");
-  system("pwd");
-  system("cp ../../../../eclComputePulseTemplates_Step2.py .");
-
   B2INFO("RUNNING eclComputePulseTemplates_Step2.py");
   system(Form("basf2 eclComputePulseTemplates_Step2.py %d %d", (m_firstCellID), (m_lastCellID)));
 
   B2INFO("RUNNING eclComputePulseTemplates_Step3");
   system(Form("eclComputePulseTemplates_Step3 %d %d", m_firstCellID, m_lastCellID));
-
-  //system(Form("rm -f HadronShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID));
-  //system(Form("rm -f PhotonShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID));
 
   //save to db
   ECLDigitWaveformParameters* HadronDiodeParameters = new ECLDigitWaveformParameters();

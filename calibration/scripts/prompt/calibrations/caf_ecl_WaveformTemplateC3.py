@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""ECL single crystal energy calibration using three control samples."""
+"""ECL waveform template calibration stage 3."""
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 

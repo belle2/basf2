@@ -142,7 +142,7 @@ outTree.Branch("TimeAll_A", TimeAll_A, 'TimeAll_A[1000]/D')
 outTree.Branch("ValuePhoton_A", ValuePhoton_A, 'ValuePhoton_A[1000]/D')
 outTree.Branch("ValueHadron_A", ValueHadron_A, 'ValueHadron_A[1000]/D')
 outTree.Branch("ValueDiode_A", ValueDiode_A, 'ValueDiode_A[1000]/D')
-#
+
 i = 0
 for i in range(entries):
     mt.GetEntry(i)
@@ -157,7 +157,7 @@ for i in range(entries):
         Time3, ValuesHadron_A = GetShaperOutput(1, flag, mt.PhotonArray)
         Time4, ValuesDiode_A = GetShaperOutput(2, flag, mt.PhotonArray)
         Time6, ValuesPhoton_A = GetShaperOutput(0, flag, mt.PhotonArray)
-        #
+
         factor = TFactor
         for j in range(1000):
             if(flag == 3):

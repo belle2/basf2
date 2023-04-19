@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/eklm/modules/EKLMAlignmentAlongStrips/EKLMAlignmentAlongStripsCollectorModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ExtHit.h>
 

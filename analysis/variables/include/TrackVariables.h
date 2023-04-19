@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
@@ -207,6 +208,18 @@ namespace Belle2 {
     * parameters are the radius and z values to stop extrapolation
     */
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars);
+
+    /**
+    * returns extrapolated theta position based on helix parameters
+    * parameter is the name of the detector surface until where the track is extrapolated
+    */
+    Manager::FunctionPtr trackHelixExtThetaOnDet(const std::vector<std::string>& arguments);
+
+    /**
+    * returns extrapolated phi position based on helix parameters
+    * parameter is the name of the detector surface until where the track is extrapolated
+    */
+    Manager::FunctionPtr trackHelixExtPhiOnDet(const std::vector<std::string>& arguments);
 
     /**
      * returns the PDG code of the track fit hypothesis actually used for the particle

@@ -259,6 +259,9 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         UseSVDHits=is_svd_used(components),
                         UseVTXHits=is_vtx_used(components),
                         UseCDCHits=is_cdc_used(components))
+
+        path.add_module('TrackToMCParticleRelator')
+
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
         path.add_module('Chi2MCTrackMatcherModule',
@@ -372,7 +375,7 @@ def add_svd_track_finding(
         components,
         input_reco_tracks,
         output_reco_tracks,
-        svd_ckf_mode="VXDTF2_after",
+        svd_ckf_mode="SVD_after",
         use_mc_truth=False,
         add_both_directions=True,
         temporary_reco_tracks="SVDRecoTracks",

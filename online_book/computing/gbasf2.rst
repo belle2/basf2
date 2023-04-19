@@ -261,7 +261,7 @@ Also, if you want to search uDST skim samples - which are what we will be using 
 
     For further information about uDST skims, including the skim code and the decay name associated with that code,
     see the basf2
-    `skim registry <https://stash.desy.de/projects/B2/repos/software/browse/skim/scripts/skim/registry.py>`_.
+    `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_.
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -273,7 +273,7 @@ Also, if you want to search uDST skim samples - which are what we will be using 
      :class: toggle xhint stacked
 
      Search the basf2
-     `skim registry <https://stash.desy.de/projects/B2/repos/software/browse/skim/scripts/skim/registry.py>`_ and look
+     `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_ and look
      at the skim codes and names.
 
 .. admonition:: Another hint

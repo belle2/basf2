@@ -57,7 +57,8 @@ void RecoTracksReverterModule::event()
     const double& currentCharge = measuredStateOnPlane.getCharge();
 
     RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
-                                                           recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),
+                                                           recoTrack.getStoreArrayNameOfPXDHits(), recoTrack.getStoreArrayNameOfSVDHits(),
+                                                           recoTrack.getStoreArrayNameOfVTXHits(), recoTrack.getStoreArrayNameOfCDCHits(),
                                                            recoTrack.getStoreArrayNameOfBKLMHits(), recoTrack.getStoreArrayNameOfEKLMHits(),
                                                            recoTrack.getStoreArrayNameOfRecoHitInformation());
     newRecoTrack->addHitsFromRecoTrack(&recoTrack, newRecoTrack->getNumberOfTotalHits(), true);

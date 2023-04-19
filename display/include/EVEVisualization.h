@@ -21,9 +21,8 @@
 #include <vtx/dataobjects/VTXSimHit.h>
 #include <vtx/dataobjects/VTXTrueHit.h>
 #include <vtx/dataobjects/VTXCluster.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -155,11 +154,8 @@ namespace Belle2 {
     /** Add a SVDSimHit. */
     void addSimHit(const SVDSimHit* hit, const MCParticle* particle);
 
-    /** Add a BKLMSimHit. */
-    void addSimHit(const BKLMSimHit* hit, const MCParticle* particle);
-
-    /** Add a EKLMSimHit. */
-    void addSimHit(const EKLMSimHit* hit, const MCParticle* particle);
+    /** Add a KLMSimHit. */
+    void addSimHit(const KLMSimHit* hit, const MCParticle* particle);
 
     /** Add simhit as a simple point. */
     void addSimHit(const TVector3& v, const MCParticle* particle);

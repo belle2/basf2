@@ -13,7 +13,7 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <background/modules/BeamBkgTagSetter/BeamBkgTagSetterModule.h>
 
 
@@ -100,8 +100,7 @@ void BeamBkgTagSetterModule::initialize()
   m_arichSimHits.isOptional();
   m_eclSimHits.isOptional();
   m_eclHits.isOptional();
-  m_bklmSimHits.isOptional();
-  m_eklmSimHits.isOptional();
+  m_klmSimHits.isOptional();
   m_vtxSimHits.isOptional();
 
   // registration of beast simHits
@@ -133,8 +132,7 @@ void BeamBkgTagSetterModule::event()
     n += setBackgroundTag(m_arichSimHits);
     n += setBackgroundTag(m_eclSimHits);
     n += setBackgroundTag(m_eclHits);
-    n += setBackgroundTag(m_bklmSimHits);
-    n += setBackgroundTag(m_eklmSimHits);
+    n += setBackgroundTag(m_klmSimHits);
     n += setBackgroundTag(m_vtxSimHits);
   }
   // BEAST addition

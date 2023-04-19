@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleCopier/ParticleCopierModule.h>
 
 
@@ -64,6 +64,10 @@ void ParticleCopierModule::event()
   for (const auto& inputListName : m_inputListNames) {
     const StoreObjPtr<ParticleList> plist(inputListName);
 
+    bool isReserved = plist->getIsReserved();
+    if (isReserved)
+      plist->setEditable(true);
+
     const unsigned int origSize = plist->getListSize();
     std::vector<Particle*> copies(origSize);
 
@@ -88,5 +92,7 @@ void ParticleCopierModule::event()
               << " has changed while copying the Particles! original size = "
               << origSize << " vs. new size = " << copySize);
 
+    if (isReserved)
+      plist->setEditable(false);
   }
 }

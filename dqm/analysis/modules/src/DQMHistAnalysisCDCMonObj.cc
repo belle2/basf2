@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisCDCMonObj.h>
 
 // CDC geometry
@@ -44,7 +44,6 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
 
 DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
 {
-
 }
 
 void DQMHistAnalysisCDCMonObjModule::initialize()
@@ -122,9 +121,6 @@ void DQMHistAnalysisCDCMonObjModule::beginRun()
 
 }
 
-void DQMHistAnalysisCDCMonObjModule::event()
-{
-}
 
 void DQMHistAnalysisCDCMonObjModule::configureBins(TH2Poly* h)
 {

@@ -97,8 +97,7 @@ void DisplayModule::initialize()
   StoreArray<PXDSimHit> PXDSimHits; PXDSimHits.isOptional();
   StoreArray<VTXSimHit> VTXSimHits; VTXSimHits.isOptional();
   StoreArray<SVDSimHit> SVDSimHits; SVDSimHits.isOptional();
-  StoreArray<BKLMSimHit> BKLMSimHits; BKLMSimHits.isOptional();
-  StoreArray<EKLMSimHit> EKLMSimHits; EKLMSimHits.isOptional();
+  StoreArray<KLMSimHit> KLMSimHits; KLMSimHits.isOptional();
   StoreArray<ECLCluster> ECLClusters; ECLClusters.isOptional();
   StoreArray<KLMCluster> KLMClusters; KLMClusters.isOptional();
   StoreArray<KLMHit2d> KLMHit2ds; KLMHit2ds.isOptional();
@@ -196,8 +195,7 @@ void DisplayModule::event()
     m_visualizer->addSimHits(StoreArray<PXDSimHit>());
     m_visualizer->addSimHits(StoreArray<VTXSimHit>());
     m_visualizer->addSimHits(StoreArray<SVDSimHit>());
-    m_visualizer->addSimHits(StoreArray<EKLMSimHit>());
-    m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
+    m_visualizer->addSimHits(StoreArray<KLMSimHit>());
   }
 
 

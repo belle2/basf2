@@ -48,13 +48,15 @@ def check_simulation(path):
 
 
 def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
-                         doCleanup=True, overrideDB=False, usePXDDataReduction=True):
+                         doCleanup=True, overrideDB=False, usePXDDataReduction=True, save_slow_pions_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param pxd_unfiltered_digits: the name of the StoreArray containing the input PXDDigits
     @param overrideDB: override settings from the DB with the value set in 'usePXDDataReduction'
     @param usePXDDataReduction: if 'overrideDB==True', override settings from the DB
     @param doCleanup: if 'doCleanup=True' temporary datastore objects are emptied
+    @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
+      of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
     """
 
     # SVD reconstruction
@@ -67,6 +69,9 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
     add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters')
 
     add_roiFinder(path, svd_reco_tracks)
+
+    if save_slow_pions_in_mc:
+        path.add_module('MCSlowPionPXDROICreator', PXDDigitsName=pxd_unfiltered_digits, ROIsName='ROIs')
 
     # Filtering of PXDDigits
     pxd_digifilter = b2.register_module('PXDdigiFilter')
@@ -109,6 +114,7 @@ def add_simulation(
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False,
+        save_slow_pions_in_mc=False,
         useVTX=False):
     """
     This function adds the standard simulation modules to a path.
@@ -121,6 +127,8 @@ def add_simulation(
         Make sure you do need to filter events before you set the value to True.
     @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
       process and the beam background files. Note that this check should be skipped only by experts.
+    @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
+      of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
     @param useVTX: use the VTX instead of the VXD
     """
 
@@ -247,8 +255,14 @@ def add_simulation(
                 m.set_name('BGOverlayExecutor_PXD')
             path.add_module('PXDDigitSorter', digits=pxd_digits_name)
             if usePXDDataReduction:
-                add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction,
-                                     overrideDB=forceSetPXDDataReduction, usePXDDataReduction=usePXDDataReduction)
+                add_PXDDataReduction(
+                    path,
+                    components,
+                    pxd_digits_name,
+                    doCleanup=cleanupPXDDataReduction,
+                    overrideDB=forceSetPXDDataReduction,
+                    usePXDDataReduction=usePXDDataReduction,
+                    save_slow_pions_in_mc=save_slow_pions_in_mc)
         else:
             # use DB conditional module to decide whether ROI finding should be activated
             path_disableROI_Sim = b2.create_path()
@@ -268,7 +282,8 @@ def add_simulation(
                 path_enableROI_Sim,
                 components,
                 pxd_unfiltered_digits='pxd_unfiltered_digits',
-                doCleanup=cleanupPXDDataReduction)
+                doCleanup=cleanupPXDDataReduction,
+                save_slow_pions_in_mc=save_slow_pions_in_mc)
 
             roi_condition_module_Sim = path.add_module('ROIfindingConditionFromDB')
             roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)

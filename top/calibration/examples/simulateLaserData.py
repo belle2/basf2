@@ -35,8 +35,13 @@ if len(argvs) > 3:
 expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
 filename = f"top.{expRun}.{num}.sroot"
 
-# global tag for run dependent simulation (the latest one recommended!)
-conditions.append_globaltag('data_reprocessing_proc11')
+# global tags for run dependent simulation
+conditions.append_globaltag('patch_main_release-07_noTOP')
+if experiment < 20:
+    conditions.append_globaltag('data_reprocessing_proc13')  # experiments 8 - 18
+else:
+    conditions.append_globaltag('data_reprocessing_prompt')  # experiments 20 - 26
+conditions.append_globaltag('online')
 
 
 def addLaserSource(x, angle, slotID, path):

@@ -104,7 +104,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
     const int charge = recoTrack.getTrackFitStatus(trackRep)->getCharge();
     const double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
-    const int nDF = recoTrack.getTrackFitStatus(trackRep)->getNdf();
+    const double nDF = recoTrack.getTrackFitStatus(trackRep)->getNdf();
 
     double Bx, By, Bz;  // In cgs units
     if (useBFieldAtHit) {
@@ -115,8 +115,8 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     }
     Bz = Bz / 10.; // In SI-Units
 
-    const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack);
-    const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(recoTrack);
+    const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack, trackRep);
+    const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(recoTrack, trackRep);
 
     const auto newTrackFitResult = trackFitResults.appendNew(
                                      ROOT::Math::XYZVector(poca), ROOT::Math::XYZVector(dirInPoca), cov, charge, particleType, pValue, Bz,
@@ -131,23 +131,15 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
     Track* addedTrack = tracks.appendNew(newTrack);
     addedTrack->addRelationTo(&recoTrack);
-    const auto& mcParticleWithWeight = recoTrack.getRelatedToWithWeight<MCParticle>(m_mcParticleColName);
-    const MCParticle* mcParticle = mcParticleWithWeight.first;
-    if (mcParticle) {
-      B2DEBUG(28, "Relation to MCParticle set.");
-      addedTrack->addRelationTo(mcParticle, mcParticleWithWeight.second);
-    } else {
-      B2DEBUG(28, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
-    }
     return true;
   } else {
-    B2DEBUG(28, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
+    B2DEBUG(28, "No valid fit for any given hypothesis. No Track is added to the Tracks StoreArray.");
   }
   return true;
 }
 
 
-uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
+uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation)
 {
   HitPatternVXD hitPatternVXD;
 
@@ -159,7 +151,7 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo();
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
 
       if (kalmanInfo) {
         const double weight = kalmanInfo->getWeights().at(measurementId);
@@ -204,7 +196,7 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
 }
 
 
-uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack)
+uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation)
 {
   HitPatternCDC hitPatternCDC;
 
@@ -218,7 +210,7 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack)
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo();
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
 
       if (kalmanInfo) {
         const double weight = kalmanInfo->getWeights().at(measurementId);

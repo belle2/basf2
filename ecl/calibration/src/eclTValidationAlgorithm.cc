@@ -6,31 +6,36 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
+/* Own header. */
 #include <ecl/calibration/eclTValidationAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
+/* Basf2 headers. */
+#include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 
-#include <TH2F.h>
-#include <TFile.h>
+/* ROOT headers. */
 #include <TF1.h>
-#include <TROOT.h>
+#include <TFile.h>
 #include <TGaxis.h>
-#include <TLegend.h>
-#include <TGraphErrors.h>
 #include <TGraphAsymmErrors.h>
+#include <TGraphErrors.h>
+#include <TH2F.h>
+#include <TLegend.h>
 #include <TMultiGraph.h>
-#include "TString.h"
+#include <TROOT.h>
+#include <TString.h>
 
 using namespace std;
 using namespace Belle2;
@@ -45,7 +50,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm():
   // Parameters
   CalibrationAlgorithm("eclHadronTimeCalibrationValidationCollector"),
   cellIDLo(1),
-  cellIDHi(8736),
+  cellIDHi(ECLElementNumbers::c_NCrystals),
   readPrevCrysPayload(false),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
@@ -66,7 +71,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm(string physicsProcessCollectorN
   // Parameters
   CalibrationAlgorithm(physicsProcessCollectorName.c_str()),
   cellIDLo(1),
-  cellIDHi(8736),
+  cellIDHi(ECLElementNumbers::c_NCrystals),
   readPrevCrysPayload(false),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
@@ -121,16 +126,12 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   TFile* histfile = 0;
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
-     Same for all crystals. */
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
-
   // Vector of time offsets to track how far from nominal the cluster times are.
-  vector<float> t_offsets(8736, 0.0);
-  vector<float> t_offsets_unc(8736, 0.0);
-  vector<long> numClusterPerCrys(8736, 0);
-  vector<bool> crysHasGoodFitandStats(8736, false);
-  vector<bool> crysHasGoodFit(8736, false);
+  vector<float> t_offsets(ECLElementNumbers::c_NCrystals, 0.0);
+  vector<float> t_offsets_unc(ECLElementNumbers::c_NCrystals, 0.0);
+  vector<long> numClusterPerCrys(ECLElementNumbers::c_NCrystals, 0);
+  vector<bool> crysHasGoodFitandStats(ECLElementNumbers::c_NCrystals, false);
+  vector<bool> crysHasGoodFit(ECLElementNumbers::c_NCrystals, false);
   int numCrysWithNonZeroEntries = 0 ;
   int numCrysWithGoodFit = 0 ;
 
@@ -209,6 +210,10 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
   crystalMapper->initFromDB();
 
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals. */
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
+
   //------------------------------------------------------------------------
   //..Read payloads from database
   DBObjPtr<Belle2::ECLCrystalCalib> crystalTimeObject("ECLCrystalTimeOffset");
@@ -220,21 +225,21 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   //..Print out a few values for quality control
   B2INFO("Values read from database.  Write out for their values for comparison against those from tcol");
-  for (int ic = 0; ic < 8736; ic += 500) {
+  for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
     B2INFO("ts: cellID " << ic + 1 << " " << currentValuesCrys[ic] << " +/- " << currentUncCrys[ic]);
   }
 
 
   //..Read in the previous crystal payload values
   DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
-  vector<float> prevValuesCrys(8736);
+  vector<float> prevValuesCrys(ECLElementNumbers::c_NCrystals);
   if (readPrevCrysPayload) {
     //..Get vectors of values from the payloads
     prevValuesCrys = customPrevCrystalTimeObject->getCalibVector();
 
     //..Print out a few values for quality control
     B2INFO("Previous values read from database.  Write out for their values for comparison against those from tcol");
-    for (int ic = 0; ic < 8736; ic += 500) {
+    for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic += 500) {
       B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic]);
     }
   }
@@ -271,7 +276,8 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
 
   // define histogram for keeping track of the peak of the cluster times per crystal
-  auto peakClusterTime_cid = new TH1F("peakClusterTime_cid", ";cell id;Peak cluster time [ns]", 8736, 1, 8736 + 1);
+  auto peakClusterTime_cid = new TH1F("peakClusterTime_cid", ";cell id;Peak cluster time [ns]", ECLElementNumbers::c_NCrystals, 1,
+                                      ECLElementNumbers::c_NCrystals + 1);
   auto peakClusterTimes = new TH1F("peakClusterTimes",
                                    "-For crystals with at least one hit-;Peak cluster time [ns];Number of crystals",
                                    hist_nTbins, hist_tmin, hist_tmax);
@@ -281,13 +287,13 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   auto peakClusterTimesGoodFit__cid = new TH1F("peakClusterTimesGoodFit__cid",
                                                "-For crystals with a good fit to distribution of hits-;cell id (only crystals with good fit);Peak cluster time [ns]",
-                                               8736, 1, 8736 + 1);
+                                               ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
 
 
   // define histograms to keep track of the difference in the new crystal times vs the old ones
   auto tsNew_MINUS_tsCustomPrev__cid = new TH1F("TsNew_MINUS_TsCustomPrev__cid",
                                                 ";cell id; ts(new|merged) - ts(old = 'pre-calib'|merged)  [ns]",
-                                                8736, 1, 8736 + 1);
+                                                ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
 
   auto tsNew_MINUS_tsCustomPrev = new TH1F("TsNew_MINUS_TsCustomPrev",
                                            ";ts(new | merged) - ts(old = 'pre-calib' | merged)  [ns];Number of crystals",
@@ -315,10 +321,13 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   TString fracWindowHistTitle = "Fraction of cluster times in window [" + s_lowTime + ", " + s_highTime +
                                 "] ns;Fraction of cluster times in window;Number of crystals";
 
-  auto clusterTimeNumberInWindow__cid = new TH1F("clusterTimeNumberInWindow__cid", fracWindowTitle, 8736, 1, 8736 + 1);
-  auto clusterTimeNumberInWindowInGoodECLRings__cid = new TH1F("clusterTimeNumberInWindowInGoodECLRings__cid", fracWindowTitle, 8736,
-      1, 8736 + 1);
-  auto clusterTimeNumber__cid = new TH1F("clusterTimeNumber_cid", fracWindowTitle, 8736, 1, 8736 + 1);
+  auto clusterTimeNumberInWindow__cid = new TH1F("clusterTimeNumberInWindow__cid", fracWindowTitle, ECLElementNumbers::c_NCrystals, 1,
+                                                 ECLElementNumbers::c_NCrystals + 1);
+  auto clusterTimeNumberInWindowInGoodECLRings__cid = new TH1F("clusterTimeNumberInWindowInGoodECLRings__cid", fracWindowTitle,
+      ECLElementNumbers::c_NCrystals,
+      1, ECLElementNumbers::c_NCrystals + 1);
+  auto clusterTimeNumber__cid = new TH1F("clusterTimeNumber_cid", fracWindowTitle, ECLElementNumbers::c_NCrystals, 1,
+                                         ECLElementNumbers::c_NCrystals + 1);
   auto clusterTimeFractionInWindow = new TH1F("clusterTimeFractionInWindow", fracWindowHistTitle, 110, 0.0, 1.1);
 
   clusterTimeNumberInWindow__cid->Sumw2();
@@ -804,7 +813,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   vector< pair<double, int> > fitClusterTime__crystalIDBase0__pairs;
 
   // Prepare a vector of pairs containing the fitted cluster time and cell ID (base 0)
-  for (int cid = 0; cid < 8736; cid++) {
+  for (int cid = 0; cid < ECLElementNumbers::c_NCrystals; cid++) {
     fitClusterTime__crystalIDBase0__pairs.push_back(make_pair(0.0, cid));
   }
 
@@ -821,10 +830,10 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   B2INFO("-------- List of the (fitted) peak cluster times sorted by their absolute value ----------");
   B2INFO("------------------------------------------------------------------------------------------");
   B2INFO("------------------------------------------------------------------------------------------");
-  B2INFO("Quoted # of clusters is before the cutting off of the distribution tails, cellID=1..8736, crysID=0..8735");
+  B2INFO("Quoted # of clusters is before the cutting off of the distribution tails, cellID=1..ECLElementNumbers::c_NCrystals, crysID=0..8735");
 
   bool hasHitThresholdBadTimes = false ;
-  for (int iSortedTimes = 0; iSortedTimes < 8736; iSortedTimes++) {
+  for (int iSortedTimes = 0; iSortedTimes < ECLElementNumbers::c_NCrystals; iSortedTimes++) {
     int cid = fitClusterTime__crystalIDBase0__pairs[iSortedTimes].second ;
     if (!hasHitThresholdBadTimes && fitClusterTime__crystalIDBase0__pairs[iSortedTimes].first > 2) {
       B2INFO("======== |t_fit| > Xns threshold ======");
@@ -844,7 +853,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   B2INFO("##########################################################################################");
   B2INFO("##########################################################################################");
 
-  for (int iSortedTimes = 0; iSortedTimes < 8736; iSortedTimes++) {
+  for (int iSortedTimes = 0; iSortedTimes < ECLElementNumbers::c_NCrystals; iSortedTimes++) {
     int cid = fitClusterTime__crystalIDBase0__pairs[iSortedTimes].second ;
     if (fitClusterTime__crystalIDBase0__pairs[iSortedTimes].first > 2  && crysHasGoodFitandStats[cid]) {
       B2INFO("WARNING: cid = " << cid << ", peak clust t = " << t_offsets[cid] << " +- " << t_offsets_unc[cid] << " ns, # clust = " <<
@@ -869,7 +878,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   /* Fill histograms with the difference in the ts values from this iteration
      and the previous values read in from the payload. */
   B2INFO("Filling histograms for difference in crystal payload values and the pre-calibration values.  These older values may be from a previous bucket or older reprocessing of the data.");
-  for (int crys_id = 1; crys_id <= 8736; crys_id++) {
+  for (int crys_id = 1; crys_id <= ECLElementNumbers::c_NCrystals; crys_id++) {
     double tsDiffCustomOld_ns = -999;
     if (readPrevCrysPayload) {
       tsDiffCustomOld_ns = (currentValuesCrys[crys_id - 1] - prevValuesCrys[crys_id - 1]) * TICKS_TO_NS;

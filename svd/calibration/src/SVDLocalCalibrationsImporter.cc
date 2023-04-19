@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <svd/calibration/SVDLocalCalibrationsImporter.h>
 
 // Map from the online world (FADC id, ADC id, APV ch id)

@@ -106,6 +106,10 @@ track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue', 'ndf']
 #: Replacement for TrackHits tool
 track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']
 
+#: Track fit parameters
+trackfit_parameters = ['omega', 'omegaErr', 'tanLambda', 'tanLambdaErr',
+                       'd0', 'd0Err', 'z0', 'z0Err', 'phi0', 'phi0Err', 'pValue', 'ndf']
+
 #: Replacement for MCTruth tool
 mc_truth = ['isSignal', 'mcErrors', 'mcPDG']
 

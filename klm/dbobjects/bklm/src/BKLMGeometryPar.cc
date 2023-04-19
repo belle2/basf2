@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 

@@ -23,7 +23,7 @@ namespace Belle2 {
    * Class to dynamically fill histograms from a config file for offline testing of analysis modules.
    */
 
-  class DQMHistAnalysisInputTestModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisInputTestModule final : public DQMHistAnalysisModule {
 
   public:
 

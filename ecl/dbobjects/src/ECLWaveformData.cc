@@ -5,12 +5,19 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <iostream>
-#include <string>
-#include <framework/logging/Logger.h>
+
+/* Own header. */
 #include <ecl/dbobjects/ECLWaveformData.h>
 
+/* Basf2 headers. */
+#include <framework/logging/Logger.h>
+
+/* C++ headers. */
+#include <iostream>
+#include <string>
+
 using namespace std;
+
 void Belle2::ECLWaveformData::print() const
 {
   string line;

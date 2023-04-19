@@ -13,7 +13,7 @@
 #include <klm/eklm/geometry/TransformData.h>
 #include <klm/simulation/SensitiveDetector.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <geometry/CreatorBase.h>
 

@@ -237,7 +237,11 @@ class GenerateSimTask(Basf2PathTask):
             "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[self.experiment_number]
         )
         path.add_module("EvtGenInput")
-        bkg_files = background.get_background_files(self.bkgfiles_dir)
+        bkg_files = ""
+        if self.experiment_number == 0:
+            bkg_files = background.get_background_files()
+        else:
+            bkg_files = background.get_background_files(self.bkgfiles_dir)
 
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, usePXDDataReduction=False)
 

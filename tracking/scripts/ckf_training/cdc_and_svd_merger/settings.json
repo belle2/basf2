@@ -8,6 +8,6 @@
     "globaltags": [],
     "experiment_numbers": [0],
     "bkgfiles_by_exp": {
-        "0": "/pnfs/desy.de/belle/local/group/belle2/dataprod/BGOverlay/nominal_phase3/prerelease-07-00-00a/overlay/BGx1/set0/"
+        "0": "/use/the/default/path/for/experiment/0/"
     }
 }

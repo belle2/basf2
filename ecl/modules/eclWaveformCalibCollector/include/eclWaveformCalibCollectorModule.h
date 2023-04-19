@@ -40,7 +40,9 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+
     int m_selectCellID;
+
     std::string m_dataOutFileName;  /**< Root file name for saving the output */
     TTree* tree{nullptr};  /**< Root tree for saving the output */
     TFile* m_rootFile{nullptr};  /**< Root file for saving the output */

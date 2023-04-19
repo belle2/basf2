@@ -50,7 +50,7 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  maxResvsCrysID = new TH2F("maxResvsCrysID", "", 8736, 0, 8736, 1000, 0, 100);
+  maxResvsCrysID = new TH2F("maxResvsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 1000, 0, 100);
   registerObject<TH2F>("maxResvsCrysID", maxResvsCrysID);
 
   m_eclDsps.registerInDataStore();
@@ -97,24 +97,12 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 
     //compute max residual in baseline
     float maxRes = 0.0;
-    //float min = aECLDsp.getDspA()[0];
-    //float max = min;
-    //float StdDev = 0.0;
+
     for (int i = 0; i < m_baselineLimit; i++) {
       float temp = fabs(aECLDsp.getDspA()[i] - baseline);
       float tempSq = temp * temp;
       if (temp > maxRes)  maxRes = temp;
-      //if(min>aECLDsp.getDspA()[i]) min=aECLDsp.getDspA()[i];
-      //if(max<aECLDsp.getDspA()[i]) max=aECLDsp.getDspA()[i];
-      //StdDev+=tempSq;
     }
-    //StdDev/=(float)(m_baselineLimit-1);
-    //StdDev=sqrt(StdDev);
-
-    //B2INFO("maxRes maxPP StdDev "<<maxRes<<" "<<StdDev <<" "<<(max-min));
-    //StdDev
-    //maxPP
-    //MaxRes
 
     //save result to histogram
     maxResvsCrysID->Fill(id, maxRes);
@@ -125,7 +113,7 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 
 void eclWaveformTemplateCalibrationC1CollectorModule::closeRun()
 {
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     for (int j = 0; j < 1000; j++) {
       getObjectPtr<TH2>("maxResvsCrysID")->SetBinContent(i + 1, j + 1, maxResvsCrysID->GetBinContent(i + 1, j + 1));
     }

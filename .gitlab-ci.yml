@@ -1,0 +1,133 @@
+stages:
+  - prepare-pipeline
+  - build-gcc
+  - run-tests
+  - build-clang
+  - build-doc
+
+variables:
+  # GitLab specific variables
+  GITLAB_BELLE2_TOOLS_B2SETUP: "/cvmfs/belle.cern.ch/tools/b2setup"
+  GITLAB_BELLE2_EXTERNALS_TOPDIR: "/belle2/externals"
+  GITLAB_IS_FIRST_STAGE: "no"
+  GITLAB_FORCE_RUNNING_PIPELINE: "no"
+  # The BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
+
+default:
+  image: gitlab.desy.de:5555/belle2/software/basf2/externals-ubuntu2004:v01-11-01
+  tags:
+    - extagent8
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .sconf_temp/
+      - .sconsign.dblite
+      - bin/
+      - build/
+      - config.log
+      - data/
+      - include/
+      - lib/
+      - modules/
+      - target_head_hash.txt
+  before_script:
+    # Preliminary operations with Git
+    - git config user.email "something@something.com"
+    - git config user.name "someone"
+    - git config --global --add safe.directory $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})
+    # Clean the current directory by stashing the remaining modified files from previous builds
+    - git stash && git stash clear
+    # If this is not the first stage: merge the HEAD of the target branch
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
+        if [ "${GITLAB_IS_FIRST_STAGE}" != "yes" ]; then
+            echo "Merging the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} up to commit $(< target_head_hash.txt) into this branch"
+            git fetch --all && git merge $(< target_head_hash.txt) --strategy-option ours --no-commit
+        fi
+      fi
+    # Preliminary operations necessary for basf2
+    - unset DISPLAY
+    - if [ ! -f .release ]; then echo "head" > .release; fi
+    - rm -rf .git/hooks && ln -sf $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})/hooks .git/hooks
+    - ln -fs site_scons/SConstruct
+    - source ${GITLAB_BELLE2_TOOLS_B2SETUP}
+    # Use the externals installed in the docker image
+    - export BELLE2_EXTERNALS_TOPDIR=${GITLAB_BELLE2_EXTERNALS_TOPDIR}
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/
+    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
+
+prepare-pipeline:
+  stage: prepare-pipeline
+  needs: []
+  variables:
+    GITLAB_IS_FIRST_STAGE: "yes"
+  script:
+    - echo "stage start time -> $(date +%H:%M:%S)"
+    # Identify the current HEAD of the target branch and cache it
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
+        git rev-parse origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} > target_head_hash.txt
+        echo "The current HEAD of the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} is $(< target_head_hash.txt)"
+      fi
+    - echo "stage stop time -> $(date +%H:%M:%S)"
+
+build-gcc:
+  stage: build-gcc
+  needs: [prepare-pipeline]
+  script:
+    - echo "stage start time -> $(date +%H:%M:%S)"
+    - b2code-option opt
+    - b2setup
+    - scons --no-debuginfo
+    - basf2 --info
+    - echo "stage stop time -> $(date +%H:%M:%S)"
+
+run-tests:
+  stage: run-tests
+  needs: [build-gcc]
+  artifacts:
+    when: always
+    reports:
+      junit:
+          - tests_report/tests-google.xml
+          - tests_report/tests-framework.xml
+          - tests_report/tests-non-framework.xml
+  script:
+    - echo "stage start time -> $(date +%H:%M:%S)"
+    - mkdir -p tests_report
+    - b2code-option opt
+    - b2setup
+    - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
+    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
+    - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 1200
+    - echo "stage stop time -> $(date +%H:%M:%S)"
+
+build-clang:
+  stage: build-clang
+  needs: [run-tests]
+  script:
+    - echo "stage start time -> $(date +%H:%M:%S)"
+    - b2code-option clang
+    - b2setup
+    - scons --no-debuginfo
+    - basf2 --info
+    - echo "stage stop time -> $(date +%H:%M:%S)"
+
+build-doc:
+  stage: build-doc
+  needs: [run-tests]
+  artifacts:
+    when: on_success
+    expose_as: 'sphinx documentation'
+    paths:
+      - build/html/
+  script:
+    - echo "stage start time -> $(date +%H:%M:%S)"
+    - b2code-option opt
+    - b2setup
+    - scons --no-debuginfo --sphinx html
+    - echo "stage stop time -> $(date +%H:%M:%S)"

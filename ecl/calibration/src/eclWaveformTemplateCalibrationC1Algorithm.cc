@@ -30,7 +30,6 @@ eclWaveformTemplateCalibrationC1Algorithm::eclWaveformTemplateCalibrationC1Algor
     "Used to determine the baseline noise level of crystals in e+e- --> gamma gamma"
   );
 
-  //m_lowestEnergyFraction=0.25;
   m_lowestEnergyFraction = 0.5;
 }
 

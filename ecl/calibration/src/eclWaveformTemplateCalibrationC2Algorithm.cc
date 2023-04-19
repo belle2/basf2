@@ -105,10 +105,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
   std::time_t t = std::time(0);
 
-  int CollectorLimit = 6; /** Maximum number of waveforms to simultaneously fit */
-
-  double ParamLimitFactor = 0.25; /** Factor to determine parameter limits in fit */
-  const int AttemptLimit = 10;  /** Number of attempts before increasing parameter limits or resLimt */
+  /** Count number of fit attempts */
   int AttemptCounter = 0;
 
   /** DBobject to store photon shape parameters computed by this algorithm */
@@ -121,6 +118,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   /** Computing photon templates for CellID range specified (recommend batches of 100) */
   for (int cellid = m_firstCellID; cellid <= m_lastCellID; cellid++) {
 
+    /** Typical parameters used for inital guess in fit. Note endcaps and barrel have different shapes */
     if (cellid > 7776 || cellid < 1153) {
       ParMin11t[0] = 20.3216;
       ParMin11t[1] = -0.0206266;
@@ -211,7 +209,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
         counterWaveforms++;
 
-        if (counterWaveforms == CollectorLimit)  break;
+        if (counterWaveforms == m_CollectorLimit)  break;
 
       }
 
@@ -249,9 +247,9 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         TotalFitFunction->SetParameter((2 * FFsize) + i, guessAmp[i]);
         for (int k = 0; k < 10; k++) {
           TotalFitFunction->SetParameter((3 * FFsize) + k, ParMin11t[k + 1]);
-          if (ParamLimitFactor < 2) {
-            TotalFitFunction->SetParLimits((3 * FFsize) + k, ParMin11t[k + 1]  - ParamLimitFactor * fabs(ParMin11t[k + 1]),
-                                           ParMin11t[k + 1] + ParamLimitFactor * fabs(ParMin11t[k + 1]));
+          if (m_ParamLimitFactor < 2) {
+            TotalFitFunction->SetParLimits((3 * FFsize) + k, ParMin11t[k + 1]  - m_ParamLimitFactor * fabs(ParMin11t[k + 1]),
+                                           ParMin11t[k + 1] + m_ParamLimitFactor * fabs(ParMin11t[k + 1]));
           } else {
             TotalFitFunction->ReleaseParameter((3 * FFsize) + k);
           }
@@ -323,25 +321,25 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         AttemptCounter++;
 
         /** Ensure at least 3 waveforms used in simultaneous fit  */
-        if (counterWaveforms < 3)  AttemptCounter = AttemptLimit;
+        if (counterWaveforms < 3)  AttemptCounter = m_AttemptLimit;
 
         /** If fit is not successful after several attempts, parameter limits are increased.  */
-        if (AttemptCounter == AttemptLimit) {
+        if (AttemptCounter == m_AttemptLimit) {
 
-          ParamLimitFactor += 0.5;
+          m_ParamLimitFactor += 0.5;
 
           B2INFO("AttemptCounter reach limit: " << AttemptCounter << " counterWaveforms: " << counterWaveforms);
-          B2INFO("Increasing ParamLimitFactor to " << ParamLimitFactor);
+          B2INFO("Increasing m_ParamLimitFactor to " << m_ParamLimitFactor);
 
           /** reseting for next round of fits with larger parameter limits  */
           EntriesToSkip.clear();
           AttemptCounter = 0;
 
           /** If fit is still not successful after several increases to the parameter limits, then resLimit is relaxed.  */
-          if (ParamLimitFactor > 2.1) {
+          if (m_ParamLimitFactor > 2.1) {
             resLimit *= 1.5;
             B2INFO("Increasing resLimit to " << resLimit);
-            ParamLimitFactor = 0.25;
+            m_ParamLimitFactor = 0.25;
           }
         }
 
@@ -353,11 +351,11 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         PASS = true;
 
         limitResidualArray.push_back(resLimit);
-        parLimitFactorArray.push_back(ParamLimitFactor);
+        parLimitFactorArray.push_back(m_ParamLimitFactor);
 
         /** reseting for next crystal  */
         AttemptCounter = 0;
-        ParamLimitFactor = 0.25;
+        m_ParamLimitFactor = 0.25;
 
         auto gFitResult = new TGraph(FitResultX.size(), FitResultX.data(), FitResultY.data());
         gFitResult->SetName(Form("gFitResult_%d", int(cellid)));

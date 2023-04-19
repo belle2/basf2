@@ -72,7 +72,6 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
     // After here your DBObjPtrs are correct
     updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
     experimentNumber = chosenRun.first;
-    //updateDBObjPtrs(1, 0,20);
 
     for (int j = firstCellID; j <= lastCellID; j++) {
       B2INFO("Check Norm Parms CellID " << j);

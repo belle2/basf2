@@ -41,6 +41,15 @@ namespace Belle2 {
       /** Getter for m_firstCellID */
       void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
 
+      /** Setter for m_AttemptLimit */
+      void setAttemptLimit(int AttemptLimit) {m_lastCellID = lastCellID;}
+
+      /** Setter for m_ParamLimitFactor */
+      void setParamLimitFactor(int ParamLimitFactor) {m_lastCellID = lastCellID;}
+
+      /** Setter for m_CollectorLimit */
+      void setCollectorLimit(int CollectorLimit) {m_lastCellID = lastCellID;}
+
     protected:
 
       /**..Run algorithm on events */
@@ -52,6 +61,9 @@ namespace Belle2 {
 
       int m_firstCellID; /** First crystal to calibrate */
       int m_lastCellID; /** Last crystal to calibrate */
+      int m_CollectorLimit = 6; /**< max number of waveforms to simultaneously fit */
+      double m_ParamLimitFactor = 0.25; /** Factor to determine parameter limits in fit */
+      int m_AttemptLimit = 10;  /** Number of attempts before increasing parameter limits or resLimt */
 
     };
   }

@@ -35,8 +35,10 @@ namespace Belle2 {
       /** Getter for m_outputName */
       std::string getOutputName() {return m_outputName;}
 
+      /** Setter for m_firstCellID */
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
 
+      /** Getter for m_firstCellID */
       void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
 
     protected:
@@ -48,13 +50,9 @@ namespace Belle2 {
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC4Algorithm.root"; /**< file name for histogram output */
 
-      int m_firstCellID;
-      int m_lastCellID;
+      int m_firstCellID; /** First crystal to calibrate */
+      int m_lastCellID; /** Last crystal to calibrate */
 
-      //DBObjPtr<ECLDigitWaveformParameters> m_existingPhotonWaveformParameters;
-      //DBObjPtr<ECLDigitWaveformParameters> m_existingHadronDiodeWaveformParameters;
-      /** Waveform parameters. */
-      //DBObjPtr<ECLDigitWaveformParameters> m_PhotonHadronDiodeWaveformParameters;
     };
   }
 } // namespace Belle2

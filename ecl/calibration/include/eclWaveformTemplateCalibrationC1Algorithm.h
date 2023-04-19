@@ -33,12 +33,6 @@ namespace Belle2 {
       /** Getter for m_outputName */
       std::string getOutputName() {return m_outputName;}
 
-      /** Setter for m_minEntries */
-      void setMinEntries(int minEntries) {m_minEntries = minEntries;}
-
-      /** Getter for m_minEntries */
-      int getMinEntries() {return m_minEntries;}
-
       /** Setter for m_lowestEnergyFraction */
       void setLowestEnergyFraction(int lowestEnergyFraction) {m_lowestEnergyFraction = lowestEnergyFraction;}
 
@@ -53,7 +47,6 @@ namespace Belle2 {
     private:
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC1Algorithm.root"; /**< file name for histogram output */
-      int m_minEntries = 1000;  /**<  Minimum entries to fit a crystal */
       float m_lowestEnergyFraction; /**<  m_lowestEnergyFraction */
 
     };

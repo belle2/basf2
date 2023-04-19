@@ -898,6 +898,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   }
 
   //..Displaced vertex
+  // See https://indico.belle2.org/event/8973/ and references therein
   if (maximumPtTracksWithoutZCut.at(-1) and maximumPtTracksWithoutZCut.at(1)) {
 
     //..Make particles of the two highest pt tracks (without IP cut)
@@ -922,6 +923,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const double vertexTheta = vertexLocation.theta() * TMath::RadToDeg();
 
     //..Angular differance of two tracks to reject cosmics
+    //  Tolerance could be reduced from 10 deg to 2 deg if needed for physics reasons,
+    //  for a 5% increase in the rate of selected displaced vertex triggers.
+    //  See https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/1867
     const ROOT::Math::PxPyPzEVector& momentumLabNeg(maximumPtTracksWithoutZCut.at(-1)->p4Lab);
     const ROOT::Math::PxPyPzEVector& momentumLabPos(maximumPtTracksWithoutZCut.at(1)->p4Lab);
     const double thetaSumLab = (momentumLabNeg.Theta() + momentumLabPos.Theta()) * TMath::RadToDeg();
@@ -929,11 +933,20 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     if (dPhiLab > 180) {
       dPhiLab = 360 - dPhiLab;
     }
-    const bool backToBackLab = std::abs(thetaSumLab - 180.) < 10. and std::abs(dPhiLab - 180.) < 10.;
+    const double backToBackTolerance = 10.; // degrees
+    const bool backToBackLab = std::abs(thetaSumLab - 180.) < backToBackTolerance and std::abs(dPhiLab - 180.) < backToBackTolerance;
 
-    //..Displaced vertex
-    if (vertexProb > 0.005 and vertexXY > 3. and vertexXY < 60. and vertexTheta > 30. and vertexTheta < 120.
+    //..Select a displaced vertex
+    const double minProbChiVertex = 0.005; // minimum probability chi square. Many backgrounds have bad chi sq.
+    const double minXYVertex = 3.; // minimum xy of vertex (cm). Should pass track filters below this.
+    const double maxXYVertex = 60.; // maximum xy. Insufficient CDC for good reconstruction beyond this.
+    const double minThetaVertex = 30.; // Large Bhabha background at low angles.
+    const double maxThetaVertex = 120.; // Large Bhabha background at low angles.
+    if (vertexProb > minProbChiVertex and vertexXY > minXYVertex and vertexXY < maxXYVertex and vertexTheta > minThetaVertex
+        and vertexTheta < maxThetaVertex
         and not backToBackLab) {calculationResult["displacedVertex"] = 1;}
+
+    //..Clean up
     delete nParticle;
     delete pParticle;
     delete vertexFit;

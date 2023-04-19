@@ -222,6 +222,9 @@ class GenerateSimTask(Basf2PathTask):
         """
         Create output file name depending on number of events and production
         mode that is specified in the random_seed string.
+
+        :param n_events Number of events to simulate.
+        :param random_seed Random seed to use for the simulation to create independent samples.
         """
         if n_events is None:
             n_events = self.n_events
@@ -242,14 +245,8 @@ class GenerateSimTask(Basf2PathTask):
         """
         basf2.set_random_seed(self.random_seed)
         path = basf2.create_path()
-        if self.experiment_number in [0, 1003]:
-            runNo = 0
-        else:
-            runNo = 0
-            raise ValueError(
-                f"Simulating events with experiment number {self.experiment_number} is not implemented yet.")
         path.add_module(
-            "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
+            "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[self.experiment_number]
         )
         path.add_module("EvtGenInput")
         # activate simulation of dead/masked pixel and reproduce detector gain, which will be
@@ -299,6 +296,9 @@ class SplitNMergeSimTask(Basf2Task):
         """
         Create output file name depending on number of events and production
         mode that is specified in the random_seed string.
+
+        :param n_events Number of events to simulate.
+        :param random_seed Random seed to use for the simulation to create independent samples.
         """
         if n_events is None:
             n_events = self.n_events
@@ -401,7 +401,7 @@ class StateRecordingTask(Basf2PathTask):
         must be truth matched before. The data have to recorded for each layer of the PXD, i.e. layers 1 and 2, but also an
         artificial layer 3.
 
-        :param layer: The layer for which the data are recorded,
+        :param layer: The layer for which the data are recorded.
         :param records1_fname: Name of the records1 file.
         :param records2_fname: Name of the records2 file.
         :param records3_fname: Name of the records3 file.
@@ -535,6 +535,9 @@ class CKFStateFilterTeacherTask(Basf2Task):
         """
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
+
+        :param fast_bdt_option FastBDT option that is used to train this MVA.
+        :param filter_number Filter number (first=1, second=2, third=3) to be trained.
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option
@@ -766,6 +769,8 @@ class CKFResultFilterTeacherTask(Basf2Task):
         """
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
+
+        :param fast_bdt_option FastBDT option that is used to train this MVA
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option_result_filter

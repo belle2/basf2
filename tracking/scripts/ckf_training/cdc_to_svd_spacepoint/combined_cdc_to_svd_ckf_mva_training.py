@@ -249,10 +249,6 @@ class GenerateSimTask(Basf2PathTask):
             "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[self.experiment_number]
         )
         path.add_module("EvtGenInput")
-        # activate simulation of dead/masked pixel and reproduce detector gain, which will be
-        # applied at reconstruction level when the data GT is present in the DB chain
-        # path.add_module("ActivatePXDPixelMasker")
-        # path.add_module("ActivatePXDGainCalibrator")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
 
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, usePXDDataReduction=False)

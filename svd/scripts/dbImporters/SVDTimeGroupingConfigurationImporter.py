@@ -36,8 +36,8 @@ def import_parameters_to_payload(payload, alg, mode):
     """ import parameters to payload """
 
     jsonVar = param["parsFor" + str(alg) + "In" + str(mode) + "Samples"]
-    print(jsonVar)
 
+    payload.setTimeGroupingParameters(alg, mode)._COMMENT = jsonVar["_COMMENT"]
     payload.setTimeGroupingParameters(alg, mode).tRange[0] = jsonVar["tRange"][0]
     payload.setTimeGroupingParameters(alg, mode).tRange[1] = jsonVar["tRange"][1]
     payload.setTimeGroupingParameters(alg, mode).rebinningFactor = jsonVar["rebinningFactor"]
@@ -69,14 +69,21 @@ class timeGroupingConfigurationImporter(b2.Module):
     def beginRun(self):
         '''begin run'''
 
+        print("")
         print("--> json INFO:")
         print("              "+str(param["_COMMENT"]))
         print("")
 
         iov = Belle2.IntervalOfValidity.always()
 
-        payload = Belle2.SVDTimeGroupingConfiguration("SVDTimeGroupingConfiguration_" +
-                                                      str(now.isoformat()))
+        uniqueID = "SVDTimeGroupingConfiguration_" + str(now.isoformat())
+        uniqueID += "_in" + param["uniqueID"]["INFO"]["source"]
+        uniqueID += "_usedFor" + param["uniqueID"]["INFO"]["usedFor"]
+        uniqueID += "_" + param["uniqueID"]["INFO"]["tag"]
+        print("uniqueID ->", uniqueID)
+        print("")
+
+        payload = Belle2.SVDTimeGroupingConfiguration(uniqueID, param["_DESCRIPTION"])
 
         for alg in ["CoG3", "ELS3", "CoG6"]:
             for mode in [3, 6]:

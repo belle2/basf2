@@ -60,6 +60,7 @@ namespace Belle2 {
      */
     std::vector<Float_t> clsSigma[3][2];
 
+    TString _COMMENT; /**< comment. */
     ClassDef(SVDTimeGroupingParameters, 1); /**< needed by root*/
   };
 
@@ -72,8 +73,9 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    SVDTimeGroupingConfiguration(const TString& uniqueID = "")
-      : m_uniqueID(uniqueID)
+    SVDTimeGroupingConfiguration(const TString& uniqueID = "",
+                                 const std::vector<TString>& description = {})
+      : m_uniqueID(uniqueID), m_description(description)
     {
 
       setTimeGroupingParameters("CoG3", 6).tRange[0] = -160;
@@ -173,8 +175,10 @@ namespace Belle2 {
 
   private:
 
-    /** unique identifier of the SVD reconstruction configuration payload */
+    /** unique identifier of the payload */
     TString m_uniqueID;
+    /** short descrition of the payload */
+    std::vector<TString> m_description;
 
     /** parameters for CoG6 time-algorithm in 6-sample DAQ mode */
     SVDTimeGroupingParameters m_parsForCoG6In6Samples;

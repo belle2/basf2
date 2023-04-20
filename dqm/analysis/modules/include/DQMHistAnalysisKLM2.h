@@ -68,6 +68,15 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Process histogram containing the efficiencies.
+     * @param[in]  eff_hist  Histogram itself.
+     * @param[in]  denominator Denominator for efficiency hist.
+     * @param[in]  numerator Numerator for efficiency hist.
+     * @param[in]  canvas Canvas of interest.
+     */
+    void processEfficiencyHistogram(TH1* effHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
+
 
     /**
      * Process histogram containing the number of hits in plane.
@@ -125,6 +134,9 @@ namespace Belle2 {
 
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;
+
+    /** Minimal number of entries for delta histogram update. */
+    double m_minEvents;
 
 
   };

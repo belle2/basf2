@@ -15,6 +15,8 @@
 /* ROOT headers. */
 #include <TROOT.h>
 
+#include <iostream>
+
 
 using namespace Belle2;
 
@@ -26,7 +28,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms.");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
-
+  addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 50000.);
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -77,6 +79,20 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_eff_eklm_sector->GetXaxis()->SetTitle("Sector number");
   m_eff_eklm_sector->SetStats(false);
   m_eff_eklm_sector->SetOption("HIST");
+
+  /* register plots for delta histogramming */
+  // all ext hits
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsBKLM", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsEKLM", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsBKLMSector", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsEKLMSector", HistDelta::c_Events, m_minEvents, 1);
+
+  // matched hits
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLM", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLM", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLMSector", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLMSector", HistDelta::c_Events, m_minEvents, 1);
+
 
 }
 
@@ -136,7 +152,32 @@ void DQMHistAnalysisKLM2Module::endRun()
   }
 }
 
+void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
+{
+  effHist->Reset();
+  TH1* effClone = (TH1*)effHist->Clone(); //will be useful for delta plots
+  if (denominator != nullptr && numerator != nullptr) {
+    canvas->cd();
+    effHist->Divide(numerator, denominator, 1, 1, "B");
+    effHist->Draw();
+    canvas->Modified();
+    canvas->Update();
 
+    /* delta component */
+    auto deltaDenom = getDelta("", denominator->GetName());
+    auto deltaNumer = getDelta("", numerator->GetName());
+
+    //both histograms should have the same update condition but checking both should be okay?
+    UpdateCanvas(canvas->GetName(), deltaNumer != nullptr);
+    if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
+      effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
+      effClone->Draw("SAME");
+      canvas->Modified();
+      canvas->Update();
+    }
+  }
+
+}
 
 void DQMHistAnalysisKLM2Module::processPlaneHistogram(
   const std::string& histName, TH1* histogram)
@@ -209,11 +250,6 @@ void DQMHistAnalysisKLM2Module::event()
       return;
   }
 
-  /* Reset efficiency histograms*/
-  m_eff_bklm->Reset();
-  m_eff_eklm->Reset();
-  m_eff_bklm_sector->Reset();
-  m_eff_eklm_sector->Reset();
 
   /* Obtain plots necessary for efficiency plots */
   TH1F* all_ext_bklm = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsBKLM");
@@ -244,33 +280,13 @@ void DQMHistAnalysisKLM2Module::event()
     B2INFO("Histograms needed for EKLM sector efficiency computation are not found");
   }
 
-  /* Check if efficiency histograms exist*/
-  m_eff_bklm->Divide(matched_hits_bklm,
-                     all_ext_bklm, 1, 1, "B");
-  m_eff_eklm->Divide(matched_hits_eklm,
-                     all_ext_eklm, 1, 1, "B");
-
-  m_eff_bklm_sector->Divide(matched_hits_bklm_sector,
-                            all_ext_bklm_sector, 1, 1, "B");
-  m_eff_eklm_sector->Divide(matched_hits_eklm_sector,
-                            all_ext_eklm_sector, 1, 1, "B");
 
   /* Draw histograms onto canvases*/
-  m_c_eff_bklm->cd();
-  m_eff_bklm->Draw();
-  m_c_eff_bklm->Modified();
+  processEfficiencyHistogram(m_eff_bklm, all_ext_bklm, matched_hits_bklm, m_c_eff_bklm);
+  processEfficiencyHistogram(m_eff_eklm, all_ext_eklm, matched_hits_eklm, m_c_eff_eklm);
 
-  m_c_eff_eklm->cd();
-  m_eff_eklm->Draw();
-  m_c_eff_eklm->Modified();
-
-  m_c_eff_bklm_sector->cd();
-  m_eff_bklm_sector->Draw();
-  m_c_eff_bklm_sector->Modified();
-
-  m_c_eff_eklm_sector->cd();
-  m_eff_eklm_sector->Draw();
-  m_c_eff_eklm_sector->Modified();
+  processEfficiencyHistogram(m_eff_bklm_sector, all_ext_bklm_sector, matched_hits_bklm_sector, m_c_eff_bklm_sector);
+  processEfficiencyHistogram(m_eff_eklm_sector, all_ext_eklm_sector, matched_hits_eklm_sector, m_c_eff_eklm_sector);
 
   processPlaneHistogram("eff_bklm_plane", m_eff_bklm);
   processPlaneHistogram("eff_eklm_plane", m_eff_eklm);

@@ -205,9 +205,10 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   histogram->Draw();
   n = histogram->GetXaxis()->GetNbins();
 
-  /* calling on delta histogram*/
+  /* call delta histogram*/
   auto delta = getDelta("", histogram->GetName());
 
+  /* call reference histograms */
   TH1* ref_histogram = nullptr;
   float ref_average = 0;
   if (m_refFile && m_refFile->IsOpen()) {

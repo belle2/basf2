@@ -131,7 +131,7 @@ namespace Belle2 {
      * @param[in] histogram  Base histogram (for normalization).
      * @param[in] canvas  Canvas with delta histogram.
      */
-    void deltaDrawer(TH1* deltaHist, TH1* histogram, TCanvas* canvas);
+    void deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas);
 
     /** Number of processed events. */
     double m_ProcessedEvents;

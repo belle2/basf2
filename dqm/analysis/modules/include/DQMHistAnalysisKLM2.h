@@ -70,7 +70,7 @@ namespace Belle2 {
 
     /**
      * Process histogram containing the efficiencies.
-     * @param[in]  eff_hist  Histogram itself.
+     * @param[in]  effHist  Histogram itself.
      * @param[in]  denominator Denominator for efficiency hist.
      * @param[in]  numerator Numerator for efficiency hist.
      * @param[in]  canvas Canvas of interest.

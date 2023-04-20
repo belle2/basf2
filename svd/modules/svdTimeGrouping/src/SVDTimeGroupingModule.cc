@@ -108,13 +108,13 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            "Assign groups to under and overflow.",
            bool(true));
 
-  // 7. svd time resolution for 3 sensor types and U/ side, w.r.t. clsSize
-  m_usedPars.clsSigma[0][0] = {2.0416991166691236, 2.360613688987707, 2.1914497716857984, 1.981012966278192, 1.8042171065257078, 1.6204728453169297};
-  m_usedPars.clsSigma[0][1] = {3.58804699995663, 3.4525792094377556, 2.9363106432863266, 2.6833549427992787, 2.5342069757206476, 2.2895310103309585};
-  m_usedPars.clsSigma[1][0] = {2.1069499260943383, 2.052958357534184, 1.9895505851645279, 1.8720107614588672, 1.6452598699302612, 1.5904707325176404};
-  m_usedPars.clsSigma[1][1] = {3.391858274539902, 2.2280311319034154, 2.117726943320176, 2.085184228466165, 1.9967582125806562, 1.9913973265497624};
-  m_usedPars.clsSigma[2][0] = {1.686329885823116, 1.9919508170100562, 1.8497745504283956, 1.77372921564042, 1.632046322040563, 1.562953208594513};
-  m_usedPars.clsSigma[2][1] = {3.2798393192895317, 3.2242993072920645, 2.9404385195553937, 2.7911493057272807, 2.6331351001027175, 2.566566502477274};
+  // 7. svd time resolution for 3 sensor types and V/U side, w.r.t. clsSize
+  m_usedPars.clsSigma[0][0] = {2.0417, 2.3606, 2.1915, 1.9810, 1.8042, 1.6205};
+  m_usedPars.clsSigma[0][1] = {3.5880, 3.4526, 2.9363, 2.6833, 2.5342, 2.2895};
+  m_usedPars.clsSigma[1][0] = {2.1069, 2.0530, 1.9895, 1.8720, 1.6453, 1.5905};
+  m_usedPars.clsSigma[1][1] = {3.3919, 2.2280, 2.1177, 2.0852, 1.9968, 1.9914};
+  m_usedPars.clsSigma[2][0] = {1.6863, 1.9920, 1.8498, 1.7737, 1.6320, 1.5629};
+  m_usedPars.clsSigma[2][1] = {3.2798, 3.2243, 2.9404, 2.7911, 2.6331, 2.5666};
 
 }
 
@@ -302,7 +302,7 @@ void SVDTimeGroupingModule::searchGausPeaksInHistogram(TH1D& hist, std::vector<G
               hist.GetXaxis()->GetXmin(), hist.GetXaxis()->GetXmax(), 3);
 
     // setting the parameters according to the maxBinCenter and maxBinContnet
-    double maxPar0 = maxBinContent * 2.50662827463100024 * m_usedPars.fitRangeHalfWidth;
+    double maxPar0 = maxBinContent * 2.50662827 * m_usedPars.fitRangeHalfWidth; // sqrt(2*pi) = 2.50662827
     ngaus.SetParameter(0, maxBinContent);
     ngaus.SetParLimits(0,
                        maxPar0 * 0.01,

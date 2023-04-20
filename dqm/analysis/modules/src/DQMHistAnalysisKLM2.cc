@@ -15,7 +15,6 @@
 /* ROOT headers. */
 #include <TROOT.h>
 
-#include <iostream>
 
 
 using namespace Belle2;

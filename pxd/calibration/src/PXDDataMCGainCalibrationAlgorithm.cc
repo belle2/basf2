@@ -20,6 +20,7 @@
 
 #include <boost/format.hpp>
 #include <cmath>
+#include <limits>
 
 
 //ROOT
@@ -386,6 +387,8 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
 
   }
 
+  // it should not reach this line
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
 double PXDDataMCGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)

@@ -26,7 +26,7 @@ namespace Belle2 {
      * Default constructor
      */
     ECLTimeWalkCorrection() :
-      m_par()
+      m_par(c_expectedParametersCount)
     {
     }
 
@@ -43,13 +43,18 @@ namespace Belle2 {
     /** set nth parameter of the time-walk correction.  */
     void setParam(int n, double newval)
     {
+      if (n < 0 || n >= c_expectedParametersCount) {
+        B2FATAL("Parameter index should be within [0, " <<
+                c_expectedParametersCount - 1 << "]." <<
+                LogVar("parameter index", n));
+      }
       m_par[n] = newval;
     }
 
     /**
      * Return std::vector containing all parameters of the time walk correction function
      * @see m_par
-     * @see m_par_format
+     * @see m_parFormat
      */
     std::vector<double> getParams() const
     {
@@ -58,10 +63,15 @@ namespace Belle2 {
     /**
      * Set std::vector containing all parameters of the time walk correction function
      * @see m_par
-     * @see m_par_format
+     * @see m_parFormat
      */
     void setParams(const std::vector<double>& new_params)
     {
+      if (new_params.size() != c_expectedParametersCount) {
+        B2FATAL("Count of parameters must always be equal to " <<
+                c_expectedParametersCount <<
+                LogVar("count of parameters", new_params.size()));
+      }
       m_par = new_params;
     }
 
@@ -70,7 +80,7 @@ namespace Belle2 {
      */
     int getParamFormat()
     {
-      return m_par_format;
+      return m_parFormat;
     }
 
     /**
@@ -78,18 +88,23 @@ namespace Belle2 {
      */
     void setParamFormat(int newval)
     {
-      m_par_format = newval;
+      m_parFormat = newval;
     }
 
   private:
     /**
      * Format of the correction parameters
-     * 0 - same set of parameters for all Cell IDs
+     * 0 - same set of (c_expectedParametersCount) parameters for all Cell IDs
      * (for now, only 0 is supported)
      */
-    int m_par_format = 0;
+    int m_parFormat = 0;
     /** List of time walk correction parameters */
     std::vector<double> m_par;
+
+    /**
+     * Number of values expected to be in the m_par vector
+     */
+    const static int c_expectedParametersCount = 6;
 
     ClassDef(ECLTimeWalkCorrection, 1); /**< ClassDef */
   };

@@ -38,7 +38,7 @@ namespace Belle2 {
     /** return nth parameter of the time-walk correction.  */
     double getParam(int n) const
     {
-      return m_par[n];
+      return m_par.at(n);
     }
     /** set nth parameter of the time-walk correction.  */
     void setParam(int n, double newval)

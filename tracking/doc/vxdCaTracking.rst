@@ -1,4 +1,4 @@
-.. _tracking_vxdCaTracking: 
+.. _tracking_vxdCaTracking:
 
 VXD Cellular Automaton Tracking
 ===============================

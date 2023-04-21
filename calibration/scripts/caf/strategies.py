@@ -1060,3 +1060,5 @@ class StrategyError(Exception):
     """
     Basic Exception for this type of class.
     """
+
+# @endcond

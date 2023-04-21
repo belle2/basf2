@@ -197,3 +197,5 @@ class RunnerError(Exception):
     """
     Base exception class for Runners
     """
+
+# @endcond

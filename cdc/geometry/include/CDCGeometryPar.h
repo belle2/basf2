@@ -676,7 +676,7 @@ namespace Belle2 {
 
       /**
        * Return wire offset in phi direction at endplate.
-       * @parm layerID layerID(0-55).
+       * @param layerID layerID(0-55).
        * @return offset value.
        */
       double offset(int layerID) const;

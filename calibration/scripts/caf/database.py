@@ -153,3 +153,5 @@ class CAFDB(SQLiteDB):
         border = line_len * "="
         header = "\n".join((border, title, border))
         return "\n".join((header, table_string, border))
+
+# @endcond

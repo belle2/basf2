@@ -893,10 +893,12 @@ For more details, see :ref:`Time Extraction <tracking_eventTimeExtraction>` page
 )DOC", "ns");
 
     REGISTER_VARIABLE("trackLength", getTrackLength, R"DOC(
-Returns the arc length of the helix for the TrackFitResult associated with the particle. The arc length is measured from the track
-origin to the radius of the CDC layer in which the Track has a hit.
+Returns the arc length of the helix for the TrackFitResult associated with the particle.
+The arc length is measured from the track origin to the radius of the CDC layer in which the Track has a hit.
 Returns NaN if the particle has no CDC Hits.
-    )DOC", "cm");
+
+)DOC", "cm");
+
 
   }
 }

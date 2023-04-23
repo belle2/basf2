@@ -20,7 +20,6 @@
 
 #include <boost/format.hpp>
 #include <cmath>
-#include <limits>
 
 
 //ROOT
@@ -305,6 +304,12 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
                                                          unsigned short histoBin)
 {
 
+  double charge = -1.;
+
+  if (strategy < 0 || strategy > 2) {
+    B2FATAL("strategy unavailable, use 0 for medians, 1 for landau fit and 2 for mean!");
+  }
+
   // Construct a tree name for requested part of PXD
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
@@ -328,13 +333,12 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
       signals.push_back(m_signal + noise); //qyliu: why we introduce noise simulation here?
     }
 
-
     if (strategy == 0) {
       double median = CalculateMedian(signals);
       B2INFO("EstimateCharge: sensor " << sensorID.getID() << "(" << layerNumber << "," << ladderNumber << "," << sensorNumber
              <<  ") U " << uBin << " V " << vBin
              << " Charge " << median);
-      return median;
+      charge = median;
     } else if (strategy == 1) {
       double median = CalculateMedian(signals);
       double landaumpv  = FitLandau(signals);
@@ -344,59 +348,49 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
       B2INFO("EstimateCharge: sensor " << sensorID.getID() << "(" << layerNumber << "," << ladderNumber << "," << sensorNumber
              <<  ") U " << uBin << " V " << vBin
              << " Charge " << landaumpv << " Median " << median << " diff = " << diff << "/" << difff);
-      return landaumpv; //FitLandau(signals);
+      charge = landaumpv; //FitLandau(signals);
     } else if (strategy == 2) {
       double mean = 0;
       for (auto& each : signals)
         mean += each;
       if (signals.size() > 0) mean = mean / signals.size();
-      return mean;
-    } else {
-      B2FATAL("strategy unavailable, use 0 for medians, 1 for landau fit and 2 for mean!");
+      charge = mean;
     }
 
   } else {
 
-    if (strategy < 0 || strategy > 2) {
-      B2FATAL("strategy unavailable, use 0 for medians, 1 for landau fit and 2 for mean!");
+    auto cluster_counter = getObjectPtr<TH2I>("PXDClusterCharge");
+    TH1D* hist_signals = cluster_counter->ProjectionY("proj", histoBin, histoBin);
 
-    } else {
-      double median_return = 0;
-      auto cluster_counter = getObjectPtr<TH2I>("PXDClusterCharge");
-      TH1D* hist_signals = cluster_counter->ProjectionY("proj", histoBin, histoBin);
+    if (strategy == 0) {
+      double median = CalculateMedian(hist_signals);
+      B2INFO("EstimateCharge: sensor " << sensorID.getID() << "(" << layerNumber << "," << ladderNumber << "," << sensorNumber
+             <<  ") U " << uBin << " V " << vBin
+             << " Charge " << median);
+      charge = median;
+    } else if (strategy == 1) {
+      double median = CalculateMedian(hist_signals);
+      double landaumpv  = FitLandau(hist_signals);
+      double diff  = (landaumpv - median);
+      double difff = 0.;
+      if (landaumpv > 0.) difff = (landaumpv - median) / landaumpv;
+      B2INFO("EstimateCharge: sensor " << sensorID.getID() << "(" << layerNumber << "," << ladderNumber << "," << sensorNumber
+             <<  ") U " << uBin << " V " << vBin
+             << " Charge " << landaumpv << " Median " << median << " diff = " << diff << "/" << difff);
 
-      if (strategy == 0) {
-        double median = CalculateMedian(hist_signals);
-        B2INFO("EstimateCharge: sensor " << sensorID.getID() << "(" << layerNumber << "," << ladderNumber << "," << sensorNumber
-               <<  ") U " << uBin << " V " << vBin
-               << " Charge " << median);
-        median_return = median;
-      } else if (strategy == 1) {
-        double median = CalculateMedian(hist_signals);
-        double landaumpv  = FitLandau(hist_signals);
-        double diff  = (landaumpv - median);
-        double difff = 0.;
-        if (landaumpv > 0.) difff = (landaumpv - median) / landaumpv;
-        B2INFO("EstimateCharge: sensor " << sensorID.getID() << "(" << layerNumber << "," << ladderNumber << "," << sensorNumber
-               <<  ") U " << uBin << " V " << vBin
-               << " Charge " << landaumpv << " Median " << median << " diff = " << diff << "/" << difff);
-
-        //return landaumpv; //FitLandau(signals);
-        median_return = landaumpv;
-      } else if (strategy == 2) {
-        median_return = hist_signals->GetMean();
-
-      }
-
-      delete hist_signals;
-      return median_return;
-
+      //return landaumpv; //FitLandau(signals);
+      charge = landaumpv;
+    } else if (strategy == 2) {
+      charge = hist_signals->GetMean();
     }
+
+    delete hist_signals;
   }
-  // it should not reach this line
-  return std::numeric_limits<double>::quiet_NaN();
+
+  return charge;
 
 }
+
 double PXDDataMCGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {
   auto size = signals.size();

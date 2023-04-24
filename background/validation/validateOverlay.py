@@ -41,6 +41,9 @@ class Histogrammer(b2.Module):
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
                               200, 20000, 40000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
+        self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
+        self.hist.append(TH1F('SVDShaperDigitsZS5L3', 'ZS5 L3 Occupancy (%)', 100, 0, 20))
+        self.nSVDL3 = 768 * 7 * 2  # number of L3 strips
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
@@ -49,7 +52,10 @@ class Histogrammer(b2.Module):
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
         for h in self.hist:
-            h.SetXTitle('number of digits in event')
+            if h.GetName() == 'SVDShaperDigitsZS5L3':
+                h.SetXTitle('ZS5 L3 occupancy (%)')
+            else:
+                h.SetXTitle('number of digits in event')
             h.SetYTitle('entries per bin')
             descr = TNamed('Description', 'Number of background ' + h.GetName() +
                            ' per event (with BG overlay only and no event generator)')
@@ -66,12 +72,19 @@ class Histogrammer(b2.Module):
 
         for h in self.hist:
             digits = Belle2.PyStoreArray(h.GetName())
+            svdDigits = Belle2.PyStoreArray('SVDShaperDigitsZS5')
             if h.GetName() == 'ECLDigits':
                 n = 0
                 for digit in digits:
                     if digit.getAmp() > 500:  # roughly 25 MeV
                         n += 1
                 h.Fill(n)
+            elif h.GetName() == 'SVDShaperDigitsZS5L3':
+                nL3 = 0
+                for svdDigit in svdDigits:
+                    if svdDigit.getSensorID().getLayerNumber() == 3:  # only check SVD L3
+                        nL3 += 1
+                h.Fill(nL3/self.nSVDL3 * 100)
             else:
                 h.Fill(digits.getEntries())
 
@@ -105,6 +118,14 @@ main.add_module(eventinfosetter)
 # Simulation
 add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True,
                simulateT0jitter=False)
+
+# Add SVD offline zero-suppression (ZS5)
+main.add_module(
+    'SVDZeroSuppressionEmulator',
+    SNthreshold=5,
+    ShaperDigits='SVDShaperDigits',
+    ShaperDigitsIN='SVDShaperDigitsZS5',
+    FADCmode=True)
 
 # Make histograms
 main.add_module(Histogrammer())

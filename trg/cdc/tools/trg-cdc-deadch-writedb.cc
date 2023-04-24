@@ -239,7 +239,7 @@ void setdeadch()
   //74 nomask
 
 
-  bool badch_map[N_config][9][8][384]; //sl layer ch
+  auto badch_map = new bool[N_config][9][8][384]; //sl layer ch
   for (int i = 0; i < N_config; i++) {
     for (unsigned int j = 0; j < c_nSuperLayers; j++) {
       for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
@@ -315,6 +315,7 @@ void setdeadch()
       db_dead.import(iov);
     }
   }
+  delete[] badch_map;
 }
 
 int main()

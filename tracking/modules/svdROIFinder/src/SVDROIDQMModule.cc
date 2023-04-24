@@ -62,7 +62,8 @@ SVDROIDQMModule::SVDROIDQMModule()
            "name of the list of ROIs", std::string(""));
 
   addParam("Layer", m_specificLayer,
-           "Layer number, if you want the plots only for a specific SVD layer", m_specificLayer);
+           "Layer number, if you want the plots only for a specific SVD layer. If it is not a SVD layer (3, 4, 5, 6) than the plots for all SVD layers are produced. Default is (-1), i.e. plots for all SVD layers are produced.",
+           m_specificLayer);
 
   addParam("plotRecoDigits", m_plotRecoDigits,
            "Set true to produce the plots for RecoDigits (false by default)", m_plotRecoDigits);
@@ -185,11 +186,13 @@ void SVDROIDQMModule::createHistosDictionaries()
   std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
 
   if (m_specificLayer >= 3 && m_specificLayer <= 6) {
+    B2INFO("Producing plots for layer: " << m_specificLayer);
     svdLayers.clear();
     svdLayers.insert(Belle2::VxdID(m_specificLayer, 0, 0));
     itSvdLayers = svdLayers.begin();
   } else {
-    B2INFO("Not specific layer selected, producing plots for all layers");
+    B2INFO("No specific SVD layer (3,4,5,6) selected (m_specificLayer = " << m_specificLayer <<
+           "). Producing plots for all SVD layers.");
   }
 
   while (itSvdLayers != svdLayers.end()) {
@@ -311,9 +314,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (it.isUStrip()) {
                 const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
@@ -334,9 +336,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (!it.isUStrip()) {
                 const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
@@ -361,9 +362,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && it.isUStrip()) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
@@ -385,9 +385,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
@@ -413,9 +412,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                     InterHistoAndFill(
                                       tmp2D,
           [this](TH1 * hPtr, const SVDIntercept * inter) {
-            StoreArray<SVDRecoDigit> SVDRecoDigits(this->m_SVDRecoDigitsName);
 
-            for (auto& it : SVDRecoDigits)
+            for (auto& it : this->m_SVDRecoDigits)
               if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
                 const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
                 double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
@@ -437,9 +435,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                     InterHistoAndFill(
                                       tmp2D,
           [this](TH1 * hPtr, const SVDIntercept * inter) {
-            StoreArray<SVDRecoDigit> SVDRecoDigits(this->m_SVDRecoDigitsName);
 
-            for (auto& it : SVDRecoDigits)
+            for (auto& it : this->m_SVDRecoDigits)
               if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
                 const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
                 double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
@@ -461,9 +458,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (it.isUCluster()) {
                 hPtr->Fill(inter->getCoorU() - it.getPosition(inter->getCoorV()));
@@ -483,9 +479,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (!it.isUCluster()) {
                 hPtr->Fill(inter->getCoorV() - it.getPosition());
@@ -508,9 +503,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && it.isUCluster()) {
               double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
               hPtr->Fill(inter->getCoorU(), resid);
@@ -531,9 +525,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
               double resid = inter->getCoorV() - it.getPosition();
               hPtr->Fill(inter->getCoorV(), resid);
@@ -556,9 +549,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUCluster())) {
               double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
               hPtr->Fill(it.getCharge() / 1000., resid);
@@ -579,9 +571,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
               double resid = inter->getCoorV() - it.getPosition();
               hPtr->Fill(it.getCharge() / 1000., resid);
@@ -603,9 +594,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUCluster())) {
               double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
               hPtr->Fill(it.getClsTime(), resid);
@@ -626,9 +616,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDCluster> SVDClusters(this->m_SVDClustersName);
 
-          for (auto& it : SVDClusters)
+          for (auto& it : this->m_SVDClusters)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
               double resid = inter->getCoorV() - it.getPosition();
               hPtr->Fill(it.getClsTime(), resid);
@@ -650,9 +639,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorU(), aSensorInfo.getUCellPosition(it.getCellID()));
@@ -674,9 +662,8 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits) {
+          for (auto& it : this->m_SVDShaperDigits) {
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorV(), aSensorInfo.getVCellPosition(it.getCellID()));

@@ -88,7 +88,8 @@ namespace Belle2 {
     void fillSensorInterHistos(const SVDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
     int m_numModules; /**< number of hardware modules*/
-    int m_specificLayer = -1; /**< specific layer selected for which to produce the plots */
+    int m_specificLayer =
+      -1; /**< specific layer selected for which to produce the plots. If it is not a SVD layer (3, 4, 5, 6) than the plots for all layers are produced. Default is (-1), i.e. plots for all SVD layers are produced.*/
     bool m_plotRecoDigits = false; /**< Produce plots for SVDRecoDigits when True */
 
     TH1F* hnROIs; /**< number of ROIs*/

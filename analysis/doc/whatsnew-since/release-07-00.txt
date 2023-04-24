@@ -1,5 +1,9 @@
 Changes in the analysis package in light-2305-korat
 ---------------------------------------------------
+Variables
++++++++++
+* Added new variable `trackLength` that returns the arc length from the track origin to the last CDC layer associated to the track.
+
 Reconstruction of V0s
 +++++++++++++++++++++
 * `stdKshorts` and `stdLambdas`: removed a pre-vertex-fit cut on the invariant mass of ``K_S0``/``Lambda0``

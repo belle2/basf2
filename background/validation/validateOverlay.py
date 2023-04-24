@@ -43,13 +43,15 @@ class Histogrammer(b2.Module):
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('SVDShaperDigitsZS5L3', 'ZS5 L3 Occupancy (%)', 100, 0, 20))
-        self.nSVDL3 = 768 * 7 * 2  # number of L3 strips
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
                               100, 0, 200))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
+
+        #: number of L3 strips
+        self.nSVDL3 = 768 * 7 * 2
 
         for h in self.hist:
             if h.GetName() == 'SVDShaperDigitsZS5L3':

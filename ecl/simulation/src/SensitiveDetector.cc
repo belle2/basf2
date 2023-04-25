@@ -282,10 +282,6 @@ void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
     }
     tsum /= esum;
 
-    double trms = 0;
-    for (const dep_t& t : v) trms += pow(t.t - tsum, 2) * t.e ;
-    trms /= esum;
-
     tsum *= 1 / CLHEP::ns;
     esum *= 1 / CLHEP::GeV;
     m_eclHits.appendNew(cellId + 1, esum, tsum);

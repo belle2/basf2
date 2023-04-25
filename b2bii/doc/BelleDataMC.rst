@@ -151,8 +151,8 @@ Here are several notes while using ``BelleMCOutput``.
 
 .. rubric:: Beam energy for MC generation
 
-The default global tag for analysis jobs is ``B2BII_MC``; however, this does not take into 
-account beam smearing. 
+The default global tag for analysis jobs is ``B2BII_MC``; however, this does not take into
+account beam smearing.
 Therefore, for the MC generation one must use ``b2bii_beamParameters_with_smearing``.
 
 .. code-block:: python
@@ -191,6 +191,6 @@ To generate user-defined decay files (aka signal decay files), use the following
 
 
 .. note::
-   Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can 
+   Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can
    only be done in basf.
 

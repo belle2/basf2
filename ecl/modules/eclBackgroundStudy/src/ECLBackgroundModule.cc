@@ -25,8 +25,8 @@
 /* ROOT headers. */
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TVector3.h>
 #include <TMath.h>
+#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -352,7 +352,6 @@ void ECLBackgroundModule::event()
     if (Energy > 0.02) {
       h_Shower->Fill(Energy);
       h_ShowerVsTheta->Fill(Energy, theta * TMath::RadToDeg());
-
     }
   }
 

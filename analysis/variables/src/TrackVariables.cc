@@ -546,6 +546,21 @@ namespace Belle2 {
       return track->isFlippedAndRefitted() ? 1 : 0;
     }
 
+    double getTrackLength(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return realNaN;
+
+      const double lastCDCLayer = trackLastCDCLayer(part);
+      if (std::isnan(lastCDCLayer) or lastCDCLayer < 0)
+        return realNaN;
+
+      const double r = DetectorSurface::cdcWireRadiuses.at((int)lastCDCLayer);
+
+      return trackFit->getHelix().getArcLength2DAtCylindricalR(r);
+    }
+
+
     VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
 The pull of the tracking parameter :math:`d_0` for the reconstructed
@@ -876,5 +891,14 @@ Returns NaN if SVD EventT0 is NaN, or if no SVD Hits are attached to the track.
 For more details, see :ref:`Time Extraction <tracking_eventTimeExtraction>` page.
 
 )DOC", "ns");
+
+    REGISTER_VARIABLE("trackLength", getTrackLength, R"DOC(
+Returns the arc length of the helix for the TrackFitResult associated with the particle.
+The arc length is measured from the track origin to the radius of the CDC layer in which the Track has a hit.
+Returns NaN if the particle has no CDC Hits.
+
+)DOC", "cm");
+
+
   }
 }

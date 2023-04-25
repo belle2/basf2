@@ -565,7 +565,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit fit type by digit energy rank
     double getTwoComponentFitTypeByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -578,7 +578,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 by digit energy rank
     double getTwoComponentChi2ByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -591,7 +591,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component total energy by digit energy rank
     double getTwoComponentTotalEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -604,7 +604,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component hadron energy by digit energy rank
     double getTwoComponentHadronEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -617,7 +617,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component hadron energy fraction by digit energy rank
     double getTwoComponentHadronEnergyFractionByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -630,7 +630,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component diode energy by digit energy rank
     double getTwoComponentDiodeEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -643,7 +643,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 for photon+hadron fit type by digit energy rank
     double getTwoComponentChi2SavedByEnergyRank_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -656,7 +656,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 for photon+hadron + pile-up photon fit type by digit energy rank
     double getTwoComponentChi2SavedByEnergyRank_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -669,7 +669,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 for photon+diode fit type by digit energy rank
     double getTwoComponentChi2SavedByEnergyRank_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;

@@ -2054,11 +2054,9 @@ void ECLDataAnalysisModule::event()
       y++;
     }
 
-    int no_rel = 0;
     int no_Primary = 1;
 
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
-      no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
       if (mcParticle->getSecondaryPhysicsProcess() == 0 && mcParticle->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getDecayVertex().X();
@@ -2084,7 +2082,6 @@ void ECLDataAnalysisModule::event()
     double no_fFMatch = 0;
 
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
-      no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
       if (mcParticle->getSecondaryPhysicsProcess() == 0) {
         double vtxx = mcParticle->getDecayVertex().X();

@@ -165,8 +165,8 @@ void eclNOptimalCollectorModule::prepare()
   //..Histograms to store the sum of n crystals. One per group / energy.
   //  Include an extra nCrystal bin at the end to store the current raw energy
   const int nHist = nCrystalGroups * m_numberEnergies;
-  TH2F* eSum[nHist];
-  TH2F* biasSum[nHist];
+  vector<TH2F*> eSum(nHist);
+  vector<TH2F*> biasSum(nHist);
   int iHist = -1;
   for (int ig = 0; ig < nCrystalGroups; ig++) {
     for (int ie = 0; ie < m_numberEnergies; ie++) {

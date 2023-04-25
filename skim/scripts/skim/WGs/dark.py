@@ -660,13 +660,10 @@ class AA2uuuu(BaseSkim):
 
         track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
 
-        path = self.skim_event_cuts(f"4<=nCleanedTracks({track_cuts})", path=path)
+        path = self.skim_event_cuts(f"nCleanedTracks({track_cuts}) >= 4", path=path)
 
         ma.cutAndCopyList("mu+:accepted", "mu+:all", muon_cuts, path=path)
         ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted mu-:accepted", cut="", path=path)
-        vertex.treeFit(list_name="vpho:rec", conf_level=0, path=path)
-
         ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
-        vertex.treeFit(list_name="Upsilon(4S):rec", conf_level=0, path=path)
 
         return ["Upsilon(4S):rec"]

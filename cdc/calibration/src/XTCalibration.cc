@@ -454,7 +454,7 @@ void XTCalibration::readXTFromText()
 
 
   }
-  int npar = 8;
+  const int npar = 8;
   //read alpha bin info.
   //  unsigned short nAlphaBins = 0;
   ifs >> nalpha_old;
@@ -479,7 +479,7 @@ void XTCalibration::readXTFromText()
   short np = 0;
   unsigned short iCL, iLR;
   //  const unsigned short npx = nXTParams - 1;
-  double xtc[npar]; // cppcheck-suppress constVariable
+  double xtc[npar];
   double theta, alpha, dummy1;
   //  unsigned m_xtParamMode_old;
   ifs >> xtmode_old >> np;

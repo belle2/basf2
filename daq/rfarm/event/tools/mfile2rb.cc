@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <string>
+#include <vector>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
   if (is <= 0) exit(-1);
   delete dumbuf;
 
-  char* evbuf[MAXEVT];
+  vector<char*> evbuf(MAXEVT);
   // Create event buffers
   for (int i = 0; i < nevt; i++) {
     evbuf[i] = new char[MAXEVTSIZE];

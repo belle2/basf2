@@ -94,6 +94,8 @@ namespace Belle2 {
     bool m_hardwareCompatibilityMode;
     /** use Neurotracks as InputTracks */
     bool m_neuroTrackInputMode;
+    /** require at least 4 axial track segments */
+    bool m_min4axials;
     /** list of input 2D tracks or neurotracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
     /** list of input real 2D tracks */

@@ -76,6 +76,9 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
   addParam("NeuroHWTrackInputMode", m_neuroTrackInputMode,
            "use Neurotracks instead of 2DTracks as input",
            false);
+  addParam("min4axials", m_min4axials,
+           "require at least 4 axial track segments",
+           true);
 }
 
 
@@ -159,7 +162,8 @@ CDCTriggerNeuroModule::event()
         (chitPattern & 341) != 337 &&
         (chitPattern & 341) != 325 &&
         (chitPattern & 341) != 277 &&
-        (chitPattern & 341) != 85) {
+        (chitPattern & 341) != 85  &&
+        m_min4axials == true) {
       B2DEBUG(250, "Not enough axial hits (<4), setting track invalid!");
       tmpvalid = false;;
     }

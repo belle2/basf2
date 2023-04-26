@@ -46,6 +46,15 @@ namespace Belle2 {
       return m_disableROIforEveryNth;
     }
 
+    double getToleranceZ() const { return m_toleranceZ; }
+    double getTolerancePhi() const { return m_tolerancePhi; }
+    double getSigmaSystU() const { return m_sigmaSystU; }
+    double getSigmaSystV() const { return m_sigmaSystV; }
+    double getNumSigmaTotU() const { return m_numSigmaTotU; }
+    double getNumSigmaTotV() const { return m_numSigmaTotV; }
+    double getMaxWidthU() const { return m_maxWidthU; }
+    double getMaxWidthV() const { return m_maxWidthV; }
+
   private:
     /** store whether ROI finding was used */
     bool m_useROIfinding;

@@ -1090,6 +1090,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
       break;
     }
     /* no break */
+    __attribute__((__fallthrough__));
 
   case NSMLIB_FNSTD:
     DBS(1010);

@@ -81,9 +81,7 @@ namespace Belle2 {
     double m_maxWidthU;  /**< maximum U width of the ROI */
     double m_maxWidthV;  /**< maximum V width of the ROI */
 
-
     DBObjPtr<ROIParameters> m_roiParameters;  /**< Configuration parameters for ROIs */
-
 
   };
 }

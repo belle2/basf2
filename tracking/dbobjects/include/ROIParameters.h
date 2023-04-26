@@ -18,7 +18,7 @@ namespace Belle2 {
   class ROIParameters: public TObject {
   public:
     /** Default constructor */
-    ROIParameters() : m_useROIfinding(true), m_disableROIforEveryNth(-1) {}
+    ROIParameters() {}
     /** Destructor */
     ~ROIParameters() {}
 
@@ -99,9 +99,9 @@ namespace Belle2 {
     double m_maxWidthV = 0.5;
 
     /** you might to disable ROI finding for every Nth event (-1 if not used) */
-    int m_disableROIforEveryNth;
+    int m_disableROIforEveryNth = -1;
     /** store whether ROI finding was used */
-    bool m_useROIfinding;
+    bool m_useROIfinding = true;
 
     ClassDef(ROIParameters, 2);  /**< ClassDef, necessary for ROOT */
   };

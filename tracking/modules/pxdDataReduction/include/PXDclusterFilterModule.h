@@ -13,7 +13,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <framework/database/DBObjPtr.h>
-#include <simulation/dbobjects/ROIParameters.h>
+#include <tracking/dbobjects/ROIParameters.h>
 
 namespace Belle2 {
 

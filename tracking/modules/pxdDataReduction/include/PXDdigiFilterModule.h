@@ -12,7 +12,7 @@
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <framework/database/DBObjPtr.h>
-#include <simulation/dbobjects/ROIParameters.h>
+#include <tracking/dbobjects/ROIParameters.h>
 #include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {

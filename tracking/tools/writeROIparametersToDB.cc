@@ -12,7 +12,7 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <simulation/dbobjects/ROIParameters.h>
+#include <tracking/dbobjects/ROIParameters.h>
 
 #include <iostream>
 

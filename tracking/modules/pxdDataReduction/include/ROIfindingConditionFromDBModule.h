@@ -11,7 +11,7 @@
 
 #include <framework/database/DBObjPtr.h>
 
-#include <simulation/dbobjects/ROIParameters.h>
+#include <tracking/dbobjects/ROIParameters.h>
 
 
 namespace Belle2 {

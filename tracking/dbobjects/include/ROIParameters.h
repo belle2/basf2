@@ -46,6 +46,23 @@ namespace Belle2 {
       return m_disableROIforEveryNth;
     }
 
+    /** Set tolerance in z */
+    void setToleranceZ(const double toleranceZ) { m_toleranceZ = toleranceZ; }
+    /** Set tolerance in phi */
+    void setTolerancePhi(const double tolerancePhi) { m_tolerancePhi = tolerancePhi; }
+    /** Set sigma_u which represents the minimum ROI size in u */
+    void setSigmaSystU(const double sigmaSystU) { m_sigmaSystU = sigmaSystU; }
+    /** Set sigma_v which represents the minimum ROI size in v */
+    void setSigmaSystV(const double sigmaSystV) { m_sigmaSystV = sigmaSystV; }
+    /** Set number of sigmas used to calculate ROI size in u */
+    void setNumSigmaTotU(const double numSigmaTotU) { m_numSigmaTotU = numSigmaTotU; }
+    /** Set number of sigmas used to calculate ROI size in v */
+    void setNumSigmaTotV(const double numSigmaTotV) { m_numSigmaTotV = numSigmaTotV; }
+    /** Set maximum ROI size in u */
+    void setMaxWidthU(const double maxWidthU) { m_maxWidthU = maxWidthU; }
+    /** Set maximum ROI size in v */
+    void setMaxWidthV(const double maxWidthV) { m_maxWidthV = maxWidthV; }
+
     /** Get tolerance in z */
     double getToleranceZ() const { return m_toleranceZ; }
     /** Get tolerance in phi */

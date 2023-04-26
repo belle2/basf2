@@ -230,13 +230,13 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
         continue; // consider only CDC hits
 
       if (kalmanInfo) {
-        bool isValidWeight = kFALSE;
+        bool isValidWeight = false;
         for (unsigned int kfinfoId = 0; kfinfoId < kalmanInfo->getNumMeasurements(); kfinfoId++) { // Loop on KalmanFitterInfo
           const double weight = kalmanInfo->getWeights().at(kfinfoId);
           if (weight < 1.e-9)
             continue;           // skip kfinfo with negligible weight
           else {
-            isValidWeight = kTRUE;
+            isValidWeight = true;
             B2DEBUG(27, "CDC: " << nCDChits << "\t" << cdcHit->getWireID().getEWire() << "\t" << kfinfoId << "\t" << weight);
           }
         }                       // end of KalmanFitterInfo loop

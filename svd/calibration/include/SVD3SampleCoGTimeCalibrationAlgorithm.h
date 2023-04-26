@@ -37,9 +37,11 @@ namespace Belle2 {
     /** Get the minimum entries required in the histograms */
     int getMinEntries() {return m_minEntries;}
 
-    void setTwoLineSelectionParameters(float interceptUpperLine, float angularCoefficientUpperLine, float interceptLowerLine,
+    void setTwoLineSelectionParameters(bool linearCutsOnCoG3ON, float interceptUpperLine, float angularCoefficientUpperLine,
+                                       float interceptLowerLine,
                                        float angularCoefficientLowerLine)
     {
+      m_applyLinearCutsToRemoveBkg = linearCutsOnCoG3ON;
       m_interceptUpperLine =  interceptUpperLine;
       m_angularCoefficientUpperLine =  angularCoefficientUpperLine;
       m_interceptLowerLine =  interceptLowerLine;
@@ -81,9 +83,10 @@ namespace Belle2 {
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
 
     // straight lines used to reject off-time clusters from 2D-distribution
-    float m_interceptUpperLine = -84.0; /**< */
+    bool m_applyLinearCutsToRemoveBkg = false; /**< */
+    float m_interceptUpperLine = -94.0; /**< */
     float m_angularCoefficientUpperLine = 1.264; /**< */
-    float m_interceptLowerLine = -144.0; /**< */
+    float m_interceptLowerLine = -134.0; /**< */
     float m_angularCoefficientLowerLine = 1.264; /**< */
   };
 } // namespace Belle2

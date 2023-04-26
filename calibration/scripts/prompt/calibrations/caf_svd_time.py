@@ -51,11 +51,12 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "timeAlgorithms": ["CoG6", "CoG3", "ELS3"],
-                                   "max_events_per_run": 50000,
+                                   "timeAlgorithms": ["CoG3", "ELS3"],
+                                   "max_events_per_run": 30000,
                                    "isMC": False,
-                                   "upperLineParameters": [-84.0, 1.264],
-                                   "lowerLineParameters": [-144.0, 1.264],
+                                   "linearCutsOnCoG3ON": False,
+                                   "upperLineParameters": [-94.0, 1.264],
+                                   "lowerLineParameters": [-134.0, 1.264],
                                    "rangeRawTimeForIoVCoG6": [20., 80.],
                                    "rangeRawTimeForIoVCoG3": [70., 140.],
                                    "rangeRawTimeForIoVELS3": [20., 80.]
@@ -135,9 +136,10 @@ def create_algorithm(
         unique_id,
         prefix="",
         min_entries=10000,
-        interceptUpperLine=-84.0,
+        linearCutsOnCoG3ON=False,
+        interceptUpperLine=-94.0,
         angularCoefficientUpperLine=1.264,
-        interceptLowerLine=-144.0,
+        interceptLowerLine=-134.0,
         angularCoefficientLowerLine=1.264):
     """
     Simply creates a SVDCoGTimeCalibrationAlgorithm class with some options.
@@ -150,6 +152,7 @@ def create_algorithm(
     if "CoG3" in prefix:
         algorithm = SVD3SampleCoGTimeCalibrationAlgorithm(unique_id)
         algorithm.setTwoLineSelectionParameters(
+            linearCutsOnCoG3ON,
             interceptUpperLine,
             angularCoefficientUpperLine,
             interceptLowerLine,

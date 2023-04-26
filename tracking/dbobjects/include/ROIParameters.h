@@ -81,13 +81,6 @@ namespace Belle2 {
     double getMaxWidthV() const { return m_maxWidthV; }
 
   private:
-    /** store whether ROI finding was used */
-    bool m_useROIfinding;
-
-    /** you might to disable ROI finding for every Nth event (-1 if not used) */
-    int m_disableROIforEveryNth;
-
-
     /** tolerance for finding sensor in Z coordinate (cm) */
     double m_toleranceZ = 0.5;
     /** tolerance for finding sensor in phi coordinate (radians) */
@@ -104,6 +97,11 @@ namespace Belle2 {
     double m_maxWidthU = 0.5;
     /** maximum V width of the ROI */
     double m_maxWidthV = 0.5;
+
+    /** you might to disable ROI finding for every Nth event (-1 if not used) */
+    int m_disableROIforEveryNth;
+    /** store whether ROI finding was used */
+    bool m_useROIfinding;
 
     ClassDef(ROIParameters, 2);  /**< ClassDef, necessary for ROOT */
   };

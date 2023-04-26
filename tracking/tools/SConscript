@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['writeROIparametersToDB'] = ['stdc++', 'tracking', 'framework', '$ROOT_LIBS']
-
-Return('env')

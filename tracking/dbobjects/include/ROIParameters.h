@@ -53,6 +53,24 @@ namespace Belle2 {
     /** you might to disable ROI finding for every Nth event (-1 if not used) */
     int m_disableROIforEveryNth;
 
-    ClassDef(ROIParameters, 1);  /**< ClassDef, necessary for ROOT */
+
+    /** tolerance for finding sensor in Z coordinate (cm) */
+    double m_toleranceZ;
+    /** tolerance for finding sensor in phi coordinate (radians) */
+    double m_tolerancePhi;
+    /** fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
+    double m_sigmaSystU;
+    /** fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */
+    double m_sigmaSystV;
+    /** number of sigma (stat+syst) determining the U width of the ROI */
+    double m_numSigmaTotU;
+    /** number of sigma (stat+syst) determining the U width of the ROI */
+    double m_numSigmaTotV;
+    /** maximum U width of the ROI */
+    double m_maxWidthU;
+    /** maximum V width of the ROI */
+    double m_maxWidthV;
+
+    ClassDef(ROIParameters, 2);  /**< ClassDef, necessary for ROOT */
   };
 }

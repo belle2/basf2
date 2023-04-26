@@ -65,6 +65,18 @@ void PXDROIFinderModule::initialize()
 
 void PXDROIFinderModule::beginRun()
 {
+  if (m_roiParameters) {
+    m_tolerancePhi = m_roiParameters->getToleranceZ();
+    m_toleranceZ = m_roiParameters->getTolerancePhi();
+    m_numSigmaTotU = m_roiParameters->getNumSigmaTotU();
+    m_numSigmaTotV = m_roiParameters->getNumSigmaTotV();
+    m_sigmaSystU = m_roiParameters->getSigmaSystU();
+    m_sigmaSystV = m_roiParameters->getSigmaSystV();
+    m_maxWidthU = m_roiParameters->getMaxWidthU();
+    m_maxWidthV = m_roiParameters->getMaxWidthV();
+  } else {
+    B2ERROR("No ROI configuration for the current run found (missing ROIParameters payload).");
+  }
 
   B2DEBUG(29, "||| PXDROIFinder Parameters:");
   B2DEBUG(29, "    tolerance: phi = " << m_tolerancePhi);

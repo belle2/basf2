@@ -17,6 +17,8 @@
 #include <tracking/pxdDataReductionClasses/ROIPixelTranslator.h>
 #include <string>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/ROIParameters.h>
 
 namespace Belle2 {
 
@@ -78,6 +80,9 @@ namespace Belle2 {
     double m_numSigmaTotV; /**< number of sigma (stat+syst) determining the U width of the ROI*/
     double m_maxWidthU;  /**< maximum U width of the ROI */
     double m_maxWidthV;  /**< maximum V width of the ROI */
+
+
+    DBObjPtr<ROIParameters> m_roiParameters;  /**< Configuration parameters for ROIs */
 
 
   };

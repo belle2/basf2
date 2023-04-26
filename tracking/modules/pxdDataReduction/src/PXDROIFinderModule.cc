@@ -65,7 +65,7 @@ void PXDROIFinderModule::initialize()
 
 void PXDROIFinderModule::beginRun()
 {
-  if (m_roiParameters) {
+  if (m_roiParameters.isValid()) {
     m_tolerancePhi = m_roiParameters->getToleranceZ();
     m_toleranceZ = m_roiParameters->getTolerancePhi();
     m_numSigmaTotU = m_roiParameters->getNumSigmaTotU();

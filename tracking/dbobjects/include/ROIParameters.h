@@ -89,21 +89,21 @@ namespace Belle2 {
 
 
     /** tolerance for finding sensor in Z coordinate (cm) */
-    double m_toleranceZ;
+    double m_toleranceZ = 0.5;
     /** tolerance for finding sensor in phi coordinate (radians) */
-    double m_tolerancePhi;
+    double m_tolerancePhi = 0.15;
     /** fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
-    double m_sigmaSystU;
+    double m_sigmaSystU = 0.02;
     /** fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */
-    double m_sigmaSystV;
+    double m_sigmaSystV = 0.02;
     /** number of sigma (stat+syst) determining the U width of the ROI */
-    double m_numSigmaTotU;
+    double m_numSigmaTotU = 10;
     /** number of sigma (stat+syst) determining the U width of the ROI */
-    double m_numSigmaTotV;
+    double m_numSigmaTotV = 10;
     /** maximum U width of the ROI */
-    double m_maxWidthU;
+    double m_maxWidthU = 0.5;
     /** maximum V width of the ROI */
-    double m_maxWidthV;
+    double m_maxWidthV = 0.5;
 
     ClassDef(ROIParameters, 2);  /**< ClassDef, necessary for ROOT */
   };

@@ -46,13 +46,21 @@ namespace Belle2 {
       return m_disableROIforEveryNth;
     }
 
+    /** Get tolerance in z */
     double getToleranceZ() const { return m_toleranceZ; }
+    /** Get tolerance in phi */
     double getTolerancePhi() const { return m_tolerancePhi; }
+    /** Get sigma_u which represents the minimum ROI size in u */
     double getSigmaSystU() const { return m_sigmaSystU; }
+    /** Get sigma_v which represents the minimum ROI size in v */
     double getSigmaSystV() const { return m_sigmaSystV; }
+    /** Get number of sigmas used to calculate ROI size in u */
     double getNumSigmaTotU() const { return m_numSigmaTotU; }
+    /** Get number of sigmas used to calculate ROI size in v */
     double getNumSigmaTotV() const { return m_numSigmaTotV; }
+    /** Get maximum ROI size in u */
     double getMaxWidthU() const { return m_maxWidthU; }
+    /** Get maximum ROI size in v */
     double getMaxWidthV() const { return m_maxWidthV; }
 
   private:

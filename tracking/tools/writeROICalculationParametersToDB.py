@@ -77,9 +77,9 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
 
 
 if __name__ == "__main__":
-    # We want ROI selection enabled by default for experiment 0
+    # We want default ROI selection for experiment 0
     writeROICalculationParametersToDB((0, 0, 0, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
-    # We don't want ROI selection enabled by default for experiment 1002
+    # We want default ROI selection for experiment 1002
     writeROICalculationParametersToDB((1002, 0, 1002, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
-    # We don't want ROI selection enabled by default for experiment 1003
+    # We want default ROI selection for experiment 1003
     writeROICalculationParametersToDB((1003, 0, 1003, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)

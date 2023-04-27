@@ -12,7 +12,7 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <simulation/dbobjects/ROIParameters.h>
+#include <simulation/dbobjects/ROISimulationParameters.h>
 
 #include <iostream>
 
@@ -59,16 +59,16 @@ int main(int argc, char** argv)
   logging->setDebugLevel(10);
 
   //..create ROI parameters
-  Belle2::ROIParameters roiParameters;
+  Belle2::ROISimulationParameters roiParameters;
   roiParameters.setROIfinding(enableROI);
   roiParameters.setDisableROIforEveryNth(disableROIforEveryNth);
 
   //------------------------------------------------------------------------
   //..Write out to localdb
-  Belle2::DBImportObjPtr<Belle2::ROIParameters> roiParametersDBPtr;
+  Belle2::DBImportObjPtr<Belle2::ROISimulationParameters> roiParametersDBPtr;
   roiParametersDBPtr.construct(roiParameters);
   roiParametersDBPtr.import(Belle2::IntervalOfValidity(experiment, run, exp_end, run_end));
-  std::cout << "Successfully wrote payload ROIParameters with iov "
+  std::cout << "Successfully wrote payload ROISimulationParameters with iov "
             << experiment << "," << run << "," << exp_end << "," << run_end << std::endl;
 }
 

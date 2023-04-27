@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/modules/pxdDataReduction/ROIfindingConditionFromDBModule.h>
+#include <simulation/modules/dbtools/ROIfindingConditionFromDBModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace Belle2;

@@ -25,8 +25,6 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
     see `tracking/dbobjects/include/ROICalculationParameters.h` for definition of the parameters
 
     :param iovList: List of IoVs for the parameters
-    :param enableROI: Enable ROI selection in general
-    :param disableROIforEveryNth: Disable ROI selection for every nth event to store all PXD data
     :param toleranceZ: Tolerance for finding sensor in Z coordinate (cm)
     :param m_tolerancePhi: Tolerance for finding sensor in phi coordinate (radians)
     :param sigmaSystU: Fixed width to add in quadrature to the extrapolation error and obtain the ROI U width

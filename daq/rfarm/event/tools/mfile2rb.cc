@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   char* dumbuf = new char[MAXEVTSIZE];
   int is = file->read(dumbuf, MAXEVTSIZE);
   if (is <= 0) exit(-1);
-  delete dumbuf;
+  delete[] dumbuf;
 
   vector<char*> evbuf(MAXEVT);
   // Create event buffers

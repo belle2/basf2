@@ -64,7 +64,7 @@ void PXDROIFinderModule::beginRun()
     m_maxWidthU = m_ROICalculationParameters->getMaxWidthU();
     m_maxWidthV = m_ROICalculationParameters->getMaxWidthV();
   } else {
-    B2ERROR("No ROI configuration for the current run found (missing ROICalculationParameters payload).");
+    B2FATAL("No ROI configuration for the current run found (missing ROICalculationParameters payload).");
   }
 
   B2DEBUG(29, "||| PXDROIFinder Parameters:");

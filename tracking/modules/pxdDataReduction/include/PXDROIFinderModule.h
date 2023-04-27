@@ -18,7 +18,7 @@
 #include <string>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/ROIParameters.h>
+#include <tracking/dbobjects/ROICalculationParameters.h>
 
 namespace Belle2 {
 
@@ -81,7 +81,7 @@ namespace Belle2 {
     double m_maxWidthU;  /**< maximum U width of the ROI */
     double m_maxWidthV;  /**< maximum V width of the ROI */
 
-    DBObjPtr<ROIParameters> m_roiParameters;  /**< Configuration parameters for ROIs */
+    DBObjPtr<ROICalculationParameters> m_ROICalculationParameters;  /**< Configuration parameters for ROIs */
 
   };
 }

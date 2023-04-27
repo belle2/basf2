@@ -54,17 +54,17 @@ void PXDROIFinderModule::initialize()
 
 void PXDROIFinderModule::beginRun()
 {
-  if (m_roiParameters.isValid()) {
-    m_tolerancePhi = m_roiParameters->getToleranceZ();
-    m_toleranceZ = m_roiParameters->getTolerancePhi();
-    m_numSigmaTotU = m_roiParameters->getNumSigmaTotU();
-    m_numSigmaTotV = m_roiParameters->getNumSigmaTotV();
-    m_sigmaSystU = m_roiParameters->getSigmaSystU();
-    m_sigmaSystV = m_roiParameters->getSigmaSystV();
-    m_maxWidthU = m_roiParameters->getMaxWidthU();
-    m_maxWidthV = m_roiParameters->getMaxWidthV();
+  if (m_ROICalculationParameters.isValid()) {
+    m_tolerancePhi = m_ROICalculationParameters->getToleranceZ();
+    m_toleranceZ = m_ROICalculationParameters->getTolerancePhi();
+    m_numSigmaTotU = m_ROICalculationParameters->getNumSigmaTotU();
+    m_numSigmaTotV = m_ROICalculationParameters->getNumSigmaTotV();
+    m_sigmaSystU = m_ROICalculationParameters->getSigmaSystU();
+    m_sigmaSystV = m_ROICalculationParameters->getSigmaSystV();
+    m_maxWidthU = m_ROICalculationParameters->getMaxWidthU();
+    m_maxWidthV = m_ROICalculationParameters->getMaxWidthV();
   } else {
-    B2ERROR("No ROI configuration for the current run found (missing ROIParameters payload).");
+    B2ERROR("No ROI configuration for the current run found (missing ROICalculationParameters payload).");
   }
 
   B2DEBUG(29, "||| PXDROIFinder Parameters:");

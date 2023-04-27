@@ -12,8 +12,6 @@ from ROOT import Belle2
 
 
 def writeROIParametersToDB(iovList=(0, 0, 0, 0),
-                           enableROI: bool = True,
-                           disableROIforEveryNth: int = -1,
                            toleranceZ: float = 0.5,
                            tolerancePhi: float = 0.15,
                            sigmaSystU: float = 0.02,
@@ -61,10 +59,8 @@ def writeROIParametersToDB(iovList=(0, 0, 0, 0),
     # create the iov
     iov = Belle2.IntervalOfValidity(*iovList)
     # and the payload object
-    dbobj = Belle2.ROIParameters()
+    dbobj = Belle2.ROICalculationParameters()
     # then set the parameters it contains
-    dbobj.setROIfinding(enableROI)
-    dbobj.setDisableROIforEveryNth(disableROIforEveryNth)
     dbobj.setToleranceZ(toleranceZ)
     dbobj.setTolerancePhi(tolerancePhi)
     dbobj.setSigmaSystU(sigmaSystU)
@@ -78,15 +74,14 @@ def writeROIParametersToDB(iovList=(0, 0, 0, 0),
     Belle2.Database.Instance().storeData("ROIParameters", dbobj, iov)
 
     print(f"Successfully wrote payload ROI parameters with {iov=} and parameters\n\
-          {enableROI=}, {disableROIforEveryNth=},\n\
           {toleranceZ=}, {tolerancePhi=}, {sigmaSystU=}, {sigmaSystV=},\n\
           {numSigmaTotU=}, {numSigmaTotV=}, {maxWidthU=}, {maxWidthV=}")
 
 
 if __name__ == "__main__":
     # We want ROI selection enabled by default for experiment 0
-    writeROIParametersToDB((0, 0, 0, -1), True, -1, 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
+    writeROIParametersToDB((0, 0, 0, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
     # We don't want ROI selection enabled by default for experiment 1002
-    writeROIParametersToDB((1002, 0, 1002, -1), False, -1, 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
+    writeROIParametersToDB((1002, 0, 1002, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
     # We don't want ROI selection enabled by default for experiment 1003
-    writeROIParametersToDB((1003, 0, 1003, -1), False, -1, 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
+    writeROIParametersToDB((1003, 0, 1003, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)

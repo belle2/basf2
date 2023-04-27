@@ -11,18 +11,18 @@
 from ROOT import Belle2
 
 
-def writeROIParametersToDB(iovList=(0, 0, 0, 0),
-                           toleranceZ: float = 0.5,
-                           tolerancePhi: float = 0.15,
-                           sigmaSystU: float = 0.02,
-                           sigmaSystV: float = 0.0,
-                           numSigmaTotU: float = 10,
-                           numSigmaTotV: float = 10,
-                           maxWidthU: float = 0.5,
-                           maxWidthV: float = 0.5,) -> None:
+def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
+                                      toleranceZ: float = 0.5,
+                                      tolerancePhi: float = 0.15,
+                                      sigmaSystU: float = 0.02,
+                                      sigmaSystV: float = 0.0,
+                                      numSigmaTotU: float = 10,
+                                      numSigmaTotV: float = 10,
+                                      maxWidthU: float = 0.5,
+                                      maxWidthV: float = 0.5,) -> None:
     """
-    run this script to create db file storing the payload information of the ROIParameters
-    see `tracking/dbobjects/include/ROIParameters.h` for definition of the parameters
+    run this script to create db file storing the payload information of the ROICalculationParameters
+    see `tracking/dbobjects/include/ROICalculationParameters.h` for definition of the parameters
 
     :param iovList: List of IoVs for the parameters
     :param enableROI: Enable ROI selection in general
@@ -71,7 +71,7 @@ def writeROIParametersToDB(iovList=(0, 0, 0, 0),
     dbobj.setMaxWidthV(maxWidthV)
 
     # write db object to 'localdb/'
-    Belle2.Database.Instance().storeData("ROIParameters", dbobj, iov)
+    Belle2.Database.Instance().storeData("ROICalculationParameters", dbobj, iov)
 
     print(f"Successfully wrote payload ROI parameters with {iov=} and parameters\n\
           {toleranceZ=}, {tolerancePhi=}, {sigmaSystU=}, {sigmaSystV=},\n\
@@ -80,8 +80,8 @@ def writeROIParametersToDB(iovList=(0, 0, 0, 0),
 
 if __name__ == "__main__":
     # We want ROI selection enabled by default for experiment 0
-    writeROIParametersToDB((0, 0, 0, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
+    writeROICalculationParametersToDB((0, 0, 0, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
     # We don't want ROI selection enabled by default for experiment 1002
-    writeROIParametersToDB((1002, 0, 1002, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
+    writeROICalculationParametersToDB((1002, 0, 1002, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
     # We don't want ROI selection enabled by default for experiment 1003
-    writeROIParametersToDB((1003, 0, 1003, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)
+    writeROICalculationParametersToDB((1003, 0, 1003, -1), 0.5, 0.15, 0.02, 0.02, 10, 10, 0.5, 0.5)

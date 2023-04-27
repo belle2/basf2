@@ -29,7 +29,7 @@ namespace Belle2 {
     bool m_roiEnabled = true;
 
     /// Configuration parameters for ROIs
-    DBObjPtr<ROISimulationParameters> m_roiParameters;
+    DBObjPtr<ROISimulationParameters> m_ROISimulationParameters;
   };
 
 }

@@ -2054,11 +2054,9 @@ void ECLDataAnalysisModule::event()
       y++;
     }
 
-    int no_rel = 0;
     int no_Primary = 1;
 
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
-      no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
       if (mcParticle->getSecondaryPhysicsProcess() == 0 && mcParticle->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getDecayVertex().X();
@@ -2084,7 +2082,6 @@ void ECLDataAnalysisModule::event()
     double no_fFMatch = 0;
 
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
-      no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
       if (mcParticle->getSecondaryPhysicsProcess() == 0) {
         double vtxx = mcParticle->getDecayVertex().X();
@@ -2100,12 +2097,12 @@ void ECLDataAnalysisModule::event()
           if (px > 0)
             pPhi = TMath::ATan(py / px);
           if (px < 0)
-            pPhi = TMath::ATan(py / px) + 3.1415;
+            pPhi = TMath::ATan(py / px) + M_PI;
         } else {
           if (px > 0)
             pPhi = TMath::ATan(py / px) ;
           if (px < 0)
-            pPhi = TMath::ATan(py / px) - 3.1415;
+            pPhi = TMath::ATan(py / px) - M_PI;
         }
         if ((TMath::Sqrt(vtxx * vtxx + vtxy * vtxy) > 118) || (vtxz > 196.16) || (vtxz < -102.16)) {
           if (TMath::Abs(aECLShowers->getTheta() - pTheta) < 0.05 && TMath::Abs(aECLShowers->getPhi() - pPhi) < 0.05)
@@ -2127,12 +2124,12 @@ void ECLDataAnalysisModule::event()
           if (px > 0)
             pPhi = TMath::ATan(py / px);
           if (px < 0)
-            pPhi = TMath::ATan(py / px) + 3.1415;
+            pPhi = TMath::ATan(py / px) + M_PI;
         } else {
           if (px > 0)
             pPhi = TMath::ATan(py / px) ;
           if (px < 0)
-            pPhi = TMath::ATan(py / px) - 3.1415;
+            pPhi = TMath::ATan(py / px) - M_PI;
         }
         if ((TMath::Sqrt(vtxx * vtxx + vtxy * vtxy) > 118) || (vtxz > 196.16) || (vtxz < -102.16)) {
           if (TMath::Abs(aECLShowers->getTheta() - pTheta) < 0.05 && TMath::Abs(aECLShowers->getPhi() - pPhi) < 0.05)

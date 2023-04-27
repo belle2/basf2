@@ -466,7 +466,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
           //-------------------------------------------------------------------
           // Loop over all digits. They get a weight using the distance to the respective centroid.
-          int nDigit = 0;
           for (const auto& digitpoint : allPoints) {
 
             // cellid and position of this digit
@@ -537,7 +536,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
             // Fill the weight for this digits and this local maximum.
             B2DEBUG(175, "   cellid: " << digitcellid << ", energy: " << digitenergy << ", weight: " << weight << ", distance: " << distance);
             weights.push_back(weight);
-            ++nDigit;
 
           } // end allPoints
 

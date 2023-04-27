@@ -22,30 +22,6 @@ namespace Belle2 {
     /** Destructor */
     ~ROICalculationParameters() {}
 
-    /** Set whether ROI finding was used */
-    void setROIfinding(bool useROIfinding)
-    {
-      m_useROIfinding = useROIfinding;
-    }
-
-    /** Get whether ROI finding was used */
-    bool getROIfinding() const
-    {
-      return m_useROIfinding;
-    }
-
-    /** Set if ROI finding was disabled for every Nth event (-1 if not used) */
-    void setDisableROIforEveryNth(int disableROIforEveryNth)
-    {
-      m_disableROIforEveryNth = disableROIforEveryNth;
-    }
-
-    /** Get if ROI finding was disabled for every Nth event (-1 if not used) */
-    int getDisableROIforEveryNth() const
-    {
-      return m_disableROIforEveryNth;
-    }
-
     /** Set tolerance in z */
     void setToleranceZ(const double toleranceZ) { m_toleranceZ = toleranceZ; }
     /** Set tolerance in phi */
@@ -97,11 +73,6 @@ namespace Belle2 {
     double m_maxWidthU = 0.5;
     /** maximum V width of the ROI */
     double m_maxWidthV = 0.5;
-
-    /** you might to disable ROI finding for every Nth event (-1 if not used) */
-    int m_disableROIforEveryNth = -1;
-    /** store whether ROI finding was used */
-    bool m_useROIfinding = true;
 
     ClassDef(ROICalculationParameters, 1);  /**< ClassDef, necessary for ROOT */
   };

@@ -42,7 +42,7 @@ namespace Belle2 {
       } else {
         B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
                   "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -53,7 +53,7 @@ namespace Belle2 {
       } else {
         B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
                   "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -67,11 +67,11 @@ namespace Belle2 {
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (!cluster) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       const KlId* klid = cluster->getRelatedTo<KlId>();
       if (!klid) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return klid->getKlId();
     }
@@ -84,10 +84,10 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getPulseShapeDiscriminationMVA();
         } else {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterNumberOfHadronDigits(const Particle* particle)
@@ -98,9 +98,9 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getNumberOfHadronDigits();
         } else
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterDetectionRegion(const Particle* particle)
@@ -110,7 +110,7 @@ namespace Belle2 {
       if (cluster)
         return cluster->getDetectorRegion();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterIsolation(const Particle* particle)
@@ -122,7 +122,7 @@ namespace Belle2 {
         if (minDist > 0)
           return minDist;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterIsolationID(const Particle* particle)
@@ -132,7 +132,7 @@ namespace Belle2 {
       if (cluster)
         return cluster->getMinTrkDistanceID();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     Manager::FunctionPtr eclClusterIsolationVar(const std::vector<std::string>& arguments)
@@ -154,9 +154,9 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
         const ECLCluster* cluster = particle->getECLCluster();
         if (!cluster)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         auto trackID = cluster->getMinTrkDistanceID();
-        double result = std::numeric_limits<float>::quiet_NaN();
+        double result = Const::doubleNaN;
         // Find particle with that track ID:
         for (unsigned int i = 0; i < particleList->getListSize(); i++)
         {
@@ -178,7 +178,7 @@ namespace Belle2 {
       if (cluster)
         return  cluster->getConnectedRegionId();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterDeltaL(const Particle* particle)
@@ -188,7 +188,7 @@ namespace Belle2 {
       if (cluster)
         return cluster->getDeltaL();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorE(const Particle* particle)
@@ -198,7 +198,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getUncertaintyEnergy();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterUncorrectedE(const Particle* particle)
@@ -208,7 +208,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getEnergyRaw();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterE(const Particle* particle)
@@ -222,7 +222,7 @@ namespace Belle2 {
 
         return frame.getMomentum(p4Cluster).E();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHighestE(const Particle* particle)
@@ -232,7 +232,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getEnergyHighestCrystal();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterCellId(const Particle* particle)
@@ -242,7 +242,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getMaxECellId();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     // An array with each number representing the last number of the cellID per thetaID. There are 69 thetaIDs in total.
@@ -263,7 +263,7 @@ namespace Belle2 {
         return std::distance(lastCellIDperThetaID.begin(), std::lower_bound(lastCellIDperThetaID.begin(), lastCellIDperThetaID.end(),
                              cellID));
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterPhiId(const Particle* particle)
@@ -280,7 +280,7 @@ namespace Belle2 {
           return cellID - closestinlist - 1;
         }
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterTiming(const Particle* particle)
@@ -290,7 +290,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getTime();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasFailedTiming(const Particle* particle)
@@ -299,7 +299,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasFailedFitTime();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorTiming(const Particle* particle)
@@ -309,7 +309,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getDeltaTime99();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasFailedErrorTiming(const Particle* particle)
@@ -318,7 +318,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasFailedTimeResolution();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterTheta(const Particle* particle)
@@ -332,7 +332,7 @@ namespace Belle2 {
 
         return frame.getMomentum(p4Cluster).Theta();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorTheta(const Particle* particle)
@@ -342,7 +342,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getUncertaintyTheta();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorPhi(const Particle* particle)
@@ -352,7 +352,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getUncertaintyPhi();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterPhi(const Particle* particle)
@@ -366,7 +366,7 @@ namespace Belle2 {
 
         return frame.getMomentum(p4Cluster).Phi();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterR(const Particle* particle)
@@ -376,7 +376,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getR();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterE1E9(const Particle* particle)
@@ -386,7 +386,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getE1oE9();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterE9E21(const Particle* particle)
@@ -396,7 +396,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getE9oE21();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterAbsZernikeMoment40(const Particle* particle)
@@ -406,7 +406,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getAbsZernike40();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterAbsZernikeMoment51(const Particle* particle)
@@ -416,7 +416,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getAbsZernike51();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterZernikeMVA(const Particle* particle)
@@ -426,7 +426,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getZernikeMVA();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterSecondMoment(const Particle* particle)
@@ -436,7 +436,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getSecondMoment();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterLAT(const Particle* particle)
@@ -446,7 +446,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getLAT();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterNHits(const Particle* particle)
@@ -456,7 +456,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getNumberOfCrystals();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterTrackMatched(const Particle* particle)
@@ -471,7 +471,7 @@ namespace Belle2 {
         else
           return 0.0;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double nECLClusterTrackMatches(const Particle* particle)
@@ -479,7 +479,7 @@ namespace Belle2 {
       // if no ECL cluster then nan
       const ECLCluster* cluster = particle->getECLCluster();
       if (!cluster)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       // one or more tracks may be matched to charged particles
       size_t out = cluster->getRelationsFrom<Track>().size();
@@ -492,7 +492,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getConnectedRegionId();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterId(const Particle* particle)
@@ -501,7 +501,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getClusterId();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasNPhotonsHypothesis(const Particle* particle)
@@ -510,7 +510,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasNeutralHadronHypothesis(const Particle* particle)
@@ -519,7 +519,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
@@ -528,7 +528,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasPulseShapeDiscrimination();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclExtTheta(const Particle* particle)
@@ -543,11 +543,11 @@ namespace Belle2 {
           return eclinfo->getExtTheta();
         } else {
           B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclExtPhi(const Particle* particle)
@@ -562,11 +562,11 @@ namespace Belle2 {
           return eclinfo->getExtPhi();
         } else {
           B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclExtPhiId(const Particle* particle)
@@ -580,11 +580,11 @@ namespace Belle2 {
           return eclinfo->getExtPhiId();
         } else {
           B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double weightedAverageECLTime(const Particle* particle)
@@ -592,7 +592,7 @@ namespace Belle2 {
       int nDaughters = particle->getNDaughters();
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       double numer = 0, denom = 0;
@@ -619,12 +619,12 @@ namespace Belle2 {
 
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       if (denom == 0) {
         B2WARNING("The denominator of the weighted mean is zero!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       } else {
         B2DEBUG(10, "numer/denom = " << numer / denom);
         return numer / denom;
@@ -636,7 +636,7 @@ namespace Belle2 {
       int nDaughters = particle->getNDaughters();
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       double maxTimeDiff = -DBL_MAX;
@@ -667,12 +667,12 @@ namespace Belle2 {
 
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       if (maxTimeDiff < 0) {
         B2WARNING("The max time difference is negative!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       } else {
         B2DEBUG(10, "maxTimeDiff = " << maxTimeDiff);
         return maxTimeDiff;
@@ -684,9 +684,9 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getArrayIndex();
-      } else return std::numeric_limits<double>::quiet_NaN();
+      } else return Const::doubleNaN;
 
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
 
@@ -696,56 +696,56 @@ namespace Belle2 {
     double nECLOutOfTimeCrystalsFWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTimeFWD();
     }
 
     double nECLOutOfTimeCrystalsBarrel(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTimeBarrel();
     }
 
     double nECLOutOfTimeCrystalsBWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTimeBWD();
     }
 
     double nECLOutOfTimeCrystals(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTime();
     }
 
     double nRejectedECLShowersFWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLShowersRejectedFWD();
     }
 
     double nRejectedECLShowersBarrel(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLShowersRejectedBarrel();
     }
 
     double nRejectedECLShowersBWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLShowersRejectedBWD();
     }
 
     double nRejectedECLShowers(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double) elci->getNECLShowersRejected();
     }
 
@@ -756,7 +756,7 @@ namespace Belle2 {
         E += part->getExtraInfo("bremsCorrectedPhotonEnergy");
       }
       const double p =  part->getMomentumMagnitude();
-      if (0 == p) { return std::numeric_limits<float>::quiet_NaN();}
+      if (0 == p) { return Const::doubleNaN;}
       return E / p;
     }
 
@@ -793,7 +793,7 @@ namespace Belle2 {
 
         if (nClusterDaughters < 1) {
           B2WARNING("There are no clusters amongst the daughters of the provided particle!");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
         B2DEBUG(10, "Number of daughters with cluster associated = " << nClusterDaughters);
         return sum.M();
@@ -823,7 +823,7 @@ namespace Belle2 {
         if (particle->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The variable photonHasOverlap is supposed to be calculated for photons. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         StoreObjPtr<ParticleList> photonlist(photonlistname);
@@ -831,13 +831,13 @@ namespace Belle2 {
         {
           B2WARNING("The provided particle list " << photonlistname << " does not exist."
                     " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (photonlist->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The list " << photonlistname << " does not contain photons."
                     " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         StoreObjPtr<ParticleList> tracklist(tracklistname);
@@ -845,13 +845,13 @@ namespace Belle2 {
         {
           B2WARNING("The provided particle list " << tracklistname << " does not exist."
                     " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tracklist->getPDGCode()))))
         {
           B2WARNING("The list " << tracklistname << " does not contain charged final state particles."
                     " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         double connectedRegionID = eclClusterConnectedRegionID(particle);

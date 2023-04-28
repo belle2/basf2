@@ -1,4 +1,4 @@
-.. _tracking_datastore: 
+.. _tracking_datastore:
 
 Tracking DataStore (dataobjects)
 ================================

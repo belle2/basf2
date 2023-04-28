@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisCDCDedx.h>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -276,7 +277,14 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     int fbin = hdEdxIRScatC->FindFirstBinAbove(0, 1);
     int lbin = hdEdxIRScatC->FindLastBinAbove(0, 1);
     int nbin = lbin - fbin + 1;
-    if (nbin <= 0)nbin = 1;
+
+    vector<TH1D*> hdEdxIRInd(nbin);
+    for (int ibin = 0; ibin < nbin; ibin++) {
+      int localbin = ibin + fbin;
+      hdEdxIRInd[ibin] = (TH1D*)hdEdxIRScatC->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
+    }
+
+    if (nbin <= 0) nbin = 1;
 
     TH1F* hdEdxIRMean = new TH1F("hdEdxIRMean", "", nbin, 0.5, nbin + 0.5);
     hdEdxIRMean->SetTitle("CDC-dE/dx gain(#mu): intra-run variation;Events(M);dE/dx (#mu_{fit})");

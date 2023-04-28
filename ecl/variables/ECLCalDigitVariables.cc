@@ -6,29 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// analysis
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/Particle.h>
-
-// framework
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-// for crystal geometry
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/geometry/B2Vector3.h>
-
-// dataobjects
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/MCParticle.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCellIdMapping.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
+/* Basf2 headers. */
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
+
+/* ROOT headers. */
+#include <Math/VectorUtil.h>
 
 using namespace std;
 
@@ -296,10 +294,10 @@ namespace Belle2 {
         B2Vector3D showerPosition;
         showerPosition.SetMagThetaPhi(shower->getR(), shower->getTheta(), shower->getPhi());
 
-        TVector3 tempP = showerPosition - calDigitPosition;
-        if (varid == varType::rRelativeToShower) return tempP.Mag();
+        ROOT::Math::XYZVector tempP = showerPosition - calDigitPosition;
+        if (varid == varType::rRelativeToShower) return tempP.R();
         if (varid == varType::thetaRelativeToShower) return tempP.Theta();
-        if (varid == varType::cosThetaRelativeToShower) return tempP.CosTheta();
+        if (varid == varType::cosThetaRelativeToShower) return tempP.Z() / tempP.R();
         if (varid == varType::phiRelativeToShower) return tempP.Phi();
       } else {
         B2FATAL("variable id not found.");
@@ -492,24 +490,28 @@ namespace Belle2 {
         }
 
         if (!edgeExtHit) return std::numeric_limits<double>::quiet_NaN();
-        const TVector3& extHitPosition = edgeExtHit->getPositionTVector3();
-        const TVector3& trackPointing = edgeExtHit->getMomentumTVector3();
+        const ROOT::Math::XYZVector& extHitPosition = edgeExtHit->getPosition();
+        const ROOT::Math::XYZVector& trackPointing = edgeExtHit->getMomentum();
 
         geometry->Mapping(edgeExtHit->getCopyID() - 1);
         const int thetaID = geometry->GetThetaID();
         const int phiID = geometry->GetPhiID();
+        const int cellID = geometry->GetCellID(thetaID, phiID);
 
-        const TVector3& crystalCenterPosition = geometry->GetCrystalPos(geometry->GetCellID(thetaID, phiID));
-        const TVector3& crystalOrientation = geometry->GetCrystalVec(geometry->GetCellID(thetaID, phiID));
-        const TVector3& crystalPositionOnSurface = crystalCenterPosition - (crystalCenterPosition - extHitPosition).Dot(
-                                                     crystalOrientation.Unit()) * crystalOrientation.Unit();
-
+        const ROOT::Math::XYZVector& crystalCenterPosition =
+          geometry->GetCrystalPos(cellID);
+        const ROOT::Math::XYZVector& crystalOrientation =
+          geometry->GetCrystalVec(cellID);
+        const ROOT::Math::XYZVector& crystalPositionOnSurface =
+          crystalCenterPosition -
+          (crystalCenterPosition - extHitPosition).Dot(
+            crystalOrientation.Unit()) * crystalOrientation.Unit();
         if (varid == varType::phiOffset) {
-          return extHitPosition.DeltaPhi(crystalPositionOnSurface);
+          return ROOT::Math::VectorUtil::Phi_mpi_pi(extHitPosition.Phi() - crystalPositionOnSurface.Phi());
         } else if (varid == varType::thetaOffset) {
           return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
         } else if (varid == varType::phiPointing) {
-          return trackPointing.DeltaPhi(crystalOrientation);
+          return ROOT::Math::VectorUtil::Phi_mpi_pi(trackPointing.Phi() - crystalOrientation.Phi());
         } else if (varid == varType::thetaPointing) {
           return trackPointing.Theta() - crystalOrientation.Theta();
         }
@@ -526,7 +528,7 @@ namespace Belle2 {
     {
 
       if (vars.size() != 1) {
-        B2FATAL("Need exactly one parameters (energy index).");
+        B2FATAL("Need exactly one parameter (energy index).");
       }
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::energy};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);

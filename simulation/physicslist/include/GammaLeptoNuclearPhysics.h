@@ -28,7 +28,9 @@ namespace Belle2 {
      */
     class GammaLeptoNuclearPhysics: public G4VPhysicsConstructor {
     public:
+      /** Constructor **/
       GammaLeptoNuclearPhysics(const G4int verbosityLevel = 0);
+      /** Destructor **/
       ~GammaLeptoNuclearPhysics();
 
       /** Build processes, models, cross sections used in physics list */

@@ -61,7 +61,7 @@ ExtPhysicsList::ExtPhysicsList() : G4VModularPhysicsList()
   G4Deuteron::Deuteron();
   G4AntiDeuteron::AntiDeuteron();
   G4GenericIon::GenericIon();
-  RegisterPhysics(new Simulation::ExtPhysicsConstructor);
+  RegisterPhysics(new ExtPhysicsConstructor);
   if (false) SetCuts();
 }
 

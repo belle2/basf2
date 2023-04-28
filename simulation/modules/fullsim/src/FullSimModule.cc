@@ -248,16 +248,16 @@ void FullSimModule::initialize()
       }
     }
 
-    // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
-    // all the energy (as is done in G4ErrorPhysicsList)
-    G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
-    myParticleIterator->reset();
-    while ((*myParticleIterator)()) {
-      G4ParticleDefinition* particle = myParticleIterator->value();
-      if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
-        physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
-      }
-    }
+    // // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
+    // // all the energy (as is done in G4ErrorPhysicsList)
+    // G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
+    // myParticleIterator->reset();
+    // while ((*myParticleIterator)()) {
+    //   G4ParticleDefinition* particle = myParticleIterator->value();
+    //   if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
+    //     physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
+    //   }
+    // }
     runManager.SetUserInitialization(physicsList);
   }
 

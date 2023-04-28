@@ -73,16 +73,16 @@ void ExtPhysicsList::SetCuts()
 {
   // Set cuts to the defaultCutValue.
   SetCutsWithDefault();
-  // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
-  // all the energy (as is done in G4ErrorPhysicsList)
-  G4ParticleTable* myParticleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleTable::G4PTblDicIterator* myParticleIterator = myParticleTable->GetIterator();
-  myParticleIterator->reset();
-  while ((*myParticleIterator)()) {
-    G4ParticleDefinition* particle = myParticleIterator->value();
-    if (particle->GetParticleName().substr(0, 4) == "g4e_") {
-      SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
-    }
-  }
+  // // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
+  // // all the energy (as is done in G4ErrorPhysicsList)
+  // G4ParticleTable* myParticleTable = G4ParticleTable::GetParticleTable();
+  // G4ParticleTable::G4PTblDicIterator* myParticleIterator = myParticleTable->GetIterator();
+  // myParticleIterator->reset();
+  // while ((*myParticleIterator)()) {
+  //   G4ParticleDefinition* particle = myParticleIterator->value();
+  //   if (particle->GetParticleName().substr(0, 4) == "g4e_") {
+  //     SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
+  //   }
+  // }
 
 }

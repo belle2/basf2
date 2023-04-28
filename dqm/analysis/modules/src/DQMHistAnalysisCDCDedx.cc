@@ -278,12 +278,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     int lbin = hdEdxIRScatC->FindLastBinAbove(0, 1);
     int nbin = lbin - fbin + 1;
 
-    vector<TH1D*> hdEdxIRInd(nbin);
-    for (int ibin = 0; ibin < nbin; ibin++) {
-      int localbin = ibin + fbin;
-      hdEdxIRInd[ibin] = (TH1D*)hdEdxIRScatC->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
-    }
-
     if (nbin <= 0) nbin = 1;
 
     TH1F* hdEdxIRMean = new TH1F("hdEdxIRMean", "", nbin, 0.5, nbin + 0.5);
@@ -521,24 +515,20 @@ void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D* hdEdx, TH1F* hmean, TH1F* h
 
   int fbin = hdEdx->FindFirstBinAbove(0, 1);
 
-  TH1D* hdEdxIRInd[nbin];
   for (int ibin = 0; ibin < nbin; ibin++) {
     int localbin = ibin + fbin;
-    hdEdxIRInd[ibin] = (TH1D*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
-  }
-
-  for (int ibin = 0; ibin < nbin; ibin++) {
+    TH1D* hdEdxIRInd = (TH1D*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
 
     double mean = 0.0, meanerr = 0.0;
     double sigma = 0.0, sigmaerr = 0.0;
 
-    fitHistogram(hdEdxIRInd[ibin], m_status);
+    fitHistogram(hdEdxIRInd, m_status);
 
     if (m_status == "OK") {
-      mean = hdEdxIRInd[ibin]->GetFunction("f_gaus")->GetParameter(1);
-      meanerr = hdEdxIRInd[ibin]->GetFunction("f_gaus")->GetParError(1);
-      sigma = hdEdxIRInd[ibin]->GetFunction("f_gaus")->GetParameter(2);
-      sigmaerr = hdEdxIRInd[ibin]->GetFunction("f_gaus")->GetParError(2);
+      mean = hdEdxIRInd->GetFunction("f_gaus")->GetParameter(1);
+      meanerr = hdEdxIRInd->GetFunction("f_gaus")->GetParError(1);
+      sigma = hdEdxIRInd->GetFunction("f_gaus")->GetParameter(2);
+      sigmaerr = hdEdxIRInd->GetFunction("f_gaus")->GetParError(2);
     }
 
     hmean->SetBinContent(ibin + 1, mean);
@@ -548,7 +538,7 @@ void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D* hdEdx, TH1F* hmean, TH1F* h
   }
 
   //Let's reset histogram here
-  for (int ibin = 0; ibin < nbin; ibin++) hdEdxIRInd[ibin]->Reset();
+  // for (int ibin = 0; ibin < nbin; ibin++) hdEdxIRInd[ibin]->Reset();
 }
 
 //-----------------------------------------------

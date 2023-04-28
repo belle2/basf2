@@ -42,12 +42,17 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
+    'sphinx_codeautolink',
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
     'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
+
+# Add codeautolink warnings for compilation
+codeautolink_warn_on_missing_inventory = True
+codeautolink_warn_on_failed_resolve = True
 
 nbsphinx_allow_errors = True
 # Anything that ends with .jupy.py will be understood as a jupyter
@@ -364,7 +369,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
-                       'matplotlib': ('https://matplotlib.org/stable/', None)}
+                       'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):

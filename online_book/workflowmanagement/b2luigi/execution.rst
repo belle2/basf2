@@ -19,5 +19,5 @@ You can run b2luigi workflows dryly with :code:`python3 main.py --dry-run` to ch
 Luigi features a dynamic directed acyclic graph, that can be viewed in the *Luigi Task Status*. To access it, start the luigi scheduler in a tmux process on KEKcc and specify the host and port in the workflow execution:
 
 .. literalinclude:: visualize.txt
-   :language: python
+   :language: shell
    :linenos:

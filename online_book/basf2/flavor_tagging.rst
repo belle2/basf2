@@ -57,6 +57,7 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S10
         :end-at: E10
+        :language: python        
 
 Good! Now we have the weights and we have already created the ROE, so we can
 start right away!
@@ -75,12 +76,14 @@ start right away!
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S23
         :end-at: E23
+        :language: python        
 
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S20
         :end-at: E20
+        :language: python        
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -95,6 +98,7 @@ start right away!
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S43
         :end-at: E43
+        :language: python        
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -108,6 +112,7 @@ start right away!
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :linenos:
+        :language: python        
 
 Good!
 Now let's talk about the output of the flavor tagger. This is the value
@@ -157,6 +162,7 @@ it to ``FBDT_qrCombined``!
 
     .. literalinclude:: flavor_tagging/plot_flavor_tags.py
         :linenos:
+        :language: python        
 
     .. _flavor_plots:
     .. figure:: flavor_tagging/flavor_tags.svg

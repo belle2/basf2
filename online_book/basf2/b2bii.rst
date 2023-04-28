@@ -413,6 +413,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
 
    .. literalinclude:: b2bii/b2bii_example.py
       :linenos:
+      :language: python        
 
 
 .. admonition:: Key points

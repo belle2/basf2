@@ -228,6 +228,7 @@ results.
 
      .. literalinclude:: steering_files/059_vertex_fitting.py
          :linenos:
+         :language: python        
 
 You can now plot some relevant vertex variables. In general, the choice would
 depend on what you need for your analysis. A few examples would include:
@@ -269,6 +270,7 @@ As an exercise we will focus on the first two.
 
     .. literalinclude:: vertex/vertex_plots.py
         :linenos:
+        :language: python        
 
 .. _vertex_plots:
 .. figure:: vertex/jpsi_dz.svg

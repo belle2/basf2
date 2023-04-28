@@ -42,13 +42,13 @@ namespace Belle2 {
       void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
 
       /** Setter for m_AttemptLimit */
-      void setAttemptLimit(int AttemptLimit) {m_lastCellID = lastCellID;}
+      void setAttemptLimit(int AttemptLimit) {m_AttemptLimit = AttemptLimit;}
 
       /** Setter for m_ParamLimitFactor */
-      void setParamLimitFactor(int ParamLimitFactor) {m_lastCellID = lastCellID;}
+      void setParamLimitFactor(int ParamLimitFactor) {m_ParamLimitFactor = ParamLimitFactor;}
 
       /** Setter for m_CollectorLimit */
-      void setCollectorLimit(int CollectorLimit) {m_lastCellID = lastCellID;}
+      void setCollectorLimit(int CollectorLimit) {m_CollectorLimit = CollectorLimit;}
 
     protected:
 

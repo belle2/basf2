@@ -70,10 +70,6 @@ variables.addAlias('DistanceCovMatrixYZ', 'extraInfo(CalculatedDistanceCovMatrix
 variables.addAlias('DistanceCovMatrixZX', 'extraInfo(CalculatedDistanceCovMatrixZX)')
 variables.addAlias('DistanceCovMatrixZY', 'extraInfo(CalculatedDistanceCovMatrixZY)')
 variables.addAlias('DistanceCovMatrixZZ', 'extraInfo(CalculatedDistanceCovMatrixZZ)')
-
-# take the latest GT, not the one from file
-b2.conditions.disable_globaltag_replay()
-
 # create path
 my_path = b2.create_path()
 

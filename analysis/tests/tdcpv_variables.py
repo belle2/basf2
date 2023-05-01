@@ -14,16 +14,12 @@ A test of the TDCPV variables using the small test file for running quickly
 """
 
 import b2test_utils
-from basf2 import set_random_seed, create_path, process, conditions
+from basf2 import set_random_seed, create_path, process
 import modularAnalysis as ma
 import vertex as vx
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
-
-# take the latest GT, not the one from file
-conditions.disable_globaltag_replay()
-
 set_random_seed("1337")
 
 ###############################################################################

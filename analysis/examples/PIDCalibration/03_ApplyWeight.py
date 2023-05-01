@@ -16,9 +16,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 
-# take the latest GT, not the one from file
-b2.conditions.disable_globaltag_replay()
-
 localDB = 'localdb/database.txt'
 b2.conditions.append_testing_payloads(localDB)
 

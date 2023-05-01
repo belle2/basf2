@@ -29,9 +29,6 @@ class TestAllParticleCombiner(unittest.TestCase):
         # Also make sure the testfile name is replaced if necessary
         b2test_utils.configure_logging_for_tests({testFile.name: "${testfile}"})
 
-        # take the latest GT, not the one from file
-        basf2.conditions.disable_globaltag_replay()
-
         basf2.set_random_seed("1234")
         main = basf2.create_path()
         inputfile = b2test_utils.require_file(

@@ -186,6 +186,8 @@ namespace Belle2::Conditions {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }
+    // TODO: add conditions to trigger this extra GT
+    m_inputGlobaltags->emplace_back("nominal_CollisionAxisCMS");
     // END TODO/HACK
   }
 

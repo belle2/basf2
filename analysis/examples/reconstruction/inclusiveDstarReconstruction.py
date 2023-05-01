@@ -17,8 +17,6 @@ import basf2
 import modularAnalysis as mA
 import stdPi0s
 
-# take the latest GT, not the one from file
-basf2.conditions.disable_globaltag_replay()
 
 main_path = basf2.create_path()
 

@@ -37,9 +37,6 @@ import uproot
 
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
-# take the latest GT, not the one from file
-basf2.conditions.disable_globaltag_replay()
-
 # --I/O----------------------------------------------------------------------------------------
 step = 'train'
 

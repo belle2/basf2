@@ -809,7 +809,7 @@ TBranch: __ncandidates__, 6
 TBranch: __weight__, 1
 TBranch: combinationID, 3
 TBranch: deltaPhi, -2.264
-TBranch: deltaPhiCMS, -2.187
+TBranch: deltaPhiCMS, -2.186
 TBranch: deltaTheta, -0.5435
 TBranch: charge_0, -1
 TBranch: charge_1, 1
@@ -821,7 +821,7 @@ TBranch: clusterPhi_0, -1.572
 TBranch: clusterPhi_1, 2.447
 TBranch: clusterECMS_0, 0.1137
 TBranch: clusterECMS_1, 0.3107
-TBranch: clusterPhiCMS_0, -1.621
+TBranch: clusterPhiCMS_0, -1.624
 TBranch: clusterPhiCMS_1, 2.474
 TBranch: clusterThetaCMS_0, 1.172
-TBranch: clusterThetaCMS_1, 1.751
+TBranch: clusterThetaCMS_1, 1.755

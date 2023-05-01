@@ -30,7 +30,7 @@
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: K_S0 and cut: 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is master_2020-05-02
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2020-05-02, nominal_CollisionAxisCMS
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with
 	PDG = 511

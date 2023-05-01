@@ -14,6 +14,11 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+
+#include <framework/logging/Logger.h>
+
 #include <numeric>
 #include <stdexcept>
 #include <optional>
@@ -142,6 +147,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["selectmumu"] = 0;
   calculationResult["singleMuon"] = 0;
   calculationResult["cosmic"] = 0;
+  calculationResult["displacedVertex"] = 0;
   calculationResult["eeFlat0"] = 0;
   calculationResult["eeFlat1"] = 0;
   calculationResult["eeFlat2"] = 0;
@@ -889,6 +895,62 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         }
       }
     }
+  }
+
+  //..Displaced vertex
+  // See https://indico.belle2.org/event/8973/ and references therein
+  if (maximumPtTracksWithoutZCut.at(-1) and maximumPtTracksWithoutZCut.at(1)) {
+
+    //..Make particles of the two highest pt tracks (without IP cut)
+    const auto nTrack = maximumPtTracksWithoutZCut.at(-1)->track;
+    Particle* nParticle = new Particle(nTrack, Const::pion);
+
+    const auto pTrack = maximumPtTracksWithoutZCut.at(1)->track;
+    Particle* pParticle = new Particle(pTrack, Const::pion);
+
+    //..Make a vertex of these two
+    Belle2::analysis::VertexFitKFit* vertexFit = new Belle2::analysis::VertexFitKFit();
+    vertexFit->addParticle(nParticle);
+    vertexFit->addParticle(pParticle);
+    vertexFit->doFit();
+
+    //..Vertex properties
+    const double chisq = vertexFit->getCHIsq();
+    const int ndf = vertexFit->getNDF();
+    const double vertexProb = TMath::Prob(chisq, ndf);
+    const auto vertexLocation = vertexFit->getVertex();
+    const double vertexXY = vertexLocation.perp();
+    const double vertexTheta = vertexLocation.theta() * TMath::RadToDeg();
+
+    //..Angular differance of two tracks to reject cosmics
+    //  Tolerance could be reduced from 10 deg to 2 deg if needed for physics reasons,
+    //  for a 5% increase in the rate of selected displaced vertex triggers.
+    //  See https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/1867
+    const ROOT::Math::PxPyPzEVector& momentumLabNeg(maximumPtTracksWithoutZCut.at(-1)->p4Lab);
+    const ROOT::Math::PxPyPzEVector& momentumLabPos(maximumPtTracksWithoutZCut.at(1)->p4Lab);
+    const double thetaSumLab = (momentumLabNeg.Theta() + momentumLabPos.Theta()) * TMath::RadToDeg();
+    double dPhiLab = std::abs(momentumLabNeg.Phi() - momentumLabPos.Phi()) * TMath::RadToDeg();
+    if (dPhiLab > 180) {
+      dPhiLab = 360 - dPhiLab;
+    }
+    const double backToBackTolerance = 10.; // degrees
+    const bool backToBackLab = std::abs(thetaSumLab - 180.) < backToBackTolerance and std::abs(dPhiLab - 180.) < backToBackTolerance;
+
+    //..Select a displaced vertex
+    const double minProbChiVertex = 0.005; // minimum probability chi square. Many backgrounds have bad chi sq.
+    const double minXYVertex = 3.; // minimum xy of vertex (cm). Should pass track filters below this.
+    const double maxXYVertex = 60.; // maximum xy. Insufficient CDC for good reconstruction beyond this.
+    const double minThetaVertex = 30.; // Large Bhabha background at low angles.
+    const double maxThetaVertex = 120.; // Large Bhabha background at low angles.
+    if (vertexProb > minProbChiVertex and vertexXY > minXYVertex and vertexXY < maxXYVertex and vertexTheta > minThetaVertex
+        and vertexTheta < maxThetaVertex
+        and not backToBackLab) {calculationResult["displacedVertex"] = 1;}
+
+    //..Clean up
+    delete nParticle;
+    delete pParticle;
+    delete vertexFit;
+
   }
 
 }

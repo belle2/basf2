@@ -51,8 +51,8 @@ if __name__ == "__main__":
 
     # Skip test if files are not available
     try:
-        train_file = basf2.find_file('mva/train_D0toKpipi.root', 'examples')
-        test_file = basf2.find_file('mva/test_D0toKpipi.root', 'examples')
+        train_file = basf2.find_file('mva/train_D0toKpipi.root', 'examples', False)
+        test_file = basf2.find_file('mva/test_D0toKpipi.root', 'examples', False)
     except BaseException:
         b2test_utils.skip_test('Necessary files "train.root" and "test.root" not available.')
 

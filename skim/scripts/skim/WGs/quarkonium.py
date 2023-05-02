@@ -187,7 +187,7 @@ class CharmoniumPsi(BaseSkim):
         # Apply charged PID MVA.
         charged_pid_mva_enabled = True
         if charged_pid_mva_enabled:
-            basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v1')
+            basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v5')
             epsilon = 1e-8
             for p in ['electron', 'muon', 'pion', 'kaon']:
                 alias = f'{p}ID_ALL_LogTransfo'

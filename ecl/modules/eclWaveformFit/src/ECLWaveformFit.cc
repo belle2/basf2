@@ -281,7 +281,7 @@ void ECLWaveformFitModule::beginRun()
     int k = 0;
     for (int i = 0; i < c_NFitPoints; i++) {
       for (int j = 0; j < i + 1; j++) {
-        packedDefaultCovariance[k] = defaultCovariance[i][j];
+        packedDefaultCovariance.m_covMatPacked[k] = defaultCovariance[i][j];
         k++;
       }
     }

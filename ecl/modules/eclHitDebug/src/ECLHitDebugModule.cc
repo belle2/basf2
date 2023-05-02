@@ -19,7 +19,7 @@
 #include <framework/gearbox/Unit.h>
 
 /* ROOT headers. */
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -86,11 +86,11 @@ void ECLHitDebugModule::event()
     double hitE        = aECLSimHit->getEnergyDep() * Unit::GeV;
     double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
     G4ThreeVector t  =   aECLSimHit->getPosIn();
-    TVector3 HitInPos(t.x(), t.y(), t.z());
+    ROOT::Math::XYZVector HitInPos(t.x(), t.y(), t.z());
 
-    const TVector3& PosCell =  eclp->GetCrystalPos(hitCellId);
-    const TVector3& VecCell =  eclp->GetCrystalVec(hitCellId);
-    double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
+    const ROOT::Math::XYZVector& PosCell = eclp->GetCrystalPos(hitCellId);
+    const ROOT::Math::XYZVector& VecCell = eclp->GetCrystalVec(hitCellId);
+    double local_pos = (15. - (HitInPos  - PosCell).Dot(VecCell));
 
     int iECLCell = hitCellId;
     if (hitTOF < 8000) {

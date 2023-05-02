@@ -39,8 +39,8 @@ def writeROISimulationParametersToDB(iovList=(0, 0, 0, 0),
     # write db object to 'localdb/'
     Belle2.Database.Instance().storeData("ROISimulationParameters", dbobj, iov)
 
-    print(
-        f"Successfully wrote payload ROISimulationParameters with {iovList=} and parameters {enableROI=}, {disableROIforEveryNth=}")
+    print(f"Successfully wrote payload ROISimulationParameters with {iovList=} and \n\
+           parameters {enableROI=}, {disableROIforEveryNth=}")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@
 namespace Belle2 {
   namespace ECL {
 
-    /** Calibrate ecl crystals using gamma pair events */
+    /** Calibrate covariance matrix for crystals using delayed Bhabha events */
     class eclAutocovarianceCalibrationC1Algorithm : public CalibrationAlgorithm {
     public:
 

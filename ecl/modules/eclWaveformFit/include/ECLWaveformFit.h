@@ -84,13 +84,13 @@ namespace Belle2 {
     explicit SignalInterpolation2(const std::vector<double>&);
 
     /**
-     * Returns signal shape(+derivatives) in 31 equidistant time points
+     * Returns signal shape and derivatives in 31 equidistant time points
      * starting from t0.
      * @param[in]  t0          Time.
      * @param[out] function    Function values.
      * @param[out] derivatives Derivatives.
      */
-    void getshape(double t0, double* function, double* derivatives) const;
+    void getShape(double t0, double* function, double* derivatives) const;
 
   };
 

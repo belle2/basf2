@@ -62,10 +62,11 @@ namespace {
   //adc data array
   double fitA[c_NFitPoints];
 
-  //g_si: photon template signal shape
-  //g_sih: hadron template signal shape
-  const SignalInterpolation2* g_si;
-  const SignalInterpolation2* g_sih;
+  /** Photon template signal shape. */
+  const SignalInterpolation2* g_PhotonSignal;
+
+  /** Hadron template signal shape. */
+  const SignalInterpolation2* g_HadronSignal;
 
   /** Covariance matrix. */
   double s_CurrentCovMat[c_NFitPoints][c_NFitPoints] = {0};
@@ -85,8 +86,8 @@ namespace {
     //getting photon and hadron component shapes for set of fit parameters
     double amplitudeGamma[c_NFitPoints], derivativesGamma[c_NFitPoints];
     double amplitudeHadron[c_NFitPoints], derivativesHadron[c_NFitPoints];
-    g_si->getshape(T, amplitudeGamma, derivativesGamma);
-    g_sih->getshape(T, amplitudeHadron, derivativesHadron);
+    g_PhotonSignal->getShape(T, amplitudeGamma, derivativesGamma);
+    g_HadronSignal->getShape(T, amplitudeHadron, derivativesHadron);
 
     //computing difference between current fit result and adc data array
     #pragma omp simd
@@ -127,10 +128,10 @@ namespace {
     double amplitudeGamma[c_NFitPoints], derivativesGamma[c_NFitPoints];
     double amplitudeGamma2[c_NFitPoints], derivativesGamma2[c_NFitPoints];
     double amplitudeHadron[c_NFitPoints], derivativesHadron[c_NFitPoints];
-    g_si->getshape(T, amplitudeGamma, derivativesGamma);
+    g_PhotonSignal->getShape(T, amplitudeGamma, derivativesGamma);
     // Background photon.
-    g_si->getshape(T2, amplitudeGamma2, derivativesGamma2);
-    g_sih->getshape(T, amplitudeHadron, derivativesHadron);
+    g_PhotonSignal->getShape(T2, amplitudeGamma2, derivativesGamma2);
+    g_HadronSignal->getShape(T, amplitudeHadron, derivativesHadron);
 
     //computing difference between current fit result and adc data array
     #pragma omp simd
@@ -369,12 +370,12 @@ void ECLWaveformFitModule::event()
     //loading template for waveform
     if (m_IsMCFlag == 0) {
       //data cell id dependent
-      g_si = &m_si[id][0];
-      g_sih = &m_si[id][1];
+      g_PhotonSignal = &m_si[id][0];
+      g_HadronSignal = &m_si[id][1];
     } else {
       // mc uses same waveform
-      g_si = &m_si[0][0];
-      g_sih = &m_si[0][1];
+      g_PhotonSignal = &m_si[0][0];
+      g_HadronSignal = &m_si[0][1];
     }
 
     //get covariance matrix for cell id
@@ -400,7 +401,7 @@ void ECLWaveformFitModule::event()
 
       //hadron + background photon fit failed try diode fit (fit type = 2)
       if (p2_chi2 >= m_chi2Threshold25dof) {
-        g_sih = &m_si[0][2];//set second component to diode
+        g_HadronSignal = &m_si[0][2];//set second component to diode
         fitType = ECLDsp::photonDiodeCrossing;
         p2_chi2 = -1;
         Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
@@ -570,7 +571,7 @@ SignalInterpolation2::SignalInterpolation2(const std::vector<double>& s)
   m_r1 = m_DerivativeInterpolation[i2] / m_DerivativeInterpolation[i1];
 }
 
-void SignalInterpolation2::getshape(
+void SignalInterpolation2::getShape(
   double t0, double* function, double* derivatives) const
 {
   /* If before pulse start time (negative times), return 0. */

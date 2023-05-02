@@ -71,7 +71,7 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
     # write db object to 'localdb/'
     Belle2.Database.Instance().storeData("ROICalculationParameters", dbobj, iov)
 
-    print(f"Successfully wrote payload ROI parameters with {iov=} and parameters\n\
+    print(f"Successfully wrote payload ROI parameters with {iovList=} and parameters\n\
           {toleranceZ=}, {tolerancePhi=}, {sigmaSystU=}, {sigmaSystV=},\n\
           {numSigmaTotU=}, {numSigmaTotV=}, {maxWidthU=}, {maxWidthV=}")
 

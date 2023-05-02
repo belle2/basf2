@@ -68,9 +68,6 @@ namespace {
   /** Hadron template signal shape. */
   const SignalInterpolation2* g_HadronSignal;
 
-  /** Covariance matrix. */
-  double s_CurrentCovMat[c_NFitPoints][c_NFitPoints] = {0};
-
   /** Noise level. */
   double aNoise;
 
@@ -272,13 +269,24 @@ void ECLWaveformFitModule::beginRun()
         regularize(buf, reg, c_NFitPoints, x0 -= 1, 1);
     }
   } else {
-    //default covariance matrix is identity for all crystals
+    // Default covariance matrix is identity for all crystals.
+    double defaultCovariance[c_NFitPoints][c_NFitPoints];
+    CovariancePacked packedDefaultCovariance;
     const double isigma = 1 / 7.5;
     for (int i = 0; i < c_NFitPoints; ++i) {
       for (int j = 0; j < c_NFitPoints; ++j) {
-        s_CurrentCovMat[i][j] = (i == j) * isigma * isigma;
+        defaultCovariance[i][j] = (i == j) * isigma * isigma;
       }
     }
+    int k = 0;
+    for (int i = 0; i < c_NFitPoints; i++) {
+      for (int j = 0; j < i + 1; j++) {
+        packedDefaultCovariance[k] = defaultCovariance[i][j];
+        k++;
+      }
+    }
+    ecl_waveform_fit_load_inverse_covariance(
+      packedDefaultCovariance.m_covMatPacked);
   }
 
 }

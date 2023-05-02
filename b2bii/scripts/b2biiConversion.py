@@ -38,6 +38,7 @@ def setupBelleDatabaseServer():
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
+                                  saveResultExtraInfo=False,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
@@ -56,6 +57,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     Args:
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
+        saveResultExtraInfo (bool): Save B2BIIFixMdst module return value as EventExtraInfo.
         useBelleDBServer (str): None to use the recommended BelleDB server.
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
@@ -133,6 +135,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix = b2.register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        fix.param('SaveResultExtraInfo', saveResultExtraInfo)
         # Hadron skim settings
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)

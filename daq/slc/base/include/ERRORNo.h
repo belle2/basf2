@@ -25,7 +25,6 @@ namespace Belle2 {
   public:
     ERRORNo() {}
     ERRORNo(const Enum& e) : Enum(e) {}
-    ERRORNo(const ERRORNo& cmd) : Enum(cmd) {}
     ERRORNo(const char* label) { *this = label; }
     ERRORNo(int id) { *this = id; }
     ~ERRORNo() {}

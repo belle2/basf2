@@ -95,6 +95,7 @@
   source="Double32_t m_cov5[15]; Double32_t m_tau[5];"      \
   targetClass="Belle2::TrackFitResult"          \
   target="m_cov5"                 \
+  include="TMath.h,TMatrixD.h,TMatrixDSym.h" \
   code="{							      \
   /* Translate the false covariance matrix back to the 6x6 matrix */  \
   TMatrixDSym oldCov5(5);					      \

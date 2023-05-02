@@ -66,6 +66,26 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     {
+      Particle pH({0.290582573157898, 0, 6.99796952744559,  7.004},  11);
+      Particle pL({0.166035330010433, 0, -3.99855423973071, 4.002}, -11);
+
+      Particle p({0, 0.999999869440028, 0, 1.0}, -11);
+      const double eps = 1e-15;
+      UseReferenceFrame<CMSFrame> dummy;
+
+      EXPECT_NEAR(0.0, particlePx(&pH), eps);
+      EXPECT_NEAR(0.0, particlePy(&pH), eps);
+      EXPECT_NEAR(0.0, particlePx(&pL), eps);
+      EXPECT_NEAR(0.0, particlePy(&pL), eps);
+      EXPECT_FLOAT_EQ(5.289778893721573, particlePz(&pH));
+      EXPECT_FLOAT_EQ(-5.289778893721573, particlePz(&pL));
+      EXPECT_FLOAT_EQ(10.579557836806245064 / 2, particleE(&pH));
+      EXPECT_FLOAT_EQ(10.579557836806245064 / 2, particleE(&pL));
+
+      EXPECT_FLOAT_EQ(0.999999869440028, particlePy(&p));
+    }
+
+    {
       Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
 
       TMatrixFSym error(7);
@@ -97,14 +117,14 @@ namespace {
 
       {
         UseReferenceFrame<CMSFrame> dummy;
-        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
-        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.68174648, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80918372, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.5489524, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80521482, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -917,11 +937,11 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.68176979);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)),  0.68174650327489894064);
 
     var = Manager::Instance().getVariable("useCMSFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80920333);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80918372124478121776);
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);

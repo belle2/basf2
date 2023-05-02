@@ -7028,7 +7028,7 @@ EventLevelTriggerTimeInfo:
   getBunchNumber(): 0
 [ERROR] Cannot find payload in any of the configured global tags
 	name = TTDOffsets
-	globaltags = release-06-00-00
+	globaltags = release-06-00-00, nominal_CollisionAxisCMS
 	experiment = 0
 	run = 0
 [ERROR] Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.

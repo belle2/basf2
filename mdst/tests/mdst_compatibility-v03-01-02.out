@@ -506,7 +506,7 @@ Track#12:
 TrackFitResult#0:
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-03-01-00_rev3, Legacy_IP_Information
+[INFO] Conditions data: configured globaltags (highest priority first) are release-03-01-00_rev3, Legacy_IP_Information, nominal_CollisionAxisCMS
   get4Momentum(): (-0.22817,0.0114942,0.0574713,0.273818)
   getChargeSign(): 1
   getChi2(): nan

@@ -15,8 +15,8 @@ def writeROISimulationParametersToDB(iovList=(0, 0, 0, 0),
                                      enableROI: bool = True,
                                      disableROIforEveryNth: int = -1) -> None:
     """
-    run this script to create db file storing the payload information of the ROICalculationParameters
-    see `tracking/dbobjects/include/ROICalculationParameters.h` for definition of the parameters
+    run this script to create db file storing the payload information of the ROISimulationParameters
+    see `simulation/dbobjects/include/ROISimulationParameters.h` for definition of the parameters
 
     :param iovList: List of IoVs for the parameters
     :param enableROI: Enable ROI finding

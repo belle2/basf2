@@ -22,8 +22,8 @@ if __name__ == "__main__":
 
     # Skip test if files are not available
     try:
-        train_file = basf2.find_file('mva/train_D0toKpipi.root', 'examples', False)
-        test_file = basf2.find_file('mva/test_D0toKpipi.root', 'examples', False)
+        train_file = basf2.find_file('mva/train_D0toKpipi.root', 'examples')
+        test_file = basf2.find_file('mva/test_D0toKpipi.root', 'examples')
     except BaseException:
         b2test_utils.skip_test('Necessary files "train.root" and "test.root" not available.')
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
                          basf2_mva.vector(train_file), 'tree', 'expert.root')
 
         command = f'basf2_mva_evaluate.py -c -o latex.pdf -train {train_file}'\
-            ' -data {test_file} -i {" ".join([i for i, _, _ in methods])}'
+            f' -data {test_file} -i {" ".join([i for i, _, _ in methods])}'
 
         result = run(command,
                      stdout=PIPE, stderr=PIPE,

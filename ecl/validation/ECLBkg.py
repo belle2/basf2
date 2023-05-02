@@ -56,12 +56,13 @@ main.add_module(pGun)
 # Fixed random seed
 b2.set_random_seed(123456)
 
-# bg = None
+bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+    b2.B2INFO('Using background samples from ' +
+              os.environ['BELLE2_BACKGROUND_DIR'])
 else:
     print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
-b2.B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
 
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)

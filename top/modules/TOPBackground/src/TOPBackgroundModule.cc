@@ -33,6 +33,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <Math/VectorUtil.h>
+#include <TMath.h>
 
 #include <geometry/Materials.h>
 #include <G4Material.hh>
@@ -257,7 +258,7 @@ namespace Belle2 {
       if (subdet != 5) continue;
 
       auto pos = tophit->getPosition();
-      double phi = ROOT::Math::VectorUtil::Phi_0_2pi(pos.Phi()) / M_PI * 180;
+      double phi = ROOT::Math::VectorUtil::Phi_0_2pi(pos.Phi()) * TMath::RadToDeg();
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {
         barID = 0;

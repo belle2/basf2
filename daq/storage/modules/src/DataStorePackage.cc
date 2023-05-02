@@ -43,7 +43,7 @@ bool DataStorePackage::restore()
   delete msg;
   if (nboard > 1) {
     unsigned int offset = m_data_hlt.getWordSize() + m_data.getHeaderWordSize();
-    for (unsigned int i = 0; i < nboard - 1; i++) {
+    for (int i = 0; i < nboard - 1; ++i) {
       m_data_pxd.setBuffer(m_data.getBuffer() + offset);
       offset += m_data_pxd.getWordSize();
       if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {

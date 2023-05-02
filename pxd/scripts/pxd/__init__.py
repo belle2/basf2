@@ -98,7 +98,26 @@ def add_pxd_packer(path):
     path.add_module(pxdpacker)
 
 
-def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDClusterShapes=False):
+def add_pxd_reconstruction(
+        path,
+        clusterName=None,
+        digitsName=None,
+        usePXDClusterShapes=False,
+        spacePointsName='PXDSpacePoints'):
+    """
+    Add the PXD reconstruction modules
+      RegisterEventLevelTrackingInfo (if not already in path)
+      ActivatePXDClusterPositionEstimator (if required by usePXDClusterShapes and not already in path)
+      PXDClusterizer
+      PXDTrackingEventLevelMdstInfoFilter
+      PXDSpacePointCreator (if not already in path)
+    to the path.
+    :param path The path to add the modules tu
+    :param clusterName Name of the PXDCluster StoreArray if it should be custom
+    :param digitsName Name of the PXDDigits StoreArray if it should be custom
+    :param usePXDClusterShapes If True, use ActivatePXDClusterPositionEstimator for estimating PXDClusterPositions
+    :param spacePointsName Name of the PXDSpacePoints, defaults to PXDSpacePoints
+    """
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
@@ -120,6 +139,10 @@ def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDCluste
         path.add_module(clusterizer)
 
     path.add_module('PXDTrackingEventLevelMdstInfoFiller')
+
+    path.add_module('PXDSpacePointCreator',
+                    PXDClusters=clusterName if clusterName else '',
+                    SpacePoints=spacePointsName)
 
 
 def add_pxd_simulation(path, digitsName=None, activatePixelMasks=True, activateGainCorrection=True):

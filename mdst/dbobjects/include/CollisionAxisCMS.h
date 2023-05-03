@@ -88,7 +88,7 @@ namespace Belle2 {
     double m_spreadYZunc;    ///< Uncertainty of the eigenvalue of m_spreadCovariance corresponding to eigenvector closer to y-axis
     double m_spreadPhiUnc;   ///< Uncertainty of the angle of the eigenvector of m_spreadCovariance
 
-    ClassDef(CollisionAxisCMS, 1);
+    ClassDef(CollisionAxisCMS, 1);  /**<  direction of collision axis in CMS and its spread **/
   };
 
 } //Belle2 namespace

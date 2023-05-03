@@ -55,7 +55,8 @@ if __name__ == "__main__":
         basf2_mva.expert(basf2_mva.vector(*[i for i, _, _ in methods]),
                          basf2_mva.vector(train_file), 'tree', 'expert.root')
 
-        command = f'basf2_mva_evaluate.py -c -o latex.pdf -train {train_file}'\
+        # don't compile the evaluation as this fails on the build bot due to missing latex files
+        command = f'basf2_mva_evaluate.py -o latex.pdf -train {train_file}'\
             f' -data {test_file} -i {" ".join([i for i, _, _ in methods])}'
 
         result = run(command,

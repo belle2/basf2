@@ -103,7 +103,7 @@ RFEventProcessor::~RFEventProcessor()
 
 // Functions hooked up by NSM2
 
-int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
+int RFEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
 {
   // Start processes from down stream
 
@@ -154,7 +154,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   char* srchost = m_conf->getconf("distributor", "host");
   //  char* port = m_conf->getconf ( "distributor", "port" );
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  // char* hostbase = m_conf->getconf("processor", "nodebase");
   /* OLD impl
   int baselen = strlen(hostbase);
   char hostname[256];
@@ -232,7 +232,7 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
+int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
   string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
                   string(m_conf->getconf("processor", "ringbufin"));
@@ -259,7 +259,7 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
   return 0;
 }
 
-int RFEventProcessor::Stop(NSMmsg* msgm, NSMcontext* msgc)
+int RFEventProcessor::Stop(NSMmsg* /*msgm*/, NSMcontext* /*msgc*/)
 {
   printf("RFEventProcessor : STOP processing started\n");
   //  fflush ( stdout );

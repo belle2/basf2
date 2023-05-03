@@ -610,7 +610,7 @@ namespace Belle2 {
 
     void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, RootDatasetVarVariant& varVariantTarget)
     {
-      auto compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name).c_str();
+      std::string compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name);
       // try the branch as is first then fall back to root safe name.
       if (checkForBranch(m_tree, branch_name.c_str())) {
         TBranch* branch = m_tree->GetBranch(branch_name.c_str());
@@ -618,8 +618,8 @@ namespace Belle2 {
         std::string type_name = leaf->GetTypeName();
         initialiseVarVariantType(type_name, varVariantTarget);
       } else if (checkForBranch(m_tree, compatible_branch_name)) {
-        TBranch* branch = m_tree->GetBranch(compatible_branch_name);
-        TLeaf* leaf = branch->GetLeaf(compatible_branch_name);
+        TBranch* branch = m_tree->GetBranch(compatible_branch_name.c_str());
+        TLeaf* leaf = branch->GetLeaf(compatible_branch_name.c_str());
         std::string type_name = leaf->GetTypeName();
         initialiseVarVariantType(type_name, varVariantTarget);
       }

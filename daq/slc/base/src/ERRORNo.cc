@@ -51,7 +51,7 @@ const ERRORNo& ERRORNo::operator=(int id)
 
 const ERRORNo& ERRORNo::operator=(const char* label)
 {
-  if (label != NULL)  *this = std::string(label);
+  if (label != nullptr)  *this = std::string(label);
   else *this = Enum::UNKNOWN;
   return *this;
 }

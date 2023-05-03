@@ -7,12 +7,6 @@
  **************************************************************************/
 
 #include <tracking/modules/svdROIFinder/SVDROIDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/SVDIntercept.h>
 
 #include <TDirectory.h>
 #include <TH2F.h>
@@ -61,7 +55,7 @@ SVDROIDQMModule::SVDROIDQMModule()
   addParam("ROIsName", m_ROIsName,
            "name of the list of ROIs", std::string(""));
 
-  addParam("Layer", m_specificLayer,
+  addParam("specificLayer", m_specificLayer,
            "Layer number, if you want the plots only for a specific SVD layer. If it is not a SVD layer (3, 4, 5, 6) than the plots for all SVD layers are produced. Default is (-1), i.e. plots for all SVD layers are produced.",
            m_specificLayer);
 

@@ -22,8 +22,8 @@
 #include <framework/dbobjects/MagneticFieldComponentConstant.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <mdst/dbobjects/BeamSpot.h>
-#include <mdst/dbobjects//CollisionAxisCMS.h>
 #include <framework/database/DBStore.h>
 
 namespace {
@@ -52,8 +52,13 @@ namespace {
       Belle2::MagneticField* field = new Belle2::MagneticField();
       field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
       Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
-      auto* collisionInvariantMass = new Belle2::CollisionInvariantMass();
 
+      // These 6 collision parameters correspond to following HER & LER momenta
+      // pHER = (0.290582573157898, 0, 6.99796952744559,  7.004)
+      // pLER = (0.166035330010433, 0, -3.99855423973071, 4.002)
+      // These are in BeamParameters (rev=59449 & rev=141509) which is default in main GT
+
+      auto* collisionInvariantMass = new Belle2::CollisionInvariantMass();
       collisionInvariantMass->setMass(10.579557836806245064, 0, 0);
       Belle2::DBStore::Instance().addConstantOverride("CollisionInvariantMass", collisionInvariantMass);
 
@@ -61,13 +66,15 @@ namespace {
       collisionBoostVector->setBoost(TVector3(0.041488088603337358595, 0, 0.27252546681036521337), TMatrixDSym(3));
       Belle2::DBStore::Instance().addConstantOverride("CollisionBoostVector", collisionBoostVector);
 
-      auto* beamSpot = new Belle2::BeamSpot();
-      Belle2::DBStore::Instance().addConstantOverride("BeamSpot", beamSpot);
-
       auto* collisionAxisCMS = new Belle2::CollisionAxisCMS();
       collisionAxisCMS->setAngles(0.0057699660560828307243, 0, TMatrixDSym(2));
       collisionAxisCMS->setSpread(TMatrixDSym(2), 0, 0, 0);
       Belle2::DBStore::Instance().addConstantOverride("CollisionAxisCMS", collisionAxisCMS);
+
+      // "dummy" beam spot with center at (0,0,0)
+      auto* beamSpot = new Belle2::BeamSpot();
+      Belle2::DBStore::Instance().addConstantOverride("BeamSpot", beamSpot);
+
     }
     /** Reset the logsytem after each test */
     virtual void OnTestEnd(const ::testing::TestInfo&) final override

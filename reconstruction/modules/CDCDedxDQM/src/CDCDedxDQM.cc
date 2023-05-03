@@ -23,10 +23,7 @@ CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()
 }
 
 //---------------------------------
-CDCDedxDQMModule::~CDCDedxDQMModule()
-{
-
-}
+CDCDedxDQMModule::~CDCDedxDQMModule() { }
 
 //---------------------------------
 void CDCDedxDQMModule::defineHisto()
@@ -36,16 +33,20 @@ void CDCDedxDQMModule::defineHisto()
   oldDir->mkdir("CDCDedx");
   oldDir->cd("CDCDedx");
 
+  int expNum = -1;
+  int runNum = -1;
+  double rungain = -99.0;
+
   if (m_MetaDataPtr) {
-    m_exp = int(m_MetaDataPtr->getExperiment());
-    m_run = int(m_MetaDataPtr->getRun());
-    if (m_DBRunGain)m_rungain = m_DBRunGain->getRunGain();
+    expNum = int(m_MetaDataPtr->getExperiment());
+    runNum = int(m_MetaDataPtr->getRun());
+    if (m_DBRunGain) rungain = m_DBRunGain->getRunGain();
   }
 
   hMeta = new TH1D("hMeta", "hMeta", 3, 0.5, 3.5);
   hMeta->GetXaxis()->SetTitle("Quantity");
   hMeta->GetYaxis()->SetTitle("Values");
-  hMeta->SetTitle(Form("(Exp:%d, Run:%d, RG:%0.03f)", m_exp, m_run, m_rungain));
+  hMeta->SetTitle(Form("(Exp:%d, Run:%d, RG:%0.03f)", expNum, runNum, rungain));
   hMeta->GetXaxis()->SetBinLabel(1, "nevt");
   hMeta->GetXaxis()->SetBinLabel(2, "nbhabha");
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
@@ -133,7 +134,9 @@ void CDCDedxDQMModule::event()
   if (IsHadronEvt)m_nHEvt += 1;
 
   //Get current evt number
-  if (m_MetaDataPtr)m_event = int(m_MetaDataPtr->getEvent());
+  int event = -1; /**< number of event */
+
+  if (m_MetaDataPtr)event = int(m_MetaDataPtr->getEvent());
 
   for (int idedx = 0; idedx < m_cdcDedxTracks.getEntries(); idedx++) {
 
@@ -198,9 +201,9 @@ void CDCDedxDQMModule::event()
       if (hdEdxvsCosth->Integral() <= 80000)hdEdxvsCosth->Fill(costh, dedxnosat);
       if (hdEdxvsPhi->Integral() <= 80000)hdEdxvsPhi->Fill(phi, dedxnosat);
 
-      if (m_event >= 150e6)m_event = 150e6 - 100;
-      m_event = int(m_event / 5e5);
-      hdEdxvsEvt->Fill(m_event, dedxnosat);
+      if (event >= 150e6)event = 150e6 - 100;
+      event = int(event / 5e5);
+      hdEdxvsEvt->Fill(event, dedxnosat);
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
@@ -255,7 +258,7 @@ void CDCDedxDQMModule::endRun()
 //---------------------------------
 void CDCDedxDQMModule::terminate()
 {
-
+  B2INFO("CDCDedxDQMModule: terminate called");
 }
 
 //------------------------------------
@@ -271,7 +274,7 @@ void CDCDedxDQMModule::plotWireMap()
   for (unsigned int ilay = 0; ilay < c_maxNSenseLayers; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       jwire++;
-      double phi = 2.*TMath::Pi() * (float(iwire) / float(cdcgeo.nWiresInLayer(ilay)));
+      double phi = 2.*TMath::Pi() * (iwire / double(cdcgeo.nWiresInLayer(ilay)));
       double radius = cdcgeo.senseWireR(ilay) / 100.;
       double x = radius * cos(phi);
       double y = radius * sin(phi);

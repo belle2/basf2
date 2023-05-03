@@ -86,15 +86,10 @@ namespace Belle2 {
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
     StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;  /**< Store array for injection time info */
 
-    int m_exp{ -1}; /**< exp number */
-    int m_run{ -1}; /**< run number */
-    int m_event{ -1}; /**< number of event */
-
     int m_nEvt{0}; /**< accepted events */
     int m_nBEvt{ 0}; /**< bhabha events  */
     int m_nHEvt{0}; /**< hadron events  */
 
-    double m_rungain{ -99.0}; /**< previous rungain */
     std::array<std::vector<double>, c_nSenseWires> m_adc; /**< adc per wire for wire status */
 
     std::string mmode; /**< monitoring mode all/basic */

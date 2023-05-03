@@ -25,10 +25,7 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
 }
 
 //--------------------------------------------------------------
-DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule()
-{
-
-}
+DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule() {}
 
 //---------------------------------------------
 void DQMHistAnalysisCDCDedxModule::initialize()
@@ -537,8 +534,6 @@ void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D* hdEdx, TH1F* hmean, TH1F* h
     hsigma->SetBinError(ibin + 1, sigmaerr);
   }
 
-  //Let's reset histogram here
-  // for (int ibin = 0; ibin < nbin; ibin++) hdEdxIRInd[ibin]->Reset();
 }
 
 //-----------------------------------------------

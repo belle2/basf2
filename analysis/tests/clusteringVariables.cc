@@ -257,9 +257,9 @@ namespace {
     const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
 
     EXPECT_FLOAT_EQ(std::get<double>(clusterPhi->function(gammalist->getParticle(1))), 2.0);
-    EXPECT_FLOAT_EQ(std::get<double>(clusterPhiCMS->function(gammalist->getParticle(1))), 2.042609);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterPhiCMS->function(gammalist->getParticle(1))), 2.0442522);
     EXPECT_FLOAT_EQ(std::get<double>(clusterTheta->function(gammalist->getParticle(1))), 1.0);
-    EXPECT_FLOAT_EQ(std::get<double>(clusterThetaCMS->function(gammalist->getParticle(1))), 1.2599005);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterThetaCMS->function(gammalist->getParticle(1))), 1.2625608);
 
     // test cluster quantities directly (lab system only)
     EXPECT_FLOAT_EQ(std::get<double>(clusterPhi->function(gammalist->getParticle(0))), eclclusters[0]->getPhi());

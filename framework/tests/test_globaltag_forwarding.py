@@ -42,7 +42,7 @@ class TestGTForwarding(unittest.TestCase):
         self.assertEqual(len(data['output_files']), 1, "Expecting exactly one output file")
         fileinfo = data['output_files'][0]
         # FIXME: Once we get rid of the legacy ip globaltag this will get nicer
-        self.assertEqual(fileinfo['metadata']['globalTag'], f"A,B,C,{inputtags},Legacy_IP_Information",
+        self.assertEqual(fileinfo['metadata']['globalTag'], f"A,B,C,{inputtags},Legacy_IP_Information,nominal_CollisionAxisCMS",
                          "Globaltags not forwarded correctly")
         self.assertEqual(fileinfo['stats']['events'], 3, "Number of events is wrong")
 

@@ -1,7 +1,7 @@
 Information for skim experts
 ----------------------------
 
-.. tip:: 
+.. tip::
     The functions and tools documented here are intended for skim liaisons and developers. If you are only interested in the selection criteria, then this section is probably not relevant for you.
 
 .. _writing-skims:

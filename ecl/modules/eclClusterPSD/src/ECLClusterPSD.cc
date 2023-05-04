@@ -5,28 +5,28 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclClusterPSD/ECLClusterPSD.h>
 
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
-
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-//MVA
-#include <mva/interface/Expert.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Interface.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-
-#include<math.h>
-
-// FRAMEWORK
+/* Basf2 headers */
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <mva/interface/Expert.h>
+#include <mva/interface/Interface.h>
+#include <mva/interface/Weightfile.h>
+
+/* Boost headers. */
+#include <boost/algorithm/string/predicate.hpp>
+
+/* C++ headers. */
+#include <cmath>
 
 using namespace Belle2;
 
@@ -178,9 +178,9 @@ double ECLClusterPSDModule::evaluateMVA(const ECLShower* cluster)
     const int digitFitType = digitFitType1;
     const int cellId = caldigit->getCellId();
     B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
-    TVector3 tempP = showerPosition - calDigitPosition;
-    const double Rval = tempP.Mag();
-    const double theVal = tempP.CosTheta();
+    ROOT::Math::XYZVector tempP = showerPosition - calDigitPosition;
+    const double Rval = tempP.R();
+    const double theVal = tempP.Z() / tempP.R();
     const double phiVal = cos(tempP.Phi());
 
     input[input_index++] = theVal;

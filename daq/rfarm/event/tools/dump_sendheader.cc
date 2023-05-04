@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
+#include <vector>
 
 enum {
   POS_NWORDS = 0,
@@ -40,9 +41,9 @@ char* timestamp()
 
 
 
-int main(int argc, char** argv)
+int main()
 {
-  unsigned int buf[4000000];
+  vector<unsigned int> buf(4000000);
   int infn = fileno(stdin);
   printf("infn = %d\n", infn);
 

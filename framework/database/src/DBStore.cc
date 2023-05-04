@@ -194,7 +194,7 @@ namespace Belle2 {
     std::set<std::string> s{};
     for (auto& [key, value] : m_dbEntries)
       s.emplace(key);
-    return std::move(s);
+    return s;
   };
 
   void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool oneRun)

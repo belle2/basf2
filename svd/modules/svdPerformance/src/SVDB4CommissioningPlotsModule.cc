@@ -221,7 +221,7 @@ void SVDB4CommissioningPlotsModule::event()
   }
 
   if (m_Tracks)
-    B2DEBUG(1, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
+    B2DEBUG(29, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
 
   //reco digits
   if (m_plotRecoDigits) {

@@ -57,9 +57,9 @@ Of course, not all of them are available for every particle. In fact in most cas
 only two of them are. However, for a very limited number of particles, you will have all three of them.  
 Most of the particles in the :math:`e^+e^-` collision do not live long enough to leave any signal 
 inside the detector, and must be reconstructed measuring their decay products. This introduces the 
-very important distinction between measured particles, who leave a signal inside the detector and 
-are reconstructed directly starting from those signals and combined particles that are reconstructed 
-as sum of measure particles.
+very important distinction between measured particles, which leave a signal inside the detector and 
+are reconstructed directly starting from those signals, and combined particles that are reconstructed 
+as sum of measured particles.
 
 .. admonition:: Question
     :class: exercise stacked

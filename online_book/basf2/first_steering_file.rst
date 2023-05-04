@@ -521,7 +521,7 @@ finds all **unique** combinations. The same particle can of course not be used
 twice, e.g. the two positive pions in :math:`D^0 \to K^- \pi^+ \pi^+ \pi^-`
 have to be different mdst track objects. However, all of this is taken care of
 internally. For multi-body decays like the one described above, there can
-easily be multiple candidates which share some particles but differ by
+easily be many multiple candidates which share some particles but differ by
 at least one final state particle.
 
 The wrapper function for the `ParticleCombiner` is

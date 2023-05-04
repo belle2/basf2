@@ -9,8 +9,7 @@ import math
 from ROOT import TFile
 from pdg import add_particle
 from basf2 import create_path, register_module, process, print_params, find_file
-from modularAnalysis import fillParticleListsFromMC
-from modularAnalysis import variablesToNtuple as v2nt
+from modularAnalysis import fillParticleListsFromMC, printVariableValues, variablesToNtuple
 from variables import variables as vm
 from tempfile import TemporaryDirectory
 
@@ -36,7 +35,7 @@ lhereader.param('inputFileList', [inputfile])
 lhereader.param('useWeights', False)
 lhereader.param('nInitialParticles', 2)
 lhereader.param('nVirtualParticles', 0)
-lhereader.param('wrongSignPz', True)  # because Belle II convention is different to LEP etc
+lhereader.param('wrongSignPz', False)  # Using BII convention where e- goes in +z
 print_params(lhereader)
 
 # prepare the path
@@ -53,8 +52,12 @@ vm.addAlias('pzcms', 'useCMSFrame(pz)')
 vm.addAlias('pecms', 'useCMSFrame(E)')
 variables = ['M', 'px', 'py', 'pz', 'E',
              'pxcms', 'pycms', 'pzcms', 'pecms']
-v2nt('A:gen', variables, 'darkphoton', 'test.root', path=testpath)
-v2nt('gamma:gen', variables, 'gammas', 'test.root', path=testpath)
+
+printVariableValues('A:gen', variables, path=testpath)
+printVariableValues('gamma:gen', variables, path=testpath)
+
+variablesToNtuple('A:gen', variables, 'darkphoton', 'test.root', path=testpath)
+variablesToNtuple('gamma:gen', variables, 'gammas', 'test.root', path=testpath)
 
 # temporary directory to keep cwd clean
 with TemporaryDirectory() as tmp:
@@ -78,26 +81,32 @@ with TemporaryDirectory() as tmp:
     assert t1.__experiment__ == 0, 'Experiment number not set correctly'
     assert t2.M == 0, 'Photon is not as expected'
 
-    # a float is only 7 decimal digits of precision, we might get improvements
-    # to the variable manager precision later
-    eps = 1e-5
-    assert math.isclose(t1.M, 5.4571074540e+00, rel_tol=eps), 'Mass is not as expected'
+    # precision is low since MCParticle class is using floats to store particle momenta
+    # when changed to double precision was much better
+    eps = 2e-5
 
+    # test momenta balance in CMS
     assert math.isclose(t1.pxcms, -t2.pxcms, rel_tol=eps), 'Momenta don\'t balance'
     assert math.isclose(t1.pycms, -t2.pycms, rel_tol=eps), 'Momenta don\'t balance'
     assert math.isclose(t1.pzcms, -t2.pzcms, rel_tol=eps), 'Momenta don\'t balance'
 
-    assert math.isclose(t1.pxcms, -0.023859674786793544, rel_tol=eps), 'CMS momenta are not as expected'
-    assert math.isclose(t1.pycms, 0.0025198485236614943, rel_tol=eps), 'CMS momenta are not as expected'
-    assert math.isclose(t1.pzcms, -3.882552444880825, rel_tol=eps), 'CMS momenta are not as expected'
-    assert math.isclose(t1.pecms, 6.697373505125157, rel_tol=eps), 'CMS momenta are not as expected'
+    # test that dark photon CM momentum is close to LHE input generators/tests/event.lhe
+    assert math.isclose(t1.pxcms, +1.4572035746e-03, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pycms, +2.5198484375e-03, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pzcms, -3.8826254795e+00, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pecms, 6.6973734293e+00, rel_tol=eps), 'CMS momenta are not as expected'
 
-    assert t1.px == 0.24189484119415283, 'Boosted momenta are not as expected'
-    assert t1.py == 0.0025198485236614943, 'Boosted momenta are not as expected'
-    assert math.isclose(t1.pz, -2.136873722076416, rel_tol=eps), 'Boosted momenta are not as expected'
+    # test that dark photon mass is as in LHE
+    assert math.isclose(t1.M, 5.4571074540e+00, rel_tol=eps), 'Mass is not as expected'
 
-    assert math.isclose(t2.px, 0.21474215388298035, rel_tol=eps), 'Boosted momenta are not as expected'
-    assert t2.py == -0.0025198485236614943, 'Boosted momenta are not as expected'
-    assert t2.pz == 5.136414527893066, 'Boosted momenta are not as expected'
+    # test dark photon momentum in LAB
+    assert math.isclose(t1.px, 0.24481175912036506892, rel_tol=eps), 'Boosted momenta are not as expected'
+    assert math.isclose(t1.py, 0.002519848437500000083, rel_tol=eps), 'Boosted momenta are not as expected'
+    assert math.isclose(t1.pz, -2.1368737390471825854, rel_tol=eps), 'Boosted momenta are not as expected'
+
+    # test photon momentum in LAB
+    assert math.isclose(t2.px, 0.21182522798639694117, rel_tol=eps), 'Boosted momenta are not as expected'
+    assert math.isclose(t2.py, -0.002519848437500000083, rel_tol=eps), 'Boosted momenta are not as expected'
+    assert math.isclose(t2.pz, 5.1364143846516343572, rel_tol=eps), 'Boosted momenta are not as expected'
 
     fi.Close()

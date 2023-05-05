@@ -103,7 +103,7 @@ namespace Belle2 {
     double sigmaCurve(double* x, const double* par, int version) const;
 
     /** calculate the predicted resolution using the parameterized resolution */
-    double getSigma(double dedx, double nhit, double sin, double timereso) const;
+    double getSigma(double dedx, double nhit, double cos, double timereso) const;
 
     /** hadron saturation parameterization part 1 */
     double I2D(double cosTheta, double I) const;
@@ -127,12 +127,12 @@ namespace Belle2 {
      * @param predres   predicted resolution for each hypothesis
      * @param p         track momentum valid in the cdc
      * @param dedx      dE/dx value
-     * @param sin       track sin(theta)
+     * @param cos       track cos(theta)
      * @param nhit      number of hits used for this track
      * @param timereso  time resolution from database
      * */
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
-                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit, double timereso) const;
+                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double cos, int nhit, double timereso) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.

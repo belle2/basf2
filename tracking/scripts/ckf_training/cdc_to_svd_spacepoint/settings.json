@@ -1,5 +1,6 @@
 {
-    "result_path": "output/",
+    "result_dir": "output/",
+    "log_dir": "logs/",
     "n_events_training": 1000,
     "n_events_testing": 500,
     "n_events_per_task": 100,

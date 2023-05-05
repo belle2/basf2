@@ -74,10 +74,11 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool
     B2WARNING("If you are generating Y(4S) events, you _really_ must use the coherent decay mode.");
   }
 
-  return new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
-                    radCorrEngine, &extraModels,  mixingMode);
+  EvtGen* evtGen = new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
+                              radCorrEngine, &extraModels,  mixingMode);
 
   initLogCapture.finish();
+  return evtGen;
 }
 
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,

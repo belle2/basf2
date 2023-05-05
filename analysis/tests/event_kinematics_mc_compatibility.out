@@ -21,7 +21,7 @@
 [INFO]    -> MDST source: MCParticles
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, nominal_CollisionAxisCMS
+[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO]      o) genMissingMass2OfEvent = 2.47672
 [INFO]      o) genMissingEnergyOfEventCMS = 2.03096
 [INFO]      o) genMissingMomentumOfEventCMS = 1.28377

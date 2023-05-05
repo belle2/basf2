@@ -48,7 +48,7 @@ Particle#0:
   getCharge(): -1
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_release-04, mc_production_MC13a_rev1, release-04-00-03, nominal_CollisionAxisCMS
+[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_release-04, mc_production_MC13a_rev1, release-04-00-03, Legacy_CollisionAxisCMS
   getCosHelicity(): nan
 [ERROR] No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle
 	name = pi-

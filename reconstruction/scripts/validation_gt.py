@@ -14,5 +14,5 @@ def get_validation_globaltags():
         'validation_2020-08-11',
         'online_2020-08-11',
         'Legacy_IP_Information',
-        'nominal_CollisionAxisCMS']
+        'Legacy_CollisionAxisCMS']
     return globaltags

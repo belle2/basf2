@@ -4,7 +4,7 @@
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/tdcpv-mdst.root
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are main_2022-07-05, nominal_CollisionAxisCMS
+[INFO] Conditions data: configured globaltags (highest priority first) are main_2022-07-05, Legacy_CollisionAxisCMS
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks

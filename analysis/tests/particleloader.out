@@ -66,7 +66,7 @@
  ... message repeated 1 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, nominal_CollisionAxisCMS
+[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] ParticleStats Summary:
 [INFO] 
 ======================================================================
@@ -253,7 +253,7 @@ Total Number of Particles created in the DataStore: 14612778
  ... message repeated 1 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, nominal_CollisionAxisCMS
+[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+:all (8+0) + e-:all (8+0)
 [INFO] collection=Particles

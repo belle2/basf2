@@ -3,7 +3,7 @@
 [INFO] Starting event processing, random seed is set to '1234'
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, nominal_CollisionAxisCMS
+[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks

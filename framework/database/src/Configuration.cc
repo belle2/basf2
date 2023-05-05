@@ -187,7 +187,7 @@ namespace Belle2::Conditions {
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }
     // TODO: add conditions to trigger this extra GT
-    m_inputGlobaltags->emplace_back("nominal_CollisionAxisCMS");
+    m_inputGlobaltags->emplace_back("Legacy_CollisionAxisCMS");
     // END TODO/HACK
   }
 

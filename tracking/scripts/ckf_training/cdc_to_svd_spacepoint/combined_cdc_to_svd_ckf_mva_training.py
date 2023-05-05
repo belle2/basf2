@@ -334,10 +334,11 @@ class SplitNMergeSimTask(Basf2Task):
         args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
         subprocess.check_call(args)
         print("Finished merging. Now remove the input files to save space.")
-        cmd2 = ["rm", "-f"]
-        for tempfile in file_list:
-            args = cmd2 + [tempfile]
-            subprocess.check_call(args)
+        for input_file in file_list:
+            try:
+                os.remove(input_file)
+            except FileNotFoundError:
+                pass
 
 
 class StateRecordingTask(Basf2PathTask):

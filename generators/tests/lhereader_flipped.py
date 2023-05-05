@@ -14,7 +14,7 @@ from variables import variables as vm
 from tempfile import TemporaryDirectory
 
 # check that the file exists, if not: skip the test
-inputfile = find_file('generators/tests/event.lhe')
+inputfile = find_file('generators/tests/event_flipped.lhe')
 if len(inputfile) == 0:
     sys.stderr.write(
         'TEST SKIPPED: input file ' +
@@ -35,7 +35,7 @@ lhereader.param('inputFileList', [inputfile])
 lhereader.param('useWeights', False)
 lhereader.param('nInitialParticles', 2)
 lhereader.param('nVirtualParticles', 0)
-lhereader.param('wrongSignPz', False)  # Using BII convention where e- goes in +z
+lhereader.param('wrongSignPz', True)  # Using flipped convention where e+ goes in +z
 print_params(lhereader)
 
 # prepare the path

@@ -140,7 +140,6 @@ you, e.g.::
 """
 
 import itertools
-import os
 import subprocess
 
 import basf2
@@ -149,7 +148,6 @@ from tracking.path_utils import add_hit_preparation_modules, add_cdc_track_findi
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 import background
 import simulation
-from packaging import version
 
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
 
@@ -160,24 +158,9 @@ try:
     import b2luigi
     from b2luigi.core.utils import create_output_dirs
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
-    from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
     raise
-
-# If b2luigi version 0.3.2 or older, it relies on $BELLE2_RELEASE being "head",
-# which is not the case in the new externals. A fix has been merged into b2luigi
-# via https://github.com/nils-braun/b2luigi/pull/17 and thus should be available
-# in future releases.
-if (
-    version.parse(b2luigi.__version__) <= version.parse("0.3.2") and
-    get_basf2_git_hash() is None and
-    os.getenv("BELLE2_LOCAL_DIR") is not None
-):
-    print(f"b2luigi version could not obtain git hash because of a bug not yet fixed in version {b2luigi.__version__}\n"
-          "Please install the latest version of b2luigi from github via\n\n"
-          "  python3 -m pip install --upgrade [--user] git+https://github.com/nils-braun/b2luigi.git\n")
-    raise ImportError
 
 
 class GenerateSimTask(Basf2PathTask):
@@ -211,8 +194,8 @@ class GenerateSimTask(Basf2PathTask):
         Create output file name depending on number of events and production
         mode that is specified in the random_seed string.
 
-        :param n_events Number of events to simulate.
-        :param random_seed Random seed to use for the simulation to create independent samples.
+        :param n_events: Number of events to simulate.
+        :param random_seed: Random seed to use for the simulation to create independent samples.
         """
         if n_events is None:
             n_events = self.n_events
@@ -285,8 +268,8 @@ class SplitNMergeSimTask(Basf2Task):
         Create output file name depending on number of events and production
         mode that is specified in the random_seed string.
 
-        :param n_events Number of events to simulate.
-        :param random_seed Random seed to use for the simulation to create independent samples.
+        :param n_events: Number of events to simulate.
+        :param random_seed: Random seed to use for the simulation to create independent samples.
         """
         if n_events is None:
             n_events = self.n_events
@@ -501,7 +484,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
 
-        :param fast_bdt_option FastBDT option that is used to train this MVA
+        :param ``fast_bdt_option``: FastBDT option that is used to train this MVA
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option
@@ -728,10 +711,11 @@ class MainTask(b2luigi.WrapperTask):
         this steering file.
         """
 
-        fast_bdt_options = []
-        fast_bdt_options.append([50, 8, 3, 0.1])
-        fast_bdt_options.append([100, 8, 3, 0.1])
-        fast_bdt_options.append([200, 8, 3, 0.1])
+        fast_bdt_options = [
+            [50, 8, 3, 0.1],
+            [100, 8, 3, 0.1],
+            [200, 8, 3, 0.1],
+        ]
         cut_values = []
         for i in range(4):
             cut_values.append((i+1) * 0.2)

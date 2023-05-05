@@ -87,8 +87,9 @@ def my_basf2_mva_teacher(
 
 def create_fbdt_option_string(fast_bdt_option):
     """
-    returns a readable string created by the fast_bdt_option array
-    :param fast_bdt_option List containing the FastBDT options that should be converted to a human readable string
+    Returns a readable string created by the fast_bdt_option array.
+
+    :param ``fast_bdt_option``: List containing the FastBDT options that should be converted to a human readable string
     """
-    return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
-        str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
+    return f"_nTrees{fast_bdt_option[0]}_nCuts{fast_bdt_option[1]}\
+             _nLevels{fast_bdt_option[2]}_shrin{int(round(100*fast_bdt_option[3], 0))}"

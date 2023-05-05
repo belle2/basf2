@@ -1079,22 +1079,20 @@ class MainTask(b2luigi.WrapperTask):
             n_best_states_list = [3, 5, 10]
             result_filter_cuts = [0.05, 0.1, 0.2]
             n_best_results_list = [3, 5, 10]
-            for state_filter_cut in state_filter_cuts:
-                for n_best_states in n_best_states_list:
-                    for result_filter_cut in result_filter_cuts:
-                        for n_best_results in n_best_results_list:
-                            yield self.clone(
-                                ValidationAndOptimisationTask,
-                                experiment_number=experiment_number,
-                                n_events_training=self.n_events_training,
-                                n_events_testing=self.n_events_testing,
-                                state_filter_cut=state_filter_cut,
-                                use_n_best_states=n_best_states,
-                                result_filter_cut=result_filter_cut,
-                                use_n_best_results=n_best_results,
-                                fast_bdt_option_state_filter=fast_bdt_option_state_filter,
-                                fast_bdt_option_result_filter=fast_bdt_option_result_filter,
-                            )
+            for state_filter_cut, n_best_states, result_filter_cut, n_best_results in \
+                    itertools.product(state_filter_cuts, n_best_states_list, result_filter_cuts, n_best_results_list):
+                yield self.clone(
+                    ValidationAndOptimisationTask,
+                    experiment_number=experiment_number,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    state_filter_cut=state_filter_cut,
+                    use_n_best_states=n_best_states,
+                    result_filter_cut=result_filter_cut,
+                    use_n_best_results=n_best_results,
+                    fast_bdt_option_state_filter=fast_bdt_option_state_filter,
+                    fast_bdt_option_result_filter=fast_bdt_option_result_filter,
+                )
 
 
 if __name__ == "__main__":

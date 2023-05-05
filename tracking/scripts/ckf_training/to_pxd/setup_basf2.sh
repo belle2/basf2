@@ -1,4 +1,4 @@
 olddir="$(pwd)"
-cd /nfs/dust/belle2/user/cwessel/head
-source /cvmfs/belle.cern.ch/tools/b2setup
+cd /path/to/your/local/installation/if/you/use/one
+source /path/to/tools/b2setup
 cd $olddir

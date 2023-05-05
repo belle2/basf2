@@ -484,7 +484,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
 
-        :param ``fast_bdt_option``: FastBDT option that is used to train this MVA
+        :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option

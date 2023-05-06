@@ -66,6 +66,9 @@ def scanTTree(filename):
         for branch in ttree.GetListOfBranches():
             branch_name = branch.GetName()
             branch_value = getattr(ttree, branch.GetName())
-            print(f"TBranch: {branch_name}, {branch_value}")
+            if isinstance(branch_value, float):
+                print(f"TBranch: {branch_name}, {branch_value:.4g}")
+            else:
+                print(f"TBranch: {branch_name}, {branch_value}")
 
     tfile.Close()

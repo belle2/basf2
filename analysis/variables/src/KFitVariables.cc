@@ -28,7 +28,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("FourCFitChi2")) return part->getExtraInfo("FourCFitChi2");
       else {
         B2WARNING("The ExtraInfo 'FourCFitChi2' could not be found!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -37,7 +37,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("FourCFitProb")) return part->getExtraInfo("FourCFitProb");
       else {
         B2WARNING("The ExtraInfo 'FourCFitProb' could not be found!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -46,7 +46,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("chiSquared_trackL")) return part->getExtraInfo("chiSquared_trackL");
       else {
         B2WARNING("The ExtraInfo 'chiSquared_trackL' could not be found!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -55,7 +55,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("kFit_nTracks")) return part->getExtraInfo("kFit_nTracks");
       else {
         B2WARNING("The ExtraInfo 'kFit_nTracks' could not be found!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 

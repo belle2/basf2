@@ -12,7 +12,7 @@
 #include <pxd/reconstruction/PXDPixelMasker.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include "TMatrixDSym.h"
 using namespace Belle2;

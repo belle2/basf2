@@ -103,7 +103,6 @@ void SVDTimeGroupingModule::initialize()
 
   if (m_numberOfSignalGroups != m_maxGroups) m_includeOutOfRangeClusters = false;
 
-  if (m_rebinningFactor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(20, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());

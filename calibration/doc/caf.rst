@@ -116,7 +116,7 @@ In order to save these checkpoint states the CAF is creating a SQLite3 database 
 The b2caf-status command line tool lets you show the current status of the Calibrations *even while the CAF is running*.
 It also lets you change the values in this database, so an advanced user could choose to reset a Calibration back to an earlier
 iteration or checkpoint state.
-This could be useful if a Collector step succeeded previously, but now needs to be re-run with different parameter values. 
+This could be useful if a Collector step succeeded previously, but now needs to be re-run with different parameter values.
 
 .. argparse::
     :filename: calibration/tools/b2caf-status

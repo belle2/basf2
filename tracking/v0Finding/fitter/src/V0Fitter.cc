@@ -9,7 +9,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 #include <framework/geometry/BFieldManager.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>

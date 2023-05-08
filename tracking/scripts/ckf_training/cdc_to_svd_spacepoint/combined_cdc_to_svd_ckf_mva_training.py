@@ -486,7 +486,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
     #: Number of events to generate for the training data set.
     n_events = b2luigi.IntParameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
         #: \cond
         hashed=True, default=[50, 8, 3, 0.1]
         #: \endcond
@@ -555,7 +555,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         :param filter_number: Filter number (first=1, second=2, third=3) to be trained
         """
         if fast_bdt_option is None:
-            fast_bdt_option = self.fast_bdt_option
+            fast_bdt_option = self.fast_bdt_option_state_filter
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = f"trk_CDCToSVDSpacePointStateFilter_{filter_number}" + fast_bdt_string
         return weightfile_name + ".xml"
@@ -617,7 +617,7 @@ class ResultRecordingTask(Basf2PathTask):
     #: Number of events to generate for the training data set.
     n_events = b2luigi.IntParameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
         #: \cond
         hashed=True, default=[50, 8, 3, 0.1]
         #: \endcond
@@ -651,7 +651,7 @@ class ResultRecordingTask(Basf2PathTask):
                 n_events=self.n_events,
                 random_seed=self.random_seed,
                 filter_number=filter_number,
-                fast_bdt_option=self.fast_bdt_option
+                fast_bdt_option=self.fast_bdt_option_state_filter
             )
 
     def create_result_recording_path(self, result_filter_records_name):
@@ -806,7 +806,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
                 experiment_number=self.experiment_number,
                 n_events=self.n_events,
                 random_seed=self.random_seed,
-                fast_bdt_option=self.fast_bdt_option_state_filter,
+                fast_bdt_option_state_filter=self.fast_bdt_option_state_filter,
                 result_filter_records_name=self.result_filter_records_name,
         )
 

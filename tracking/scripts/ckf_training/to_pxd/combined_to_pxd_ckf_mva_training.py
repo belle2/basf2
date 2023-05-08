@@ -490,7 +490,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
     #: Number of events to generate for the training data set.
     n_events = b2luigi.IntParameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
         #: \cond
         hashed=True, default=[50, 8, 3, 0.1]
         #: \endcond
@@ -520,7 +520,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         :param filter_number: Filter number (first=1, second=2, third=3) to be trained.
         """
         if fast_bdt_option is None:
-            fast_bdt_option = self.fast_bdt_option
+            fast_bdt_option = self.fast_bdt_option_state_filter
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = f"trk_ToPXDStateFilter_{filter_number}" + fast_bdt_string
         return weightfile_name + ".xml"
@@ -563,7 +563,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
             weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier(filter_number=self.filter_number)),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
-            fast_bdt_option=self.fast_bdt_option,
+            fast_bdt_option=self.fast_bdt_option_state_filter,
         )
 
 
@@ -582,7 +582,7 @@ class ResultRecordingTask(Basf2PathTask):
     #: Number of events to generate.
     n_events_training = b2luigi.IntParameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
+    fast_bdt_option_state_filter = b2luigi.ListParameter(
         #: \cond
         hashed=True, default=[200, 8, 3, 0.1]
         #: \endcond
@@ -616,7 +616,7 @@ class ResultRecordingTask(Basf2PathTask):
                 n_events=self.n_events_training,
                 random_seed=self.random_seed,
                 filter_number=filter_number,
-                fast_bdt_option=self.fast_bdt_option
+                fast_bdt_option_state_filter=self.fast_bdt_option_state_filter
             )
 
     def create_result_recording_path(self, result_filter_records_name):
@@ -868,7 +868,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
                 n_events=self.n_events_training,
                 random_seed="training",
                 filter_number=filter_number,
-                fast_bdt_option=self.fast_bdt_option_state_filter
+                fast_bdt_option_state_filter=self.fast_bdt_option_state_filter
             )
 
     def create_optimisation_and_validation_path(self):

@@ -651,7 +651,7 @@ class ResultRecordingTask(Basf2PathTask):
                         prRecoTracksStoreArrayName="CDCSVDRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCSVDRecoTracks")
 
-        fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option)
+        fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         path.add_module("ToPXDCKF",
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
                         outputRecoTrackStoreArrayName="RecoTracks",
@@ -761,7 +761,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
                 experiment_number=self.experiment_number,
                 n_events_training=self.n_events,
                 random_seed=self.random_seed,
-                fast_bdt_option=self.fast_bdt_option_state_filter,
+                fast_bdt_option_state_filter=self.fast_bdt_option_state_filter,
                 result_filter_records_name=self.result_filter_records_name,
         )
 

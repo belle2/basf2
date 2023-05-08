@@ -326,9 +326,7 @@ class SplitNMergeSimTask(Basf2Task):
         """
         create_output_dirs(self)
 
-        file_list = []
-        for _, file_name in self.get_input_file_names().items():
-            file_list.append(*file_name)
+        file_list = [item for sublist in self.get_input_file_names().values() for item in sublist]
         print("Merge the following files:")
         print(file_list)
         cmd = ["b2file-merge", "-f"]

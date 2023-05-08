@@ -394,7 +394,8 @@ class StateRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
+        file_list = [fname for fname in file_list if (
+            "generated_mc_N" in fname and "training" in fname and fname.endswith(".root"))]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -634,7 +635,8 @@ class ResultRecordingTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if ("generated_mc_N" in x and "training" in x and ".root" in x)]
+        file_list = [fname for fname in file_list if (
+            "generated_mc_N" in fname and "training" in fname and fname.endswith(".root"))]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -884,7 +886,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         file_list = []
         for _, file_name in self.get_input_file_names().items():
             file_list.append(*file_name)
-        file_list = [x for x in file_list if ("generated_mc_N" in x and "optimisation" in x and ".root" in x)]
+        file_list = [
+            fname for fname in file_list if (
+                "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root"))]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")

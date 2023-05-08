@@ -27,7 +27,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms.");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
-  addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 50000.);
+  addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed

@@ -414,8 +414,6 @@ class StateRecordingTask(Basf2PathTask):
                         prRecoTracksStoreArrayName="CDCSVDRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCSVDRecoTracks")
 
-        path.add_module("PXDSpacePointCreator")
-
         path.add_module("ToPXDCKF",
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
                         outputRecoTrackStoreArrayName="RecoTracks",
@@ -653,8 +651,6 @@ class ResultRecordingTask(Basf2PathTask):
                         prRecoTracksStoreArrayName="CDCSVDRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCSVDRecoTracks")
 
-        path.add_module("PXDSpacePointCreator")
-
         fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option)
         path.add_module("ToPXDCKF",
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
@@ -891,8 +887,6 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         add_track_finding(path, reco_tracks="CDCSVDRecoTracks", components=["CDC", "SVD"], prune_temporary_tracks=False)
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCSVDRecoTracks")
-
-        path.add_module("PXDSpacePointCreator")
 
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)

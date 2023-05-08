@@ -598,7 +598,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
             weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier(filter_number=self.filter_number)),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
-            fast_bdt_option=self.fast_bdt_option,
+            fast_bdt_option=self.fast_bdt_option_state_filter,
         )
 
 
@@ -688,7 +688,7 @@ class ResultRecordingTask(Basf2PathTask):
                         prRecoTracksStoreArrayName="CDCRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
 
-        fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option)
+        fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         path.add_module("CDCToSVDSpacePointCKF",
                         inputRecoTrackStoreArrayName="CDCRecoTracks",
                         outputRecoTrackStoreArrayName="VXDRecoTracks",

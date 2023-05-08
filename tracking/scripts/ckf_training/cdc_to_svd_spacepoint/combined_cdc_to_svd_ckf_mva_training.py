@@ -153,6 +153,7 @@ that interest you, e.g.::
 
 import itertools
 import subprocess
+import os
 
 import basf2
 from tracking import add_track_finding
@@ -553,7 +554,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
 
-        :param ``fast_bdt_option``: FastBDT option that is used to train this MVA
+        :param fast_bdt_option: FastBDT option that is used to train this MVA
         :param filter_number: Filter number (first=1, second=2, third=3) to be trained
         """
         if fast_bdt_option is None:
@@ -793,7 +794,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
 
-        :param ``fast_bdt_option``: FastBDT option that is used to train this MVA
+        :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option_result_filter

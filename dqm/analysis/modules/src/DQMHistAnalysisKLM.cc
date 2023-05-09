@@ -64,9 +64,6 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   m_PlaneText.SetTextSize(0.02); // 2% of TPad's full height
 }
 
-DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
-{
-}
 
 void DQMHistAnalysisKLMModule::initialize()
 {

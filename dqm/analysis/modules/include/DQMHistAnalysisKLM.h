@@ -45,10 +45,6 @@ namespace Belle2 {
      */
     DQMHistAnalysisKLMModule();
 
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLMModule();
 
     /**
      * Initializer.

@@ -41,11 +41,6 @@ namespace Belle2 {
     DQMHistAnalysisKLM2Module();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLM2Module();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

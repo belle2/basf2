@@ -9,5 +9,10 @@
 
 def get_validation_globaltags():
     # Legacy_IP_Information GT is for exp3 test file
-    globaltags = ['patch_main_release-07', 'validation_2020-08-11', 'online_2020-08-11', 'Legacy_IP_Information']
+    globaltags = [
+        'temp_arich_geometry_geant4_11_1',
+        'patch_main_release-07',
+        'validation_2020-08-11',
+        'online_2020-08-11',
+        'Legacy_IP_Information']
     return globaltags

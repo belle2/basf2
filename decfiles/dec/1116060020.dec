@@ -5,10 +5,11 @@
 #                                  D_s- -> K- K*0
 #                                          K*0 -> K+ pi-
 #                       B0 -> anything
-# NickName: Bd_D+Ds-_K-pi+pi+_K-Kst0_K+pi-
-# PhysicsWG: B2Hadronic
+# NickName: Bd_D+Ds-_K-pi+pi+_K-Kst0_K+pi-_dalitz
+# Tested: yes
+# PhysicsWG: BHADRONIC
 # Reponsible: Valerio Bertacchi
-# Email:bertacchi@cppm.in2p3.fr
+# Email: bertacchi@cppm.in2p3.fr
 # Cuts: None
 # Date: 2022-07-27
 

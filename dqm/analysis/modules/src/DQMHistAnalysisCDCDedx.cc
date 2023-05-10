@@ -24,8 +24,6 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
   addParam("mmode", mmode, "default monitoring mode is basic", std::string("basic"));
 }
 
-//--------------------------------------------------------------
-DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule() {}
 
 //---------------------------------------------
 void DQMHistAnalysisCDCDedxModule::initialize()

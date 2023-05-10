@@ -46,11 +46,6 @@ namespace Belle2 {
     DQMHistAnalysisCDCDedxModule();
 
     /**
-    * destructor
-    */
-    ~DQMHistAnalysisCDCDedxModule();
-
-    /**
     * init function for default values
     */
     void initialize() override final;

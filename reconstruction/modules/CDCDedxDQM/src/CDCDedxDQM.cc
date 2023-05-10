@@ -23,9 +23,6 @@ CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()
 }
 
 //---------------------------------
-CDCDedxDQMModule::~CDCDedxDQMModule() { }
-
-//---------------------------------
 void CDCDedxDQMModule::defineHisto()
 {
 

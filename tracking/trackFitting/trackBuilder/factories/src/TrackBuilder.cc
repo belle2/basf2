@@ -238,6 +238,7 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
           else {
             isValidWeight = true;
             B2DEBUG(27, "CDC: " << nCDChits << "\t" << cdcHit->getWireID().getEWire() << "\t" << kfinfoId << "\t" << weight);
+            break;
           }
         }                       // end of KalmanFitterInfo loop
 

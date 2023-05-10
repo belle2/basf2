@@ -240,6 +240,15 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_cosTheta = costh;
     dedxTrack->m_charge = charge;
 
+    double injring = -1.0, injtime = -1.0;
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
+    if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
+      injring = m_TTDInfo->isHER();
+      injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+    }
+    dedxTrack->m_injring = injring;
+    dedxTrack->m_injtime = injtime;
+
     // dE/dx values will be calculated using associated RecoTrack
     const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
     if (!recoTrack) {
@@ -257,16 +266,22 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_scale = (m_DBScaleFactor) ? m_DBScaleFactor->getScaleFactor() : 1.0;
 
     // store run gains only for data!
-    dedxTrack->m_runGain = (m_DBRunGain && m_usePrediction && numMCParticles == 0) ? m_DBRunGain->getRunGain() : 1.0;
+    bool isData = false;
+    if (m_usePrediction && numMCParticles == 0)isData = true;
+    dedxTrack->m_runGain = (m_DBRunGain && isData) ? m_DBRunGain->getRunGain() : 1.0;
 
     // get the cosine correction only for data!
-    dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
+    dedxTrack->m_cosCor = (m_DBCosineCor && isData) ? m_DBCosineCor->getMean(costh) : 1.0;
 
     // get the cosine edge correction only for data!
     bool isEdge = false;
     if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
-    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && m_usePrediction && numMCParticles == 0
-                               && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && isData && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+
+    bool isvalidTime = true;
+    if (injtime < 0 || injring < 0)isvalidTime = false;
+    dedxTrack->m_timeGain = (m_DBInjectTime && isData && isvalidTime) ? m_DBInjectTime->getCorrection("mean", injring, injtime) : 1.0;
+    dedxTrack->m_timeReso = (m_DBInjectTime && isData && isvalidTime) ? m_DBInjectTime->getCorrection("reso", injring, injtime) : 1.0;
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -475,7 +490,8 @@ void CDCDedxPIDModule::event()
           // apply the calibration to dE to propagate to both hit and layer measurements
           // Note: could move the sin(theta) here since it is common accross the track
           //       It is applied in two places below (hit level and layer level)
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * wiregain * twodcor * onedcor;
+          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
+                              twodcor * onedcor;
 
           // --------------------
           // save individual hits (even for dead wires)
@@ -579,7 +595,8 @@ void CDCDedxPIDModule::event()
     if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_pCDC / dedxTrack->m_mcmass);
-      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
+      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed,
+                              dedxTrack->m_cosTheta, dedxTrack->m_timeReso);
       dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_simDedx < 0)
         dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
@@ -589,7 +606,7 @@ void CDCDedxPIDModule::event()
 
     // save the PID information for both lookup tables and parameterized means and resolutions
     saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_pCDC, dedxTrack->m_dedxAvgTruncated,
-                 std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
+                 dedxTrack->m_cosTheta, dedxTrack->m_lNHitsUsed, dedxTrack->m_timeReso);
     if (!m_useIndividualHits)
       saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_pCDC, dedxTrack->m_dedxAvgTruncated);
 
@@ -831,6 +848,10 @@ double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) c
     } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
       f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
           par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
+    } else if (par[0] == 3) { // return cos(theta) parameterization
+      f = par[1] * exp(-0.5 * pow(((x[0] - par[2]) / par[3]), 2)) +
+          par[4] * pow(x[0], 6) + par[5] * pow(x[0], 5) + par[6] * pow(x[0], 4) +
+          par[7] * pow(x[0], 3) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
     }
   }
 
@@ -838,38 +859,46 @@ double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) c
 }
 
 
-double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
+double CDCDedxPIDModule::getSigma(double dedx, double nhit, double cos, double timereso) const
 {
-  if (nhit < 5) nhit = 5;
-  if (sin > 0.99) sin = 0.99;
 
   double x[1];
   double dedxpar[3];
   double nhitpar[6];
-  double sinpar[6];
+  double cospar[11];
 
-  dedxpar[0] = 1; nhitpar[0] = 2; sinpar[0] = 2;
-  for (int i = 0; i < 5; ++i) {
+  dedxpar[0] = 1; nhitpar[0] = 2; cospar[0] = 3;
+  for (int i = 0; i < 10; ++i) {
     if (i < 2) dedxpar[i + 1] = m_sigmapars[i];
-    nhitpar[i + 1] = m_sigmapars[i + 2];
-    sinpar[i + 1] = m_sigmapars[i + 7];
+    if (i < 5) nhitpar[i + 1] = m_sigmapars[i + 2];
+    cospar[i + 1] = m_sigmapars[i + 7];
   }
 
   // determine sigma from the parameterization
   x[0] = dedx;
   double corDedx = sigmaCurve(x, dedxpar, 0);
-  x[0] = nhit;
-  double corNHit = sigmaCurve(x, nhitpar, 0);
-  if (nhit > 42) corNHit = 1.0;
-  x[0] = sin;
-  double corSin = sigmaCurve(x, sinpar, 0);
 
-  return (corDedx * corSin * corNHit);
+  x[0] = nhit;
+  double corNHit;
+  int nhit_min = 8, nhit_max = 37;
+
+  if (nhit <  nhit_min) {
+    x[0] = nhit_min;
+    corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_min / nhit);
+  } else if (nhit > nhit_max) {
+    x[0] = nhit_max;
+    corNHit = sigmaCurve(x, nhitpar, 0) * sqrt(nhit_max / nhit);
+  } else corNHit = sigmaCurve(x, nhitpar, 0);
+
+  x[0] = cos;
+  double corCos = sigmaCurve(x, cospar, 0);
+
+  return (corDedx * corCos * corNHit * timereso);
 }
 
 void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
                                     double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
-                                    double sin, int nhit) const
+                                    double cos, int nhit, double timereso) const
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
@@ -878,7 +907,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 
     // determine the predicted mean and resolution
     double mean = getMean(bg);
-    double sigma = getSigma(mean, nhit, sin);
+    double sigma = getSigma(mean, nhit, cos, timereso);
 
     predmean[pdgIter.getIndex()] = mean;
     predsigma[pdgIter.getIndex()] = sigma;

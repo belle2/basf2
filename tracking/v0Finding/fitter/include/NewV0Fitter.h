@@ -31,7 +31,7 @@ namespace Belle2 {
      * Structure to save track data of the last successful iteration
      */
     struct FittedTrack {
-      const RecoTrack* recoTrack = 0; /**< reco track */
+      const RecoTrack* recoTrack = nullptr; /**< reco track */
       Const::ParticleType ptype = Const::invalidParticle; /**< particle type of the V0 track */
       genfit::MeasuredStateOnPlane state; /**< measured state at first hit, extrapolated to fitted vertex */
       double pValue = 0; /**< p-value of track fit */
@@ -39,18 +39,18 @@ namespace Belle2 {
 
       /**
        * Sets the data members
-       * @param trk reco track
+       * @param recoTrk reco track
        * @param hypo particle type of the V0 track (not necessary the one used for the track fit!)
-       * @param sop measured state at first hit extrapolated to fitted vertex
+       * @param mSoP measured state at first hit extrapolated to fitted vertex
        * @param rep track representation used for track fit
        */
-      void set(const RecoTrack* trk, const Const::ParticleType& hypo, const genfit::MeasuredStateOnPlane& sop,
+      void set(const RecoTrack* recoTrk, const Const::ParticleType& hypo, const genfit::MeasuredStateOnPlane& mSoP,
                const genfit::AbsTrackRep* rep)
       {
-        recoTrack = trk;
+        recoTrack = recoTrk;
         ptype = hypo;
-        state = sop;
-        const auto* fitStatus = trk->getGenfitTrack().getFitStatus(rep);
+        state = mSoP;
+        const auto* fitStatus = recoTrk->getGenfitTrack().getFitStatus(rep);
         pValue = fitStatus->getPVal();
         Ndf = fitStatus->getNdf();
       }
@@ -59,11 +59,11 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * @param trackFitResultsName name of the store array TrackFitResults
-     * @param v0sName name of the store array V0s
-     * @param v0ValidationVerticesName name of the store array V0ValidationVertex
-     * @param recoTracksName name of the store array RecoTracks
-     * @param copiedRecoTracksName name of the store array of copied RecoTracks
+     * @param trackFitResultsName name of the StoreArray TrackFitResults
+     * @param v0sName name of the StoreArray V0s
+     * @param v0ValidationVerticesName name of the StoreArray V0ValidationVertex
+     * @param recoTracksName name of the StoreArray RecoTracks
+     * @param copiedRecoTracksName name of the StoreArray of copied RecoTracks
      * @param enableValidation on true store additional data for validation
      */
     NewV0Fitter(const std::string& trackFitResultsName = "",
@@ -75,13 +75,13 @@ namespace Belle2 {
 
     /**
      * Initialization of cuts applied during the fit and store process.
-     * @param beamPipeRadius radius of the beam pipe
+     * @param vertexDistanceCut cut on the transverse radius to cut-off vertices within the beam pipe
      * @param vertexChi2Cut cut on the vertex chi^2
      * @param invMassRangeKshort selection mass window for Ks
      * @param invMassRangeLambda selection mass window for Lambda
      * @param invMassRangePhoton selection mass window for converted gamma
      */
-    void initializeCuts(double beamPipeRadius,
+    void initializeCuts(double vertexDistanceCut,
                         double vertexChi2Cut,
                         const std::tuple<double, double>& invMassRangeKshort,
                         const std::tuple<double, double>& invMassRangeLambda,
@@ -152,10 +152,10 @@ namespace Belle2 {
     /**
      * Sets cardinal representation of a given genfit track and PDG code.
      * @param gfTrack genfit track [in/out]
-     * @param pdg PDG code
+     * @param pdgCode PDG code
      * @return true on success
      */
-    bool setCardinalRep(genfit::Track& gfTrack, int pdg);
+    bool setCardinalRep(genfit::Track& gfTrack, int pdgCode);
 
     /**
      * Genfit Rave vertex fit called by vertexFit method.
@@ -221,8 +221,8 @@ namespace Belle2 {
     StoreArray<V0ValidationVertex> m_validationV0s;  /**< V0ValidationVertex collection (optional) */
     StoreArray<RecoTrack> m_copiedRecoTracks;        /**< copied RecoTracks collection */
 
-    double m_beamPipeRadius = 0;  /**< Radius of beampipe */
-    double m_vertexChi2Cut = 0;   /**< Chi2 cut if vertex is outside beampipe */
+    double m_vertexDistanceCut = 0;  /**< cut on the transverse radius */
+    double m_vertexChi2Cut = 0;   /**< Chi2 cut */
     std::map<int, std::pair<double, double> > m_invMassCuts; /**< invariant mass cuts, key = abs(PDG) */
 
     int m_fitterMode = 1;  /**< fitter mode */

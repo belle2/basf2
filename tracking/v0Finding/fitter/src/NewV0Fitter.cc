@@ -29,6 +29,11 @@ NewV0Fitter::NewV0Fitter(const std::string& trackFitResultsName, const std::stri
                          const std::string& copiedRecoTracksName, bool enableValidation)
   : m_recoTracksName(recoTracksName), m_validation(enableValidation)
 {
+  B2ASSERT("V0Fitter: material effects not set up.  Please use SetupGenfitExtrapolationModule.",
+           genfit::MaterialEffects::getInstance()->isInitialized());
+  B2ASSERT("V0Fitter: magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
+           genfit::FieldManager::getInstance()->isInitialized());
+
   m_recoTracks.isRequired(m_recoTracksName);
   m_trackFitResults.isRequired(trackFitResultsName);
 
@@ -42,20 +47,16 @@ NewV0Fitter::NewV0Fitter(const std::string& trackFitResultsName, const std::stri
     m_v0s.registerRelationTo(m_validationV0s);
   }
 
-  B2ASSERT("V0Fitter: material effects not set up.  Please use SetupGenfitExtrapolationModule.",
-           genfit::MaterialEffects::getInstance()->isInitialized());
-  B2ASSERT("V0Fitter: magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
-           genfit::FieldManager::getInstance()->isInitialized());
 }
 
 
-void NewV0Fitter::initializeCuts(double beamPipeRadius,
+void NewV0Fitter::initializeCuts(double vertexDistanceCut,
                                  double vertexChi2Cut,
                                  const std::tuple<double, double>& invMassRangeKshort,
                                  const std::tuple<double, double>& invMassRangeLambda,
                                  const std::tuple<double, double>& invMassRangePhoton)
 {
-  m_beamPipeRadius = beamPipeRadius;
+  m_vertexDistanceCut = vertexDistanceCut;
   m_vertexChi2Cut = vertexChi2Cut;
   m_invMassCuts[22] = std::make_pair(std::get<0>(invMassRangePhoton), std::get<1>(invMassRangePhoton));
   m_invMassCuts[310] = std::make_pair(std::get<0>(invMassRangeKshort), std::get<1>(invMassRangeKshort));
@@ -85,8 +86,8 @@ bool NewV0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus, c
   /// Initialize status flags and result storage
   isForceStored = false;
   isHitRemoved = false;
-  m_trkPlus.recoTrack = 0;
-  m_trkMinus.recoTrack = 0;
+  m_trkPlus.recoTrack = nullptr;
+  m_trkMinus.recoTrack = nullptr;
 
   /// Get related recoTracks
   const RecoTrack* recoTrackPlus  =  trackPlus->getRelated<RecoTrack>(m_recoTracksName);
@@ -186,7 +187,7 @@ int NewV0Fitter::vertexFit(const RecoTrack* recoTrackPlus, const RecoTrack* reco
 
   // apply cuts on the vertex
 
-  if (vertexPos.Rho() < m_beamPipeRadius) return c_NotSelected;
+  if (vertexPos.Rho() < m_vertexDistanceCut) return c_NotSelected;
   if (vert.getChi2() > m_vertexChi2Cut) return c_NotSelected;
 
   // apply cut on the invariant mass
@@ -196,11 +197,11 @@ int NewV0Fitter::vertexFit(const RecoTrack* recoTrackPlus, const RecoTrack* reco
   auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
   double mass1 = trackHypotheses.first.getMass();
   double mass2 = trackHypotheses.second.getMass();
-  ROOT::Math::PxPyPzMVector lv1(p1.X(), p1.Y(), p1.Z(), mass1);
-  ROOT::Math::PxPyPzMVector lv2(p2.X(), p2.Y(), p2.Z(), mass2);
-  double invMass = (lv1 + lv2).M();
-  int pdg = abs(v0Hypothesis.getPDGCode());
-  const auto& cuts = m_invMassCuts[pdg];
+  ROOT::Math::PxPyPzMVector fourVec1(p1.X(), p1.Y(), p1.Z(), mass1);
+  ROOT::Math::PxPyPzMVector fourVec2(p2.X(), p2.Y(), p2.Z(), mass2);
+  double invMass = (fourVec1 + fourVec2).M();
+  int pdgCode = abs(v0Hypothesis.getPDGCode());
+  const auto& cuts = m_invMassCuts[pdgCode];
   if (invMass < cuts.first or invMass > cuts.second) return c_NotSelected;
 
   // extrapolate tracks to fitted vertex; the return status, if positive, indicates whether there are inner hits
@@ -213,7 +214,7 @@ int NewV0Fitter::vertexFit(const RecoTrack* recoTrackPlus, const RecoTrack* reco
   // save fitted vertex and tracks
 
   m_fittedVertex = vert;
-  m_momentum = (lv1 + lv2).P();
+  m_momentum = (fourVec1 + fourVec2).P();
   m_invMass = invMass;
   m_trkPlus.set(recoTrackPlus, trackHypotheses.first, statePlus, plusRepresentation);
   m_trkMinus.set(recoTrackMinus, trackHypotheses.second, stateMinus, minusRepresentation);
@@ -233,21 +234,21 @@ const genfit::AbsTrackRep* NewV0Fitter::getTrackRepresentation(const RecoTrack* 
   }
 
   B2ERROR("V0Fitter: track hypothesis with closest mass not available. Should never happen!");
-  return 0;
+  return nullptr;
 }
 
 
-bool NewV0Fitter::setCardinalRep(genfit::Track& gfTrack, int pdg)
+bool NewV0Fitter::setCardinalRep(genfit::Track& gfTrack, int pdgCode)
 {
   const auto& reps = gfTrack.getTrackReps();
   for (unsigned id = 0; id < reps.size(); id++) {
-    if (abs(reps[id]->getPDG()) == pdg) {
+    if (abs(reps[id]->getPDG()) == pdgCode) {
       gfTrack.setCardinalRep(id);
       return true;
     }
   }
 
-  B2ERROR("V0Fitter: cannot set cardinal representation for PDG = " << pdg);
+  B2ERROR("V0Fitter: cannot set cardinal representation for PDG = " << pdgCode);
   return false;
 }
 
@@ -312,6 +313,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   // make a copy of useInFit flags
   std::vector<bool> useInFit;
   const auto& recoHitInformations = origRecoTrack->getRecoHitInformations(true); // true to get sorted hits info
+  useInFit.reserve(recoHitInformations.size());
   for (const auto& hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
 
   // get track representation for a given particle
@@ -466,7 +468,7 @@ const TrackFitResult* NewV0Fitter::saveTrackFitResult(const FittedTrack& trk, in
   const auto* recoTrack = trk.recoTrack;
   if (not recoTrack) {
     B2ERROR("V0Fitter: bug in saving track fit result, recoTrack is nullptr");
-    return 0;
+    return nullptr;
   }
 
   auto hitPatternCDC = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);

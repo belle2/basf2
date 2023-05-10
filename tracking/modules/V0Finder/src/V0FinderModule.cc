@@ -48,7 +48,7 @@ V0FinderModule::V0FinderModule() : Module()
 
   // output: V0s
   addParam("V0s", m_arrayNameV0, "V0 StoreArry name (output).", std::string(""));
-  addParam("Validation", m_validation, "Create output for validation.", bool(false));
+  addParam("Validation", m_useValidation, "Create output for validation.", bool(false));
   addParam("V0ValidationVertices", m_arrayNameV0ValidationVertex, "V0ValidationVertex StoreArray name (optional output)",
            std::string(""));
 
@@ -82,7 +82,7 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("massRangeLambda", m_preFilterMassRangeLambda,
            "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
            " (to be chosen loosely as used momenta ignore material effects)", m_preFilterMassRangeLambda);
-  addParam("precutRho", m_precutRho, "preselection cut on the transverse radius of the point-of-closest-approach of track pair. "
+  addParam("precutRho", m_precutRho, "preselection cut on the transverse radius of the point-of-closest-approach of two tracks. "
            "Set value to 0 to accept all.", 0.5);
   addParam("precutCosAlpha", m_precutCosAlpha, "preselection cut on the cosine of opening angle between two tracks. "
            "Those above this cut are always accepted.", 0.9);
@@ -100,14 +100,14 @@ void V0FinderModule::initialize()
   if (m_useNewV0Fitter) {
     m_newV0Fitter = std::make_unique<NewV0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
                                                   m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
-                                                  m_arrayNameCopiedRecoTrack, m_validation);
+                                                  m_arrayNameCopiedRecoTrack, m_useValidation);
     m_newV0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
                                   m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
     m_newV0Fitter->setFitterMode(m_v0FitterMode);
   } else {
     m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
                                             m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
-                                            m_arrayNameCopiedRecoTrack, m_validation);
+                                            m_arrayNameCopiedRecoTrack, m_useValidation);
     m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
                                m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
     m_v0Fitter->setFitterMode(m_v0FitterMode);
@@ -236,36 +236,46 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
 }
 
 
-bool V0FinderModule::isTrackPairSelected(const Track* trk1, const Track* trk2)
+bool V0FinderModule::isTrackPairSelected(const Track* track1, const Track* track2)
 {
   if (m_precutRho <= 0) return true;
 
-  auto* fit1 = trk1->getTrackFitResultWithClosestMass(Belle2::Const::pion);
+  auto* fit1 = track1->getTrackFitResultWithClosestMass(Belle2::Const::pion);
   if (not fit1) return false;
-  auto r1 = fit1->getPosition();
-  auto k1 = fit1->getMomentum().Unit();
+  auto r1 = fit1->getPosition();        // point on the straight line
+  auto k1 = fit1->getMomentum().Unit(); // direction of the line
 
-  auto* fit2 = trk2->getTrackFitResultWithClosestMass(Belle2::Const::pion);
+  auto* fit2 = track2->getTrackFitResultWithClosestMass(Belle2::Const::pion);
   if (not fit2) return false;
-  auto r2 = fit2->getPosition();
-  auto k2 = fit2->getMomentum().Unit();
+  auto r2 = fit2->getPosition();        // point on the straight line
+  auto k2 = fit2->getMomentum().Unit(); // direction of the line
 
   double cosAlpha = k1.Dot(k2);  // cosine of opening angle between two tracks
   if (cosAlpha > m_precutCosAlpha) return true;
 
-  double D = cosAlpha * cosAlpha - 1;
-  if (D == 0) return true;
+  // Find points, p1 and p2, on the straight lines that are closest to each other, i.e.
+  //   (p2 - p1).Dot(k1) = 0 and (p2 - p1).Dot(k2) = 0,
+  // where p1 = r1 + k1 * lam1 and p2 = r2 + k2 * lam2,
+  // and lam1 and lam2 are running parameters - the unknowns of the equations.
+  //
+  // After rearangement the system of equations reads:
+  //
+  //   lam1 - cosAlpha * lam2 = b1, b1 = (r2 - r1).Dot(k1),
+  //   cosAlpha * lam1 - lam2 = b2, b2 = (r2 - r1).Dot(k2)
+
+  double D = cosAlpha * cosAlpha - 1; // determinant of the system of two equations
+  if (D == 0) return true; // tracks are parallel
 
   auto dr = r2 - r1;
   double b1 = dr.Dot(k1);
   double b2 = dr.Dot(k2);
-  double lam1 = (-b1 + b2 * cosAlpha) / D;
-  double lam2 = (b2 - b1 * cosAlpha) / D;
-  auto rr1 = r1 + k1 * lam1;
-  auto rr2 = r2 + k2 * lam2;
-  auto r = (rr1 + rr2) / 2;  // POCA of two tracks
+  double lam1 = (-b1 + b2 * cosAlpha) / D; // solution for the first straight line
+  double lam2 = (b2 - b1 * cosAlpha) / D;  // solution for the second staright line
+  auto p1 = r1 + k1 * lam1;  // point on the first line closest to the second line
+  auto p2 = r2 + k2 * lam2;  // point on the second line closest to the first line
+  auto poca = (p1 + p2) / 2; // POCA of two straight lines, an approximation for the vertex
 
-  return r.Rho() > m_precutRho;
+  return poca.Rho() > m_precutRho;
 }
 
 

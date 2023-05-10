@@ -24,13 +24,9 @@ namespace Belle2 {
    * V0 finder module.
    *
    * Pairs up all positive and negative tracks,
-   * tries to find vertices between them,
-   * stores found vertices.
+   * tries to find vertices between them.
    * Only vertices outside the beam pipe are saved, the others are
-   * recovered in a following analysis level.
-   *
-   * Cut outside the beam pipe is maximum chi^2.
-   * The value used as beam pipe radius is an option.
+   * recovered at the analysis level.
    *
    * The resulting pairs of tracks are stored as mdst::V0.
    */
@@ -71,7 +67,7 @@ namespace Belle2 {
     double m_precutRho;      ///< preselection cut on transverse radius of the track pair POCA
     double m_precutCosAlpha; ///< preselection cut on opening angle of the track pair
     bool   m_useNewV0Fitter; ///< toggle between old (false) and new (true) V0 fitter
-    bool   m_validation;     ///< true to use validation.
+    bool   m_useValidation;  ///< on true save also fitted vertices in V0ValidationVertex StoreArray
 
     /// range for reconstructed Kshort mass used after removing material effects and inner hits
     std::tuple<double, double> m_invMassRangeKshort = { 0.425, 0.575 };
@@ -90,11 +86,11 @@ namespace Belle2 {
     /**
      * Track pair preselection based on a point-of-closest-approach of two tracks.
      * Tracks are approximated with staright lines using their perigee parameters.
-     * @param trk1 first track
-     * @param trk2 second track
+     * @param track1 first track
+     * @param track2 second track
      * @return true, if preselection criteria are satisfied.
      */
-    bool isTrackPairSelected(const Track* trk1, const Track* trk2);
+    bool isTrackPairSelected(const Track* track1, const Track* track2);
 
     /**
      * Helper function that gets the approximate mass range for the two given tracks and rejects candidates which

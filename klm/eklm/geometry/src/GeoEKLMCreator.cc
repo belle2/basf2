@@ -11,9 +11,9 @@
 
 /* KLM headers. */
 #include <klm/eklm/geometry/G4TriangularPrism.h>
-#include <klm/eklm/simulation/EKLMSensitiveDetector.h>
+#include <klm/simulation/SensitiveDetector.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>
@@ -139,8 +139,8 @@ void EKLM::GeoEKLMCreator::newVolumes()
 void EKLM::GeoEKLMCreator::newSensitive()
 {
   try {
-    m_Sensitive =
-      new EKLMSensitiveDetector("EKLMSensitiveStrip");
+    m_Sensitive = new KLM::SensitiveDetector("EKLMSensitiveStrip",
+                                             KLMElementNumbers::c_EKLM);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

@@ -25,7 +25,7 @@ REG_MODULE(MasterClass);
 MasterClassModule::MasterClassModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("Module to write out data in a format for Belle II masterclasses)DOC");
+  setDescription(R"DOC(Module to write out data in a format for Belle II masterclasses)DOC");
   addParam("outputFileName", m_filename, "File name of root ntuple output.", std::string("masterclass.root"));
 }
 
@@ -68,8 +68,8 @@ void MasterClassModule::event()
     if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
     double E = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
     if (E < 0.1) continue;
-    TVector3 p = cluster.getClusterPosition();
-    p.SetMag(E);
+    ROOT::Math::XYZVector p = cluster.getClusterPosition();
+    p *= (E / p.R());
     m_event->AddTrack(p.x(), p.y(), p.z(), E, 0, PHOTON);
   }
 

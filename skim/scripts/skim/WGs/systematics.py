@@ -94,7 +94,7 @@ class SystematicsTracking(BaseSkim):
     def load_standard_lists(self, path):
         stdK("loose", path=path)
         stdPi("loose", path=path)
-        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPi0s("eff40_May2020", path=path)
 
     def build_lists(self, path):
         return self.BtoDStarPiList(path) + self.DstarToD0PiPartList(path)
@@ -184,7 +184,7 @@ class Resonance(BaseSkim):
         stdMu("loose", path=path)
         stdPi("loose", path=path)
         stdPr("loose", path=path)
-        stdPi0s("eff40_May2020Fit", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPi0s("eff40_May2020Fit", path=path)
 
     def build_lists(self, path):
         return (
@@ -540,7 +540,7 @@ class SystematicsPhiGamma(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("loose", path=path)
         stdK("all", path=path)
         stdKshorts(path=path)
 
@@ -562,8 +562,7 @@ class SystematicsPhiGamma(BaseSkim):
         stdKshorts(path=path)
         ma.fillParticleList('K+:all', "", writeOut=True, path=path)
         ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
-        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
 
         ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=path)
 
@@ -612,7 +611,7 @@ class Random(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         # Select one photon/track per event with no other cuts, so that all events are
@@ -689,7 +688,7 @@ class SystematicsJpsi(BaseSkim):
     def load_standard_lists(self, path):
         stdMu("all", path=path)
         stdE("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     TestSampleProcess = "ccbar"
     ApplyHLTHadronCut = True

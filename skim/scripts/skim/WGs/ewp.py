@@ -23,7 +23,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
-__liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
+__liaison__ = "Rahul Tiwary <rahul.tiwary@tifr.res.in>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -36,7 +36,7 @@ class BtoXgamma(BaseSkim):
 
     Event-level cuts:
 
-    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
     * :math:`n_{\\text{tracks}} \\geq 3`
 
@@ -55,14 +55,13 @@ class BtoXgamma(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\gamma` decays."""
         # event level cuts: R2 and require a minimum number of tracks + decent photons
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
-        ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
                            allMoments=False,
@@ -76,8 +75,8 @@ class BtoXgamma(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.5 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
         ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
@@ -94,7 +93,7 @@ class BtoXgamma(BaseSkim):
         histogram_filename = f'{self}_Validation.root'
 
         stdK('all', path=path)
-        stdPhotons('cdc', path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons('cdc', path=path)
         ma.cutAndCopyList('gamma:sig', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
 
         ma.reconstructDecay('K*0:sig  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
@@ -127,7 +126,7 @@ class BtoXll(BaseSkim):
 
       Event-level cuts:
 
-      * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+      * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
         :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
       * :math:`n_{\\text{tracks}} \\geq 3`
 
@@ -160,7 +159,7 @@ class BtoXll(BaseSkim):
         stdE("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
@@ -181,14 +180,14 @@ class BtoXll(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.5 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
         ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
@@ -241,7 +240,7 @@ class BtoXll_LFV(BaseSkim):
 
     Event-level cuts:
 
-    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
     * :math:`n_{\\text{tracks}} \\geq 3`
 
@@ -272,7 +271,7 @@ class BtoXll_LFV(BaseSkim):
         stdE("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""
@@ -293,14 +292,14 @@ class BtoXll_LFV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.5 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
         ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)

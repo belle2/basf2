@@ -20,7 +20,7 @@ namespace Belle2 {
   TEST_F(ThreeHitFiltersTest, simpleTest)
   {
     // testing deltaPt-calculator:
-    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
+    B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
 
     ThreeHitFilters aFilter = ThreeHitFilters(outerHitSimple, centerHit, innerHit);
 
@@ -50,7 +50,7 @@ namespace Belle2 {
   /** the correctness of the magneticField-values (important for pT-related calculations) */
   TEST_F(ThreeHitFiltersTest, TestMagneticField)
   {
-    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
+    B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
 
     ThreeHitFilters aFilter = ThreeHitFilters(outerHitSimple, centerHit, innerHit);
 
@@ -66,9 +66,8 @@ namespace Belle2 {
   /** the correctness of the angle calculators */
   TEST_F(ThreeHitFiltersTest, TestAngles)
   {
-//     TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
-    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.);
-    TVector3 cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
+    B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.);
+    B2Vector3D cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
 
 //    B2INFO("now tests with 1T \n")
     ThreeHitFilters aFilter = ThreeHitFilters(outerHit, centerHit, innerHit);
@@ -90,8 +89,8 @@ namespace Belle2 {
   /** test sign, helixFit and calcDeltaSlopeRZ filters */
   TEST_F(ThreeHitFiltersTest, TestSignAndOtherFilters)
   {
-    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.), sigma(.01, .01, .01), unrealsigma(2, 2, 2),
-             outerhighHit(4., 6., 1.);
+    B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.), sigma(.01, .01, .01), unrealsigma(2, 2, 2),
+               outerhighHit(4., 6., 1.);
 
     ThreeHitFilters aFilter = ThreeHitFilters(outerHit, centerHit, innerHit);
 
@@ -119,8 +118,8 @@ namespace Belle2 {
   /** test DeltaSOverZ */
   TEST_F(ThreeHitFiltersTest, TestDeltaSOverZ)
   {
-    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 1.), outerHit(6., 4., 3.);
-    TVector3 cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
+    B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 1.), outerHit(6., 4., 3.);
+    B2Vector3D cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
     ThreeHitFilters aFilter = ThreeHitFilters(outerHit, centerHit, innerHit);
 
     EXPECT_FLOAT_EQ(0.31823963, aFilter.calcDeltaSlopeZOverS());
@@ -138,10 +137,10 @@ namespace Belle2 {
   TEST_F(ThreeHitFiltersTest, TestCalcPt)
   {
     // calcCircleCenterV2 had problems when x_1==x_2 or y_1==y_2
-    TVector3 innerHit(1., 2., 0.), centerHit(3., 2., 1.), outerHit(3., 4., 3.);
-    TVector3 cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
+    B2Vector3D innerHit(1., 2., 0.), centerHit(3., 2., 1.), outerHit(3., 4., 3.);
+    B2Vector3D cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
     ThreeHitFilters aFilter = ThreeHitFilters();
-    TVector3 innerHit2(1., 1., 0.), centerHit2(3., 3., 0.), outerHitEvil(6., 3., 0.);
+    B2Vector3D innerHit2(1., 1., 0.), centerHit2(3., 3., 0.), outerHitEvil(6., 3., 0.);
 
     double pt = 0, ptTrue = 0;
 

@@ -1,0 +1,23 @@
+# EventType: 4110441000
+# Descriptor: [vpho->gamma[Y2S->pi+pi-[Y1S->mu+mu-]]]
+# NickName: vpho_gammaY2S_pipiY1S_mumu
+# Cuts: None
+# Documentation: ee-> gamma Upsilon process
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Yang Li 
+# Email: y_li21@m.fudan.edu.cn 
+# Date: 20230102
+
+Decay vpho
+1.0   Upsilon(2S) gamma  VECTORISR 1.0 1.0;
+Enddecay
+
+Decay Upsilon(2S)
+1.0   Upsilon  pi+ pi-  YMSTOYNSPIPICLEOBOOST -0.753 0.000;
+Enddecay
+
+Decay Upsilon
+1.0   mu+ mu-  PHSP;
+Enddecay
+End

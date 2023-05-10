@@ -21,17 +21,17 @@ DisplayData::~DisplayData()
   m_histograms.clear();
 }
 
-void DisplayData::addArrow(const std::string& name, const TVector3& start, const TVector3& end, int color)
+void DisplayData::addArrow(const std::string& name, const ROOT::Math::XYZVector& start, const ROOT::Math::XYZVector& end, int color)
 {
   m_arrows.push_back(Arrow {name, start, end, color});
 }
 
-void DisplayData::addPoint(const std::string& name, const TVector3& pos)
+void DisplayData::addPoint(const std::string& name, const ROOT::Math::XYZVector& pos)
 {
   m_pointSets[name].push_back(pos);
 }
 
-void DisplayData::addLabel(const std::string& text, const TVector3& pos)
+void DisplayData::addLabel(const std::string& text, const ROOT::Math::XYZVector& pos)
 {
   m_labels.emplace_back(text, pos);
 }

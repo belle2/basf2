@@ -9,9 +9,9 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
@@ -36,7 +36,7 @@ namespace Belle2 {
   /**
    * Analysis of KLM DQM histograms.
    */
-  class DQMHistAnalysisKLMModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisKLMModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -53,27 +53,27 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate() override;
+    void terminate() override final;
 
   private:
 
@@ -87,12 +87,13 @@ namespace Belle2 {
      * @param[in]  subdetector  Subdetector.
      * @param[in]  section      Section.
      * @param[in]  sector       Sector.
+     * @param[in]  index        Histogram Index.
      * @param[in]  histogram    Histogram.
      * @param[in]  canvas       Canvas.
      * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
-      int subdetector, int section, int sector,
+      int subdetector, int section, int sector, int index,
       TH1* histogram, TCanvas* canvas, TLatex& latex);
 
     /**
@@ -162,12 +163,6 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
-    /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = nullptr;
-
-    /** String with run type. */
-    TString m_RunTypeString;
-
     /** Run type flag for null runs. */
     bool m_IsNullRun;
 
@@ -185,6 +180,9 @@ namespace Belle2 {
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
 
   };
 

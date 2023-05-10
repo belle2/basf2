@@ -24,7 +24,7 @@ REG_MODULE(TheKiller);
 TheKillerModule::TheKillerModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("This Modules kills basf2 as horribly as possible (or as selected)
+  setDescription(R"DOC(This Modules kills basf2 as horribly as possible (or as selected)
 
 With this module you can kill basf2 in a variety of ways to test what happens if processing is interrupted by
 

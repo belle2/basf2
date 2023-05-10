@@ -104,7 +104,7 @@ namespace Belle2 {
      */
     double getPt() const
     {
-      const double bField = BFieldManager::getField(TVector3(0, 0, getZ0())).Z() / Unit::T;
+      const double bField = BFieldManager::getField(0, 0, getZ0()).Z() / Unit::T;
       return getTransverseMomentum(bField);
     }
     /** get the quadrant */

@@ -112,7 +112,7 @@ void NoKickCutsEvalModule::event()
     if (XP8.size() > 0) {
       for (int i = 0; (i + 1) < (int)XP8.size(); i++) {
         for (int par = 0; par < c_nbinpar; par++) {
-          int p = (int)((XP8.at(i).m_momentum0.Mag() - c_pmin) / c_pwidth);
+          int p = (int)((XP8.at(i).m_momentum0.R() - c_pmin) / c_pwidth);
           if (p > c_nbinp - 1 || p < 0) {
             m_pCounter++;
             continue;
@@ -170,8 +170,8 @@ void NoKickCutsEvalModule::endRun()
               double moltSigma2 = 2;
               double sigma1 = (double)moltSigma1 * (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
               double sigma2 = (double)moltSigma2 * (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
-              double norm1 = sigma1 * sqrt(2 * 3.1415) * 0.9 * nbin0;
-              double norm2 = sigma2 * sqrt(2 * 3.1415) * 0.1 * nbin0;
+              double norm1 = sigma1 * sqrt(2 * M_PI) * 0.9 * nbin0;
+              double norm2 = sigma2 * sqrt(2 * M_PI) * 0.1 * nbin0;
               double mean1 = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
               double mean2 = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
               double bkg = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(2);

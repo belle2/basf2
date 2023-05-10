@@ -143,15 +143,15 @@ namespace TreeFitter {
 
     auto p_vec = particle()->getMomentum();
     // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec.x()) >= std::abs(p_vec.y())) && (std::abs(p_vec.x()) >= std::abs(p_vec.z()))) {
+    if ((std::abs(p_vec.X()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.X()) >= std::abs(p_vec.Z()))) {
       m_i1 = 0; m_i2 = 1; m_i3 = 2;
-    } else if ((std::abs(p_vec.y()) >= std::abs(p_vec.x())) && (std::abs(p_vec.y()) >= std::abs(p_vec.z()))) {
+    } else if ((std::abs(p_vec.Y()) >= std::abs(p_vec.X())) && (std::abs(p_vec.Y()) >= std::abs(p_vec.Z()))) {
       m_i1 = 1; m_i2 = 0; m_i3 = 2;
-    } else if ((std::abs(p_vec.z()) >= std::abs(p_vec.y())) && (std::abs(p_vec.z()) >= std::abs(p_vec.x()))) {
+    } else if ((std::abs(p_vec.Z()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.Z()) >= std::abs(p_vec.X()))) {
       m_i1 = 2; m_i2 = 1; m_i3 = 0;
     } else {
       B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
-              << p_vec.x() << " py: " << p_vec.y() << " pz: " << p_vec.z() << " calculated from Ec: " << m_clusterPars(3));
+              << p_vec.X() << " py: " << p_vec.Y() << " pz: " << p_vec.Z() << " calculated from Ec: " << m_clusterPars(3));
       return ErrCode(ErrCode::Status::photondimerror);
     }
 

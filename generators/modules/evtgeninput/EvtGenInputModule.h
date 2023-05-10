@@ -16,6 +16,8 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
+#include <Math/Vector3D.h>
+
 #include <string>
 #include <utility>
 

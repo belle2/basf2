@@ -4,7 +4,7 @@ Changes in the analysis package
 TreeFitter
 ++++++++++
 
-* Fix the :math:`\phi`-dependent loss of performance for displaced vertices (:issue:`BII-4753`).  
+* Fix the :math:`\phi`-dependent loss of performance for displaced vertices (:issue:`4674`).
 
 Flavor Tagger
 +++++++++++++
@@ -45,7 +45,7 @@ Variables
    defining them as the PDG 2018, p. 722.
 
 * The function to create variable aliases for particles selected from a decay
-  string has been fixed and extended to allow better customization (:issue:`BII-4437`)
+  string has been fixed and extended to allow better customization (:issue:`4368`)
 
   .. seealso:: `variables.utils.create_aliases_for_selected()`
 
@@ -80,7 +80,7 @@ Variables
 * The variables for the fast reco HLT trigger stage have been removed,
   as we are currently not planning to have it in the early data taking.
 
-* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
+* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`4919`).
 
 * The variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz`, :b2:var:`dr`, :b2:var:`dphi`, :b2:var:`dcosTheta` ) are now with respect to the interaction point (as documented). 
   This now makes them different with respect to the cartesian position ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ) with respect to the origin..
@@ -103,7 +103,7 @@ Variables
   :b2:var:`medianValueInList` which calculate the arithmetic mean and median of
   a given variable in a given particle list.
 
-* Removed ``nECLClusters`` (:issue:`BII-4476`).
+* Removed ``nECLClusters`` (:issue:`4407`).
   The number of ``ECLClusters`` is not a good measure for anything except the age of the input mdst file.
   Recent changes to the handling of ECLClusters and their hypotheses have changed this (already arbitrary) 
   number to another (equally arbitrary but different) number.
@@ -169,7 +169,7 @@ Modules
 
 * Fixed a bug in the :b2:mod:`BestCandidateSelection` module: When
   ``allowMultiRank=True`` there always at least two candidates with rank of one,
-  even if they didn't have the same variable value (:issue:`BII-4460`)
+  even if they didn't have the same variable value (:issue:`4391`)
 
   This affects all users of `modularAnalysis.rankByLowest()` and
   `modularAnalysis.rankByHighest()` if they passed ``allowMultiRank=True``
@@ -237,7 +237,7 @@ Standard Particle Lists
 * Fix the `stdKlongs.stdKlongs` lists.
 
 * Updated charged standard PID cut values to reflect the correct efficiencies.
-  This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
+  This recovers the efficiency loss reported in ``BIIDP-1065``.
 
 Tutorials
 +++++++++

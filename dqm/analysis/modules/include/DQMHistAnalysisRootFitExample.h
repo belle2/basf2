@@ -17,7 +17,7 @@
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <RooWorkspace.h>
@@ -29,7 +29,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisRooFitExampleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisRooFitExampleModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

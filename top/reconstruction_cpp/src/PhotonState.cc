@@ -19,25 +19,26 @@ namespace Belle2 {
 
     double PhotonState::s_maxLen = 10000;
 
-    PhotonState::PhotonState(const TVector3& position, const TVector3& direction):
+    PhotonState::PhotonState(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& direction):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_kx(direction.X()), m_ky(direction.Y()), m_kz(direction.Z()),
       m_status(true)
     {}
 
 
-    PhotonState::PhotonState(const TVector3& position, double kx, double ky, double kz):
+    PhotonState::PhotonState(const ROOT::Math::XYZPoint& position, double kx, double ky, double kz):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_kx(kx), m_ky(ky), m_kz(kz),
       m_status(true)
     {}
 
-    PhotonState::PhotonState(const TVector3& position, const TVector3& trackDir, double thc, double fic):
+    PhotonState::PhotonState(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& trackDir,
+                             double thc, double fic):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_status(true)
     {
-      TVector3 dir(cos(fic) * sin(thc), sin(fic) * sin(thc), cos(thc));
-      dir.RotateUz(trackDir);
+      ROOT::Math::XYZVector dir(cos(fic) * sin(thc), sin(fic) * sin(thc), cos(thc));
+      func::rotateUz(dir, trackDir);
       m_kx = dir.X();
       m_ky = dir.Y();
       m_kz = dir.Z();

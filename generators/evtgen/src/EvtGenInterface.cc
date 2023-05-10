@@ -195,7 +195,7 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   int pdg;
   EvtId id;
   ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
-  B2Vector3D vertex = parent.getVertex();
+  ROOT::Math::XYZVector vertex = parent.getVertex();
   EvtVector4R pinit(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCaptureDebug.start();
   // we want to decay the particle so the decay time in the tree needs to be lower

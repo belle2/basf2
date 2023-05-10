@@ -110,12 +110,11 @@ void XTCalibration::CreateHisto()
   int al = 0;
   int th = 0;
   int lr = 0;
-  Long64_t nbytes = 0;
   int nEntries = tree->GetEntries();
   cout << "Number of Hit: " << nEntries << endl;
 
   for (int i = 0; i < nEntries; ++i) {
-    nbytes += tree->GetEntry(i);
+    tree->GetEntry(i);
     /* protect in case |alpha|>90*/
     if (fabs(alpha) > 90) {
       if (alpha < 0) alpha += 180;
@@ -455,7 +454,7 @@ void XTCalibration::readXTFromText()
 
 
   }
-  int npar = 8;
+  const int npar = 8;
   //read alpha bin info.
   //  unsigned short nAlphaBins = 0;
   ifs >> nalpha_old;
@@ -482,7 +481,6 @@ void XTCalibration::readXTFromText()
   //  const unsigned short npx = nXTParams - 1;
   double xtc[npar]; // cppcheck-suppress constVariable
   double theta, alpha, dummy1;
-  unsigned nRead = 0;
   //  unsigned m_xtParamMode_old;
   ifs >> xtmode_old >> np;
 
@@ -493,7 +491,6 @@ void XTCalibration::readXTFromText()
     for (int i = 0; i < np; ++i) {
       ifs >> xtc[i];
     }
-    ++nRead;
 
     int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {

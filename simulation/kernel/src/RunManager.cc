@@ -34,8 +34,9 @@ RunManager& RunManager::Instance()
 
 void RunManager::Initialize()
 {
+  m_randomEngine = new RandomEngine();
   //Set the random number engine
-  CLHEP::HepRandom::setTheEngine(new RandomEngine());
+  CLHEP::HepRandom::setTheEngine(m_randomEngine);
 
   SetGeometryToBeOptimized(true);
   //Set geometry to be Initialized because there won't be any before the beginRun
@@ -83,6 +84,8 @@ void RunManager::endRun()
 
 void RunManager::destroy()
 {
+  delete m_randomEngine;
+
   if (m_instance == nullptr) return;
 
   for (G4AssemblyVolume* assemblyVolume : m_AssemblyVolumes) delete assemblyVolume;

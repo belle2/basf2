@@ -55,9 +55,9 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-      B2Vector3D ipposition(0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
       PxPyPzEVector ksmomentum(1, 0, 0, 3);
-      B2Vector3D ksposition(1.0, 0, 0);
+      ROOT::Math::XYZVector ksposition(1.0, 0, 0);
       //Creation of test particles:
       //All daughters and mother particles have the same momenta within a decay
       //In principle, this concept can be better developed if needed

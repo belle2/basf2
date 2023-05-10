@@ -18,6 +18,7 @@
 
 #include <framework/utilities/IOIntercept.h>
 
+#include <Math/Vector3D.h>
 #include <string>
 
 namespace Belle2 {
@@ -72,7 +73,7 @@ namespace Belle2 {
 
     /** Copy parameters from EvtParticle to MCParticle */
     void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                             ROOT::Math::XYZVector  pPrimaryVertex, double timeOffset = 0);
+                             ROOT::Math::XYZVector pPrimaryVertex, double timeOffset = 0);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */

@@ -18,7 +18,7 @@ from pxd import add_pxd_reconstruction
 
 from rawdata import add_unpackers
 
-from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
     add_mc_tracking_reconstruction,
@@ -32,8 +32,6 @@ from softwaretrigger.path_utils import (
     add_filter_software_trigger,
     add_skim_software_trigger
 )
-
-import mdst
 
 
 CDST_TRACKING_OBJECTS = (
@@ -77,7 +75,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                       legacy_ecl_charged_pid=False):
+                       legacy_ecl_charged_pid=False, emulate_HLT=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -119,13 +117,18 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
+        MVA based charged particle ID (false).
+    :param emulate_HLT: if True, it runs the reconstruction as it is run on HLT (e.g. without PXD).
+        If you want to use this flag on raw data, you should also exclude the following branches from RootInput: ROIs, ROIpayload
     """
 
     # By default, the FullGrid module is not used in the reconstruction chain.
     # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
     if reconstruct_cdst == 'rawFormat':
         append_full_grid_cdc_eventt0 = True
+
+    if emulate_HLT:
+        components = DEFAULT_HLT_COMPONENTS
 
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -532,25 +535,23 @@ def add_prefilter_posttracking_reconstruction(path,
     path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
 
 
-def add_mdst_output(
-    path,
-    mc=True,
-    filename='mdst.root',
-    additionalBranches=[],
-    dataDescription=None,
-):
+def add_mdst_output(*args, **kwargs):
     """
-    This function adds the MDST output modules to a path, saving only objects defined as part of the MDST data format.
+        .. deprecated:: release-08-00-00
 
-    @param path Path to add modules to
-    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
-    @param filename Output file name.
-    @param additionalBranches Additional objects/arrays of event durability to save
-    @param dataDescription Additional key->value pairs to be added as data description
-           fields to the output FileMetaData
+    This function simply returns a FATAL message.
+
+    Please use the equivalent function from the mdst package if you want to store
+    the output in a mDST file:
+
+    .. code-block:: python
+
+        import mdst
+        mdst.add_mdst_output(path=mypath)
     """
 
-    return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
+    basf2.B2FATAL("This function is deprecated and it will be removed in release-09.\n"
+                  "Please use the equivalent function from the mdst package.")
 
 
 def add_cdst_output(

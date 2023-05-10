@@ -9,10 +9,13 @@
 /* Own header. */
 #include <mdst/dataobjects/KLMCluster.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+
+/* ROOT headers. */
+#include <TMatrixD.h>
 
 using namespace Belle2;
 
@@ -47,9 +50,9 @@ float KLMCluster::getEnergy() const
 
 ROOT::Math::PxPyPzEVector KLMCluster::getMomentum() const
 {
-  B2Vector3D p3(m_globalX, m_globalY, m_globalZ);
+  ROOT::Math::XYZVector p3(m_globalX, m_globalY, m_globalZ);
   p3 = p3.Unit() * m_p;
-  return ROOT::Math::PxPyPzEVector(p3.x(), p3.y(), p3.z(), getEnergy());
+  return ROOT::Math::PxPyPzEVector(p3.X(), p3.Y(), p3.Z(), getEnergy());
 }
 
 bool KLMCluster::getAssociatedEclClusterFlag() const

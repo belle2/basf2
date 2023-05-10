@@ -1,16 +1,292 @@
+Changes in the analysis package in light-2305-korat
+---------------------------------------------------
+Variables
++++++++++
+* Added new variable `trackLength` that returns the arc length from the track origin to the last CDC layer associated to the track.
+
+Reconstruction of V0s
++++++++++++++++++++++
+* `stdKshorts` and `stdLambdas`: removed a pre-vertex-fit cut on the invariant mass of ``K_S0``/``Lambda0``
+  candidates found by the ``V0Finder`` module. The cut was not useful, as ``V0Finder`` already applies a cut
+  on its candidates, and could discard signal candidates with very displaced vertex due to the
+  ``K_S0``/``Lambda0`` vertex being assumed at the origin before the fit, affecting the invariant mass computation.
+  The post-fit cut on the invariant mass is still present. Cuts on ``K_S0``/``Lambda0`` candidates found by `reconstructDecay`
+  are still the same as before.
+
+Command line tools
+++++++++++++++++++
+* The command line tool :ref:`b2help-variables <b2help-variables>` is extended to get a description of specific variables and to
+  display only their data.
+
+
+Changes in the analysis package in light-2303-iriomote
+------------------------------------------------------
+Modules
++++++++
+* Fixed a bug in the `EventShapeCalculator` module and `modularAnalysis.buildEventShape` that was introduced in
+  ``light-2302-genetta``. Meaningless values were provided for the event-shape variables.
+* Fixed a bug on the `findMCDecay` that creates duplicated particles which differ only in the order of their daughters.
+* Fixed a bug of the TreeFit that affected the initialization of vertex position that is calculated from two track helices.
+  This bug mainly affected particles that decay far from the IP, specifically ``V0`` particles such as ``K_S0``.
+  The bugfix recovers the inefficiency of those particles.
+
+Variables
++++++++++
+* Added new charged PID variables `kaonIDNN` and `pionIDNN` representing the probability for the given hypothesis, calculated
+  from a neural network that uses high-level information such as PID likelihoods, track momentum and charge.
+  The probabilities are unaffected by momentum updates in vertex fits or the application of the track momentum scale correction.
+
+
+Changes in the analysis package in light-2302-genetta
+-----------------------------------------------------
+
+Charm Flavor Tagger
++++++++++++++++++++
+* The Charm Flavor Tagger algorithm has been added in ``analysis/scripts/charmFlavorTagger.py``. This allows for the determination
+  of the signal flavor of neutral D mesons with information from the ROE. The CFT output, qr, is saved in the extraInfo field of
+  the signal particle.
+
+MCMatching of K_S0
+++++++++++++++++++
+* Modified the MCMatching algorithm for the ``K_S0`` particle. The MCError flags of missing daughters (e.g.
+  ``c_MissMassiveParticle``. please see :ref:`Error_flags`) was not assigned to the ``K_S0``. It was not a problem for the
+  :math:`K_S^0 \to \pi^+ \pi^-` process, because ``K_S0`` fails to be matched to the MCParticle when one of ``pi+`` is missed.
+  However, when the ``K_S0`` decays interacting with the detector material, it can have many daughters. If the ``K_S0`` is
+  reconstructed from two pions of these daughters, it was considered as "signal" (i.e. ``isSignal==1``) even though its
+  kinematics was wrongly reconstructed.
+  We modified the MCMatching algorithm and assigned the MCError flags of missing daughters on the ``K_S0`` properly. The most of
+  "fake-signal" ``K_S0`` candidates are now correctly identified as background (i.e. ``isSignal==0``).
+* There remains a small fraction of "fake-signal" candidates that decay interacting with the detector material but having only
+  two pions. The effect is expected to be small, for example, that is about ``0.0005%`` in the tau-LFV process,
+  :math:`\tau^- \to \ell^- K_S^0 K_S^0`. You can identify such events with the `mcSecPhysProc` variable that returns the secondary
+  process of the Geant4, namely ``countFSPDaughters(mcPrimary==0 and mcSecPhysProc!=201)>0``.
+
+Graph Neural Network based Flavor Tagger
+++++++++++++++++++++++++++++++++++++++++
+* The Graph Neural Network based Flavor Tagger is available from the basf2. The new options ``useGNN`` and ``identifierGNN`` are
+  added to `flavorTagger.flavorTagger`. If ``useGNN`` is set to ``True`` and ``identifierGNN`` is set to the trained weight file
+  name, the qr value is stored in the alias variable ``qrGNN``. One can find the information on the identifier and the global tag
+  which includes the payload on the `TDCPV WG Confluence Page <https://confluence.desy.de/display/BI/Recipes+for+TDCPV+tools>`_.
+
+Modules
++++++++
+* New function `modularAnalysis.estimateAndAttachTrackFitResult` and module `TrackFitResultEstimator` are added. It creates a
+  ``TrackFitResult`` from the momentum of the Particle and creates a relation between them. The main use case is the tracking
+  efficiency study by extrapolating the recoil particle to the detector surfaces.
+* Removed the prepending of the analysis global tag inside the modularAnalysis functions, `lowEnergyPi0Identification`,
+  `getBeamBackgroundProbability`, `getFakePhotonProbability`, and `getNbarIDMVA`, so that the priority of global tags gets clearer.
+* Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
+* Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is
+  ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle
+  in the input ParticleLists.
+* Modified parameters for the functions :func:`modularAnalysis.fillParticleList` and :func:`modularAnalysis.fillParticleLists` so
+  that they no longer contain parameters that load the beam background or fake photon (formerly hadronic split-off) MVA.
+* Parameters for `stdPhotons`, `stdPi0s` and `stdHyperons` have been changed in both name and type. The new parameters are called
+  ``beamBackgroundMVAWeight`` and ``fakePhotonMVAWeight``, and they are now strings to specify which weight files should be used. For
+  run-independent training use ``MCri`` while for run-dependent training use ``MCrd``. More information on the new weights can be
+  found on the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+* Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy
+  bias corrections for the ``stdXi0`` particle list. The latest information on the bias correction can be found on the `Neutrals
+  Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+* Added a parameter ``updateAllDaughters`` to `stdKshorts` and `stdLambdas` so that users can instruct the vertex fitter to
+  update the variables of the V0 daughters. The parameter is ``False`` by default for backward compatibility.
+* New function `modularAnalysis.fillParticleListFromChargedCluster` is added to load the neutral final-state-particles from the
+  ECL and KLM clusters that are being matched with the Track of input ParticleList.
+* Added the argument ``ignoreFromVertexFit`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position. The
+  kinematics of the particles are treated as constant. The ``ignoreFromVertexFit`` option is expected to be used to perform fit
+  without ``K_L0`` or mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit. While,
+  ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an
+  invisible particle's kinematics from beam-constraint.
+* Fixed a bug of the TreeFit with the Bremsstrahlung correction tools, `modularAnalysis.correctBrems` and
+  `modularAnalysis.correctBremsBelle`. The position uncertainties of the brems-corrected particle were wrongly assigned.
+  This bug does not affect the kinematics very much but induces a bias on the position and its uncertainty.
+* Allowed ``-o`` argument of basf2 to override the output ROOT filename of `VariablesToNtuple`, `VariablesToEventBasedTree`, and
+  `VariablesToHistogram` modules, e.g. ``basf2 script.py -o new.root``. If the modules are called more than once, the override will
+  be applied to all output files. If you need to save multiple TTrees with the same name, please use the new argument
+  ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended to
+  the output ROOT file name even if the ``-o`` argument is used.
+* Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
+* New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
+  The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available both in the
+  ``for_each`` loop over the ROEs (e.g. ``roe_path``) and the main path if the signal side ParticleList has only one candidate.
+* Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle, a DNN trained with ECLCluster variables for discrimination of
+  anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to
+  0.
+* New interface for module `TrackIsoCalculator` that allow creating a single module instance for multiple detectors.
+  The module now also calculates an isolation score per particle according to a new definition (see Variables).
+* Fixed a bug of the TreeFit with the particle loaded from the KLMCluster. The mass of the particle, which should have been fixed
+  with the PDG value, was floated in the TreeFit. Now it is fixed and the fit results get more reasonable.
+  However, since the covariance matrix of the KLMCluster is not properly set yet, the performance of the TreeFit with these
+  particles is not guaranteed.
+* Added an option ``overwriteRank`` to the `modularAnalysis.rankByHighest` and `modularAnalysis.rankByLowest` to overwrite the
+  extraInfo of rank when the particle has already the extraInfo.
+
+Variables
++++++++++
+* New variable `momentaTripleProduct` is added for the searches for CP violation via T-odd correlations in multi-body decays.
+* Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
+  energies of all generated particles, respectively.
+* Deprecated `hadronicSplitOffSuppression` which has been replaced with `fakePhotonSuppression`
+* New variables `countFSPDaughters` and `countDescendants` are added to get number of daughters which passes the given selection.
+* New meta-variables `originalParticle` and `originalDaughter` are added to get the variable of the original particle from which
+  the given particle or the specified daughter. One can get the variables of the daughters particles before they are updated by the
+  vertex fit, for example.
+* New variables `helixExtThetaOnDet` and `helixExtPhiOnDet` are added. They returns theta and phi of extrapolated helix parameters
+  on the detector surface given by the argument.
+* New variable `clusterBestMatchedMCParticle` is added to access the MCParticle that is related to the ECLCluster but not to the
+  Particle object.
+* New variable `minET2ETIsoScoreAsWeightedAvg` that returns a particle's isolation score based on a weighted average of inverse distances
+  at each input detector layers.
+
+Changes in the analysis package in light-2212-foldex
+----------------------------------------------------
+ParticleList dataobject
++++++++++++++++++++++++
+* Added new member variable ``isReserved`` to prevent the reserved ParticleLists (``:all`` labeled final-state particles, and
+  ``:V0`` labeled V0-particles) from being changed. While some modules have already had protection not to edit the reserved lists,
+  e.g. `ParticleSelector` and `ParticleListManipulator`, the other modules editing the ParticleList had the potential to introduce
+  critical bugs. If one's script breaks due to the update since the ``light-2212-foldex``, please modify the script not to edit
+  the reserved ParticleLists by copying them with other names beforehand.
+
+Signal embedding
+++++++++++++++++
+* New modules `UdstListFilter` and `PostMergeUpdater` for signal embedding which remove extra ``mdst`` objects and merge events
+  together, respectively.
+* New scripts ``udst_purge_list`` and ``embedding_merge`` to enable signal embedding.
+* A python script ``analysis/examples/embedding/embedding.py`` which illustrates the usage of the scripts.
+
+Variables
++++++++++
+* Extended the variable `useAlternativeDaughterHypothesis` to variables using daughters' pdg codes, e.g. `InvM`.
+* New metavariable `useDaughterRestFrame` to calculate a variable in the rest frame of the given daughters is added.
+* New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on a quasi-two-body decay.
+* Extended the variable `cosTPTO` to be available both in a main path and for_each loop over ROEs.
+
+stdCharged
+++++++++++
+* Added working points for uniform pion-lepton fake rate.
+
+stdPhoton and stdPi0
+++++++++++++++++++++
+* Added an optional parameter ``biasCorrectionTable`` to `stdPhotons` and `stdPi0s` that allows the user to specify a table name
+  for the photon energy bias correction. Providing a table name will automatically apply the bias correction to all particles in
+  the particle lists. This is available for all list types. The latest information on the bias correction can be found on the
+  `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+
+Modules
++++++++
+* Added an option ``signalSideParticleList`` to the function :func:`modularAnalysis.variablesToNtuple` to store the index of the
+  signal-side particle. This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent. The
+  branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option. An example
+  of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
+* Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
+  ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
+* Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
+  users apply the mother-mass constraint on a charged particle.
+* The `findMCDecay` function is fixed so that all output particles have ``isSignal==1``.
+  New option ``appendAllDaughters`` is added so that one can append not only the daughters described in the decay string but all
+  daughters of the matched MCParticle. Another new option ``skipNonPrimaryDaughters`` is added to skip secondary particles when
+  ``appendAllDaughters=True``.
+* The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
+  created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
+  removed.
+
+Changes in the analysis package in light-2210-devonrex
+------------------------------------------------------
+
+Modules
++++++++
+* Fixed a bug in KFit when the daughters' kinematics are updated (``daughtersUpdate=True``). The mother's momentum was calculated
+  at the updated vertex position, while the updated daughters' momenta were calculated at the original position. This caused an
+  inconsistency in the momentum between the mother and the sum of the daughters. Now the daughters' momenta are also calculated at
+  the updated vertex position and the inconsistency is resolved.
+* Changed TreeFit and KFit to be compatible with the momentum scaling factor.
+  The daughters' kinematics as member variables of the Particle class are updated by being divided by the momentum scaling factor.
+  However, the vertex fitters do not change the momentum scaling factor. So, the kinematics variables now return correct values.
+
+Changes in the analysis package in light-2209-calico
+----------------------------------------------------
+
+MVA-based pi0 identification
+++++++++++++++++++++++++++++
+* New function :func:`modularAnalysis.lowEnergyPi0Identification` providing MVA-based pi0 identification is added.
+* Example of its usage is added as ``analysis/examples/PostMdstIdentification/LowEnergyPi0Identification.py``.
+
+Variables
++++++++++
+* Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g.
+  `cosHelicityAngleMomentum`.
+* Added metavariable to retrieve the distance to the closest neighbour at a detector surface (based on track helix extrapolation):
+  `minET2ETDist`.
+* Added metavariable to retrieve any variable associated to the closest neighbour at a detector surface from the reference
+  particle list: `minET2ETDistVar`.
+* Added metavariable to retrieve the particle isolation score (based on `minET2ETDist` and, optionally, on PID detector weights):
+  `minET2ETIsoScore`.
+
+Modules
++++++++
+* New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0
+  identification are added.
+* Added the new module :b2:mod:`ParticleMomentumUpdater` which is also available via the
+  function :func:`modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
+  of one particle in your decay chain by p(beam)-p(selected particles).
+* The module :b2:mod:`ParticleLoader` has a new option to create particles which do
+  not have a mdst source. It is also available via the convenience function
+  :func:`modularAnalysis.fillParticleListFromDummy`.
+* New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
+  Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
+* In the module :b2:mod:`TagVertex` an iterative version of the KFit vertex fitter is added. This fitter should
+  substitute Rave vertex fitter for the tagged B meson. The default configuration of the :b2:mod:`TagVertex` has changed.
+  The default algorithm changed from ``Rave`` to ``KFit`` and the default constraint from ``IP`` to ``tube``.
+  The ``KFit`` algorithm by default includes iterations, this can be changed by newly added ``kFitReqReducedChi2`` parameter.
+* The new expert argument ``expertBeamConstraintPDG`` has been added to the :b2:mod:`TreeFitter`. It allows the user to constrain
+  the four-momentum of a Particle to the four-momentum of the initial e+e- state.
+* Updated :b2:mod:`TrackIsoCalculator` to compute the particle isolation score.
+
+Database Objects
+++++++++++++++++
+* New database object class ``PIDDetectorWeights`` to store PID detector weights per standard charged particle, binned in p and
+  theta.
+
+Modular Analysis Function
++++++++++++++++++++++++++
+* Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the selection. The
+  decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend the list of meta variables
+  which should be decomposed and should themselves be ignored in the check.
+* Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit.
+* Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, `minET2ETIsoScore`,
+  optionally `minET2ETDistVar` as well) correctly configured according to the helper input options. Users can then create aliases
+  in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.
+* The default argument of :func:`flavorTagger.flavorTagger` is updated so that the weight files trained with MC15ri will be used as default.
+  If one wants to use the previous weight files, the arguments should be set as follows: ``maskName='all'`` and ``prefix=''``.
+* With the :func:`vertex.kFit`, the daughters' kinematics are updated after the vertex fit, even when fit daughters are
+  selected using ``decay_string`` and ``daughtersUpdate=True``.
+* The new argument ``ignoreMotherFlavor`` has been added to the function `mergeListsWithBestDuplicate`. It allows to ignore the
+  flavor of the mother particle when identifying duplicates.
+
+Particle dataobject
++++++++++++++++++++
+* Added a ``replaceDaughter`` method to Particle. It allows you to replace the daughter
+  of a Particle with another Particle while keeping the original order of the daughters.
+  This is important to ensure the decay string will work correctly after replacing a daughter.
+* Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles
+  that do not come from any mdst source.
+
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------
 
 Variables
 +++++++++
- * Added the variables of the PID probability with the calibration weights, `weightedElectronID`, `weightedMuonID`,
-   `weightedPionID`, `weightedKaonID`, `weightedProtonID`, and `weightedDeuteronID`.
-   Also, the expert PID variables were added, `pidWeightedLogLikelihoodValueExpert`, `pidWeightedPairProbabilityExpert`,
-   and `pidWeightedProbabilityExpert`.
- * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
-   the ROE object and the particle that is loaded from the ROE.
+* Added the variables of the PID probability with the calibration weights, `weightedElectronID`, `weightedMuonID`,
+  `weightedPionID`, `weightedKaonID`, `weightedProtonID`, and `weightedDeuteronID`.
+  Also, the expert PID variables were added, `pidWeightedLogLikelihoodValueExpert`, `pidWeightedPairProbabilityExpert`,
+  and `pidWeightedProbabilityExpert`.
+* Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
+  the ROE object and the particle that is loaded from the ROE.
+* Added the variable `nMCDaughters` which returns the number of daughters of the MC-matched MCParticle or a MCParticle
+  obtained with e.g. the `genUpsilon4S` metavariable.
 
 Modules
 +++++++
- * Fixed a bug in the :func:`modularAnalysis.fillParticleListFromROE`. The relationship of the pdg code between the loaded
-   particle and the source particle was inconsistent when the loaded particle was not a self-conjugated particle.
+* Fixed a bug in the :func:`modularAnalysis.fillParticleListFromROE`. The relationship of the pdg code between the loaded
+  particle and the source particle was inconsistent when the loaded particle was not a self-conjugated particle.

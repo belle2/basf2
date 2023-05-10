@@ -6,11 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/PIDVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -21,6 +23,7 @@
 //#include <framework/database/DBObjPtr.h>
 #include <analysis/dbobjects/PIDCalibrationWeight.h>
 #include <analysis/utility/PIDCalibrationWeightUtil.h>
+#include <analysis/utility/PIDNeuralNetwork.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -104,7 +107,7 @@ namespace Belle2 {
       else if (pdg == Const::kaon.getPDGCode())     return kaonID(p);
       else if (pdg == Const::proton.getPDGCode())   return protonID(p);
       else if (pdg == Const::deuteron.getPDGCode()) return deuteronID(p);
-      else return std::numeric_limits<float>::quiet_NaN();
+      else return Const::doubleNaN;
     }
 
     Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
@@ -128,10 +131,10 @@ namespace Belle2 {
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return pid->getLogL(hypType, detectorSet);
       };
@@ -167,10 +170,10 @@ namespace Belle2 {
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return (pid->getLogL(hypType, detectorSet) - pid->getLogL(testType, detectorSet));
       };
@@ -205,10 +208,10 @@ namespace Belle2 {
       auto testType = Const::ChargedStable(abs(pdgCodeTest));
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return pid->getProbability(hypType, testType, detectorSet);
       };
@@ -241,10 +244,10 @@ namespace Belle2 {
 
       auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return pid->getProbability(hypType, frac, detectorSet);
       };
@@ -264,7 +267,7 @@ namespace Belle2 {
 
       auto func = [detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<double>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         if (not pid->isAvailable(detectorSet))
           return 1;
         else return 0;
@@ -295,17 +298,21 @@ namespace Belle2 {
         PIDCalibrationWeightUtil weightMatrix(matrixName);
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
 
         double LogL = 0;
-        for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index)
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
-          Const::EDetector detector = Const::PIDDetectorSet::set()[index];
           if (detectorSet.contains(detector))
-            LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
+            LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector, p, theta);
         }
         return LogL;
       };
@@ -336,10 +343,15 @@ namespace Belle2 {
       auto func = [hypType, detectorSet, matrixName](const Particle * part) -> double {
         PIDCalibrationWeightUtil weightMatrix(matrixName);
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
 
         double LogL[Const::ChargedStable::c_SetSize];
         double LogL_max = 0;
@@ -349,11 +361,9 @@ namespace Belle2 {
           const int index_pdg = pdgIter.getIndex();
 
           LogL[index_pdg] = 0;
-          for (unsigned int index_det = 0; index_det < Const::PIDDetectorSet::set().size(); ++index_det) {
-            Const::EDetector detector = Const::PIDDetectorSet::set()[index_det];
-
+          for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
             if (detectorSet.contains(detector))
-              LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector);
+              LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector, p, theta);
           }
 
           if (!hasMax || (LogL[index_pdg] > LogL_max)) {
@@ -371,6 +381,140 @@ namespace Belle2 {
         else
           return -1;
       };
+      return func;
+    }
+
+
+    Manager::FunctionPtr pidNeuralNetworkValueExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 0) {
+        B2ERROR("Need pdg code for pidNeuralNetworkValueExpert");
+        return nullptr;
+      }
+      if (arguments.size() > 2) {
+        B2ERROR("pidNeuralNetworkValueExpert expects at most two arguments, i.e. the pdg code and the pidNeuralNetworkName");
+        return nullptr;
+      }
+      int pdgCode;
+      try {
+        pdgCode = abs(Belle2::convertString<int>(arguments[0]));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidNeuralNetworkValueExpert must be a PDG code");
+        return nullptr;
+      }
+
+      std::shared_ptr<PIDNeuralNetwork> neuralNetworkPtr;
+      if (arguments.size() == 2) {
+        std::string parameterSetName = arguments[1];
+        neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>(parameterSetName);
+      } else {
+        neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>();
+      }
+
+      neuralNetworkPtr->hasPdgCode(pdgCode, true); // raise exception if pdg code is not predicted
+
+      /**
+       * Input mapping:
+       * Preparing the set of input variables is done by first creating a
+       * list `inputsAll` of all possible input variables in an order defined by this function.
+       * Then only those variables that are needed by the used neural network are selected
+       * and ordered accordingly. This allows to employ different neural networks with different
+       * inputs using the same code. For performance reasons, we first create a mapping between the
+       * index in the neural-network input array and the inputsAll here once, as this requires
+       * time-consuming string comparisons, and then use this mapping in the code that collects the inputs
+       * for each track below.
+       * CAUTION: If you change the list of inputsAll here, you have to change it also in the loop that
+       *          collects the input variables of each track in the code below.
+       */
+      // build list of all input names
+      std::vector<std::string> inputsAllNames;
+      for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
+        for (const auto& hypeType : Const::chargedStableSet) {
+          inputsAllNames.push_back("pidLogLikelihood_Of_" + std::to_string(abs(hypeType.getPDGCode())) + "_From_" + Const::parseDetectors(
+                                     detector));
+        }
+      }
+      inputsAllNames.push_back("momentum");
+      inputsAllNames.push_back("cosTheta");
+      inputsAllNames.push_back("phi");
+      inputsAllNames.push_back("charge");
+      const size_t inputsAllSize = inputsAllNames.size();
+
+      //build mapping for neural-network inputs
+      std::vector<size_t> mapInputsNN2InputsAll;  // mapInputsNN2InputsAll[<NN-index>] = <all-index>
+      for (const auto& inputName : neuralNetworkPtr->getInputNames()) {
+        const auto itr = std::find(inputsAllNames.begin(), inputsAllNames.end(), inputName);
+        if (itr == inputsAllNames.end()) {
+          B2ERROR("Neural network needs input '" + inputName + "', but this input is not (yet) available!");
+          return nullptr;
+        }
+        mapInputsNN2InputsAll.push_back(static_cast<size_t>(itr - inputsAllNames.begin()));
+      }
+
+      std::map<int, std::string> extraInfoNames; // mapping from pdg code to extra info names
+      for (const auto outputPdgCode : neuralNetworkPtr->getOutputSpeciesPdg()) {
+        extraInfoNames[outputPdgCode] = "pidNeuralNetworkValueExpert(" + std::to_string(outputPdgCode) \
+                                        + ((arguments.size() == 2) ? ("," + arguments[1]) : "") + ")";
+      }
+
+
+      auto func = [neuralNetworkPtr, pdgCode, mapInputsNN2InputsAll, inputsAllSize, extraInfoNames](const Particle * part) -> double {
+        const std::string extraInfoName = extraInfoNames.at(pdgCode);
+        if (part->hasExtraInfo(extraInfoName))
+          return part->getExtraInfo(extraInfoName);
+
+        const auto& neuralNetwork = *neuralNetworkPtr;
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid)
+          return Const::doubleNaN;
+        {
+          auto hypType = Const::ChargedStable(pdgCode);
+          if (pid->getLogL(hypType) == 0)
+            return Const::doubleNaN;
+        }
+
+
+        /**
+         * prepare inputs
+         * CAUTION: If you change the inputs stored in `inputsAll` or their order,
+         * you have to change the input mapping created above
+         */
+        std::vector<float> inputsAll;
+        inputsAll.reserve(inputsAllSize);
+        const auto mom = part->getTrackFitResult()->getMomentum();
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
+        {
+          for (const auto& hypType : Const::chargedStableSet) {
+            const float logL = pid->getLogL(hypType, detector);
+            if (logL == 0) inputsAll.push_back(Const::doubleNaN);
+            else inputsAll.push_back(logL);
+          }
+        }
+        inputsAll.push_back(mom.R());
+        inputsAll.push_back(cos(mom.Theta()));
+        inputsAll.push_back(mom.Phi());
+        inputsAll.push_back(part->getCharge());
+
+        // collect only those inputs needed for the neural network in the correct order
+        std::vector<float> inputsNN;
+        inputsNN.reserve(neuralNetwork.getInputSize());
+        for (const auto& indexAll : mapInputsNN2InputsAll)
+        {
+          inputsNN.push_back(inputsAll[indexAll]);
+        }
+
+        const auto probabilities = neuralNetwork.predict(inputsNN);
+
+        // store all probabilities for all hypotheses in extraInfo
+        for (const auto element : probabilities)
+        {
+          const auto [pdgCodeElement, probability] = element;
+          const_cast<Particle*>(part)->addExtraInfo(extraInfoNames.at(pdgCodeElement), probability);
+        }
+
+        return probabilities.at(pdgCode);
+      };
+
       return func;
     }
 
@@ -407,18 +551,22 @@ namespace Belle2 {
         PIDCalibrationWeightUtil weightMatrix(matrixName);
 
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
 
         double LogL_hypType(0), LogL_testType(0);
-        for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index)
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
-          Const::EDetector detector = Const::PIDDetectorSet::set()[index];
           if (detectorSet.contains(detector)) {
-            LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
-            LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector);
+            LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector, p, theta);
+            LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector, p, theta);
           }
         }
 
@@ -444,39 +592,51 @@ namespace Belle2 {
 
     double electronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID(const Particle* part, const std::vector<double>& arguments)
     {
       if (arguments.size() != 2) {
         B2ERROR("The variable binaryPID needs exactly two arguments: the PDG codes of two hypotheses.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
@@ -488,38 +648,49 @@ namespace Belle2 {
     double electronID_noSVD(const Particle* part)
     {
       // Excluding SVD for electron ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID_noSVD(const Particle* part)
     {
       // Excluding SVD for muon ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID_noSVD(const Particle* part)
     {
       // Excluding SVD for pion ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID_noSVD(const Particle* part)
     {
       // Excluding SVD for kaon ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID_noSVD(const Particle* part)
     {
       // Excluding SVD for proton ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID_noSVD(const Particle* part)
     {
       // Excluding SVD for deuteron ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID_noSVD(const Particle* part, const std::vector<double>& arguments)
@@ -527,7 +698,7 @@ namespace Belle2 {
       // Excluding SVD for binary ID. This variable is temporary. BII-8760
       if (arguments.size() != 2) {
         B2ERROR("The variable binaryPID_noSVD needs exactly two arguments: the PDG codes of two hypotheses.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
@@ -539,7 +710,9 @@ namespace Belle2 {
     double electronID_noTOP(const Particle* part)
     {
       // Excluding TOP for electron ID. This variable is temporary. BII-8444
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "SVD", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -547,7 +720,7 @@ namespace Belle2 {
       // Excluding TOP for electron ID. This is temporary. BII-8444
       if (arguments.size() != 1) {
         B2ERROR("The variable binaryElectronID_noTOP needs exactly one argument: the PDG code of the test hypothesis.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
 
       int pdgCodeHyp = Const::electron.getPDGCode();
@@ -562,7 +735,9 @@ namespace Belle2 {
     double electronID_noSVD_noTOP(const Particle* part)
     {
       // Excluding SVD and TOP for electron ID. This variable is temporary. BII-8444, BII-8760.
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -570,7 +745,7 @@ namespace Belle2 {
       // Excluding SVD and TOP for electron ID. This is temporary. BII-8444, BII-8760.
       if (arguments.size() != 1) {
         B2ERROR("The variable binaryElectronID_noSVD_noTOP needs exactly one argument: the PDG code of the test hypothesis.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
 
       int pdgCodeHyp = Const::electron.getPDGCode();
@@ -589,9 +764,11 @@ namespace Belle2 {
       const ECLCluster* cluster = part->getECLCluster();
       if (!cluster) {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
-          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ECL, KLM)")->function(part));
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"211", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
         }
       }
       return pionID(part);
@@ -604,9 +781,11 @@ namespace Belle2 {
       const ECLCluster* cluster = part->getECLCluster();
       if (!cluster) {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
-          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ECL, KLM)")->function(part));
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"321", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
         }
       }
       return kaonID(part);
@@ -618,7 +797,7 @@ namespace Belle2 {
       // Excluding ARICH for tracks without ECL cluster and identified as heavier of the two hypotheses from binary ID.
       if (arguments.size() != 2) {
         B2ERROR("The variable binaryPID_noARICHwoECL needs exactly two arguments: the PDG codes of two hypotheses.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
@@ -628,7 +807,7 @@ namespace Belle2 {
       const ECLCluster* cluster = part->getECLCluster();
       if (!cluster) {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         double lkhdiff = pid->getLogL(hypType, Const::ARICH) - pid->getLogL(testType, Const::ARICH);
         if ((lkhdiff > 0 && pdgCodeHyp > pdgCodeTest) || (lkhdiff < 0 && pdgCodeHyp < pdgCodeTest)) {
           return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
@@ -652,7 +831,7 @@ namespace Belle2 {
           B2WARNING("The extraInfo nbarID is not registered! \n"
                     "Please use function getNbarIDMVA in modularAnalysis.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -677,12 +856,11 @@ namespace Belle2 {
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         auto name = "pidChargedBDTScore_" + std::to_string(hypType.getPDGCode());
-        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        for (const Const::EDetector& detector : detectorSet)
         {
-          auto det = detectorSet[iDet];
-          name += "_" + std::to_string(det);
+          name += "_" + std::to_string(detector);
         }
-        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : Const::doubleNaN;
       };
       return func;
     }
@@ -715,12 +893,11 @@ namespace Belle2 {
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         auto name = "pidPairChargedBDTScore_" + std::to_string(hypType.getPDGCode()) + "_VS_" + std::to_string(testType.getPDGCode());
-        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        for (const Const::EDetector& detector : detectorSet)
         {
-          auto det = detectorSet[iDet];
-          name += "_" + std::to_string(det);
+          name += "_" + std::to_string(detector);
         }
-        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : Const::doubleNaN;
       };
       return func;
     }
@@ -729,7 +906,7 @@ namespace Belle2 {
     {
       if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidMostLikelyPDG");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double prob[Const::ChargedStable::c_SetSize];
       if (arguments.size() == 0) {
@@ -739,7 +916,7 @@ namespace Belle2 {
       }
 
       auto* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<double>::quiet_NaN();
+      if (!pid) return Const::doubleNaN;
       return pid->getMostLikely(prob).getPDGCode();
     }
 
@@ -866,6 +1043,24 @@ namespace Belle2 {
       return func;
     };
 
+
+    double pionIDNN(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(211)"))
+        return particle->getExtraInfo("pidNeuralNetworkValueExpert(211)");
+      static auto func = pidNeuralNetworkValueExpert({"211"});
+      return std::get<double>(func(particle));
+    }
+
+    double kaonIDNN(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("pidNeuralNetworkValueExpert(321)"))
+        return particle->getExtraInfo("pidNeuralNetworkValueExpert(321)");
+      static auto func = pidNeuralNetworkValueExpert({"321"});
+      return std::get<double>(func(particle));
+    }
+
+
     //*************
     // B2BII
     //*************
@@ -975,9 +1170,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
-    - 1  signal(antineutron) like
-    - 0  background like
-    - -1 invalid using this PID due to some ECL variables used unavailable
+- 1  signal(antineutron) like
+- 0  background like
+- -1 invalid using this PID due to some ECL variables used unavailable
 
 This PID is only for antineutron. Neutron is also considered as background.
 The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,
@@ -1067,6 +1262,17 @@ One can provide the name of the weight matrix as the argument.
 )DOC",
                           Manager::VariableDataType::c_double);
 
+
+    REGISTER_VARIABLE("pionIDNN", pionIDNN,
+			  R"DOC(
+pion identification probability as calculated from the PID neural network.
+)DOC");
+    REGISTER_VARIABLE("kaonIDNN", kaonIDNN,
+			  R"DOC(
+kaon identification probability as calculated from the PID neural network.
+)DOC");
+
+
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");
     REGISTER_METAVARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
@@ -1110,6 +1316,12 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}/\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{\\tilde{L}}_i` where :math:`\\mathcal{\\tilde{L}}_{i}` is defined as "
                           ":math:`\\log\\mathcal{\\tilde{L}}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`. "
                           "The :math:`\\mathcal{L}_{ij}` is the original likelihood and :math:`\\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pidNeuralNetworkValueExpert(pdgCodeHyp, PIDNeuralNetworkName)",
+                          pidNeuralNetworkValueExpert,
+                          "Probability for the particle hypothesis pdgCodeHype calculated from a neural network, which uses high-level information as inputs,  "
+                          "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "
+                          ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);
 
     // B2BII PID

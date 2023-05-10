@@ -10,12 +10,13 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
+#include <TMath.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -155,7 +156,7 @@ void Teegg::init()
 }
 
 
-void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+void Teegg::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -277,7 +278,8 @@ void Teegg::applySettings()
 }
 
 
-void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                          ROOT::Math::LorentzRotation boost,
                           bool isVirtual, bool isInitial)
 {
   // Create particle
@@ -303,7 +305,7 @@ void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, 
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
@@ -315,7 +317,7 @@ void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, 
 
   //set vertex
   if (!isInitial) {
-    B2Vector3D v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

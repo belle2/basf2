@@ -22,7 +22,6 @@
 namespace Belle2 {
 
   class GearDir;
-  class BkgSensitiveDetector;
 
   namespace bklm {
 
@@ -48,12 +47,6 @@ namespace Belle2 {
       bool doBeamBackgroundStudy(void) const
       {
         return m_DoBeamBackgroundStudy;
-      }
-
-      //! Get the beam background study flag
-      BkgSensitiveDetector* getBkgSensitiveDetector(void) const
-      {
-        return m_BkgSensitiveDetector;
       }
 
       //! Get the inner radius of specified layer
@@ -628,9 +621,6 @@ namespace Belle2 {
 
       //! Flag for enabling beam background study (=use bkg sensitive-detector function too)
       bool m_DoBeamBackgroundStudy;
-
-      //! Pointer to object that creates BeamBkgHits for BKLM
-      BkgSensitiveDetector* m_BkgSensitiveDetector;
 
       //! Global rotation about z of the BKLM
       double m_Rotation;

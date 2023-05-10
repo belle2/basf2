@@ -13,10 +13,8 @@ import basf2
 import basf2_mva
 import unittest
 import unittest.mock
+import b2test_utils
 import os
-import tempfile
-import atexit
-import shutil
 import ROOT
 
 import b2bii
@@ -1216,12 +1214,8 @@ class TestGetPath(unittest.TestCase):
 
 
 if __name__ == '__main__':
-
-    tempdir = tempfile.mkdtemp()
-    os.chdir(tempdir)
-    basf2.conditions.testing_payloads = ['localdb/database.txt']
-    # main() never returns, so install exit handler to do our cleanup
-    atexit.register(shutil.rmtree, tempdir)
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        basf2.conditions.testing_payloads = ['localdb/database.txt']
+        unittest.main()
 
 # @endcond

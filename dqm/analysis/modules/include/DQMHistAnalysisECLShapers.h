@@ -14,7 +14,7 @@
 #endif
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //std
 #include <set>
@@ -28,7 +28,7 @@ namespace Belle2 {
    * This module is for analysis of ECL DQM histograms.
    */
 
-  class DQMHistAnalysisECLShapersModule : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
+  class DQMHistAnalysisECLShapersModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
   public:
 
@@ -36,18 +36,18 @@ namespace Belle2 {
     DQMHistAnalysisECLShapersModule();
 
     /** Destructor. */
-    virtual ~DQMHistAnalysisECLShapersModule();
+    ~DQMHistAnalysisECLShapersModule();
 
     /** Initialize the module. */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Call when a run begins. */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Event processor. */
-    virtual void event() override;
+    void event() override final;
     /** Call when a run ends. */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Terminate. */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 

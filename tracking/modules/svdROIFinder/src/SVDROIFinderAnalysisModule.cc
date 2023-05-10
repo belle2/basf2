@@ -14,9 +14,10 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <iostream>
-#include <TVector3.h>
 
 #include <vxd/geometry/GeoCache.h>
+
+#include <TMath.h>
 
 
 using namespace Belle2;
@@ -470,11 +471,11 @@ void SVDROIFinderAnalysisModule::event()
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();
-    m_phimc = (aMcParticle->getMomentum()).Phi() * 180 / 3.1415;
-    m_thetamc = (aMcParticle->getMomentum()).Theta() * 180 / 3.1415;
-    m_costhetamc = (aMcParticle->getMomentum()).CosTheta();
+    m_phimc = (aMcParticle->getMomentum()).Phi() * TMath::RadToDeg();
+    m_thetamc = (aMcParticle->getMomentum()).Theta() * TMath::RadToDeg();
+    m_costhetamc = cos((aMcParticle->getMomentum()).Theta());
     m_lambdamc = 90 - m_thetamc;
-    m_pTmc = (aMcParticle->getMomentum()).Perp();
+    m_pTmc = (aMcParticle->getMomentum()).Rho();
 
 
     bool part_outsideROI = false;

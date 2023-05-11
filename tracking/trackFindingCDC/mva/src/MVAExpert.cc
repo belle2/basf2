@@ -12,9 +12,7 @@
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
 #include <framework/database/DBObjPtr.h>
-
 #include <boost/algorithm/string/predicate.hpp>
-using namespace std;
 
 namespace Belle2 {
   class DatabaseRepresentationOfWeightfile;
@@ -100,8 +98,6 @@ void MVAExpert::Impl::beginRun()
       for (int iVar = 0; iVar < nExpectedVars; ++iVar) {
         std::string variableElementName = "variable" + std::to_string(iVar);
         std::string expectedName = weightfile->getElement<std::string>(variableElementName);
-        //  cout << "### MVAExpert 1 " << m_identifier << endl;
-
         auto itNamedVariable = std::find_if(m_allNamedVariables.begin(),
                                             m_allNamedVariables.end(),
         [expectedName](const Named<Float_t*>& namedVariable) {

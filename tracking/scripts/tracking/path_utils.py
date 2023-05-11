@@ -645,14 +645,13 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     ClusterFilterParameters={})
 
     # Find segments within the clusters
-
     path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     SegmentRelationFilterParameters={'DBPayloadName': 'RealisticSegmentRelationFilterParameters'})
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
 
-    # tra Improve the quality of the axial tracks
+    # Improve the quality of the axial tracks
     path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["B2B"])
 

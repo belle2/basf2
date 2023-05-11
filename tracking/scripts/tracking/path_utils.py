@@ -645,12 +645,14 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     ClusterFilterParameters={})
 
     # Find segments within the clusters
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton")
+
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+                    SegmentRelationFilterParameters={'DBPayloadName': 'RealisticSegmentRelationFilterParameters'})
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
 
-    # Improve the quality of the axial tracks
+    # tra Improve the quality of the axial tracks
     path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["B2B"])
 
@@ -847,7 +849,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     # Constructs clusters and reduce background hits
     path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2})
+                    ClusterFilterParameters={"cut": 0.2, 'DBPayloadName': 'ClusterFilterParameters'})
 
     # Find segments within the clusters
     path.add_module("TFCDC_SegmentFinderFacetAutomaton",
@@ -866,9 +868,9 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     # Combine segments with axial tracks
     path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.74},
+                    segmentTrackFilterParameters={"cut": 0.74, 'DBPayloadName': 'SegmentTrackFilterParameters'},
                     trackFilter="mva",
-                    trackFilterParameters={"cut": 0.1})
+                    trackFilterParameters={"cut": 0.1, 'DBPayloadName': 'TrackFilterParameters'})
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",

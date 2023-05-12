@@ -113,6 +113,8 @@ bool NewV0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus, c
     int counter = 0;
     while (status != 0 and counter < 5) {
       counter++;
+      /// Usually this procedure converges in up to 3 iterations (mostly in a single iteration),
+      /// but for a small fraction of track pairs it does not converge at all, so we set the limit at 5.
       const RecoTrack* trkPlus = recoTrackPlus;
       if (status & 0x1) {
         trkPlus = removeHitsAndRefit(origRecoTrackPlus, recoTrackPlus, ptypeTrackPlus);
@@ -225,13 +227,8 @@ int NewV0Fitter::vertexFit(const RecoTrack* recoTrackPlus, const RecoTrack* reco
 
 const genfit::AbsTrackRep* NewV0Fitter::getTrackRepresentation(const RecoTrack* recoTrack, int pdgCode)
 {
-  for (const auto* rep : recoTrack->getGenfitTrack().getTrackReps()) {
-    // Check if the track representation is a RKTrackRep.
-    const auto* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(rep);
-    if (rkTrackRepresenation) {
-      if (std::abs(rkTrackRepresenation->getPDG()) == pdgCode and recoTrack->wasFitSuccessful(rep)) return rep;
-    }
-  }
+  const auto* rep = recoTrack->getTrackRepresentationForPDG(pdgCode);
+  if (rep and recoTrack->wasFitSuccessful(rep)) return rep;
 
   B2ERROR("V0Fitter: track hypothesis with closest mass not available. Should never happen!");
   return nullptr;
@@ -431,7 +428,7 @@ int NewV0Fitter::isInnermostClusterShared(const RecoTrack* recoTrackPlus, const 
   if (innerHitsPlus.front()->getTrackingDetector() == RecoHitInformation::c_PXD) {
     const auto* clusterPlus = innerHitsPlus.front()->getRelatedTo<PXDCluster>();
     const auto* clusterMinus = innerHitsMinus.front()->getRelatedTo<PXDCluster>();
-    if (clusterPlus and clusterPlus == clusterMinus) return 0x03;
+    if (clusterPlus and clusterPlus == clusterMinus) return 0x03; // PXD cluster the same: set both bits
     return 0;
   }
 
@@ -442,8 +439,8 @@ int NewV0Fitter::isInnermostClusterShared(const RecoTrack* recoTrackPlus, const 
     const auto* clusterMinus = innerHitsMinus.front()->getRelatedTo<SVDCluster>();
     if (clusterPlus and clusterPlus == clusterMinus) {
       sensorID = clusterPlus->getSensorID();
-      if (clusterPlus->isUCluster()) flag = 0x01;
-      else flag = 0x02;
+      if (clusterPlus->isUCluster()) flag = 0x01; // SVD U-cluster the same: set first bit
+      else flag = 0x02;  // SVD V-cluster the same: set second bit
     }
   }
 
@@ -453,8 +450,8 @@ int NewV0Fitter::isInnermostClusterShared(const RecoTrack* recoTrackPlus, const 
     const auto* clusterPlus = innerHitsPlus.back()->getRelatedTo<SVDCluster>();
     const auto* clusterMinus = innerHitsMinus.back()->getRelatedTo<SVDCluster>();
     if (clusterPlus and clusterPlus == clusterMinus and clusterPlus->getSensorID() == sensorID) {
-      if (clusterPlus->isUCluster()) flag |= 0x01;
-      else flag |= 0x02;
+      if (clusterPlus->isUCluster()) flag |= 0x01; // SVD U-cluster the same: set first bit
+      else flag |= 0x02; // SVD V-cluster the same: set second bit
     }
   }
 

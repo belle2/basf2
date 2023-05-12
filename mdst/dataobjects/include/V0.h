@@ -16,21 +16,25 @@
 namespace Belle2 {
   /** Object holding information for V0s.
    *
-   *  This object only holds the indices of the Tracks used to create the V0 and
-   *  the indices of the TrackFitResults belonging to that Tracks, but material effects
-   *  and hits as appropriate for the point of the intersection of the Tracks.
+   *  This object only holds the indices of the Tracks used to create the V0, the
+   *  the indices of the TrackFitResults belonging to that Tracks (with material
+   *  effects and hits as appropriate for the point of the intersection of the
+   *  Tracks), and the fitted vertex position.
    *
    *  For additional information see [BELLE2-NOTE-TE-2015-034].
    *  --> https://d2comp.kek.jp/record/307/files/BELLE2-NOTE-TE-2015-034.pdf
+   *  Please note that the note was written before introducing the vertex
+   *  position in this object.
    */
   class V0 : public RelationsObject {
   public:
     /** Constructor without arguments; needed for I/O. */
     V0();
 
-    /** Constructor taking two pairs of tracks and trackFitResults. */
+    /** Constructor taking two pairs of tracks and trackFitResults, and the fitted vertex coordinates. */
     V0(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
-       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative);
+       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative,
+       double vertexX, double vertexY, double vertexZ);
 
     /** Get pair of  yhe Tracks, that are part of the V0 particle.*/
     std::pair<Track*, Track*> getTracks() const
@@ -62,6 +66,18 @@ namespace Belle2 {
      * This does not use an MC information, but just checks the particle type in the corresponding TrackFitResults.*/
     Const::ParticleType getV0Hypothesis() const;
 
+    /** Get the X coordinate of the fitted vertex. */
+    double getFittedVertexX() const { return m_fittedVertexX; }
+
+    /** Get the Y coordinate of the fitted vertex. */
+    double getFittedVertexY() const { return m_fittedVertexY; }
+
+    /** Get the Z coordinate of the fitted vertex. */
+    double getFittedVertexZ() const { return m_fittedVertexZ; }
+
+    /** Get the fitted vertex position. */
+    ROOT::Math::XYZVector getVertexPosition() const { return ROOT::Math::XYZVector(m_fittedVertexX, m_fittedVertexY, m_fittedVertexZ); }
+
   private:
     /** Indicates which positively charged track was used for this V0. */
     short m_trackIndexPositive;
@@ -75,8 +91,17 @@ namespace Belle2 {
     /** Points to the new TrackFitResult of the positive Track. */
     short m_trackFitResultIndexNegative;
 
+    /** The X coordinate of the fitted vertex. */
+    Double32_t m_fittedVertexX;
+
+    /** The Y coordinate of the fitted vertex. */
+    Double32_t m_fittedVertexY;
+
+    /** The Z coordinate of the fitted vertex. */
+    Double32_t m_fittedVertexZ;
+
     /** Macro for ROOTification. */
-    ClassDef(V0, 3);
+    ClassDef(V0, 4);
 
     friend class FixMergedObjectsModule;
   };

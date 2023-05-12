@@ -54,7 +54,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                    "timeAlgorithms": ["CoG3", "ELS3"],
                                    "max_events_per_run": 30000,
                                    "isMC": False,
-                                   "linearCutsOnCoG3ON": False,
+                                   "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],
                                    "lowerLineParameters": [-134.0, 1.264],
                                    "rangeRawTimeForIoVCoG6": [20., 80.],
@@ -136,7 +136,7 @@ def create_algorithm(
         unique_id,
         prefix="",
         min_entries=10000,
-        linearCutsOnCoG3ON=False,
+        linearCutsOnCoG3=False,
         interceptUpperLine=-94.0,
         angularCoefficientUpperLine=1.264,
         interceptLowerLine=-134.0,
@@ -152,7 +152,7 @@ def create_algorithm(
     if "CoG3" in prefix:
         algorithm = SVD3SampleCoGTimeCalibrationAlgorithm(unique_id)
         algorithm.setTwoLineSelectionParameters(
-            linearCutsOnCoG3ON,
+            linearCutsOnCoG3,
             interceptUpperLine,
             angularCoefficientUpperLine,
             interceptLowerLine,
@@ -267,6 +267,7 @@ def get_calibrations(input_data, **kwargs):
     timeAlgorithms = expert_config["timeAlgorithms"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     isMC = expert_config["isMC"]
+    linearCutsOnCoG3 = expert_config["linearCutsOnCoG3"]
     upperLineParameters = expert_config["upperLineParameters"]
     lowerLineParameters = expert_config["lowerLineParameters"]
     rangeRawTimeForIoVCoG6 = expert_config["rangeRawTimeForIoVCoG6"]
@@ -373,6 +374,7 @@ def get_calibrations(input_data, **kwargs):
         unique_id_cog3,
         prefix=coll_cog3.name(),
         min_entries=10000,
+        linearCutsOnCoG3=linearCutsOnCoG3,
         interceptUpperLine=upperLineParameters[0],
         angularCoefficientUpperLine=upperLineParameters[1],
         interceptLowerLine=lowerLineParameters[0],

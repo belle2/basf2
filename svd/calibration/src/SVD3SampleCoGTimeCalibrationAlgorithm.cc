@@ -76,9 +76,11 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
   m_tree->Branch("ndf", &ndf, "ndf/I");
   m_tree->Branch("p", &p, "p/F");
 
-  B2INFO("--------- 2D-region selection parameters: ");
-  B2INFO("Upper Line (q, m): " << m_interceptUpperLine << ", " << m_angularCoefficientUpperLine);
-  B2INFO("Lower Line (q, m): " << m_interceptLowerLine << ", " << m_angularCoefficientLowerLine);
+  if (m_applyLinearCutsToRemoveBkg) {
+    B2INFO("--------- Applyingselection, 2D-region selection parameters: ");
+    B2INFO("Upper Line (q, m): " << m_interceptUpperLine << ", " << m_angularCoefficientUpperLine);
+    B2INFO("Lower Line (q, m): " << m_interceptLowerLine << ", " << m_angularCoefficientLowerLine);
+  } //B2INFO("Selecton applied : " << m_applyLinearCutsToRemoveBkg);
 
   for (int layer = 0; layer < 4; layer++) {
     layer_num = layer + 3;

@@ -37,11 +37,11 @@ namespace Belle2 {
     /** Get the minimum entries required in the histograms */
     int getMinEntries() {return m_minEntries;}
 
-    void setTwoLineSelectionParameters(bool linearCutsOnCoG3ON, float interceptUpperLine, float angularCoefficientUpperLine,
+    void setTwoLineSelectionParameters(bool linearCutsOnCoG3, float interceptUpperLine, float angularCoefficientUpperLine,
                                        float interceptLowerLine,
                                        float angularCoefficientLowerLine)
     {
-      m_applyLinearCutsToRemoveBkg = linearCutsOnCoG3ON;
+      m_applyLinearCutsToRemoveBkg = linearCutsOnCoG3;
       m_interceptUpperLine =  interceptUpperLine;
       m_angularCoefficientUpperLine =  angularCoefficientUpperLine;
       m_interceptLowerLine =  interceptLowerLine;

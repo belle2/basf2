@@ -10,7 +10,7 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -39,15 +39,36 @@ namespace Belle2 {
 
 
   private:
-    int m_subDet;           /**< subdetector id number */
-    int m_identifier;       /**< identifier of subdetector component */
-    int m_trackID;          /**< track id */
-    TVector3 m_startPos;    /**< particle position at the entrance in volume */
-    TVector3 m_startMom;    /**< particle momentum at the entrance in volume */
-    double m_startTime;     /**< global time */
-    double m_startEnergy;   /**< particle energy at the entrance in volume */
-    double m_energyDeposit; /**< energy deposited in volume */
-    double m_trackLength;   /**< length of the track in the volume */
-    int m_eclrepscale;      /**< replica (=sector) scale in ECL */
+
+    /** Subdetector id number. */
+    int m_subDet;
+
+    /** Identifier of subdetector component. */
+    int m_identifier;
+
+    /** Track id. */
+    int m_trackID;
+
+    /** Particle position at the entrance in volume. */
+    ROOT::Math::XYZVector m_startPos;
+
+    /** Particle momentum at the entrance in volume. */
+    ROOT::Math::XYZVector m_startMom;
+
+    /** Global time. */
+    double m_startTime;
+
+    /** Particle energy at the entrance in volume. */
+    double m_startEnergy;
+
+    /** Energy deposited in volume. */
+    double m_energyDeposit;
+
+    /** Length of the track in the volume. */
+    double m_trackLength;
+
+    /** Replica (=sector) scale in ECL. */
+    int m_eclrepscale;
+
   }; // SensitiveDetector class
 } // end of namespace Belle2

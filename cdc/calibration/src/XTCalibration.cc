@@ -454,7 +454,7 @@ void XTCalibration::readXTFromText()
 
 
   }
-  int npar = 8;
+  const int npar = 8;
   //read alpha bin info.
   //  unsigned short nAlphaBins = 0;
   ifs >> nalpha_old;

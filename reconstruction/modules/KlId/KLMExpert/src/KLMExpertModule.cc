@@ -105,7 +105,7 @@ void KLMExpertModule::event()
   // loop thru clusters in event and classify
   for (KLMCluster& cluster : m_klmClusters) {
 
-    const TVector3& clusterPos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& clusterPos = cluster.getClusterPosition();
 
     // get various KLMCluster vars
     m_KLMglobalZ         = clusterPos.Z();
@@ -114,7 +114,7 @@ void KLMExpertModule::event()
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
     m_KLMtime            = cluster.getTime();
     m_KLMenergy          = cluster.getEnergy();
-    m_KLMhitDepth        = cluster.getClusterPosition().Mag();
+    m_KLMhitDepth        = cluster.getClusterPosition().R();
 
     // find nearest ecl cluster and calculate distance
     pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos, eclHypothesis);

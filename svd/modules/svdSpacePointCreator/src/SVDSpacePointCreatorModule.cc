@@ -73,8 +73,7 @@ void SVDSpacePointCreatorModule::initialize()
   //Relations to cluster objects only if the ancestor relations exist:
   m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
-
-  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
+  B2DEBUG(20, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
           "\nsvdClusters: " << m_svdClusters.getName() <<
           "\nspacePoints: " << m_spacePoints.getName());
 
@@ -93,6 +92,9 @@ void SVDSpacePointCreatorModule::initialize()
     if (!m_calibrationFile->IsOpen())
       B2FATAL("Couldn't open pdf file:" << m_inputPDF);
   }
+
+  if (m_useSVDGroupInfo) B2INFO("SVDSpacePointCreator : SVDCluster groupId is used while forming cluster combinations.");
+  else B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used while forming cluster combinations.");
 
   // set some counters for output:
   InitializeCounters();
@@ -114,7 +116,7 @@ void SVDSpacePointCreatorModule::event()
   }
 
 
-  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance <<
+  B2DEBUG(21, "SVDSpacePointCreatorModule(" << m_nameOfInstance <<
           ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           ", svdClusters: " << m_svdClusters.getEntries() <<
           ", spacePoints: " << m_spacePoints.getEntries());
@@ -124,7 +126,7 @@ void SVDSpacePointCreatorModule::event()
     for (int index = 0; index < m_spacePoints.getEntries(); index++) {
       const SpacePoint* sp = m_spacePoints[index];
 
-      B2DEBUG(10, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
+      B2DEBUG(29, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<
               " and VxdID " << VxdID(sp->getVxdID()) <<
               " is tied to a cluster in: " << sp->getArrayName());
@@ -140,7 +142,7 @@ void SVDSpacePointCreatorModule::event()
 
 void SVDSpacePointCreatorModule::terminate()
 {
-  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2DEBUG(20, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
           ", svdClusters: " << m_TESTERSVDClusterCtr <<
           ", spacePoints: " << m_TESTERSpacePointCtr);
   if (m_useQualityEstimator == true) {

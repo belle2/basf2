@@ -11,6 +11,8 @@
 #include <analysis/utility/CLHEPToROOT.h>
 #include <framework/gearbox/Const.h>
 
+#include <TMath.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::analysis;

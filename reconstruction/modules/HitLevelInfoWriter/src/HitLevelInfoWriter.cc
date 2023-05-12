@@ -8,6 +8,7 @@
 
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
 
+
 using namespace Belle2;
 using namespace Dedx;
 
@@ -96,13 +97,19 @@ void HitLevelInfoWriterModule::event()
       m_runID = evtMetaData->getRun();
       m_eventID = evtMetaData->getEvent();
 
+      m_injring = dedxTrack->getInjectionRing();
+      m_injtime = dedxTrack->getInjectionTime();
+
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
         m_e = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-        m_e1_9 = eclCluster->getE1oE9();
-        m_e9_21 = eclCluster->getE9oE21();
+        if (enableExtraVar) {
+          m_e1_9 = eclCluster->getE1oE9();
+          m_e9_21 = eclCluster->getE9oE21();
+          m_eclsnHits = eclCluster->getNumberOfCrystals();
+        }
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
         if (klmCluster) m_klmLayers = klmCluster->getLayers();
@@ -124,7 +131,6 @@ void HitLevelInfoWriterModule::event()
   //  LOOP OVER particles in the given particle lists
   //
   // **************************************************
-
   for (int iList = 0; iList < nParticleList; iList++) {
     // make sure the list exists and is not empty
     StoreObjPtr<ParticleList> particlelist(m_strParticleList[iList]);
@@ -181,11 +187,19 @@ void HitLevelInfoWriterModule::event()
       m_runID = evtMetaData->getRun();
       m_eventID = evtMetaData->getEvent();
 
+      m_injring = dedxTrack->getInjectionRing();
+      m_injtime = dedxTrack->getInjectionTime();
+
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
-
+        m_e = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        if (enableExtraVar) {
+          m_e1_9 = eclCluster->getE1oE9();
+          m_e9_21 = eclCluster->getE9oE21();
+          m_eclsnHits = eclCluster->getNumberOfCrystals();
+        }
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
         if (klmCluster) m_klmLayers = klmCluster->getLayers();
@@ -253,6 +267,7 @@ void HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   m_dr = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Rho();
   m_dphi = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Phi();
   m_dz = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Z();
+
 }
 
 //---------------------------------------------------------------------------------------
@@ -278,6 +293,9 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_scale = m_DBScaleFactor->getScaleFactor();
   m_runGain = m_DBRunGain->getRunGain();
   m_cosCor = m_DBCosineCor->getMean(m_cosTheta);
+  m_timeGain = m_DBInjectTime->getCorrection("mean", m_injring, m_injtime);
+  m_timeReso = m_DBInjectTime->getCorrection("reso", m_injring, m_injtime);
+
 
   if (m_cosTheta <= -0.850 || m_cosTheta >= 0.950) {
     m_cosEdgeCor = m_DBCosEdgeCor->getMean(m_cosTheta);
@@ -672,17 +690,26 @@ void HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("event", &m_eventID, "event/I");
 
   // track level information (from tfr)
-  m_tree[i]->Branch("d0", &m_d0, "d0/D");
-  m_tree[i]->Branch("z0", &m_z0, "z0/D");
   m_tree[i]->Branch("dz", &m_dz, "dz/D");
   m_tree[i]->Branch("dr", &m_dr, "dr/D");
-  m_tree[i]->Branch("dphi", &m_dphi, "dphi/D");
-  m_tree[i]->Branch("vx0", &m_vx0, "vx0/D");
-  m_tree[i]->Branch("vy0", &m_vy0, "vy0/D");
-  m_tree[i]->Branch("vz0", &m_vz0, "vz0/D");
-  m_tree[i]->Branch("tanlambda", &m_tanlambda, "tanlambda/D");
-  m_tree[i]->Branch("phi0", &m_phi0, "phi0/D");
   m_tree[i]->Branch("chi2", &m_chi2, "chi2/D");
+  m_tree[i]->Branch("injtime", &m_injtime, "injtime/D");
+  m_tree[i]->Branch("isher", &m_injring, "isher/D");
+
+  if (enableExtraVar) {
+    m_tree[i]->Branch("d0", &m_d0, "d0/D");
+    m_tree[i]->Branch("z0", &m_z0, "z0/D");
+    m_tree[i]->Branch("dphi", &m_dphi, "dphi/D");
+    m_tree[i]->Branch("vx0", &m_vx0, "vx0/D");
+    m_tree[i]->Branch("vy0", &m_vy0, "vy0/D");
+    m_tree[i]->Branch("vz0", &m_vz0, "vz0/D");
+    m_tree[i]->Branch("tanlambda", &m_tanlambda, "tanlambda/D");
+    m_tree[i]->Branch("phi0", &m_phi0, "phi0/D");
+    m_tree[i]->Branch("e1_9", &m_e1_9, "e1_9/D");
+    m_tree[i]->Branch("e9_21", &m_e9_21, "e9_21/D");
+    m_tree[i]->Branch("eclsnhits", &m_eclsnHits, "eclsnhits/D");
+    m_tree[i]->Branch("klmLayers", &m_klmLayers, "klmLayers/I");
+  }
 
   // track level information (from cdt)
   m_tree[i]->Branch("nCDChits", &m_nCDChits, "nCDChits/D");
@@ -703,19 +730,18 @@ void HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("dedxnosat", &m_truncNoSat, "dedxnosat/D");
   m_tree[i]->Branch("dedxerr", &m_error, "dedxerr/D");
 
-
   // other track level information
   m_tree[i]->Branch("eop", &m_eop, "eop/D");
   m_tree[i]->Branch("e", &m_e, "e/D");
-  m_tree[i]->Branch("e1_9", &m_e1_9, "e1_9/D");
-  m_tree[i]->Branch("e9_21", &m_e9_21, "e9_21/D");
-  m_tree[i]->Branch("klmLayers", &m_klmLayers, "klmLayers/I");
 
   // calibration constants
   m_tree[i]->Branch("scale", &m_scale, "scale/D");
   m_tree[i]->Branch("coscor", &m_cosCor, "coscor/D");
   m_tree[i]->Branch("cosedgecor", &m_cosEdgeCor, "cosedgecor/D");
   m_tree[i]->Branch("rungain", &m_runGain, "rungain/D");
+  m_tree[i]->Branch("timegain", &m_timeGain, "timegain/D");
+  m_tree[i]->Branch("timereso", &m_timeReso, "timereso/D");
+
 
   // PID values
   m_tree[i]->Branch("chiE", &m_chie, "chiE/D");

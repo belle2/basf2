@@ -91,12 +91,13 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   vector<double> vrel_mean;
   vector<double> vdedx_means;
 
-  array<TH1D*, c_nwireCDC>  hdedxhit;
+  vector<TH1D*> hdedxhit(c_nwireCDC);
 
   B2INFO("Creating CDCGeometryPar object");
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
-  array<double, c_maxNSenseLayers> layermean;
+  vector<double> layermean(c_maxNSenseLayers);
+
   int activelayers = 0;
   double layeravg = 0.0;
 
@@ -218,7 +219,7 @@ void CDCDedxWireGainAlgorithm::getExpRunInfo()
 }
 
 //--------------------------
-void CDCDedxWireGainAlgorithm::createPayload(vector<double>& vdedx_means)
+void CDCDedxWireGainAlgorithm::createPayload(const vector<double>& vdedx_means)
 {
 
   B2INFO("dE/dx Calibration done for " << vdedx_means.size() << " CDC wires");
@@ -303,7 +304,7 @@ void CDCDedxWireGainAlgorithm::plotLayerDist(array<TH1D*, 2> hdedxL)
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotWireDist(array<TH1D*, c_nwireCDC> hist, vector<double>& vrel_mean)
+void CDCDedxWireGainAlgorithm::plotWireDist(const vector<TH1D*>& hist, const vector<double>& vrel_mean)
 {
 
   TCanvas ctmp(Form("cdcdedx_%s", m_suffix.data()), "", 1200, 1200);
@@ -316,7 +317,7 @@ void CDCDedxWireGainAlgorithm::plotWireDist(array<TH1D*, c_nwireCDC> hist, vecto
   psname.str("");
   psname << Form("cdcdedx_wgcal_%s.pdf", m_suffix.data());
 
-  for (unsigned int iw = 0; iw < c_nwireCDC; iw++) {
+  for (unsigned int iw = 0; iw < hist.size(); iw++) {
 
     int minbin = stoi(hist[iw]->GetXaxis()->GetTitle());
     int maxbin = stoi(hist[iw]->GetYaxis()->GetTitle());
@@ -336,7 +337,7 @@ void CDCDedxWireGainAlgorithm::plotWireDist(array<TH1D*, c_nwireCDC> hist, vecto
     hdedxhitC->SetFillColor(kAzure + 1);
     hdedxhitC->DrawCopy("same histo");
 
-    if (((iw + 1) % 16 == 0) || iw == (c_nwireCDC - 1))  {
+    if (((iw + 1) % 16 == 0) || iw == (hist.size() - 1))  {
       ctmp.Print(psname.str().c_str());
       ctmp.Clear("D");
     }
@@ -350,7 +351,7 @@ void CDCDedxWireGainAlgorithm::plotWireDist(array<TH1D*, c_nwireCDC> hist, vecto
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotWireGain(vector<double>& vdedx_means, vector<double>& vrel_mean, double layeravg)
+void CDCDedxWireGainAlgorithm::plotWireGain(const vector<double>& vdedx_means, const vector<double>& vrel_mean, double layeravg)
 {
 
   //saving final constants in a histograms for validation
@@ -406,15 +407,15 @@ void CDCDedxWireGainAlgorithm::plotWireGain(vector<double>& vdedx_means, vector<
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotLayerGain(array<double, c_maxNSenseLayers>& layermean, double layeravg)
+void CDCDedxWireGainAlgorithm::plotLayerGain(const vector<double>& layermean, double layeravg)
 {
 
-  TH1D hlayeravg(Form("hlayeravg_%s", m_suffix.data()), "", c_maxNSenseLayers, -0.5, 55.5);
+  TH1D hlayeravg(Form("hlayeravg_%s", m_suffix.data()), "", layermean.size(), -0.5, 55.5);
   hlayeravg.SetTitle(Form("layer gain avg (%s); layer numbers;<dedxhit>", m_suffix.data()));
 
-  for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
+  for (unsigned int il = 0; il < layermean.size(); il++) {
     hlayeravg.SetBinContent(il + 1, layermean[il]);
-    if (il % 2 == 0 || il == c_maxNSenseLayers - 1) hlayeravg.GetXaxis()->SetBinLabel(il + 1, Form("L%d", il));
+    if (il % 2 == 0 || il == layermean.size() - 1) hlayeravg.GetXaxis()->SetBinLabel(il + 1, Form("L%d", il));
   }
 
   TCanvas clayeravg("clayeravg", "clayeravg", 800, 500);
@@ -435,8 +436,7 @@ void CDCDedxWireGainAlgorithm::plotLayerGain(array<double, c_maxNSenseLayers>& l
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotWGPerLayer(vector<double>& vdedx_means, array<double, c_maxNSenseLayers>& layermean,
-                                              double layeravg)
+void CDCDedxWireGainAlgorithm::plotWGPerLayer(const vector<double>& vdedx_means, const vector<double>& layermean, double layeravg)
 {
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
@@ -452,7 +452,7 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(vector<double>& vdedx_means, array
 
   int jwire = 0;
 
-  for (unsigned int il = 0; il < c_maxNSenseLayers; ++il) {
+  for (unsigned int il = 0; il < layermean.size(); ++il) {
 
     unsigned int nwires = cdcgeo.nWiresInLayer(il);
     TH1D hconstpl(Form("hconstpwvar_l%d_%s", il, m_suffix.data()), "", nwires, jwire, jwire + nwires);
@@ -485,7 +485,7 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(vector<double>& vdedx_means, array
     tlc->SetLineColor(kRed);
     tlc->DrawClone("same");
 
-    if ((il + 1) % 4 == 0 || (il + 1) == c_maxNSenseLayers) {
+    if ((il + 1) % 4 == 0 || (il + 1) == layermean.size()) {
       clconst.Print(psnameL.str().c_str());
       clconst.Clear("D");
     }

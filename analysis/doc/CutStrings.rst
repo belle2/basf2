@@ -17,14 +17,14 @@ You can use logical operators ``and`` and ``or`` to combine your cuts into more 
 Use ``not`` to negate conditional statements.
 Square brackets ``[``, ``]`` are for grouping conditional statements.
 
-Cut strings support writing formulas in cuts directly. Operator precedences work as expected. 
+Cut strings support writing formulas in cuts directly. Operator precedences work as expected.
 Formulas in conditions can be written freely e.g ``0.2 <= dx**2+dy**2 <= 0.7`` as one would expect in python.
 Common arithmetic operators ``+``, ``-``, ``*``, ``/`` can be used. For the exponentiation operator both ``**`` and ``^`` are valid.
 You can use parenthesis ``(`` ``)`` to group expressions in formulas.
 
 Formulas as arguments for MetaVariables are also supported e.g ``abs(dx+dy) < 1`` .
 
-Cuts supports writing numeric literals of different data types in different formats. Double values can be written in scientific notation. 
+Cuts supports writing numeric literals of different data types in different formats. Double values can be written in scientific notation.
 You can also compare to special values like ``nan`` and ``inf``. Integer literals can also be given in hexadecimal notation e.g ``0xABC`` (case insensitive).
 Boolean literals can be written in both python ``True/False`` and c++ ``true/false`` style.
 

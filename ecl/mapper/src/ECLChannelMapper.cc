@@ -5,12 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//
+
+/* Own header. */
 #include <ecl/mapper/ECLChannelMapper.h>
-#include <rawdata/dataobjects/RawCOPPERFormat.h>
+
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
-//
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
+
+/* C++ headers. */
 #include <fstream>
 #include <string>
 

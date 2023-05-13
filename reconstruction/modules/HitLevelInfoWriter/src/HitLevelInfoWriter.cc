@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
-
+#include <mdst/dbobjects/BeamSpot.h>
+#include <TMath.h>
 
 using namespace Belle2;
 using namespace Dedx;
+using namespace std;
 
 REG_MODULE(HitLevelInfoWriter);
 
@@ -19,12 +21,13 @@ HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
 
   setDescription("Extract dE/dx information for calibration development.");
 
-  addParam("outputBaseName", m_strOutputBaseName, "Suffix for output file name", std::string("HLInfo.root"));
-  addParam("particleLists", m_strParticleList, "Vector of ParticleLists to save", std::vector<std::string>());
-  addParam("enableHitLevel", enableHitLevel, "True or False for Hit level variables", false);
-  addParam("enableExtraVar", enableExtraVar, "True or False for extra track/hit level variables", false);
-  addParam("nodeadwire", nodeadwire, "True or False for deadwire hit variables", true);
-  addParam("relativeCorrections", m_relative, "If true, apply corrections relative to those used in production", false);
+  addParam("outputBaseName", m_strOutputBaseName, "Suffix for output file name", string("HLInfo.root"));
+  addParam("particleLists", m_strParticleList, "Vector of ParticleLists to save", vector<string>());
+  addParam("enableHitLevel", m_isHitLevel, "True or False for Hit level variables", false);
+  addParam("m_isExtraVar", m_isExtraVar, "True or False for extra track/hit level variables", false);
+  addParam("nodeadwire", m_isDeadwire, "True or False for deadwire hit variables", false);
+  addParam("relativeCorrections", m_isRelative, "If true, apply corrections relative to those used in production", false);
+  addParam("corrections", m_isCorrection, "If true, apply corrections", true);
 
 }
 
@@ -43,7 +46,7 @@ void HitLevelInfoWriterModule::initialize()
   m_klmClusters.isOptional();
 
   // build a map to relate input strings to the right particle type
-  std::map<std::string, std::string> pdgMap = {{"pi+", "Const::pion.getPDGCode()"}, {"K+", "Const::kaon.getPDGCode()"}, {"mu+", "Const::muon.getPDGCode()"}, {"e+", "Const::electron.getPDGCode()"}, {"p+", "Const::proton.getPDGCode()"}, {"deuteron", "Const::deuteron.getPDGCode()"}};
+  map<string, string> pdgMap = {{"pi+", "Const::pion.getPDGCode()"}, {"K+", "Const::kaon.getPDGCode()"}, {"mu+", "Const::muon.getPDGCode()"}, {"e+", "Const::electron.getPDGCode()"}, {"p+", "Const::proton.getPDGCode()"}, {"deuteron", "Const::deuteron.getPDGCode()"}};
 
   // if no particle lists are given, write out all tracks
   if (m_strParticleList.size() == 0) bookOutput(m_strOutputBaseName);
@@ -51,8 +54,8 @@ void HitLevelInfoWriterModule::initialize()
   // create a new output file for each particle list specified
   for (unsigned int i = 0; i < m_strParticleList.size(); i++) {
     // strip the name of the particle lists to make this work
-    std::string pdg = pdgMap[m_strParticleList[i].substr(0, m_strParticleList[i].find(":"))];
-    std::string filename = std::string(m_strOutputBaseName + "_PID" + pdg + ".root");
+    string pdg = pdgMap[m_strParticleList[i].substr(0, m_strParticleList[i].find(":"))];
+    string filename = string(m_strOutputBaseName + "_PID" + pdg + ".root");
     bookOutput(filename);
   }
 }
@@ -100,12 +103,22 @@ void HitLevelInfoWriterModule::event()
       m_injring = dedxTrack->getInjectionRing();
       m_injtime = dedxTrack->getInjectionTime();
 
+      //--------REMOVEBAL--------
+      //when CDST are reproduced with injection time
+      if (m_injtime == -1 || m_injring == -1) {
+        if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
+          m_injring = m_TTDInfo->isHER();
+          m_injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+        }
+      }
+      //--------REMOVEBAL--------
+
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
         m_e = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-        if (enableExtraVar) {
+        if (m_isExtraVar) {
           m_e1_9 = eclCluster->getE1oE9();
           m_e9_21 = eclCluster->getE9oE21();
           m_eclsnHits = eclCluster->getNumberOfCrystals();
@@ -162,7 +175,7 @@ void HitLevelInfoWriterModule::event()
         B2WARNING("No related CDCDedxTrack...");
         continue;
       }
-      std::string ptype = m_strParticleList[iList].substr(0, m_strParticleList[iList].find(":"));
+      string ptype = m_strParticleList[iList].substr(0, m_strParticleList[iList].find(":"));
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
       if (ptype != "pi+") {
         if (ptype == "K+") fitResult = track->getTrackFitResultWithClosestMass(Const::kaon);
@@ -190,12 +203,22 @@ void HitLevelInfoWriterModule::event()
       m_injring = dedxTrack->getInjectionRing();
       m_injtime = dedxTrack->getInjectionTime();
 
+      //--------REMOVEBAL--------
+      //when CDST are reproduced with injection time
+      if (m_injtime == -1 || m_injring == -1) {
+        if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
+          m_injring = m_TTDInfo->isHER();
+          m_injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+        }
+      }
+      //--------REMOVEBAL--------
+
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
         m_e = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-        if (enableExtraVar) {
+        if (m_isExtraVar) {
           m_e1_9 = eclCluster->getE1oE9();
           m_e9_21 = eclCluster->getE9oE21();
           m_eclsnHits = eclCluster->getNumberOfCrystals();
@@ -296,7 +319,6 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_timeGain = m_DBInjectTime->getCorrection("mean", m_injring, m_injtime);
   m_timeReso = m_DBInjectTime->getCorrection("reso", m_injring, m_injtime);
 
-
   if (m_cosTheta <= -0.850 || m_cosTheta >= 0.950) {
     m_cosEdgeCor = m_DBCosEdgeCor->getMean(m_cosTheta);
   } else {
@@ -305,17 +327,26 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_hadronpars = m_DBHadronCor->getHadronPars();
 
   //variable to save layer variables
-  std::map<int, std::vector<double>>l_var;
+  map<int, vector<double>>l_var;
+  double cdcChi[Const::ChargedStable::c_SetSize];
 
   //Modify the hit level dedx
-  recalculateDedx(dedxTrack, l_var);
-
-  m_chieOld = dedxTrack->getChi(0);
-  m_chimuOld = dedxTrack->getChi(1);
-  m_chipiOld = dedxTrack->getChi(2);
-  m_chikOld = dedxTrack->getChi(3);
-  m_chipOld = dedxTrack->getChi(4);
-  m_chidOld = dedxTrack->getChi(5);
+  if (m_isCorrection) {
+    recalculateDedx(dedxTrack, l_var, cdcChi);
+    m_chie = cdcChi[0];
+    m_chimu = cdcChi[1];
+    m_chipi = cdcChi[2];
+    m_chik = cdcChi[3];
+    m_chip = cdcChi[4];
+    m_chid = cdcChi[5];
+  } else {
+    m_chie = dedxTrack->getChi(0);
+    m_chimu = dedxTrack->getChi(1);
+    m_chipi = dedxTrack->getChi(2);
+    m_chik = dedxTrack->getChi(3);
+    m_chip = dedxTrack->getChi(4);
+    m_chid = dedxTrack->getChi(5);
+  }
 
   m_pmeane = dedxTrack->getPmean(0);
   m_pmeanmu = dedxTrack->getPmean(1);
@@ -335,19 +366,30 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   double lout = 0, lin = 0, increment = 0;
   int lastlayer = 0;
 
-  l_nhits = l_var[0].size();
-  // add a factor of 0.51 here to make sure we are rounding appropriately...
-  const int lEdgeTrunc = int(l_nhits * 0.05 + 0.51);
-  const int hEdgeTrunc = int(l_nhits * (1 - 0.25) + 0.51);
-  l_nhitsused = hEdgeTrunc - lEdgeTrunc;
+  if (m_isCorrection) {
+    l_nhits = l_var[0].size();
+    const int lEdgeTrunc = int(l_nhits * 0.05 + 0.51);
+    const int hEdgeTrunc = int(l_nhits * (1 - 0.25) + 0.51);
+    l_nhitsused = hEdgeTrunc - lEdgeTrunc;
+  } else {
+    l_nhits = dedxTrack->getNLayerHits();
+    l_nhitsused = dedxTrack->getNLayerHitsUsed();
+  }
 
   for (int il = 0; il < l_nhits; ++il) {
-    l_nhitscombined[il] = l_var[0][il];
-    l_wirelongesthit[il] = l_var[1][il];
-    l_layer[il] = l_var[2][il];
-    l_path[il] = l_var[3][il];
-    l_dedx[il] = l_var[4][il];
-
+    if (m_isCorrection) {
+      l_nhitscombined[il] = l_var[0][il];
+      l_wirelongesthit[il] = l_var[1][il];
+      l_layer[il] = l_var[2][il];
+      l_path[il] = l_var[3][il];
+      l_dedx[il] = l_var[4][il];
+    } else {
+      l_nhitscombined[il] = dedxTrack->getNHitsCombined(il);
+      l_wirelongesthit[il] = dedxTrack->getWireLongestHit(il);
+      l_layer[il] = dedxTrack->getLayer(il);
+      l_path[il] = dedxTrack->getLayerPath(il);
+      l_dedx[il] = dedxTrack->getLayerDedx(il);
+    }
     if (l_layer[il] > lastlayer) lout++;
     else if (l_layer[il] < lastlayer) lin++;
     else continue;
@@ -358,10 +400,10 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_ioasym = (lout - lin) / increment;
 
   // Get the vector of dE/dx values for all hits
-  if (enableHitLevel) {
+  if (m_isHitLevel) {
     for (int ihit = 0; ihit < h_nhits; ++ihit) {
 
-      if (nodeadwire && m_DBWireGains->getWireGain(dedxTrack->getWire(ihit)) == 0)continue;
+      if (m_isDeadwire) continue;
 
       h_lwire[ihit] = dedxTrack->getWireInLayer(ihit);
       h_wire[ihit] = dedxTrack->getWire(ihit);
@@ -379,7 +421,7 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
       h_driftD[ihit] = dedxTrack->getDriftD(ihit);
 
       // Get extra variable from tracking
-      if (enableExtraVar) {
+      if (m_isExtraVar) {
         h_WeightPionHypo[ihit] = dedxTrack->getWeightPionHypo(ihit);
         h_WeightKaonHypo[ihit] = dedxTrack->getWeightKaonHypo(ihit);
         h_WeightProtonHypo[ihit] = dedxTrack->getWeightProtonHypo(ihit);
@@ -396,9 +438,10 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
 }
 
 //---------------------------------------------------------------------------------------
-void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, std::map<int, std::vector<double>>& l_var)
+void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, map<int, vector<double>>& l_var,
+                                               double (&cdcChi)[Const::ChargedStable::c_SetSize])
 {
-  std::vector<double> newLayerHits;
+  vector<double> newLayerHits;
   double newLayerDe = 0, newLayerDx = 0;
   int nhitscombined = 0; // number of hits combined per layer
   int wirelongesthit = 0; // wire number of longest hit
@@ -412,23 +455,24 @@ void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, std::map
     double jEntaRS = dedxTrack->getEntaRS(ihit);
     double jPath = dedxTrack->getPath(ihit);
 
-    double correction = dedxTrack->getScaleFactor() * dedxTrack->getRunGain() * dedxTrack->getCosineCorrection() *
-                        dedxTrack->getCosEdgeCorrection() *
-                        dedxTrack->getTwoDCorrection(ihit) * dedxTrack->getOneDCorrection(ihit) * dedxTrack->getNonLADCCorrection(ihit);
+    double correction = dedxTrack->getScaleFactor() * dedxTrack->getRunGain() * dedxTrack->getTimeMean() *
+                        dedxTrack->getCosineCorrection() * dedxTrack->getCosEdgeCorrection() *
+                        dedxTrack->getTwoDCorrection(ihit) * dedxTrack->getOneDCorrection(ihit) *
+                        dedxTrack->getNonLADCCorrection(ihit);
     if (dedxTrack->getWireGain(ihit) > 0) correction *= dedxTrack->getWireGain(ihit); //also keep dead wire
 
-    if (m_relative) {
+    if (m_isRelative) {
       //get same base adc + rel correction factor
-      correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta);
+      correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta, m_injring, m_injtime);
       if (!m_DBWireGains && dedxTrack->getWireGain(ihit) == 0) correction = 0;
     } else {
       //get modifed adc + abs correction factor
-      correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta);
+      correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta, m_injring, m_injtime);
     }
 
     double newhitdedx = 1.0;
 
-    newhitdedx *= jadcbase * std::sqrt(1 - m_cosTheta * m_cosTheta) / jPath;
+    newhitdedx *= jadcbase * sqrt(1 - m_cosTheta * m_cosTheta) / jPath;
 
     if (correction != 0) {
       newhitdedx /= correction;
@@ -449,7 +493,7 @@ void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, std::map
       continue;
     } else {
       if (newLayerDx != 0) {
-        double totalDistance = newLayerDx / std::sqrt(1 - m_cosTheta * m_cosTheta);
+        double totalDistance = newLayerDx / sqrt(1 - m_cosTheta * m_cosTheta);
         double newLayerDedx = newLayerDe / totalDistance ;
         newLayerHits.push_back(newLayerDedx);
         l_var[0].push_back(nhitscombined);
@@ -481,18 +525,12 @@ void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, std::map
   m_error = dedxerror;
 
   // save the PID information
-  double cdcChi[Const::ChargedStable::c_SetSize];
   saveChiValue(cdcChi, dedxTrack, m_trunc);
-  m_chie = cdcChi[0];
-  m_chimu = cdcChi[1];
-  m_chipi = cdcChi[2];
-  m_chik = cdcChi[3];
-  m_chip = cdcChi[4];
-  m_chid = cdcChi[5];
 }
 
 //---------------------------------------------------------------------------------------
-double HitLevelInfoWriterModule::GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const
+double HitLevelInfoWriterModule::GetCorrection(int& adc, int layer, int wireID, double doca, double enta,
+                                               double costheta, double ring, double time) const
 {
   double correction = 1.0;
   correction *= m_DBScaleFactor->getScaleFactor();
@@ -500,11 +538,12 @@ double HitLevelInfoWriterModule::GetCorrection(int& adc, int layer, int wireID, 
   correction *= m_DB2DCell->getMean(layer, doca, enta);
   correction *= m_DB1DCell->getMean(layer, enta);
   correction *= m_DBCosineCor->getMean(costheta);
+  correction *= m_DBInjectTime->getCorrection("mean", ring, time);
   if (costheta <= -0.850 || costheta >= 0.950) correction *= m_DBCosEdgeCor->getMean(costheta);
   if (m_DBWireGains->getWireGain(wireID) > 0)  correction *= m_DBWireGains->getWireGain(wireID);
 
   //last is only for abs constant
-  if (!m_relative) adc = m_DBNonlADC->getCorrectedADC(adc, layer);
+  if (!m_isRelative) adc = m_DBNonlADC->getCorrectedADC(adc, layer);
 
   return correction;
 }
@@ -579,13 +618,13 @@ double HitLevelInfoWriterModule::I2D(const double cosTheta, const double I) cons
 
 //---------------------------------------------------------------------------------------
 void HitLevelInfoWriterModule::calculateMeans(double* mean, double* truncMean, double* truncMeanErr,
-                                              const std::vector<double>& dedx) const
+                                              const vector<double>& dedx) const
 {
   // Calculate the truncated average by skipping the lowest & highest
   // events in the array of dE/dx values
-  std::vector<double> sortedDedx = dedx;
-  std::sort(sortedDedx.begin(), sortedDedx.end());
-  sortedDedx.erase(std::remove(sortedDedx.begin(), sortedDedx.end(), 0), sortedDedx.end());
+  vector<double> sortedDedx = dedx;
+  sort(sortedDedx.begin(), sortedDedx.end());
+  sortedDedx.erase(remove(sortedDedx.begin(), sortedDedx.end(), 0), sortedDedx.end());
   sortedDedx.shrink_to_fit();
 
   double truncMeanTmp = 0.0, meanTmp = 0.0, sumOfSqs = 0.0;
@@ -646,7 +685,7 @@ void HitLevelInfoWriterModule::clearEntries()
     l_dedx[il] = 0;
   }
 
-  if (enableHitLevel) {
+  if (m_isHitLevel) {
     for (int ihit = 0; ihit < 200; ++ihit) {
       h_lwire[ihit] = 0;
       h_wire[ihit] = 0;
@@ -675,7 +714,7 @@ void HitLevelInfoWriterModule::clearEntries()
 }
 
 //---------------------------------------------------------------------------------------
-void HitLevelInfoWriterModule::bookOutput(std::string filename)
+void HitLevelInfoWriterModule::bookOutput(string filename)
 {
   // register output root file
   m_file.push_back(new TFile(filename.c_str(), "RECREATE"));
@@ -696,7 +735,7 @@ void HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("injtime", &m_injtime, "injtime/D");
   m_tree[i]->Branch("isher", &m_injring, "isher/D");
 
-  if (enableExtraVar) {
+  if (m_isExtraVar) {
     m_tree[i]->Branch("d0", &m_d0, "d0/D");
     m_tree[i]->Branch("z0", &m_z0, "z0/D");
     m_tree[i]->Branch("dphi", &m_dphi, "dphi/D");
@@ -742,7 +781,6 @@ void HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("timegain", &m_timeGain, "timegain/D");
   m_tree[i]->Branch("timereso", &m_timeReso, "timereso/D");
 
-
   // PID values
   m_tree[i]->Branch("chiE", &m_chie, "chiE/D");
   m_tree[i]->Branch("chiMu", &m_chimu, "chiMu/D");
@@ -782,7 +820,7 @@ void HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("lDedx", l_dedx, "lDedx[lNHits]/D");
 
   // hit level information
-  if (enableHitLevel) {
+  if (m_isHitLevel) {
     m_tree[i]->Branch("hNHits", &h_nhits, "hNHits/I");
     m_tree[i]->Branch("hLWire", h_lwire, "hLWire[hNHits]/I");
     m_tree[i]->Branch("hWire", h_wire, "hWire[hNHits]/I");
@@ -803,7 +841,7 @@ void HitLevelInfoWriterModule::bookOutput(std::string filename)
     m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
     m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");
 
-    if (enableExtraVar) {
+    if (m_isExtraVar) {
       m_tree[i]->Branch("hWeightPionHypo", h_WeightPionHypo, "hWeightPionHypo[hNHits]/D");
       m_tree[i]->Branch("hWeightKaonHypo", h_WeightKaonHypo, "hWeightKaonHypo[hNHits]/D");
       m_tree[i]->Branch("hWeightProtonHypo", h_WeightProtonHypo, "hWeightProtonHypo[hNHits]/D");

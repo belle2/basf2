@@ -13,8 +13,8 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <genfit/Track.h>
 
@@ -33,6 +33,7 @@
 #include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
+#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 #include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
 #include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
@@ -47,7 +48,6 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TString.h>
-#include <TMath.h>
 
 class TH2F;
 
@@ -83,12 +83,13 @@ namespace Belle2 {
     /**
      * Function to recalculate the dedx with latest constants
      **/
-    void recalculateDedx(CDCDedxTrack* dedxTrack, std::map<int, std::vector<double>>& l_var);
+    void recalculateDedx(CDCDedxTrack* dedxTrack, std::map<int, std::vector<double>>& l_var,
+                         double (&cdcChi)[Const::ChargedStable::c_SetSize]);
 
     /**
      * Function to get the correction factor
      **/
-    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const;
+    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta, double ring, double time) const;
 
     /**
      * Function to apply the hadron correction
@@ -132,6 +133,7 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array of input TrackFitResults */
     StoreArray<ECLCluster> m_eclClusters; /**< Required array of input ECLClusters */
     StoreArray<KLMCluster> m_klmClusters; /**< Required array of input KLMClusters */
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo; /**< Store Object Ptr: EventLevelTriggerTimeInfo */
 
     /** Fill the TTree with the information from the track fit */
     void fillTrack(const TrackFitResult* fitResult);
@@ -147,8 +149,8 @@ namespace Belle2 {
     int m_runID{ -1};   /**< run in which this Track was found */
     int m_eventID{ -1}; /**< event in which this Track was found */
 
-    double m_injring{-1.0}; /**< HER injection status */
-    double m_injtime{-1.0}; /**< time since last injection in micro seconds */
+    double m_injring{ -1.0}; /**< HER injection status */
+    double m_injtime{ -1.0}; /**< time since last injection in micro seconds */
 
     // track level information (from tfr)
     double m_d0{0.};     /**< Signed distance to the POCA in the r-phi plane */
@@ -178,6 +180,9 @@ namespace Belle2 {
 
     // track level Mc
     double m_PDG{ -1.};     /**< MC PID */
+    //    double m_motherPDG; /**< MC PID of mother particle */
+    //    double m_pTrue;     /**< MC true momentum */
+    //    double m_trackDist; /**< the total distance traveled by the track */
 
     // track level dE/dx measurements
     double m_mean{ -1.};       /**< dE/dx averaged */
@@ -190,9 +195,8 @@ namespace Belle2 {
     double m_e{ -1.};       /**< energy in the calorimeter */
     double m_e1_9{ -1.};       /**< ratio of energies of the central 1 crystal vs 3x3 crystals */
     double m_e9_21{ -1.};        /**< ratio of energies of the central 3x3 crystal vs 5x5 crystals */
-    double m_eclsnHits{ -1.};        /**<# of clusters */
-
     double m_klmLayers{ -1.}; /**< number of klm layers with hits */
+    double m_eclsnHits{ -1.};        /**<# of clusters */
 
     // calibration constants
     double m_scale{ -1.};   /**< calibration scale factor */
@@ -283,10 +287,11 @@ namespace Belle2 {
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
-    bool nodeadwire; /**< write only active wires */
+    bool m_isDeadwire; /**< write only active wires */
     //Flag to enable and disable set of variables
-    bool enableHitLevel; /**< Flag to switch on/off hit level info */
-    bool enableExtraVar; /**< Flag to switch on/off extra level info and some available w/ release/5 only */
-    bool m_relative; /**< Flag to switch on/off relative constants */
+    bool m_isHitLevel; /**< Flag to switch on/off hit level info */
+    bool m_isExtraVar; /**< Flag to switch on/off extra level info and some available w/ release/5 only */
+    bool m_isRelative; /**< Flag to switch on/off relative constants */
+    bool m_isCorrection; /**< Flag to switch on/off corrections */
   };
 } // Belle2 namespace

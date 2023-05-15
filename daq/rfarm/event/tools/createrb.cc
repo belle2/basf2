@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     printf("createrb : rbufname \n");
     exit(-1);
   }
-  RingBuffer* rbuf = new RingBuffer(argv[1], RBUFSIZE);
+  new RingBuffer(argv[1], RBUFSIZE);
 }
 
 

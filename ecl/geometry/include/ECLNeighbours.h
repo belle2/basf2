@@ -5,10 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
 
-#include <vector>
+/* C++ headers. */
 #include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace ECL {

@@ -64,15 +64,21 @@ namespace TreeFitter {
 
   void KalmanCalculator::updateState(FitParams& fitparams)
   {
-    fitparams.getStateVector() -= m_K * m_res;
+    double eps = Eigen::NumTraits<double>::epsilon();
+    fitparams.getStateVector() = (fitparams.getStateVector().array() - (m_K * m_res).array()).matrix()
+                                 + eps * Eigen::MatrixXd::Identity(fitparams.getStateVector().rows(), fitparams.getStateVector().cols());
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
   }
 
   void KalmanCalculator::updateState(FitParams& fitparams, FitParams& oldState)
   {
+    double eps = Eigen::NumTraits<double>::epsilon();
     Eigen::Matrix < double, -1, 1, 0, 7, 1 > res_prime =
-      m_res + m_G * (oldState.getStateVector() - fitparams.getStateVector());
-    fitparams.getStateVector() = oldState.getStateVector() -  m_K * res_prime;
+      m_res + m_G * ((oldState.getStateVector().array() - fitparams.getStateVector().array()).matrix() +
+                     + eps * Eigen::MatrixXd::Identity(fitparams.getStateVector().rows(), fitparams.getStateVector().cols()));
+    fitparams.getStateVector() = (oldState.getStateVector().array() - (m_K * res_prime).array()).matrix()
+                                 + eps * Eigen::MatrixXd::Identity(oldState.getStateVector().rows(), oldState.getStateVector().cols());
+
     m_chisq = res_prime.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * res_prime;
   }
 
@@ -90,8 +96,9 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > deltaCov  =
       fitCov.selfadjointView<Eigen::Lower>() * GRinvGt * fitCov.selfadjointView<Eigen::Lower>();
 
+    double eps = Eigen::NumTraits<double>::epsilon();
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > delta =
-      fitCov - deltaCov;
+      (fitCov.array() - deltaCov.array()).matrix() + eps * Eigen::MatrixXd::Identity(fitCov.rows(), fitCov.cols());
 
     fitparams.getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
 

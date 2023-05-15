@@ -103,7 +103,7 @@ The format of ``input_data`` is:
 
 .. code-block:: python
 
-  input_data = {"Your_Input_Name_A": 
+  input_data = {"Your_Input_Name_A":
                     {"/path/to/type/a/input/file_1_1.root": caf.utils.IoV(1, 1, 1, 1),
                      "/path/to/type/a/input/file_1_2.root": caf.utils.IoV(1, 2, 1, 2),
                      ...

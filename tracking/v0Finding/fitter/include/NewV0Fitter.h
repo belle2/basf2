@@ -128,9 +128,19 @@ namespace Belle2 {
       c_NotSelected = -1            /**< fitted vertex not passing the cuts */
     };
 
+
+    /**
+     * Bits used to signal that track has hits inside the V0 vertex
+     */
+    enum EInnerHitBits {
+      c_BitTrackPlus = 0x1, /**< positive track has inner hits */
+      c_BitTrackMinus = 0x2 /**< negative track has inner hits */
+    };
+
+
     /**
      * Performs a vertex fit. On success the return value indicates if tracks have inner hits or not
-     * (bit 0 set for positive, bit 1 set for negative track). On failure it returns ErrorStatus code.
+     * (see EInnerHitBits). On failure it returns ErrorStatus code.
      * @param recoTrackPlus positively charged track
      * @param recoTrackMinus negatively charged track
      * @param pdgTrackPlus PDG code used in the fit of positively charged track (closest mass to V0 daughter)
@@ -168,7 +178,7 @@ namespace Belle2 {
 
     /**
      * Extrapolation of both tracks to the vertex. On success the return value indicates if tracks have inner hits
-     * (bit 0 set for positive, bit 1 set for negative track).
+     * (see EInnerHitBits).
      * @param statePlus measured state of positively charged track from which the extrapolation is performed [in/out]
      * @param stateMinus measured state of negatively charged track from which the extrapolation is performed [in/out]
      * @param vertex vertex

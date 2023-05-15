@@ -116,13 +116,13 @@ bool NewV0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus, c
       /// Usually this procedure converges in up to 3 iterations (mostly in a single iteration),
       /// but for a small fraction of track pairs it does not converge at all, so we set the limit at 5.
       const RecoTrack* trkPlus = recoTrackPlus;
-      if (status & 0x1) {
+      if (status & c_BitTrackPlus) {
         trkPlus = removeHitsAndRefit(origRecoTrackPlus, recoTrackPlus, ptypeTrackPlus);
         if (not trkPlus) return false;
         isHitRemoved = true;
       }
       const RecoTrack* trkMinus = recoTrackMinus;
-      if (status & 0x2) {
+      if (status & c_BitTrackMinus) {
         trkMinus = removeHitsAndRefit(origRecoTrackMinus, recoTrackMinus, ptypeTrackMinus);
         if (not trkMinus) return false;
         isHitRemoved = true;
@@ -291,8 +291,8 @@ int NewV0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& statePlus, ge
     double extralengthPlus  =  statePlus.extrapolateToPoint(vertex.getPos());
     double extralengthMinus =  stateMinus.extrapolateToPoint(vertex.getPos());
     unsigned status = 0;
-    if (extralengthPlus  > 0) status |= 0x1; ///  plus track has hits inside the V0 vertex.
-    if (extralengthMinus > 0) status |= 0x2; /// minus track has hits inside the V0 vertex.
+    if (extralengthPlus  > 0) status |= c_BitTrackPlus; ///  plus track has hits inside the V0 vertex.
+    if (extralengthMinus > 0) status |= c_BitTrackMinus; /// minus track has hits inside the V0 vertex.
     return status;
   } catch (...) {
     /// This shouldn't ever happen, but I can see the extrapolation

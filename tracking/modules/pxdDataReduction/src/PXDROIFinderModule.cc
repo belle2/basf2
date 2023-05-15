@@ -65,7 +65,11 @@ void PXDROIFinderModule::initialize()
 
 void PXDROIFinderModule::beginRun()
 {
-  if (m_ROICalculationParameters.isValid()) {
+  if (not m_ROICalculationParameters.isValid()) {
+    // No valid ROI calculation parameters from DB, crash in any case, even though module parameters are provided.
+    B2FATAL("No ROI configuration for the current run found (missing ROICalculationParameters payload).");
+  } else if (m_ROICalculationParameters.isValid() and not m_overrideDBROICalculation) {
+    // Use ROI calculation parameters from DB.
     m_tolerancePhi = m_ROICalculationParameters->getToleranceZ();
     m_toleranceZ = m_ROICalculationParameters->getTolerancePhi();
     m_numSigmaTotU = m_ROICalculationParameters->getNumSigmaTotU();
@@ -74,8 +78,10 @@ void PXDROIFinderModule::beginRun()
     m_sigmaSystV = m_ROICalculationParameters->getSigmaSystV();
     m_maxWidthU = m_ROICalculationParameters->getMaxWidthU();
     m_maxWidthV = m_ROICalculationParameters->getMaxWidthV();
-  } else {
-    B2FATAL("No ROI configuration for the current run found (missing ROICalculationParameters payload).");
+  } else if (m_ROICalculationParameters.isValid() and m_overrideDBROICalculation) {
+    // Use ROI calculation parameters from module parameters.
+    B2DEBUG(29, "ROI calculation parameters from DB are valid, but they are overridden by the module parameters.\n"
+            "  --> Using module parameters instead of parameters from DB.");
   }
 
   B2DEBUG(29, "||| PXDROIFinder Parameters:");

@@ -654,13 +654,13 @@ class AA2uuuu(BaseSkim):
         stdMu("all", path=path)
 
     def build_lists(self, path):
-        muon_cuts = """[muonID_noSVD > 0.8]
+        muon_cuts = """[0.8 < muonID_noSVD]
         and [inKLMAcceptance == 1]
-        and [inCDCAcceptance == 1] and [nCDCHits > 4]"""
+        and [inCDCAcceptance == 1] and [4 < nCDCHits]"""
 
         track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
 
-        path = self.skim_event_cuts(f"nCleanedTracks({track_cuts}) >= 4", path=path)
+        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts}) <= 6", path=path)
 
         ma.cutAndCopyList("mu+:accepted", "mu+:all", muon_cuts, path=path)
         ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted mu-:accepted", cut="", path=path)

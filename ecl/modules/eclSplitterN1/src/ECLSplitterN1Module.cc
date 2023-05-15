@@ -6,35 +6,34 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclSplitterN1/ECLSplitterN1Module.h>
 
-//STL
-#include <string>
-#include <utility>      // std::pair
-#include <algorithm>    // std::find
-
-//Root
-#include "TFile.h"
-#include "TGraph2D.h"
-#include "TH1F.h"
-
-// FRAMEWORK
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/geometry/B2Vector3.h>
-
-// ECL
-#include <ecl/utility/Position.h>
+/* ECL header. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/utility/Position.h>
 
-// MDST
+/* Basf2 headers. */
+#include <framework/geometry/B2Vector3.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TGraph2D.h>
+#include <TH1F.h>
+
+/* C++ headers. */
+#include <algorithm>
+#include <string>
+#include <utility>
 
 // NAMESPACES
 using namespace Belle2;
@@ -134,8 +133,8 @@ void ECLSplitterN1Module::initialize()
   m_NeighbourMap21 = new ECLNeighbours("NC", 2); // NC: 5x5 excluding corners = 21
 
   // initialize the vector that gives the relation between cellid and store array position
-  m_StoreArrPosition.resize(8736 + 1);
-  m_StoreArrPositionLM.resize(8736 + 1);
+  m_StoreArrPosition.resize(ECLElementNumbers::c_NCrystals + 1);
+  m_StoreArrPositionLM.resize(ECLElementNumbers::c_NCrystals + 1);
 
   // read the Background correction factors (for full background)
   m_fileBackgroundNorm = new TFile(m_fileBackgroundNormName.c_str(), "READ");
@@ -467,7 +466,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
           //-------------------------------------------------------------------
           // Loop over all digits. They get a weight using the distance to the respective centroid.
-          int nDigit = 0;
           for (const auto& digitpoint : allPoints) {
 
             // cellid and position of this digit
@@ -538,7 +536,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
             // Fill the weight for this digits and this local maximum.
             B2DEBUG(175, "   cellid: " << digitcellid << ", energy: " << digitenergy << ", weight: " << weight << ", distance: " << distance);
             weights.push_back(weight);
-            ++nDigit;
 
           } // end allPoints
 

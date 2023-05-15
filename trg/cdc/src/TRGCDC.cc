@@ -14,6 +14,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <math.h>
+#include <TRandom.h>
 #include <iostream>
 #include <fstream>
 #include "framework/datastore/StoreArray.h"
@@ -1030,7 +1031,7 @@ namespace Belle2 {
       //...Loop over CDCHits...
       for (unsigned i = 0; i < nHits; i++) {
         const CDCHit& h = *CDCHits[i];
-        double tmp = rand() / (double(RAND_MAX));
+        double tmp = gRandom->Uniform(0.0, 1.0) / (double(RAND_MAX));
         if (tmp < _inefficiency)
           continue;
 

@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /** Analysis of ER Tracking DQM plots */
-  class DQMHistAnalysisTrackingERModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTrackingERModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -24,9 +24,9 @@ namespace Belle2 {
     ~DQMHistAnalysisTrackingERModule() {};
 
     /** Module function initialize */
-    void initialize() override;
+    void initialize() override final;
     /** Module function event */
-    void event() override;
+    void event() override final;
 
   private:
 

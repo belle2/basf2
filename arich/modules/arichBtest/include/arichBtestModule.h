@@ -6,9 +6,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHBTESTMODULE_H
-#define ARICHBTESTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -115,4 +113,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // ARICHBTESTMODULE_H

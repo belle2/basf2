@@ -13,7 +13,7 @@ the event shape concepts specific to the problem of separating :math:`e^+e^- \to
 
 Event shapes are discussed in several papers. Two comprehensive introductions can be found in:
 
-`The Pythia 6 manual <http://home.thep.lu.se/~torbjorn/pythia6/pythia6200.pdf>`_ 
+`The Pythia 6 manual <http://home.thep.lu.se/~torbjorn/pythia6/pythia6200.pdf>`_
 
 `G. Fox, S. Wolfram, Event shapes in e+e- annihilation <https://www.stephenwolfram.com/publications/academic/event-shapes-annihilation.pdf>`_
 
@@ -73,7 +73,7 @@ This is a very minimal implementation of the event shape in a steering file:
 		# to the VariableManager
 
 
-For a complete steering file, see the example `B2A704-EventShape.py <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A704-EventShape.py>`_ .
+For a complete steering file, see the example `B2A704-EventShape.py <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/tutorials/B2A704-EventShape.py>`_ .
 
 Event shape variables
 ---------------------
@@ -140,7 +140,7 @@ Here you can find some deeper theoretical explanation about their meaning, and h
      The CLEO cones are a set of concentric cones with different opening angle having the thrust axis as symmetry axis. In our current implementation we use 9 cones,
      of opening angle between 10 and 90 degrees, 10 degrees apart one from the other. The measurement of the energy flux in each cone provides a set of variables that
      have been proven to be very powerful for continuum suppression. Jet like events will be more likely to have all the energy flow
-     concentrated in the narrower cones, while spherical events will have a more evenly-distributed flow. 
+     concentrated in the narrower cones, while spherical events will have a more evenly-distributed flow.
      The `VariableManager` provides access to any CLEO cone value up to order 8, calculated either using the collision axis or the thrust axis,  via the metavariable :b2:var:`cleoCone`.
      For convenience the CLEO cones variables calculated using using the thrust axis are also accessible using the variables :b2:var:`cleoConeThrust0` to :b2:var:`cleoConeThrust8`.
 	    
@@ -150,8 +150,4 @@ Complete list of the eventShape variables:
 
 .. b2-variables::
     :group: EventShape
-    :noindex: 
-
- 
-
-
+    :noindex:

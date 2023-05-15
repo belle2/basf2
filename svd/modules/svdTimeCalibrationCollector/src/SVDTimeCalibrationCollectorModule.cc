@@ -68,7 +68,7 @@ void SVDTimeCalibrationCollectorModule::prepare()
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
-  m_svdEI.isRequired(m_svdEventInfo);
+//  m_svdEI.isRequired(m_svdEventInfo);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -131,6 +131,7 @@ void SVDTimeCalibrationCollectorModule::collect()
     m_svdEventInfoName = "SVDEventInfoSim";
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  eventinfo->setAPVClock(m_hwClock);
 
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
     // get cluster time

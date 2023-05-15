@@ -6,29 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// analysis
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/Particle.h>
-
-// framework
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-// for crystal geometry
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/geometry/B2Vector3.h>
-
-// dataobjects
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/MCParticle.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCellIdMapping.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
+/* Basf2 headers. */
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
+
+/* ROOT headers. */
+#include <Math/VectorUtil.h>
 
 using namespace std;
 
@@ -296,10 +294,10 @@ namespace Belle2 {
         B2Vector3D showerPosition;
         showerPosition.SetMagThetaPhi(shower->getR(), shower->getTheta(), shower->getPhi());
 
-        TVector3 tempP = showerPosition - calDigitPosition;
-        if (varid == varType::rRelativeToShower) return tempP.Mag();
+        ROOT::Math::XYZVector tempP = showerPosition - calDigitPosition;
+        if (varid == varType::rRelativeToShower) return tempP.R();
         if (varid == varType::thetaRelativeToShower) return tempP.Theta();
-        if (varid == varType::cosThetaRelativeToShower) return tempP.CosTheta();
+        if (varid == varType::cosThetaRelativeToShower) return tempP.Z() / tempP.R();
         if (varid == varType::phiRelativeToShower) return tempP.Phi();
       } else {
         B2FATAL("variable id not found.");
@@ -325,8 +323,8 @@ namespace Belle2 {
         B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      if (nneighbours != 5 and nneighbours != 7) {
-        B2FATAL("Please request 5 or 7 neighbour area.");
+      if (nneighbours != 5 and nneighbours != 7 and nneighbours != 9 and nneighbours != 11) {
+        B2FATAL("Please request 5, 7, 9 or 11 neighbour area.");
         return std::numeric_limits<double>::quiet_NaN();
       }
 
@@ -349,6 +347,10 @@ namespace Belle2 {
         neighbours = mapping->getCellIdToNeighbour5(maxCellId);
       } else if (nneighbours == 7) {
         neighbours = mapping->getCellIdToNeighbour7(maxCellId);
+      } else if (nneighbours == 9) {
+        neighbours = mapping->getCellIdToNeighbour9(maxCellId);
+      } else if (nneighbours == 11) {
+        neighbours = mapping->getCellIdToNeighbour11(maxCellId);
       }
 
       if (posid < neighbours.size()) {
@@ -488,24 +490,28 @@ namespace Belle2 {
         }
 
         if (!edgeExtHit) return std::numeric_limits<double>::quiet_NaN();
-        const TVector3& extHitPosition = edgeExtHit->getPositionTVector3();
-        const TVector3& trackPointing = edgeExtHit->getMomentumTVector3();
+        const ROOT::Math::XYZVector& extHitPosition = edgeExtHit->getPosition();
+        const ROOT::Math::XYZVector& trackPointing = edgeExtHit->getMomentum();
 
         geometry->Mapping(edgeExtHit->getCopyID() - 1);
         const int thetaID = geometry->GetThetaID();
         const int phiID = geometry->GetPhiID();
+        const int cellID = geometry->GetCellID(thetaID, phiID);
 
-        const TVector3& crystalCenterPosition = geometry->GetCrystalPos(geometry->GetCellID(thetaID, phiID));
-        const TVector3& crystalOrientation = geometry->GetCrystalVec(geometry->GetCellID(thetaID, phiID));
-        const TVector3& crystalPositionOnSurface = crystalCenterPosition - (crystalCenterPosition - extHitPosition).Dot(
-                                                     crystalOrientation.Unit()) * crystalOrientation.Unit();
-
+        const ROOT::Math::XYZVector& crystalCenterPosition =
+          geometry->GetCrystalPos(cellID);
+        const ROOT::Math::XYZVector& crystalOrientation =
+          geometry->GetCrystalVec(cellID);
+        const ROOT::Math::XYZVector& crystalPositionOnSurface =
+          crystalCenterPosition -
+          (crystalCenterPosition - extHitPosition).Dot(
+            crystalOrientation.Unit()) * crystalOrientation.Unit();
         if (varid == varType::phiOffset) {
-          return extHitPosition.DeltaPhi(crystalPositionOnSurface);
+          return ROOT::Math::VectorUtil::Phi_mpi_pi(extHitPosition.Phi() - crystalPositionOnSurface.Phi());
         } else if (varid == varType::thetaOffset) {
           return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
         } else if (varid == varType::phiPointing) {
-          return trackPointing.DeltaPhi(crystalOrientation);
+          return ROOT::Math::VectorUtil::Phi_mpi_pi(trackPointing.Phi() - crystalOrientation.Phi());
         } else if (varid == varType::thetaPointing) {
           return trackPointing.Theta() - crystalOrientation.Theta();
         }
@@ -522,7 +528,7 @@ namespace Belle2 {
     {
 
       if (vars.size() != 1) {
-        B2FATAL("Need exactly one parameters (energy index).");
+        B2FATAL("Need exactly one parameter (energy index).");
       }
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::energy};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -561,7 +567,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit fit type by digit energy rank
     double getTwoComponentFitTypeByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -574,7 +580,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 by digit energy rank
     double getTwoComponentChi2ByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -587,7 +593,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component total energy by digit energy rank
     double getTwoComponentTotalEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -600,7 +606,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component hadron energy by digit energy rank
     double getTwoComponentHadronEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -613,7 +619,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component hadron energy fraction by digit energy rank
     double getTwoComponentHadronEnergyFractionByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -626,7 +632,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component diode energy by digit energy rank
     double getTwoComponentDiodeEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -639,7 +645,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 for photon+hadron fit type by digit energy rank
     double getTwoComponentChi2SavedByEnergyRank_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -652,7 +658,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 for photon+hadron + pile-up photon fit type by digit energy rank
     double getTwoComponentChi2SavedByEnergyRank_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -665,7 +671,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit two component chi2 for photon+diode fit type by digit energy rank
     double getTwoComponentChi2SavedByEnergyRank_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
     {
-      if (!((vars.size() == 1) | (vars.size() == 2))) {
+      if (!((vars.size() == 1) || (vars.size() == 2))) {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
@@ -1264,8 +1270,8 @@ namespace Belle2 {
         B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      if (nneighbours != 5 and nneighbours != 7) {
-        B2FATAL("Please request 5 or 7 neighbour area.");
+      if (nneighbours != 5 and nneighbours != 7 and nneighbours != 9 and nneighbours != 11) {
+        B2FATAL("Please request 5, 7, 9 or 11 neighbour area.");
         return std::numeric_limits<double>::quiet_NaN();
       }
 
@@ -1278,6 +1284,10 @@ namespace Belle2 {
         neighbours = mapping->getCellIdToNeighbour5(centercellid);
       } else if (nneighbours == 7) {
         neighbours = mapping->getCellIdToNeighbour7(centercellid);
+      } else if (nneighbours == 9) {
+        neighbours = mapping->getCellIdToNeighbour9(centercellid);
+      } else if (nneighbours == 11) {
+        neighbours = mapping->getCellIdToNeighbour11(centercellid);
       }
 
       for (unsigned int idx = 0; idx < neighbours.size(); idx++) {
@@ -1302,8 +1312,8 @@ namespace Belle2 {
         B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      if (nneighbours != 5 and nneighbours != 7) {
-        B2FATAL("Please request 5 or 7 neighbour area.");
+      if (nneighbours != 5 and nneighbours != 7 and nneighbours != 9 and nneighbours != 11) {
+        B2FATAL("Please request 5, 7, 9 or 11 neighbour area.");
         return std::numeric_limits<double>::quiet_NaN();
       }
 
@@ -1316,6 +1326,10 @@ namespace Belle2 {
         neighbours = mapping->getCellIdToNeighbour5(centercellid);
       } else if (nneighbours == 7) {
         neighbours = mapping->getCellIdToNeighbour7(centercellid);
+      } else if (nneighbours == 9) {
+        neighbours = mapping->getCellIdToNeighbour9(centercellid);
+      } else if (nneighbours == 11) {
+        neighbours = mapping->getCellIdToNeighbour11(centercellid);
       }
 
       for (unsigned int idx = 0; idx < neighbours.size(); idx++) {
@@ -1507,33 +1521,33 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Calibration (cDST)");
     REGISTER_VARIABLE("eclcaldigitEnergy(i, j)", getECLCalDigitEnergy,
-                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitWeight(i, j)", getECLCalDigitWeight,
-                      "[calibration] Returns the weight of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the weight of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTime(i, j)", getECLCalDigitTime,
-                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTimeResolution(i, j)", getECLCalDigitTimeResolution,
-                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2(i, j)", getTwoComponentChi2,
-                      "[calibration] Returns the two component fit chi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the two component fit chi2 of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentTotalEnergy(i, j)", getTwoComponentTotalEnergy,
-                      "[calibration] Returns the two component total energy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the two component total energy of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergy(i, j)", getTwoComponentHadronEnergy,
-                      "[calibration] Returns the two component hadron energy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the two component hadron energy of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitPhi(i, j)", getPhi,
-                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTheta(i, j)", getTheta,
-                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitR(i, j)", getR,
-                      "Returns R (from a geometry object) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "Returns R (from a geometry object) of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitPhiId(i, j)", getPhiId,
-                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitThetaId(i, j)", getThetaId,
-                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitCellId(i, j)", getCellId,
-                      "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+                      "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours (1-based)");
     REGISTER_VARIABLE("eclcaldigitUsedForClusterEnergy(i, j)", getUsedForClusterEnergy,
-                      " [calibration] Returns the 0 (not used) 1 (used) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+                      " [calibration] Returns the 0 (not used) 1 (used) of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours (1-based)");
 
     REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id");
     REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
@@ -1543,40 +1557,40 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalPhi", getCenterCellCrystalPhi,
                       "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours)");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5), 7x7 (i=7), 9x9 (i=9) or 11x11 (i=11) neighbours neighbours)");
     REGISTER_VARIABLE("eclcaldigitMCEnergy(i, j)", getMCEnergy,
-                      "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+                      "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours (1-based)");
     REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
                       "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)");
 
     VARIABLE_GROUP("ECL Calibration (based on extrapolated tracks) (cDST)");
     REGISTER_VARIABLE("eclcaldigitExtEnergy(i, j)", getExtECLCalDigitEnergy,
-                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTime(i, j)", getExtECLCalDigitTime,
-                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTimeResolution(i, j)", getExtECLCalDigitTimeResolution,
-                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentTotalEnergy(i, j)", getExtECLCalDigitTwoComponentTotalEnergy,
-                      "[calibration] Returns the TwoComponentTotalEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentTotalEnergy of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentHadronEnergy(i, j)", getExtECLCalDigitTwoComponentHadronEnergy,
-                      "[calibration] Returns the TwoComponentHadronEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentHadronEnergy of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2(i, j)", getExtECLCalDigitTwoComponentChi2,
-                      "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtPhi(i, j)", getExtPhi,
-                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an extrapolated track");
     REGISTER_VARIABLE("eclcaldigitExtTheta(i, j)", getExtTheta,
-                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an extrapolated track");
     REGISTER_VARIABLE("eclcaldigitExtPhiId(i, j)", getExtPhiId,
-                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11)) neighbours for an extrapolated track");
     REGISTER_VARIABLE("eclcaldigitExtThetaId(i, j)", getExtThetaId,
-                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an extrapolated track");
     REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id");
     REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id");
     REGISTER_VARIABLE("eclcaldigitExtCellPhiId", getExtCellPhiId, "[calibration] Returns the ext cell phi id");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours) for an ext track");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5), 7x7 (i=7), 9x9 (i=9) or 11x11 (i=11) neighbours) for an ext track");
 
     REGISTER_VARIABLE("eclcaldigitExtFrontPositionPhiOffset", getExtFrontPositionPhiOffset,
                       "[calibration] Returns the difference in the azimuthal angle (in radians)"
@@ -1596,26 +1610,26 @@ namespace Belle2 {
                       "orientation of the struck crystal.");
 
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentFitType(i, j)", getExtECLCalDigitTwoComponentFitType,
-                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentDiodeEnergy(i, j)", getExtECLCalDigitTwoComponentDiodeEnergy,
-                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonHadron(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonHadron,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PileUpPhoton(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
-                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonDiode(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonDiode,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours for an ext track");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentFitType(i, j)", getECLCalDigitTwoComponentFitType,
-                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergy(i, j)", getECLCalDigitTwoComponentDiodeEnergy,
-                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonHadron(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonHadron,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PileUpPhoton(i, j)", getECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
-                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonDiode(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonDiode,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5), 7x7 (j=7), 9x9 (j=9) or 11x11 (j=11) neighbours");
 
     REGISTER_VARIABLE("eclcaldigitEnergyByEnergyRank(i)", getECLCalDigitEnergyByEnergyRank,
                       "[calibration/eclChargedPIDExpert] Returns the caldigit energy of the i-th highest energy caldigit in the cluster (i>=0)");

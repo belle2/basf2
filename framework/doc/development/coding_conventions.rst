@@ -113,8 +113,8 @@ Names should be precise, colorful and in self-explanatory English:
 
    * template arguments begin with ``A`` followed by a capital letter
 
-   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, and
-     ``c_`` for constants
+   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, ``h_`` or ``m_h``
+     for histogram member variables, and ``c_`` for constants
 
    * *Python*: use all upper case with underscores for constants; always use
      ``self``/``cls`` as first argument of instance/class methods
@@ -416,13 +416,13 @@ In general use
 
 Example::
 
-  if (x == y) {  
-    ...   
-  } else if (x > y) {  
-    ...   
-  } else {  
-    ....   
-  }   
+  if (x == y) {
+    ...
+  } else if (x > y) {
+    ...
+  } else {
+    ....
+  }
 
 *Python*: Follow the `Style Guide for Python Code <http://www.python.org/dev/peps/pep-0008/>`_.
 
@@ -434,8 +434,8 @@ Example::
 In the definition of pointers and references the \* and \& symbols have to be attached to
 the variable type, not the variable name, e.g.::
 
-  int* pIndex;   
-  int& index = *pIndex;   
+  int* pIndex;
+  int& index = *pIndex;
 
 Be aware of the (wrong) C++ convention for definitions of multiple variables in one statement.
 E.g. ``int* a, b;`` will define a pointer a and an int variable (not a pointer) b. It is

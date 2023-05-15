@@ -24,6 +24,10 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dataobjects/EventT0.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+
+
 namespace Belle2 {
   /**
    * Collector module used to create the histograms needed for the
@@ -61,6 +65,7 @@ namespace Belle2 {
     std::string m_svdEventInfo = "SVDEventInfo"; /**< Name of the SVDEventInfo store array used as parameter of the module*/
     StoreObjPtr<SVDEventInfo> m_svdEI; /**< SVDEventInfo store object pointer*/
 
+    DBObjPtr<HardwareClockSettings> m_hwClock;  /**< systems clock*/
 
     /**SVDCluster */
     std::string m_svdClusters = "SVDClustersFromTracks"; /**< Name of the SVDClusters store array used as parameter of the module*/

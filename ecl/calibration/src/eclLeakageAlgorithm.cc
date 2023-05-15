@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <ecl/calibration/eclLeakageAlgorithm.h>
+#include <ecl/calibration/tools.h>
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -216,7 +217,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
 
   //..Energies
-  float generatedE[nLeakReg][nEnergies]; // 3 regions forward barrel backward
+  auto generatedE = create2Dvector<float>(nLeakReg, nEnergies); // 3 regions forward barrel backward
+
   int bin = 2; // bin 1 = nPositions, bin 2 = nEnergies, bin 3 = first energy
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
     B2INFO("Generated energies for ireg = " << ireg);
@@ -230,7 +232,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   B2INFO("No nCrys threshold = " << m_noNCrysThreshold);
 
   //..Energy per thetaID (in MeV, for use in titles etc)
-  int iEnergiesMeV[nEnergies][nThetaID];
+  auto iEnergiesMeV = create2Dvector<int>(nEnergies, nThetaID);
   for (int thID = 0; thID < nThetaID; thID++) {
     int ireg = 0;
     if (thID >= firstBarrelID and thID <= lastBarrelID) {
@@ -247,7 +249,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //..Bins for eFrac histograms (eFrac = uncorrected reconstructed E / E true)
   const double eFracLo = 0.4; // low edge of eFrac histograms
   const double eFracHi = 1.5; // high edge of eFrac histograms
-  int nEfracBins[nEnergies][nThetaID];
+  auto nEfracBins = create2Dvector<int>(nEnergies, nThetaID);
   for (int thID = 0; thID < nThetaID; thID++) {
     B2DEBUG(25, "eFrac nBins for thetaID " << thID);
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -330,7 +332,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Histograms of location error for each energy and thetaID
-  TH1F* locError[nEnergies][nThetaID];
+  auto locError = create2Dvector<TH1F*>(nEnergies, nThetaID);
   TString name;
   TString title;
   for (int thID = 0; thID < nThetaID; thID++) {
@@ -356,7 +358,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const double peakFrac = 0.025; // look for distribution to drop to this fraction of peak value
   const double startOfPed = 10.0001; // cm
 
-  float maxLocCut[nEnergies][nThetaID]; // location cut for each energy and thetaID
+  auto maxLocCut = create2Dvector<float>(nEnergies, nThetaID); // location cut for each energy and thetaID
 
   //..Summary histograms of cut values and fraction of events passing cut
   TH1F* locCutSummary = new TH1F("locCutSummary", "location cut for each thetaID/energy; xBin = thetaID + ie*nTheta", nbinX, 0,
@@ -424,7 +426,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..One histogram of e/eTrue per energy per thetaID.
   //  Used to fix eta in subsequent fits, and to get overall correction for that thetaID
-  TH1F* hELabUncorr[nEnergies][nThetaID];
+  auto hELabUncorr = create2Dvector<TH1F*>(nEnergies, nThetaID);
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -453,8 +455,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Fit each thetaID/energy histogram to get peak (overall correction) and eta (fixed
   //  in subsequent fits to individual locations).
-  float peakUncorr[nEnergies][nThetaID]; // store peak from each fit
-  float etaUncorr[nEnergies][nThetaID]; // store eta from each fit
+  auto peakUncorr = create2Dvector<float>(nEnergies, nThetaID); // store peak from each fit
+  auto etaUncorr  = create2Dvector<float>(nEnergies, nThetaID); // store eta from each fit
+
   std::vector<TString> failedELabUncorr; // names of hists with failed fits
   std::vector<int> statusELabUncorr; // status of failed fits
   int payloadStatus = 0; // Overall status of payload determination
@@ -599,7 +602,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const int nDir = 3;
   const TString dirName[nDir] = {"theta", "phiMech", "phiNoMech"};
 
-  TH1F* eFracPosition[nEnergies][nThetaID][nDir][nPositions]; // the histograms
+  auto eFracPosition  = create4Dvector<TH1F*>(nEnergies, nThetaID, nDir, nPositions); // the histograms
+
+
   std::vector<TString> failedeFracPosition; // names of hists with failed fits
   std::vector<int> statuseFracPosition; // status of failed fits
 
@@ -649,8 +654,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Now fit many many histograms to get the position-dependent corrections
-  float positionCorrection[nEnergies][nThetaID][nDir][nPositions];
-  float positionCorrectionUnc[nEnergies][nThetaID][nDir][nPositions];
+  auto positionCorrection     = create4Dvector<float>(nEnergies, nThetaID, nDir, nPositions);
+  auto positionCorrectionUnc  = create4Dvector<float>(nEnergies, nThetaID, nDir, nPositions);
   int nHistToFit = 0;
 
 
@@ -795,7 +800,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..One histogram of ePos per energy per thetaID.
-  TH1F* hEPos[nEnergies][nThetaID];
+  auto hEPos  = create2Dvector<TH1F*>(nEnergies, nThetaID);
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -832,7 +837,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Fit each thetaID/energy histogram to get eta (fixed for later nCrys fits)
-  float etaEpos[nEnergies][nThetaID]; // store eta from each fit
+  auto etaEpos  = create2Dvector<float>(nEnergies, nThetaID); // store eta from each fit
   std::vector<TString> failedEPos; // names of hists with failed fits
   std::vector<int> statusEPos; // status of failed fits
 
@@ -929,7 +934,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Histograms of ePos
-  TH1F* ePosnCry[nEnergies][nThetaID][maxN + 1]; // +1 to include 0
+  auto ePosnCry = create3Dvector<TH1F*>(nEnergies, nThetaID, maxN + 1); // +1 to include 0
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -966,12 +971,12 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Fit ePos histograms for each value of nCrys. Many of these will not have enough stats
-  float nCrysCorrection[nEnergies][nThetaID][maxN + 1];
-  float nCrysCorrectionUnc[nEnergies][nThetaID][maxN + 1];
+  auto nCrysCorrection   = create3Dvector<float>(nEnergies, nThetaID, maxN + 1);
+  auto nCrysCorrectionUnc = create3Dvector<float>(nEnergies, nThetaID, maxN + 1);
 
   //..Keep track of the peak nCrys for each thetaID/energy. Use this later to fix up
   //  values of nCrys without a successful fit
-  int maxNCry[nEnergies][nThetaID];
+  auto maxNCry = create2Dvector<int>(nEnergies, nThetaID);
 
   //..Keep track of fit status
   TH1F* statusOfePosnCry = new TH1F("statusOfePosnCry",
@@ -1268,7 +1273,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const int nResType = 5;
   const TString resName[nResType] = {"Uncorrected", "Original", "Corrected no nCrys", "Corrected measured", "Corrected true"};
   const TString regName[nLeakReg] = {"forward", "barrel", "backward"};
-  TH1F* energyResolution[nLeakReg][nEnergies][nResType];
+  auto energyResolution = create3Dvector<TH1F*>(nLeakReg, nEnergies, nResType);
 
   //..Base number of bins on a typical thetaID for each region
   int thIDReg[nLeakReg];
@@ -1390,8 +1395,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //..Fit each histogram to find peak, and extract resolution.
 
   //..Store the peak and resolution values for each histogram
-  float peakEnergy[nLeakReg][nEnergies][nResType];
-  float energyRes[nLeakReg][nEnergies][nResType];
+  auto peakEnergy = create3Dvector<float>(nLeakReg, nEnergies, nResType);
+  auto energyRes  = create3Dvector<float>(nLeakReg, nEnergies, nResType);
 
   //..Loop over the histograms to be fit
   for (int ireg = 0; ireg < nLeakReg; ireg++) {

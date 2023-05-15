@@ -3,27 +3,32 @@
 
 /* Avoid having a too large admonition box, because the last child
    adds bottom margin in addition to its mother */
-.rst-content .admonition *:last-child {
+.admonition *:last-child {
     margin-bottom: 0 !important;
 }
 
+/* Disable rounded borders for all boxes, because it doesn't look nice when
+ * we stack them on top of each other */
+.admonition {
+    border-radius: 0px;
+}
 
 /* Getting things to toggle, e.g. for solution boxes */
 /* ------------------------------------------------- */
 
-.rst-content .toggle {
+.toggle {
     padding: 12px;
     line-height: 24px;
     margin-bottom: 24px;
 }
 
-.rst-content .toggle .admonition-title {
+.toggle .admonition-title {
     display: block;
     clear: both;
     cursor: pointer;
 }
 
-.rst-content .toggle .admonition-title {
+.toggle .admonition-title {
     display: block;
     clear: both;
     /* Avoid that there is a bit of the box that will be expanded
@@ -31,17 +36,17 @@
     margin-bottom: -12px;
 }
 
-.rst-content .toggle .admonition-title + * {
+.toggle .admonition-title + * {
     /* Since we set the admonition-title to have -12px margin, we need to
     balance this for its first sibling here. */
     margin-top: 24px;
 }
 
-.rst-content .toggle .admonition-title:after {
+.toggle .admonition-title:after {
     content: " ▼";
 }
 
-.rst-content .toggle .admonition-title.open:after {
+.toggle .admonition-title.open:after {
     content: " ▶";
 }
 
@@ -60,66 +65,61 @@
 /* Styling specific admonitions */
 /* ---------------------------- */
 
-.rst-content .xhint .admonition-title, .rst-content .solution .admonition-title{
-    background: #f9c9da;
+.xhint .admonition-title, .solution .admonition-title{
+    background: #ffecf3;
     color: inherit;
     font-weight: inherit;
 }
 
 
-.rst-content .xhint .admonition-title:before {
+.xhint .admonition-title:before {
     content: "  ";
     width: 15px;
+    color: #F085B2;
 }
 
-.rst-content .solution .admonition-title:before {
+.solution .admonition-title:before {
     content: "  ";
     width: 15px;
+    color: #F085B2;
 }
 
-.rst-content .exercise, .rst-content .solution, .rst-content .xhint{
+
+.exercise, .solution, .xhint{
+    border-left-color: #F085B2;
+}
+
+.exercise .admonition-title{
     background: #ffecf3;
 }
 
-.rst-content .exercise .admonition-title{
-    background: #F085B2;
-}
 
-
-.rst-content .key-points .admonition-title{
-    background: #9c9ff4;
-}
-
-.rst-content .key-points {
+.key-points .admonition-title{
     background: #f7f0ff;
 }
 
-.rst-content .overview .admonition-title, .rst-content .overview .sidebar-title {
-    background: #9c9ff4;
-    color: white;
+.key-points {
+    border-left-color: #9c9ff4;
 }
 
-.rst-content .overview {
-    background: #f7f0ff;
-}
-
-.rst-content .overview p, .rst-content .overview ul, .rst-content .overview blockquote {
+.overview p, .overview ul, .overview blockquote {
     margin-bottom: 5px;
 }
 
 
-.rst-content .overview .admonition-title:before, .rst-content .overview .sidebar-title:before {
+.overview .admonition-title:before, .overview .sidebar-title:before {
     content: "  ";
     font-family: FontAwesome;
     width: 15px;
 }
 
-.rst-content .exercise .admonition-title:before {
+.exercise .admonition-title:before {
     content: "  ";
     width: 15px;
+    color: #F085B2;
 }
 
-.rst-content .key-points .admonition-title:before {
+.key-points .admonition-title:before {
     content: " ";
     width: 15px;
 }
@@ -128,15 +128,11 @@
 /* -------------- */
 
 .stacked {
-    margin-bottom: 0px;
+    margin-bottom: -24px;
 }
 
-.rst-content .stacked {
-    margin-bottom: 0px;
-}
-
-.rst-content .stacked .admonition {
-    margin-bottom: 0px;
+.stacked .admonition {
+    margin-bottom: -24px;
 }
 
 /* Textbox that looks like the ROOT TEve GUI */

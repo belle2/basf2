@@ -2,7 +2,7 @@ Belle2 Physics List
 ===================
 
 .. _Geant4-provided reference physics lists : https://geant4.web.cern.ch/node/155
-.. _Belle2PhysicsList : https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/physicslist/src/Belle2PhysicsList.cc
+.. _Belle2PhysicsList : https://gitlab.desy.de/belle2/software/basf2/-/tree/main/simulation/physicslist/src/Belle2PhysicsList.cc
 .. _geant4/source/physics_lists/constructors : https://geant4.kek.jp/lxr/source/physics_lists/constructors/
 
 `Belle2PhysicsList`_ is a Geant4 modular physics list designed to fit the requirements of
@@ -53,7 +53,7 @@ this small loss of precision is acceptable for Belle2.  If not, the physics list
 provides the option to switch back to G4EmStandardPhysics.
 
 An option also exists to add optical photon physics.  By default, this is not added in
-order to save CPU time.  
+order to save CPU time.
 
 Decay physics
 -------------
@@ -72,12 +72,12 @@ Hadronic physics
 
 The choice of hadronic physics in *Belle2PhysicsList* was tuned to match the Belle2 energy
 range.  In most of the Geant4 reference physics lists, including *FTFP_BERT*, this choice
-was governed more by high energy physics data from test beam experiments.  
+was governed more by high energy physics data from test beam experiments.
 
 The implementation of inelastic hadronic collisions of hadrons with nuclei is quite
 detailed because many different models and sub-models are required to cover the entire
 energy range and the set of particles involved.  For *Belle2PhysicsList*, and most of the
-Geant4 reference physics lists, these processes are usually implemented by two main 
+Geant4 reference physics lists, these processes are usually implemented by two main
 hadronic models, the Bertini cascade and the FTFP QCD string model.  QCD string models
 are excellent for high energies where the incident hadron has more than a few GeV of
 kinetic energy, sufficient to form a QCD string.  Below such energies, QCD strings do not
@@ -132,7 +132,7 @@ Secondary production thresholds
 
 This physics list allows the Geant4 secondary production thresholds to be set either
 globally or separately for each detector envelope (cuts per region).  The current global
-default value is 0.07 cm.  Using the steering script, a different threshold may be set 
+default value is 0.07 cm.  Using the steering script, a different threshold may be set
 for each of the following detectors:
 
 - PXD   0.01 cm
@@ -145,19 +145,19 @@ for each of the following detectors:
 The values shown here are suggestions and may be changed in order to optimize the simulation.
 See below for how to set these for a run.
 
-Using this physics list 
+Using this physics list
 -----------------------
 
 *Belle2PhysicsList* is currently invoked in **FullSimModule**.  It can be chosen by setting
-``PhysicsList="Belle2"`` 
+``PhysicsList="Belle2"``
 in ``main.add_module`` for ``FullSim``.
 Secondary production thresholds may also be set in ``main.add_module``.
 If no cut values are specified in this file, the default value of 0.07 cm is
-used everywhere in the Belle2 geometry.  This global default can be changed by setting 
-the parameter ``ProductionCut``.  Each detector envelope can have a cut value distinct from 
+used everywhere in the Belle2 geometry.  This global default can be changed by setting
+the parameter ``ProductionCut``.  Each detector envelope can have a cut value distinct from
 the global value by setting the parameters ``PXDProductionCut``, ``SVDProductionCut``, etc.
-Cut values which are not explicitly set for a given detetcor envelope assume the value 
-set by the ``ProductionCut`` parameter. 
+Cut values which are not explicitly set for a given detetcor envelope assume the value
+set by the ``ProductionCut`` parameter.
 
 Example useage::
 
@@ -173,7 +173,7 @@ lines are commented out.
 
 .. note::
     
-  Above example is part of test script, `Belle2PhyslistTestBrems.py <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/examples/Belle2PhyslistTestBrems.py>`_, which is identical to `BremsstralungPhotons.py <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/examples/BremsstralungPhotons.py>`_,:: 
+  Above example is part of test script, `Belle2PhyslistTestBrems.py <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/simulation/examples/Belle2PhyslistTestBrems.py>`_, which is identical to `BremsstralungPhotons.py <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/simulation/examples/BremsstralungPhotons.py>`_,::
 
    main.add_module("FullSim", StoreBremsstrahlungPhotons=True, BremsstrahlungPhotonsEnergyCut=10.0)
 

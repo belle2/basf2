@@ -6,10 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPAligner/TOPAlignerModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
+
+// Basf2 headers.
 #include <framework/logging/Logger.h>
 
 // root

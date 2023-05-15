@@ -27,10 +27,10 @@ REG_MODULE(DQMHistAnalysis);
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisModule::HistList DQMHistAnalysisModule::g_hist;
-DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
-DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::g_delta;
-DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::g_canvasup;
+DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
+DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
+DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
+DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
 
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
@@ -47,19 +47,20 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   } else {
     fullname = histname;
   }
-  g_hist[fullname].update(h);
+  s_histList[fullname].update(h);
 
-  if (g_hist[fullname].isUpdated()) {
+  if (s_histList[fullname].isUpdated()) {
     // only if histogram changed, check if delta histogram update needed
-    auto it = g_delta.find(fullname);
-    if (it != g_delta.end()) {
+    auto it = s_deltaList.find(fullname);
+    if (it != s_deltaList.end()) {
       B2DEBUG(20, "Found Delta" << fullname);
       it->second->update(h); // update
     }
   }
 }
 
-void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a)
+void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
+                                        unsigned int a)
 {
   std::string fullname;
   if (dirname.size() > 0) {
@@ -67,7 +68,18 @@ void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::s
   } else {
     fullname = histname;
   }
-  g_delta[fullname] = new HistDelta(t, p, a);
+  s_deltaList[fullname] = new HistDelta(t, p, a);
+}
+
+bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::string& histname)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  return s_deltaList.find(fullname) != s_deltaList.end(); // contains() if we switch to C++20
 }
 
 TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool onlyIfUpdated)
@@ -83,26 +95,27 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::stri
 
 TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool onlyIfUpdated)
 {
-  auto it = g_delta.find(fullname);
-  if (it != g_delta.end()) {
+  auto it = s_deltaList.find(fullname);
+  if (it != s_deltaList.end()) {
     return it->second->getDelta(n, onlyIfUpdated);
   }
+  B2WARNING("Delta hist " << fullname << " not found");
   return nullptr;
 }
 
 MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
 {
-  if (g_monObj.find(objName) != g_monObj.end()) {
-    if (g_monObj[objName]) {
-      return g_monObj[objName];
+  if (s_monObjList.find(objName) != s_monObjList.end()) {
+    if (s_monObjList[objName]) {
+      return s_monObjList[objName];
     } else {
       B2WARNING("MonitoringObject " << objName << " listed as being in memfile but points to nowhere. New Object will be made.");
-      g_monObj.erase(objName);
+      s_monObjList.erase(objName);
     }
   }
 
   MonitoringObject* obj = new MonitoringObject(objName);
-  g_monObj.insert(MonObjList::value_type(objName, obj));
+  s_monObjList.insert(MonObjList::value_type(objName, obj));
   return obj;
 }
 
@@ -122,10 +135,10 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
 
 TH1* DQMHistAnalysisModule::findHist(const std::string& histname, bool was_updated)
 {
-  if (g_hist.find(histname) != g_hist.end()) {
-    if (was_updated && !g_hist[histname].isUpdated()) return nullptr;
-    if (g_hist[histname].getHist()) {
-      return g_hist[histname].getHist();
+  if (s_histList.find(histname) != s_histList.end()) {
+    if (was_updated && !s_histList[histname].isUpdated()) return nullptr;
+    if (s_histList[histname].getHist()) {
+      return s_histList[histname].getHist();
     } else {
       B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
     }
@@ -146,6 +159,10 @@ TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
 {
   // parse the dir+histo name and create the corresponding canvas name
   auto s = StringSplit(histo_name, '/');
+  if (s.size() != 2) {
+    B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
+    return nullptr;
+  }
   auto dirname = s.at(0);
   auto hname = s.at(1);
   std::string canvas_name = dirname + "/c_" + hname;
@@ -187,16 +204,25 @@ TH1* DQMHistAnalysisModule::findHistInFile(TFile* file, const std::string& histn
 
 MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string& objName)
 {
-  if (g_monObj.find(objName) != g_monObj.end()) {
-    if (g_monObj[objName]) {
+  if (s_monObjList.find(objName) != s_monObjList.end()) {
+    if (s_monObjList[objName]) {
       //Want to search elsewhere if null-pointer saved in map
-      return g_monObj[objName];
+      return s_monObjList[objName];
     } else {
       B2ERROR("MonitoringObject " << objName << " listed as being in memfile but points to nowhere.");
     }
   }
   B2INFO("MonitoringObject " << objName << " not in memfile.");
   return NULL;
+}
+
+double DQMHistAnalysisModule::getSigma68(TH1* h) const
+{
+  double probs[2] = {0.16, 1 - 0.16};
+  double quant[2] = {0, 0};
+  h->GetQuantiles(2, quant, probs);
+  const double sigma68 = (-quant[0] + quant[1]) / 2;
+  return sigma68;
 }
 
 std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& in, const char delim)
@@ -208,23 +234,48 @@ std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& 
 
 void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 {
-  for (auto& h : g_hist) {
+  for (auto& h : s_histList) {
     // attention, we need the reference, otherwise we work on a copy
     h.second.resetBeforeEvent();
   }
-  for (auto d : g_delta) {
+  for (auto d : s_deltaList) {
     d.second->setNotUpdated();
   }
 
-  g_canvasup.clear();
+  s_canvasUpdatedList.clear();
 }
 
 void DQMHistAnalysisModule::clearHistList(void)
 {
-  g_hist.clear();
+  s_histList.clear();
 }
 
-void  DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
 {
-  g_canvasup[name] = updated;
+  s_canvasUpdatedList[name] = updated;
 }
+
+void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
+{
+  s_runType = "";
+  for (size_t i = 0; i < hs.size(); i++) {
+    if (hs[i]->GetName() == std::string("DQMInfo/rtype")) {
+      s_runType = hs[i]->GetTitle();
+      return;
+    }
+  }
+  B2ERROR("ExtractRunType: Histogram \"DQMInfo/rtype\" missing");
+}
+
+void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
+{
+  s_eventProcessed = 0;
+  for (size_t i = 0; i < hs.size(); i++) {
+    if (hs[i]->GetName() == std::string("DAQ/Nevent")) {
+      s_eventProcessed = hs[i]->GetEntries();
+      return;
+    }
+  }
+  B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
+}
+

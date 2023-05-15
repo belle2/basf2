@@ -97,8 +97,8 @@ void PXDROIFinderModule::beginRun()
     m_maxWidthV = m_ROICalculationParameters->getMaxWidthV();
   } else if (m_ROICalculationParameters.isValid() and m_overrideDBROICalculation) {
     // Use ROI calculation parameters from module parameters.
-    B2DEBUG(29, "ROI calculation parameters from DB are valid, but they are overridden by the module parameters.\n"
-            "  --> Using module parameters instead of parameters from DB.");
+    B2WARNING("ROI calculation parameters from DB are valid, but they are overridden by the module parameters.\n"
+              "  --> Using module parameters instead of parameters from DB.");
   }
 
   B2DEBUG(29, "||| PXDROIFinder Parameters:");

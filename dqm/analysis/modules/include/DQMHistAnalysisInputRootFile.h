@@ -50,16 +50,6 @@ namespace Belle2 {
      */
     void event() override final;
 
-    /**
-     * End-of-run action.
-     */
-    void endRun() override final;
-
-    /**
-     * Termination action.
-     */
-    void terminate() override final;
-
   private:
     /**
      * Pattern match for histogram name
@@ -113,9 +103,6 @@ namespace Belle2 {
 
     /** Test mode for null histograms */
     bool m_nullHistoMode = false;
-
-    /** Whether to automatically generate canvases for histograms */
-    bool m_autocanvas = true;
   };
 } // end namespace Belle2
 

@@ -739,3 +739,36 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         )
 
         return [f"beam:{skim_str}"]
+
+
+@fancy_skim_header
+class AA2uuuu(BaseSkim):
+    """
+    Searching the dark sector through U(1) kinetic mixing.
+
+    Reconstructed 2 muons to a dark photon.
+    """
+    __description__ = ":math:`ee\\to A^{\\prime}A^{\\prime}\\nu_{D}\\nu_{D}\\to \\mu\\mu\\mu\\mu`"
+    __category__ = "physics, dark sector"
+    __authors__ = ["Chanyoung LEE"]
+    __contact__ = __liaison__
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        muon_cuts = """[0.8 < muonID_noSVD]
+        and [inKLMAcceptance == 1]
+        and [inCDCAcceptance == 1] and [4 < nCDCHits]"""
+
+        track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
+
+        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts}) <= 6", path=path)
+
+        ma.cutAndCopyList("mu+:accepted", "mu+:all", muon_cuts, path=path)
+        ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted mu-:accepted", cut="", path=path)
+        ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
+
+        return ["Upsilon(4S):rec"]

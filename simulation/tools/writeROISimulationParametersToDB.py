@@ -11,25 +11,25 @@
 from ROOT import Belle2
 
 
-def writeROISimulationParametersToDB(iovList=(0, 0, 0, 0),
+def writeROISimulationParametersToDB(IoV=(0, 0, 0, 0),
                                      enableROI: bool = True,
                                      disableROIforEveryNth: int = -1) -> None:
     """
     run this script to create db file storing the payload information of the ROISimulationParameters
     see `simulation/dbobjects/include/ROISimulationParameters.h` for definition of the parameters
 
-    :param iovList: List of IoVs for the parameters
+    :param IoV: IoV for the parameters
     :param enableROI: Enable ROI finding
     :param disableROIforEveryNth: Disable ROI selection for every n-th event. -1 means ROI selection is always used if
         the parameter enableROI is True.
     """
 
     # just a small sanity check (expLow, runLow, expHigh, runHigh)
-    if len(iovList) != 4:
+    if len(IoV) != 4:
         return
 
     # create the iov
-    iov = Belle2.IntervalOfValidity(*iovList)
+    b2IoV = Belle2.IntervalOfValidity(*IoV)
     # and the payload object
     dbobj = Belle2.ROISimulationParameters()
     # then set the parameters it contains
@@ -37,9 +37,9 @@ def writeROISimulationParametersToDB(iovList=(0, 0, 0, 0),
     dbobj.setDisableROIforEveryNth(disableROIforEveryNth)
 
     # write db object to 'localdb/'
-    Belle2.Database.Instance().storeData("ROISimulationParameters", dbobj, iov)
+    Belle2.Database.Instance().storeData("ROISimulationParameters", dbobj, b2IoV)
 
-    print(f"Successfully wrote payload ROISimulationParameters with {iovList=} and \n\
+    print(f"Successfully wrote payload ROISimulationParameters with {IoV=} and \n\
            parameters {enableROI=}, {disableROIforEveryNth=}")
 
 

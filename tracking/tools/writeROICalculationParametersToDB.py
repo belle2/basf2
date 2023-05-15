@@ -11,7 +11,7 @@
 from ROOT import Belle2
 
 
-def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
+def writeROICalculationParametersToDB(IoV=(0, 0, 0, 0),
                                       toleranceZ: float = 0.5,
                                       tolerancePhi: float = 0.15,
                                       sigmaSystU: float = 0.02,
@@ -24,7 +24,7 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
     run this script to create db file storing the payload information of the ROICalculationParameters
     see `tracking/dbobjects/include/ROICalculationParameters.h` for definition of the parameters
 
-    :param iovList: List of IoVs for the parameters
+    :param IoV: IoV for the parameters
     :param toleranceZ: Tolerance for finding sensor in Z coordinate (cm)
     :param m_tolerancePhi: Tolerance for finding sensor in phi coordinate (radians)
     :param sigmaSystU: Fixed width to add in quadrature to the extrapolation error and obtain the ROI U width
@@ -36,7 +36,7 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
     """
 
     # just a small sanity check (expLow, runLow, expHigh, runHigh)
-    if len(iovList) != 4:
+    if len(IoV) != 4:
         return
 
     # make sure the defined parameters make sense.
@@ -55,7 +55,7 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
         return
 
     # create the iov
-    iov = Belle2.IntervalOfValidity(*iovList)
+    b2IoV = Belle2.IntervalOfValidity(*IoV)
     # and the payload object
     dbobj = Belle2.ROICalculationParameters()
     # then set the parameters it contains
@@ -69,9 +69,9 @@ def writeROICalculationParametersToDB(iovList=(0, 0, 0, 0),
     dbobj.setMaxWidthV(maxWidthV)
 
     # write db object to 'localdb/'
-    Belle2.Database.Instance().storeData("ROICalculationParameters", dbobj, iov)
+    Belle2.Database.Instance().storeData("ROICalculationParameters", dbobj, b2IoV)
 
-    print(f"Successfully wrote payload ROI parameters with {iovList=} and parameters\n\
+    print(f"Successfully wrote payload ROI parameters with {IoV=} and parameters\n\
           {toleranceZ=}, {tolerancePhi=}, {sigmaSystU=}, {sigmaSystV=},\n\
           {numSigmaTotU=}, {numSigmaTotV=}, {maxWidthU=}, {maxWidthV=}")
 

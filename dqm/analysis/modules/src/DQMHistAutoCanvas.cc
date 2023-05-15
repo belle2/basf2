@@ -37,7 +37,8 @@ DQMHistAutoCanvasModule::DQMHistAutoCanvasModule()
 
 void DQMHistAutoCanvasModule::event()
 {
-  // The following code may be better placed in its own module ...
+  // There may be a more clever way instead of doing the iteration my myself here
+  // This only works because the getHistList is not const anymore
   for (auto& it : getHistList()) {
     bool give_canvas = false;
     TString histoname = it.first;
@@ -95,6 +96,9 @@ void DQMHistAutoCanvasModule::event()
       TCanvas* c = m_cs[name]; // access already created canvas
       B2DEBUG(1, "DQMHistAnalysisInput: new canvas " << c->GetName());
       c->cd();
+
+      // not so nice as we actually touch the histogram by iterator
+      // we could use findHist function, but then we do another lookup within iteration
       auto hist = it.second.getHist();
       if (hist) {
         if (hist->GetDimension() == 1) {
@@ -108,7 +112,9 @@ void DQMHistAutoCanvasModule::event()
       }
 
       // set Canvas "name" update flag if histo was updated
-      UpdateCanvas(name, findHist(histoname.Data()) != nullptr);
+      // UpdateCanvas(name, findHist(histoname.Data()) != nullptr);
+      // we already have the HistObject, so we can directly get it
+      UpdateCanvas(name, it.second.isUpdated());
 
       // Mark Canvas as repaint needed, but is this needed?
       c->Update();

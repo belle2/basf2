@@ -68,9 +68,6 @@ namespace Belle2 {
     /** Global EventMetaData for run number and event number. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    /** The map between canvas name and canvas object. */
-    std::map<std::string, TCanvas*> m_cs;
-
     /** List of histogram name patterns to process. */
     std::vector<std::string> m_histograms;
 

@@ -83,5 +83,7 @@ namespace Belle2 {
 
     DBObjPtr<ROICalculationParameters> m_ROICalculationParameters;  /**< Configuration parameters for ROIs */
 
+    bool m_overrideDBROICalculation = false; /**< Override DB parameters for ROI calculation for debugging and testing. */
+
   };
 }

@@ -43,6 +43,8 @@ PXDROIFinderModule::PXDROIFinderModule() : Module(), m_ROIinfo()
   addParam("numSigmaTotV", m_numSigmaTotV, " number of sigmas (total) in the V local coordinate ", double(10));
   addParam("maxWidthU", m_maxWidthU, " upper limit on width of the ROI in the U local coordinate (cm) ", double(0.5));
   addParam("maxWidthV", m_maxWidthV, " upper limit on width of the ROI in the V local coordinate (cm) ", double(0.5));
+  addParam("overrideDBROICalculation", m_overrideDBROICalculation, "Override the parameters from DB for testing or debugging.",
+           false);
 }
 
 

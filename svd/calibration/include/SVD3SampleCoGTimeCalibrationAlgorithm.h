@@ -83,10 +83,14 @@ namespace Belle2 {
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
 
     // straight lines used to reject off-time clusters from 2D-distribution
-    bool m_applyLinearCutsToRemoveBkg = false; /**< */
-    float m_interceptUpperLine = -94.0; /**< */
-    float m_angularCoefficientUpperLine = 1.264; /**< */
-    float m_interceptLowerLine = -134.0; /**< */
-    float m_angularCoefficientLowerLine = 1.264; /**< */
+    bool m_applyLinearCutsToRemoveBkg = false; /**< if true turns on the selection to remove background clusters from CoG3 calibration*/
+    float m_interceptUpperLine =
+      -94.0; /**< Intercept of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+    float m_angularCoefficientUpperLine =
+      1.264; /**< Angular coefficient of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+    float m_interceptLowerLine =
+      -134.0; /**< Intercept of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+    float m_angularCoefficientLowerLine =
+      1.264; /**< Angulat coefficienct of one of the two lines that define the signal region used in the CoG3 calibration (to remove bakground clusters) */
   };
 } // namespace Belle2

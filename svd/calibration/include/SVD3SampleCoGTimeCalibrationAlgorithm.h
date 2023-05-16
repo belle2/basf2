@@ -37,6 +37,7 @@ namespace Belle2 {
     /** Get the minimum entries required in the histograms */
     int getMinEntries() {return m_minEntries;}
 
+    /** Set the parameters of the two-line-based selection to remove background clusters from CoG3 calibration */
     void setTwoLineSelectionParameters(bool linearCutsOnCoG3, float interceptUpperLine, float angularCoefficientUpperLine,
                                        float interceptLowerLine,
                                        float angularCoefficientLowerLine)
@@ -48,6 +49,7 @@ namespace Belle2 {
       m_angularCoefficientLowerLine =  angularCoefficientLowerLine;
     }
 
+    /** Get the parameters of the two-line-based selection to remove background clusters from CoG3 calibration */
     std::vector<float> getTwoLineSelectionParameters()
     {
       std::vector<float> twoLineSelectionParameters;

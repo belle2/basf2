@@ -245,16 +245,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   // Get the number of LMs in this CR
   const int nLocalMaximums = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName()).size();
 
-  B2DEBUG(175, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
+  B2DEBUG(170, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
 
   // Three cases:
   // 1) There is no local maximum (most likely in presence of high background) or there are too many:
-  //    Make one photon around the highest largest energy deposition in this CR.
+  //    Only use the m_maxSplits photons highest energy LM to make clusters.
   // 2) There is exactly one local maximum, this is the easiest (and most likely for true photons) case.
   // 3) There are more than one, typically two or three, local maxima and we have to share energy between them.
 
   // ---------------------------------------------------------------------
-  if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
+  // if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
+  if (nLocalMaximums == 1) {
 
     // Create a shower.
     const auto aECLShower = m_eclShowers.appendNew();
@@ -342,7 +343,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
       showerEnergy = getEnergySum(weighteddigits, nOptimal);
-      B2DEBUG(150, "Shower Energy (1): " << showerEnergy);
+      B2DEBUG(175, "Shower Energy (1): " << showerEnergy);
 
     } else {
       showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
@@ -378,7 +379,25 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
   } // end case with one LM
-  else { // this is the really interesing part where showers are split. this alogorithm is based on BaBar code.
+  else { // This is the really interesting part where showers are split. This algorithm is inspired by BaBar code.
+
+    // check if we have too many local maximums
+    // if yes: increase energy threshold for local maxima or limit to user set maximum
+
+    // create a vector with all local maximums and its crystal energies
+    std::vector<std::pair<int, double>> alllocalmaximus;
+    for (auto& aLocalMaximum :  aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
+      const int cellid = aLocalMaximum.getCellId();
+      const int pos = m_StoreArrPosition[cellid];
+      const double digitenergy = m_eclCalDigits[pos]->getEnergy();
+      alllocalmaximus.push_back(std::pair<int, double>(cellid, digitenergy));
+    };
+
+    // sort this vector in descending order and keep only up to m_maxSplits entries
+    std::sort(alllocalmaximus.begin(), alllocalmaximus.end(), [](const std::pair<int, double>& x, const std::pair<int, double>& y) {
+      return x.second > y.second;
+    });
+    alllocalmaximus.resize(m_maxSplits);
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
@@ -394,6 +413,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
 
       int cellid = aLocalMaximum.getCellId();
+
+      //check if that local maximum is in the list of alllocalmaximus to use
+      // auto it = std::ranges::find(alllocalmaximus, cellid, &std::pair<int, double>::first);
+      auto it = std::find_if(alllocalmaximus.begin(), alllocalmaximus.end(), [&](const auto & pair) { return pair.first == cellid; });
+      if (it == alllocalmaximus.end()) {
+        B2DEBUG(170, "   skipping local maximum with cellid=" << cellid << " E=" << m_eclCalDigits[m_StoreArrPosition[cellid]]->getEnergy();
+               );
+        continue;
+      } else {
+        B2DEBUG(170, "keeping local maximum with cellid=" << cellid << " E=" << m_eclCalDigits[m_StoreArrPosition[cellid]]->getEnergy(););
+      }
 
       // Get the position of this crystal and fill it in two maps.
       B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);
@@ -753,7 +783,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);
-        B2DEBUG(150, "Shower Energy (2): " << showerEnergy);
+        B2DEBUG(175, "Shower Energy (2): " << showerEnergy);
 
       } else {
         showerEnergy = Belle2::ECL::computeEnergySum(newdigits, newweights);
@@ -846,10 +876,10 @@ double ECLSplitterN1Module::getEnergySum(std::vector < std::pair<double, double>
   if (weighteddigits.size() < n) min = weighteddigits.size();
 
   for (unsigned int i = 0; i < min; ++i) {
-    B2DEBUG(150, "getEnergySum: " << weighteddigits.at(i).first << " " << weighteddigits.at(i).second);
+    B2DEBUG(175, "getEnergySum: " << weighteddigits.at(i).first << " " << weighteddigits.at(i).second);
     energysum += (weighteddigits.at(i).first * weighteddigits.at(i).second);
   }
-  B2DEBUG(150, "getEnergySum: energysum=" << energysum);
+  B2DEBUG(175, "getEnergySum: energysum=" << energysum);
 
   return energysum;
 }

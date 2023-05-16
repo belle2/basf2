@@ -258,5 +258,20 @@
         else if(onfile.m_hypothesisId == 6) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
         else m_hypotheses = 0;}"
 
+#pragma read sourceClass="Belle2::V0" version="[-3]" \
+  source="" \
+  targetClass="Belle2::V0" target="m_fittedVertexX" \
+  code="{m_fittedVertexX = 0;}"
+
+#pragma read sourceClass="Belle2::V0" version="[-3]" \
+  source="" \
+  targetClass="Belle2::V0" target="m_fittedVertexY" \
+  code="{m_fittedVertexY = 0;}"
+
+#pragma read sourceClass="Belle2::V0" version="[-3]" \
+  source="" \
+  targetClass="Belle2::V0" target="m_fittedVertexZ" \
+  code="{m_fittedVertexZ = 0;}"
+
 
 #endif

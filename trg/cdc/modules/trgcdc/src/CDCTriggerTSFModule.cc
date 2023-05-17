@@ -114,14 +114,13 @@ CDCTriggerTSFModule::initialize()
   if (m_makeTrueLRTable) {
     StoreArray<CDCSimHit> simhits;
     simhits.isRequired();
-    innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
-    outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
+    innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
+    outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
   if (m_makeRecoLRTable) {
     m_recoTracks.isRequired("RecoTracks");
-    m_cdcHits.isRequired();
-    innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
-    outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
+    innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
+    outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
   // register relations
   StoreArray<MCParticle> mcparticles;
@@ -488,6 +487,7 @@ CDCTriggerTSFModule::event()
                                   s.priorityTime(),
                                   s.fastestTime(),
                                   s.foundTime());
+        unsigned short adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];
@@ -496,6 +496,7 @@ CDCTriggerTSFModule::event()
             double weight = (wire == &(s.priority())) ? 2. : 1.; // not sure if this is needed..
             if (weight == 2. || m_relateAllHits) {
               tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);
+              adcSum += m_cdcHits[wire->hit()->iCDCHit()]->getADCCount();
             }
           }
         }
@@ -511,17 +512,25 @@ CDCTriggerTSFModule::event()
             if (isl == 0) {
               B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
               innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+              innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              innerTrueLRTable[s.lutPattern()][4] += adcSum;
             } else {
               outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+              outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              outerTrueLRTable[s.lutPattern()][4] += adcSum;
               B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
             }
           } else {
             if (isl == 0) {
               B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
               innerTrueLRTable[s.lutPattern()][2] += 1;
+              innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              innerTrueLRTable[s.lutPattern()][4] += adcSum;
             }  else {
               B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
               outerTrueLRTable[s.lutPattern()][2] += 1;
+              outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              outerTrueLRTable[s.lutPattern()][4] += adcSum;
             }
           }
         }
@@ -549,10 +558,10 @@ CDCTriggerTSFModule::event()
 //std::cout << "now looping over cdchits... " << iHit << "/" << cdcHits.size() << std::endl;
               if (tsHit->getID() == cdcHits[iHit]->getID()) {
                 // check, wether recotrack is already related to ts, skip in this case.
-                // this is necessary because sometimes two wires are related to the same ts
+                // this is necessary because sometimes two wires are related to the same ts // dont get it, should be uneccessary
                 if (related == false) related = true;
                 else continue;
-
+//              std::cout << "ts " << tsHit->getID() << " :  creating relation to recotrack " << ireco;
                 //              std::cout << tsHit->getID() << " " << cdcHits[iHit]->getID() << " " << iHit << " matching id of priohit and current cdchit, creating relation... " << std::endl;
                 recoTrack->addRelationTo(tsHit);
                 tsHit->addRelationTo(recoTrack);
@@ -561,31 +570,40 @@ CDCTriggerTSFModule::event()
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
                   innerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+                  innerRecoLRTable[s.lutPattern()][4] += adcSum;
                   B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
                           "), hit: " << iHit);
                 } else {
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
                   outerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+                  outerRecoLRTable[s.lutPattern()][4] += adcSum;
                   B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
                           "), hit: " << iHit);
                 }
+//std::cout << " , lrflag: " << lrflag << ", 0=left, 1=right";
                 //break;
               }
             }
-            if (lrflag == 2) {
-
-              if (isl == 0) {
-                B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")");
-                innerRecoLRTable[s.lutPattern()][2] += 1;
-              } else {
-                B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")");
-                outerRecoLRTable[s.lutPattern()][2] += 1;
-
-              }
-            }
-
           }
+          if (lrflag == 2) {
+            if (isl == 0) {
+              B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern());
+              innerRecoLRTable[s.lutPattern()][2] += 1;
+              innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              innerRecoLRTable[s.lutPattern()][4] += adcSum;
+            } else {
+              B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern());
+              outerRecoLRTable[s.lutPattern()][2] += 1;
+              outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              outerRecoLRTable[s.lutPattern()][4] += adcSum;
+
+            }
+            //std::cout << " , lrflag: " << lrflag << ", 0=left, 1=right, 2=bg";
+          }
+          //std::cout << std::endl;
         }
       }
     }

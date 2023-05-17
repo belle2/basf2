@@ -111,7 +111,6 @@ def create_collector(name="SVDTimeCalibrationCollector",
 def create_validation_collector(name="SVDTimeValidationCollector",
                                 clusters="SVDClusters",
                                 clusters_onTracks="SVDClustersOnTracks",
-                                event_info="SVDEventInfo",
                                 event_t0="EventT0",
                                 granularity="run"):
     """
@@ -125,7 +124,6 @@ def create_validation_collector(name="SVDTimeValidationCollector",
     collector.set_name(name)
     collector.param("SVDClustersName", clusters)
     collector.param("SVDClustersOnTracksName", clusters_onTracks)
-    collector.param("SVDEventInfoName", event_info)
     collector.param("EventT0Name", event_t0)
     collector.param("granularity", granularity)
 
@@ -489,7 +487,6 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeValidationCollector{cog6_suffix}",
         clusters=f"SVDClusters{cog6_suffix}",
         clusters_onTracks=f"SVDClusters{cog6_suffix}_onTracks",
-        event_info=eventInfo,
         event_t0="EventT0")
 
     val_algo_cog6 = create_validation_algorithm(
@@ -500,7 +497,6 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeValidationCollector{cog3_suffix}",
         clusters=f"SVDClusters{cog3_suffix}",
         clusters_onTracks=f"SVDClusters{cog3_suffix}_onTracks",
-        event_info=eventInfo,
         event_t0="EventT0")
 
     val_algo_cog3 = create_validation_algorithm(
@@ -511,7 +507,6 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeValidationCollector{els3_suffix}",
         clusters=f"SVDClusters{els3_suffix}",
         clusters_onTracks=f"SVDClusters{els3_suffix}_onTracks",
-        event_info=eventInfo,
         event_t0="EventT0")
 
     val_algo_els3 = create_validation_algorithm(

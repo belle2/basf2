@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <analysis/modules/NeutralHadronMatcher/NeutralHadronMatcherModule.h>
 #include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/core/Environment.h>
@@ -18,34 +26,43 @@ NeutralHadronMatcherModule::NeutralHadronMatcherModule() : Module()
   addParam("particleLists", m_ParticleLists, "Input particle list");
   addParam("efficiencyCorrection", m_effcorr, "data/mc efficiency ratio", 0.83);
   addParam("distanceCut", m_distance, "Matching distance", 15.0);
-  addParam("mcPDGcode", mcPDG, "MC PDG code of the neutral hadron", 130);
+  addParam("mcPDGcode", m_mcPDG, "MC PDG code of the neutral hadron", 130);
 }
 
 void NeutralHadronMatcherModule::initialize()
 {
-  if (mcPDG == 130) {
+  if (m_mcPDG == 130) {
     m_infoName = "mcdistanceKL";
     m_matchedId = "mdstIndexTruthKL";
-  } else if (abs(mcPDG) == 2112) {
+  } else if (abs(m_mcPDG) == 2112) {
     m_infoName = "mcdistanceNeutron";
     m_matchedId = "mdstIndexTruthNeutron";
   } else {
-    B2FATAL("Unsupported mcPDG value: " << mcPDG);
+    B2FATAL("Unsupported mcPDG value: " << m_mcPDG);
   }
+
+  for (auto& iList : m_ParticleLists)
+    StoreObjPtr<ParticleList>().isRequired(iList);
+
+  if (! StoreArray<MCParticle>().isValid())
+    B2WARNING("No MCParticles array found. Do you call the NeutralHadronMatcher with real data?");
+
 }
 
 void NeutralHadronMatcherModule::event()
 {
 
+  StoreArray<MCParticle> mcparticles;
+  if (!mcparticles.isValid())
+    return;
+  if (mcparticles.getEntries() < 1)
+    B2FATAL("Missing mcparticles list for MC");
+
   // Initialize extra info
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
-    //check particle List exists and has particles
-    if (!particleList) {
-      B2FATAL("ParticleList " << iList << " not found");
-      continue;
-    }
 
+    //check particle List has particles
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
@@ -54,67 +71,73 @@ void NeutralHadronMatcherModule::event()
     }
   }
 
-  if (not Environment::Instance().isMC()) {
-    return;
+  // collect only primary mcparticles that match m_mcPDG
+  std::vector<MCParticle*> primaryMCParticles;
+  for (int i = 0; i++; mcparticles.getEntries()) {
+    auto mcPart = mcparticles[i];
+    if (mcPart->isPrimaryParticle() && abs(mcPart->getPDG()) == m_mcPDG)
+      primaryMCParticles.push_back(mcPart);
   }
 
-  StoreArray<MCParticle> mcparticles;
-  if (mcparticles.getEntries() < 1) {
-    B2FATAL("Missing mcparticles list for MC");
-  }
+  for (auto& iList : m_ParticleLists) {
+    StoreObjPtr<ParticleList> particleList(iList);
 
+    // loop over particles first
+    const size_t nPart = particleList->getListSize();
+    for (size_t iPart = 0; iPart < nPart; iPart++) {
 
-  // loop over MC particles first
-  for (MCParticle& mcPart : mcparticles) {
-    if (mcPart.isPrimaryParticle() && abs(mcPart.getPDG()) == mcPDG) {
+      auto particle = particleList->getParticle(iPart);
 
-      bool AddInefficiency = (gRandom->Uniform() > m_effcorr);
-      auto vtx = mcPart.getProductionVertex();
-      auto momentum = mcPart.getMomentum();
+      const MCParticle* mcPartCl = particle->getMCParticle();
+      const ECLCluster* eclcluster = particle->getECLCluster();
+      if ((mcPartCl) && (mcPartCl->getPDG() == 22)) continue;
+      if (!eclcluster) continue;
 
-      // loop over particle lists
-      for (auto& iList : m_ParticleLists) {
-        StoreObjPtr<ParticleList> particleList(iList);
+      const size_t nMCPart = primaryMCParticles.size();
 
-        size_t nPart = particleList->getListSize();
-        for (size_t iPart = 0; iPart < nPart; iPart++) {
-          auto particle = particleList->getParticle(iPart);
-          const Belle2::MCParticle* mcPartCl = particle->getRelated<Belle2::MCParticle>();
-          const ECLCluster* eclcluster = particle->getECLCluster();
+      // create a vector of distances from MCParticles
+      std::vector<double> distances;
+      distances.resize(nMCPart);
 
-          if (eclcluster) {
-            if ((mcPartCl) && (mcPartCl->getPDG() == 22)) continue;
+      // loop over mcparticles
+      for (size_t iMCPart = 0; iMCPart < nMCPart; iMCPart++) {
 
-            // got potential KL candidate
-            double R = eclcluster->getR();
-            double phi = eclcluster->getPhi();
-            double theta = eclcluster->getTheta();
-            double zcl = R / tan(theta);
-            double xcl = R * cos(phi);
-            double ycl = R * sin(phi);
+        auto mcPart = primaryMCParticles[iMCPart];
 
-            double distMin = particle-> getExtraInfo(m_infoName);
+        auto vtx = mcPart->getProductionVertex();
+        auto momentum = mcPart->getMomentum();
 
-            double rECL = R; //cm
-            double z = vtx.Z() + rECL / tan(momentum.Theta());
-            double x = vtx.X() + rECL * cos(momentum.Phi());
-            double y = vtx.Y() + rECL * sin(momentum.Phi());
+        // got potential KL candidate
+        double R = eclcluster->getR();
+        double phi = eclcluster->getPhi();
+        double theta = eclcluster->getTheta();
+        double zcl = R / tan(theta);
+        double xcl = R * cos(phi);
+        double ycl = R * sin(phi);
 
-            double dist = sqrt((x - xcl) * (x - xcl) + (y - ycl) * (y - ycl) + (z - zcl) * (z - zcl));
-            if (dist < distMin) {
-              distMin = dist;
-            }
-            if ((distMin < m_distance) && AddInefficiency) {
-              distMin = -distMin;
-            }
+        double rECL = R; //cm
+        double z = vtx.Z() + rECL / tan(momentum.Theta());
+        double x = vtx.X() + rECL * cos(momentum.Phi());
+        double y = vtx.Y() + rECL * sin(momentum.Phi());
 
-            particle->setExtraInfo(m_infoName, distMin);
-            if ((distMin < m_distance) & (distMin > 0)) {
-              particle->setExtraInfo(m_matchedId, mcPart.getArrayIndex());
-            }
-          }
-        }
+        double dist = sqrt((x - xcl) * (x - xcl) + (y - ycl) * (y - ycl) + (z - zcl) * (z - zcl));
+        distances[iMCPart] = dist;
       }
+
+      auto it_distMin = std::min_element(distances.begin(), distances.end());
+      double distMin = *it_distMin;
+      bool AddInefficiency = (gRandom->Uniform() > m_effcorr);
+      if ((distMin < m_distance) && AddInefficiency)
+        distMin = -distMin;
+
+      particle->setExtraInfo(m_infoName, distMin);
+
+      if ((distMin < m_distance) && (distMin > 0))
+        particle->setExtraInfo(m_matchedId, primaryMCParticles[std::distance(distances.begin(), it_distMin)]->getArrayIndex());
+
     }
   }
+
 }
+
+

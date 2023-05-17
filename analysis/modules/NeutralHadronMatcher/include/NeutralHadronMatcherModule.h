@@ -27,7 +27,7 @@ namespace Belle2 {
     virtual void event() override final;
   private:
     /** input mcPDG value */
-    int mcPDG;
+    int m_mcPDG;
     /** input particle lists name */
     std::vector<std::string> m_ParticleLists;
     /** input efficiency correction */

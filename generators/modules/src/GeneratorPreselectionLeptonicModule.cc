@@ -1,3 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+
 #include <generators/modules/GeneratorPreselectionLeptonicModule.h>
 #include <framework/gearbox/Unit.h>
 #include <TVector3.h>
@@ -11,7 +20,7 @@ REG_MODULE(GeneratorPreselectionLeptonic);
 GeneratorPreselectionLeptonicModule::GeneratorPreselectionLeptonicModule() : Module()
 {
   // Set module properties
-  setDescription("Filtering based on generator truth information. Returns 0 if cuts have not been pased, 1 only if all cuts are passed.");
+  setDescription("Filtering based on generator truth information. Returns 0 if cuts have not been passed, 1 only if all cuts are passed.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("signalLeptonPDG", m_signalLeptonPDG, "PDG code for the signal lepton", 11.0);
@@ -22,8 +31,10 @@ GeneratorPreselectionLeptonicModule::GeneratorPreselectionLeptonicModule() : Mod
   addParam("projectionMin", m_projectionMin, "minimum value for projection of tau lepton onto signal lepton momentum (in CMS)",
            -10.0);
   addParam("projectionMax", m_projectionMax, "maximum value for projection of tau lepton onto signal lepton momentum (in CMS)", 10.0);
-  addParam("angleMin", m_angleMin, "minimum value for the angle between the tau and signal lepton momentum vectors (in CMS)", -1.0);
-  addParam("angleMax", m_angleMax, "maximum value for the angle between the tau and signal lepton momentum vectors (in CMS)", 1.0);
+  addParam("angleMin", m_angleMin,
+           "minimum value for the cosine of the angle between the tau and signal lepton momentum vectors (in CMS)", -1.0);
+  addParam("angleMax", m_angleMax,
+           "maximum value for the cosine of the angle between the tau and signal lepton momentum vectors (in CMS)", 1.0);
   addParam("zDiffMin", m_zDiffMin, "minimum value for difference between production vertex z-component for signal and tau leptons",
            -5.0);
   addParam("zDiffMax", m_zDiffMax, "maximum value for difference between production vertex z-component for signal and tau leptons",
@@ -44,7 +55,6 @@ void GeneratorPreselectionLeptonicModule::event()
 {
   m_nSignalLepton = 0;
   m_nTauLepton = 0;
-  m_goodEvent = 0;
   m_missingPx = 0.0;
   m_missingPy = 0.0;
   m_missingPz = 0.0;
@@ -58,6 +68,8 @@ void GeneratorPreselectionLeptonicModule::event()
   double missingP = pow(pow(m_missingPx, 2) + pow(m_missingPy, 2) + pow(m_missingPz, 2), 0.5);
   double U = m_missingE - missingP;
 
+  int returnValue = 0;
+
   if (m_nSignalLepton == 1 && m_nTauLepton > 0 && U > m_UMin && U < m_UMax) {
     for (int i = 0; i < m_nTauLepton; i++) {
       double dotProduct = m_signalLeptonPVec.Dot(m_tauLeptonPVecs[i]);
@@ -67,14 +79,14 @@ void GeneratorPreselectionLeptonicModule::event()
       double projection = dotProduct / signalLeptonPCMS;
       double zDiff = m_signalLeptonZ - m_tauLeptonZs[i];
       if (angle > m_angleMin && angle < m_angleMax && projection > m_projectionMin && projection < m_projectionMax && zDiff > m_zDiffMin
-          && zDiff < m_zDiffMax) m_goodEvent = 1;
+          && zDiff < m_zDiffMax) {
+        returnValue = 1;
+        break;
+      }
     }
   }
 
-  int retvalue = 0;
-  if (m_goodEvent == 1) retvalue = 1;
-
-  setReturnValue(retvalue);
+  setReturnValue(returnValue);
 
 }
 
@@ -84,19 +96,20 @@ void GeneratorPreselectionLeptonicModule::checkParticle(const MCParticle& mc)
   if (mc.hasStatus(MCParticle::c_Initial) or mc.hasStatus(MCParticle::c_IsVirtual)) return;
 
   int pdg = mc.getPDG();
-  const TLorentzVector vec = m_initial->getLabToCMS() * mc.get4Vector();
+  const auto vec = m_initial->getLabToCMS() * mc.get4Vector();
   double p = vec.P();
 
-  if ((abs(pdg) == 13 || abs(pdg) == 11) && p > m_tauLeptonPMin && p < m_tauLeptonPMax) {
+  if ((abs(pdg) == Const::muon.getPDGCode() || abs(pdg) == Const::electron.getPDGCode()) && p > m_tauLeptonPMin
+      && p < m_tauLeptonPMax) {
     m_nTauLepton++;
-    TVector3 temp(vec.Px(), vec.Py(), vec.Pz());
+    ROOT::Math::XYZVector temp(vec.Px(), vec.Py(), vec.Pz());
     m_tauLeptonPVecs.push_back(temp);
     m_tauLeptonZs.push_back(mc.getVertex().Z());
   }
 
   if (abs(pdg) == m_signalLeptonPDG && p > m_signalLeptonPMin && p < m_signalLeptonPMax) {
     m_nSignalLepton++;
-    TVector3 temp(vec.Px(), vec.Py(), vec.Pz());
+    ROOT::Math::XYZVector temp(vec.Px(), vec.Py(), vec.Pz());
     m_signalLeptonPVec = temp;
     m_signalLeptonZ = mc.getVertex().Z();
   }

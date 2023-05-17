@@ -30,14 +30,14 @@ namespace Belle2 {
      * Currently, return "false" as default (= all good strips).
      *
      * Input:
-     * @param sensor ID: identitiy of the sensor for which the
+     * @param VxdID: identitiy of the sensor for which the
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      *
      * Output: boolean variable as flag for bad strips.
      */
-    bool isBad(VxdID, bool, unsigned char) const
+    bool isBad(VxdID, bool isU, unsigned char strip) const
     {
       return false;
     }

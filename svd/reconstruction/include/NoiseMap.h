@@ -58,13 +58,12 @@ namespace Belle2 {
        */
       float getSignificance(const Sample& sample) const { return sample.getCharge() / getNoise(sample); }
       /** Return the noise level for a given strip
-       * @param (not used) number of the strip
        * @return noise level
        */
       virtual float getNoise(short) const { return m_noiseLevel; }
 
       /** Return the noise value for a given strip
-       * @param (not used) Sample at whose position we want noise level
+       * @param Sample at whose position we want noise level (Sample not used)
        * @return noise level for the Sample's strip
        */
       virtual float getNoise(const Sample&) const { return m_noiseLevel; }
@@ -72,7 +71,7 @@ namespace Belle2 {
       /** Check whether a signal exceeds a given significance
        * @param sample strip to check
        * @param significance minimum significance
-       * @true if the maximum signal of the strip exceeds the given significance.
+       * @return true if the maximum signal of the strip exceeds the given significance.
        */
       bool operator()(const Sample& sample, float significance) const
       { return getSignificance(sample) >= significance; }

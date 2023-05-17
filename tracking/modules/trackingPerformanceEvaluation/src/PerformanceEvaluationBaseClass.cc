@@ -142,7 +142,7 @@ TH1*  PerformanceEvaluationBaseClass::duplicateHistogram(const char* newname, co
   TH2F* h2 =  dynamic_cast<TH2F*>(h);
   TH3F* h3 =  dynamic_cast<TH3F*>(h);
 
-  TH1* newh = 0;
+  TH1* newh = nullptr;
 
   if (h1)
     newh = new TH1F(*h1);

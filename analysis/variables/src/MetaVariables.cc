@@ -3561,25 +3561,25 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
-                      "Returns the total energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the total energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
-                      "Returns the total momentum Px of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the total momentum Px of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
-                      "Returns the total momentum Py of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the total momentum Py of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
-                      "Returns the total momentum Pz of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the total momentum Pz of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
-                      "Returns the invariant mass of the combination of particles in the given particle lists. The unit of the invariant mass is GeV/:math:`\\text{c}^2` ", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the invariant mass of the combination of particles in the given particle lists. The unit of the invariant mass is GeV/:math:`\\text{c}^2` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
-                      "Returns the total ECL energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the total ECL energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("maxPtInList(particleListName)", maxPtInList,
-                      "Returns maximum transverse momentum Pt in the given particle List. The unit of the transverse momentum is ``GeV/c``", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns maximum transverse momentum Pt in the given particle List. The unit of the transverse momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
                       "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
-                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the arithmetic mean of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
-                      "Returns the median value of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns the median value of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
                       "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("closestInList(particleListName, variable)", closestInList,
@@ -3589,7 +3589,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
-                      "Returns maximum opening angle in the given particle List. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns maximum opening angle in the given particle List. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
 Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters.
 

@@ -1,5 +1,4 @@
 
-
 Tracking for Special Classes of Tracks
 --------------------------------------
 
@@ -7,7 +6,7 @@ Tracking for Special Classes of Tracks
 
 V0 Finding
 """"""""""
-V0s are neutral particles we reconstruct from their decay into two charged tracks, such as :math:`K_S\to\pi^+\pi^-` or :math:`\Lambda\to p\pi^-`. Due to their relatively long lifetime, they mostly decay outside of the beam pipe. At analysis level, BASF2 assumes that everything we try to reconstruct decayed inside the beam pipe, where several assumptions can be made (constant and uniform magnetic field, no material to interact with, negligible energy losses for tracks): because this is not true for V0s, they need some special treatment. The `V0Finder` module takes care of this.
+V0s are neutral particles we reconstruct from their decay into two charged tracks, such as :math:`K_S\to\pi^+\pi^-` or :math:`\Lambda\to p\pi^-`. Due to their relatively long lifetime, they mostly decay outside of the beam pipe. At analysis level, basf2 assumes that everything we try to reconstruct decayed inside the beam pipe, where several assumptions can be made (constant and uniform magnetic field, no material to interact with, negligible energy losses for tracks). Because this is not true for V0s, they need some special treatment. The `V0Finder` module takes care of this.
 
 Also photon conversions (:math:`\gamma\to e^+e^-` inside material) need the same kind of special treatment for the same reasons, therefore `V0Finder` takes care of these as well.
 

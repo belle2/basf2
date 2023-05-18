@@ -1551,18 +1551,18 @@ This variable should only be used for study of the ECL. Please see :b2:var:`clus
 )DOC","GeV");
 
     REGISTER_VARIABLE("distanceToMcKl",distanceToMcKl,R"DOC(
-      Returns the distance to the nearest truth KL particle, extrapolated to the cluster radius. To use
-      this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
-      negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
-      to MC difference in KL efficiency.
+Returns the distance to the nearest truth KL particle, extrapolated to the cluster radius. To use
+this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+to MC difference in KL efficiency.
 
 )DOC", "cm");
 
     REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
-      Returns the distance to the nearest truth (anti)neutron, extrapolated to the cluster radius. To use
-      this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
-      negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
-      to MC difference in KL efficiency.
+Returns the distance to the nearest truth (anti)neutron, extrapolated to the cluster radius. To use
+this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+to MC difference in KL efficiency.
 
 )DOC", "cm");
 

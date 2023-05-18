@@ -63,7 +63,7 @@ void NeutralHadronMatcherModule::event()
     StoreObjPtr<ParticleList> particleList(iList);
 
     //check particle List has particles
-    size_t nPart = particleList->getListSize();
+    const size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
       particle->addExtraInfo(m_infoName, 1.e10);
@@ -73,7 +73,7 @@ void NeutralHadronMatcherModule::event()
 
   // collect only primary mcparticles that match m_mcPDG
   std::vector<MCParticle*> primaryMCParticles;
-  for (int i = 0; i++; mcparticles.getEntries()) {
+  for (int i = 0; i < mcparticles.getEntries(); i++) {
     auto mcPart = mcparticles[i];
     if (mcPart->isPrimaryParticle() && abs(mcPart->getPDG()) == m_mcPDG)
       primaryMCParticles.push_back(mcPart);
@@ -89,8 +89,9 @@ void NeutralHadronMatcherModule::event()
       auto particle = particleList->getParticle(iPart);
 
       const MCParticle* mcPartCl = particle->getMCParticle();
-      const ECLCluster* eclcluster = particle->getECLCluster();
       if ((mcPartCl) && (mcPartCl->getPDG() == 22)) continue;
+
+      const ECLCluster* eclcluster = particle->getECLCluster();
       if (!eclcluster) continue;
 
       const size_t nMCPart = primaryMCParticles.size();

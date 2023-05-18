@@ -32,7 +32,7 @@ REG_MODULE(eclAutocovarianceCalibrationC1Collector);
 eclAutocovarianceCalibrationC1CollectorModule::eclAutocovarianceCalibrationC1CollectorModule()
 {
   // Set module properties
-  setDescription("Module to export histogram of noise level of ECL waveforms in random trigger events");
+  setDescription("Module to export histogram of noise level of ECL waveforms in delayed Bhabha events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -47,7 +47,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
   /** Create the histograms and register them in the data store */
   PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)",
                         ECLElementNumbers::c_NCrystals, 0,
-                        ECLElementNumbers::c_NCrystals, 2000, 0, 2000);
+                        ECLElementNumbers::c_NCrystals, MaxPeaktoPeakValue, 0, MaxPeaktoPeakValue);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);
 
   m_eclDsps.registerInDataStore();
@@ -81,7 +81,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::collect()
 void eclAutocovarianceCalibrationC1CollectorModule::closeRun()
 {
   for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
-    for (int j = 0; j < 2000; j++) {
+    for (int j = 0; j < MaxPeaktoPeakValue; j++) {
       getObjectPtr<TH2>("PPVsCrysID")->SetBinContent(i + 1, j + 1, PPVsCrysID->GetBinContent(i + 1, j + 1));
     }
   }

@@ -48,5 +48,7 @@ namespace Belle2 {
 
     TH2F* PPVsCrysID; /**< histogram of peak-to-peak amplitude vs crystalID (cellID-1) */
 
+    const int MaxPeaktoPeakValue = 2000;  /**< histogram limit for peak-to-peak amplitude */
+
   };
 } // end Belle2 namespace

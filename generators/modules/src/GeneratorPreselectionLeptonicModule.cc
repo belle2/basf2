@@ -9,7 +9,6 @@
 
 #include <generators/modules/GeneratorPreselectionLeptonicModule.h>
 #include <framework/gearbox/Unit.h>
-#include <TVector3.h>
 #include <numeric>
 
 using namespace std;
@@ -122,3 +121,4 @@ void GeneratorPreselectionLeptonicModule::checkParticle(const MCParticle& mc)
   }
 
 }
+

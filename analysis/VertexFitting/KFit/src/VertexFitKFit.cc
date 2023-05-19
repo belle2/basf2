@@ -262,8 +262,8 @@ VertexFitKFit::doFit3() {
   HepMatrix tmp2_V_D(m_V_D), tmp2_V_E(m_V_E);
   HepMatrix tmp2_lam0(m_lam0), tmp2_v_a(m_v_a);
 
-  double tmp_each_chisq[KFitConst::kMaxTrackCount2];
-  double tmp2_each_chisq[KFitConst::kMaxTrackCount2];
+  std::vector<double> tmp_each_chisq(m_TrackCount);
+  std::vector<double> tmp2_each_chisq(m_TrackCount);
 
   for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
   {

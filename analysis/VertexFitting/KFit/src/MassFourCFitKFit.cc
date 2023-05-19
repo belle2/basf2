@@ -569,7 +569,7 @@ MassFourCFitKFit::makeCoreMatrix() {
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(4, 1, 0);
     HepMatrix Sum_child_al_1(4 * m_ConstraintMassCount, 1, 0);
-    double energy[KFitConst::kMaxTrackCount2];
+    std::vector<double> energy(m_TrackCount);
     double a;
 
     for (int i = 0; i < m_TrackCount; i++) {

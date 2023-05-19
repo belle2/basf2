@@ -5,7 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
+#include <analysis/dbobjects/ParticleWeightingBinLimits.h>
+#include <analysis/dbobjects/ParticleWeightingAxis.h>
+
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>

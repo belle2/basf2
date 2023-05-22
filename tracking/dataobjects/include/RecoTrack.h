@@ -574,6 +574,12 @@ namespace Belle2 {
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;
 
+    /** Set the genfit track copying the information from another genfit track.
+     * This is used by the fit&refit, since the original genfit track must be
+     * updated with the refitted object obtained after the flip
+     */
+    void setGenfitTrack(const genfit::Track track);
+
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const ROOT::Math::XYZVector& positionSeed, const ROOT::Math::XYZVector& momentumSeed)
     {

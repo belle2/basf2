@@ -189,9 +189,8 @@ namespace Belle2 {
         const double length = (wallZfwd - wallZbwd) / 2.0;
 
 
-        G4Material* medWall(nullptr);
+        G4Material* medWall;
         if (strstr((wallName).c_str(), "MiddleWall") != nullptr) {
-          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else {
           medWall = medAluminum;
@@ -216,9 +215,8 @@ namespace Belle2 {
         const double length = (wallZfwd - wallZbwd) / 2.0;
         const int iInnerWall = wall.getId();
 
-        G4Material* medWall(nullptr);
+        G4Material* medWall;
         if (strstr(wallName.c_str(), "MiddleWall") != nullptr) {
-          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else if (strstr(wallName.c_str(), "MiddleGlue") != nullptr) { // Glue layer 0.005 mmt
           medWall = medGlue;

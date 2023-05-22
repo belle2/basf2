@@ -9,9 +9,9 @@
 #pragma once
 
 /* External headers. */
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 
 /* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -70,20 +70,20 @@ namespace Belle2 {
     {return m_innermostLayer;}
 
     /**
-     * Get global position (TVector3 version).
+     * Get global position (ROOT::Math::XYZVector version).
      * @return Hit coordinates.
      */
-    inline TVector3 getClusterPosition() const
-    {return TVector3(m_globalX, m_globalY, m_globalZ);}
+    inline ROOT::Math::XYZVector getClusterPosition() const
+    {return ROOT::Math::XYZVector(m_globalX, m_globalY, m_globalZ);}
 
     /**
-     * Get global position (TVector3 version) of the origin of KLMCluster
+     * Get global position (ROOT::Math::XYZVector version) of the origin of KLMCluster
      * (always return (0,0,0) since we believe all KLMClusters to originate at or
      * near primary vertex).
      * @return KLMCluster origin coordinates.
      */
-    inline TVector3 getPosition() const
-    {return TVector3(0, 0, 0);}
+    inline ROOT::Math::XYZVector getPosition() const
+    {return ROOT::Math::XYZVector(0, 0, 0);}
 
     /**
      * Get momentum magnitude.

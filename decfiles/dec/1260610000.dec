@@ -1,0 +1,26 @@
+# EventType: 1260610000
+# Descriptor: Y(4S) -> B+ B-
+# 	      	       [B+ -> K+ tau+ tau-] cc
+#				 [tau- -> generic]
+# NickName: Bu_Ktautau
+# Documentation: Signal MC of B+ -> K+ tau+ tau- where taus decay to anything
+# Tested: Yes
+# Responsible: Debjit Ghosh
+# Email: debjit.ghosh@ts.infn.it
+# PhysicsWG: EWP
+# Cuts: None
+# Date: 10/02/2023
+
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.5 B+sig B-    VSS;
+0.5 B+    B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 K+ tau+ tau- BTOSLLBALL;
+Enddecay
+CDecay B-sig
+
+End

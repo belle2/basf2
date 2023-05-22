@@ -245,7 +245,7 @@ void PXDReadRawBonnDAQMatchedModule::event()
   auto tnr = triggernr;
   do {
     // Search for triggernr
-    tnr = triggernr; // set again as it is the return value
+    // tnr = triggernr; // set again as it is the return value
     int stat = readOneEvent(tnr);
     if (stat <= 0) {
       // End of File

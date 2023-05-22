@@ -9,7 +9,7 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/ModuleParam.templateDetails.h> // needed for complicated parameter types 
+#include <framework/core/ModuleParam.templateDetails.h> // needed for complicated parameter types
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -73,7 +73,7 @@ V0FinderModule::V0FinderModule() : Module()
            "designate which fitAndStore function is called in V0Fitter.\n"
            "    0: store V0 at the first vertex fit, regardless of inner hits; \n"
            "    1: remove hits inside the V0 vertex position;\n"
-           "    2: mode 2 + don't use SVD hits if there is only one available SVD hit-pair",
+           "    2: mode 1 + don't use SVD hits if there is only one available SVD hit-pair",
            1);
 
   addParam("massRangeKshort", m_preFilterMassRangeKshort,

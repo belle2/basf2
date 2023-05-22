@@ -56,7 +56,7 @@ namespace Belle2 {
      * Cls-time resolution based on sensor side and type,
      * types -> 0: L3, 1: Barrel, 2: Forward.
      * sides -> 0: V, 1: U,
-     * vector elements are sigmas wrt cls-size.
+     * vector elements are sigmas wrt cls-size (currently from 1 to 6).
      */
     std::vector<Float_t> clsSigma[3][2];
 

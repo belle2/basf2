@@ -45,7 +45,7 @@ class TestStdCharged(unittest.TestCase):
             f(listtype, path=testpath)
             self.assertEqual(
                 len(testpath.modules()), 1 if listtype == 'all' else 3,
-                "List {} doesn't work with function {}".format(listtype, f.__name__))
+                "List %s doesn't work with function %s" % (listtype, f.__name__))
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
 
             # now we're certain that the loader is the only module on the path,
@@ -72,7 +72,7 @@ class TestStdCharged(unittest.TestCase):
             f(listtype, path=testpath)
             self.assertEqual(
                 len(testpath.modules()), 0,
-                "List {} works with function {}".format(listtype, f.__name__))
+                "List %s works with function %s" % (listtype, f.__name__))
             self.assertFalse(any(module.type() == "ParticleLoader" for module in testpath.modules()))
 
     def test_nonesense_list(self):

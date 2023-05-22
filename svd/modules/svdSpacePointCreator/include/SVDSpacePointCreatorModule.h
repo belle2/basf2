@@ -110,9 +110,9 @@ namespace Belle2 {
 
     SVDHitTimeSelection m_HitTimeCut; /**< selection based on clustr time db object*/
 
-    bool m_useSVDGroupInfoIn6Sample; /**< Use SVD group info to reject combinations in 6-sample DAQ mode */
-    bool m_useSVDGroupInfoIn3Sample; /**< Use SVD group info to reject combinations in 3-sample DAQ mode */
+    bool m_useSVDGroupInfoIn6Sample = false; /**< Use SVD group info to reject combinations in 6-sample DAQ mode */
+    bool m_useSVDGroupInfoIn3Sample = false; /**< Use SVD group info to reject combinations in 3-sample DAQ mode */
 
-    bool   m_useDB;  /**< if true takes the configuration from the DB objects. */
+    bool   m_useDB = true;  /**< if true takes the configuration from the DB objects. */
   };
 } // end namespace Belle2

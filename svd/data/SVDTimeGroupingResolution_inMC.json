@@ -19,7 +19,7 @@
     ],
 
     "parsForCoG3In3Samples": {
-	"_COMMENT": "roughly estimated",
+	"_COMMENT": "judged from data, only for testing purposes",
 	"acceptSigmaN": 5,
 	"clsSigma": [[[2.041699, 2.360614, 2.191450, 1.981013, 1.804217, 1.620473],
 		      [3.588047, 3.452579, 2.936311, 2.683355, 2.534207, 2.289531]],
@@ -139,7 +139,7 @@
 	"writeGroupInfo": 1},
 
     "parsForELS3In6Samples": {
-	"_COMMENT": "copied from parsForCoG6In6Samples",
+	"_COMMENT": "copied from parsForCoG3In6Samples",
 	"acceptSigmaN": 7,
 	"clsSigma": [[[2.041699, 2.360614, 2.191450, 1.981013, 1.804217, 1.620473],
 		      [3.588047, 3.452579, 2.936311, 2.683355, 2.534207, 2.289531]],

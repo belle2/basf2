@@ -36,7 +36,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "SpacePoints collection name", string("SVDSpacePoints"));
   addParam("EventLevelTrackingInfoName", m_eventLevelTrackingInfoName,
            "EventLevelTrackingInfo collection name", string(""));
-  addParam("EventInfo", m_svdEventInfoName,
+  addParam("SVDEventInfo", m_svdEventInfoName,
            "SVDEventInfo collection name.", string("SVDEventInfo"));
 
   // 2.Modification parameters:
@@ -61,13 +61,11 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            unsigned(m_numMaxSpacePoints));
 
   addParam("useSVDGroupInfoIn6Sample", m_useSVDGroupInfoIn6Sample,
-           "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode",
-           bool(false));
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode");
   addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
-           "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode",
-           bool(false));
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode");
 
-  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
+  addParam("useDB", m_useDB, "if False, use configuration module parameters");
 
 }
 

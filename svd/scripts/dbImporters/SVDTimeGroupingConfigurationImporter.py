@@ -32,35 +32,35 @@ def arg_parser():
     return parser
 
 
-def import_parameters_to_payload(payload, alg, mode):
+def import_parameters_to_payload(payload, alg, numberOfAcquiredSamples):
     """ import parameters to payload """
 
-    jsonVar = param["parsFor" + str(alg) + "In" + str(mode) + "Samples"]
+    jsonVar = param["parsFor" + str(alg) + "In" + str(numberOfAcquiredSamples) + "Samples"]
 
-    payload.setTimeGroupingParameters(alg, mode)._COMMENT = jsonVar["_COMMENT"]
-    payload.setTimeGroupingParameters(alg, mode).tRange[0] = jsonVar["tRange"][0]
-    payload.setTimeGroupingParameters(alg, mode).tRange[1] = jsonVar["tRange"][1]
-    payload.setTimeGroupingParameters(alg, mode).rebinningFactor = jsonVar["rebinningFactor"]
-    payload.setTimeGroupingParameters(alg, mode).fillSigmaN = jsonVar["fillSigmaN"]
-    payload.setTimeGroupingParameters(alg, mode).limitSigma[0] = jsonVar["limitSigma"][0]
-    payload.setTimeGroupingParameters(alg, mode).limitSigma[1] = jsonVar["limitSigma"][1]
-    payload.setTimeGroupingParameters(alg, mode).fitRangeHalfWidth = jsonVar["fitRangeHalfWidth"]
-    payload.setTimeGroupingParameters(alg, mode).removeSigmaN = jsonVar["removeSigmaN"]
-    payload.setTimeGroupingParameters(alg, mode).fracThreshold = jsonVar["fracThreshold"]
-    payload.setTimeGroupingParameters(alg, mode).maxGroups = jsonVar["maxGroups"]
-    payload.setTimeGroupingParameters(alg, mode).expectedSignalTime[0] = jsonVar["expectedSignalTime"][0]
-    payload.setTimeGroupingParameters(alg, mode).expectedSignalTime[1] = jsonVar["expectedSignalTime"][1]
-    payload.setTimeGroupingParameters(alg, mode).expectedSignalTime[2] = jsonVar["expectedSignalTime"][2]
-    payload.setTimeGroupingParameters(alg, mode).signalLifetime = jsonVar["signalLifetime"]
-    payload.setTimeGroupingParameters(alg, mode).numberOfSignalGroups = jsonVar["numberOfSignalGroups"]
-    payload.setTimeGroupingParameters(alg, mode).formSingleSignalGroup = jsonVar["formSingleSignalGroup"]
-    payload.setTimeGroupingParameters(alg, mode).acceptSigmaN = jsonVar["acceptSigmaN"]
-    payload.setTimeGroupingParameters(alg, mode).writeGroupInfo = jsonVar["writeGroupInfo"]
-    payload.setTimeGroupingParameters(alg, mode).includeOutOfRangeClusters = jsonVar["includeOutOfRangeClusters"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples)._COMMENT = jsonVar["_COMMENT"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).tRange[0] = jsonVar["tRange"][0]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).tRange[1] = jsonVar["tRange"][1]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).rebinningFactor = jsonVar["rebinningFactor"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).fillSigmaN = jsonVar["fillSigmaN"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).limitSigma[0] = jsonVar["limitSigma"][0]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).limitSigma[1] = jsonVar["limitSigma"][1]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).fitRangeHalfWidth = jsonVar["fitRangeHalfWidth"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).removeSigmaN = jsonVar["removeSigmaN"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).fracThreshold = jsonVar["fracThreshold"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).maxGroups = jsonVar["maxGroups"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).expectedSignalTime[0] = jsonVar["expectedSignalTime"][0]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).expectedSignalTime[1] = jsonVar["expectedSignalTime"][1]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).expectedSignalTime[2] = jsonVar["expectedSignalTime"][2]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).signalLifetime = jsonVar["signalLifetime"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).numberOfSignalGroups = jsonVar["numberOfSignalGroups"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).formSingleSignalGroup = jsonVar["formSingleSignalGroup"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).acceptSigmaN = jsonVar["acceptSigmaN"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).writeGroupInfo = jsonVar["writeGroupInfo"]
+    payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).includeOutOfRangeClusters = jsonVar["includeOutOfRangeClusters"]
     sigmas = jsonVar["clsSigma"]
     for stype in range(len(sigmas)):
         for side in [0, 1]:     # 0:V, 1:U
-            payload.setTimeGroupingParameters(alg, mode).clsSigma[stype][side].assign(sigmas[stype][side])
+            payload.setTimeGroupingParameters(alg, numberOfAcquiredSamples).clsSigma[stype][side].assign(sigmas[stype][side])
 
 
 class timeGroupingConfigurationImporter(b2.Module):
@@ -86,8 +86,8 @@ class timeGroupingConfigurationImporter(b2.Module):
         payload = Belle2.SVDTimeGroupingConfiguration(uniqueID, param["_DESCRIPTION"])
 
         for alg in ["CoG3", "ELS3", "CoG6"]:
-            for mode in [3, 6]:
-                import_parameters_to_payload(payload, alg, mode)
+            for numberOfAcquiredSamples in [3, 6]:
+                import_parameters_to_payload(payload, alg, numberOfAcquiredSamples)
 
         # write out the payload to localdb directory
         Belle2.Database.Instance().storeData(Belle2.SVDTimeGroupingConfiguration.name, payload, iov)

@@ -22,7 +22,7 @@ namespace Belle2 {
    * of SVDTimeGrouping module
    */
   struct SVDTimeGroupingParameters: public TObject {
-    /** Expected range of time histogram [ns]. */
+    /** Expected range of svd time histogram [ns]. */
     Float_t tRange[2];
     /** Time bin width is 1/rebinningFactor [ns]. */
     Int_t   rebinningFactor;
@@ -125,16 +125,16 @@ namespace Belle2 {
      * Returns the reference to the parameters
      */
     SVDTimeGroupingParameters getTimeGroupingParameters(const TString& alg,
-                                                        const Int_t& mode) const
+                                                        const Int_t& numberOfAcquiredSamples) const
     {
-      if (mode == 6) {
+      if (numberOfAcquiredSamples == 6) {
         if (alg == "CoG3")
           return m_parsForCoG3In6Samples;
         else if (alg == "ELS3")
           return m_parsForELS3In6Samples;
         else if (alg == "CoG6")
           return m_parsForCoG6In6Samples;
-      } else if (mode == 3) {
+      } else if (numberOfAcquiredSamples == 3) {
         if (alg == "CoG3")
           return m_parsForCoG3In3Samples;
         else if (alg == "ELS3")
@@ -150,16 +150,17 @@ namespace Belle2 {
     /**
      * Sets all the parameters
      */
-    SVDTimeGroupingParameters& setTimeGroupingParameters(const TString& alg, const Int_t& mode)
+    SVDTimeGroupingParameters& setTimeGroupingParameters(const TString& alg,
+                                                         const Int_t& numberOfAcquiredSamples)
     {
-      if (mode == 6) {
+      if (numberOfAcquiredSamples == 6) {
         if (alg == "CoG3")
           return m_parsForCoG3In6Samples;
         else if (alg == "ELS3")
           return m_parsForELS3In6Samples;
         else if (alg == "CoG6")
           return m_parsForCoG6In6Samples;
-      } else if (mode == 3) {
+      } else if (numberOfAcquiredSamples == 3) {
         if (alg == "CoG3")
           return m_parsForCoG3In3Samples;
         else if (alg == "ELS3")

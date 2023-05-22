@@ -33,7 +33,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
   // 1a. Collections.
   addParam("SVDClusters", m_svdClustersName, "SVDCluster collection name", std::string(""));
-  addParam("EventInfo", m_svdEventInfoName,
+  addParam("SVDEventInfo", m_svdEventInfoName,
            "SVDEventInfo collection name.", std::string("SVDEventInfo"));
 
   // 1b. Module Configuration

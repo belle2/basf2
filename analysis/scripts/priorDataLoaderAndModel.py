@@ -129,7 +129,7 @@ class PriorModel(torch.nn.Module):
             n_output (int): Number of output nodes.
 
         """
-        super(PriorModel, self).__init__()
+        super().__init__()
         #: Linear layer with 9 inputs and 128 outputs.
         self.hidden1 = Linear(9, 128)
         kaiming_uniform_(self.hidden1.weight, nonlinearity="relu")

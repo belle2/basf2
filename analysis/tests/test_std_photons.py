@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ class TestStdPhotons(unittest.TestCase):
         # verify that we load only the list-creating modules
         self.assertEqual(
             len(testpath.modules()), len(set(expected_lists)) + 1 if listtype == 'all' else len(set(expected_lists)) + 3,
-            "List %s doesn't work with function %s" % (listtype, std_function.__name__))
+            "List {} doesn't work with function {}".format(listtype, std_function.__name__))
         self.assertTrue(all((module.type() == "ParticleLoader") or (module.type() == "ParticleListManipulator")
                             or (module.type() == "ParticleSelector")
                             for module in testpath.modules()))
@@ -48,7 +47,7 @@ class TestStdPhotons(unittest.TestCase):
 
         # we have the particle lists we expect
         for a, b in zip(built_list, expected_lists):
-            self.assertEqual(a, b, "Loaded list \'%s\' instead of \'%s\' with function %s" % (a, b, std_function.__name__))
+            self.assertEqual(a, b, "Loaded list \'{}\' instead of \'{}\' with function {}".format(a, b, std_function.__name__))
 
     def test_nonsense_list(self):
         """Check that the builder function raises a ValueError for a non-existing list name."""

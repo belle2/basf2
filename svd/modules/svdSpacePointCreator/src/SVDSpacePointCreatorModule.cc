@@ -61,11 +61,11 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            unsigned(m_numMaxSpacePoints));
 
   addParam("useSVDGroupInfoIn6Sample", m_useSVDGroupInfoIn6Sample,
-           "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode");
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode", bool(false));
   addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
-           "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode");
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode", bool(false));
 
-  addParam("useDB", m_useDB, "if False, use configuration module parameters");
+  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
 
 }
 

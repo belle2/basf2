@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 
 Full Simultaneous Global and Local VXD and CDC alignment with Millepede II

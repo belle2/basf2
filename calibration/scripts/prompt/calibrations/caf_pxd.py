@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -104,7 +102,7 @@ def get_calibrations(input_data, **kwargs):
     # iov_list_physics = list(sorted(iov_set_physics))
     iov_list_all = list(sorted(iov_set_cosmics | iov_set_physics))
 
-    exp_set = set([iov.exp_low for iov in iov_list_all])
+    exp_set = {iov.exp_low for iov in iov_list_all}
     chunks_exp = []
     for exp in sorted(exp_set):
         chunks_exp += [list(g) for k, g in groupby(iov_list_all, lambda x: x.exp_low == exp) if k]

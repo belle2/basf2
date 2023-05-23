@@ -22,12 +22,14 @@ namespace {
   TEST(ParticleWeighting, BinLimits)
   {
     EXPECT_B2FATAL(ParticleWeightingBinLimits(42, 42));
+#ifndef __clang_analyzer__
     auto* a = new ParticleWeightingBinLimits(0, 1);
     EXPECT_TRUE(a->first() == 0);
     EXPECT_TRUE(a->second() == 1);
     auto* b = new ParticleWeightingBinLimits(1, 0);
     EXPECT_TRUE(b->first() == 0);
     EXPECT_TRUE(b->second() == 1);
+#endif
   }
 
   TEST(ParticleWeighting, Axis)
@@ -40,17 +42,19 @@ namespace {
     auto* bin1 = new ParticleWeightingBinLimits(0, 1);
     auto* bin1b = new ParticleWeightingBinLimits(1, 2);
     auto* bin2 = new ParticleWeightingBinLimits(2, 3);
-    auto* bin3 = new ParticleWeightingBinLimits(0, 5);
-    auto* bin4 = new ParticleWeightingBinLimits(0.5, 1.5);
-    auto* bin5 = new ParticleWeightingBinLimits(2.5, 3);
 
     int added_bin_id_1 = a->addBin(bin1);
     EXPECT_EQ(added_bin_id_1, 1);
     int added_bin_id_2 = a->addBin(bin2);
     EXPECT_EQ(added_bin_id_2, 2);
+#ifndef __clang_analyzer__
+    auto* bin3 = new ParticleWeightingBinLimits(0, 5);
+    auto* bin4 = new ParticleWeightingBinLimits(0.5, 1.5);
+    auto* bin5 = new ParticleWeightingBinLimits(2.5, 3);
     EXPECT_B2FATAL(a->addBin(bin3));
     EXPECT_B2FATAL(a->addBin(bin4));
     EXPECT_B2FATAL(a->addBin(bin5));
+#endif
     EXPECT_TRUE(a->findBin(0.5) == 1);
     EXPECT_TRUE(a->findBin(1.5) == -1);
     EXPECT_TRUE(a->findBin(bin1) == 1);

@@ -27,7 +27,7 @@ eclAutocovarianceCalibrationC1Algorithm::eclAutocovarianceCalibrationC1Algorithm
   CalibrationAlgorithm("eclAutocovarianceCalibrationC1Collector")
 {
   setDescription(
-    "Determine noise threshold for waveforms to be used in computing the coveriance matrix"
+    "Determine noise threshold for waveforms to be used in computing the covariance matrix"
   );
 }
 
@@ -43,6 +43,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   std::vector<float> cellIDs;
   std::vector<float> PPamps;
+  std::vector<float> PPampsErrorVector;
 
   std::vector<int> cellIDsWithLowEntries;
 
@@ -55,34 +56,30 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
     float fraction = 0.0;
     int counter = 0;
 
-    while (fraction < m_lowestEnergyFraction) {
-      subTotal += hPP->GetBinContent(counter);
-      fraction = ((float)subTotal) / ((float)Total);
-      counter++;
+    if (Total < m_TotalCountsThreshold) {
+      B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries for cell ID " << crysID + 1 << " is only: " << Total <<
+             " Requirement is m_TotalCountsThreshold: " << m_TotalCountsThreshold);
+      counter = -1;
+      /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
+      return c_NotEnoughData;
+    } else {
+      while (fraction < m_lowestEnergyFraction) {
+        subTotal += hPP->GetBinContent(counter);
+        fraction = ((float)subTotal) / ((float)Total);
+        counter++;
+      }
     }
 
     cellIDs.push_back(crysID + 1);
     PPamps.push_back(counter);
+    PPampsErrorVector.push_back(0);
 
     B2INFO("eclAutocovarianceCalibrationC1Algorithm: crysID counter fraction Total " << crysID << " " << counter << " " << fraction <<
            " " << Total);
 
-    if (Total < 100) {
-      B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries is only: " << Total);
-      cellIDsWithLowEntries.push_back(crysID + 1);
-    }
   }
 
-  if (cellIDsWithLowEntries.size() > 10) {
-
-    B2INFO("eclAutocovarianceCalibrationC1Algorithm: The following Cell ID's did not have enough entries:");
-    for (int i = 0; i < cellIDsWithLowEntries.size(); i++)  B2INFO("Cell ID: " << cellIDsWithLowEntries[i]);
-    B2INFO("eclAutocovarianceCalibrationC1Algorithm will return c_NotEnoughData");
-    return c_NotEnoughData;
-
-  }
-
-  /** Write out the noise threshold vs Celltal ID*/
+  /** Write out the noise threshold vs Cell ID*/
   auto gPPVsCellID = new TGraph(cellIDs.size(), cellIDs.data(), PPamps.data());
   gPPVsCellID->SetName("gPPVsCellID");
 
@@ -95,7 +92,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   /**-----------------------------------------------------------------------------------------------*/
   /** Write output to DB */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(PPamps, cellIDs);
+  PPThreshold->setCalibVector(PPamps, PPampsErrorVector);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC1Threshold");
   B2INFO("eclAutocovarianceCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 

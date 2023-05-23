@@ -39,6 +39,12 @@ namespace Belle2 {
       /** Getter for m_lowestEnergyFraction */
       float getLowestEnergyFraction() {return m_lowestEnergyFraction;}
 
+      /** Setter for m_TotalCountsThreshold */
+      void setTotalCountsThreshold(int totalCountsThreshold) {m_TotalCountsThreshold = totalCountsThreshold;}
+
+      /** Getter for m_TotalCountsThreshold*/
+      int getTotalCountsThreshold() {return m_TotalCountsThreshold;}
+
     protected:
 
       /**..Run algorithm on events */
@@ -49,6 +55,8 @@ namespace Belle2 {
       std::string m_outputName = "eclAutocovarianceCalibrationC1Algorithm.root"; /**< file name for histogram output */
 
       float m_lowestEnergyFraction = 0.75;  /**< Fraction of noise waveforms to use */
+
+      int m_TotalCountsThreshold = 10000; /**< min number of counts needed to compute calibration */
 
     };
   }

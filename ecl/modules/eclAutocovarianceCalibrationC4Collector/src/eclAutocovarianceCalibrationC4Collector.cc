@@ -51,7 +51,7 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  Chi2VsCrysID = new TH2F("Chi2VsCrysID", "", 8736, 0, 8736, 1000, 0, 1000);
+  Chi2VsCrysID = new TH2F("Chi2VsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 1000, 0, 1000);
   registerObject<TH2F>("Chi2VsCrysID", Chi2VsCrysID);
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();

@@ -171,13 +171,13 @@ void PXDBackgroundModule::event()
 
   VxdID currentSensorID(0);
   double currentSensorThickness(0);
-  double currentSensorMass(0);
   double currentSensorArea(0);
 
   // Exposition and dose
   if (m_doseReportingLevel > c_reportNone) {
     B2DEBUG(100, "Expo and dose");
     currentSensorID.setID(0);
+    double currentSensorMass(0);
     for (const PXDSimHit& hit : storeSimHits) {
       // Update if we have a new sensor
       VxdID sensorID = hit.getSensorID();

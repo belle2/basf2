@@ -53,7 +53,8 @@ PHYSICS = [
     "filter ggBarrelLoose",
     "filter singleTagLowMassB",
     "filter singleTagHighMassB",
-    "filter b2b phi photons"
+    "filter b2b phi photons",
+    "filter displaced vertex"
 ]
 
 # QED channels

@@ -11,7 +11,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/core/FrameworkExceptions.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <genfit/Track.h>
 

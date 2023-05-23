@@ -13,7 +13,7 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/dbobjects/HardwareClockSettings.h>

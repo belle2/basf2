@@ -13,7 +13,7 @@ The dataobjects are particularly important as they are the (only) information th
 These *mdst dataobjects* are optimised for minimal disk size per event.
 This is important because the Belle II experiment will collect around :math:`5\times10^{10}` events, so data file size considerations will become rather critical.
 
-.. seealso:: 
+.. seealso::
 
     `What is the difference between an mdst and a dst?
     <https://questions.belle2.org/question/219/what-is-the-difference-between-an-mdst-and-a-dst/>`_
@@ -40,9 +40,9 @@ Mdst files are written by the :b2:mod:`RootOutput` module and are based on the R
 However it is important to note that analysis of mdst with any software other than basf2 is not supported or permitted.
 I.e. use of the basf2 framework and the :ref:`analysis` package is mandatory.
 
-.. warning:: 
+.. warning::
 
-        A common misconception: Opening an mdst file with standard ROOT tools (e.g. with a TBrowser) may initially "work", 
+        A common misconception: Opening an mdst file with standard ROOT tools (e.g. with a TBrowser) may initially "work",
         but the results are not reproducible.
 
         Many dataobject member accessors require the basf2 environment to return meaningful values.

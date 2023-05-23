@@ -131,7 +131,11 @@ namespace Belle2 {
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
     inline T& operator *()  const {return *operator->();}  /**< Imitate pointer functionality. */
+#ifdef __clang_analyzer__
+    inline T* operator ->() const {ensureValid(); assert(m_storeObjPtr); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
+#else
     inline T* operator ->() const {ensureValid(); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
+#endif
     inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
 
 

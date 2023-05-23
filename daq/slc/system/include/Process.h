@@ -21,7 +21,7 @@ namespace Belle2 {
     template <class WORKER>
     static void g_handler_exit(int, void* worker)
     {
-      delete(WORKER*)worker;
+      delete (WORKER*)worker;
       exit(0);
     }
     static void g_handler_int(int) { exit(0); }
@@ -59,7 +59,7 @@ namespace Belle2 {
     bool wait(int opt = 0)
     {
       if (m_pid < 0) return false;
-      if (m_waitpid_result = ::waitpid(m_pid, &m_waitpid_status, opt)) {
+      if ((m_waitpid_result = ::waitpid(m_pid, &m_waitpid_status, opt))) {
         m_pid = -1;
       }
       return true;

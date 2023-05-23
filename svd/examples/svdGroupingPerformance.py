@@ -638,6 +638,7 @@ if args.isMC:
             if m.name() == "SVDEventInfoSetter":
                 m.param("daqMode", 1)
                 m.param("relativeShift", 7)
+                m.param("useDB", False)
 
 
 else:
@@ -654,8 +655,6 @@ else:
 
     MCTracking = False
 
-
-if not args.isMC:
     if args.test:
         main.add_module('RootInput', entrySequences=['0:100'])
     else:

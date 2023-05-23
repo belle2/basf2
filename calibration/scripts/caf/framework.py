@@ -1474,3 +1474,5 @@ class CAF():
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
         with CAFDB(self._db_path):
             pass
+
+# @endcond

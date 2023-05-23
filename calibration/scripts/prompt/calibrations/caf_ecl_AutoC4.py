@@ -24,7 +24,6 @@ settings = CalibrationSettings(
         "delayedbhabha": [
             INPUT_DATA_FILTERS["Data Tag"]["delayedbhabha"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
-            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],

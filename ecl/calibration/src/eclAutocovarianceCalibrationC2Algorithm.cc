@@ -16,7 +16,7 @@
 /* ROOT headers. */
 #include <TFile.h>
 #include <TGraph.h>
-#include <TH2F.h>
+#include <TH1D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -34,31 +34,26 @@ eclAutocovarianceCalibrationC2Algorithm::eclAutocovarianceCalibrationC2Algorithm
 CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate()
 {
 
-
-  ///** Put root into batch mode so that we don't try to open a graphics window */
-  //gROOT->SetBatch();
-
   ///**-----------------------------------------------------------------------------------------------*/
-  ///** Histograms containing the data collected by eclGammaGammaECollectorModule */
-  auto m_BaselineInfoVsCrysID = getObjectPtr<TH2F>("m_BaselineInfoVsCrysID");
+  ///** Histograms containing the data collected by eclAutocovarianceCalibrationC2CollectorModule */
+  auto m_BaselineVsCrysID = getObjectPtr<TH1D>("BaselineVsCrysID");
+  auto m_CounterVsCrysID = getObjectPtr<TH1D>("CounterVsCrysID");
 
   std::vector<float> cryIDs;
   std::vector<float> baselines;
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    float totalCounts = m_BaselineInfoVsCrysID->GetBinContent(m_BaselineInfoVsCrysID->GetBin(crysID + 1, 32));
-    float baseline = 0.0;
-    for (int i = 0; i < 31; i++) {
-      //B2INFO(i<<" "<<m_BaselineInfoVsCrysID->Fill(crysID,i,0)/totalCounts<<" "<<m_BaselineInfoVsCrysID->Fill(crysID,i,0));
-      baseline += float(m_BaselineInfoVsCrysID->GetBinContent(m_BaselineInfoVsCrysID->GetBin(crysID + 1, i + 1)));
-    }
+    double totalCounts = m_CounterVsCrysID->GetBinContent(m_CounterVsCrysID->GetBin(crysID + 1));
+
+    ///** Note min number of entries requirement is present in the C1 Algorithm */
+    double baseline = baseline = m_BaselineVsCrysID->GetBinContent(m_BaselineVsCrysID->GetBin(crysID + 1));;
     baseline /= 31.0;
     baseline /= totalCounts;
 
     B2INFO("crysID " << crysID << " baseline: " << baseline);
 
-    cryIDs.push_back(crysID + 1);
+    cryIDs.push_back(crysID);
     baselines.push_back(baseline);
 
     B2INFO("eclAutocovarianceCalibrationC2Algorithm crysID baseline totalCounts  " << crysID << " " << baseline << " " << totalCounts);
@@ -73,7 +68,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
 
-  m_BaselineInfoVsCrysID->Write();
+  m_BaselineVsCrysID->Write();
   gBaselineVsCrysID->Write();
 
   /** Saving baseline results to db for access in stage C3 */

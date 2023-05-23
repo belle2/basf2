@@ -7,6 +7,9 @@
 
 #pragma once
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
 //Calibration
 #include <calibration/CalibrationCollectorModule.h>
 
@@ -48,9 +51,11 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold; /**< peak to peak noise threshold computed from step C1 */
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
 
-    float myHist[8736][32];  /**< container for histogram values  */
+    double m_sumOfSamples[ECLElementNumbers::c_NCrystals] = {}; // sum of 31 samples for selected waveforms
+    int m_nSelectedWaveforms[ECLElementNumbers::c_NCrystals] = {}; // number of selected waveforms for each crystal
 
-    TH2F* m_BaselineInfoVsCrysID; /**< final histogram returned by collector  */
+    TH1D* m_BaselineVsCrysID; /**< final histogram returned by collector contains baseline */
+    TH1D* m_CounterVsCrysID; /**< final histogram returned by collector contains counter */
 
   };
 } // end Belle2 namespace

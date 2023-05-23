@@ -7,6 +7,9 @@
 
 #pragma once
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
 //Calibration
 #include <calibration/CalibrationCollectorModule.h>
 
@@ -49,7 +52,8 @@ namespace Belle2 {
     std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
     std::vector<float> m_tempArray; /**< vector of thresholds obtained from DB object */
     TH2F* CovarianceMatrixInfoVsCrysID;  /**< result returned by collector that contains the coveriance matrix for each crystal  */
-    float myHist[8736][32]; /**< container for coveriance matrix  */
+    const int nADCWaveformPoints = 31; /**< length of ECLDSP waveforms  */
+    float m_CovarianceMatrixInfoVsCrysIDHistogram[ECLElementNumbers::c_NCrystals][32] = {}; /**< container for coveriance matrix  */
 
   };
 } // end Belle2 namespace

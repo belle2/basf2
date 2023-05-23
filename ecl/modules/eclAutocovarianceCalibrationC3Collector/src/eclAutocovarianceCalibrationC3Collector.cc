@@ -34,7 +34,7 @@ eclAutocovarianceCalibrationC3CollectorModule::eclAutocovarianceCalibrationC3Col
   m_ECLAutocovarianceCalibrationC2Baseline("ECLAutocovarianceCalibrationC2Baseline")
 {
   // Set module properties
-  setDescription("Module to compute covarience matrix using waveforms from random trigger events");
+  setDescription("Module to compute covarience matrix using waveforms from delayed Bhabha events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -48,7 +48,8 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   CovarianceMatrixInfoVsCrysID = new TH2F("CovarianceMatrixInfoVsCrysID", "", ECLElementNumbers::c_NCrystals, 0,
-                                          ECLElementNumbers::c_NCrystals, 32, 0, 32);
+                                          ECLElementNumbers::c_NCrystals, nADCWaveformPoints + 1, 0, nADCWaveformPoints + 1);
+
   registerObject<TH2F>("CovarianceMatrixInfoVsCrysID", CovarianceMatrixInfoVsCrysID);
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
@@ -57,11 +58,6 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 
   m_eclDsps.registerInDataStore();
 
-  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
-
-    for (int j = 0; j < 32; j++) myHist[i][j] = 0.0;
-
-  }
 }
 
 
@@ -84,22 +80,35 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
 
         float baseline = m_Baselines[id];
 
+        // Computing baseline subtracted waveform
         m_tempArray.clear();
-        for (int i = 0; i < 31; i++) m_tempArray.push_back(aECLDsp.getDspA()[i] - baseline);
+        for (int i = 0; i < nADCWaveformPoints; i++) m_tempArray.push_back(aECLDsp.getDspA()[i] - baseline);
 
-        for (int i = 0; i < 31; i++) {
+        /*
+        Info on convariance matrix calucation:
+
+        We store only nADCWaveformPoints numbers because there are several symmetries:
+        -  In general the matrix is nADCWaveformPointsxnADCWaveformPoints, however, the matrix symmetric so we only compute the upper part of the matrix.
+        -  We also assume the noise is random in time.  With this assumption the values of each matrix diagonal will be the same.   This allows us to define the matrix with only nADCWaveformPoints numbers: One for each diagonal (starting with the main diagonal)
+           I divide by (nADCWaveformPoints - (i-j)) to average over the number of off-diagonal elements for each row.
+           Using the final nADCWaveformPoints numbers the full nADCWaveformPointsxnADCWaveformPoints matrix in constructed by:
+           Element 0 is the nADCWaveformPoints main diagonals
+           Element 1 is the value of the 30 off diagonals
+        */
+
+        for (int i = 0; i < nADCWaveformPoints; i++) {
 
           float value_i = m_tempArray[i];
 
-          for (int j = i; j < 31; j++) {
+          for (int j = i; j < nADCWaveformPoints; j++) {
 
             int tempIndex = abs(i - j);
 
-            myHist[id][tempIndex] += (value_i * m_tempArray[j]);
+            m_CovarianceMatrixInfoVsCrysIDHistogram[id][tempIndex] += (value_i * m_tempArray[j]);
 
           }
+          m_CovarianceMatrixInfoVsCrysIDHistogram[id][31]++;
         }
-        myHist[id][31]++;
       }
     }
   }
@@ -108,9 +117,9 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
 
 void eclAutocovarianceCalibrationC3CollectorModule::closeRun()
 {
-  for (int i = 0; i < 8736; i++) {
-    for (int j = 0; j < 32; j++) {
-      getObjectPtr<TH2>("CovarianceMatrixInfoVsCrysID")->SetBinContent(i + 1, j + 1, myHist[i][j]);
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
+    for (int j = 0; j < (nADCWaveformPoints + 1); j++) {
+      getObjectPtr<TH2>("CovarianceMatrixInfoVsCrysID")->SetBinContent(i + 1, j + 1, m_CovarianceMatrixInfoVsCrysIDHistogram[i][j]);
     }
   }
 }

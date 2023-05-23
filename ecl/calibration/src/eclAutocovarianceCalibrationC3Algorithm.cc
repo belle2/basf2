@@ -43,8 +43,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   ///** Put root into batch mode so that we don't try to open a graphics window */
   gROOT->SetBatch();
 
-  int m_CountLimit = 1000;
-
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histogram containing the data collected by eclAutocovarianceCalibrationC3Collector*/
   auto CovarianceMatrixInfoVsCrysID = getObjectPtr<TH2F>("CovarianceMatrixInfoVsCrysID");
@@ -54,11 +52,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   for (int ID = 0; ID < ECLElementNumbers::c_NCrystals; ID++) {
 
     float totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1, 32));
-
-    if (totalCounts < m_CountLimit) {
-      B2INFO("eclAutocovarianceCalibrationC3Algorithm: Warning Below Count Limit: ID totalCounts m_CountLimit: " << ID << " " <<
-             totalCounts << " " << m_CountLimit);
-    }
 
     TMatrixDSym NoiseMatrix;
     NoiseMatrix.ResizeTo(31, 31);

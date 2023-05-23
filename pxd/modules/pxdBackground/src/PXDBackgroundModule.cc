@@ -239,7 +239,10 @@ void PXDBackgroundModule::event()
           }
         }
       }
-      if (!simhit) continue; //skip this true hit if the simhit is still null after setting it manually
+      if (!simhit) {
+        B2WARNING("No related PXDSimHit found");
+        continue; //skip this true hit if the simhit is still null after setting it manually
+      }
       // FIXME: Is there a difference between positrons and electrons wrt. NIEL?
       // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.
       // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.

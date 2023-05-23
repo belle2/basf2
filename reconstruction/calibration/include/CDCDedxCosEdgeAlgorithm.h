@@ -47,7 +47,7 @@ namespace Belle2 {
     /**
     * function enable monitoring plots
     */
-    void setMonitoringPlots(bool value = false) {m_isMakePlots = value;}
+    void setMonitoringPlots(bool value = true) {m_isMakePlots = value;}
 
     /**
     * set sigma to restrict fit in (mean+/sigma) range

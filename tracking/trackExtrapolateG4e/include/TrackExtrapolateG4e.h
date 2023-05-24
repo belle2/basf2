@@ -222,20 +222,6 @@ namespace Belle2 {
                      const G4ThreeVector& momentum,
                      const G4ErrorSymMatrix& covariance);
 
-    //! Performs muon identification for a single track (specified in genfit2 units).
-    //! @param pdgCode Signed PDG identifier of the particle hypothesis to be used for the extrapolation.
-    //! @param tof Starting time, i.e., time of flight from the IP, at the starting point (ns).
-    //! @param isCosmic True to back-extrapolate a cosmic ray
-    //! @param position Starting point of the extrapolation (cm).
-    //! @param momentum Momentum of the track at the starting point (GeV/c).
-    //! @param covariance Phase-space covariance matrix (6x6) at the starting point (cm, GeV/c).
-    void identifyMuon(int pdgCode,
-                      double tof,
-                      bool isCosmic,
-                      const G4ThreeVector& position,
-                      const G4ThreeVector& momentum,
-                      const G4ErrorSymMatrix& covariance);
-
   private:
 
     //! constructor is hidden; user calls TrackExtrapolateG4e::getInstance() instead

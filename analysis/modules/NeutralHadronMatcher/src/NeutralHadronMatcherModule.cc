@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TRandom.h>
+#include <analysis/variables/MCTruthVariables.h>
 
 using namespace Belle2;
 
@@ -27,6 +28,8 @@ NeutralHadronMatcherModule::NeutralHadronMatcherModule() : Module()
   addParam("efficiencyCorrection", m_effcorr, "data/mc efficiency ratio", 0.83);
   addParam("distanceCut", m_distance, "Matching distance", 15.0);
   addParam("mcPDGcode", m_mcPDG, "MC PDG code of the neutral hadron", 130);
+  addParam("ignoreClustersWithPDGcodes", m_PDGignore, "Do not attempt to match clusters that are already matched with specific codes",
+           std::vector<int> {22});
 }
 
 void NeutralHadronMatcherModule::initialize()
@@ -72,11 +75,13 @@ void NeutralHadronMatcherModule::event()
   }
 
   // collect only primary mcparticles that match m_mcPDG
-  std::vector<MCParticle*> primaryMCParticles;
+  std::vector< std::pair<MCParticle*, bool> > primaryMCParticles;
   for (int i = 0; i < mcparticles.getEntries(); i++) {
     auto mcPart = mcparticles[i];
-    if (mcPart->isPrimaryParticle() && abs(mcPart->getPDG()) == m_mcPDG)
-      primaryMCParticles.push_back(mcPart);
+    if (mcPart->isPrimaryParticle() && abs(mcPart->getPDG()) == m_mcPDG) {
+      bool AddInefficiency = (gRandom->Uniform() > m_effcorr);
+      primaryMCParticles.push_back(std::pair(mcPart, AddInefficiency));
+    }
   }
 
   const size_t nMCPart = primaryMCParticles.size();
@@ -93,21 +98,23 @@ void NeutralHadronMatcherModule::event()
     for (size_t iPart = 0; iPart < nPart; iPart++) {
 
       auto particle = particleList->getParticle(iPart);
+      auto bestMatch = Variable::particleClusterBestMCPDGCode(particle);
 
-      const MCParticle* mcPartCl = particle->getMCParticle();
-      if ((mcPartCl) && (mcPartCl->getPDG() == 22)) continue;
+      if ((bestMatch) && (std::find(m_PDGignore.begin(), m_PDGignore.end(), int(bestMatch)) != m_PDGignore.end())) {
+        continue;
+      }
 
       const ECLCluster* eclcluster = particle->getECLCluster();
       if (!eclcluster) continue;
 
       // create a vector of distances from MCParticles
-      std::vector<double> distances;
+      std::vector< std::pair <double, bool> > distances;
       distances.resize(nMCPart);
 
       // loop over mcparticles
       for (size_t iMCPart = 0; iMCPart < nMCPart; iMCPart++) {
 
-        auto mcPart = primaryMCParticles[iMCPart];
+        auto mcPart = primaryMCParticles[iMCPart].first;
 
         auto vtx = mcPart->getProductionVertex();
         auto momentum = mcPart->getMomentum();
@@ -126,19 +133,20 @@ void NeutralHadronMatcherModule::event()
         double y = vtx.Y() + rECL * sin(momentum.Phi());
 
         double dist = sqrt((x - xcl) * (x - xcl) + (y - ycl) * (y - ycl) + (z - zcl) * (z - zcl));
-        distances[iMCPart] = dist;
+        distances[iMCPart] = std::pair(dist, primaryMCParticles[iMCPart].second);
       }
 
-      auto it_distMin = std::min_element(distances.begin(), distances.end());
-      double distMin = *it_distMin;
-      bool AddInefficiency = (gRandom->Uniform() > m_effcorr);
+      auto it_distMin = std::min_element(distances.begin(), distances.end(),
+      [](const auto & a, const auto & b) { return a.first < b.first;});
+      double distMin = (*it_distMin).first;
+      bool AddInefficiency = (*it_distMin).second;
       if ((distMin < m_distance) && AddInefficiency)
         distMin = -distMin;
 
       particle->setExtraInfo(m_infoName, distMin);
 
       if ((distMin < m_distance) && (distMin > 0))
-        particle->setExtraInfo(m_matchedId, primaryMCParticles[std::distance(distances.begin(), it_distMin)]->getArrayIndex());
+        particle->setExtraInfo(m_matchedId, primaryMCParticles[std::distance(distances.begin(), it_distMin)].first->getArrayIndex());
 
     }
   }

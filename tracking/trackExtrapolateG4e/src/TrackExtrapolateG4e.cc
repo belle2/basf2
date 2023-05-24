@@ -484,54 +484,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
   swim(extState, g4eState);
 }
 
-void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
-                                       double tof, // in ns (from IP to position)
-                                       bool isCosmic, // true for back-extrapolation
-                                       const G4ThreeVector& position, // in cm (genfit2 units)
-                                       const G4ThreeVector& momentum, // in GeV/c (genfit2 units)
-                                       const G4ErrorSymMatrix& covariance) // (6x6) using cm, GeV/c (genfit2 units)
-{
-
-  if ((!m_ExtInitialized) && (!m_MuidInitialized)) {
-    // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
-    // The default values are taken from the MUID module's parameter definitions.
-    Simulation::ExtManager* extMgr = Simulation::ExtManager::GetManager();
-    extMgr->Initialize("Muid", "default", 0.0, 0.25, false, 0, std::vector<std::string>());
-    // Redefine geant4e step length, magnetic field step limitation (fraction of local curvature radius),
-    // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
-    // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
-    // *NOTE* If module muid runs after this, its G4UImanager commands will override these.
-    G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/stepLength 250 mm");
-    G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
-    G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
-    m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used
-    initialize(0.0, 30.0, 3.5, 150.0, 100.0, 0.1, 0.002, false, *m_DefaultHypotheses);
-  }
-
-  // Put geant4 in proper state (in case this module is in a separate process)
-  if (G4StateManager::GetStateManager()->GetCurrentState() == G4State_Idle) {
-    G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
-  }
-
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetMuid);
-
-  // Do extrapolation for selected hypothesis (pion, electron, muon, kaon, proton,
-  // deuteron) for the selected track until calorimeter exit.
-
-  G4ThreeVector positionG4e = position * CLHEP::cm; // from genfit2 units (cm) to geant4 units (mm)
-  G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // from genfit2 units (GeV/c) to geant4 units (MeV/c)
-  if (isCosmic)
-    momentumG4e = -momentumG4e;
-  G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
-  fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
-  G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
-  G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
-  ExtState extState = { nullptr, pdgCode, isCosmic, tof, 0.0,                             // for EXT and MUID
-                        momentumG4e.unit(), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false  // for MUID only
-                      };
-  swim(extState, g4eState, nullptr, nullptr, nullptr);
-}
-
 // Swim one track for MUID until it stops or leaves the KLM-bounding cylinder
 void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eState,
                                const std::vector<std::pair<ECLCluster*, G4ThreeVector> >* eclClusterInfo,

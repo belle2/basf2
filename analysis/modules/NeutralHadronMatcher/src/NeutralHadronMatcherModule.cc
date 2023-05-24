@@ -79,6 +79,12 @@ void NeutralHadronMatcherModule::event()
       primaryMCParticles.push_back(mcPart);
   }
 
+  const size_t nMCPart = primaryMCParticles.size();
+
+  // if no primary MCParticles matching m_mcPDG exists, nothing to do.
+  if (nMCPart == 0)
+    return;
+
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
@@ -93,8 +99,6 @@ void NeutralHadronMatcherModule::event()
 
       const ECLCluster* eclcluster = particle->getECLCluster();
       if (!eclcluster) continue;
-
-      const size_t nMCPart = primaryMCParticles.size();
 
       // create a vector of distances from MCParticles
       std::vector<double> distances;

@@ -26,10 +26,18 @@ namespace Belle2 {
      * @param cutFirst the cut for the 1st MVA
      * @param cutSecond the cut for the 2nd MVA
      */
-    void setCuts(const float cutFirst, const float cutSecond)
+    void setCuts(const bool status, const float cutFirst, const float cutSecond)
     {
+      m_status = status;
       m_cutFirst = cutFirst;
       m_cutSecond = cutSecond;
+    }
+
+
+    /** get the info about turnning on/off the flip&refit */
+    bool getOnOffInfo() const
+    {
+      return m_status;
     }
 
     /** get the first cuts value */
@@ -45,11 +53,13 @@ namespace Belle2 {
     }
 
   private:
+    /** The status of the flip&refit*/
+    float m_status;
     /** The cuts for the 1st filter*/
     float m_cutFirst;
     /** The cuts for the 2nd filter*/
     float m_cutSecond;
 
-    ClassDef(TrackFlippingCuts, 1);  /**< ClassDef, necessary for ROOT */
+    ClassDef(TrackFlippingCuts, 2);  /**< ClassDef, necessary for ROOT */
   };
 }

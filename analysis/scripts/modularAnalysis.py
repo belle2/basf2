@@ -17,8 +17,6 @@ from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 import basf2
 import subprocess
-from ROOT import Belle2
-Const = Belle2.Const
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):

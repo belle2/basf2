@@ -3304,6 +3304,9 @@ def getNeutralHadronGeomMatches(
     @param efficiencyCorrectionNeutrons (default 1.0) apply overall efficiency correction
     @param path    modules are added to this path
     """
+    from ROOT import Belle2
+    Const = Belle2.Const
+
     if addKL:
         path.add_module(
             "NeutralHadronMatcher",

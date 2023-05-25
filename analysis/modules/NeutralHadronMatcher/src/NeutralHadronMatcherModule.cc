@@ -27,17 +27,17 @@ NeutralHadronMatcherModule::NeutralHadronMatcherModule() : Module()
   addParam("particleLists", m_ParticleLists, "Input particle list");
   addParam("efficiencyCorrection", m_effcorr, "data/mc efficiency ratio", 0.83);
   addParam("distanceCut", m_distance, "Matching distance", 15.0);
-  addParam("mcPDGcode", m_mcPDG, "MC PDG code of the neutral hadron", 130);
+  addParam("mcPDGcode", m_mcPDG, "MC PDG code of the neutral hadron", Const::Klong.getPDGCode());
   addParam("ignoreClustersWithPDGcodes", m_PDGignore, "Do not attempt to match clusters that are already matched with specific codes",
-           std::vector<int> {22});
+           std::vector<int> {Const::photon.getPDGCode()});
 }
 
 void NeutralHadronMatcherModule::initialize()
 {
-  if (m_mcPDG == 130) {
+  if (m_mcPDG == Const::Klong.getPDGCode()) {
     m_infoName = "mcdistanceKL";
     m_matchedId = "mdstIndexTruthKL";
-  } else if (abs(m_mcPDG) == 2112) {
+  } else if (abs(m_mcPDG) == Const::neutron.getPDGCode()) {
     m_infoName = "mcdistanceNeutron";
     m_matchedId = "mdstIndexTruthNeutron";
   } else {

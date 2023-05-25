@@ -43,6 +43,7 @@ inroot.param('InputRootFile', argv[1])
 # inroot.param('SelectHistograms', ['TRGTOP/h_*'])
 
 main.add_module(inroot)
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 outroot = b2.register_module('DQMHistAnalysisOutputFile')
 

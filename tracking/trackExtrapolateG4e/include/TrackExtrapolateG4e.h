@@ -182,7 +182,7 @@ namespace Belle2 {
     /** Initialize for track extrapolation by the MUID module.
      @param meanDt Mean value of the in-time window (ns).
      @param maxDt Half-width of the in-time window (ns).
-     @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
+     @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (number of sigmas).
      @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm), criterion for matching relation Track->KLMCluster on MDST.
      @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
      @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
@@ -304,7 +304,7 @@ namespace Belle2 {
     //! Magnetic field z component (gauss) at origin
     double m_MagneticField;
 
-    //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
+    //! user-defined maximum squared-distance (in number of variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
     //! user-defined maximum distance (mm) between KLMCluster and associated track (for KLID)

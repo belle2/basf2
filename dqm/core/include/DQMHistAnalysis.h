@@ -88,7 +88,7 @@ namespace Belle2 {
      * Get the list of the histograms.
      * @return The list of the histograms.
      */
-    static const HistList& getHistList() { return s_histList;};
+    static /*const*/ HistList& getHistList() { return s_histList;};
 
     /**
      * Get the list of MonitoringObjects.

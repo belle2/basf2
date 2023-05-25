@@ -47,6 +47,8 @@ namespace Belle2 {
      * Initializer.
      */
     virtual void initialize() override;
+    /** The map of histogram names to canvas pointers for output. */
+    std::map<std::string, TCanvas*> m_cs;
 
     /**
      * Called when entering a new run.
@@ -84,23 +86,15 @@ namespace Belle2 {
     int m_memsize;
     /** The refresh interval. */
     int m_interval;
-    /** Whether automatically generate canvases for histograms. */
-    bool m_autocanvas;
     /** Whether to remove empty histograms. */
     bool m_remove_empty;
     /** Whether to enable the run info to be displayed. */
     bool m_enable_run_info;
-    /** The list of folders for which automatically generate canvases. */
-    std::vector<std::string> m_acfolders;
-    /** The list of folders which are excluded from automatically generate canvases. */
-    std::vector<std::string> m_exclfolders;
     /** The canvas hold the basic DQM info. */
     TCanvas* m_c_info = nullptr;
 
     /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
-    /** The map of histogram names to canvas pointers for output. */
-    std::map<std::string, TCanvas*> m_cs;
 
     /** Exp number */
     unsigned int m_expno = 0;

@@ -39,11 +39,6 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
   addParam("ShmId", m_shm_id, "ID of shared memory", 0);
   addParam("SemId", m_sem_id, "ID of semaphore", 0);
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
-  addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
-  addParam("AutoCanvasFolders", m_acfolders, "List of histograms to automatically create canvases, empty for all",
-           std::vector<std::string>());
-  addParam("ExcludeFolders", m_exclfolders, "List of folders to exclude from create canvases, empty for none, \"all\" for all",
-           std::vector<std::string>());
   addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
   B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
@@ -59,7 +54,7 @@ void DQMHistAnalysisInputModule::initialize()
     m_memory = new DqmMemFile(m_mempath.c_str());
   else
     m_memory = new DqmMemFile(m_shm_id, m_sem_id);
-  if (m_autocanvas && m_enable_run_info) {
+  if (m_enable_run_info) {
     m_c_info = new TCanvas("DQMInfo/c_info", "");
     m_c_info->SetTitle("");
   } else {
@@ -166,83 +161,6 @@ void DQMHistAnalysisInputModule::event()
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
 
-  // The following code may be better placed in its own module ...
-  if (m_autocanvas) {
-    for (auto& h : hs) {
-      bool give_canvas = false;
-      TString histoname = h->GetName();
-
-      // the following lines prevent any histogram outside a directory to be processed
-      auto split_result = StringSplit(histoname.Data(), '/');
-      if (split_result.size() <= 1) continue;
-      auto dirname = split_result.at(0); // extract dirname, get hist name is in histogram itself
-      if (m_exclfolders.size() == 0) { //If none specified, canvases for all histograms
-        give_canvas = true;
-      } else {
-        bool in_excl_folder = false;
-        if (m_exclfolders.size() == 1 && m_exclfolders[0] == "all") {
-          in_excl_folder = true;
-        } else {
-          for (auto& excl_folder : m_exclfolders) {
-            if (excl_folder == dirname) {
-              in_excl_folder = true;
-              break;
-            }
-          }
-        }
-
-        if (in_excl_folder) {
-          for (auto& wanted_folder : m_acfolders) {
-            B2DEBUG(1, "==" << wanted_folder << "==" << dirname << "==");
-            if (wanted_folder == std::string(histoname)) {
-              give_canvas = true;
-              break;
-            }
-          }
-        } else {
-          give_canvas = true;
-        }
-      }
-
-      if (give_canvas) {
-        B2DEBUG(1, "Auto Hist->Canvas for " << histoname);
-        histoname.ReplaceAll("/", "_");
-        std::string name = histoname.Data();
-        if (m_cs.find(name) == m_cs.end()) {
-          // no canvas exists yet, create one
-          if (split_result.size() > 1) {
-            std::string hname = split_result.at(1);
-            if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
-            TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-            m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-          } else {
-            // but this case is explicity excluded above?
-            std::string hname = histoname.Data();
-            TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
-            m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-          }
-        }
-        TCanvas* c = m_cs[name]; // access already created canvas
-        B2DEBUG(1, "DQMHistAnalysisInput: new canvas " << c->GetName());
-        c->cd();
-        if (h->GetDimension() == 1) {
-          // assume users are expecting non-0-suppressed axis
-          if (h->GetMinimum() > 0) h->SetMinimum(0);
-          h->Draw("hist");
-        } else if (h->GetDimension() == 2) {
-          // ... but not in 2d
-          h->Draw("colz");
-        }
-
-        // set Canvas "name" update flag if histo was updated
-        UpdateCanvas(name, findHist(histoname.Data()) != nullptr);
-
-        // Mark Canvas as repaint needed, but is this needed?
-        c->Update();
-      }
-    }
-  }
-
   // if no histogram was updated, we could stop processing
   setReturnValue(anyupdate);
 }
@@ -260,7 +178,6 @@ void DQMHistAnalysisInputModule::endRun()
     }
   }
 }
-
 
 void DQMHistAnalysisInputModule::terminate()
 {

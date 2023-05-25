@@ -652,17 +652,23 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       if (eclHit1[c].getStatus() != EXT_FIRST) {
         ExtHit* h = m_extHits.appendNew(eclHit1[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
-        extState.track->addRelationTo(h);
+        if (extState.track != nullptr) {
+          extState.track->addRelationTo(h);
+        }
       }
       if (eclHit2[c].getStatus() != EXT_FIRST) {
         ExtHit* h = m_extHits.appendNew(eclHit2[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
-        extState.track->addRelationTo(h);
+        if (extState.track != nullptr) {
+          extState.track->addRelationTo(h);
+        }
       }
       if (eclHit3[c].getStatus() != EXT_FIRST) {
         ExtHit* h = m_extHits.appendNew(eclHit3[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
-        extState.track->addRelationTo(h);
+        if (extState.track != nullptr) {
+          extState.track->addRelationTo(h);
+        }
       }
     }
   }
@@ -678,7 +684,9 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
       (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
-      extState.track->addRelationTo(h); // relation Track to TrackSep
+      if (extState.track != nullptr) {
+        extState.track->addRelationTo(h); // relation Track to TrackSep
+      }
       if (klmHit[c].getDistance() < minDistance) {
         closestCluster = c;
         minDistance = klmHit[c].getDistance();
@@ -687,7 +695,9 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     if (minDistance < m_MaxKLMTrackClusterDistance) {
       // set the relation Track to KLMCluster, using the distance as weight
       // but for being consistent with the basf2 conventions, store the distance in cm
-      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / (minDistance / CLHEP::cm));
+      if (extState.track != nullptr) {
+        extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / (minDistance / CLHEP::cm));
+      }
     }
   }
 

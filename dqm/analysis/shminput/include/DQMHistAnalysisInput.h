@@ -99,7 +99,7 @@ namespace Belle2 {
 
     /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
-    /** The list of canvases for output. */
+    /** The map of histogram names to canvas pointers for output. */
     std::map<std::string, TCanvas*> m_cs;
 
     /** Exp number */

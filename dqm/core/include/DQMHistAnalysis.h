@@ -193,8 +193,9 @@ namespace Belle2 {
      * @param dirname The name of the directory.
      * @param histname The name of the histogram.
      * @param h The TH1 pointer for the histogram.
+     * @return histogram was updated flag
      */
-    static void addHist(const std::string& dirname,
+    static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
     /**

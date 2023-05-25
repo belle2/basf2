@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::CKFParameters+; // checksum=0x8dcd40df, version=1
 #pragma link C++ class Belle2::TrackFitMomentumRange+; // checksum=0x8f6de621, version=1
 #pragma link C++ class Belle2::TrackFlippingCuts+; // checksum=0x57cfa387, version=1
+#pragma link C++ class Belle2::DAFparameters+; // checksum=0x6378593d, version=1
 
 #endif

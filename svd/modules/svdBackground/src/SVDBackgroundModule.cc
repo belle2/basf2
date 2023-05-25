@@ -234,7 +234,7 @@ void SVDBackgroundModule::event()
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;
         currentSensorThickness = getSensorThickness(currentSensorID);
-        currentSensorMass = getSensorMass(currentSensorID);
+        //currentSensorMass = getSensorMass(currentSensorID);
         currentSensorArea = getSensorArea(currentSensorID);
       }
       // J(TrueHit) = abs(step)/thickness * correctionFactor;

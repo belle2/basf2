@@ -119,10 +119,10 @@ void SVDTimeCalibrationsMonitorModule::event()
             float f4 = -99;
 
             if (TString(m_timeAlgo).Contains("CoG6")) {
-              f0 = m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
-              f1 = m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
-              f2 = m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
-              f4 = m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
+              m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
+              m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
+              m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
+              m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
             }
 
             if (TString(m_timeAlgo).Contains("CoG3")) {
@@ -139,10 +139,10 @@ void SVDTimeCalibrationsMonitorModule::event()
             }
 
             if (TString(m_timeAlgo).Contains("ELS3")) {
-              f0 = m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
-              f1 = m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
-              f2 = m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
-              f4 = m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
+              m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
+              m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
+              m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
+              m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
             }
 
             m_tree->Fill();

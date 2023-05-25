@@ -49,8 +49,8 @@ main.add_module('DQMHistAnalysisInputRootFile',
                                   "SVDClsTrk/*",
                                   "SVDEfficiency/*"],
                 EventInterval=1,
-                NullHistogramMode=False,
-                AutoCanvas=False)
+                NullHistogramMode=False)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 # Run analysis module
 main.add_module('DQMHistAnalysisSVDOnMiraBelle')

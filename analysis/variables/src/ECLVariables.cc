@@ -42,7 +42,7 @@ namespace Belle2 {
       } else {
         B2WARNING("The extraInfo mcdistanceKL is not registered! \n"
                   "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -53,7 +53,7 @@ namespace Belle2 {
       } else {
         B2WARNING("The extraInfo mcdistanceNeutron is not registered! \n"
                   "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 

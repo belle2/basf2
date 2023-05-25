@@ -23,7 +23,7 @@ namespace Belle2 {
     TBranch* m_branch;
   public:
     /** Add to the TTree
-     * @param tree a branch whose name and type are inferred from @param var
+     * @param tree a branch whose name and type are inferred from parameter var
      */
     explicit VariableTBranch(TTree* tree);
 

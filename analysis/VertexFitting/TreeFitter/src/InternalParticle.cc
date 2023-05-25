@@ -121,10 +121,8 @@ namespace TreeFitter {
         RecoTrack* dau1 = trkdaughters[0];
         RecoTrack* dau2 = trkdaughters[1];
 
-        Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                 dau1->particle()->getPDGCode())))->getHelix();
-        Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                 dau2->particle()->getPDGCode())))->getHelix();
+        Belle2::Helix helix1 = dau1->particle()->getTrackFitResult()->getHelix();
+        Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
 
         double flt1(0), flt2(0);
         HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
@@ -391,4 +389,3 @@ namespace TreeFitter {
   }
 
 }
-

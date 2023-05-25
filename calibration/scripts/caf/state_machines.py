@@ -1116,3 +1116,5 @@ class TransitionError(MachineError):
     """
     Exception for when transitions fail.
     """
+
+# @endcond

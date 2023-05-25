@@ -2271,3 +2271,5 @@ class SplitterError(Exception):
     """
     Base exception class for SubjobSplitter objects.
     """
+
+# @endcond

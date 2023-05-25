@@ -14,6 +14,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <TMatrixFfwd.h>
 #include <TMatrixFSymfwd.h>
 
 #include <vector>

@@ -3,10 +3,10 @@ Changes in the analysis package in light-2305-korat
 
 Geometric matching of KL and neutrons to ECL clusters
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-* Added a new module and a helper function ``getNeutralHadronGeomMatches`` to perform geometric match between generated neutral hadrons
-  (KL and neutrons) to ECL clusters. The function optinally provides efficiency correction to the simulation to improve KL modelling in ECL.
-  The function creates additional variables ``mcdistanceKL``, ``mdstIndexTruthKL`` for KL and ``mcdistanceNeutron``,
-  ``mdstIndexTruthNeutron`` for neutrons, respectively.
+* Added a new module and a helper function `getNeutralHadronGeomMatches` to perform geometric match between generated neutral hadrons
+  (KL and neutrons) and ECL clusters. The function optionally provides efficiency correction to the simulation to improve KL modelling in ECL.
+  The function creates the additional variables `distanceToMcKl`, `mdstIndexMcKl` for KL and `distanceToMcNeutron`,
+  `mdstIndexMcNeutron` for neutrons, respectively.
 
 Variables
 +++++++++

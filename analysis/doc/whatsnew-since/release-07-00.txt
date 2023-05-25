@@ -5,8 +5,8 @@ Geometric matching of KL and neutrons to ECL clusters
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Added a new module and a helper function ``getNeutralHadronGeomMatches`` to perform geometric match between generated neutral hadrons
   (KL and neutrons) to ECL clusters. The function optinally provides efficiency correction to the simulation to improve KL modelling in ECL.
-  The function creates additional variables `mcdistanceKL`, `mdstIndexTruthKL` for KL and `mcdistanceNeutron`, `mdstIndexTruthNeutron`
-  for neutrons, respectively.
+  The function creates additional variables ``mcdistanceKL``, ``mdstIndexTruthKL`` for KL and ``mcdistanceNeutron``,
+  ``mdstIndexTruthNeutron`` for neutrons, respectively.
 
 Variables
 +++++++++

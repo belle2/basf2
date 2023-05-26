@@ -30,8 +30,8 @@
 		<!-- Include the definition of all the components like ladders, sensors and
 				 chips -->
 		<xi:include href="SVD-Components.xml"/>
-		<!-- include radiation sensor definition -->
-		<xi:include href="SVD-RadiationSensors.xml"/>
+		<!-- include radiation sensor definition, OBSOLETE, replaced by beast/beamabort -->
+		<!-- <xi:include href="SVD-RadiationSensors.xml"/> -->
 
 		<!-- Only for testing: Each layer with only one ladder to check module positions -->
 		<!--<HalfShell name="Pat">

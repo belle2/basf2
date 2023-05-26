@@ -7,8 +7,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <TObject.h>
 #include <tuple>
 
@@ -40,54 +38,53 @@ namespace Belle2 {
       m_DeltaWeight = weight;
     }
     /** Set the probability cut for the weight calculation for the hits
-    * @param probcut probability cut used in setProbCut and addProbCut method from DAF
+    * @param probabilitycut probability cut used in setProbCut and addProbCut method from DAF
     */
-    void setProbCut(const float probcut)
+    void setProbabilityCut(const float probabilitycut)
     {
-      m_ProbCut = probcut;
+      m_ProbabilityCut = probabilitycut;
     }
     /** Set the start and end temperatures, and the number of iterations for the annealing scheme
-    * @param Tstart Starting temperature for annealing scheme
-    * @param Tfinal Final temperature for annealing scheme
-    * @param niter number of iterations for annealing scheme
+    * @param temperaturestart Starting temperature for annealing scheme
+    * @param temperaturefinal Final temperature for annealing scheme
+    * @param numberofiterations number of iterations for annealing scheme
     */
-    void setAnnealingScheme(const float Tstart, const float Tfinal, const int niter)
+    void setAnnealingScheme(const float temperaturestart, const float temperaturefinal, const int numberofiterations)
     {
-      //m_AnnealingScheme = std::tuple<float, float, int>(Tstart, Tfinal, niter);
-      m_TStart = Tstart;
-      m_TFinal = Tfinal;
-      m_NIter = niter;
+      m_TemperatureStart = temperaturestart;
+      m_TemperatureFinal = temperaturefinal;
+      m_NumberOfIterations = numberofiterations;
     }
     /** Set the minimum number of iterations for pValue check
-    * @param miniter number of iterations for annealing scheme
+    * @param minimumiterations number of iterations for annealing scheme
     */
-    void setMinIter(const int miniter)
+    void setMinimumIterations(const int minimumiterations)
     {
-      m_MinIter = miniter;
+      m_MinimumIterations = minimumiterations;
     }
     /** Set the maximum number of iterations
-    * @param maxiter max number of iterations of annealing scheme
+    * @param maximumiterations max number of iterations of annealing scheme
     * We suggest to avoid setting MaxIter < NIter
     */
-    void setMaxIter(const int maxiter)
+    void setMaximumIterations(const int maximumiterations)
     {
-      m_MaxIter = maxiter;
+      m_MaximumIterations = maximumiterations;
     }
     /** Set the minimum number of iterations for pValue check
-    * @param miniterforpval min number of iterations of annealing scheme before pvalue check
+    * @param minimumiterationsforpval min number of iterations of annealing scheme before pvalue check
     */
-    void setMinIterForPVal(const int miniterforpval)
+    void setMinimumIterationsForPVal(const int minimumiterationsforpval)
     {
-      m_MinIterForPVal = miniterforpval;
+      m_MinimumIterationsForPVal = minimumiterationsforpval;
     }
-    /** Set the maximum number of failed hits after which yhe fit should be cancelled.
+    /** Set the maximum number of failed hits after which the fit should be cancelled.
     * (exception during construction of plane, extrapolation etc.)
     * -1 means don't cancel
-    * @param maxfailedhits max number of failed hits
+    * @param maximumfailedhits max number of failed hits
     */
-    void setMaxFailedHits(const int maxfailedhits)
+    void setMaximumFailedHits(const int maximumfailedhits)
     {
-      m_MaxFailedHits = maxfailedhits;
+      m_MaximumFailedHits = maximumfailedhits;
     }
 
 
@@ -106,65 +103,66 @@ namespace Belle2 {
     }
     /** Get the probability cut for the weight calculation for the hits
     */
-    float getProbCut() const
+    float getProbabilityCut() const
     {
-      return m_ProbCut;
+      return m_ProbabilityCut;
     }
     /** Get the start and end temperatures and number of iterations for the annealing scheme
+    * returns a tuple with the elements in the following order: (TStart, TEnd, NIter)
     */
     std::tuple<float, float, int> getAnnealingScheme() const
     {
-      return std::tuple<float, float, int>(m_TStart, m_TFinal, m_NIter);
+      return std::tuple<float, float, int>(m_TemperatureStart, m_TemperatureFinal, m_NumberOfIterations);
     }
     /** Get the minimum number of iterations of annealing scheme
     */
-    int getMinIter() const
+    int getMinimumIterations() const
     {
-      return m_MinIter;
+      return m_MinimumIterations;
     }
     /** Get the maximum number of iterations of annealing scheme
     */
-    int getMaxIter() const
+    int getMaximumIterations() const
     {
-      return m_MaxIter;
+      return m_MaximumIterations;
     }
     /** Get the minimum number of iterations for pValue check
     */
-    int getMinIterForPVal() const
+    int getMinimumIterationsForPVal() const
     {
-      return m_MinIterForPVal;
+      return m_MinimumIterationsForPVal;
     }
     /** Get the maximum number of failed hits after which the fit should be cancelled.
     * (exception during construction of plane, extrapolation etc.)
     * -1 means don't cancel
     */
-    int getMaxFailedHits() const
+    int getMaximumFailedHits() const
     {
-      return m_MaxFailedHits;
+      return m_MaximumFailedHits;
     }
 
   private:
     /** The DeltaPValue for p-value convergence criterion */
-    float m_DeltaPValue;
+    float m_DeltaPValue = 1;
     /** The DeltaWeight for weights convergence criterion */
-    float m_DeltaWeight;
+    float m_DeltaWeight = 0.001;
     /** The probability cut for weight calculation */
-    float m_ProbCut;
+    float m_ProbabilityCut = 0.001;
     /** The annealing scheme :
-    /** Start temperature */
-    float m_TStart;
+    * Start temperature */
+    float m_TemperatureStart = 100;
     /** End temperature */
-    float m_TFinal;
+    float m_TemperatureFinal = 0.1;
     /** Number of iterations */
-    int m_NIter;
+    int m_NumberOfIterations = 5;
     /** The minimum number of iterations of annealing scheme */
-    int m_MinIter;
+    int m_MinimumIterations = 5;
     /** The maximum number of iterations of annealing scheme */
-    int m_MaxIter;
+    int m_MaximumIterations = 9;
     /** The minimum number of iterations for pValue check */
-    int m_MinIterForPVal;
+    int m_MinimumIterationsForPVal = 5;
     /** The maximum number of failed hits after which the fit should be cancelled.*/
-    int m_MaxFailedHits;
+    int m_MaximumFailedHits = 5;
 
 
     ClassDef(DAFparameters, 1);  /**< ClassDef, necessary for ROOT */

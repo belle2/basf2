@@ -15,7 +15,7 @@
 #pragma link C++ class Belle2::KLMCluster+; // checksum=0x9be09a36, version=2
 #pragma link C++ class Belle2::KlId+; // checksum=0xdc073aa, version=2
 
-#pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0xb832890d, version=2
+#pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x3cd041d6, version=3
 
 #pragma link C++ class Belle2::Track+; // checksum=0x1388f8ff, version=6
 #pragma link C++ class Belle2::HitPatternCDC+; // checksum=0x8d86d89e, version=-1

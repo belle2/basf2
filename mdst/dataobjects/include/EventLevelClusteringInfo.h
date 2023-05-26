@@ -17,7 +17,9 @@ namespace Belle2 {
   /**
    * ECL/KLM clustering event level information:
    * - out of time ECLCalDigits;
-   * - ECLClusters rejected before storing to mdst;
+   * - ECLShowers rejected before storing to mdst;
+   * - ECLShowers;
+   * - ECLLocalMaximums;
    * - multi-strip KLMDigits.
    */
   class EventLevelClusteringInfo : public TObject {
@@ -152,6 +154,90 @@ namespace Belle2 {
       m_nKLMDigitsMultiStripBWD = nKLMDigitsMultiStripBWD;
     }
 
+    /** ECL: getter for the number of ECLShowers with photon hypothesis, forward endcap */
+    uint16_t getNECLShowersFWD() const
+    {
+      return m_nECLShowersFWD;
+    }
+
+    /** ECL: getter for the number of ECLShowers with photon hypothesis, barrel */
+    uint16_t getNECLShowersBarrel() const
+    {
+      return m_nECLShowersBarrel;
+    }
+
+    /** ECL: getter for the number of ECLShowers with photon hypothesis, backward endcap */
+    uint16_t getNECLShowersBWD() const
+    {
+      return m_nECLShowersBWD;
+    }
+
+    /** ECL: getter for the number of ECLShowers with photon hypothesis, entire ECL */
+    uint16_t getNECLShowers() const
+    {
+      return m_nECLShowersFWD + m_nECLShowersBarrel + m_nECLShowersBWD;
+    }
+
+    /** ECL: setter for the number of ECLShowers, forward endcap */
+    void setNECLShowersFWD(uint16_t const nECLShowersFWD)
+    {
+      m_nECLShowersFWD = nECLShowersFWD;
+    }
+
+    /** ECL: setter for the number of ECLShowers, barrel */
+    void setNECLShowersBarrel(uint16_t const nECLShowersBarrel)
+    {
+      m_nECLShowersBarrel = nECLShowersBarrel;
+    }
+
+    /** ECL: setter for the number of ECLShowers, backward endcap */
+    void setNECLShowersBWD(uint16_t const nECLShowersBWD)
+    {
+      m_nECLShowersBWD = nECLShowersBWD;
+    }
+
+    /** ECL: getter for the number of ECLLocalMaximums, forward endcap */
+    uint16_t getNECLLocalMaximumsFWD() const
+    {
+      return m_nECLLocalMaximumsFWD;
+    }
+
+    /** ECL: getter for the number of ECLLocalMaximums, barrel */
+    uint16_t getNECLLocalMaximumsBarrel() const
+    {
+      return m_nECLLocalMaximumsBarrel;
+    }
+
+    /** ECL: getter for the number of ECLLocalMaximums, backward endcap */
+    uint16_t getNECLLocalMaximumsBWD() const
+    {
+      return m_nECLLocalMaximumsBWD;
+    }
+
+    /** ECL: getter for the number of ECLLocalMaximums, full ECL */
+    uint16_t getNECLLocalMaximums() const
+    {
+      return m_nECLLocalMaximumsFWD + m_nECLLocalMaximumsBarrel + m_nECLLocalMaximumsBWD;
+    }
+
+    /** ECL: setter for the number of ECLLocalMaximums, forward endcap */
+    void setNECLLocalMaximumsFWD(uint16_t const nECLLocalMaximumsFWD)
+    {
+      m_nECLLocalMaximumsFWD = nECLLocalMaximumsFWD;
+    }
+
+    /** ECL: setter for the number of ECLLocalMaximums, barrel */
+    void setNECLLocalMaximumsBarrel(uint16_t const nECLLocalMaximumsBarrel)
+    {
+      m_nECLLocalMaximumsBarrel = nECLLocalMaximumsBarrel;
+    }
+
+    /** ECL: setter for the number of ECLLocalMaximums, backward endcap */
+    void setNECLLocalMaximumsBWD(uint16_t const nECLLocalMaximumsBWD)
+    {
+      m_nECLLocalMaximumsBWD = nECLLocalMaximumsBWD;
+    }
+
   private:
 
     /** ECL: number of out of time, energetic ECLCalDigits, forward endcap. */
@@ -172,6 +258,24 @@ namespace Belle2 {
     /** KLM: number of multi-strip KLMDigits, backward endcap. */
     uint16_t m_nKLMDigitsMultiStripBWD{0};
 
+    /** ECL: number of ECLShowers, forward endcap. */
+    uint16_t m_nECLShowersFWD {0};
+
+    /** ECL: number of ECLShowers, barrel. */
+    uint16_t m_nECLShowersBarrel {0};
+
+    /** ECL: number of ECLShowers, backward endcap. */
+    uint16_t m_nECLShowersBWD {0};
+
+    /** ECL: number of ECLLocalMaximums, forward endcap. */
+    uint16_t m_nECLLocalMaximumsFWD {0};
+
+    /** ECL: number of ECLLocalMaximums, barrel. */
+    uint16_t m_nECLLocalMaximumsBarrel {0};
+
+    /** ECL: number of ECLLocalMaximums, backward endcap. */
+    uint16_t m_nECLLocalMaximumsBWD {0};
+
     /** ECL: number of photon ECLShowers that are rejected before storing to mdst (max. 255), endcap forward. */
     uint8_t m_nECLShowersRejectedFWD {0};
 
@@ -181,6 +285,9 @@ namespace Belle2 {
     /** ECL: number of photon ECLShowers that are rejected before storing to mdst (max. 255), backward endcap. */
     uint8_t m_nECLShowersRejectedBWD {0};
 
-    ClassDef(EventLevelClusteringInfo, 2); /**< ROOT. */
+    /** Class definition */
+    ClassDef(EventLevelClusteringInfo, 3);
+    // 2: add multi-strip KLMDigits
+    // 3: add ECLShowers and ECLLocalMaximums
   };
 }

@@ -51,7 +51,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            double(5.));
   addParam("removeSigmaN", m_removeSigmaN,
            "Evaluate and remove gauss upto N sigma.",
-           double(5.));
+           double(7.));
   addParam("fracThreshold", m_fracThreshold,
            "Minimum fraction of candidates in a peak (wrt to the highest peak) considered for fitting in the peak-search.",
            double(0.05));
@@ -82,7 +82,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            bool(false));
   addParam("acceptSigmaN", m_acceptSigmaN,
            "Accept clusters upto N sigma.",
-           double(5.));
+           double(7.));
   addParam("writeGroupInfo", m_writeGroupInfo,
            "Write group info into SVDClusters.",
            bool(true));

@@ -7,119 +7,180 @@
  **************************************************************************/
 #pragma once
 
+// ROOT headers.
+#include <TObject.h>
+
+// C++ headers.
+#include <cstdint>
+
 namespace Belle2 {
   /**
-   *Clustering event level information, for example out of time ECLCalDigits, or ECLClusters rejected before storing to mdst.
+   * ECL/KLM clustering event level information:
+   * - out of time ECLCalDigits;
+   * - ECLClusters rejected before storing to mdst;
+   * - multi-strip KLMDigits.
    */
   class EventLevelClusteringInfo : public TObject {
   public:
 
-    /** default constructor */
+    /** Default constructor */
     EventLevelClusteringInfo() = default;
 
-    /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), FWD only. */
+    /** ECL: getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), forward endcap. */
     uint16_t getNECLCalDigitsOutOfTimeFWD() const
     {
       return m_nECLCalDigitsOutOfTimeFWD;
     }
 
-    /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), Barrel only */
+    /** ECL: getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), barrel. */
     uint16_t getNECLCalDigitsOutOfTimeBarrel() const
     {
       return m_nECLCalDigitsOutOfTimeBarrel;
     }
 
-    /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), BWD only */
+    /** ECL: getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), backward endcap. */
     uint16_t getNECLCalDigitsOutOfTimeBWD() const
     {
       return m_nECLCalDigitsOutOfTimeBWD;
     }
 
-    /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), FWD+Barrel+BWD */
+    /** ECL: getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), entire ECL. */
     uint16_t getNECLCalDigitsOutOfTime() const
     {
       return m_nECLCalDigitsOutOfTimeFWD + m_nECLCalDigitsOutOfTimeBarrel + m_nECLCalDigitsOutOfTimeBWD;
     }
 
-    /** Setter for the number of ECLCalDigits that are out of time and above some MeV, FWD only. */
+    /** ECL: setter for the number of ECLCalDigits that are out of time and above some MeV, forward endcap. */
     void setNECLCalDigitsOutOfTimeFWD(uint16_t const nECLCalDigitsOutOfTimeFWD)
     {
       m_nECLCalDigitsOutOfTimeFWD = nECLCalDigitsOutOfTimeFWD;
     }
 
-    /** Setter for the number of ECLCalDigits that are out of time and above some MeV, Barrel only. */
+    /** ECL: setter for the number of ECLCalDigits that are out of time and above some MeV, barrel. */
     void setNECLCalDigitsOutOfTimeBarrel(uint16_t const nECLCalDigitsOutOfTimeBarrel)
     {
       m_nECLCalDigitsOutOfTimeBarrel = nECLCalDigitsOutOfTimeBarrel;
     }
 
-    /** Setter for the number of ECLCalDigits that are out of time and above some MeV, BWD only. */
+    /** ECL: setter for the number of ECLCalDigits that are out of time and above some MeV, backward endcap. */
     void setNECLCalDigitsOutOfTimeBWD(uint16_t const nECLCalDigitsOutOfTimeBWD)
     {
       m_nECLCalDigitsOutOfTimeBWD = nECLCalDigitsOutOfTimeBWD;
     }
 
-    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters, FWD. */
+    /** ECL: getter for the number of photon ECLShowers that are not stored as ECLClusters, forward endcap. */
     uint8_t getNECLShowersRejectedFWD() const
     {
       return m_nECLShowersRejectedFWD;
     }
 
-    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters, Barrel. */
+    /** ECL: getter for the number of photon ECLShowers that are not stored as ECLClusters, barrel. */
     uint8_t getNECLShowersRejectedBarrel() const
     {
       return m_nECLShowersRejectedBarrel;
     }
 
-    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters, BWD. */
+    /** ECL: getter for the number of photon ECLShowers that are not stored as ECLClusters, backward endcap. */
     uint8_t getNECLShowersRejectedBWD() const
     {
       return m_nECLShowersRejectedBWD;
     }
 
-    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters. */
+    /** ECL: setter for the number of photon ECLShowers that are not stored as ECLClusters, entire ECL. */
     uint8_t getNECLShowersRejected() const
     {
       return m_nECLShowersRejectedFWD + m_nECLShowersRejectedBarrel + m_nECLShowersRejectedBWD;
     }
 
-    /** Setter for the number of photon ECLShowers that are not stored as ECLClusters, FWD. */
+    /** ECL: setter for the number of photon ECLShowers that are not stored as ECLClusters, forward endcap. */
     void setNECLShowersRejectedFWD(uint8_t const nECLShowersRejectedFWD)
     {
       m_nECLShowersRejectedFWD = nECLShowersRejectedFWD;
     }
 
-    /** Setter for the number of photon ECLShowers that are not stored as ECLClusters, Barrel. */
+    /** ECL: setter for the number of photon ECLShowers that are not stored as ECLClusters, barrel. */
     void setNECLShowersRejectedBarrel(uint8_t const nECLShowersRejectedBarrel)
     {
       m_nECLShowersRejectedBarrel = nECLShowersRejectedBarrel;
     }
 
-    /** Setter for the number of photon ECLShowers that are not stored as ECLClusters, BWD. */
+    /** ECL: setter for the number of photon ECLShowers that are not stored as ECLClusters, backward endcap. */
     void setNECLShowersRejectedBWD(uint8_t const nECLShowersRejectedBWD)
     {
       m_nECLShowersRejectedBWD = nECLShowersRejectedBWD;
     }
 
+    /** KLM: getter for the number of multi-strip KLMDigits, forward endcap. */
+    uint16_t getNKLMDigitsMultiStripFWD() const
+    {
+      return m_nKLMDigitsMultiStripFWD;
+    }
+
+    /** KLM: getter for the number of multi-strip KLMDigits, barrel. */
+    uint16_t getNKLMDigitsMultiStripBarrel() const
+    {
+      return m_nKLMDigitsMultiStripBarrel;
+    }
+
+    /** KLM: getter for the number of multi-strip KLMDigits, backward endcap. */
+    uint16_t getNKLMDigitsMultiStripBWD() const
+    {
+      return m_nKLMDigitsMultiStripBWD;
+    }
+
+    /** KLM: getter for the number of multi-strip KLMDigits, entire KLM. */
+    uint16_t getNKLMDigitsMultiStrip() const
+    {
+      return m_nKLMDigitsMultiStripFWD + m_nKLMDigitsMultiStripBarrel + m_nKLMDigitsMultiStripBWD;
+    }
+
+    /** KLM: getter for the number of multi-strip KLMDigits, forward endcap. */
+    void setNKLMDigitsMultiStripFWD(uint16_t const nKLMDigitsMultiStripFWD)
+    {
+      m_nKLMDigitsMultiStripFWD = nKLMDigitsMultiStripFWD;
+    }
+
+    /** KLM: getter for the number of multi-strip KLMDigits, barrel. */
+    void setNKLMDigitsMultiStripBarrel(uint16_t const nKLMDigitsMultiStripBarrel)
+    {
+      m_nKLMDigitsMultiStripBarrel = nKLMDigitsMultiStripBarrel;
+    }
+
+    /** KLM: getter for the number of multi-strip KLMDigits, backward endcap. */
+    void setNKLMDigitsMultiStripBWD(uint16_t const nKLMDigitsMultiStripBWD)
+    {
+      m_nKLMDigitsMultiStripBWD = nKLMDigitsMultiStripBWD;
+    }
+
   private:
-    /** Number of out of time, energetic ECLCalDigits, FWD. */
+
+    /** ECL: number of out of time, energetic ECLCalDigits, forward endcap. */
     uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
 
-    /** Number of out of time, energetic ECLCalDigits, Barrel. */
+    /** ECL: number of out of time, energetic ECLCalDigits, barrel. */
     uint16_t m_nECLCalDigitsOutOfTimeBarrel {0};
 
-    /** Number of out of time, energetic ECLCalDigits, BWD. */
+    /** ECL: number of out of time, energetic ECLCalDigits, backward endcap. */
     uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
 
-    /** Number of photon showers that are rejected before storing to mdst (max. 255), FWD. */
+    /** KLM: number of multi-strip KLMDigits, forward endcap. */
+    uint16_t m_nKLMDigitsMultiStripFWD{0};
+
+    /** KLM: number of multi-strip KLMDigits, barrel. */
+    uint16_t m_nKLMDigitsMultiStripBarrel{0};
+
+    /** KLM: number of multi-strip KLMDigits, backward endcap. */
+    uint16_t m_nKLMDigitsMultiStripBWD{0};
+
+    /** ECL: number of photon ECLShowers that are rejected before storing to mdst (max. 255), endcap forward. */
     uint8_t m_nECLShowersRejectedFWD {0};
 
-    /** Number of photon showers that are rejected before storing to mdst (max. 255), Barrel. */
+    /** ECL: cumber of photon ECLShowers that are rejected before storing to mdst (max. 255), barrel. */
     uint8_t m_nECLShowersRejectedBarrel {0};
 
-    /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
+    /** ECL: number of photon ECLShowers that are rejected before storing to mdst (max. 255), backward endcap. */
     uint8_t m_nECLShowersRejectedBWD {0};
 
-    ClassDef(EventLevelClusteringInfo, 1); /**< ROOT. */
+    ClassDef(EventLevelClusteringInfo, 2); /**< ROOT. */
   };
 }

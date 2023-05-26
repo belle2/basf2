@@ -60,6 +60,7 @@ WeightInfo ParticleWeightingModule::getInfo(const Particle* p)
 
 void ParticleWeightingModule::initialize()
 {
+  m_particles.isRequired();
   m_inputList.isRequired(m_inputListName);
   if (m_selectedDaughters != "")
     m_decayDescriptor.init(m_selectedDaughters);
@@ -73,20 +74,26 @@ void ParticleWeightingModule::event()
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
   }
-  for (auto& p : *m_inputList) {
+
+  const unsigned int numParticles = m_inputList->getListSize();
+  for (unsigned int i = 0; i < numParticles; i++) {
+    const Particle* ppointer = m_inputList->getParticle(i);
+    double index = ppointer->getArrayIndex();
+    Particle* p = m_particles[index];
+
     if (m_selectedDaughters != "") {
-      auto selParticles = (m_decayDescriptor.getSelectionParticles(&p));
+      auto selParticles = (m_decayDescriptor.getSelectionParticles(p));
       for (auto& selParticle : selParticles) {
-        Particle* pp = const_cast<Particle*>(selParticle);
+        Particle* pp = m_particles[selParticle->getArrayIndex()];
         WeightInfo info = getInfo(pp);
         for (const auto& entry : info) {
           pp->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
         }
       }
     } else {
-      WeightInfo info = getInfo(&p);
+      WeightInfo info = getInfo(p);
       for (const auto& entry : info) {
-        p.addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+        p->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
       }
     }
   }

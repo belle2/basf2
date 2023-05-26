@@ -10,9 +10,11 @@
 
 /* Basf2 headers. */
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 class TTree;
 class TFile;
@@ -73,6 +75,9 @@ namespace Belle2 {
 
     /** Store array: ECLLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** MCParticles.*/
     virtual const char* mcParticleArrayName() const

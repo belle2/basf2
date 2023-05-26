@@ -150,10 +150,12 @@ namespace Belle2 {
     float m_DeltaWeight;
     /** The probability cut for weight calculation */
     float m_ProbCut;
-    /** The annealing scheme : start temperature, end temerature, number of iterations */
-    //std::tuple<float, float, int> m_AnnealingScheme;
+    /** The annealing scheme :
+    /** Start temperature */
     float m_TStart;
+    /** End temperature */
     float m_TFinal;
+    /** Number of iterations */
     int m_NIter;
     /** The minimum number of iterations of annealing scheme */
     int m_MinIter;

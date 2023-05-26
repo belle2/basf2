@@ -89,8 +89,8 @@ namespace Belle2 {
     }
 
     /**
-     * Sets number of global clock tics since last revo9 flag
-     * @param revo9Counter counter state
+     * Sets number of system clock tics since last revo9 marker
+     * @param revo9Counter counter state when L1 trigger is issued
      */
     void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
 
@@ -129,16 +129,29 @@ namespace Belle2 {
     int getBunchNo() const {return m_recBunchNo;}
 
     /**
-     * Returns reconstructed absolute bunch number within the ring
-     * @param offset offset [RF clock ticks] (to be calibrated)
+     * Returns reconstructed bucket number within the ring
+     * @param recBunchNo reconstructed bunch number relative to L1 trigger
+     * @param revo9Count number of system clock tics since last revo9 marker at L1 trigger
+     * @param offset calibrated offset [RF clock ticks]
      * @param RFBucketsPerRevolution number of RF buckets per beam revolution
-     * @return bunch number w.r.t revolution marker
+     * @return bucket number
      */
-    int getAbsoluteBunchNo(int offset, unsigned RFBucketsPerRevolution = 5120) const
+    static int getBucketNumber(int recBunchNo, int revo9Count, int offset, int RFBucketsPerRevolution)
     {
-      int bn = (m_recBunchNo + m_revo9Counter * 4 - offset) % RFBucketsPerRevolution;
+      int bn = (recBunchNo + revo9Count * 4 - offset) % RFBucketsPerRevolution;
       if (bn < 0) bn += RFBucketsPerRevolution;
       return bn;
+    }
+
+    /**
+     * Returns reconstructed bucket number within the ring
+     * @param offset calibrated offset [RF clock ticks]
+     * @param RFBucketsPerRevolution number of RF buckets per beam revolution
+     * @return buncket number
+     */
+    int getBucketNumber(int offset, unsigned RFBucketsPerRevolution = 5120) const
+    {
+      return getBucketNumber(m_recBunchNo, m_revo9Counter, offset, RFBucketsPerRevolution);
     }
 
     /**

@@ -673,10 +673,9 @@ namespace Belle2 {
 
     // corresponding bucket number
 
-    auto RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
+    int RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
     int offset = m_isMC ? 0 : m_fillPatternOffset->get();
-    int bucket = (bunchNo + m_revo9Counter * 4 - offset) % RFBuckets;
-    if (bucket < 0) bucket += RFBuckets;
+    int bucket = TOPRecBunch::getBucketNumber(bunchNo, m_revo9Counter, offset, RFBuckets);
 
     return m_bunchStructure->getBucket(bucket);
   }

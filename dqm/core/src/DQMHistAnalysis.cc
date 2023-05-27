@@ -39,7 +39,7 @@ DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
   setDescription("Histogram Analysis module base class");
 }
 
-void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
+bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
 {
   std::string fullname;
   if (dirname.size() > 0) {
@@ -47,16 +47,18 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   } else {
     fullname = histname;
   }
-  s_histList[fullname].update(h);
 
-  if (s_histList[fullname].isUpdated()) {
+  if (s_histList[fullname].update(h)) {
     // only if histogram changed, check if delta histogram update needed
     auto it = s_deltaList.find(fullname);
     if (it != s_deltaList.end()) {
       B2DEBUG(20, "Found Delta" << fullname);
       it->second->update(h); // update
     }
+    return true; // histogram changed
   }
+
+  return false; // histogram didnt change
 }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,

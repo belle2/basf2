@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -327,7 +326,7 @@ class fitDeltaT(b2.Module):
         Here the module initializes by declaring the variables corresponding to the interesting physical parameters and
         decay times. The RooDataSets where the information will be saved are also declared.
         """
-        super(fitDeltaT, self).__init__()
+        super().__init__()
         self.nentries = 0
 
         self.DT = ROOT.RooRealVar("DT", "#Delta#it{t}", 0., -11., 11., "ps")

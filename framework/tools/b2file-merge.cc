@@ -334,6 +334,7 @@ The following restrictions apply:
     delete tree;
     tfile.Close();
   }
+  assert(outputEventTree);
   // make sure we have an index ...
   if(!outputEventTree->GetTreeIndex()) {
     B2INFO("No Index found: building new index");

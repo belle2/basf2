@@ -67,7 +67,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            float(5.));
   addParam("removeSigmaN", m_usedPars.removeSigmaN,
            "Evaluate and remove gauss upto N sigma.",
-           float(5.));
+           float(7.));
   addParam("fracThreshold", m_usedPars.fracThreshold,
            "Minimum fraction of candidates in a peak (wrt to the highest peak) considered for fitting in the peak-search.",
            float(0.05));
@@ -98,7 +98,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            bool(false));
   addParam("acceptSigmaN", m_usedPars.acceptSigmaN,
            "Accept clusters upto N sigma.",
-           float(5.));
+           float(7.));
   addParam("writeGroupInfo", m_usedPars.writeGroupInfo,
            "Write group info into SVDClusters.",
            bool(true));

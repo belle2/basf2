@@ -27,7 +27,7 @@ eclAutocovarianceCalibrationC2Algorithm::eclAutocovarianceCalibrationC2Algorithm
   CalibrationAlgorithm("eclAutocovarianceCalibrationC2Collector")
 {
   setDescription(
-    "Determine baseline for waveforms to be used in computing the coveriance matrix"
+    "Determine baseline for waveforms to be used in computing the covariance matrix"
   );
 }
 

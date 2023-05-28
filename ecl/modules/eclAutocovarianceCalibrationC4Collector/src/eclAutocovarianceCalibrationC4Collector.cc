@@ -38,7 +38,7 @@ eclAutocovarianceCalibrationC4CollectorModule::eclAutocovarianceCalibrationC4Col
   m_ECLAutocovarianceCalibrationC3Autocovariances("ECLAutocovarianceCalibrationC3Autocovariances")
 {
   // Set module properties
-  setDescription("Module to test covariance matrix calibrations using waveforms from random trigger events");
+  setDescription("Module to test covariance matrix calibrations using waveforms from delayed Bhabha events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 

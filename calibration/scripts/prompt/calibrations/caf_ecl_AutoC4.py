@@ -41,7 +41,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Calibration
 
     # --------------------------------------------------------------
-    # ..gamma gamma
+    # ..delayed Bhabha
 
     # ..Input data
     file_to_iov_gamma_gamma = input_data["delayedbhabha"]

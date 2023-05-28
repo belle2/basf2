@@ -12,6 +12,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dbobjects/ECLnOptimal.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 #include <TH2F.h>
 
 namespace Belle2 {
@@ -51,6 +52,9 @@ namespace Belle2 {
 
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** location of cluster; cellID and position within the crystal*/
     ECL::ECLLeakagePosition* m_leakagePosition{nullptr};

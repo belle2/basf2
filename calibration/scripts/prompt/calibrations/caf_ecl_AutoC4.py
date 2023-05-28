@@ -47,8 +47,8 @@ def get_calibrations(input_data, **kwargs):
     # ..delayed Bhabha
 
     # ..Input data
-    file_to_iov_gamma_gamma = input_data["delayedbhabha"]
-    input_files = list(file_to_iov_gamma_gamma.keys())
+    file_to_iov_delayed_Bhabha = input_data["delayedbhabha"]
+    input_files = list(file_to_iov_delayed_Bhabha.keys())
 
     # ..Algorithm
     algo_C1 = Belle2.ECL.eclAutocovarianceCalibrationC1Algorithm()
@@ -65,12 +65,12 @@ def get_calibrations(input_data, **kwargs):
                                   input_files=input_files, max_files_per_collector_job=4)
 
     # ..Add prepare_cdst_analysis to pre_collector_path
-    gamma_gamma_pre_path = basf2.create_path()
-    gamma_gamma_pre_path.add_module("RootInput", inputFileNames="", branchNames=["EventMetaData", "RawECLs"])
+    delayed_Bhabha_pre_path = basf2.create_path()
+    delayed_Bhabha_pre_path.add_module("RootInput", inputFileNames="", branchNames=["EventMetaData", "RawECLs"])
     eclunpacker = basf2.register_module('ECLUnpacker')
-    gamma_gamma_pre_path.add_module(eclunpacker)
+    delayed_Bhabha_pre_path.add_module(eclunpacker)
 
-    cal_ecl_Auto_C1.pre_collector_path = gamma_gamma_pre_path
+    cal_ecl_Auto_C1.pre_collector_path = delayed_Bhabha_pre_path
 
     # ..Algorithm
     algo_C2 = Belle2.ECL.eclAutocovarianceCalibrationC2Algorithm()
@@ -83,7 +83,7 @@ def get_calibrations(input_data, **kwargs):
                                   algorithms=[algo_C2],
                                   input_files=input_files, max_files_per_collector_job=4)
 
-    cal_ecl_Auto_C2.pre_collector_path = gamma_gamma_pre_path
+    cal_ecl_Auto_C2.pre_collector_path = delayed_Bhabha_pre_path
 
     cal_ecl_Auto_C2.depends_on(cal_ecl_Auto_C1)
 
@@ -98,7 +98,7 @@ def get_calibrations(input_data, **kwargs):
                                   algorithms=[algo_C3],
                                   input_files=input_files, max_files_per_collector_job=4)
 
-    cal_ecl_Auto_C3.pre_collector_path = gamma_gamma_pre_path
+    cal_ecl_Auto_C3.pre_collector_path = delayed_Bhabha_pre_path
 
     cal_ecl_Auto_C3.depends_on(cal_ecl_Auto_C2)
 
@@ -113,7 +113,7 @@ def get_calibrations(input_data, **kwargs):
                                   algorithms=[algo_C4],
                                   input_files=input_files, max_files_per_collector_job=4)
 
-    cal_ecl_Auto_C4.pre_collector_path = gamma_gamma_pre_path
+    cal_ecl_Auto_C4.pre_collector_path = delayed_Bhabha_pre_path
 
     cal_ecl_Auto_C4.depends_on(cal_ecl_Auto_C3)
 

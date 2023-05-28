@@ -65,7 +65,7 @@ void ECLShowerCorrectorModule::beginRun()
 {
   //-----------------------------------------------------------------
   //..Read in leakage corrections from database
-  if (m_eclLeakageCorrections.isValid()) {
+  if (m_eclLeakageCorrections.hasChanged()) {
 
     //..Vectors of log(E) for each region
     std::vector<float> logEnergiesFwd = m_eclLeakageCorrections->getlogEnergiesFwd();
@@ -91,7 +91,7 @@ void ECLShowerCorrectorModule::beginRun()
     //..Relevant parameters
     nPositionBins = thetaCorrection.GetNbinsY();
     nXBins = nThetaID * nEnergies;
-  } else {
+  } else if (!m_eclLeakageCorrections.isValid()) {
     B2FATAL("ECLShowerCorrectorModule: missing eclLeakageCorrections payload");
   }
 
@@ -101,7 +101,7 @@ void ECLShowerCorrectorModule::beginRun()
   //  Energy bin and group number for the shower are found in
   //  eclSplitterN1 and are stored in the ECLShower dataobject.
 
-  if (m_eclNOptimal.isValid()) {
+  if (m_eclNOptimal.hasChanged()) {
 
     //..Bias is the difference between the peak energy in nOptimal crystals
     //  before bias correction and the mc true deposited energy.
@@ -113,7 +113,7 @@ void ECLShowerCorrectorModule::beginRun()
     //..peakFracEnergy is the peak energy after subtracting the beam bias
     //  divided by the generated photon energy.
     m_peakFracEnergy = m_eclNOptimal->getPeakFracEnergy();
-  } else {
+  } else if (!m_eclNOptimal.isValid()) {
     B2FATAL("ECLShowerCorrectorModule: missing eclNOptimal payload");
   }
 }

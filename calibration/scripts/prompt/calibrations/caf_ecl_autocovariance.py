@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""ECL ECLAutoCovariance calibration."""
+"""ECL Autocovariance."""
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 

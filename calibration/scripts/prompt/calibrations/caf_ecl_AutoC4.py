@@ -27,7 +27,10 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
-    expert_config={})
+    expert_config={
+        "C1_lowestEnergyFraction": 0.75,
+        "C1_TotalCountsThreshold": 10000
+    })
 
 
 # --------------------------------------------------------------
@@ -49,6 +52,9 @@ def get_calibrations(input_data, **kwargs):
 
     # ..Algorithm
     algo_C1 = Belle2.ECL.eclAutocovarianceCalibrationC1Algorithm()
+    expert_config = kwargs.get("expert_config")
+    algo_C1.setLowestEnergyFraction(expert_config["C1_lowestEnergyFraction"])
+    algo_C1.setTotalCountsThreshold(expert_config["C1_TotalCountsThreshold"])
 
     # ..The calibration
     collector_C1 = basf2.register_module("eclAutocovarianceCalibrationC1Collector")

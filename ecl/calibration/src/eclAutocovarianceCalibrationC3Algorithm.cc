@@ -54,18 +54,18 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
     float totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1, 32));
 
     TMatrixDSym NoiseMatrix;
-    NoiseMatrix.ResizeTo(31, 31);
-    for (int i = 0; i < 31; i++) {
-      for (int j = 0; j < 31; j++) {
+    NoiseMatrix.ResizeTo(m_numberofADCPoints, m_numberofADCPoints);
+    for (int i = 0; i < m_numberofADCPoints; i++) {
+      for (int j = 0; j < m_numberofADCPoints; j++) {
         int index = abs(i - j);
         NoiseMatrix(i, j) = float(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
-                                  index + 1))) / totalCounts / (float(31.0 - index));
+                                  index + 1))) / totalCounts / (float(m_numberofADCPoints - index));
       }
     }
 
-    double tempAutoCov[31];
+    double tempAutoCov[m_numberofADCPoints];
 
-    for (int i = 0; i < 31; i++) tempAutoCov[i] = NoiseMatrix(0, i);
+    for (int i = 0; i < m_numberofADCPoints; i++) tempAutoCov[i] = NoiseMatrix(0, i);
     Autocovariances->setAutoCovariance(ID + 1, tempAutoCov);
 
     TDecompChol dc(NoiseMatrix);

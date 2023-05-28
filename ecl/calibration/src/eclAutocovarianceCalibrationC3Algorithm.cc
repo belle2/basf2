@@ -32,7 +32,7 @@ eclAutocovarianceCalibrationC3Algorithm::eclAutocovarianceCalibrationC3Algorithm
   CalibrationAlgorithm("eclAutocovarianceCalibrationC3Collector")
 {
   setDescription(
-    "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
+    "Computes the covariance matrix for each crystal"
   );
 }
 

@@ -961,7 +961,7 @@ Good luck.
 .. seealso::
 
     While the next sections will help you to understand the basics of steering
-    files step by step, there are also some comple examples for steering files
+    files step by step, there are also some complete examples for steering files
     `in the main software repository <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 

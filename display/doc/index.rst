@@ -4,8 +4,8 @@
 The Belle II Event Display
 ==========================
 
-.. seealso:: 
-        `evdisp.belle2.org <https://evdisp.belle2.org>`_ for a live event 
+.. seealso::
+        `evdisp.belle2.org <https://evdisp.belle2.org>`_ for a live event
         display of the data-taking in real time.
 
 .. figure:: Belle2EventDisplay.png
@@ -17,7 +17,7 @@ The Belle II Event Display
         screenshots).
 
 .. seealso::
-        `Here is a gallery of nice event display images 
+        `Here is a gallery of nice event display images
         <https://confluence.desy.de/x/1nQHAg>`_.
 
 .. _display_starting_the_display:
@@ -28,9 +28,9 @@ Starting the display
 The Belle II event display is invoked with ``b2display``.
 You can use it to explore any :ref:`mdst` files.
 
-You must use a :ref:`full release <choosing_a_release>`, and it is usually 
-recommended to use the same release that was used to create the file you want 
-to explore. If you are working remotely, you will need to connect with 
+You must use a :ref:`full release <choosing_a_release>`, and it is usually
+recommended to use the same release that was used to create the file you want
+to explore. If you are working remotely, you will need to connect with
 xforwarding or start a ``vncserver`` (if permitted by your institute).
 
 .. code:: bash
@@ -54,7 +54,7 @@ Usage::
 
 Show data in given input file using the event display.
 
-You can also open multiple files using wildcards, though you have to pass the 
+You can also open multiple files using wildcards, though you have to pass the
 string with wildcards to b2display to prevent expansion by the shell, e.g.
 
 ::
@@ -64,7 +64,7 @@ string with wildcards to b2display to prevent expansion by the shell, e.g.
 
 Using .sroot files, and ``http://`` or ``root://`` URLs is also possible.
 
-Configuration of the display can be changed from the defaults by editing 
+Configuration of the display can be changed from the defaults by editing
 display/examples/display.py. See output of ``basf2 -m Display`` for available
 options.
 
@@ -82,7 +82,7 @@ Viewer navigation and the user interface
 The right side shows a 3D view (top) and ρ-z and r-ϕ projections (bottom
 left/right). The views can be navigated by clicking in one (to choose) then by
 holding the left, middle or right mouse button and moving the cursor, the
-scroll wheel will also work. 
+scroll wheel will also work.
 
 Here are all of the mouse and keyboard bindings:
 
@@ -114,7 +114,7 @@ Here are all of the mouse and keyboard bindings:
 |Shift          |Faster (combine with arrow keys or mouse actions)           |
 +---------------+------------------------------------------------------------+
 |r              |Normal rendering                                            |
-+---------------+------------------------------------------------------------+ 
++---------------+------------------------------------------------------------+
 |w              |Wireframe rendering                                         |
 +---------------+------------------------------------------------------------+
 |t              |Hybrid rendering (normal + wireframe)                       |
@@ -150,8 +150,8 @@ resolution image.  (Specifying very high resolutions may crash your X server,
 also change the background colour using the :gui-highlight-style:`Dark/light
 colors` button.
 
-.. important:: 
-        We recommend saving high resolution if you intend to show these anywhere 
+.. important::
+        We recommend saving high resolution if you intend to show these anywhere
         outside of the collaboration.
 
 The :gui-highlight-style:`Eve` tab shows a tree representation of all objects
@@ -243,9 +243,9 @@ The Actions menu then gives you access to different operations. All important
 ones are found at the very top:
 
 * :gui-highlight-style:`SwapWindowWithCurrent` swaps this view with the
-  currently selected view, which is selected by anywhere in it. 
+  currently selected view, which is selected by anywhere in it.
 * :gui-highlight-style:`UndockWindow` moves this view into its own window, so
-  it can be freely moved around, or shown in fullscreen.  
+  it can be freely moved around, or shown in fullscreen.
 * :gui-highlight-style:`DestroyWindow` removes this view entirely until the
   display is restarted.
 

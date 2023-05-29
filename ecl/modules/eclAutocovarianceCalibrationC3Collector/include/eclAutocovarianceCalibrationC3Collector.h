@@ -50,7 +50,6 @@ namespace Belle2 {
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline; /**< baselines obtained from C2 stage */
     std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
-    std::vector<float> m_tempArray; /**< vector of thresholds obtained from DB object */
     TH2F* CovarianceMatrixInfoVsCrysID;  /**< result returned by collector that contains the coveriance matrix for each crystal  */
     const int nADCWaveformPoints = 31; /**< length of ECLDSP waveforms  */
     float m_CovarianceMatrixInfoVsCrysIDHistogram[ECLElementNumbers::c_NCrystals][32] = {}; /**< container for coveriance matrix  */

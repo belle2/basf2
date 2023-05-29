@@ -64,6 +64,8 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 void eclAutocovarianceCalibrationC3CollectorModule::collect()
 {
 
+  std::vector<float> m_tempArray; /**< temp vector to store baseline subracted waveform */
+
   const int NumDsp = m_eclDsps.getEntries();
 
   //Random Trigger Events have waveform for each crystal

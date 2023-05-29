@@ -89,6 +89,7 @@ Modules
   particles is not guaranteed.
 * Added an option ``overwriteRank`` to the `modularAnalysis.rankByHighest` and `modularAnalysis.rankByLowest` to overwrite the 
   extraInfo of rank when the particle has already the extraInfo.
+* Added an option ``selectedDaughters`` to specify daughters to apply weightings in `ParticleWeighting`.
 
 Variables
 +++++++++

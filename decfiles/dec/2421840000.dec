@@ -1,0 +1,29 @@
+##############################################################
+# EventType: 2421840000
+# Descriptor: [e+ e- -> Jpsi [ -> e+ e- / mu+ mu- ] pi+ pi-] are generated via ISR
+# NickName: ISR_pi+pi-J/psi
+# Test : Yes
+# Documentation: to be used with add_phokhara_evtgen_combination()
+# PhysicsWG: Charmonium
+# Responsible: Yipu Liao
+# Email: liaoyp@ihep.ac.cn
+# Cuts: None
+# Date: 2023/5/25
+#
+# Decay table to generate
+# vpho -> J/psi pi+ pi- gamma
+#           |
+#           -> e+ e- gamma
+#           -> mu+ mu- gamma
+###############################################################
+
+Decay vpho
+1.0 pi+ pi- J/psi PHOTOS PHSP;
+Enddecay
+
+Decay J/psi
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+
+End

@@ -3,8 +3,8 @@
 # Descriptor: [e+ e- -> Jpsi [ -> e+ e- / mu+ mu- ] pi+ pi-] are generated via ISR
 # NickName: ISR_pi+pi-J/psi
 # Test : Yes
-# Documentation: to be used with add_phokhara_evtgen_combination()
-# PhysicsWG: Charmonium
+# Documentation: MC15rd signal request
+# PhysicsWG: Quarkmonium
 # Responsible: Yipu Liao
 # Email: liaoyp@ihep.ac.cn
 # Cuts: None
@@ -15,13 +15,14 @@
 #           |
 #           -> e+ e- gamma
 #           -> mu+ mu- gamma
+#                     
 ###############################################################
 
 Decay vpho
-1.0 pi+ pi- J/psi PHOTOS PHSP;
+1.0 pi+ pi- J/psisig PHOTOS PHSP;
 Enddecay
 
-Decay J/psi
+Decay J/psisig
 0.5 e+ e- PHOTOS VLL;
 0.5 mu+ mu- PHOTOS VLL;
 Enddecay

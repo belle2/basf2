@@ -11,18 +11,22 @@
 
 '''
 Generate and simulate few events BBbar events for testing purposes.
+Let's store only the digits-like objects without MCParticles information.
 '''
 
 import basf2 as b2
 import simulation as si
+import reconstruction as re
 
 
 b2.set_random_seed('aSeed')
+
+objects_to_store = list(re.DIGITS_OBJECTS) + ['EventLevelTriggerTimeInfo', 'TRGSummary']
 
 main = b2.Path()
 main.add_module('EventInfoSetter')
 main.add_module('EvtGenInput')
 si.add_simulation(main)
-main.add_module('RootOutput')
+main.add_module('RootOutput', branchNames=objects_to_store)
 
 b2.process(main)

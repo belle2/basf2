@@ -50,3 +50,5 @@ if __name__ == "__main__":
     writeROISimulationParametersToDB((1002, 0, 1002, -1), False, -1)
     # We want default ROI selection for experiment 1003
     writeROISimulationParametersToDB((1003, 0, 1003, -1), False, -1)
+    # We want default ROI selection for experiment 1004
+    writeROISimulationParametersToDB((1004, 0, 1004, -1), False, -1)

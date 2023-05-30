@@ -125,13 +125,13 @@ class EventRangePathSplitter(Module):
         """
         import ROOT  # noqa
         super(EventRangePathSplitter, self).__init__()
-        # tuple or list of event codes
+        #: tuple or list of event codes
         self.event_codes = event_codes
-        # PyStoreObj off EventExtraInfo
+        #: PyStoreObj off EventExtraInfo
         self.event_extra_info = ROOT.Belle2.PyStoreObj('EventExtraInfo')
-        # Dictionary to get number of events for each event code
+        #: Dictionary to get number of events for each event code
         self.event_ranges = None
-        # Event number
+        #: Event number
         self.event_number = -1
 
     def initialize(self):
@@ -179,9 +179,9 @@ class ExtraInfoPathSplitter(Module):
         """
         import ROOT  # noqa
         super(ExtraInfoPathSplitter, self).__init__()
-        # list of event codes
+        #: list of event codes
         self.event_codes = [e.value for e in event_codes]
-        # PyStoreObj for EventExtraInfo to save event codes
+        #: PyStoreObj for EventExtraInfo to save event codes
         self.event_extra_info = ROOT.Belle2.PyStoreObj('EventExtraInfo')
 
     def initialize(self):

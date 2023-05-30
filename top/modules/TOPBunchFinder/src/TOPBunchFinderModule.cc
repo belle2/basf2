@@ -484,10 +484,11 @@ namespace Belle2 {
     double err2 = (1 - a) * error;
     m_runningError = sqrt(err1 * err1 + err2 * err2);
 
-    // check if reconstructed bunch is filled; return if not.
+    // when not running in HLT mode, check if reconstructed bunch is filled
 
-    if (m_useFillPattern and not m_HLTmode) {
-      if (not isBucketFilled(bunchNo)) return;
+    if (not m_HLTmode) {
+      bool isFilled = isBucketFilled(bunchNo); // stores in addition the bucket number and fill status in m_recBunch
+      if (m_useFillPattern and not isFilled) return;
     }
 
     // store the results
@@ -664,20 +665,32 @@ namespace Belle2 {
 
   bool TOPBunchFinderModule::isBucketFilled(int bunchNo)
   {
-    // return true if needed information not available
+    // return true if needed information is not available
 
     if (not m_bunchStructure->isSet()) return true;
-    if (not m_fillPatternOffset.isValid()) return true;
-    if (not m_fillPatternOffset->isCalibrated()) return true;
     if (m_revo9Counter == 0xFFFF) return true;
 
-    // corresponding bucket number
+    // fill pattern offset; it is always zero on MC.
+
+    int offset = 0;
+    if (not m_isMC) {
+      if (not m_fillPatternOffset.isValid()) return true;
+      if (not m_fillPatternOffset->isCalibrated()) return true;
+      offset = m_fillPatternOffset->get();
+    }
+
+    // corresponding bucket number and fill status
 
     int RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
-    int offset = m_isMC ? 0 : m_fillPatternOffset->get();
     int bucket = TOPRecBunch::getBucketNumber(bunchNo, m_revo9Counter, offset, RFBuckets);
+    bool isFilled = m_bunchStructure->getBucket(bucket);
 
-    return m_bunchStructure->getBucket(bucket);
+    // store them in TOPRecBunch
+
+    m_recBunch->setBucketNumber(bucket);
+    m_recBunch->setBucketFillStatus(isFilled);
+
+    return isFilled;
   }
 
 

@@ -32,11 +32,15 @@ DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
 
+bool DQMHistAnalysisModule::m_useEpics;
+bool DQMHistAnalysisModule::m_epicsReadOnly;
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
   setDescription("Histogram Analysis module base class");
+  m_useEpics = false; // to enable EPICS, add EPICS Module class into chain
+  m_epicsReadOnly = false;
 }
 
 bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
@@ -284,6 +288,7 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
 
 int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
 {
+  if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
   if (m_epicsNameToChID[pvname] != nullptr) {
     B2ERROR("Epics PV " << pvname << " already registered!");
@@ -310,6 +315,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
 
 void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value, float wait)
 {
+  if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
   if (m_epicsNameToChID[keyname] == nullptr) {
     B2ERROR("Epics PV " << keyname << " not registered!");
@@ -322,6 +328,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value, float 
 
 void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value, float wait)
 {
+  if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
   if (m_epicsNameToChID[keyname] == nullptr) {
     B2ERROR("Epics PV " << keyname << " not registered!");
@@ -334,17 +341,22 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value, float wai
 
 void DQMHistAnalysisModule::setEpicsPV(int index, double value, float wait)
 {
-  if (index < 0 || index >= m_epicsChID.size()) {
+  if (!m_useEpics || m_epicsReadOnly) return;
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
   SEVCHK(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure");
+#endif
+  updateEpicsPVs(wait);
 }
 
 void DQMHistAnalysisModule::setEpicsPV(int index, int value, float wait)
 {
+  if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
-  if (index < 0 || index >= m_epicsChID.size()) {
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
@@ -355,6 +367,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value, float wait)
 
 void DQMHistAnalysisModule::updateEpicsPVs(float wait)
 {
+  if (!m_useEpics) return;
 #ifdef _BELLE2_EPICS
   if (wait > 0.) SEVCHK(ca_pend_io(wait), "ca_pend_io failure");
 #endif

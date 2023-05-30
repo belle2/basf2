@@ -88,6 +88,9 @@ namespace Belle2 {
      */
     inline static std::string s_runType = "";
 
+    static bool m_useEpics;
+    static bool m_epicsReadOnly;
+
 #ifdef _BELLE2_EPICS
     //! Vector of EPICS PVs
     std::vector <chid>  m_epicsChID;
@@ -289,6 +292,11 @@ namespace Belle2 {
     void setEpicsPV(int index, int value, float wait = -1.);
 
     void updateEpicsPVs(float wait);
+
+    void setUseEpics(bool flag) {m_useEpics = flag;};
+    void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
+    bool getUseEpics(void) {return m_useEpics;};
+    bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     // Public functions
   public:

@@ -22,6 +22,11 @@
 #include <string>
 #include <map>
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 namespace Belle2 {
 
   /**
@@ -82,6 +87,13 @@ namespace Belle2 {
      * The Run type.
      */
     inline static std::string s_runType = "";
+
+#ifdef _BELLE2_EPICS
+    //! Vector of EPICS PVs
+    std::vector <chid>  m_epicsChID;
+    //! Map of (key)names to EPICS PVs
+    std::map <std::string, chid*> m_epicsNameToChID;
+#endif
 
   public:
     /**
@@ -268,6 +280,15 @@ namespace Belle2 {
      * Extract event processed from daq histogram, called from input module
      */
     void ExtractEvent(std::vector <TH1*>& hs);
+
+    int registerEpicsPV(std::string pvname, std::string keyname = "");
+
+    void setEpicsPV(std::string keyname, double value, float wait = -1.);
+    void setEpicsPV(std::string keyname, int value, float wait = -1.);
+    void setEpicsPV(int index, double value, float wait = -1.);
+    void setEpicsPV(int index, int value, float wait = -1.);
+
+    void updateEpicsPVs(float wait);
 
     // Public functions
   public:

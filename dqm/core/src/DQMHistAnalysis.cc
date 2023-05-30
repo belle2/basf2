@@ -281,3 +281,80 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
+
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+{
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[pvname] != nullptr) {
+    B2ERROR("Epics PV " << pvname << " already registered!");
+    return -1;
+  }
+  if (keyname != "" && m_epicsNameToChID[keyname] != nullptr) {
+    B2ERROR("Epics PV with key " << keyname << " already registered!");
+    return -1;
+  }
+
+  m_epicsChID.emplace_back();
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel(pvname.data(), NULL, NULL, 10, &m_epicsChID.back()), "ca_create_channel failure");
+
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+
+  m_epicsNameToChID[pvname] =  &m_epicsChID.back();
+  if (keyname != "") m_epicsNameToChID[keyname] =  &m_epicsChID.back();
+  return m_epicsChID.size() - 1; // return index to last added item
+#else
+  return -1;
+#endif
+}
+
+void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value, float wait)
+{
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return;
+  }
+  // TODO Check if value is allowed as local variable!
+  SEVCHK(ca_put(DBR_DOUBLE, *m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+#endif
+  updateEpicsPVs(wait);
+}
+
+void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value, float wait)
+{
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return;
+  }
+  // TODO Check if value is allowed as local variable!
+  SEVCHK(ca_put(DBR_SHORT, *m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+#endif
+  updateEpicsPVs(wait);
+}
+
+void DQMHistAnalysisModule::setEpicsPV(int index, double value, float wait)
+{
+#ifdef _BELLE2_EPICS
+  // TODO Check if value is allowed as local variable!
+  SEVCHK(ca_put(DBR_DOUBLE, m_epicsChID.at(index), (void*)&value), "ca_set failure");
+#endif
+  updateEpicsPVs(wait);
+}
+
+void DQMHistAnalysisModule::setEpicsPV(int index, int value, float wait)
+{
+#ifdef _BELLE2_EPICS
+  // TODO Check if value is allowed as local variable!
+  SEVCHK(ca_put(DBR_SHORT, m_epicsChID.at(index), (void*)&value), "ca_set failure");
+#endif
+  updateEpicsPVs(wait);
+}
+
+void DQMHistAnalysisModule::updateEpicsPVs(float wait)
+{
+#ifdef _BELLE2_EPICS
+  if (wait > 0.) SEVCHK(ca_pend_io(wait), "ca_pend_io failure");
+#endif
+}

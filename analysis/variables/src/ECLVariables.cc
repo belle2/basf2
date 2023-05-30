@@ -35,6 +35,51 @@
 
 namespace Belle2 {
   namespace Variable {
+    double distanceToMcKl(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mcdistanceKL")) {
+        return particle->getExtraInfo("mcdistanceKL");
+      } else {
+        B2WARNING("The extraInfo mcdistanceKL is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return Const::doubleNaN;
+      }
+    }
+
+    double distanceToMcNeutron(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mcdistanceNeutron")) {
+        return particle->getExtraInfo("mcdistanceNeutron");
+      } else {
+        B2WARNING("The extraInfo mcdistanceNeutron is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return Const::doubleNaN;
+      }
+    }
+
+    int mdstIndexMcKl(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mdstIndexTruthKL")) {
+        return int(particle->getExtraInfo("mdstIndexTruthKL") + 0.1);
+      } else {
+        B2WARNING("The extraInfo mdstIndexTruthKL is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return -1;
+      }
+    }
+
+    int mdstIndexMcNeutron(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mdstIndexTruthNeutron")) {
+        return int(particle->getExtraInfo("mdstIndexTruthNeutron") + 0.1);
+      } else {
+        B2WARNING("The extraInfo mdstIndexTruthNeutron is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return -1;
+      }
+    }
+
+
     double beamBackgroundSuppression(const Particle* particle)
     {
       if (particle->hasExtraInfo("beamBackgroundSuppression")) {
@@ -1504,6 +1549,32 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
 This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
 
 )DOC","GeV");
+
+    REGISTER_VARIABLE("distanceToMcKl",distanceToMcKl,R"DOC(
+Returns the distance to the nearest truth KL particle, extrapolated to the cluster radius. To use
+this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+to MC difference in KL efficiency.
+
+)DOC", "cm");
+
+    REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
+Returns the distance to the nearest truth (anti)neutron, extrapolated to the cluster radius. To use
+this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+to MC difference in KL efficiency.
+
+)DOC", "cm");
+
+    REGISTER_VARIABLE("mdstIndexMcKl",mdstIndexMcKl,R"DOC(
+      Returns the mdst index of the nearest truth KL, extrapolated to the cluster radius, if it is
+      within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
+)DOC");
+
+    REGISTER_VARIABLE("mdstIndexMcNeutron",mdstIndexMcNeutron,R"DOC(
+      Returns the mdst index of the nearest truth (anti)neutron, extrapolated to the cluster radius, if it is
+      within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
+)DOC");
 
   }
 }

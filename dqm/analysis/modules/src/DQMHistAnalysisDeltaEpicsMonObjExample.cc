@@ -34,19 +34,14 @@ DQMHistAnalysisDeltaEpicsMonObjExampleModule::DQMHistAnalysisDeltaEpicsMonObjExa
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
   addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:"));
   B2DEBUG(1, "DQMHistAnalysisDeltaEpicsMonObjExample: Constructor done.");
 
 }
 
 DQMHistAnalysisDeltaEpicsMonObjExampleModule::~DQMHistAnalysisDeltaEpicsMonObjExampleModule()
 {
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
+  // destructor not needed
 }
 
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::initialize()
@@ -61,16 +56,9 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::initialize()
 
   m_monObj->addCanvas(m_canvas);
 
-#ifdef _BELLE2_EPICS
-  mychid.resize(2);
-  if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "TEST1").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "TEST2").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV(m_pvPrefix + "mean", "mean");
+  registerEpicsPV(m_pvPrefix + "width", "width");
+  updateEpicsPVs(5.0);
 }
 
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::beginRun()
@@ -136,14 +124,10 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
       m_monObj->setVariable("width", data_width);
     } else {
       // we do not want to fill epics again at end of run, as this would be identical to the last event called before.
-#ifdef _BELLE2_EPICS
-      if (m_useEpics) {
-        SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data_mean), "ca_set failure");
-        SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&data_width), "ca_set failure");
-        // write out
-        SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-      }
-#endif
+      setEpicsPV("mean", data_mean);
+      setEpicsPV("width", data_width);
+      // write out
+      updateEpicsPVs(5.0);
     }
   }
 }

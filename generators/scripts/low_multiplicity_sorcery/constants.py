@@ -13,21 +13,21 @@ class EventCode(enum.IntEnum):
     Event code number for channel identification. The value should be
     read from mDST with variable ``eventExtraInfo(EventCode)``.
     """
-    eetautau = 1
-    mumumumu = 2
-    mumutautau = 3
-    tautautautau = 4
-    eeKK = 5
-    eepp = 6
-    eepipi = 7
-    pipipi0ISR = 8
-    KKISR = 9
-    K0K0barISR = 10
-    pipiISR = 11
-    pipipipiISR = 12
-    pipipi0pi0ISR = 13
-    etapipiISR = 14
-    ppbarISR = 15
+    eetautau = 1  # eetautau
+    mumumumu = 2  # mumumumu
+    mumutautau = 3  # mumutautau
+    tautautautau = 4  # tautautautau
+    eeKK = 5  # eeKK
+    eepp = 6  # eepp
+    eepipi = 7  # eepipi
+    pipipi0ISR = 8  # pi+pi-pi0ISR
+    KKISR = 9  # K+K-ISR
+    K0K0barISR = 10  # K0K0barISR
+    pipiISR = 11  # pi+pi-ISR
+    pipipipiISR = 12  # pi+pi-pi+pi-ISR
+    pipipi0pi0ISR = 13  # pi+pi-pi0pi0ISR
+    etapipiISR = 14  # etapi+pi-ISR
+    ppbarISR = 15  # ppbarISR
 
 
 EventCode_CrossSection = {

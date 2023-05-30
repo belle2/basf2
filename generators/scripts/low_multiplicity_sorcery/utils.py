@@ -118,22 +118,36 @@ class EventRangePathSplitter(Module):
     """
 
     def __init__(self, event_codes):
+        """
+        Initialize the class
+        Parameters:
+            event_codes (Iterable): tuple or list of EventCode.
+        """
         import ROOT  # noqa
         super(EventRangePathSplitter, self).__init__()
+        # tuple or list of event codes
         self.event_codes = event_codes
+        # PyStoreObj off EventExtraInfo
         self.event_extra_info = ROOT.Belle2.PyStoreObj('EventExtraInfo')
+        # Dictionary to get number of events for each event code
         self.event_ranges = None
+        # Event number
         self.event_number = -1
 
     def initialize(self):
+        """
+        Initialize module before any events are processed
+        """
         import ROOT  # noqa
         self.event_ranges = get_event_ranges(ROOT.Belle2.Environment.Instance().getNumberOfEvents(), self.event_codes)
         self.event_extra_info.registerInDataStore()
 
     def beginRun(self):
+        """Begin run method of the module"""
         self.event_number = -1
 
     def event(self):
+        """Event method of the module"""
         self.event_number += 1
         if not self.event_extra_info.isValid():
             self.event_extra_info.create()
@@ -158,15 +172,26 @@ class ExtraInfoPathSplitter(Module):
     """
 
     def __init__(self, event_codes):
+        """
+        Initialize the class
+        Parameters:
+            event_codes (Iterable): tuple or list of EventCode.
+        """
         import ROOT  # noqa
         super(ExtraInfoPathSplitter, self).__init__()
+        # list of event codes
         self.event_codes = [e.value for e in event_codes]
+        # PyStoreObj for EventExtraInfo to save event codes
         self.event_extra_info = ROOT.Belle2.PyStoreObj('EventExtraInfo')
 
     def initialize(self):
+        """
+        Initialize module before any events are processed
+        """
         self.event_extra_info.isRequired()
 
     def event(self):
+        """Event method of the module"""
         if not self.event_extra_info.hasExtraInfo('EventCode'):
             B2FATAL('The EventExtraInfo object has no EventCode field registered.')
         if self.event_extra_info.getExtraInfo('EventCode') in self.event_codes:

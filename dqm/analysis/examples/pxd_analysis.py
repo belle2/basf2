@@ -36,9 +36,8 @@ main = b2.create_path()
 
 input = b2.register_module('DQMHistAnalysisInput')
 input.param('HistMemoryPath', argv[1])
-input.param('AutoCanvas', False)
-input.param('AutoCanvasFolders', [])
 main.add_module(input)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 # input = register_module('DQMHistAnalysisInputRootFile')
 # input.param('InputRootFile', argv[1])

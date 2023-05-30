@@ -23,6 +23,15 @@ namespace Belle2 {
   public:
 
     /**
+     * Reconstructed bucket status
+     */
+    enum EBucketStatus {
+      c_Unknown = -1, /**< not known */
+      c_Empty = 0,    /**< bucket is empty */
+      c_Filled = 1,   /**< bucket is filled */
+    };
+
+    /**
      * Default constructor
      */
     TOPRecBunch()
@@ -47,6 +56,8 @@ namespace Belle2 {
       m_recValid = false;
       m_minChi2 = 0;
       m_detector = Const::invalidDetector;
+      m_bucketNumber = c_Unknown;
+      m_isBucketFilled = c_Unknown;
     }
 
     /**
@@ -122,6 +133,18 @@ namespace Belle2 {
     }
 
     /**
+     * Sets reconstructed bucket number
+     * @param bucketNumber bucket number
+     */
+    void setBucketNumber(int bucketNumber) {m_bucketNumber = bucketNumber;}
+
+    /**
+     * Sets reconstructed bucket fill status
+     * @param isFilled fill status
+     */
+    void setBucketFillStatus(bool isFilled) {m_isBucketFilled = isFilled ? c_Filled : c_Empty;}
+
+    /**
      * Returns reconstructed bunch number relative to L1 trigger signal at TOP
      * note: depends on the "look back" setting
      * @return bunch number relative to L1 trigger signal at TOP minus "look back"
@@ -153,6 +176,18 @@ namespace Belle2 {
     {
       return getBucketNumber(m_recBunchNo, m_revo9Counter, offset, RFBucketsPerRevolution);
     }
+
+    /**
+     * Returns reconstructed bucket number stored in private member
+     * @return buncket number
+     */
+    int getBucketNumber() const {return m_bucketNumber;}
+
+    /**
+     * Returns bucket fill status
+     * @return bucket fill status
+     */
+    EBucketStatus getBucketFillStatus() const {return m_isBucketFilled;}
 
     /**
      * Returns reconstructed bunch time relative to L1 trigger signal at TOP
@@ -280,7 +315,10 @@ namespace Belle2 {
     float m_minChi2 = 0; /**< chi2 value at minimum */
     Const::EDetector m_detector = Const::invalidDetector; /**< component providing the time seed */
 
-    ClassDef(TOPRecBunch, 5); /**< ClassDef */
+    int m_bucketNumber = c_Unknown;   /**< reconstructed bucket number */
+    EBucketStatus m_isBucketFilled = c_Unknown; /**< reconstructed bucket status */
+
+    ClassDef(TOPRecBunch, 6); /**< ClassDef */
 
   };
 

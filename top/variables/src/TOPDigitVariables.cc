@@ -566,6 +566,22 @@ namespace Belle2 {
         return recBunch->getBunchNo();
       }
 
+      double TOPRecBucketNumber([[maybe_unused]] const Particle* particle)
+      {
+        StoreObjPtr<TOPRecBunch> recBunch;
+        if (not recBunch.isValid()) return std::numeric_limits<double>::quiet_NaN();
+        auto bucket = recBunch->getBucketNumber();
+        if (bucket == TOPRecBunch::c_Unknown) return std::numeric_limits<double>::quiet_NaN();
+        return bucket;
+      }
+
+      double isTOPRecBunchFilled([[maybe_unused]] const Particle* particle)
+      {
+        StoreObjPtr<TOPRecBunch> recBunch;
+        if (not recBunch.isValid()) return std::numeric_limits<double>::quiet_NaN();
+        return recBunch->getBucketFillStatus();
+      }
+
       double isTOPRecBunchNumberEQsim([[maybe_unused]] const Particle* particle)
       {
         StoreObjPtr<TOPRecBunch> recBunch;
@@ -740,8 +756,12 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("topBunchIsReconstructed", TOPVariable::isTOPRecBunchReconstructed,
                       "reconstruction flag: 1 if reconstructed, 0 otherwise");
+    REGISTER_VARIABLE("topBunchIsFilled", TOPVariable::isTOPRecBunchFilled,
+                      "bunch fill status: 0 empty, 1 filled, -1 unknown");
     REGISTER_VARIABLE("topBunchNumber", TOPVariable::TOPRecBunchNumber,
                       "reconstructed bunch number relative to L1 trigger");
+    REGISTER_VARIABLE("topBucketNumber", TOPVariable::TOPRecBucketNumber,
+                      "reconstructed bucket number within the ring");
     REGISTER_VARIABLE("topBunchMCMatch", TOPVariable::isTOPRecBunchNumberEQsim,
                       "MC matching status: 1 if reconstructed bunch equal to simulated bunch, 0 otherwise");
     REGISTER_VARIABLE("topBunchOffset", TOPVariable::TOPRecBunchCurrentOffset,

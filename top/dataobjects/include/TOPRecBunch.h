@@ -318,7 +318,7 @@ namespace Belle2 {
     int m_bucketNumber = c_Unknown;   /**< reconstructed bucket number */
     EBucketStatus m_isBucketFilled = c_Unknown; /**< reconstructed bucket status */
 
-    ClassDef(TOPRecBunch, 6); /**< ClassDef */
+    ClassDef(TOPRecBunch, 7); /**< ClassDef */
 
   };
 

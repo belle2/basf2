@@ -105,7 +105,6 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGrouping = b2.register_module('SVDTimeGrouping')
         svdTimeGrouping.set_name(timeGroupComposerName)
         svdTimeGrouping.param('SVDClusters', clustersName)
-        svdTimeGrouping.param('rebinningFactor', 0)  # disabled by default
         path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
@@ -237,7 +236,6 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGrouping = b2.register_module('SVDTimeGrouping')
         svdTimeGrouping.set_name(timeGroupComposerName)
         svdTimeGrouping.param('SVDClusters', clusterName)
-        svdTimeGrouping.param('rebinningFactor', 0)  # disabled by default
         path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator

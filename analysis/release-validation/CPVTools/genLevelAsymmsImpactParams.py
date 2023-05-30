@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -260,7 +259,7 @@ def makePlotsForEachParticleKind(cutOnUpsilonFourS=""):
             condition = condition + cutOnUpsilonFourS
             condition = condition + " abs(MCParticles.m_pdg[MCParticles.m_mother - 1])==511 && "
 
-            factorMultiplication = str()
+            factorMultiplication = ''
 
             if belleOrBelle2 != "Belle" or (belleOrBelle2 == "Belle" and cutOnUpsilonFourS != ""):
                 factorMultiplication = "*10 "
@@ -465,7 +464,7 @@ def makeZtagDecayPlot(cutOnUpsilonFourS="", asymplot=True):
         condition = condition + cutOnUpsilonFourS
         condition = condition + particleCondsB0tag[Particle][4]
 
-        factorMultiplication = str()
+        factorMultiplication = ''
 
         if belleOrBelle2 != "Belle" or (belleOrBelle2 == "Belle" and cutOnUpsilonFourS != ""):
             factorMultiplication = "*10 "

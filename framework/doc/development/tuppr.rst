@@ -7,7 +7,7 @@ Updating the main globaltag
    Please have a look to :ref:`this page<conditionsdb_overview>` for a broader overview about the Conditions Database.
 
 basf2 needs payloads to work so we need a special globaltag (usually called "main" globaltag) for software development.
-The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there 
+The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there
 are a few requirements for this globaltag:
 
 - The contents of the database should work correctly for any commit on the main basf2 branch. We have to be sure that
@@ -23,7 +23,7 @@ are a few requirements for this globaltag:
 .. tip::
    If you want to know who is the manager of the main globaltag, please browse
    `the relevant file in the versioning repository
-   <https://stash.desy.de/projects/B2/repos/versioning/browse/versioning.py>`__, go down to the ``jira_global_tag_v2``
+   <https://gitlab.desy.de/belle2/software/versioning/-/tree/main/versioning.py>`__, go down to the ``jira_global_tag_v2``
    function and look for the assignee of the task labelled as ``main``.
 
 

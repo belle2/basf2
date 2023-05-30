@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility for more
 specific statements about guarantees, and in case you observe a test failure.
 
 We keep a coarse log of the changes here for reference. Please reference a
-JIRA ticket wherever possible...
+GitLab issue wherever possible...
 
 CHANGES between release-04-00-00 and release-05-00-00:
     * Renamed m_particleType to m_particleSource (a more meaningful name).

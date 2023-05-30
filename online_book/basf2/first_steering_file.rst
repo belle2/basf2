@@ -474,7 +474,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
-    <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/variables/src/AcceptanceVariables.cc#27>`_.
+    <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/variables/src/AcceptanceVariables.cc#27>`_.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -520,8 +520,8 @@ analysis software is the `ParticleCombiner`. It takes those particle lists and
 finds all **unique** combinations. The same particle can of course not be used
 twice, e.g. the two positive pions in :math:`D^0 \to K^- \pi^+ \pi^+ \pi^-`
 have to be different mdst track objects. However, all of this is taken care of
-internally. For multi-body decays like the one described above there, can
-easily be many multiple candidates, which share some particles but differ by
+internally. For multi-body decays like the one described above, there can
+easily be many multiple candidates which share some particles but differ by
 at least one final state particle.
 
 The wrapper function for the `ParticleCombiner` is
@@ -991,7 +991,7 @@ or `matchedMC`.
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`
-    can be found `on stash <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/VariableManager>`_.
+    can be found `on stash <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager>`_.
 
 .. admonition:: Exercise
     :class: exercise

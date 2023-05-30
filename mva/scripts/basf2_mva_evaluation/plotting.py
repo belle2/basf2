@@ -21,6 +21,8 @@ import matplotlib.gridspec
 import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
+import matplotlib.patheffects as PathEffects
+
 
 from basf2_mva_evaluation import histogram
 
@@ -1184,13 +1186,18 @@ class Importance(Plotter):
 
         for y in range(importance_matrix.shape[0]):
             for x in range(importance_matrix.shape[1]):
-                self.axis.text(x + 0.5, y + 0.5, '%.0f' % importance_matrix[y, x],
-                               size=14,
-                               horizontalalignment='center',
-                               verticalalignment='center')
+                txt = self.axis.text(x + 0.5, y + 0.5, '%.0f' % importance_matrix[y, x],
+                                     size=14,
+                                     horizontalalignment='center',
+                                     verticalalignment='center',
+                                     color='w')
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
 
         cb = self.figure.colorbar(importance_heatmap, ticks=[0.0, 100], orientation='vertical')
         cb.ax.set_yticklabels(['low', 'high'])
+
+        # remove whitespace
+        self.axis.set_ylim(0, importance_matrix.shape[0])
 
         self.axis.set_aspect('equal')
 
@@ -1268,17 +1275,21 @@ class CorrelationMatrix(Plotter):
 
         for y in range(signal_corr.shape[0]):
             for x in range(signal_corr.shape[1]):
-                self.signal_axis.text(x + 0.5, y + 0.5, '%.0f' % signal_corr[y, x],
-                                      size=14,
-                                      horizontalalignment='center',
-                                      verticalalignment='center')
+                txt = self.signal_axis.text(x + 0.5, y + 0.5, '%.0f' % signal_corr[y, x],
+                                            size=14,
+                                            horizontalalignment='center',
+                                            verticalalignment='center',
+                                            color='w')
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
 
         for y in range(bckgrd_corr.shape[0]):
             for x in range(bckgrd_corr.shape[1]):
-                self.bckgrd_axis.text(x + 0.5, y + 0.5, '%.0f' % bckgrd_corr[y, x],
-                                      size=14,
-                                      horizontalalignment='center',
-                                      verticalalignment='center')
+                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, '%.0f' % bckgrd_corr[y, x],
+                                            size=14,
+                                            horizontalalignment='center',
+                                            verticalalignment='center',
+                                            color='w')
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
 
         cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis, ticks=[-100, 0, 100], orientation='horizontal')
         cb.solids.set_rasterized(True)
@@ -1287,6 +1298,11 @@ class CorrelationMatrix(Plotter):
         self.signal_axis.text(0.5, -1.0, "Signal", horizontalalignment='center')
         self.bckgrd_axis.text(0.5, -1.0, "Background", horizontalalignment='center')
 
+        # remove whitespace
+        self.signal_axis.set_xlim(0, signal_corr.shape[0])
+        self.signal_axis.set_ylim(0, signal_corr.shape[1])
+        self.bckgrd_axis.set_xlim(0, bckgrd_corr.shape[0])
+        self.bckgrd_axis.set_ylim(0, bckgrd_corr.shape[1])
         return self
 
     def finish(self):

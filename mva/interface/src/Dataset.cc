@@ -313,10 +313,8 @@ namespace Belle2 {
     {
       m_input_variant.resize(m_general_options.m_variables.size());
       m_spectators_variant.resize(m_general_options.m_spectators.size());
-      m_weight_double = 1.0;
-      m_target_double = 0.0;
-      m_target_int = 0;
-      m_target_bool = 0;
+      m_weight_variant = 1.0f;
+      m_target_variant = 0.0f;
 
       for (const auto& variable : general_options.m_variables)
         for (const auto& spectator : general_options.m_spectators)
@@ -367,8 +365,23 @@ namespace Belle2 {
         }
       }
       setRootInputType();
-      setTargetRootInputType();
       setBranchAddresses();
+    }
+
+
+    float ROOTDataset::castVarVariantToFloat(RootDatasetVarVariant& variant) const
+    {
+      if (std::holds_alternative<double>(variant))
+        return static_cast<float>(std::get<double>(variant));
+      else if (std::holds_alternative<float>(variant))
+        return std::get<float>(variant);
+      else if (std::holds_alternative<int>(variant))
+        return static_cast<float>(std::get<int>(variant));
+      else if (std::holds_alternative<bool>(variant))
+        return static_cast<float>(std::get<bool>(variant));
+      else {
+        B2FATAL("Unsupported variable type");
+      }
     }
 
     void ROOTDataset::loadEvent(unsigned int event)
@@ -377,34 +390,14 @@ namespace Belle2 {
         B2ERROR("Error during loading entry from chain");
       }
 
-      if (!m_isFloatInputType) {
-        m_weight = (float) m_weight_double;
-
-        for (unsigned int i = 0; i < m_input_variant.size(); i++) {
-          if (std::holds_alternative<double>(m_input_variant[i]))
-            m_input[i] = (float) std::get<double>(m_input_variant[i]);
-          else if (std::holds_alternative<int>(m_input_variant[i]))
-            m_input[i] = (float) std::get<int>(m_input_variant[i]);
-          else if (std::holds_alternative<bool>(m_input_variant[i]))
-            m_input[i] = (float) std::get<bool>(m_input_variant[i]);
-        }
-        for (unsigned int i = 0; i < m_spectators_variant.size(); i++) {
-          if (std::holds_alternative<double>(m_spectators_variant[i]))
-            m_spectators[i] = (float) std::get<double>(m_spectators_variant[i]);
-          else if (std::holds_alternative<int>(m_spectators_variant[i]))
-            m_spectators[i] = (float) std::get<int>(m_spectators_variant[i]);
-          else if (std::holds_alternative<bool>(m_spectators_variant[i]))
-            m_spectators[i] = (float) std::get<bool>(m_spectators_variant[i]);
-        }
+      for (unsigned int i = 0; i < m_input_variant.size(); i++) {
+        m_input[i] = castVarVariantToFloat(m_input_variant[i]);
       }
-
-      if (m_target_data_type == Variable::Manager::VariableDataType::c_double)
-        m_target = (float) m_target_double;
-      else if (m_target_data_type == Variable::Manager::VariableDataType::c_int)
-        m_target = (float) m_target_int;
-      else if (m_target_data_type == Variable::Manager::VariableDataType::c_bool)
-        m_target = (float) m_target_bool;
-
+      for (unsigned int i = 0; i < m_spectators_variant.size(); i++) {
+        m_spectators[i] = castVarVariantToFloat(m_spectators_variant[i]);
+      }
+      m_target = castVarVariantToFloat(m_target_variant);
+      m_weight = castVarVariantToFloat(m_weight_variant);
       m_isSignal = std::lround(m_target) == m_general_options.m_signal_class;
     }
 
@@ -425,15 +418,8 @@ namespace Belle2 {
           return values;
         }
       }
-
-      std::string typeName = "weights";
-
-      if (m_isFloatInputType)
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight);
-      else
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight_double);
-
-
+      std::string typeLabel = "weights";
+      return getVectorFromTTreeVariant(typeLabel, branchName, m_weight_variant);
     }
 
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
@@ -442,20 +428,9 @@ namespace Belle2 {
         B2ERROR("Feature index " << iFeature << " is out of bounds of given number of features: "
                 << getNumberOfFeatures());
       }
-
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]);
-      std::string typeName = "features";
-
-      if (!m_isFloatInputType) {
-        if (std::holds_alternative<double>(m_input_variant[iFeature]))
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_input_variant[iFeature]));
-        else if (std::holds_alternative<int>(m_input_variant[iFeature]))
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_input_variant[iFeature]));
-        else if (std::holds_alternative<bool>(m_input_variant[iFeature]))
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_input_variant[iFeature]));
-      }
-
-      return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input[iFeature]);
+      std::string typeLabel = "features";
+      return getVectorFromTTreeVariant(typeLabel, branchName, m_input_variant[iFeature]);
     }
 
     std::vector<float> ROOTDataset::getSpectator(unsigned int iSpectator)
@@ -466,18 +441,8 @@ namespace Belle2 {
       }
 
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
-      std::string typeName = "spectators";
-
-      if (!m_isFloatInputType) {
-        if (std::holds_alternative<double>(m_spectators_variant[iSpectator]))
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_spectators_variant[iSpectator]));
-        else if (std::holds_alternative<int>(m_spectators_variant[iSpectator]))
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_spectators_variant[iSpectator]));
-        else if (std::holds_alternative<bool>(m_spectators_variant[iSpectator]))
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_spectators_variant[iSpectator]));
-      }
-
-      return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators[iSpectator]);
+      std::string typeLabel = "spectators";
+      return getVectorFromTTreeVariant(typeLabel, branchName, m_spectators_variant[iSpectator]);
     }
 
     ROOTDataset::~ROOTDataset()
@@ -486,8 +451,23 @@ namespace Belle2 {
       m_tree = nullptr;
     }
 
+    std::vector<float> ROOTDataset::getVectorFromTTreeVariant(const std::string& variableType, const std::string& branchName,
+                                                              RootDatasetVarVariant& memberVariableTarget)
+    {
+      if (std::holds_alternative<double>(memberVariableTarget))
+        return getVectorFromTTree(variableType, branchName, std::get<double>(memberVariableTarget));
+      else if (std::holds_alternative<float>(memberVariableTarget))
+        return getVectorFromTTree(variableType, branchName, std::get<float>(memberVariableTarget));
+      else if (std::holds_alternative<int>(memberVariableTarget))
+        return getVectorFromTTree(variableType, branchName, std::get<int>(memberVariableTarget));
+      else if (std::holds_alternative<bool>(memberVariableTarget))
+        return getVectorFromTTree(variableType, branchName, std::get<bool>(memberVariableTarget));
+      else
+        B2FATAL("Input type of " << variableType << " variable " << branchName << " is not supported");
+    }
+
     template<class T>
-    std::vector<float> ROOTDataset::getVectorFromTTree(std::string& variableType, std::string& branchName,
+    std::vector<float> ROOTDataset::getVectorFromTTree(const std::string& variableType, const std::string& branchName,
                                                        T& memberVariableTarget)
     {
       int nentries = getNumberOfEvents();
@@ -528,7 +508,7 @@ namespace Belle2 {
     }
 
     template<class T>
-    void ROOTDataset::setScalarVariableAddress(std::string& variableType, std::string& variableName,
+    void ROOTDataset::setScalarVariableAddress(const std::string& variableType, const std::string& variableName,
                                                T& variableTarget)
     {
       if (not variableName.empty()) {
@@ -549,24 +529,35 @@ namespace Belle2 {
       }
     }
 
+    void ROOTDataset::setScalarVariableAddressVariant(const std::string& variableType, const std::string& variableName,
+                                                      RootDatasetVarVariant& varVariantTarget)
+    {
+      if (std::holds_alternative<double>(varVariantTarget))
+        setScalarVariableAddress(variableType, variableName, std::get<double>(varVariantTarget));
+      else if (std::holds_alternative<float>(varVariantTarget))
+        setScalarVariableAddress(variableType, variableName, std::get<float>(varVariantTarget));
+      else if (std::holds_alternative<int>(varVariantTarget))
+        setScalarVariableAddress(variableType, variableName, std::get<int>(varVariantTarget));
+      else if (std::holds_alternative<bool>(varVariantTarget))
+        setScalarVariableAddress(variableType, variableName, std::get<bool>(varVariantTarget));
+      else
+        B2FATAL("Variable type for branch " << variableName <<  " not supported!");
+    }
+
     template<class T>
-    void ROOTDataset::setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableNames,
+    void ROOTDataset::setVectorVariableAddress(const std::string& variableType, const std::vector<std::string>& variableNames,
                                                T& variableTargets)
     {
       for (unsigned int i = 0; i < variableNames.size(); ++i)
         ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], variableTargets[i]);
     }
 
-    void ROOTDataset::setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableNames,
-                                               std::vector<Variable::Manager::VarVariant>& varVariantTargets)
+
+    void ROOTDataset::setVectorVariableAddressVariant(const std::string& variableType, const std::vector<std::string>& variableNames,
+                                                      std::vector<RootDatasetVarVariant>& varVariantTargets)
     {
       for (unsigned int i = 0; i < variableNames.size(); ++i) {
-        if (std::holds_alternative<double>(varVariantTargets[i]))
-          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<double>(varVariantTargets[i]));
-        else if (std::holds_alternative<int>(varVariantTargets[i]))
-          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<int>(varVariantTargets[i]));
-        else if (std::holds_alternative<bool>(varVariantTargets[i]))
-          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<bool>(varVariantTargets[i]));
+        ROOTDataset::setScalarVariableAddressVariant(variableType, variableNames[i], varVariantTargets[i]);
       }
     }
 
@@ -574,155 +565,102 @@ namespace Belle2 {
     {
       // Deactivate all branches by default
       m_tree->SetBranchStatus("*", false);
-      std::string typeName;
 
-      if (m_general_options.m_weight_variable.empty()) {
-        m_weight = 1;
-        m_weight_double = 1;
-        B2INFO("No weight variable provided. The weight will be set to 1.");
-      }
-
-      if (m_general_options.m_weight_variable == "__weight__") {
-        if (checkForBranch(m_tree, "__weight__")) {
-          m_tree->SetBranchStatus("__weight__", true);
-          if (m_isFloatInputType)
-            m_tree->SetBranchAddress("__weight__", &m_weight);
-          else
-            m_tree->SetBranchAddress("__weight__", &m_weight_double);
+      if (!m_general_options.m_weight_variable.empty()) {
+        if (m_general_options.m_weight_variable == "__weight__") {
+          if (checkForBranch(m_tree, "__weight__")) {
+            m_tree->SetBranchStatus("__weight__", true);
+            std::string typeLabel_weight = "weight";
+            std::string weight_string =  "__weight__";
+            setScalarVariableAddressVariant(typeLabel_weight, weight_string, m_weight_variant);
+          } else {
+            m_weight_variant = 1.0f;
+          }
         } else {
-          B2INFO("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the "
-                 "weight variable to an empty string if you don't need it.");
-          m_weight = 1;
-          m_weight_double = 1;
+          std::string typeLabel_weight = "weight";
+          setScalarVariableAddressVariant(typeLabel_weight, m_general_options.m_weight_variable, m_weight_variant);
         }
-      } else if (m_isFloatInputType) {
-        typeName = "weight";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_weight_variable, m_weight);
-      } else {
-        typeName = "weight";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_weight_variable, m_weight_double);
       }
 
-      if (m_target_data_type == Variable::Manager::VariableDataType::c_double) {
-        typeName = "target";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_double);
-      } else if (m_target_data_type == Variable::Manager::VariableDataType::c_int) {
-        typeName = "target";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_int);
-      } else if (m_target_data_type == Variable::Manager::VariableDataType::c_bool) {
-        typeName = "target";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_bool);
-      }
+      std::string typeLabel_target = "target";
+      setScalarVariableAddressVariant(typeLabel_target, m_general_options.m_target_variable, m_target_variant);
+      std::string typeLabel_feature = "feature";
+      setVectorVariableAddressVariant(typeLabel_feature, m_general_options.m_variables, m_input_variant);
+      std::string typeLabel_spectator = "spectator";
+      setVectorVariableAddressVariant(typeLabel_spectator, m_general_options.m_spectators, m_spectators_variant);
+    }
 
-      if (m_isFloatInputType) {
-        typeName = "feature";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input);
-        typeName = "spectator";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators);
-      } else {
-        typeName = "feature";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_variant);
-        typeName = "spectator";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_variant);
+
+    void ROOTDataset::initialiseVarVariantType(const std::string type, RootDatasetVarVariant& varVariantTarget)
+    {
+      if (type == "Double_t")
+        varVariantTarget = 0.0;
+      else if (type == "Float_t")
+        varVariantTarget = 0.0f;
+      else if (type == "Int_t")
+        varVariantTarget = 0;
+      else if (type == "Bool_t")
+        varVariantTarget = false;
+      else {
+        B2FATAL("Unknown root input type: " << type);
+        throw std::runtime_error("Unknown root input type: " + type);
       }
     }
 
+
+    void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, RootDatasetVarVariant& varVariantTarget)
+    {
+      std::string compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name);
+      // try the branch as is first then fall back to root safe name.
+      if (checkForBranch(m_tree, branch_name.c_str())) {
+        TBranch* branch = m_tree->GetBranch(branch_name.c_str());
+        TLeaf* leaf = branch->GetLeaf(branch_name.c_str());
+        std::string type_name = leaf->GetTypeName();
+        initialiseVarVariantType(type_name, varVariantTarget);
+      } else if (checkForBranch(m_tree, compatible_branch_name)) {
+        TBranch* branch = m_tree->GetBranch(compatible_branch_name.c_str());
+        TLeaf* leaf = branch->GetLeaf(compatible_branch_name.c_str());
+        std::string type_name = leaf->GetTypeName();
+        initialiseVarVariantType(type_name, varVariantTarget);
+      }
+    }
 
     void ROOTDataset::setRootInputType()
     {
+      // set target variable
+      initialiseVarVariantForBranch(m_general_options.m_target_variable, m_target_variant);
+
+      // set feature variables
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); i++) {
         auto variable = m_general_options.m_variables[i];
-        std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
-
-        if (checkForBranch(m_tree, branchName)) {
-          TBranch* branch = m_tree->GetBranch(branchName.c_str());
-          TLeaf* leaf = branch->GetLeaf(branchName.c_str());
-          std::string type_name = leaf->GetTypeName();
-
-          // m_isFloatInputType is decided from the first input variable.
-          if (i == 0) {
-            if (type_name == "Float_t")
-              m_isFloatInputType = true;
-            else
-              m_isFloatInputType = false;
-          }
-
-          if (type_name == "Float_t") {
-            if (m_isFloatInputType)
-              continue;
-            else
-              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
-          } else if (type_name == "Double_t" or type_name == "Int_t" or type_name == "Bool_t") {
-            if (m_isFloatInputType)
-              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
-            else {
-              if (type_name == "Double_t")
-                m_input_variant[i] = 0.0;
-              else if (type_name == "Int_t")
-                m_input_variant[i] = 0;
-              else if (type_name == "Bool_t")
-                m_input_variant[i] = false;
-            }
-          } else {
-            B2FATAL("Unknown root input type: " << type_name);
-            throw std::runtime_error("Unknown root input type: " + type_name);
-          }
-        }
+        initialiseVarVariantForBranch(m_general_options.m_variables[i], m_input_variant[i]);
       }
 
+      // set spectator variables
       for (unsigned int i = 0; i < m_general_options.m_spectators.size(); i++) {
         auto variable = m_general_options.m_spectators[i];
-        std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
+        initialiseVarVariantForBranch(m_general_options.m_spectators[i], m_spectators_variant[i]);
+      }
 
-        if (checkForBranch(m_tree, branchName)) {
-          TBranch* branch = m_tree->GetBranch(branchName.c_str());
-          TLeaf* leaf = branch->GetLeaf(branchName.c_str());
-          std::string type_name = leaf->GetTypeName();
-          if (type_name == "Float_t") {
-            if (m_isFloatInputType)
-              continue;
-            else
-              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
-          } else if (type_name == "Double_t" or type_name == "Int_t" or type_name == "Bool_t") {
-            if (m_isFloatInputType)
-              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
-            else {
-              if (type_name == "Double_t")
-                m_spectators_variant[i] = 0.0;
-              else if (type_name == "Int_t")
-                m_spectators_variant[i] = 0;
-              else if (type_name == "Bool_t")
-                m_spectators_variant[i] = false;
-            }
+      // set weight variable - bit more tricky as we allow it to not be set or to not be present.
+      if (m_general_options.m_weight_variable.empty()) {
+        m_weight_variant = 1.0f;
+        B2INFO("No weight variable provided. The weight will be set to 1.");
+      } else {
+        if (m_general_options.m_weight_variable == "__weight__") {
+          if (checkForBranch(m_tree, "__weight__")) {
+            m_tree->SetBranchStatus("__weight__", true);
+            initialiseVarVariantForBranch("__weight__", m_weight_variant);
           } else {
-            B2FATAL("Unknown root input type: " << type_name);
-            throw std::runtime_error("Unknown root input type: " + type_name);
+            B2INFO("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the "
+                   "weight variable to an empty string if you don't need it.");
+            m_weight_variant = 1.0f;
           }
+        } else {
+          initialiseVarVariantForBranch(m_general_options.m_weight_variable, m_weight_variant);
         }
       }
-
     }
 
-    void ROOTDataset::setTargetRootInputType()
-    {
-      // if we don't pass a target_variable just take the default type.
-      if (m_general_options.m_target_variable.empty()) return;
-
-      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_target_variable);
-
-      TBranch* branch = m_tree->GetBranch(branchName.c_str());
-      TLeaf* leaf = branch->GetLeaf(branchName.c_str());
-      std::string target_type_name = leaf->GetTypeName();
-      if (target_type_name == "Double_t")
-        m_target_data_type = Variable::Manager::VariableDataType::c_double;
-      else if (target_type_name == "Int_t")
-        m_target_data_type = Variable::Manager::VariableDataType::c_int;
-      else if (target_type_name == "Bool_t")
-        m_target_data_type = Variable::Manager::VariableDataType::c_bool;
-      else {
-        B2FATAL("Input type " << target_type_name << " for target variable is not supported");
-        throw std::runtime_error("Unsupported target input type: " + target_type_name);
-      }
-    }
   }
 }

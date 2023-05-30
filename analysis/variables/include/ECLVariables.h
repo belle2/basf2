@@ -45,6 +45,26 @@ namespace Belle2 {
     double beamBackgroundSuppression(const Particle* particle);
 
     /**
+     * return distance to the nearest MC KL extrapolated to the radius of the cluster
+     */
+    double distanceToMcKl(const Particle* particle);
+
+    /**
+     * return distance to the nearest MC neutron extrapolated to the radius of the cluster
+     */
+    double distanceToMcNeutron(const Particle* particle);
+
+    /**
+     * return mdstIndex of the nearest MC KL
+     */
+    int mdstIndexMcKl(const Particle* particle);
+
+    /**
+     * return mdstIndex of the nearest MC neutron
+     */
+    int mdstIndexMcNeutron(const Particle* particle);
+
+    /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
      * Variable is used to separate hadronic showers from electromagnetic showers
      */

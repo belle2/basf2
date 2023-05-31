@@ -31,7 +31,7 @@ DQMHistAnalysisDeltaEpicsMonObjExampleModule::DQMHistAnalysisDeltaEpicsMonObjExa
 {
   // This module CAN NOT be run in parallel!
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
   addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:"));
@@ -42,23 +42,29 @@ DQMHistAnalysisDeltaEpicsMonObjExampleModule::DQMHistAnalysisDeltaEpicsMonObjExa
 DQMHistAnalysisDeltaEpicsMonObjExampleModule::~DQMHistAnalysisDeltaEpicsMonObjExampleModule()
 {
   // destructor not needed
+  // EPICS singleton deletion not urgent -> can be done by framework
 }
 
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaEpicsMonObjExample: initialized.");
 
-  m_monObj = getMonitoringObject("test");
-
-  gROOT->cd(); // this seems to be important, or strange things happen
-
+  gROOT->cd(); // this seems to be important before creating new Canvas, or strange things happen
   m_canvas = new TCanvas((m_histogramDirectoryName + "/c_Test").data());
 
+  m_monObj = getMonitoringObject("test");
   m_monObj->addCanvas(m_canvas);
+
+  // delta parameters, two examples:
+  addDeltaPar(m_histogramDirectoryName, m_histogramName, HistDelta::c_Events,
+              100000, 1); // update each 100k events (from daq histogram)
+  // addDeltaPar(m_histogramDirectoryName, m_histogramName, HistDelta::c_Entries, 10000, 1); // update each 10000 entries
 
   registerEpicsPV(m_pvPrefix + "mean", "mean");
   registerEpicsPV(m_pvPrefix + "width", "width");
-  updateEpicsPVs(5.0);
+  registerEpicsPV(m_pvPrefix + "alarm", "alarm");
+  updateEpicsPVs(
+    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
 }
 
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::beginRun()
@@ -69,6 +75,8 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::beginRun()
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::endRun()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaEpicsMonObjExample: endRun called.");
+  // MiraBelle export code should run at end of Run
+  // but it still "remembers" the state from last event call.
   doHistAnalysis(true);
 }
 
@@ -82,8 +90,10 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
 {
   double data_mean = 0.0;
   double data_width = 0.0;
+  int data_alarm = 0;
 
   m_canvas->Clear();
+  m_canvas->cd(0);
 
   // more handy to have it as a full name, but find/get functions
   // can work with one or two parameters
@@ -105,10 +115,37 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
   if (hist) {
     data_mean = hist->GetMean();
     data_width = hist->GetRMS();
+
+    // whatever condition
+    data_alarm = 2; // good, green
+    if (data_mean > 0.5 || data_mean < -0.5 || data_width > 0.5) data_alarm = 3; // warning, yellow
+    if (data_mean > 0.7 || data_mean < -0.7 || data_width > 0.7) data_alarm = 4; // error, red
+    // maybe other condition, e.g. too low to judge -> 0
+
+    hist->Draw("hist");
+
+    // the following will be replaced by a base class function
+    auto color = kWhite;
+    switch (data_alarm) {
+      case 2:
+        color = kGreen;
+        break;
+      case 3:
+        color = kYellow;
+        break;
+      case 4:
+        color = kRed;
+        break;
+      default:
+        color = kGray;
+        break;
+    }
+    m_canvas->Pad()->SetFillColor(color);
   }
 
   // Tag canvas as updated ONLY if things have changed.
   UpdateCanvas(m_canvas->GetName(), hist != nullptr);
+  // Remark: if you do not tag, you may have an empty Canvas (as it is cleared above)
 
   // this if left over from jsroot, may not be needed anymore (to check)
   m_canvas->Update();
@@ -126,8 +163,10 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
       // we do not want to fill epics again at end of run, as this would be identical to the last event called before.
       setEpicsPV("mean", data_mean);
       setEpicsPV("width", data_width);
-      // write out
-      updateEpicsPVs(5.0);
+      setEpicsPV("alarm", data_alarm);
+      // until now, chnages are buffered only locally, not written out to network for performance reason
+      updateEpicsPVs(
+        5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
     }
   }
 }
@@ -135,7 +174,5 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaEpicsMonObjExample: terminate called");
-  // MiraBelle export code should run at end of Run
-  // but it still "remembers" the state from last event call.
 }
 

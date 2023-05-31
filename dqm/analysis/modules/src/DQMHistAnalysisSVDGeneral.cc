@@ -202,6 +202,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
   //  m_cOnlineOccupancyV->SetGrid(1);
   m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
+  m_cClusterOnTrack3Time_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrack3Time_L456V");
 
   const int nY = 19;
   TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
@@ -235,8 +236,8 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  rtype = findHist("DQMInfo/rtype");
-  runtype = rtype ? rtype->GetTitle() : "";
+  //rtype = findHist("DQMInfo/rtype");
+  runtype = "physics"; //rtype ? rtype->GetTitle() : "";
 }
 
 
@@ -254,6 +255,7 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
     m_cStripOccupancyV[i]->Clear();
   }
   m_cClusterOnTrackTime_L456V->Clear();
+  m_cClusterOnTrack3Time_L456V->Clear();
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -377,6 +379,57 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   if (m_printCanvas)
     m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
+
+
+  // cluster time for clusters of track
+  m_h = findHist("SVDClsTrk/SVDTRK_Cluster3TimeV456");
+  if (m_h != NULL) {
+    m_hClusterOnTrack3Time_L456V.Clear();
+    m_h->Copy(m_hClusterOnTrack3Time_L456V);
+    m_hClusterOnTrack3Time_L456V.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
+    Float_t mean_PeakInCenter = m_hClusterOnTrack3Time_L456V.GetMean(); //
+    m_hClusterOnTrack3Time_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
+    m_hClusterOnTrack3Time_L456V.SetTitle("ClusterOnTrack Time L456V 3 samples " + runID);
+    bool hasError = false;
+    if (nEvents > m_statThreshold) {
+      if (runtype == "physics") {
+        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
+        if (difference_physics > m_timeThreshold) {
+          hasError = true;
+        }
+      } else if (runtype == "cosmic") {
+        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
+        if (difference_cosmic > m_timeThreshold) {
+          hasError = true;
+        }
+      } else {
+        B2WARNING("Run type:" << runtype);
+      }
+    } else {
+      m_cClusterOnTrack3Time_L456V->SetFillColor(kGray);
+      m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
+    }
+    if (! hasError) {
+      m_cClusterOnTrack3Time_L456V->SetFillColor(kGreen);
+      m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
+    } else {
+      m_legError->Draw("same");
+      m_cClusterOnTrack3Time_L456V->SetFillColor(kRed);
+      m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
+    }
+  } else {
+    B2INFO("Histogram SVDClsTrk/c_SVDTRK_Cluster3TimeV456 from SVDDQMClustersOnTrack module not found!");
+    m_cClusterOnTrack3Time_L456V->SetFillColor(kRed);
+  }
+
+  m_cClusterOnTrack3Time_L456V->cd();
+  m_hClusterOnTrack3Time_L456V.Draw();
+
+  m_cClusterOnTrack3Time_L456V->Modified();
+  m_cClusterOnTrack3Time_L456V->Update();
+
+  if (m_printCanvas)
+    m_cClusterOnTrack3Time_L456V->Print("c_SVDClusterOnTrack3Time_L456V.pdf");
 
   //check MODULE OCCUPANCY online & offline
 

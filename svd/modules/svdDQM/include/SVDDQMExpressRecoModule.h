@@ -194,6 +194,24 @@ namespace Belle2 {
     /** v Time of clusters for layer 4,5,6 sensors */
     TH1F* m_clusterTimeV456 = nullptr;
 
+    /** u Time of clusters for layer 3 sensors  for 3 samples*/
+    TH1F* m_cluster3TimeU3 = nullptr;
+    /** v Time of clusters for layer 3  sensors   for 3 samples*/
+    TH1F* m_cluster3TimeV3 = nullptr;
+    /** u Time of clusters for layer 4,5,6 sensors  for 3 samples*/
+    TH1F* m_cluster3TimeU456 = nullptr;
+    /** v Time of clusters for layer 4,5,6 sensors  for 3 samples*/
+    TH1F* m_cluster3TimeV456 = nullptr;
+
+    /** u Time of clusters for layer 3 sensors   for 6 samples*/
+    TH1F* m_cluster6TimeU3 = nullptr;
+    /** v Time of clusters for layer 3  sensors  for 6 samples*/
+    TH1F* m_cluster6TimeV3 = nullptr;
+    /** u Time of clusters for layer 4,5,6 sensors  for 6 samples */
+    TH1F* m_cluster6TimeU456 = nullptr;
+    /** v Time of clusters for layer 4,5,6 sensors  for 6 samples */
+    TH1F* m_cluster6TimeV456 = nullptr;
+
     //----------------------------------------------------------------
     // Additional histograms for out of ExpressReco
     //----------------------------------------------------------------

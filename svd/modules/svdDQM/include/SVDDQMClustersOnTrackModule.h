@@ -65,6 +65,9 @@ namespace Belle2 {
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
+    /**< event T0 */
+    StoreObjPtr<EventT0> m_EventT0;
+
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
 
@@ -112,10 +115,39 @@ namespace Belle2 {
     TH1F* m_clsTrkTimeU3 = nullptr;
     /** v Time of clusters related to tracks for layer 3  sensors */
     TH1F* m_clsTrkTimeV3 = nullptr;
+
+    /** u Time of clusters related to tracks for layer 3 sensors for 3 samples*/
+    TH1F* m_cls3TrkTimeU3 = nullptr;
+    /** v Time of clusters related to tracks for layer 3  sensors for 3 sampes*/
+    TH1F* m_cls3TrkTimeV3 = nullptr;
+
+    /** u Time of clusters related to tracks for layer 3 sensors for 3 samples*/
+    TH1F* m_cls6TrkTimeU3 = nullptr;
+    /** v Time of clusters related to tracks for layer 3  sensors for 3 sampes*/
+    TH1F* m_cls6TrkTimeV3 = nullptr;
+
     /** u Time of clusters related to tracks for layer 4,5,6 sensors */
     TH1F* m_clsTrkTimeU456 = nullptr;
     /** v Time of clusters related to tracks for layer 4,5,6 sensors */
     TH1F* m_clsTrkTimeV456 = nullptr;
+
+    /** u Time of clusters related to tracks for layer 4,5,6 sensors */
+    TH1F* m_cls3TrkTimeU456 = nullptr;
+    /** v Time of clusters related to tracks for layer 4,5,6 sensors */
+    TH1F* m_cls3TrkTimeV456 = nullptr;
+
+    /** u Time of clusters related to tracks for layer 4,5,6 sensors */
+    TH1F* m_cls6TrkTimeU456 = nullptr;
+    /** v Time of clusters related to tracks for layer 4,5,6 sensors */
+    TH1F* m_cls6TrkTimeV456 = nullptr;
+
+    /** SVD T0 */
+    TH1F* m_SVDT0 = nullptr;
+    TH1F* m_SVD3T0 = nullptr;
+    TH1F* m_SVD6T0 = nullptr;
+
+    /** Correlation plot*/
+    TH2F* m_SVD6T0cls6TrkTime = nullptr;
 
   };
 

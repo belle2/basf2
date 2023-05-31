@@ -198,6 +198,7 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_clusterChargeVAll->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeVAll);
+
   //----------------------------------------------------------------
   // Charge of clusters for L3/L456 sensors
   //----------------------------------------------------------------
@@ -314,6 +315,64 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_clusterTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV456);
+
+  //----------------------------------------------------------------
+  // Time of clusters for L3/L456 sensors for 3 samples
+  //----------------------------------------------------------------
+  Name = "SVDDQM_Cluster3TimeU3";
+  Title = Form("SVD U-Cluster Time %s for layer 3 sensors for 3 samples", refFrame.Data());
+  m_cluster3TimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster3TimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster3TimeU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster3TimeU3);
+  name = str(format("SVDDQM_Cluster3TimeV3"));
+  Title = Form("SVD V-Cluster Time %s for layer 3 sensors for 3 samples", refFrame.Data());
+  m_cluster3TimeV3 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster3TimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster3TimeV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster3TimeV3);
+
+  name = str(format("SVDDQM_Cluster3TimeU456"));
+  Title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
+  m_cluster3TimeU456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster3TimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster3TimeU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster3TimeU456);
+  name = str(format("SVDDQM_Cluster3TimeV456"));
+  Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
+  m_cluster3TimeV456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster3TimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster3TimeV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster3TimeV456);
+
+  //----------------------------------------------------------------
+  // Time of clusters for L3/L456 sensors for 6 samples
+  //----------------------------------------------------------------
+  Name = "SVDDQM_Cluster6TimeU3";
+  Title = Form("SVD U-Cluster Time %s for layer 3 sensors for 6 samples", refFrame.Data());
+  m_cluster6TimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster6TimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster6TimeU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster6TimeU3);
+  name = str(format("SVDDQM_Cluster6TimeV3"));
+  Title = Form("SVD V-Cluster Time %s for layer 3 sensors for 6 samples", refFrame.Data());
+  m_cluster6TimeV3 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster6TimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster6TimeV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster6TimeV3);
+
+  name = str(format("SVDDQM_Cluster6TimeU456"));
+  Title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
+  m_cluster6TimeU456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster6TimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster6TimeU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster6TimeU456);
+  name = str(format("SVDDQM_Cluster6TimeV456"));
+  Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
+  m_cluster6TimeV456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cluster6TimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster6TimeV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cluster6TimeV456);
 
   //----------------------------------------------------------------
   // MaxBin of strips for all sensors (offline ZS)
@@ -634,6 +693,7 @@ void SVDDQMExpressRecoModule::event()
   StoreObjPtr<EventMetaData> evtMetaData;
   m_expNumber = evtMetaData->getExperiment();
   m_runNumber = evtMetaData->getRun();
+  int nSamples = m_svdEventInfo->getNSamples();
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
@@ -796,10 +856,20 @@ void SVDDQMExpressRecoModule::event()
         if (m_clusterChargeU3 != nullptr) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRU3 != nullptr) m_clusterSNRU3->Fill(cluster.getSNR());
         if (m_clusterTimeU3 != nullptr) m_clusterTimeU3->Fill(time);
+        if (nSamples == 3) {
+          if (m_cluster3TimeU3 != nullptr) m_cluster3TimeU3->Fill(time);
+        } else {
+          if (m_cluster6TimeU3 != nullptr) m_cluster6TimeU3->Fill(time);
+        }
       } else {
         if (m_clusterChargeU456 != nullptr) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRU456 != nullptr) m_clusterSNRU456->Fill(cluster.getSNR());
         if (m_clusterTimeU456 != nullptr) m_clusterTimeU456->Fill(time);
+        if (nSamples == 3) {
+          if (m_cluster3TimeU456 != nullptr) m_cluster3TimeU456->Fill(time);
+        } else {
+          if (m_cluster6TimeU456 != nullptr) m_cluster6TimeU456->Fill(time);
+        }
       }
 
       if (m_ShowAllHistos == 1)
@@ -821,10 +891,20 @@ void SVDDQMExpressRecoModule::event()
         if (m_clusterChargeV3 != nullptr) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRV3 != nullptr) m_clusterSNRV3->Fill(cluster.getSNR());
         if (m_clusterTimeV3 != nullptr) m_clusterTimeV3->Fill(time);
+        if (nSamples == 3) {
+          if (m_cluster3TimeV3 != nullptr) m_cluster3TimeV3->Fill(time);
+        } else {
+          if (m_cluster6TimeV3 != nullptr) m_cluster6TimeV3->Fill(time);
+        }
       } else {
         if (m_clusterChargeV456 != nullptr) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRV456 != nullptr) m_clusterSNRV456->Fill(cluster.getSNR());
         if (m_clusterTimeV456 != nullptr) m_clusterTimeV456->Fill(time);
+        if (nSamples == 3) {
+          if (m_cluster3TimeV456 != nullptr) m_cluster3TimeV456->Fill(time);
+        } else {
+          if (m_cluster6TimeV456 != nullptr) m_cluster6TimeV456->Fill(time);
+        }
       }
       if (m_ShowAllHistos == 1)
         if (m_hitMapVCl[index] != nullptr) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));

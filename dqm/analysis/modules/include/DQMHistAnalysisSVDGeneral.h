@@ -112,6 +112,9 @@ namespace Belle2 {
     TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
 
+    TH1F m_hClusterOnTrack3Time_L456V; /**< time for clusters on Track for L456V histo*/
+    TCanvas* m_cClusterOnTrack3Time_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
     TPaveText* m_legProblem = nullptr; /**< OfflineOccupancy plot legend, problem */

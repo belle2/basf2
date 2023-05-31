@@ -82,6 +82,13 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
 
+    TCanvas* m_c3EfficiencyU = nullptr; /**< efficiency U plot canvas */
+    TCanvas* m_c3EfficiencyV = nullptr; /**< efficiency V plot canvas */
+    SVDSummaryPlots* m_h3Efficiency = nullptr; /**< efficiency histo */
+    TCanvas* m_c3EfficiencyErrU = nullptr; /**<efficiency U error plot canvas */
+    TCanvas* m_c3EfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
+    SVDSummaryPlots* m_h3EfficiencyErr = nullptr; /**< efficiency error histo */
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 
     TPaveText* m_legProblem = nullptr; /**< efficiency plot legend, problem */

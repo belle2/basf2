@@ -15,7 +15,7 @@
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/database/DBImportObjPtr.h>
@@ -126,10 +126,6 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   TFile* histfile = 0;
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
-     Same for all crystals. */
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
-
   // Vector of time offsets to track how far from nominal the cluster times are.
   vector<float> t_offsets(ECLElementNumbers::c_NCrystals, 0.0);
   vector<float> t_offsets_unc(ECLElementNumbers::c_NCrystals, 0.0);
@@ -213,6 +209,10 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   updateDBObjPtrs(eventNumberForCrates, minRunNum, minExpNum);
   unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
   crystalMapper->initFromDB();
+
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals. */
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
   //------------------------------------------------------------------------
   //..Read payloads from database

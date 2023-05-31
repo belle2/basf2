@@ -345,6 +345,8 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     m_svdEventInfoName = "SVDEventInfoSim";
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  eventinfo->setAPVClock(m_hwClock);
+
 
   m_numberOfAcquiredSamples = eventinfo->getNSamples();
 

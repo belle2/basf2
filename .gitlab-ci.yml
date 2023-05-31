@@ -35,11 +35,14 @@ default:
     - git config user.email "something@something.com"
     - git config user.name "someone"
     - git config --global --add safe.directory $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})
+    # Clean the current directory by stashing the remaining modified files from previous builds
+    - git stash && git stash clear
+    # If this is not the first stage: merge the HEAD of the target branch
     - |
       if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
         if [ "${GITLAB_IS_FIRST_STAGE}" != "yes" ]; then
             echo "Merging the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} up to commit $(< target_head_hash.txt) into this branch"
-            git fetch --all && git merge $(< target_head_hash.txt) --allow-unrelated-histories --strategy-option ours
+            git fetch --all && git merge $(< target_head_hash.txt) --strategy-option ours --no-commit --allow-unrelated-histories
         fi
       fi
     # Preliminary operations necessary for basf2
@@ -64,6 +67,7 @@ prepare-pipeline:
     GITLAB_IS_FIRST_STAGE: "yes"
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
+    # Identify the current HEAD of the target branch and cache it
     - |
       if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
         git rev-parse origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} > target_head_hash.txt

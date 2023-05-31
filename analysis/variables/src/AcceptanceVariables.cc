@@ -14,6 +14,8 @@
 
 #include <analysis/dataobjects/Particle.h>
 
+#include <TMath.h>
+
 using namespace std;
 
 namespace Belle2 {

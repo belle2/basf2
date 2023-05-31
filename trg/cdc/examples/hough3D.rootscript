@@ -68,8 +68,6 @@ void hough3D(){
   hphi00->SetMinimum(0);
   hpt00->SetMinimum(0);
 
-  const double Trg_PI = 3.141592653589793;
-
   TFile* inFile = new TFile("Fitter3D.root");
   TTree* inTree = (TTree*)inFile->Get("m_treeTrackFitter3D");
   TTree* inTree2 = (TTree*)inFile->Get("m_treeConstantsFitter3D");
@@ -463,7 +461,7 @@ void hough3D(){
     //cout<<"mcCot: "<<mcPar[3]<<" mcZ0: "<<mcZ0<<endl;
 
     hz02->Fill(bestZ0*z0StepSize*100);
-    htheta02->Fill((Trg_PI/2.-atan(bestCot*cotStepSize+cotStart))*180./Trg_PI);
+    htheta02->Fill((M_PI_2-atan(bestCot*cotStepSize+cotStart))*TMath::RadToDeg());
 
     // Third Version
     // Compare all votes. Pick one that has small chi^2
@@ -527,8 +525,8 @@ void hough3D(){
     // Find phiSt from foundZ
     for(int i=0; i<4; i++){
       foundPhiSt[i] = fitPhi0+mysign*acos(rr[i+5]/2/rho)+2*asin((ztostraw[i]-foundZ[i])*tan(anglest[i])/2/rr[i+5]); 
-      if(foundPhiSt[i]>2*Trg_PI) foundPhiSt[i]-=2*Trg_PI;
-      if(foundPhiSt[i]<0) foundPhiSt[i]+=2*Trg_PI;
+      if(foundPhiSt[i]>2*M_PI) foundPhiSt[i]-=2*M_PI;
+      if(foundPhiSt[i]<0) foundPhiSt[i]+=2*M_PI;
     }
     //cout<<"PhiSt[0]: "<<phi[5]<<" PhiSt[1]: "<<phi[6]<<" PhiSt[2]: "<<phi[7]<<" PhiSt[3]: "<<phi[8]<<endl;
     //cout<<"FoundPhiSt[0]: "<<foundPhiSt[0]<<" FoundPhiSt[1]: "<<foundPhiSt[1]<<" FoundPhiSt[2]: "<<foundPhiSt[2]<<" FoundPhiSt[3]: "<<foundPhiSt[3]<<endl;
@@ -564,12 +562,12 @@ void hough3D(){
     rSFit(iezz2,arcS,zz,z0,cot);
 
     // Change units
-    fitPhi0 = fitPhi0*180/Trg_PI;
-    mcPhi0 = mcPhi0*180/Trg_PI;
-    ztheta=Trg_PI/2.-atan(cot);
-    ztheta*=180./Trg_PI;
-    mcTheta = Trg_PI/2.-atan(mcPar[3]);
-    mcTheta *= 180./Trg_PI;
+    fitPhi0 = fitPhi0*TMath::RadToDeg();
+    mcPhi0 = mcPhi0*TMath::RadToDeg();
+    ztheta=M_PI_2-atan(cot);
+    ztheta*=TMath::RadToDeg();
+    mcTheta = M_PI_2-atan(mcPar[3]);
+    mcTheta *= TMath::RadToDeg();
 
     //this should be deleted
     hpt00->Fill(pt);

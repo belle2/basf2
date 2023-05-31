@@ -12,16 +12,17 @@
 
 namespace TreeFitter {
 
-  /** A class for composite particles */
-  class RecoComposite : public ParticleBase {
+  /** A class for composite particles, where the daughters must be ignored by the fitter */
+  /** Currently used for bremsstrahlung correction and dummy invisibles */
+  class Composite : public ParticleBase {
 
   public:
     /** constructor */
-    RecoComposite(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config,
-                  bool massconstraint = false);
+    Composite(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config,
+              bool massconstraint = false);
 
     /** destructor */
-    virtual ~RecoComposite() {};
+    virtual ~Composite() {};
 
     /** init particle in case it has a mother */
     virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
@@ -33,7 +34,7 @@ namespace TreeFitter {
     void updateParams();
 
     /** project this particle constraint  */
-    ErrCode projectRecoComposite(const FitParams& fitparams, Projection& p) const;
+    ErrCode projectComposite(const FitParams& fitparams, Projection& p) const;
 
     /** dimension of the measurement vector */
     int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
@@ -48,7 +49,7 @@ namespace TreeFitter {
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override ;
 
     /** get ype */
-    virtual int type() const override { return kRecoComposite ; }
+    virtual int type() const override { return kComposite ; }
 
     /** get position index in statevectof x,y,z,tau,px,py,pz */
     virtual int posIndex() const override { return index()   ; }

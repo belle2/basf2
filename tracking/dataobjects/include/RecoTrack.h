@@ -582,12 +582,6 @@ namespace Belle2 {
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;
 
-    /** Set the genfit track copying the information from another genfit track.
-     * This is used by the fit&refit, since the original genfit track must be
-     * updated with the refitted object obtained after the flip
-     */
-    void setGenfitTrack(genfit::Track* track);
-
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const ROOT::Math::XYZVector& positionSeed, const ROOT::Math::XYZVector& momentumSeed)
     {
@@ -1092,6 +1086,15 @@ namespace Belle2 {
      * @return genfit::Track of the RecoTrack.
      */
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
+
+    /** Set the genfit track of a Recotrack copying the information from another genfit track.
+     * This is used by the fit&refit, since the original genfit track must be
+     * updated with the refitted object obtained after the flip
+     *
+     * @param recoTrack : RecoTrack whose Track we want to update
+     * @param track : input genfit::Track which we want to copy inside the RecoTrack
+     */
+    static void swapGenfitTrack(RecoTrack& recoTrack, const genfit::Track* track);
 
     /**
      * Checks if a TrackRap for the PDG id of the RecoTrack (and its charge conjugate) does

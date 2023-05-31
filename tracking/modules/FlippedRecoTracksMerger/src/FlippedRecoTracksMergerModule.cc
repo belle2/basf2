@@ -112,7 +112,6 @@ void FlippedRecoTracksMergerModule::event()
 
     // swapping the flipped genfit::Track into the main RecoTrack, to store the new fitted values (useful for V0Finder)
     genfit::Track flipTrack = RecoTrackGenfitAccess::getGenfitTrack(*flippedRecoTrack);
-    recoTrack.setGenfitTrack(&flipTrack);
-
+    RecoTrackGenfitAccess::swapGenfitTrack(recoTrack, &flipTrack);
   }
 }

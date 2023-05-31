@@ -32,15 +32,14 @@ DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
 
-bool DQMHistAnalysisModule::m_useEpics;
-bool DQMHistAnalysisModule::m_epicsReadOnly;
+bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
+bool DQMHistAnalysisModule::m_epicsReadOnly =
+  false; // special for second "online" use (reading limits). default to false, to enable EPICS, add special EPICS Module parameter
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
   setDescription("Histogram Analysis module base class");
-  m_useEpics = false; // to enable EPICS, add EPICS Module class into chain
-  m_epicsReadOnly = false;
 }
 
 bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)

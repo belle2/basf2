@@ -10,8 +10,8 @@
 namespace Belle2 {
   namespace CDC {
 
-    double ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
-                           TVector3& hitPosition, TVector3& wirePosition)
+    double ClosestApproach(const B2Vector3D& bwp, const B2Vector3D& fwp, const B2Vector3D& posIn, const B2Vector3D& posOut,
+                           B2Vector3D& hitPosition, B2Vector3D& wirePosition)
     {
       //----------------------------------------------------------
       /* For two lines r=r1+t1.v1 & r=r2+t2.v2
@@ -29,17 +29,17 @@ namespace Belle2 {
       // Get wirepoint @ endplate
       //--------------------------
       /*  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
-      TVector3 tfwp = cdcgp.wireForwardPosition(layerId, cellId);
-      G4ThreeVector fwp(tfwp.x(), tfwp.y(), tfwp.z());
-      TVector3 tbwp = cdcgp.wireBackwardPosition(layerId, cellId);
-      G4ThreeVector bwp(tbwp.x(), tbwp.y(), tbwp.z());
+      B2Vector3D tfwp = cdcgp.wireForwardPosition(layerId, cellId);
+      G4ThreeVector fwp(tfwp.X(), tfwp.Y(), tfwp.Z());
+      B2Vector3D tbwp = cdcgp.wireBackwardPosition(layerId, cellId);
+      G4ThreeVector bwp(tbwp.X(), tbwp.Y(), tbwp.Z());
       */
 
-      TVector3 wireLine = fwp - bwp;
-      TVector3 hitLine = posOut - posIn;
+      B2Vector3D wireLine = fwp - bwp;
+      B2Vector3D hitLine = posOut - posIn;
 
-      TVector3 hitXwire = hitLine.Cross(wireLine);
-      TVector3 wire2hit = fwp - posOut;
+      B2Vector3D hitXwire = hitLine.Cross(wireLine);
+      B2Vector3D wire2hit = fwp - posOut;
 
       //----------------------------------------------------------------
       // Hitposition is the position on hit line where closest approach

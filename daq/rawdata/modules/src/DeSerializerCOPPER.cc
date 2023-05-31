@@ -178,7 +178,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 }
 
 
-int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word)
+int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int /*entry*/, int* /*delete_flag*/, int* /*m_size_word*/)
 {
 #ifdef USE_PCIE40
   char err_buf[500];
@@ -272,7 +272,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   } else if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
     sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
-            recvd_byte, *m_size_word * sizeof(int) , m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
+            recvd_byte, *m_size_word * sizeof(int), m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
@@ -351,7 +351,7 @@ void DeSerializerCOPPERModule::openCOPPER()
 
 
 
-int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
+int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int /*delete_flag*/)
 {
 
   int n = 0;
@@ -569,7 +569,7 @@ void DeSerializerCOPPERModule::event()
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       printf("[DEBUG] RunPause was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
-             max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+             max_nevt, max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }
@@ -579,7 +579,7 @@ void DeSerializerCOPPERModule::event()
   //
   //  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
   if (n_basf2evt % 100 == 0) {
-    RateMonitor(m_prev_ftsweve32,  m_prev_exprunsubrun_no & RawHeader_latest::SUBRUNNO_MASK ,
+    RateMonitor(m_prev_ftsweve32,  m_prev_exprunsubrun_no & RawHeader_latest::SUBRUNNO_MASK,
                 (m_prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT);
   }
   n_basf2evt++;

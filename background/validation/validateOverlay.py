@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -39,7 +38,7 @@ class Histogrammer(b2.Module):
         #: list of histograms
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
-                              100, 30000, 40000))
+                              200, 20000, 40000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
@@ -110,8 +109,7 @@ add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, fo
 main.add_module(Histogrammer())
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

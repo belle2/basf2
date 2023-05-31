@@ -148,14 +148,14 @@ namespace Belle2 {
     /** returns raw IDs of entries being outer friend of sectors on same layer. This function assumes that the ids are sorted from outermost (= first) to innermost (= last) iD. */
     std::vector<unsigned> hasSharedLayer() const
     {
-      B2DEBUG(1, "hasSharedLayer-start with iD " << print() << ":");
+      B2DEBUG(20, "hasSharedLayer-start with iD " << print() << ":");
       std::vector<unsigned> outerOnes;
       for (unsigned i = 0; i < size() - 1; i++) { // i: outer iD i+1: inner iD
-        B2DEBUG(1, "found layerIDs for outer/inner: " << FullSecID(m_idChain[i]).getLayerID() << "/" << FullSecID(
+        B2DEBUG(20, "found layerIDs for outer/inner: " << FullSecID(m_idChain[i]).getLayerID() << "/" << FullSecID(
                   m_idChain[i + 1]).getLayerID());
         if (FullSecID(m_idChain[i]).getLayerID() == FullSecID(m_idChain[i + 1]).getLayerID()) {
           outerOnes.push_back(m_idChain[i]);
-          B2DEBUG(1, "hasSharedLayer good combi found with inner: " << FullSecID(m_idChain[i + 1]).getFullSecString() << ", storing outer: "
+          B2DEBUG(20, "hasSharedLayer good combi found with inner: " << FullSecID(m_idChain[i + 1]).getFullSecString() << ", storing outer: "
                   << FullSecID(m_idChain[i]).getFullSecString());
         }
       }

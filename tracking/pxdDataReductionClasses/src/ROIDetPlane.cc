@@ -11,9 +11,9 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
-using namespace std;
 
 
 ROIDetPlane::ROIDetPlane(const VxdID& vxdID) : ROIDetPlane(vxdID, 10.0, 0.4999999 * M_PI)
@@ -24,21 +24,19 @@ ROIDetPlane::ROIDetPlane(const VxdID& vxdID) : ROIDetPlane(vxdID, 10.0, 0.499999
 ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerancePhi)
   : m_vxdID(vxdID), m_orthoVec_upper(0, 0, 0), m_orthoVec_lower(0, 0, 0)
 {
-
   const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::getInstance().getSensorInfo(
                                              m_vxdID);   /**< reference to sensor info in geometry */
 
-  TVector3 local(0, 0, 0);
-  TVector3 uVector(1, 0, 0);
-  TVector3 vVector(0, 1, 0);
+  ROOT::Math::XYZVector local(0, 0, 0);
+  ROOT::Math::XYZVector uVector(1, 0, 0);
+  ROOT::Math::XYZVector vVector(0, 1, 0);
 
-  TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
-  TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector, true);
-  TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector, true);
+  ROOT::Math::XYZVector globalSensorPos = aSensorInfo.pointToGlobal(local, true);
+  ROOT::Math::XYZVector globaluVector = aSensorInfo.vectorToGlobal(uVector, true);
+  ROOT::Math::XYZVector globalvVector = aSensorInfo.vectorToGlobal(vVector, true);
 
-  setO(globalSensorPos);
-
-  setUV(globaluVector, globalvVector);
+  setO(XYZToTVector(globalSensorPos));
+  setUV(XYZToTVector(globaluVector), XYZToTVector(globalvVector));
 
 
   // the maximum distance in  u-direction for hit to be considered to lie on the sensor (for wedge take the maximum width)
@@ -46,24 +44,24 @@ ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerance
 
   // translate the phi-tolerance into a tolerance in u, NOTE: this is only approximate as it uses the center and not the edge of the sensor.
   if (tolerancePhi >= 0 && tolerancePhi < M_PI / 2.0) {
-    maxDistU += fabs(std::tan(tolerancePhi) * globalSensorPos.Perp());
+    maxDistU += fabs(std::tan(tolerancePhi) * globalSensorPos.Rho());
   } else {
     B2WARNING("No valid value for the phi tolerance given! Will use 0 tolerance!" << LogVar("tolerance phi", tolerancePhi));
   }
 
 
   // get points at upper and lower edge of the sensor
-  TVector3 edgepoint_upper = globalSensorPos + maxDistU * globaluVector;
-  TVector3 edgepoint_lower = globalSensorPos - maxDistU * globaluVector;
+  ROOT::Math::XYZVector edgepoint_upper = globalSensorPos + maxDistU * globaluVector;
+  ROOT::Math::XYZVector edgepoint_lower = globalSensorPos - maxDistU * globaluVector;
   /* Get the orthogonal vectors, no need to normalize as we only test for the sign.
      These two vectors are defined so that they are orthogonal to  the plane spanned by the z-axis and the vector going from
      the origin to the upper/lower edge of the sensor (global coordinates).*/
-  m_orthoVec_upper = TVector3(0, 0, 1).Cross(edgepoint_upper);
-  m_orthoVec_lower = TVector3(0, 0, 1).Cross(edgepoint_lower);
+  m_orthoVec_upper = ROOT::Math::XYZVector(0, 0, 1).Cross(edgepoint_upper);
+  m_orthoVec_lower = ROOT::Math::XYZVector(0, 0, 1).Cross(edgepoint_lower);
 
   //setting acceptance in z for the sensor
-  TVector3 minVecV(0, -aSensorInfo.getVSize() / 2.0, 0);
-  TVector3 maxVecV(0, aSensorInfo.getVSize() / 2.0, 0);
+  ROOT::Math::XYZVector minVecV(0, -aSensorInfo.getVSize() / 2.0, 0);
+  ROOT::Math::XYZVector maxVecV(0, aSensorInfo.getVSize() / 2.0, 0);
   m_sensorZMin = aSensorInfo.pointToGlobal(minVecV, true).Z() - toleranceZ;
   m_sensorZMax = aSensorInfo.pointToGlobal(maxVecV, true).Z() + toleranceZ;
 
@@ -71,7 +69,7 @@ ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerance
 }
 
 
-bool ROIDetPlane::isSensorInRange(const TVector3& trackPosition, int layer)
+bool ROIDetPlane::isSensorInRange(const ROOT::Math::XYZVector& trackPosition, int layer)
 {
   // check for correct layer
   if (layer != m_layer)

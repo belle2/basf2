@@ -19,9 +19,9 @@ RecoTrackStoreArrayCombinerModule::RecoTrackStoreArrayCombinerModule() :
   setDescription("Combine two collections of tracks without additional checks.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("Temp1RecoTracksStoreArrayName", m_temp1RecoTracksStoreArrayName , "Name of the first input StoreArray.",
+  addParam("Temp1RecoTracksStoreArrayName", m_temp1RecoTracksStoreArrayName, "Name of the first input StoreArray.",
            m_temp1RecoTracksStoreArrayName);
-  addParam("Temp2RecoTracksStoreArrayName", m_temp2RecoTracksStoreArrayName , "Name of the second input StoreArray.",
+  addParam("Temp2RecoTracksStoreArrayName", m_temp2RecoTracksStoreArrayName, "Name of the second input StoreArray.",
            m_temp2RecoTracksStoreArrayName);
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the output StoreArray.", m_recoTracksStoreArrayName);
 }

@@ -6,11 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisARICH.h>
-
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TH1F.h>
 #include <TH2F.h>
@@ -68,9 +65,6 @@ void DQMHistAnalysisARICHModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
 
-void DQMHistAnalysisARICHModule::beginRun()
-{
-}
 
 void DQMHistAnalysisARICHModule::event()
 {

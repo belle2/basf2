@@ -8,8 +8,13 @@
 
 #include <top/dbobjects/TOPGeoModuleDisplacement.h>
 #include <iostream>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
+#include <Math/Translation3D.h>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
 
@@ -23,6 +28,15 @@ namespace Belle2 {
     cout << getBeta() << " ";
     cout << getGamma() << " ";
     cout << endl;
+  }
+
+  Transform3D TOPGeoModuleDisplacement::getTransformation() const
+  {
+    RotationX Rx(m_alpha);
+    RotationY Ry(m_beta);
+    RotationZ Rz(m_gamma);
+    Translation3D t(m_x, m_y, m_z);
+    return Transform3D(Rz * Ry * Rx, t);
   }
 
 } // end Belle2 namespace

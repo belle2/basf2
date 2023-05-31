@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -87,8 +86,7 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
             'TOPSimHits',
             'ARICHSimHits',
             'ECLHits',
-            'BKLMSimHits',
-            'EKLMSimHits',
+            'KLMSimHits',
         ]
     elif sampleType == 'usual' and phase == 2:
         madeFor = ''
@@ -99,8 +97,7 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
             'TOPSimHits',
             'ARICHSimHits',
             'ECLHits',
-            'BKLMSimHits',
-            'EKLMSimHits',
+            'KLMSimHits',
             'CLAWSSimHits',
             'FANGSSimHits',
             'PlumeSimHits',

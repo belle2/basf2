@@ -112,7 +112,7 @@ int DeSerializerPrePCModule::recvFD(int sock, char* buf, int data_size_byte, int
   int n = 0;
   while (1) {
     int read_size = 0;
-    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
+    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n, flag)) < 0) {
       if (errno == EINTR) {
         continue;
       } else {
@@ -247,7 +247,7 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
       char err_buf[500];
       sprintf(err_buf,
               "[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
-              *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
+              *num_events_in_sendblock, temp_num_events, i,  *num_nodes_in_sendblock, temp_num_nodes, i);
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -376,9 +376,6 @@ void DeSerializerPrePCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int
 
 void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
 {
-  int data_size_copper_0 = -1;
-  int data_size_copper_1 = -1;
-
   //
   // Data check
   //
@@ -466,13 +463,13 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         //
         // RawCOPPER
         //
-        int block_id = 0;
 
         RawCOPPER* temp_rawcopper = new RawCOPPER;
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
+        int block_id = 0;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
@@ -497,10 +494,10 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
 
         if (cpr_num == 0) {
-          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
+          raw_datablk->GetBlockNwords(entry_id); // returns data_size_copper_0
           *eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
         } else if (cpr_num == 1) {
-          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
+          raw_datablk->GetBlockNwords(entry_id); // returns data_size_copper_1
         }
         cpr_num++;
         delete temp_rawcopper;
@@ -688,7 +685,7 @@ void DeSerializerPrePCModule::event()
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
       printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
-             max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+             max_nevt, max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }

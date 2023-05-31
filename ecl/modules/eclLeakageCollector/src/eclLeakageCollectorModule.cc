@@ -6,29 +6,28 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//..This module`
+/* Own header. */
 #include <ecl/modules/eclLeakageCollector/eclLeakageCollectorModule.h>
 
-//..Framework
-#include <framework/gearbox/Const.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-//..Root
-#include <TH2F.h>
-#include <TVector3.h>
-#include <TMath.h>
-#include <TTree.h>
-
-//..mdst
-#include <mdst/dataobjects/MCParticle.h>
-
-//..ECL
+/* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLLeakagePosition.h>
 
+/* Basf2 headers. */
+#include <framework/gearbox/Const.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/geometry/VectorUtil.h>
+#include <mdst/dataobjects/MCParticle.h>
 
-//..Other
+/* Root headers. */
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TTree.h>
+
+/* C++ headers. */
 #include <iostream>
 
 using namespace Belle2;
@@ -176,8 +175,8 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Generated MC particle (always the first entry in the list)
   double mcLabE = m_mcParticleArray[0]->getEnergy();
-  TVector3 mcp3 = m_mcParticleArray[0]->getMomentum();
-  B2Vector3D vertex = m_mcParticleArray[0]->getProductionVertex();
+  ROOT::Math::XYZVector mcp3 = m_mcParticleArray[0]->getMomentum();
+  ROOT::Math::XYZVector vertex = m_mcParticleArray[0]->getProductionVertex();
 
   //-----------------------------------------------------------------
   //..Find the shower closest to the MC true angle
@@ -190,15 +189,15 @@ void eclLeakageCollectorModule::collect()
     if (m_eclShowerArray[is]->getHypothesisId() == ECLShower::c_nPhotons) {
 
       //..Make a position vector from theta, phi, and R
-      TVector3 position(0., 0., 1.);
-      position.SetTheta(m_eclShowerArray[is]->getTheta());
-      position.SetPhi(m_eclShowerArray[is]->getPhi());
-      position.SetMag(m_eclShowerArray[is]->getR());
+      ROOT::Math::XYZVector position;
+      VectorUtil::setMagThetaPhi(
+        position, m_eclShowerArray[is]->getR(),
+        m_eclShowerArray[is]->getTheta(), m_eclShowerArray[is]->getPhi());
 
       //..Direction is difference between position and vertex
-      TVector3 direction = position - vertex;
+      ROOT::Math::XYZVector direction = ROOT::Math::XYZVector(position) - vertex;
 
-      double angle = direction.Angle(mcp3);
+      double angle = ROOT::Math::VectorUtil::Angle(direction, mcp3);
       if (angle < minAngle) {
         minAngle = angle;
         minShower = is;
@@ -248,12 +247,11 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Distance between generated and reconstructed positions
   const double radius = m_eclShowerArray[minShower]->getR();
-  TVector3 measuredLocation(0., 0., 1.);
-  measuredLocation.SetTheta(thetaLocation);
-  measuredLocation.SetPhi(phiLocation);
-  measuredLocation.SetMag(radius);
-  TVector3 measuredDirection = measuredLocation - vertex;
-  t_locationError = radius * measuredDirection.Angle(mcp3);
+  ROOT::Math::XYZVector measuredLocation;
+  VectorUtil::setMagThetaPhi(
+    measuredLocation, radius, thetaLocation, phiLocation);
+  ROOT::Math::XYZVector measuredDirection = ROOT::Math::XYZVector(measuredLocation) - vertex;
+  t_locationError = radius * ROOT::Math::VectorUtil::Angle(measuredDirection, mcp3);
 
   //-----------------------------------------------------------------
   //..Done

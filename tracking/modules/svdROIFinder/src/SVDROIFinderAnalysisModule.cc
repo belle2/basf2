@@ -14,12 +14,12 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <iostream>
-#include <TVector3.h>
 
 #include <vxd/geometry/GeoCache.h>
 
+#include <TMath.h>
 
-using namespace std;
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -196,7 +196,7 @@ SVDROIFinderAnalysisModule::SVDROIFinderAnalysisModule() : Module()
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("svdDataRedAnalysis"));
+           std::string("svdDataRedAnalysis"));
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
@@ -392,7 +392,7 @@ void SVDROIFinderAnalysisModule::event()
   NtrackHit = 0;
   Ntrack = 0;
 
-  B2DEBUG(1, "  ++++++++++++++ SVDROIFinderAnalysisModule");
+  B2DEBUG(21, "  ++++++++++++++ SVDROIFinderAnalysisModule");
 
   int nROIs = 0;
 
@@ -464,18 +464,18 @@ void SVDROIFinderAnalysisModule::event()
 
     Ntrack++;
 
-    B2DEBUG(1, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and SVDShaperDigits = " << svdDigits_MCParticle.size() <<
+    B2DEBUG(21, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and SVDShaperDigits = " << svdDigits_MCParticle.size() <<
             " related to this MCParticle");
 
     //retrieve general informations of MCParticle
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();
-    m_phimc = (aMcParticle->getMomentum()).Phi() * 180 / 3.1415;
-    m_thetamc = (aMcParticle->getMomentum()).Theta() * 180 / 3.1415;
-    m_costhetamc = (aMcParticle->getMomentum()).CosTheta();
+    m_phimc = (aMcParticle->getMomentum()).Phi() * TMath::RadToDeg();
+    m_thetamc = (aMcParticle->getMomentum()).Theta() * TMath::RadToDeg();
+    m_costhetamc = cos((aMcParticle->getMomentum()).Theta());
     m_lambdamc = 90 - m_thetamc;
-    m_pTmc = (aMcParticle->getMomentum()).Perp();
+    m_pTmc = (aMcParticle->getMomentum()).Rho();
 
 
     bool part_outsideROI = false;

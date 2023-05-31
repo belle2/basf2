@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <iostream>
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -306,12 +307,12 @@ int main(int argc, char** argv)
                              NW_RAW_TRAILER);
   printf("TET %d %d %d %d %d\n ", NW_SEND_HEADER + NW_SEND_TRAILER, ncpr,
          NW_RAW_HEADER, (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb, NW_RAW_TRAILER);
-  int buff[total_words];
+  vector<int> buff(total_words);
 
   //
   // Prepare header
   //
-  int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb, run_no);
+  int temp_ret = fillDataContents(buff.data(), nwords_per_fee, node_id, ncpr, nhslb, run_no);
   if (temp_ret != total_words) {
     printf("[FATAL] data-production error 1 %d %d\n", total_words, temp_ret);
     fflush(stdout);
@@ -346,7 +347,7 @@ int main(int argc, char** argv)
   int nconn = 0;
 
   while (1) {
-    int nready = poll(client, maxi + 1, -1);
+    //int nready = poll(client, maxi + 1, -1);
     if (client[0].revents & POLLRDNORM) {
       printf("Accepting..."); fflush(stdout);
       int connfd = accept(listenfd, (struct sockaddr*) NULL, NULL);
@@ -387,7 +388,7 @@ int main(int argc, char** argv)
   for (;;) {
 #endif
     //    addEvent(buff, total_words, cnt);
-    addEvent(buff, nwords_per_fee, cnt, ncpr, nhslb);
+    addEvent(buff.data(), nwords_per_fee, cnt, ncpr, nhslb);
     //    printf("cnt %d bytes\n", cnt*total_words); fflush(stdout);
     //    sprintf( buff, "event %d dessa", cnt );
 
@@ -398,7 +399,7 @@ int main(int argc, char** argv)
 
     for (int i = 1 ; i <= NUM_CLIENTS ; i++) {
       int Ret = 0;
-      if ((Ret = write(client[i].fd, buff, total_words * sizeof(int))) <= 0) {
+      if ((Ret = write(client[i].fd, buff.data(), total_words * sizeof(int))) <= 0) {
         printf("[FATAL] Return value %d\n", Ret);
         fflush(stdout);
         exit(1);
@@ -411,14 +412,14 @@ int main(int argc, char** argv)
     if (cnt % 10000 == 1) {
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
-        printf("run %d evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+        printf("run %d evt %llu time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
                run_no,
                cnt,
                cur_time - init_time,
                NUM_CLIENTS * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_CLIENTS * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         prev_time = cur_time;

@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/bklm/modules/bklmAna/BKLMAnaModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
@@ -19,7 +19,6 @@
 /* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace CLHEP;
 
@@ -62,7 +61,7 @@ BKLMAnaModule::BKLMAnaModule() : Module(),
     m_effiTrkThephi[i] = nullptr;
   }
   setDescription("analyze bklm efficiency associated to CDC, check performance of bklm et al.");
-  addParam("filename", m_filename, "Output root filename", string("bklmana.root"));
+  addParam("filename", m_filename, "Output root filename", std::string("bklmana.root"));
 }
 
 BKLMAnaModule::~BKLMAnaModule()
@@ -175,9 +174,9 @@ void BKLMAnaModule::event()
     ExtHit* exthit =  extHits[t];
     if (exthit->getDetectorID() != Const::EDetector::BKLM)
       continue;
-    m_extx[nExtHit] = exthit->getPosition()[0];
-    m_exty[nExtHit] = exthit->getPosition()[1];
-    m_extz[nExtHit] = exthit->getPosition()[2];
+    m_extx[nExtHit] = exthit->getPosition().X();
+    m_exty[nExtHit] = exthit->getPosition().Y();
+    m_extz[nExtHit] = exthit->getPosition().Z();
     nExtHit++;
     if (nExtHit > 199)
       break;
@@ -191,9 +190,9 @@ void BKLMAnaModule::event()
     // load the muon fit hypothesis or the hypothesis which is the clostes in mass to a muon
     // the tracking will not always fit a muon hypothesis
     const TrackFitResult* fitres = track->getTrackFitResultWithClosestMass(Belle2::Const::muon);
-    double mom = fitres->getMomentum().Mag();
+    double mom = fitres->getMomentum().R();
     //double  pt = fitres->getTransverseMomentum();
-    B2Vector3D p3 = fitres->getMomentum();
+    ROOT::Math::XYZVector p3 = fitres->getMomentum();
     double trkphi = p3.Phi() * TMath::RadToDeg();
     double trktheta = p3.Theta() * TMath::RadToDeg();
     if (trkphi < 0)
@@ -218,11 +217,10 @@ void BKLMAnaModule::event()
       if (!crossed)
         continue;
 
-      TVector3 extMom = exthit->getMomentum();
-      TVector3 extVec = exthit->getPosition();
+      ROOT::Math::XYZVector extVec = exthit->getPosition();
       bool matched = false;
-      m_totalYX->Fill(extVec[0], extVec[1]);
-      m_totalYZ->Fill(extVec[2], extVec[1]);
+      m_totalYX->Fill(extVec.X(), extVec.Y());
+      m_totalYZ->Fill(extVec.Z(), extVec.Y());
       float phi = extVec.Phi() * TMath::RadToDeg();
       float theta = extVec.Theta() * TMath::RadToDeg();
       if (phi < 0)
@@ -244,20 +242,20 @@ void BKLMAnaModule::event()
           continue;
         if (hit->getLayer() != layer)
           continue;
-        TVector3 position = hit->getPosition();
-        TVector3 distance = extVec - position;
+        ROOT::Math::XYZVector position = hit->getPosition();
+        ROOT::Math::XYZVector distance = extVec - position;
         //on same track, same sector, same layer, we should believe extHit and KLMHit2d are matched.
         //let's record the distance to check, should be small
-        m_hdistance->Fill(distance.Mag());
-        if (distance.Mag() < 20)
+        m_hdistance->Fill(distance.R());
+        if (distance.R() < 20)
           matched = true;
         //m_pointUsed.insert(m);
         if (matched)
           break;
       }
       if (matched) {
-        m_passYX->Fill(extVec[0], extVec[1]);
-        m_passYZ->Fill(extVec[2], extVec[1]);
+        m_passYX->Fill(extVec.X(), extVec.Y());
+        m_passYZ->Fill(extVec.Z(), extVec.Y());
         m_passTrkThephi[layer - 1]->Fill(trkphi, trktheta);
         m_passThephi[layer - 1]->Fill(phi, theta);
         m_passMom->Fill(mom);

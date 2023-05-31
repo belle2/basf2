@@ -390,7 +390,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
   if (not m_param_useMCParticleIds.empty()) {
     for (const std::pair<int, size_t> nHitsForMCParticleId : nHitsByMCParticleId) {
-      B2DEBUG(100,
+      B2DEBUG(25,
               "MC particle " << nHitsForMCParticleId.first << " #hits "
               << nHitsForMCParticleId.second);
     }

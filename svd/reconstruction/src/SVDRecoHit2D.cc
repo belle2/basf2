@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/VectorUtil.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>
@@ -160,12 +161,13 @@ void SVDRecoHit2D::setDetectorPlane()
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
-  TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0), true);
-  TVector3 uGlobal = geometry.vectorToGlobal(TVector3(1, 0, 0), true);
-  TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0), true);
+  ROOT::Math::XYZVector origin  = geometry.pointToGlobal(ROOT::Math::XYZVector(0, 0, 0), true);
+  ROOT::Math::XYZVector uGlobal = geometry.vectorToGlobal(ROOT::Math::XYZVector(1, 0, 0), true);
+  ROOT::Math::XYZVector vGlobal = geometry.vectorToGlobal(ROOT::Math::XYZVector(0, 1, 0), true);
 
   //Construct the detector plane
-  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20)));
+  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(XYZToTVector(origin), XYZToTVector(uGlobal), XYZToTVector(vGlobal),
+                                                       new VXD::SensorPlane(m_sensorID, 20, 20)));
   setPlane(detPlane, m_sensorID);
 }
 

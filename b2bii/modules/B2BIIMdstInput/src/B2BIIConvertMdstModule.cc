@@ -15,10 +15,13 @@
 
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/VectorUtil.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -33,6 +36,7 @@
 #include <Math/RotationY.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/Point3D.h>
 
 #include <limits>
 #include <algorithm>
@@ -178,6 +182,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
   addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
+  addParam("convertNbar", m_convertNbar, " Flag to switch on conversion of nbar:mdst (copy from gamma:mdst)", false);
 
   m_realData = false;
 
@@ -225,6 +230,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> nbarParticleList("anti-n0:mdst");
+  nbarParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
   pi0ParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> kShortParticleList("K_S0:mdst");
@@ -331,14 +338,14 @@ void B2BIIConvertMdstModule::event()
   // 1. Convert MC information
   convertGenHepEvtTable();
 
-  // 2. Convert ECL information
+  // 2. Convert Tracking information
+  convertMdstChargedTable();
+
+  // 3. Convert ECL information
   convertMdstECLTable();
 
-  // 3. Convert KLM information
+  // 4. Convert KLM information
   convertMdstKLMTable();
-
-  // 4. Convert Tracking information
-  convertMdstChargedTable();
 
   // 5. Set Track -> ECLCluster relations
   setTracksToECLClustersRelations();
@@ -363,6 +370,9 @@ void B2BIIConvertMdstModule::event()
 
   // 12. Convert trigger information from rectrg_summary3
   if (m_convertRecTrg) convertRecTrgTable();
+
+  // 13. Copy nbar from Gamma with the cut E > 0.5 GeV
+  if (m_convertNbar) copyNbarFromGamma();
 
 }
 
@@ -934,6 +944,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
   m_particleGraph.generateList();
 }
 
+
 void B2BIIConvertMdstModule::convertMdstECLTable()
 {
   // Relations
@@ -1020,6 +1031,7 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
   }
 }
 
+
 void B2BIIConvertMdstModule::convertMdstGammaTable()
 {
   // Relations
@@ -1064,6 +1076,32 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
     MCParticle* matchedMCParticle = B2EclCluster->getRelated<MCParticle>();
     if (matchedMCParticle)
       B2Gamma->addRelationTo(matchedMCParticle);
+  }
+}
+
+void B2BIIConvertMdstModule::copyNbarFromGamma()
+{
+  StoreObjPtr<ParticleList> plist("anti-n0:mdst");
+  plist.create();
+  plist->initialize(Const::antiNeutron.getPDGCode(), "anti-n0:mdst");
+
+  B2DEBUG(99, "Getting gamma:mdst in copyNbarFromGamma");
+  StoreObjPtr<ParticleList> plist_gamma("gamma:mdst");
+  for (const Particle& gamma : *plist_gamma) {
+    auto* eclCluster = gamma.getECLCluster();
+    // Pre-select energetic gamma
+    if (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) <= 0.5) continue;
+    B2DEBUG(99, "Copying anti-n0:mdst from gamma:mdst");
+    Particle* nbar = m_particles.appendNew(eclCluster, Const::antiNeutron);
+    plist->addParticle(nbar);
+
+    if (m_realData)
+      continue;
+
+    // Relation to MCParticle
+    MCParticle* matchedMCParticle = eclCluster->getRelated<MCParticle>();
+    if (matchedMCParticle)
+      nbar->addRelationTo(matchedMCParticle);
   }
 }
 
@@ -1838,6 +1876,8 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
     eclCluster->setIsTrack(ecl.match() == 1);
 
   eclCluster->setEnergy(ecl.energy()); //must happen before setCovarianceMatrix()!
+  if (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > 0.5)
+    eclCluster->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
   eclCluster->setPhi(ecl.phi());
   eclCluster->setTheta(ecl.theta());
   eclCluster->setR(ecl.r());
@@ -1856,8 +1896,76 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setEnergyRaw(eclAux.mass());
   eclCluster->setE9oE21(eclAux.e9oe25());
   eclCluster->setEnergyHighestCrystal(eclAux.seed());
-  eclCluster->setTime(eclAux.property(0));
+  // The property 2 of eclAux contains the timing information
+  // in a bit encoded format.
+  // The 16 bits: 0-15 contain tdc count
+  float prop2 = eclAux.property(2);
+  // a float to int conversion
+  int property2;
+  std::memcpy(&property2, &prop2, sizeof(int));
+  //decode the bit encoded variables
+  int tdccount;
+  tdccount  = property2     & 0xffff;
+  eclCluster->setTime(tdccount);
   eclCluster->setNumberOfCrystals(eclAux.nhits());
+  double dist = computeTrkMinDistanceBelle(eclCluster);
+  eclCluster->setMinTrkDistance(dist);
+}
+
+double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster)
+{
+  const double m_extRadius(125.0);
+  const double m_extZFWD(196.0);
+  const double m_extZBWD(-102.2);
+  double minDist(10000);
+
+  // get cluster info
+  const int reg = eclCluster->getDetectorRegion();
+  double eclClusterR_surface = m_extRadius / sin(eclCluster->getTheta());
+  if (reg == 1) {eclClusterR_surface = m_extZFWD / cos(eclCluster->getTheta());}
+  else if (reg == 3) {eclClusterR_surface = m_extZBWD / cos(eclCluster->getTheta());}
+
+  ROOT::Math::XYZVector eclCluster_surface_position(0, 0, 0);
+  VectorUtil::setMagThetaPhi(eclCluster_surface_position, eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
+
+  for (const auto& track : m_tracks) {
+    const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::ChargedStable(Const::pion));
+
+    if (trackFit == NULL) {continue;}
+    // get the track parameters
+    const double z0        = trackFit->getZ0();
+    const double tanlambda = trackFit->getTanLambda();
+
+    // use the helix class
+    Helix h = trackFit->getHelix();
+
+    // extrapolate to radius
+    const double lHelixRadius = h.getArcLength2DAtCylindricalR(m_extRadius) > 0 ? h.getArcLength2DAtCylindricalR(m_extRadius) : 999999.;
+
+    // extrapolate to FWD z
+    const double lFWD = (m_extZFWD - z0) / tanlambda > 0 ? (m_extZFWD - z0) / tanlambda : 999999.;
+
+    // extrapolate to backward z
+    const double lBWD = (m_extZBWD - z0) / tanlambda > 0 ? (m_extZBWD - z0) / tanlambda : 999999.;
+
+    // pick smallest arclength
+    const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
+
+    B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
+
+    ROOT::Math::XYZVector ext_helix = h.getPositionAtArcLength2D(l);
+    double helixExtR_surface = m_extRadius / sin(ext_helix.Theta());
+    if (l == lFWD) { helixExtR_surface = m_extZFWD / cos(ext_helix.Theta());}
+    else if (l == lBWD) { helixExtR_surface = m_extZBWD / cos(ext_helix.Theta());}
+
+    ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
+    VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+
+    double distance = (eclCluster_surface_position - helixExt_surface_position).R();
+    if (distance < minDist) {minDist = distance;}
+  }
+  if (minDist > 9999) minDist = -1;
+  return minDist;
 }
 
 void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster& klm_cluster, KLMCluster* klmCluster)
@@ -2145,8 +2253,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const uint32_t hitPatternVXDInitializer,
                                                             const uint16_t ndf)
 {
-  TVector3 pos(position.x(),  position.y(),  position.z());
-  TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
+  ROOT::Math::XYZVector pos(position.x(),  position.y(),  position.z());
+  ROOT::Math::XYZVector mom(momentum.px(), momentum.py(), momentum.pz());
 
   TMatrixDSym errMatrix(6);
   for (unsigned i = 0; i < 7; i++) {

@@ -20,7 +20,7 @@
 // #include "cantProceed.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <TFile.h>
@@ -29,7 +29,7 @@
 namespace Belle2 {
   /** Class definition for the reference histogram display. */
 
-  class DQMHistComparitorModule : public DQMHistAnalysisModule {
+  class DQMHistComparitorModule final : public DQMHistAnalysisModule {
 
     /**
      * The struct for reference histogram comparison.
@@ -91,13 +91,6 @@ namespace Belle2 {
      * This method is called at the end of the event processing.
      */
     void terminate() override final;
-
-    /**
-     * Find histogram corresponding to canvas.
-     * @param hname Name of the histogram
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* find_histo_in_canvas(TString hname);
 
     // Data members
   private:

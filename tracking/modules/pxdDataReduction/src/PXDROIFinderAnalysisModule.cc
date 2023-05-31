@@ -7,23 +7,19 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <vxd/geometry/GeoCache.h>
 
+#include <TMath.h>
 
-using namespace std;
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -107,7 +103,7 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("pxdDataRedAnalysis"));
+           std::string("pxdDataRedAnalysis"));
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
@@ -124,18 +120,10 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
 
 void PXDROIFinderAnalysisModule::initialize()
 {
-
-  StoreArray<RecoTrack> recoTracks;
-  recoTracks.isRequired(m_recoTrackListName);
-
-  StoreArray<ROIid> roiIDs;
-  roiIDs.isRequired(m_ROIListName);
-
-  StoreArray<PXDIntercept> pxdIntercepts;
-  pxdIntercepts.isRequired(m_PXDInterceptListName);
-
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
+  m_recoTracks.isRequired(m_recoTrackListName);
+  m_ROIs.isRequired(m_ROIListName);
+  m_PXDIntercepts.isRequired(m_PXDInterceptListName);
+  m_MCParticles.isRequired();
 
   n_rois           = 0;
   n_intercepts     = 0;
@@ -376,15 +364,14 @@ void PXDROIFinderAnalysisModule::event()
 
 
   //ROIs general
-  StoreArray<ROIid> ROIList(m_ROIListName);
-  for (int i = 0; i < (int)ROIList.getEntries(); i++) { //loop on ROIlist
+  for (int i = 0; i < (int)m_ROIs.getEntries(); i++) { //loop on ROIlist
 
-    m_h2ROIbottomLeft->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMinVid());
-    m_h2ROItopRight->Fill(ROIList[i]->getMaxUid(), ROIList[i]->getMaxVid());
-    m_h2ROIuMinMax->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMaxUid());
-    m_h2ROIvMinMax->Fill(ROIList[i]->getMinVid(), ROIList[i]->getMaxVid());
-    int tmpArea = (ROIList[i]->getMaxUid() - ROIList[i]->getMinUid()) * (ROIList[i]->getMaxVid() - ROIList[i]->getMinVid());
-    if ((ROIList[i]->getSensorID()).getLayerNumber() == 1)
+    m_h2ROIbottomLeft->Fill(m_ROIs[i]->getMinUid(), m_ROIs[i]->getMinVid());
+    m_h2ROItopRight->Fill(m_ROIs[i]->getMaxUid(), m_ROIs[i]->getMaxVid());
+    m_h2ROIuMinMax->Fill(m_ROIs[i]->getMinUid(), m_ROIs[i]->getMaxUid());
+    m_h2ROIvMinMax->Fill(m_ROIs[i]->getMinVid(), m_ROIs[i]->getMaxVid());
+    int tmpArea = (m_ROIs[i]->getMaxUid() - m_ROIs[i]->getMinUid()) * (m_ROIs[i]->getMaxVid() - m_ROIs[i]->getMinVid());
+    if ((m_ROIs[i]->getSensorID()).getLayerNumber() == 1)
       totArea_L1 += tmpArea;
     else
       totArea_L2 += tmpArea;
@@ -400,7 +387,7 @@ void PXDROIFinderAnalysisModule::event()
       if (!isOK)
         //loop on PXDDigits
         for (unsigned int iPXDDigit = 0; iPXDDigit < pxdDigits_MCParticle.size(); iPXDDigit++)
-          if (ROIList[i]->Contains(*(pxdDigits_MCParticle[iPXDDigit]))) {
+          if (m_ROIs[i]->Contains(*(pxdDigits_MCParticle[iPXDDigit]))) {
             nROIs++;
             isOK = true;
             break;
@@ -415,16 +402,14 @@ void PXDROIFinderAnalysisModule::event()
   m_h1redFactor_L1->Fill((double) redFactor_L1);
   m_h1redFactor_L2->Fill((double) redFactor_L2);
 
-  m_h1totROIs->Fill(ROIList.getEntries());
-  n_rois += ROIList.getEntries();
+  m_h1totROIs->Fill(m_ROIs.getEntries());
+  n_rois += m_ROIs.getEntries();
 
   //RecoTrack general
-  StoreArray<RecoTrack> trackList(m_recoTrackListName);
-  n_tracks += trackList.getEntries();
+  n_tracks += m_recoTracks.getEntries();
 
   //PXDIntercepts general
-  StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-  n_intercepts += PXDInterceptList.getEntries();
+  n_intercepts += m_PXDIntercepts.getEntries();
 
   Int_t n_NoInterceptTracks = 0;
 
@@ -461,11 +446,11 @@ void PXDROIFinderAnalysisModule::event()
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();
-    m_phimc = (aMcParticle->getMomentum()).Phi() * 180 / 3.1415;
-    m_thetamc = (aMcParticle->getMomentum()).Theta() * 180 / 3.1415;
-    m_costhetamc = (aMcParticle->getMomentum()).CosTheta();
+    m_phimc = (aMcParticle->getMomentum()).Phi() * TMath::RadToDeg();
+    m_thetamc = (aMcParticle->getMomentum()).Theta() * TMath::RadToDeg();
+    m_costhetamc = cos((aMcParticle->getMomentum()).Theta());
     m_lambdamc = 90 - m_thetamc;
-    m_pTmc = (aMcParticle->getMomentum()).Perp();
+    m_pTmc = (aMcParticle->getMomentum()).Rho();
 
     //SVDhits
     RelationVector<SVDCluster> svdRelations = aMcParticle->getRelationsFrom<SVDCluster>();
@@ -534,8 +519,8 @@ void PXDROIFinderAnalysisModule::event()
       m_coorUmc = aSensorInfo.getUCellPosition(m_Uidmc);   //pxdDigits_MCParticle[iPXDDigit]->getUCellPosition();
       m_coorVmc = aSensorInfo.getVCellPosition(m_Vidmc);   //pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
 
-      TVector3 local(m_coorUmc, m_coorVmc, 0);
-      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
+      ROOT::Math::XYZVector local(m_coorUmc, m_coorVmc, 0);
+      ROOT::Math::XYZVector globalSensorPos = aSensorInfo.pointToGlobal(local, true);
 
 
       if (m_pTmc > 1) npxdDigit[5]++;
@@ -596,7 +581,7 @@ void PXDROIFinderAnalysisModule::event()
                   m_h2sigmaVphi->Fill(m_phimc, m_sigmaV);
                   m_h1SigmaU->Fill(m_sigmaU);
                   m_h1SigmaV->Fill(m_sigmaV);
-                  m_h2Mapglob->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+                  m_h2Mapglob->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
 
 
                   if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
@@ -653,7 +638,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out2->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out2->Fill(m_sigmaU);
           m_h1SigmaV_out2->Fill(m_sigmaV);
-          m_h2Mapglob_out2->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out2->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out2->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -679,7 +664,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out3->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out3->Fill(m_sigmaU);
           m_h1SigmaV_out3->Fill(m_sigmaV);
-          m_h2Mapglob_out3->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out3->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out3->Fill(v2, u2);
 
@@ -704,7 +689,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out4->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out4->Fill(m_sigmaU);
           m_h1SigmaV_out4->Fill(m_sigmaV);
-          m_h2Mapglob_out4->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out4->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out4->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -723,7 +708,7 @@ void PXDROIFinderAnalysisModule::event()
           n_notINdigit5 ++;
 
           m_h1GlobalTime_out5->Fill(m_globalTime);
-          m_h2Mapglob_out5->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out5->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out5->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -809,14 +794,14 @@ void PXDROIFinderAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  B2RESULT(" o  PXDROIFinder ANALYSIS: tot ROIs = " << ROIList.getEntries() << ", ok ROIs = " << nROIs);
-  B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
-           (double)NtrackHit / Ntrack);
-  if (nROIs > ROIList.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
+  B2INFO(" o  PXDROIFinder ANALYSIS: tot ROIs = " << m_ROIs.getEntries() << ", ok ROIs = " << nROIs);
+  B2INFO(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
+         (double)NtrackHit / Ntrack);
+  if (nROIs > m_ROIs.getEntries()) B2INFO(" HOUSTON WE HAVE A PROBLEM!");
 
   m_h1okROIs->Fill(nROIs);
-  m_h1okROIfrac->Fill(1.*nROIs / ROIList.getEntries());
-  cout << "" << endl;
+  m_h1okROIfrac->Fill(1.*nROIs / m_ROIs.getEntries());
+  std::cout << "" << std::endl;
 
 
 }
@@ -848,22 +833,22 @@ void PXDROIFinderAnalysisModule::terminate()
     m_h1TrackOneDigiIn->SetBinContent(i + 1, TrackOneDigiIn[i]);
   }
 
-  B2RESULT("     ROI Analysis Summary     ");
-  B2RESULT("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  B2RESULT("");
-  B2RESULT(" number of tracks = " << n_tracks);
-  B2RESULT(" number of Intercepts = " << n_intercepts);
-  B2RESULT(" number of ROIs = " << n_rois);
-  B2RESULT("");
-  B2RESULT("          average number of ROIs = " << m_h1totROIs->GetMean() << ", average area " << m_h1totArea->GetMean() <<
-           " (not excluding overlaps!)");
-  B2RESULT(" average number of ROIs w digits = " << m_h1okROIs->GetMean() << ", average tot area " << m_h1okArea->GetMean());
-  B2RESULT("");
-  B2RESULT(" red Factor = " << m_h1redFactor->GetMean()  << ", RMS = " << m_h1redFactor->GetRMS());
-  B2RESULT("");
-  B2RESULT("tracks w digits: " << n_tracksWithDigits);
-  B2RESULT("tracks w digits in ROI: " << n_tracksWithDigitsInROI);
-  B2RESULT("efficiency PTD : " << epsilon2Tot << " +/- " << sqrt(epsilon2Tot * (1 - epsilon2Tot) / n_tracksWithDigits));
+  B2INFO("     ROI Analysis Summary     ");
+  B2INFO("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+  B2INFO("");
+  B2INFO(" number of tracks = " << n_tracks);
+  B2INFO(" number of Intercepts = " << n_intercepts);
+  B2INFO(" number of ROIs = " << n_rois);
+  B2INFO("");
+  B2INFO("          average number of ROIs = " << m_h1totROIs->GetMean() << ", average area " << m_h1totArea->GetMean() <<
+         " (not excluding overlaps!)");
+  B2INFO(" average number of ROIs w digits = " << m_h1okROIs->GetMean() << ", average tot area " << m_h1okArea->GetMean());
+  B2INFO("");
+  B2INFO(" red Factor = " << m_h1redFactor->GetMean()  << ", RMS = " << m_h1redFactor->GetRMS());
+  B2INFO("");
+  B2INFO("tracks w digits: " << n_tracksWithDigits);
+  B2INFO("tracks w digits in ROI: " << n_tracksWithDigitsInROI);
+  B2INFO("efficiency PTD : " << epsilon2Tot << " +/- " << sqrt(epsilon2Tot * (1 - epsilon2Tot) / n_tracksWithDigits));
 
   Int_t totTrackOneDigiIn = 0; //not used for the moment, added to double check
   Int_t totnnotINtrack2 = 0;
@@ -884,136 +869,136 @@ void PXDROIFinderAnalysisModule::terminate()
                     j + 1) + m_h1nnotINtrack2->GetBinContent(j + 1) + m_h1TrackOneDigiIn->GetBinContent(j + 1);
   }
 
-  B2RESULT("      out ROI = " << totnnotINtrack2);
-  B2RESULT("       no ROI = " << totnnotINtrack3);
-  B2RESULT("  wrongVxdID  = " << totnnotINtrack4);
-  B2RESULT("     no Inter = " << totnnotINtrack5);
-  B2RESULT("");
+  B2INFO("      out ROI = " << totnnotINtrack2);
+  B2INFO("       no ROI = " << totnnotINtrack3);
+  B2INFO("  wrongVxdID  = " << totnnotINtrack4);
+  B2INFO("     no Inter = " << totnnotINtrack5);
+  B2INFO("");
 
-  B2RESULT("    pxdDigit : " << n_pxdDigit);
-  B2RESULT("  pxdDigitIn : " << n_pxdDigitInROI);
+  B2INFO("    pxdDigit : " << n_pxdDigit);
+  B2INFO("  pxdDigitIn : " << n_pxdDigitInROI);
 
-  B2RESULT("        eff DGT: " << epsilonTot << " +/- " << sqrt(epsilonTot * (1 - epsilonTot) / n_pxdDigit));
-  B2RESULT("  inefficiency (PXDDigits): ");
-  B2RESULT("         out ROI: " << n_notINdigit2);
-  B2RESULT("          no ROI: " << n_notINdigit3);
-  B2RESULT("      wrongVxdID: " << n_notINdigit4);
-  B2RESULT("         noInter: " << n_notINdigit5);
-  B2RESULT("");
+  B2INFO("        eff DGT: " << epsilonTot << " +/- " << sqrt(epsilonTot * (1 - epsilonTot) / n_pxdDigit));
+  B2INFO("  inefficiency (PXDDigits): ");
+  B2INFO("         out ROI: " << n_notINdigit2);
+  B2INFO("          no ROI: " << n_notINdigit3);
+  B2INFO("      wrongVxdID: " << n_notINdigit4);
+  B2INFO("         noInter: " << n_notINdigit5);
+  B2INFO("");
 
 
-  B2RESULT(" pT > 1 : " << pt[5]);
-  B2RESULT("         out ROI: " << nnotINdigit2[5]);
-  B2RESULT("          no ROI: " << nnotINdigit3[5]);
-  B2RESULT("      wrongVxdID: " << nnotINdigit4[5]);
-  B2RESULT("         noInter: " << nnotINdigit5[5]);
-  B2RESULT("    pxdDigit : " << npxdDigit[5]);
-  B2RESULT("  pxdDigitIn : " << npxdDigitInROI[5]);
+  B2INFO(" pT > 1 : " << pt[5]);
+  B2INFO("         out ROI: " << nnotINdigit2[5]);
+  B2INFO("          no ROI: " << nnotINdigit3[5]);
+  B2INFO("      wrongVxdID: " << nnotINdigit4[5]);
+  B2INFO("         noInter: " << nnotINdigit5[5]);
+  B2INFO("    pxdDigit : " << npxdDigit[5]);
+  B2INFO("  pxdDigitIn : " << npxdDigitInROI[5]);
   if ((npxdDigit[5] - npxdDigitInROI[5]) != (nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] + nnotINdigit5[5]))
-    B2RESULT(" pxdDigitOut : " << npxdDigit[5] - npxdDigitInROI[5] << " != " << nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] +
-             nnotINdigit5[5]);
+    B2INFO(" pxdDigitOut : " << npxdDigit[5] - npxdDigitInROI[5] << " != " << nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] +
+           nnotINdigit5[5]);
   epsilon[5] = (double)npxdDigitInROI[5] / (double) npxdDigit[5];
   epsilonErr[5] = sqrt(epsilon[5] * (1 - epsilon[5]) / npxdDigit[5]);
-  B2RESULT("  efficiency : " << epsilon[5] << " +/- " << epsilonErr[5]);
+  B2INFO("  efficiency : " << epsilon[5] << " +/- " << epsilonErr[5]);
   epsilon2[5] = (double)TrackOneDigiIn[5] / (double) totTrack[5]  ;
   epsilon2Err[5] = sqrt(epsilon2[5] * (1 - epsilon2[5]) / totTrack[5]);
-  B2RESULT("  efficiency2 : " << epsilon2[5] << " +/- " << epsilon2Err[5]);
-  B2RESULT("");
+  B2INFO("  efficiency2 : " << epsilon2[5] << " +/- " << epsilon2Err[5]);
+  B2INFO("");
 
-  B2RESULT(" 0.5 < pT < 1 : " << pt[4]);
-  B2RESULT("         out ROI: " << nnotINdigit2[4]);
-  B2RESULT("          no ROI: " << nnotINdigit3[4]);
-  B2RESULT("      wrongVxdID: " << nnotINdigit4[4]);
-  B2RESULT("         noInter: " << nnotINdigit5[4]);
-  B2RESULT("    pxdDigit : " << npxdDigit[4]);
-  B2RESULT("  pxdDigitIn : " << npxdDigitInROI[4]);
+  B2INFO(" 0.5 < pT < 1 : " << pt[4]);
+  B2INFO("         out ROI: " << nnotINdigit2[4]);
+  B2INFO("          no ROI: " << nnotINdigit3[4]);
+  B2INFO("      wrongVxdID: " << nnotINdigit4[4]);
+  B2INFO("         noInter: " << nnotINdigit5[4]);
+  B2INFO("    pxdDigit : " << npxdDigit[4]);
+  B2INFO("  pxdDigitIn : " << npxdDigitInROI[4]);
   if ((npxdDigit[4] - npxdDigitInROI[4]) != (nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] + nnotINdigit5[4]))
-    B2RESULT(" pxdDigitOut : " << npxdDigit[4] - npxdDigitInROI[4] << " != " << nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] +
-             nnotINdigit5[4]);
+    B2INFO(" pxdDigitOut : " << npxdDigit[4] - npxdDigitInROI[4] << " != " << nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] +
+           nnotINdigit5[4]);
   epsilon[4] = (double)npxdDigitInROI[4] / (double) npxdDigit[4];
   epsilonErr[4] = sqrt(epsilon[4] * (1 - epsilon[4]) / npxdDigit[4]);
-  B2RESULT("  efficiency : " << epsilon[4] << " +/- " << epsilonErr[4]);
+  B2INFO("  efficiency : " << epsilon[4] << " +/- " << epsilonErr[4]);
   epsilon2[4] = (double)TrackOneDigiIn[4] / (double) totTrack[4]  ;
   epsilon2Err[4] = sqrt(epsilon2[4] * (1 - epsilon2[4]) / totTrack[4]);
-  B2RESULT("  efficiency2 : " << epsilon2[4] << " +/- " << epsilon2Err[4]);
+  B2INFO("  efficiency2 : " << epsilon2[4] << " +/- " << epsilon2Err[4]);
 
-  B2RESULT("");
-  B2RESULT(" 0.3 < pT < 0.5 : " << pt[3]);
-  B2RESULT("         out ROI: " << nnotINdigit2[3]);
-  B2RESULT("          no ROI: " << nnotINdigit3[3]);
-  B2RESULT("      wrongVxdID: " << nnotINdigit4[3]);
-  B2RESULT("         noInter: " << nnotINdigit5[3]);
-  B2RESULT("    pxdDigit : " << npxdDigit[3]);
-  B2RESULT("  pxdDigitIn : " << npxdDigitInROI[3]);
+  B2INFO("");
+  B2INFO(" 0.3 < pT < 0.5 : " << pt[3]);
+  B2INFO("         out ROI: " << nnotINdigit2[3]);
+  B2INFO("          no ROI: " << nnotINdigit3[3]);
+  B2INFO("      wrongVxdID: " << nnotINdigit4[3]);
+  B2INFO("         noInter: " << nnotINdigit5[3]);
+  B2INFO("    pxdDigit : " << npxdDigit[3]);
+  B2INFO("  pxdDigitIn : " << npxdDigitInROI[3]);
   if ((npxdDigit[3] - npxdDigitInROI[3]) != (nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] + nnotINdigit5[3]))
-    B2RESULT(" pxdDigitOut : " << npxdDigit[3] - npxdDigitInROI[3] << " != " << nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] +
-             nnotINdigit5[3]);
+    B2INFO(" pxdDigitOut : " << npxdDigit[3] - npxdDigitInROI[3] << " != " << nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] +
+           nnotINdigit5[3]);
   epsilon[3] = (double)npxdDigitInROI[3] / (double) npxdDigit[3];
   epsilonErr[3] = sqrt(epsilon[3] * (1 - epsilon[3]) / npxdDigit[3]);
-  B2RESULT("  efficiency : " << epsilon[3] << " +/- " << epsilonErr[3]);
+  B2INFO("  efficiency : " << epsilon[3] << " +/- " << epsilonErr[3]);
   epsilon2[3] = (double)TrackOneDigiIn[3] / (double) totTrack[3];
   epsilon2Err[3] = sqrt(epsilon2[3] * (1 - epsilon2[3]) / totTrack[3]);
-  B2RESULT("  efficiency2 : " << epsilon2[3] << " +/- " << epsilon2Err[3]);
+  B2INFO("  efficiency2 : " << epsilon2[3] << " +/- " << epsilon2Err[3]);
 
-  B2RESULT("");
-  B2RESULT(" 0.2 < pT < 0.3 : " << pt[2]);
-  B2RESULT("         out ROI: " << nnotINdigit2[2]);
-  B2RESULT("          no ROI: " << nnotINdigit3[2]);
-  B2RESULT("      wrongVxdID: " << nnotINdigit4[2]);
-  B2RESULT("         noInter: " << nnotINdigit5[2]);
-  B2RESULT("    pxdDigit : " << npxdDigit[2]);
-  B2RESULT("  pxdDigitIn : " << npxdDigitInROI[2]);
+  B2INFO("");
+  B2INFO(" 0.2 < pT < 0.3 : " << pt[2]);
+  B2INFO("         out ROI: " << nnotINdigit2[2]);
+  B2INFO("          no ROI: " << nnotINdigit3[2]);
+  B2INFO("      wrongVxdID: " << nnotINdigit4[2]);
+  B2INFO("         noInter: " << nnotINdigit5[2]);
+  B2INFO("    pxdDigit : " << npxdDigit[2]);
+  B2INFO("  pxdDigitIn : " << npxdDigitInROI[2]);
   if ((npxdDigit[2] - npxdDigitInROI[2]) != (nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] + nnotINdigit5[2]))
-    B2RESULT(" pxdDigitOut : " << npxdDigit[2] - npxdDigitInROI[2] << " != " << nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] +
-             nnotINdigit5[2]);
+    B2INFO(" pxdDigitOut : " << npxdDigit[2] - npxdDigitInROI[2] << " != " << nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] +
+           nnotINdigit5[2]);
   epsilon[2] = (double)npxdDigitInROI[2] / (double) npxdDigit[2];
   epsilonErr[2] = sqrt(epsilon[2] * (1 - epsilon[2]) / npxdDigit[2]);
-  B2RESULT("  efficiency : " << epsilon[2] << " +/- " << epsilonErr[2]);
+  B2INFO("  efficiency : " << epsilon[2] << " +/- " << epsilonErr[2]);
   epsilon2[2] = (double)TrackOneDigiIn[2] / (double) totTrack[2]  ;
   epsilon2Err[2] = sqrt(epsilon2[2] * (1 - epsilon2[2]) / totTrack[2]);
-  B2RESULT("  efficiency2 : " << epsilon2[2] << " +/- " << epsilon2Err[2]);
+  B2INFO("  efficiency2 : " << epsilon2[2] << " +/- " << epsilon2Err[2]);
 
-  B2RESULT("");
-  B2RESULT(" 0.1 < pT < 0.2 : " << pt[1]);
-  B2RESULT("         out ROI: " << nnotINdigit2[1]);
-  B2RESULT("          no ROI: " << nnotINdigit3[1]);
-  B2RESULT("      wrongVxdID: " << nnotINdigit4[1]);
-  B2RESULT("         noInter: " << nnotINdigit5[1]);
-  B2RESULT("    pxdDigit : " << npxdDigit[1]);
-  B2RESULT("  pxdDigitIn : " << npxdDigitInROI[1]);
+  B2INFO("");
+  B2INFO(" 0.1 < pT < 0.2 : " << pt[1]);
+  B2INFO("         out ROI: " << nnotINdigit2[1]);
+  B2INFO("          no ROI: " << nnotINdigit3[1]);
+  B2INFO("      wrongVxdID: " << nnotINdigit4[1]);
+  B2INFO("         noInter: " << nnotINdigit5[1]);
+  B2INFO("    pxdDigit : " << npxdDigit[1]);
+  B2INFO("  pxdDigitIn : " << npxdDigitInROI[1]);
   if ((npxdDigit[1] - npxdDigitInROI[1]) != (nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] + nnotINdigit5[1]))
-    B2RESULT(" pxdDigitOut : " << npxdDigit[1] - npxdDigitInROI[1] << " ?=? " << nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] +
-             nnotINdigit5[1]);
+    B2INFO(" pxdDigitOut : " << npxdDigit[1] - npxdDigitInROI[1] << " ?=? " << nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] +
+           nnotINdigit5[1]);
   epsilon[1] = (double)npxdDigitInROI[1] / (double) npxdDigit[1];
   epsilonErr[1] = sqrt(epsilon[1] * (1 - epsilon[1]) / npxdDigit[1]);
-  B2RESULT("  efficiency : " << epsilon[1] << " +/- " << epsilonErr[1]);
+  B2INFO("  efficiency : " << epsilon[1] << " +/- " << epsilonErr[1]);
   epsilon2[1] = (double)TrackOneDigiIn[1] / (double) totTrack[1]  ;
   epsilon2Err[1] = sqrt(epsilon2[1] * (1 - epsilon2[1]) / totTrack[1]);
-  B2RESULT("  efficiency2 : " << epsilon2[1] << " +/- " << epsilon2Err[1]);
+  B2INFO("  efficiency2 : " << epsilon2[1] << " +/- " << epsilon2Err[1]);
 
-  B2RESULT("");
-  B2RESULT(" pT < 0.1 : " << pt[0]);
-  B2RESULT("         out ROI: " << nnotINdigit2[0]);
-  B2RESULT("          no ROI: " << nnotINdigit3[0]);
-  B2RESULT("      wrongVxdID: " << nnotINdigit4[0]);
-  B2RESULT("         noInter: " << nnotINdigit5[0]);
-  B2RESULT("    pxdDigit : " << npxdDigit[0]);
-  B2RESULT("  pxdDigitIn : " << npxdDigitInROI[0]);
+  B2INFO("");
+  B2INFO(" pT < 0.1 : " << pt[0]);
+  B2INFO("         out ROI: " << nnotINdigit2[0]);
+  B2INFO("          no ROI: " << nnotINdigit3[0]);
+  B2INFO("      wrongVxdID: " << nnotINdigit4[0]);
+  B2INFO("         noInter: " << nnotINdigit5[0]);
+  B2INFO("    pxdDigit : " << npxdDigit[0]);
+  B2INFO("  pxdDigitIn : " << npxdDigitInROI[0]);
   if ((npxdDigit[0] - npxdDigitInROI[0]) != (nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] + nnotINdigit5[0]))
-    B2RESULT(" pxdDigitOut : " << npxdDigit[0] - npxdDigitInROI[0] << " ?=? " << nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] +
-             nnotINdigit5[0]);
+    B2INFO(" pxdDigitOut : " << npxdDigit[0] - npxdDigitInROI[0] << " ?=? " << nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] +
+           nnotINdigit5[0]);
   epsilon[0] = (double)npxdDigitInROI[0] / (double) npxdDigit[0];
   epsilonErr[0] = sqrt(epsilon[0] * (1 - epsilon[0]) / npxdDigit[0]);
-  B2RESULT("  efficiency : " << epsilon[0] << " +/- " << epsilonErr[0]);
+  B2INFO("  efficiency : " << epsilon[0] << " +/- " << epsilonErr[0]);
   epsilon2[0] = (double)TrackOneDigiIn[0] / (double) totTrack[0]  ;
   epsilon2Err[0] = sqrt(epsilon2[0] * (1 - epsilon2[0]) / totTrack[0]);
-  B2RESULT("  efficiency2 : " << epsilon2[0] << " +/- " << epsilon2Err[0]);
+  B2INFO("  efficiency2 : " << epsilon2[0] << " +/- " << epsilon2Err[0]);
 
-  B2RESULT("legend:");
-  B2RESULT(" CASO2:  if (ROI exists but no PXDDigit inside)");
-  B2RESULT(" CASO3:  if (ROI does not exist, intercept with correct VxdID)");
-  B2RESULT(" CASO4:  if (intercept with wrong VxdID)");
-  B2RESULT(" CASO5:  if (intercept does not exist)");
+  B2INFO("legend:");
+  B2INFO(" CASO2:  if (ROI exists but no PXDDigit inside)");
+  B2INFO(" CASO3:  if (ROI does not exist, intercept with correct VxdID)");
+  B2INFO(" CASO4:  if (intercept with wrong VxdID)");
+  B2INFO(" CASO5:  if (intercept does not exist)");
 
 
   m_gEff2 = new TGraphErrors(6, pt, epsilon2, ptErr, epsilon2Err);

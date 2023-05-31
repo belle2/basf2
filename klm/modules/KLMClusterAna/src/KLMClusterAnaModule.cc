@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 
-/* Other Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -192,7 +192,7 @@ void KLMClusterAnaModule::event()
 {
   for (KLMCluster& klmcluster : m_KLMClusters) {
     //Obtain KLMHit2D information
-    TVector3 hitPosition;
+    ROOT::Math::XYZVector hitPosition;
 
     //Obtain KLMHit2D Information
     RelationVector<KLMHit2d> hit2ds = klmcluster.getRelationsTo<KLMHit2d>();

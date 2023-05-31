@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

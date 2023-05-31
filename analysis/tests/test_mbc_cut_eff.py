@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -69,4 +68,5 @@ class TestMbcEff(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

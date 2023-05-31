@@ -9,11 +9,11 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/simulation/EKLMSensitiveDetector.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
+#include <klm/simulation/SensitiveDetector.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <geometry/CreatorBase.h>
 
@@ -663,7 +663,7 @@ namespace Belle2 {
       const GeometryData* m_GeoDat;
 
       /** Sensitive detector. */
-      EKLMSensitiveDetector* m_Sensitive;
+      KLM::SensitiveDetector* m_Sensitive;
 
     };
 

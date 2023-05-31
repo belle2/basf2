@@ -8,6 +8,16 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
 #include <TMatrixDSym.h>
 #include <string>
 
@@ -101,9 +111,15 @@ namespace Belle2 {
     bool m_allowFirstCDCSuperLayerOnly;                         /**< Boolean to allow tracks to pass the stereo hit requirement if they touched only the first (axial) CDC layer */
     int m_minimalNdf;                                           /**< Minimum number of total hits per track to allow track candidate creation. 2D hits are counted as 2*/
     std::vector<int>
-    m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (mother or mother of mother etc) with PDG codes same as in this vector a track candidate be created*/
+    m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (parent or parent of parent etc) with PDG codes same as in this vector a track candidate be created*/
     std::vector<int>
     m_particlePdgCodes;                        /**< if size() is not 0, only for particles with PDG codes same as in this vector a track candidate will be created*/
+    /** To be used together with WhichParticles to select the ancestor and daughters.
+     *  If true, only check the direct parent to be contained in the list of possible ancestors.
+     *  If false, check all ancestors in in the list of possible ancestors.
+     *  This could be used to e.g. only create MCRecoTracks for slow pions from D* decays.
+     */
+    bool m_onlyCheckDirectParentPdgCode = false;
 
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
@@ -120,6 +136,15 @@ namespace Belle2 {
     std::array<bool, 9> m_useCDCSuperLayers{};   /**< Bits for the used super layers ATTENTION: hardcoded value for number of super layers */
 
     std::array<bool, 56> m_useCDCLayers{};       /**< Bits for the used layers ATTENTION: hardcoded value for number of layers */
+
+    StoreArray<MCParticle> m_MCParticles;   /**< MCParticles StoreArray */
+    StoreArray<RecoTrack> m_RecoTracks;     /**< RecoTracks StoreArray */
+    StoreArray<PXDTrueHit> m_PXDTrueHits;   /**< PXDTrueHits StoreArray */
+    StoreArray<PXDCluster> m_PXDClusters;   /**< PXDClusters StoreArray */
+    StoreArray<SVDTrueHit> m_SVDTrueHits;   /**< SVDTrueHits StoreArray */
+    StoreArray<SVDCluster> m_SVDClusters;   /**< SVDTrueHits StoreArray */
+    StoreArray<CDCHit> m_CDCHits;           /**< CDCHits StoreArray */
+    StoreArray<CDCSimHit> m_CDCSimHits;     /**< CDCSimHits StoreArray */
   };
 }
 

@@ -26,7 +26,7 @@ using namespace Belle2::CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTrigger2DFinder)
+REG_MODULE(CDCTrigger2DFinder);
 
 //-----------------------------------------------------------------
 //                 Implementation

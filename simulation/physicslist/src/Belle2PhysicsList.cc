@@ -71,11 +71,15 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   RegisterPhysics(new IonPhysics());
   RegisterPhysics(new GammaLeptoNuclearPhysics());
   RegisterPhysics(new Geant4ePhysics());
+
+  m_regionCuts = new G4ProductionCuts;
 }
 
 
 Belle2PhysicsList::~Belle2PhysicsList()
-{}
+{
+  delete m_regionCuts;
+}
 
 
 void Belle2PhysicsList::ConstructParticle()
@@ -239,9 +243,7 @@ void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector
   } else {
     B2INFO("Set production cut for detector region" << LogVar("detector", name) << LogVar("production_cut", cutValue));
   }
-  auto* regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(cutValue * cm);
-  bool foundOne{false};
+  m_regionCuts->SetProductionCut(cutValue * cm);
   for (const auto& regionName : regions) {
     auto* region = theRegionStore->GetRegion(regionName, false);
     if (!region) {
@@ -249,10 +251,8 @@ void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector
                 << LogVar("detector", name) << LogVar("region", regionName));
       continue;
     }
-    region->SetProductionCuts(regionCuts);
-    foundOne = true;
+    region->SetProductionCuts(m_regionCuts);
   }
-  if (!foundOne) delete regionCuts;
 }
 
 

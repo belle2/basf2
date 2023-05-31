@@ -7,7 +7,7 @@ Tracking
 The main goal of the tracking reconstruction is to find and fit tracks using the hit informations provided by the main tracking sub-detectors: PXD, :ref:`SVD<svd>`, CDC.
 In general, tracking consists in two steps:
 
-#. pattern recognition, or track finding: recognise the hits belonging to a single charged particle 
+#. pattern recognition, or track finding: recognise the hits belonging to a single charged particle
 
    .. seealso::
 
@@ -17,7 +17,7 @@ In general, tracking consists in two steps:
 
 The tracking reconstruction chain is built as a modular system that can be adapted to different background levels and detector performance. We combine stages of pattern recognition and fitting for the different detectors in order to improve efficiency and minimise fakes and clones.
 
-SVD and CDC provide hits for the first steps of the pattern recognition. In order to optimise the performance of the pattern recognition we have different algorithms for the CDC and for the SVD. Hits in the PXD are added to existing tracks to improve the track quality. 
+SVD and CDC provide hits for the first steps of the pattern recognition. In order to optimise the performance of the pattern recognition we have different algorithms for the CDC and for the SVD. Hits in the PXD are added to existing tracks to improve the track quality.
 
 .. note::
 
@@ -35,6 +35,7 @@ Use :ref:`add_tracking_reconstruction<tracking_addtrkreconstruction>` to append 
    trackFinding/trackFinding
    trackFitting
    specials
+   trackRefining
    trackMatching
    eventTimeExtraction
    pxdDataReduction

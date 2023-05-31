@@ -28,13 +28,22 @@ MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticl
   //Parameter definition
   addParam("decayString", m_strDecay, "DecayDescriptor string.");
   addParam("listName", m_listName, "Name of the output particle list");
+  addParam("appendAllDaughters", m_appendAllDaughters,
+           "If true, all daughters of the matched MCParticle will be added in the order defined at the MCParticle. "
+           "If false, only the daughters described in the given decayString will be appended to the output particle.",
+           false);
+  addParam("skipNonPrimaryDaughters", m_skipNonPrimaryDaughters,
+           "If true, the secondary MC daughters will be skipped to append to the output particles. Default: true",
+           true);
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 }
 
 void MCDecayFinderModule::initialize()
 {
-  m_decaydescriptor.init(m_strDecay);
+  bool valid = m_decaydescriptor.init(m_strDecay);
+  if (!valid)
+    B2ERROR("Invalid input DecayString: " << m_strDecay);
 
   m_antiListName = ParticleListName::antiParticleListName(m_listName);
   m_isSelfConjugatedParticle = (m_listName == m_antiListName);
@@ -59,31 +68,68 @@ void MCDecayFinderModule::initialize()
 
 void MCDecayFinderModule::event()
 {
+  if (not m_extraInfoMap)
+    m_extraInfoMap.create();
+
   // Create output particle list
+  const int motherPDG = m_decaydescriptor.getMother()->getPDGCode();
   m_outputList.create();
-  m_outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
+  m_outputList->initialize(motherPDG, m_listName);
 
   if (!m_isSelfConjugatedParticle) {
     m_antiOutputList.create();
-    m_antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName);
+    m_antiOutputList->initialize(-1 * motherPDG, m_antiListName);
     m_outputList->bindAntiParticleList(*(m_antiOutputList));
   }
 
   // loop over all MCParticles
   int nMCParticles = m_mcparticles.getEntries();
   for (int i = 0; i < nMCParticles; i++) {
+
+    if (abs(m_mcparticles[i]->getPDG()) != abs(motherPDG))
+      continue;
+
     for (int iCC = 0; iCC < 2; iCC++) {
-      std::unique_ptr<DecayTree<MCParticle>> decay(match(m_mcparticles[i], m_decaydescriptor, iCC));
-      if (decay->getObj()) {
-        B2DEBUG(19, "Match!");
-        int iIndex = write(decay.get());
-        m_outputList->addParticle(m_particles[iIndex]);
+      int arrayIndex = -1;
+      std::unique_ptr<DecayTree<MCParticle>> decay(match(m_mcparticles[i], m_decaydescriptor, iCC, arrayIndex));
+
+      MCParticle* mcp = decay->getObj();
+      if (!mcp) continue;
+
+      B2DEBUG(19, "Match!");
+
+      if (m_appendAllDaughters) {
+        // if m_appendAllDaughters is True, create a new Particle appending all daughters
+        Particle* newParticle = m_particles.appendNew(mcp);
+        newParticle->addRelationTo(mcp);
+
+        for (auto mcDaughter : mcp->getDaughters()) {
+          if (mcDaughter->hasStatus(MCParticle::c_PrimaryParticle) or not m_skipNonPrimaryDaughters
+              or abs(mcp->getPDG()) == Const::Lambda.getPDGCode()) {  // Lambda's daughters are not primary but it is not FSP at mcmatching
+
+            auto partDaughter = createParticleRecursively(mcDaughter, m_skipNonPrimaryDaughters);
+            newParticle->appendDaughter(partDaughter, /* updateType = */ false); // particleSource remain c_MCParticle
+          }
+        }
+        addUniqueParticleToList(newParticle);
+
+      } else if (arrayIndex == -1) {
+        // Particle is not created when no daughter is described in decayString
+        Particle* newParticle = m_particles.appendNew(mcp);
+        newParticle->addRelationTo(mcp);
+
+        addUniqueParticleToList(newParticle);
+      } else {
+        // Particle is already created
+        addUniqueParticleToList(m_particles[arrayIndex]);
+
       }
+
     }
   }
 }
 
-DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC)
+DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC, int& arrayIndex)
 {
   // Suffixes used in this method:
   // P = Information from MCParticle
@@ -93,10 +139,9 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   auto* decay = new DecayTree<MCParticle>();
 
   // Load PDG codes and compare,
-  int iPDGD = d->getMother()->getPDGCode();
-  int iPDGP = mcp->getPDG();
-
-  bool isSelfConjugatedParticle = !(EvtPDLUtil::hasAntiParticle(iPDGD));
+  const int iPDGD = d->getMother()->getPDGCode();
+  const int iPDGP = mcp->getPDG();
+  const bool isSelfConjugatedParticle = !(EvtPDLUtil::hasAntiParticle(iPDGD));
 
   if (!isCC && iPDGD != iPDGP) return decay;
   else if (isCC && (iPDGD != -iPDGP && !isSelfConjugatedParticle)) return decay;
@@ -105,43 +150,55 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
   // Get number of daughters in the decay descriptor.
   // If no daughters in decay descriptor, no more checks needed.
-  int nDaughtersD = d->getNDaughters();
+  const int nDaughtersD = d->getNDaughters();
   if (nDaughtersD == 0) {
     B2DEBUG(19, "DecayDescriptor has no Daughters, everything OK!");
     decay->setObj(const_cast<MCParticle*>(mcp));
-    return decay;
-  }
-  // Get number of daughter recursively if missing intermediate states are accepted.
-  int nDaughtersRecursiveD = nDaughtersD;
-  if (d->isIgnoreIntermediate()) {
-    nDaughtersRecursiveD = getNDaughtersRecursive(d);
+    return decay; // arrayIndex is not set
   }
 
   // Get daughters of MCParticle
   vector<const MCParticle*> daughtersP;
+  int nDaughtersRecursiveD = 0;
   if (d->isIgnoreIntermediate()) {
     appendParticles(mcp, daughtersP);
+    // Get number of daughter recursively if missing intermediate states are accepted.
+    nDaughtersRecursiveD = getNDaughtersRecursive(d);
   } else {
     const vector<MCParticle*>& tmpDaughtersP = mcp->getDaughters();
     for (auto daug : tmpDaughtersP)
       daughtersP.push_back(daug);
+    nDaughtersRecursiveD = nDaughtersD;
   }
 
   // The MCParticle must have at least as many daughters as the decaydescriptor
-  int nDaughtersP = daughtersP.size();
-  if (nDaughtersRecursiveD > nDaughtersP) {
+  if (nDaughtersRecursiveD > (int)daughtersP.size()) {
     B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
     return decay;
   }
 
-  // loop over all daughters of the decay descriptor
+  // nested daughter has to be called at first to avoid overlap
+  std::vector<std::pair<int, int>> daughtersDepthMapD; // first: -1*depth, second:iDD
   for (int iDD = 0; iDD < nDaughtersD; iDD++) {
+    int depth = 1; // to be incremented
+    countMaxDepthOfNest(d->getDaughter(iDD), depth);
+
+    daughtersDepthMapD.push_back({-1 * depth, iDD});
+  }
+  // sorted in ascending order = the deepest nested daughter will come first
+  std::sort(daughtersDepthMapD.begin(), daughtersDepthMapD.end());
+
+  // loop over all daughters of the decay descriptor
+  for (auto pair : daughtersDepthMapD) {
+    int iDD = pair.second;
     // check if there is an unmatched particle daughter matching this decay descriptor daughter
     bool isMatchDaughter = false;
     auto itDP = daughtersP.begin();
     while (itDP != daughtersP.end()) {
       const MCParticle* daugP = *itDP;
-      DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC);
+
+      int tmp; // array index of a created daughter Particle (not to be used)
+      DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC, tmp);
       if (!daughter->getObj()) {
         ++itDP;
         continue;
@@ -183,58 +240,31 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   }
 
   // Ok, it seems that everything from the DecayDescriptor could be matched.
-  // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
-  bool isInclusive = (d->isIgnoreMassive() and d->isIgnoreNeutrino() and d->isIgnoreGamma() and d->isIgnoreRadiatedPhotons());
-  if (!isInclusive) {
-    B2DEBUG(10, "Check for left over MCParticles!\n");
-    for (auto daugP : daughtersP) {
-      if (daugP->getPDG() == Const::photon.getPDGCode()) { // gamma
-        // if gamma is FSR or produced by PHOTOS
-        if (MCMatching::isFSR(daugP) or daugP->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
-          // if the radiated photons are ignored, we can skip the particle
-          if (d->isIgnoreRadiatedPhotons()) continue;
-        }
-        // else if missing gamma is ignored, we can skip the particle
-        else if (d->isIgnoreGamma()) continue;
-      } else if ((abs(daugP->getPDG()) == 12 or abs(daugP->getPDG()) == 14 or abs(daugP->getPDG()) == 16)) { // neutrino
-        if (d->isIgnoreNeutrino()) continue;
-      } else if (MCMatching::isFSP(daugP->getPDG())) { // other final state particle
-        if (d->isIgnoreMassive()) continue;
-      } else { // intermediate
-        if (d->isIgnoreIntermediate()) continue;
-      }
-      B2DEBUG(10, "There was an additional particle left. Found " << daugP->getPDG());
-      return decay;
-    }
-  }
   decay->setObj(const_cast<MCParticle*>(mcp));
+
+  Particle* newParticle = buildParticleFromDecayTree(decay, d);
+  int status = MCMatching::getMCErrors(newParticle);
+  if (status != MCMatching::c_Correct) { // isSignal != 1
+    B2DEBUG(10, "isSignal is not True. There was an additional particle left.");
+    decay->setObj(nullptr);
+    return decay;
+  }
+
+  arrayIndex = newParticle->getArrayIndex();
+
   B2DEBUG(19, "Match found!");
   return decay;
 }
 
-int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
-{
-  // Create new Particle in particles array
-  Particle* newParticle = m_particles.appendNew(decay->getObj());
-
-  // set relation between the created Particle and the MCParticle
-  newParticle->addRelationTo(decay->getObj());
-  const int iIndex = m_particles.getEntries() - 1;
-
-  // Now save also daughters of this MCParticle and set the daughter relation
-  vector< DecayTree<MCParticle>* > daughters = decay->getDaughters();
-  int nDaughers = daughters.size();
-  for (int i = 0; i < nDaughers; ++i) {
-    int iIndexDaughter = write(daughters[i]);
-    newParticle->appendDaughter(iIndexDaughter);
-  }
-  return iIndex;
-}
-
 void MCDecayFinderModule::appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
 {
-  if (MCMatching::isFSP(gen->getPDG()))
-    return; //stop at the bottom of the MC decay tree (ignore secondaries)
+  if (MCMatching::isFSP(gen->getPDG())) {
+    if (gen->getPDG() != Const::Kshort.getPDGCode()) // exception for K_S0
+      return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+    // Currently the decay of "FSP" cannot be specified except for K_S0,
+    // e.g. photon-conversion: gamma -> e+ e-, decay-in-flight: K+ -> mu+ nu_mu
+  }
 
   const vector<MCParticle*>& genDaughters = gen->getDaughters();
   for (auto daug : genDaughters) {
@@ -256,4 +286,114 @@ int MCDecayFinderModule::getNDaughtersRecursive(const DecayDescriptor* d)
   }
 
   return nDaughterRecursive;
+}
+
+void MCDecayFinderModule::countMaxDepthOfNest(const DecayDescriptor* d, int& depth)
+{
+  int maxDepth = 0;
+  for (int i = 0; i < d->getNDaughters(); i++) {
+    int tmp_depth = 1;
+    countMaxDepthOfNest(d->getDaughter(i), tmp_depth);
+
+    if (tmp_depth > maxDepth)
+      maxDepth = tmp_depth;
+  }
+
+  depth += maxDepth;
+}
+
+bool MCDecayFinderModule::performMCMatching(const DecayTree<MCParticle>* decay, const DecayDescriptor* dd)
+{
+  auto newParticle = buildParticleFromDecayTree(decay, dd);
+  int status = MCMatching::getMCErrors(newParticle);
+  return (status == MCMatching::c_Correct);
+}
+
+
+Particle* MCDecayFinderModule::buildParticleFromDecayTree(const DecayTree<MCParticle>* decay, const DecayDescriptor* dd)
+{
+  const int nDaughters = dd->getNDaughters();
+  const vector<DecayTree<MCParticle>*> decayDaughters = decay->getDaughters();
+
+  // sanity check
+  if ((int)decayDaughters.size() != nDaughters) {
+    B2ERROR("MCDecayFinderModule::buildParticleFromDecayTree Inconsistency on the number daughters between DecayTree and DecayDescriptor");
+    return nullptr;
+  }
+
+  // build particle from head of DecayTree
+  MCParticle* mcp = decay->getObj();
+  Particle* newParticle = m_particles.appendNew(mcp);
+  newParticle->addRelationTo(mcp);
+
+  int property = dd->getProperty();
+  property |= dd->getMother()->getProperty();
+  newParticle->setProperty(property);
+
+  // if nDaughters is 0 but mcp is not FSP, all primary daughters are appended for mcmatching
+  if (nDaughters == 0 and not MCMatching::isFSP(mcp->getPDG())) {
+    for (auto mcDaughter : mcp->getDaughters()) {
+      if (mcDaughter->hasStatus(MCParticle::c_PrimaryParticle) or
+          (abs(mcp->getPDG()) == Const::Lambda.getPDGCode())) { // Lambda's daughters are not primary but it is not FSP at mcmatching
+
+        auto partDaughter = createParticleRecursively(mcDaughter, true); // for mcmatching non-primary should be omitted
+        newParticle->appendDaughter(partDaughter, false);
+      }
+    }
+  }
+
+
+  // Daughters of DecayTree were filled in ascending order of depth of nest.
+  std::vector<std::pair<int, int>> daughtersDepthMapD; // first: -1*depth, second:iDD
+  for (int iDD = 0; iDD < nDaughters; iDD++) {
+    auto daugD =  dd->getDaughter(iDD);
+
+    int depth = 1; // to be incremented
+    countMaxDepthOfNest(daugD, depth);
+    daughtersDepthMapD.push_back({-1 * depth, iDD});
+  }
+  std::sort(daughtersDepthMapD.begin(), daughtersDepthMapD.end());
+
+  for (int iDD = 0; iDD < nDaughters; iDD++) {
+
+    int index_decayDaughter = 0;
+    for (auto pair : daughtersDepthMapD) {
+      if (pair.second == iDD) break;
+      index_decayDaughter++;
+    }
+
+    Particle* partDaughter = buildParticleFromDecayTree(decayDaughters[index_decayDaughter], dd->getDaughter(iDD));
+
+    int daughterProperty = dd->getDaughter(iDD)->getMother()->getProperty();
+    newParticle->appendDaughter(partDaughter, false, daughterProperty);
+  }
+
+  return newParticle;
+}
+
+Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, bool skipNonPrimaryDaughters)
+{
+  Particle* newParticle = m_particles.appendNew(mcp);
+  newParticle->addRelationTo(mcp);
+
+  for (auto mcDaughter : mcp->getDaughters()) {
+    if (mcDaughter->hasStatus(MCParticle::c_PrimaryParticle) or not skipNonPrimaryDaughters
+        or abs(mcp->getPDG()) == Const::Lambda.getPDGCode()) { // Lambda's daughters are not primary but it is not FSP at mcmatching
+      auto partDaughter = createParticleRecursively(mcDaughter, skipNonPrimaryDaughters);
+      newParticle->appendDaughter(partDaughter, false);
+    }
+  }
+
+  return newParticle;
+}
+
+void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
+{
+
+  for (auto existingParticle : *m_outputList) {
+    if (existingParticle.isCopyOf(newParticle))
+      return;
+  }
+
+  m_outputList->addParticle(newParticle);
 }

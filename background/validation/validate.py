@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -41,8 +40,9 @@ class BGHistogrammer(b2.Module):
         'TOPSimHits',
         'ARICHSimHits',
         'ECLHits',
-        'BKLMSimHits',
-        'EKLMSimHits',
+        'BKLMSimHits',  # Merged to KLMSimHits, keep the entry here temporarily.
+        'EKLMSimHits',  # Merged to KLMSimHits, keep the entry here temporarily.
+        'KLMSimHits',
     ]
     #: length of simHits list
     n = len(simHits)
@@ -138,8 +138,7 @@ else:
 main.add_module(BGHistogrammer())
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

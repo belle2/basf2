@@ -20,6 +20,7 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <utility>
+#include <Math/VectorUtil.h>
 
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
@@ -213,7 +214,7 @@ void DataWriterModule::event()
 
     if (!m_useKLM) {continue;}
 
-    const TVector3& clusterPos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& clusterPos = cluster.getClusterPosition();
 
     m_KLMPhi                         = clusterPos.Phi();
     m_KLMTheta                       = clusterPos.Theta();
@@ -225,7 +226,7 @@ void DataWriterModule::event()
     m_KLMtime                        = cluster.getTime();
     m_KLMinvM                        = cluster.getMomentum().M2();
     m_KLMenergy                      = cluster.getEnergy();
-    m_KLMhitDepth                    = cluster.getClusterPosition().Mag();
+    m_KLMhitDepth                    = cluster.getClusterPosition().R();
     m_KLMtrackFlag                   = cluster.getAssociatedTrackFlag();
     m_KLMeclFlag                     = cluster.getAssociatedEclClusterFlag();
 
@@ -313,12 +314,12 @@ void DataWriterModule::event()
 
     if (part) {
       m_KLMMCWeight = mcParticleWeightPair.second;
-      m_KLMAngleToMC    = clusterPos.Angle(part->getMomentum());
+      m_KLMAngleToMC    = ROOT::Math::VectorUtil::Angle(clusterPos, part->getMomentum());
       m_KLMMCStatus     = part->getStatus();
       m_KLMMCLifetime   = part->getLifetime();
       m_KLMMCPDG        = std::abs(part->getPDG());
       m_KLMMCPrimaryPDG = getPrimaryPDG(part);
-      m_KLMMCMom        = part->getMomentum().Mag();
+      m_KLMMCMom        = part->getMomentum().R();
       m_KLMMCPhi        = part->getMomentum().Phi();
       m_KLMMCTheta      = part->getMomentum().Theta();
     } else {
@@ -387,7 +388,7 @@ void DataWriterModule::event()
       m_ECLKLid = -999;
     }
 
-    const TVector3& clusterPos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& clusterPos = cluster.getClusterPosition();
 
     m_ECLPhi               = clusterPos.Phi();
     m_ECLTheta             = clusterPos.Theta();

@@ -34,7 +34,8 @@ SignalSideVariablesToExtraInfoModule::SignalSideVariablesToExtraInfoModule() : M
 
   // Parameter definitions
   std::map<std::string, std::string> emptymap;
-  addParam("particleListName", m_particleListName, "The input particleList name. This list should contain at most 1 particle",
+  addParam("particleListName", m_particleListName, "The input particleList name.\n"
+           "This list should either contain at most 1 particle or all requested variables should be event-based.",
            std::string(""));
   addParam("variableToExtraInfo", m_variableToExtraInfo,
            "Dictionary of variables and extraInfo names to save in the extra-info field.",
@@ -53,6 +54,8 @@ void SignalSideVariablesToExtraInfoModule::initialize()
     } else {
       m_functions.push_back(var->function);
       m_extraInfoNames.push_back(pair.second);
+      if (m_allVariablesEventbased and var->description.find("[Eventbased]") == std::string::npos)
+        m_allVariablesEventbased = false;
     }
   }
 }
@@ -65,12 +68,12 @@ void SignalSideVariablesToExtraInfoModule::event()
   if (n == 0)
     return;
 
-  if (n > 1)
+  if (n > 1 and !m_allVariablesEventbased)
     B2WARNING("Input ParticleList " << m_particleListName << " contains more than 1 particle. plist.size = " << n);
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    auto* signalSide = roe->getRelated<Particle>();
+    auto* signalSide = roe->getRelatedFrom<Particle>();
 
     const unsigned int nVars = m_functions.size();
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {

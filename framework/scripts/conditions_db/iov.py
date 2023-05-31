@@ -251,7 +251,7 @@ class IntervalOfValidity:
         return None
 
     def contains(self, exp, run):
-        """Check if a run is part of the validtiy"""
+        """Check if a run is part of the validity"""
         return self.first <= (exp, run) <= self.final
 
     @property

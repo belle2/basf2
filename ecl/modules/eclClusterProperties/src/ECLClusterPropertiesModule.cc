@@ -6,8 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/modules/eclClusterProperties/ECLClusterPropertiesModule.h>
+
+/* ECL headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
+
+/* Basf2 headers. */
+#include <framework/geometry/VectorUtil.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -75,18 +84,19 @@ double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower
                                                          unsigned short& trackID) const
 {
   double minDist(10000);
-  TVector3 cryCenter;
-  cryCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
+  ROOT::Math::XYZVector cryCenter;
+  VectorUtil::setMagThetaPhi(
+    cryCenter, shower.getR(), shower.getTheta(), shower.getPhi());
   Const::ChargedStable hypothesis = Const::pion;
   int pdgCode = abs(hypothesis.getPDGCode());
   for (const auto& track : tracks) {
-    TVector3 trkpos(0, 0, 0);
+    ROOT::Math::XYZVector trkpos;
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
       if (abs(extHit.getPdgCode()) != pdgCode) continue;
       if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
       if (extHit.getCopyID() == -1) continue;
       trkpos = extHit.getPosition();
-      double distance = (cryCenter - trkpos).Mag();
+      double distance = (cryCenter - trkpos).R();
       if (distance < minDist) {
         trackID = track.getArrayIndex();
         minDist = distance;
@@ -102,8 +112,9 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   lTrk = 0;
   lShower = 0;
   ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-  TVector3 avgDir(0, 0, 0), showerCenter, trkpos, trkdir;
-  showerCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
+  ROOT::Math::XYZVector avgDir(0, 0, 0), showerCenter, trkpos, trkdir;
+  VectorUtil::setMagThetaPhi(
+    showerCenter, shower.getR(), shower.getTheta(), shower.getPhi());
 
   auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
@@ -111,7 +122,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
     const auto weight = relatedDigitsPairs.weight(iRel);
     double energy = weight * aECLCalDigit->getEnergy();
     int cellid = aECLCalDigit->getCellId();
-    TVector3 cvec = geometry->GetCrystalVec(cellid - 1);
+    ROOT::Math::XYZVector cvec = geometry->GetCrystalVec(cellid - 1);
     avgDir += energy * cvec;
   }
   const ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
@@ -121,7 +132,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   for (const auto& track : cluster->getRelationsFrom<Track>("", m_trackClusterRelationName)) {
     const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
-    if (fit != 0) cp = fit->getMomentum().Mag();
+    if (fit != 0) cp = fit->getMomentum().R();
     if (cp > p) {
       selectedTrk = &track;
       p = cp;
@@ -139,12 +150,12 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
     break;
   }
   if (!found) return;
-  TVector3 w0 = showerCenter - trkpos;
-  double costh = avgDir.Unit() * trkdir;
+  ROOT::Math::XYZVector w0 = showerCenter - trkpos;
+  double costh = avgDir.Unit().Dot(trkdir);
   double sin2th = 1 - costh * costh;
-  lShower = costh * (w0 * trkdir) - w0 * avgDir.Unit();
+  lShower = costh * w0.Dot(trkdir) - w0.Dot(avgDir.Unit());
   lShower /= sin2th;
 
-  lTrk = w0 * trkdir - costh * (w0 * avgDir.Unit());
+  lTrk = w0.Dot(trkdir) - costh * w0.Dot(avgDir.Unit());
   lTrk /= sin2th;
 }

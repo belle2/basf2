@@ -8,6 +8,7 @@
 #include <daq/rawdata/DesSerPrePC.h>
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
+#include <utility>
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -61,7 +62,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
   int n = 0;
   while (1) {
     int read_size = 0;
-    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
+    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n, flag)) < 0) {
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -144,7 +145,7 @@ int DesSerPrePC::Connect()
     timeout.tv_usec = 0;
     setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &timeout, (socklen_t)sizeof(timeout));
 
-    printf("[DEBUG] Connecting to %s port %d\n" , m_hostname_from[ i ].c_str(), m_port_from[ i ]); fflush(stdout);
+    printf("[DEBUG] Connecting to %s port %d\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]); fflush(stdout);
 
     while (1) {
       if (connect(sd, (struct sockaddr*)(&socPC), sizeof(socPC)) < 0) {
@@ -228,7 +229,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
       char err_buf[500];
       sprintf(err_buf,
               "[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
-              *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
+              *num_events_in_sendblock, temp_num_events, i,  *num_nodes_in_sendblock, temp_num_nodes, i);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -279,7 +280,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
         printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
         delete temp_buf;
       }
-      throw (err_str);
+      throw (std::move(err_str));
     }
     //
     // Data length check
@@ -324,7 +325,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
         printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
         delete temp_buf;
       }
-      throw (err_str);
+      throw (std::move(err_str));
     }
   }
 
@@ -432,7 +433,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
         } catch (string err_str) {
           char err_buf[500];
           strcpy(err_buf, err_str.c_str());
-          print_err.PrintError(err_buf , __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(1);
         }
 #endif
@@ -515,7 +516,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
           ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
         char err_buf[500];
         for (int m = 0; m < num_nodes_in_sendblock; m++) {
-          printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
+          printf("[DEBUG] node %d eve # %x utime %x ctime %x\n",
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
         sprintf(err_buf, "[FATAL] CORRUPTED DATA: Event or Time record mismatch. Exiting...");
@@ -732,7 +733,7 @@ void DesSerPrePC::DataAcquisition()
 //     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
 //         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
         printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
-               max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+               max_nevt, max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       }
 #endif
     }

@@ -23,7 +23,7 @@ namespace Belle2 {
     TBranch* m_branch;
   public:
     /** Add to the TTree
-     * @param tree a branch whose name and type are inferred from @param var
+     * @param tree a branch whose name and type are inferred from parameter var
      */
     explicit VariableTBranch(TTree* tree);
 
@@ -49,7 +49,7 @@ namespace Belle2 {
   VariableTBranch<Variable>::VariableTBranch(TTree* tree)
   {
     if (tree != nullptr && tree -> GetBranch(Variable::name().c_str()) == nullptr)
-      m_branch = tree->Branch(Variable::name().c_str() , & m_storedValue,
+      m_branch = tree->Branch(Variable::name().c_str(), & m_storedValue,
                               TBranchLeafType(m_storedValue));
   }
 }

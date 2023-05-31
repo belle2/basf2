@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -118,7 +117,6 @@ ma.variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
                      filename=output_file, treename='dsttree', path=my_path)
 
 
-progress = b2.register_module('Progress')
-my_path.add_module(progress)
+my_path.add_module('Progress')
 
 b2.process(my_path)

@@ -92,7 +92,7 @@ void DeSerializerFILEModule::initialize()
 }
 
 
-int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, int* data_type)
+int* DeSerializerFILEModule::readOneDataBlock(int* /*delete_flag*/, int* /*size_word*/, int* /*data_type*/)
 {
 #ifdef USE_PCIE40
   char err_buf[500];
@@ -315,7 +315,7 @@ void DeSerializerFILEModule::event()
     int block_num = 0;
 
     unsigned int eve_num;
-    int subsysid = 0;
+    //int subsysid = 0;
 
     if (temp_rawdblk.CheckFTSWID(block_num)) {
       RawFTSW temp_raw_ftsw;
@@ -325,7 +325,7 @@ void DeSerializerFILEModule::event()
       RawCOPPER temp_raw_copper;
       temp_raw_copper.SetBuffer(temp_buf, size_word, 0, num_nodes, num_events);
       eve_num = temp_raw_copper.GetEveNo(block_num);
-      subsysid = temp_raw_copper.GetNodeID(block_num);
+      //subsysid = temp_raw_copper.GetNodeID(block_num);
     }
 
     if (eve_num != prev_eve_num && first_flag != 0) {

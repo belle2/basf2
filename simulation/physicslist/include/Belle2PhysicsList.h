@@ -90,6 +90,8 @@ namespace Belle2 {
       G4double m_arichtopCutValue;  /**< threshold for ARICH and TOP */
       G4double m_eclCutValue;       /**< threshold for ECL */
       G4double m_klmCutValue;       /**< threshold for BKLM and EKLM */
+      G4ProductionCuts*
+      m_regionCuts;  /**< Global pointer for the region cuts to avoid memory leak and side effects when deleting the pointer */
     };
 
   } // end of namespace Simulation

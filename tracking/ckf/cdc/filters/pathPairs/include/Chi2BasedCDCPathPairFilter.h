@@ -16,15 +16,14 @@ namespace Belle2 {
   class Chi2BasedCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final {
+    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
+    {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
 
-      if (lhs.size() > rhs.size() + 2)
-      {
+      if (lhs.size() > rhs.size() + 2) {
         return true;
-      } else if (lhs.size() + 2 < rhs.size())
-      {
+      } else if (lhs.size() + 2 < rhs.size()) {
         return false;
       }
 

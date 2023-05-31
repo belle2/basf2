@@ -61,14 +61,13 @@ namespace Belle2 {
       leafList += variableName;
       leafList += "_max/";
       leafList += TBranchLeafType(m_max);
-      TBranch* branch = new TBranch(t, branchName.c_str() , & m_min, leafList.c_str());
+      TBranch* branch = new TBranch(t, branchName.c_str(), & m_min, leafList.c_str());
       t->GetListOfBranches()->Add(branch);
     }
 
     /** sets branch addresses of the given tree to the m_min and m_msx. Note: it assumes a certain oder for
      * @param t: the tree of the which the branch addresses need to be set
      * @param branchName: name of the branch
-     * @param variableName: specifier for the leafs
     */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)

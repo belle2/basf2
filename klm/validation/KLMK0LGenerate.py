@@ -12,7 +12,7 @@
 """
 <header>
     <output>KLMK0LOutput.root</output>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Leo Piilonen (piilonen@vt.edu)</contact>
     <description>Generation of 2000 B -> J/psi K_L0 events for KLM validation.</description>
 </header>
 """

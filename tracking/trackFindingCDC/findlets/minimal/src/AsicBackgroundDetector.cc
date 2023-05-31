@@ -27,7 +27,7 @@ void AsicBackgroundDetector::initialize()
   m_channelMapFromDB = std::make_unique<DBArray<CDCChannelMap>> ();
 
   if ((*m_channelMapFromDB).isValid()) {
-    B2DEBUG(100, "CDC Channel map is  valid");
+    B2DEBUG(25, "CDC Channel map is  valid");
   } else {
     B2FATAL("CDC Channel map is not valid");
   }

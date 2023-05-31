@@ -14,6 +14,9 @@
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+
 #include <genfit/TrackCand.h>
 #include <genfit/TrackCandHit.h>
 
@@ -282,15 +285,13 @@ namespace Belle2 {
      * @returns first is the SPTC, .second is the conversion status, if < 0, something went wrong
      */
     std::pair<const Belle2::SpacePointTrackCand, conversionStatus>
-    createSpacePointTC(const genfit::TrackCand* genfitTC, const StoreArray<PXDCluster>& pxdClusters,
-                       const StoreArray<SVDCluster>& svdClusters);
+    createSpacePointTC(const genfit::TrackCand* genfitTC);
 
     /**
      * process a TrackCandHit (i.e. do the handling of the different ClusterTypes), this is essentially nothing more than a wrapper, that directly returns whats returned from getSpacePoint(args) that is called within!
      */
     std::pair<Belle2::SpacePoint*, conversionStatus>
-    processTrackCandHit(genfit::TrackCandHit* hit, const StoreArray<PXDCluster>& pxdClusters, const StoreArray<SVDCluster>& svdClusters,
-                        std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit);
+    processTrackCandHit(genfit::TrackCandHit* hit, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit);
 
     /**
      * templated version to get a SpacePoint from a Cluster
@@ -361,5 +362,15 @@ namespace Belle2 {
      */
     BELLE2_DEFINE_EXCEPTION(UnusedHits,
                             "Not all hits of the genfit::TrackCand have been marked as used. This indicates that not all hits have been used to create a SpacePointTrackCand.");
+  private:
+    StoreArray<PXDCluster> m_PXDClusters; /**< PXDClusters StoreArray */
+    StoreArray<SVDCluster> m_SVDClusters; /**< SVDClusters StoreArray */
+    StoreArray<SpacePoint> m_SingleClusterSpacePoints; /**< SVD SpacePoints StoreArray only consisting of one SVDCluster */
+    StoreArray<SpacePoint> m_NoSingleClusterSpacePoints; /**<  SVD SpacePoints StoreArray consisting of two SVDClusters */
+    StoreArray<SpacePoint> m_PXDSpacePoints; /**< PXDSpacePoints StoreArray */
+    StoreArray<genfit::TrackCand> m_GenfitTrackCands; /**< Genfit::TrackCand StoreArray */
+    StoreArray<SpacePointTrackCand> m_SpacePointTrackCands; /**< SpacePointTrackCands StoreArray */
+    StoreArray<PXDTrueHit> m_PXDTrueHits; /**< PXDTrueHits StoreArray */
+    StoreArray<SVDTrueHit> m_SVDTrueHits; /**< SVDTrueHits StoreArray */
   };
 }

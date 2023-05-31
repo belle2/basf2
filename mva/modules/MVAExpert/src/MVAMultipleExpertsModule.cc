@@ -12,7 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
 
@@ -39,10 +39,10 @@ MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
   addParam("identifiers", m_identifiers, "The database identifiers which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
-  std::vector<bool> empty_bool;
+  std::vector<int> empty_vec;
   addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
            "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
-           empty_bool);
+           empty_vec);
 }
 
 void MVAMultipleExpertsModule::initialize()
@@ -70,8 +70,8 @@ void MVAMultipleExpertsModule::initialize()
   m_individual_feature_variables.resize(m_identifiers.size());
   m_datasets.resize(m_identifiers.size());
   m_nClasses.resize(m_identifiers.size());
-  // if the size of m_overwriteExistingExtraInfo is smaller than that of m_identifiers, true will be filled.
-  m_overwriteExistingExtraInfo.resize(m_identifiers.size(), true);
+  // if the size of m_overwriteExistingExtraInfo is smaller than that of m_identifiers, 2 will be filled.
+  m_overwriteExistingExtraInfo.resize(m_identifiers.size(), 2);
   m_existGivenExtraInfo.resize(m_identifiers.size(), false);
 
   for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
@@ -183,8 +183,18 @@ void MVAMultipleExpertsModule::setExtraInfoField(Particle* particle, std::string
   if (particle->hasExtraInfo(extraInfoName)) {
     if (particle->getExtraInfo(extraInfoName) != responseValue) {
       m_existGivenExtraInfo[i] = true;
-      if (m_overwriteExistingExtraInfo[i])
+      double current = particle->getExtraInfo(extraInfoName);
+      if (m_overwriteExistingExtraInfo[i] == -1) {
+        if (responseValue < current) particle->setExtraInfo(extraInfoName, responseValue);
+      } else if (m_overwriteExistingExtraInfo[i] == 0) {
+        // don't overwrite!
+      } else if (m_overwriteExistingExtraInfo[i] == 1) {
+        if (responseValue > current) particle->setExtraInfo(extraInfoName, responseValue);
+      } else if (m_overwriteExistingExtraInfo[i] == 2) {
         particle->setExtraInfo(extraInfoName, responseValue);
+      } else {
+        B2FATAL("m_overwriteExistingExtraInfo must be one of {-1,0,1,2}. Received '" << m_overwriteExistingExtraInfo[i] << "'.");
+      }
     }
   } else {
     particle->addExtraInfo(extraInfoName, responseValue);
@@ -196,8 +206,18 @@ void MVAMultipleExpertsModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo
 {
   if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
     m_existGivenExtraInfo[i] = true;
-    if (m_overwriteExistingExtraInfo[i])
+    double current = eventExtraInfo->getExtraInfo(extraInfoName);
+    if (m_overwriteExistingExtraInfo[i] == -1) {
+      if (responseValue < current) eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else if (m_overwriteExistingExtraInfo[i] == 0) {
+      // don't overwrite!
+    } else if (m_overwriteExistingExtraInfo[i] == 1) {
+      if (responseValue > current) eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else if (m_overwriteExistingExtraInfo[i] == 2) {
       eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else {
+      B2FATAL("m_overwriteExistingExtraInfo must be one of {-1,0,1,2}. Received '" << m_overwriteExistingExtraInfo[i] << "'.");
+    }
   } else {
     eventExtraInfo->addExtraInfo(extraInfoName, responseValue);
   }
@@ -260,12 +280,18 @@ void MVAMultipleExpertsModule::terminate()
     m_datasets[i].reset();
 
     if (m_existGivenExtraInfo[i]) {
-      if (m_overwriteExistingExtraInfo[i])
+      if (m_overwriteExistingExtraInfo[i] == -1) {
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] <<
+                  " has already been set! It was overwritten by this module if the new value was lower than the previous!");
+      } else if (m_overwriteExistingExtraInfo[i] == 0) {
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] <<
+                  " has already been set! The original value was kept and this module did not overwrite it!");
+      } else if (m_overwriteExistingExtraInfo[i] == 1) {
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] <<
+                  " has already been set! It was overwritten by this module if the new value was higher than the previous!");
+      } else if (m_overwriteExistingExtraInfo[i] == 2) {
         B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! It was overwritten by this module!");
-      else
-        B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! "
-                  << "The original value was kept and this module did not overwrite it!");
+      }
     }
   }
-
 }

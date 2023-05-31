@@ -12,7 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
 
@@ -40,8 +40,8 @@ MVAExpertModule::MVAExpertModule() : Module()
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
   addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
-           "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
-           true);
+           "-1/0/1/2: Overwrite if lower / don't overwrite / overwrite if higher / always overwrite, in case the extra info with given name already exists",
+           2);
 }
 
 void MVAExpertModule::initialize()
@@ -150,8 +150,18 @@ void MVAExpertModule::setExtraInfoField(Particle* particle, std::string extraInf
   if (particle->hasExtraInfo(extraInfoName)) {
     if (particle->getExtraInfo(extraInfoName) != responseValue) {
       m_existGivenExtraInfo = true;
-      if (m_overwriteExistingExtraInfo)
+      double current = particle->getExtraInfo(extraInfoName);
+      if (m_overwriteExistingExtraInfo == -1) {
+        if (responseValue < current) particle->setExtraInfo(extraInfoName, responseValue);
+      } else if (m_overwriteExistingExtraInfo == 0) {
+        // don't overwrite!
+      } else if (m_overwriteExistingExtraInfo == 1) {
+        if (responseValue > current) particle->setExtraInfo(extraInfoName, responseValue);
+      } else if (m_overwriteExistingExtraInfo == 2) {
         particle->setExtraInfo(extraInfoName, responseValue);
+      } else {
+        B2FATAL("m_overwriteExistingExtraInfo must be one of {-1,0,1,2}. Received '" << m_overwriteExistingExtraInfo << "'.");
+      }
     }
   } else {
     particle->addExtraInfo(extraInfoName, responseValue);
@@ -163,8 +173,18 @@ void MVAExpertModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo> eventEx
 {
   if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
     m_existGivenExtraInfo = true;
-    if (m_overwriteExistingExtraInfo)
+    double current = eventExtraInfo->getExtraInfo(extraInfoName);
+    if (m_overwriteExistingExtraInfo == -1) {
+      if (responseValue < current) eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else if (m_overwriteExistingExtraInfo == 0) {
+      // don't overwrite!
+    } else if (m_overwriteExistingExtraInfo == 1) {
+      if (responseValue > current) eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else if (m_overwriteExistingExtraInfo == 2) {
       eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else {
+      B2FATAL("m_overwriteExistingExtraInfo must be one of {-1,0,1,2}. Received '" << m_overwriteExistingExtraInfo << "'.");
+    }
   } else {
     eventExtraInfo->addExtraInfo(extraInfoName, responseValue);
   }
@@ -225,10 +245,17 @@ void MVAExpertModule::terminate()
   m_dataset.reset();
 
   if (m_existGivenExtraInfo) {
-    if (m_overwriteExistingExtraInfo)
+    if (m_overwriteExistingExtraInfo == -1) {
+      B2WARNING("The extraInfo " << m_extraInfoName <<
+                " has already been set! It was overwritten by this module if the new value was lower than the previous!");
+    } else if (m_overwriteExistingExtraInfo == 0) {
+      B2WARNING("The extraInfo " << m_extraInfoName <<
+                " has already been set! The original value was kept and this module did not overwrite it!");
+    } else if (m_overwriteExistingExtraInfo == 1) {
+      B2WARNING("The extraInfo " << m_extraInfoName <<
+                " has already been set! It was overwritten by this module if the new value was higher than the previous!");
+    } else if (m_overwriteExistingExtraInfo == 2) {
       B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! It was overwritten by this module!");
-    else
-      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! "
-                << "The original value was kept and this module did not overwrite it!");
+    }
   }
 }

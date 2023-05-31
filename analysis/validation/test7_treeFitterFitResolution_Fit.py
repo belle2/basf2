@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <output>../TreeFitted_B0ToJPsiKs.root</output>
-  <contact>Jo-Frederik Krohn; jkrohn@student.unimelb.edu.au</contact>
+  <contact>Yo Sato; yosato@post.kek.jp</contact>
   <interval>nightly</interval>
 </header>
 """
@@ -83,6 +82,7 @@ path.add_module('VariablesToNtuple',
                 variables=variables,
                 fileName='../TreeFitted_B0ToJPsiKs.root')
 
+path.add_module('Progress')
 process(path)
 
 print(statistics)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -62,6 +61,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 0  # corresponds to stage -1, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 assert len(glob.glob('mcParticlesCount.root')) == 1
@@ -79,6 +79,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 1  # corresponds to stage 0, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 
@@ -115,6 +116,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 2  # corresponds to stage 1, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 
@@ -145,6 +147,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 4  # corresponds to stage 3, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 
@@ -182,6 +185,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 7  # corresponds to stage 6, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 

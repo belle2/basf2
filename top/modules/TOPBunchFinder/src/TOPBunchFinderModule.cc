@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBunchFinder/TOPBunchFinderModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
@@ -98,7 +100,7 @@ namespace Belle2 {
     addParam("useTimeSeed",  m_useTimeSeed, "use SVD or CDC event T0 as a seed "
              "(only when running in data processing mode and autoRange turned off).", true);
     addParam("useFillPattern", m_useFillPattern, "use known accelerator fill pattern to enhance efficiency "
-             "(only when running in data processing mode).", true);
+             "(only when running in data processing mode).", false);
   }
 
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -54,9 +53,8 @@ ft.flavorTagger(
     weightFiles='B2nunubarBGx1',
     path=cp_val_path)
 
-vx.raveFit(list_name='B0:jpsiks', conf_level=0.0,
-           decay_string='B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', constraint='', path=cp_val_path)
-vx.TagV(list_name='B0:jpsiks', MCassociation='breco', path=cp_val_path)
+vx.treeFit(list_name='B0:jpsiks', conf_level=1e-10, ipConstraint=True, path=cp_val_path)
+vx.TagV(list_name='B0:jpsiks', MCassociation='breco', constraintType='tube', path=cp_val_path)
 
 # Select variables that will be stored to ntuple
 fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
@@ -86,6 +84,7 @@ ma.variablesToNtuple(decayString='B0:jpsiks',
 
 ma.summaryOfLists(particleLists=['B0:jpsiks'], path=cp_val_path)
 
+cp_val_path.add_module('Progress')
 # Process the events
 b2.process(cp_val_path)
 

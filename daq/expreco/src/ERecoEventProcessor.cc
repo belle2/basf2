@@ -129,7 +129,7 @@ int ERecoEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   char* srchost = m_conf->getconf("distributor", "host");
   //  char* port = m_conf->getconf ( "distributor", "port" );
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  //  char* hostbase = m_conf->getconf("processor", "nodebase");
   int rport;
   sscanf(&m_nodename[strlen(m_nodename) - 2], "%d", &rport);
   rport += portbase;

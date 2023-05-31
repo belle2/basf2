@@ -17,7 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <string>
@@ -105,7 +105,7 @@ namespace Belle2 {
     std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert */
     std::unique_ptr<MVA::SingleDataset> m_dataset; /**< Pointer to the current dataset */
 
-    bool m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo is already defined, the old extraInfo value is overwritten */
+    int m_overwriteExistingExtraInfo; /**< -1/0/1/2: overwrite if lower/ don't overwrite / overwrite if higher/ always overwrite, in case the given extraInfo is already defined. */
     bool m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
 
     unsigned int

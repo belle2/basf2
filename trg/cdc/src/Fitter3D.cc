@@ -14,16 +14,13 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
+#include <cmath>
+
 #include "trg/trg/Debug.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Link.h"
-#include <cmath>
-
-#include <framework/dataobjects/EventMetaData.h>
-#include "cdc/dataobjects/CDCSimHit.h"
-#include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Utilities.h"
@@ -35,7 +32,6 @@
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Relation.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
@@ -48,6 +44,13 @@
 #include "trg/cdc/JSignalData.h"
 #include "trg/cdc/FpgaUtility.h"
 #include "trg/cdc/HandleRoot.h"
+
+#include "cdc/dataobjects/CDCSimHit.h"
+#include "cdc/geometry/CDCGeometryPar.h"
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/geometry/B2Vector3.h>
+#include "mdst/dataobjects/MCParticle.h"
+
 
 using namespace std;
 namespace Belle2 {
@@ -83,7 +86,7 @@ namespace Belle2 {
     m_mBool["debugLargeZ0"] = 0;
 
     // Init values
-    m_mConstD["Trg_PI"] = 3.141592653589793;
+    m_mConstD["Trg_PI"] = M_PI;
 
     // Get rr,zToStraw,angleSt,nWire
     const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
@@ -973,7 +976,7 @@ namespace Belle2 {
     m_mVector_in["impactPosition"] = vector<double> ({impactPosition.X(), impactPosition.Y(), impactPosition.Z()});
 
     // Access track's particle parameters
-    m_mDouble_in["mcPt"] = trackMCParticle.getMomentum().Pt();
+    m_mDouble_in["mcPt"] = trackMCParticle.getMomentum().Rho();
     m_mDouble_in["mcPhi0"] = 0;
     if (trackMCParticle.getCharge() > 0) m_mDouble_in["mcPhi0"] = trackMCParticle.getMomentum().Phi() - m_mConstD_in.at("Trg_PI") / 2;
     if (trackMCParticle.getCharge() < 0) m_mDouble_in["mcPhi0"] = trackMCParticle.getMomentum().Phi() + m_mConstD_in.at("Trg_PI") / 2;
@@ -981,7 +984,7 @@ namespace Belle2 {
     if (m_mDouble_in["mcPhi0"] < 0) m_mDouble_in["mcPhi0"] += 2 * m_mConstD_in.at("Trg_PI");
     //m_mDouble["mcZ0"] = trackMCParticle.getVertex().Z();
     m_mDouble_in["mcZ0"] = impactPosition.Z();
-    m_mDouble_in["mcCot"] = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+    m_mDouble_in["mcCot"] = trackMCParticle.getMomentum().z() / trackMCParticle.getMomentum().Rho();
     m_mDouble_in["mcCharge"] = trackMCParticle.getCharge();
 
     // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
@@ -1590,7 +1593,7 @@ namespace Belle2 {
                                     bool isXtSimple)
   {
     const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
-    mConstD["Trg_PI"] = 3.141592653589793;
+    mConstD["Trg_PI"] = M_PI;
     mConstV["priorityLayer"] = {3, 10, 16, 22, 28, 34, 40, 46, 52};
     mConstV["rr"] = vector<double> (9);
     mConstV["nWires"] = vector<double> (9);

@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /** ROIpayload
-   * @TODO: Better explanation, Is there a reason to inherit from TObject and not Relationsobject here?
+   * TODO: Better explanation, Is there a reason to inherit from TObject and not Relationsobject here?
    * This Object contains a binary blob which is send as whole from the HLT Roi Sender output
    * node to the ONSEN system, containing the trigger decision and the Region od Interest (ROI)
    * for data selection on the PXD modules
@@ -63,7 +63,7 @@ namespace Belle2 {
     void setTriggerNumber(unsigned long int triggerNumber); /**< set trigger number*/
 
     //! set run/ subrun/exp number
-    void setRunSubrunExpNumber(int run , int subrun , int exp); /**< set run, subrun and experiment number*/
+    void setRunSubrunExpNumber(int run, int subrun, int exp);   /**< set run, subrun and experiment number*/
 
     //    void addROIraw(ROIrawID roiraw);
     void addROIraw(unsigned long int roiraw); /**< add a ROIrawID */

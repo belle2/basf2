@@ -586,7 +586,7 @@ namespace Belle2 {
      * This is used by the fit&refit, since the original genfit track must be
      * updated with the refitted object obtained after the flip
      */
-    void setGenfitTrack(const genfit::Track track);
+    void setGenfitTrack(genfit::Track* track);
 
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const ROOT::Math::XYZVector& positionSeed, const ROOT::Math::XYZVector& momentumSeed)

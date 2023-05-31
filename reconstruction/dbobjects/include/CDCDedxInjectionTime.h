@@ -85,14 +85,13 @@ namespace Belle2 {
     };
 
     /** Return time bin for the given time array
-    * @param n length of time array
     * @param array of time
     * @param value of input time
     */
-    unsigned int getTimeBin(unsigned int n, unsigned int* array, unsigned int value) const
+    unsigned int getTimeBin(const std::vector<unsigned int>& array, unsigned int value) const
     {
       int nabove, nbelow, middle;
-      nabove = n + 1;
+      nabove = array.size() + 1;
       nbelow = 0;
       while (nabove - nbelow > 1) {
         middle = (nabove + nbelow) / 2;

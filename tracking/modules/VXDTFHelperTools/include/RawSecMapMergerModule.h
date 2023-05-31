@@ -277,9 +277,9 @@ namespace Belle2 {
     }
 
     /** check that the vector of FullSecIDs @param ids is meaningfull for us.
-     * if @param ids size == 2 it checks that the two sectors are not on the same
+     * if ids size == 2 it checks that the two sectors are not on the same
      * layer and ladder
-     * if @param ids size == 3 it checks that both segments satisfy the same requirement
+     * if ids size == 3 it checks that both segments satisfy the same requirement
      */
     bool good(const std::vector< unsigned>& ids);
   };

@@ -492,6 +492,14 @@ namespace Belle2 {
       return m_genfitTrack.getStateSeed();
     }
 
+    /**
+     * Returns genfit track.
+     * const casting of the return reference is forbidden!
+     * If you need to modify genfit track, please use RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack).
+     * @return const reference to genfit track
+     */
+    const genfit::Track& getGenfitTrack() const {return m_genfitTrack;}
+
     /// Return the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
     short int getChargeSeed() const { return m_charge; }
 
@@ -635,7 +643,7 @@ namespace Belle2 {
      *
      * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
      */
-    genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode);
+    genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode) const;
 
     /**
      * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when

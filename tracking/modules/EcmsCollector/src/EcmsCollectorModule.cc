@@ -142,14 +142,17 @@ void EcmsCollectorModule::collect()
     } else {
       B2INFO("No D meson found");
     }
-    m_mD[i] = D->getMass();
-    const Particle* Kaon =  D->getDaughter(0);
+    if (D != nullptr) {
+      m_mD[i] = D->getMass();
+      const Particle* Kaon =  D->getDaughter(0);
 
-
-
-    m_Kpid[i] = -99;
-    if (Kaon && Kaon->getPIDLikelihood()) {
-      m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
+      m_Kpid[i] = -99;
+      if (Kaon && Kaon->getPIDLikelihood()) {
+        m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
+      }
+    } else {
+      m_mD[i] = -99;
+      m_Kpid[i] = -99;
     }
   }
 

@@ -35,8 +35,8 @@ void CDCDedxInjectionTime::printCorrection(std::string svar, std::string sfx) co
       break;
     }
 
-    unsigned int tedges[sizet]; //time edges array
-    std::copy(m_injectionvar[ir * 3].begin(), m_injectionvar[ir * 3].end(), tedges);
+    std::vector<unsigned int> tedges(sizet); //time edges array
+    std::copy(m_injectionvar[ir * 3].begin(), m_injectionvar[ir * 3].end(), tedges.begin());
 
     std::string hname = Form("hconst_%s_%s_%s", svar.data(), sring[ir].data(), sfx.data());
     std::string title = Form("%s corrections;injection-time (#mu-sec);%s", svar.data(), svar.data());
@@ -101,12 +101,12 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
     return 1.0;
   }
 
-  unsigned int tedges[sizet]; //time edges array
-  std::copy(m_injectionvar[ring * 3].begin(), m_injectionvar[ring * 3].end(), tedges);
+  std::vector<unsigned int> tedges(sizet); //time edges array
+  std::copy(m_injectionvar[ring * 3].begin(), m_injectionvar[ring * 3].end(), tedges.begin());
 
   if (time >= 5e6)time = 5e6 - 10;
 
-  unsigned int it = getTimeBin(sizet, tedges, time);
+  unsigned int it = getTimeBin(tedges, time);
   double center = 0.5 * (m_injectionvar[ring * 3].at(it) + m_injectionvar[ring * 3].at(it + 1));
 
   //no corr before veto bin (usually one or two starting bin)

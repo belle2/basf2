@@ -401,8 +401,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effU = -1;
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
 
-      cout << "effU  = " << numU << "/" << denU << " = " << effU << endl;
-
       m_h3Efficiency->fill(m_SVDModules[i], 1, effU * 100);
       if (effU == -1)
         erreffU = -1;

@@ -8,35 +8,25 @@
 
 import os
 import pathlib
-import sys
-from basf2 import find_file
-from softwaretrigger import constants
-from softwaretrigger.test_support import get_file_name, generate_input_file
+import subprocess
+
+import basf2 as b2
 
 
 if __name__ == "__main__":
 
     prepare_path = os.getenv("BELLE2_PREPARE_PATH", "")
     if prepare_path == "":
-        parent_path = pathlib.Path(find_file('framework')).parent.absolute()
+        parent_path = pathlib.Path(b2.find_file('framework')).parent.absolute()
         prepare_path = os.path.join(parent_path, "prepare_tests")
         try:
             os.mkdir(prepare_path)
         except FileExistsError:
             pass
 
-    run_type = constants.RunTypes.beam
-    location = constants.Location.hlt
-    passthrough = False
-    simulate_events_of_doom_buster = True
-    output_file_name = get_file_name(
-        prepare_path, run_type, location, passthrough, simulate_events_of_doom_buster
-    )
-    sys.exit(generate_input_file(
-        output_file_name=output_file_name,
-        run_type=run_type,
-        location=location,
-        exp_number=1004,
-        passthrough=passthrough,
-        simulate_events_of_doom_buster=simulate_events_of_doom_buster)
+    # Generate and simulate few events without MC information for exp. 0
+    steering = b2.find_file(os.path.join('reconstruction', 'tests', 'prepare', 'evtgen_no_mc.py_noexec'))
+    output_file = os.path.join(prepare_path, 'test_standalone_reco_no_mc_bbbar_exp0.root')
+    subprocess.check_call(
+        ['basf2', steering, '--experiment', '0', '--run', '0', '-n', '3', '-o', output_file]
     )

@@ -65,8 +65,8 @@ namespace Belle2 {
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
-    /**< event T0 */
-    StoreObjPtr<EventT0> m_EventT0;
+
+    StoreObjPtr<EventT0> m_EventT0;  /**< event T0 object */
 
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ def setupBelleDatabaseServer():
     try:
         with open(belleDBServerFile) as f:
             belleDBServer = (f.read()).strip()
-    except IOError:
+    except OSError:
         pass
 
     os.environ['PGUSER'] = 'g0db'
@@ -218,7 +217,7 @@ def parse_process_url(url):
             return [url]
         else:
             b2.B2ERROR(
-                "Could not parse url '{0}': no such file or directory".format(url))
+                "Could not parse url '{}': no such file or directory".format(url))
             return []
 
     # regular expression to find process_event lines in html response

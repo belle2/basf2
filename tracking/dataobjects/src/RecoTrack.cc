@@ -467,7 +467,7 @@ void RecoTrack::deleteFittedInformationForRepresentation(const genfit::AbsTrackR
   m_genfitTrack.deleteFittedState(rep);
 }
 
-genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)
+genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode) const
 {
   if (pdgCode < 0) {
     B2FATAL("Only positive pdgCode is possible when calling getTrackRepresentationForPDG, got " << pdgCode);

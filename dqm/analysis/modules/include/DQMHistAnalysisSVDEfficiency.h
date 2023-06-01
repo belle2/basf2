@@ -82,12 +82,12 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
 
-    TCanvas* m_c3EfficiencyU = nullptr; /**< efficiency U plot canvas */
-    TCanvas* m_c3EfficiencyV = nullptr; /**< efficiency V plot canvas */
-    SVDSummaryPlots* m_h3Efficiency = nullptr; /**< efficiency histo */
-    TCanvas* m_c3EfficiencyErrU = nullptr; /**<efficiency U error plot canvas */
-    TCanvas* m_c3EfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
-    SVDSummaryPlots* m_h3EfficiencyErr = nullptr; /**< efficiency error histo */
+    TCanvas* m_c3EfficiencyU = nullptr; /**< efficiency U plot canvas  for 3 samples */
+    TCanvas* m_c3EfficiencyV = nullptr; /**< efficiency V plot canvas  for 3 samples */
+    SVDSummaryPlots* m_h3Efficiency = nullptr; /**< efficiency histo for 3 samples */
+    TCanvas* m_c3EfficiencyErrU = nullptr; /**<efficiency U error plot canvas for 3 samples*/
+    TCanvas* m_c3EfficiencyErrV = nullptr; /**<efficiency V error plot canvas for 3 samples*/
+    SVDSummaryPlots* m_h3EfficiencyErr = nullptr; /**< efficiency error histo for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 

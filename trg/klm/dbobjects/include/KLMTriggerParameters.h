@@ -15,6 +15,7 @@
 /* ROOT headers. */
 #include <TObject.h>
 
+
 /* C++ headers. */
 #include <string>
 
@@ -96,12 +97,87 @@ namespace Belle2 {
       return m_whichLayers;
     }
 
+    int getSubdetector(int i) const
+    {
+      return m_Subdetector[i];
+    }
+
+    int getSection(int i) const
+    {
+      return m_section[i];
+    }
+    int getSector(int i) const
+    {
+      return m_sector[i];
+    }
+    int getLayer(int i) const
+    {
+      return m_layer[i];
+    }
+
+    int getPlane(int i) const
+    {
+      return m_plane[i];
+    }
+
+    double getSlopeX(int i) const
+    {
+      return m_slopeX[i];
+    }
+    double getOffsetX(int i) const
+    {
+      return m_offsetX[i];
+    }
+
+    double getSlopeY(int i) const
+    {
+      return m_slopeY[i];
+    }
+    double getOffsetY(int i) const
+    {
+      return m_offsetY[i];
+    }
+
+
+    size_t getGeometryDataSize() const
+    {
+      return m_Subdetector.size();
+    }
+
+    void pushGeometryData(int Subdetector, int section, int sector, int layer, int plane, double  slopeX, double offsetX,
+                          double  slopeY, double offsetY)
+    {
+
+      m_Subdetector.push_back(Subdetector);
+      m_section.push_back(section);
+      m_sector.push_back(sector);
+      m_layer.push_back(layer);
+      m_plane.push_back(plane);
+      m_slopeX.push_back(slopeX);
+      m_offsetX.push_back(offsetX);
+      m_slopeY.push_back(slopeY);
+      m_offsetY.push_back(offsetY);
+    }
+
+
   private:
 
     /**
      * Number of layers used in the trigger logic.
      */
     unsigned int m_nLayers{0};
+
+    std::vector<int> m_Subdetector;
+    std::vector<int> m_section;
+    std::vector<int> m_sector;
+    std::vector<int> m_layer;
+    std::vector<int> m_plane;
+    std::vector<double> m_slopeX;
+    std::vector<double> m_offsetX;
+    std::vector<double> m_slopeY;
+    std::vector<double> m_offsetY;
+
+
 
     /**
      * Pattern of layers used in the trigger logic.

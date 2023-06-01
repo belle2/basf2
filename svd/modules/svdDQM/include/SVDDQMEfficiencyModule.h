@@ -92,18 +92,18 @@ namespace Belle2 {
     std::map<VxdID, TH2D*> m_h_track_hits; /**< track hits histogram map to sensorID*/
     std::map<VxdID, TH2D*> m_h_matched_clusterU; /**< matched U-hits histogram map to sensorID*/
     std::map<VxdID, TH2D*> m_h_matched_clusterV; /**< matched V-hits histogram map to sensorID*/
-    std::map<VxdID, TH2D*> m_h_matched3_clusterU; /**< matched U-hits histogram map to sensorID*/
-    std::map<VxdID, TH2D*> m_h_matched3_clusterV; /**< matched V-hits histogram map to sensorID*/
-    std::map<VxdID, TH2D*> m_h_matched6_clusterU; /**< matched U-hits histogram map to sensorID*/
-    std::map<VxdID, TH2D*> m_h_matched6_clusterV; /**< matched V-hits histogram map to sensorID*/
+    std::map<VxdID, TH2D*> m_h_matched3_clusterU; /**< matched U-hits histogram map to sensorID for 3 samples*/
+    std::map<VxdID, TH2D*> m_h_matched3_clusterV; /**< matched V-hits histogram map to sensorID for 3 samples*/
+    std::map<VxdID, TH2D*> m_h_matched6_clusterU; /**< matched U-hits histogram map to sensorID for 6 samples*/
+    std::map<VxdID, TH2D*> m_h_matched6_clusterV; /**< matched V-hits histogram map to sensorID for 6 samples*/
 
 
     SVDSummaryPlots* m_TrackHits = nullptr; /**< track hits summary plot*/
-    SVDSummaryPlots* m_TrackHits3 = nullptr; /**< track hits summary plot*/
-    SVDSummaryPlots* m_TrackHits6 = nullptr; /**< track hits summary plot*/
+    SVDSummaryPlots* m_TrackHits3 = nullptr; /**< track hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_TrackHits6 = nullptr; /**< track hits summary plot for 6 samples*/
     SVDSummaryPlots* m_MatchedHits = nullptr; /**< matched hits summary plot*/
-    SVDSummaryPlots* m_MatchedHits3 = nullptr; /**< matched hits summary plot*/
-    SVDSummaryPlots* m_MatchedHits6 = nullptr; /**< matched hits summary plot*/
+    SVDSummaryPlots* m_MatchedHits3 = nullptr; /**< matched hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_MatchedHits6 = nullptr; /**< matched hits summary plot for 6 samples*/
 
   };
 }

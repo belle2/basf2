@@ -131,22 +131,24 @@ namespace Belle2 {
     /** v Time of clusters related to tracks for layer 4,5,6 sensors */
     TH1F* m_clsTrkTimeV456 = nullptr;
 
-    /** u Time of clusters related to tracks for layer 4,5,6 sensors */
+    /** u Time of clusters related to tracks for layer 4,5,6 sensors  for 3 samples*/
     TH1F* m_cls3TrkTimeU456 = nullptr;
-    /** v Time of clusters related to tracks for layer 4,5,6 sensors */
+    /** v Time of clusters related to tracks for layer 4,5,6 sensors  for 3 samples*/
     TH1F* m_cls3TrkTimeV456 = nullptr;
 
-    /** u Time of clusters related to tracks for layer 4,5,6 sensors */
+    /** u Time of clusters related to tracks for layer 4,5,6 sensors  for 6 samples*/
     TH1F* m_cls6TrkTimeU456 = nullptr;
-    /** v Time of clusters related to tracks for layer 4,5,6 sensors */
+    /** v Time of clusters related to tracks for layer 4,5,6 sensors  for 6 samples*/
     TH1F* m_cls6TrkTimeV456 = nullptr;
 
-    /** SVD T0 */
+    /** SVD T0  */
     TH1F* m_SVDT0 = nullptr;
+    /** SVD T0  for 3 sampels */
     TH1F* m_SVD3T0 = nullptr;
+    /** SVD T0  for 6 samples*/
     TH1F* m_SVD6T0 = nullptr;
 
-    /** Correlation plot*/
+    /** Correlation plot btw T0 and cluster on tracks for 6 samples*/
     TH2F* m_SVD6T0cls6TrkTime = nullptr;
 
   };

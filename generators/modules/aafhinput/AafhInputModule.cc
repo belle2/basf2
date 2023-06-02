@@ -24,7 +24,7 @@ REG_MODULE(AafhInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearALL)//  BeamParameters::c_smearVertex)
+AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearALL)
 {
   // Set module properties
   setDescription("AAFH Generator to generate non-radiative two-photon events like e+e- -> e+e-e+e-");

@@ -15,6 +15,18 @@
 
 namespace Belle2 {
 
+  /** Main function scaleParticleEnergies in this header
+   * scales momenta in CMS of all particles in the final state by
+   * a constant factor such that the overall collision energy is slightly changed.
+   * It is used for MC generators which do not provide option to generate events
+   * with smeared energy of initial particles. There is an assumption that matrix element
+   * of the process does not change much when Ecms is varied by 5MeV/10580MeV = 0.05%
+   * (typical Ecms smearing at Belle II).
+   * This is typically the case if the cross section does not have the resonance peak around
+   * collision energy.
+   */
+
+  /** Get total energy of all particles in the provided vector */
   inline double getTotalEnergy(const std::vector<ROOT::Math::PxPyPzMVector>& ps)
   {
     double eTot = 0;
@@ -23,6 +35,8 @@ namespace Belle2 {
     return eTot;
   }
 
+  /** Find approximative value of the momentum scaling factor which makes the total energy of the particles
+      provided in the vector ps equal to EcmsTarget */
   inline double getScaleFactor(const std::vector<ROOT::Math::PxPyPzMVector>& ps, double EcmsTarget)
   {
     double s = 0;
@@ -35,7 +49,8 @@ namespace Belle2 {
     return sqrt(1 - L);
   }
 
-
+  /* Scale momenta of the particles in the vector ps with a factor C.
+     Result is returned as returned as a vector with the scaled momenta */
   inline std::vector<ROOT::Math::PxPyPzMVector> scaleMomenta(const std::vector<ROOT::Math::PxPyPzMVector>& ps, double C)
   {
     std::vector<ROOT::Math::PxPyPzMVector> psS(ps.size());
@@ -45,7 +60,10 @@ namespace Belle2 {
     return psS;
   }
 
-
+  /* Scale momenta of the particles by a constant factor such that total energy is changed
+     to EcmsTarget. It also changes momenta of the incoming particles such that energy is
+     conserved. Should be called in CM reference frame.
+   */
   inline void scaleParticleEnergies(MCParticleGraph& mpg, double EcmsTarget)
   {
     // scale energy of incoming particles

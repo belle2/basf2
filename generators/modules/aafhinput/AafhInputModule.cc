@@ -12,7 +12,6 @@
 
 #include <Math/Vector3D.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -95,8 +94,6 @@ void AafhInputModule::initialize()
   m_initial.initialize();
 }
 
-
-
 void AafhInputModule::event()
 {
 
@@ -112,8 +109,7 @@ void AafhInputModule::event()
   // Initial particle from beam parameters (for random vertex)
   const MCInitialParticles& initial = m_initial.generate();
 
-
-  // True boost.
+  // get Lorentz transformation from CMS to LAB
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex.
@@ -121,15 +117,13 @@ void AafhInputModule::event()
 
   MCParticleGraph mpg;
 
-  // Generate event.
+  // generate event
   m_generator.generateEvent(mpg);
 
-
-  // Scale CMS energy of generated particles to initial.getMass()
+  // scale CMS energy of generated particles to initial.getMass()
   scaleParticleEnergies(mpg, initial.getMass());
 
-
-  //Boost to lab and set vertex.
+  // transform to lab and set vertex.
   for (size_t i = 0; i < mpg.size(); ++i) {
     mpg[i].set4Vector(boost * mpg[i].get4Vector());
 

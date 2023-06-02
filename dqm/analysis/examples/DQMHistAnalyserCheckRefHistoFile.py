@@ -24,8 +24,8 @@ main = b2.create_path()
 # Modules
 input = b2.register_module('DQMHistAnalysisInput')
 input.param('HistMemoryPath', argv[1])
-input.param('AutoCanvas', False)
 main.add_module(input)
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 checker = b2.register_module('DQMHistComparitor')
 checker.param('HistoList', [

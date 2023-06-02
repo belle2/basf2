@@ -112,7 +112,7 @@ namespace Belle2 {
 
     /** Assign the 2 space point
     @param inner FullSecID of the inner SpacePoint
-    @param filter to this static sector which is friend of the sector whose FullSecID is @param inner.
+    @param filter to this static sector which is friend of the sector whose FullSecID is the parameter inner.
     */
     void assign2spFilter(FullSecID inner, const Filter2sp  filter)
     {

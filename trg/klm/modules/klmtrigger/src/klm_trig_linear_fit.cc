@@ -93,9 +93,9 @@ namespace Belle2 {
                           );
 
     sort(hits_w_geo_fit);
-    auto linear_fited = group<event_nr, Subdetector, section, sector, plane>::apply1(hits_w_geo_fit,
+    auto linear_fited = group<event_nr, Subdetector, section, sector, plane>::apply(hits_w_geo_fit,
                         Linear_fit_of_Hits
-                                                                                    );
+                                                                                   );
     sort(linear_fited);
     return linear_fited;
 

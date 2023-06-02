@@ -153,13 +153,13 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
 
 
 
-  auto grouped = group<Subdetector, section, isectors_t, sector>::apply1(hits,
+  auto grouped = group<Subdetector, section, isectors_t, sector>::apply(hits,
   [](const auto & e1)  {
     const auto  bit_mask     = layer_mask(to_bit_mask<to_plane_layer>(e1));
     const auto  layer_count_ = layer_count(countBits(bit_mask));
     return std::tuple(layer_count_,   bit_mask);
   }
-                                                                        );
+                                                                       );
 
 
   sort(grouped);

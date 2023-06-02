@@ -167,7 +167,9 @@ namespace Belle2 {
     template <typename T, typename... Us>
     struct has_type<T, std::tuple<Us...>> : std::disjunction<std::is_same<T, Us>...> {};
 
+    template <typename> struct is_tuple: std::false_type {};
 
+    template <typename ...T> struct is_tuple<std::tuple<T...>>: std::true_type {};
 
 
     template <class _Ty>
@@ -262,7 +264,7 @@ namespace Belle2 {
 
 
       template <typename VEC_T, typename... FUNC_T>
-      static auto apply(const std::vector<VEC_T>& vec, FUNC_T&& ... fun)
+      static auto __apply__list__(const std::vector<VEC_T>& vec, FUNC_T&& ... fun)
       {
 
         auto is_sorted_ = std::is_sorted(std::begin(vec), std::end(vec), [](const auto & lhs, const auto & rhs) {
@@ -294,7 +296,7 @@ namespace Belle2 {
       }
 
       template <typename VEC_T, typename FUNC_T>
-      static auto apply1(const std::vector<VEC_T>& vec, FUNC_T&& fun)
+      static auto __apply__tuple__(const std::vector<VEC_T>& vec, FUNC_T&& fun)
       {
 
         auto is_sorted_ = std::is_sorted(std::begin(vec), std::end(vec), [](const auto & lhs, const auto & rhs) {
@@ -333,6 +335,29 @@ namespace Belle2 {
         }
         ret.push_back(tuple_cat(std::make_tuple(std::get<T>(*tail)...), fun(__range__(tail, std::end(vec)))));
         return ret;
+      }
+
+      template <typename VEC_T, typename FUNC_T>
+      static auto __apply__one_argument__(const std::vector<VEC_T>& vec, FUNC_T&& fun)
+      {
+        if constexpr(is_tuple< decltype(fun(__range__(std::begin(vec), std::end(vec))))>::value) {
+          return __apply__tuple__(vec, std::forward<FUNC_T>(fun));
+        } else {
+          return __apply__list__(vec, std::forward<FUNC_T>(fun));
+        }
+
+      }
+
+      template <typename VEC_T, typename... FUNC_T>
+      static auto apply(const std::vector<VEC_T>& vec, FUNC_T&& ... fun)
+      {
+        if constexpr(sizeof...(FUNC_T) > 1) {
+          return __apply__list__(vec, std::forward<FUNC_T>(fun)...);
+        } else {
+
+          return __apply__one_argument__(vec, std::forward<FUNC_T>(fun)...);
+        }
+
       }
     };
 

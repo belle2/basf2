@@ -49,8 +49,8 @@ namespace Belle2 {
     return sqrt(1 - L);
   }
 
-  /* Scale momenta of the particles in the vector ps with a factor C.
-     Result is returned as returned as a vector with the scaled momenta */
+  /** Scale momenta of the particles in the vector ps with a factor C.
+      Result is returned as returned as a vector with the scaled momenta */
   inline std::vector<ROOT::Math::PxPyPzMVector> scaleMomenta(const std::vector<ROOT::Math::PxPyPzMVector>& ps, double C)
   {
     std::vector<ROOT::Math::PxPyPzMVector> psS(ps.size());
@@ -60,9 +60,9 @@ namespace Belle2 {
     return psS;
   }
 
-  /* Scale momenta of the particles by a constant factor such that total energy is changed
-     to EcmsTarget. It also changes momenta of the incoming particles such that energy is
-     conserved. Should be called in CM reference frame.
+  /** Scale momenta of the particles by a constant factor such that total energy is changed
+      to EcmsTarget. It also changes momenta of the incoming particles such that energy is
+      conserved. Should be called in CM reference frame.
    */
   inline void scaleParticleEnergies(MCParticleGraph& mpg, double EcmsTarget)
   {

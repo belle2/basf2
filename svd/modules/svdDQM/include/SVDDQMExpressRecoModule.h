@@ -172,6 +172,26 @@ namespace Belle2 {
     TH1F** m_onlineZSstripCountU = nullptr;
     /** v strip count (online Zero Suppression */
     TH1F** m_onlineZSstripCountV = nullptr;
+
+    /** u strip count for 3 samples */
+    TH1F** m_strip3CountU = nullptr;
+    /** v strip count  for 3 samples*/
+    TH1F** m_strip3CountV = nullptr;
+    /** u strip count (online Zero Suppression)  for 3 samples*/
+    TH1F** m_onlineZSstrip3CountU = nullptr;
+    /** v strip count (online Zero Suppression  for 3 samples*/
+    TH1F** m_onlineZSstrip3CountV = nullptr;
+
+
+    /** u strip count for 6 samples */
+    TH1F** m_strip6CountU = nullptr;
+    /** v strip count  for 3 samples*/
+    TH1F** m_strip6CountV = nullptr;
+    /** u strip count (online Zero Suppression)  for 6 samples*/
+    TH1F** m_onlineZSstrip6CountU = nullptr;
+    /** v strip count (online Zero Suppression  for 6 samples*/
+    TH1F** m_onlineZSstrip6CountV = nullptr;
+
     /** u size */
     TH1F** m_clusterSizeU = nullptr;
     /** v size */

@@ -160,8 +160,18 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_stripSignalV = new TH1F*[nSVDSensors];
   m_stripCountU = new TH1F*[nSVDSensors];
   m_stripCountV = new TH1F*[nSVDSensors];
+  m_strip3CountU = new TH1F*[nSVDSensors];
+  m_strip3CountV = new TH1F*[nSVDSensors];
+  m_strip6CountU = new TH1F*[nSVDSensors];
+  m_strip6CountV = new TH1F*[nSVDSensors];
+
   m_onlineZSstripCountU = new TH1F*[nSVDSensors];
   m_onlineZSstripCountV = new TH1F*[nSVDSensors];
+  m_onlineZSstrip3CountU = new TH1F*[nSVDSensors];
+  m_onlineZSstrip3CountV = new TH1F*[nSVDSensors];
+  m_onlineZSstrip6CountU = new TH1F*[nSVDSensors];
+  m_onlineZSstrip6CountV = new TH1F*[nSVDSensors];
+
   m_clusterSizeU = new TH1F*[nSVDSensors];
   m_clusterSizeV = new TH1F*[nSVDSensors];
   m_clusterTimeU = new TH1F*[nSVDSensors];
@@ -529,6 +539,70 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_onlineZSstripCountV[i]->GetXaxis()->SetTitle("cellID");
     m_onlineZSstripCountV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_onlineZSstripCountV[i]);
+
+    //----------------------------------------------------------------
+    // Strips Counts for 3 samples
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_Strip3CountU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired U-Strip vs Strip Number for 3 samples") % sensorDescr);
+    m_strip3CountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_strip3CountU[i]->GetXaxis()->SetTitle("cellID");
+    m_strip3CountU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_strip3CountU[i]);
+    name = str(format("SVDDQM_%1%_Strip3CountV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired V-Strip vs Strip Number for 3 samples") % sensorDescr);
+    m_strip3CountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_strip3CountV[i]->GetXaxis()->SetTitle("cellID");
+    m_strip3CountV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_strip3CountV[i]);
+    //----------------------------------------------------------------
+    // Strips Counts with online ZS for 3 samples
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_OnlineZSStrip3CountU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired U-Strip vs Strip Number for 3 samples") % sensorDescr);
+    m_onlineZSstrip3CountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_onlineZSstrip3CountU[i]->GetXaxis()->SetTitle("cellID");
+    m_onlineZSstrip3CountU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_onlineZSstrip3CountU[i]);
+    name = str(format("SVDDQM_%1%_OnlineZSStrip3CountV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired V-Strip vs Strip Number for 3 samples") % sensorDescr);
+    m_onlineZSstrip3CountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_onlineZSstrip3CountV[i]->GetXaxis()->SetTitle("cellID");
+    m_onlineZSstrip3CountV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_onlineZSstrip3CountV[i]);
+
+
+    //----------------------------------------------------------------
+    // Strips Counts for 6 samples
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_Strip6CountU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired U-Strip vs Strip Number for 6 samples") % sensorDescr);
+    m_strip6CountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_strip6CountU[i]->GetXaxis()->SetTitle("cellID");
+    m_strip6CountU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_strip6CountU[i]);
+    name = str(format("SVDDQM_%1%_Strip6CountV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired V-Strip vs Strip Number for 6 samples") % sensorDescr);
+    m_strip6CountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_strip6CountV[i]->GetXaxis()->SetTitle("cellID");
+    m_strip6CountV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_strip6CountV[i]);
+    //----------------------------------------------------------------
+    // Strips Counts with online ZS for 6 samples
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_OnlineZSStrip6CountU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired U-Strip vs Strip Number for 6 samples") % sensorDescr);
+    m_onlineZSstrip6CountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_onlineZSstrip6CountU[i]->GetXaxis()->SetTitle("cellID");
+    m_onlineZSstrip6CountU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_onlineZSstrip6CountU[i]);
+    name = str(format("SVDDQM_%1%_OnlineZSStrip6CountV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired V-Strip vs Strip Number for 6 samples") % sensorDescr);
+    m_onlineZSstrip6CountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_onlineZSstrip6CountV[i]->GetXaxis()->SetTitle("cellID");
+    m_onlineZSstrip6CountV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_onlineZSstrip6CountV[i]);
+
     //----------------------------------------------------------------
     // Cluster size distribution
     //----------------------------------------------------------------
@@ -734,10 +808,14 @@ void SVDDQMExpressRecoModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (digitIn.isUStrip()) {
 
-      //      B2DEBUG(29, digitIn.toString().c_str() );
-
       //fill strip count first
       if (m_stripCountU[index] != nullptr) m_stripCountU[index]->Fill(digitIn.getCellID());
+
+      if (nSamples == 3) {
+        if (m_strip3CountU[index] != nullptr) m_strip3CountU[index]->Fill(digitIn.getCellID());
+      } else {
+        if (m_strip6CountU[index] != nullptr) m_strip6CountU[index]->Fill(digitIn.getCellID());
+      }
 
       //fill max bin
       if (m_stripMaxBinUAll != nullptr) m_stripMaxBinUAll->Fill(digitIn.getMaxTimeBin());
@@ -768,6 +846,12 @@ void SVDDQMExpressRecoModule::event()
     } else {
       //fill strip count first
       if (m_stripCountV[index] != nullptr) m_stripCountV[index]->Fill(digitIn.getCellID());
+
+      if (nSamples == 3) {
+        if (m_strip3CountV[index] != nullptr) m_strip3CountV[index]->Fill(digitIn.getCellID());
+      } else {
+        if (m_strip6CountV[index] != nullptr) m_strip6CountV[index]->Fill(digitIn.getCellID());
+      }
 
       //fill max bin
       if (m_stripMaxBinVAll != nullptr) m_stripMaxBinVAll->Fill(digitIn.getMaxTimeBin());
@@ -817,8 +901,18 @@ void SVDDQMExpressRecoModule::event()
       SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
       if (digitIn.isUStrip()) {
         if (m_onlineZSstripCountU[index] != nullptr) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
+        if (nSamples == 3) {
+          if (m_onlineZSstrip3CountU[index] != nullptr) m_onlineZSstrip3CountU[index]->Fill(digitIn.getCellID());
+        } else {
+          if (m_onlineZSstrip6CountU[index] != nullptr) m_onlineZSstrip6CountU[index]->Fill(digitIn.getCellID());
+        }
       } else {
         if (m_onlineZSstripCountV[index] != nullptr) m_onlineZSstripCountV[index]->Fill(digitIn.getCellID());
+        if (nSamples == 3) {
+          if (m_onlineZSstrip3CountV[index] != nullptr) m_onlineZSstrip3CountV[index]->Fill(digitIn.getCellID());
+        } else {
+          if (m_onlineZSstrip6CountV[index] != nullptr) m_onlineZSstrip6CountV[index]->Fill(digitIn.getCellID());
+        }
       }
     }
 

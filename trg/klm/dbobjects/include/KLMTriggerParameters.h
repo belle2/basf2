@@ -40,7 +40,7 @@ namespace Belle2 {
      * @param[in] nLayers      Number of layers used in the trigger logic.
      * @param[in] whichLayers  Pattern of layers used in the trigger logic.
      */
-    KLMTriggerParameters(unsigned int nLayers, const std::string& whichLayers) :
+    KLMTriggerParameters(int32_t nLayers, const std::string& whichLayers) :
       m_nLayers{nLayers},
       m_whichLayers{whichLayers}
     {
@@ -57,11 +57,11 @@ namespace Belle2 {
      * Set the number of layers used in the trigger logic.
      * @param[in] nLayers Max number of CDC hits for an event.
      */
-    void setNLayers(unsigned int nLayers)
+    void setNLayers(int32_t nLayers)
     {
       // Reject values that exceed the number of layers in backward EKLM,
       // since it is the part with the smallest number of layers.
-      unsigned int threshold{static_cast<unsigned int>(EKLMElementNumbers::Instance().getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection))};
+      int32_t threshold{static_cast<int32_t>(EKLMElementNumbers::Instance().getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection))};
       if (nLayers > threshold)
         B2FATAL("The value passed to 'setNLayers' exceed the maximum allowed number of layers."
                 << LogVar("nLayers", nLayers)
@@ -84,7 +84,7 @@ namespace Belle2 {
     /**
      * Get the number of layers used in the trigger logic.
      */
-    unsigned int getNLayers() const
+    int32_t getNLayers() const
     {
       return m_nLayers;
     }
@@ -97,43 +97,43 @@ namespace Belle2 {
       return m_whichLayers;
     }
 
-    int getSubdetector(int i) const
+    int32_t getSubdetector(int32_t i) const
     {
       return m_Subdetector[i];
     }
 
-    int getSection(int i) const
+    int32_t getSection(int32_t i) const
     {
       return m_section[i];
     }
-    int getSector(int i) const
+    int32_t getSector(int32_t i) const
     {
       return m_sector[i];
     }
-    int getLayer(int i) const
+    int32_t getLayer(int32_t i) const
     {
       return m_layer[i];
     }
 
-    int getPlane(int i) const
+    int32_t getPlane(int32_t i) const
     {
       return m_plane[i];
     }
 
-    double getSlopeX(int i) const
+    double getSlopeX(int32_t i) const
     {
       return m_slopeX[i];
     }
-    double getOffsetX(int i) const
+    double getOffsetX(int32_t i) const
     {
       return m_offsetX[i];
     }
 
-    double getSlopeY(int i) const
+    double getSlopeY(int32_t i) const
     {
       return m_slopeY[i];
     }
-    double getOffsetY(int i) const
+    double getOffsetY(int32_t i) const
     {
       return m_offsetY[i];
     }
@@ -144,7 +144,8 @@ namespace Belle2 {
       return m_Subdetector.size();
     }
 
-    void pushGeometryData(int Subdetector, int section, int sector, int layer, int plane, double  slopeX, double offsetX,
+    void pushGeometryData(int32_t Subdetector, int32_t section, int32_t sector, int32_t layer, int32_t plane, double  slopeX,
+                          double offsetX,
                           double  slopeY, double offsetY)
     {
 
@@ -165,7 +166,7 @@ namespace Belle2 {
     /**
      * Number of layers used in the trigger logic.
      */
-    unsigned int32_t m_nLayers{0};
+    int32_t m_nLayers{0};
 
     std::vector<int32_t> m_Subdetector;
     std::vector<int32_t> m_section;

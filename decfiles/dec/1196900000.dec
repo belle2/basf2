@@ -7,20 +7,11 @@
 # Responsible: Priyanka Cheema
 # Email: pche3675@uni.sydney.edu.au
 # Cuts: None
-# Date: 20201207
+# Date: 20230602
 #
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
-
-Alias Bsig B0
-Alias Btag B0
-Alias anti-Bsig anti-B0
-Alias anti-Btag anti-B0
-
-ChargeConj Bsig anti-Bsig
-ChargeConj Btag anti-Btag
-
 
 
 #############################
@@ -31,7 +22,7 @@ ChargeConj Btag anti-Btag
 
 
 Decay Upsilon(4S)
-1.00         Bsig  anti-Bsig  Btag  anti-Btag         VSS_BMIX dm;
+1.00         B0sig  anti-B0sig  B0  anti-B0         VSS_BMIX dm;
 Enddecay
 
 
@@ -43,10 +34,10 @@ Enddecay
 #######################
 
 
-Decay Bsig
-1.00          mu+  tau-                               PHOTOS PHSP;
+Decay B0sig
+1.00         mu+  tau-                               PHOTOS PHSP;
 Enddecay
-CDecay anti-Bsig
+CDecay anti-B0sig
 
 
 End

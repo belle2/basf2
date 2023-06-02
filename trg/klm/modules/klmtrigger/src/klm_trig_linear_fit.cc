@@ -14,8 +14,8 @@
 
 
 
-AXIS_NAME(pos_x_t, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(pos_y_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(x_pos, int);
+AXIS_NAME(y_pos, int);
 
 using namespace Belle2::group_helper::KLM_Coordinates_n;
 using namespace Belle2::group_helper::KLM_Generic;
@@ -30,13 +30,13 @@ namespace Belle2 {
     {
       int sumX = 0, sumY = 0, sumXX = 0, sumXY = 0, sumYY = 0;
       for (const auto& e : container) {
-        sumX += pos_x_t(e);
-        sumXX += pos_x_t(e) * pos_x_t(e);
+        sumX += x_pos(e);
+        sumXX += x_pos(e) * x_pos(e);
 
-        sumY += pos_y_t(e);
-        sumYY += pos_y_t(e) * pos_y_t(e);
+        sumY += y_pos(e);
+        sumYY += y_pos(e) * y_pos(e);
 
-        sumXY += pos_x_t(e) * pos_y_t(e);
+        sumXY += x_pos(e) * y_pos(e);
       }
       auto nHits = Nhits_t(container.size());
       int denom = sumXX * nHits - sumX * sumX;
@@ -85,8 +85,8 @@ namespace Belle2 {
                 plane(e1),
                 layer(e1),
                 strip(e1),
-                pos_x_t(layer(e1) *  geofit::slopeX(e2) + geofit::offsetX(e2)),
-                pos_y_t(strip(e1) * geofit::slopeY(e2) + geofit::offsetY(e2))
+                x_pos(layer(e1) *  geofit::slopeX(e2) + geofit::offsetX(e2)),
+                y_pos(strip(e1) * geofit::slopeY(e2) + geofit::offsetY(e2))
               );
     }
 

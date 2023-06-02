@@ -165,13 +165,13 @@ namespace Belle2 {
     /**
      * Number of layers used in the trigger logic.
      */
-    unsigned int m_nLayers{0};
+    unsigned int32_t m_nLayers{0};
 
-    std::vector<int> m_Subdetector;
-    std::vector<int> m_section;
-    std::vector<int> m_sector;
-    std::vector<int> m_layer;
-    std::vector<int> m_plane;
+    std::vector<int32_t> m_Subdetector;
+    std::vector<int32_t> m_section;
+    std::vector<int32_t> m_sector;
+    std::vector<int32_t> m_layer;
+    std::vector<int32_t> m_plane;
     std::vector<double> m_slopeX;
     std::vector<double> m_offsetX;
     std::vector<double> m_slopeY;

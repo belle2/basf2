@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #include <generators/modules/aafhinput/AafhInputModule.h>
+#include <generators/utilities/scaleParticleEnergies.h>
 #include <framework/logging/Logger.h>
 
 #include <Math/Vector3D.h>
 
+using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -22,7 +24,7 @@ REG_MODULE(AafhInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearALL)//  BeamParameters::c_smearVertex)
 {
   // Set module properties
   setDescription("AAFH Generator to generate non-radiative two-photon events like e+e- -> e+e-e+e-");
@@ -93,6 +95,8 @@ void AafhInputModule::initialize()
   m_initial.initialize();
 }
 
+
+
 void AafhInputModule::event()
 {
 
@@ -108,6 +112,7 @@ void AafhInputModule::event()
   // Initial particle from beam parameters (for random vertex)
   const MCInitialParticles& initial = m_initial.generate();
 
+
   // True boost.
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
@@ -116,8 +121,13 @@ void AafhInputModule::event()
 
   MCParticleGraph mpg;
 
-  //Generate event.
+  // Generate event.
   m_generator.generateEvent(mpg);
+
+
+  // Scale CMS energy of generated particles to initial.getMass()
+  scaleParticleEnergies(mpg, initial.getMass());
+
 
   //Boost to lab and set vertex.
   for (size_t i = 0; i < mpg.size(); ++i) {

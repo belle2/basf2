@@ -284,18 +284,88 @@ namespace Belle2 {
      */
     void ExtractEvent(std::vector <TH1*>& hs);
 
+    /// EPICS related Functions
+
+    /**
+     * Register a PV with its name and a key name
+     * @param pvname full PV name
+     * @param keyname key name for easier access
+     * @return an index which can be used to access the PV instead of key name, -1 if failure
+     */
     int registerEpicsPV(std::string pvname, std::string keyname = "");
 
-    void setEpicsPV(std::string keyname, double value, float wait = -1.);
-    void setEpicsPV(std::string keyname, int value, float wait = -1.);
-    void setEpicsPV(int index, double value, float wait = -1.);
-    void setEpicsPV(int index, int value, float wait = -1.);
+    /**
+     * Write value to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value value to write
+     */
+    void setEpicsPV(std::string keyname, double value);
 
-    void updateEpicsPVs(float wait);
+    /**
+     * Write value to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value value to write
+     */
+    void setEpicsPV(std::string keyname, int value);
 
+    /**
+     * Write value to a EPICS PV
+     * @param index index of PV
+     * @param value value to write
+     */
+    void setEpicsPV(int index, double value);
+
+    /**
+     * Write value to a EPICS PV
+     * @param index index of PV
+     * @param value value to write
+     */
+    void setEpicsPV(int index, int value);
+
+    /**
+     * Update all EPICS PV (flush to network)
+     * @param timeout maximum time until timeout in s
+     * */
+    void updateEpicsPVs(float timout);
+
+    /**
+     * Get EPICS PV Channel Id
+     * @param keyname key name (or full PV name) of PV
+     * @param id Channel ID is written on success, otherwise invalid
+     * @return success (Channel found)
+     */
+    bool getEpicsPVChID(std::string keyname, chid& id);
+
+    /**
+     * Get EPICS PV Channel Id
+     * @param index index of PV
+     * @param id Channel ID is written on success, otherwise invalid
+     * @return success (Channel found)
+     */
+    bool getEpicsPVChID(int index, chid& id);
+
+    /**
+     * Setter for EPICS usage
+     * @param flag set in use
+     */
     void setUseEpics(bool flag) {m_useEpics = flag;};
+
+    /**
+     * Setter EPICS flag in read only mode
+     * @param flag set read only
+     */
     void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
+
+    /**
+     * Getter for EPICS usage
+     * @return flag is in use
+     */
     bool getUseEpics(void) {return m_useEpics;};
+
+    /**
+     * Getter EPICS flag in read only mode
+     * @return flag if read only
+     */
     bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     // Public functions

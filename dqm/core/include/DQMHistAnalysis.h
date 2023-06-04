@@ -331,18 +331,16 @@ namespace Belle2 {
     /**
      * Get EPICS PV Channel Id
      * @param keyname key name (or full PV name) of PV
-     * @param id Channel ID is written on success, otherwise invalid
-     * @return success (Channel found)
+     * @return Channel ID is written on success, otherwise nullptr
      */
-    bool getEpicsPVChID(std::string keyname, chid& id);
+    chid getEpicsPVChID(std::string keyname);
 
     /**
      * Get EPICS PV Channel Id
      * @param index index of PV
-     * @param id Channel ID is written on success, otherwise invalid
-     * @return success (Channel found)
+     * @return Channel ID is written on success, otherwise nullptr
      */
-    bool getEpicsPVChID(int index, chid& id);
+    chid getEpicsPVChID(int index);
 
     /**
      * Setter for EPICS usage
@@ -367,6 +365,11 @@ namespace Belle2 {
      * @return flag if read only
      */
     bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
+
+    /**
+     * Unsubsribe from EPICS PVs on terminate
+     */
+    void cleanupEpicsPVs(void);
 
     // Public functions
   public:

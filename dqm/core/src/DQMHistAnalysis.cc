@@ -360,34 +360,32 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
 #endif
 }
 
-bool DQMHistAnalysisModule::getEpicsPVChID(std::string keyname, chid& id)
+chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
 {
-  if (!m_useEpics) return false;
 #ifdef _BELLE2_EPICS
-  if (m_epicsNameToChID[keyname] == nullptr) {
-    B2ERROR("Epics PV " << keyname << " not registered!");
-    return false;
+  if (m_useEpics) {
+    if (m_epicsNameToChID[keyname] != nullptr) {
+      return *m_epicsNameToChID[keyname];
+    } else {
+      B2ERROR("Epics PV " << keyname << " not registered!");
+    }
   }
-  id = *m_epicsNameToChID[keyname];
-  return true;
-#else
-  return false;
 #endif
+  return nullptr;
 }
 
-bool DQMHistAnalysisModule::getEpicsPVChID(int index, chid& id)
+chid DQMHistAnalysisModule::getEpicsPVChID(int index)
 {
-  if (!m_useEpics) return false;
 #ifdef _BELLE2_EPICS
-  if (index < 0 || index >= (int)m_epicsChID.size()) {
-    B2ERROR("Epics PV with " << index << " not registered!");
-    return false;
+  if (m_useEpics) {
+    if (index >= 0 && index < (int)m_epicsChID.size()) {
+      return m_epicsChID[index];
+    } else {
+      B2ERROR("Epics PV with " << index << " not registered!");
+    }
   }
-  id = m_epicsChID[index];
-  return true;
-#else
-  return false;
 #endif
+  return nullptr;
 }
 
 void DQMHistAnalysisModule::updateEpicsPVs(float wait)
@@ -395,5 +393,16 @@ void DQMHistAnalysisModule::updateEpicsPVs(float wait)
   if (!m_useEpics) return;
 #ifdef _BELLE2_EPICS
   if (wait > 0.) SEVCHK(ca_pend_io(wait), "ca_pend_io failure");
+#endif
+}
+
+void DQMHistAnalysisModule::cleanupEpicsPVs(void)
+{
+  // this should be called in terminate function of analysis modules
+#ifdef _BELLE2_EPICS
+  if (getUseEpics()) {
+    for (auto& it : m_epicsChID) SEVCHK(ca_clear_channel(it), "ca_clear_channel failure");
+    updateEpicsPVs(5.0);
+  }
 #endif
 }

@@ -20,6 +20,7 @@ namespace Belle2 {
    * - ECLShowers rejected before storing to mdst;
    * - ECLShowers;
    * - ECLLocalMaximums;
+   * - ECL trigger cells;
    * - multi-strip KLMDigits.
    */
   class EventLevelClusteringInfo : public TObject {
@@ -238,6 +239,48 @@ namespace Belle2 {
       m_nECLLocalMaximumsBWD = nECLLocalMaximumsBWD;
     }
 
+    /** ECL: getter for the number of trigger cells (above 100 MeV), forward endcap */
+    uint16_t getNECLTriggerCellsFWD() const
+    {
+      return m_nECLTriggerCellsFWD;
+    }
+
+    /** ECL: getter for the number of trigger cells (above 100 MeV), barrel */
+    uint16_t getNECLTriggerCellsBarrel() const
+    {
+      return m_nECLTriggerCellsBarrel;
+    }
+
+    /** ECL: getter for the number of trigger cells (above 100 MeV), backward endcap */
+    uint16_t getNECLTriggerCellsBWD() const
+    {
+      return m_nECLTriggerCellsBWD;
+    }
+
+    /** ECL: getter for the number of trigger cells (above 100 MeV), full ECL */
+    uint16_t getNECLTriggerCells() const
+    {
+      return m_nECLTriggerCellsFWD + m_nECLTriggerCellsBarrel + m_nECLTriggerCellsBWD;
+    }
+
+    /** ECL: setter for the number of trigger cells, forward endcap */
+    void setNECLTriggerCellsFWD(uint16_t const nECLTriggerCellsFWD)
+    {
+      m_nECLTriggerCellsFWD = nECLTriggerCellsFWD;
+    }
+
+    /** ECL: setter for the number of trigger cells, barrel */
+    void setNECLTriggerCellsBarrel(uint16_t const nECLTriggerCellsBarrel)
+    {
+      m_nECLTriggerCellsBarrel = nECLTriggerCellsBarrel;
+    }
+
+    /** ECL: setter for the number of trigger cells, backward endcap */
+    void setNECLTriggerCellsBWD(uint16_t const nECLTriggerCellsBWD)
+    {
+      m_nECLTriggerCellsBWD = nECLTriggerCellsBWD;
+    }
+
   private:
 
     /** ECL: number of out of time, energetic ECLCalDigits, forward endcap. */
@@ -276,6 +319,15 @@ namespace Belle2 {
     /** ECL: number of ECLLocalMaximums, backward endcap. */
     uint16_t m_nECLLocalMaximumsBWD {0};
 
+    /** ECL: number of ECL trigger cells, forward endcap. */
+    uint16_t m_nECLTriggerCellsFWD {0};
+
+    /** ECL: number of ECL trigger cells, barrel. */
+    uint16_t m_nECLTriggerCellsBarrel {0};
+
+    /** ECL: number of ECL trigger cells, backward endcap. */
+    uint16_t m_nECLTriggerCellsBWD {0};
+
     /** ECL: number of photon ECLShowers that are rejected before storing to mdst (max. 255), endcap forward. */
     uint8_t m_nECLShowersRejectedFWD {0};
 
@@ -286,8 +338,9 @@ namespace Belle2 {
     uint8_t m_nECLShowersRejectedBWD {0};
 
     /** Class definition */
-    ClassDef(EventLevelClusteringInfo, 3);
+    ClassDef(EventLevelClusteringInfo, 4);
     // 2: add multi-strip KLMDigits
     // 3: add ECLShowers and ECLLocalMaximums
+    // 4: add ECL trigger cells
   };
 }

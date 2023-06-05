@@ -9,7 +9,6 @@ env['LIBS'] = [
     'ca', 'Com'
 ]
 
-print("HERERERERERERE")
 # this check is not completely save if new options are added with clang
 if os.environ['BELLE2_OPTION'] in ['clang', 'intel']:
     env.Append(CPPPATH=['$EPICS_BASE/include/compiler/clang'])

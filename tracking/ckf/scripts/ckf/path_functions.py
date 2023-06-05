@@ -89,7 +89,7 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
 
         module_parameters = dict(
             firstHighFilter="truth",
-            secdccondHighFilter="all",
+            secondHighFilter="all",
             thirdHighFilter="all",
 
             filter="truth",

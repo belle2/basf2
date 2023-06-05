@@ -88,7 +88,16 @@ namespace Belle2 {
      */
     inline static std::string s_runType = "";
 
+    /**
+     * Flag if to use EPICS
+     * do not set by yourself, use EpicsEnable module to set.
+     */
     static bool m_useEpics;
+
+    /**
+     * Flag if to use EPICS in ReadOnly mode (for reading limits)
+     * do not set by yourself, use EpicsEnable module to set.
+     */
     static bool m_epicsReadOnly;
 
 #ifdef _BELLE2_EPICS
@@ -326,7 +335,7 @@ namespace Belle2 {
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
      * */
-    void updateEpicsPVs(float timout);
+    void updateEpicsPVs(float timeout);
 
     /**
      * Get EPICS PV Channel Id

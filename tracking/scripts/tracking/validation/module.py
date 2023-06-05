@@ -190,6 +190,8 @@ class TrackingValidationModule(basf2.Module):
         #: list of PR-track fakes
         self.pr_fakes = collections.deque()
 
+        #: list of PR-track seed pt values
+        self.pr_seed_pt = collections.deque()
         #: list of PR-track seed tan(lambda) values
         self.pr_seed_tan_lambdas = collections.deque()
         #: list of PR-track seed phi values
@@ -328,6 +330,7 @@ class TrackingValidationModule(basf2.Module):
             # Avoid zero division exception
             seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))
             seed_phi = seed_momentum.Phi()
+            seed_pt = seed_momentum.Rho()
 
             if prTrackFitResult:
                 omega_estimate = prTrackFitResult.getOmega()
@@ -345,6 +348,7 @@ class TrackingValidationModule(basf2.Module):
                 pt_estimate = momentum.Rho()
 
             # store properties of the seed
+            self.pr_seed_pt.append(seed_pt)
             self.pr_seed_tan_lambdas.append(seed_tan_lambda)
             self.pr_seed_phi.append(seed_phi)
 
@@ -752,7 +756,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         xs,
         quantity_name,
         unit=None,
-        parameter_names=['Seed tan #lambda', 'Seed #phi'],
+        parameter_names=['Seed p_t', 'Seed tan #lambda', 'Seed #phi'],
         make_hist=True,
     ):
         """Create profile histograms by PR-track parameters"""
@@ -762,7 +766,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                not in self.exclude_profile_pr_parameter]
 
         # Profile versus the various parameters
-        profile_parameters = {'Seed tan #lambda': self.pr_seed_tan_lambdas,
+        profile_parameters = {'Seed p_t': self.pr_seed_pt,
+                              'Seed tan #lambda': self.pr_seed_tan_lambdas,
                               'Seed #phi': self.pr_seed_phi}
 
         return self.profiles_by_parameters_base(

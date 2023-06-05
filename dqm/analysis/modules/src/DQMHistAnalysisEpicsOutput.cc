@@ -43,8 +43,3 @@ void DQMHistAnalysisEpicsOutputModule::event()
   updateEpicsPVs(5.0); // 5 seconds
   // be aware that any "error" arising from a PV in an analysis module, may only show up here (timeout etc)
 }
-
-void DQMHistAnalysisEpicsOutputModule::terminate()
-{
-  // Cleaning up the PVs is a task of the individual modules
-}

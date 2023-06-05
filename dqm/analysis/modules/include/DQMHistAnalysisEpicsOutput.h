@@ -27,11 +27,6 @@ namespace Belle2 {
     DQMHistAnalysisEpicsOutputModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisEpicsOutputModule();
-
-    /**
      * Initialize the Module.
      */
     void initialize() override final;
@@ -40,11 +35,6 @@ namespace Belle2 {
      * Event action.
      */
     void event() override final;
-
-    /**
-     * Termination action.
-     */
-    void terminate() override final;
 
   protected:
 

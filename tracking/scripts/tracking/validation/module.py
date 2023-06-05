@@ -243,8 +243,6 @@ class TrackingValidationModule(basf2.Module):
         self.mc_d0s = collections.deque()
         #: list of MC-track tan(lambda) values
         self.mc_tan_lambdas = collections.deque()
-        #: direction of the track in theta
-        self.mc_theta = collections.deque()
         #: direction of the track in phi
         self.mc_phi = collections.deque()
         #: list of MC-track pt values
@@ -440,7 +438,6 @@ class TrackingValidationModule(basf2.Module):
             self.mc_d0s.append(d0)
             self.mc_tan_lambdas.append(tan_lambda)
             self.mc_multiplicities.append(multiplicity)
-            self.mc_theta.append(momentum.Theta())
             self.mc_phi.append(momentum.Phi())
             self.mc_ndf.append(ndf)
             if not is_primary(mcParticle):
@@ -726,7 +723,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'tan_lambda',
             'multiplicity',
             'phi',
-            'theta',
             'ndf',
         ],
         make_hist=True,
@@ -745,7 +741,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'p_{t}': self.mc_pts,
             'tan #lambda': self.mc_tan_lambdas,
             '#phi': self.mc_phi,
-            '#theta': self.mc_theta,
             'multiplicity': self.mc_multiplicities,
             'ndf': self.mc_ndf,
         }

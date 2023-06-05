@@ -146,7 +146,6 @@ void TrackFitter::resetFitterToDefaultSettings()
                                            m_DAFparameters->getDeltaPValue(),
                                            m_DAFparameters->getDeltaWeight(),
                                            m_DAFparameters->getProbabilityCut());
-  dafFitter->setProbCut(m_DAFparameters->getProbabilityCut());
   dafFitter->setMaxFailedHits(m_DAFparameters->getMaximumFailedHits());
 
   m_fitter.reset(dafFitter);

@@ -29,7 +29,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
         result_filter_parameters = {}
     else:
         result_filter = "mva_with_relations"
-        result_filter_parameters = {"cut": 0.6}
+        result_filter_parameters = {"cut": 0.6, 'DBPayloadName': 'SeededCDCToSVDResultParameters'}
 
     if direction == "forward":
         reverse_seed = True
@@ -97,19 +97,28 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
         )
     else:
         module_parameters = dict(
-            firstHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_1",
-                                       "direction": direction},
+            firstHighFilterParameters={
+                "cut": filter_cut,
+                "identifier": "ckf_ToPXDStateFilter_1",
+                'DBPayloadName': 'ToPXDStateFilter_1Parameters',
+                "direction": direction},
             firstHighUseNStates=use_best_seeds,
-
-            secondHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_2"},
+            secondHighFilterParameters={
+                "cut": filter_cut,
+                "identifier": "ckf_ToPXDStateFilter_2",
+                'DBPayloadName': 'ToPXDStateFilter_3Parameters'},
             secondHighUseNStates=use_best_seeds,
-
-            thirdHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_3"},
+            thirdHighFilterParameters={
+                "cut": filter_cut,
+                "identifier": "ckf_ToPXDStateFilter_3",
+                'DBPayloadName': 'ToPXDStateFilter_3Parameters'},
             thirdHighUseNStates=use_best_seeds,
-
-            filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
+            filterParameters={
+                    "cut": overlap_cut,
+                    "identifier": "ckf_PXDTrackCombination",
+                    'DBPayloadName': 'PXDTrackCombinationParameters'},
             useBestNInSeed=use_best_results,
-        )
+                     )
 
     module_parameters["seedHitJumping"] = -1  # get from payload
     module_parameters["hitHitJumping"] = 0

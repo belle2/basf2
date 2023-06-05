@@ -77,7 +77,7 @@ namespace Belle2 {
         B2DEBUG(20,
                 "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " << m_cutValue << ".");
       } else {
-        B2DEBUG(20, "MVAFilter: No valid MVAFilter payload with name " + m_DBPayloadName + " was found. with weightfile " << m_identifier <<
+        B2FATAL("MVAFilter: No valid MVAFilter payload with name " + m_DBPayloadName + " was found. with weightfile " << m_identifier <<
                 ".");
       }
 

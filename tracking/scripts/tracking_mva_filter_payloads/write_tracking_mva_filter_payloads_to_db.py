@@ -177,8 +177,20 @@ if __name__ == "__main__":
     write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
                                              (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_3", 0.03)
     write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
-                                             (0,    0,    0, -1), "PXDTrackCombination", 0.2)
+                                             (0,    0,    0, -1), "ckf_PXDTrackCombination", 0.2)
     write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
-                                             (1002, 0, 1002, -1), "PXDTrackCombination", 0.2)
+                                             (1002, 0, 1002, -1), "ckf_PXDTrackCombination", 0.2)
     write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
-                                             (1003, 0, 1003, -1), "PXDTrackCombination", 0.2)
+                                             (1003, 0, 1003, -1), "ckf_PXDTrackCombination", 0.2)
+    write_tracking_mva_filter_payloads_to_db("SeededCDCToSVDResultParameters",
+                                             (0,    0,    0, -1), "ckf_SeededCDCToSVDResult", 0.6)
+    write_tracking_mva_filter_payloads_to_db("SeededCDCToSVDResultParameters",
+                                             (1002, 0, 1002, -1), "ckf_SeededCDCToSVDResult", 0.6)
+    write_tracking_mva_filter_payloads_to_db("SeededCDCToSVDResultParameters",
+                                             (1003, 0, 1003, -1), "ckf_SeededCDCToSVDResult", 0.6)
+#    write_tracking_mva_filter_payloads_to_db("**Parameters",
+#                                             (0,    0,    0, -1), "**", 0.*)
+#    write_tracking_mva_filter_payloads_to_db("**Parameters",
+#                                             (1002, 0, 1002, -1), "**", 0.*)
+#    write_tracking_mva_filter_payloads_to_db("**Parameters",
+#                                             (1003, 0, 1003, -1), "**", 0.*)

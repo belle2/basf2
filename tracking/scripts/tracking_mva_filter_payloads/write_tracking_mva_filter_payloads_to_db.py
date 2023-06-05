@@ -134,17 +134,51 @@ if __name__ == "__main__":
     write_tracking_mva_filter_payloads_to_db("RealisticSegmentRelationFilterParameters",
                                              (1003, 0, 1003, -1), "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
 
-#
-#    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
-#                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_1", 0.1)
-#    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
-#                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_1", 0.1)
-#    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
-#                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_1", 0.1)
-#    write_tracking_mva_filter_payloads_to_db("*FilterParameters",
-#                                             (0,    0,    0, -1), "*Filter", 0.*)
-#    write_tracking_mva_filter_payloads_to_db("*FilterParameters",
-#                                             (1002, 0, 1002, -1), "*Filter", 0.*)
-#    write_tracking_mva_filter_payloads_to_db("*FilterParameters",
-#                                             (1003, 0, 1003, -1), "*Filter", 0.*)
-#
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
+                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_1", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
+                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_1", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
+                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_1", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_2Parameters",
+                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_2", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_2Parameters",
+                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_2", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_2Parameters",
+                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_2", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_3Parameters",
+                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_3", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_3Parameters",
+                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_3", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_3Parameters",
+                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_3", 0.1)
+    write_tracking_mva_filter_payloads_to_db("CDCToSVDResultParameters",
+                                             (0,    0,    0, -1), "ckf_CDCToSVDResult", 0.2)
+    write_tracking_mva_filter_payloads_to_db("CDCToSVDResultParameters",
+                                             (1002, 0, 1002, -1), "ckf_CDCToSVDResult", 0.2)
+    write_tracking_mva_filter_payloads_to_db("CDCToSVDResultParameters",
+                                             (1003, 0, 1003, -1), "ckf_CDCToSVDResult", 0.2)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_1Parameters",
+                                             (0,    0,    0, -1), "ckf_ToPXDStateFilter_1", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_1Parameters",
+                                             (1002, 0, 1002, -1), "ckf_ToPXDStateFilter_1", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_1Parameters",
+                                             (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_1", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_2Parameters",
+                                             (0,    0,    0, -1), "ckf_ToPXDStateFilter_2", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_2Parameters",
+                                             (1002, 0, 1002, -1), "ckf_ToPXDStateFilter_2", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_2Parameters",
+                                             (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_2", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
+                                             (0,    0,    0, -1), "ckf_ToPXDStateFilter_3", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
+                                             (1002, 0, 1002, -1), "ckf_ToPXDStateFilter_3", 0.03)
+    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
+                                             (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_3", 0.03)
+    write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
+                                             (0,    0,    0, -1), "PXDTrackCombination", 0.2)
+    write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
+                                             (1002, 0, 1002, -1), "PXDTrackCombination", 0.2)
+    write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
+                                             (1003, 0, 1003, -1), "PXDTrackCombination", 0.2)

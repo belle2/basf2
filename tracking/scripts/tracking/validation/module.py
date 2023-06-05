@@ -756,7 +756,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         xs,
         quantity_name,
         unit=None,
-        parameter_names=['Seed p_t', 'Seed tan #lambda', 'Seed #phi'],
+        parameter_names=['Seed_p_t', 'Seed tan #lambda', 'Seed #phi'],
         make_hist=True,
     ):
         """Create profile histograms by PR-track parameters"""
@@ -766,7 +766,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                not in self.exclude_profile_pr_parameter]
 
         # Profile versus the various parameters
-        profile_parameters = {'Seed p_t': self.pr_seed_pt,
+        profile_parameters = {'Seed p_{t}': self.pr_seed_pt,
                               'Seed tan #lambda': self.pr_seed_tan_lambdas,
                               'Seed #phi': self.pr_seed_phi}
 
@@ -817,17 +817,25 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 is_expert = not(parameter_name in self.non_expert_parameters)
 
+                parameter_root_name = root_save_name(parameter_name)
+
                 # Apply some boundaries for the maximal tracking acceptance
                 # such that the plots look more instructive
-                if root_save_name(parameter_name) == 'tan_lambda':
-                    lower_bound = -1.73
-                    upper_bound = 3.27
-                elif root_save_name(parameter_name) == 'theta':
+                if 'tan_lambda' in parameter_root_name:
+                    lower_bound = -2.0
+                    upper_bound = 5.0
+                elif 'theta' in parameter_root_name:
                     lower_bound = 17 * math.pi / 180
                     upper_bound = 150 * math.pi / 180
-                elif root_save_name(parameter_name) == 'ndf':
+                elif 'ndf' in parameter_root_name:
                     lower_bound = 0
                     upper_bound = min(200, np.max(parameter_values))
+                elif 'p_t' in parameter_root_name:
+                    lower_bound = 0
+                    upper_bound = 2.5
+                elif 'd_0' in parameter_root_name:
+                    lower_bound = -0.6
+                    upper_bound = 0.6
                 else:
                     lower_bound = None
                     upper_bound = None

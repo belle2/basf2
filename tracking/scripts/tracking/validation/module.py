@@ -824,9 +824,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 if 'tan_lambda' in parameter_root_name:
                     lower_bound = -2.0
                     upper_bound = 5.0
-                elif 'theta' in parameter_root_name:
-                    lower_bound = 17 * math.pi / 180
-                    upper_bound = 150 * math.pi / 180
                 elif 'ndf' in parameter_root_name:
                     lower_bound = 0
                     upper_bound = min(200, np.max(parameter_values))

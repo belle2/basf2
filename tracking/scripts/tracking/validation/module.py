@@ -553,15 +553,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         validation_plots.extend(plots)
 
-        # Fake rate (all tracks not matched or clone            #
-        # use TrackCand seeds for the fake track plotting       #
-        # as the fit (if successful) is probably not meaningful #
-        #########################################################
-        print('fake list: ' + str(self.pr_fakes.count(1)))
-        plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
-                                               make_hist=False)
-        validation_plots.extend(plots)
-
         # Hit efficiency #
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,

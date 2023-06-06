@@ -113,11 +113,6 @@ void SVDTimeCalibrationsMonitorModule::event()
 
           for (m_triggerBin = 0; m_triggerBin < 4; m_triggerBin++) {
 
-            float f0 = -99;
-            float f1 = -99;
-            float f2 = -99;
-            float f4 = -99;
-
             if (TString(m_timeAlgo).Contains("CoG6")) {
               m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
               m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
@@ -126,10 +121,10 @@ void SVDTimeCalibrationsMonitorModule::event()
             }
 
             if (TString(m_timeAlgo).Contains("CoG3")) {
-              f0 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
-              f1 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
-              f2 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
-              f4 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
+              double f0 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
+              double f1 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
+              double f2 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
+              double f4 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
 
               m_c0 = f0;
               m_c1 = 1. / 12 * (-21 * f0 + 32 * f1 - 12 * f2 + f4);

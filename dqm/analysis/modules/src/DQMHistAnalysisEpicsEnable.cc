@@ -27,6 +27,8 @@ DQMHistAnalysisEpicsEnableModule::DQMHistAnalysisEpicsEnableModule()
   setDescription("EPICS output enabler module");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("useEpicsReadOnly", m_useEpicsRO, "use Epics Read Only", false);
+
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
 #endif
@@ -42,8 +44,8 @@ DQMHistAnalysisEpicsEnableModule::~DQMHistAnalysisEpicsEnableModule()
 void DQMHistAnalysisEpicsEnableModule::initialize()
 {
 #ifdef _BELLE2_EPICS
-  setUseEpics(true);
-  setUseEpicsReadOnly(false);
+  setUseEpics(true); // set always true
+  setUseEpicsReadOnly(m_useEpicsRO);
 #endif
 }
 

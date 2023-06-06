@@ -194,8 +194,6 @@ class TrackingValidationModule(basf2.Module):
         self.pr_seed_tan_lambdas = collections.deque()
         #: list of PR-track seed phi values
         self.pr_seed_phi = collections.deque()
-        #: list of PR-track seed theta values
-        self.pr_seed_theta = collections.deque()
 
         #: list of PR-track seed omega-truth values
         self.pr_omega_truths = collections.deque()
@@ -328,12 +326,10 @@ class TrackingValidationModule(basf2.Module):
             # store seed information, they are always available from the pattern reco
             # even if the fit was no successful
             # this information can we used when plotting fake tracks, for example
-            seed_position = trackCand.getPositionSeed()
             seed_momentum = trackCand.getMomentumSeed()
             # Avoid zero division exception
             seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))
-            seed_phi = seed_position.Phi()
-            seed_theta = seed_position.Theta()
+            seed_phi = seed_momentum.Phi()
 
             if prTrackFitResult:
                 omega_estimate = prTrackFitResult.getOmega()
@@ -353,7 +349,6 @@ class TrackingValidationModule(basf2.Module):
             # store properties of the seed
             self.pr_seed_tan_lambdas.append(seed_tan_lambda)
             self.pr_seed_phi.append(seed_phi)
-            self.pr_seed_theta.append(seed_theta)
 
             self.pr_bining_pt.append(pt_truth)
 
@@ -771,7 +766,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         xs,
         quantity_name,
         unit=None,
-        parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
+        parameter_names=['Seed tan #lambda', 'Seed #phi'],
         make_hist=True,
     ):
         """Create profile histograms by PR-track parameters"""
@@ -782,8 +777,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         # Profile versus the various parameters
         profile_parameters = {'Seed tan #lambda': self.pr_seed_tan_lambdas,
-                              'Seed #phi': self.pr_seed_phi,
-                              'Seed #theta': self.pr_seed_theta}
+                              'Seed #phi': self.pr_seed_phi}
 
         return self.profiles_by_parameters_base(
             xs,

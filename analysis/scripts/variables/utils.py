@@ -157,7 +157,7 @@ def create_daughter_aliases(
 
     """
 
-    if not isinstance(indices, collections.Iterable):
+    if not isinstance(indices, collections.abc.Iterable):
         indices = [indices]
 
     if include_indices:

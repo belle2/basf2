@@ -32,6 +32,7 @@ namespace {
 namespace Belle2 {
   DBStoreEntry DBStoreEntry::fromObject(const std::string& name, const TObject* obj, bool isRequired)
   {
+    assert(obj);
     bool isArray = dynamic_cast<const TClonesArray*>(obj) != nullptr;
     TClass* objClass = isArray ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
     return DBStoreEntry(c_Object, name, objClass, isArray, isRequired);

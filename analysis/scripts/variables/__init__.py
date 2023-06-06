@@ -10,7 +10,7 @@ import argparse
 import basf2.utils as b2utils
 
 
-class PythonVariableManager(object):
+class PythonVariableManager:
     '''
     Wrapper around the variable manager class.
     This is necessary for avoiding to import ROOT globally when 'variables' is imported.

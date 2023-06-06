@@ -4,7 +4,7 @@ Continuum suppression
 =====================
 
 This page contains instructions on how to use the continuum suppression
-framework, with a focus on recent modifications. 
+framework, with a focus on recent modifications.
 
 .. seealso::
 
@@ -91,10 +91,10 @@ The Continuum Suppression variables are defined as following:
 
 Thrust and thrust axis
   For a set of :math:`N` particles with momenta :math:`p_i` the thrust axis :math:`\vec{T}` is defined as the unit vector along which their total projection is maximal.
-  The thrust scalar is 
+  The thrust scalar is
   :math:`T=\frac{\sum^N_{i=1} |\vec{T}\cdot \vec{p}_i|}{\sum^N_{i=1} |\vec{p}_i|}`,
 
-CLEO Cones 
+CLEO Cones
   The CLEO collaboration introduced variables based on the sum of the
   absolute values of the momenta of all particles within angular sectors around the thrust
   axis in intervals of 10 degrees, resulting in 9 concentric cones.

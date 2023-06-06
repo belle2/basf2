@@ -35,7 +35,7 @@ then use it:
 
    skimRNDtrg = skimOutRNDTrgModule()
    main.add_module(skimRNDtrg)
-   emptypath = create_path()  
+   emptypath = create_path()
    skimRNDtrg.if_false(emptypath)
 
 .. autofunction:: svd.skim_utils.skimOutRNDTrgModule

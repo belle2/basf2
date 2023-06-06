@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -59,9 +57,9 @@ def getEigenPars(covM):
     assert(eigVals[1] > 1e-4)
     assert(eigVals[2] > 1e-4)
 
-    sxEig = sqrt((eigVals[1]))
-    syEig = sqrt((eigVals[2]))
-    szEig = sqrt((eigVals[0]))
+    sxEig = sqrt(eigVals[1])
+    syEig = sqrt(eigVals[2])
+    szEig = sqrt(eigVals[0])
 
     # get the signs right
     if eigVecs[2][0] < 0:

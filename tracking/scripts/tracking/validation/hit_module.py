@@ -376,7 +376,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 self.pr_number_of_matched_hits
             pr_figures_of_merit['pr_seed_tan_lambdas'] = self.pr_seed_tan_lambdas
             pr_figures_of_merit['pr_seed_phi'] = self.pr_seed_phi
-            pr_figures_of_merit['pr_seed_theta'] = self.pr_seed_theta
 
             pr_figures_of_merit['number_of_connected_tracks'] = \
                 self.number_of_connected_tracks

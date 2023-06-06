@@ -107,7 +107,7 @@ namespace Belle2 {
       else if (pdg == Const::kaon.getPDGCode())     return kaonID(p);
       else if (pdg == Const::proton.getPDGCode())   return protonID(p);
       else if (pdg == Const::deuteron.getPDGCode()) return deuteronID(p);
-      else return std::numeric_limits<float>::quiet_NaN();
+      else return Const::doubleNaN;
     }
 
     Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
@@ -131,10 +131,10 @@ namespace Belle2 {
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return pid->getLogL(hypType, detectorSet);
       };
@@ -170,10 +170,10 @@ namespace Belle2 {
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return (pid->getLogL(hypType, detectorSet) - pid->getLogL(testType, detectorSet));
       };
@@ -208,10 +208,10 @@ namespace Belle2 {
       auto testType = Const::ChargedStable(abs(pdgCodeTest));
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return pid->getProbability(hypType, testType, detectorSet);
       };
@@ -244,10 +244,10 @@ namespace Belle2 {
 
       auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return pid->getProbability(hypType, frac, detectorSet);
       };
@@ -267,7 +267,7 @@ namespace Belle2 {
 
       auto func = [detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<double>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         if (not pid->isAvailable(detectorSet))
           return 1;
         else return 0;
@@ -298,10 +298,10 @@ namespace Belle2 {
         PIDCalibrationWeightUtil weightMatrix(matrixName);
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto mom = frame.getMomentum(part);
@@ -343,17 +343,17 @@ namespace Belle2 {
       auto func = [hypType, detectorSet, matrixName](const Particle * part) -> double {
         PIDCalibrationWeightUtil weightMatrix(matrixName);
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto mom = frame.getMomentum(part);
         auto p = mom.P();
         auto theta = mom.Theta();
 
-        double LogL[Const::ChargedStable::c_SetSize];
+        std::vector<double> LogL(Const::ChargedStable::c_SetSize);
         double LogL_max = 0;
         bool hasMax = false;
         for (const auto& pdgIter : Const::chargedStableSet)
@@ -373,8 +373,8 @@ namespace Belle2 {
         }
 
         double norm = 0;
-        for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; ++i)
-          norm += exp(LogL[i] - LogL_max);
+        for (auto LogL_i : LogL)
+          norm += exp(LogL_i - LogL_max);
 
         if (norm > 0)
           return exp(LogL[hypType.getIndex()] - LogL_max) / norm;
@@ -466,11 +466,11 @@ namespace Belle2 {
         const auto& neuralNetwork = *neuralNetworkPtr;
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         {
           auto hypType = Const::ChargedStable(pdgCode);
           if (pid->getLogL(hypType) == 0)
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
         }
 
 
@@ -486,7 +486,7 @@ namespace Belle2 {
         {
           for (const auto& hypType : Const::chargedStableSet) {
             const float logL = pid->getLogL(hypType, detector);
-            if (logL == 0) inputsAll.push_back(std::numeric_limits<float>::quiet_NaN());
+            if (logL == 0) inputsAll.push_back(Const::doubleNaN);
             else inputsAll.push_back(logL);
           }
         }
@@ -551,10 +551,10 @@ namespace Belle2 {
         PIDCalibrationWeightUtil weightMatrix(matrixName);
 
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         const auto& frame = ReferenceFrame::GetCurrent();
         auto mom = frame.getMomentum(part);
@@ -636,7 +636,7 @@ namespace Belle2 {
     {
       if (arguments.size() != 2) {
         B2ERROR("The variable binaryPID needs exactly two arguments: the PDG codes of two hypotheses.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
@@ -698,7 +698,7 @@ namespace Belle2 {
       // Excluding SVD for binary ID. This variable is temporary. BII-8760
       if (arguments.size() != 2) {
         B2ERROR("The variable binaryPID_noSVD needs exactly two arguments: the PDG codes of two hypotheses.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
@@ -720,7 +720,7 @@ namespace Belle2 {
       // Excluding TOP for electron ID. This is temporary. BII-8444
       if (arguments.size() != 1) {
         B2ERROR("The variable binaryElectronID_noTOP needs exactly one argument: the PDG code of the test hypothesis.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
 
       int pdgCodeHyp = Const::electron.getPDGCode();
@@ -745,7 +745,7 @@ namespace Belle2 {
       // Excluding SVD and TOP for electron ID. This is temporary. BII-8444, BII-8760.
       if (arguments.size() != 1) {
         B2ERROR("The variable binaryElectronID_noSVD_noTOP needs exactly one argument: the PDG code of the test hypothesis.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
 
       int pdgCodeHyp = Const::electron.getPDGCode();
@@ -764,7 +764,7 @@ namespace Belle2 {
       const ECLCluster* cluster = part->getECLCluster();
       if (!cluster) {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
           static Manager::FunctionPtr pidFunction =
             pidProbabilityExpert({"211", "SVD", "CDC", "TOP", "ECL", "KLM"});
@@ -781,7 +781,7 @@ namespace Belle2 {
       const ECLCluster* cluster = part->getECLCluster();
       if (!cluster) {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
           static Manager::FunctionPtr pidFunction =
             pidProbabilityExpert({"321", "SVD", "CDC", "TOP", "ECL", "KLM"});
@@ -797,7 +797,7 @@ namespace Belle2 {
       // Excluding ARICH for tracks without ECL cluster and identified as heavier of the two hypotheses from binary ID.
       if (arguments.size() != 2) {
         B2ERROR("The variable binaryPID_noARICHwoECL needs exactly two arguments: the PDG codes of two hypotheses.");
-        return std::numeric_limits<float>::quiet_NaN();;
+        return Const::doubleNaN;;
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
@@ -807,7 +807,7 @@ namespace Belle2 {
       const ECLCluster* cluster = part->getECLCluster();
       if (!cluster) {
         const PIDLikelihood* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (!pid) return Const::doubleNaN;
         double lkhdiff = pid->getLogL(hypType, Const::ARICH) - pid->getLogL(testType, Const::ARICH);
         if ((lkhdiff > 0 && pdgCodeHyp > pdgCodeTest) || (lkhdiff < 0 && pdgCodeHyp < pdgCodeTest)) {
           return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
@@ -831,7 +831,7 @@ namespace Belle2 {
           B2WARNING("The extraInfo nbarID is not registered! \n"
                     "Please use function getNbarIDMVA in modularAnalysis.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -860,7 +860,7 @@ namespace Belle2 {
         {
           name += "_" + std::to_string(detector);
         }
-        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : Const::doubleNaN;
       };
       return func;
     }
@@ -897,7 +897,7 @@ namespace Belle2 {
         {
           name += "_" + std::to_string(detector);
         }
-        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : Const::doubleNaN;
       };
       return func;
     }
@@ -906,7 +906,7 @@ namespace Belle2 {
     {
       if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidMostLikelyPDG");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double prob[Const::ChargedStable::c_SetSize];
       if (arguments.size() == 0) {
@@ -916,7 +916,7 @@ namespace Belle2 {
       }
 
       auto* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<double>::quiet_NaN();
+      if (!pid) return Const::doubleNaN;
       return pid->getMostLikely(prob).getPDGCode();
     }
 

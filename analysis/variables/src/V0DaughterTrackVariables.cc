@@ -37,8 +37,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-
     // helper function to get the helix parameters of the V0 daughter tracks
     // Not registered in variable manager
     double getV0DaughterTrackDetNHits(const Particle* particle, const double daughterID, const Const::EDetector& det)
@@ -80,10 +78,10 @@ namespace Belle2 {
         return 0;
       auto daughter = part->getDaughter(daughterID[0]);
       const Track* track = daughter->getTrack();
-      if (!track) return realNaN;
+      if (!track) return Const::doubleNaN;
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
                                          daughter->getPDGCode())));
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       double nHitsBeforeRemoval = trackFit->getHitPatternCDC().getNHits()
                                   + trackFit->getHitPatternVXD().getNSVDHits()
                                   + trackFit->getHitPatternVXD().getNPXDHits();
@@ -190,14 +188,14 @@ namespace Belle2 {
     double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::XYZVector v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
       const TrackFitResult* trackFit = daug->getTrackFitResult();
-      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
+      if (!trackFit) return Const::doubleNaN;
 
       UncertainHelix helix = trackFit->getUncertainHelix();
       helix.passiveMoveBy(v0Vertex);
@@ -213,14 +211,14 @@ namespace Belle2 {
     double v0DaughterZ0(const Particle* particle, const std::vector<double>& daughterID)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::XYZVector v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
       const TrackFitResult* trackFit = daug->getTrackFitResult();
-      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
+      if (!trackFit) return Const::doubleNaN;
 
       UncertainHelix helix = trackFit->getUncertainHelix();
       helix.passiveMoveBy(v0Vertex);
@@ -238,21 +236,21 @@ namespace Belle2 {
     double getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
         const int tauIndex)
     {
-      if (!particle) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!particle) { return Const::doubleNaN; }
 
       const int dID = int(std::lround(daughterID));
-      if (not(dID == 0 || dID == 1)) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (not(dID == 0 || dID == 1)) { return Const::doubleNaN; }
 
       const MCParticle* mcparticle_v0 = particle->getMCParticle();
-      if (!mcparticle_v0) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!mcparticle_v0) { return Const::doubleNaN; }
 
-      if (!(particle->getDaughter(dID))) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!(particle->getDaughter(dID))) { return Const::doubleNaN; }
 
       const MCParticle* mcparticle = particle->getDaughter(dID)->getMCParticle();
-      if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!mcparticle) { return Const::doubleNaN; }
 
       const TrackFitResult* trackFit = particle->getDaughter(dID)->getTrackFitResult();
-      if (!trackFit) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!trackFit) { return Const::doubleNaN; }
 
       // MC information
       const ROOT::Math::XYZVector mcProdVertex   = mcparticle->getVertex();
@@ -279,7 +277,7 @@ namespace Belle2 {
       if (measErrSquare.at(tauIndex) > 0)
         return (mcHelixPars.at(tauIndex) - measHelixPars.at(tauIndex)) / std::sqrt(measErrSquare.at(tauIndex));
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double v0DaughterHelixWithTrueVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID)
@@ -341,16 +339,16 @@ namespace Belle2 {
     {
       auto daughter = part->getDaughter(params[0]);
       if (!daughter) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       auto trackFit = daughter->getTrackFitResult();
       if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       const int paramID = int(std::lround(params[1]));
       if (not(0 <= paramID && paramID < 5))
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       std::vector<float> tau = trackFit->getTau();
       return tau[paramID];
@@ -360,16 +358,16 @@ namespace Belle2 {
     {
       auto daughter = part->getDaughter(params[0]);
       if (!daughter) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       auto trackFit = daughter->getTrackFitResult();
       if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       const int paramID = int(std::lround(params[1]));
       if (not(0 <= paramID && paramID < 15))
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       std::vector<float> cov = trackFit->getCov();
       return cov[paramID];
@@ -449,7 +447,7 @@ namespace Belle2 {
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return std::numeric_limits<double>::quiet_NaN();}
+      if (errFlag == -1) {return Const::doubleNaN;}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -485,7 +483,7 @@ namespace Belle2 {
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return std::numeric_limits<double>::quiet_NaN();}
+      if (errFlag == -1) {return Const::doubleNaN;}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -504,7 +502,7 @@ namespace Belle2 {
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return std::numeric_limits<double>::quiet_NaN();}
+      if (errFlag == -1) {return Const::doubleNaN;}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -514,11 +512,11 @@ namespace Belle2 {
                                                Omega2, Z02, TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonDelR failed.");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonDelR failed.");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       //Delta-R
@@ -537,7 +535,7 @@ namespace Belle2 {
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return std::pair<double, double>(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
+      if (errFlag == -1) {return std::pair<double, double>(Const::doubleNaN, Const::doubleNaN);}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -547,11 +545,11 @@ namespace Belle2 {
                                                Omega2, Z02, TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonZ1Z2 failed.");
-        return  std::pair<double, double>(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+        return  std::pair<double, double>(Const::doubleNaN, Const::doubleNaN);
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonZ1Z2 failed.");
-        return  std::pair<double, double>(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+        return  std::pair<double, double>(Const::doubleNaN, Const::doubleNaN);
       }
 
       //Delta-Z
@@ -597,7 +595,7 @@ namespace Belle2 {
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return TVector2(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
+      if (errFlag == -1) {return TVector2(Const::doubleNaN, Const::doubleNaN);}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -607,11 +605,11 @@ namespace Belle2 {
                                                Omega2, Z02, TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonXY failed.");
-        return  TVector2(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+        return  TVector2(Const::doubleNaN, Const::doubleNaN);
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonXY failed.");
-        return  TVector2(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+        return  TVector2(Const::doubleNaN, Const::doubleNaN);
       }
 
       //Radial unit vectors
@@ -651,7 +649,7 @@ namespace Belle2 {
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
+      if (errFlag == -1) {return B2Vector3D(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -662,13 +660,11 @@ namespace Belle2 {
                                                TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-                           std::numeric_limits<double>::quiet_NaN());
+        return  B2Vector3D(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-                           std::numeric_limits<double>::quiet_NaN());
+        return  B2Vector3D(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
       }
 
       //Delta-Z

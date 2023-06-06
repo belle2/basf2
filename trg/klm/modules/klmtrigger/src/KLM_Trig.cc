@@ -25,16 +25,16 @@
 
 
 
-AXIS_NAME(layer_count, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(layer_mask, uint64_t);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(n_triggered, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(sector_mask, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(sector_mask_or, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_count, int);
+AXIS_NAME(layer_mask, uint64_t);
+AXIS_NAME(n_triggered, int);
+AXIS_NAME(sector_mask, int);
+AXIS_NAME(sector_mask_or, int);
 
-AXIS_NAME(n_sections_trig, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(back2back_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(n_sections_trig, int);
+AXIS_NAME(back2back_t, int);
 
-AXIS_NAME(TriggerCut, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(TriggerCut, int);
 AXIS_NAME(vetoCut, int);
 
 
@@ -133,7 +133,7 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_, ve
 struct to_plane_layer {
 
   template <typename Tuple_T>
-  constexpr to_plane_layer(const Tuple_T& t) :
+  constexpr explicit to_plane_layer(const Tuple_T& t) :
     m_data((layer(t) + 1) * 2 + plane(t)) { }
 
   constexpr operator uint64_t() const

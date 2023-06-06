@@ -126,7 +126,7 @@ namespace Belle2 {
     double trackFirstVTXLayer(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return realNaN;
+      if (!trackFit) return Const::doubleNaN;
       return trackFit->getHitPatternVXD().getFirstVTXLayer();
     }
 

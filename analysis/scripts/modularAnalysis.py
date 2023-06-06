@@ -4275,21 +4275,33 @@ def getNbarIDMVA(particleList, path=None):
         B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
 
     from variables import variables
-    variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
-    variables.addAlias('V2', 'clusterE')
-    variables.addAlias('V3', 'clusterLAT')
-    variables.addAlias('V4', 'clusterE1E9')
-    variables.addAlias('V5', 'clusterE9E21')
-    variables.addAlias('V6', 'clusterZernikeMVA')
-    variables.addAlias('V7', 'clusterAbsZernikeMoment40')
-    variables.addAlias('V8', 'clusterAbsZernikeMoment51')
+    import variables.utils as vu
+    import functools
+    template = "{variable}"
+    hierarchy = vu.get_hierarchy_of_decay(particleList)
+    if len(hierarchy) > 0 and len(hierarchy[0]) > 0:
+        indices = [tup[0] for tup in hierarchy[0]]
+        template = functools.reduce(lambda x, y: f"daughter({y},{x})", reversed(indices), "{variable}")
+    variables.addAlias('V1', template.format(variable='clusterHasPulseShapeDiscrimination'))
+    variables.addAlias('V2', template.format(variable='clusterE'))
+    variables.addAlias('V3', template.format(variable='clusterLAT'))
+    variables.addAlias('V4', template.format(variable='clusterE1E9'))
+    variables.addAlias('V5', template.format(variable='clusterE9E21'))
+    variables.addAlias('V6', template.format(variable='clusterZernikeMVA'))
+    variables.addAlias('V7', template.format(variable='clusterAbsZernikeMoment40'))
+    variables.addAlias('V8', template.format(variable='clusterAbsZernikeMoment51'))
 
-    variables.addAlias('nbarIDValid',
-                       'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
-    variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
+    variables.addAlias('nbarIDValid', template.format(
+        variable='passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)'))
+    variables.addAlias('nbarIDmod', template.format(
+        variable='conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))'))
 
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
-    variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+    if '->' not in particleList:
+        variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+    else:
+        listname = particleList.split('->')[0].strip()
+        variablesToDaughterExtraInfo(listname, particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
 def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowAnyParticleSource=False, path=None, **kwargs):

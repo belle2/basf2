@@ -56,6 +56,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
+    addParam("TimeWindowStart", m_timeWindowStart, "Shift of the readout time window with respect to the global zero in ns", -50.0);
     addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.066);
     addParam("MagneticFieldDistorsion", m_bdistort, "Apply image distortion due to non-perp. magnetic field", 0);
   }
@@ -103,9 +104,9 @@ namespace Belle2 {
     for (const ARICHSimHit& aSimHit : m_ARICHSimHits) {
 
       // check for time window
-      double globaltime = aSimHit.getGlobalTime();
+      double time = aSimHit.getGlobalTime() - m_timeWindowStart;
 
-      if (globaltime < 0. || globaltime > m_timeWindow) continue;
+      if (time < 0 || time > m_timeWindow) continue;
 
       TVector2 locpos(aSimHit.getLocalPosition().X(), aSimHit.getLocalPosition().Y());
 

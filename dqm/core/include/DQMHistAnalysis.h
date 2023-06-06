@@ -88,7 +88,7 @@ namespace Belle2 {
      * Get the list of the histograms.
      * @return The list of the histograms.
      */
-    static const HistList& getHistList() { return s_histList;};
+    static /*const*/ HistList& getHistList() { return s_histList;};
 
     /**
      * Get the list of MonitoringObjects.
@@ -193,8 +193,9 @@ namespace Belle2 {
      * @param dirname The name of the directory.
      * @param histname The name of the histogram.
      * @param h The TH1 pointer for the histogram.
+     * @return histogram was updated flag
      */
-    static void addHist(const std::string& dirname,
+    static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
     /**

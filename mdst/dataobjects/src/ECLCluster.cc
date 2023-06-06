@@ -41,12 +41,12 @@ double ECLCluster::getEnergy(ECLCluster::EHypothesisBit hypothesis) const
   };
 }
 
-TVector3 ECLCluster::getClusterPosition() const
+ROOT::Math::XYZVector ECLCluster::getClusterPosition() const
 {
   const double cluster_x =  getR() * sin(getTheta()) * cos(getPhi());
   const double cluster_y =  getR() * sin(getTheta()) * sin(getPhi());
   const double cluster_z =  getR() * cos(getTheta());
-  return TVector3(cluster_x, cluster_y, cluster_z);
+  return ROOT::Math::XYZVector(cluster_x, cluster_y, cluster_z);
 }
 
 TMatrixDSym ECLCluster::getCovarianceMatrix3x3() const

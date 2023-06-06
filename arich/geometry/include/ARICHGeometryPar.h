@@ -14,6 +14,7 @@
 #include <map>
 #include <unordered_set>
 #include <framework/gearbox/GearDir.h>
+#include <Math/Vector3D.h>
 #include "TVector3.h"
 #include "TVector2.h"
 #include <G4ThreeVector.hh>
@@ -71,6 +72,8 @@ namespace Belle2 {
     int getNMCopies() const;
     //! get the copy number of HAPD module containing point "hit"
     int getCopyNo(TVector3 hit);
+    //! get the copy number of HAPD module containing point "hit"
+    int getCopyNo(const ROOT::Math::XYZVector& hit);
     //! get the position of copyno-th HAPD module origin
     TVector3 getOrigin(int copyno);
     //! get the position of copyNo-th HAPD module origin (returns G4ThreeVector)

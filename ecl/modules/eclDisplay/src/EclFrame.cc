@@ -5,29 +5,30 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDisplay/EclFrame.h>
 
-//ROOT
-#include <TFile.h>
-#include <TCanvas.h>
-#include <TSystem.h>
-#include <TRootEmbeddedCanvas.h>
-#include <TGDoubleSlider.h>
-#include <TGNumberEntry.h>
-#include <TGListTree.h>
-#include <TGFileDialog.h>
-#include <TStyle.h>
-#include <TGLabel.h>
-#include <TGComboBox.h>
-#include <TGMenu.h>
-
-//ECL
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/modules/eclDisplay/geometry.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/modules/eclDisplay/MultilineWidget.h>
 #include <ecl/modules/eclDisplay/EclPainter.h>
 #include <ecl/modules/eclDisplay/EclPainter1D.h>
+
+/* ROOT headers. */
+#include <TCanvas.h>
+#include <TFile.h>
+#include <TGComboBox.h>
+#include <TGDoubleSlider.h>
+#include <TGFileDialog.h>
+#include <TGLabel.h>
+#include <TGListTree.h>
+#include <TGMenu.h>
+#include <TGNumberEntry.h>
+#include <TRootEmbeddedCanvas.h>
+#include <TStyle.h>
+#include <TSystem.h>
 
 using namespace Belle2;
 using namespace ECL;

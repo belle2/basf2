@@ -43,6 +43,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                svd_standalone_mode="VXDTF2",
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
@@ -95,6 +96,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param fit_tracks: if false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: if true, add the MVA track quality estimation
@@ -125,6 +129,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         fit_tracks=fit_tracks,
         use_second_cdc_hits=use_second_cdc_hits,
         skipHitPreparerAdding=skipHitPreparerAdding,
+        svd_standalone_mode=svd_standalone_mode,
         use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
         use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
         add_cdcTrack_QI=add_cdcTrack_QI,
@@ -148,6 +153,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
                                           prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                          svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                           pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False):
@@ -170,6 +176,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
@@ -220,6 +229,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_track_finding(path, components=components, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits,
+                          svd_standalone_mode=svd_standalone_mode,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
                           add_cdcTrack_QI=add_cdcTrack_QI,
@@ -260,13 +270,13 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    # V0 finding
-    if v0_finding:
-        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
+
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')
@@ -658,9 +668,8 @@ def add_vxd_standalone_cosmics_finder(
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    sp_creator_pxd = b2.register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
-    path.add_module(sp_creator_pxd)
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
+        path.add_module('PXDSpacePointCreator', SpacePoints=pxd_spacepoints_name)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 

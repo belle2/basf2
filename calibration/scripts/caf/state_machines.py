@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -332,8 +331,8 @@ class Machine():
             for after_func in after_callbacks:
                 self._callback(after_func, **kwargs)
         else:
-            raise ConditionError((f"Transition '{transition_name}' called for but one or more conditions "
-                                  "evaluated False"))
+            raise ConditionError(f"Transition '{transition_name}' called for but one or more conditions "
+                                 "evaluated False")
 
     @staticmethod
     def _callback(func, **kwargs):
@@ -1042,8 +1041,8 @@ class AlgorithmMachine(Machine):
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
         for filename, directory in self.dependent_databases:
-            B2INFO((f"Adding Local Database {filename} to head of chain of local databases created by"
-                    f" a dependent calibration, for {self.algorithm.name}."))
+            B2INFO(f"Adding Local Database {filename} to head of chain of local databases created by"
+                   f" a dependent calibration, for {self.algorithm.name}.")
             b2conditions.prepend_testing_payloads(filename)
 
         # Create a directory to store the payloads of this algorithm
@@ -1116,3 +1115,5 @@ class TransitionError(MachineError):
     """
     Exception for when transitions fail.
     """
+
+# @endcond

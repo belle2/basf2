@@ -65,7 +65,7 @@ like output from the real detector. And the real detector measures the
 interaction of these particles with the material of our detector: ionisation,
 scintillation, bremsstrahlung, pair production, Cherenkov radiation and so forth.
 
-All these processes are well known and can in be simulated. There has been a lot
+All these processes are well known and can be simulated. There has been a lot
 of effort put into this by many experiments to create simulation software
 capable of all of these processes. The most well known one is
 `Geant4 <https://geant4.web.cern.ch/>`_ and we also use it in Belle II.

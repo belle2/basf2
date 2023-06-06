@@ -27,32 +27,39 @@ db = Database.Instance()
 
 if (mc):
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Run2), IntervalOfValidity(
-            0, 0, 0, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Run2),
+        IntervalOfValidity(0, 0, 0, -1)
+    )
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Phase2), IntervalOfValidity(
-            1002, 0, 1002, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Phase2),
+        IntervalOfValidity(1002, 0, 1002, -1)
+    )
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Run1), IntervalOfValidity(
-            1003, 0, 1003, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Run1),
+        IntervalOfValidity(1003, 0, 1003, -1)
+    )
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Run2), IntervalOfValidity(
-            1004, 0, 1004, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Run2),
+        IntervalOfValidity(1004, 0, 1004, -1)
+    )
 
 else:
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Phase2), IntervalOfValidity(
-            1, 0, 3, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Phase2),
+        IntervalOfValidity(1, 0, 3, -1)
+    )
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Run1), IntervalOfValidity(
-            4, 0, 27, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Run1),
+        IntervalOfValidity(4, 0, 27, -1)
+    )
     db.storeData(
-        "KLMScintillatorFirmware", KLMScintillatorFirmware(
-            KLMScintillatorFirmware.c_Run2), IntervalOfValidity(
-            28, 0, -1, -1))
+        "KLMScintillatorFirmware",
+        KLMScintillatorFirmware(KLMScintillatorFirmware.c_Run2),
+        IntervalOfValidity(28, 0, -1, -1)
+    )

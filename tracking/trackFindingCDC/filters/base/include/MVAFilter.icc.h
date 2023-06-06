@@ -59,10 +59,6 @@ namespace Belle2 {
                                     m_DBPayloadName,
                                     "Name of the DB payload containing weightfile name and the cut value. If a DB payload with both values is available and valid, it will override the values provided by parameters.",
                                     m_DBPayloadName);
-      B2DEBUG(20,
-              "MVAFilter000: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " << m_cutValue <<
-              " prefix " << prefix << ".");
-
     }
 
     template <class AFilter>
@@ -74,11 +70,10 @@ namespace Belle2 {
       if (m_mvaPayload->isValid()) {
         m_identifier = (*m_mvaPayload)->getIdentifierName();
         m_cutValue = (*m_mvaPayload)->getCutValue();
-        B2DEBUG(20,
-                "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " << m_cutValue << ".");
+        B2DEBUG(20, "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " <<
+                m_cutValue << ".");
       } else {
-        B2FATAL("MVAFilter: No valid MVAFilter payload with name " + m_DBPayloadName + " was found. with weightfile " << m_identifier <<
-                ".");
+        B2FATAL("MVAFilter: No valid MVAFilter payload with name " + m_DBPayloadName + " was found.");
       }
 
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();

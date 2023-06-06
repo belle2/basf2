@@ -1,0 +1,30 @@
+# EventType: 1213050031
+# Descriptor:  Y(4S) -> B-B+
+#                       B- -> D0 K- K+ pi-
+#                             D0 -> K- pi+
+#                       B+ -> anything
+# NickName: Bu_D0K-K+pi-_K-pi+
+# Tested: yes
+# PhysicsWG: B2Hadronic
+# Reponsible: Valerio Bertacchi
+# Email:bertacchi@cppm.in2p3.fr
+# Cuts: None
+# Date: 2023-05-31
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+Decay B-sig
+1.0 D0sig  K-  K+ pi- PHSP;
+Enddecay
+
+Decay D0sig
+1.0 K-   pi+ PHSP;
+Enddecay
+
+CDecay B+sig
+CDecay anti-D0sig
+
+End

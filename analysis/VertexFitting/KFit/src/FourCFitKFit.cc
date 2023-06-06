@@ -549,7 +549,7 @@ FourCFitKFit::makeCoreMatrix() {
 
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(4, 1, 0);
-    double energy[KFitConst::kMaxTrackCount2];
+    std::vector<double> energy(m_TrackCount);
     double a;
 
     for (int i = 0; i < m_TrackCount; i++) {
@@ -561,14 +561,13 @@ FourCFitKFit::makeCoreMatrix() {
                        al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
                        al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
                        m_property[i][1] * m_property[i][1]);
-    }
-
-    for (int i = 0; i < m_TrackCount; i++) {
       if (m_IsFixMass[i])
         Sum_al_1[3][0] += energy[i];
       else
         Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
+    }
 
+    for (int i = 0; i < m_TrackCount; i++) {
       for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
@@ -618,7 +617,7 @@ FourCFitKFit::makeCoreMatrix() {
     // m_FlagFitIncludingVertex == true
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(7, 1, 0);
-    double energy[KFitConst::kMaxTrackCount2];
+    std::vector<double> energy(m_TrackCount);
     double a;
 
     for (int i = 0; i < m_TrackCount; i++) {

@@ -61,6 +61,9 @@ class recoConfigurationImporter(basf2.Module):
         # strip charge
         payload.setStripChargeRecoWith6Samples(algorithmFor_stripChargeRecoWith6Samples)
         payload.setStripChargeRecoWith3Samples(algorithmFor_stripChargeRecoWith3Samples)
+        # SVDTimeGrouping
+        payload.setStateOfSVDTimeGrouping(6, True)
+        payload.setUseOfSVDGroupInfoInSPCreator(6, True)
 
         Belle2.Database.Instance().storeData(Belle2.SVDRecoConfiguration.name, payload, iov)
 

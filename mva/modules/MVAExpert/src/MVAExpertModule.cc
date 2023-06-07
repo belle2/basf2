@@ -34,7 +34,7 @@ MVAExpertModule::MVAExpertModule() : Module()
 
   std::vector<std::string> empty;
   addParam("listNames", m_listNames,
-           "Particles from these ParticleLists are used as input. If no name is given the expert is applied to every event once, and one can only use variables which accept nullptr as Particle*",
+           "Particles from these ParticleLists are used as input. If no name is given the expert is applied to every event once, and one can only use variables which accept nullptr as Particle*. Decay descriptor functionality is supported, which allows to run the module on daughter particles, e.g. Lambda0:my_list -> ^p+ pi-. One has to provide full name of the mother particle list and only one selected daughter is supported.",
            empty);
   addParam("extraInfoName", m_extraInfoName,
            "Name under which the output of the expert is stored in the ExtraInfo of the Particle object. If the expert returns multiple values, the index of the value is appended to the name in the form '_0', '_1', ...");
@@ -56,7 +56,7 @@ void MVAExpertModule::initialize()
       B2ERROR("Decay string " << name << " is invalid.");
     }
     const DecayDescriptorParticle* mother = dd.getMother();
-    uint nSelectedDaughters = dd.getSelectionNames().size();
+    unsigned int nSelectedDaughters = dd.getSelectionNames().size();
     if (nSelectedDaughters > 1) {
       B2ERROR("More than one daughter is selected in the decay string " << name << ".");
     }
@@ -211,7 +211,7 @@ void MVAExpertModule::event()
     // Calculate target Value for Particles
     for (unsigned i = 0; i < list->getListSize(); ++i) {
       auto dd = m_decaydescriptors[listName];
-      uint nSelectedDaughters = dd.getSelectionNames().size();
+      unsigned int nSelectedDaughters = dd.getSelectionNames().size();
       const Particle* particle = (nSelectedDaughters > 0) ? dd.getSelectionParticles(list->getParticle(i))[0] : list->getParticle(i);
       if (m_nClasses == 2) {
         float responseValue = analyse(particle);

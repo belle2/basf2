@@ -65,6 +65,9 @@ namespace Belle2 {
       m_FirmwareVersion = firmwareVersion;
     };
 
+    /**
+     * Get firmware version.
+     */
     enum FirmwareVersion getFirmwareVersion() const
     {
       return m_FirmwareVersion;

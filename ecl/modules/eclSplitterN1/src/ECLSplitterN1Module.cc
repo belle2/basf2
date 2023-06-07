@@ -248,13 +248,12 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   B2DEBUG(170, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
 
   // Three cases:
-  // 1) There is no local maximum (most likely in presence of high background) or there are too many:
-  //    Only use the m_maxSplits photons highest energy LM to make clusters.
-  // 2) There is exactly one local maximum, this is the easiest (and most likely for true photons) case.
+  // 1) There is no local maximum (can only happen if the CR seed is not a LM itself).
+  // 2) There is exactly one local maximum.
   // 3) There are more than one, typically two or three, local maxima and we have to share energy between them.
+  //    If there are more than m_maxSplits local maxima, the m_maxSplits highest energy local maxima will be used.
 
   // ---------------------------------------------------------------------
-  // if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
   if (nLocalMaximums == 1) {
 
     // Create a shower.
@@ -379,25 +378,24 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
   } // end case with one LM
-  else { // This is the really interesting part where showers are split. This algorithm is inspired by BaBar code.
+  else { // More than one LM, energy must be split. This algorithm is inspired by BaBar code.
 
-    // check if we have too many local maximums
-    // if yes: increase energy threshold for local maxima or limit to user set maximum
-
+    // check if we have too many local maximums. if yes: limit to user set maximum
     // create a vector with all local maximums and its crystal energies
-    std::vector<std::pair<int, double>> alllocalmaximus;
+    std::vector<std::pair<ECLLocalMaximum, double>> lm_energy_vector;
     for (auto& aLocalMaximum :  aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
       const int cellid = aLocalMaximum.getCellId();
       const int pos = m_StoreArrPosition[cellid];
       const double digitenergy = m_eclCalDigits[pos]->getEnergy();
-      alllocalmaximus.push_back(std::pair<int, double>(cellid, digitenergy));
+      lm_energy_vector.push_back(std::pair<ECLLocalMaximum, double>(aLocalMaximum, digitenergy));
     };
 
     // sort this vector in descending order and keep only up to m_maxSplits entries
-    std::sort(alllocalmaximus.begin(), alllocalmaximus.end(), [](const std::pair<int, double>& x, const std::pair<int, double>& y) {
+    std::sort(lm_energy_vector.begin(), lm_energy_vector.end(), [](const std::pair<ECLLocalMaximum, double>& x,
+    const std::pair<ECLLocalMaximum, double>& y) {
       return x.second > y.second;
     });
-    alllocalmaximus.resize(m_maxSplits);
+    lm_energy_vector.resize(m_maxSplits);
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
@@ -410,20 +408,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // Fill the maxima positions in a map
     std::map<int, B2Vector3D> localMaximumsPoints; // key = locmaxid, value = maximum position
     std::map<int, B2Vector3D> centroidPoints; // key = locmaxid (as index), value = centroid position
-    for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
 
-      int cellid = aLocalMaximum.getCellId();
+    for (auto& aLocalMaximum : lm_energy_vector) {
 
-      //check if that local maximum is in the list of alllocalmaximus to use
-      // auto it = std::ranges::find(alllocalmaximus, cellid, &std::pair<int, double>::first);
-      auto it = std::find_if(alllocalmaximus.begin(), alllocalmaximus.end(), [&](const auto & pair) { return pair.first == cellid; });
-      if (it == alllocalmaximus.end()) {
-        B2DEBUG(170, "   skipping local maximum with cellid=" << cellid << " E=" << m_eclCalDigits[m_StoreArrPosition[cellid]]->getEnergy();
-               );
-        continue;
-      } else {
-        B2DEBUG(170, "keeping local maximum with cellid=" << cellid << " E=" << m_eclCalDigits[m_StoreArrPosition[cellid]]->getEnergy(););
-      }
+      int cellid = aLocalMaximum.first.getCellId();
 
       // Get the position of this crystal and fill it in two maps.
       B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);

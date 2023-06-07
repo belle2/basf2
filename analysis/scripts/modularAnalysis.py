@@ -4299,7 +4299,7 @@ def getNbarIDMVA(particleList: str, path=None):
     if decayDescriptor.getNDaughters() == 0:
         variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
     else:
-        listname = particleList.split('->')[0].strip()
+        listname = decayDescriptor.getMother().getFullName()
         variablesToDaughterExtraInfo(listname, particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 

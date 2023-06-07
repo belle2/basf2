@@ -12,7 +12,9 @@
 /* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLLeakagePosition.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
 /* Basf2 headers. */
 #include <framework/gearbox/Const.h>
@@ -23,7 +25,6 @@
 /* Root headers. */
 #include <Math/Vector3D.h>
 #include <Math/VectorUtil.h>
-#include <TH2F.h>
 #include <TMath.h>
 #include <TTree.h>
 
@@ -142,6 +143,32 @@ void eclLeakageCollectorModule::prepare()
   //..Required arrays
   m_eclShowerArray.isRequired(m_showerArrayName);
   m_mcParticleArray.isRequired();
+
+  //-----------------------------------------------------------------
+  //..nOptimal payload. Get optimal number of crystals, and
+  //  corresponding correction factors.
+  m_nOptimal2D = m_eclNOptimal->getNOptimal();
+  m_peakFracEnergy = m_eclNOptimal->getPeakFracEnergy();
+  m_bias = m_eclNOptimal->getBias();
+  m_logPeakEnergy = m_eclNOptimal->getLogPeakEnergy();
+  m_groupNumber = m_eclNOptimal->getGroupNumber();
+
+  //..Vectors of energy boundaries for each region
+  std::vector<float> eBoundariesFwd = m_eclNOptimal->getUpperBoundariesFwd();
+  std::vector<float> eBoundariesBrl = m_eclNOptimal->getUpperBoundariesBrl();
+  std::vector<float> eBoundariesBwd = m_eclNOptimal->getUpperBoundariesBwd();
+  m_nEnergies = eBoundariesBrl.size();
+
+  //..Copy values to m_eBoundaries
+  m_eBoundaries.resize(m_nLeakReg, std::vector<float>(m_nEnergies, 0.));
+  for (int ie = 0; ie < m_nEnergies; ie++) {
+    m_eBoundaries[0][ie] = eBoundariesFwd[ie];
+    m_eBoundaries[1][ie] = eBoundariesBrl[ie];
+    m_eBoundaries[2][ie] = eBoundariesBwd[ie];
+    B2INFO(" nOptimal upper boundaries for energy point " << ie << " " << m_eBoundaries[0][ie] << " " << m_eBoundaries[1][ie] << " " <<
+           m_eBoundaries[2][ie]);
+  }
+
 }
 
 //-----------------------------------------------------------------
@@ -173,13 +200,15 @@ void eclLeakageCollectorModule::collect()
   }
 
   //-----------------------------------------------------------------
-  //..Generated MC particle (always the first entry in the list)
+  //..Generated MC particle. Should only be one entry, but check.
+  const int nMC = m_mcParticleArray.getEntries();
+  if (nMC != 1) {return;}
   double mcLabE = m_mcParticleArray[0]->getEnergy();
   ROOT::Math::XYZVector mcp3 = m_mcParticleArray[0]->getMomentum();
   ROOT::Math::XYZVector vertex = m_mcParticleArray[0]->getProductionVertex();
 
   //-----------------------------------------------------------------
-  //..Find the shower closest to the MC true angle
+  //..Find the ECLShower (should only be one when using trimmed data object)
   const int nShower = m_eclShowerArray.getEntries();
   double minAngle = 999.;
   int minShower = -1;
@@ -234,15 +263,108 @@ void eclLeakageCollectorModule::collect()
     }
   }
 
-  //..Crystals used to calculate energy
-  int nForEnergy = (int)(m_eclShowerArray[minShower]->getNumberOfCrystalsForEnergy() + 0.001);
-  t_nCrys = std::min(nCrysMax, nForEnergy);
-
-  //..Reconstructed (without leakage corrections), normalized to generated
-  t_energyFrac = m_eclShowerArray[minShower]->getEnergyRaw() / mcLabE;
+  //..Quit if the true energy is not equal to a generated one.
+  //  This can happen if the cluster is reconstructed in the wrong region.
+  if (t_energyBin == -1) {return;}
 
   //..Reconstructed energy after existing leakage correction, normalized to generated
   t_origEnergyFrac = m_eclShowerArray[minShower]->getEnergy() / mcLabE;
+
+  //..Sum of nOptimal crystals (without leakage correction), when events were generated
+  const double eRaw = m_eclShowerArray[minShower]->getEnergyRaw();
+
+  //-----------------------------------------------------------------
+  //..Find nOptimal from cellID and 3x3 energy found by ECLSplitterN1Module.
+  //  Note that payload may have been updated since events were generated, so
+  //  we need to redo the sum of energies of the nOptimal crystals.
+  const int ig = m_groupNumber[maxECellId - 1];
+  const double e3x3 = m_eclShowerArray[minShower]->getNOptimalEnergy();
+
+  //..Need the detector region to get the energy bin boundaries
+  int iRegion = 1; // barrel
+  if (ECLElementNumbers::isForward(maxECellId)) {iRegion = 0;}
+  if (ECLElementNumbers::isBackward(maxECellId)) {iRegion = 2;}
+
+  //..nOptimal energy bin for this energy.
+  int iEnergy = 0;
+  while (e3x3 > m_eBoundaries[iRegion][iEnergy] and iEnergy < m_nEnergies - 1) {iEnergy++;}
+
+  //..nOptimal
+  t_nCrys = m_nOptimal2D.GetBinContent(ig + 1, iEnergy + 1);
+
+  //-----------------------------------------------------------------
+  //..Find the sum of the nOptimal most-energetic digits
+
+  //..Get the ECLCalDigits and rank them by energy
+  std::vector<double> digitEnergies;
+  const auto showerDigitRelations = m_eclShowerArray[minShower]->getRelationsWith<ECLCalDigit>("ECLTrimmedDigits");
+  unsigned int nRelatedDigits = showerDigitRelations.size();
+  for (unsigned int ir = 0; ir < nRelatedDigits; ir++) {
+    const auto calDigit = showerDigitRelations.object(ir);
+    const auto weight = showerDigitRelations.weight(ir);
+    digitEnergies.push_back(calDigit->getEnergy() * weight);
+  }
+
+  //..Rank from lowest to highest
+  std::sort(digitEnergies.begin(), digitEnergies.end());
+
+  //..Sum the highest nOptimal digit energies (if there are that many)
+  double eSumOfN = 1.e-10; // cpp does not like 0
+  for (int isum = 0; isum < t_nCrys; isum++) {
+    const int i = (int)nRelatedDigits - 1 - isum;
+    if (i >= 0) {eSumOfN +=  digitEnergies[i];}
+  }
+
+  //-----------------------------------------------------------------
+  //..Correct the sum of nOptimal crystals for bias and nCrystal peak energy
+  //  We need to do this because the nOptimal payload may have changed
+  //  since the events were generated.
+
+  //..To allow for energy interpolation, there are three bins per group and energy:
+  //  iy = iEnergy + 1 in all three cases
+  //  ix = 3*ig + 1 = value for nominal energy, i.e logPeakEnergy(3*ig+1, iEnergy+1)
+  //  ix = 3*ig + 2 = value for lower energy, i.e logPeakEnergy(3*ig+2, iEnergy+1)
+  //  ix = 3*ig + 3 = value for higher energy, i.e logPeakEnergy(3*ig+3, iEnergy+1)
+  const int iy = iEnergy + 1;
+
+  const int ixNom = 3 * ig + 1;
+  const int ixLowerE = ixNom + 1;
+  const int ixHigherE = ixNom + 2;
+
+  const double logENom = m_logPeakEnergy.GetBinContent(ixNom, iy);
+  const double logELower = m_logPeakEnergy.GetBinContent(ixLowerE, iy);
+  const double logEHigher = m_logPeakEnergy.GetBinContent(ixHigherE, iy);
+
+  const double biasNom = m_bias.GetBinContent(ixNom, iy);
+  const double biasLower = m_bias.GetBinContent(ixLowerE, iy);
+  const double biasHigher = m_bias.GetBinContent(ixHigherE, iy);
+
+  const double peakNom = m_peakFracEnergy.GetBinContent(ixNom, iy);
+  const double peakLower = m_peakFracEnergy.GetBinContent(ixLowerE, iy);
+  const double peakHigher = m_peakFracEnergy.GetBinContent(ixHigherE, iy);
+
+  //..Interpolate in log energy
+  const double logESumN = log(eSumOfN);
+
+  double logEOther = logELower;
+  double biasOther = biasLower;
+  double peakOther = peakLower;
+  if (logESumN > logENom) {
+    logEOther = logEHigher;
+    biasOther = biasHigher;
+    peakOther = peakHigher;
+  }
+
+  //..The nominal and "other" energies may be identical if this is the first or last energy
+  double bias = biasNom;
+  double peak = peakNom;
+  if (abs(logEOther - logENom) > 0.0001) {
+    bias = biasNom + (biasOther - biasNom) * (logESumN - logENom) / (logEOther - logENom);
+    peak = peakNom + (peakOther - peakNom) * (logESumN - logENom) / (logEOther - logENom);
+  }
+
+  //..Normalized reconstructed energy after bias and nCrystal correction
+  t_energyFrac = (eSumOfN - bias) / peak / mcLabE;
 
   //-----------------------------------------------------------------
   //..Distance between generated and reconstructed positions
@@ -253,7 +375,21 @@ void eclLeakageCollectorModule::collect()
   ROOT::Math::XYZVector measuredDirection = ROOT::Math::XYZVector(measuredLocation) - vertex;
   t_locationError = radius * ROOT::Math::VectorUtil::Angle(measuredDirection, mcp3);
 
+
+  //-----------------------------------------------------------------
+  //..Debug: dump some events
+  if (m_Dump < 100) {
+    m_Dump++;
+    B2DEBUG(170, " ");
+    B2DEBUG(170, "cellID " << t_cellID << " ig " << ig << " Eraw " << eRaw * mcLabE << " ESum " << eSumOfN << " ie " << t_energyBin <<
+            " nOpt " << t_nCrys << " eFrac " << t_energyFrac);
+    B2DEBUG(170, " 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
+    B2DEBUG(170, "  3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
+    B2DEBUG(170, "  3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
+  }
+
   //-----------------------------------------------------------------
   //..Done
   getObjectPtr<TTree>("tree")->Fill();
 }
+

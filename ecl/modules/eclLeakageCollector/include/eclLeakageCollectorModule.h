@@ -12,6 +12,8 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <ecl/dbobjects/ECLnOptimal.h>
+#include <TH2F.h>
 
 namespace Belle2 {
   class ECLCrystalCalib;
@@ -61,6 +63,19 @@ namespace Belle2 {
     std::vector< std::vector<int> > i_energies;/**< Generated energies in MeV in each region */
 
     ECL::ECLLeakagePosition* leakagePosition{nullptr}; /**< location of position of cluster */
+    int m_Dump = 0; /**< Number of events with diagnostic printouts */
+
+    /** nOptimal payload */
+    DBObjPtr<ECLnOptimal> m_eclNOptimal;
+    TH2F m_nOptimal2D; /**< 2D hist of nOptimal for Ebin vs groupID */
+    TH2F m_peakFracEnergy; /**< 2D histogram of peak fractional contained energy */
+    TH2F m_bias; /**< 2D histogram of bias = sum of ECLCalDigit energy minus true (GeV) */
+    TH2F m_logPeakEnergy; /**< log of peak contained energy in GeV */
+
+    std::vector<int> m_groupNumber; /**< group number for each crystal */
+    const int m_nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
+    int m_nEnergies = 0; /**< number of energies bins in nOptimal payload */
+    std::vector< std::vector<float> > m_eBoundaries; /**< energy boundaries each region */
 
     /** For TTree */
     int t_cellID = 0; /**< cellID of photon */

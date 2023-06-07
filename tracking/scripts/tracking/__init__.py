@@ -293,13 +293,13 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    # V0 finding
-    if v0_finding:
-        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
+
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')
@@ -741,9 +741,8 @@ def add_vxd_standalone_cosmics_finder(
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    sp_creator_pxd = b2.register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
-    path.add_module(sp_creator_pxd)
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
+        path.add_module('PXDSpacePointCreator', SpacePoints=pxd_spacepoints_name)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 

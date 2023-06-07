@@ -1,3 +1,39 @@
+Changes in the analysis package in light-2305-korat
+---------------------------------------------------
+
+Modules
++++++++
+* Added an option ``selectedDaughters`` to specify daughters to apply weightings in `ParticleWeighting`.
+
+Geometric matching of KL and neutrons to ECL clusters
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Added a new module and a helper function `getNeutralHadronGeomMatches` to perform geometric match between generated neutral hadrons
+  (KL and neutrons) and ECL clusters. The function optionally provides efficiency correction to the simulation to improve KL modelling in ECL.
+  The function creates the additional variables `distanceToMcKl`, `mdstIndexMcKl` for KL and `distanceToMcNeutron`,
+  `mdstIndexMcNeutron` for neutrons, respectively.
+
+Variables
++++++++++
+* Added new variable `trackLength` that returns the arc length from the track origin to the last CDC layer associated to the track.
+* A bug affecting the variables `flightTimeOfDaughter`, `flightTimeOfDaughterErr`,
+  `flightDistanceOfDaughter`, and `flightDistanceOfDaughterErr` has been fixed, which caused the
+  return value to be NaN if the composite daughter particle was a V0 object.
+
+Reconstruction of V0s
++++++++++++++++++++++
+* `stdKshorts` and `stdLambdas`: removed a pre-vertex-fit cut on the invariant mass of ``K_S0``/``Lambda0``
+  candidates found by the ``V0Finder`` module. The cut was not useful, as ``V0Finder`` already applies a cut
+  on its candidates, and could discard signal candidates with very displaced vertex due to the
+  ``K_S0``/``Lambda0`` vertex being assumed at the origin before the fit, affecting the invariant mass computation.
+  The post-fit cut on the invariant mass is still present. Cuts on ``K_S0``/``Lambda0`` candidates found by `reconstructDecay`
+  are still the same as before.
+
+Command line tools
+++++++++++++++++++
+* The command line tool :ref:`b2help-variables <b2help-variables>` is extended to get a description of specific variables and to
+  display only their data.
+
+
 Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------
 Modules
@@ -15,14 +51,15 @@ Variables
   from a neural network that uses high-level information such as PID likelihoods, track momentum and charge.
   The probabilities are unaffected by momentum updates in vertex fits or the application of the track momentum scale correction.
 
+
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 
 Charm Flavor Tagger
 +++++++++++++++++++
 * The Charm Flavor Tagger algorithm has been added in ``analysis/scripts/charmFlavorTagger.py``. This allows for the determination
-  of the signal flavor of neutral D mesons with information from the ROE. The CFT output, qr, is saved in the extraInfo field of 
-  the signal particle. 
+  of the signal flavor of neutral D mesons with information from the ROE. The CFT output, qr, is saved in the extraInfo field of
+  the signal particle.
 
 MCMatching of K_S0
 ++++++++++++++++++
@@ -96,7 +133,7 @@ Modules
   with the PDG value, was floated in the TreeFit. Now it is fixed and the fit results get more reasonable.
   However, since the covariance matrix of the KLMCluster is not properly set yet, the performance of the TreeFit with these
   particles is not guaranteed.
-* Added an option ``overwriteRank`` to the `modularAnalysis.rankByHighest` and `modularAnalysis.rankByLowest` to overwrite the 
+* Added an option ``overwriteRank`` to the `modularAnalysis.rankByHighest` and `modularAnalysis.rankByLowest` to overwrite the
   extraInfo of rank when the particle has already the extraInfo.
 
 Variables

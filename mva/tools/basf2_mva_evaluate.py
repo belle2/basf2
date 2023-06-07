@@ -50,6 +50,9 @@ def get_argument_parser() -> argparse.ArgumentParser:
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
                         help='Compile latex to pdf directly')
+    parser.add_argument('-a', '--abbreviation_length', dest='abbreviation_length',
+                        action='store', type=int, default=5,
+                        help='Number of characters to which variable names are abbreviated.')
     return parser
 
 
@@ -106,7 +109,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     identifiers = flatten(args.identifiers)
-    identifier_abbreviations = create_abbreviations(identifiers)
+    identifier_abbreviations = create_abbreviations(identifiers, args.abbreviation_length)
 
     datafiles = flatten(args.datafiles)
     if args.localdb is not None:
@@ -139,11 +142,11 @@ if __name__ == '__main__':
             train_target[identifier_abbreviations[method.identifier]] = t
 
     variables = unique(v for method in methods for v in method.variables)
-    variable_abbreviations = create_abbreviations(variables)
+    variable_abbreviations = create_abbreviations(variables, args.abbreviation_length)
     root_variables = unique(v for method in methods for v in method.root_variables)
 
     spectators = unique(v for method in methods for v in method.spectators)
-    spectator_abbreviations = create_abbreviations(spectators)
+    spectator_abbreviations = create_abbreviations(spectators, args.abbreviation_length)
     root_spectators = unique(v for method in methods for v in method.root_spectators)
 
     print("Load variables array")
@@ -169,6 +172,17 @@ if __name__ == '__main__':
             os.chdir(tempdir)
         else:
             os.chdir(args.working_directory)
+
+        with open('abbreviations.txt', 'w') as f:
+            f.write('Identifier Abbreviation : Identifier \n')
+            for name, abbrev in identifier_abbreviations.items():
+                f.write(f'\t{abbrev} : {name}\n')
+            f.write('\n\n\nVariable Abbreviation : Variable \n')
+            for name, abbrev in variable_abbreviations.items():
+                f.write(f'\t{abbrev} : {name}\n')
+            f.write('\n\n\nSpectator Abbreviation : Spectator \n')
+            for name, abbrev in spectator_abbreviations.items():
+                f.write(f'\t{abbrev} : {name}\n')
 
         o = b2latex.LatexFile()
         o += b2latex.TitlePage(title='Automatic MVA Evaluation',

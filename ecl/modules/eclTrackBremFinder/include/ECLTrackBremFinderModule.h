@@ -8,10 +8,11 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/ModuleParam.templateDetails.h>
 
 namespace Belle2 {
   class ECLCluster;

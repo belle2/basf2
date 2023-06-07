@@ -8,7 +8,7 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <framework/utilities/TestHelpers.h>
 #include <framework/gearbox/Const.h>

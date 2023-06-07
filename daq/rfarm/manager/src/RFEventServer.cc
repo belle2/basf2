@@ -109,7 +109,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   m_nnodes = 0;
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  // char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char* sender = m_conf->getconf("distributor", "sender", "script");

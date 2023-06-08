@@ -46,8 +46,6 @@ def writeROISimulationParametersToDB(IoV=(0, 0, 0, 0),
 if __name__ == "__main__":
     # We want default ROI selection for experiment 0
     writeROISimulationParametersToDB((0, 0, 0, -1), True, -1)
-    # We want default ROI selection for experiment 1002
-    writeROISimulationParametersToDB((1002, 0, 1002, -1), False, -1)
     # We want default ROI selection for experiment 1003
     writeROISimulationParametersToDB((1003, 0, 1003, -1), False, -1)
     # We want default ROI selection for experiment 1004

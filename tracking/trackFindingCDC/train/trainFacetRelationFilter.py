@@ -85,7 +85,7 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
             ]
 
             #: Signal some variables to select in the classification analysis
-            # self.variables = None #all variables
+            # self.variables = None   # accept all variables
             self.variables = [
                 # "delta_phi",
                 # "delta_phi_pull",

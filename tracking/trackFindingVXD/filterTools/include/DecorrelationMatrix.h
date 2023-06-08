@@ -101,7 +101,6 @@ namespace Belle2 {
   //! @cond Doxygen_Suppress
   template<size_t Ndims>
   void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(const DecorrelationMatrix<Ndims>::MatrixT& covMatrix, bool normalise)
-  //! @endcond
   {
     // make an eigen decomposition of the covariance matrix to define the transformation matrix
     Eigen::SelfAdjointEigenSolver<MatrixT> eigenSolver(covMatrix);
@@ -116,6 +115,7 @@ namespace Belle2 {
       m_matrix = U;
     }
   }
+  //! @endcond
 
   template<size_t Ndims>
   std::vector<double> DecorrelationMatrix<Ndims>::decorrelate(const std::vector<double>& inputVec) const

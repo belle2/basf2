@@ -157,11 +157,11 @@ void eclLeakageCollectorModule::prepare()
   std::vector<float> eBoundariesFwd = m_eclNOptimal->getUpperBoundariesFwd();
   std::vector<float> eBoundariesBrl = m_eclNOptimal->getUpperBoundariesBrl();
   std::vector<float> eBoundariesBwd = m_eclNOptimal->getUpperBoundariesBwd();
-  m_nEnergies = eBoundariesBrl.size();
+  m_nEnergyBins = eBoundariesBrl.size();
 
   //..Copy values to m_eBoundaries
-  m_eBoundaries.resize(m_nLeakReg, std::vector<float>(m_nEnergies, 0.));
-  for (int ie = 0; ie < m_nEnergies; ie++) {
+  m_eBoundaries.resize(m_nLeakReg, std::vector<float>(m_nEnergyBins, 0.));
+  for (int ie = 0; ie < m_nEnergyBins; ie++) {
     m_eBoundaries[0][ie] = eBoundariesFwd[ie];
     m_eBoundaries[1][ie] = eBoundariesBrl[ie];
     m_eBoundaries[2][ie] = eBoundariesBwd[ie];
@@ -287,7 +287,7 @@ void eclLeakageCollectorModule::collect()
 
   //..nOptimal energy bin for this energy.
   int iEnergy = 0;
-  while (e3x3 > m_eBoundaries[iRegion][iEnergy] and iEnergy < m_nEnergies - 1) {iEnergy++;}
+  while (e3x3 > m_eBoundaries[iRegion][iEnergy] and iEnergy < m_nEnergyBins - 1) {iEnergy++;}
 
   //..nOptimal
   t_nCrys = m_nOptimal2D.GetBinContent(ig + 1, iEnergy + 1);
@@ -378,8 +378,8 @@ void eclLeakageCollectorModule::collect()
 
   //-----------------------------------------------------------------
   //..Debug: dump some events
-  if (m_Dump < 100) {
-    m_Dump++;
+  if (m_nDump < 100) {
+    m_nDump++;
     B2DEBUG(170, " ");
     B2DEBUG(170, "cellID " << t_cellID << " ig " << ig << " Eraw " << eRaw * mcLabE << " ESum " << eSumOfN << " ie " << t_energyBin <<
             " nOpt " << t_nCrys << " eFrac " << t_energyFrac);

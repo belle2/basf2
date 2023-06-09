@@ -15,12 +15,12 @@ namespace Belle2 {
   /** The payload containing all PXD ROI parameters.
       Right now this is only whether ROI finding was enabled or not,
       but this class can be extended to store size of ROIs etc. */
-  class ROIParameters: public TObject {
+  class ROISimulationParameters: public TObject {
   public:
     /** Default constructor */
-    ROIParameters() : m_useROIfinding(true), m_disableROIforEveryNth(-1) {}
+    ROISimulationParameters() {}
     /** Destructor */
-    ~ROIParameters() {}
+    ~ROISimulationParameters() {}
 
     /** Set whether ROI finding was used */
     void setROIfinding(bool useROIfinding)
@@ -47,12 +47,11 @@ namespace Belle2 {
     }
 
   private:
-    /** store whether ROI finding was used */
-    bool m_useROIfinding;
-
     /** you might to disable ROI finding for every Nth event (-1 if not used) */
-    int m_disableROIforEveryNth;
+    int m_disableROIforEveryNth = -1;
+    /** store whether ROI finding was used */
+    bool m_useROIfinding = true;
 
-    ClassDef(ROIParameters, 1);  /**< ClassDef, necessary for ROOT */
+    ClassDef(ROISimulationParameters, 1);  /**< ClassDef, necessary for ROOT */
   };
 }

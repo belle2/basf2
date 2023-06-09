@@ -824,15 +824,29 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 if 'tan_lambda' in parameter_root_name:
                     lower_bound = -2.0
                     upper_bound = 5.0
+                    # need different bounds for cosmics
+                    if 'cosmics' in self.validation_name.lower() or \
+                       'cosmics' in self.output_file_name.lower():
+                        lower_bound = -1.5
+                        upper_bound = 1.5
                 elif 'ndf' in parameter_root_name:
                     lower_bound = 0
                     upper_bound = min(200, np.max(parameter_values))
                 elif 'p_t' in parameter_root_name:
                     lower_bound = 0
                     upper_bound = 2.5
+                    # need different upper_bound for cosmics
+                    if 'cosmics' in self.validation_name.lower() or \
+                       'cosmics' in self.output_file_name.lower():
+                        upper_bound = 30
                 elif 'd_0' in parameter_root_name:
                     lower_bound = -0.06
                     upper_bound = 0.06
+                    # need different bounds for cosmics
+                    if 'cosmics' in self.validation_name.lower() or \
+                       'cosmics' in self.output_file_name.lower():
+                        lower_bound = -20
+                        upper_bound = 20
                 else:
                     lower_bound = None
                     upper_bound = None

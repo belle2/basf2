@@ -66,10 +66,10 @@ namespace Belle2 {
     {
       Super::initialize();
 
-      m_mvaPayload = std::make_unique<OptionalDBObjPtr<TrackingMVAFilterParameters>>(m_DBPayloadName);
-      if (m_mvaPayload->isValid()) {
-        m_identifier = (*m_mvaPayload)->getIdentifierName();
-        m_cutValue = (*m_mvaPayload)->getCutValue();
+      DBObjPtr<TrackingMVAFilterParameters> mvaParameterPayload(m_DBPayloadName);
+      if (mvaParameterPayload.isValid()) {
+        m_identifier = mvaParameterPayload->getIdentifierName();
+        m_cutValue = mvaParameterPayload->getCutValue();
         B2DEBUG(20, "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " <<
                 m_cutValue << ".");
       } else {

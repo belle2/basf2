@@ -79,9 +79,6 @@ namespace Belle2 {
       /// Name of the DB payload
       std::string m_DBPayloadName = "";
 
-      /// Pointer to the TrackingMVAFilterParameters base class
-      std::unique_ptr<DBObjPtr<TrackingMVAFilterParameters>> m_mvaPayload;
-
       /// MVA Expert to examine the object
       std::unique_ptr<MVAExpert> m_mvaExpert;
     };

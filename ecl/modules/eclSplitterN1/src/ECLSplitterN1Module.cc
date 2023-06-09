@@ -391,11 +391,14 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     };
 
     // sort this vector in descending order and keep only up to m_maxSplits entries
-    std::sort(lm_energy_vector.begin(), lm_energy_vector.end(), [](const std::pair<ECLLocalMaximum, double>& x,
-    const std::pair<ECLLocalMaximum, double>& y) {
-      return x.second > y.second;
-    });
-    lm_energy_vector.resize(m_maxSplits);
+    if (lm_energy_vector.size() >= static_cast<size_t>(m_maxSplits)) {
+      std::sort(lm_energy_vector.begin(), lm_energy_vector.end(), [](const std::pair<ECLLocalMaximum, double>& x,
+      const std::pair<ECLLocalMaximum, double>& y) {
+        return x.second > y.second;
+      });
+
+      lm_energy_vector.resize(m_maxSplits);
+    }
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;

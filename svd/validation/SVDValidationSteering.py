@@ -20,7 +20,7 @@
   <output>SVDValidationTTreeRecoDigit.root</output>
   <output>SVDValidationTTreeTrueHit.root</output>
   <output>SVDValidationTTreeCluster.root</output>
-  <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
+  <contact>SVD Software Group, svd-software@belle2.org</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
 """

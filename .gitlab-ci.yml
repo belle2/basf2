@@ -42,7 +42,7 @@ default:
       if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
         if [ "${GITLAB_IS_FIRST_STAGE}" != "yes" ]; then
             echo "Merging the branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} up to commit $(< target_head_hash.txt) into this branch"
-            git fetch --all && git merge $(< target_head_hash.txt) --strategy-option ours --no-commit
+            git fetch --all && git merge $(< target_head_hash.txt) --strategy-option ours --no-commit --allow-unrelated-histories
         fi
       fi
     # Preliminary operations necessary for basf2
@@ -84,6 +84,7 @@ build-gcc:
     - b2setup
     - scons --no-debuginfo
     - basf2 --info
+    - which root
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 run-tests:

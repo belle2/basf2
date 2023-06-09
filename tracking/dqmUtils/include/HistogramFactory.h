@@ -54,8 +54,7 @@ namespace Belle2::HistogramFactory {
     bool m_isSetTemporarily;
   };
 
-  /** Sets the permanent value.
-  * @param value - a value we want to assign to the permanent value. */
+  /** Sets the permanent value. */
   template <class AType>
   void Parameter<AType>::Set(const AType& value)
   {
@@ -63,8 +62,7 @@ namespace Belle2::HistogramFactory {
     m_isSet = true;
   }
 
-  /** Copy the permanent value setting.
-  * @param parameter - another parameter which permanent value setting we want to copy. */
+  /** Copy the permanent value setting. */
   template <class AType>
   void Parameter<AType>::Set(const Parameter<AType>& parameter)
   {
@@ -72,9 +70,7 @@ namespace Belle2::HistogramFactory {
       Set(parameter.m_value);
   }
 
-  /** Sets the temporary value.
-  * @param value - a value we want to assign to the temporary value. */
-
+  /** Sets the temporary value. */
   template <class AType>
   void Parameter<AType>::SetTemporarily(const AType& value)
   {
@@ -82,8 +78,7 @@ namespace Belle2::HistogramFactory {
     m_isSetTemporarily = true;
   }
 
-  /** Copy the temporary value setting.
-  * @param parameter - another parameter which temporary value setting we want to copy. */
+  /** Copy the temporary value setting. */
   template <class AType>
   void Parameter<AType>::SetTemporarily(const Parameter<AType>& parameter)
   {

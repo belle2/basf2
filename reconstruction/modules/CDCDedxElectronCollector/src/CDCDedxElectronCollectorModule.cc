@@ -8,9 +8,6 @@
 
 #include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
 #include <TTree.h>
 #include <TH1D.h>
 #include <TH1I.h>
@@ -31,10 +28,9 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   setDescription("A collector module for CDC dE/dx electron calibrations");
 
   // Parameter definitions
-  addParam("cleanupCuts", m_cuts, "Boolean to apply cleanup cuts", true);
-  addParam("maxNumHits", m_maxNumHits,
-           "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
-  addParam("setEoverP", m_setEoverP, "Set E over p Cut values. ", double(0.25));
+  addParam("cleanupCuts", m_cuts, "boolean to apply cleanup cuts", true);
+  addParam("maxHits", m_maxHits, "maximum number of hits per track ", int(100));
+  addParam("setEoP", m_setEoP, "Set E over p Cut values. ", double(0.25));
   addParam("isCosth", m_isCosth, "true for adding costh tree branch. ", false);
   addParam("isMom", m_isMom, "true for adding momentum tree branch. ", false);
   addParam("isCharge", m_isCharge, "true for charge dedx tree branch. ", false);
@@ -43,13 +39,14 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("isLayer", m_isLayer, "true for adding layers tree branch. ", false);
   addParam("isDoca", m_isDoca, "true for adding doca tree branch. ", false);
   addParam("isEnta", m_isEnta, "true for adding enta tree branch. ", false);
+  addParam("isInjTime", m_isInjTime, "true for adding time var tree branch. ", false);
   addParam("isDocaRS", m_isDocaRS, "true for adding doca tree branch. ", false);
   addParam("isEntaRS", m_isEntaRS, "true for adding enta tree branch. ", false);
   addParam("isDedxhit", m_isDedxhit, "true for adding dedxhit tree branch. ", false);
   addParam("isADCcorr", m_isADCcorr, "true for adding adc tree branch. ", false);
-  addParam("isBhabhaEvt", m_isBhabhaEvt, "true for bhabha events", true);
-  addParam("isRadBhabhaEvt", m_isRadBhabhaEvt, "true for radee events", false);
-  addParam("enableTrgSel", m_enableTrgSel, "true to enable trigger sel inside module", false);
+  addParam("isBhabha", m_isBhabha, "true for bhabha events", true);
+  addParam("isRadee", m_isRadee, "true for radee events", false);
+  addParam("isTrgSel", m_isTrgSel, "true to enable trigger sel inside module", false);
 }
 
 //-----------------------------------------------------------------
@@ -58,7 +55,7 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
 void CDCDedxElectronCollectorModule::prepare()
 {
-  m_TrgResult.isOptional();
+  m_trgResult.isOptional();
   m_dedxTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
@@ -85,6 +82,11 @@ void CDCDedxElectronCollectorModule::prepare()
   htstats->GetXaxis()->SetBinLabel(5, "weop");
   htstats->GetXaxis()->SetBinLabel(6, "radee");
   htstats->GetXaxis()->SetBinLabel(7, "selected");
+
+  if (m_isInjTime) {
+    ttree->Branch<double>("injtime", &m_injTime);
+    ttree->Branch<double>("injring", &m_injRing);
+  }
 
   ttree->Branch<double>("dedx", &m_dedx);
   if (m_isCosth)ttree->Branch<double>("costh", &m_costh);
@@ -117,15 +119,15 @@ void CDCDedxElectronCollectorModule::collect()
   auto hestats = getObjectPtr<TH1I>("hestats");
   hestats->Fill(0);
 
-  if (m_enableTrgSel) {
-    if (!m_TrgResult.isValid()) {
+  if (m_isTrgSel) {
+    if (!m_trgResult.isValid()) {
       B2WARNING("SoftwareTriggerResult required to select bhabha/radee event is not found");
       hestats->Fill(1);
       return;
     }
 
     //release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee
-    const std::map<std::string, int>& fresults = m_TrgResult->getResults();
+    const std::map<std::string, int>& fresults = m_trgResult->getResults();
     if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() and
         fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()) {
       B2WARNING("Can't find required bhabha/radee trigger identifiers");
@@ -133,21 +135,21 @@ void CDCDedxElectronCollectorModule::collect()
       return;
     }
 
-    const bool eBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
+    const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                           SoftwareTriggerCutResult::c_accept);
 
-    const bool eRadBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_radee") ==
+    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee") ==
                              SoftwareTriggerCutResult::c_accept);
 
-    if (!m_isBhabhaEvt && !m_isRadBhabhaEvt) {
+    if (!m_isBhabha && !m_isRadee) {
       B2WARNING("requested not-supported event type: going back");
       hestats->Fill(3);
       return;
-    } else if (m_isBhabhaEvt && !m_isRadBhabhaEvt && !eBhabha) {
+    } else if (m_isBhabha && !m_isRadee && !eBhabha) {
       B2WARNING("requested bhabha only but event not found: going back");
       hestats->Fill(3);
       return;
-    } else  if (m_isRadBhabhaEvt && !m_isBhabhaEvt && !eRadBhabha) {
+    } else  if (m_isRadee && !m_isBhabha && !eRadBhabha) {
       B2WARNING("requested radee only but event not found: going back");
       hestats->Fill(3);
       return;
@@ -161,7 +163,6 @@ void CDCDedxElectronCollectorModule::collect()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int run = eventMetaDataPtr->getRun();
   if (m_isRun)m_run = run;
-
   int nTracks = m_dedxTracks.getEntries();
   if (nTracks >= 4) {
     B2WARNING("too many tracks: unclean bhabha or radee event: " << nTracks);
@@ -200,6 +201,8 @@ void CDCDedxElectronCollectorModule::collect()
     m_p = dedxTrack->getMomentum();
     m_costh = dedxTrack->getCosTheta();
     m_charge = fitResult->getChargeSign();
+    m_injTime = dedxTrack->getInjectionTime();
+    m_injRing = dedxTrack->getInjectionRing();
     htstats->Fill(0);
 
     if (m_cuts) {
@@ -212,6 +215,9 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_costh < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
       if (m_costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
       htstats->Fill(2);
+
+      m_nhits = dedxTrack->size();
+      if (m_nhits > m_maxHits) continue;
 
       //making some cuts based on acceptance
       if (m_costh > -0.55 && m_costh < 0.820) {
@@ -229,26 +235,26 @@ void CDCDedxElectronCollectorModule::collect()
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
-        if (abs(TrkEoverP - 1.0) > m_setEoverP)continue;
+        if (abs(TrkEoverP - 1.0) > m_setEoP)continue;
       }
       htstats->Fill(4);
+    }
 
-      //if dealing with radee here (do a safe side cleanup)
-      if (m_isRadBhabhaEvt) {
-        if (nTracks != 2)continue; //exactly 2 tracks
-        bool goodradee = false;
-        //checking if dedx of other track is restricted
-        //will not do too much as radee is clean enough
-        for (int jdedx = 0; jdedx < nTracks; jdedx++) {
-          CDCDedxTrack* dedxOtherTrack = m_dedxTracks[abs(jdedx - 1)];
-          if (!dedxOtherTrack)continue;
-          if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
-          goodradee = true;
-          break;
-        }
-        if (!goodradee)continue;
-        htstats->Fill(5);
+    //if dealing with radee here (do a safe side cleanup)
+    if (m_isRadee) {
+      if (nTracks != 2)continue; //exactly 2 tracks
+      bool goodradee = false;
+      //checking if dedx of other track is restricted
+      //will not do too much as radee is clean enough
+      for (int jdedx = 0; jdedx < nTracks; jdedx++) {
+        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[abs(jdedx - 1)];
+        if (!dedxOtherTrack)continue;
+        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
+        goodradee = true;
+        break;
       }
+      if (!goodradee)continue;
+      htstats->Fill(5);
     }
 
 
@@ -264,8 +270,6 @@ void CDCDedxElectronCollectorModule::collect()
 
     // Simple numbers don't need to be cleared
     // make sure to use the truncated mean without the hadron saturation correction
-    m_nhits = dedxTrack->size();
-    if (m_nhits > m_maxNumHits) continue;
 
     for (int i = 0; i < m_nhits; ++i) {
       // if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue;

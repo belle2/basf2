@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>

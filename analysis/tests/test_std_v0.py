@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,17 +29,11 @@ class TestStdV0(unittest.TestCase):
                 "TreeFitter",
                 "ParticleSelector",
                 "ParticleListManipulator"],
-            expected_lists=['V0', 'V0_MassWindow', 'all', 'RD', 'merged']):
+            expected_lists=['V0_ToFit', 'V0_ToFit', 'all', 'RD', 'merged']):
         """check that a given function works"""
         testpath = create_path()
         std_function(path=testpath)
 
-        # verify that we load the correct amount of modules
-        self.assertEqual(
-            len(testpath.modules()), len(expected_modules),
-            "Function %s does not load the expected number of modules" % (std_function.__name__))
-
-        #
         loaded_modules = []
         built_lists = []
         for module in testpath.modules():
@@ -56,13 +49,15 @@ class TestStdV0(unittest.TestCase):
                     name = param.values.split(':')[1].split(' -> ')[0]
                     built_lists.append(name)
 
-        # we have the modules we expect
-        for a, b in zip(loaded_modules, expected_modules):
-            self.assertEqual(a, b, "Loaded module \'%s\' instead of \'%s\' with function %s" % (a, b, std_function.__name__))
+        # Check that we load the correct modules
+        self.assertListEqual(
+            loaded_modules, expected_modules,
+            f"Loaded modules do not match the expected ones (function {std_function.__name__})")
 
-        # we have the particle lists we expect
-        for a, b in zip(built_lists, expected_lists):
-            self.assertEqual(a, b, "Loaded list \'%s\' instead of \'%s\' with function %s" % (a, b, std_function.__name__))
+        # Check that we load the correct particle lists
+        self.assertListEqual(
+            built_lists, expected_lists,
+            f"Built particles lists do not match the expected ones (function {std_function.__name__})")
 
     def test_stdkshorts_list(self):
         """check that the builder function works with the stdKshorts list"""
@@ -75,7 +70,8 @@ class TestStdV0(unittest.TestCase):
                             "ParticleSelector",
                             "ParticleVertexFitter",
                             "ParticleSelector"]
-        self._check_list(std_function=stdV0s.goodBelleKshort, expected_modules=expected_modules, expected_lists=["legacyGoodKS"])
+        self._check_list(std_function=stdV0s.goodBelleKshort, expected_modules=expected_modules,
+                         expected_lists=["legacyGoodKS", "legacyGoodKS"])
 
     def test_stdlambdas_list(self):
         """check that the builder function works with the stdLambdas list"""
@@ -93,7 +89,7 @@ class TestStdV0(unittest.TestCase):
                             "DuplicateVertexMarker",
                             "ParticleSelector",
                             "ParticleListManipulator"]
-        expected_lists = ['V0', 'V0_MassWindow', 'all', 'all', 'RD', 'merged']
+        expected_lists = ['V0_ToFit', 'V0_ToFit', 'all', 'all', 'RD', 'merged']
         self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
 
 

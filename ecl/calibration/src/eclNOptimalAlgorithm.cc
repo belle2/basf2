@@ -10,6 +10,7 @@
 #include <ecl/calibration/eclNOptimalAlgorithm.h>
 
 /* ECL headers. */
+#include <ecl/calibration/tools.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLnOptimal.h>
 
@@ -255,7 +256,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   const int nCrystalGroups = (int)(inputParameters->GetBinContent(1) + 0.5);
   const int nEnergies = (int)(inputParameters->GetBinContent(2) + 0.5);
   const int nLeakReg = 3; // 3 regions forward barrel backward
-  float generatedE[nLeakReg][nEnergies];
+  auto generatedE = create2Dvector<float>(nLeakReg, nEnergies);
   int bin = 2; // bin 1 = nCrystalGroups, bin 2 = nEnergies, bin 3 = first energy
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -830,7 +831,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Prepare the payload contents
   //..Upper energy boundaries are the mid-point of the log energies
-  float boundaryE[nLeakReg][nEnergies];
+  auto  boundaryE = create2Dvector<float>(nLeakReg, nEnergies);
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
     B2INFO("Generated energies and boundaries for region = " << ireg);
     for (int ie = 0; ie < nEnergies - 1; ie++) {

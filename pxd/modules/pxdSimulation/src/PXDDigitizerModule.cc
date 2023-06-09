@@ -263,6 +263,7 @@ void PXDDigitizerModule::event()
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
+    if (!m_currentHit->getElectrons()) continue;
     const RelationIndex<MCParticle, PXDSimHit>::Element* mcRel =
       relMCParticleSimHit.getFirstElementTo(m_currentHit);
     if (mcRel) {

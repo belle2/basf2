@@ -382,8 +382,8 @@ that they do not work properly because of missing ``python`` packages. In that c
 The last step is to install `gbasf2`_. For that purpose, please switch to a new terminal window with fresh environment
 on your machine, and follow the steps for `gbasf2 installation <https://confluence.desy.de/display/BI/Computing+GBasf2#ComputingGBasf2-gBasf2installationprocedure>`_.
 
-In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the JIRA issue
-`BIIDCD-1256 <https://agira.desy.de/browse/BIIDCD-1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
+In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the GitLab issue
+`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
 

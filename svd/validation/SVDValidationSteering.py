@@ -26,7 +26,7 @@
 """
 
 import basf2 as b2
-from basf2 import conditions as b2c
+# from basf2 import conditions as b2c
 # Individual validation packages
 from SVDValidationTTreeStrip import SVDValidationTTreeStrip
 from SVDValidationTTreeSimhit import SVDValidationTTreeSimhit
@@ -38,7 +38,7 @@ from SVDValidationTTreeCluster import SVDValidationTTreeCluster
 
 b2.set_random_seed(12345)
 
-b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+# b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = b2.create_path()
 

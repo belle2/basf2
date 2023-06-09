@@ -702,19 +702,22 @@ for moda in main.modules():
         moda.param("returnClusterRawTime", args.isRawTime)
     if moda.name() == 'SVDTimeGrouping':
         if args.doSVDGrouping:
+            moda.param("useDB", False)
             moda.param('tRangeLow',  minTime)
             moda.param('tRangeHigh', maxTime)
             moda.param("expectedSignalTimeCenter",    sigLoc)
             moda.param('expectedSignalTimeMin',  sigMin)
             moda.param('expectedSignalTimeMax', sigMax)
-            moda.param("rebinningFactor", 2)
+            moda.param("isEnabledIn6Samples", True)
+            moda.param("isEnabledIn3Samples", True)
             moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
             moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
             moda.param("signalLifetime", args.signalLifetime)
-        else:
-            moda.param("rebinningFactor", 0)
     if moda.name() == 'SVDSpacePointCreator':
-        moda.param("useSVDGroupInfo", args.useSVDGroupInfo)
+        if args.useSVDGroupInfo:
+            moda.param("useDB", False)
+            moda.param("useSVDGroupInfoIn6Sample", True)
+            moda.param("useSVDGroupInfoIn3Sample", True)
 
 
 if args.executionTime:

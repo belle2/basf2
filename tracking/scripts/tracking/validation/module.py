@@ -831,8 +831,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                     lower_bound = 0
                     upper_bound = 2.5
                 elif 'd_0' in parameter_root_name:
-                    lower_bound = -0.6
-                    upper_bound = 0.6
+                    lower_bound = -0.06
+                    upper_bound = 0.06
                 else:
                     lower_bound = None
                     upper_bound = None

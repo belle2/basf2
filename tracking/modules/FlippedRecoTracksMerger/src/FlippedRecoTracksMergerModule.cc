@@ -109,11 +109,9 @@ void FlippedRecoTracksMergerModule::event()
     }
 
     recoTrack.flipTrackDirectionAndCharge();
-    // Initialise the TrackFitter to refit the recoTrack and provide a valid genfit state
-    TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
-                       m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
-    // PDG code 211 for pion is enough to get a valid track fit with a valid genfit::MeasuredStateOnPlane
-    Const::ChargedStable particleUsedForFitting(211);
-    fitter.fit(recoTrack, particleUsedForFitting);
+
+    // swapping the flipped genfit::Track into the main RecoTrack, to store the new fitted values (useful for V0Finder)
+    genfit::Track flipTrack = RecoTrackGenfitAccess::getGenfitTrack(*flippedRecoTrack);
+    RecoTrackGenfitAccess::swapGenfitTrack(recoTrack, &flipTrack);
   }
 }

@@ -396,6 +396,11 @@ void RecoTrack::prune()
   }
 }
 
+void RecoTrackGenfitAccess::swapGenfitTrack(RecoTrack& recoTrack, const genfit::Track* track)
+{
+  recoTrack.m_genfitTrack = *track;
+}
+
 genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
 {
   return recoTrack.m_genfitTrack;

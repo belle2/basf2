@@ -377,7 +377,7 @@ class CDCDedxCalibration(Calibration):
             name: name of calibration
             algorithims: algorithm of calibration
             input_file_dict: input files list
-            max_interations: maximum number of iterations
+            max_iterations: maximum number of iterations
             dependenices: depends on the previous calibration
             collector_granularity: granularity : all or run
         '''
@@ -404,6 +404,7 @@ class CDCDedxCalibration(Calibration):
                                     )
         self.add_collection(name=name, collection=collection)
 
+        #: maximum iterations
         self.max_iterations = max_iterations
 
         if dependencies is not None:

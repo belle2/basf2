@@ -211,7 +211,6 @@ def pre_collector(name='rg'):
     Returns:
         path : path for pre collection
     """
-
     reco_path = basf2.create_path()
     recon.prepare_cdst_analysis(path=reco_path)
     if(name == "tg"):
@@ -329,6 +328,7 @@ def cosedge_algo():
     algo = CDCDedxCosEdgeAlgorithm()
     algo.setMonitoringPlots(True)
     return algo
+
 
 # Badwire Algorithm setup
 

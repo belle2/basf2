@@ -29,7 +29,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
         result_filter_parameters = {}
     else:
         result_filter = "mva_with_relations"
-        result_filter_parameters = {"cut": 0.6, 'DBPayloadName': 'SeededCDCToSVDResultParameters'}
+        result_filter_parameters = {'DBPayloadName': 'ckf_SeededCDCToSVDResultParameters'}
 
     if direction == "forward":
         reverse_seed = True
@@ -98,25 +98,17 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
     else:
         module_parameters = dict(
             firstHighFilterParameters={
-                "cut": filter_cut,
-                "identifier": "ckf_ToPXDStateFilter_1",
-                'DBPayloadName': 'ToPXDStateFilter_1Parameters',
+                'DBPayloadName': 'ckf_ToPXDStateFilter_1Parameters',
                 "direction": direction},
             firstHighUseNStates=use_best_seeds,
             secondHighFilterParameters={
-                "cut": filter_cut,
-                "identifier": "ckf_ToPXDStateFilter_2",
-                'DBPayloadName': 'ToPXDStateFilter_3Parameters'},
+                'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'},
             secondHighUseNStates=use_best_seeds,
             thirdHighFilterParameters={
-                "cut": filter_cut,
-                "identifier": "ckf_ToPXDStateFilter_3",
-                'DBPayloadName': 'ToPXDStateFilter_3Parameters'},
+                'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'},
             thirdHighUseNStates=use_best_seeds,
             filterParameters={
-                    "cut": overlap_cut,
-                    "identifier": "ckf_PXDTrackCombination",
-                    'DBPayloadName': 'PXDTrackCombinationParameters'},
+                    'DBPayloadName': 'ckf_PXDTrackCombinationParameters'},
             useBestNInSeed=use_best_results,
                      )
 
@@ -171,25 +163,17 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, filt
     else:
         module_parameters = dict(
             firstHighFilterParameters={
-                "identifier": "ckf_CDCSVDStateFilter_1",
-                "cut": filter_cut,
                 "direction": direction,
-                'DBPayloadName': 'CDCSVDStateFilter_1Parameters'},
+                'DBPayloadName': 'ckf_CDCSVDStateFilter_1Parameters'},
             firstHighUseNStates=use_best_seeds,
             secondHighFilterParameters={
-                "identifier": "ckf_CDCSVDStateFilter_2",
-                "cut": filter_cut,
-                'DBPayloadName': 'CDCSVDStateFilter_2Parameters'},
+                'DBPayloadName': 'ckf_CDCSVDStateFilter_2Parameters'},
             secondHighUseNStates=use_best_seeds,
             thirdHighFilterParameters={
-                "identifier": "ckf_CDCSVDStateFilter_3",
-                "cut": filter_cut,
-                'DBPayloadName': 'CDCSVDStateFilter_3Parameters'},
+                'DBPayloadName': 'ckf_CDCSVDStateFilter_3Parameters'},
             thirdHighUseNStates=use_best_seeds,
             filterParameters={
-                    "cut": overlap_cut,
-                    "identifier": "ckf_CDCToSVDResult",
-                    'DBPayloadName': 'CDCToSVDResultParameters'},
+                    'DBPayloadName': 'ckf_CDCToSVDResultParameters'},
             useBestNInSeed=use_best_results,
                      )
 
@@ -320,25 +304,17 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
             preHitFilter="all",
             preSeedFilter="all",
             firstHighFilterParameters={
-                "cut": filter_cut,
-                "identifier": "ckf_ToPXDStateFilter_1",
-                'DBPayloadName': 'ToPXDStateFilter_1Parameters',
+                'DBPayloadName': 'ckf_ToPXDStateFilter_1Parameters',
                 "direction": direction},
             firstHighUseNStates=use_best_seeds,
             secondHighFilterParameters={
-                "cut": filter_cut,
-                "identifier": "ckf_ToPXDStateFilter_2",
-                'DBPayloadName': 'ToPXDStateFilter_2Parameters'},
+                'DBPayloadName': 'ckf_ToPXDStateFilter_2Parameters'},
             secondHighUseNStates=use_best_seeds,
             thirdHighFilterParameters={
-                "cut": filter_cut,
-                "identifier": "ckf_ToPXDStateFilter_3",
-                'DBPayloadName': 'ToPXDStateFilter_3Parameters'},
+                'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'},
             thirdHighUseNStates=use_best_seeds,
             filterParameters={
-                    "cut": overlap_cut,
-                    "identifier": "ckf_PXDTrackCombination",
-                    'DBPayloadName': 'PXDTrackCombinationParameters'},
+                'DBPayloadName': 'ckf_PXDTrackCombinationParameters'},
             useBestNInSeed=use_best_results,
             seedHitJumping=1,
             hitHitJumping=0,

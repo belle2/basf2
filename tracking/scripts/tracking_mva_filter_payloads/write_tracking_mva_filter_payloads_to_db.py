@@ -47,150 +47,54 @@ def write_tracking_mva_filter_payloads_to_db(dbobj_name: str = None,
 
 
 if __name__ == "__main__":
-    write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
-    write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
-    write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
 
-    write_tracking_mva_filter_payloads_to_db("SegmentTrackFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_SegmentTrackFilter", 0.74)
-    write_tracking_mva_filter_payloads_to_db("SegmentTrackFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_SegmentTrackFilter", 0.74)
-    write_tracking_mva_filter_payloads_to_db("SegmentTrackFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_SegmentTrackFilter", 0.74)
+    validIoVs = [(0, 0, 0, -1), (1002, 0, 1002, -1), (1003, 0, 1003, -1), (1004, 0, 1004, -1)]
+    for iov in validIoVs:
 
-    write_tracking_mva_filter_payloads_to_db("TrackFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_TrackFilter", 0.1)
-    write_tracking_mva_filter_payloads_to_db("TrackFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_TrackFilter", 0.1)
-    write_tracking_mva_filter_payloads_to_db("TrackFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_TrackFilter", 0.1)
-    write_tracking_mva_filter_payloads_to_db("ClusterFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_BackgroundClusterFilter", 0.2)
-    write_tracking_mva_filter_payloads_to_db("ClusterFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_BackgroundClusterFilter", 0.2)
-    write_tracking_mva_filter_payloads_to_db("ClusterFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_BackgroundClusterFilter", 0.2)
-    write_tracking_mva_filter_payloads_to_db("FacetFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_FacetFilter", 2.805)
-    write_tracking_mva_filter_payloads_to_db("FacetFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_FacetFilter", 2.805)
-    write_tracking_mva_filter_payloads_to_db("FacetFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_FacetFilter", 2.805)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentPairRelationFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_RealisticSegmentPairRelationFilter", 0.22)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentPairRelationFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_RealisticSegmentPairRelationFilter", 0.22)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentPairRelationFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_RealisticSegmentPairRelationFilter", 0.22)
-    write_tracking_mva_filter_payloads_to_db("FeasibleSegmentPairFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
-    write_tracking_mva_filter_payloads_to_db("FeasibleSegmentPairFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
-    write_tracking_mva_filter_payloads_to_db("FeasibleSegmentPairFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentPairFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_RealisticSegmentPairFilter", 0.02)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentPairFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_RealisticSegmentPairFilter", 0.02)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentPairFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_RealisticSegmentPairFilter", 0.02)
-    write_tracking_mva_filter_payloads_to_db("FeasibleTrackRelationFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_FeasibleTrackRelationFilter", 0.03)
-    write_tracking_mva_filter_payloads_to_db("FeasibleTrackRelationFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_FeasibleTrackRelationFilter", 0.03)
-    write_tracking_mva_filter_payloads_to_db("FeasibleTrackRelationFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_FeasibleTrackRelationFilter", 0.03)
-    write_tracking_mva_filter_payloads_to_db("RealisticTrackRelationFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_RealisticTrackRelationFilter", 0.80)
-    write_tracking_mva_filter_payloads_to_db("RealisticTrackRelationFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_RealisticTrackRelationFilter", 0.80)
-    write_tracking_mva_filter_payloads_to_db("RealisticTrackRelationFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_RealisticTrackRelationFilter", 0.80)
-    write_tracking_mva_filter_payloads_to_db("FeasibleAxialSegmentPairFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_FeasibleAxialSegmentPairFilter", 0.04)
-    write_tracking_mva_filter_payloads_to_db("FeasibleAxialSegmentPairFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_FeasibleAxialSegmentPairFilter", 0.04)
-    write_tracking_mva_filter_payloads_to_db("FeasibleAxialSegmentPairFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_FeasibleAxialSegmentPairFilter", 0.04)
-    write_tracking_mva_filter_payloads_to_db("RealisticAxialSegmentPairFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_RealisticAxialSegmentPairFilter", 0.49)
-    write_tracking_mva_filter_payloads_to_db("RealisticAxialSegmentPairFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_RealisticAxialSegmentPairFilter", 0.49)
-    write_tracking_mva_filter_payloads_to_db("RealisticAxialSegmentPairFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_RealisticAxialSegmentPairFilter", 0.49)
-    write_tracking_mva_filter_payloads_to_db("FeasibleSegmentRelationFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_FeasibleSegmentRelationFilter", 0.04)
-    write_tracking_mva_filter_payloads_to_db("FeasibleSegmentRelationFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_FeasibleSegmentRelationFilter", 0.04)
-    write_tracking_mva_filter_payloads_to_db("FeasibleSegmentRelationFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_FeasibleSegmentRelationFilter", 0.04)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentRelationFilterParameters",
-                                             (0,    0,    0, -1), "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentRelationFilterParameters",
-                                             (1002, 0, 1002, -1), "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
-    write_tracking_mva_filter_payloads_to_db("RealisticSegmentRelationFilterParameters",
-                                             (1003, 0, 1003, -1), "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_TrackQualityEstimatorParameters",
+                                                 iov, "trackfindingcdc_TrackQualityIndicator", 0.7)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_SegmentTrackFilterParameters",
+                                                 iov, "trackfindingcdc_SegmentTrackFilter", 0.74)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_TrackFilterParameters",
+                                                 iov, "trackfindingcdc_TrackFilter", 0.1)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_ClusterFilterParameters",
+                                                 iov, "trackfindingcdc_BackgroundClusterFilter", 0.2)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_FacetFilterParameters",
+                                                 iov, "trackfindingcdc_FacetFilter", 2.805)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticSegmentPairRelationFilterParameters",
+                                                 iov, "trackfindingcdc_RealisticSegmentPairRelationFilter", 0.22)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_FeasibleSegmentPairFilterParameters",
+                                                 iov, "trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticSegmentPairFilterParameters",
+                                                 iov, "trackfindingcdc_RealisticSegmentPairFilter", 0.02)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_FeasibleTrackRelationFilterParameters",
+                                                 iov, "trackfindingcdc_FeasibleTrackRelationFilter", 0.03)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticTrackRelationFilterParameters",
+                                                 iov, "trackfindingcdc_RealisticTrackRelationFilter", 0.80)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_FeasibleAxialSegmentPairFilterParameters",
+                                                 iov, "trackfindingcdc_FeasibleAxialSegmentPairFilter", 0.04)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticAxialSegmentPairFilterParameters",
+                                                 iov, "trackfindingcdc_RealisticAxialSegmentPairFilter", 0.49)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_FeasibleSegmentRelationFilterParameters",
+                                                 iov, "trackfindingcdc_FeasibleSegmentRelationFilter", 0.04)
+        write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticSegmentRelationFilterParameters",
+                                                 iov, "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
 
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
-                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_1", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
-                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_1", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_1Parameters",
-                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_1", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_2Parameters",
-                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_2", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_2Parameters",
-                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_2", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_2Parameters",
-                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_2", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_3Parameters",
-                                             (0,    0,    0, -1), "ckf_CDCSVDStateFilter_3", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_3Parameters",
-                                             (1002, 0, 1002, -1), "ckf_CDCSVDStateFilter_3", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCSVDStateFilter_3Parameters",
-                                             (1003, 0, 1003, -1), "ckf_CDCSVDStateFilter_3", 0.1)
-    write_tracking_mva_filter_payloads_to_db("CDCToSVDResultParameters",
-                                             (0,    0,    0, -1), "ckf_CDCToSVDResult", 0.2)
-    write_tracking_mva_filter_payloads_to_db("CDCToSVDResultParameters",
-                                             (1002, 0, 1002, -1), "ckf_CDCToSVDResult", 0.2)
-    write_tracking_mva_filter_payloads_to_db("CDCToSVDResultParameters",
-                                             (1003, 0, 1003, -1), "ckf_CDCToSVDResult", 0.2)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_1Parameters",
-                                             (0,    0,    0, -1), "ckf_ToPXDStateFilter_1", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_1Parameters",
-                                             (1002, 0, 1002, -1), "ckf_ToPXDStateFilter_1", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_1Parameters",
-                                             (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_1", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_2Parameters",
-                                             (0,    0,    0, -1), "ckf_ToPXDStateFilter_2", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_2Parameters",
-                                             (1002, 0, 1002, -1), "ckf_ToPXDStateFilter_2", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_2Parameters",
-                                             (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_2", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
-                                             (0,    0,    0, -1), "ckf_ToPXDStateFilter_3", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
-                                             (1002, 0, 1002, -1), "ckf_ToPXDStateFilter_3", 0.03)
-    write_tracking_mva_filter_payloads_to_db("ToPXDStateFilter_3Parameters",
-                                             (1003, 0, 1003, -1), "ckf_ToPXDStateFilter_3", 0.03)
-    write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
-                                             (0,    0,    0, -1), "ckf_PXDTrackCombination", 0.2)
-    write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
-                                             (1002, 0, 1002, -1), "ckf_PXDTrackCombination", 0.2)
-    write_tracking_mva_filter_payloads_to_db("PXDTrackCombinationParameters",
-                                             (1003, 0, 1003, -1), "ckf_PXDTrackCombination", 0.2)
-    write_tracking_mva_filter_payloads_to_db("SeededCDCToSVDResultParameters",
-                                             (0,    0,    0, -1), "ckf_SeededCDCToSVDResult", 0.6)
-    write_tracking_mva_filter_payloads_to_db("SeededCDCToSVDResultParameters",
-                                             (1002, 0, 1002, -1), "ckf_SeededCDCToSVDResult", 0.6)
-    write_tracking_mva_filter_payloads_to_db("SeededCDCToSVDResultParameters",
-                                             (1003, 0, 1003, -1), "ckf_SeededCDCToSVDResult", 0.6)
-#    write_tracking_mva_filter_payloads_to_db("**Parameters",
-#                                             (0,    0,    0, -1), "**", 0.*)
-#    write_tracking_mva_filter_payloads_to_db("**Parameters",
-#                                             (1002, 0, 1002, -1), "**", 0.*)
-#    write_tracking_mva_filter_payloads_to_db("**Parameters",
-#                                             (1003, 0, 1003, -1), "**", 0.*)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_1Parameters",
+                                                 iov, "ckf_CDCSVDStateFilter_1", 0.1)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_2Parameters",
+                                                 iov, "ckf_CDCSVDStateFilter_2", 0.1)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_3Parameters",
+                                                 iov, "ckf_CDCSVDStateFilter_3", 0.1)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCToSVDResultParameters",
+                                                 iov, "ckf_CDCToSVDResult", 0.2)
+        write_tracking_mva_filter_payloads_to_db("ckf_ToPXDStateFilter_1Parameters",
+                                                 iov, "ckf_ToPXDStateFilter_1", 0.03)
+        write_tracking_mva_filter_payloads_to_db("ckf_ToPXDStateFilter_2Parameters",
+                                                 iov, "ckf_ToPXDStateFilter_2", 0.03)
+        write_tracking_mva_filter_payloads_to_db("ckf_ToPXDStateFilter_3Parameters",
+                                                 iov, "ckf_ToPXDStateFilter_3", 0.03)
+        write_tracking_mva_filter_payloads_to_db("ckf_PXDTrackCombinationParameters",
+                                                 iov, "ckf_PXDTrackCombination", 0.2)
+        write_tracking_mva_filter_payloads_to_db("ckf_SeededCDCToSVDResultParameters",
+                                                 iov, "ckf_SeededCDCToSVDResult", 0.6)

@@ -1,3 +1,4 @@
+
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
@@ -18,6 +19,6 @@ MVAFeasibleSegmentRelationFilter::MVAFeasibleSegmentRelationFilter()
   : Super(std::make_unique<VarSet>(),
           "trackfindingcdc_FeasibleSegmentRelationFilter",
           0.04,
-          "FeasibleSegmentRelationFilterParameters")
+          "trackfindingcdc_FeasibleSegmentRelationFilterParameters")
 {
 }

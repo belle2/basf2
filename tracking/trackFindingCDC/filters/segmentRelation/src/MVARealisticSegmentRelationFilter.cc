@@ -18,7 +18,7 @@ MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
   : Super(std::make_unique<VarSet>(),
           "trackfindingcdc_RealisticSegmentRelationFilter",
           0.805,
-          "RealisticSegmentRelationFilterParameters")
+          "trackfindingcdc_RealisticSegmentRelationFilterParameters")
 {
   this->addProcessingSignalListener(&m_feasibleSegmentRelationFilter);
 }

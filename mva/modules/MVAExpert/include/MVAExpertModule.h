@@ -99,7 +99,7 @@ namespace Belle2 {
      */
     StoreArray<Particle> m_particles;
     /**
-     *< Decay descriptor of decays to look for.
+     * Decay descriptor of decays to look for.
      */
     std::unordered_map<std::string, DecayDescriptor>  m_decaydescriptors;
     std::vector<std::string> m_listNames; /**< input particle list names */

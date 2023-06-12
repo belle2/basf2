@@ -148,9 +148,6 @@ namespace Belle2 {
     /** SVD T0  for 6 samples*/
     TH1F* m_SVD6T0 = nullptr;
 
-    /** Correlation plot btw T0 and cluster on tracks for 6 samples*/
-    TH2F* m_SVD6T0cls6TrkTime = nullptr;
-
   };
 
 }

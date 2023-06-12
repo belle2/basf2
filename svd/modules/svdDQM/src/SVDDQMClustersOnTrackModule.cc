@@ -263,14 +263,6 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_SVD6T0->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_SVD6T0);
 
-  name = "SVD6_T0cls6TrkTime";
-  title = Form("SVD T0 vs V345-Cluster-on-Track 6 samples");
-  m_SVD6T0cls6TrkTime = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, TimeBins, TimeMin, TimeMax);
-  m_SVD6T0cls6TrkTime->GetXaxis()->SetTitle("cluster time (ns)");
-  m_SVD6T0cls6TrkTime->GetYaxis()->SetTitle("SVD T0 (ns)");
-  m_histoList->Add(m_SVD6T0cls6TrkTime);
-
-
   //----------------------------------------------------------------
   // EventT0 vs Time of clusters for U and V sides
   //----------------------------------------------------------------
@@ -362,7 +354,6 @@ void SVDDQMClustersOnTrackModule::event()
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
-  double event6T0 = -1000;
   if (m_eventT0.isOptional())
     if (m_eventT0.isValid())
       if (m_eventT0->hasEventT0())
@@ -381,7 +372,6 @@ void SVDDQMClustersOnTrackModule::event()
       m_SVD3T0->Fill(svdEventT0);
     } else  {
       m_SVD6T0->Fill(svdEventT0);
-      event6T0 = svdEventT0;
     }
   }
 
@@ -445,7 +435,6 @@ void SVDDQMClustersOnTrackModule::event()
             if (m_cls3TrkTimeU456 != nullptr) m_cls3TrkTimeU456->Fill(time);
           } else {
             if (m_cls6TrkTimeU456 != nullptr) m_cls6TrkTimeU456->Fill(time);
-            m_SVD6T0cls6TrkTime->Fill(time, event6T0);
           }
         }
 

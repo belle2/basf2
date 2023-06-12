@@ -27,8 +27,9 @@ class MVAExtraInfoChecker(basf2.Module):
 
     def initialize(self):
         """Create particle list object"""
-        #: particle list object
+        #: Particle list object
         self.plist = Belle2.PyStoreObj("pi+:test")
+        #: Composite particle list object
         self.comp_plist = Belle2.PyStoreObj("Lambda0:test")
 
         #: event extra info object

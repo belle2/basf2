@@ -6,20 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisExample.h
-// Description : An example module for DQM histogram analysis
+// File : DQMHistAnalysisDeltaEpicsMonObjExample.h
+// Description : DQM Analysis Delta+Epics+MonObj example
 //-
 
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TF1.h>
+#include <TCanvas.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! DQM Delta Histogram Test code and example */
 
-  class DQMHistAnalysisExampleModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisDeltaEpicsMonObjExampleModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -27,43 +27,48 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    DQMHistAnalysisExampleModule();
+    DQMHistAnalysisDeltaEpicsMonObjExampleModule();
+
+  private:
 
     /**
      * Destructor.
      */
-    ~DQMHistAnalysisExampleModule();
+    ~DQMHistAnalysisDeltaEpicsMonObjExampleModule();
 
     /**
      * Initializer.
-     * This method is called at the beginning of data processing.
      */
-    void initialize() override final;
+    void initialize(void) override final;
 
     /**
      * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
      */
-    void beginRun() override final;
+    void beginRun(void) override final;
+
+    /**
+     * Called when run ends.
+     */
+    void endRun(void) override final;
 
     /**
      * This method is called for each event.
      */
-    void event() override final;
-
-    /**
-     * This method is called if the current run ends.
-     * Save run-related stuff, such as statistics.
-     */
-    void endRun() override final;
+    void event(void) override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate() override final;
+    void terminate(void) override final;
 
-    //! Parameters accesible from basf2 scripts
+    /**
+     * Do the actual processing
+     */
+    void doHistAnalysis(bool forMiraBelle = false);
+
   private:
+
+    // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! name of histogram
@@ -71,13 +76,11 @@ namespace Belle2 {
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
-    //! Data members
-  private:
-    /** The fitting function. */
-    TF1* m_function = nullptr;
-    /** The drawing canvas for the fitting result. */
+    //! Final Canvas
     TCanvas* m_canvas = nullptr;
 
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
   };
 } // end namespace Belle2
 

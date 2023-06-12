@@ -27,9 +27,9 @@ with b2tu.clean_working_directory():
 
     # Modules
     main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=configs)
-    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_x", MonitorPrefix="ip", useEpics=False)
-    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_y", MonitorPrefix="ip", useEpics=False)
-    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_z", MonitorPrefix="ip", useEpics=False)
+    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_x", MonitorPrefix="ip")
+    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_y", MonitorPrefix="ip")
+    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_z", MonitorPrefix="ip")
 
     # Process all events
     b2.process(main)

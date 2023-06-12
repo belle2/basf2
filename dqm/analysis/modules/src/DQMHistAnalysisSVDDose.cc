@@ -24,7 +24,6 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
   setDescription("Monitoring of SVD Dose with events from Poisson trigger w/o inj. veto. See also SVDDQMDoseModule.");
   // THIS MODULE CAN NOT BE RUN IN PARALLEL
   addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("DQM:SVD:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
            "Minimum interval between two successive PV updates (in seconds).", 1000.0);
   addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":Occ:Pois:Avg"));
@@ -37,7 +36,7 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics && ca_current_context()) ca_context_destroy();
+  if (getUseEpics() && ca_current_context()) ca_context_destroy();
 #endif
 }
 
@@ -100,7 +99,7 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   m_legend->AddText("No inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kBlack);
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context())
       SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     // Channels for the occupancies
@@ -133,7 +132,7 @@ void DQMHistAnalysisSVDDoseModule::beginRun()
 {
   // Set status PV to running, reset last update time
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     B2DEBUG(19, "beginRun: setting state PV to RUNNING");
     m_stateCtrl.value = 1;
     if (m_stateChan) {
@@ -154,7 +153,7 @@ void DQMHistAnalysisSVDDoseModule::event()
   // Update PVs ("write" to EPICS)
 #ifdef _BELLE2_EPICS
   double timeSinceLastPVUpdate = getClockSeconds() - m_lastPVUpdate;
-  if (m_useEpics && timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
+  if (getUseEpics() && timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
     // Dummy ca_get to ensure reconnection to the IOC in case of past errors
     if (m_stateChan) {
       SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
@@ -227,7 +226,7 @@ void DQMHistAnalysisSVDDoseModule::endRun()
 
   // EPICS: reset the counters used for the delta computation, set state to NOT RUNNING
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     B2DEBUG(19, "endRun: setting state PV to NOT RUNNING");
     m_stateCtrl.value = 0;
     if (m_stateChan) {

@@ -42,8 +42,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
-  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
@@ -56,7 +54,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -100,8 +98,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
 #ifdef _BELLE2_EPICS
-  m_useEpics |= m_useEpicsRO; // implicit
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   }
 #endif
@@ -110,7 +107,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
 #ifdef _BELLE2_EPICS
-    if (m_useEpics) {
+    if (getUseEpics()) {
       SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &mychid_eff[aPXDModule]), "ca_create_channel failure");
     }
 #endif
@@ -186,7 +183,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_monObj->addCanvas(m_cEffAllUpdate);
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     // values per module, see above
     mychid_status.resize(2);
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
@@ -218,7 +215,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
 
 #ifdef _BELLE2_EPICS
-    if (m_useEpics) {
+    if (getUseEpics()) {
       // get warn and error limit
       // as the same array as above, we assume chid exists
       struct dbr_ctrl_double tPvData;
@@ -524,7 +521,7 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
 #ifdef _BELLE2_EPICS
-      if (m_useEpics && !m_useEpicsRO) {
+      if (getUseEpics() && !getUseEpicsReadOnly()) {
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           if (updated[m_PXDModules[i]]) {
             Double_t x, y;// we assume that double and Double_t are same!
@@ -581,7 +578,7 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("nmodules", ieff);
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics && !m_useEpicsRO) {
+  if (getUseEpics() && !getUseEpicsReadOnly()) {
     SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
     // only update if statistics is reasonable, we dont want "0" drops between runs!
     if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
@@ -594,7 +591,7 @@ void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
     for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

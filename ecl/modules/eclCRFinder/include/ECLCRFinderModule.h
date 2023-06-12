@@ -13,6 +13,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+// C++
+#include <set>
+
 namespace Belle2 {
   class ECLConnectedRegion;
   class ECLCalDigit;
@@ -72,18 +75,15 @@ namespace Belle2 {
 
     // Module parameters
     double m_energyCut[3]; /**< Energy cut for seed, neighbours, ...*/
-    double m_energyCutBkgd[3]; /**< Energy cut (for high background) for seed, neighbours, ...*/
     double m_timeCut[3]; /**< Time cut for seed, neighbours, ...*/
+    double m_timeCut_maxEnergy[3]; /**< Time cut is only applied below this energy, ...*/
     std::string m_mapType[2]; /**< Neighbour map types.*/
     double m_mapPar[2]; /**< Parameters for neighbour maps.*/
-    int m_useBackgroundLevel; /**< Background dependend energy and timing cuts.*/
     int m_skipFailedTimeFitDigits; /**< Handling of digits with failed time fits.*/
-    int m_fullBkgdCount; /**< Number of expected background digits at full background. TODO move to DB*/
 
     /** Other variables. */
     bool m_isOnlineProcessing{false}; /**< flag for identifying the online processing. */
 
-    double m_energyCutMod[3] {}; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
     int m_tempCRId = -1; /**< Temporary CR ID*/
 
     /** Digit vectors. */
@@ -95,8 +95,6 @@ namespace Belle2 {
     /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_calDigitStoreArrPosition;
 
-    // USE POSITION IN STORE ARRAY!!!
-
     /** Connected Region map. */
     std::vector < int > m_cellIdToTempCRIdVec; /**< cellid -> temporary CR.*/
     std::map < int, int > m_cellIdToTempCRIdMap; /**< cellid -> temporary CR.*/
@@ -104,11 +102,21 @@ namespace Belle2 {
     /** Neighbour maps. */
     std::vector<ECL::ECLNeighbours*> m_neighbourMaps;
 
-    /** Neighbour finder. */
-    void checkNeighbours(const int cellid, const int tempcrid, const int type);
+    /** Check if two crystals are neighbours. */
+    // void checkNeighbours(const int cellid, const int tempcrid, const int type);
+    bool areNeighbours(const int cellid1, const int cellid2, const int maptype);
 
-    /** Update CRs. */
-    void updateCRs(int cellid, int tempcr);
+    /** Convert vector of cell ids to 0/1 vectors from 1-8737. */
+    std::vector<int> oneHotVector(std::vector<int> A, const int n);
+
+    /** Convert vector of vectors to one long vector. */
+    std::vector<int> flattenVector(std::vector<std::vector<int>> A);
+
+    /** Find all lists of cell-ids that share at least one cell. */
+    std::vector<std::set<int>> mergeVectorsUsingSets(std::vector<std::vector<int>> A);
+
+    /** Get all connected regions. */
+    std::vector<std::vector<int>> getConnectedRegions(const std::vector<int>& A, const std::vector<int>& B, const int maptype);
 
   };
 

@@ -185,7 +185,7 @@ void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* 
 
 void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int subdetector, int section, int sector, int index,
-  TH1* histogram, TCanvas* canvas, TLatex& latex)
+  TH1* histogram, TH1* delta, TCanvas* canvas, TLatex& latex)
 {
   double x = 0.15;
   double y = 0.85;
@@ -200,10 +200,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->cd();
   histogram->SetStats(false);
   histogram->Draw();
+  deltaDrawer(delta, histogram, canvas); //draw normalized delta on top
   n = histogram->GetXaxis()->GetNbins();
-
-  /* call delta histogram*/
-  auto delta = getDelta("", histogram->GetName());
 
   /* call reference histograms */
   TH1* ref_histogram = nullptr;
@@ -376,10 +374,6 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->Modified();
   canvas->Update();
 
-  // delta histogram
-  UpdateCanvas(canvas->GetName(), delta != nullptr);
-  if (delta != nullptr)
-    deltaDrawer(delta, histogram, canvas);
 }
 
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
@@ -404,25 +398,26 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
 {
   TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
   if (histogram == nullptr) {
-    B2ERROR("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
+    B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
     return;
   }
 
   TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
   if (canvas == nullptr) {
-    B2ERROR("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
+    B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   }
 
-  canvas->Clear();
-  canvas->cd();
-  histogram->Draw();
-
-  /* calling on delta histogram*/
-  auto delta = getDelta(m_histogramDirectoryName, histName);
-  UpdateCanvas(canvas->GetName(), delta != nullptr);
-  if (delta != nullptr)
-    deltaDrawer(delta, histogram, canvas);
+  if (histogram != nullptr && canvas != nullptr) {
+    /* calling on delta histogram*/
+    TH1* delta = getDelta(m_histogramDirectoryName, histName);
+    UpdateCanvas(canvas->GetName(), delta != nullptr);
+    if (delta != nullptr) {
+      canvas->Clear();
+      canvas->cd();
+      delta->Draw("hist");
+    }
+  }
 }
 
 void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
@@ -430,14 +425,15 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
 {
   TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
   if (histogram == nullptr) {
-    B2ERROR("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
+    B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
     return;
   }
   TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
   if (canvas == nullptr) {
-    B2ERROR("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
+    B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   }
+
   histogram->Clear();
   canvas->Clear();
   canvas->cd();
@@ -471,98 +467,100 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   double yAlarm = 0.8;
   TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
   if (histogram == nullptr) {
-    B2ERROR("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
+    B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
     return;
   }
   TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
   if (canvas == nullptr) {
-    B2ERROR("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
+    B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   }
-  canvas->Clear();
-  canvas->cd();
-  histogram->SetStats(false);
-  histogram->Draw();
-  if (histName.find("bklm") != std::string::npos) {
-    /* First draw the vertical lines and the sector names. */
-    const int maximalLayer = BKLMElementNumbers::getMaximalLayerNumber();
-    for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
-      int bin = maximalLayer * sector + 1;
-      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
-      double xText = histogram->GetXaxis()->GetBinLowEdge(bin + maximalLayer / 2);
-      double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
-      if (sector > 0)
-        m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
-      name = "B";
-      if (sector < 8)
-        name += "B";
-      else
-        name += "F";
-      name += std::to_string(sector % 8);
-      m_PlaneText.DrawText(xText, yText, name.c_str());
-    }
-    /* Then, color the canvas with red if there is a dead module
-     * and write an error message. */
-    if (m_DeadBarrelModules.size() == 0) {
-      canvas->Pad()->SetFillColor(kWhite);
-    } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-      for (KLMModuleNumber module : m_DeadBarrelModules) {
-        m_ElementNumbers->moduleNumberToElementNumbers(
-          module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
-        alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
-        alarm += ", layer " + std::to_string(moduleLayer);
-        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-        yAlarm -= 0.05;
-      }
-      if (m_IsNullRun == false) {
-        alarm = "Call the KLM experts immediately!";
-        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-        canvas->Pad()->SetFillColor(kRed);
-      }
-    }
-  } else {
-    /* First draw the vertical lines and the sector names. */
-    const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
-    const double maxPlane = EKLMElementNumbers::getMaximalPlaneNumber() * EKLMElementNumbers::getMaximalSectorNumber();
-    for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
-      int bin = maxPlane * layerGlobal + 1;
-      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
-      double xText = histogram->GetXaxis()->GetBinLowEdge(bin - maxPlane / 2);
-      double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
-      if (layerGlobal < maximalLayer)
-        m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
-      int section, layer;
-      m_EklmElementNumbers->layerNumberToElementNumbers(
-        layerGlobal, &section, &layer);
-      if (section == EKLMElementNumbers::c_BackwardSection)
+  if (histogram != nullptr && canvas != nullptr) {
+    canvas->Clear();
+    canvas->cd();
+    histogram->SetStats(false);
+    histogram->Draw();
+    if (histName.find("bklm") != std::string::npos) {
+      /* First draw the vertical lines and the sector names. */
+      const int maximalLayer = BKLMElementNumbers::getMaximalLayerNumber();
+      for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
+        int bin = maximalLayer * sector + 1;
+        double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+        double xText = histogram->GetXaxis()->GetBinLowEdge(bin + maximalLayer / 2);
+        double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
+        if (sector > 0)
+          m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
         name = "B";
-      else
-        name = "F";
-      name += std::to_string(layer);
-      m_PlaneText.DrawText(xText, yText, name.c_str());
-    }
-    /* Then, color the canvas with red if there is a dead module
-     * and write an error message. */
-    if (m_DeadEndcapModules.size() == 0) {
-      canvas->Pad()->SetFillColor(kWhite);
-    } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-      for (KLMModuleNumber module : m_DeadEndcapModules) {
-        m_ElementNumbers->moduleNumberToElementNumbers(
-          module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
-        alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
-        alarm += ", layer " + std::to_string(moduleLayer);
-        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-        yAlarm -= 0.05;
+        if (sector < 8)
+          name += "B";
+        else
+          name += "F";
+        name += std::to_string(sector % 8);
+        m_PlaneText.DrawText(xText, yText, name.c_str());
       }
-      if (m_IsNullRun == false) {
-        alarm = "Call the KLM experts immediately!";
-        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-        canvas->Pad()->SetFillColor(kRed);
+      /* Then, color the canvas with red if there is a dead module
+      * and write an error message. */
+      if (m_DeadBarrelModules.size() == 0) {
+        canvas->Pad()->SetFillColor(kWhite);
+      } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+        for (KLMModuleNumber module : m_DeadBarrelModules) {
+          m_ElementNumbers->moduleNumberToElementNumbers(
+            module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
+          alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
+          alarm += ", layer " + std::to_string(moduleLayer);
+          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+          yAlarm -= 0.05;
+        }
+        if (m_IsNullRun == false) {
+          alarm = "Call the KLM experts immediately!";
+          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+          canvas->Pad()->SetFillColor(kRed);
+        }
+      }
+    } else {
+      /* First draw the vertical lines and the sector names. */
+      const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+      const double maxPlane = EKLMElementNumbers::getMaximalPlaneNumber() * EKLMElementNumbers::getMaximalSectorNumber();
+      for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
+        int bin = maxPlane * layerGlobal + 1;
+        double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+        double xText = histogram->GetXaxis()->GetBinLowEdge(bin - maxPlane / 2);
+        double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
+        if (layerGlobal < maximalLayer)
+          m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
+        int section, layer;
+        m_EklmElementNumbers->layerNumberToElementNumbers(
+          layerGlobal, &section, &layer);
+        if (section == EKLMElementNumbers::c_BackwardSection)
+          name = "B";
+        else
+          name = "F";
+        name += std::to_string(layer);
+        m_PlaneText.DrawText(xText, yText, name.c_str());
+      }
+      /* Then, color the canvas with red if there is a dead module
+      * and write an error message. */
+      if (m_DeadEndcapModules.size() == 0) {
+        canvas->Pad()->SetFillColor(kWhite);
+      } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+        for (KLMModuleNumber module : m_DeadEndcapModules) {
+          m_ElementNumbers->moduleNumberToElementNumbers(
+            module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
+          alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
+          alarm += ", layer " + std::to_string(moduleLayer);
+          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+          yAlarm -= 0.05;
+        }
+        if (m_IsNullRun == false) {
+          alarm = "Call the KLM experts immediately!";
+          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+          canvas->Pad()->SetFillColor(kRed);
+        }
       }
     }
+    canvas->Modified();
+    canvas->Update();
   }
-  canvas->Modified();
-  canvas->Update();
 }
 
 void DQMHistAnalysisKLMModule::event()
@@ -599,18 +597,24 @@ void DQMHistAnalysisKLMModule::event()
       histogramName = m_histogramDirectoryName + "/" + str;
       canvasName = m_histogramDirectoryName + "/c_" + str;
       TH1* histogram = findHist(histogramName);
+      //get delta histogram (should we work with a clone instead?)
+      auto delta = getDelta("", histogramName);
+
       if (histogram == nullptr) {
-        B2ERROR("KLM DQM histogram " << histogramName << " is not found.");
+        B2WARNING("KLM DQM histogram " << histogramName << " is not found.");
         continue;
       }
       TCanvas* canvas = findCanvas(canvasName);
       if (canvas == nullptr) {
-        B2ERROR("KLM DQM histogram canvas " << canvasName << " is not found.");
+        B2WARNING("KLM DQM histogram canvas " << canvasName << " is not found.");
         continue;
       }
-      analyseChannelHitHistogram(
-        klmSector.getSubdetector(), klmSector.getSection(),
-        klmSector.getSector(), j, histogram, canvas, latex);
+      UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
+      if (delta != nullptr || histogram != nullptr) {
+        analyseChannelHitHistogram(
+          klmSector.getSubdetector(), klmSector.getSection(),
+          klmSector.getSector(), j, histogram, delta, canvas, latex);
+      }
     }
   }
   /* Temporary change the color palette. */

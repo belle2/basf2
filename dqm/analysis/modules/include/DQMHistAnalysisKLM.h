@@ -85,12 +85,13 @@ namespace Belle2 {
      * @param[in]  sector       Sector.
      * @param[in]  index        Histogram Index.
      * @param[in]  histogram    Histogram.
+     * @param[in]  delta        Delta Histogram.
      * @param[in]  canvas       Canvas.
      * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector, int index,
-      TH1* histogram, TCanvas* canvas, TLatex& latex);
+      TH1* histogram, TH1* delta, TCanvas* canvas, TLatex& latex);
 
     /**
      * Process spatial 2D hits histograms for endcap.

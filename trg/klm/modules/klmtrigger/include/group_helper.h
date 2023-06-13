@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <iostream>
 
-
+#define let const auto
 
 
 
@@ -186,21 +186,25 @@ namespace Belle2 {
       return ret;
     }
 
+    struct identity {
+      template<typename T>
+      constexpr T&& operator()(T&& t) const noexcept
+      {
+        return (T&&)t;
+      }
+    };
 
-    template <typename T1, typename T2>
-    class __range__impl {
-
-    public:
-
-      __range__impl(T1&& b, T2&& e) : m_begin(b), m_end(e) {}
-      __range__impl(const T1& b, const T2& e) : m_begin(b), m_end(e) {}
+    template <typename T1, typename T2, typename Prj_T = identity>
+    struct __range__impl_prj  {
+      __range__impl_prj(T1&& b, T2&& e, Prj_T&&  prj = identity{}) : m_begin(std::move(b), prj), m_end(std::move(e), prj) {}
+      __range__impl_prj(const T1& b, const T2& e, Prj_T&&  prj = identity{}) : m_begin(b, prj), m_end(e, prj) {}
       auto begin() const
       {
         return m_begin;
       }
       auto back() const
       {
-        return *(m_end - 1);
+        return m_end.m_prj(*(m_end.get_base() - 1));
       }
       auto front() const
       {
@@ -212,24 +216,83 @@ namespace Belle2 {
       }
       auto operator[](size_t i) const
       {
-        return *(m_begin + i);
+        return m_begin.m_prj(*(m_begin.get_base() + i));
       }
+
       size_t size() const
       {
         return  m_end - m_begin;
       }
-      T1 m_begin;
-      T2 m_end;
+      struct begin_t : T1 {
+        begin_t(T1&& t1, Prj_T& pro) : T1(std::move(t1)), m_prj(pro) {}
+        begin_t(const T1& t1, Prj_T& pro) : T1(t1), m_prj(pro) {}
+        Prj_T m_prj;
+        auto operator*() const
+        {
+          return m_prj(**((const T1*)this));
+        }
+        T1 get_base() const
+        {
+          return *((const T1*)this);
+        }
+      } m_begin, m_end;
+
 
     };
-
 
     template <typename T1, typename T2>
     auto __range__(T1&& b, T2&& e)
     {
-      return __range__impl< _Remove_cvref_t<T1>, _Remove_cvref_t<T2> >(std::forward<T1>(b), std::forward<T2>(e));
+      return __range__impl_prj< _Remove_cvref_t<T1>, _Remove_cvref_t<T2> >(std::forward<T1>(b), std::forward<T2>(e), {});
+    }
+    template <typename T1, typename T2, typename PRJ>
+    auto __range__(T1&& b, T2&& e, PRJ&& prj)
+    {
+      return __range__impl_prj< _Remove_cvref_t<T1>, _Remove_cvref_t<T2>, _Remove_cvref_t<PRJ> >(std::forward<T1>(b), std::forward<T2>(e),
+             std::forward<PRJ>(prj));
     }
 
+    template <typename PRJ, typename VEC_T>
+    auto project(VEC_T&& vec)
+    {
+      return __range__(vec.begin(), vec.end(), [](const auto & e) { return std::get<PRJ>(e); });
+    }
+    template <typename VEC_T, typename PRJ>
+    auto project(VEC_T&& vec, PRJ&& prj)
+    {
+      return __range__(vec.begin(), vec.end(), std::forward<PRJ>(prj));
+    }
+
+
+    template <typename T1, typename T2, typename PRJ, typename OP>
+    auto operator|(__range__impl_prj<T1, T2, PRJ> r, OP op)
+    {
+      return  __range__(r.begin(), r.end(), std::move(op));
+    }
+
+
+
+    struct to_range_ {
+      template <typename T>
+      friend auto operator|(T&& t, const to_range_&)
+      {
+        return __range__(t.begin(), t.end());
+      }
+
+      template <typename T>
+      friend auto  operator|(const  T& t, const to_range_&)
+      {
+        return __range__(t.begin(), t.end());
+      }
+    };
+    constexpr const to_range_ to_range;
+    /*
+        template <typename T1, typename T2>
+        auto __range__(T1&& b, T2&& e)
+        {
+          return __range__impl< _Remove_cvref_t<T1>, _Remove_cvref_t<T2> >(std::forward<T1>(b), std::forward<T2>(e));
+        }
+    */
     template <typename... T>
     struct group {
 
@@ -383,11 +446,7 @@ namespace Belle2 {
       container.erase(std::unique(container.begin(), container.end()), container.end());
     }
 
-    template <typename CONTAINER_T, typename FUNCTION_T>
-    bool contains_if(const CONTAINER_T& container, FUNCTION_T&& fun)
-    {
-      return std::find_if(container.begin(), container.end(), fun) != container.end();
-    }
+
 
     template <typename CONTAINER_T, typename T1>
     bool contains(const CONTAINER_T& container, T1&& value)
@@ -395,13 +454,6 @@ namespace Belle2 {
       return std::find(container.begin(), container.end(), value) != container.end();
     }
 
-    struct plus {
-      template<typename T, typename U>
-      constexpr auto operator()(T&& t, U&& u) const -> decltype((T&&)t + (U&&)u)
-      {
-        return (T&&)t + (U&&)u;
-      }
-    };
 
     template<typename T1 = int>
     struct greater {
@@ -416,40 +468,18 @@ namespace Belle2 {
       }
     };
 
-    template<typename T1>
-    struct greater_equal {
-      explicit greater_equal(T1 data) : m_data(data) {}
-
-      T1 m_data;
-      template<typename U>
-      constexpr auto operator()(U&& u) const
-      {
-        return m_data <= (U&&)u;
-      }
-    };
-    struct identity {
-      template<typename T>
-      constexpr T&& operator()(T&& t) const noexcept
-      {
-        return (T&&)t;
-      }
-    };
 
 
-    template <typename CONTAINER_T, typename INIT_T, typename OP_T = plus, typename PROJECTION_T = identity>
-    auto accumulate(const  CONTAINER_T& container, INIT_T init, OP_T op = plus {}, PROJECTION_T proj = identity{})
-    {
-      for (const auto& e : container)
-        init = op(init, proj(e));
-      return init;
-    }
 
-    template <typename CONTAINER_T, typename OP_T = group_helper::greater<int>, typename PROJECTION_T = identity>
-    auto count_if(const  CONTAINER_T& container, OP_T op = group_helper::greater<int> { 0 }, PROJECTION_T proj = identity{})
+
+
+
+    template <typename CONTAINER_T, typename OP_T = group_helper::greater<int>>
+    auto count_if(const  CONTAINER_T& container, OP_T op = group_helper::greater<int> { 0 })
     {
       int i = 0;
       for (const auto& e : container)
-        if (op(proj(e)))
+        if (op(e))
           ++i;
       return i;
     }

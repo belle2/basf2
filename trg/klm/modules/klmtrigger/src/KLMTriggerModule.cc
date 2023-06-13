@@ -89,15 +89,6 @@ REG_MODULE(KLMTrigger);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-struct compare {
-  int key;
-  explicit compare(int const& i): key(i) { }
-
-  bool operator()(int const& i)
-  {
-    return (i == key);
-  }
-};
 
 
 vector<string> split(const string& str, const string& delim)
@@ -318,6 +309,7 @@ auto push_linear_fit_to_KLMTrgFittedTrack(const T1& linear_fited,  T2& KLMTrgFit
 
 void KLMTriggerModule::event()
 {
+
   try {
     StoreArray<KLMDigit> klmDigits;
     StoreArray<KLMTrgFittedTrack> KLMTrgFittedTrack_("KLMTrgFittedTrack");
@@ -333,6 +325,7 @@ void KLMTriggerModule::event()
                             [&](auto Index) -> layer         { return layer(klmDigits[Index]->getLayer()  - 1);  },
                             [&](auto Index) -> strip         { return strip(klmDigits[Index]->getStrip());}
                            );
+
 
     sort(hits);
     drop_duplicates(hits);

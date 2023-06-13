@@ -15,7 +15,7 @@
 #include <tuple>
 #include <iostream>
 #include <bitset>
-
+#include <cassert>
 
 #include "trg/klm/modules/klmtrigger/group_helper.h"
 #include "trg/klm/modules/klmtrigger/KLMAxis.h"
@@ -34,8 +34,7 @@ AXIS_NAME(sector_mask_or, int);
 AXIS_NAME(n_sections_trig, int);
 AXIS_NAME(back2back_t, int);
 
-AXIS_NAME(TriggerCut, int);
-AXIS_NAME(vetoCut, int);
+
 
 
 using namespace Belle2;
@@ -73,18 +72,18 @@ std::size_t countBits(uint64_t n)
 
 
 
-template <typename AXIS_NAME_T, typename CONTAINER_T>
+template <typename CONTAINER_T>
 uint64_t to_bit_mask(const CONTAINER_T& container)
 {
 
-  return std::accumulate(container.begin(), container.end(), uint64_t(0),
-  [](const auto & lhs, const auto & rhs) {
-    const auto bitshift = uint64_t(AXIS_NAME_T(rhs));
-    if (bitshift > 32) {
-      throw std::runtime_error("from:\nuint64_t to_bit_mask(const CONTAINER_T& container)\ninput number to large.\n\n");
-    }
-    return lhs | (uint64_t(1) << bitshift);
-  });
+  uint64_t ret = 0;
+  for (let& e : container) {
+    assert(e <= 32);
+    ret |= (uint64_t(1) << e);
+  }
+  return ret;
+
+
 
 
 
@@ -103,7 +102,7 @@ bool sectors_adjacent(int e1, int e2)
 
 
 template <typename CONTAINER_T>
-auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_, vetoCut vetoCut_ = vetoCut(0))
+auto to_sector_bit_mask(const CONTAINER_T& container, int TriggerCut_, int vetoCut_ = 0)
 {
   int ret = 0;
   auto back = container.back();
@@ -130,19 +129,6 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_, ve
 
 
 
-struct to_plane_layer {
-
-  template <typename Tuple_T>
-  constexpr explicit to_plane_layer(const Tuple_T& t) :
-    m_data((layer(t) + 1) * 2 + plane(t)) { }
-
-  constexpr operator uint64_t() const
-  {
-    return m_data;
-  }
-
-  uint64_t m_data;
-};
 
 
 
@@ -154,10 +140,10 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
 
 
   auto grouped = group<Subdetector, section, isectors_t, sector>::apply(hits,
-  [](const auto & e1)  {
-    const auto  bit_mask     = layer_mask(to_bit_mask<to_plane_layer>(e1));
-    const auto  layer_count_ = layer_count(countBits(bit_mask));
-    return std::tuple(layer_count_,   bit_mask);
+  [](let & e1)  {
+    let  bit_mask     = to_bit_mask(project(e1,  [](let & t) { return (layer(t) + 1) * 2 + plane(t); }));
+    let  layer_count_ = countBits(bit_mask);
+    return std::tuple(layer_mask(layer_count_), layer_count(bit_mask));
   }
                                                                        );
 
@@ -165,23 +151,23 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
   sort(grouped);
 
 
-  auto summery2 = group<Subdetector>::apply(grouped,
-  [&](const auto & e1) -> n_sections_trig {
-    return (n_sections_trig) count_if(e1, group_helper::greater_equal<int>{NLayerTrigger  }, layer_count());
+  let summery2 = group<Subdetector>::apply(grouped,
+  [&](let & e1)  {
+    return (n_sections_trig) count_if(project<layer_count>(e1), [NLayerTrigger](let & e) {return e >= NLayerTrigger; });
   });
 
 
-  auto n_triggered_sectors2 = group<Subdetector, section, isectors_t>::apply(grouped,
-                              [&](const auto & e1) -> sector_mask    { return (sector_mask)    to_sector_bit_mask(e1, TriggerCut(NLayerTrigger)); },
-                              [&](const auto & e1) -> sector_mask_or { return (sector_mask_or) to_sector_bit_mask(e1, TriggerCut(NLayerTrigger), vetoCut(NLayerTrigger)); }
-                                                                            );
+  let n_triggered_sectors2 = group<Subdetector, section, isectors_t>::apply(grouped,
+  [&](let & e1)  { return (sector_mask)    to_sector_bit_mask(e1, NLayerTrigger); },
+  [&](let & e1)  { return (sector_mask_or) to_sector_bit_mask(e1, NLayerTrigger, NLayerTrigger); }
+                                                                           );
 
 
-  auto summery1 = group<Subdetector>::apply(n_triggered_sectors2,
-  [](const auto & e1) -> back2back_t {
-    return back2back_t(count_if(e1, group_helper::greater<int>{0}, sector_mask()) >= c_TotalSections_per_EKLM_BKLM);
+  let summery1 = group<Subdetector>::apply(n_triggered_sectors2,
+  [](let & e1)  {
+    return back2back_t(count_if(project<sector_mask>(e1)) >= c_TotalSections_per_EKLM_BKLM);
   }
-                                           );
+                                          );
 
 
 

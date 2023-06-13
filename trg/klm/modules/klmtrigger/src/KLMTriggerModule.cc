@@ -297,6 +297,7 @@ auto push_linear_fit_to_KLMTrgFittedTrack(const T1& linear_fited,  T2& KLMTrgFit
     FittedTrack->setSlopeXY(slopeXY_t(e)) ;
     FittedTrack->setInterceptXY(interceptXY_t(e));
     FittedTrack->setIpXY(ipXY_t(e)) ;
+    FittedTrack->setPlane(plane(e));
     FittedTrack->setChisqXY(chisqXY_t(e));
     FittedTrack->setSubdetector(Subdetector(e));
     FittedTrack->setSection(section(e));

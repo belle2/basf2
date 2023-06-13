@@ -408,7 +408,7 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
     return;
   }
 
-  if (histogram != nullptr && canvas != nullptr) {
+  else {
     /* calling on delta histogram*/
     TH1* delta = getDelta(m_histogramDirectoryName, histName);
     UpdateCanvas(canvas->GetName(), delta != nullptr);
@@ -461,10 +461,7 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
 void DQMHistAnalysisKLMModule::processPlaneHistogram(
   const std::string& histName, TLatex& latex)
 {
-  std::string name, alarm;
-  int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
-  double xAlarm = 0.15;
-  double yAlarm = 0.8;
+
   TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
   if (histogram == nullptr) {
     B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
@@ -474,8 +471,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   if (canvas == nullptr) {
     B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
-  }
-  if (histogram != nullptr && canvas != nullptr) {
+  } else {
+    std::string name, alarm;
+    int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
+    double xAlarm = 0.15;
+    double yAlarm = 0.8;
     canvas->Clear();
     canvas->cd();
     histogram->SetStats(false);
@@ -610,11 +610,10 @@ void DQMHistAnalysisKLMModule::event()
         continue;
       }
       UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
-      if (delta != nullptr || histogram != nullptr) {
-        analyseChannelHitHistogram(
-          klmSector.getSubdetector(), klmSector.getSection(),
-          klmSector.getSector(), j, histogram, delta, canvas, latex);
-      }
+      analyseChannelHitHistogram(
+        klmSector.getSubdetector(), klmSector.getSection(),
+        klmSector.getSector(), j, histogram, delta, canvas, latex);
+
     }
   }
   /* Temporary change the color palette. */

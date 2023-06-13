@@ -1,3 +1,13 @@
+Changes in the analysis package in light-2307-laperm
+----------------------------------------------------
+
+Modules
++++++++
+* Added support of decay string functionality to ``MVAExpert`` module, so it can be used for daughter particles. 
+  The first MVA to support this feature is `getNbarIDMVA`.
+
+
+
 Changes in the analysis package in light-2305-korat
 ---------------------------------------------------
 

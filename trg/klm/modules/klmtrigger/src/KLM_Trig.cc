@@ -153,7 +153,7 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
 
   let summery2 = group<Subdetector>::apply(grouped,
   [&](let & e1)  {
-    return (n_sections_trig) count_if(project<layer_count>(e1), [NLayerTrigger](let & e) {return e >= NLayerTrigger; });
+    return (n_sections_trig) count_if(project<layer_count>(e1), [NLayerTrigger](const auto  & e) {return e >= NLayerTrigger; });
   });
 
 

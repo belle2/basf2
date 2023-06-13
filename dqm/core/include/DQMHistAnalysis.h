@@ -104,7 +104,7 @@ namespace Belle2 {
     //! Vector of EPICS PVs
     std::vector <chid>  m_epicsChID;
     //! Map of (key)names to EPICS PVs
-    std::map <std::string, chid*> m_epicsNameToChID;
+    std::map <std::string, chid> m_epicsNameToChID;
 #endif
 
   public:

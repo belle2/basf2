@@ -299,13 +299,14 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   }
 
   m_epicsChID.emplace_back();
+  auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(pvname.data(), NULL, NULL, 10, &m_epicsChID.back()), "ca_create_channel failure");
+  SEVCHK(ca_create_channel(pvname.data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 
-  m_epicsNameToChID[pvname] =  &m_epicsChID.back();
-  if (keyname != "") m_epicsNameToChID[keyname] =  &m_epicsChID.back();
+  m_epicsNameToChID[pvname] =  *ptr;
+  if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;
   return m_epicsChID.size() - 1; // return index to last added item
 #else
   return -1;
@@ -320,7 +321,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_DOUBLE, *m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
 #endif
 }
 
@@ -332,7 +333,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_SHORT, *m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  SEVCHK(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
 #endif
 }
 
@@ -344,7 +345,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, double value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure");
 #endif
 }
 
@@ -365,7 +366,7 @@ chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     if (m_epicsNameToChID[keyname] != nullptr) {
-      return *m_epicsNameToChID[keyname];
+      return m_epicsNameToChID[keyname];
     } else {
       B2ERROR("Epics PV " << keyname << " not registered!");
     }

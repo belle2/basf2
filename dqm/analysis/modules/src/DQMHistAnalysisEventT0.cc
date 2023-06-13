@@ -58,9 +58,16 @@ void DQMHistAnalysisEventT0Module::initialize()
   m_pad2CDCTRG = new TPad("pad2CDCTRG", "pad2 CDCTRG", 0.35, 0.02, 0.65, 0.98);
   m_pad3CDCTRG = new TPad("pad3CDCTRG", "pad3 CDCTRG", 0.67, 0.02, 0.97, 0.98);
 
+  //SVDTRG canvases
+  m_cSVDTRG = new TCanvas("EventT0/c_SVDTRGjitter", "SVDTRG jitter", 1200, 400);
+  m_pad1SVDTRG = new TPad("pad1SVDTRG", "pad1 SVDTRG", 0.03, 0.02, 0.33, 0.98);
+  m_pad2SVDTRG = new TPad("pad2SVDTRG", "pad2 SVDTRG", 0.35, 0.02, 0.65, 0.98);
+  m_pad3SVDTRG = new TPad("pad3SVDTRG", "pad3 SVDTRG", 0.67, 0.02, 0.97, 0.98);
+
   m_monObj = getMonitoringObject("eventT0");
   m_monObj->addCanvas(m_cECLTRG);
   m_monObj->addCanvas(m_cCDCTRG);
+  m_monObj->addCanvas(m_cSVDTRG);
 }
 
 
@@ -68,6 +75,7 @@ void DQMHistAnalysisEventT0Module::beginRun()
 {
   m_cECLTRG->Clear();
   m_cCDCTRG->Clear();
+  m_cSVDTRG->Clear();
 }
 
 void DQMHistAnalysisEventT0Module::endRun()
@@ -189,6 +197,27 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_cCDCTRG->Print(Form("%s_CDCTRG.pdf", m_prefixCanvas.c_str()));
 
 
+  //find SVD EventT0 Mumus SVDTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_TOP_mumu_L1_SVDTRG");
+  tag = "mumuSVDTRG";
+  m_pad3SVDTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_pad3SVDTRG->SetFillColor(0);
+    m_pad3SVDTRG->Modified();
+    m_pad3SVDTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    h->Draw();
+    m_pad3SVDTRG->SetFillColor(kGray);
+  }
+
+  m_cSVDTRG->cd();
+  m_pad1SVDTRG->Draw();
+  m_pad2SVDTRG->Draw();
+  m_pad3SVDTRG->Draw();
+
+  if (m_printCanvas)
+    m_cSVDTRG->Print(Form("%s_SVDTRG.pdf", m_prefixCanvas.c_str()));
 }
 
 void DQMHistAnalysisEventT0Module::terminate()
@@ -196,6 +225,7 @@ void DQMHistAnalysisEventT0Module::terminate()
 
   delete m_cECLTRG;
   delete m_cCDCTRG;
+  delete m_cSVDTRG;
 
 }
 

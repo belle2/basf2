@@ -50,9 +50,10 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
 ]
 
-# Add codeautolink warnings for compilation
-codeautolink_warn_on_missing_inventory = True
-codeautolink_warn_on_failed_resolve = True
+# Codeautolink warnings for compilation. Turned off due to conflicts with line
+# numbering.
+codeautolink_warn_on_missing_inventory = False
+codeautolink_warn_on_failed_resolve = False
 
 nbsphinx_allow_errors = True
 # Anything that ends with .jupy.py will be understood as a jupyter
@@ -68,7 +69,7 @@ nbsphinx_custom_formats = {
 # prefix each section with the name of the document it is in followed by a
 # colon
 autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = ['autosectionlabel.*', 'codeautolink.*']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']

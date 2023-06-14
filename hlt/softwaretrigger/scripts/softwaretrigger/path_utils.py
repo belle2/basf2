@@ -194,7 +194,6 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
         reconstruction.add_prefilter_reconstruction(
             path,
             skipGeometryAdding=True,
-            pruneTracks=False,
             components=components,
             event_abort=hlt_event_abort,
             **kwargs)
@@ -225,7 +224,7 @@ def add_post_filter_reconstruction(path, run_type, components):
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_postfilter_reconstruction(path, components=components)
+        reconstruction.add_postfilter_reconstruction(path, components=components, pruneTracks=False)
 
         add_skim_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:

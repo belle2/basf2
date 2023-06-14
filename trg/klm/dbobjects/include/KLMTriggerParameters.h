@@ -188,7 +188,7 @@ namespace Belle2 {
     /**
      * Class version.
      */
-    ClassDef(KLMTriggerParameters, 2);
+    ClassDef(KLMTriggerParameters, 3);
 
   };
 

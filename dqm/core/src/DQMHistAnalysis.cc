@@ -404,6 +404,9 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
   if (getUseEpics()) {
     for (auto& it : m_epicsChID) SEVCHK(ca_clear_channel(it), "ca_clear_channel failure");
     updateEpicsPVs(5.0);
+    // Make sure we clean up both afterwards!
+    m_epicsChID.clear();
+    m_epicsNameToChID.clear();
   }
 #endif
 }

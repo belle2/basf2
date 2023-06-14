@@ -140,8 +140,8 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
 
 
   auto grouped = group<Subdetector, section, isectors_t, sector>::apply(hits,
-  [](let & e1)  {
-    let  bit_mask     = to_bit_mask(project(e1,  [](let & t) { return (layer(t) + 1) * 2 + plane(t); }));
+  [](letref e1)  {
+    let  bit_mask     = to_bit_mask(project(e1,  [](letref t) { return (layer(t) + 1) * 2 + plane(t); }));
     let  layer_count_ = countBits(bit_mask);
     return std::tuple(layer_mask(layer_count_), layer_count(bit_mask));
   }
@@ -152,19 +152,19 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
 
 
   let summery2 = group<Subdetector>::apply(grouped,
-  [&](let & e1)  {
-    return (n_sections_trig) count_if(project<layer_count>(e1), [NLayerTrigger](const auto  & e) {return e >= NLayerTrigger; });
+  [&](letref e1)  {
+    return (n_sections_trig) count_if(project<layer_count>(e1), [NLayerTrigger](letref e) {return e >= NLayerTrigger; });
   });
 
 
   let n_triggered_sectors2 = group<Subdetector, section, isectors_t>::apply(grouped,
-  [&](let & e1)  { return (sector_mask)    to_sector_bit_mask(e1, NLayerTrigger); },
-  [&](let & e1)  { return (sector_mask_or) to_sector_bit_mask(e1, NLayerTrigger, NLayerTrigger); }
+  [&](letref e1)  { return (sector_mask)    to_sector_bit_mask(e1, NLayerTrigger); },
+  [&](letref e1)  { return (sector_mask_or) to_sector_bit_mask(e1, NLayerTrigger, NLayerTrigger); }
                                                                            );
 
 
   let summery1 = group<Subdetector>::apply(n_triggered_sectors2,
-  [](let & e1)  {
+  [](letref e1)  {
     return back2back_t(count_if(project<sector_mask>(e1)) >= c_TotalSections_per_EKLM_BKLM);
   }
                                           );

@@ -292,7 +292,7 @@ template <typename T1, typename T2>
 auto push_linear_fit_to_KLMTrgFittedTrack(const T1& linear_fited,  T2& KLMTrgFittedTrack_)
 {
   for (const auto& e : linear_fited) {
-    if (slopeXY_t(e) > 1e8) {     continue;    }
+    if (slopeXY_t(e) >= 1e100) {     continue;    }
     auto FittedTrack =  KLMTrgFittedTrack_.appendNew();
     FittedTrack->setSlopeXY(slopeXY_t(e)) ;
     FittedTrack->setInterceptXY(interceptXY_t(e));

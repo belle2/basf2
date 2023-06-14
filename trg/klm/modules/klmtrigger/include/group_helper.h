@@ -20,6 +20,7 @@
 #include <iostream>
 
 #define let const auto
+#define letref const auto&
 
 
 

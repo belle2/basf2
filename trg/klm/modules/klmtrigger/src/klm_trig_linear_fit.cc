@@ -41,7 +41,7 @@ namespace Belle2 {
       auto nHits = Nhits_t(container.size());
       int denom = sumXX * nHits - sumX * sumX;
       if (denom == 0) {
-        return std::tuple(slopeXY_t(1e9), interceptXY_t(1e9), ipXY_t(1e9), chisqXY_t(1e9), nHits);
+        return std::tuple(slopeXY_t(1e100), interceptXY_t(1e100), ipXY_t(1e100), chisqXY_t(1e100), nHits);
       }
       auto slopeXY = slopeXY_t((double)(sumXY * nHits - sumX * sumY) / (double)denom);
       auto  interceptXY = interceptXY_t((double)(sumXX * sumY - sumX * sumXY) / (double)denom);

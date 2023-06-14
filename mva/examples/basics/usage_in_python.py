@@ -11,15 +11,21 @@
 import basf2_mva
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
+
     # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector('M', 'p', 'pz', 'pt', 'phi', 'daughter(0, kaonID)', 'daughter(0, pionID)',
@@ -47,6 +53,6 @@ if __name__ == "__main__":
             'weightfile2.root',
             'MVADatabaseIdentifier',
             'MVADatabaseIdentifier2'),
-        basf2_mva.vector('train.root'),
+        testing_data,
         'tree',
         'expert.root')

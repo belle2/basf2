@@ -211,6 +211,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
   for (auto n : pmynode) {
     if (m_callback && !n->changed) continue;
     n->changed = false;
+    if (ca_field_type(n->mychid) != DBF_LONG && ca_field_type(n->mychid) != DBF_FLOAT) continue;
 
     // FIXME: dbr_size_n is a preprocessor macro, it would be nice replacing it with something better
 #pragma GCC diagnostic push
@@ -221,7 +222,6 @@ void DQMHistAnalysisInputPVSrvModule::event()
     void* buffer = (void*) bufferorg;
     int status;
 
-    if (ca_field_type(n->mychid) != DBF_LONG && ca_field_type(n->mychid) != DBF_FLOAT) continue;
     status = ca_array_get(ca_field_type(n->mychid), ca_element_count(n->mychid), n->mychid, buffer);
     SEVCHK(status, "ca_array_get()");
     status = ca_pend_io(15.0);

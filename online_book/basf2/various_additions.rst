@@ -326,7 +326,6 @@ Bremsstrahlung recovery?
     Your steering file should look like this:
 
     .. literalinclude:: steering_files/035_various_additions.py
-        :linenos:
         :language: python        
 
 .. admonition:: Exercise
@@ -339,7 +338,6 @@ Bremsstrahlung recovery?
    :class: toggle solution
 
     .. literalinclude:: roe/invariant_mass_plot.py
-      :linenos:
       :language: python        
 
     The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a
@@ -451,7 +449,6 @@ random seed.
      :class: solution toggle
 
      .. literalinclude:: steering_files/039_various_additions.py
-       :linenos:
        :language: python        
 
 .. admonition:: Extra exercises

@@ -9,7 +9,6 @@ Processing steps in a snakemake workflow are called *rules*, written in a simple
 
 .. literalinclude:: snakefile
    :language: python
-   :linenos:
    :caption:
    
 In a snakefile the topmost rule is the target rule, in our case :code:`OfflineAnalysis` which produces the histogram plots. Rules can have :code:`log:` and :code:`params:` directives for log file paths and additional parameters respectively. 
@@ -22,17 +21,14 @@ To submit jobs to the grid using gbasf2, we provide a public wrapper via :code:`
 
 .. literalinclude:: config.yaml
    :language: yaml
-   :linenos:
    :caption:
 
 To map gbasf2 input file paths to output directories, we here use a dictionary :code:`PathDictionary`, which is filled with paths from the provided text files:
 
 .. literalinclude:: ../qqcontinuumskims.dat
    :language: none
-   :linenos:
    :caption:
    
 .. literalinclude:: ../bmesonsskims.dat
    :language: none
-   :linenos:
    :caption:

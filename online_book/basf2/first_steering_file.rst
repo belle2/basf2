@@ -230,7 +230,6 @@ A helpful function to get common data files from the examples directory is
     :class: toggle solution
 
     .. literalinclude:: steering_files/010_first_steering_file.py
-        :linenos:
         :language: python        
 
 In the solution to the last task we have added empty lines, some comments, and used shortcuts for the
@@ -285,7 +284,6 @@ having to change anything in the script itself.
     :class: toggle solution
 
     .. literalinclude:: steering_files/011_first_steering_file.py
-        :linenos:
         :language: python        
 
 
@@ -403,7 +401,6 @@ of the decay mode you are studying, it is recommended to use them for V0s
     :class: toggle solution
 
     .. literalinclude:: steering_files/012_first_steering_file.py
-        :linenos:
         :language: python        
 
     In the solution we gave the electrons the label ``uncorrected``. This is
@@ -590,7 +587,6 @@ particles themselves need to be written in the decay string.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :end-at: E30
-        :linenos:
         :language: python        
 
 Writing out information to an ntuple
@@ -650,7 +646,6 @@ mass.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :language: python
-        :linenos:
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -684,7 +679,6 @@ happen to fulfill all your selection criteria.
     :class: toggle solution
 
     .. code-block:: python
-        :linenos:
 
         import matplotlib.pyplot as plt
         import uproot
@@ -762,7 +756,6 @@ definitely read it to understand at least the basics.
     :class: toggle solution
 
     .. literalinclude:: steering_files/014_first_steering_file.py
-        :linenos:
         :language: python        
 
 .. --------------
@@ -784,7 +777,6 @@ definitely read it to understand at least the basics.
     :class: toggle solution
 
     .. code-block:: python
-        :linenos:
 
         import matplotlib.pyplot as plt
         import uproot
@@ -870,7 +862,6 @@ documentation.
     :class: toggle solution
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :linenos:
         :language: python
 
 .. hint::
@@ -992,7 +983,6 @@ or `matchedMC`.
     :class: toggle solution
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :linenos:
         :language: python        
 
 .. hint::

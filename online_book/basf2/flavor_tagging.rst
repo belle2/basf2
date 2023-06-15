@@ -111,7 +111,6 @@ start right away!
     This is the full steering file at this point:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :linenos:
         :language: python        
 
 Good!
@@ -161,7 +160,6 @@ it to ``FBDT_qrCombined``!
     :class: solution toggle
 
     .. literalinclude:: flavor_tagging/plot_flavor_tags.py
-        :linenos:
         :language: python        
 
     .. _flavor_plots:

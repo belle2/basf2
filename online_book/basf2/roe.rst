@@ -253,7 +253,6 @@ loop to insert this argument.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/029_roe.py
-         :linenos:
          :language: python        
 
 

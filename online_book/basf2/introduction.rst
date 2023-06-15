@@ -889,7 +889,6 @@ convenience functions that you find yourself using often.
 In pseudo-python you will see they are very often of the form:
 
 .. code-block:: python
-        :linenos:
 
         import basf2
 

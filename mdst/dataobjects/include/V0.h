@@ -19,7 +19,8 @@ namespace Belle2 {
    *  This object holds the indices of the Tracks used to create the V0, the
    *  the indices of the TrackFitResults belonging to that Tracks (with material
    *  effects and hits as appropriate for the point of the intersection of the
-   *  Tracks), and the fitted vertex position.
+   *  Tracks), and the fitted vertex position (to be used as a starting point
+   *  for vertex fitting at analysis level).
    *
    *  For additional information see [BELLE2-NOTE-TE-2015-034].
    *  --> https://docs.belle2.org/record/307

@@ -219,8 +219,4 @@ def add_roi_finder(path):
     """
 
     path.add_module('PXDROIFinder', recoTrackListName='RecoTracks',
-                    PXDInterceptListName='PXDIntercepts', ROIListName='ROIs',
-                    tolerancePhi=0.15, toleranceZ=0.5,
-                    sigmaSystU=0.02, sigmaSystV=0.02,
-                    numSigmaTotU=10, numSigmaTotV=10,
-                    maxWidthU=0.5, maxWidthV=0.5)
+                    PXDInterceptListName='PXDIntercepts', ROIListName='ROIs')

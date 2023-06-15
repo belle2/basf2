@@ -18,10 +18,11 @@
 #include <boost/algorithm/string.hpp>
 
 #include <set>
+#include <regex>
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2023-05-09"
+#define CURRENT_DEFAULT_TAG "main_2023-06-08"
 
 namespace py = boost::python;
 
@@ -162,29 +163,47 @@ namespace Belle2::Conditions {
 
     // HACK: So, we successfully set the input globaltags from the input file,
     // however we also decided that we want to add new payloads for
-    // boost/invariant mass/beam spot. So if any of the files was created
-    // before the first of October 2019 we assume their globaltag might be
-    // missing these new payloads and we append an extra globaltag containing
-    // just this information with lowest priority. If the files actually had
-    // all payloads these legacy payloads will never be used as they have
-    // lowest priority. Otherwise this should enable running over old files.
+    // boost, invariant mass, beam spot, collision axis in CMS.
+    // So if the release is older than when these features were introduced
+    // or if files were produced before specific date, extra GTs are appended.
+    // The appended GTs contain only the possible missing info and are added
+    // with lowest priority.
+    // If the files actually had all payloads these legacy payloads will never
+    // be used as they have lowest priority.
+    // Otherwise this should enable running over old files.
     //
     // TODO: Once we're sure all files being used contain all payloads remove this.
-    std::optional<std::string> youngest;
+
+    std::optional<std::string> relMin, dateMin;
+
     for (const auto& metadata : inputMetadata) {
-      // Skip release 4 or later files.
-      const std::string& release = metadata.getRelease();
-      if (release.substr(0, 8) == "release-" and
-          release.compare(8, 2, "04", 2) >= 0)
-        continue;
-      // Otherwise, get the date of the youngest file.
-      if (!youngest or * youngest > metadata.getDate()) {
-        youngest = metadata.getDate();
+      // get oldest release
+      std::string rel = metadata.getRelease().substr(0, 10);
+      if (std::regex_match(rel, std::regex("release-[0-9][0-9]"))) {
+        if (!relMin) relMin = rel;
+        relMin = min(*relMin, rel);
+      }
+
+      // get oldest production date
+      std::string date = metadata.getDate().substr(0, 10);
+      if (std::regex_match(date, std::regex("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))) {
+        if (!dateMin) dateMin = date;
+        dateMin = min(*dateMin, date);
       }
     }
-    if (youngest and youngest->compare("2019-12-31") < 0) {
+
+    // add IP GT if rel older than rel04 or for old files
+    if ((relMin && relMin < "release-04") ||
+        (!relMin && (!dateMin || dateMin < "2019-12-31"))) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
+    }
+
+    // add CollisionAxisCMS GT if rel older than rel08 or for old files
+    if ((relMin && relMin < "release-08") ||
+        (!relMin && (!dateMin || dateMin < "2023-08-31"))) {
+      B2DEBUG(30, "Enabling legacy CollsionAxisCMS globaltag in tag replay");
+      m_inputGlobaltags->emplace_back("Legacy_CollisionAxisCMS");
     }
     // END TODO/HACK
   }

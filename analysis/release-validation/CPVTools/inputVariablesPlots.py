@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -263,7 +262,7 @@ def plotInputVariablesOfFlavorTagger():
                                             limXmin,
                                             limXmax)
 
-            factorMultiplication = str()
+            factorMultiplication = ''
 
             if belleOrBelle2 == "Belle2" and ((category != "Lambda" and inputVariable == 'distance') or inputVariable ==
                                               'z0' or inputVariable == 'ImpactXY' or inputVariable ==

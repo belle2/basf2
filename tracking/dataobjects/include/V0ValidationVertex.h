@@ -34,6 +34,9 @@ namespace Belle2 {
      *
      * @param trackPairPositive Positive charged Belle2::Track and TrackFitResult from the V0.
      * @param trackPairNegative Negative charged Belle2::Track and TrackFitResult from the V0.
+     * @param vertexX The x coordinate of the fitted vertex position.
+     * @param vertexY The y coordinate of the fitted vertex position.
+     * @param vertexZ The z coordinate of the fitted vertex position.
      */
     V0ValidationVertex(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
                        const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative,

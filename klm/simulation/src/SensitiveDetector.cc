@@ -186,7 +186,7 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
         simHit->setEnergyDeposit(eDep);
         simHit->setPosition(globalPosition.x(), globalPosition.y(),
                             globalPosition.z());
-        simHit->setPDG(track.GetDefinition()->GetPDGEncoding());
+        simHit->setPDG(track->GetDefinition()->GetPDGEncoding());
         m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
       }
       if (phiStripLower > 0) {
@@ -203,7 +203,7 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
         simHit->setEnergyDeposit(eDep);
         simHit->setPosition(globalPosition.x(), globalPosition.y(),
                             globalPosition.z());
-        simHit->setPDG(track.GetDefinition()->GetPDGEncoding());
+        simHit->setPDG(track->GetDefinition()->GetPDGEncoding());
         m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
       }
     } else {
@@ -228,7 +228,7 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
       simHit->setEnergyDeposit(eDep);
       simHit->setPosition(globalPosition.x(), globalPosition.y(),
                           globalPosition.z());
-      simHit->setPDG(track.GetDefinition()->GetPDGEncoding());
+      simHit->setPDG(track->GetDefinition()->GetPDGEncoding());
       m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
     }
     return true;

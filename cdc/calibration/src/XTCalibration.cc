@@ -244,7 +244,7 @@ bool XTCalibration::calibrate()
             p0 = 0; p1 = 0.005;
             tmin = 12;
           }
-          XT* xt;
+          XT* xt(nullptr);
           if (m_useSliceFit) {
             xt = new XT(hist2d_1[l][lr][al][th], m_xtmode);
           } else {
@@ -285,6 +285,7 @@ bool XTCalibration::calibrate()
           } else {
             hprof[l][lr][al][th] = (TProfile*)xt->getFittedHisto();
           }
+          delete xt;
         }
       }
     }

@@ -53,7 +53,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
     ma.applyCuts('K_S0:V0_ToFit', '0.450 < M < 0.550', path=path)
     # Reconstruct a second list
-    stdPi('all', path=path)  # no quality cuts
+    stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
     ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
@@ -220,8 +220,8 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     ma.markDuplicate('Lambda0:V0_ToFit', False, path=path)
     ma.applyCuts('Lambda0:V0_ToFit', 'extraInfo(highQualityVertex)', path=path)
     # Reconstruct a second list
-    stdPi('all', path=path)  # no quality cuts
-    stdPr('all', path=path)  # no quality cuts
+    stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
+    stdPr('all', path=path, writeOut=writeOut)  # no quality cuts
     ma.reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':

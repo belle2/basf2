@@ -67,9 +67,6 @@ class recoConfigurationImporter(basf2.Module):
         payload.setStripChargeRecoWith6Samples(algorithmFor_stripChargeRecoWith6Samples)
         payload.setStripChargeRecoWith3Samples(algorithmFor_stripChargeRecoWith3Samples)
         # SVDTimeGrouping
-        payload.setStateOfSVDTimeGrouping(6, True)
-        payload.setUseOfSVDGroupInfoInSPCreator(6, True)
-        # SVDTimeGrouping
         payload.setStateOfSVDTimeGrouping(6, grouping_stateOfTimeGroupingInClusterizerIn6Samples)
         payload.setUseOfSVDGroupInfoInSPCreator(6, grouping_useOfSVDGroupInfoInSPCreatorIn6Sampes)
         payload.setStateOfSVDTimeGrouping(3, grouping_stateOfTimeGroupingInClusterizerIn3Samples)

@@ -30,6 +30,11 @@ algorithmFor_stripTimeRecoWith6Samples = "dontdo"
 algorithmFor_stripTimeRecoWith3Samples = "dontdo"
 algorithmFor_stripChargeRecoWith6Samples = "MaxSample"
 algorithmFor_stripChargeRecoWith3Samples = "MaxSample"
+# grouping
+grouping_stateOfTimeGroupingInClusterizerIn6Samples = True  # in 6 Samples DAQ Mode
+grouping_useOfSVDGroupInfoInSPCreatorIn6Sampes = True
+grouping_stateOfTimeGroupingInClusterizerIn3Samples = False  # in 3 Samples DAQ Mode
+grouping_useOfSVDGroupInfoInSPCreatorIn3Sampes = False
 
 
 class recoConfigurationImporter(basf2.Module):
@@ -64,6 +69,11 @@ class recoConfigurationImporter(basf2.Module):
         # SVDTimeGrouping
         payload.setStateOfSVDTimeGrouping(6, True)
         payload.setUseOfSVDGroupInfoInSPCreator(6, True)
+        # SVDTimeGrouping
+        payload.setStateOfSVDTimeGrouping(6, grouping_stateOfTimeGroupingInClusterizerIn6Samples)
+        payload.setUseOfSVDGroupInfoInSPCreator(6, grouping_useOfSVDGroupInfoInSPCreatorIn6Sampes)
+        payload.setStateOfSVDTimeGrouping(3, grouping_stateOfTimeGroupingInClusterizerIn3Samples)
+        payload.setUseOfSVDGroupInfoInSPCreator(3, grouping_useOfSVDGroupInfoInSPCreatorIn3Sampes)
 
         Belle2.Database.Instance().storeData(Belle2.SVDRecoConfiguration.name, payload, iov)
 

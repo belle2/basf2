@@ -119,7 +119,7 @@ namespace TreeFitter {
         auto v0 = particle()->getV0();
         auto dummy_vertex = ROOT::Math::XYZVector(0, 0, 0);
 
-        if (v0 && v0->getVertexPosition() != dummy_vertex) {
+        if (v0 && v0->getFittedVertexPosition() != dummy_vertex) {
 
           double X_V0(v0->getFittedVertexX()), Y_V0(v0->getFittedVertexY()), Z_V0(v0->getFittedVertexZ());
           fitparams.getStateVector()(posindex)     = X_V0;

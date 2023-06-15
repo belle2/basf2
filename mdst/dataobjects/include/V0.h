@@ -16,13 +16,13 @@
 namespace Belle2 {
   /** Object holding information for V0s.
    *
-   *  This object only holds the indices of the Tracks used to create the V0, the
+   *  This object holds the indices of the Tracks used to create the V0, the
    *  the indices of the TrackFitResults belonging to that Tracks (with material
    *  effects and hits as appropriate for the point of the intersection of the
    *  Tracks), and the fitted vertex position.
    *
    *  For additional information see [BELLE2-NOTE-TE-2015-034].
-   *  --> https://d2comp.kek.jp/record/307/files/BELLE2-NOTE-TE-2015-034.pdf
+   *  --> https://docs.belle2.org/record/307
    *  Please note that the note was written before introducing the vertex
    *  position in this object.
    */
@@ -76,7 +76,7 @@ namespace Belle2 {
     double getFittedVertexZ() const { return m_fittedVertexZ; }
 
     /** Get the fitted vertex position. */
-    ROOT::Math::XYZVector getVertexPosition() const { return ROOT::Math::XYZVector(m_fittedVertexX, m_fittedVertexY, m_fittedVertexZ); }
+    ROOT::Math::XYZVector getFittedVertexPosition() const { return ROOT::Math::XYZVector(m_fittedVertexX, m_fittedVertexY, m_fittedVertexZ); }
 
   private:
     /** Indicates which positively charged track was used for this V0. */

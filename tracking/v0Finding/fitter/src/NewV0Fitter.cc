@@ -145,7 +145,8 @@ bool NewV0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus, c
   if (not fitMinus) return false;
 
   auto* v0 = m_v0s.appendNew(std::make_pair(trackPlus, fitPlus),
-                             std::make_pair(trackMinus, fitMinus));
+                             std::make_pair(trackMinus, fitMinus),
+                             m_fittedVertex.getPos().X(), m_fittedVertex.getPos().Y(), m_fittedVertex.getPos().Z());
 
   if (m_validation) {
     auto* validationV0 = m_validationV0s.appendNew(std::make_pair(trackPlus, fitPlus),

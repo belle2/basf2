@@ -30,7 +30,6 @@ SVD3SampleCoGTimeCalibrationAlgorithm::SVD3SampleCoGTimeCalibrationAlgorithm(con
 
 CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 {
-
   gROOT->SetBatch(true);
 
   int ladderOfLayer[4] = {7, 10, 12, 16};
@@ -155,6 +154,8 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
+          if (pfx != nullptr) delete pfx;
+
           if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
             f->Close();
             B2FATAL("Fit to the histogram failed in SVD3SampleCoGTimeCalibrationAlgorithm. "
@@ -167,7 +168,6 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
             p    = tfr->Prob();
             m_tree->Fill();
           }
-
         }
       }
     }

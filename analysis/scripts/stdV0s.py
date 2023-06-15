@@ -14,7 +14,7 @@ from stdCharged import stdPi, stdPr
 import vertex
 
 
-def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False):
+def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False, writeOut=False):
     """
     Load a combined list of the Kshorts list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.
@@ -177,7 +177,7 @@ def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
-def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False):
+def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False, writeOut=False):
     """
     Load a combined list of the Lambda list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.

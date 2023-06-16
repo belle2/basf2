@@ -106,9 +106,9 @@ void BaseRecoFitterModule::event()
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
 
-        // If the charge after the fit is different from the seed charge,
-        // we change the charge see and refit th track
-        if (recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep).getCharge()) {
+        // If the charge after the fit (cardinal rep) is different from the seed charge,
+        // we change the charge seed and refit the track
+        if (recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge()) {
           recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
           B2DEBUG(29, "Refitting with opposite charge PDG: " << pdgCodeToUseForFitting);
           wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);

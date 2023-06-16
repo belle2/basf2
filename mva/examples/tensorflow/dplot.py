@@ -16,7 +16,7 @@ import basf2_mva
 from basf2_mva_python_interface.tensorflow import State
 
 
-class Prior(object):
+class Prior:
     """
     Calculates prior from signal and background pdfs of the fit variable
     """

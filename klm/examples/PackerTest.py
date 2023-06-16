@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -90,4 +89,4 @@ for branch in tree.GetListOfBranches():
     if name.startswith('Raw'):
         size = branch.GetTotBytes('*') * 1.0
         zipsize = branch.GetZipBytes('*') * 1.0
-        print("%s %.2f (%.2f)" % (name, size / 1024. / events, zipsize / 1024. / events))
+        print("{} {:.2f} ({:.2f})".format(name, size / 1024. / events, zipsize / 1024. / events))

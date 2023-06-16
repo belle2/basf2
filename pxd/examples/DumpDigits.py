@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ class DumpDigits(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(DumpDigits, self).__init__()
+        super().__init__()
         #: Output file object.
         self.dumpfile = 'PXDDigitsDump.txt'
         #: Factors for decoding VXDId's

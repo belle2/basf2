@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -106,7 +105,7 @@ class EventInspectorPocketDAQ:
     def initialize(self):
         """Handle job initialization: create histograms"""
 
-        expRun = 'e{0:02d}r{1}: '.format(int(self.exp), int(self.run))
+        expRun = 'e{:02d}r{}: '.format(int(self.exp), int(self.run))
 
         #: Output ROOT TFile that will contain the histograms/scatterplots
         self.histogramFile = ROOT.TFile.Open(self.histName, "RECREATE")
@@ -166,11 +165,11 @@ class EventInspectorPocketDAQ:
             [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         for lane in range(0, 21):
             nChannels = 64 if (lane > 2) else 128
-            label = 'ChannelOccupancy_A0L{0}'.format(lane)
-            title = '{0}Channel occupancy for axis 0 lane {1};channel'.format(expRun, lane)
+            label = 'ChannelOccupancy_A0L{}'.format(lane)
+            title = '{}Channel occupancy for axis 0 lane {};channel'.format(expRun, lane)
             self.hist_ChannelOccupancyAL[lane][0] = ROOT.TH1F(label, title, nChannels, -0.5, nChannels - 0.5)
-            label = 'ChannelOccupancy_A1L{0}'.format(lane)
-            title = '{0}Channel occupancy for axis 1 lane {1};channel'.format(expRun, lane)
+            label = 'ChannelOccupancy_A1L{}'.format(lane)
+            title = '{}Channel occupancy for axis 1 lane {};channel'.format(expRun, lane)
             self.hist_ChannelOccupancyAL[lane][1] = ROOT.TH1F(label, title, nChannels, -0.5, nChannels - 0.5)
         #: scatterplot of RPC TDC low-order bits vs sector (should be 0 since granularity is 4 ns)
         self.hist_RPCTimeLowBitsBySector = ROOT.TH2F('RPCTimeLowBitsBySector',
@@ -189,26 +188,26 @@ class EventInspectorPocketDAQ:
         #: histograms of RPC TDC value relative to event's trigger time for axis 0, indexed by lane
         self.hist_RPCTimePerLayerA0 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for lane in range(0, 21):
-            label = 'RPCTimeA0L{0:02d}'.format(lane)
-            title = '{0}RPC axis 0 lane {1} time relative to trigtime;t - triggerTime (ns)'.format(expRun, lane)
+            label = 'RPCTimeA0L{:02d}'.format(lane)
+            title = '{}RPC axis 0 lane {} time relative to trigtime;t - triggerTime (ns)'.format(expRun, lane)
             self.hist_RPCTimePerLayerA0[lane] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
         #: histograms of RPC TDC value relative to event's trigger time for axis 1, indexed by lane
         self.hist_RPCTimePerLayerA1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for lane in range(0, 21):
-            label = 'RPCTimeA1L{0:02d}'.format(lane)
-            title = '{0}RPC axis 1 lane {1} time relative to trigtime;t - triggerTime (ns)'.format(expRun, lane)
+            label = 'RPCTimeA1L{:02d}'.format(lane)
+            title = '{}RPC axis 1 lane {} time relative to trigtime;t - triggerTime (ns)'.format(expRun, lane)
             self.hist_RPCTimePerLayerA1[lane] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
         #: histograms of RPC TDC value relative to event's ctime for axis 0, indexed by lane
         self.hist_RPCTime2PerLayerA0 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for lane in range(0, 21):
-            label = 'RPCTime2A0L{0:02d}'.format(lane)
-            title = '{0}RPC axis 0 lane {1} time relative to trigCtime;t - trigCtime (ns)'.format(expRun, lane)
+            label = 'RPCTime2A0L{:02d}'.format(lane)
+            title = '{}RPC axis 0 lane {} time relative to trigCtime;t - trigCtime (ns)'.format(expRun, lane)
             self.hist_RPCTime2PerLayerA0[lane] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
         #: histograms of RPC TDC value relative to event's ctime for axis 1, indexed by lane
         self.hist_RPCTime2PerLayerA1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for lane in range(0, 21):
-            label = 'RPCTime2A1L{0:02d}'.format(lane)
-            title = '{0}RPC axis 1 lane {1} time relative to trigCtime;t - trigCtime (ns)'.format(expRun, lane)
+            label = 'RPCTime2A1L{:02d}'.format(lane)
+            title = '{}RPC axis 1 lane {} time relative to trigCtime;t - trigCtime (ns)'.format(expRun, lane)
             self.hist_RPCTime2PerLayerA1[lane] = ROOT.TH1F(label, title, 256, -0.5, 1023.5)
         #: histogram of RPC TDC range in event
         self.hist_RPCTdcRange = ROOT.TH1F('RPCTdcRange', expRun + 'RPC TDC-range in event;TDCMax - TDCMin (ns)', 512, -0.5, 2047.5)
@@ -262,19 +261,19 @@ class EventInspectorPocketDAQ:
         """Handle job termination: draw histograms, close output files"""
 
         canvas = ROOT.TCanvas("canvas", self.pdfName, 1600, 1600)
-        title = '{0}['.format(self.pdfName)
+        title = '{}['.format(self.pdfName)
         canvas.SaveAs(title)
         canvas.Clear()
         canvas.GetPad(0).SetGrid(1, 1)
         canvas.GetPad(0).Update()
         self.hist_rawKLMlane.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMlane.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_rawKLMlane.GetName()))
         self.hist_rawKLMsizeMultihit.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeMultihit.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_rawKLMsizeMultihit.GetName()))
         self.hist_rawKLMsize.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsize.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_rawKLMsize.GetName()))
         self.hist_PerChannelMultiplicity.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_PerChannelMultiplicity.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_PerChannelMultiplicity.GetName()))
         canvas.Clear()
         canvas.Divide(2, 1)
         canvas.GetPad(0).SetGrid(1, 1)
@@ -285,7 +284,7 @@ class EventInspectorPocketDAQ:
             self.hist_ChannelOccupancy[0].Draw("colz")
             canvas.cd(2)
             self.hist_ChannelOccupancy[1].Draw("colz")
-            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ChannelOccupancy[0].GetName()))
+            canvas.Print(self.pdfName, "Title:{}".format(self.hist_ChannelOccupancy[0].GetName()))
         for lane in range(0, 21):
             n0 = self.hist_ChannelOccupancyAL[lane][0].GetEntries()
             n1 = self.hist_ChannelOccupancyAL[lane][1].GetEntries()
@@ -294,47 +293,47 @@ class EventInspectorPocketDAQ:
                 self.hist_ChannelOccupancyAL[lane][0].Draw()
                 canvas.cd(2)
                 self.hist_ChannelOccupancyAL[lane][1].Draw()
-                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ChannelOccupancyAL[lane][0].GetName()))
+                canvas.Print(self.pdfName, "Title:{}".format(self.hist_ChannelOccupancyAL[lane][0].GetName()))
         canvas.Clear()
         canvas.Divide(1, 1)
         self.hist_ttc_trigtime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ttc_trigtime.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_ttc_trigtime.GetName()))
         self.hist_RPCTimeLowBitsBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTimeLowBitsBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_RPCTimeLowBitsBySector.GetName()))
         self.hist_RPCTime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTime.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_RPCTime.GetName()))
         for lane in range(0, 21):
             if self.hist_RPCTimePerLayerA0[lane].GetEntries() > 0:
                 self.hist_RPCTimePerLayerA0[lane].Draw()
-                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTimePerLayerA0[lane].GetName()))
+                canvas.Print(self.pdfName, "Title:{}".format(self.hist_RPCTimePerLayerA0[lane].GetName()))
         for lane in range(0, 21):
             if self.hist_RPCTimePerLayerA1[lane].GetEntries() > 0:
                 self.hist_RPCTimePerLayerA1[lane].Draw()
-                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTimePerLayerA1[lane].GetName()))
+                canvas.Print(self.pdfName, "Title:{}".format(self.hist_RPCTimePerLayerA1[lane].GetName()))
         self.hist_RPCTdcRange.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCTdcRange.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_RPCTdcRange.GetName()))
         self.hist_RPCRevotimeRange.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_RPCRevotimeRange.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_RPCRevotimeRange.GetName()))
         self.hist_revotimeRPCtdc.Draw("colz")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_revotimeRPCtdc.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_revotimeRPCtdc.GetName()))
         # self.hist_revotimeRPCtdc2.Draw("colz")
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_revotimeRPCtdc2.GetName()))
         self.hist_jRPCtdc.Draw("colz")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtdc.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_jRPCtdc.GetName()))
         # self.hist_jRPCtdc2.Draw("colz")
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_jRPCtdc2.GetName()))
         self.hist_ScintTimeLowBitsBySector.Draw("box")
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
         self.hist_ScintTime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintTime.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_ScintTime.GetName()))
         self.hist_ScintCtime.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintCtime.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_ScintCtime.GetName()))
         self.hist_ScintCtime0.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintCtime0.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_ScintCtime0.GetName()))
         self.hist_ScintCtimeRange.Draw()
-        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintCtimeRange.GetName()))
-        pdfNameLast = '{0}]'.format(self.pdfName)
-        canvas.Print(pdfNameLast, "Title:{0}".format(self.hist_ScintCtimeRange.GetName()))
+        canvas.Print(self.pdfName, "Title:{}".format(self.hist_ScintCtimeRange.GetName()))
+        pdfNameLast = '{}]'.format(self.pdfName)
+        canvas.Print(pdfNameLast, "Title:{}".format(self.hist_ScintCtimeRange.GetName()))
         self.histogramFile.Write()
         self.histogramFile.Close()
         print('Goodbye')

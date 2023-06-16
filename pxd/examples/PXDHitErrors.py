@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ class PXDHitErrors(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(PXDHitErrors, self).__init__()
+        super().__init__()
         #: Input file object.
         self.file = open('PXDHitErrorOutput.txt', 'w')
         #: Factors for decoding VXDId's

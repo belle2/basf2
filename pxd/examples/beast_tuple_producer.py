@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -41,7 +40,7 @@ class CalculationProcess(multiprocessing.Process):
 
     def __init__(self, iov, file_paths, output_dir):
         """ Constructor """
-        super(CalculationProcess, self).__init__()
+        super().__init__()
         #: interval of validity
         self.iov = iov
         #: path to files

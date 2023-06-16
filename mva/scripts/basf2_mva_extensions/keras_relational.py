@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -48,7 +47,7 @@ class Relations(Layer):
         #: number of relation combinations
         self.combinations = 0
 
-        super(Relations, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         """
@@ -75,7 +74,7 @@ class Relations(Layer):
 
             self.weightvariables.append([weights, bias])
 
-        super(Relations, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
         """
@@ -119,7 +118,7 @@ class Relations(Layer):
             'hidden_feature_shape': self.hidden_feature_shape,
             'activation': activations.serialize(self.activation)
         }
-        base_config = super(Relations, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
@@ -154,7 +153,7 @@ class EnhancedRelations(Layer):
         #: size of second input vector
         self.question_len = 0
 
-        super(EnhancedRelations, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         """
@@ -187,7 +186,7 @@ class EnhancedRelations(Layer):
 
             self.weightvariables.append([weights, bias])
 
-        super(EnhancedRelations, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
         """
@@ -236,5 +235,5 @@ class EnhancedRelations(Layer):
             'hidden_feature_shape': self.hidden_feature_shape,
             'activation': activations.serialize(self.activation)
         }
-        base_config = super(EnhancedRelations, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

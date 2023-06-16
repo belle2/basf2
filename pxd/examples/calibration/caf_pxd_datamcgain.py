@@ -176,7 +176,7 @@ else:
         ignoreRuns = dirkekcc + "RunListBeam," + dirkekcc + "RunListCosmic"
     if ignoreRuns:
         for flist in ignoreRuns.split(","):
-            fignore = open(flist, 'r')
+            fignore = open(flist)
             line = fignore.readline()
             while line:
                 run = line[0:line.find(',')]

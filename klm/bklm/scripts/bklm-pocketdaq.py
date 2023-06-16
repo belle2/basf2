@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -80,24 +79,24 @@ if options.infilename != '':
     inputName = options.infilename
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
-        print("No file(s) match {0}".format(inputName))
+        print("No file(s) match {}".format(inputName))
         sys.exit()
     inputName = fileList[0].replace("f00000", "f*")
 else:
-    print("Missing input filename (required parameter) for experiment <{0}> run <{1}>".format(options.eNumber, options.rNumber))
+    print("Missing input filename (required parameter) for experiment <{}> run <{}>".format(options.eNumber, options.rNumber))
     sys.exit()
 if not options.eNumber.isdecimal():
-    print("Experiment number ({0}) is not valid".format(options.eNumber))
+    print("Experiment number ({}) is not valid".format(options.eNumber))
     sys.exit()
-exp = '{0:04d}'.format(int(options.eNumber))
+exp = '{:04d}'.format(int(options.eNumber))
 if not options.rNumber.isdecimal():
-    print("Run number ({0}) is not valid".format(options.rNumber))
+    print("Run number ({}) is not valid".format(options.rNumber))
     sys.exit()
-run = '{0:05d}'.format(int(options.rNumber))
+run = '{:05d}'.format(int(options.rNumber))
 
 infile = TFile(fileList[0])
-histName = 'bklmHists-e{0}r{1}.root'.format(exp, run)
-pdfName = 'bklmPlots-e{0}r{1}.pdf'.format(exp, run)
+histName = 'bklmHists-e{}r{}.root'.format(exp, run)
+pdfName = 'bklmPlots-e{}r{}.pdf'.format(exp, run)
 
 if eventFilter == 0:
     print('bklm-pocketdaq: exp=' + exp + ' run=' + run + ' input=', options.infilename + ' - processing even-numbered events')
@@ -131,7 +130,7 @@ for row in infile.Get('KLM_raw_hits'):
         count = count + 1
         eventNumber = newEventNumber
         if row.broken != 0:
-            print('*** Event {0} is broken!'.format(eventNumber))
+            print('*** Event {} is broken!'.format(eventNumber))
         eventHits.clear()
         eventHits.append(items)
         tt_ctime = row.tt_ctime << 3

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 ##########################################################################
@@ -41,7 +40,7 @@ matplotlib.rcParams.update({'font.size': 36})
 plt.style.use("belle2")
 
 
-class Plotter(object):
+class Plotter:
     """
     Base class for all Plotters.
     """
@@ -505,7 +504,7 @@ class Multiplot(Plotter):
         #: the subplots which are displayed in the grid
         self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
         self.axis = self.sub_plots[0].axis
-        super(Multiplot, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, i, *args, **kwargs):
         """
@@ -583,7 +582,7 @@ class Distribution(Plotter):
         @param keep_first_binning use the binning of the first distribution for further plots
         @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
-        super(Distribution, self).__init__(figure, axis)
+        super().__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed_to_all_entries = normed_to_all_entries
         #: Normalize histograms before drawing them
@@ -777,7 +776,7 @@ class Difference(Plotter):
         @param normed normalize minuend and subtrahend before comparing them
         @param shift_to_zero mean difference is shifted to zero, to remove constant offset due to e.g. different sample sizes
         """
-        super(Difference, self).__init__(figure, axis)
+        super().__init__(figure, axis)
         self.normed = normed
         self.shift_to_zero = shift_to_zero
         if self.normed:
@@ -871,7 +870,7 @@ class Overtraining(Plotter):
         self.axis_d1 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
         self.axis_d2 = self.figure.add_subplot(gs[4, :], sharex=self.axis)
 
-        super(Overtraining, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, data, column, train_mask, test_mask, signal_mask, bckgrd_mask, weight_column=None):
         """
@@ -983,7 +982,7 @@ class VerboseDistribution(Plotter):
         @param normed true if the histograms should be normed before drawing
         @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
-        super(VerboseDistribution, self).__init__(figure, axis)
+        super().__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed = normed
         #: Show only a certain range in terms of standard deviations of the data
@@ -1071,7 +1070,7 @@ class Correlation(Plotter):
         self.axis_d1 = self.figure.add_subplot(gs[1, :], sharex=self.axis)
         self.axis_d2 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
 
-        super(Correlation, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, data, column, cut_column, quantiles, signal_mask=None, bckgrd_mask=None, weight_column=None):
         """
@@ -1246,7 +1245,7 @@ class CorrelationMatrix(Plotter):
         #: Usual axis object which every Plotter object needs, here it is just a dummy
         self.axis = self.signal_axis
 
-        super(CorrelationMatrix, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, data, columns, signal_mask, bckgrd_mask):
         """

@@ -103,13 +103,34 @@ class nntd(basf2.Module):
 
         # storearrays
         self.recotracks = Belle2.PyStoreArray(self.recotracksname)
-        self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
-        self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
-        self.swneurotracks = Belle2.PyStoreArray(self.swneurotracksname)
-        self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
-        self.swtwodtracks = Belle2.PyStoreArray(self.swtwodtracksname)
-        self.ts = Belle2.PyStoreArray(self.tsname)
-        self.etf = Belle2.PyStoreObj(self.etfname)
+        try:
+            self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
+        except ValueError:
+            self.neurotracks = None
+        try:
+            self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
+        except ValueError:
+            self.hwneurotracks = None
+        try:
+            self.swneurotracks = Belle2.PyStoreArray(self.swneurotracksname)
+        except ValueError:
+            self.swneurotracks = None
+        try:
+            self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
+        except ValueError:
+            self.twodtracks = None
+        try:
+            self.swtwodtracks = Belle2.PyStoreArray(self.swtwodtracksname)
+        except ValueError:
+            self.swtwodtracks = None
+        try:
+            self.ts = Belle2.PyStoreArray(self.tsname)
+        except ValueError:
+            self.ts = None
+        try:
+            self.etf = Belle2.PyStoreObj(self.etfname)
+        except ValueError:
+            self.etf = None
 
         self.varnum = nntd.varnum
 

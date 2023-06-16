@@ -97,9 +97,9 @@ class randommaker(basf2.Module):
         self.counter = 0
 
     def event(self):
-        print("counter is " + str(self.counter))
+        # print("counter is " + str(self.counter))
         if self.counter % 100 == 0:
-            print("case 0")
+            # print("case 0")
             self.return_value(0)
         elif self.counter % 3 == 0:
             self.return_value(1)

@@ -16,7 +16,7 @@
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL
-#    phase          2, 31 (= early phase 3) or 3
+#    phase          2, 31 (= early phase 3, ie pre-LS1), 32 (= pre-LS2) or 3 (D = 3)
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
 
@@ -55,14 +55,14 @@ elif argc == 6:
     phase = int(argvs[4])
     outdir = argvs[5]
 else:
-    print('usage:')
+    print('Usage:')
     print('  basf2', argvs[0], 'equivTime_us num [sampleType phase outdir]')
-    print('arguments:')
+    print('Arguments:')
     print('  equivTime_us  equivalent SuperKEKB running time in micro-seconds')
     print('  num           output file number')
-    print('  sampleType    one of: study, usual, PXD, ECL')
-    print('  phase         2, 31 (=early phase 3) or 3')
-    print('  outdir        output directory path')
+    print('  sampleType    one of: study, usual, PXD, ECL (D = usual)')
+    print('  phase         2, 31 (= early phase 3, ie pre-LS1), 32 (= pre-LS2) or 3 (D = 3)')
+    print('  outdir        output directory path (D = output)')
     sys.exit()
 
 # set parameters
@@ -71,9 +71,11 @@ bgType = 'twoPhoton'
 crossect = 7.28e6  # nb
 
 if phase == 3:
-    lumi = 630  # /nb/s
+    lumi = 630  # /nb/s (1/nb/s = 1e33/cm^2/s)
 elif phase == 31:
     lumi = 30  # /nb/s
+elif phase == 32:
+    lumi = 100  # /nb/s
 elif phase == 2:
     lumi = 20   # /nb/s
 else:
@@ -117,6 +119,8 @@ if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
     gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
+elif phase == 32:
+    gearbox.param('fileName', 'geometry/Belle2_preLS2.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),
@@ -126,7 +130,8 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='TOP']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='KLM']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//BKLM/BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//EKLM/BeamBackgroundStudy", '1', ''),
     ])
 main.add_module(gearbox)
 
@@ -149,7 +154,7 @@ geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 addComp = ["MagneticField3dQuadBeamline"]
 # add beast detectors for early phase3
-if phase == 31 and sampleType == 'study':
+if sampleType == 'study' and (phase == 31 or phase == 32):
     addComp.extend(["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
 
 geometry.param({"excludedComponents": ["MagneticField"],
@@ -170,7 +175,7 @@ progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Output
-if phase == 31:
+if phase == 31 or phase == 32:
     phase = 3
 add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
 

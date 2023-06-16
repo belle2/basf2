@@ -63,6 +63,13 @@ class nntd(basf2.Module):
     varnum["swtwodphi"] = [47, r'$\phi_{SW2D}$', r'$[°]$']
     varnum["swtwodpt"] = [48, r'$P_{t, SW2D}$', r'$[GeV]$']
     varnum["swtwodfot"] = [49, r'FoundOldTrack', '']
+    varnum["neuroats"] = [50, r'NumberOfAxials', '']
+    varnum["hwneuroats"] = [51, r'NumberOfAxials', '']
+    varnum["swneuroats"] = [52, r'NumberOfAxials', '']
+    varnum["neuroetfcc"] = [53, r'ETF Eventtime from CC', 'clocks']
+    varnum["neurohwtime"] = [54, r'Reconstructed HW Eventtime', 'clocks']
+    varnum["hwneuroetfcc"] = [55, r'ETF Eventtime', 'clocks']
+    varnum["hwneurohwtime"] = [56, r'Reconstructed HW Eventtime', 'clocks']
     nonelist = []
     for x in varnum:
         nonelist.append(None)
@@ -147,9 +154,13 @@ class nntd(basf2.Module):
                                                                                           np.sqrt(1 + neuro.getCotTheta()**2)))
             evlist[self.varnum[pre + "neuroval"][0]] = neuro.getValidStereoBit()
             evlist[self.varnum[pre + "neuroqual"][0]] = neuro.getQualityVector()
-            # evlist[self.varnum[pre + "neurots"][0]] = int(neuro.getTSVector())
+            evlist[self.varnum[pre + "neurots"][0]] = int("".join([str(x) for x in neuro.getTSVector()]))
+            xx = sum([int(i != 0) for i in neuro.getTSVector()][::2])
+            if xx is None:
+                xx = 0
+            evlist[self.varnum[pre + "neuroats"][0]] = xx
             evlist[self.varnum[pre + "neuroexp"][0]] = neuro.getExpert()
-            # evlist[self.varnum[pre + "neurodriftth"][0]] = int(neuro.getDriftThreshold())
+            evlist[self.varnum[pre + "neurodriftth"][0]] = int("".join([str(int(x)) for x in neuro.getDriftThreshold()]))
             evlist[self.varnum[pre + "neuroquad"][0]] = neuro.getQuadrant()
             fpt = 9999
             for ts in neuro.getRelationsTo(self.tsname):
@@ -161,6 +172,9 @@ class nntd(basf2.Module):
                 eft = None
             evlist[self.varnum[pre + "neurofp"][0]] = fpt
             evlist[self.varnum[pre + "neuroetf"][0]] = eft
+            if pre != "sw":
+                evlist[self.varnum[pre + "neuroetfcc"][0]] = neuro.getETF_unpacked()
+                evlist[self.varnum[pre + "neurohwtime"][0]] = neuro.getETF_recalced()
         return evlist
 
     def gettwodvals(self, evlist, twod):

@@ -32,13 +32,15 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         updateAllDaughters (bool): see the ``updateAllDaughters`` parameter of `vertex.treeFit`
             or the ``daughtersUpdate`` parameter of `vertex.kFit` / `vertex.raveFit`.
 
-    .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
-        to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
-        return meaningful results if the daughters momenta are updated.
+            .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
+                to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
+                return meaningful results if the daughters momenta are updated.
 
-        This happens because variables like `daughterAngle` assume the direction of the
-        daughers momenta *at the Ks vertex* to be provided, while non-updated daughters will
-        provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
+                This happens because variables like `daughterAngle` assume the direction of the
+                daughers momenta *at the Ks vertex* to be provided, while non-updated daughters will
+                provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
+
+        writeOut (bool): whether RootOutput module should save the created ParticleList
     """
     # Fill one list from V0
     ma.fillParticleList('K_S0:V0_ToFit -> pi+ pi-', '', writeOut=writeOut, path=path)
@@ -195,14 +197,16 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         updateAllDaughters (bool): see the ``updateAllDaughters`` parameter of `vertex.treeFit`
             or the ``daughtersUpdate`` parameter of `vertex.kFit` / `vertex.raveFit`.
 
-    .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
-        to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
-        return meaningful results if the daughters momenta are updated.
+            .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
+                to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
+                return meaningful results if the daughters momenta are updated.
 
-        This happens because variables like `daughterAngle` assume the direction of the
-        daughers momenta *at the Lambda vertex* to be provided, while non-updated daughters
-        will provide their momenta direction at the point-of-closest-approach (POCA) to the
-        beam axis.
+                This happens because variables like `daughterAngle` assume the direction of the
+                daughers momenta *at the Lambda vertex* to be provided, while non-updated daughters
+                will provide their momenta direction at the point-of-closest-approach (POCA) to the
+                beam axis.
+
+        writeOut (bool): whether RootOutput module should save the created ParticleList
     """
     # Fill one list from V0
     ma.fillParticleList('Lambda0:V0_ToFit -> p+ pi-', '', writeOut=writeOut, path=path)

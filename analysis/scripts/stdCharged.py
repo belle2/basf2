@@ -69,6 +69,7 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     @param particletype type of charged particle to make a list of
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
 
     # basic quality cut strings
@@ -132,6 +133,7 @@ def stdPi(listtype=_defaultlist, path=None, writeOut=True):
 
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
     stdCharged('pi', listtype, path, writeOut)
 
@@ -142,6 +144,7 @@ def stdK(listtype=_defaultlist, path=None, writeOut=True):
 
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
     stdCharged('K', listtype, path, writeOut)
 
@@ -152,6 +155,7 @@ def stdPr(listtype=_defaultlist, path=None, writeOut=True):
 
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
     stdCharged('p', listtype, path, writeOut)
 
@@ -591,6 +595,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     @param suffix       string added to the end of particle list names
     @param custom_cuts  custom selection cut string, if empty, standard track quality cuts will be applied
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
     # Here we need basic track quality cuts to be applied,
     # otherwise, we get a lot of badly reconstructed particles,

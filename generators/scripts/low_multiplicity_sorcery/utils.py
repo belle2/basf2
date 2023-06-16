@@ -124,7 +124,7 @@ class EventRangePathSplitter(Module):
             event_codes (Iterable): tuple or list of EventCode.
         """
         import ROOT  # noqa
-        super(EventRangePathSplitter, self).__init__()
+        super().__init__()
         #: tuple or list of event codes
         self.event_codes = event_codes
         #: PyStoreObj off EventExtraInfo
@@ -178,7 +178,7 @@ class ExtraInfoPathSplitter(Module):
             event_codes (Iterable): tuple or list of EventCode.
         """
         import ROOT  # noqa
-        super(ExtraInfoPathSplitter, self).__init__()
+        super().__init__()
         #: list of event codes
         self.event_codes = [e.value for e in event_codes]
         #: PyStoreObj for EventExtraInfo to save event codes

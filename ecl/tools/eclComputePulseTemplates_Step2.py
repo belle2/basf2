@@ -44,7 +44,7 @@ def EvalAnyComp(tin, ttrg, TauIn):
 
 
 def CalcShaperOutput(muonShaper, muonInitial, inputPreShaper, ITER):
-    impulse = ((ifft((fft(muonShaper) / fft(muonInitial)))))
+    impulse = (ifft(fft(muonShaper) / fft(muonInitial)))
     outputShaper = np.real(ifft(fft(impulse) * fft(inputPreShaper)))
     base = outputShaper[ITER]
     i = 0

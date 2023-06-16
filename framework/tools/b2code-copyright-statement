@@ -80,7 +80,7 @@ if __name__ == "__main__":
         if any(bad_thing in file_name.lower() for bad_thing in bad_things):
             continue
 
-        with open(file_name, 'r') as source:
+        with open(file_name) as source:
             try:
                 text = source.read()
             except Exception:

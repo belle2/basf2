@@ -31,10 +31,10 @@ def getCollidingPatternFromFiles(herFilePath, lerFilePath):
     the second is 1.0000 or .0000 depending on whether the bunch is filled or not. The third column is extra.
     """
 
-    herFile = open(herFilePath, 'r')
+    herFile = open(herFilePath)
     herLines = herFile.readlines()
 
-    lerFile = open(lerFilePath, 'r')
+    lerFile = open(lerFilePath)
     lerLines = lerFile.readlines()
 
     pattern = []

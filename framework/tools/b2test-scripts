@@ -60,7 +60,7 @@ import re
 import datetime
 import tempfile
 import timeit
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 from collections import defaultdict
 from functools import partial
 from b2test_utils import is_ci, temporary_set_environment

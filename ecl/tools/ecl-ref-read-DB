@@ -78,7 +78,7 @@ def print_near_info(set_info, near_info, which):
 	
 def print_ref_runs(runs_hists):
 
-	u_runs = set([item[0] for item in runs_hists])
+	u_runs = {item[0] for item in runs_hists}
 	print('\nReference runs for exp ' + str(exp) + ', type ' + str(run_type) + ':')
 	print(u_runs)
 
@@ -99,7 +99,7 @@ def print_ref_runs(runs_hists):
 
 def print_ref_runs_for_hist(runs_hists):
 
-	u_runs = set([item[0] for item in runs_hists])
+	u_runs = {item[0] for item in runs_hists}
 	print('\nReference runs for exp ' + str(exp) + ', type ' + str(run_type) + ', histogram ' + runs_hists[0][1])
 	print(u_runs)
 

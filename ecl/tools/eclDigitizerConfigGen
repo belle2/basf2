@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -89,10 +88,10 @@ def main():
     if USE_8736_PARAMETERS:
         groups = [[x + 1] for x in range(8736)]
     else:
-        f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
+        f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'))
         for line in f.readlines():
             if len(line.strip()) == 0: continue
-            cid0, group = [int(x) for x in line.split()]
+            cid0, group = (int(x) for x in line.split())
             new_len = group + 1
             while new_len > len(groups): groups.append(list())
             groups[group].append(cid0 + 1)

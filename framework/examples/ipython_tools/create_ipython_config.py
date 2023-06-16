@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -40,7 +39,7 @@ def main():
     print("Will now write your notebook config.")
 
     jupyter_template_file = find_file("framework/examples/ipython_tools/jupyter_notebook_config.py.j2")
-    with open(jupyter_template_file, 'r') as f:
+    with open(jupyter_template_file) as f:
         template = Template(f.read())
 
         try:

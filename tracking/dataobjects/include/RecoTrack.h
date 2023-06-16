@@ -1087,6 +1087,15 @@ namespace Belle2 {
      */
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
 
+    /** Set the genfit track of a Recotrack copying the information from another genfit track.
+     * This is used by the fit&refit, since the original genfit track must be
+     * updated with the refitted object obtained after the flip
+     *
+     * @param recoTrack : RecoTrack whose Track we want to update
+     * @param track : input genfit::Track which we want to copy inside the RecoTrack
+     */
+    static void swapGenfitTrack(RecoTrack& recoTrack, const genfit::Track* track);
+
     /**
      * Checks if a TrackRap for the PDG id of the RecoTrack (and its charge conjugate) does
      * already exit and returns it if available. If no TrackRep is available, a new RKTrackRep

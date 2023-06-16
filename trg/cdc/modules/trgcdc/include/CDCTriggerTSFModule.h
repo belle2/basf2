@@ -100,6 +100,12 @@ namespace Belle2 {
     const static int MAX_N_LAYERS = c_maxWireLayersPerSuperLayer;
     /** bad channel mapping */
     bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
+    /** list of (# reconstructed right, # reconstructed left, # unrelated background)
+     *  for the inner-most super layer */
+    std::vector<std::vector<unsigned>> innerRecoLRTable = {};
+    /** list of (# true right, # true left, # true background)
+     *  for the outer super layers */
+    std::vector<std::vector<unsigned>> outerRecoLRTable = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;

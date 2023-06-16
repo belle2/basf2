@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -91,7 +90,7 @@ def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=F
         b2.B2INFO('skip tsim')
 
     output = b2.register_module('RootOutput',
-                                outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
+                                outputFileName='gcr.cdc.{:04d}.{:06d}.{:04d}.root'.format(int(exp), int(run), int(st)))
     main_path.add_module(output)
     b2.print_path(main_path)
     b2.process(main_path)

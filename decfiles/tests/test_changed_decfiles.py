@@ -65,7 +65,7 @@ if __name__ == '__main__':
         with NamedTemporaryFile(mode='w', suffix='.pdl') as tempfile:
 
             for fname in [custom_evtpdl, default_evtpdl]:
-                with open(fname, 'r') as infile:
+                with open(fname) as infile:
                     tempfile.write(infile.read())
 
             for decfile in added_or_modified_decfiles:

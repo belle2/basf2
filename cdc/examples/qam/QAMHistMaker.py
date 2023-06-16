@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -44,7 +43,7 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
     main.add_module('Geometry',
                     excludedComponents=['EKLM'])
 
-    output = "/".join([dest, 'qam.{0:0>4}.{1:0>5}.root'.format(exp, run)])
+    output = "/".join([dest, 'qam.{:0>4}.{:0>5}.root'.format(exp, run)])
     main.add_module('CDCCosmicAnalysis',
                     noBFit=not magneticField,
                     Output=output,

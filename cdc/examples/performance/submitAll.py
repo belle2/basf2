@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ exp = 1
 
 # Data directory
 # GCR 2017
-dir = '/hsm/belle2/bdata/Data/Raw/e{0:0>4}'.format(exp)
+dir = '/hsm/belle2/bdata/Data/Raw/e{:0>4}'.format(exp)
 # pre GCR period
 # dir = '/ghi/fs01/belle2/bdata/group/detector/CDC/unpacked/'
 # files = glob.glob(dir + exp + '/gcr.cdc.*.root')

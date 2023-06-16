@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ exit_status = 0
 list_of_wg = ['SL', 'EWP', 'TCPV', 'HAD', 'CHARM', 'ONIA', 'TAU']
 
 
-class GenericOptionFile(object):
+class GenericOptionFile:
 
     """
     Class to write in an option file
@@ -120,13 +119,13 @@ class GenericOptionFile(object):
         Set the EvtGen .dec file.
         """
         self.AddOptionValue('EvtGenUserDecayFile',
-                            '"$DECFILESROOT/dec/{0}.dec"'.format(eventtype.DecayName()))
+                            '"$DECFILESROOT/dec/{}.dec"'.format(eventtype.DecayName()))
 
     def AddDecayOptions(self, eventtype):
         """
         Specify options for .dec file.
         """
-        [self.AddOptionValue('ToolSvc.{0}Decay.{1}'.format(
+        [self.AddOptionValue('ToolSvc.{}Decay.{}'.format(
             eventtype.DecayEngine(), eventtype.DecayOptions().split()[2 * i]),
             eventtype.DecayOptions().split()[2 * i + 1])
          for i in range(len(eventtype.DecayOptions().split()) / 2)]
@@ -160,19 +159,19 @@ class TextOptionFile(GenericOptionFile):
         """
         Set the value of option.
         """
-        self.Write(['{0} = {1};'.format(option, value)])
+        self.Write(['{} = {};'.format(option, value)])
 
     def AddInclude(self, filename):
         """
         Add include statements.
         """
-        self.Write(['#include "$DECFILESROOT/prod/{0}.py"'.format(filename)])
+        self.Write(['#include "$DECFILESROOT/prod/{}.py"'.format(filename)])
 
     def IncreaseOptionValue(self, option, value):
         """
         Add option string.
         """
-        self.Write(['{0} += {1};'.format(option, value)])
+        self.Write(['{} += {};'.format(option, value)])
 
 
 class PythonOptionFile(GenericOptionFile):
@@ -211,7 +210,7 @@ class PythonOptionFile(GenericOptionFile):
         self.list_algorithm = []
         #: list of tools
         self.list_tool = []
-        super(PythonOptionFile, self).__init__()
+        super().__init__()
 
     def AddOptionValue(self, option, value, substitute=False):
         """
@@ -222,14 +221,14 @@ class PythonOptionFile(GenericOptionFile):
         if substitute:
             value = value.replace('true', 'True')
             value = value.replace('false', 'False')
-        self.Write(['{0} = {1}'.format(option, value)])
+        self.Write(['{} = {}'.format(option, value)])
 
     def IncreaseOptionValue(self, option, value):
         """
         Add option string.
         """
         option = self.ConfigureToolAndAlgo(option)
-        self.Write(['{0} += {1}'.format(option, value)])
+        self.Write(['{} += {}'.format(option, value)])
 
 
 class EventType:
@@ -499,7 +498,7 @@ class EventType:
             self.OptionFile = PythonOptionFile()
 
         if not filename:
-            filename = '{0}/prod/{1}'.format(
+            filename = '{}/prod/{}'.format(
                 os.environ['DECFILESROOT'], self.EventTypeNumber())
 
         self.OptionFile.SetFileName(filename)
@@ -722,7 +721,7 @@ def writeBkkTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = '{0} | {1} | {2}\n'.format(evttypeid, nick, desc)
+            line = '{} | {} | {}\n'.format(evttypeid, nick, desc)
             f.write(line)
 
 
@@ -749,7 +748,7 @@ def writeSQLTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = 'EVTTYPEID = {0}, DESCRIPTION = "{1}", PRIMARY = "{2}"\n'.format(
+            line = 'EVTTYPEID = {}, DESCRIPTION = "{}", PRIMARY = "{}"\n'.format(
                 evttypeid, nick, desc)
             f.write(line)
 
@@ -766,7 +765,7 @@ def readObsoleteTypeTable():
             for line in f:
                 list_of_obsoletes.append(line.split()[2].strip(','))
                 logging.info(' This will be ignored %s', line)
-    except IOError:
+    except OSError:
         logging.warning('No files containing obsolete event types found')
     except IndexError:
         pass
@@ -869,8 +868,8 @@ def CheckFile(option, opt_str, value, parser):
     Check if file exists.
     """
 
-    if not os.path.exists('{0}/dec/{1}.dec'.format(os.environ['DECFILESROOT'],
-                                                   value)):
+    if not os.path.exists('{}/dec/{}.dec'.format(os.environ['DECFILESROOT'],
+                                                 value)):
         raise OptionValueError('Decay file %s.dec ' % value + 'does not ' +
                                'exist in the $DECFILESROOT/dec directory')
     setattr(parser.values, option.dest, value)
@@ -1021,7 +1020,7 @@ def main():
     if options.NickName:
         try:
             run_create(
-                '{0}/dec/{1}.dec'.format(
+                '{}/dec/{}.dec'.format(
                     os.environ['DECFILESROOT'],
                     options.NickName),
                 options.remove,

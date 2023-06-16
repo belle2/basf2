@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -92,7 +91,7 @@ class CDCHistMakerModule(b2.Module):
         call constructor of base class, required.
         """
 
-        super(CDCHistMakerModule, self).__init__()
+        super().__init__()
         #: Experimental number
         self.m_exp = exp
         #: Run number
@@ -102,7 +101,7 @@ class CDCHistMakerModule(b2.Module):
         if os.path.exists(self.m_dest) is False:
             os.mkdir(self.m_dest)
         #: Output file name
-        self.m_outputFile = self.m_dest + '/dqm.{0:0>4}.{1:0>5}.root'.format(self.m_exp, self.m_run)
+        self.m_outputFile = self.m_dest + '/dqm.{:0>4}.{:0>5}.root'.format(self.m_exp, self.m_run)
 
     def event(self):
         """
@@ -153,7 +152,7 @@ class CDCHistMakerModule(b2.Module):
 def main(exp=1, run=3118, prefix='', dest=''):
 
     # Seach dst files.
-    files = glob.glob(prefix + '/dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
+    files = glob.glob(prefix + '/dst.cosmic.{:0>4}.{:0>5}'.format(exp, run) + '*.root')
     # create path
     main = b2.create_path()
     # Input (ROOT file).

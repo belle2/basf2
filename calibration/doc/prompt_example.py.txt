@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Docstring explaining what this calibration script does. Maybe a description of payloads?
 This can be a long as you want."""
 

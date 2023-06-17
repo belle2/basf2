@@ -116,30 +116,22 @@
 //   o   m_fittedVertexPosition (TVector3) moved to V0::m_fittedVertex{X,Y,Z}
 #pragma read \
   sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[-1]" \
-  targetClass="Belle2::V0" target="m_fittedVertexX" \
-  code = "{ m_fittedVertexX = onfile.m_fittedVertexPosition.X(); }"
-#pragma read \
-  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[-1]" \
-  targetClass="Belle2::V0" target="m_fittedVertexY" \
-  code = "{ m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); }"
-#pragma read \
-  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[-1]" \
-  targetClass="Belle2::V0" target="m_fittedVertexZ" \
-  code = "{ m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); }"
+  targetClass="Belle2::V0" target="m_fittedVertexX,m_fittedVertexY,m_fittedVertexZ" \
+  code = "{ \
+            m_fittedVertexX = onfile.m_fittedVertexPosition.X(); \
+            m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); \
+            m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); \
+          }"
 // In version 4- (2-3)
 //   o   m_fittedVertexPosition (ROOT::Math::XYZVector) moved to V0::m_fittedVertex{X,Y,Z}
 #pragma read \
   sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[2-3]" \
-  targetClass="Belle2::V0" target="m_fittedVertexX" \
-  code = "{ m_fittedVertexX = onfile.m_fittedVertexPosition.X(); }"
-#pragma read \
-  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[2-3]" \
-  targetClass="Belle2::V0" target="m_fittedVertexY" \
-  code = "{ m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); }"
-#pragma read \
-  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[2-3]" \
-  targetClass="Belle2::V0" target="m_fittedVertexZ" \
-  code = "{ m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); }"
+  targetClass="Belle2::V0" target="m_fittedVertexX,m_fittedVertexY,m_fittedVertexZ" \
+  code = "{ \
+            m_fittedVertexX = onfile.m_fittedVertexPosition.X(); \
+            m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); \
+            m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); \
+          }"
 
 // BremHit evolution
 // In version 2- (1)

@@ -25,8 +25,6 @@
 using namespace Belle2;
 using namespace std;
 
-#define TWOPI 6.28318530718
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -146,8 +144,8 @@ void ECLTrackCalDigitMatchModule::event()
     if (!isnan(exttheta)) {
       // get the correct phi bin for this track (phi: -PI..PI, but phi-ids in ECL from 0..144)
       double extphitwopi = extphi;
-      if (extphi < 0) extphitwopi = TWOPI + extphi;
-      const int phiid = extphitwopi / (TWOPI / 144);
+      if (extphi < 0) extphitwopi = 2.0 * M_PI + extphi;
+      const int phiid = extphitwopi / (2.0 * M_PI / 144);
 
       // get the energy sums
       double sum3FWDBarrel = 0.0;

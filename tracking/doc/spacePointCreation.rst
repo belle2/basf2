@@ -1,4 +1,4 @@
-.. _tracking_spacePointCreation: 
+.. _tracking_spacePointCreation:
 
 Space Point Creation
 ====================

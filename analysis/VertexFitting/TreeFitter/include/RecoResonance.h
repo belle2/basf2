@@ -9,12 +9,12 @@
 
 #pragma once
 
-#include <analysis/VertexFitting/TreeFitter/RecoComposite.h>
+#include <analysis/VertexFitting/TreeFitter/Composite.h>
 
 namespace TreeFitter {
 
   /** A class for resonances */
-  class RecoResonance : public RecoComposite {
+  class RecoResonance : public Composite {
 
   public:
 

@@ -82,8 +82,6 @@ public:
   double m_ztostraw[4];
   /// Holds the tan theta of streo super layer in radian.
   double m_anglest[4];
-  /// Hold the PI value.
-  double m_Trg_PI;
   /// Hough finder variables.
   /// Hough mesh cot start range.
   double m_cotStart;

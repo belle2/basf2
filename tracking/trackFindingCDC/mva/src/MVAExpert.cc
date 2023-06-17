@@ -160,9 +160,13 @@ double MVAExpert::Impl::predict()
 }
 
 /** PImpl Interface **/
+// Silence Doxygen which is complaining that "no matching class member found for"
+// But there should be a better way that I just don't know of / find
+//! @cond Doxygen_Suppress
 MVAExpert::MVAExpert(const std::string& identifier,
                      std::vector<Named<Float_t*> > namedVariables)
   : m_impl(std::make_unique<MVAExpert::Impl>(identifier, std::move(namedVariables)))
+//! @endcond
 {
 }
 

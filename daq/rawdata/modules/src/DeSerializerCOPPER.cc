@@ -178,7 +178,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 }
 
 
-int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word)
+int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int /*entry*/, int* /*delete_flag*/, int* /*m_size_word*/)
 {
 #ifdef USE_PCIE40
   char err_buf[500];
@@ -351,7 +351,7 @@ void DeSerializerCOPPERModule::openCOPPER()
 
 
 
-int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
+int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int /*delete_flag*/)
 {
 
   int n = 0;

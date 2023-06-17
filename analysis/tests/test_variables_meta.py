@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -91,7 +90,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         """
 
         # Read file contents
-        with open(filepath, "r") as fp:
+        with open(filepath) as fp:
             filecontent = fp.read()
 
         # List for all found registering statements

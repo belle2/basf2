@@ -23,6 +23,15 @@ namespace Belle2 {
   public:
 
     /**
+     * Reconstructed bucket status
+     */
+    enum EBucketStatus {
+      c_Unknown = -1, /**< not known */
+      c_Empty = 0,    /**< bucket is empty */
+      c_Filled = 1,   /**< bucket is filled */
+    };
+
+    /**
      * Default constructor
      */
     TOPRecBunch()
@@ -47,6 +56,8 @@ namespace Belle2 {
       m_recValid = false;
       m_minChi2 = 0;
       m_detector = Const::invalidDetector;
+      m_bucketNumber = c_Unknown;
+      m_isBucketFilled = c_Unknown;
     }
 
     /**
@@ -89,8 +100,8 @@ namespace Belle2 {
     }
 
     /**
-     * Sets number of global clock tics since last revo9 flag
-     * @param revo9Counter counter state
+     * Sets number of system clock tics since last revo9 marker
+     * @param revo9Counter counter state when L1 trigger is issued
      */
     void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
 
@@ -122,6 +133,18 @@ namespace Belle2 {
     }
 
     /**
+     * Sets reconstructed bucket number
+     * @param bucketNumber bucket number
+     */
+    void setBucketNumber(int bucketNumber) {m_bucketNumber = bucketNumber;}
+
+    /**
+     * Sets reconstructed bucket fill status
+     * @param isFilled fill status
+     */
+    void setBucketFillStatus(bool isFilled) {m_isBucketFilled = isFilled ? c_Filled : c_Empty;}
+
+    /**
      * Returns reconstructed bunch number relative to L1 trigger signal at TOP
      * note: depends on the "look back" setting
      * @return bunch number relative to L1 trigger signal at TOP minus "look back"
@@ -129,17 +152,42 @@ namespace Belle2 {
     int getBunchNo() const {return m_recBunchNo;}
 
     /**
-     * Returns reconstructed absolute bunch number within the ring
-     * @param offset offset [RF clock ticks] (to be calibrated)
+     * Returns reconstructed bucket number within the ring
+     * @param recBunchNo reconstructed bunch number relative to L1 trigger
+     * @param revo9Count number of system clock tics since last revo9 marker at L1 trigger
+     * @param offset calibrated offset [RF clock ticks]
      * @param RFBucketsPerRevolution number of RF buckets per beam revolution
-     * @return bunch number w.r.t revolution marker
+     * @return bucket number
      */
-    int getAbsoluteBunchNo(int offset, unsigned RFBucketsPerRevolution = 5120) const
+    static int getBucketNumber(int recBunchNo, int revo9Count, int offset, int RFBucketsPerRevolution)
     {
-      int bn = (m_recBunchNo + m_revo9Counter * 4 - offset) % RFBucketsPerRevolution;
+      int bn = (recBunchNo + revo9Count * 4 - offset) % RFBucketsPerRevolution;
       if (bn < 0) bn += RFBucketsPerRevolution;
       return bn;
     }
+
+    /**
+     * Returns reconstructed bucket number within the ring
+     * @param offset calibrated offset [RF clock ticks]
+     * @param RFBucketsPerRevolution number of RF buckets per beam revolution
+     * @return buncket number
+     */
+    int getBucketNumber(int offset, unsigned RFBucketsPerRevolution = 5120) const
+    {
+      return getBucketNumber(m_recBunchNo, m_revo9Counter, offset, RFBucketsPerRevolution);
+    }
+
+    /**
+     * Returns reconstructed bucket number stored in private member
+     * @return buncket number
+     */
+    int getBucketNumber() const {return m_bucketNumber;}
+
+    /**
+     * Returns bucket fill status
+     * @return bucket fill status
+     */
+    EBucketStatus getBucketFillStatus() const {return m_isBucketFilled;}
 
     /**
      * Returns reconstructed bunch time relative to L1 trigger signal at TOP
@@ -267,7 +315,10 @@ namespace Belle2 {
     float m_minChi2 = 0; /**< chi2 value at minimum */
     Const::EDetector m_detector = Const::invalidDetector; /**< component providing the time seed */
 
-    ClassDef(TOPRecBunch, 5); /**< ClassDef */
+    int m_bucketNumber = c_Unknown;   /**< reconstructed bucket number */
+    EBucketStatus m_isBucketFilled = c_Unknown; /**< reconstructed bucket status */
+
+    ClassDef(TOPRecBunch, 7); /**< ClassDef */
 
   };
 

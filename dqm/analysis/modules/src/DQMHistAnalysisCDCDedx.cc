@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisCDCDedx.h>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -286,7 +287,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     int lbin = hdEdxIRScatC->FindLastBinAbove(0, 1);
     int nbin = lbin - fbin + 1;
 
-    TH1D* hdEdxIRInd[nbin];
+    vector<TH1D*> hdEdxIRInd(nbin);
     for (int ibin = 0; ibin < nbin; ibin++) {
       int localbin = ibin + fbin;
       hdEdxIRInd[ibin] = (TH1D*)hdEdxIRScatC->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);

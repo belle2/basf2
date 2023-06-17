@@ -26,6 +26,7 @@ main = b2.create_path()
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', sys.argv[1])
 main.add_module(inroot)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Inputnot needed
 
 v0a = b2.register_module('DQMHistAnalysisV0')
 v0a.param('OverlayPath', Belle2.FileSystem.findFile('/dqm/analysis/CAD'))

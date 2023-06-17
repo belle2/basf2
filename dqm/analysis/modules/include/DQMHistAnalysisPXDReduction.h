@@ -93,12 +93,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-    /** flag if to import from EPICS only */
-    bool m_useEpicsRO;
-
 #ifdef _BELLE2_EPICS
     //! EPICS PVs
     std::vector <chid>  mychid;

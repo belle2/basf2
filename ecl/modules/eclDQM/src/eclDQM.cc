@@ -16,7 +16,7 @@
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/core/HistoModule.h>

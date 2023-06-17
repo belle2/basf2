@@ -84,7 +84,7 @@ DBObject DBObjectLoader::load(ConfigFile& config)
 
 DBObject DBObjectLoader::load(DBInterface& db,
                               const std::string& tablename,
-                              const std::string& config_in, bool isfull)
+                              const std::string& config_in, bool /*isfull*/)
 {
   std::string configname = config_in;
   if (!db.isConnected()) {

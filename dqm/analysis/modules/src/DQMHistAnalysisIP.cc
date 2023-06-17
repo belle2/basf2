@@ -37,7 +37,6 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   addParam("HistoDirectory", m_histoDirectory, "Name of Histogram dir", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
   addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix");// force to be set!
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
 }
@@ -46,7 +45,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
 DQMHistAnalysisIPModule::~DQMHistAnalysisIPModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -78,7 +77,7 @@ void DQMHistAnalysisIPModule::initialize()
 
   // need the function to get parameter names
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     std::string aa;
     aa = m_pvPrefix + "Mean";
@@ -140,7 +139,7 @@ void DQMHistAnalysisIPModule::event()
     m_monObj->setVariable(m_monPrefix + "_width", w);
 
 #ifdef _BELLE2_EPICS
-    if (m_useEpics) {
+    if (getUseEpics()) {
       B2DEBUG(20, "Update EPICS");
       if (mychid[0]) SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&x), "ca_set failure");
       if (mychid[1]) SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&w), "ca_set failure");
@@ -156,7 +155,7 @@ void DQMHistAnalysisIPModule::event()
 void DQMHistAnalysisIPModule::terminate()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto i = 0; i < m_parameters; i++) {
       if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
     }

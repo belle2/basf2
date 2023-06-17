@@ -20,30 +20,30 @@ Training
     :nodefault:
 
 .. note::
-         - The output during the training process will show a 
+         - The output during the training process will show a
            smaller value for validation loss but this is just because the loss on training
            set includes regularization.
-         - In case you notice overfitting or want to stop the training, 
+         - In case you notice overfitting or want to stop the training,
            Ctrl+C will stop the training and create the required output files so in
            case it takes some time to exit out, it may be because it is writing
            those files.
 
 .. warning::
-         - The tool does not consider the particles with PDG values other than the ones given 
-           in ``particle_list`` (even as background) during training so it is advisable to include 
-           particles with sufficiently large proportions in the ``particle_list`` even if their 
+         - The tool does not consider the particles with PDG values other than the ones given
+           in ``particle_list`` (even as background) during training so it is advisable to include
+           particles with sufficiently large proportions in the ``particle_list`` even if their
            priors are not required.
          - In case your ``particle_list`` contains only two particles, kindly avoid creation
            of scaling file because ``TemperatureScaling`` which is used for calibration
-           of priors will give out only the output for the higher PDG value and so further 
-           functions like posterior calculation (as well as getting priors for a specific PDG 
+           of priors will give out only the output for the higher PDG value and so further
+           functions like posterior calculation (as well as getting priors for a specific PDG
            value) will not work.
 
 Evaluation
 ----------
 
 For evaluation we have a class called Priors within EvalPriors. The user
-needs to first initialize it using the trained model, the particlelist for 
+needs to first initialize it using the trained model, the particlelist for
 which the model was trained and a scaling file (if created). Then using relevant
 input, we can get priors as well as posteriors.
 
@@ -61,13 +61,13 @@ Initialize
     prior = Priors(particle_list,model,scalefile)
 
 Here, ``particle_list`` is a list of the form ``[11,13,211,321]`` and
-``model`` and ``scalefile`` are paths to the model and scaling data file 
-respectively which are of the form ``'/path/model_name.pth'`` and 
-``'/path/scalefile.root'`` respectively. However, the use of scaling file 
+``model`` and ``scalefile`` are paths to the model and scaling data file
+respectively which are of the form ``'/path/model_name.pth'`` and
+``'/path/scalefile.root'`` respectively. However, the use of scaling file
 for calibration is optional.
 
 .. note::
-          To use the scaling file for calibration, you are required to 
+          To use the scaling file for calibration, you are required to
           additionally install the netcal module using pip.
 
 Prior Calculation

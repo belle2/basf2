@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
     on_kek_cc = parse_process_url(
         'http://bweb3.cc.kek.jp/montecarlo.php?'
-        'ex={exp}&rs={run}&re={run}&ty={typ}&dt=on_resonance&bl=caseB&st=1'.format(exp=exp, run=run, typ=typ))
+        f'ex={exp}&rs={run}&re={run}&ty={typ}&dt=on_resonance&bl=caseB&st=1')
     if len(on_kek_cc) != 1:
         raise RuntimeError("Webinterface returned not exactly one file, I can't handle this")
 

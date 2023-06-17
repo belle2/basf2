@@ -35,11 +35,11 @@ def enter_new_state(**kwargs):
     Enter and exit callbacks have access to the prior and new state objects but NOT
     the transition arguments.
     """
-    b2.B2INFO("Entering state {} from state {}".format(kwargs["new_state"].name, kwargs["prior_state"].name))
+    b2.B2INFO(f'Entering state {kwargs["new_state"].name} from state {kwargs["prior_state"].name}')
 
 
 def exit_old_state(**kwargs):
-    b2.B2INFO("Exiting state {} to state {}".format(kwargs["prior_state"].name, kwargs["new_state"].name))
+    b2.B2INFO(f'Exiting state {kwargs["prior_state"].name} to state {kwargs["new_state"].name}')
 
 
 def condition_true(**kwargs):

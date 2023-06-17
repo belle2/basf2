@@ -69,7 +69,7 @@ def run_validation(job_path, input_data_path, expert_config):
     nomLum = 2.36  # fb-1
     estUnc = 0.5 * np.sqrt(nomLum / lumi)
 
-    print("{:f} entries in gg EnVsCrysID lumi = {:.2f} fb-1 est uncerta = {:.2f} \n".format(ggEntries, lumi, estUnc))
+    print(f"{ggEntries:f} entries in gg EnVsCrysID lumi = {lumi:.2f} fb-1 est uncerta = {estUnc:.2f} \n")
 
     # Summarize fit status
     hStatusgg = gg.Get("hStatus")
@@ -101,7 +101,7 @@ def run_validation(job_path, input_data_path, expert_config):
             ggRatio.Fill(ratio)
             if(ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
-                print("{:.2f} cellID {:.4f} {:.3f} {}\n".format(bigChange, cellID, ratio, status))
+                print(f"{bigChange:.2f} cellID {cellID:.4f} {ratio:.3f} {status}\n")
 
             # Look for large deviations in the barrel excluding first and last
             if(cellID >= 1297 and cellID <= 7632):
@@ -116,8 +116,8 @@ def run_validation(job_path, input_data_path, expert_config):
     myC.Print("plots/ggRatio.pdf")
 
     print("\nLargest changes in thetaID [14,57]\n")
-    print("ratio = {:.3f} in cellID {:f} \n".format(minBarrelRatio, minCellID))
-    print("ratio = {:.3f} in cellID {:f} \n".format(maxBarrelRatio, maxCellID))
+    print(f"ratio = {minBarrelRatio:.3f} in cellID {minCellID:f} \n")
+    print(f"ratio = {maxBarrelRatio:.3f} in cellID {maxCellID:f} \n")
 
     histMean = ggRatio.GetMean()
     ggfit = ggRatio.GetFunction("gaus")
@@ -150,7 +150,7 @@ def run_validation(job_path, input_data_path, expert_config):
                 bigChange += 1
                 print(" %2d cellID %.4f %5.3f\n" % (bigChange, cellID, ratio))
 
-    print("Total calibrated crystals = {:.4f} = {:.1f} \n\n".format(eeCalibrated, 100. * eeCalibrated / 8736.))
+    print(f"Total calibrated crystals = {eeCalibrated:.4f} = {100. * eeCalibrated / 8736.:.1f} \n\n")
     eeRatio.Fit("gaus")
     myC.Print("plots/eeRatio.pdf")
 
@@ -158,7 +158,7 @@ def run_validation(job_path, input_data_path, expert_config):
     eefit = eeRatio.GetFunction("gaus")
     fitMean = eefit.GetParameter(1)
     fitSigma = eefit.GetParameter(2)
-    print("\nBhabha mean ratio = {:.4f} mean of Gaussian fit = {:.4f}, sigma = {:.4f}\n".format(histMean, fitMean, fitSigma))
+    print(f"\nBhabha mean ratio = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # ------------------------------------------------------------------------
     # Bhabha/gg comparison
@@ -185,7 +185,7 @@ def run_validation(job_path, input_data_path, expert_config):
     eeggfit = eeggRatio.GetFunction("gaus")
     fitMean = eeggfit.GetParameter(1)
     fitSigma = eeggfit.GetParameter(2)
-    print("\nBhabha to gg ratio mean = {:.4f} mean of Gaussian fit = {:.4f}, sigma = {:.4f}\n".format(histMean, fitMean, fitSigma))
+    print(f"\nBhabha to gg ratio mean = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # Graph
     eeggRatiovsCellID = TGraph(nPo, xcellID, yratio)
@@ -246,10 +246,7 @@ def run_validation(job_path, input_data_path, expert_config):
     fitMean = mumuggfit.GetParameter(1)
     fitSigma = mumuggfit.GetParameter(2)
     print(
-        "\nMuon pair to gg ratio mean = {:.4f} mean of Gaussian fit = {:.4f}, sigma = {:.4f}\n".format(
-            histMean,
-            fitMean,
-            fitSigma))
+        f"\nMuon pair to gg ratio mean = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # Graph of ratio versus cellID
     mumuggRatiovsCellID = TGraph(nPo, xcellID, yratio)
@@ -295,7 +292,7 @@ def run_validation(job_path, input_data_path, expert_config):
     finalRatiofit = finalRatio.GetFunction("gaus")
     fitMean = finalRatiofit.GetParameter(1)
     fitSigma = finalRatiofit.GetParameter(2)
-    print("\nNew to exist ratio mean = {:.4f} mean of Gaussian fit = {:.4f}, sigma = {:.4f}\n".format(histMean, fitMean, fitSigma))
+    print(f"\nNew to exist ratio mean = {histMean:.4f} mean of Gaussian fit = {fitMean:.4f}, sigma = {fitSigma:.4f}\n")
 
     # Graph of / old calibration constants
     newOldRatiovsCellID = TGraph(nPo, xcellID, yratio)

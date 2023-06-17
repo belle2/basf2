@@ -119,7 +119,7 @@ class GenericOptionFile:
         Set the EvtGen .dec file.
         """
         self.AddOptionValue('EvtGenUserDecayFile',
-                            '"$DECFILESROOT/dec/{}.dec"'.format(eventtype.DecayName()))
+                            f'"$DECFILESROOT/dec/{eventtype.DecayName()}.dec"')
 
     def AddDecayOptions(self, eventtype):
         """
@@ -159,19 +159,19 @@ class TextOptionFile(GenericOptionFile):
         """
         Set the value of option.
         """
-        self.Write(['{} = {};'.format(option, value)])
+        self.Write([f'{option} = {value};'])
 
     def AddInclude(self, filename):
         """
         Add include statements.
         """
-        self.Write(['#include "$DECFILESROOT/prod/{}.py"'.format(filename)])
+        self.Write([f'#include "$DECFILESROOT/prod/{filename}.py"'])
 
     def IncreaseOptionValue(self, option, value):
         """
         Add option string.
         """
-        self.Write(['{} += {};'.format(option, value)])
+        self.Write([f'{option} += {value};'])
 
 
 class PythonOptionFile(GenericOptionFile):
@@ -221,14 +221,14 @@ class PythonOptionFile(GenericOptionFile):
         if substitute:
             value = value.replace('true', 'True')
             value = value.replace('false', 'False')
-        self.Write(['{} = {}'.format(option, value)])
+        self.Write([f'{option} = {value}'])
 
     def IncreaseOptionValue(self, option, value):
         """
         Add option string.
         """
         option = self.ConfigureToolAndAlgo(option)
-        self.Write(['{} += {}'.format(option, value)])
+        self.Write([f'{option} += {value}'])
 
 
 class EventType:
@@ -498,8 +498,7 @@ class EventType:
             self.OptionFile = PythonOptionFile()
 
         if not filename:
-            filename = '{}/prod/{}'.format(
-                os.environ['DECFILESROOT'], self.EventTypeNumber())
+            filename = f'{os.environ["DECFILESROOT"]}/prod/{self.EventTypeNumber()}'
 
         self.OptionFile.SetFileName(filename)
         if os.path.exists(self.OptionFile.OptionFileName()):
@@ -721,7 +720,7 @@ def writeBkkTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = '{} | {} | {}\n'.format(evttypeid, nick, desc)
+            line = f'{evttypeid} | {nick} | {desc}\n'
             f.write(line)
 
 
@@ -748,8 +747,7 @@ def writeSQLTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = 'EVTTYPEID = {}, DESCRIPTION = "{}", PRIMARY = "{}"\n'.format(
-                evttypeid, nick, desc)
+            line = f'EVTTYPEID = {evttypeid}, DESCRIPTION = "{nick}", PRIMARY = "{desc}"\n'
             f.write(line)
 
 
@@ -868,8 +866,7 @@ def CheckFile(option, opt_str, value, parser):
     Check if file exists.
     """
 
-    if not os.path.exists('{}/dec/{}.dec'.format(os.environ['DECFILESROOT'],
-                                                 value)):
+    if not os.path.exists(f'{os.environ["DECFILESROOT"]}/dec/{value}.dec'):
         raise OptionValueError('Decay file %s.dec ' % value + 'does not ' +
                                'exist in the $DECFILESROOT/dec directory')
     setattr(parser.values, option.dest, value)
@@ -1020,9 +1017,7 @@ def main():
     if options.NickName:
         try:
             run_create(
-                '{}/dec/{}.dec'.format(
-                    os.environ['DECFILESROOT'],
-                    options.NickName),
+                f'{os.environ["DECFILESROOT"]}/dec/{options.NickName}.dec',
                 options.remove,
                 options.python,
                 options.force)

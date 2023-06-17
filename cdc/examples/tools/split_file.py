@@ -49,9 +49,9 @@ for i in range(0, int(nfile)):
     out.append(b2.create_path())
     out[i].add_module('RootOutput', outputFileName=Dir + run + '_' + str(i) + '.root')
     if i == nfile - 1:
-        split.if_value('>={}'.format(i), out[i])
+        split.if_value(f'>={i}', out[i])
     else:
-        split.if_value('={}'.format(i), out[i])
+        split.if_value(f'={i}', out[i])
 
 b2.process(main)
 

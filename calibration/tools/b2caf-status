@@ -81,7 +81,7 @@ def main():
         db_path = Path("calibration_results", CAF._db_name)
     else: db_path = Path(args.path, CAF._db_name)
     if not db_path.exists():
-        print("No database at path: {}".format(db_path))
+        print(f"No database at path: {db_path}")
         return 1
 
     return args.func(args, db_path)

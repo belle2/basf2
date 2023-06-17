@@ -71,7 +71,7 @@ with open('location') as file:
 # getname
 names = name.split(".")
 
-inputfilename = datadir + "r{:05}/sub00/".format(int(names[2])) + name
+inputfilename = datadir + f"r{int(names[2]):05}/sub00/" + name
 outputfilename = rootdir + '/output_' + name
 outputfilename2 = rootdir + '/twotracks_' + name
 logfilename = rootdir + '/run_' + name

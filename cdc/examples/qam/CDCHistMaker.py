@@ -101,7 +101,7 @@ class CDCHistMakerModule(b2.Module):
         if os.path.exists(self.m_dest) is False:
             os.mkdir(self.m_dest)
         #: Output file name
-        self.m_outputFile = self.m_dest + '/dqm.{:0>4}.{:0>5}.root'.format(self.m_exp, self.m_run)
+        self.m_outputFile = self.m_dest + f'/dqm.{self.m_exp:0>4}.{self.m_run:0>5}.root'
 
     def event(self):
         """
@@ -152,7 +152,7 @@ class CDCHistMakerModule(b2.Module):
 def main(exp=1, run=3118, prefix='', dest=''):
 
     # Seach dst files.
-    files = glob.glob(prefix + '/dst.cosmic.{:0>4}.{:0>5}'.format(exp, run) + '*.root')
+    files = glob.glob(prefix + f'/dst.cosmic.{exp:0>4}.{run:0>5}' + '*.root')
     # create path
     main = b2.create_path()
     # Input (ROOT file).

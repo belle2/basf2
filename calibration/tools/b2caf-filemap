@@ -132,7 +132,7 @@ def main():
     import pickle
     with open(args.output_file, 'bw') as iov_map_file:
         pickle.dump(file_to_iov, iov_map_file)
-        print("Saved the file to ioV map to file '{}'.".format(args.output_file))
+        print(f"Saved the file to ioV map to file '{args.output_file}'.")
 
 if __name__ == "__main__":
     import sys

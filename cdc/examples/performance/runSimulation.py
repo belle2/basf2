@@ -90,7 +90,7 @@ def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=F
         b2.B2INFO('skip tsim')
 
     output = b2.register_module('RootOutput',
-                                outputFileName='gcr.cdc.{:04d}.{:06d}.{:04d}.root'.format(int(exp), int(run), int(st)))
+                                outputFileName=f'gcr.cdc.{int(exp):04d}.{int(run):06d}.{int(st):04d}.root')
     main_path.add_module(output)
     b2.print_path(main_path)
     b2.process(main_path)

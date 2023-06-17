@@ -61,10 +61,10 @@ if __name__ == "__main__":
             line = f.readline()
             cnt += 1
 
-    basf2.B2INFO("# of B+ decays: {}".format(len(Bdecs['B+'])))
-    basf2.B2INFO("# of B- decays: {}".format(len(Bdecs['B-'])))
-    basf2.B2INFO("# of B0 decays: {}".format(len(Bdecs['B0'])))
-    basf2.B2INFO("# of anti-B0 decays: {}".format(len(Bdecs['anti-B0'])))
+    basf2.B2INFO(f"# of B+ decays: {len(Bdecs['B+']))}"
+    basf2.B2INFO(f"# of B- decays: {len(Bdecs['B-']))}"
+    basf2.B2INFO(f"# of B0 decays: {len(Bdecs['B0']))}"
+    basf2.B2INFO(f"# of anti-B0 decays: {len(Bdecs['anti-B0']))}"
 
     for keys, vals in Bdecs.items():
         for string in vals:
@@ -77,10 +77,10 @@ if __name__ == "__main__":
     nomatch = [index for index, (e1, e2) in enumerate(zip(BallBF['B+'], BallBF['B-'])) if e1 != e2]
     basf2.B2INFO('charged B not matching decay modes:')
     for idx in nomatch:
-        basf2.B2INFO('{} vs. {} at index {}'.format(Bdecs['B+'][idx], Bdecs['B-'][idx], idx))
+        basf2.B2INFO(f'{Bdecs["B+"][idx]} vs. {Bdecs["B-"][idx]} at index {idx}')
 
 
     nomatch2 = [index for index, (e3, e4) in enumerate(zip(BallBF['B0'], BallBF['anti-B0'])) if e3 != e4]
     basf2.B2INFO('neutral B not matching decay modes:')
     for idx in nomatch2:
-        basf2.B2INFO('{} vs. {} at index {}'.format(Bdecs['B0'][idx], Bdecs['anti-B0'][idx], idx))
+        basf2.B2INFO(f'{Bdecs["B0"][idx]} vs. {Bdecs["anti-B0"][idx]} at index {idx}')

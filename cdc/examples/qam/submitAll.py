@@ -38,7 +38,7 @@ def getRunList(dir):
 # Experimantl number
 exp = 1
 # dir = '/ghi/fs01/belle2/bdata/users/karim/data/GCR1/build-2017-08-21'
-dir = '/hsm/belle2/bdata/Data/release-00-09-01/DB00000266/GCR1/prod00000001/e{:0>4}/cosmics/'.format(exp)
+dir = f'/hsm/belle2/bdata/Data/release-00-09-01/DB00000266/GCR1/prod00000001/e{exp:0>4}/cosmics/'
 # dir = '/ghi/fs01/belle2/bdata/users/karim/MC/GCR1/release-00-09-02'
 # dir = '/ghi/fs01/belle2/bdata/users/karim/data/GCR1/release-00-09-00_new'
 # dir = '/home/belle/muchida/basf2/release/cdc/examples/performance/output'
@@ -48,10 +48,10 @@ runs = getRunList(dir)
 
 for run in runs:
     if mode == 'dqm':
-        logfile = 'dqm.cosmic.{:0>4}.{:0>5}.log'.format(exp, run)
+        logfile = f'dqm.cosmic.{exp:0>4}.{run:0>5}.log'
         command = ' '.join(['basf2 CDCHistMaker.py', str(exp), str(run), '>&', logfile])
     elif mode == 'qam':
-        logfile = 'qam.cosmic.{:0>4}.{:0>5}.log'.format(exp, run)
+        logfile = f'qam.cosmic.{exp:0>4}.{run:0>5}.log'
         command = ' '.join(['basf2 QAMHistMaker.py', str(exp), str(run), '>&', logfile])
     else:
         print('Specify the type : dqm/qam')

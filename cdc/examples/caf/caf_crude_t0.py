@@ -36,16 +36,16 @@ def main():
     calibrations = []
     for i in range(1):
         col_test = b2.register_module('CDCCrudeT0Collector')
-        col_test.set_name('CDCCrudeT0{}'.format(i))  # Sets the prefix of the collected data in the datastore
+        col_test.set_name(f'CDCCrudeT0{i}')  # Sets the prefix of the collected data in the datastore
         col_test.param('granularity', 'all')  # Allows us to execute algorithm over all data, in one big IoV
 
         alg_test = Belle2.CDC.CrudeT0CalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have
         # different names. TestCalibrationAlgorithm outputs to the database using the prefix name so we change it
         # slightly for each calibration. Not something you'd usually have to do.
-        alg_test.setPrefix('CDCCrudeT0{}'.format(i))  # Must be the same as colllector prefix
+        alg_test.setPrefix(f'CDCCrudeT0{i}')  # Must be the same as colllector prefix
 
-        cal_test = Calibration(name='CrudeT0Calibration{}'.format(i),
+        cal_test = Calibration(name=f'CrudeT0Calibration{i}',
                                collector=col_test,
                                algorithms=alg_test,
                                input_files=input_files_test)

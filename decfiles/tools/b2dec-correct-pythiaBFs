@@ -76,7 +76,7 @@ if __name__ == '__main__':
     basf2.B2INFO(len(Bdecs['anti-B0']))
 
     for keys, vals in Bdecs.items():
-        basf2.B2INFO('Processing decays of {}'.format(keys))
+        basf2.B2INFO(f'Processing decays of {keys}')
         for string in vals:
             BtotBF[keys] += float(string.split()[0])
             if('u' == string.split()[1] or 'anti-u' == string.split()[1]
@@ -118,7 +118,7 @@ if __name__ == '__main__':
                                 or 'c' == line.split()[1] or 'anti-c' == line.split()[1]
                                 or 'cd' in line.split()[1] or 'anti-cd' in line.split()[1]
                                 or 'cs' in line.split()[1] or 'anti-cs' in line.split()[1]):
-                            bfstr = '{:.8f}    '.format(float(line.split()[0])*jetsetscale[togglesave])
+                            bfstr = f'{float(line.split()[0])*jetsetscale[togglesave]:.8f}    '
                             bfstr += (line.split(None, 1)[-1])
                             outf.write(bfstr)
                         else:

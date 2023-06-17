@@ -87,7 +87,7 @@ plt.savefig("xTalkProb.pdf")
 #: variables to write out
 names = ["Board", "Channel"]
 for i in range(8):
-    names += ['Asic_ADC{:d}'.format(i), 'Asic_TDC{:d}'.format(i), 'Asic_TOT{:d}'.format(i)]
+    names += [f'Asic_ADC{i:d}', f'Asic_TDC{i:d}', f'Asic_TOT{i:d}']
 #: do not write index
 df[(df.Nhit > 1) & (df.asic % 3 == 1)][names].to_root("t.root", index=False)
 #: open root file to store x-talk probability histogram

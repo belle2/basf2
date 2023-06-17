@@ -20,10 +20,10 @@ b2.use_central_database("GT_gen_data_003.04_gcr2017-08", b2.LogLevel.WARNING)
 def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
 
     # Seach dst files.
-    #    files = glob.glob(prefix + '/output_cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
-    files = glob.glob(prefix + '/e{0:0>4}/cosmics/r{1:0>5}/all/dst/sub00/dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
-    #    files = glob.glob(prefix + 'dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
-    #    files = glob.glob(prefix + '/dst_run{0}'.format(run) + '.root')
+    #    files = glob.glob(prefix + f'/output_cosmic.{exp:0>4}.{run:0>5}' + '*.root')
+    files = glob.glob(prefix + f'/e{exp:0>4}/cosmics/r{run:0>5}/all/dst/sub00/dst.cosmic.{exp:0>4}.{run:0>5}' + '*.root')
+    #    files = glob.glob(prefix + f'dst.cosmic.{exp:0>4}.{run:0>5}' + '*.root')
+    #    files = glob.glob(prefix + f'/dst_run{run}' + '.root')
 
     # create path
     main = b2.create_path()
@@ -43,7 +43,7 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
     main.add_module('Geometry',
                     excludedComponents=['EKLM'])
 
-    output = "/".join([dest, 'qam.{:0>4}.{:0>5}.root'.format(exp, run)])
+    output = "/".join([dest, f'qam.{exp:0>4}.{run:0>5}.root'])
     main.add_module('CDCCosmicAnalysis',
                     noBFit=not magneticField,
                     Output=output,

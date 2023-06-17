@@ -65,7 +65,7 @@ int RFLogManager::today()
 
 int RFLogManager::OpenLogFile(int today)
 {
-  char filename[1024];
+  char filename[2048];
   if (m_logdir[0] != 0)
     sprintf(filename, "%s/%s_d%6.6d.log", m_logdir, m_id, today);
   else
@@ -231,9 +231,11 @@ void RFLogManager::Abort(const char* fmt, ...)
 
 int RFLogManager::ProcessLog(int fd)
 {
-  char* p, *q, buf[4000000];
+  const int bufSize = 4000000;
+  char* p, *q;
+  char* const buf = new char[bufSize];
   int len;
-  int siz = sizeof(buf) - 1;
+  int siz = bufSize * sizeof(char) - 1;
   int toolong = 0;
 
   p = buf;
@@ -288,7 +290,7 @@ int RFLogManager::ProcessLog(int fd)
           } else {
             len -= p - buf;
             memmove(buf, p, len);
-            siz = sizeof(buf) - len;
+            siz = bufSize * sizeof(char) - len;
             p = buf + len;
           }
           break;

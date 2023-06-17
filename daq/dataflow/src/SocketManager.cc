@@ -38,9 +38,9 @@ int SocketManager::examine()
   memcpy(&m_rset, &m_allset, sizeof(m_rset));
   memcpy(&m_wset, &m_allset, sizeof(m_wset));
 
-  timeval timeout;
-  timeout.tv_sec = 0; // 1sec
-  timeout.tv_usec = 1000; // 1msec (in microsec)
+  //timeval timeout;
+  //timeout.tv_sec = 0; // 1sec
+  //timeout.tv_usec = 1000; // 1msec (in microsec)
   //  printf ( "SocketManager: maxfd = %d, start select...; rset=%x, wset=%x\n", m_maxfd, m_rset, m_wset);
 
   int rc = select(m_maxfd + 1, &m_rset, NULL, NULL, NULL);

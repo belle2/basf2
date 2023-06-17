@@ -540,7 +540,7 @@ void DesSerCOPPER::openCOPPER()
 
 
 
-int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
+int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int /*delete_flag*/)
 {
 
   int n = 0;

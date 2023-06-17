@@ -15,7 +15,7 @@
 #pragma once
 
 /* ECL headers. */
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>

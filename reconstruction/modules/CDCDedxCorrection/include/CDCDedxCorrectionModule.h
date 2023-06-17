@@ -23,12 +23,15 @@
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
+#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
-#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
-#include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
+#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h>
+#include <reconstruction/dbobjects/CDCDedxCosineEdge.h>
+
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <cdc/geometry/CDCGeometryParConstants.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -66,6 +69,9 @@ namespace Belle2 {
     /** Perform a run gain correction */
     void RunGainCorrection(double& dedx) const;
 
+    /** Perform a injection time gain correction */
+    void TimeGainCorrection(double& dedx, double ring, double time) const;
+
     /** Perform a wire gain correction */
     void WireGainCorrection(int wireID, double& dedx, int layer) const;
 
@@ -86,11 +92,11 @@ namespace Belle2 {
     void HadronCorrection(double costheta,  double& dedx) const;
 
     /** Perform a standard set of corrections */
-    void StandardCorrection(int adc, int layer, int wireID, double doca, double enta, double length, double costheta,
-                            double& dedx) const;
+    void StandardCorrection(int adc, int layer, int wireID, double doca, double enta, double length,
+                            double costheta, double ring, double time, double& dedx) const;
 
     /** Get the standard set of corrections */
-    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const;
+    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta, double ring, double time) const;
 
     /** Saturation correction:
      * convert the measured ionization (D) to actual ionization (I) */
@@ -110,25 +116,27 @@ namespace Belle2 {
     bool m_cosineCor; /**< boolean to apply cosine correction */
     bool m_wireGain; /**< boolean to apply wire gains */
     bool m_runGain; /**< boolean to apply run gains */
+    bool m_timeGain; /**< boolean to apply injection time gains */
     bool m_twoDCell; /**< boolean to apply 2D correction */
     bool m_oneDCell; /**< boolean to apply 1D correction */
     bool m_cosineEdge; /**< boolean to apply cosine edge */
     bool m_nonlADC; /**< boolean to apply non linear ADC */
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array: CDCDedxTrack */
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo; /**< Store Object Ptr: EventLevelTriggerTimeInfo */
 
     //parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
     DBObjPtr<CDCDedxMomentumCor> m_DBMomentumCor; /**< Momentum correction DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< time gain/reso DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
     DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
-
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
     std::array<double, 56> m_lgainavg; /**< average calibration factor for the layer */
 

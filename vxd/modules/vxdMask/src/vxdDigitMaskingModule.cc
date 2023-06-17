@@ -392,7 +392,6 @@ void vxdDigitMaskingModule::endRun()
       fprintf(MaskList, "        <!--pixels vStart = \"100\" vEnd = \"120\"></pixels-->\n");
       fprintf(MaskList, "        <!--pixels uStart = \"120\" uEnd = \"202\"></pixels-->\n");
       fprintf(MaskList, "\n");
-      int nMasked = 0;
       for (int i1 = 0; i1 < m_PXDMaskUV[i]->GetNbinsX(); ++i1) {
         for (int i2 = 0; i2 < m_PXDMaskUV[i]->GetNbinsY(); ++i2) {
           int ExistMask = 0;
@@ -407,7 +406,6 @@ void vxdDigitMaskingModule::endRun()
           if (ExistMask || (m_PXDHitMapUV[i]->GetBinContent(i1 + 1, i2 + 1) > PXDCut)) {
             fprintf(MaskList, "        <pixels uStart = \"%04i\" vStart = \"%04i\"></pixels>\n", i1, i2);
             m_PXDMaskUV[i]->SetBinContent(i1 + 1, i2 + 1, 1 + ExistMask);
-            nMasked++;
           }
         }
       }

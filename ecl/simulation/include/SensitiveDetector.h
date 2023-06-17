@@ -8,18 +8,24 @@
 
 #pragma once
 
-#include <simulation/kernel/SensitiveDetectorBase.h>
-#include <simulation/dataobjects/BeamBackHit.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/database/DBObjPtr.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dbobjects/ECLHadronComponentEmissionFunction.h>
 
-#include "G4EmCalculator.hh"
+/* Basf2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
+#include <simulation/dataobjects/BeamBackHit.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
-#include "TGraph.h"
+/* Geant4 headers. */
+#include <G4EmCalculator.hh>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
+#include <TGraph.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -112,8 +118,8 @@ namespace Belle2 {
       bool step(G4Step* aStep, G4TouchableHistory* history) override;
     private:
       int m_trackID;          /**< track id */
-      TVector3 m_startPos;    /**< particle position at the entrance in volume */
-      TVector3 m_startMom;    /**< particle momentum at the entrance in volume */
+      ROOT::Math::XYZVector m_startPos;    /**< particle position at the entrance in volume */
+      ROOT::Math::XYZVector m_startMom;    /**< particle momentum at the entrance in volume */
       double m_startTime;     /**< global time */
       double m_startEnergy;   /**< particle energy at the entrance in volume */
       double m_energyDeposit; /**< energy deposited in volume */

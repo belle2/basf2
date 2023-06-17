@@ -88,26 +88,46 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut,
+                                       const bool& useSVDGroupInfo)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
       if (! hitTimeCut.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
-        B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
+        B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
         if (! hitTimeCut.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
-          B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
+          B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
 
         if (! hitTimeCut.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
-          B2DEBUG(1, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
+          B2DEBUG(29, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
                   ") is incompatible with Cluster time V (" << vCluster->getClsTime() << ")");
           continue;
         }
 
+        if (useSVDGroupInfo) {
+          const std::vector<int>& uTimeGroupId = uCluster->getTimeGroupId();
+          const std::vector<int>& vTimeGroupId = vCluster->getTimeGroupId();
+
+          if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) { // indirect check if the clusterizer module is disabled
+            bool isContinue = true;
+            for (auto& uitem : uTimeGroupId) {
+              if (uitem < 0) continue;
+              for (auto& vitem : vTimeGroupId)
+                if (vitem >= 0 && uitem == vitem) { isContinue = false; break; }
+              if (!isContinue) break;
+            }
+
+            if (isContinue) {
+              B2DEBUG(29, "Cluster combination rejected due to different time-group Id.");
+              continue;
+            }
+          }
+        }
 
         foundCombinations.push_back({uCluster, vCluster});
 
@@ -222,7 +242,7 @@ namespace Belle2 {
 
 
     if (chargeProbError == 0) {
-      B2DEBUG(1, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
+      B2DEBUG(21, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
@@ -242,7 +262,7 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName, const bool& useSVDGroupInfo)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -258,7 +278,7 @@ namespace Belle2 {
 
 
     for (auto& aSensor : activatedSensors)
-      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut);
+      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo);
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {

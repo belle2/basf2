@@ -35,7 +35,6 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:DAQ:"));
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: Constructor done.");
 
 }
@@ -43,7 +42,7 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
 DQMHistAnalysisPXDDAQModule::~DQMHistAnalysisPXDDAQModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -77,7 +76,7 @@ void DQMHistAnalysisPXDDAQModule::initialize()
 
 #ifdef _BELLE2_EPICS
   mychid.resize(20);
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     SEVCHK(ca_create_channel((m_pvPrefix + "HLTRej").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
     SEVCHK(ca_create_channel((m_pvPrefix + "Trunc").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
@@ -316,7 +315,7 @@ void DQMHistAnalysisPXDDAQModule::event()
     m_monObj->setVariable("LER_Miss_1ms", data_LER_Miss_1ms);
 
 #ifdef _BELLE2_EPICS
-    if (m_useEpics) {
+    if (getUseEpics()) {
       SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data_HLTRej), "ca_set failure");
       SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&data_Trunc), "ca_set failure");
       SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&data_HER_Trunc), "ca_set failure");

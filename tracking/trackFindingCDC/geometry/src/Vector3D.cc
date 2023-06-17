@@ -29,6 +29,12 @@ Vector3D::Vector3D(const B2Vector3D& b2Vector3)
 {
 }
 
+Vector3D::Vector3D(const ROOT::Math::XYZVector& xyzVector3)
+  : m_xy(xyzVector3.X(), xyzVector3.Y())
+  , m_z(xyzVector3.Z())
+{
+}
+
 Vector3D& Vector3D::operator=(const TVector3& tVector3)
 {
   m_xy.setX(tVector3.X());
@@ -45,6 +51,14 @@ Vector3D& Vector3D::operator=(const B2Vector3D& b2Vector3)
   return *this;
 }
 
+Vector3D& Vector3D::operator=(const ROOT::Math::XYZVector& xyzVector3)
+{
+  m_xy.setX(xyzVector3.X());
+  m_xy.setY(xyzVector3.Y());
+  m_z = xyzVector3.Z();
+  return *this;
+}
+
 Vector3D::operator const TVector3() const
 {
   return TVector3(x(), y(), z());
@@ -53,6 +67,11 @@ Vector3D::operator const TVector3() const
 Vector3D::operator const B2Vector3D() const
 {
   return B2Vector3D(x(), y(), z());
+}
+
+Vector3D::operator const ROOT::Math::XYZVector() const
+{
+  return ROOT::Math::XYZVector(x(), y(), z());
 }
 
 std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Vector3D& vector3D)

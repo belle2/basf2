@@ -13,9 +13,11 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <vxd/geometry/GeoCache.h>
+
+#include <TMath.h>
 
 
 using namespace Belle2;
@@ -444,8 +446,8 @@ void PXDROIFinderAnalysisModule::event()
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();
-    m_phimc = (aMcParticle->getMomentum()).Phi() * 180 / 3.1415;
-    m_thetamc = (aMcParticle->getMomentum()).Theta() * 180 / 3.1415;
+    m_phimc = (aMcParticle->getMomentum()).Phi() * TMath::RadToDeg();
+    m_thetamc = (aMcParticle->getMomentum()).Theta() * TMath::RadToDeg();
     m_costhetamc = cos((aMcParticle->getMomentum()).Theta());
     m_lambdamc = 90 - m_thetamc;
     m_pTmc = (aMcParticle->getMomentum()).Rho();
@@ -517,8 +519,8 @@ void PXDROIFinderAnalysisModule::event()
       m_coorUmc = aSensorInfo.getUCellPosition(m_Uidmc);   //pxdDigits_MCParticle[iPXDDigit]->getUCellPosition();
       m_coorVmc = aSensorInfo.getVCellPosition(m_Vidmc);   //pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
 
-      TVector3 local(m_coorUmc, m_coorVmc, 0);
-      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
+      ROOT::Math::XYZVector local(m_coorUmc, m_coorVmc, 0);
+      ROOT::Math::XYZVector globalSensorPos = aSensorInfo.pointToGlobal(local, true);
 
 
       if (m_pTmc > 1) npxdDigit[5]++;
@@ -579,7 +581,7 @@ void PXDROIFinderAnalysisModule::event()
                   m_h2sigmaVphi->Fill(m_phimc, m_sigmaV);
                   m_h1SigmaU->Fill(m_sigmaU);
                   m_h1SigmaV->Fill(m_sigmaV);
-                  m_h2Mapglob->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+                  m_h2Mapglob->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
 
 
                   if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
@@ -636,7 +638,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out2->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out2->Fill(m_sigmaU);
           m_h1SigmaV_out2->Fill(m_sigmaV);
-          m_h2Mapglob_out2->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out2->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out2->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -662,7 +664,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out3->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out3->Fill(m_sigmaU);
           m_h1SigmaV_out3->Fill(m_sigmaV);
-          m_h2Mapglob_out3->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out3->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out3->Fill(v2, u2);
 
@@ -687,7 +689,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out4->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out4->Fill(m_sigmaU);
           m_h1SigmaV_out4->Fill(m_sigmaV);
-          m_h2Mapglob_out4->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out4->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out4->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -706,7 +708,7 @@ void PXDROIFinderAnalysisModule::event()
           n_notINdigit5 ++;
 
           m_h1GlobalTime_out5->Fill(m_globalTime);
-          m_h2Mapglob_out5->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
+          m_h2Mapglob_out5->Fill(globalSensorPos.Rho(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out5->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2

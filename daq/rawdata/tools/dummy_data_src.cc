@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <iostream>
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -411,13 +412,13 @@ int main(int argc, char** argv)
   printf("TET %d %d %d %d %d\n ", NW_SEND_HEADER + NW_SEND_TRAILER, ncpr,
          NW_RAW_HEADER + NW_COPPER_HEADER, (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb, NW_COPPER_TRAILER +   NW_RAW_TRAILER);
 
-  int buff[total_words];
+  vector<int> buff(total_words);
 
   //
   // Prepare header
   //
 
-  int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb, run_no);
+  int temp_ret = fillDataContents(buff.data(), nwords_per_fee, node_id, ncpr, nhslb, run_no);
   if (temp_ret != total_words) {
     printf("[FATAL] data-production error %d %d\n", total_words, temp_ret);
     fflush(stdout);
@@ -486,7 +487,7 @@ int main(int argc, char** argv)
   unsigned long long int start_cnt = 300000;
   for (;;) {
     //    addEvent(buff, total_words, cnt);
-    addEvent(buff, nwords_per_fee, cnt, ncpr, nhslb);
+    addEvent(buff.data(), nwords_per_fee, cnt, ncpr, nhslb);
     //    printf("cnt %d bytes\n", cnt*total_words); fflush(stdout);
     //    sprintf( buff, "event %d dessa", cnt );
 
@@ -496,7 +497,7 @@ int main(int argc, char** argv)
     //  }
 
     int Ret = 0;
-    if ((Ret = write(connfd, buff, total_words * sizeof(int))) <= 0) {
+    if ((Ret = write(connfd, buff.data(), total_words * sizeof(int))) <= 0) {
       printf("[FATAL] Return value %d\n", Ret);
       fflush(stdout);
       exit(1);

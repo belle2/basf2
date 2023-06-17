@@ -24,7 +24,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisIPModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisIPModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -69,7 +69,7 @@ namespace Belle2 {
     std::string  m_pvPrefix;
     /** The prefix for MonitoringObj. */
     std::string  m_monPrefix;
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 1000;
 
     /** The drawing canvas. */
@@ -82,8 +82,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
     /** number of EPICS PVs */
     static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS

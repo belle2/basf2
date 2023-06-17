@@ -28,6 +28,7 @@
 #include <svd/calibration/SVDMCClusterPositionFudgeFactor.h>
 #include <svd/calibration/SVDMCClusterTimeFudgeFactor.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <TMath.h>
 
@@ -137,6 +138,7 @@ namespace Belle2 {
       // 4. Calibration Objects
       bool m_returnRawClusterTime = false; /**< if true cluster time is not calibrated, to be used for time calibration */
 
+      DBObjPtr<HardwareClockSettings> m_hwClock;  /**< systems clock*/
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/

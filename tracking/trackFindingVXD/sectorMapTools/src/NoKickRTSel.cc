@@ -183,7 +183,7 @@ bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> se
       B2DEBUG(20, "Min=" << selCut.at(0));
       B2DEBUG(20, "Max=" << selCut.at(1));
       B2DEBUG(20, "deltaPar=" << deltaPar);
-      B2DEBUG(20, "momentum=" << hit1.m_momentum0.Mag());
+      B2DEBUG(20, "momentum=" << hit1.m_momentum0.R());
       return false;
     }
   }
@@ -198,7 +198,7 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
 
   if (m_outputFlag) {
     m_pdgID = m_8hitTrack[0].getPDGID();
-    m_pMag = track.getMomentumSeed().Mag();
+    m_pMag = track.getMomentumSeed().R();
     m_pt = sqrt(track.getMomentumSeed().X() * track.getMomentumSeed().X() + track.getMomentumSeed().Y() * track.getMomentumSeed().Y());
   }
 
@@ -209,19 +209,19 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
       m_Ncuts = m_numberOfCuts;
       m_isCutted = true;
       m_nCutHit->Fill(m_numberOfCuts);
-      m_momCut->Fill(track.getMomentumSeed().Mag());
+      m_momCut->Fill(track.getMomentumSeed().R());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
       m_noKickTree->Fill();
     }
     return false;
   }
 
-  if (track.getMomentumSeed().Mag() > m_pmax) {
+  if (track.getMomentumSeed().R() > m_pmax) {
     if (m_outputFlag) {
       m_Ncuts = m_numberOfCuts;
       m_isCutted = false;
       m_nCutHit->Fill(m_numberOfCuts);
-      m_momSel->Fill(track.getMomentumSeed().Mag());
+      m_momSel->Fill(track.getMomentumSeed().R());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
       m_noKickTree->Fill();
     }
@@ -261,11 +261,11 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
     m_nCutHit->Fill(m_numberOfCuts);
     if (good) {
       m_isCutted = false;
-      m_momSel->Fill(track.getMomentumSeed().Mag());
+      m_momSel->Fill(track.getMomentumSeed().R());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     } else {
       m_isCutted = true;
-      m_momCut->Fill(track.getMomentumSeed().Mag());
+      m_momCut->Fill(track.getMomentumSeed().R());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     }
     m_noKickTree->Fill();

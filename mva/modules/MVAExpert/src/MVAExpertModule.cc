@@ -9,10 +9,12 @@
 
 #include <mva/modules/MVAExpert/MVAExpertModule.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
 
@@ -32,7 +34,7 @@ MVAExpertModule::MVAExpertModule() : Module()
 
   std::vector<std::string> empty;
   addParam("listNames", m_listNames,
-           "Particles from these ParticleLists are used as input. If no name is given the expert is applied to every event once, and one can only use variables which accept nullptr as Particle*",
+           "Particles from these ParticleLists are used as input. If no name is given the expert is applied to every event once, and one can only use variables which accept nullptr as Particle*. Decay descriptor functionality is supported, which allows to run the module on daughter particles, e.g. Lambda0:my_list -> ^p+ pi-. One has to provide full name of the mother particle list and only one selected daughter is supported.",
            empty);
   addParam("extraInfoName", m_extraInfoName,
            "Name under which the output of the expert is stored in the ExtraInfo of the Particle object. If the expert returns multiple values, the index of the value is appended to the name in the form '_0', '_1', ...");
@@ -48,8 +50,20 @@ void MVAExpertModule::initialize()
 {
   // All specified ParticleLists are required to exist
   for (auto& name : m_listNames) {
-    StoreObjPtr<ParticleList> list(name);
+    DecayDescriptor dd;
+    bool valid = dd.init(name);
+    if (!valid) {
+      B2ERROR("Decay string " << name << " is invalid.");
+    }
+    const DecayDescriptorParticle* mother = dd.getMother();
+    unsigned int nSelectedDaughters = dd.getSelectionNames().size();
+    if (nSelectedDaughters > 1) {
+      B2ERROR("More than one daughter is selected in the decay string " << name << ".");
+    }
+    StoreObjPtr<ParticleList> list(mother->getFullName());
     list.isRequired();
+    m_targetListNames.push_back(mother->getFullName());
+    m_decaydescriptors.insert(std::make_pair(mother->getFullName(), dd));
   }
 
   if (m_listNames.empty()) {
@@ -111,7 +125,7 @@ void MVAExpertModule::init_mva(MVA::Weightfile& weightfile)
   m_nClasses = general_options.m_nClasses;
 }
 
-void MVAExpertModule::fillDataset(Particle* particle)
+void MVAExpertModule::fillDataset(const Particle* particle)
 {
   for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
     auto var_result = m_feature_variables[i]->function(particle);
@@ -125,7 +139,7 @@ void MVAExpertModule::fillDataset(Particle* particle)
   }
 }
 
-float MVAExpertModule::analyse(Particle* particle)
+float MVAExpertModule::analyse(const Particle* particle)
 {
   if (not m_expert) {
     B2ERROR("MVA Expert is not loaded! I will return 0");
@@ -135,7 +149,7 @@ float MVAExpertModule::analyse(Particle* particle)
   return m_expert->apply(*m_dataset)[0];
 }
 
-std::vector<float> MVAExpertModule::analyseMulticlass(Particle* particle)
+std::vector<float> MVAExpertModule::analyseMulticlass(const Particle* particle)
 {
   if (not m_expert) {
     B2ERROR("MVA Expert is not loaded! I will return 0");
@@ -192,14 +206,16 @@ void MVAExpertModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo> eventEx
 
 void MVAExpertModule::event()
 {
-  for (auto& listName : m_listNames) {
+  for (auto& listName : m_targetListNames) {
     StoreObjPtr<ParticleList> list(listName);
     // Calculate target Value for Particles
     for (unsigned i = 0; i < list->getListSize(); ++i) {
-      Particle* particle = list->getParticle(i);
+      auto dd = m_decaydescriptors[listName];
+      unsigned int nSelectedDaughters = dd.getSelectionNames().size();
+      const Particle* particle = (nSelectedDaughters > 0) ? dd.getSelectionParticles(list->getParticle(i))[0] : list->getParticle(i);
       if (m_nClasses == 2) {
         float responseValue = analyse(particle);
-        setExtraInfoField(particle, m_extraInfoName, responseValue);
+        setExtraInfoField(m_particles[particle->getArrayIndex()], m_extraInfoName, responseValue);
       } else if (m_nClasses > 2) {
         std::vector<float> responseValues = analyseMulticlass(particle);
         if (responseValues.size() != m_nClasses) {
@@ -207,7 +223,7 @@ void MVAExpertModule::event()
                   ") does not match the declared number of classes (" << m_nClasses << ").");
         }
         for (unsigned int iClass = 0; iClass < m_nClasses; iClass++) {
-          setExtraInfoField(particle, m_extraInfoName + "_" + std::to_string(iClass), responseValues[iClass]);
+          setExtraInfoField(m_particles[particle->getArrayIndex()], m_extraInfoName + "_" + std::to_string(iClass), responseValues[iClass]);
         }
       } else {
         B2ERROR("Received a value of " << m_nClasses <<

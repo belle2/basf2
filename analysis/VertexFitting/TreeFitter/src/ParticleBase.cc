@@ -13,7 +13,7 @@
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
-#include <analysis/VertexFitting/TreeFitter/RecoComposite.h>
+#include <analysis/VertexFitting/TreeFitter/Composite.h>
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 
@@ -33,52 +33,13 @@ namespace TreeFitter {
     m_isStronglyDecayingResonance(false),
     m_config(config),
     m_index(0),
-    m_pdgMass(particle->getPDGMass()),
-    m_pdgWidth(0),
-    m_pdgLifeTime(TDatabasePDG::Instance()->GetParticle(particle->getPDGCode())->Lifetime() * 1e9),
-    m_charge(0),
     m_name("Unknown")
   {
     if (particle) {
       m_isStronglyDecayingResonance = isAResonance(particle);
       const int pdgcode = particle->getPDGCode();
       if (pdgcode) { // PDG code != 0
-
-        double fltcharge = particle->getCharge();
-
-        //  round to nearest integer
-        m_charge = fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5);
         m_name = particle->getName();
-      } else {// PDG code = 0
-        m_charge = particle->getCharge() > 0 ? 1 : (particle->getCharge() < 0 ? -1 : 0);
-      }
-    }
-  }
-
-  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
-    m_particle(particle),
-    m_mother(mother),
-    m_isStronglyDecayingResonance(false),
-    m_config(nullptr),
-    m_index(0),
-    m_pdgMass(particle->getPDGMass()),
-    m_pdgWidth(0),
-    m_pdgLifeTime(TDatabasePDG::Instance()->GetParticle(particle->getPDGCode())->Lifetime() * 1e9),
-    m_charge(0),
-    m_name("Unknown")
-  {
-    if (particle) {
-      m_isStronglyDecayingResonance = isAResonance(particle);
-      const int pdgcode = particle->getPDGCode();
-      if (pdgcode) { // PDG code != 0
-
-        double fltcharge = particle->getCharge();
-
-        //  round to nearest integer
-        m_charge = fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5);
-        m_name = particle->getName();
-      } else {// PDG code = 0
-        m_charge = particle->getCharge() > 0 ? 1 : (particle->getCharge() < 0 ? -1 : 0);
       }
     }
   }
@@ -89,10 +50,6 @@ namespace TreeFitter {
     m_isStronglyDecayingResonance(false),
     m_config(nullptr),
     m_index(0),
-    m_pdgMass(0),
-    m_pdgWidth(0),
-    m_pdgLifeTime(0),
-    m_charge(0),
     m_name(name)
   {}
 
@@ -147,83 +104,32 @@ namespace TreeFitter {
   {
     ParticleBase* rc = nullptr;
 
-    if (!mother) { // 'head of tree' particles
-      if (!particle->getMdstArrayIndex()) { //0 means it's a composite
-        rc = new InternalParticle(particle, nullptr, config, forceFitAll);
-
-      } else {
-
-        rc = new InternalParticle(particle, nullptr, config,
-                                  forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
-
-      }
-    } else if (particle->hasExtraInfo("bremsCorrected")) { // Has Bremsstrahlungs-recovery
-      if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> simple track
-        rc = new RecoTrack(particle, mother);
-      } else { // Got gammas -> composite particle
-        rc = new RecoComposite(particle, mother, config, true);
-      }
+    if (!mother) { // If there is no mother, this is the 'head of tree' particle (is never a resonance)
+      rc = new InternalParticle(particle, nullptr, config, forceFitAll);
+    } else if (particle->hasExtraInfo("bremsCorrected") // Has Bremsstrahlungs-recovery
+               && particle->getExtraInfo("bremsCorrected") != 0) { // and gammas are attached
+      rc = new Composite(particle, mother, config, true);
+      // if no gamma is attached, it is treated as a RecoTrack
     } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")
                && particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) { // dummy particles with invisible flag
       rc = new RecoResonance(particle, mother, config);
-
-    } else if (particle->getMdstArrayIndex() ||
-               particle->getTrack() ||
-               particle->getECLCluster() ||
-               particle->getKLMCluster()) { // external particles and final states
-      if (particle->getTrack()) {
-        rc = new RecoTrack(particle, mother);
-      } else if (particle->getECLCluster()) {
-        rc = new RecoPhoton(particle, mother);
-
-      } else if (particle->getKLMCluster()) {
-        rc = new RecoKlong(particle, mother);
-
-      } else if (isAResonance(particle)) {
-        rc = new RecoResonance(particle, mother, config);
-
-      }  else {
-        rc = new InternalParticle(particle, mother, config, forceFitAll);
-
-      }
-
+    } else if (particle->getTrack()) { // external reconstructed track
+      rc = new RecoTrack(particle, mother);
+    } else if (particle->getECLCluster()) { // external reconstructed photon
+      rc = new RecoPhoton(particle, mother);
+    } else if (particle->getKLMCluster()) { // external reconstructed klong
+      rc = new RecoKlong(particle, mother);
+    } else if (particle->getMdstArrayIndex()) { // external composite e.g. V0
+      rc = new InternalParticle(particle, mother, config, forceFitAll);
     } else { // 'internal' particles
-
-      if (false) {   // fitted composites //JFK::eventually implement prefitting mechanic to prefit composites with other fitters
-        if (isAResonance(particle)) {
-
-          rc = new RecoResonance(particle, mother, config);
-
-        } else {
-          rc = new RecoComposite(particle, mother, config);
-        }
-
-      } else {         // unfitted composites
-
-        if (isAResonance(particle)) {
-          rc = new Resonance(particle, mother, config, forceFitAll);
-
-        } else {
-          rc = new InternalParticle(particle, mother, config, forceFitAll);
-        }
+      if (isAResonance(particle)) {
+        rc = new Resonance(particle, mother, config, forceFitAll);
+      } else {
+        rc = new InternalParticle(particle, mother, config, forceFitAll);
       }
     }
     return rc;
   }
-
-
-  double ParticleBase::pdgLifeTime(Belle2::Particle* particle)
-  {
-    int pdgcode = particle->getPDGCode();
-    double lifetime = 0;
-
-    if (pdgcode) {
-      lifetime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime() * 1e9;
-    }
-
-    return lifetime ;
-  }
-
 
   bool ParticleBase::isAResonance(Belle2::Particle* particle)
   {
@@ -241,7 +147,7 @@ namespace TreeFitter {
           rc = true ;
           break ;
         default: //everything with boosted flight length less than 1 micrometer
-          rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
+          rc = (pdgcode && particle->getPDGLifetime() < 1e-14);
       }
     }
     return rc ;
@@ -285,14 +191,9 @@ namespace TreeFitter {
     return status;
   }
 
-  const ParticleBase* ParticleBase::mother() const
-  {
-    return m_mother;
-  }
-
   std::string ParticleBase::parname(int thisindex) const
   {
-    std::string rc = name();
+    std::string rc = m_name;
     switch (thisindex) {
       case 0: rc += "_x  "; break;
       case 1: rc += "_y  "; break;
@@ -410,21 +311,10 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  void inline setExtraInfo(Belle2::Particle* part, const std::string& name, const double value)
-  {
-    if (part) {
-      if (part->hasExtraInfo(name)) {
-        part->setExtraInfo(name, value);
-      } else {
-        part->addExtraInfo(name, value);
-      }
-    }
-  }
-
   ErrCode ParticleBase::projectMassConstraintDaughters(const FitParams& fitparams,
                                                        Projection& p) const
   {
-    const double mass = pdgMass();
+    const double mass = particle()->getPDGMass();
     const double mass2 = mass * mass;
     double px = 0;
     double py = 0;
@@ -446,7 +336,7 @@ namespace TreeFitter {
         E += fitparams.getStateVector()(momindex + 3);
       } else {
         // final states dont have an energy index
-        const double m = daughter->pdgMass();
+        const double m = daughter->particle()->getPDGMass();
         E += std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
       }
     }
@@ -469,7 +359,7 @@ namespace TreeFitter {
         const double px_daughter = fitparams.getStateVector()(momindex);
         const double py_daughter = fitparams.getStateVector()(momindex + 1);
         const double pz_daughter = fitparams.getStateVector()(momindex + 2);
-        const double m = daughter->pdgMass();
+        const double m = daughter->particle()->getPDGMass();
 
         const double E_daughter = std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
         const double E_by_E_daughter = E / E_daughter;
@@ -485,7 +375,7 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraintParticle(const FitParams& fitparams,
                                                       Projection& p) const
   {
-    const double mass = pdgMass();
+    const double mass = particle()->getPDGMass();
     const double mass2 = mass * mass;
     const int momindex = momIndex();
     const double px = fitparams.getStateVector()(momindex);
@@ -556,7 +446,11 @@ namespace TreeFitter {
       const double dot = std::abs(vertex_dist.dot(mom));
       const double tau = dot / mom_norm;
       if (0 == mom_norm || 0 == dot) {
-        fitparams.getStateVector()(tauindex) = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
+        const double mass = m_particle->getPDGMass();
+        if (mass > 0)
+          fitparams.getStateVector()(tauindex) = m_particle->getPDGLifetime() * 1e9 * Belle2::Const::speedOfLight / mass;
+        else
+          fitparams.getStateVector()(tauindex) = 0;
       } else {
         fitparams.getStateVector()(tauindex) = tau;
       }

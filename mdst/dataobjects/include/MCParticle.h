@@ -563,6 +563,8 @@ namespace Belle2 {
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
     ClassDefOverride(MCParticle, 5); /**< A Class to store the Monte Carlo particle information. */
+
+    friend class FixMergedObjectsModule;
   };
 
 

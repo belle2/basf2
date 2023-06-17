@@ -121,10 +121,8 @@ namespace TreeFitter {
         RecoTrack* dau1 = trkdaughters[0];
         RecoTrack* dau2 = trkdaughters[1];
 
-        Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                 dau1->particle()->getPDGCode())))->getHelix();
-        Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                 dau2->particle()->getPDGCode())))->getHelix();
+        Belle2::Helix helix1 = dau1->particle()->getTrackFitResult()->getHelix();
+        Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
 
         double flt1(0), flt2(0);
         HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
@@ -184,7 +182,7 @@ namespace TreeFitter {
       fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        double mass = daughter->pdgMass();
+        double mass = daughter->particle()->getPDGMass();
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
@@ -229,7 +227,7 @@ namespace TreeFitter {
         // m^2 + p^2 = E^2
         // so
         // E = sqrt(m^2 + p^2)
-        const double mass = daughter->pdgMass();
+        const double mass = daughter->particle()->getPDGMass();
         const double p2 = p3_vec.squaredNorm();
         const double energy = std::sqrt(mass * mass + p2);
         p.getResiduals()(3) -= energy;
@@ -391,4 +389,3 @@ namespace TreeFitter {
   }
 
 }
-

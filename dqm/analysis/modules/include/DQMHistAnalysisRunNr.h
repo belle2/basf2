@@ -23,7 +23,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Common Modes */
 
-  class DQMHistAnalysisRunNrModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisRunNrModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -71,9 +71,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! epics PVs

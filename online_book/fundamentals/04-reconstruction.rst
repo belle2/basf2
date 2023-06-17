@@ -10,14 +10,14 @@ Reconstruction
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals of Data Taking <onlinebook_fundamentals_datataking>`
-        * :ref:`Fundamentals of Simulation <onlinebook_fundamentals_simulation>`
+    * :ref:`Fundamentals of Data Taking <onlinebook_fundamentals_datataking>`
+    * :ref:`Fundamentals of Simulation <onlinebook_fundamentals_simulation>`
 
     **Objectives**:
 
-        * The key concepts of data reconstruction.
-        * How is reconstruction organized in Belle II
-        * The different data formats available
+    * The key concepts of data reconstruction.
+    * How is reconstruction organized in Belle II
+    * The different data formats available
 
 
 Now after the data acquisition or the simulation we have events which contain
@@ -121,7 +121,7 @@ process. It would be impossible to describe it properly here. You can find more
 details in the Belle II physics book and there is also a paper describing `track
 finding at Belle II <https://arxiv.org/abs/2003.12466>`_
 
-What we can say that track finding and fitting requires a lot of computing time
+What we can say is that track finding and fitting requires a lot of computing time
 to find all the tracks in our events. As a matter of fact currently our tracking
 reconstruction takes about twice as long as the simulation of an event.
 
@@ -275,7 +275,7 @@ low-level objects
 reconstruction-level objects
     The last step is called reconstruction, and consists
     in running algorithm on the collection of digits to produce analysis-friendly quantities.
-    The output of the reconstruction is are high-level variables like ECL clusters, resulting
+    The outputs of the reconstruction are high-level variables like ECL clusters, resulting
     from running cluster algorithms on the ECLDigits,  tracks resulting from running the
     tracking algorithms over the collections of CDC, SVD and PXD hits, PID likelihood resulting
     from the analysis of the TOP signals. In the process of reconstruction the calibrations
@@ -334,14 +334,14 @@ uDST (user Data Summary Table)
     * Reconstruction takes quite some time and is handled centrally by the Data
       Production Group
     * We have different data formats what contain different subsets of
-      information. Analysis usually runs on udst.
+      information. Analysis usually runs on uDST.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

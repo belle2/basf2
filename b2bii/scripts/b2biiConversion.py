@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,23 +29,15 @@ def setupBelleDatabaseServer():
     try:
         with open(belleDBServerFile) as f:
             belleDBServer = (f.read()).strip()
-    except IOError:
+    except OSError:
         pass
 
     os.environ['PGUSER'] = 'g0db'
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path):
-    """
-    This function set the Belle Magnetic field (constant).
-    """
-    b2.B2WARNING(
-        'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
-        'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
-
-
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
+                                  saveResultExtraInfo=False,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
@@ -56,7 +47,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=2, enableLocalDB=True):
+                                  SmearTrack=2, enableLocalDB=True,
+                                  convertNbar=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -64,6 +56,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     Args:
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
+        saveResultExtraInfo (bool): Save B2BIIFixMdst module return value as EventExtraInfo.
         useBelleDBServer (str): None to use the recommended BelleDB server.
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
@@ -85,6 +78,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
             Set to 0 to skip smearing (automatically set to 0 internally for real data).
         enableLocalDB (bool): Enables to use local payloads.
+        convertNbar (bool): Enables conversion of anti-n0:mdst.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -140,6 +134,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix = b2.register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        fix.param('SaveResultExtraInfo', saveResultExtraInfo)
         # Hadron skim settings
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)
@@ -169,9 +164,13 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert.param("nisKsInfo", enableNisKsFinder)
     convert.param("RecTrg", enableRecTrg)
     convert.param("convertEvtcls", enableEvtcls)
+    convert.param("convertNbar", convertNbar)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
+    if convertNbar:
+        b2.conditions.append_globaltag('BellePID')
+        path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
 
 
 def parse_process_url(url):
@@ -218,7 +217,7 @@ def parse_process_url(url):
             return [url]
         else:
             b2.B2ERROR(
-                "Could not parse url '{0}': no such file or directory".format(url))
+                "Could not parse url '{}': no such file or directory".format(url))
             return []
 
     # regular expression to find process_event lines in html response

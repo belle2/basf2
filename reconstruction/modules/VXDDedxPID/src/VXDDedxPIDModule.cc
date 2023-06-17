@@ -44,8 +44,6 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
            "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
-  addParam("enableDebugOutput", m_enableDebugOutput, "Option to write out debugging information to DedxTracks (DataStore objects).",
-           false);
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -136,13 +134,11 @@ void VXDDedxPIDModule::initialize()
   else
     m_pxdClusters.isOptional();
 
-  // register optional outputs
-  if (m_enableDebugOutput) {
-    m_dedxTracks.registerInDataStore();
-    m_tracks.registerRelationTo(m_dedxTracks);
-  }
+  // register dE/dx data points
+  m_dedxTracks.registerInDataStore();
+  m_tracks.registerRelationTo(m_dedxTracks);
 
-  // register outputs
+  // register likelihoods
   m_dedxLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_dedxLikelihoods);
 
@@ -192,7 +188,7 @@ void VXDDedxPIDModule::event()
       continue;
     }
 
-    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and numMCParticles != 0) {
+    if (numMCParticles != 0) {
       // find MCParticle corresponding to this track
       const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
@@ -261,18 +257,15 @@ void VXDDedxPIDModule::event()
       }
     }
 
-    if (m_enableDebugOutput) {
-      // add a few last things to the VXDDedxTrack
-      const int numDedx = dedxTrack->dedx.size();
-      dedxTrack->m_nHits = numDedx;
-      // no need to define lowedgetruncated and highedgetruncated as we always remove the highest 2 dE/dx values from 8 dE/dx value
+    // add a few last things to the VXDDedxTrack
+    const int numDedx = dedxTrack->dedx.size();
+    dedxTrack->m_nHits = numDedx;
+    // no need to define lowedgetruncated and highedgetruncated as we always remove the highest 2 dE/dx values from 8 dE/dx value
+    dedxTrack->m_nHitsUsed = numDedx - 2;
 
-      dedxTrack->m_nHitsUsed = numDedx - 2;
-
-      // now book the information for this track
-      VXDDedxTrack* newVXDDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
-      track.addRelationTo(newVXDDedxTrack);
-    }
+    // now book the information for this track
+    VXDDedxTrack* newVXDDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
+    track.addRelationTo(newVXDDedxTrack);
 
     // save VXDDedxLikelihood
     VXDDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(dedxTrack->m_vxdLogl);
@@ -332,11 +325,11 @@ double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHe
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  const TVector3 localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-  const TVector3& globalPos = sensor.pointToGlobal(localPos);
-  const ROOT::Math::XYZVector& localMomentum = helix->momentum(helix->pathLengthToPoint(ROOT::Math::XYZVector(globalPos)));
+  const ROOT::Math::XYZVector localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+  const ROOT::Math::XYZVector& globalPos = sensor.pointToGlobal(localPos);
+  const ROOT::Math::XYZVector& localMomentum = helix->momentum(helix->pathLengthToPoint(globalPos));
 
-  const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
+  const ROOT::Math::XYZVector& sensorNormal = sensor.vectorToGlobal(ROOT::Math::XYZVector(0.0, 0.0, 1.0));
   const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
   //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
@@ -349,20 +342,20 @@ double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHe
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  TVector3 a, b;
+  ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
     const float u = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
-    b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
   } else {
     const float v = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
-    b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(-0.5 * sensor.getWidth(v), v, 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(+0.5 * sensor.getWidth(v), v, 0.0));
   }
   const double pathLength = helix->pathLengthToLine(ROOT::Math::XYZVector(a), ROOT::Math::XYZVector(b));
   const ROOT::Math::XYZVector& localMomentum = helix->momentum(pathLength);
 
-  const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
+  const ROOT::Math::XYZVector& sensorNormal = sensor.vectorToGlobal(ROOT::Math::XYZVector(0.0, 0.0, 1.0));
   const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
@@ -394,11 +387,8 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
       continue;
     }
     const VxdID& currentSensor = hit->getSensorID();
-    int layer = -1;
-    if (m_enableDebugOutput) {
-      layer = -currentSensor.getLayerNumber();
-      assert(layer >= -6 && layer < 0);
-    }
+    int layer = -currentSensor.getLayerNumber();
+    assert(layer >= -6 && layer < 0);
 
     //active medium traversed, in cm (can traverse one sensor at most)
     //assumption: Si detectors are close enough to the origin that helix is still accurate
@@ -419,18 +409,14 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
       }
     }
 
-    if (m_enableDebugOutput) {
-      track->addHit(currentSensor, layer, charge, totalDistance, dedx);
-    }
+    track->addHit(currentSensor, layer, charge, totalDistance, dedx);
   }
 
-  //save averages averages
-  if (!m_useIndividualHits or m_enableDebugOutput) {
-    calculateMeans(&(track->m_dedxAvg[currentDetector]),
-                   &(track->m_dedxAvgTruncated[currentDetector]),
-                   &(track->m_dedxAvgTruncatedErr[currentDetector]),
-                   siliconDedx);
-  }
+  //save averages
+  calculateMeans(&(track->m_dedxAvg[currentDetector]),
+                 &(track->m_dedxAvgTruncated[currentDetector]),
+                 &(track->m_dedxAvgTruncatedErr[currentDetector]),
+                 siliconDedx);
 }
 
 void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const

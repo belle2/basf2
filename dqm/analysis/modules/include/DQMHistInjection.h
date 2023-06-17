@@ -25,11 +25,11 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
-  class DQMHistInjectionModule : public DQMHistAnalysisModule {
+  class DQMHistInjectionModule final : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
     typedef struct MYNODE_struct {
-      chid    mychid; /**< channel ID */
+      chid  mychid; /**< channel ID */
       TH1*  histo = {}; /**< initial histogram */
       std::vector <double> data; /**< vector of data */
     } MYNODE;
@@ -76,8 +76,6 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! whether to use EPICs
-    bool m_useEpics;
 
     //! Clean up PVs
     // cppcheck-suppress unusedPrivateFunction

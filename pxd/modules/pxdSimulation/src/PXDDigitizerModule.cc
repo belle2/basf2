@@ -263,6 +263,7 @@ void PXDDigitizerModule::event()
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
+    if (!m_currentHit->getElectrons()) continue;
     const RelationIndex<MCParticle, PXDSimHit>::Element* mcRel =
       relMCParticleSimHit.getFirstElementTo(m_currentHit);
     if (mcRel) {
@@ -291,9 +292,7 @@ void PXDDigitizerModule::event()
 
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
-      m_currentSensorInfo =
-        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(
-                                          sensorID));
+      m_currentSensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
       if (!m_currentSensorInfo)
         B2FATAL(
           "SensorInformation for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
@@ -336,8 +335,8 @@ void PXDDigitizerModule::processHit()
     float currentHitTime = m_currentHit->getGlobalTime();
 
     // First we have to now the current hit gate
-    const TVector3 startPoint = m_currentHit->getPosIn();
-    const TVector3 stopPoint = m_currentHit->getPosOut();
+    const ROOT::Math::XYZVector startPoint = m_currentHit->getPosIn();
+    const ROOT::Math::XYZVector stopPoint = m_currentHit->getPosOut();
     auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.Y() + startPoint.Y()));
 
     if (m_currentSensorInfo->getID().getLayerNumber() == 1)
@@ -382,8 +381,8 @@ void PXDDigitizerModule::processHit()
   }
 
   //Get step length and direction
-  const TVector3 startPoint = m_currentHit->getPosIn();
-  TVector3 stopPoint = m_currentHit->getPosOut();
+  const ROOT::Math::XYZVector startPoint = m_currentHit->getPosIn();
+  ROOT::Math::XYZVector stopPoint = m_currentHit->getPosOut();
   double dx = stopPoint.X() - startPoint.X();
   double dy = stopPoint.Y() - startPoint.Y();
   double dz = stopPoint.Z() - startPoint.Z();
@@ -422,7 +421,7 @@ inline double pol3(double x, const double* c)
   return c[0] + x * (c[1] + x * (c[2] + x * c[3]));
 };
 
-void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
+void PXDDigitizerModule::driftCharge(const ROOT::Math::XYZVector& r, double electrons)
 {
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;

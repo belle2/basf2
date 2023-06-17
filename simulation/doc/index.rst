@@ -4,16 +4,16 @@ Simulation
 
 .. _Geant4: https://geant4.web.cern.ch/
 
-The (detector) simulation package simulates how MC events appear in the detector (e.g. which 
-tracks they leave). MC with detector simulation can then be processed in the same way as raw 
+The (detector) simulation package simulates how MC events appear in the detector (e.g. which
+tracks they leave). MC with detector simulation can then be processed in the same way as raw
 data, allowing for an accurate comparison that takes detector effects into account as well.
 
-The core of the simulation library is `Geant4`_, which is an external library. 
-A simulation library module, **FullSim**, was created as a wrapper for the ``basf2`` 
+The core of the simulation library is `Geant4`_, which is an external library.
+A simulation library module, **FullSim**, was created as a wrapper for the ``basf2``
 - Geant4 interface. The default input parameters for FullSim are stored in two places,
 
-* `simulation/scripts/simulation.py <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/scripts/simulation.py>`_ and
-* `simulation/modules/fullsim/src/FullSimModule.cc <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/modules/fullsim/src/FullSimModule.cc>`_.
+* `simulation/scripts/simulation.py <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/simulation/scripts/simulation.py>`_ and
+* `simulation/modules/fullsim/src/FullSimModule.cc <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/simulation/modules/fullsim/src/FullSimModule.cc>`_.
 
 Geant4 version in the externals library
 =======================================
@@ -43,22 +43,22 @@ The history of Geant4 version information in the ``basf2`` external library is a
 
 To check the externals version of your current ``basf2`` setup, use::
 
-  echo $BELLE2_EXTERNALS_VERSION 
+  echo $BELLE2_EXTERNALS_VERSION
 
 
 Physics list for Geant4
 =======================
 
-PhysicsList collects information on all the particles, physics processes and production thresholds to 
-be used in the detector simulation. This class is passed to the Geant4 run manager as the 
-"physics configuration” of the application. 
-``basf2`` has two options for the input physics list for Geant4. 
+PhysicsList collects information on all the particles, physics processes and production thresholds to
+be used in the detector simulation. This class is passed to the Geant4 run manager as the
+"physics configuration” of the application.
+``basf2`` has two options for the input physics list for Geant4.
 
 The default physics list
 """"""""""""""""""""""""
 
-Until November 29, 2013, the default physics list parameter for FullSim was set as *QGSP_VERT*. 
-After this day, the parameter was changed to *FTFP_BERT*, the popular physics list for high energy physics. 
+Until November 29, 2013, the default physics list parameter for FullSim was set as *QGSP_VERT*.
+After this day, the parameter was changed to *FTFP_BERT*, the popular physics list for high energy physics.
 
 Belle2PhysicsList
 """""""""""""""""

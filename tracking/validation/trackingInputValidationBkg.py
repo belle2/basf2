@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -204,7 +203,6 @@ path.add_module('Gearbox')
 path.add_module('Geometry')
 add_svd_reconstruction(path, isROIsimulation=False)
 add_pxd_reconstruction(path)
-path.add_module('PXDSpacePointCreator')
 
 path.add_module(TrackingInputValidation())
 

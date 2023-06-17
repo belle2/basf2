@@ -38,7 +38,7 @@ class SinglePhotonDark(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
 
@@ -119,8 +119,7 @@ class ALP3Gamma(BaseSkim):
         ma.fillParticleList(
             'gamma:cdcAndMinimumEnergy',
             'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
-            True, path=path, loadPhotonBeamBackgroundMVA=False
-        )
+            True, path=path)
 
         # defining the decay string
         ALPchannels = ['gamma:cdcAndMinimumEnergy  gamma:cdcAndMinimumEnergy']
@@ -309,7 +308,7 @@ class EGammaControlDark(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -375,7 +374,7 @@ class GammaGammaControlKLMDark(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     TestSampleProcess = "gg"
 
@@ -508,7 +507,7 @@ class RadBhabhaV0Control(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -552,7 +551,7 @@ class InelasticDarkMatter(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -634,3 +633,141 @@ class BtoKplusLLP(BaseSkim):
                             kinematicCuts, path=path)
 
         return ["B+:b" + btoksLbl]
+
+
+@fancy_skim_header
+class InelasticDarkMatterWithDarkHiggs(BaseSkim):
+    """
+    Skim list contains events with at least one displaced vertex and no additional unused tracks from the IP.
+    """
+    __authors__ = ["Patrick Ecker"]
+    __contact__ = __liaison__
+    __description__ = "Skim for the inelastic Dark Matter with a Dark Higgs analysis."
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def addParticlesToPDG(self):
+        """Adds the particle codes to the basf2 pdg instance """
+        pdg.add_particle("chi2", 52, 0, 0, 0, 0)
+        # Abstract beam object to combine the two vertices (particles)
+        pdg.add_particle("beam", 9999, 0, 0, 0, 0)
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def additional_setup(self, path):
+        self.addParticlesToPDG()
+
+    def build_lists(self, path):
+        skim_str = "InelasticDarkMatterWithDarkHiggs"
+        n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
+
+        track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 20]"
+
+        ma.cutAndCopyList(
+            f"e+:{skim_str}",
+            "e+:all",
+            f"[{track_requirements} and {n_track_event_cut}]",
+            path=path)
+        ma.cutAndCopyList(
+            f"mu+:{skim_str}",
+            "mu+:all",
+            f"[{track_requirements} and {n_track_event_cut}]",
+            path=path)
+
+        ma.reconstructDecay(
+            decayString=f"A0:{skim_str} -> mu+:{skim_str} mu-:{skim_str}",
+            cut="pt > 0.1",
+            path=path
+        )
+        vertex.treeFit(
+            list_name=f"A0:{skim_str}",
+            conf_level=0,
+            updateAllDaughters=True,
+            path=path,
+        )
+        ma.applyCuts(
+            list_name=f"A0:{skim_str}",
+            cut="chiProb > 0",
+            path=path,
+        )
+
+        ma.reconstructDecay(
+            decayString=f"chi2:{skim_str} -> e+:{skim_str} e-:{skim_str}",
+            cut="pt > 0.1",
+            path=path
+        )
+        vertex.treeFit(
+            list_name=f"chi2:{skim_str}",
+            conf_level=0,
+            updateAllDaughters=True,
+            path=path,
+        )
+        ma.applyCuts(
+            list_name=f"chi2:{skim_str}",
+            cut="chiProb > 0",
+            path=path,
+        )
+
+        dr_cut = "[daughter(0, dr) > 0.05] or [daughter(1, dr) > 0.05]"
+        vertex_fit_cut = "[daughter(0, chiProb) > 0.1] or [daughter(1, chiProb) > 0.1]"
+        ma.reconstructDecay(
+            decayString=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
+            cut=f"[{dr_cut} and {vertex_fit_cut}]",
+            path=path,
+        )
+        ma.buildRestOfEvent(
+            target_list_name=f"beam:{skim_str}",
+            fillWithMostLikely=True,
+            path=path,
+        )
+        ma.appendROEMasks(
+            list_name=f"beam:{skim_str}",
+            mask_tuples=[
+                ("std_roe",
+                 "thetaInCDCAcceptance and nCDCHits>20 and dr < 0.5 and abs(dz) < 2",
+                 "thetaInCDCAcceptance and E > 0.05")],
+            path=path,
+         )
+
+        ma.applyCuts(
+            list_name=f"beam:{skim_str}",
+            cut="roeNeextra(std_roe) < 2.0",
+            path=path,
+        )
+
+        return [f"beam:{skim_str}"]
+
+
+@fancy_skim_header
+class AA2uuuu(BaseSkim):
+    """
+    Searching the dark sector through U(1) kinetic mixing.
+
+    Reconstructed 2 muons to a dark photon.
+    """
+    __description__ = ":math:`ee\\to A^{\\prime}A^{\\prime}\\nu_{D}\\nu_{D}\\to \\mu\\mu\\mu\\mu`"
+    __category__ = "physics, dark sector"
+    __authors__ = ["Chanyoung LEE"]
+    __contact__ = __liaison__
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        muon_cuts = """[0.8 < muonID_noSVD]
+        and [inKLMAcceptance == 1]
+        and [inCDCAcceptance == 1] and [4 < nCDCHits]"""
+
+        track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
+
+        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts}) <= 6", path=path)
+
+        ma.cutAndCopyList("mu+:accepted", "mu+:all", muon_cuts, path=path)
+        ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted mu-:accepted", cut="", path=path)
+        ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
+
+        return ["Upsilon(4S):rec"]

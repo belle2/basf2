@@ -1829,7 +1829,7 @@ void CDCTriggerNeuroDQMModule::event()
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
           genfit::MeasuredStateOnPlane state =
-            recoTrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), rep);
+            recoTrack.getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), rep);
           rep->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
           // TODO check after matching
           //  // flip tracks if necessary, such that trigger tracks and reco tracks
@@ -3179,7 +3179,7 @@ void CDCTriggerNeuroDQMModule::event()
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
           genfit::MeasuredStateOnPlane state =
-            ltrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), rep);
+            ltrack.getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), rep);
           rep->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
           // TODO check after matching
           //  // flip tracks if necessary, such that trigger tracks and reco tracks

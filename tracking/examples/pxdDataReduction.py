@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -36,22 +35,6 @@ param_pxdROIFinder = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
-    'tolerancePhi': 0.15,
-    'toleranceZ': 0.5,
-    # optimized performance
-    #    'sigmaSystU': 0.1,
-    #    'sigmaSystV': 0.1,
-    #    'numSigmaTotU': 10,
-    #    'numSigmaTotV': 10,
-    #    'maxWidthU': 2,
-    #    'maxWidthV': 6,
-    # official simulation
-    'sigmaSystU': 0.02,
-    'sigmaSystV': 0.02,
-    'numSigmaTotU': 10,
-    'numSigmaTotV': 10,
-    'maxWidthU': 0.5,
-    'maxWidthV': 0.5,
 }
 pxdROIFinder.param(param_pxdROIFinder)
 

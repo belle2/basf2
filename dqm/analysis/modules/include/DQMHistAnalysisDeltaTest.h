@@ -24,7 +24,7 @@
 namespace Belle2 {
   /*! DQM Delta Histogram Test code and example */
 
-  class DQMHistAnalysisDeltaTestModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisDeltaTestModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -79,9 +79,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! vector for EPICS PVs

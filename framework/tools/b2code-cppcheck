@@ -10,7 +10,7 @@
 
 # make sure belle2 is setup
 if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
-  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
+  echo "Please setup the Belle II software before calling this script by sourcing b2setup"
   exit 1
 fi
 

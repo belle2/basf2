@@ -197,12 +197,12 @@ namespace {
 
     EXPECT_EQ(gammalist->getListSize(), 3);
 
-    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(0))), 3.0276606);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(0))), 3.0276554);
     EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(0))), 0.0);
-    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(1))), 1.6036042);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(1))), 1.6035342);
     EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(1))), -1.0607308);
-    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(2))), 2.7840068);
-    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(2))), -1.3155469);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterTheta->function(gammalist->getParticle(2))), 2.7839828);
+    EXPECT_FLOAT_EQ(std::get<double>(b2bClusterPhi->function(gammalist->getParticle(2))), -1.3155545);
 
     // track (or anything without a cluster) should be nan
     ASSERT_TRUE(std::isnan(std::get<double>(b2bClusterTheta->function(noclustertrack))));
@@ -257,9 +257,9 @@ namespace {
     const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
 
     EXPECT_FLOAT_EQ(std::get<double>(clusterPhi->function(gammalist->getParticle(1))), 2.0);
-    EXPECT_FLOAT_EQ(std::get<double>(clusterPhiCMS->function(gammalist->getParticle(1))), 2.042609);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterPhiCMS->function(gammalist->getParticle(1))), 2.0442522);
     EXPECT_FLOAT_EQ(std::get<double>(clusterTheta->function(gammalist->getParticle(1))), 1.0);
-    EXPECT_FLOAT_EQ(std::get<double>(clusterThetaCMS->function(gammalist->getParticle(1))), 1.2599005);
+    EXPECT_FLOAT_EQ(std::get<double>(clusterThetaCMS->function(gammalist->getParticle(1))), 1.2625608);
 
     // test cluster quantities directly (lab system only)
     EXPECT_FLOAT_EQ(std::get<double>(clusterPhi->function(gammalist->getParticle(0))), eclclusters[0]->getPhi());
@@ -570,6 +570,7 @@ namespace {
     // initialise the photon list
     gammalist.create();
     gammalist->initialize(22, gammalist.getName());
+    gammalist->setEditable(true);
 
     // make the photons from clusters
     for (int i = 0; i < eclclusters.getEntries(); ++i) {
@@ -578,6 +579,7 @@ namespace {
         gammalist->addParticle(p);
       }
     }
+    gammalist->setEditable(false);
 
     // initialize the pion lists
     pionlist.create();
@@ -585,12 +587,14 @@ namespace {
     piminuslist.create();
     piminuslist->initialize(-211, piminuslist.getName());
     piminuslist->bindAntiParticleList(*(pionlist));
+    pionlist->setEditable(true);
 
     // fill the pion list with the tracks
     for (int i = 0; i < tracks.getEntries(); ++i) {
       const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
       pionlist->addParticle(p);
     }
+    pionlist->setEditable(false);
 
     // check overlap without any arguments
     const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");

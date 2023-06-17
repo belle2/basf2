@@ -16,7 +16,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KlId.h>
@@ -32,11 +32,11 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     const KlId* klid = cluster->getRelatedTo<KlId>();
     if (!klid) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return klid->getKlId();
   }
@@ -81,7 +81,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getTime();
   }
@@ -91,7 +91,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().X();
   }
@@ -101,7 +101,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Y();
   }
@@ -111,7 +111,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Z();
   }
@@ -121,7 +121,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getInnermostLayer();
   }
@@ -131,7 +131,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getLayers();
   }
@@ -140,7 +140,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getEnergy();
   }
@@ -149,7 +149,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getMomentumMag();
   }
@@ -158,7 +158,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if ((clusterZ > -180) && (clusterZ < 275)) {
@@ -171,7 +171,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if ((clusterZ < -180) || (clusterZ > 275)) {
@@ -184,7 +184,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if (clusterZ > 275) {
@@ -197,7 +197,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     float clusterZ = cluster->getClusterPosition().Z();
     if (clusterZ < -180) {
@@ -210,7 +210,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Theta();
   }
@@ -219,7 +219,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
     return cluster->getClusterPosition().Phi();
   }
@@ -228,7 +228,7 @@ namespace Belle2::Variable {
   {
     // check there actually are KLM clusters in the event
     StoreArray<KLMCluster> clusters;
-    if (clusters.getEntries() == 0) return std::numeric_limits<double>::quiet_NaN();
+    if (clusters.getEntries() == 0) return Const::doubleNaN;
 
     // get the input particle's vector momentum in the CMS frame
     PCmsLabTransform T;
@@ -248,7 +248,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     size_t out = cluster->getRelationsFrom<Track>().size();
     return double(out);
   }
@@ -261,7 +261,7 @@ namespace Belle2::Variable {
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
       return particle->getECLCluster()->getRelationsTo<KLMCluster>().size();
     } else {
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
   }
 
@@ -269,7 +269,7 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     size_t out = cluster->getRelationsFrom<ECLCluster>().size();
     return double(out);
   }
@@ -278,10 +278,10 @@ namespace Belle2::Variable {
   {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     auto trackWithWeight = cluster->getRelatedFromWithWeight<Track>();
     if (!trackWithWeight.first)
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     return 1. / trackWithWeight.second;
   }
 
@@ -296,19 +296,18 @@ namespace Belle2::Variable {
   REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, R"DOC(
 Returns the timing information of the associated KLMCluster.
 
-.. warning::
-  Currently the KLM has no time calibration. This leads to a huge discrepancy for the variable :b2:var:`klmClusterTiming` if one compares collisions and simulated data. Moreover, the distribution of the variable on collisions data has a very complicated structure, due to the different timing shifts of different KLM components.
-  It is recommended to not use it in any case until the KLM is calibrated, even for simulated data.
-
 )DOC","ns");
   REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, R"DOC(
 Returns the :math:`x` position of the associated KLMCluster.
+
 )DOC","cm");
   REGISTER_VARIABLE("klmClusterPositionY", klmClusterPositionY, R"DOC(
 Returns the :math:`y` position of the associated KLMCluster.
+
 )DOC","cm");
   REGISTER_VARIABLE("klmClusterPositionZ", klmClusterPositionZ, R"DOC(
 Returns the :math:`z` position of the associated KLMCluster.
+
 )DOC","cm");
   REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
                     "Returns the number of the innermost KLM layer with a 2-dimensional hit of the associated KLMCluster.");
@@ -342,12 +341,14 @@ Returns the momentum magnitude of the associated KLMCluster.
                     "Returns 1 if the associated KLMCluster is in backward endcap KLM.");
   REGISTER_VARIABLE("klmClusterTheta", klmClusterTheta, R"DOC(
 Returns the polar (:math:`\theta`) angle of the associated KLMCluster.
+
 )DOC","rad");
   REGISTER_VARIABLE("klmClusterPhi", klmClusterPhi, R"DOC(
 Returns the azimuthal (:math:`\phi`) angle of the associated KLMCluster.
+
 )DOC","rad");
   REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
-                    "Returns the maximum angle in the CMS frame between the Particle and all KLMClusters in the event.","rad");
+                    "Returns the maximum angle in the CMS frame between the Particle and all KLMClusters in the event.\n\n","rad");
   REGISTER_VARIABLE("nKLMClusterTrackMatches", nKLMClusterTrackMatches, R"DOC(
 Returns the number of Tracks matched to the KLMCluster associated to this Particle. This variable can return a number greater than 0 for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters and returns NaN for Particles with no KLMClusters associated.
 )DOC");
@@ -360,7 +361,7 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.",
+                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "cm");
 
 }

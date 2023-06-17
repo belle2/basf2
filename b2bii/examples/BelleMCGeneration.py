@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,16 +19,13 @@ basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
 
 # Use B2BII global tag.
 basf2.conditions.override_globaltags()
-basf2.conditions.prepend_globaltag('B2BII_MC')
+basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
 
 # Path.
 main = basf2.create_path()
 
 # Generate for experiment 55, run 0 (run-independent MC).
 main.add_module('EventInfoSetter', expList=55, runList=0, evtNumList=100)
-
-# Override generation flags (allow vertex smearing).
-main.add_module('OverrideGenerationFlags')
 
 # Add generator.
 add_evtgen_generator(path=main, finalstate='charged')

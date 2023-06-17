@@ -35,8 +35,6 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
-  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("lowarnlimit", m_lowarnlimit, "Mean Reduction Low Warn limit for alarms", 0.99);
   addParam("LowErrorlimit", m_loerrorlimit, "Mean Reduction Low limit for alarms", 0.90);
   addParam("HighWarnlimit", m_hiwarnlimit, "Mean Reduction High Warn limit for alarms", 1.01);
@@ -48,7 +46,7 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
 DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -79,8 +77,10 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     TString ModuleName = (std::string)m_PXDModules[i];
     m_hReduction->GetXaxis()->SetBinLabel(i + 1, ModuleName);
-    addDeltaPar(m_histogramDirectoryName, "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i], 1, m_minEntries,
-                1); // register delta
+    if (!hasDeltaPar(m_histogramDirectoryName,
+                     "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i])) addDeltaPar(m_histogramDirectoryName,
+                           "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i], HistDelta::c_Entries, m_minEntries,
+                           1); // register delta
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hReduction->Draw("");
@@ -101,8 +101,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 //   m_line3->SetLineWidth(3);
 
 #ifdef _BELLE2_EPICS
-  m_useEpics |= m_useEpicsRO; // implicit
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     mychid.resize(2);
     SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
@@ -121,7 +120,7 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
   m_hReduction->Reset(); // dont sum up!!!
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     // get warn and error limit
     // as the same array as above, we assume chid exists
     struct dbr_ctrl_double tPvData;
@@ -224,7 +223,7 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
-  if (m_useEpics && !m_useEpicsRO) {
+  if (getUseEpics() && !getUseEpicsReadOnly()) {
 /// doch besser DBR_DOUBLE wg alarms?
     SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
     // only update if statistics is reasonable, we dont want "0" drops between runs!
@@ -238,7 +237,7 @@ void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }

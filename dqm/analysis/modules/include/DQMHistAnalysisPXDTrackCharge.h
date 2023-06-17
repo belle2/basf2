@@ -33,7 +33,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
-  class DQMHistAnalysisPXDTrackChargeModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDTrackChargeModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -128,9 +128,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation

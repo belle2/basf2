@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -46,6 +45,7 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         "UseReassignedHits": True,
+        'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }
     #: tracks will be already fitted by
@@ -53,8 +53,6 @@ class Full(TrackingValidationRun):
     fit_tracks = False
     #: But we need to tell the validation module to use the fit information
     use_fit_information = True
-    #: do not create expert-level output histograms
-    use_expert_folder = False
     #: Include pulls in the validation output
     pulls = True
     #: Include resolution information in the validation output

@@ -57,16 +57,26 @@ void SVDPerformanceTTreeModule::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   recoTracks.isOptional();
+  m_EventT0.isOptional();
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
   //Tree for SVD u overlapping clusters
   m_t_U = new TTree("t_U", "Tree for SVD u-clusters");
+  m_t_U->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
+  m_t_U->Branch("cdcEventT0_6SRF", &m_cdcEventT0_6SRF, "cdcEventT0_6SRF/F");
+  m_t_U->Branch("cdcEventT0_3SRF", &m_cdcEventT0_3SRF, "cdcEventT0_3SRF/F");
+  m_t_U->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
+  m_t_U->Branch("svdTB", &m_svdTB, "svdTB/i");
   m_t_U->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
   m_t_U->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
   m_t_U->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_U->Branch("svdStrip6Samples", &m_svdStrip6Samples);
   m_t_U->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
+  m_t_U->Branch("svdClTimeErr", &m_svdClTimeErr, "svdClTimeErr/F");
+  m_t_U->Branch("svdClTime_6SRF", &m_svdClTime_6SRF, "svdClTime_6SRF/F");
+  m_t_U->Branch("svdClTime_3SRF", &m_svdClTime_3SRF, "svdClTime_3SRF/F");
+  m_t_U->Branch("svdFF", &m_svdFF, "svdFF/i");
   m_t_U->Branch("svdStripTime", &m_svdStripTime);
   m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_U->Branch("svdRes", &m_svdRes, "svdRes/F");
@@ -102,14 +112,22 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdLadder", &m_svdLadder, "svdLadder/i");
   m_t_U->Branch("svdSensor", &m_svdSensor, "svdSensor/i");
   m_t_U->Branch("svdSize", &m_svdSize, "svdSize/i");
-  m_t_U->Branch("svdTB", &m_svdTB, "svdTB/i");
   //Tree for SVD v overlapping clusters
-  m_t_V = new TTree("t_V", "Tree for M_SVD v-clusters");
+  m_t_V = new TTree("t_V", "Tree for SVD v-clusters");
+  m_t_V->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
+  m_t_V->Branch("cdcEventT0_6SRF", &m_cdcEventT0_6SRF, "cdcEventT0_6SRF/F");
+  m_t_V->Branch("cdcEventT0_3SRF", &m_cdcEventT0_3SRF, "cdcEventT0_3SRF/F");
+  m_t_V->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
+  m_t_V->Branch("svdTB", &m_svdTB, "svdTB/i");
   m_t_V->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
   m_t_V->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
   m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_V->Branch("svdStrip6Samples", &m_svdStrip6Samples);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
+  m_t_V->Branch("svdClTimeErr", &m_svdClTimeErr, "svdClTimeErr/F");
+  m_t_V->Branch("svdClTime_6SRF", &m_svdClTime_6SRF, "svdClTime_6SRF/F");
+  m_t_V->Branch("svdClTime_3SRF", &m_svdClTime_3SRF, "svdClTime_3SRF/F");
+  m_t_V->Branch("svdFF", &m_svdFF, "svdFF/i");
   m_t_V->Branch("svdStripTime", &m_svdStripTime);
   m_t_V->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_V->Branch("svdRes", &m_svdRes, "svdRes/F");
@@ -145,12 +163,31 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdLadder", &m_svdLadder, "svdLadder/i");
   m_t_V->Branch("svdSensor", &m_svdSensor, "svdSensor/i");
   m_t_V->Branch("svdSize", &m_svdSize, "svdSize/i");
-  m_t_V->Branch("svdTB", &m_svdTB, "svdTB/i");
 
 }
 
+void SVDPerformanceTTreeModule::beginRun()
+{
+  /** APV clock period*/
+  m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+}
 void SVDPerformanceTTreeModule::event()
 {
+
+  m_cdcEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0_6SRF     = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0_3SRF     = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+
+  if (m_EventT0.isValid())
+    if (m_EventT0->hasEventT0()) {
+      if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+        auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
+        //    The most accurate CDC event t0 value is the last one in the list.
+        m_cdcEventT0 = evtT0List_CDC.back().eventT0 ;
+        m_cdcEventT0Err = evtT0List_CDC.back().eventT0Uncertainty;
+      }
+    }
 
   //first check SVDEventInfo name
   StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -233,15 +270,17 @@ void SVDPerformanceTTreeModule::event()
           const int strips_1 = svd_1->getSize();
 
           const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-          const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
+          const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-          const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-          double svdZ_1 = svdGlobal_1(2);
+          const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X()); // maybe use svdGlobal_1.Phi()
+          double svdZ_1 = svdGlobal_1.Z();
 
+          m_svdFF = svd_1->getFirstFrame();
           //Fill SVD tree for u-overlaps if required by the user
           m_svdRes = res_U_1;
           m_svdClTime = svd_1->getClsTime();
+          m_svdClTimeErr = svd_1->getClsTimeSigma();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
           m_svdClPosErr = svd_1->getPositionSigma();
@@ -299,21 +338,27 @@ void SVDPerformanceTTreeModule::event()
               m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
-
+          m_cdcEventT0_3SRF = eventinfo->getTimeInSVDReference(m_cdcEventT0, m_svdFF);
+          m_cdcEventT0_6SRF = m_cdcEventT0_3SRF + m_apvClockPeriod * m_svdFF;
+          m_svdClTime_3SRF = eventinfo->getTimeInSVDReference(m_svdClTime, m_svdFF);
+          m_svdClTime_6SRF = m_svdClTime_3SRF + m_apvClockPeriod * m_svdFF;
 
           m_t_U->Fill();
 
         } else {
           const int strips_1 = svd_1->getSize();
           const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-          const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
+          const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-          const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-          double svdZ_1 = svdGlobal_1(2);
+          const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi()
+          double svdZ_1 = svdGlobal_1.Z();
+
+          m_svdFF = svd_1->getFirstFrame();
 
           m_svdRes = res_V_1;
           m_svdClTime = svd_1->getClsTime();
+          m_svdClTimeErr = svd_1->getClsTimeSigma();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
           m_svdClPosErr = svd_1->getPositionSigma();
@@ -368,6 +413,12 @@ void SVDPerformanceTTreeModule::event()
               //Aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
               m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
+
+          m_cdcEventT0_3SRF = eventinfo->getTimeInSVDReference(m_cdcEventT0, m_svdFF);
+          m_cdcEventT0_6SRF = m_cdcEventT0_3SRF + m_apvClockPeriod * m_svdFF;
+          m_svdClTime_3SRF = eventinfo->getTimeInSVDReference(m_svdClTime, m_svdFF);
+          m_svdClTime_6SRF = m_svdClTime_3SRF + m_apvClockPeriod * m_svdFF;
+
 
           m_t_V->Fill();
         }

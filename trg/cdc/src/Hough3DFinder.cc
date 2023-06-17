@@ -65,7 +65,7 @@ namespace Belle2 {
     m_mBool["debugEfficiency"] = 1;
     m_mBool["debugNTs"] = 1;
 
-    m_mConstD["Trg_PI"] = 3.141592653589793;
+    m_mConstD["Trg_PI"] = M_PI;
     // Get rr,zToStraw,angleSt,nWire
     const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);
@@ -373,7 +373,7 @@ namespace Belle2 {
         for (unsigned iTS = 0; iTS < mcTSList.size(); iTS++) {
           unsigned iCDCSimHit = mcTSList[iTS]->iCDCSimHit();
           CDCSimHit* aCDCSimHit = SimHits[iCDCSimHit];
-          TVector3 posWire = aCDCSimHit->getPosWire();
+          B2Vector3D posWire = aCDCSimHit->getPosWire();
           m_mVector["mcTSsX"][iTS] = posWire.X();
           m_mVector["mcTSsY"][iTS] = posWire.Y();
         }

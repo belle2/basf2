@@ -10,12 +10,12 @@ Data Taking
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
+    * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
 
     **Objectives**:
 
-        * Understand the different detector systems in Belle II.
-        * Definition of triggers and their effects.
+    * Understand the different detector systems in Belle II.
+    * Definiton of triggers and their effects.
 
 One of the most important steps is of course to record the data we want to
 analyse. In this chapter we will go through the important concepts of the Belle
@@ -310,7 +310,7 @@ ARICH
     and the fraction of particles actually hitting the backwards direction of
     the detector is low.
 
-    With higher boost we would not need a backawards detector at all. And if we
+    With higher boost we would not need a backwards detector at all. And if we
     could go even higher with the boost we might not even need a barrel region.
 
     So now if you look at the LHCb detector you might understand why its only a
@@ -344,7 +344,7 @@ ECL
     :width: 900px
     :alt: Picture of ECL electronics
 
-    Small part of the ECL electronics in the endcap. oards do the mapping from
+    Small part of the ECL electronics in the endcap. Boards do the mapping from
     the preamps (which you can’t see) to the cables that go to the ShaperDSPs.
     You can also see the cooling lines under the boards.
 
@@ -559,10 +559,10 @@ intended functionality is of highest importance for the success of the experimen
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

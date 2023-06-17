@@ -77,11 +77,11 @@ class SplitMultiplicities(basf2.Module):
                         mcMother = mcMother.getMother()
 
         # create the extra info names and save the corresponding multiplicities
-        extraInfoName = 'nGen_{}'.format(self.pdgcode)
-        extraInfoName_Bp = 'nGen_{}_Bp'.format(self.pdgcode)
-        extraInfoName_Bm = 'nGen_{}_Bm'.format(self.pdgcode)
-        extraInfoName_B0 = 'nGen_{}_B0'.format(self.pdgcode)
-        extraInfoName_antiB0 = 'nGen_{}_antiB0'.format(self.pdgcode)
+        extraInfoName = f'nGen_{self.pdgcode}'
+        extraInfoName_Bp = f'nGen_{self.pdgcode}_Bp'
+        extraInfoName_Bm = f'nGen_{self.pdgcode}_Bm'
+        extraInfoName_B0 = f'nGen_{self.pdgcode}_B0'
+        extraInfoName_antiB0 = f'nGen_{self.pdgcode}_antiB0'
 
         self.eventExtraInfo.create()
         self.eventExtraInfo.setExtraInfo(extraInfoName, gen_counter)

@@ -153,7 +153,7 @@ def ecldspFromRoot(localdb_path, exp, run):
     dsp_list = []
 
     for i in range(len(CRATE_GROUPS)):
-        payload_name = 'ECLDSPPars{}'.format(i)
+        payload_name = f'ECLDSPPars{i}'
         query = Belle2.Database.DBQuery(payload_name)
         found = db.getData(EventMetaData(1, run, exp), query)
 
@@ -195,7 +195,7 @@ def ecldspToRoot(localdb_path, dsp_list, exp, run, expEnd = -1, runEnd = -1):
         dsp_pars.append(payload)
 
     for i, payload in enumerate(dsp_pars):
-        payload_name = 'ECLDSPPars{}'.format(i)
+        payload_name = f'ECLDSPPars{i}'
         iov = Belle2.IntervalOfValidity(exp, run, expEnd, runEnd)
         db.storeData(payload_name, payload, iov)
 
@@ -213,7 +213,7 @@ def ecldspFromDB(db_tag, exp, run):
     dsp_list = []
 
     for i in range(len(CRATE_GROUPS)):
-        payload_name = 'ECLDSPPars{}'.format(i)
+        payload_name = f'ECLDSPPars{i}'
         query = Belle2.Database.DBQuery(payload_name)
         found = db.getData(EventMetaData(1, run, exp), query)
 

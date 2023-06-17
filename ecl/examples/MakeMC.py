@@ -118,8 +118,7 @@ add_reconstruction(mainPath)
 # Register and add 'RootOutput' module
 outputFile = b2.register_module('RootOutput')
 outputFile.param('outputFileName',
-                 'pdg{}_BGx1_{}.mdst.root'.format(args.pdgCode,
-                                                  args.fileNumber))
+                 f'pdg{args.pdgCode}_BGx1_{args.fileNumber}.mdst.root')
 mainPath.add_module(outputFile)
 
 # Process the events and print call statistics

@@ -261,7 +261,7 @@ def calculate_beamparameters(name, E_cms=None):
         her = __get_4vector(values["energyHER"], values["angleXHER"])
         mass = (her + ler).M()
         scale = E_cms / mass
-        B2INFO("Scaling beam energies by {:g} to obtain E_cms = {:g} GeV".format(scale, E_cms))
+        B2INFO(f"Scaling beam energies by {scale:g} to obtain E_cms = {E_cms:g} GeV")
         values["energyHER"] *= scale
         values["energyLER"] *= scale
 

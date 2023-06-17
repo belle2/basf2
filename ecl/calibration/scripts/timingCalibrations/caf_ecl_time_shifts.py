@@ -93,7 +93,7 @@ def get_calibrations(input_data, **kwargs):
     # Collector setup
 
     # Set up the collector but with only one event per file
-    root_input = register_module('RootInput', entrySequences=['0:{}'.format(1)])
+    root_input = register_module('RootInput', entrySequences=[f'0:{1}'])
 
     rec_path_bhabha = create_path()
     rec_path_bhabha.add_module(root_input)

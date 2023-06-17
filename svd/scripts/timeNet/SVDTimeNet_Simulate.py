@@ -6,7 +6,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# coding: utf-8
 
 # ## Generate a data sample for SVDTime Neural Network training
 #
@@ -132,7 +131,7 @@ generator = SampleGenerator(
     args.tau_jitter,
     args.bin_size)
 
-print('Generating {0} samples...'.format(args.n_samples))
+print('Generating {} samples...'.format(args.n_samples))
 sample = generator.generate(args.n_samples)
 
 # Create a bin table
@@ -174,5 +173,5 @@ sample.to_pickle(output_name.format('Sample', args.n_samples))
 bins.to_pickle(output_name.format('Bins', args.n_samples))
 bounds.to_pickle(output_name.format('Bounds', args.n_samples))
 
-print('Done.\nResults saved to {0}.'.format(output_name.format(
+print('Done.\nResults saved to {}.'.format(output_name.format(
     '{Sample, Bins, Bounds}', args.n_samples)))

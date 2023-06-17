@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -214,10 +213,10 @@ class printSVDLadders(b2.Module):
 
                     angleDeg = m.degrees(angleRad)
 
-                    xStr = "{0:.2f}".format(round(glob.X(), 2))
-                    yStr = "{0:.2f}".format(round(glob.Y(), 2))
-                    radStr = "{0:.2f}".format(round(angleRad, 4))
-                    degStr = "{0:.2f}".format(round(angleDeg, 2))
+                    xStr = "{:.2f}".format(round(glob.X(), 2))
+                    yStr = "{:.2f}".format(round(glob.Y(), 2))
+                    radStr = "{:.2f}".format(round(angleRad, 4))
+                    degStr = "{:.2f}".format(round(angleDeg, 2))
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
 

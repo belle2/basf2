@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -26,7 +25,7 @@ class dump_clusters(b2.Module):
     def __init__(self, filename='dump_clusters.txt', collection='SVDClusters'):
         """Initialize the module"""
 
-        super(dump_clusters, self).__init__()
+        super().__init__()
         #: Input file object.
         self.file = open(filename, 'w')
 #: name of the StoreArraw SVDClusters

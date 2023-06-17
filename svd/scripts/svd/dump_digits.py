@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ class dump_digits(b2.Module):
     def __init__(self, filename='dumped_digits.txt'):
         """Initialize the module"""
 
-        super(dump_digits, self).__init__()
+        super().__init__()
         #: Input file object.
         self.outfile = open(filename, 'w')
         #: Factors for decoding VXDId's
@@ -92,7 +91,7 @@ class dump_digits(b2.Module):
             # Digit information
             samples = shaper_digit.getSamples()
             for iSample in range(6):
-                s += '{0} '.format(samples[iSample])
+                s += '{} '.format(samples[iSample])
 
             # Data from time fit
             s += '{amplitude:.3f} {time:.3f} {chi2:.3f}'.format(

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -47,7 +46,7 @@ class SVDValidationTTreeSpacePoint(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeSpacePoint, self).__init__()
+        super().__init__()
         #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeSpacePoint.root', 'recreate')
         #: output ttree

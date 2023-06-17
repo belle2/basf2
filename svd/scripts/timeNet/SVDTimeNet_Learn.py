@@ -6,7 +6,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# coding: utf-8
 
 # ## Train and save the SVDTime Neural Network
 #
@@ -164,9 +163,9 @@ for field in root.find(nsprefix + 'DataDictionary'):
     if field.attrib['name'] == 't0_bin':
         for child in field:
             i = int(child.attrib['value'])
-            child.attrib['lower'] = '{0:.3f}'.format(bins.loc[i, 'lower'])
-            child.attrib['upper'] = '{0:.3f}'.format(bins.loc[i, 'upper'])
-            child.attrib['midpoint'] = '{0:.3f}'.format(bins.loc[i, 'midpoint'])
+            child.attrib['lower'] = '{:.3f}'.format(bins.loc[i, 'lower'])
+            child.attrib['upper'] = '{:.3f}'.format(bins.loc[i, 'upper'])
+            child.attrib['midpoint'] = '{:.3f}'.format(bins.loc[i, 'midpoint'])
 
 net.write(xml_name, xml_declaration=True, pretty_print=True, encoding='utf-8')
 
@@ -214,7 +213,7 @@ def fitFromProb(fw, signals, p, tau, timearray):
 
 probdf = pd.DataFrame(probs)
 probdf.index = X_test.index
-probdf.to_pickle('SVDTime_TrainingProbs_{0}.pkl'.format(args.n_samples))
+probdf.to_pickle('SVDTime_TrainingProbs_{}.pkl'.format(args.n_samples))
 
 fits = X_test.apply(
     lambda row: fitFromProb(
@@ -231,7 +230,7 @@ fits['a_true'] = Trues_test['amplitude']
 fits['t_bin'] = Trues_test['t0_bin']
 fits['a_bin'] = Trues_test['abin']
 
-fits.to_pickle('SVDTime_TrainingFits_{0}.pkl'.format(args.n_samples))
+fits.to_pickle('SVDTime_TrainingFits_{}.pkl'.format(args.n_samples))
 
 print('Writing classifier...')
 
@@ -241,7 +240,7 @@ with open('classifier.pkl', 'wb') as f:
 with open('classifier.txt', 'w') as cdump:
     cdump.write("Classifier coefficients:\n")
     for iLayer in range(len(classifier.coefs_)):
-        cdump.write('Layer: {0}\n'.format(iLayer))
+        cdump.write('Layer: {}\n'.format(iLayer))
         nrows = classifier.coefs_[iLayer].shape[0]
         ncols = classifier.coefs_[iLayer].shape[1]
         cdump.write('Weights:\n')

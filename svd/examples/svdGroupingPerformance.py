@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -119,7 +118,7 @@ class SVDGroupingPerformance(b2.Module):
 
         timeBin = int(maxTime - minTime)
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.TH1F_Index = {}
         self.TH1F_Store = []
         TH1F_Store_Count = 0

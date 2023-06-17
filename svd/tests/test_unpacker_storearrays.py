@@ -54,7 +54,7 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(create_input)
 
         test_successful = test_successful and (result == 0)
-        basf2.B2INFO('Generation {0}.\n'.format(test_message[result]))
+        basf2.B2INFO('Generation {}.\n'.format(test_message[result]))
 
         basf2.B2INFO('2/5\nRead shaper digits using default settings of SVDUnpacker.' +
                      '\nWe should see FATAL with message for SVDShaperDigits.')
@@ -70,7 +70,7 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(read_shapers_default)
 
         test_successful = test_successful and (result == 1)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[1 - result]))
+        basf2.B2INFO('Test {}.\n'.format(test_message[1 - result]))
 
         basf2.B2INFO('3/5\nRead the safe way, excluding branches.\nWe should see no errors.')
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(read_safe_way)
 
         test_successful = test_successful and (result == 0)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+        basf2.B2INFO('Test {}.\n'.format(test_message[result]))
 
         basf2.B2INFO('4/5\nRead with the Unpacker silentlyAppend switch on.\n' +
                      'We also include the SVDShaperDigitSorter.\n' +
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(read_append_sort)
 
         test_successful = test_successful and (result == 0)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+        basf2.B2INFO('Test {}.\n'.format(test_message[result]))
 
         basf2.B2INFO('5/5\nRead with the Unpacker silentAppend switch on.\n' +
                      'We don\'t include the SVDShaperDigitSorter.\n' +
@@ -126,7 +126,7 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(read_append_nosort)
 
         test_successful = test_successful and (result == 0)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+        basf2.B2INFO('Test {}.\n'.format(test_message[result]))
 
         basf2.B2INFO('6 tasks of Test 1 completed\n\n')
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(unpack_with_data)
 
         test_successful = test_successful and (result == 0)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+        basf2.B2INFO('Test {}.\n'.format(test_message[result]))
 
         basf2.B2INFO('2/2\nRun unpacking and reconstruction without data.' +
                      '\nAll settings are standard.' +
@@ -167,9 +167,9 @@ if __name__ == "__main__":
             result = b2test_utils.safe_process(unpack_without_data)
 
         test_successful = test_successful and (result == 0)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+        basf2.B2INFO('Test {}.\n'.format(test_message[result]))
 
         basf2.B2INFO('2 tasks of Test 2 completed\n')
 
-        basf2.B2INFO('Summary result:\nTests {0}.\n'.format(
+        basf2.B2INFO('Summary result:\nTests {}.\n'.format(
             test_message[0 if test_successful else 1]))

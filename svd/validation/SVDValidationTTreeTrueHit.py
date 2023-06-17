@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -45,7 +44,7 @@ class SVDValidationTTreeTrueHit(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeTrueHit, self).__init__()
+        super().__init__()
         #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeTrueHit.root', 'recreate')
         #: output ttree

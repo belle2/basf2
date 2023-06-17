@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ class SVDChargeSharing(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDChargeSharing, self).__init__()
+        super().__init__()
         #: Input file object.
         self.file = open('SVDChargeSharingData.txt', 'w')
 

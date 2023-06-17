@@ -180,4 +180,4 @@ if __name__ == "__main__":
                 else:
                     n_good += 1
 
-        basf2.B2INFO('Processed {0} matching digits.'.format(n_good))
+        basf2.B2INFO('Processed {} matching digits.'.format(n_good))

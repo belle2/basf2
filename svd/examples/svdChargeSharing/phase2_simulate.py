@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,7 +18,7 @@ from generators import add_evtgen_generator
 
 print('***')
 print('*** Used steering script:')
-with open(sys.argv[0], 'r') as fin:
+with open(sys.argv[0]) as fin:
     print(fin.read(), end="")
 print('*** end of the script.')
 print('***')

@@ -1,4 +1,4 @@
-.. _tracking_validation: 
+.. _tracking_validation:
 
 The tracking validation package
 ===============================

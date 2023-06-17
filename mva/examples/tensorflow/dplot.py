@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+from basf2 import find_file
 import numpy as np
 import tensorflow as tf
 import basf2_mva
@@ -220,8 +221,12 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 
 if __name__ == "__main__":
+
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    training_data = basf2_mva.vector(train_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_identifier = "TensorflowDPlot"
     general_options.m_treename = "tree"
     variables = ['p', 'pt', 'pz',

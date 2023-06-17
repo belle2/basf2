@@ -30,9 +30,9 @@ main.add_module(inroot)
 
 # input = register_module('DQMHistAnalysisInput')
 # input.param('HistMemoryPath', argv[1])
-# input.param('AutoCanvas', False)
-# input.param('AutoCanvasFolders', [])
 # main.add_module(input)
+
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 ip_x = b2.register_module('DQMHistAnalysisIP')
 ip_x.param("HistoName", "IPMonitoring/Y4S_Vertex.X")

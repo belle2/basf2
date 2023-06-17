@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -1456,7 +1455,7 @@ for category in usedCategories:
         bins[i] = float(bins[i]) / 50
     # ------
 
-    title = str()
+    title = ''
     location = 1
     if category != 'Lambda' and category != 'MaximumPstar' and category != 'Kaon':
         title = r'$q_{\rm cand}\cdot y_{\rm ' + category + '}$'

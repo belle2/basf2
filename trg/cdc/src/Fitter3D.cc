@@ -86,7 +86,7 @@ namespace Belle2 {
     m_mBool["debugLargeZ0"] = 0;
 
     // Init values
-    m_mConstD["Trg_PI"] = 3.141592653589793;
+    m_mConstD["Trg_PI"] = M_PI;
 
     // Get rr,zToStraw,angleSt,nWire
     const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
@@ -1593,7 +1593,7 @@ namespace Belle2 {
                                     bool isXtSimple)
   {
     const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
-    mConstD["Trg_PI"] = 3.141592653589793;
+    mConstD["Trg_PI"] = M_PI;
     mConstV["priorityLayer"] = {3, 10, 16, 22, 28, 34, 40, 46, 52};
     mConstV["rr"] = vector<double> (9);
     mConstV["nWires"] = vector<double> (9);

@@ -24,7 +24,6 @@ namespace Belle2 {
     /** Default Constructor. */
     V0ValidationVertex() :
       V0(),
-      m_fittedVertexPosition(ROOT::Math::XYZVector(0, 0, 0)),
       m_fittedMomentum(0),
       m_fittedInvariantMass(0),
       m_chi2(0)
@@ -42,7 +41,6 @@ namespace Belle2 {
                        const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative,
                        double vertexX, double vertexY, double vertexZ) :
       V0(trackPairPositive, trackPairNegative, vertexX, vertexY, vertexZ),
-      m_fittedVertexPosition(ROOT::Math::XYZVector(vertexX, vertexY, vertexZ)),
       m_fittedMomentum(0),
       m_fittedInvariantMass(0),
       m_chi2(0)
@@ -66,15 +64,14 @@ namespace Belle2 {
                        const double& invariantMass,
                        const double& chi2) :
       V0(trackPairPositive, trackPairNegative, fittedVertexPosition.X(), fittedVertexPosition.Y(), fittedVertexPosition.Z()),
-      m_fittedVertexPosition(fittedVertexPosition),
       m_fittedVertexPositionCovariance(fittedVertexPositionCovariance),
       m_fittedMomentum(momentum),
       m_fittedInvariantMass(invariantMass),
       m_chi2(chi2)
     {}
 
-    /// Getter for the reconstructed vertex position.
-    ROOT::Math::XYZVector getVertexPosition() const { return m_fittedVertexPosition; }
+    /// Getter for the reconstructed vertex position. Aliases getFittedVertexPosition for backwards compatibility.
+    ROOT::Math::XYZVector getVertexPosition() const { return getFittedVertexPosition(); }
 
     /// Getter for the reconstructed vertex position covariance.
     TMatrixDSym getVertexPositionCovariance() const { return m_fittedVertexPositionCovariance; }
@@ -89,16 +86,12 @@ namespace Belle2 {
     float getVertexChi2() const { return m_chi2; }
 
   private:
-    /** Vertex position. Now duplicated, since it is also in the base class V0,
-     *  but kept here for backwards compatibility.
-     */
-    ROOT::Math::XYZVector m_fittedVertexPosition;
     TMatrixDSym m_fittedVertexPositionCovariance;  ///< vertex position covariance
     float m_fittedMomentum; ///< reconstructed momentum
     float m_fittedInvariantMass; ///< reconstructed invariant mass
     float m_chi2; ///< reconstructed chi2
 
-    ClassDef(V0ValidationVertex, 3);  ///< Dataobjects for the reconstruction level validation of V0 reconstruction.
+    ClassDef(V0ValidationVertex, 4);  ///< Dataobjects for the reconstruction level validation of V0 reconstruction.
   };
 
 }

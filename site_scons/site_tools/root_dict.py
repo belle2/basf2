@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -81,7 +80,7 @@ def linkdef_emitter(target, source, env):
         namespace = match.group(1)  # or possibly a class, but it might match the header file
         classname = match.group(2)
         if not classname:
-            raise RuntimeError("%s contains '%s' without class name?" % (str(linkdef), str(line)))
+            raise RuntimeError("{} contains '{}' without class name?".format(str(linkdef), str(line)))
 
         is_implicit = not linkdef_implicit.search(line) is None
         if is_implicit:

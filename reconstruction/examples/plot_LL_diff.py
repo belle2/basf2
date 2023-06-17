@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -57,7 +56,7 @@ class MinModule(b2.Module):
         call constructor of base class, required.
         """
 
-        super(MinModule, self).__init__()
+        super().__init__()
 
     def event(self):
         """

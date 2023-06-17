@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -480,9 +479,9 @@ class SystematicsRadEE(BaseSkim):
         prescale_logic += " or [%s and %s and %s]" \
             % (electron_is_second, second_in_fwd_endcap, passes_prescale)
         # 3) electron first in string and not in fwd endcap (no prescale)
-        prescale_logic += " or [%s and %s]" % (electron_is_first, first_not_in_fwd_endcap)
+        prescale_logic += " or [{} and {}]".format(electron_is_first, first_not_in_fwd_endcap)
         # 4) electron second in string and not in fwd endcap (no prescale)
-        prescale_logic += " or [%s and %s]" % (electron_is_second, second_not_in_fwd_endcap)
+        prescale_logic += " or [{} and {}]".format(electron_is_second, second_not_in_fwd_endcap)
 
         # final candidate building with cuts and prescales
         prescale_logic = "[%s]" % prescale_logic

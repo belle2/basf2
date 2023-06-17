@@ -22,6 +22,8 @@ class Basf2Object(ObjectDescription):
     Basically copied together from sphinxcontrib-domaintools and sphinxcontrib-adadomain.
     """
 
+#: \cond Doxygen_suppress
+
     doc_field_types = {
         TypedField("parameter", label="Parameters", names=("param", "parameter", "arg", "argument"),
                    typenames=("paramtype", "type"), typerolename=None, can_collapse=True),
@@ -51,14 +53,16 @@ class Basf2Object(ObjectDescription):
                 if not arg:
                     continue
                 paramlist += addnodes.desc_parameter(arg, arg)
-            signode += paramlist
+                signode += paramlist
 
         # return the object name for referencing
         return name
 
+#: \endcond
+
     def add_target_and_index(self, name, sig, signode):
         # Create a full id from objtype and name
-        targetname = '%s-%s' % (self.objtype, name)
+        targetname = '{}-{}'.format(self.objtype, name)
         # and append the id to the object node
         signode['ids'].append(targetname)
         self.state.document.note_explicit_target(signode)
@@ -69,7 +73,7 @@ class Basf2Object(ObjectDescription):
 
         if name in ddata:
             # already exists, give warning
-            logger.warn("Duplicate description of basf2 %s %s, " % (self.objtype, name) +
+            logger.warn("Duplicate description of basf2 {} {}, ".format(self.objtype, name) +
                         "Other instance in " + self.env.doc2path(ddata[name][0]) +
                         ", please add ':noindex:' to one",
                         location=(self.env.docname, self.lineno))
@@ -79,6 +83,7 @@ class Basf2Object(ObjectDescription):
 
 class Basf2ModuleIndex(Index):
     """Create an alphabetic index of all modules"""
+    #: \cond Doxygen_suppress
     name = "modindex"
     localname = "basf2 Module Index"
     shortname = "basf2 modules"
@@ -91,10 +96,12 @@ class Basf2ModuleIndex(Index):
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
         return list(content.items()), False
+    #: \endcond
 
 
 class Basf2VariableIndex(Index):
     """Create an alphabetic index of all variables"""
+    #: \cond Doxygen_suppress
     name = "varindex"
     localname = "basf2 Variable Index"
     shortname = "basf2 variables"
@@ -108,10 +115,12 @@ class Basf2VariableIndex(Index):
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
         return list(content.items()), False
+    #: \endcond
 
 
 class Basf2Domain(Domain):
     """basf2 Software Domain"""
+    #: \cond Doxygen_suppress
     name = "b2"
     label = "Belle II Software"
     object_types = {
@@ -135,6 +144,7 @@ class Basf2Domain(Domain):
         Basf2ModuleIndex,
         Basf2VariableIndex,
     ]
+    #: \endcond
 
     def clear_doc(self, docname):
         """Remove the existing domain data for a given document name"""
@@ -146,6 +156,7 @@ class Basf2Domain(Domain):
             except Exception:
                 pass
 
+    #: \cond Doxygen_suppress
     def get_objects(self):
         for i, type in enumerate(["modules", "variables"]):
             for name, (docname, target) in self.data[type].items():
@@ -164,3 +175,4 @@ class Basf2Domain(Domain):
                                 labelid, contnode)
         except Exception:
             return None
+    #: \endcond

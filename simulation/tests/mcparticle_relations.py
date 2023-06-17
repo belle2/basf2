@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ class TestModule(b2.Module):
     def __init__(self):
         """constructor."""
 
-        super(TestModule, self).__init__()
+        super().__init__()
 
     def event(self):
         """reimplementation of Module::event().

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -38,7 +37,7 @@ class TestSkimRegistry(unittest.TestCase):
     def assertIsSubclass(self, cls, parent_cls, msg=None):
         """Fail if `cls` is not a subclass of `parent_cls`."""
         if not issubclass(cls, parent_cls):
-            standardMsg = "%r is not a subclass of %r" % (cls, parent_cls)
+            standardMsg = "{!r} is not a subclass of {!r}".format(cls, parent_cls)
             self.fail(self._formatMessage(msg, standardMsg))
 
     def test_code_format(self):

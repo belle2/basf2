@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -57,7 +56,7 @@ class TreeWriterModule(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(TreeWriterModule, self).__init__()
+        super().__init__()
 
         #: Output ROOT file.
         self.file = ROOT.TFile('PID_TTree.root', 'recreate')

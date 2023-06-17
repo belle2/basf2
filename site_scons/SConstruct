@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 import shlex
@@ -310,7 +309,7 @@ else:
     # loop over directory entries and select package directories
     exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
     if (os.path.exists('.excluded_directories')):
-        f = open('.excluded_directories', 'r')
+        f = open('.excluded_directories')
         for line in f.readlines():
             exclude_dirs.add(line.rstrip('\n'))
         f.close()
@@ -323,7 +322,7 @@ else:
 
     # retain only packages specified in the .light file if the light option is given
     if GetOption('light'):
-        light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
+        light_packages = {entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')}
         available_packages = available_packages.intersection(light_packages)
 
     # we looped over all of them and know what's available so let's compile

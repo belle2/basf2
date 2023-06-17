@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -74,7 +73,7 @@ def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
         elif name in Registry.modules:
             skims.extend(Registry.get_skims_in_module(name))
 
-    duplicates = set([skim for skim in skims if skims.count(skim) > 1])
+    duplicates = {skim for skim in skims if skims.count(skim) > 1}
     if duplicates:
         raise RuntimeError(
             f"Skim{'s'*(len(duplicates)>1)} requested more than once: {', '.join(duplicates)}"

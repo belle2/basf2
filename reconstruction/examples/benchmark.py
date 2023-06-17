@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -108,7 +107,7 @@ for module in b2.statistics.modules:
 # open output file
 output = None
 if args.file is not None:
-    output = open(args.file, 'wt')
+    output = open(args.file, 'w')
 
 # print benchmark results and write them to the output file
 b2.set_log_level(b2.LogLevel.INFO)
@@ -117,7 +116,7 @@ for category in categories:
     if category not in times.keys():
         continue
     time = times[category]
-    message = 'Execution time per event for %s is %.f ms' % (category, time)
+    message = 'Execution time per event for {} is {:.f} ms'.format(category, time)
     fraction = -1
     if category in limits.keys():
         fraction = time / limits[category]
@@ -134,7 +133,7 @@ for category in categories:
         b2.B2INFO(message)
 
     if output is not None:
-        output.write('%s %.2f' % (category, time))
+        output.write('{} {:.2f}'.format(category, time))
         if fraction >= 0:
             output.write(' %.4f' % fraction)
         output.write('\n')

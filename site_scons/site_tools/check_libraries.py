@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -31,7 +30,7 @@ def get_dtneeded(filename):
         needed_entries = re_readelf.findall(readelf_out)
         return needed_entries
     except Exception as e:
-        print("Could not get dependencies for library %s: %s" % (filename, e))
+        print("Could not get dependencies for library {}: {}".format(filename, e))
         return None
 
 
@@ -68,7 +67,7 @@ def get_package(env, node):
 def print_libs(title, text, pkg, lib, libs):
     """Print information on extra/missing libraries"""
     for library in sorted(libs):
-        print("%s:%s:%s -> %s (%s)" % (title, pkg, lib, library, text))
+        print("{}:{}:{} -> {} ({})".format(title, pkg, lib, library, text))
 
 
 def check_libraries(target, source, env):
@@ -138,9 +137,9 @@ def check_libraries(target, source, env):
         # But for now we just restrict ourselves to libraries in $LIBDIR
         # because we know they don't have so-versions. So reduce the
         # lists to libraries which we can actually find in $LIBDIR
-        given_internal = set("lib%s.so" % library for library in given if os.path.exists(os.path.join(libdir,
-                                                                                         "lib%s.so" % library)))
-        needed_internal = set(library for library in needed if os.path.exists(os.path.join(libdir, library)))
+        given_internal = {"lib%s.so" % library for library in given if os.path.exists(os.path.join(libdir,
+                                                                                                   "lib%s.so" % library))}
+        needed_internal = {library for library in needed if os.path.exists(os.path.join(libdir, library))}
 
         # now check for extra or missing direct dependencies using
         # simple set operations

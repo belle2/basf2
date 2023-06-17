@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -56,7 +55,7 @@ def timeOfFlightToColor(timeOfFlight):
 
     (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+    color = 'rgb({:.2%}, {:.2%}, {:.2%})'.format(red, green, blue)
     return color
 
 
@@ -71,7 +70,7 @@ def inTrackIdToColor(inTrackId):
 
     (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+    color = 'rgb({:.2%}, {:.2%}, {:.2%})'.format(red, green, blue)
     return color
 
 
@@ -376,7 +375,7 @@ class MCSegmentIdColorMap(CDCHitColorMap):
             (red, green, blue) = colorsys.hls_to_rgb(hue, lightness,
                                                      saturation)
 
-            color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+            color = 'rgb({:.2%}, {:.2%}, {:.2%})'.format(red, green, blue)
             return color
 
 

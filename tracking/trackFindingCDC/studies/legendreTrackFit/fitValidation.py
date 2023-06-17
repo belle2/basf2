@@ -29,9 +29,7 @@ class FitValidationModule(HarvestingModule):
             legendre_track_cand_store_array_name,
             output_file_name):
         """Constructor"""
-        super(
-            FitValidationModule,
-            self).__init__(
+        super().__init__(
             foreach=legendre_track_cand_store_array_name,
             output_file_name=output_file_name)
 
@@ -102,7 +100,7 @@ class FitValidation(StandardEventGenerationRun):
     def create_path(self):
         """Create and populate the basf2 path"""
 
-        main_path = super(FitValidation, self).create_path()
+        main_path = super().create_path()
 
         main_path.add_module("TFCDC_WireHitPreparer")
 

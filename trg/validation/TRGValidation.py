@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -61,6 +60,7 @@ class MakePlots(basf2.Module):
         histogram.GetYaxis().SetLabelSize(0.020)
         histogram.SetLineColor(ROOT.kBlack)
 
+#: \cond Doxygen_suppress
     def initialize(self):
 
         self.tfile = TFile("TRGValidation.root", "recreate")
@@ -148,19 +148,19 @@ class MakePlots(basf2.Module):
 
         #: validation histogram
         self.d_phi = TH1F("d_phi", "#Delta#phi of CDC 2D finder", 50, -0.5, 0.5)
-        tree.Draw("{0}-atan({1}/{2})>>d_phi".format(trk2d_phi, mc_py, mc_px),
+        tree.Draw("{}-atan({}/{})>>d_phi".format(trk2d_phi, mc_py, mc_px),
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
-                  "fabs({0}-atan({1}/{2}))<{3}&&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
+                  "fabs({}-atan({}/{}))<{}&&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
 
         self.d_phi_2 = TH1F("d_phi_2", "d_phi_2", 50, -0.5, 0.5)
-        tree.Draw("{0}-atan({1}/{2})-{3}>>d_phi_2".format(trk2d_phi, mc_py, mc_px, PI),
+        tree.Draw("{}-atan({}/{})-{}>>d_phi_2".format(trk2d_phi, mc_py, mc_px, PI),
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
-                  "{0}-atan({1}/{2})>={3} &&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
+                  "{}-atan({}/{})>={} &&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
 
         self.d_phi_3 = TH1F("d_phi_3", "d_phi_3", 50, -0.5, 0.5)
-        tree.Draw("{0}-atan({1}/{2})+{3}>>d_phi_2".format(trk2d_phi, mc_py, mc_px, PI),
+        tree.Draw("{}-atan({}/{})+{}>>d_phi_2".format(trk2d_phi, mc_py, mc_px, PI),
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
-                  "{0}-atan({1}/{2})<=-{3}&&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
+                  "{}-atan({}/{})<=-{}&&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
 
         self.d_phi.Add(self.d_phi_2)
         self.d_phi.Add(self.d_phi_3)
@@ -249,6 +249,7 @@ class MakePlots(basf2.Module):
         self.d_z0_nn.Write()
         self.d_E_ECL.Write()
         self.tfile.Close()
+#: \endcond
 
 
 # Create path

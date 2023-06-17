@@ -21,9 +21,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
     def __init__(self, output_file_name, tracks_store_vector_name="CDCTrackVector"):
         """ Initiialize with the output file name of the root file and the store obj with the
         CDCTrack vector to use. MC track cands are needed. """
-        super(
-            ReconstructionPositionHarvester,
-            self).__init__(
+        super().__init__(
             foreach=tracks_store_vector_name,
             output_file_name=output_file_name)
 
@@ -164,9 +162,7 @@ class SegmentFakeRatesModule(HarvestingModule):
           mc_track_cands_store_array_name Name of the StoreArray for MC track cands
           legendre_track_cand_store_array_name Name of the StoreArray for legendre track cands
         """
-        super(
-            SegmentFakeRatesModule,
-            self).__init__(
+        super().__init__(
             foreach=local_track_cands_store_array_name,
             output_file_name=output_file_name)
 
@@ -285,9 +281,7 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
         """ Init the harvester with the local track candidates StoreArray name and the one for MC track cands
         and the output file name for the result root file.
         """
-        super(
-            SegmentFinderParameterExtractorModule,
-            self).__init__(
+        super().__init__(
             foreach=local_track_cands_store_array_name,
             output_file_name=output_file_name)
 

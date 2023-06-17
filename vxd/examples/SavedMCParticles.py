@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ class CheckMCParticles(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(CheckMCParticles, self).__init__()
+        super().__init__()
         #: Number of secondaries that generated a PXDTrueHit
         self.nSecondariesPXD = 0
         #: Number of secondaries that generated an SVD TrueHit

@@ -30,12 +30,12 @@ if __name__ == '__main__':
         b2.logging.add_file(log_file)
         b2u.safe_process(steering_path(), max_event=1)
         offended = False
-        with open(log_file, 'r') as log:
+        with open(log_file) as log:
             if __offending_warning in log.read():
                 offended = True
         if offended:
             bits = []
-            with open(log_file, 'r') as log:
+            with open(log_file) as log:
                 for line in log:
                     if 'bitname =' in line:
                         bits.append(line.split(' ')[2])

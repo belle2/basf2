@@ -24,13 +24,12 @@
 This module provides :class:`VCDWriter` for writing VCD files.
 
 """
-from __future__ import print_function
-from collections import OrderedDict, Sequence
+from collections import OrderedDict
+from collections.abc import Sequence
 from numbers import Number
 import datetime
 
-import six
-from six.moves import zip, zip_longest
+from itertools import zip_longest
 
 
 class VCDPhaseError(Exception):
@@ -42,7 +41,7 @@ class VCDPhaseError(Exception):
     """
 
 
-class VCDWriter(object):
+class VCDWriter:
     """Value Change Dump writer.
 
     A VCD file captures time-ordered changes to the value of variables.
@@ -242,7 +241,7 @@ class VCDWriter(object):
         """Stop dumping to VCD file."""
         print('#' + str(int(timestamp)), file=self._ofile)
         print('$dumpoff', file=self._ofile)
-        for ident, val_str in six.iteritems(self._ident_values):
+        for ident, val_str in self._ident_values.items():
             if val_str[0] == 'b':
                 print('bx', ident, file=self._ofile)
             elif val_str[0] == 'r':
@@ -263,7 +262,7 @@ class VCDWriter(object):
         """Dump values to VCD file."""
         print(keyword, file=self._ofile)
         # TODO: events should be excluded
-        print(*six.itervalues(self._ident_values),
+        print(*self._ident_values.values(),
               sep='\n', file=self._ofile)
         print('$end', file=self._ofile)
 
@@ -317,7 +316,7 @@ class VCDWriter(object):
 
     def _get_scope_tuple(self, scope):
         """get scope tuple function of the VCDWrite"""
-        if isinstance(scope, six.string_types):
+        if isinstance(scope, str):
             return tuple(scope.split(self._scope_sep))
         if isinstance(scope, (list, tuple)):
             return tuple(scope)
@@ -338,7 +337,7 @@ class VCDWriter(object):
                 num_str = str(num)
             else:
                 raise ValueError('Invalid timescale {}'.format(timescale))
-        elif isinstance(timescale, six.string_types):
+        elif isinstance(timescale, str):
             if timescale in cls.TIMESCALE_UNITS:
                 num_str = '1'
                 unit = timescale
@@ -407,7 +406,7 @@ class VCDWriter(object):
 
     def _gen_header(self):
         """generate header for VCDWriter"""
-        for kwname, kwvalue in sorted(six.iteritems(self._header_keywords)):
+        for kwname, kwvalue in sorted(self._header_keywords.items()):
             if not kwvalue:
                 continue
             lines = kwvalue.split('\n')
@@ -436,8 +435,7 @@ class VCDWriter(object):
             else:
                 assert scope != prev_scope  # pragma no cover
 
-            for var_str in var_strs:
-                yield var_str
+            yield from var_strs
 
             prev_scope = scope
 
@@ -463,7 +461,7 @@ class VCDWriter(object):
         self._scope_var_names.clear()
 
 
-class Variable(object):
+class Variable:
     """VCD variable details needed to call :meth:`VCDWriter.change()`."""
 
     #: variables
@@ -502,7 +500,7 @@ class ScalarVariable(Variable):
         :returns: string representing value change for use in a VCD stream.
 
         """
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             if check and (len(value) != 1 or value not in '01xzXZ'):
                 raise ValueError('Invalid scalar value ({})'.format(value))
             return value + self.ident
@@ -598,7 +596,7 @@ class VectorVariable(Variable):
 
     def _format_value(self, value, size, check):
         """format value function of VCDWriter"""
-        if isinstance(value, six.integer_types):
+        if isinstance(value, int):
             max_val = 1 << size
             if check and (-value > (max_val >> 1) or value >= max_val):
                 raise ValueError('Value ({}) not representable in {} bits'
@@ -609,7 +607,7 @@ class VectorVariable(Variable):
         elif value is None:
             return 'z'
         else:
-            if check and (not isinstance(value, six.string_types) or
+            if check and (not isinstance(value, str) or
                           len(value) > size or
                           any(c not in '01xzXZ-' for c in value)):
                 raise ValueError('Invalid vector value ({})'.format(value))

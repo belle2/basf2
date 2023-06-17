@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -32,7 +31,7 @@ class PrintPXDHits(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(PrintPXDHits, self).__init__()
+        super().__init__()
 
     def initialize(self):
         """ Does nothing """

@@ -157,4 +157,4 @@ def get_module_param(module, name):
         if name == parameter.name:
             return parameter.values
     else:
-        raise AttributeError('%s module does not have a parameter named %s' % (module, name))
+        raise AttributeError('{} module does not have a parameter named {}'.format(module, name))

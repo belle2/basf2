@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -28,7 +27,7 @@ class SetVXDSensitiveThreshold(b2.Module):
     def __init__(self, threshold):
         """Initialize the module"""
 
-        super(SetVXDSensitiveThreshold, self).__init__()
+        super().__init__()
         #: The threshold value to be set.
         self.threshold = threshold
         #: The current pxd threshold value.

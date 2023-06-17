@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -171,7 +170,7 @@ class ClusterEfficiency(b2.Module):
             # meh, something strange with the momentum, ignore this one
             if p_gen is None:
                 b2.B2WARNING("Strange particle momentum: %f, expected one of %s" %
-                             (p.R(), ", ".join(str() for p in momenta)))
+                             (p.R(), ", ".join('' for p in momenta)))
                 continue
 
             # and check all truehits

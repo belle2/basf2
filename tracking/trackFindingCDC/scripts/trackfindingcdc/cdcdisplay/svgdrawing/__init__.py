@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -224,7 +223,7 @@ class CDCSVGPlotter:
 
         eventdata_plotter.save(temp_file_name)
 
-        with open(temp_file_name, "r") as temp_file:
+        with open(temp_file_name) as temp_file:
             with open(pngFileName, "w") as output_file:
                 svg_code = temp_file.read()
                 cairosvg.svg2png(bytestring=svg_code, write_to=output_file)

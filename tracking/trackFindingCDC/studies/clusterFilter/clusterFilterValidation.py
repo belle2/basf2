@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -44,7 +43,7 @@ class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGe
 
     def create_argument_parser(self, **kwds):
         """Configure the basf2 job script using the translated command-line arguments"""
-        argument_parser = super(ClusterFilterValidationRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
         return argument_parser
 
     def create_path(self):
@@ -52,7 +51,7 @@ class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGe
         Sets up a path that plays back pregenerated events or generates events
         based on the properties in the base class.
         """
-        main_path = super(ClusterFilterValidationRun, self).create_path()
+        main_path = super().create_path()
 
         cluster_preparation_module = self.get_basf2_module(self.cluster_preparation_module)
         main_path.add_module(cluster_preparation_module)
@@ -73,8 +72,8 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
 
     def __init__(self, output_file_name):
         """Constructor"""
-        super(ClusterFilterValidationModule, self).__init__(foreach="CDCWireHitClusterVector",
-                                                            output_file_name=output_file_name)
+        super().__init__(foreach="CDCWireHitClusterVector",
+                         output_file_name=output_file_name)
         #: reference to the CDCMCHitlookUp singleton
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         #: reference to the CDCWireHitClusterVarSet
@@ -83,12 +82,12 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
     def initialize(self):
         """Receive signal at the start of event processing"""
         self.cluster_varset.initialize()
-        super(ClusterFilterValidationModule, self).initialize()
+        super().initialize()
 
     def terminate(self):
         """Receive signal at the end of event processing"""
         self.cluster_varset.terminate()
-        super(ClusterFilterValidationModule, self).terminate()
+        super().terminate()
 
     def prepare(self):
         """Fill the MC hit table"""

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -350,14 +348,12 @@ class HarvestingModule(basf2.Module):
         if foreach is not None:
             if foreach_is_store_array:
                 store_array = Belle2.PyStoreArray(self.foreach)
-                for crop in store_array:
-                    yield crop
+                yield from store_array
 
             elif foreach_is_store_obj:
                 store_obj = Belle2.PyStoreObj(self.foreach)
                 try:
-                    for crop in self.iter_store_obj(store_obj):
-                        yield crop
+                    yield from self.iter_store_obj(store_obj)
                 except TypeError:
                     # Cannot iter the store object. Yield it instead.
                     yield store_obj.obj()

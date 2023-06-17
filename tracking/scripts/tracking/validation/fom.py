@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -48,7 +47,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         """Informal string output listing the assigned figures of merit."""
 
         figures_by_name = self.figures_by_name
-        return '\n'.join('%s : %s' % (key, figures_by_name[key])
+        return '\n'.join('{} : {}'.format(key, figures_by_name[key])
                          for key in
                          figures_by_name.keys())
 

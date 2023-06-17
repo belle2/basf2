@@ -400,8 +400,8 @@ def update_gitlab_issue(
     plot_package = file_path.split("/")[-2]
     issue.notes.create(
         {
-            "body": "Related observation in validation of `{0}` package, `{1}`\
-             plot in `{2}` build. See the [error plot]({3})".format(
+            "body": "Related observation in validation of `{}` package, `{}`\
+             plot in `{}` build. See the [error plot]({})".format(
                 plot_package, plot_name, rev_label, uploaded_file["url"]
             )
         }
@@ -689,8 +689,8 @@ class ValidationRoot:
         uploaded_file = upload_file_gitlab(self.plot_path, project)
         plot_title = self.plot_path.split("/")[-1].split(".")[0]
         description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant plot: {0}\n\n\
-            Revision label: {1}\n\n---".format(
+            Relevant plot: {}\n\n\
+            Revision label: {}\n\n---".format(
             plot_title,
             self.revision_label
         )

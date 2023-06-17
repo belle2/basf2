@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -109,7 +108,7 @@ def compose_axis_label(quantity_name, unit=None):
     if unit is None:
         axis_label = quantity_name
     else:
-        axis_label = '%s (%s)' % (quantity_name, unit)
+        axis_label = '{} ({})'.format(quantity_name, unit)
 
     return axis_label
 
@@ -157,7 +156,7 @@ def get1DBinningFromReference(name, refFileName):
 StatsEntry = ROOT.TParameter(float)
 
 
-class ValidationPlot(object):
+class ValidationPlot:
 
     """Class for generating a validation plot for the Belle II validation page.
 

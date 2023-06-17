@@ -10,7 +10,7 @@ import string
 import unittest
 
 
-class NoReplacementField(object):
+class NoReplacementField:
 
     """This class serves as a placeholder for keys in not found during lookup into
     keyword or positional arguments during a call to TolerateMissingKeyFormatter.
@@ -94,7 +94,7 @@ class TolerateMissingKeyFormatter(string.Formatter):
             except KeyError:
                 return NoReplacementField(key)
         else:
-            return super(TolerateMissingKeyFormatter, self).get_value(key, args, kwds)
+            return super().get_value(key, args, kwds)
 
     def convert_field(self, value, conversion):
         """Applies the conversion to the value.
@@ -107,7 +107,7 @@ class TolerateMissingKeyFormatter(string.Formatter):
             value.conversion = conversion
             return value
         else:
-            return super(TolerateMissingKeyFormatter, self).convert_field(value, conversion)
+            return super().convert_field(value, conversion)
 
     def format_field(self, value, format_spec):
         """Applies the conversion to the value.
@@ -122,7 +122,7 @@ class TolerateMissingKeyFormatter(string.Formatter):
             value.format_spec = format_spec
             return value.compose()
         else:
-            return super(TolerateMissingKeyFormatter, self).format_field(value, format_spec)
+            return super().format_field(value, format_spec)
 
 
 class TolerateMissingKeyFormatterTest(unittest.TestCase):

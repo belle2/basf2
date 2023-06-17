@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-class ClassificationAnalysis(object):
+class ClassificationAnalysis:
     """Perform truth-classification analysis"""
 
     def __init__(
@@ -498,7 +497,7 @@ class ClassificationAnalysis(object):
             self.fom.write(tdirectory)
 
 
-class CutClassifier(object):
+class CutClassifier:
 
     """Simple classifier cutting on a single variable"""
 
@@ -571,7 +570,7 @@ class CutAtBackgroundRejectionClassifier(CutClassifier):
 
     def __init__(self, background_rejection=0.5, cut_direction=1):
         """Constructor"""
-        super(CutAtBackgroundRejectionClassifier, self).__init__(cut_direction=cut_direction, cut_value=np.nan)
+        super().__init__(cut_direction=cut_direction, cut_value=np.nan)
         #: cachec copy of the background-rejection threshold
         self.background_rejection = background_rejection
 

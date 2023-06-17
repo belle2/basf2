@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-class ResolutionAnalysis(object):
+class ResolutionAnalysis:
     """Perform resolution analysis"""
 
     #: default Z-score (for outlier detection)

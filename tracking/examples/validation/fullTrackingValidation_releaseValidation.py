@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
     This script runs the tracking validation on cdst samples like done for the release validation.
@@ -50,6 +49,7 @@ class Full(TrackingValidationRun):
     output_file_name = './FullTrackingValidation_validationSample.root'
 
 
+#: \cond Doxygen_suppress
 def main():
     validation_run = Full()
     validation_run.configure_and_execute_from_commandline()
@@ -58,3 +58,4 @@ def main():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     main()
+#: \endcond

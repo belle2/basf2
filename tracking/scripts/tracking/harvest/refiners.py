@@ -31,7 +31,7 @@ def get_logger():
 formatter = TolerateMissingKeyFormatter()
 
 
-class Refiner(object):
+class Refiner:
     """Python module to refine a peeled dictionary"""
 
     def __init__(self, refiner_function=None):
@@ -105,7 +105,7 @@ class SaveFiguresOfMeritRefiner(Refiner):
                  ):
         """Constructor for this refiner"""
 
-        super(SaveFiguresOfMeritRefiner, self).__init__()
+        super().__init__()
 
         #: cached name of the figure of merit
         self.name = name
@@ -206,7 +206,7 @@ class SaveHistogramsRefiner(Refiner):
                  fit_z_score=None):
         """Constructor for this refiner"""
 
-        super(SaveHistogramsRefiner, self).__init__()
+        super().__init__()
 
         #: cached user-defined name for this histogram
         self.name = name
@@ -826,7 +826,7 @@ class SaveTreeRefiner(Refiner):
                  name=None,
                  title=None):
         """Constructor for this refiner"""
-        super(SaveTreeRefiner, self).__init__()
+        super().__init__()
 
         #: cached name for this TTree
         self.name = name
@@ -1327,7 +1327,7 @@ def select_crop_parts(crops, select=None, exclude=None):
         return selected_crops
 
     else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crops, type(crops)))
+        raise ValueError("Unrecognised crop {} of type {}".format(crops, type(crops)))
 
 
 def filter_crops(crops, filter_function, part_name=None):
@@ -1348,7 +1348,7 @@ def filter_crops(crops, filter_function, part_name=None):
         return filtered_crops
 
     else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crops, type(crops)))
+        raise ValueError("Unrecognised crop {} of type {}".format(crops, type(crops)))
 
 
 def iter_items_sorted_for_key(crops):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -90,7 +89,7 @@ class EffModule(Module):
 
     def __init__(self, Belle2Phase):
         """Initialization of EffModule"""
-        super(EffModule, self).__init__()
+        super().__init__()
         #: Belle2 phase
         self.Belle2Phase = Belle2Phase
 

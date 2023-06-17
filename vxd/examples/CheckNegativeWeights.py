@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ class CheckNegativeWeights(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(CheckNegativeWeights, self).__init__()
+        super().__init__()
         #: Relation sign statistics for PXDClusters
         self.sign_stats_pxd = {
             'primary': {'positive': 0, 'negative': 0},

@@ -75,7 +75,7 @@ class HitCleaner(basf2.Module):
 
     def __init__(self):
         """Constructor"""
-        super(HitCleaner, self).__init__()
+        super().__init__()
 
         #: count the tracks
         self.number_of_tracks = 0
@@ -159,9 +159,9 @@ class HitCleaner(basf2.Module):
 
     def terminate(self):
         """Termination signal at the end of the event processing"""
-        print(("Number of tracks in total: %d" % self.number_of_tracks))
-        print(("Number of hits in total: %d" % self.number_of_hits))
-        print(("Number of deleted hits: %d" % self.number_of_deleted_hits))
+        print("Number of tracks in total: %d" % self.number_of_tracks)
+        print("Number of hits in total: %d" % self.number_of_hits)
+        print("Number of deleted hits: %d" % self.number_of_deleted_hits)
 
-        print(("Number of deleted hits per track: %f" % (1.0 * self.number_of_deleted_hits / self.number_of_tracks)))
-        print(("Ratio of deleted hits: %f" % (100.0 * self.number_of_deleted_hits / self.number_of_hits)))
+        print("Number of deleted hits per track: %f" % (1.0 * self.number_of_deleted_hits / self.number_of_tracks))
+        print("Ratio of deleted hits: %f" % (100.0 * self.number_of_deleted_hits / self.number_of_hits))

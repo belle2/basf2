@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -200,7 +199,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         totalHitListPRFake = set(totalHitListPRFake)
 
         # # All CDC Hits
-        totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
+        totalHitList = {cdcHit.getArrayIndex() for cdcHit in cdcHits}
 
         number_of_mc_hits = len(totalHitListMC)
         number_of_pr_hits = len(totalHitListPR)

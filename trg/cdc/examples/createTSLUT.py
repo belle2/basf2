@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -35,8 +34,8 @@ b = 0.8
 p = 0.7
 
 # filenames for the new LUTs
-innerLUTFilename = "innerLUT_Bkg_p%.2f_b%.2f.coe" % (p, b)
-outerLUTFilename = "outerLUT_Bkg_p%.2f_b%.2f.coe" % (p, b)
+innerLUTFilename = "innerLUT_Bkg_p{:.2f}_b{:.2f}.coe".format(p, b)
+outerLUTFilename = "outerLUT_Bkg_p{:.2f}_b{:.2f}.coe".format(p, b)
 
 
 def isValidInnerPattern(pattern):

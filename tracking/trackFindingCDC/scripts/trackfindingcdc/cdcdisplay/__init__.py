@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -43,7 +42,7 @@ class CDCSVGDisplayModule(basf2.Module):
             Defaults to True
         """
 
-        super(CDCSVGDisplayModule, self).__init__()
+        super().__init__()
         # call constructor of base class, required!
 
         #: Switch if the module shall show the event to the user and wait to continue or just generate the images

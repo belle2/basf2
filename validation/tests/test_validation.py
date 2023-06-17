@@ -32,7 +32,6 @@ class ValidationTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(
                 b"#!/usr/bin/env python3\n"
-                b"# -*- coding: utf-8 -*-\n"
                 b'"""\n'
                 b"<header>\n"
                 b"<interval>release</interval>"
@@ -54,7 +53,6 @@ class ValidationTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(
                 b"#!/usr/bin/env python3\n"
-                b"# -*- coding: utf-8 -*-\n"
                 b'"""\n'
                 b"<header>\n"
                 b"<interval>nightly</interval>"
@@ -81,7 +79,6 @@ class ValidationTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(
                 b"#!/usr/bin/env python3\n"
-                b"# -*- coding: utf-8 -*-\n"
                 b'"""\n'
                 b"<header>\n"
                 b"<output>EvtGenSim.root</output>\n"
@@ -177,7 +174,6 @@ class ValidationTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(
                 b"#!/usr/bin/env python3\n"
-                b"# -*- coding: utf-8 -*-\n"
                 b'"""\n'
                 b"<header>\n"
                 b"<input>SomeIn.root</input>\n"

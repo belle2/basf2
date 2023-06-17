@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -247,7 +246,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
 
     def __init__(self, output_file_name):
         """Constructor"""
-        super(SegmentPairFitValidationModule, self).__init__(
+        super().__init__(
             output_file_name=output_file_name,
             foreach="CDCSegmentPairVector"
         )
@@ -258,7 +257,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
     def initialize(self):
         """Receive signal at the start of event processing"""
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
-        super(SegmentPairFitValidationModule, self).initialize()
+        super().initialize()
 
     def prepare(self):
         """Initialize the MC-hit lookup method"""
@@ -388,7 +387,7 @@ class AxialStereoPairFitterModule(basf2.Module):
         if not fit_method:
             self.fit_method = self.default_fit_method
 
-        super(AxialStereoPairFitterModule, self).__init__()
+        super().__init__()
 
     def event(self):
         """Called by basf2 for each event"""

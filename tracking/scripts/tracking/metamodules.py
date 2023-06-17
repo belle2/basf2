@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -47,7 +46,7 @@ class WrapperModule(basf2.Module):
     def __init__(self, module):
         """Create a new wrapper module around the given module. This base implementation does not change anything,
            so there is no reason to use this base implementation alone."""
-        super(WrapperModule, self).__init__()
+        super().__init__()
         name = self.compose_wrapped_module_name(module)
 
         #: The wrapped module
@@ -133,7 +132,7 @@ class PyProfilingModule(WrapperModule):
     def __init__(self, module, output_file_name=None):
         """Create a new PyProfilingModule wrapped around the given module
            which outputs its results to the output_file_name of given (if not, to profile.txt)."""
-        super(PyProfilingModule, self).__init__(module)
+        super().__init__(module)
 
         #: The output file name the results will be written into.
         self.output_file_name = self.default_output_file_name
@@ -145,18 +144,18 @@ class PyProfilingModule(WrapperModule):
         """Initialize method of the module"""
         #: The used profiler instance.
         self.profiler = cProfile.Profile()
-        super(PyProfilingModule, self).initialize()
+        super().initialize()
 
     def event(self):
         """Event method of the module"""
         profiler = self.profiler
         profiler.enable()
-        super(PyProfilingModule, self).event()
+        super().event()
         profiler.disable()
 
     def terminate(self):
         """Terminate method of the module"""
-        super(PyProfilingModule, self).terminate()
+        super().terminate()
         sortby = 'cumulative'
         with open(self.output_file_name, 'w') as profile_output_file:
             profile_stats = pstats.Stats(self.profiler, stream=profile_output_file)
@@ -192,7 +191,7 @@ class IfModule(WrapperModule):
             If None call the condition method instead, which can be overridden by subclasses.
         """
 
-        super(IfModule, self).__init__(module)
+        super().__init__(module)
         if condition is not None:
             #: Condition function called at each event to determine
             # if wrapped module should be executed
@@ -219,7 +218,7 @@ class IfModule(WrapperModule):
         """
 
         if self.condition():
-            super(IfModule, self).event()
+            super().event()
 
 
 def is_storearray_present(storearray_name,
@@ -255,7 +254,7 @@ class IfStoreArrayPresentModule(IfModule):
           storearray_durability (int, optional): The durability of the StoreArray. Default 0.
         """
 
-        super(IfStoreArrayPresentModule, self).__init__(module)
+        super().__init__(module)
 
         #: Name of the StoreArray to be checked (str).
         self.storearray_name = storearray_name
@@ -304,7 +303,7 @@ class IfMCParticlesPresentModule(IfStoreArrayPresentModule):
         Args:
           module (basf2.Module): The module executed, if the condition is met.
         """
-        super(IfMCParticlesPresentModule, self).__init__(module, "MCParticles")
+        super().__init__(module, "MCParticles")
 
 
 class PathModule(basf2.Module):
@@ -333,7 +332,7 @@ class PathModule(basf2.Module):
           modules (iterable of basf2.Module): Module to be added to the path.
         """
 
-        super(PathModule, self).__init__()
+        super().__init__()
 
         if path is None:
             path = basf2.create_path()

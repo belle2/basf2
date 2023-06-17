@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-class PullAnalysis(object):
+class PullAnalysis:
     """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
     #: default outlier z score
     default_outlier_z_score = 5.0

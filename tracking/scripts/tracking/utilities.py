@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -44,7 +43,7 @@ class NonstrictChoices(list):
     def __iter__(self):
         """Displays all explicit values and a final "..." to indicate more choices might be possible."""
         # Append an ellipses to indicate that there are more choices.
-        copy = list(super(NonstrictChoices, self).__iter__())
+        copy = list(super().__iter__())
         copy.append('...')
         return iter(copy)
 

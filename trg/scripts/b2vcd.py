@@ -10,7 +10,6 @@
 # Convert Belle2Link data into human-readable Value Change Dump file
 # =====================================================================
 
-from __future__ import print_function
 import pickle
 import re
 from writer import VCDWriter

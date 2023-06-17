@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ class CheckTrueHits(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(CheckTrueHits, self).__init__()
+        super().__init__()
         #: TrueHit statistics for the PXD
         self.truehit_stats_pxd = {
             'through': {'total': 0, 'secondary': 0, 'remapped': 0},

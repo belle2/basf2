@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,7 +36,7 @@ import os
 ROOT.gSystem.Load("libtracking")
 
 
-class FilterProperties(object):
+class FilterProperties:
     """
     contains all informations necessary for track filters to decide whether
     track will be included into the processed list of tracks
@@ -88,7 +87,7 @@ class FilterProperties(object):
 #    mcParticle is guaranteed to be != None
 #
 
-class AlwaysPassFilter(object):
+class AlwaysPassFilter:
     """Filter that always passes"""
 
     def doesPrPass(self, filterProperties):
@@ -125,7 +124,7 @@ class TrackingValidationModule(basf2.Module):
     ):
         """Constructor"""
 
-        super(TrackingValidationModule, self).__init__()
+        super().__init__()
 
         #: cached value of the tracking-validation name
         self.validation_name = name

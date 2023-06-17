@@ -51,8 +51,8 @@ particlegun_params = {
 # including the seed in the filename allows to combine several runs later
 innerFilename = 'innerTrueLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
 outerFilename = 'outerTrueLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
-innerrFilename = 'innerRecoLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
-outerrFilename = 'outerRecoLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
+innerrecoFilename = 'innerRecoLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
+outerrecoFilename = 'outerRecoLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
 
 # ------------------------- #
 # create path up to trigger #
@@ -96,8 +96,8 @@ tsf_params = {
     'makeRecoLRTable': True,
     'innerTrueLRTableFilename': innerFilename,
     'outerTrueLRTableFilename': outerFilename,
-    'innerRecoLRTableFilename': innerrFilename,
-    'outerRecoLRTableFilename': outerrFilename}
+    'innerRecoLRTableFilename': innerrecoFilename,
+    'outerRecoLRTableFilename': outerrecoFilename}
 tsf.param(tsf_params)
 if clock:
     tsf.param('CDCHitCollectionName', 'CDCHits4Trg')

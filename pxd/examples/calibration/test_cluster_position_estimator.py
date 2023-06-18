@@ -56,14 +56,14 @@ class PXDPositionEstimation(b2.Module):
 
         # Loop over clusterkinds (=4 means 'all' kinds)
         for kind in range(5):
-            self.hist_map_momentum[kind] = ROOT.TH1F(
-                f"hist_momentum_kind_{kind:d}", f'Particle momentum kind={kind:d}', 5000, 0.0, 10.0)
-            self.hist_map_theta_u[kind] = ROOT.TH1F(
-                f"hist_theta_u_kind_{kind:d}", f'Particle angle thetaU kind={kind:d}', 180, -90, +90)
-            self.hist_map_theta_v[kind] = ROOT.TH1F(
-                f"hist_theta_v_kind_{kind:d}", f'Particle angle thetaV kind={kind:d}', 180, -90, +90)
-            self.hist_map_clustercharge[kind] = ROOT.TH1F(
-                f"hist_clustercharge_kind_{kind:d}", f'Cluster charge kind={kind:d}', 255, 0.0, 255.0)
+            self.hist_map_momentum[kind] = ROOT.TH1F(f"hist_momentum_kind_{kind:d}",
+                                                     f'Particle momentum kind={kind:d}', 5000, 0.0, 10.0)
+            self.hist_map_theta_u[kind] = ROOT.TH1F(f"hist_theta_u_kind_{kind:d}",
+                                                    f'Particle angle thetaU kind={kind:d}', 180, -90, +90)
+            self.hist_map_theta_v[kind] = ROOT.TH1F(f"hist_theta_v_kind_{kind:d}",
+                                                    f'Particle angle thetaV kind={kind:d}', 180, -90, +90)
+            self.hist_map_clustercharge[kind] = ROOT.TH1F(f"hist_clustercharge_kind_{kind:d}",
+                                                          f'Cluster charge kind={kind:d}', 255, 0.0, 255.0)
 
         #: Histograms for u residuals
         self.hist_map_residual_u = {}

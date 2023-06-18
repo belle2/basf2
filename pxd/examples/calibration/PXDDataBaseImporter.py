@@ -139,13 +139,13 @@ def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expH
         for i in range(nHotPixels):
             uid = ROOT.gRandom.Integer(250)
             vid = ROOT.gRandom.Integer(768)
-            print("mask pixel uid={}, vid={}, id={}".format(uid, vid, uid * 768 + vid))
+            print(f"mask pixel uid={uid}, vid={vid}, id={uid * 768 + vid}")
             pixelMask.maskSinglePixel(sensorID.getID(), uid * 768 + vid)
 
     # Print the final mask before committing to db
     for sensorMask in pixelMask.getMaskedPixelMap():
         sensorID = Belle2.VxdID(sensorMask.first)
-        print("Mask for sensor {} contains {} pixels".format(sensorID, sensorMask.second.size()))
+        print(f"Mask for sensor {sensorID} contains {sensorMask.second.size()} pixels")
 
     iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
     Belle2.Database.Instance().storeData('PXDMaskedPixelPar', pixelMask, iov)

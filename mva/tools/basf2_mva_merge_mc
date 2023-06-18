@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     # Adjust the signal/background ratio if requested
     if args.fsig is not None:
-        print('Adjusting signal/background ratio from {:f} to {:f}.'.format(n_sig/float(n_bkg+n_sig), args.fsig))
+        print(f'Adjusting signal/background ratio from {n_sig/float(n_bkg+n_sig):f} to {args.fsig:f}.')
         assert 0 < args.fsig < 1, 'Please provide a signal fraction within [0,1]'
 
         if n_sig >= n_bkg:
@@ -153,7 +153,7 @@ if __name__ == '__main__':
         if filename.endswith('.root'):
             filename = filename.split('.root')[0]
 
-        print('Creating output files\n\t -  {} \n\t -  {}'.format(filename + '_train.root', filename + '_test.root'))
+        print(f'Creating output files\n\t -  {filename + "_train.root"} \n\t -  {filename + "_test.root"}')
 
         with uproot.recreate(filename + '_train.root') as outfile:
             outfile[args.treename] = df_train

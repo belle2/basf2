@@ -454,9 +454,9 @@ class RejectionOverEfficiency(Plotter):
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
         if label is not None:
-            self.labels.append(label[:10] + " ({:.2f})".format(auc))
+            self.labels.append(label[:10] + f" ({auc:.2f})")
         else:
-            self.labels.append(column[:10] + " ({:.2f})".format(auc))
+            self.labels.append(column[:10] + f" ({auc:.2f})")
         return self
 
     def finish(self):

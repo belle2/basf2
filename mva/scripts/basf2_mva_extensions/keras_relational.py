@@ -67,9 +67,9 @@ class Relations(Layer):
         dense_shape = [2 * self.group_len] + self.hidden_feature_shape + [self.number_features]
 
         for i in range(len(dense_shape[:-1])):
-            weights = self.add_weight(name='relation_weights_{}'.format(i),
+            weights = self.add_weight(name=f'relation_weights_{i}',
                                       shape=list(dense_shape[i:i + 2]), initializer='glorot_uniform', trainable=True)
-            bias = self.add_weight(name='relation_weights_{}'.format(i),
+            bias = self.add_weight(name=f'relation_weights_{i}',
                                    shape=(dense_shape[i + 1],), initializer='zeros', trainable=True)
 
             self.weightvariables.append([weights, bias])
@@ -179,9 +179,9 @@ class EnhancedRelations(Layer):
         dense_shape = [2 * self.group_len + self.question_len] + self.hidden_feature_shape + [self.number_features]
 
         for i in range(len(dense_shape[:-1])):
-            weights = self.add_weight(name='relation_weights_{}'.format(i),
+            weights = self.add_weight(name=f'relation_weights_{i}',
                                       shape=list(dense_shape[i:i + 2]), initializer='glorot_uniform', trainable=True)
-            bias = self.add_weight(name='relation_weights_{}'.format(i),
+            bias = self.add_weight(name=f'relation_weights_{i}',
                                    shape=(dense_shape[i + 1],), initializer='zeros', trainable=True)
 
             self.weightvariables.append([weights, bias])

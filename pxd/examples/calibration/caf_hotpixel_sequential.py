@@ -73,7 +73,7 @@ with open(map_file_path, 'br') as map_file:
 
 
 input_file_iov_set = set(files_to_iovs.values())
-print('Number of distinct iovs {}'.format(len(input_file_iov_set)))
+print(f'Number of distinct iovs {len(input_file_iov_set)}')
 
 
 input_files = []
@@ -84,7 +84,7 @@ for file_iov in input_file_iov_set:
         input_files.extend(subruns[:args.maxSubRuns])
 
 
-print('Number selected input files:  {}'.format(len(input_files)))
+print(f'Number selected input files:  {len(input_files)}')
 
 # Create and configure the collector and its pre collector path
 hotpixelcollector = b2.register_module("PXDRawHotPixelMaskCollector")
@@ -154,7 +154,6 @@ cal_fw.backend = backends.Local(max_processes=20)
 # collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs
-cal_fw.output_dir = 'calibration_results_range_{}_{}'.format(
-    args.runLow, args.runHigh)
+cal_fw.output_dir = f'calibration_results_range_{args.runLow}_{args.runHigh}'
 cal_fw.run(iov=iov_to_calibrate)
 # Should have created a directory called 'calibration_results'

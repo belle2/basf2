@@ -66,10 +66,7 @@ class CalculationProcess(multiprocessing.Process):
         pxdtupleproducer = b2.register_module('PXDBgTupleProducer')
         pxdtupleproducer.param(
             'outputFileName',
-            '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(
-                self.output_dir,
-                self.iov.exp_low,
-                self.iov.run_low))
+            f'{self.output_dir}/pxd_beast_tuple_exp_{self.iov.exp_low}_run_{self.iov.run_low}.root')
 
         # Create the path
         main = b2.create_path()
@@ -95,7 +92,7 @@ class CalculationProcess(multiprocessing.Process):
 
 def worker(task_q, done_q):
     for iov, file_paths, output_dir in iter(task_q.get, 'STOP'):
-        print("Start processing IoV={}".format(str(iov)))
+        print(f"Start processing IoV={str(iov)}")
         p = CalculationProcess(iov, file_paths, output_dir)
         p.start()
         p.join()

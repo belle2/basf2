@@ -89,4 +89,4 @@ for branch in tree.GetListOfBranches():
     if name.startswith('Raw'):
         size = branch.GetTotBytes('*') * 1.0
         zipsize = branch.GetZipBytes('*') * 1.0
-        print("{} {:.2f} ({:.2f})".format(name, size / 1024. / events, zipsize / 1024. / events))
+        print(f"{name} {size / 1024. / events:.2f} ({zipsize / 1024. / events:.2f})")

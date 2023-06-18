@@ -77,23 +77,16 @@ class PXDHitErrors(b2.Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
 
-                s_id = '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '.format(
-                    sID=sensorID,
-                    layer=layer,
-                    ladder=ladder,
-                    sensor=sensor,
-                    indexT=truehit_index,
-                    indexC=cluster_index,
-                )
+                s_id = f'{sensorID} {layer} {ladder} {sensor} {truehit_index:4d} {cluster_index:4d} '
                 s += s_id
                 # TrueHit information
                 thetaU = math.atan2(truehit.getExitU() - truehit.getEntryU(),
                                     0.0075)
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
-                s_th = '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} '.format(
-                    uTH=truehit.getU(), vTH=truehit.getV(), tTH=truehit.getGlobalTime(),
-                    eTH=truehit.getEnergyDep()) + '{thetaU:6.3f} {thetaV:6.3f} '.format(thetaU=thetaU, thetaV=thetaV)
+                s_th = f'{truehit.getU():10.5f} {truehit.getV():10.5f} ' \
+                    + f'{truehit.getGlobalTime():10.2f} {truehit.getEnergyDep():10.7f} ' \
+                    + f'{thetaU:6.3f} {thetaV:6.3f} '
                 s += s_th
                 # Cluster information
                 cluster_pull_u = 0
@@ -105,9 +98,9 @@ class PXDHitErrors(b2.Module):
                         / cluster.getVSigma()
                 except ZeroDivisionError:
                     if cluster.getUSigma() < 1.0e-8:
-                        b2.B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
+                        b2.B2ERROR(f'Zero error in u, clsize {cluster.getUSize()}.')
                     else:
-                        b2.B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
+                        b2.B2ERROR(f'Zero error in v, clsize {cluster.getVSize()}.')
 
                 s_cl = \
                     '{u:10.5f} {v:10.5f} {uEr:10.5f} {vEr:10.5f} {rho:10.4f} '.format(

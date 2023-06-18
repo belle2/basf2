@@ -66,7 +66,7 @@ def hot_pixel_mask_calibration(
     if run_type is None:
         run_type = 'all'
     if not isinstance(run_type, str) or run_type.lower() not in run_types:
-        raise ValueError("run_type not found in run_types : {}".format(run_type))
+        raise ValueError(f"run_type not found in run_types : {run_type}")
     activate_masking = kwargs.get("activate_masking", False)
     if not isinstance(activate_masking, bool):
         raise ValueError("activate_masking is not a boolean!")
@@ -196,11 +196,11 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     if gain_method is None:
         gain_method = 'analytic'
     if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
-        raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
+        raise ValueError(f"gain_method not found in gain_methods : {gain_method}")
     collector_prefix = kwargs.get("collector_prefix", "PXDPerformanceVariablesCollector")
     supported_collectors = ["PXDPerformanceVariablesCollector", "PXDPerformanceCollector"]
     if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
-        raise ValueError("collector_prefix not found in {}".format(supported_collectors))
+        raise ValueError(f"collector_prefix not found in {supported_collectors}")
     useClusterPosition = kwargs.get("useClusterPosition", False)
     if not isinstance(useClusterPosition, bool):
         raise ValueError("useClusterPosition has to be a boolean!")

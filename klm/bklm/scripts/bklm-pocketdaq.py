@@ -79,24 +79,24 @@ if options.infilename != '':
     inputName = options.infilename
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
-        print("No file(s) match {}".format(inputName))
+        print(f"No file(s) match {inputName}")
         sys.exit()
     inputName = fileList[0].replace("f00000", "f*")
 else:
-    print("Missing input filename (required parameter) for experiment <{}> run <{}>".format(options.eNumber, options.rNumber))
+    print(f"Missing input filename (required parameter) for experiment <{options.eNumber}> run <{options.rNumber}>")
     sys.exit()
 if not options.eNumber.isdecimal():
-    print("Experiment number ({}) is not valid".format(options.eNumber))
+    print(f"Experiment number ({options.eNumber}) is not valid")
     sys.exit()
-exp = '{:04d}'.format(int(options.eNumber))
+exp = f'{int(options.eNumber):04d}'
 if not options.rNumber.isdecimal():
-    print("Run number ({}) is not valid".format(options.rNumber))
+    print(f"Run number ({options.rNumber}) is not valid")
     sys.exit()
-run = '{:05d}'.format(int(options.rNumber))
+run = f'{int(options.rNumber):05d}'
 
 infile = TFile(fileList[0])
-histName = 'bklmHists-e{}r{}.root'.format(exp, run)
-pdfName = 'bklmPlots-e{}r{}.pdf'.format(exp, run)
+histName = f'bklmHists-e{exp}r{run}.root'
+pdfName = f'bklmPlots-e{exp}r{run}.pdf'
 
 if eventFilter == 0:
     print('bklm-pocketdaq: exp=' + exp + ' run=' + run + ' input=', options.infilename + ' - processing even-numbered events')
@@ -130,7 +130,7 @@ for row in infile.Get('KLM_raw_hits'):
         count = count + 1
         eventNumber = newEventNumber
         if row.broken != 0:
-            print('*** Event {} is broken!'.format(eventNumber))
+            print(f'*** Event {eventNumber} is broken!')
         eventHits.clear()
         eventHits.append(items)
         tt_ctime = row.tt_ctime << 3

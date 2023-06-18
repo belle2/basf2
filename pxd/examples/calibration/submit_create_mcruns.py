@@ -42,18 +42,18 @@ def run_job_submission(backend, mc_iov_list):
         for setNo in range(0, _number_of_sets):
             expNo = mc_iov.exp_low
             runNo = mc_iov.run_low
-            job = backends.Job("Create_Exp_{}_Run_{}_Set_{}".format(expNo, runNo, setNo))
+            job = backends.Job(f"Create_Exp_{expNo}_Run_{runNo}_Set_{setNo}")
             job.output_dir = str(Path(_tempdir_name, job.name).absolute())
             job.working_dir = str(Path(_tempdir_name, job.name).absolute())
             job.cmd = [
                 'basf2',
                 'create_mcrun.py',
                 '--',
-                '--tag={}'.format(_tag),
-                '--bg={}'.format(_bg),
-                '--expNo={}'.format(expNo),
-                '--runNo={}'.format(runNo),
-                '--setNo={}'.format(setNo)]
+                f'--tag={_tag}',
+                f'--bg={_bg}',
+                f'--expNo={expNo}',
+                f'--runNo={runNo}',
+                f'--setNo={setNo}']
 
             # Any files appended to this list will be place in the Job's working directory
             job.input_sandbox_files.append("create_mcrun.py")
@@ -145,6 +145,6 @@ if __name__ == "__main__":
         if iov_to_calibrate.contains(data_iov):
             mc_iov_list.append(data_iov)
 
-    print('Number selected iovs for mc generation :  {}'.format(len(mc_iov_list)))
+    print(f'Number selected iovs for mc generation :  {len(mc_iov_list)}')
 
     main(args.backend, mc_iov_list, output_dir)

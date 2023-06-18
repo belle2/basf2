@@ -56,14 +56,14 @@ class PXDPositionEstimation(b2.Module):
 
         # Loop over clusterkinds (=4 means 'all' kinds)
         for kind in range(5):
-            self.hist_map_momentum[kind] = ROOT.TH1F("hist_momentum_kind_{:d}".format(
-                kind), 'Particle momentum kind={:d}'.format(kind), 5000, 0.0, 10.0)
-            self.hist_map_theta_u[kind] = ROOT.TH1F("hist_theta_u_kind_{:d}".format(
-                kind), 'Particle angle thetaU kind={:d}'.format(kind), 180, -90, +90)
-            self.hist_map_theta_v[kind] = ROOT.TH1F("hist_theta_v_kind_{:d}".format(
-                kind), 'Particle angle thetaV kind={:d}'.format(kind), 180, -90, +90)
-            self.hist_map_clustercharge[kind] = ROOT.TH1F("hist_clustercharge_kind_{:d}".format(
-                kind), 'Cluster charge kind={:d}'.format(kind), 255, 0.0, 255.0)
+            self.hist_map_momentum[kind] = ROOT.TH1F(
+                f"hist_momentum_kind_{kind:d}", f'Particle momentum kind={kind:d}', 5000, 0.0, 10.0)
+            self.hist_map_theta_u[kind] = ROOT.TH1F(
+                f"hist_theta_u_kind_{kind:d}", f'Particle angle thetaU kind={kind:d}', 180, -90, +90)
+            self.hist_map_theta_v[kind] = ROOT.TH1F(
+                f"hist_theta_v_kind_{kind:d}", f'Particle angle thetaV kind={kind:d}', 180, -90, +90)
+            self.hist_map_clustercharge[kind] = ROOT.TH1F(
+                f"hist_clustercharge_kind_{kind:d}", f'Cluster charge kind={kind:d}', 255, 0.0, 255.0)
 
         #: Histograms for u residuals
         self.hist_map_residual_u = {}
@@ -78,14 +78,18 @@ class PXDPositionEstimation(b2.Module):
 
         for kind in range(4):
             for mode in range(3):
-                self.hist_map_residual_u[(kind, mode)] = ROOT.TH1F('hist_map_residual_u_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual U kind={:d} mode={:d}'.format(kind, mode), 400, -0.007, +0.007)
-                self.hist_map_residual_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_v_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual V kind={:d} mode={:d}'.format(kind, mode), 400, -0.007, +0.007)
-                self.hist_map_residual_pull_u[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_u_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual pull U kind={:d} mode={:d}'.format(kind, mode), 200, -10, +10)
-                self.hist_map_residual_pull_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_v_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual pull V kind={:d} mode={:d}'.format(kind, mode), 200, -10, +10)
+                self.hist_map_residual_u[(kind, mode)] = ROOT.TH1F(f'hist_map_residual_u_kind_{kind:d}_mode_{mode:d}',
+                                                                   f'PXD residual U kind={kind:d} mode={mode:d}',
+                                                                   400, -0.007, +0.007)
+                self.hist_map_residual_v[(kind, mode)] = ROOT.TH1F(f'hist_map_residual_v_kind_{kind:d}_mode_{mode:d}',
+                                                                   f'PXD residual V kind={kind:d} mode={mode:d}',
+                                                                   400, -0.007, +0.007)
+                self.hist_map_residual_pull_u[(kind, mode)] = ROOT.TH1F(f'hist_map_residual_pull_u_kind_{kind:d}_mode_{mode:d}',
+                                                                        f'PXD residual pull U kind={kind:d} mode={mode:d}',
+                                                                        200, -10, +10)
+                self.hist_map_residual_pull_v[(kind, mode)] = ROOT.TH1F(f'hist_map_residual_pull_v_kind_{kind:d}_mode_{mode:d}',
+                                                                        f'PXD residual pull V kind={kind:d} mode={mode:d}',
+                                                                        200, -10, +10)
 
                 #: ThetaV angle ranges for v residuals
                 self.binlimits = {}
@@ -94,9 +98,9 @@ class PXDPositionEstimation(b2.Module):
                 self.binlimits[2] = (+30, +90)
 
                 for bin in range(3):
-                    name = 'hist_map_residual_v_kind_{:d}_mode_{:d}_special_{:d}'.format(kind, mode, bin)
-                    title = 'PXD residual V kind={:d} mode={:d} {:.0f}<thetaV<{:.0f}'.format(
-                        kind, mode, self.binlimits[bin][0], self.binlimits[bin][1])
+                    name = f'hist_map_residual_v_kind_{kind:d}_mode_{mode:d}_special_{bin:d}'
+                    title = f'PXD residual V kind={kind:d} mode={mode:d} ' \
+                        + f'{self.binlimits[bin][0]:.0f}<thetaV<{self.binlimits[bin][1]:.0f}'
                     self.hist_map_residual_v_special[(kind, mode, bin)] = ROOT.TH1F(name, title, 400, -0.007, +0.007)
 
     def event(self):
@@ -290,8 +294,8 @@ class PXDPositionEstimation(b2.Module):
         hcoverage.SetYTitle('coverage / %')
         hcoverage.SetTitle('Coverage of cluster shape corrections')
 
-        print("Coverage of cluster shape corrections is {:.2f}% ".format(100.0 * float(self.nfound_offset / self.nclusters)))
-        print("Coverage of cluster shape likelyhoods is {:.2f}% ".format(100.0 * float(self.nfound_shapes / self.nclusters)))
+        print(f"Coverage of cluster shape corrections is {100.0 * float(self.nfound_offset / self.nclusters):.2f}% ")
+        print(f"Coverage of cluster shape likelyhoods is {100.0 * float(self.nfound_shapes / self.nclusters):.2f}% ")
 
         self.rfile.Write()
         self.rfile.Close()

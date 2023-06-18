@@ -137,19 +137,19 @@ namespace Belle2 {
       return m_nKLMDigitsMultiStripFWD + m_nKLMDigitsMultiStripBarrel + m_nKLMDigitsMultiStripBWD;
     }
 
-    /** KLM: getter for the number of multi-strip KLMDigits, forward endcap. */
+    /** KLM: setter for the number of multi-strip KLMDigits, forward endcap. */
     void setNKLMDigitsMultiStripFWD(uint16_t const nKLMDigitsMultiStripFWD)
     {
       m_nKLMDigitsMultiStripFWD = nKLMDigitsMultiStripFWD;
     }
 
-    /** KLM: getter for the number of multi-strip KLMDigits, barrel. */
+    /** KLM: setter for the number of multi-strip KLMDigits, barrel. */
     void setNKLMDigitsMultiStripBarrel(uint16_t const nKLMDigitsMultiStripBarrel)
     {
       m_nKLMDigitsMultiStripBarrel = nKLMDigitsMultiStripBarrel;
     }
 
-    /** KLM: getter for the number of multi-strip KLMDigits, backward endcap. */
+    /** KLM: setter for the number of multi-strip KLMDigits, backward endcap. */
     void setNKLMDigitsMultiStripBWD(uint16_t const nKLMDigitsMultiStripBWD)
     {
       m_nKLMDigitsMultiStripBWD = nKLMDigitsMultiStripBWD;

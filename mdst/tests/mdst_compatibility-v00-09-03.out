@@ -1,4 +1,4 @@
-[INFO] Steering file: mdst_compatibility-v00-09-03.py
+[INFO] Steering file: ../mdst/tests/mdst_compatibility-v00-09-03.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v00-09-03.root
@@ -89,9 +89,21 @@ Untested method ECLCluster::setdeltaL
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBWD
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBarrel
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeFWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBarrel
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsFWD
+Untested method EventLevelClusteringInfo::setNECLShowersBWD
+Untested method EventLevelClusteringInfo::setNECLShowersBarrel
+Untested method EventLevelClusteringInfo::setNECLShowersFWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBarrel
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedFWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBarrel
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsFWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
 Untested method KLMCluster::setErrorP
 Untested method KLMCluster::setErrorX

@@ -187,6 +187,7 @@ with the `passesCut` function.
    .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S10
            :end-at: E10
+           :language: python        
 
 .. admonition:: Solution
    :class: toggle solution
@@ -194,6 +195,7 @@ with the `passesCut` function.
         .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S20
            :end-at: E20
+           :language: python        
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
 Modular Analysis package.
@@ -220,6 +222,7 @@ one Bremsstrahlung photon was added to this particle.
         .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S30
            :end-at: E30
+           :language: python        
 
 .. admonition:: Question
    :class: exercise stacked
@@ -272,6 +275,7 @@ marker to the decay string:
 .. literalinclude:: steering_files/039_various_additions.py
    :start-at: S40
    :end-at: E40
+   :language: python        
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
@@ -309,6 +313,7 @@ Bremsstrahlung recovery?
     .. literalinclude:: steering_files/039_various_additions.py
       :start-at: S50
       :end-at: E50
+      :language: python        
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -321,7 +326,7 @@ Bremsstrahlung recovery?
     Your steering file should look like this:
 
     .. literalinclude:: steering_files/035_various_additions.py
-        :linenos:
+        :language: python        
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -333,7 +338,7 @@ Bremsstrahlung recovery?
    :class: toggle solution
 
     .. literalinclude:: roe/invariant_mass_plot.py
-      :linenos:
+      :language: python        
 
     The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a
     different steering file, so do not mind if your plot is not exactly the same).
@@ -425,6 +430,7 @@ random seed.
     .. literalinclude:: steering_files/039_various_additions.py
        :start-at: S60
        :end-at: E60
+       :language: python        
 
 .. warning::
 
@@ -443,7 +449,7 @@ random seed.
      :class: solution toggle
 
      .. literalinclude:: steering_files/039_various_additions.py
-       :linenos:
+       :language: python        
 
 .. admonition:: Extra exercises
    :class: exercise

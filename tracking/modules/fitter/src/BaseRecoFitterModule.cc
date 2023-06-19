@@ -106,13 +106,16 @@ void BaseRecoFitterModule::event()
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
 
-        // If the charge after the fit (cardinal rep) is different from the seed charge,
-        // we change the charge seed and refit the track
-        if (recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge()) {
-          recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
-          B2DEBUG(29, "Refitting with opposite charge PDG: " << pdgCodeToUseForFitting);
-          wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
-        }
+        if (wasFitSuccessful) { // charge flipping
+          // If the charge after the fit (cardinal rep) is different from the seed charge,
+          // we change the charge seed and refit the track
+          if (recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge()) {
+            recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
+            B2DEBUG(29, "Refitting with opposite charge PDG: " << pdgCodeToUseForFitting);
+            wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+          }
+        }  // end of charge flipping
+
       } else {
         // Different call signature for monopoles in order not to change Const::ChargedStable types
         wasFitSuccessful = fitter.fit(recoTrack, pdgCodeToUseForFitting);

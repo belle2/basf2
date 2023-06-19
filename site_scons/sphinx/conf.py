@@ -41,12 +41,18 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
+    'sphinx_codeautolink',
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
     'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
+
+# Codeautolink warnings for compilation. Turned off due to conflicts with line
+# numbering.
+codeautolink_warn_on_missing_inventory = False
+codeautolink_warn_on_failed_resolve = False
 
 nbsphinx_allow_errors = True
 # Anything that ends with .jupy.py will be understood as a jupyter
@@ -62,7 +68,7 @@ nbsphinx_custom_formats = {
 # prefix each section with the name of the document it is in followed by a
 # colon
 autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = ['autosectionlabel.*', 'codeautolink.*']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']
@@ -363,7 +369,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
-                       'matplotlib': ('https://matplotlib.org/stable/', None)}
+                       'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):

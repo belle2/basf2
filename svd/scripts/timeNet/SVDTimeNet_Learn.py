@@ -96,8 +96,8 @@ nntime_fitter.fit(X_train, Y_train)
 
 test_score = nntime_fitter.score(X_test, Y_test)
 train_score = nntime_fitter.score(X_train, Y_train)
-print('Test: {}'.format(test_score))
-print('Train: {}'.format(train_score))
+print(f'Test: {test_score}')
+print(f'Train: {train_score}')
 print('Fitting done.')
 
 print('Writing output...')
@@ -163,9 +163,9 @@ for field in root.find(nsprefix + 'DataDictionary'):
     if field.attrib['name'] == 't0_bin':
         for child in field:
             i = int(child.attrib['value'])
-            child.attrib['lower'] = '{:.3f}'.format(bins.loc[i, 'lower'])
-            child.attrib['upper'] = '{:.3f}'.format(bins.loc[i, 'upper'])
-            child.attrib['midpoint'] = '{:.3f}'.format(bins.loc[i, 'midpoint'])
+            child.attrib['lower'] = f'{bins.loc[i, "lower"]:.3f}'
+            child.attrib['upper'] = f'{bins.loc[i, "upper"]:.3f}'
+            child.attrib['midpoint'] = f'{bins.loc[i, "midpoint"]:.3f}'
 
 net.write(xml_name, xml_declaration=True, pretty_print=True, encoding='utf-8')
 
@@ -213,7 +213,7 @@ def fitFromProb(fw, signals, p, tau, timearray):
 
 probdf = pd.DataFrame(probs)
 probdf.index = X_test.index
-probdf.to_pickle('SVDTime_TrainingProbs_{}.pkl'.format(args.n_samples))
+probdf.to_pickle(f'SVDTime_TrainingProbs_{args.n_samples}.pkl')
 
 fits = X_test.apply(
     lambda row: fitFromProb(
@@ -230,7 +230,7 @@ fits['a_true'] = Trues_test['amplitude']
 fits['t_bin'] = Trues_test['t0_bin']
 fits['a_bin'] = Trues_test['abin']
 
-fits.to_pickle('SVDTime_TrainingFits_{}.pkl'.format(args.n_samples))
+fits.to_pickle(f'SVDTime_TrainingFits_{args.n_samples}.pkl')
 
 print('Writing classifier...')
 
@@ -240,7 +240,7 @@ with open('classifier.pkl', 'wb') as f:
 with open('classifier.txt', 'w') as cdump:
     cdump.write("Classifier coefficients:\n")
     for iLayer in range(len(classifier.coefs_)):
-        cdump.write('Layer: {}\n'.format(iLayer))
+        cdump.write(f'Layer: {iLayer}\n')
         nrows = classifier.coefs_[iLayer].shape[0]
         ncols = classifier.coefs_[iLayer].shape[1]
         cdump.write('Weights:\n')

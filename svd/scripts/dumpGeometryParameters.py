@@ -213,10 +213,10 @@ class printSVDLadders(b2.Module):
 
                     angleDeg = m.degrees(angleRad)
 
-                    xStr = "{:.2f}".format(round(glob.X(), 2))
-                    yStr = "{:.2f}".format(round(glob.Y(), 2))
-                    radStr = "{:.2f}".format(round(angleRad, 4))
-                    degStr = "{:.2f}".format(round(angleDeg, 2))
+                    xStr = f"{round(glob.X(), 2):.2f}"
+                    yStr = f"{round(glob.Y(), 2):.2f}"
+                    radStr = f"{round(angleRad, 4):.2f}"
+                    degStr = f"{round(angleDeg, 2):.2f}"
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
 

@@ -49,7 +49,7 @@ class CheckCalibDB(b2.Module):
         ''' event processing '''
 
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
-        runNo = 'r' + '{:0=5d}'.format(evtMetaData.getRun())
+        runNo = 'r' + f'{evtMetaData.getRun():05d}'
 
         if not self.db:
             b2.B2ERROR(runNo + ': payload not found')
@@ -69,7 +69,7 @@ class CheckCalibDB(b2.Module):
                 status = 'unusable'
             else:
                 status = 'default'
-            print('  slot' + '{:0=2d}'.format(slot) + ': T0 =',
+            print('  slot' + f'{slot:02d}' + ': T0 =',
                   round(self.db.getT0(slot), 4), '+/-', round(self.db.getT0Error(slot), 4),
                   status)
 

@@ -45,7 +45,7 @@ class CheckZS(basf2.Module):
                 if s > threshold_in_adu:
                     break
             else:
-                basf2.B2FATAL("Found digit under threshold: {}".format(digit.to_string()))
+                basf2.B2FATAL(f"Found digit under threshold: {digit.to_string()}")
 
 
 if __name__ == "__main__":

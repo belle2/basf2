@@ -46,9 +46,9 @@ run_last = int(argvs[3])
 
 # Make list of files
 inputFiles = []
-expNo = 'e' + '{:0=4d}'.format(experiment)
+expNo = 'e' + f'{experiment:04d}'
 for run in range(run_first, run_last + 1):
-    runNo = 'r' + '{:0=5d}'.format(run)
+    runNo = 'r' + f'{run:05d}'
     filename = f"{data_dir}/{expNo}/*/{runNo}/{skim_dir}/cdst*.root"
     files = glob.glob(filename)
     if maxFiles > 0:
@@ -64,7 +64,7 @@ if len(inputFiles) == 0:
     sys.exit()
 
 # Output folder name
-run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
+run_range = 'r' + f'{run_first:05d}' + '-' + f'{run_last:05d}'
 output_dir = f"{main_output_dir}/BS13d-bhabha-{expNo}-{run_range}"
 
 # Define calibration

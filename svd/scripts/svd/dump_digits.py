@@ -60,46 +60,28 @@ class dump_digits(b2.Module):
 
             # Sesnor/side/strip identification
             [layer, ladder, sensor] = self.decode(reco_digit.getRawSensorID())
-            s += '{event} {layer} {ladder} {sensor} {side} {strip} '.format(
-                event=event_number,
-                layer=layer,
-                ladder=ladder,
-                sensor=sensor,
-                side=('u' if reco_digit.isUStrip() else 'v'),
-                strip=reco_digit.getCellID()
-            )
+            s += f'{event_number} {layer} {ladder} {sensor} {"u" if reco_digit.isUStrip() else "v"} {reco_digit.getCellID()} '
             sensorID = reco_digit.getSensorID()
             stripNo = reco_digit.getCellID()
             # Trigger bin from SVDModeByte
             triggerBin = ord(mode_byte.getTriggerBin())
             triggerTime = 0.25 * 31.44 * (-4 + triggerBin + 0.5)
-            s += '{trigger:.3f} '.format(trigger=triggerTime)
+            s += f'{triggerTime:.3f} '
             # Calibrations
             stripNoise = self.noise_cal.getNoise(sensorID, reco_digit.isUStrip(), stripNo)
             stripGain = 22500 / self.pulse_cal.getADCFromCharge(sensorID, reco_digit.isUStrip(), stripNo, 22500)
 
             stripT0 = self.pulse_cal.getPeakTime(sensorID, reco_digit.isUStrip(), stripNo)
             stripWidth = self.pulse_cal.getWidth(sensorID, reco_digit.isUStrip(), stripNo)
-            s += '{mask} {gain:.3f} {noise:.3f} {width} {delay:.3f} '.format(
-                mask='y',
-                gain=stripGain,
-                noise=stripNoise,
-                width=stripWidth,
-                delay=stripT0
-            )
+            s += f'{"y"} {stripGain:.3f} {stripNoise:.3f} {stripWidth} {stripT0:.3f} '
 
             # Digit information
             samples = shaper_digit.getSamples()
             for iSample in range(6):
-                s += '{} '.format(samples[iSample])
+                s += f'{samples[iSample]} '
 
             # Data from time fit
-            s += '{amplitude:.3f} {time:.3f} {chi2:.3f}'.format(
-                amplitude=reco_digit.getCharge(),
-                time=reco_digit.getTime(),
-                chi2=reco_digit.getChi2Ndf()
-            )
-
+            s += f'{reco_digit.getCharge():.3f} {reco_digit.getTime():.3f} {reco_digit.getChi2Ndf():.3f}'
             s += '\n'
             self.outfile.write(s)
 

@@ -131,7 +131,7 @@ generator = SampleGenerator(
     args.tau_jitter,
     args.bin_size)
 
-print('Generating {} samples...'.format(args.n_samples))
+print(f'Generating {args.n_samples} samples...')
 sample = generator.generate(args.n_samples)
 
 # Create a bin table

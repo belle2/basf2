@@ -51,7 +51,7 @@ class CheckCalibDB(b2.Module):
         ''' event processing '''
 
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
-        runNo = 'r' + '{:0=5d}'.format(evtMetaData.getRun())
+        runNo = 'r' + f'{evtMetaData.getRun():05d}'
 
         if not self.db:
             b2.B2ERROR(runNo + ': payload not found')

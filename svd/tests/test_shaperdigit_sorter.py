@@ -112,5 +112,4 @@ if __name__ == "__main__":
         test_ordering.add_module(CheckOrderingOfDigits())
 
         result = b2test_utils.safe_process(test_ordering)
-        basf2.B2INFO('\nTest finished {}.\n'.format(
-            ['successfully', 'with failure'][result]))
+        basf2.B2INFO(f'\nTest finished {["successfully", "with failure"][result]}.\n')

@@ -31,7 +31,7 @@ if len(argvs) > 3:
     num = 'MC-' + argvs[3]
 
 # output file name
-expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
+expRun = f'{experiment:04d}' + '.' + f'{run:05d}'
 filename = f"top.{expRun}.{num}.sroot"
 
 # global tags for run dependent simulation

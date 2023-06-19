@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::ExtHit+; // checksum=0x6b296224, version=8
 #pragma link C++ class Belle2::TrackClusterSeparation+; // checksum=0x8d25ce5e, version=3
-#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0x1b03f08a, version=4
+#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0x1b03f08a, version=3
 #pragma link C++ class Belle2::FullSecID+; // checksum=0xa4543536, version=-1
 
 #pragma link C++ class pair <bool, double>+; // checksum=0x90c0afc6, version=-1
@@ -122,10 +122,10 @@
             m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); \
             m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); \
           }"
-// In version 4- (2-3)
+// In version 3- (2)
 //   o   m_fittedVertexPosition (ROOT::Math::XYZVector) moved to V0::m_fittedVertex{X,Y,Z}
 #pragma read \
-  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[2-3]" \
+  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[2]" \
   targetClass="Belle2::V0" target="m_fittedVertexX,m_fittedVertexY,m_fittedVertexZ" \
   code = "{ \
             m_fittedVertexX = onfile.m_fittedVertexPosition.X(); \

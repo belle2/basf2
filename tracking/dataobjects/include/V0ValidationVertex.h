@@ -91,7 +91,7 @@ namespace Belle2 {
     float m_fittedInvariantMass; ///< reconstructed invariant mass
     float m_chi2; ///< reconstructed chi2
 
-    ClassDef(V0ValidationVertex, 4);  ///< Dataobjects for the reconstruction level validation of V0 reconstruction.
+    ClassDef(V0ValidationVertex, 3);  ///< Dataobjects for the reconstruction level validation of V0 reconstruction.
   };
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Detector xmlns:xi="http://www.w3.org/2001/XInclude">
   <Name>Belle2Detector</Name>
-  <Description>The Belle II detector (pre-LS2 configuration)</Description>
+  <Description>The Belle II detector (Run 2 configuration)</Description>
   <Global>
     <material>Air</material>
     <!-- size of the global volume in each direction, that is a width of 8 m

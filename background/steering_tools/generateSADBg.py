@@ -22,7 +22,7 @@
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL (D = usual)
-#    phase          2, 31 (= early phase 3, ie pre-LS1), 32 (= pre-LS2) or 3 (D = 3)
+#    phase          2, 31 (= early phase 3, ie Run 1), 32 (= Run 2) or 3 (D = 3)
 #    outdir         output directory path (D = output)
 # -------------------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ else:
     print('  equivTime_us   equivalent SuperKEKB running time in micro-seconds')
     print('  num            output file number')
     print('  sampleType     one of: study, usual, PXD, ECL (D = usual)')
-    print('  phase          2, 31 (= early phase 3, ie pre-LS1), 32 (= pre-LS2) or 3 (D = 3)')
+    print('  phase          2, 31 (= early phase 3, ie Run 1), 32 (= Run 2) or 3 (D = 3)')
     print('  outdir         output directory path (D = output)')
     sys.exit()
 
@@ -88,7 +88,7 @@ if phase == 3:
 elif phase == 31:
     subdir = 'phase3-early/'
 elif phase == 32:
-    subdir = 'phase3-preLS2/'
+    subdir = 'phase3-Run2/'
 elif phase == 2:
     subdir = 'phase2/'
 else:
@@ -138,7 +138,7 @@ if phase == 2:
 elif phase == 31:
     gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
 elif phase == 32:
-    gearbox.param('fileName', 'geometry/Belle2_preLS2.xml')
+    gearbox.param('fileName', 'geometry/Belle2_Run2.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),

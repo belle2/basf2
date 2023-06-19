@@ -45,11 +45,32 @@ class recoConfigurationImporter(basf2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        payload = Belle2.SVDRecoConfiguration("SVDRecoConfiguration_default_3=6_" +
-                                              str(now.isoformat()) + "_INFO:" +
-                                              "_" + str(algorithmFor_timeRecoWith6Samples) + "Time" +
-                                              "_" + str(algorithmFor_chargeRecoWith6Samples) + "Charge" +
-                                              "_" + str(algorithmFor_positionRecoWith6Samples) + "Position")
+        uniqueID = "SVDRecoConfiguration_default_3=6_" + \
+            str(now.isoformat()) + "_INFO:" + \
+            "_" + str(algorithmFor_timeRecoWith6Samples) + "Time" + \
+            "_" + str(algorithmFor_chargeRecoWith6Samples) + "Charge" + \
+            "_" + str(algorithmFor_positionRecoWith6Samples) + "Position"
+
+        groupingSpecificString = ""
+        if grouping_stateOfTimeGroupingInClusterizerIn6Samples and grouping_stateOfTimeGroupingInClusterizerIn3Samples:
+            if grouping_useOfSVDGroupInfoInSPCreatorIn6Samples or grouping_useOfSVDGroupInfoInSPCreatorIn3Samples:
+                groupingSpecificString += "_groupSelectionON"
+            else:
+                groupingSpecificString += "_groupIdON"
+        elif grouping_stateOfTimeGroupingInClusterizerIn6Samples:
+            if grouping_useOfSVDGroupInfoInSPCreatorIn6Samples:
+                groupingSpecificString += "_6groupSelectionON"
+            else:
+                groupingSpecificString += "_6groupIdON"
+        elif grouping_stateOfTimeGroupingInClusterizerIn3Samples:
+            if grouping_useOfSVDGroupInfoInSPCreatorIn3Samples:
+                groupingSpecificString += "_3groupSelectionON"
+            else:
+                groupingSpecificString += "_3groupIdON"
+
+        uniqueID += groupingSpecificString
+
+        payload = Belle2.SVDRecoConfiguration(uniqueID)
 
         # cluster time
         payload.setTimeRecoWith6Samples(algorithmFor_timeRecoWith6Samples)

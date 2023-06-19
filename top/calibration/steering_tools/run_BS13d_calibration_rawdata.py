@@ -45,7 +45,7 @@ run_last = int(argvs[3])
 inputFiles = []
 expNo = 'e' + f'{experiment:04d}'
 for run in range(run_first, run_last + 1):
-    runNo = 'r' + f'{run:0=5d}'
+    runNo = 'r' + f'{run:05d}'
     filename = f"{data_dir}/{expNo}/{runNo}/sub00/physics.*.root"
     files = glob.glob(filename)
     if maxFiles > 0:

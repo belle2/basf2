@@ -62,7 +62,7 @@ class Basf2Object(ObjectDescription):
 
     def add_target_and_index(self, name, sig, signode):
         # Create a full id from objtype and name
-        targetname = '{}-{}'.format(self.objtype, name)
+        targetname = f'{self.objtype}-{name}'
         # and append the id to the object node
         signode['ids'].append(targetname)
         self.state.document.note_explicit_target(signode)
@@ -73,7 +73,7 @@ class Basf2Object(ObjectDescription):
 
         if name in ddata:
             # already exists, give warning
-            logger.warn("Duplicate description of basf2 {} {}, ".format(self.objtype, name) +
+            logger.warn(f"Duplicate description of basf2 {self.objtype} {name}, " +
                         "Other instance in " + self.env.doc2path(ddata[name][0]) +
                         ", please add ':noindex:' to one",
                         location=(self.env.docname, self.lineno))

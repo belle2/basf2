@@ -69,7 +69,7 @@ class RetentionCheck(b2.Module):
 
         self.particle_lists = particle_lists
 
-        self._key = "{:04}. {}".format(int(self.module_number), str(self.module_name))
+        self._key = f"{int(self.module_number):04}. {str(self.module_name)}"
         type(self).summary[self._key] = {}
 
         if type(self).output_override is None:
@@ -177,8 +177,7 @@ class RetentionCheck(b2.Module):
         for module, results in cls.summary.items():
 
             if particle_list not in results.keys():
-                b2.B2WARNING(particle_list + " is not present in the results of the RetentionCheck for the module {}."
-                             .format(module))
+                b2.B2WARNING(particle_list + f" is not present in the results of the RetentionCheck for the module {module}.")
                 return
 
             if results[particle_list]['retention_rate'] > 0 or at_least_one_entry:
@@ -214,8 +213,7 @@ class RetentionCheck(b2.Module):
                 os.makedirs(os.path.dirname(save_as), exist_ok=True)
             plt.title(plot_title)
             plt.savefig(save_as, bbox_inches="tight")
-            b2.B2RESULT("Retention rate results for list {} saved in {}."
-                        .format(particle_list, os.getcwd() + "/" + save_as))
+            b2.B2RESULT(f'Retention rate results for list {particle_list} saved in {os.getcwd() + "/" + save_as}.')
 
 
 def pathWithRetentionCheck(particle_lists, path):

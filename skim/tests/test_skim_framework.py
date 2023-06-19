@@ -37,7 +37,7 @@ class TestSkimRegistry(unittest.TestCase):
     def assertIsSubclass(self, cls, parent_cls, msg=None):
         """Fail if `cls` is not a subclass of `parent_cls`."""
         if not issubclass(cls, parent_cls):
-            standardMsg = "{!r} is not a subclass of {!r}".format(cls, parent_cls)
+            standardMsg = f"{cls!r} is not a subclass of {parent_cls!r}"
             self.fail(self._formatMessage(msg, standardMsg))
 
     def test_code_format(self):

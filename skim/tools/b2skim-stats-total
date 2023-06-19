@@ -366,9 +366,7 @@ def average_table(*args, **kwargs):
         # add one more decimal place to fmt_string
         kwargs["fmt_string"] = re.sub(
             r"^(\d*\.)(\d+)(f)$",
-            lambda m: "{}{}{}".format(
-                m.groups()[0], int(m.groups()[1]) + 1, m.groups()[2]
-            ),
+            lambda m: f"{m.groups()[0]}{int(m.groups()[1]) + 1}{m.groups()[2]}",
             kwargs["fmt_string"],
         )
     except KeyError:

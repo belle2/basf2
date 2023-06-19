@@ -116,7 +116,7 @@ for category in categories:
     if category not in times.keys():
         continue
     time = times[category]
-    message = 'Execution time per event for {} is {:.f} ms'.format(category, time)
+    message = f'Execution time per event for {category} is {time:.f} ms'
     fraction = -1
     if category in limits.keys():
         fraction = time / limits[category]
@@ -133,7 +133,7 @@ for category in categories:
         b2.B2INFO(message)
 
     if output is not None:
-        output.write('{} {:.2f}'.format(category, time))
+        output.write(f'{category} {time:.2f}')
         if fraction >= 0:
             output.write(' %.4f' % fraction)
         output.write('\n')

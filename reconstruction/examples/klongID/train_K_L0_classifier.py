@@ -30,22 +30,15 @@ ex_e = -1   # experiment end, -1 for all of them
 run_b = 0   # run begin, 0 for all
 run_e = -1   # run end, -1 for all of them
 
-training_string = ('basf2_mva_teacher --datafiles {data_path} --treename KLMdata --identifier {identifier} ' +
-                   '--variable "KLMnLayer" "KLMnInnermostlayer" "KLMglobalZ" "KLMtime" "KLMdistToNextCl" ' +
-                   '"KLMenergy" "KLMTrackSepDist" "KLMInitialtrackSepAngle" "KLMTrackRotationAngle" ' +
-                   '"KLMTrackSepAngle" "KLMhitDepth" "KLMECLenergy" "KLMECLE9oE25" "KLMECLtiming" ' +
-                   '"KLMECLmintrackDist" "KLMECLZMVA" "KLMECLZ40" "KLMECLZ51" --target_variable isSignal ' +
-                   '--method FastBDT --nTrees 400 --nCutLevels 8 --nLevels 4').format(data_path=data_path, identifier=identifier)
+training_string = f'basf2_mva_teacher --datafiles {data_path} --treename KLMdata --identifier {identifier} ' + \
+    '--variable "KLMnLayer" "KLMnInnermostlayer" "KLMglobalZ" "KLMtime" "KLMdistToNextCl" ' + \
+    '"KLMenergy" "KLMTrackSepDist" "KLMInitialtrackSepAngle" "KLMTrackRotationAngle" ' + \
+    '"KLMTrackSepAngle" "KLMhitDepth" "KLMECLenergy" "KLMECLE9oE25" "KLMECLtiming" ' + \
+    '"KLMECLmintrackDist" "KLMECLZMVA" "KLMECLZ40" "KLMECLZ51" --target_variable isSignal ' + \
+    '--method FastBDT --nTrees 400 --nCutLevels 8 --nLevels 4'
 
 os.system(training_string)
 
 # "upload" to localdb
-os.system(
-    ('basf2_mva_upload --identifier {identifier} --db_identifier {identifier_db} ' +
-     '--begin_experiment {ex_b} --end_experiment {ex_e} --begin_run {run_b} --end_run {run_e}').format(
-        identifier=identifier,
-        identifier_db=identifier.split(".xml")[0],
-        ex_b=ex_b,
-        ex_e=ex_e,
-        run_b=run_b,
-        run_e=run_e))
+os.system(f'basf2_mva_upload --identifier {identifier} --db_identifier {identifier.split(".xml")[0]} ' +
+          f'--begin_experiment {ex_b} --end_experiment {ex_e} --begin_run {run_b} --end_run {run_e}')

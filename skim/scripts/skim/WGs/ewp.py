@@ -358,8 +358,8 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
         track_cleanup += ' and dr < 0.5'
 
         # Min 4 tracks and Max 10 tracks per event.
-        event_cleanup = 'nCleanedTracks({}) > 3'.format(track_cleanup)
-        event_cleanup += ' and nCleanedTracks({}) < 11'.format(track_cleanup)
+        event_cleanup = f'nCleanedTracks({track_cleanup}) > 3'
+        event_cleanup += f' and nCleanedTracks({track_cleanup}) < 11'
 
         # Define the signal
         total_cleanup = track_cleanup + ' and ' + event_cleanup + ' and ' + 'nPXDHits>0'
@@ -407,7 +407,7 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
 
         # Define a couple of aliases
         vm.addAlias('kaon_pt', 'daughter(0,pt)')
-        vm.addAlias('nCleanedTracks_simple_cleanup', 'nCleanedTracks({})'.format(track_cleanup))
+        vm.addAlias('nCleanedTracks_simple_cleanup', f'nCleanedTracks({track_cleanup})')
 
         # Output validation histograms
         create_validation_histograms(

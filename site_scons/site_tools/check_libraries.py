@@ -30,7 +30,7 @@ def get_dtneeded(filename):
         needed_entries = re_readelf.findall(readelf_out)
         return needed_entries
     except Exception as e:
-        print("Could not get dependencies for library {}: {}".format(filename, e))
+        print(f"Could not get dependencies for library {filename}: {e}")
         return None
 
 
@@ -67,7 +67,7 @@ def get_package(env, node):
 def print_libs(title, text, pkg, lib, libs):
     """Print information on extra/missing libraries"""
     for library in sorted(libs):
-        print("{}:{}:{} -> {} ({})".format(title, pkg, lib, library, text))
+        print(f"{title}:{pkg}:{lib} -> {library} ({text})")
 
 
 def check_libraries(target, source, env):

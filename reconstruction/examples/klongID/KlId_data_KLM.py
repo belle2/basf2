@@ -69,7 +69,7 @@ add_reconstruction(mypath)
 #    m.logging.log_level = LogLevel.ERROR
 #    #m.logging.debug_level = 200
 #    if KLMexpertPath:
-#      m.logging.info("Setting KLMclassifier to {}".format(KLMexpertPath))
+#      m.logging.info(f"Setting KLMclassifier to {KLMexpertPath}")
 #      m.param("classifierPath", KLMexpertPath)
 
 if((not useKLM) and (not useECL)):

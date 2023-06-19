@@ -80,7 +80,7 @@ def linkdef_emitter(target, source, env):
         namespace = match.group(1)  # or possibly a class, but it might match the header file
         classname = match.group(2)
         if not classname:
-            raise RuntimeError("{} contains '{}' without class name?".format(str(linkdef), str(line)))
+            raise RuntimeError(f"{str(linkdef)} contains '{str(line)}' without class name?")
 
         is_implicit = not linkdef_implicit.search(line) is None
         if is_implicit:

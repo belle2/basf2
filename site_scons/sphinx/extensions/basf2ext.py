@@ -121,13 +121,13 @@ class ModuleListDirective(Directive):
             required_params = []
             for p in module.available_params():
                 dest = required_params if p.forceInSteering else optional_params
-                default = "" if p.forceInSteering else ", default={default!r}".format(default=p.default)
+                default = "" if p.forceInSteering else f", default={p.default!r}"
                 param_desc = p.description.splitlines()
                 # run the description through autodoc event to get
                 # Google/Numpy/doxygen style as well
                 env.app.emit('autodoc-process-docstring', 'b2:module:param', module.name() + '.' + p.name, p, None, param_desc)
                 param_desc = textwrap.indent("\n".join(param_desc), 8 * " ").splitlines()
-                dest += ["    * **{name}** *({type}{default})*".format(name=p.name, type=p.type, default=default)]
+                dest += [f"    * **{p.name}** *({p.type}{default})*"]
                 dest += param_desc
 
             if(required_params):
@@ -140,7 +140,7 @@ class ModuleListDirective(Directive):
             if os.path.exists(image):
                 description += [":IO diagram:", "    ", "    .. image:: /%s" % image]
 
-        content = [".. b2:module:: {module}".format(module=module.name())] + self.noindex + ["    "]
+        content = [f".. b2:module:: {module.name()}"] + self.noindex + ["    "]
         content += ["    " + e for e in description]
         return parse_with_titles(self.state, content)
 

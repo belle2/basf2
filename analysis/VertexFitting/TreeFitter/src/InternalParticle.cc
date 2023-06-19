@@ -119,13 +119,8 @@ namespace TreeFitter {
         auto v0 = particle()->getV0();
         auto dummy_vertex = ROOT::Math::XYZVector(0, 0, 0);
 
+        bool initWithV0 = false;
         if (v0 && v0->getFittedVertexPosition() != dummy_vertex) {
-
-          double X_V0(v0->getFittedVertexX()), Y_V0(v0->getFittedVertexY()), Z_V0(v0->getFittedVertexZ());
-          fitparams.getStateVector()(posindex)     = X_V0;
-          fitparams.getStateVector()(posindex + 1) = Y_V0;
-          fitparams.getStateVector()(posindex + 2) = Z_V0;
-
           auto part_dau1 = particle()->getDaughter(0);
           auto part_dau2 = particle()->getDaughter(1);
 
@@ -134,14 +129,25 @@ namespace TreeFitter {
           auto recotrack_dau2 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
           [&part_dau2](RecoTrack * rt) { return rt->particle() == part_dau2; });
 
-          Belle2::Helix helix1 = v0->getTrackFitResults().first->getHelix();
-          Belle2::Helix helix2 = v0->getTrackFitResults().second->getHelix();
+          if (recotrack_dau1 == trkdaughters.end() || recotrack_dau2 == trkdaughters.end()) {
+            B2WARNING("V0 daughter particles do not match with RecoTracks.");
+          } else {
+            double X_V0(v0->getFittedVertexX()), Y_V0(v0->getFittedVertexY()), Z_V0(v0->getFittedVertexZ());
+            fitparams.getStateVector()(posindex)     = X_V0;
+            fitparams.getStateVector()(posindex + 1) = Y_V0;
+            fitparams.getStateVector()(posindex + 2) = Z_V0;
 
-          (*recotrack_dau1)->setFlightLength(helix1.getArcLength2DAtXY(X_V0, Y_V0));
-          (*recotrack_dau2)->setFlightLength(helix2.getArcLength2DAtXY(X_V0, Y_V0));
+            Belle2::Helix helix1 = v0->getTrackFitResults().first->getHelix();
+            Belle2::Helix helix2 = v0->getTrackFitResults().second->getHelix();
 
-        } else {
+            (*recotrack_dau1)->setFlightLength(helix1.getArcLength2DAtXY(X_V0, Y_V0));
+            (*recotrack_dau2)->setFlightLength(helix2.getArcLength2DAtXY(X_V0, Y_V0));
 
+            initWithV0 = true;
+          }
+        }
+
+        if (!initWithV0) {
           std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
 
           RecoTrack* dau1 = trkdaughters[0];
@@ -160,7 +166,6 @@ namespace TreeFitter {
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
-
         }
 
       } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {

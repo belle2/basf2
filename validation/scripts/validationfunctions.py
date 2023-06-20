@@ -565,7 +565,7 @@ def congratulator(
     if just_comment:
         return comment
     else:
-        return "{} {}%. {}".format(rate_name, int(success_rate), comment)
+        return f"{rate_name} {int(success_rate)}%. {comment}"
 
 
 def terminal_title_line(title="", subtitle="", level=0) -> str:

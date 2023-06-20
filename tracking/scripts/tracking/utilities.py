@@ -22,7 +22,7 @@ class DefaultHelpArgumentParser(argparse.ArgumentParser):
         Writes an extended help over the base ArgumentParser.
         """
         self.print_help()
-        sys.stderr.write('error: %s\n' % message)
+        sys.stderr.write(f'error: {message}\n')
         sys.exit(2)
 
 

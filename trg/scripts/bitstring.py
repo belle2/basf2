@@ -129,7 +129,7 @@ class CreationError(Error, ValueError):
         Error.__init__(self, *params)
 
 
-class ConstByteStore(object):
+class ConstByteStore:
     """Stores raw bytes together with a bit offset and length.
 
     Used internally - not part of public interface.
@@ -393,7 +393,7 @@ def equal(a, b):
     return a_val == b_val
 
 
-class MmapByteArray(object):
+class MmapByteArray:
     """Looks like a bytearray, but from an mmap.
 
     Not part of public interface.
@@ -448,10 +448,10 @@ BYTE_REVERSAL_DICT = dict()
 try:
     xrange
     for i in range(256):
-        BYTE_REVERSAL_DICT[i] = chr(int("{0:08b}".format(i)[::-1], 2))
+        BYTE_REVERSAL_DICT[i] = chr(int(f"{i:08b}"[::-1], 2))
 except NameError:
     for i in range(256):
-        BYTE_REVERSAL_DICT[i] = bytes([int("{0:08b}".format(i)[::-1], 2)])
+        BYTE_REVERSAL_DICT[i] = bytes([int(f"{i:08b}"[::-1], 2)])
     from io import IOBase as file
     xrange = range
     basestring = str
@@ -596,7 +596,7 @@ def tokenparser(fmt, keys=None, token_cache=None):
                 # and if you don't specify a 'name' then the default is 'uint':
                 m2 = DEFAULT_UINT.match(token)
                 if not m2:
-                    raise ValueError("Don't understand token '{0}'.".format(token))
+                    raise ValueError(f"Don't understand token '{token}'.")
             if m1:
                 name = m1.group('name')
                 length = m1.group('len')
@@ -627,7 +627,7 @@ def tokenparser(fmt, keys=None, token_cache=None):
                     raise ValueError("Can't read a token with a negative length.")
                 except ValueError:
                     if not keys or length not in keys:
-                        raise ValueError("Don't understand length '{0}' of token.".format(length))
+                        raise ValueError(f"Don't understand length '{length}' of token.")
             ret_vals.append([name, length, value])
         # This multiplies by the multiplicative factor, but this means that
         # we can't allow keyword values as multipliers (e.g. n*uint:8).
@@ -663,7 +663,7 @@ def expand_brackets(s):
                 break
             p += 1
         if count:
-            raise ValueError("Unbalanced parenthesis in '{0}'.".format(s))
+            raise ValueError(f"Unbalanced parenthesis in '{s}'.")
         if start == 0 or s[start - 1] != '*':
             s = s[0:start] + s[start + 1:p] + s[p + 1:]
         else:
@@ -673,18 +673,18 @@ def expand_brackets(s):
                 matchstart = m.start('factor')
                 s = s[0:matchstart] + (factor - 1) * (s[start + 1:p] + ',') + s[start + 1:p] + s[p + 1:]
             else:
-                raise ValueError("Failed to parse '{0}'.".format(s))
+                raise ValueError(f"Failed to parse '{s}'.")
     return s
 
 
 # This converts a single octal digit to 3 bits.
-OCT_TO_BITS = ['{0:03b}'.format(i) for i in xrange(8)]
+OCT_TO_BITS = [f'{i:03b}' for i in xrange(8)]
 
 # A dictionary of number of 1 bits contained in binary representation of any byte
 BIT_COUNT = dict(zip(xrange(256), [bin(i).count('1') for i in xrange(256)]))
 
 
-class Bits(object):
+class Bits:
     """A container holding an immutable sequence of bits.
 
     For a mutable container use the BitArray class instead.
@@ -803,7 +803,7 @@ class Bits(object):
                 return auto
         except TypeError:
             pass
-        x = super(Bits, cls).__new__(cls)
+        x = super().__new__(cls)
         x._initialise(auto, length, offset, **kwargs)
         return x
 
@@ -854,16 +854,16 @@ class Bits(object):
         return self
 
     def __lt__(self, other):
-        raise TypeError("unorderable type: {0}".format(type(self).__name__))
+        raise TypeError(f"unorderable type: {type(self).__name__}")
 
     def __gt__(self, other):
-        raise TypeError("unorderable type: {0}".format(type(self).__name__))
+        raise TypeError(f"unorderable type: {type(self).__name__}")
 
     def __le__(self, other):
-        raise TypeError("unorderable type: {0}".format(type(self).__name__))
+        raise TypeError(f"unorderable type: {type(self).__name__}")
 
     def __ge__(self, other):
-        raise TypeError("unorderable type: {0}".format(type(self).__name__))
+        raise TypeError(f"unorderable type: {type(self).__name__}")
 
     def __add__(self, bs):
         """Concatenate bitstrings and return new bitstring.
@@ -976,16 +976,15 @@ class Bits(object):
         if isinstance(self._datastore._rawarray, MmapByteArray):
             offsetstring = ''
             if self._datastore.byteoffset or self._offset:
-                offsetstring = ", offset=%d" % (self._datastore._rawarray.byteoffset * 8 + self._offset)
-            lengthstring = ", length=%d" % length
-            return "{0}(filename='{1}'{2}{3})".format(self.__class__.__name__,
-                                                      self._datastore._rawarray.source.name, lengthstring, offsetstring)
+                offsetstring = f", offset={int(self._datastore._rawarray.byteoffset * 8 + self._offset)}"
+            lengthstring = f", length={int(length)}"
+            return f"{self.__class__.__name__}(filename='{self._datastore._rawarray.source.name}'{lengthstring}{offsetstring})"
         else:
             s = self.__str__()
             lengthstring = ''
             if s.endswith('...'):
-                lengthstring = " # length={0}".format(length)
-            return "{0}('{1}'){2}".format(self.__class__.__name__, s, lengthstring)
+                lengthstring = f" # length={length}"
+            return f"{self.__class__.__name__}('{s}'){lengthstring}"
 
     def __eq__(self, bs):
         """Return True if two bitstrings have the same binary representation.
@@ -1206,7 +1205,7 @@ class Bits(object):
     def _assertsanity(self):
         """Check internal self consistency as a debugging aid."""
         assert self.len >= 0
-        assert 0 <= self._offset, "offset={0}".format(self._offset)
+        assert 0 <= self._offset, f"offset={self._offset}"
         assert (self.len + self._offset + 7) // 8 == self._datastore.bytelength + self._datastore.byteoffset
         return True
 
@@ -1222,9 +1221,9 @@ class Bits(object):
 
         if value is None:
             if token_length is None:
-                error = "Token has no value ({0}=???).".format(name)
+                error = f"Token has no value ({name}=???)."
             else:
-                error = "Token has no value ({0}:{1}=???).".format(name, token_length)
+                error = f"Token has no value ({name}:{token_length}=???)."
             raise ValueError(error)
         try:
             b = cls(**{_tokenname_to_initialiser[name]: value})
@@ -1301,11 +1300,11 @@ class Bits(object):
             data = bytearray((s + 7) // 8)
             self._datastore = ByteStore(data, s, 0)
             return
-        if isinstance(s, collections.Iterable):
+        if isinstance(s, collections.abc.Iterable):
             # Evaluate each item as True or False and set bits to 1 or 0.
             self._setbin_unsafe(''.join(str(int(bool(x))) for x in s))
             return
-        raise TypeError("Cannot initialise bitstring from {0}.".format(type(s)))
+        raise TypeError(f"Cannot initialise bitstring from {type(s)}.")
 
     def _setfile(self, filename, length, offset):
         """Use file as source of bits."""
@@ -1862,10 +1861,10 @@ class Bits(object):
         b = self._datastore.getbyteslice(startbyte, endbyte + 1)
         # Convert to a string of '0' and '1's (via a hex string an and int!)
         try:
-            c = "{:0{}b}".format(int(binascii.hexlify(b), 16), 8 * len(b))
+            c = f"{int(binascii.hexlify(b), 16):0{{}}b}"
         except TypeError:
             # Hack to get Python 2.6 working
-            c = "{0:0{1}b}".format(int(binascii.hexlify(str(b)), 16), 8 * len(b))
+            c = f"{int(binascii.hexlify(str(b)), 16):0{{1}}b}"
         # Finally chop off any extra bits.
         return c[startoffset:startoffset + length]
 
@@ -2019,15 +2018,15 @@ class Bits(object):
     def _readtoken(self, name, pos, length):
         """Reads a token from the bitstring and returns the result."""
         if length is not None and int(length) > self.length - pos:
-            raise ReadError("Reading off the end of the data. "
-                            "Tried to read {0} bits when only {1} available.".format(int(length), self.length - pos))
+            raise ReadError(f"Reading off the end of the data. Tried to read {int(length)} bits when only " +
+                            f"{self.length - pos} available.")
         try:
             val = name_to_read[name](self, length, pos)
             return val, pos + length
         except KeyError:
             if name == 'pad':
                 return None, pos + length
-            raise ValueError("Can't parse token {0}:{1}".format(name, length))
+            raise ValueError(f"Can't parse token {name}:{length}")
         except TypeError:
             # This is for the 'ue', 'se' and 'bool' tokens. They will also return the new pos.
             return name_to_read[name](self, pos)
@@ -2294,7 +2293,7 @@ class Bits(object):
         # TODO: optimise
         for i, f in enumerate(fmt):
             if isinstance(f, numbers.Integral):
-                fmt[i] = "bits:{0}".format(f)
+                fmt[i] = f"bits:{f}"
         for f_item in fmt:
             stretchy, tkns = tokenparser(f_item, tuple(sorted(kwargs.keys())))
             if stretchy:
@@ -2746,7 +2745,7 @@ class Bits(object):
             if p < 0:
                 p += length
             if not 0 <= p < length:
-                raise IndexError("Bit position {0} out of range.".format(p))
+                raise IndexError(f"Bit position {p} out of range.")
             if not self._datastore.getbit(p) is value:
                 return False
         return True
@@ -2768,7 +2767,7 @@ class Bits(object):
             if p < 0:
                 p += length
             if not 0 <= p < length:
-                raise IndexError("Bit position {0} out of range.".format(p))
+                raise IndexError(f"Bit position {p} out of range.")
             if self._datastore.getbit(p) is value:
                 return True
         return False
@@ -3064,7 +3063,7 @@ class BitArray(Bits):
             self._ensureinmemory()
 
     def __new__(cls, auto=None, length=None, offset=None, **kwargs):
-        x = super(BitArray, cls).__new__(cls)
+        x = super().__new__(cls)
         y = Bits.__new__(BitArray, auto, length, offset, **kwargs)
         x._datastore = y._datastore
         return x
@@ -3125,7 +3124,7 @@ class BitArray(Bits):
                 if value in (1, -1):
                     self._set(key)
                     return
-                raise ValueError("Cannot set a single bit with integer {0}.".format(value))
+                raise ValueError(f"Cannot set a single bit with integer {value}.")
             value = Bits(value)
             if value.len == 1:
                 # TODO: this can't be optimal
@@ -3154,8 +3153,7 @@ class BitArray(Bits):
                     # TODO: Better way than calling constructor here?
                     value = Bits(value)
                 except TypeError:
-                    raise TypeError("Bitstring, integer or string expected. "
-                                    "Got {0}.".format(type(value)))
+                    raise TypeError(f"Bitstring, integer or string expected. Got {type(value)}.")
             if key.start is not None:
                 start = key.start
                 if key.start < 0:
@@ -3486,14 +3484,14 @@ class BitArray(Bits):
                 if p < 0:
                     p += length
                 if not 0 <= p < length:
-                    raise IndexError("Bit position {0} out of range.".format(p))
+                    raise IndexError(f"Bit position {p} out of range.")
                 f(p)
         except TypeError:
             # Single pos
             if pos < 0:
                 pos += self.len
             if not 0 <= pos < length:
-                raise IndexError("Bit position {0} out of range.".format(pos))
+                raise IndexError(f"Bit position {pos} out of range.")
             f(pos)
 
     def invert(self, pos=None):
@@ -3508,7 +3506,7 @@ class BitArray(Bits):
         if pos is None:
             self._invert_all()
             return
-        if not isinstance(pos, collections.Iterable):
+        if not isinstance(pos, collections.abc.Iterable):
             pos = (pos,)
         length = self.len
 
@@ -3516,7 +3514,7 @@ class BitArray(Bits):
             if p < 0:
                 p += length
             if not 0 <= p < length:
-                raise IndexError("Bit position {0} out of range.".format(p))
+                raise IndexError(f"Bit position {p} out of range.")
             self._invert(p)
 
     def ror(self, bits, start=None, end=None):
@@ -3581,12 +3579,12 @@ class BitArray(Bits):
             bytesizes = [(end - start) // 8]
         elif isinstance(fmt, numbers.Integral):
             if fmt < 0:
-                raise ValueError("Improper byte length {0}.".format(fmt))
+                raise ValueError(f"Improper byte length {fmt}.")
             bytesizes = [fmt]
         elif isinstance(fmt, basestring):
             m = STRUCT_PACK_RE.match(fmt)
             if not m:
-                raise ValueError("Cannot parse format string {0}.".format(fmt))
+                raise ValueError(f"Cannot parse format string {fmt}.")
             # Split the format string into a list of 'q', '4h' etc.
             formatlist = re.findall(STRUCT_SPLIT_RE, m.group('fmt'))
             # Now deal with multiplicative factors, 4h -> hhhh etc.
@@ -3596,11 +3594,11 @@ class BitArray(Bits):
                     bytesizes.append(PACK_CODE_SIZE[f])
                 else:
                     bytesizes.extend([PACK_CODE_SIZE[f[-1]]] * int(f[:-1]))
-        elif isinstance(fmt, collections.Iterable):
+        elif isinstance(fmt, collections.abc.Iterable):
             bytesizes = fmt
             for bytesize in bytesizes:
                 if not isinstance(bytesize, numbers.Integral) or bytesize < 0:
-                    raise ValueError("Improper byte length {0}.".format(bytesize))
+                    raise ValueError(f"Improper byte length {bytesize}.")
         else:
             raise TypeError("Format must be an integer, string or iterable.")
 
@@ -3801,7 +3799,7 @@ class ConstBitStream(Bits):
         self._pos = 0
 
     def __new__(cls, auto=None, length=None, offset=None, **kwargs):
-        x = super(ConstBitStream, cls).__new__(cls)
+        x = super().__new__(cls)
         x._initialise(auto, length, offset, **kwargs)
         return x
 
@@ -3900,8 +3898,7 @@ class ConstBitStream(Bits):
         _, token = tokenparser(fmt)
         if len(token) != 1:
             self._pos = p
-            raise ValueError("Format string should be a single token, not {0} "
-                             "tokens - use readlist() instead.".format(len(token)))
+            raise ValueError(f"Format string should be a single token, not {len(token)} tokens - use readlist() instead.")
         name, length, _ = token[0]
         if length is None:
             length = self.len - self._pos
@@ -4138,7 +4135,7 @@ class BitStream(ConstBitStream, BitArray):
             self._ensureinmemory()
 
     def __new__(cls, auto=None, length=None, offset=None, **kwargs):
-        x = super(BitStream, cls).__new__(cls)
+        x = super().__new__(cls)
         x._initialise(auto, length, offset, **kwargs)
         return x
 

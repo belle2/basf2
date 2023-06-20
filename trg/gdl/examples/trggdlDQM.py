@@ -51,7 +51,7 @@ else:
 
 main.add_module(input)
 histo = b2.register_module('HistoManager')
-histo.param("histoFileName", "dqm.%s.root" % basename)
+histo.param("histoFileName", f"dqm.{basename}.root")
 
 # Unpacker
 trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
@@ -68,7 +68,7 @@ trggdldqm.param('bitNameOnBinLabel', True)
 # generate postscript file that includes rising and falling edge distribution
 trggdldqm.param('generatePostscript', False)
 # postscript file name
-psname = "dqm.%s.ps" % basename
+psname = f"dqm.{basename}.ps"
 trggdldqm.param('postScriptName', psname)
 
 # dump vcd file

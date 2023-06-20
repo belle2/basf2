@@ -101,10 +101,10 @@ class TrackingValidationResult:
         latex_string = r'\begin{table}' + "\n"
         latex_string += r'  \begin{tabular}{cc} \toprule' + "\n"
         latex_string += r'    & \\ \midrule' + "\n"
-        latex_string += r'    Finding Efficiency & ' + "%.2f" % (100 * results["finding_efficiency"]) + r' \% \\' + "\n"
-        latex_string += r'    Hit Efficiency & ' + "%.2f" % (100 * results["hit_efficiency"]) + r' \% \\' + "\n"
-        latex_string += r'    Fake Rate & ' + "%.2f" % (100 * results["fake_rate"]) + r' \% \\' + "\n"
-        latex_string += r'    Clone Rate & ' + "%.2f" % (100 * results["clone_rate"]) + r' \% \\ \bottomrule' + "\n"
+        latex_string += r'    Finding Efficiency & ' + f"{100 * results['finding_efficiency']:.2f}" + r' \% \\' + "\n"
+        latex_string += r'    Hit Efficiency & ' + f"{100 * results['hit_efficiency']:.2f}" + r' \% \\' + "\n"
+        latex_string += r'    Fake Rate & ' + f"{100 * results['fake_rate']:.2f}" + r' \% \\' + "\n"
+        latex_string += r'    Clone Rate & ' + f"{100 * results['clone_rate']:.2f}" + r' \% \\ \bottomrule' + "\n"
         latex_string += r'  \end{tabular}' + "\n"
         latex_string += r'\end{table}'
 

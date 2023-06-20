@@ -67,9 +67,9 @@ ddd(15 downto 0) & cntr125M2D(15 downto 0) &
 "000" & TSF8_input(218 downto 210) &
 "0000" &
 """ + \
-    ''.join(["""TSF{sl:d}_input({high:d} downto {low:d}) &
-TSF{sl:d}_input({high2:d} downto {low2:d}) &
-""".format(sl=sl, high=h, low=h - 7, high2=h - 8, low2=h - 20) for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
+    ''.join([f"""TSF{sl:d}_input({h:d} downto {h - 7:d}) &
+TSF{sl:d}_input({h - 8:d} downto {h - 20:d}) &
+""" for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
     """unamed(901 downto 0)
 """
 
@@ -164,8 +164,7 @@ def unpack(triggers, atlas, writer):
             for i, sig in enumerate(atlas):
                 if isUnamed(sig):
                     if dummycheck and '1' in values[i] and '0' in values[i]:
-                        print('[Warning] non-uniform dummy value detected at {}ns: {}'.format(
-                            timestamp, sig[3] % sum(evtsize)))
+                        print(f'[Warning] non-uniform dummy value detected at {timestamp}ns: {sig[3] % sum(evtsize)}')
                         print(values[i])
                     continue
                 if values[i] != lastvalues[i]:
@@ -203,8 +202,7 @@ def literalVCD(triggers, atlas, writer):
                     if dummycheck and sigvalue.any(1) and sigvalue.any(0):
                         with sys.stderr as fout:
                             fout.write(
-                                '[Warning] non-uniform dummy value detected at {}ns: {}'.format(
-                                    timestamp, sig[3] % sum(evtsize)))
+                                f'[Warning] non-uniform dummy value detected at {timestamp}ns: {sig[3] % sum(evtsize)}')
                             fout.write(value[i])
                     continue
                 if not lastvalue or sigvalue != lastsigvalue:

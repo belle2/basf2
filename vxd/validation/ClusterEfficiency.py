@@ -169,8 +169,7 @@ class ClusterEfficiency(b2.Module):
 
             # meh, something strange with the momentum, ignore this one
             if p_gen is None:
-                b2.B2WARNING("Strange particle momentum: %f, expected one of %s" %
-                             (p.R(), ", ".join('' for p in momenta)))
+                b2.B2WARNING(f"Strange particle momentum: {p.R():f}, expected one of {', '.join('' for p in momenta)}")
                 continue
 
             # and check all truehits

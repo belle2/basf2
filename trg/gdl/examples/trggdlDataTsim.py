@@ -86,7 +86,7 @@ datatsim.param('Belle2Phase', "Belle2Phase")
 main.add_module(datatsim)
 
 histo = b2.register_module('HistoManager')
-histo.param("histoFileName", "trgsum/dsim.%s.root" % basename)
+histo.param("histoFileName", f"trgsum/dsim.{basename}.root")
 main.add_module(histo)
 if not os.path.isdir('trgsum'):
     os.mkdir('trgsum')

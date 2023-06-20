@@ -441,10 +441,8 @@ class Chi2Test(PvalueTest):
                 b.SetBinContent(ibin, 0.0)
                 if self.debug:
                     print(
-                        "DEBUG: Warning: Setting bin content of bin {} to "
-                        "zero for both histograms, because both histograms "
-                        "have vanishing errors there.".format(ibin)
-                    )
+                        f"DEBUG: Warning: Setting bin content of bin {ibin} to zero for both histograms, because both " +
+                        "histograms have vanishing errors there.")
 
     def _compute(self) -> None:
         """
@@ -468,8 +466,7 @@ class Chi2Test(PvalueTest):
 
         if nbins < 2:
             raise TooFewBins(
-                "{} bin(s) is too few to perform the Chi2 "
-                "test.".format(nbins)
+                f"{nbins} bin(s) is too few to perform the Chi2 test."
             )
 
         weighted_types = ["TProfile", "TH1D", "TH1F"]
@@ -518,8 +515,7 @@ class Chi2Test(PvalueTest):
             print_contents_and_errors(first_obj, second_obj)
             print()
             print(
-                "Here's what ROOT's Chi2Test gave us (comp_options: '{}'):"
-                " ".format(comp_options)
+                f"Here's what ROOT's Chi2Test gave us (comp_options: '{comp_options}'): "
             )
 
             tp = TablePrinter(3, width=(10, 10, 40))
@@ -772,7 +768,7 @@ class TablePrinter:
                 form = f"{{:{width}d}}"
                 out.append(form.format(col))
             elif isinstance(col, float):
-                form = "{{:{}.{}f}}".format(width, width // 2)
+                form = f"{{:{width}.{width // 2}f}}"
                 out.append(form.format(col))
             else:
                 # convert everything else to a string if it isn't already

@@ -50,7 +50,7 @@ def printFractions(checkResults):
     nCorrectMC, nWrongMC, nUnknownMC, nKnownBkg, nUnknownBkg = checkResults
     nMC = nCorrectMC + nWrongMC + nUnknownMC
     nBkg = nKnownBkg + nUnknownBkg
-    print("  %d TS with MC hit in priority wire" % nMC)
+    print(f"  {int(nMC)} TS with MC hit in priority wire")
     if nMC > 0:
         print("    %d correct, %d wrong, %d unknown"
               % (nCorrectMC, nWrongMC, nUnknownMC))
@@ -58,10 +58,9 @@ def printFractions(checkResults):
               "+-", 100. * np.sqrt(nCorrectMC * nWrongMC / (nCorrectMC + nWrongMC) ** 3))
         print("    unknown fraction", 100. * nUnknownMC / nMC,
               "+-", 100. * np.sqrt(nUnknownMC * (nMC - nUnknownMC) / nMC ** 3))
-    print("  %d TS with Bkg hit in priority wire" % nBkg)
+    print(f"  {int(nBkg)} TS with Bkg hit in priority wire")
     if nBkg > 0:
-        print("    %d known, %d unknown"
-              % (nKnownBkg, nUnknownBkg))
+        print(f"    {int(nKnownBkg)} known, {int(nUnknownBkg)} unknown")
         print("    unknown fraction", 100. * nUnknownBkg / nBkg,
               "+-", 100. * np.sqrt(nUnknownBkg * (nBkg - nUnknownBkg) / nBkg ** 3))
 

@@ -137,9 +137,8 @@ class V0ValidationPlots:
         """
         efficiency = ROOT.TEfficiency(found, all)
         efficiency.SetName("".join(title.split()))
-        ylabel = 'Efficiency / ({} {})'.format((found.GetXaxis().GetXmax() -
-                                                found.GetXaxis().GetXmin()) / found.GetNbinsX(), x_unit)
-        efficiency.SetTitle("{};{} / ({});{}".format(title, x_variable, x_unit, ylabel))
+        ylabel = f'Efficiency / ({(found.GetXaxis().GetXmax() - found.GetXaxis().GetXmin()) / found.GetNbinsX()} {x_unit})'
+        efficiency.SetTitle(f"{title};{x_variable} / ({x_unit});{ylabel}")
         efficiency.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         efficiency.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         efficiency.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -161,12 +160,11 @@ class V0ValidationPlots:
         :return: modified hist
         """
         hist.SetName("".join(title.split()))
-        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
-        ylabel = 'Entries / ({} {})'.format((hist.GetXaxis().GetXmax() -
-                                             hist.GetXaxis().GetXmin()) /
-                                            hist.GetNbinsX(), x_unit) if x_unit is not None \
-            else 'Entries / ({})'.format((hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX())
-        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        xlabel = f'{x_variable} / ({x_unit})' if x_unit is not None else f'{x_variable}'
+        ylabel = f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()} {x_unit})' \
+            if x_unit is not None \
+            else f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()})'
+        hist.SetTitle(f"{title};{xlabel};{ylabel}")
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -192,9 +190,9 @@ class V0ValidationPlots:
         :return:
         """
         hist.SetName("".join(title.split()))
-        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
-        ylabel = '{} / ({})'.format(y_variable, y_unit) if y_unit is not None else '{}'.format(y_variable)
-        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        xlabel = f'{x_variable} / ({x_unit})' if x_unit is not None else f'{x_variable}'
+        ylabel = f'{y_variable} / ({y_unit})' if y_unit is not None else f'{y_variable}'
+        hist.SetTitle(f"{title};{xlabel};{ylabel}")
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))

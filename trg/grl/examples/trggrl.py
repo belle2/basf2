@@ -30,7 +30,7 @@ if argc == 2:
     f_out_root = argvs[1]
 print()
 # print 'f_in_root  = %s' % f_in_root
-print('f_out_root = %s\n' % f_out_root)
+print(f'f_out_root = {f_out_root}\n')
 
 ################
 # f_in_root1 = f_in_root+ "1.root";

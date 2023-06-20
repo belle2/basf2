@@ -518,7 +518,7 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
         if not reco_track or not mc_reco_track:
             hit_efficiency = float("nan")
         else:
-            mc_reco_hits = getObjectList(getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))())
+            mc_reco_hits = getObjectList(getattr(mc_reco_track, f"get{detector_string.upper()}HitList")())
             if len(mc_reco_hits) == 0:
                 hit_efficiency = float('nan')
             else:
@@ -532,7 +532,7 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
 
                     mc_reco_hit_size += 1
 
-                    for reco_hit in getObjectList(getattr(reco_track, "get{}HitList".format(detector_string.upper()))()):
+                    for reco_hit in getObjectList(getattr(reco_track, f"get{detector_string.upper()}HitList")()):
                         if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
                             hit_efficiency += 1
                             break
@@ -542,7 +542,7 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
                 else:
                     hit_efficiency /= mc_reco_hit_size
 
-        return {"{}_hit_efficiency".format(detector_string.lower()): hit_efficiency}
+        return {f"{detector_string.lower()}_hit_efficiency": hit_efficiency}
 
     return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
 
@@ -554,7 +554,7 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
         if not reco_track or not mc_reco_track:
             hit_purity = float("nan")
         else:
-            reco_hits = getObjectList(getattr(reco_track, "get{}HitList".format(detector_string.upper()))())
+            reco_hits = getObjectList(getattr(reco_track, f"get{detector_string.upper()}HitList")())
             reco_hit_size = len(reco_hits)
 
             if reco_hit_size == 0:
@@ -562,14 +562,14 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
             else:
                 hit_purity = 0.
                 for reco_hit in reco_hits:
-                    for mc_reco_hit in getObjectList(getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()):
+                    for mc_reco_hit in getObjectList(getattr(mc_reco_track, f"get{detector_string.upper()}HitList")()):
                         if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
                             hit_purity += 1
                             break
 
                 hit_purity /= reco_hit_size
 
-        return {"{}_hit_purity".format(detector_string.lower()): hit_purity}
+        return {f"{detector_string.lower()}_hit_purity": hit_purity}
 
     return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
 

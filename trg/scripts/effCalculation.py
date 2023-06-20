@@ -127,13 +127,13 @@ class EffModule(Module):
         sp = ' '
         print('\n')
         eff_tot = self.Ntrg_event / self.Ntot_event * 100.0
-        print('L1 Trigger efficiency(%%): %6.2f' % (eff_tot))
+        print(f'L1 Trigger efficiency(%): {eff_tot:6.2f}')
         print('Trigger Line', 5 * sp, 'PreScale Factor', 3 * sp, 'Efficiency(%)', 3 * sp, 'Logics')
         ntrg = len(self.Nsubtrg_event)
         if self.Ntot_event != 0:
             for i in range(ntrg):
                 eff = self.Nsubtrg_event[i] / self.Ntot_event * 100.0
-                print('T%3d                %4d              %6.2f              %s ' % (i, prescale[i], eff, trglog[i]))
+                print(f'T{int(i):3}                {int(prescale[i]):4}              {eff:6.2f}              {trglog[i]} ')
 
 
 def EffCalculation(path, Belle2Phase="Phase2"):

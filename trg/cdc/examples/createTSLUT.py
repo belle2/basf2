@@ -26,8 +26,8 @@ unknown: otherwise
 innerTrueLRTable = np.loadtxt('innerTrueLRTable_Bkg1.0_1.dat')
 outerTrueLRTable = np.loadtxt('outerTrueLRTable_Bkg1.0_1.dat')
 for i in range(2, 5):
-    innerTrueLRTable += np.loadtxt('innerTrueLRTable_Bkg1.0_%d.dat' % i)
-    outerTrueLRTable += np.loadtxt('outerTrueLRTable_Bkg1.0_%d.dat' % i)
+    innerTrueLRTable += np.loadtxt(f'innerTrueLRTable_Bkg1.0_{int(i)}.dat')
+    outerTrueLRTable += np.loadtxt(f'outerTrueLRTable_Bkg1.0_{int(i)}.dat')
 
 # define thresholds for left/right
 b = 0.8
@@ -95,11 +95,11 @@ outerLUT = createLUT(outerTrueLRTable, inner=False)
 innerLUTFile = open(innerLUTFilename, 'w')
 innerLUTFile.write("memory_initialization_radix=10;\n")
 innerLUTFile.write("memory_initialization_vector=\n")
-innerLUTFile.write(",\n".join("%d" % i for i in innerLUT))
+innerLUTFile.write(",\n".join(f"{int(i)}" for i in innerLUT))
 innerLUTFile.write(";\n\n")
 
 outerLUTFile = open(outerLUTFilename, 'w')
 outerLUTFile.write("memory_initialization_radix=10;\n")
 outerLUTFile.write("memory_initialization_vector=\n")
-outerLUTFile.write(",\n".join("%d" % i for i in outerLUT))
+outerLUTFile.write(",\n".join(f"{int(i)}" for i in outerLUT))
 outerLUTFile.write(";\n\n")

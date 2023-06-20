@@ -132,7 +132,7 @@ class QuickCheck(basf2.Module):
 
     def terminate(self):
         def mystr(val):
-            return '%3s' % ('%d' % val)
+            return f"{f'{val:d}':3s}"
         headline0 = [' ' for i in range(6)]
         headline0.insert(4, 'TrackType')
         headline1 = ['  NTrack', '__|'] + ['___' for i in range(5)]

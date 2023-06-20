@@ -114,18 +114,18 @@ class TestModule(basf2.Module):
                                     tracks3Dfitter, tracks3Dneuro]):
             print(listnames[i], "has", len(tracks), "tracks.")
             for track in tracks:
-                print("phi0[deg] = %.2f" % (track.getPhi0() * 180. / np.pi),
-                      "pt[GeV] = %.3f" % track.getTransverseMomentum(1.5),
-                      "charge = %d" % track.getChargeSign(),
-                      "theta[deg] = %.2f" % (np.arctan2(1., track.getCotTheta()) * 180. / np.pi),
-                      "z[cm] = %.2f" % track.getZ0())
+                print(f"phi0[deg] = {track.getPhi0() * 180.0 / np.pi:.2f}",
+                      f"pt[GeV] = {track.getTransverseMomentum(1.5):.3f}",
+                      f"charge = {int(track.getChargeSign())}",
+                      f"theta[deg] = {np.arctan2(1.0, track.getCotTheta()) * 180.0 / np.pi:.2f}",
+                      f"z[cm] = {track.getZ0():.2f}")
         print(len(Belle2.PyStoreArray("MCParticles")), "MCParticles.")
         for particle in Belle2.PyStoreArray("MCParticles"):
-            print("phi0[deg] = %.2f" % (particle.getMomentum().Phi() * 180. / np.pi),
-                  "pt[GeV] = %.3f" % particle.getMomentum().Pt(),
-                  "charge = %d" % particle.getCharge(),
-                  "theta[deg] = %.2f" % (particle.getMomentum().Theta() * 180. / np.pi),
-                  "z[cm] = %.2f" % particle.getProductionVertex().Z())
+            print(f"phi0[deg] = {particle.getMomentum().Phi() * 180.0 / np.pi:.2f}",
+                  f"pt[GeV] = {particle.getMomentum().Pt():.3f}",
+                  f"charge = {int(particle.getCharge())}",
+                  f"theta[deg] = {particle.getMomentum().Theta() * 180.0 / np.pi:.2f}",
+                  f"z[cm] = {particle.getProductionVertex().Z():.2f}")
 
 
 main.add_module(TestModule())

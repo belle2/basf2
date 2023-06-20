@@ -1288,8 +1288,7 @@ class ValidationPlot:
 
         if max_n_data:
             if x_n_data > max_n_data or y_n_data > max_n_data:
-                get_logger().warning("Number of points in scatter graph %s exceed limit %s" %
-                                     (self.name, max_n_data))
+                get_logger().warning(f"Number of points in scatter graph {self.name} exceed limit {max_n_data}")
 
                 get_logger().warning(f"Cropping  {max_n_data}")
 
@@ -1720,7 +1719,7 @@ class ValidationPlot:
             # Special value for the flat distribution binning
             n_bins = None
 
-        elif isinstance(bins, collections.Iterable):
+        elif isinstance(bins, collections.abc.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins

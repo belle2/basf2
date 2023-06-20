@@ -45,8 +45,8 @@ particlegun_params = {
     'zVertexParams': [0.]}
 # filenames for the generates tables
 # including the seed in the filename allows to combine several runs later
-innerFilename = 'innerTrueLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
-outerFilename = 'outerTrueLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
+innerFilename = f'innerTrueLRTable_Bkg{backgroundLevel:.1f}_{int(seed)}.dat'
+outerFilename = f'outerTrueLRTable_Bkg{backgroundLevel:.1f}_{int(seed)}.dat'
 
 # ------------------------- #
 # create path up to trigger #

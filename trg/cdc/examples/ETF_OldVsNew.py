@@ -119,9 +119,9 @@ class TestModule(basf2.Module):
         else:
             newT0 = 9999
         if oldT0 == newT0:
-            basf2.B2INFO("T0 %d" % oldT0)
+            basf2.B2INFO(f"T0 {int(oldT0)}")
         else:
-            basf2.B2WARNING("old T0 %d, new T0 %d" % (oldT0, newT0))
+            basf2.B2WARNING(f"old T0 {int(oldT0)}, new T0 {int(newT0)}")
 
 
 main.add_module(TestModule(), logLevel=basf2.LogLevel.INFO)

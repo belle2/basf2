@@ -105,15 +105,12 @@ class CheckNumbering(basf2.Module):
         sensor = idOfFirstPXDSensor.getSensorNumber()
         if layer != self.gTools.getFirstPXDLayer() or ladder != 1 or sensor != 1:
             basf2.B2ERROR('Mismatch in first PXD sensor placement:\n' +
-                          'Expected {}/{}/{}\nGot: {}/{}/{}'.format(
-                              layer, ladder, sensor,
-                              self.gTools.getFirstPXDLayer(), 1, 1))
+                          f'Expected {layer}/{ladder}/{sensor}\nGot: {self.gTools.getFirstPXDLayer()}/{1}/{1}')
         idOfLastPXDSensor = self.gTools.getSensorIDFromPXDIndex(self.gTools.getNumberOfPXDSensors() - 1)
         layer = idOfLastPXDSensor.getLayerNumber()
         if layer != self.gTools.getLastPXDLayer():
             basf2.B2ERROR('Mismatch in last PXD sensor placement:\n' +
-                          'Expected layer {} got layer {}'.format(
-                              layer, self.gTools.getLastPXDLayer()))
+                          f'Expected layer {layer} got layer {self.gTools.getLastPXDLayer()}')
         # SVD
         # First SVD sensor should be (first PXD layer)/1/1,
         idOfFirstSVDSensor = self.gTools.getSensorIDFromSVDIndex(0)
@@ -122,15 +119,12 @@ class CheckNumbering(basf2.Module):
         sensor = idOfFirstSVDSensor.getSensorNumber()
         if layer != self.gTools.getFirstSVDLayer() or ladder != 1 or sensor != 1:
             basf2.B2ERROR('Mismatch in first SVD sensor placement:\n' +
-                          'Expected {}/{}/{}\nGot: {}/{}/{}'.format(
-                              layer, ladder, sensor,
-                              self.gTools.getFirstSVDLayer(), 1, 1))
+                          f'Expected {layer}/{ladder}/{sensor}\nGot: {self.gTools.getFirstSVDLayer()}/{1}/{1}')
         idOfLastSVDSensor = self.gTools.getSensorIDFromSVDIndex(self.gTools.getNumberOfSVDSensors() - 1)
         layer = idOfLastSVDSensor.getLayerNumber()
         if layer != self.gTools.getLastSVDLayer():
             basf2.B2ERROR('Mismatch in last SVD sensor placement:\n' +
-                          'Expected layer {} got layer {}'.format(
-                              layer, self.gTools.getLastSVDLayer()))
+                          f'Expected layer {layer} got layer {self.gTools.getLastSVDLayer()}')
         #
         # 1. General sensor indexing
         #
@@ -140,26 +134,22 @@ class CheckNumbering(basf2.Module):
         ret_sensorID = self.gTools.getSensorIDFromIndex(init_sensor_index)
         if init_sensorID.getID() != ret_sensorID.getID():
             basf2.B2ERROR(
-                "Sensor index failure: \n Initial id: {} \n VXD index: {} \n Retrieved id: {}.".format(
-                    init_sensorID, init_sensor_index, ret_sensorID))
+                f"Sensor index failure: \n Initial id: {init_sensorID} \n VXD index: {init_sensor_index} \n Retrieved id: " +
+                f"{ret_sensorID}.")
         # 1b. Neighbourhood test
         next_sensorID = self.gTools.getSensorIDFromIndex(init_sensor_index + 1)
         next_expected_sensorID = Belle2.VxdID(init_sensorID)
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR('Sensor index neighbourhood test failure: \n' +
-                          'Initial id: {} \n Expected id: {} \n Actaul id: {} \n Index: {}.'.format(
-                              init_sensorID, next_expected_sensorID,
-                              next_sensorID, init_sensor_index + 1
-                          ))
+                          f'Initial id: {init_sensorID} \n Expected id: {next_expected_sensorID} \n Actaul id: ' +
+                          f'{next_sensorID} \n Index: {init_sensor_index + 1}.')
 
         # 1c. Sensor counting
         num_sensors_expected = 212
         if (self.gTools.getNumberOfSensors() != num_sensors_expected):
             basf2.B2ERROR('Number of sensors mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              num_sensors_expected, self.gTools.getNumberOfSensors()
-                          ))
+                          f'Expected: {num_sensors_expected}, got {self.gTools.getNumberOfSensors()}.')
         #
         # 2. PXD sensor indexing
         #
@@ -172,8 +162,8 @@ class CheckNumbering(basf2.Module):
         ret_sensorID = self.gTools.getSensorIDFromPXDIndex(init_sensor_index)
         if init_sensorID.getID() != ret_sensorID.getID():
             basf2.B2ERROR(
-                "PXD sensor index failure: \n Initial id: {} \n VXD index: {} \n Retrieved id: {}.".format(
-                    init_sensorID, init_sensor_index, ret_sensorID))
+                f"PXD sensor index failure: \n Initial id: {init_sensorID} \n VXD index: {init_sensor_index} \n " +
+                f"Retrieved id: {ret_sensorID}.")
         # 2b. Neighbourhood test
         next_sensorID = self.gTools.getSensorIDFromPXDIndex(init_sensor_index + 1)
         next_expected_sensorID = Belle2.VxdID(init_sensorID)
@@ -187,9 +177,7 @@ class CheckNumbering(basf2.Module):
         num_sensors_expected = 40
         if (self.gTools.getNumberOfPXDSensors() != num_sensors_expected):
             basf2.B2ERROR('Number of PXD sensors mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              num_sensors_expected, self.gTools.getNumberOfPXDSensors()
-                          ))
+                          f'Expected: {num_sensors_expected}, got {self.gTools.getNumberOfPXDSensors()}.')
         #
         # 3. SVD sensor indexing
         #
@@ -202,25 +190,21 @@ class CheckNumbering(basf2.Module):
         ret_sensorID = self.gTools.getSensorIDFromSVDIndex(init_sensor_index)
         if init_sensorID.getID() != ret_sensorID.getID():
             basf2.B2ERROR(
-                "SVD sensor index failure: \n Initial id: {} \n VXD index: {} \n Retrieved id: {}.".format(
-                    init_sensorID, init_sensor_index, ret_sensorID))
+                f"SVD sensor index failure: \n Initial id: {init_sensorID} \n VXD index: {init_sensor_index} \n " +
+                f"Retrieved id: {ret_sensorID}.")
         # 2b. Neighbourhood test
         next_sensorID = self.gTools.getSensorIDFromSVDIndex(init_sensor_index + 1)
         next_expected_sensorID = Belle2.VxdID(init_sensorID)
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR(
-                'SVD sensor index neighbourhood test failure: \n'
-                'Initial id: {} \n Expected id: {} \n Actaul id: {} \n '
-                'Index: {}.'.format(init_sensorID, next_expected_sensorID,
-                                    next_sensorID, init_sensor_index + 1))
+                f'SVD sensor index neighbourhood test failure: \nInitial id: {init_sensorID} \n Expected id: ' +
+                f'{next_expected_sensorID} \n Actaul id: {next_sensorID} \n Index: {init_sensor_index + 1}.')
         # 3c. Sensor counting
         num_sensors_expected = 172
         if (self.gTools.getNumberOfSVDSensors() != num_sensors_expected):
             basf2.B2ERROR('Number of SVD sensors mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              num_sensors_expected, self.gTools.getNumberOfSVDSensors()
-                          ))
+                          f'Expected: {num_sensors_expected}, got {self.gTools.getNumberOfSVDSensors()}.')
         #
         # 4. Layer indexing
         #
@@ -230,19 +214,14 @@ class CheckNumbering(basf2.Module):
         ret_layer = self.gTools.getLayerNumberFromLayerIndex(init_layer_index)
         if init_layer != ret_layer:
             basf2.B2ERROR(
-                "Layer index failure: \n Initial: {} \n Index: {} \n Retrieved: {}.".format(
-                    init_layer, init_layer_index, ret_layer))
+                f"Layer index failure: \n Initial: {init_layer} \n Index: {init_layer_index} \n Retrieved: {ret_layer}.")
         # 2b. Neighbourhood test
         next_layer = self.gTools.getLayerNumberFromLayerIndex(init_layer_index + 1)
         next_expected_layer = init_layer + 1
         if next_layer != next_expected_layer:
             basf2.B2ERROR(
-                "Layer index neighbourhood test failure: \n Initial id: {} \n Expected: {} \n Actaul: {} \n Index: {}.".format(
-                    init_layer,
-                    next_expected_layer,
-                    next_layer,
-                    init_layer_index +
-                    1))
+                f"Layer index neighbourhood test failure: \n Initial id: {init_layer} \n Expected: " +
+                f"{next_expected_layer} \n Actaul: {next_layer} \n Index: {init_layer_index + 1}.")
         #
         # 5. PXD chip indexing
         #
@@ -253,13 +232,11 @@ class CheckNumbering(basf2.Module):
                           )
         if self.gTools.getNumberOfPXDUSideChips() != 4:
             basf2.B2ERROR('PXD u-side chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              4, self.gTools.getNumberOfPXDUSideChips())
+                          f'Expected: {4}, got {self.gTools.getNumberOfPXDUSideChips()}.'
                           )
         if self.gTools.getNumberOfPXDVSideChips() != 6:
             basf2.B2ERROR('PXD v-side chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              6, self.gTools.getNumberOfPXDVSideChips())
+                          f'Expected: {6}, got {self.gTools.getNumberOfPXDVSideChips()}.'
                           )
         if self.gTools.getTotalSVDChips() != 1748:
             basf2.B2ERROR('SVD chip count mismatch: \n' +
@@ -267,18 +244,15 @@ class CheckNumbering(basf2.Module):
                           )
         if self.gTools.getNumberOfSVDUSideChips() != 6:
             basf2.B2ERROR('SVD u-side chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              6, self.gTools.getNumberOfSVDUSideChips())
+                          f'Expected: {6}, got {self.gTools.getNumberOfSVDUSideChips()}.'
                           )
         if self.gTools.getNumberOfSVDVSideChips(3) != 6:
             basf2.B2ERROR('SVD v-side chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              6, self.gTools.getNumberOfSVDVSideChips(3))
+                          f'Expected: {6}, got {self.gTools.getNumberOfSVDVSideChips(3)}.'
                           )
         if self.gTools.getNumberOfSVDVSideChips(4) != 4:
             basf2.B2ERROR('SVD v-side chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              4, self.gTools.getNumberOfSVDVSideChips(4))
+                          f'Expected: {4}, got {self.gTools.getNumberOfSVDVSideChips(4)}.'
                           )
         # 5b. PXD chip indexing - loop
         init_layer = 1
@@ -290,8 +264,7 @@ class CheckNumbering(basf2.Module):
         index_with_llss = self.gTools.getPXDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
         if index_with_vxdid != index_with_llss:
             basf2.B2ERROR('Mismatch between VxdID-based and layer-ladder-sensor based index:\n' +
-                          'VxdID-based: {}\nlayer-ladder-sensor: {}'.format(
-                              index_with_vxdid, index_with_llss)
+                          f'VxdID-based: {index_with_vxdid}\nlayer-ladder-sensor: {index_with_llss}'
                           )
         returned_chipID = self.gTools.getChipIDFromPXDIndex(index_with_vxdid)
         returned_layer = returned_chipID.getLayerNumber()
@@ -306,10 +279,8 @@ class CheckNumbering(basf2.Module):
             (init_chipNo == returned_chipNo)
         if not match:
             basf2.B2ERROR('Mismatch in PXD chip indexing:\n' +
-                          'Initial: {} {} {} {} {}\n'.format(
-                              init_layer, init_ladder, init_sensor, init_uSide, init_chipNo) +
-                          'Final: {} {} {} {} {}.'.format(
-                              returned_layer, returned_ladder, returned_sensor, returned_uSide, returned_chipNo)
+                          f'Initial: {init_layer} {init_ladder} {init_sensor} {init_uSide} {init_chipNo}\n' +
+                          f'Final: {returned_layer} {returned_ladder} {returned_sensor} {returned_uSide} {returned_chipNo}.'
                           )
         # 5c. PXD chip indexing - neighbourhood
         # We are expecting same sensor, v-side, chip 0
@@ -331,10 +302,8 @@ class CheckNumbering(basf2.Module):
             (expected_chipNo == neighbour_chipNo)
         if not match:
             basf2.B2ERROR('Mismatch in PXD chip index neighbourship:\n' +
-                          'Expected: {} {} {} {} {}\n'.format(
-                              expected_layer, expected_ladder, expected_sensor, expected_uSide, expected_chipNo) +
-                          'Obtained: {} {} {} {} {}.'.format(
-                              neighbour_layer, neighbour_ladder, neighbour_sensor, neighbour_uSide, neighbour_chipNo)
+                          f'Expected: {expected_layer} {expected_ladder} {expected_sensor} {expected_uSide} {expected_chipNo}\n' +
+                          f'Obtained: {neighbour_layer} {neighbour_ladder} {neighbour_sensor} {neighbour_uSide} {neighbour_chipNo}.'
                           )
 
         # 5d. SVD chip indexing - loop
@@ -347,8 +316,7 @@ class CheckNumbering(basf2.Module):
         index_with_llss = self.gTools.getSVDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
         if index_with_vxdid != index_with_llss:
             basf2.B2ERROR('Mismatch between VxdID-based and layer-ladder-sensor based index:\n' +
-                          'VxdID-based: {}\nlayer-ladder-sensor: {}'.format(
-                              index_with_vxdid, index_with_llss)
+                          f'VxdID-based: {index_with_vxdid}\nlayer-ladder-sensor: {index_with_llss}'
                           )
         returned_chipID = self.gTools.getChipIDFromSVDIndex(index_with_vxdid)
         returned_layer = returned_chipID.getLayerNumber()
@@ -363,10 +331,8 @@ class CheckNumbering(basf2.Module):
             (init_chipNo == returned_chipNo)
         if not match:
             basf2.B2ERROR('Mismatch in SVD chip indexing:\n' +
-                          'Initial: {} {} {} {} {}\n'.format(
-                              init_layer, init_ladder, init_sensor, init_uSide, init_chipNo) +
-                          'Final: {} {} {} {} {}.'.format(
-                              returned_layer, returned_ladder, returned_sensor, returned_uSide, returned_chipNo)
+                          f'Initial: {init_layer} {init_ladder} {init_sensor} {init_uSide} {init_chipNo}\n' +
+                          f'Final: {returned_layer} {returned_ladder} {returned_sensor} {returned_uSide} {returned_chipNo}.'
                           )
         # 5e. SVD chip indexing - neighbourhood
         # We are expecting same sensor, v-side, chip 0
@@ -388,10 +354,8 @@ class CheckNumbering(basf2.Module):
             (expected_chipNo == neighbour_chipNo)
         if not match:
             basf2.B2ERROR('Mismatch in SVD chip index neighbourship:\n' +
-                          'Expected: {} {} {} {} {}\n'.format(
-                              expected_layer, expected_ladder, expected_sensor, expected_uSide, expected_chipNo) +
-                          'Obtained: {} {} {} {} {}.'.format(
-                              neighbour_layer, neighbour_ladder, neighbour_sensor, neighbour_uSide, neighbour_chipNo)
+                          f'Expected: {expected_layer} {expected_ladder} {expected_sensor} {expected_uSide} {expected_chipNo}\n' +
+                          f'Obtained: {neighbour_layer} {neighbour_ladder} {neighbour_sensor} {neighbour_uSide} {neighbour_chipNo}.'
                           )
         # 5f. Test of PXD chip assignment
         # We want to see that the first and last chips have correct placement.
@@ -410,17 +374,8 @@ class CheckNumbering(basf2.Module):
                 not firstChipUSide or
                 firstChipNo != 1):
             basf2.B2ERROR(
-                'Wrong 1st PXD chip assignment:\nExpected {}/{}/{} side {} chip {},\nGot {}/{}/{} side {} chip {}'.format(
-                    self.gTools.getFirstPXDLayer(),
-                    1,
-                    1,
-                    'u',
-                    1,
-                    firstChipLayer,
-                    firstChipLadder,
-                    firstChipSensor,
-                    'u' if firstChipUSide else 'v',
-                    firstChipNo))
+                f"Wrong 1st PXD chip assignment:\nExpected {self.gTools.getFirstPXDLayer()}/{1}/{1} side u chip {1},\nGot " +
+                f"{firstChipLayer}/{firstChipLadder}/{firstChipSensor} side {'u' if firstChipUSide else 'v'} chip {firstChipNo}")
         indexOfLastPXDChip = self.gTools.getTotalPXDChips() - 1
         # Last chip must be on last PXD layer, v-sie, chip 6.
         idOfLastPXDChip = self.gTools.getChipIDFromPXDIndex(indexOfLastPXDChip)
@@ -433,13 +388,8 @@ class CheckNumbering(basf2.Module):
                 lastChipNo != expectedLastChipNo):
             basf2.B2ERROR(
                 'Wrong last PXD chip assignment:\n' +
-                'Expected layer {} side {} chip {},\nGot layer {} side {} chip {}'.format(
-                    self.gTools.getLastPXDLayer(),
-                    'v',
-                    expectedLastChipNo,
-                    lastChipLayer,
-                    'u' if lastChipUSide else 'v',
-                    lastChipNo))
+                f"Expected layer {self.gTools.getLastPXDLayer()} side v chip {expectedLastChipNo},\nGot layer " +
+                f"{lastChipLayer} side {'u' if lastChipUSide else 'v'} chip {lastChipNo}")
         # 5g. Test of SVD chip assignment
         # We want to see that the first and last chips have correct placement.
         indexOfFirstSVDChip = 0
@@ -457,17 +407,8 @@ class CheckNumbering(basf2.Module):
                 not firstChipUSide or
                 firstChipNo != 1):
             basf2.B2ERROR(
-                'Wrong 1st SVD chip assignment:\nExpected {}/{}/{} side {} chip {},\nGot {}/{}/{} side {} chip {}'.format(
-                    self.gTools.getFirstSVDLayer(),
-                    1,
-                    1,
-                    'u',
-                    1,
-                    firstChipLayer,
-                    firstChipLadder,
-                    firstChipSensor,
-                    'u' if firstChipUSide else 'v',
-                    firstChipNo))
+                f"Wrong 1st SVD chip assignment:\nExpected {self.gTools.getFirstSVDLayer()}/{1}/{1} side u chip {1},\nGot " +
+                f"{firstChipLayer}/{firstChipLadder}/{firstChipSensor} side {'u' if firstChipUSide else 'v'} chip {firstChipNo}")
         indexOfLastSVDChip = self.gTools.getTotalSVDChips() - 1
         # Last chip must be on last SVD layer, v-sie, chip 6.
         idOfLastSVDChip = self.gTools.getChipIDFromSVDIndex(indexOfLastSVDChip)
@@ -480,13 +421,8 @@ class CheckNumbering(basf2.Module):
                 lastChipNo != expectedLastChipNo):
             basf2.B2ERROR(
                 'Wrong last SVD chip assignment:\n' +
-                'Expected layer {} side {} chip {},\nGot layer {} side {} chip {}'.format(
-                    self.gTools.getLastSVDLayer(),
-                    'v',
-                    expectedLastChipNo,
-                    lastChipLayer,
-                    'u' if lastChipUSide else 'v',
-                    lastChipNo))
+                f"Expected layer {self.gTools.getLastSVDLayer()} side v chip {expectedLastChipNo},\nGot layer " +
+                f"{lastChipLayer} side {'u' if lastChipUSide else 'v'} chip {lastChipNo}")
 
             # END OF TESTS
 

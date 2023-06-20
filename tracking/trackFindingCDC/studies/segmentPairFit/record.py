@@ -159,7 +159,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
             return sz_segment_pair_fusion_fit
 
         else:
-            raise ValueError("Unexpected fit_positions %s" % fit_method_name)
+            raise ValueError(f"Unexpected fit_positions {fit_method_name}")
 
     def create_path(self):
         """

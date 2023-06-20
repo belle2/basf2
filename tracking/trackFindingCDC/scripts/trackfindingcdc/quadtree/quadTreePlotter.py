@@ -86,9 +86,9 @@ class QuadTreePlotter(basf2.Module):
 
         plt.gca().pcolorfast(x_edges, y_edges, (arr_l + l2).T, cmap=cmap)
 
-        x_labels = ["{1:0.{0}f}".format(int(not float(x).is_integer()), x) if i % 4 == 0 else "" for i, x in enumerate(x_edges)]
+        x_labels = [f"{x:0.{{0}}f}" if i % 4 == 0 else "" for i, x in enumerate(x_edges)]
         plt.xticks(x_edges, x_labels)
-        y_labels = ["{1:0.{0}f}".format(int(not float(y).is_integer()), y) if i % 4 == 0 else "" for i, y in enumerate(y_edges)]
+        y_labels = [f"{y:0.{{0}}f}" if i % 4 == 0 else "" for i, y in enumerate(y_edges)]
         plt.yticks(y_edges, y_labels)
 
     def save_and_show_file(self):

@@ -94,7 +94,7 @@ if gen_hist:
         os.mkdir('rawdatahist')
 
     histo = b2.register_module('HistoManager')
-    histo.param("histoFileName", "rawdatahist/raw.%s.root" % basename)
+    histo.param("histoFileName", f"rawdatahist/raw.{basename}.root")
     main.add_module(histo)
 
 b2.process(main)

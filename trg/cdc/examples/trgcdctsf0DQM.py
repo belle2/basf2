@@ -48,7 +48,7 @@ else:
 
 main.add_module(input)
 histo = b2.register_module('HistoManager')
-histo.param("histoFileName", "dqm.%s.superlayer0.root" % basename)
+histo.param("histoFileName", f"dqm.{basename}.superlayer0.root")
 
 # Unpacker
 trgcdctsfUnpacker = b2.register_module("TRGCDCTSFUnpacker")
@@ -61,7 +61,7 @@ trgcdctsfdqm = b2.register_module('TRGCDCTSFDQM')
 trgcdctsfdqm.param('generatePostscript', True)
 trgcdctsfdqm.param('TSFMOD', 0)
 # postscript file name
-psname = "dqm.%s.ps" % basename
+psname = f"dqm.{basename}.ps"
 trgcdctsfdqm.param('postScriptName', psname)
 
 main.add_module(trgcdctsfdqm)

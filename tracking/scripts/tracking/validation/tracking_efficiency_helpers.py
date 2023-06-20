@@ -155,7 +155,7 @@ def run_simulation(path, pt_value, output_filename=''):
     if 'BELLE2_BACKGROUND_DIR' in os.environ:
         background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 
-        print('Number of used background files (%d): ' % len(background_files))
+        print(f'Number of used background files ({len(background_files)}): ')
 
     if len(background_files) == 0:
         background_files = None

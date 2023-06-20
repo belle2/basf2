@@ -198,9 +198,9 @@ class Cluster:
                 "#!/bin/bash \n\n"
                 + "BELLE2_NO_TOOLS_CHECK=1 \n"
                 + f"source {self.tools}/b2setup \n"
-                + "cd {} \n".format(self.adjust_path(output_dir))
+                + f"cd {self.adjust_path(output_dir)} \n"
                 + f"{command} \n"
-                + "echo $? > {}/script_{}.done \n".format(self.path, job.name)
+                + f"echo $? > {self.path}/script_{job.name}.done \n"
                 + f"rm {tmp_name} \n"
             )
 

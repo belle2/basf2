@@ -30,7 +30,7 @@ b2.set_random_seed(123458)
 
 pt_value = get_generated_pt_value(5)
 
-output_filename = '../trackingEfficiency_pt_%.2fGeV.root' % pt_value
+output_filename = f'../trackingEfficiency_pt_{pt_value:.2f}GeV.root'
 
 print(output_filename)
 

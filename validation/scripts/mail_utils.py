@@ -52,7 +52,7 @@ def get_greeting(name):
         "Hochachtungsvoll",
     ]
     return {
-        "greeting": "{} {}".format(random.choice(greetings), name),
+        "greeting": f"{random.choice(greetings)} {name}",
         "closing": random.choice(closing),
     }
 
@@ -88,7 +88,7 @@ def send_mail(
     all_moods = ["happy", "normal", "meh", "angry", "livid", "dead"]
     if mood not in all_moods:
         raise KeyError(
-            "Unknown mood please use one of {}".format(", ".join(all_moods))
+            f"Unknown mood please use one of {', '.join(all_moods)}"
         )
 
     add_charset("utf-8", QP, QP, "utf-8")
@@ -132,8 +132,7 @@ def send_mail(
     # create multipart mime mail
     msg.attach(
         MIMEText(
-            "{greeting},\n\n{text}{plain_link}\n\n{closing}"
-            "\n\tThe Belle II Software Bot (B2Bot)".format(**data),
+            f'{data["greeting"]},\n\n{data["text"]}{data["plain_link"]}\n\n{data["closing"]}\n\tThe Belle II Software Bot (B2Bot)',
             "plain",
         )
     )

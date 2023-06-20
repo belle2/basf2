@@ -123,23 +123,20 @@ class TestModule(basf2.Module):
         oldHits = Belle2.PyStoreArray("CDCTriggerSegmentHits")
         newHits = Belle2.PyStoreArray("TSHits")
         if oldHits.getEntries() == newHits.getEntries():
-            basf2.B2INFO("%d hits" % oldHits.getEntries())
+            basf2.B2INFO(f"{int(oldHits.getEntries())} hits")
         else:
-            basf2.B2WARNING("old version: %d, new version: %d" %
-                            (oldHits.getEntries(), newHits.getEntries()))
+            basf2.B2WARNING(f"old version: {int(oldHits.getEntries())}, new version: {int(newHits.getEntries())}")
         for i in range(max(oldHits.getEntries(), newHits.getEntries())):
             if i < oldHits.getEntries():
-                oldString = "ID %d priority %d LR %d fastest T %d priority T %d found T %d" % \
-                            (oldHits[i].getSegmentID(), oldHits[i].getPriorityPosition(),
-                             oldHits[i].getLeftRight(), oldHits[i].fastestTime(),
-                             oldHits[i].priorityTime(), oldHits[i].foundTime())
+                oldString = f"ID {oldHits[i].getSegmentID():d} priority {oldHits[i].getPriorityPosition():d} LR " + \
+                    f"{oldHits[i].getLeftRight():d} fastest T {oldHits[i].fastestTime():d} " + \
+                    f"priority T {oldHits[i].priorityTime():d} found T {oldHits[i].foundTime():d}"
             else:
                 oldString = "no hit"
             if i < newHits.getEntries():
-                newString = "ID %d priority %d LR %d fastest T %d priority T %d found T %d" % \
-                            (newHits[i].getSegmentID(), newHits[i].getPriorityPosition(),
-                             newHits[i].getLeftRight(), newHits[i].fastestTime(),
-                             newHits[i].priorityTime(), newHits[i].foundTime())
+                newString = f"ID {newHits[i].getSegmentID():d} priority {newHits[i].getPriorityPosition():d} " + \
+                    f"LR {newHits[i].getLeftRight():d} fastest T {newHits[i].fastestTime():d} " + \
+                    f"priority T {newHits[i].priorityTime():d} found T {newHits[i].foundTime():d}"
             else:
                 newString = "no hit"
             if oldString == newString:
@@ -155,19 +152,17 @@ class TestModule(basf2.Module):
                 oldCDCRels = oldHits[i].getRelationsTo("CDCHits")
                 newCDCRels = newHits[i].getRelationsTo("CDCHits")
             if len(oldCDCRels) == len(newCDCRels):
-                basf2.B2INFO("%d related CDCHits" % len(oldCDCRels))
+                basf2.B2INFO(f"{len(oldCDCRels)} related CDCHits")
             else:
-                basf2.B2WARNING("old version: %d related CDCHits" % len(oldCDCRels))
-                basf2.B2WARNING("new version: %d related CDCHits" % len(newCDCRels))
+                basf2.B2WARNING(f"old version: {len(oldCDCRels)} related CDCHits")
+                basf2.B2WARNING(f"new version: {len(newCDCRels)} related CDCHits")
             for irel in range(max(len(oldCDCRels), len(newCDCRels))):
                 if irel < len(oldCDCRels):
-                    oldString = "relation to hit %d, weight %.1f" % \
-                                (oldCDCRels[irel].getArrayIndex(), oldCDCRels.weight(irel))
+                    oldString = f"relation to hit {int(oldCDCRels[irel].getArrayIndex())}, weight {oldCDCRels.weight(irel):.1f}"
                 else:
                     oldString = "no relation"
                 if irel < len(newCDCRels):
-                    newString = "relation to hit %d, weight %.1f" % \
-                                (newCDCRels[irel].getArrayIndex(), newCDCRels.weight(irel))
+                    newString = f"relation to hit {int(newCDCRels[irel].getArrayIndex())}, weight {newCDCRels.weight(irel):.1f}"
                 else:
                     newString = "no relation"
                 if oldString == newString:

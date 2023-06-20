@@ -106,7 +106,7 @@ Note that some options are only relevant, if the cellular automaton finder in th
             drawoptions = cdc_display_module.drawoptions
 
         for option in sorted(drawoptions):
-            options_flag = '--%s ' % option.replace('_', '-')
+            options_flag = f"--{option.replace('_', '-')} "
 
             draw_argument_group.add_argument(
                 options_flag,

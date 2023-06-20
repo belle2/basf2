@@ -345,7 +345,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
 
         bkgname_and_color = sorted(color_by_bkgname.items())
 
-        message = 'Background tag color coding is \n%s' % '\n'.join(name + ' -> ' + color for (name, color) in bkgname_and_color)
+        message = f'Background tag color coding is \n{chr(10).join(name + " -> " + color for (name, color) in bkgname_and_color):s}'
         return message
 
 

@@ -130,32 +130,22 @@ class TestModule(basf2.Module):
         oldTracks = Belle2.PyStoreArray("Trg3DFitterTracks")
         newTracks = Belle2.PyStoreArray("Fitter3DTracks")
         if oldTracks.getEntries() == newTracks.getEntries():
-            basf2.B2INFO("%d tracks" % oldTracks.getEntries())
+            basf2.B2INFO(f"{int(oldTracks.getEntries())} tracks")
         else:
-            basf2.B2WARNING("old version: %d, new version: %d" %
-                            (oldTracks.getEntries(), newTracks.getEntries()))
+            basf2.B2WARNING(f"old version: {int(oldTracks.getEntries())}, new version: {int(newTracks.getEntries())}")
         for i in range(max(oldTracks.getEntries(), newTracks.getEntries())):
             if i < oldTracks.getEntries():
                 ptfactor = 0.3 * 1.5 / 100 * 222.376063
-                oldString = "phi %.3f pt %.3f charge %d chi2 %.3f z %.3f cot %.3f chi2 %.3f" % \
-                            (oldTracks[i].getPhi0() * 180. / np.pi,
-                             oldTracks[i].getTransverseMomentum(1.5) / ptfactor,
-                             oldTracks[i].getChargeSign(),
-                             oldTracks[i].getChi2D(),
-                             oldTracks[i].getZ0(),
-                             oldTracks[i].getCotTheta(),
-                             oldTracks[i].getChi3D())
+                oldString = f"phi {oldTracks[i].getPhi0() * 180. / np.pi:.3f} pt " + \
+                    f"{oldTracks[i].getTransverseMomentum(1.5) / ptfactor:.3f} charge {oldTracks[i].getChargeSign():d} " + \
+                    f"chi2 {oldTracks[i].getChi2D():.3f} z {oldTracks[i].getZ0():.3f} cot {oldTracks[i].getCotTheta():.3f} " + \
+                    f"chi2 {oldTracks[i].getChi3D():.3f}"
             else:
                 oldString = "no track"
             if i < newTracks.getEntries():
-                newString = "phi %.3f pt %.3f charge %d chi2 %.3f z %.3f cot %.3f chi2 %.3f" % \
-                            (newTracks[i].getPhi0() * 180. / np.pi,
-                             newTracks[i].getTransverseMomentum(1.5),
-                             newTracks[i].getChargeSign(),
-                             newTracks[i].getChi2D(),
-                             newTracks[i].getZ0(),
-                             newTracks[i].getCotTheta(),
-                             newTracks[i].getChi3D())
+                newString = f"phi {newTracks[i].getPhi0() * 180. / np.pi:.3f} pt {newTracks[i].getTransverseMomentum(1.5):.3f} " + \
+                    f"charge {newTracks[i].getChargeSign():d} chi2 {newTracks[i].getChi2D():.3f} z {newTracks[i].getZ0():.3f} " + \
+                    f"cot {newTracks[i].getCotTheta():.3f} chi2 {newTracks[i].getChi3D():.3f}"
             else:
                 newString = "no track"
             if oldString == newString:

@@ -483,8 +483,7 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
-                                                    % name)
+        figures_of_merit = ValidationFiguresOfMerit(f'{name}_figures_of_merit')
         figures_of_merit['finding_charge_efficiency'] = finding_charge_efficiency
         figures_of_merit['finding_efficiency'] = finding_efficiency
         figures_of_merit['charge_efficiency'] = charge_efficiency

@@ -65,9 +65,9 @@ ddd(15 downto 0) & cntr125M2D(15 downto 0) &
 "000" & TSF8_input(218 downto 210) &
 "0000" &
 """ + \
-    ''.join(["""TSF{sl:d}_input({high:d} downto {low:d}) &
-TSF{sl:d}_input({high2:d} downto {low2:d}) &
-""".format(sl=sl, high=h, low=h - 7, high2=h - 8, low2=h - 20) for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
+    ''.join([f"""TSF{sl:d}_input({h:d} downto {h - 7:d}) &
+TSF{sl:d}_input({h - 8:d} downto {h - 20:d}) &
+""" for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
     """unamed(901 downto 0)
 """
 

@@ -506,7 +506,7 @@ def print_plotting_summary(
     print()
     print(terminal_title_line("Summary of plotting", level=0))
 
-    print("Total number of plotuples considered: {}".format(len(plotuples)))
+    print(f"Total number of plotuples considered: {len(plotuples)}")
 
     def pt_key(plotuple):
         """ How we report on this plotuple """
@@ -873,8 +873,8 @@ def create_plots(
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
         print(
-            "Plots for the revision(s) {} have already been created before "
-            "and will be served from the archive.".format(", ".join(revisions))
+            f"Plots for the revision(s) {', '.join(revisions)} have already been created before and will be served " +
+            "from the archive."
         )
     # Otherwise: Create the requested plots
     else:

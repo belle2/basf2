@@ -51,7 +51,7 @@ main.add_module(input)
 
 # output
 output = b2.register_module('RootOutput')
-output.param("outputFileName", "trgsum/trgsum.%s.root" % basename)
+output.param("outputFileName", f"trgsum/trgsum.{basename}.root")
 if not os.path.isdir('trgsum'):
     os.mkdir('trgsum')
 

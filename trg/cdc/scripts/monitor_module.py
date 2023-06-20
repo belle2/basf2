@@ -192,10 +192,8 @@ class Monitor(b2.Module):
                     options += ' same'
                 h.Draw(options)
             can.BuildLegend(.85, .76, .95, .95)
-            hits[0].SetTitle(name + ' hit distribution in run {}; #phi (rad)'.format(
-                self.first_run))
-            can.SaveAs('monitor_plots/' + name.split()[0] +
-                       f'_ts_hits_{self.first_run:05d}.{file_type}')
+            hits[0].SetTitle(name + f' hit distribution in run {self.first_run}; #phi (rad)')
+            can.SaveAs('monitor_plots/' + name.split()[0] + f'_ts_hits_{self.first_run:05d}.{file_type}')
 
         for ratio, name in [(quos, 'ghost rate'), (quong, 'efficiency (w.r.t. fast TSIM)')]:
             upp = max([g.GetMaximum() for g in ratio])

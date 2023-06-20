@@ -241,7 +241,7 @@ namespace Belle2 {
     };
 
     /** default constructor. */
-    CDCTriggerMLPData(): inputSamples(), targetSamples(), hitCounters(), trackCounter(0) { }
+    CDCTriggerMLPData(): m_inputSamples(), m_targetSamples(), m_hitCounters(), m_trackCounter(0) { }
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerMLPData() { }
 
@@ -250,26 +250,26 @@ namespace Belle2 {
     {
       std::vector<unsigned short> counters;
       counters.assign(nWires, 0);
-      hitCounters.push_back(counters);
+      m_hitCounters.push_back(counters);
     }
     /** increase counter for super layer and track segment number in super layer.
      *  track segment number can be negative.
      *  hits in the wrong hemisphere (not in [-nWires/4, nWires/4]) are skipped. */
     void addHit(unsigned iSL, int iTS);
     /** increase track counter */
-    void countTrack() { ++trackCounter; }
+    void countTrack() { ++m_trackCounter; }
     template<unsigned inLen, unsigned outLen>
     void addSample(const NeuroSet<inLen, outLen>& dsample)
     {
       std::vector<float> in(dsample.input, dsample.input + sizeof dsample.input / sizeof dsample.input[0]);
-      inputSamples.push_back(in);
+      m_inputSamples.push_back(in);
       std::vector<float> out(dsample.target, dsample.target + sizeof dsample.target / sizeof dsample.target[0]);
-      targetSamples.push_back(out);
-      explist.push_back(dsample.exp);
-      runlist.push_back(dsample.run);
-      subrunlist.push_back(dsample.subrun);
-      evtlist.push_back(dsample.evt);
-      tracklist.push_back(dsample.track);
+      m_targetSamples.push_back(out);
+      m_expList.push_back(dsample.exp);
+      m_runList.push_back(dsample.run);
+      m_subRunList.push_back(dsample.subrun);
+      m_evtList.push_back(dsample.evt);
+      m_trackList.push_back(dsample.track);
 
     }
 
@@ -277,54 +277,54 @@ namespace Belle2 {
     void addSample(const std::vector<float>& input, const std::vector<float>& target, const int& expnumber, const int& runnumber,
                    const int& subrunnumber, const int& eventnumber, const int& tracknumber)
     {
-      inputSamples.push_back(input);
-      targetSamples.push_back(target);
-      explist.push_back(expnumber);
-      runlist.push_back(runnumber);
-      subrunlist.push_back(subrunnumber);
-      evtlist.push_back(eventnumber);
-      tracklist.push_back(tracknumber);
+      m_inputSamples.push_back(input);
+      m_targetSamples.push_back(target);
+      m_expList.push_back(expnumber);
+      m_runList.push_back(runnumber);
+      m_subRunList.push_back(subrunnumber);
+      m_evtList.push_back(eventnumber);
+      m_trackList.push_back(tracknumber);
     }
 
     /** get track counter */
-    short getTrackCounter() const { return trackCounter; }
+    short getTrackCounter() const { return m_trackCounter; }
     /** get hit counter for super layer and track segment number is super layer.
      *  track segment number can be negative.
      *  @return counter or 0 (for invalid input) */
     unsigned short getHitCounter(unsigned iSL, int iTS) const;
     /** get number of samples (same for input and target) */
-    unsigned nSamples() const { return targetSamples.size(); }
+    unsigned nSamples() const { return m_targetSamples.size(); }
     /** get input vector of sample i */
-    const std::vector<float>& getInput(unsigned i) const { return inputSamples[i]; }
+    const std::vector<float>& getInput(unsigned i) const { return m_inputSamples[i]; }
     /** get target value of sample i */
-    const std::vector<float>& getTarget(unsigned i) const { return targetSamples[i]; }
+    const std::vector<float>& getTarget(unsigned i) const { return m_targetSamples[i]; }
     const std::vector<int>& getevtList() const { return getEvtList(); }
-    const std::vector<int>& getEvtList() const { return evtlist; }
-    const std::vector<int>& getExpList() const { return explist; }
-    const std::vector<int>& getRunList() const { return runlist; }
-    const std::vector<int>& getSubRunList() const { return subrunlist; }
-    const std::vector<int>& getTrackList() const { return tracklist; }
-    const int& getevtnum(unsigned i) const { return evtlist[i]; }
+    const std::vector<int>& getEvtList() const { return m_evtList; }
+    const std::vector<int>& getExpList() const { return m_expList; }
+    const std::vector<int>& getRunList() const { return m_runList; }
+    const std::vector<int>& getSubRunList() const { return m_subRunList; }
+    const std::vector<int>& getTrackList() const { return m_trackList; }
+    const int& getevtnum(unsigned i) const { return m_evtList[i]; }
   private:
     /** list of input vectors for network training. */
-    std::vector<std::vector<float>> inputSamples;
+    std::vector<std::vector<float>> m_inputSamples;
     /** list of target values for network training. */
-    std::vector<std::vector<float>> targetSamples;
+    std::vector<std::vector<float>> m_targetSamples;
     /** hit counter of active track segment IDs,
      *  used to determine the relevant id range for an MLP. */
-    std::vector<std::vector<unsigned short>> hitCounters;
+    std::vector<std::vector<unsigned short>> m_hitCounters;
     /** number of tracks used for the hit counter. */
-    short trackCounter;
+    short m_trackCounter;
     /** Vectors for experiment, run, event and tracknumber */
-    std::vector<int> explist;
-    std::vector<int> runlist;
-    std::vector<int> subrunlist;
+    std::vector<int> m_expList;
+    std::vector<int> m_runList;
+    std::vector<int> m_subRunList;
     /** List for debug purposes to store the event number for every entry of input/target vector */
-    std::vector<int> evtlist;
-    std::vector<int> tracklist;
+    std::vector<int> m_evtList;
+    std::vector<int> m_trackList;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLPData, 2);
+    ClassDef(CDCTriggerMLPData, 3);
   };
 }
 #endif

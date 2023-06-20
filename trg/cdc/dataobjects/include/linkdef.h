@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::CDCTriggerSegmentHit+; // checksum=0x89ed4679, version=4
 #pragma link C++ class Belle2::CDCTriggerTrack+; // checksum=0xa5ae9350, version=13
 #pragma link C++ class Belle2::CDCTriggerMLP+; // checksum=0x2a3c1c8d, version=10
-#pragma link C++ class Belle2::CDCTriggerMLPData+; // checksum=0x933865e9, version=2
+#pragma link C++ class Belle2::CDCTriggerMLPData+; // checksum=0x62b29f0b, version=3
 #pragma link C++ class Belle2::CDCTriggerMLPInput+; // checksum=0x6fd59940, version=1
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+; // checksum=0x8c000310, version=1
 #pragma link C++ class Belle2::CDCTriggerFinderClone+; // checksum=0x6581a3cf, version=1

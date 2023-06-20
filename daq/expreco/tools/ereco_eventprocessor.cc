@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
   ERecoEventProcessor* evproc = new ERecoEventProcessor(argv[1]);
 
-  char nodename[256];
+  char nodename[256 + 4];
   strcpy(nodename, "evp_");
   gethostname(&nodename[4], sizeof(nodename));
 

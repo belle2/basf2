@@ -156,7 +156,7 @@ if args.mcOnly:
     with open("mc_file_iov_map.pkl", 'br') as map_file:
         files_to_iovs = pickle.load(map_file)
     input_files = list(files_to_iovs.keys())
-    print(f'Number selected mc input files:  {len(input_files)}')
+    print('Number selected mc input files:  {}'.format(len(input_files)))
 
 else:
 
@@ -172,11 +172,11 @@ else:
     # load ignore run list
     ignoreRuns = args.ignoreRuns
     if "DefaultFromKEKCC" in ignoreRuns:
-        dirkekcc = f"/hsm/belle2/bdata/Data/Raw/e000{args.expNo}/"
+        dirkekcc = "/hsm/belle2/bdata/Data/Raw/e000{}/".format(args.expNo)
         ignoreRuns = dirkekcc + "RunListBeam," + dirkekcc + "RunListCosmic"
     if ignoreRuns:
         for flist in ignoreRuns.split(","):
-            fignore = open(flist)
+            fignore = open(flist, 'r')
             line = fignore.readline()
             while line:
                 run = line[0:line.find(',')]
@@ -197,7 +197,7 @@ else:
             subruns = [k for k, v in files_to_iovs.items() if v == file_iov]
             input_files.extend(subruns[:args.maxSubRuns])
 
-    print(f'Number selected data input files:  {len(input_files)}')
+    print('Number selected data input files:  {}'.format(len(input_files)))
 
 
 ###################
@@ -312,5 +312,6 @@ cal_fw = CAF()
 cal_fw.add_calibration(charge_cal)
 cal_fw.backend = LSF()  # KEKCC batch
 # cal_fw.backend = backends.Local(max_processes=20) # interactive
-cal_fw.output_dir = f'pxd_calibration_results_e{args.expNo}_range_{args.runLow}_{args.runHigh}'
+cal_fw.output_dir = 'pxd_calibration_results_e{}_range_{}_{}'.format(
+    args.expNo, args.runLow, args.runHigh)
 cal_fw.run(iov=iov_to_calibrate)

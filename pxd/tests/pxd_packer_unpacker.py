@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -96,7 +97,7 @@ class PxdPackerUnpackerTestModule(b2.Module):
         if not len(pxdDigits) == len(pxdRawHitsPackedUnpacked):
             b2.B2FATAL("PXDDigits and PXDRawHits count not equal after packing and unpacking")
 
-        print(f"Comparing {len(pxdDigits)} pxd digits ")
+        print("Comparing %i pxd digits " % len(pxdDigits))
 
         # check all quantities between the direct and the packed/unpacked pxd digits
         for i in range(len(pxdDigits)):

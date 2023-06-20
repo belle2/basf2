@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -168,7 +170,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
                 run_data.append([exp_run.run, result, [exp_run],
                                  algorithm_results, '', None])
             result_str = calibration_result_string(result)
-            basf2.B2INFO(f'Run {int(exp_run.run)}: {result_str}.')
+            basf2.B2INFO('Run %d: %s.' % (exp_run.run, result_str))
 
         # Sort by run number.
         run_data.sort(key=lambda x: x[0])
@@ -202,12 +204,15 @@ class KLMStripEfficiency(AlgorithmStrategy):
             if (next_run < len(run_data)):
                 while (i >= run_range[0]):
                     if (can_merge(run_data, i, next_run)):
-                        basf2.B2INFO(f'Run {int(run_data[i][0])} (not enough data) can be merged into the next normal run ' +
-                                     f'{int(run_data[next_run][0])}.')
+                        basf2.B2INFO('Run %d (not enough data) can be merged '
+                                     'into the next normal run %d.' %
+                                     (run_data[i][0], run_data[next_run][0]))
                         run_data[i][4] = 'next'
                     else:
-                        basf2.B2INFO(f'Run {int(run_data[i][0])} (not enough data) cannot be merged into the next normal run ' +
-                                     f'{int(run_data[next_run][0])}, will try the previous one.')
+                        basf2.B2INFO('Run %d (not enough data) cannot be '
+                                     'merged into the next normal run %d, '
+                                     'will try the previous one.' %
+                                     (run_data[i][0], run_data[next_run][0]))
                         break
                     i -= 1
                 if (i < run_range[0]):
@@ -216,18 +221,24 @@ class KLMStripEfficiency(AlgorithmStrategy):
             if (previous_run >= 0):
                 while (j <= i):
                     if (can_merge(run_data, j, previous_run)):
-                        basf2.B2INFO(f'Run {int(run_data[j][0])} (not enough data) can be merged into the previous normal run ' +
-                                     f'{int(run_data[previous_run][0])}.')
+                        basf2.B2INFO('Run %d (not enough data) can be merged '
+                                     'into the previous normal run %d.' %
+                                     (run_data[j][0],
+                                      run_data[previous_run][0]))
                         run_data[j][4] = 'previous'
                     else:
-                        basf2.B2INFO(f'Run {int(run_data[j][0])} (not enough data) cannot be merged into the previous normal ' +
-                                     f'run {int(run_data[previous_run][0])}.')
+                        basf2.B2INFO('Run %d (not enough data) cannot be '
+                                     'merged into the previous normal run %d.' %
+                                     (run_data[j][0],
+                                      run_data[previous_run][0]))
                         break
                     j += 1
                 if (j > i):
                     continue
-            basf2.B2INFO('A range of runs with not enough data is found that cannot be merged into neither previous nor ' +
-                         f'next normal run: from {int(run_data[j][0])} to {int(run_data[i][0])}.')
+            basf2.B2INFO('A range of runs with not enough data is found '
+                         'that cannot be merged into neither previous nor '
+                         'next normal run: from %d to %d.' %
+                         (run_data[j][0], run_data[i][0]))
             while (j <= i):
                 run_data[j][4] = 'none'
                 j += 1
@@ -240,8 +251,9 @@ class KLMStripEfficiency(AlgorithmStrategy):
             while ((run_data[i][1] == 2) and (run_data[i + 1][1] == 2)):
                 if (run_data[i][4] != run_data[i + 1][4]):
                     break
-                basf2.B2INFO(f'Merging run {int(run_data[i + 1][0])} (not enough data) into run {int(run_data[i][0])} ' +
-                             '(not enough data).')
+                basf2.B2INFO('Merging run %d (not enough data) into '
+                             'run %d (not enough data).' %
+                             (run_data[i + 1][0], run_data[i][0]))
                 run_data[i][2].extend(run_data[i + 1][2])
                 del run_data[i + 1]
                 self.execute_over_run_list(
@@ -251,15 +263,17 @@ class KLMStripEfficiency(AlgorithmStrategy):
                 run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
                     self.machine.algorithm.algorithm.getResults())
                 result_str = calibration_result_string(run_data[i][1])
-                basf2.B2INFO(f'Run {int(run_data[i][0])}: {result_str}.')
+                basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                 if (i >= len(run_data) - 1):
                     break
             i += 1
 
         # Merge runs that do not have enough data into normal runs.
         def merge_runs(run_data, run_not_enough_data, run_normal, forced):
-            basf2.B2INFO(f'Merging run {int(run_data[run_not_enough_data][0])} (not enough data) into run ' +
-                         f'{int(run_data[run_normal][0])} (normal).')
+            basf2.B2INFO('Merging run %d (not enough data) into '
+                         'run %d (normal).' %
+                         (run_data[run_not_enough_data][0],
+                          run_data[run_normal][0]))
             run_data[run_normal][2].extend(run_data[run_not_enough_data][2])
             self.execute_over_run_list(
                 run_data[run_normal][2], iteration, forced,
@@ -268,10 +282,11 @@ class KLMStripEfficiency(AlgorithmStrategy):
             run_data[run_normal][3] = KLMStripEfficiencyAlgorithm.Results(
                 self.machine.algorithm.algorithm.getResults())
             result_str = calibration_result_string(run_data[run_normal][1])
-            basf2.B2INFO(f'Run {int(run_data[run_normal][0])}: {result_str}.')
+            basf2.B2INFO('Run %d: %s.' % (run_data[run_normal][0], result_str))
             if (run_data[run_normal][1] != 0):
-                basf2.B2FATAL(f'Merging run {int(run_data[run_not_enough_data][0])} into ' +
-                              f'run {int(run_data[run_normal][0])} failed.')
+                basf2.B2FATAL('Merging run %d into run %d failed.' %
+                              (run_data[run_not_enough_data][0],
+                               run_data[run_normal][0]))
             del run_data[run_not_enough_data]
 
         i = 0
@@ -293,13 +308,17 @@ class KLMStripEfficiency(AlgorithmStrategy):
                 if (i < len(run_data) - 1):
                     new_planes_next = run_data[i][3].newExtHitsPlanes(
                         run_data[i + 1][3].getExtHitsPlane())
-                    basf2.B2INFO(f'There are {int(new_planes_next)} new active modules in run {int(run_data[i][0])} ' +
-                                 f'relatively to run {int(run_data[i + 1][0])}.')
+                    basf2.B2INFO('There are %d new active modules in run %d '
+                                 'relatively to run %d.' %
+                                 (new_planes_next, run_data[i][0],
+                                  run_data[i + 1][0]))
                 if (i > 0):
                     new_planes_previous = run_data[i][3].newExtHitsPlanes(
                         run_data[i - 1][3].getExtHitsPlane())
-                    basf2.B2INFO(f'There are {int(new_planes_previous)} new active modules in run {int(run_data[i][0])} ' +
-                                 f'relatively to run {int(run_data[i - 1][0])}.')
+                    basf2.B2INFO('There are %d new active modules in run %d '
+                                 'relatively to run %d.' %
+                                 (new_planes_previous,
+                                  run_data[i][0], run_data[i - 1][0]))
                 run_for_merging = -1
                 # If a forced merge of the normal run with another run from
                 # a different range of runs with not enough data has already
@@ -318,8 +337,9 @@ class KLMStripEfficiency(AlgorithmStrategy):
                     else:
                         run_for_merging = i + 1
                 else:
-                    basf2.B2INFO(f'Cannot determine run for merging for run {int(run_data[i][0])}, performing its' +
-                                 ' forced calibration.')
+                    basf2.B2INFO('Cannot determine run for merging for run %d, '
+                                 'performing its forced calibration.' %
+                                 (run_data[i][0]))
                     self.execute_over_run_list(
                         run_data[i][2], iteration, True,
                         KLMStripEfficiencyAlgorithm.c_MeasurablePlaneCheck,
@@ -328,9 +348,10 @@ class KLMStripEfficiency(AlgorithmStrategy):
                     run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
                         self.machine.algorithm.algorithm.getResults())
                     result_str = calibration_result_string(run_data[i][1])
-                    basf2.B2INFO(f'Run {int(run_data[i][0])}: {result_str}.')
+                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                     if (run_data[i][1] != 0):
-                        basf2.B2FATAL(f'Forced calibration of run {int(run_data[i][0])} failed.')
+                        basf2.B2FATAL('Forced calibration of run %d failed.' %
+                                      (run_data[i][0]))
                 if (run_for_merging >= 0):
                     merge_runs(run_data, i, run_for_merging, True)
             else:
@@ -352,10 +373,14 @@ class KLMStripEfficiency(AlgorithmStrategy):
                         run_data[j][3].getEfficiency()) != 0):
                     planes_differ = True
                 if (planes_differ):
-                    basf2.B2INFO(f'Run {int(run_data[j][0])}: the set of planes is different from run {int(run_data[i][0])}.')
+                    basf2.B2INFO('Run %d: the set of planes is different '
+                                 'from run %d.'
+                                 % (run_data[j][0], run_data[i][0]))
                     break
                 else:
-                    basf2.B2INFO(f'Run {int(run_data[j][0])}: the set of planes is the same as for run {int(run_data[i][0])}.')
+                    basf2.B2INFO('Run %d: the set of planes is the same '
+                                 'as for run %d.'
+                                 % (run_data[j][0], run_data[i][0]))
                     j = j + 1
             run_ranges.append([i, j])
             i = j
@@ -368,9 +393,11 @@ class KLMStripEfficiency(AlgorithmStrategy):
 
         # Merge runs.
         def merge_runs_2(run_data, run_1, run_2, forced):
-            basf2.B2INFO(f'Merging run {int(run_data[run_2][0])} into run {int(run_data[run_1][0])}.')
+            basf2.B2INFO('Merging run %d into run %d.' %
+                         (run_data[run_2][0], run_data[run_1][0]))
             run_data[run_1][2].extend(run_data[run_2][2])
-            output_file = f'efficiency/efficiency_{int(run_data[run_1][2][0].exp)}_{int(run_data[run_1][2][0].run)}.root'
+            output_file = 'efficiency/efficiency_%d_%d.root' % \
+                          (run_data[run_1][2][0].exp, run_data[run_1][2][0].run)
             self.execute_over_run_list(
                 run_data[run_1][2], iteration, forced,
                 KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement,
@@ -381,13 +408,17 @@ class KLMStripEfficiency(AlgorithmStrategy):
             run_data[run_1][5] = \
                 self.machine.algorithm.algorithm.getPayloadValues()
             result_str = calibration_result_string(run_data[run_1][1])
-            basf2.B2INFO(f'Run {int(run_data[run_1][0])}: {result_str}; requested precision {0.02:f}, achieved precision ' +
-                         f'{run_data[run_1][3].getAchievedPrecision():f}.')
+            basf2.B2INFO('Run %d: %s; requested precision %f, achieved '
+                         'precision %f.' %
+                         (run_data[run_1][0], result_str, 0.02,
+                          # run_data[run_1][3].getRequestedPrecision(),
+                          run_data[run_1][3].getAchievedPrecision()))
 
         for run_range in run_ranges:
             i = run_range[0]
             while (i < run_range[1]):
-                output_file = f'efficiency/efficiency_{int(run_data[i][2][0].exp)}_{int(run_data[i][2][0].run)}.root'
+                output_file = 'efficiency/efficiency_%d_%d.root' % \
+                              (run_data[i][2][0].exp, run_data[i][2][0].run)
                 # Force calibration if there are no more runs in the range.
                 if (i == run_range[1] - 1):
                     forced_calibration = True
@@ -403,8 +434,11 @@ class KLMStripEfficiency(AlgorithmStrategy):
                 run_data[i][5] = \
                     self.machine.algorithm.algorithm.getPayloadValues()
                 result_str = calibration_result_string(run_data[i][1])
-                basf2.B2INFO(f'Run {int(run_data[i][0])}: {result_str}; requested precision {0.02:f}, achieved precision ' +
-                             f'{run_data[i][3].getAchievedPrecision():f}.')
+                basf2.B2INFO('Run %d: %s; requested precision %f, achieved '
+                             'precision %f.' %
+                             (run_data[i][0], result_str, 0.02,
+                              # run_data[i][3].getRequestedPrecision(),
+                              run_data[i][3].getAchievedPrecision()))
                 if (run_data[i][1] == 2):
                     j = i + 1
                     while (j < run_range[1]):
@@ -432,7 +466,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
 
         # Stage 4: write the results to the database.
         def commit_payload(run_data, run):
-            basf2.B2INFO(f'Writing run {int(run_data[run][0])}.')
+            basf2.B2INFO('Writing run %d.' % (run_data[run][0]))
             self.machine.algorithm.algorithm.commit(run_data[run][5])
 
         for i in range(0, len(run_data)):

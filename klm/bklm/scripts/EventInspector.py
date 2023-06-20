@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -135,7 +136,7 @@ class EventInspector(basf2.Module):
     def initialize(self):
         """Handle job initialization: fill the mapping database, create histograms, open the event-display file"""
 
-        expRun = f'e{int(self.exp):02d}r{int(self.run)}: '
+        expRun = 'e{0:02d}r{1}: '.format(int(self.exp), int(self.run))
         #: blank scatterplot to define the bounds of the BKLM end view
         self.hist_XY = ROOT.TH2F('XY', ' ;x;y', 10, -345.0, 345.0, 10, -345.0, 345.0)
         self.hist_XY.SetStats(False)
@@ -274,11 +275,11 @@ class EventInspector(basf2.Module):
             dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
-            label = f'rawKLM_S{sectorFB:02d}_sizeMultihit'
-            title = f'{expRun}sector {sectorFB} [COPPER {copper} finesse {finesse}] word count (N/channel)'
+            label = 'rawKLM_S{0:02d}_sizeMultihit'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] word count (N/channel)'.format(expRun, sectorFB, copper, finesse)
             self.hist_rawKLMsizeByDCMultihit.append(ROOT.TH1F(label, title, 100, -0.5, 199.5))
-            label = f'rawKLM_S{sectorFB:02d}_size'
-            title = f'{expRun}sector {sectorFB} [COPPER {copper} finesse {finesse}] word count (1/channel)'
+            label = 'rawKLM_S{0:02d}_size'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] word count (1/channel)'.format(expRun, sectorFB, copper, finesse)
             self.hist_rawKLMsizeByDC.append(ROOT.TH1F(label, title, 100, -0.5, 199.5))
         #: scatterplots of multiplicity of entries in one readout channel vs lane/axis, indexed by sector#
         self.hist_rawKLMchannelMultiplicity = []
@@ -288,13 +289,13 @@ class EventInspector(basf2.Module):
             dc = self.sectorFBToDC[sectorFB]
             copper = dc & 0x03
             finesse = dc >> 2
-            label = f'rawKLM_S{sectorFB:02d}_channelMultiplicity'
-            title = f'{expRun}sector {sectorFB} [COPPER {copper} finesse {finesse}] per-channel multiplicity (N/channel > 1);' + \
-                'Per-channel multiplicity;(Lane #) * 2 + (Axis #)'
+            label = 'rawKLM_S{0:02d}_channelMultiplicity'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] per-channel multiplicity (N/channel > 1);'.format(
+                expRun, sectorFB, copper, finesse) + 'Per-channel multiplicity;(Lane #) * 2 + (Axis #)'
             self.hist_rawKLMchannelMultiplicity.append(ROOT.TH2F(label, title, 30, -0.5, 29.5, 42, -0.5, 41.5))
-            label = f'rawKLM_S{sectorFB:02d}_channelMultiplicityFine'
-            title = f'{expRun}sector {sectorFB} [COPPER {copper} finesse {finesse}] per-channel multiplicity (N/channel > 1);' + \
-                'Per-channel multiplicity;(Lane #) * 256 + (Axis #) * 128 + (Channel #)'
+            label = 'rawKLM_S{0:02d}_channelMultiplicityFine'.format(sectorFB)
+            title = '{0}sector {1} [COPPER {2} finesse {3}] per-channel multiplicity (N/channel > 1);'.format(
+                expRun, sectorFB, copper, finesse) + 'Per-channel multiplicity;(Lane #) * 256 + (Axis #) * 128 + (Channel #)'
             self.hist_rawKLMchannelMultiplicityFine.append(ROOT.TH2F(label, title, 30, -0.5, 29.5, 8192, -0.5, 8191.5))
         #: histogram of number of mapped hits by sector, including multiple entries on one readout channel
         self.hist_mappedSectorOccupancyMultihit = ROOT.TH1F(
@@ -385,23 +386,23 @@ class EventInspector(basf2.Module):
             [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
             [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         for sectorFB in range(0, 16):
-            label = f'mappedChannelOccupancy_S{sectorFB:02d}ZPrompt'
-            title = f'{expRun}In-time mapped channel occupancy for sector {sectorFB} z hits;lane;channel'
+            label = 'mappedChannelOccupancy_S{0:02d}ZPrompt'.format(sectorFB)
+            title = '{0}In-time mapped channel occupancy for sector {1} z hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyPrompt[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = f'mappedChannelOccupancy_S{sectorFB:02d}ZBkgd'
-            title = f'{expRun}Out-of-time mapped channel occupancy for sector {sectorFB} z hits;lane;channel'
+            label = 'mappedChannelOccupancy_S{0:02d}ZBkgd'.format(sectorFB)
+            title = '{0}Out-of-time mapped channel occupancy for sector {1} z hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyBkgd[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = f'unmappedChannelOccupancy_S{sectorFB:02d}Z'
-            title = f'{expRun}Unmapped channel occupancy for sector {sectorFB} z hits;lane;channel'
+            label = 'unmappedChannelOccupancy_S{0:02d}Z'.format(sectorFB)
+            title = '{0}Unmapped channel occupancy for sector {1} z hits;lane;channel'.format(expRun, sectorFB)
             self.hist_unmappedChannelOccupancy[sectorFB][0] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = f'mappedChannelOccupancy_S{sectorFB:02d}PhiPrompt'
-            title = f'{expRun}In-time mapped occupancy for sector {sectorFB} phi hits;lane;channel'
+            label = 'mappedChannelOccupancy_S{0:02d}PhiPrompt'.format(sectorFB)
+            title = '{0}In-time mapped occupancy for sector {1} phi hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyPrompt[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = f'mappedChannelOccupancy_S{sectorFB:02d}PhiBkgd'
-            title = f'{expRun}Out-of-time mapped occupancy for sector {sectorFB} phi hits;lane;channel'
+            label = 'mappedChannelOccupancy_S{0:02d}PhiBkgd'.format(sectorFB)
+            title = '{0}Out-of-time mapped occupancy for sector {1} phi hits;lane;channel'.format(expRun, sectorFB)
             self.hist_mappedChannelOccupancyBkgd[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
-            label = f'unmappedChannelOccupancy_S{sectorFB:02d}Phi'
-            title = f'{expRun}Unmapped channel occupancy for sector {sectorFB} phi hits;lane;channel'
+            label = 'unmappedChannelOccupancy_S{0:02d}Phi'.format(sectorFB)
+            title = '{0}Unmapped channel occupancy for sector {1} phi hits;lane;channel'.format(expRun, sectorFB)
             self.hist_unmappedChannelOccupancy[sectorFB][1] = ROOT.TH2F(label, title, 42, -0.25, 20.75, 128, -0.25, 63.75)
         #: scatterplot of RPC TDC low-order bits vs sector (should be 0 since granularity is 4 ns)
         self.hist_RPCTimeLowBitsBySector = ROOT.TH2F('RPCTimeLowBitsBySector',
@@ -423,11 +424,11 @@ class EventInspector(basf2.Module):
             self.hist_mappedRPCPhiTimePerLayer.append([])
             self.hist_mappedRPCZTimePerLayer.append([])
             for layer in range(0, 15):
-                label = f'mappedRPCPhiTime_S{sectorFB:02d}L{layer:02d}'
-                title = f'{expRun}RPC sector {sectorFB} layer {layer} phi time distribution;t - t(trigger) (ns)'
+                label = 'mappedRPCPhiTime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
+                title = '{0}RPC sector {1} layer {2} phi time distribution;t - t(trigger) (ns)'.format(expRun, sectorFB, layer)
                 self.hist_mappedRPCPhiTimePerLayer[sectorFB].append(ROOT.TH1F(label, title, 256, -0.5, 1023.5))
-                label = f'mappedRPCZTime_S{sectorFB:02d}L{layer:02d}'
-                title = f'{expRun}RPC sector {sectorFB} layer {layer} z time distribution;t - t(trigger) (ns)'
+                label = 'mappedRPCZTime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
+                title = '{0}RPC sector {1} layer {2} z time distribution;t - t(trigger) (ns)'.format(expRun, sectorFB, layer)
                 self.hist_mappedRPCZTimePerLayer[sectorFB].append(ROOT.TH1F(label, title, 256, -0.5, 1023.5))
         #: scatterplot of RPC mapped-channel TDC value relative to event's trigger time vs sector
         self.hist_mappedRPCTimeBySector = ROOT.TH2F('mappedRPCTimeBySector',
@@ -499,11 +500,13 @@ class EventInspector(basf2.Module):
             self.hist_mappedScintPhiCtimePerLayer.append([])
             self.hist_mappedScintZCtimePerLayer.append([])
             for layer in range(0, 2):
-                label = f'mappedScintPhiCtime_S{sectorFB:02d}L{layer:02d}'
-                title = f'{expRun}Scint sector {sectorFB} layer {layer} phi ctime distribution;ctime - ct(trigger) (ns)'
+                label = 'mappedScintPhiCtime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
+                title = '{0}Scint sector {1} layer {2} phi ctime distribution;ctime - ct(trigger) (ns)'.format(expRun,
+                                                                                                               sectorFB, layer)
                 self.hist_mappedScintPhiCtimePerLayer[sectorFB].append(ROOT.TH1F(label, title, 32, -0.5, 1023.5))
-                label = f'mappedScintZCtime_S{sectorFB:02d}L{layer:02d}'
-                title = f'{expRun}Scint sector {sectorFB} layer {layer} z ctime distribution;ctime - ct(trigger) (ns)'
+                label = 'mappedScintZCtime_S{0:02d}L{1:02d}'.format(sectorFB, layer)
+                title = '{0}Scint sector {1} layer {2} z ctime distribution;ctime - ct(trigger) (ns)'.format(expRun,
+                                                                                                             sectorFB, layer)
                 self.hist_mappedScintZCtimePerLayer[sectorFB].append(ROOT.TH1F(label, title, 32, -0.5, 1023.5))
         #: histogram of scint mapped-channel CTIME range in event
         self.hist_mappedScintCtimeRange = ROOT.TH1F('mappedScintCtimeRange',
@@ -750,7 +753,7 @@ class EventInspector(basf2.Module):
         if self.maxDisplays > 0:
             #: TCanvas on which event displays will be drawn
             self.eventCanvas = ROOT.TCanvas("eventCanvas", self.eventPdfName, 3200, 1600)
-            title = f'{self.eventPdfName}['
+            title = '{0}['.format(self.eventPdfName)
             self.eventCanvas.SaveAs(title)
             self.eventCanvas.Clear()
             self.eventCanvas.Divide(2, 1)
@@ -895,7 +898,7 @@ class EventInspector(basf2.Module):
         """Handle job termination: draw histograms, close output files"""
 
         if self.maxDisplays > 0:
-            pdfNameLast = f'{self.eventPdfName}]'
+            pdfNameLast = '{0}]'.format(self.eventPdfName)
             self.eventCanvas.Print(pdfNameLast, self.lastTitle)
 
         for sectorFB in range(0, 16):
@@ -924,24 +927,24 @@ class EventInspector(basf2.Module):
                     self.hist_unmappedRPCLaneAxisOccupancy.SetBinContent(
                         sectorFB + 1, laneAxis + 1, 100.0 * numerator / unmappedRPCSectorOccupancy)
         canvas = ROOT.TCanvas("canvas", self.pdfName, 1600, 1600)
-        title = f'{self.pdfName}['
+        title = '{0}['.format(self.pdfName)
         canvas.SaveAs(title)
         canvas.Clear()
         canvas.GetPad(0).SetGrid(1, 1)
         canvas.GetPad(0).Update()
         self.hist_nDigit.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_nDigit.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nDigit.GetName()))
         if self.verbosity > 0:
             self.hist_nRawKLM.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_nRawKLM.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nRawKLM.GetName()))
             self.hist_rawKLMnumEvents.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMnumEvents.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumEvents.GetName()))
             self.hist_rawKLMnumNodes.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMnumNodes.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnumNodes.GetName()))
             self.hist_rawKLMnodeID.Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMnodeID.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMnodeID.GetName()))
             self.hist_rawKLMlaneFlag.Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMlaneFlag.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMlaneFlag.GetName()))
         # self.hist_rawKLMtdcExtraRPC.Draw("box")
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMtdcExtraRPC.GetName()))
         # self.hist_rawKLMadcExtraRPC.Draw("box")
@@ -952,32 +955,32 @@ class EventInspector(basf2.Module):
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMadcExtraScint.GetName()))
         if self.verbosity > 0:
             self.hist_rawKLMsizeMultihit.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMsizeMultihit.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeMultihit.GetName()))
             for dc in range(0, 16):
                 self.hist_rawKLMsizeByDCMultihit[dc].Draw()
-                canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMsizeByDCMultihit[dc].GetName()}")
+                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeByDCMultihit[dc].GetName()))
         self.hist_rawKLMsize.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMsize.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsize.GetName()))
         if self.verbosity > 0:
             for dc in range(0, 16):
                 self.hist_rawKLMsizeByDC[dc].Draw()
-                canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMsizeByDC[dc].GetName()}")
+                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMsizeByDC[dc].GetName()))
         for dc in range(0, 16):
             self.hist_rawKLMchannelMultiplicity[dc].Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_rawKLMchannelMultiplicity[dc].GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_rawKLMchannelMultiplicity[dc].GetName()))
         # self.hist_mappedSectorOccupancy.Draw()
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedSectorOccupancy.GetName()))
         # self.hist_unmappedSectorOccupancy.Draw()
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedSectorOccupancy.GetName()))
         if self.verbosity > 0:
             self.hist_mappedRPCSectorOccupancy.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCSectorOccupancy.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCSectorOccupancy.GetName()))
             self.hist_unmappedRPCSectorOccupancy.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_unmappedRPCSectorOccupancy.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCSectorOccupancy.GetName()))
             self.hist_unmappedScintSectorOccupancy.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_unmappedScintSectorOccupancy.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintSectorOccupancy.GetName()))
             self.hist_mappedScintSectorOccupancy.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintSectorOccupancy.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintSectorOccupancy.GetName()))
         canvas.Clear()
         canvas.Divide(2, 1)
         canvas.GetPad(0).SetGrid(1, 1)
@@ -1048,7 +1051,7 @@ class EventInspector(basf2.Module):
             graphScint0.Draw("L")
             textRPC1.Draw()
             textScint0.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_mappedChannelOccupancyPrompt[sectorFB][0].GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyPrompt[sectorFB][0].GetName()))
         if self.verbosity > 0:
             for sectorFB in range(0, 16):
                 zmax = 1
@@ -1081,7 +1084,7 @@ class EventInspector(basf2.Module):
                 graphScint0.Draw("L")
                 textRPC1.Draw()
                 textScint0.Draw()
-                canvas.Print(self.pdfName, f"Title:{self.hist_mappedChannelOccupancyBkgd[sectorFB][0].GetName()}")
+                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedChannelOccupancyBkgd[sectorFB][0].GetName()))
             for sectorFB in range(0, 16):
                 canvas.cd(1)
                 self.hist_unmappedChannelOccupancy[sectorFB][0].Draw("colz")  # z hits
@@ -1101,7 +1104,7 @@ class EventInspector(basf2.Module):
                 graphScint0.Draw("L")
                 textRPC1.Draw()
                 textScint0.Draw()
-                canvas.Print(self.pdfName, f"Title:{self.hist_unmappedChannelOccupancy[sectorFB][0].GetName()}")
+                canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedChannelOccupancy[sectorFB][0].GetName()))
         canvas.Clear()
         canvas.Divide(1, 1)
         # self.hist_RPCTimeLowBitsBySector.Draw("box")
@@ -1120,9 +1123,9 @@ class EventInspector(basf2.Module):
         timeFit.SetParameter(3, 100.0)
         self.hist_mappedRPCTime.Fit("timeFit", "QR")
         self.hist_mappedRPCTime.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCTime.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTime.GetName()))
         self.hist_mappedRPCTimeBySector.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCTimeBySector.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeBySector.GetName()))
         n = self.hist_mappedRPCTimeCal.GetEntries()
         timeFit.SetParameter(0, n)
         timeFit.SetParLimits(0, 0.2 * n, 5.0 * n)
@@ -1131,14 +1134,14 @@ class EventInspector(basf2.Module):
         timeFit.SetParameter(3, 100.0)
         self.hist_mappedRPCTimeCal.Fit("timeFit", "QR")
         self.hist_mappedRPCTimeCal.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCTimeCal.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCal.GetName()))
         self.hist_mappedRPCTimeCalBySector.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCTimeCalBySector.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCTimeCalBySector.GetName()))
         if self.verbosity > 0:
             self.hist_unmappedRPCTime.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_unmappedRPCTime.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTime.GetName()))
             self.hist_unmappedRPCTimeBySector.Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_unmappedRPCTimeBySector.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedRPCTimeBySector.GetName()))
             for sectorFB in range(0, 16):
                 for layer in range(2, 15):
                     n = self.hist_mappedRPCPhiTimePerLayer[sectorFB][layer].GetEntries()
@@ -1149,7 +1152,7 @@ class EventInspector(basf2.Module):
                     timeFit.SetParameter(3, 100.0)
                     self.hist_mappedRPCPhiTimePerLayer[sectorFB][layer].Fit("timeFit", "QR")
                     self.hist_mappedRPCPhiTimePerLayer[sectorFB][layer].Draw()
-                    canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCPhiTimePerLayer[sectorFB][layer].GetName()}")
+                    canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCPhiTimePerLayer[sectorFB][layer].GetName()))
             for sectorFB in range(0, 16):
                 for layer in range(2, 15):
                     n = self.hist_mappedRPCZTimePerLayer[sectorFB][layer].GetEntries()
@@ -1160,7 +1163,7 @@ class EventInspector(basf2.Module):
                     timeFit.SetParameter(3, 100.0)
                     self.hist_mappedRPCZTimePerLayer[sectorFB][layer].Fit("timeFit", "QR")
                     self.hist_mappedRPCZTimePerLayer[sectorFB][layer].Draw()
-                    canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCZTimePerLayer[sectorFB][layer].GetName()}")
+                    canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCZTimePerLayer[sectorFB][layer].GetName()))
         # self.hist_ScintTimeLowBitsBySector.Draw("box")
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ScintTimeLowBitsBySector.GetName()))
         # self.hist_mappedScintTDC.Draw()
@@ -1189,9 +1192,9 @@ class EventInspector(basf2.Module):
         ctimeFit.SetParameter(3, 10.0)
         self.hist_mappedScintCtime.Fit("ctimeFit", "QR")
         self.hist_mappedScintCtime.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintCtime.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtime.GetName()))
         self.hist_mappedScintCtimeBySector.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintCtimeBySector.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeBySector.GetName()))
         n = 32 * self.hist_mappedScintCtimeCal.GetEntries()
         ctimeFit.SetParameter(0, n)
         ctimeFit.SetParLimits(0, 0.2 * n, 5.0 * n)
@@ -1200,14 +1203,14 @@ class EventInspector(basf2.Module):
         ctimeFit.SetParameter(3, 10.0)
         self.hist_mappedScintCtimeCal.Fit("ctimeFit", "QR")
         self.hist_mappedScintCtimeCal.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintCtimeCal.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCal.GetName()))
         self.hist_mappedScintCtimeCalBySector.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintCtimeCalBySector.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeCalBySector.GetName()))
         if self.verbosity > 0:
             self.hist_unmappedScintCtime.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_unmappedScintCtime.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintCtime.GetName()))
             self.hist_unmappedScintCtimeBySector.Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_unmappedScintCtimeBySector.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_unmappedScintCtimeBySector.GetName()))
             for sectorFB in range(0, 16):
                 for layer in range(0, 2):
                     n = 32 * self.hist_mappedScintPhiCtimePerLayer[sectorFB][layer].GetEntries()
@@ -1218,7 +1221,7 @@ class EventInspector(basf2.Module):
                     ctimeFit.SetParameter(3, 10.0)
                     self.hist_mappedScintPhiCtimePerLayer[sectorFB][layer].Fit("ctimeFit", "QR")
                     self.hist_mappedScintPhiCtimePerLayer[sectorFB][layer].Draw()
-                    canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintPhiCtimePerLayer[sectorFB][layer].GetName()}")
+                    canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintPhiCtimePerLayer[sectorFB][layer].GetName()))
             for sectorFB in range(0, 16):
                 for layer in range(0, 2):
                     n = 32 * self.hist_mappedScintZCtimePerLayer[sectorFB][layer].GetEntries()
@@ -1229,50 +1232,50 @@ class EventInspector(basf2.Module):
                     ctimeFit.SetParameter(3, 10.0)
                     self.hist_mappedScintZCtimePerLayer[sectorFB][layer].Fit("ctimeFit", "QR")
                     self.hist_mappedScintZCtimePerLayer[sectorFB][layer].Draw()
-                    canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintZCtimePerLayer[sectorFB][layer].GetName()}")
+                    canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintZCtimePerLayer[sectorFB][layer].GetName()))
             self.hist_mappedRPCCtimeRangeBySector.Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_mappedRPCCtimeRangeBySector.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedRPCCtimeRangeBySector.GetName()))
             canvas.SetLogy(0)
             self.hist_tdcRangeRPC.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_tdcRangeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeRPC.GetName()))
             canvas.SetLogy(1)
             self.hist_tdcRangeRPC.Draw("")
-            canvas.Print(self.pdfName, f"Title:{self.hist_tdcRangeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeRPC.GetName()))
             canvas.SetLogy(0)
             self.hist_ctimeRangeRPC.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_ctimeRangeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeRPC.GetName()))
             canvas.SetLogy(1)
             self.hist_ctimeRangeRPC.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_ctimeRangeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeRPC.GetName()))
             canvas.SetLogy(0)
             canvas.SetLogz(0)
             self.hist_tdcRangeVsCtimeRangeRPC.Draw("BOX")
-            canvas.Print(self.pdfName, f"Title:{self.hist_tdcRangeVsCtimeRangeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsCtimeRangeRPC.GetName()))
             canvas.SetLogz(1)
             self.hist_tdcRangeVsCtimeRangeRPC.Draw("COLZ")
-            canvas.Print(self.pdfName, f"Title:{self.hist_tdcRangeVsCtimeRangeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsCtimeRangeRPC.GetName()))
             canvas.SetLogz(0)
             self.hist_tdcRangeVsTimeRPC.Draw("BOX")
-            canvas.Print(self.pdfName, f"Title:{self.hist_tdcRangeVsTimeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsTimeRPC.GetName()))
             canvas.SetLogz(1)
             self.hist_tdcRangeVsTimeRPC.Draw("COLZ")
-            canvas.Print(self.pdfName, f"Title:{self.hist_tdcRangeVsTimeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tdcRangeVsTimeRPC.GetName()))
             canvas.SetLogz(0)
             self.hist_ctimeRangeVsTimeRPC.Draw("BOX")
-            canvas.Print(self.pdfName, f"Title:{self.hist_ctimeRangeVsTimeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeVsTimeRPC.GetName()))
             canvas.SetLogz(1)
             self.hist_ctimeRangeVsTimeRPC.Draw("COLZ")
-            canvas.Print(self.pdfName, f"Title:{self.hist_ctimeRangeVsTimeRPC.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctimeRangeVsTimeRPC.GetName()))
             canvas.SetLogz(0)
             self.hist_mappedScintCtimeRange.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintCtimeRange.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRange.GetName()))
             self.hist_mappedScintCtimeRangeBySector.Draw("box")
-            canvas.Print(self.pdfName, f"Title:{self.hist_mappedScintCtimeRangeBySector.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_mappedScintCtimeRangeBySector.GetName()))
 
         self.hist_nHit1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_nHit1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1d.GetName()))
         self.hist_n1dPhiZ.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_n1dPhiZ.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_n1dPhiZ.GetName()))
         # self.hist_nHit1dRPCPrompt.Draw()
         # canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit1dRPCPrompt.GetName()))
         # self.hist_nHit1dRPCBkgd.Draw()
@@ -1295,7 +1298,7 @@ class EventInspector(basf2.Module):
         timeFit.SetParameter(3, 100.0)
         self.hist_tphiRPCCal1d.Fit("timeFit", "QR")
         self.hist_tphiRPCCal1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_tphiRPCCal1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tphiRPCCal1d.GetName()))
         n = self.hist_tzRPCCal1d.GetEntries()
         timeFit.SetParameter(0, n)
         timeFit.SetParLimits(0, 0.2 * n, 5.0 * n)
@@ -1304,7 +1307,7 @@ class EventInspector(basf2.Module):
         timeFit.SetParameter(3, 100.0)
         self.hist_tzRPCCal1d.Fit("timeFit", "QR")
         self.hist_tzRPCCal1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_tzRPCCal1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tzRPCCal1d.GetName()))
         if self.verbosity > 0:
             n = self.hist_tRPCCal1d.GetEntries()
             timeFit.SetParameter(0, n)
@@ -1314,9 +1317,9 @@ class EventInspector(basf2.Module):
             timeFit.SetParameter(3, 100.0)
             self.hist_tRPCCal1d.Fit("timeFit", "QR")
             self.hist_tRPCCal1d.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_tRPCCal1d.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal1d.GetName()))
         self.hist_dtRPC1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_dtRPC1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtRPC1d.GetName()))
         n = 32 * self.hist_ctphiScintCal1d.GetEntries()
         ctimeFit.SetParameter(0, n)
         ctimeFit.SetParLimits(0, 0.2 * n, 5.0 * n)
@@ -1325,7 +1328,7 @@ class EventInspector(basf2.Module):
         ctimeFit.SetParameter(3, 10.0)
         self.hist_ctphiScintCal1d.Fit("ctimeFit", "QR")
         self.hist_ctphiScintCal1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_ctphiScintCal1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctphiScintCal1d.GetName()))
         n = 32 * self.hist_ctzScintCal1d.GetEntries()
         ctimeFit.SetParameter(0, n)
         ctimeFit.SetParLimits(0, 0.2 * n, 5.0 * n)
@@ -1334,7 +1337,7 @@ class EventInspector(basf2.Module):
         ctimeFit.SetParameter(3, 10.0)
         self.hist_ctzScintCal1d.Fit("ctimeFit", "QR")
         self.hist_ctzScintCal1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_ctzScintCal1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctzScintCal1d.GetName()))
         if self.verbosity > 0:
             n = 32 * self.hist_ctScintCal1d.GetEntries()
             ctimeFit.SetParameter(0, n)
@@ -1344,37 +1347,37 @@ class EventInspector(basf2.Module):
             ctimeFit.SetParameter(3, 10.0)
             self.hist_ctScintCal1d.Fit("ctimeFit", "QR")
             self.hist_ctScintCal1d.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_ctScintCal1d.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal1d.GetName()))
         self.hist_dtScint1d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_dtScint1d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_dtScint1d.GetName()))
 
         self.hist_nHit2d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_nHit2d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_nHit2d.GetName()))
         self.hist_occupancyForwardXYPrompt.Draw("colz")
-        canvas.Print(self.pdfName, f"Title:{self.hist_occupancyForwardXYPrompt.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyForwardXYPrompt.GetName()))
         self.hist_occupancyBackwardXYPrompt.Draw("colz")
-        canvas.Print(self.pdfName, f"Title:{self.hist_occupancyBackwardXYPrompt.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyBackwardXYPrompt.GetName()))
         if self.verbosity > 0:
             self.hist_occupancyForwardXYBkgd.Draw("colz")
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyForwardXYBkgd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyForwardXYBkgd.GetName()))
             self.hist_occupancyBackwardXYBkgd.Draw("colz")
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyBackwardXYBkgd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyBackwardXYBkgd.GetName()))
             self.hist_occupancyRZPrompt.Draw("colz")
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyRZPrompt.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRZPrompt.GetName()))
             self.hist_occupancyZPrompt.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyZPrompt.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZPrompt.GetName()))
             self.hist_occupancyRPrompt.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyRPrompt.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRPrompt.GetName()))
             self.hist_occupancyRZBkgd.Draw("colz")
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyRZBkgd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRZBkgd.GetName()))
             self.hist_occupancyZBkgd.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyZBkgd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyZBkgd.GetName()))
             self.hist_occupancyRBkgd.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_occupancyRBkgd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_occupancyRBkgd.GetName()))
             self.hist_tVsZFwd.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_tVsZFwd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tVsZFwd.GetName()))
             self.hist_tVsZBwd.Draw()
-            canvas.Print(self.pdfName, f"Title:{self.hist_tVsZFwd.GetName()}")
+            canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tVsZFwd.GetName()))
         timeFit.SetParameter(0, self.hist_tRPCCal2d.GetEntries())
         n = self.hist_tRPCCal2d.GetEntries()
         timeFit.SetParameter(0, n)
@@ -1384,9 +1387,9 @@ class EventInspector(basf2.Module):
         timeFit.SetParameter(3, 100.0)
         self.hist_tRPCCal2d.Fit("timeFit", "QR")
         self.hist_tRPCCal2d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_tRPCCal2d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2d.GetName()))
         self.hist_tRPCCal2dBySector.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_tRPCCal2dBySector.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_tRPCCal2dBySector.GetName()))
         n = 32 * self.hist_ctScintCal2d.GetEntries()
         ctimeFit.SetParameter(0, n)
         ctimeFit.SetParLimits(0, 0.2 * n, 5.0 * n)
@@ -1395,12 +1398,12 @@ class EventInspector(basf2.Module):
         ctimeFit.SetParameter(3, 10.0)
         self.hist_ctScintCal2d.Fit("ctimeFit", "QR")
         self.hist_ctScintCal2d.Draw()
-        canvas.Print(self.pdfName, f"Title:{self.hist_ctScintCal2d.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal2d.GetName()))
         self.hist_ctScintCal2dBySector.Draw("box")
-        canvas.Print(self.pdfName, f"Title:{self.hist_ctScintCal2dBySector.GetName()}")
+        canvas.Print(self.pdfName, "Title:{0}".format(self.hist_ctScintCal2dBySector.GetName()))
         # the last page of the PDF file has to have "]" at the end of the PDF filename
-        pdfNameLast = f'{self.pdfName}]'
-        canvas.Print(pdfNameLast, f"Title:{self.hist_ctScintCal2dBySector.GetName()}")
+        pdfNameLast = '{0}]'.format(self.pdfName)
+        canvas.Print(pdfNameLast, "Title:{0}".format(self.hist_ctScintCal2dBySector.GetName()))
         self.histogramFile.Write()
         self.histogramFile.Close()
         print('Goodbye')
@@ -1872,7 +1875,7 @@ class EventInspector(basf2.Module):
                 if len(zyList[sector]) > self.minRPCHits:
                     drawnSectors += 1
                     self.eventCanvas.cd(jCanvas)
-                    title = f'e{int(self.exp):02d}r{int(self.run)}: event {event} z-readout hits in S{sector}'
+                    title = 'e{0:02d}r{1}: event {2} z-readout hits in S{3}'.format(int(self.exp), int(self.run), event, sector)
                     self.hist_ZY1D[jCanvas - 1].SetTitle(title)
                     self.hist_ZY1D[jCanvas - 1].Draw()
                     for g in self.bklmZY:
@@ -1882,7 +1885,7 @@ class EventInspector(basf2.Module):
                     jCanvas += 1
                     if jCanvas > 2:
                         jCanvas = 1
-                        self.lastTitle = f"Title:E{event} (#{self.eventCounter})"
+                        self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
                         self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
             enoughXYHits = False
             for sector in range(0, 8):
@@ -1893,7 +1896,7 @@ class EventInspector(basf2.Module):
                 drawnSectors += 1
                 self.eventCanvas.cd(jCanvas)
                 jCanvas += 1
-                title = f'e{int(self.exp):02d}r{int(self.run)}: event {event} phi-readout hits'
+                title = 'e{0:02d}r{1}: event {2} phi-readout hits'.format(int(self.exp), int(self.run), event)
                 self.hist_XY.SetTitle(title)
                 self.hist_XY.Draw()
                 for g in self.bklmXY:
@@ -1903,12 +1906,12 @@ class EventInspector(basf2.Module):
                         g.Draw("L")
                 if jCanvas > 2:
                     jCanvas = 1
-                    self.lastTitle = f"Title:E{event} (#{self.eventCounter})"
+                    self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
                     self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
             if jCanvas == 2:
                 self.eventCanvas.cd(jCanvas)
                 ROOT.gPad.Clear()
-                self.lastTitle = f"Title:E{event} (#{self.eventCounter})"
+                self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
                 self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
             if drawnSectors > 0:
                 self.eventDisplays += 1
@@ -2065,7 +2068,7 @@ class EventInspector(basf2.Module):
                     break
             if hasEnoughRPCHits:
                 self.eventDisplays += 1
-                title = f'e{int(self.exp):02d}r{int(self.run)}: event {event} 2D hits'
+                title = 'e{0:02d}r{1}: event {2} 2D hits'.format(int(self.exp), int(self.run), event)
                 self.hist_XY.SetTitle(title)
                 self.hist_ZY.SetTitle(title)
                 self.eventCanvas.cd(1)
@@ -2080,5 +2083,5 @@ class EventInspector(basf2.Module):
                     g.Draw("L")
                 for g in zyList:
                     g.Draw("L")
-                self.lastTitle = f"Title:E{event} (#{self.eventCounter})"
+                self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
                 self.eventCanvas.Print(self.eventPdfName, self.lastTitle)

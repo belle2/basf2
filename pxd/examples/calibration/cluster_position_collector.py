@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -65,7 +66,8 @@ if __name__ == "__main__":
     eventinfosetter = main.add_module("EventInfoSetter")
     histoman = main.add_module(
         'HistoManager',
-        histoFileName=f'PXDClusterPositionCollectorOutput_kind_{args.clusterkind:d}.root')
+        histoFileName='PXDClusterPositionCollectorOutput_kind_{:d}.root'.format(
+            args.clusterkind))
     gearbox = main.add_module("Gearbox")
     geometry = main.add_module("Geometry")
     geometry.param({"components": ['MagneticField', 'PXD']})

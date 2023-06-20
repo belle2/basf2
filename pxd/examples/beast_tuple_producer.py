@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -40,7 +41,7 @@ class CalculationProcess(multiprocessing.Process):
 
     def __init__(self, iov, file_paths, output_dir):
         """ Constructor """
-        super().__init__()
+        super(CalculationProcess, self).__init__()
         #: interval of validity
         self.iov = iov
         #: path to files
@@ -66,7 +67,10 @@ class CalculationProcess(multiprocessing.Process):
         pxdtupleproducer = b2.register_module('PXDBgTupleProducer')
         pxdtupleproducer.param(
             'outputFileName',
-            f'{self.output_dir}/pxd_beast_tuple_exp_{self.iov.exp_low}_run_{self.iov.run_low}.root')
+            '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(
+                self.output_dir,
+                self.iov.exp_low,
+                self.iov.run_low))
 
         # Create the path
         main = b2.create_path()
@@ -92,7 +96,7 @@ class CalculationProcess(multiprocessing.Process):
 
 def worker(task_q, done_q):
     for iov, file_paths, output_dir in iter(task_q.get, 'STOP'):
-        print(f"Start processing IoV={str(iov)}")
+        print("Start processing IoV={}".format(str(iov)))
         p = CalculationProcess(iov, file_paths, output_dir)
         p.start()
         p.join()

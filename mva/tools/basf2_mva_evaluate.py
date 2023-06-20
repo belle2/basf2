@@ -252,8 +252,8 @@ if __name__ == '__main__':
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
-            p.save(f'variable_{hash(v)}.pdf')
-            graphics.add(f'variable_{hash(v)}.pdf', width=1.0)
+            p.save('variable_{}.pdf'.format(hash(v)))
+            graphics.add('variable_{}.pdf'.format(hash(v)), width=1.0)
             o += graphics.finish()
 
         o += b2latex.Section("Classifier Plot")
@@ -284,8 +284,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 0, label='Test')
                 p.finish()
                 p.axis.set_title(identifier)
-                p.save(f'roc_test_{hash(identifier)}.pdf')
-                graphics.add(f'roc_test_{hash(identifier)}.pdf', width=1.0)
+                p.save('roc_test_{}.pdf'.format(hash(identifier)))
+                graphics.add('roc_test_{}.pdf'.format(hash(identifier)), width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Classification Results")
@@ -297,15 +297,15 @@ if __name__ == '__main__':
             p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] == 0, normed=True)
-            p.sub_plots[0].axis.set_title(f"Classification result in test data for {identifier}")
+            p.sub_plots[0].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
 
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] == 0, normed=False)
-            p.sub_plots[1].axis.set_title(f"Classification result in test data for {identifier}")
+            p.sub_plots[1].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
             p.finish()
 
-            p.save(f'classification_result_{hash(identifier)}.pdf')
-            graphics.add(f'classification_result_{hash(identifier)}.pdf', width=1)
+            p.save('classification_result_{identifier}.pdf'.format(identifier=hash(identifier)))
+            graphics.add('classification_result_{identifier}.pdf'.format(identifier=hash(identifier)), width=1)
             o += graphics.finish()
 
         o += b2latex.Section("Diagonal Plot")
@@ -334,9 +334,9 @@ if __name__ == '__main__':
                       train_mask == 1, train_mask == 0,
                       target == 1, target == 0, )
                 p.finish()
-                p.axis.set_title(f"Overtraining check for {identifier}")
-                p.save(f'overtraining_plot_{hash(identifier)}.pdf')
-                graphics.add(f'overtraining_plot_{hash(identifier)}.pdf', width=1.0)
+                p.axis.set_title("Overtraining check for {}".format(identifier))
+                p.save('overtraining_plot_{}.pdf'.format(hash(identifier)))
+                graphics.add('overtraining_plot_{}.pdf'.format(hash(identifier)), width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Spectators")
@@ -356,8 +356,8 @@ if __name__ == '__main__':
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
-            p.save(f'spectator_{hash(spectator)}.pdf')
-            graphics.add(f'spectator_{hash(spectator)}.pdf', width=1.0)
+            p.save('spectator_{}.pdf'.format(hash(spectator)))
+            graphics.add('spectator_{}.pdf'.format(hash(spectator)), width=1.0)
             o += graphics.finish()
 
             for identifier in identifiers:
@@ -370,8 +370,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] == 0)
                 p.finish()
-                p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
-                graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
+                p.save('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)))
+                graphics.add('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)), width=1.0)
                 o += graphics.finish()
 
         if args.compile:

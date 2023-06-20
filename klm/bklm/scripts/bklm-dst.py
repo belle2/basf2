@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -121,13 +122,13 @@ if options.infilename != '':
     inputName = re.sub(r"HLT.\.f0....", "HLT*.f*", options.infilename)
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
-        print(f"No file(s) match {inputName}")
+        print("No file(s) match {0}".format(inputName))
         sys.exit()
 if options.eNumber != '':
     if not options.eNumber.isdecimal():
-        print(f"Experiment number ({options.eNumber}) is not valid")
+        print("Experiment number ({0}) is not valid".format(options.eNumber))
         sys.exit()
-    exp = f'{int(options.eNumber):04d}'
+    exp = '{0:04d}'.format(int(options.eNumber))
 else:
     eStart = inputName.find('/e') + 2
     if eStart < 0:
@@ -136,13 +137,13 @@ else:
     eEnd = inputName.find('/', eStart)
     exp = inputName[eStart:eEnd]
     if not exp.isdecimal():
-        print(f"Input filename's experiment number ({exp}) is not valid")
+        print("Input filename's experiment number ({0}) is not valid".format(exp))
         sys.exit()
 if options.rNumber != '':
     if not options.rNumber.isdecimal():
-        print(f"Run number ({options.rNumber}) is not valid")
+        print("Run number ({0}) is not valid".format(options.rNumber))
         sys.exit()
-    run = f'{int(options.rNumber):05d}'
+    run = '{0:05d}'.format(int(options.rNumber))
 else:
     rStart = inputName.find('/r') + 2
     if rStart < 0:
@@ -151,19 +152,19 @@ else:
     rEnd = inputName.find('/', rStart)
     run = inputName[rStart:rEnd]
     if not run.isdecimal():
-        print(f"Input filename's run number ({run}) is not valid")
+        print("Input filename's run number ({0}) is not valid".format(run))
         sys.exit()
 if len(inputName) == 0:
-    inputName = f'/ghi/fs01/belle2/bdata/Data/Raw/e{exp}/r{run}/sub00/*.{exp}.{run}.HLT*.f*.root'
+    inputName = '/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT*.f*.root'.format(exp, run)
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
-        print(f"No file(s) found for experiment <{options.eNumber}> run <{options.rNumber}>")
+        print("No file(s) found for experiment <{0}> run <{1}>".format(options.eNumber, options.rNumber))
         sys.exit()
 
 suffix = '' if singleEntry == 0 else '-singleEntry' if singleEntry == 1 else '-multipleEntries'
-histName = f'bklmHists-e{exp}r{run}{suffix}.root'
-pdfName = f'bklmPlots-e{exp}r{run}{suffix}.pdf'
-eventPdfName = f'bklmEvents{view}D-e{exp}r{run}{suffix}.pdf'
+histName = 'bklmHists-e{0}r{1}{2}.root'.format(exp, run, suffix)
+pdfName = 'bklmPlots-e{0}r{1}{2}.pdf'.format(exp, run, suffix)
+eventPdfName = 'bklmEvents{3}D-e{0}r{1}{2}.pdf'.format(exp, run, suffix, view)
 
 if maxCount >= 0:
     print('bklm-dst: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze', maxCount, 'events using ' + tagName)

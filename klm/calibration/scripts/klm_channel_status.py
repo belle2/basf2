@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -164,7 +166,7 @@ class KLMChannelStatus(AlgorithmStrategy):
             else:
                 run_data_klm_excluded.append(run_results)
             result_str = calibration_result_string(result)
-            basf2.B2INFO(f'Run {int(exp_run.run)}: {result_str}.')
+            basf2.B2INFO('Run %d: %s.' % (exp_run.run, result_str))
 
         # Sort by run number.
         run_data.sort(key=lambda x: x[0])
@@ -309,13 +311,15 @@ class KLMChannelStatus(AlgorithmStrategy):
                 while (i >= run_range[0]):
                     if (can_merge(run_data, i, next_run)):
                         basf2.B2INFO(
-                            f'Run {int(run_data[i][0])} (not enough data) can be merged into the next normal run ' +
-                            f'{int(run_data[next_run][0])}.')
+                            'Run %d (not enough data) can be merged into '
+                            'the next normal run %d.' %
+                            (run_data[i][0], run_data[next_run][0]))
                         run_data[i][4] = 'next'
                     else:
                         basf2.B2INFO(
-                            f'Run {int(run_data[i][0])} (not enough data) cannot be merged into the next normal run ' +
-                            f'{int(run_data[next_run][0])}, will try the previous one.')
+                            'Run %d (not enough data) cannot be merged into '
+                            'the next normal run %d, will try the previous '
+                            'one.' % (run_data[i][0], run_data[next_run][0]))
                         break
                     i -= 1
                 if (i < run_range[0]):
@@ -325,19 +329,23 @@ class KLMChannelStatus(AlgorithmStrategy):
                 while (j <= i):
                     if (can_merge(run_data, j, previous_run)):
                         basf2.B2INFO(
-                            f'Run {int(run_data[j][0])} (not enough data) can be merged into the previous normal run ' +
-                            f'{int(run_data[previous_run][0])}.')
+                            'Run %d (not enough data) can be merged into '
+                            'the previous normal run %d.' %
+                            (run_data[j][0], run_data[previous_run][0]))
                         run_data[j][4] = 'previous'
                     else:
                         basf2.B2INFO(
-                            f'Run {int(run_data[j][0])} (not enough data) cannot be merged into the previous normal run ' +
-                            f'{int(run_data[previous_run][0])}.')
+                            'Run %d (not enough data) cannot be merged into '
+                            'the previous normal run %d.' %
+                            (run_data[j][0], run_data[previous_run][0]))
                         break
                     j += 1
                 if (j > i):
                     continue
-            basf2.B2INFO('A range of runs with not enough data is found that cannot be merged into neither previous nor ' +
-                         f'next normal run: from {int(run_data[j][0])} to {int(run_data[i][0])}.')
+            basf2.B2INFO('A range of runs with not enough data is found '
+                         'that cannot be merged into neither previous nor '
+                         'next normal run: from %d to %d.' %
+                         (run_data[j][0], run_data[i][0]))
             while (j <= i):
                 run_data[j][4] = 'none'
                 j += 1
@@ -350,8 +358,9 @@ class KLMChannelStatus(AlgorithmStrategy):
             while ((run_data[i][1] == 2) and (run_data[i + 1][1] == 2)):
                 if (run_data[i][4] != run_data[i + 1][4]):
                     break
-                basf2.B2INFO(f'Merging run {int(run_data[i + 1][0])} (not enough data) into run {int(run_data[i][0])} ' +
-                             '(not enough data).')
+                basf2.B2INFO('Merging run %d (not enough data) into '
+                             'run %d (not enough data).' %
+                             (run_data[i + 1][0], run_data[i][0]))
                 run_data[i][2].extend(run_data[i + 1][2])
                 del run_data[i + 1]
                 self.execute_over_run_list(run_data[i][2], iteration, False)
@@ -361,7 +370,7 @@ class KLMChannelStatus(AlgorithmStrategy):
                 run_data[i][5] = \
                     self.machine.algorithm.algorithm.getPayloadValues()
                 result_str = calibration_result_string(run_data[i][1])
-                basf2.B2INFO(f'Run {int(run_data[i][0])}: {result_str}.')
+                basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                 if (i >= len(run_data) - 1):
                     break
             i += 1
@@ -369,8 +378,10 @@ class KLMChannelStatus(AlgorithmStrategy):
         # Merge runs that do not have enough data into normal runs.
         # Currently merging the data (TODO: consider result comparison).
         def merge_runs(run_data, run_not_enough_data, run_normal, forced):
-            basf2.B2INFO(f'Merging run {int(run_data[run_not_enough_data][0])} (not enough data) into run ' +
-                         f'{int(run_data[run_normal][0])} (normal).')
+            basf2.B2INFO('Merging run %d (not enough data) into '
+                         'run %d (normal).' %
+                         (run_data[run_not_enough_data][0],
+                          run_data[run_normal][0]))
             run_data[run_normal][2].extend(run_data[run_not_enough_data][2])
             self.execute_over_run_list(run_data[run_normal][2], iteration,
                                        forced)
@@ -379,10 +390,11 @@ class KLMChannelStatus(AlgorithmStrategy):
                 self.machine.algorithm.algorithm.getResults())
             run_data[run_normal][5] = self.machine.algorithm.algorithm.getPayloadValues()
             result_str = calibration_result_string(run_data[run_normal][1])
-            basf2.B2INFO(f'Run {int(run_data[run_normal][0])}: {result_str}.')
+            basf2.B2INFO('Run %d: %s.' % (run_data[run_normal][0], result_str))
             if (run_data[run_normal][1] != 0):
-                basf2.B2FATAL(f'Merging run {int(run_data[run_not_enough_data][0])} into run {int(run_data[run_normal][0])} ' +
-                              'failed.')
+                basf2.B2FATAL('Merging run %d into run %d failed.' %
+                              (run_data[run_not_enough_data][0],
+                               run_data[run_normal][0]))
             del run_data[run_not_enough_data]
 
         i = 0
@@ -404,13 +416,17 @@ class KLMChannelStatus(AlgorithmStrategy):
                 if (i < len(run_data) - 1):
                     new_modules_next = run_data[i][3].getModuleStatus(). \
                         newNormalChannels(run_data[i + 1][3].getModuleStatus())
-                    basf2.B2INFO(f'There are {int(new_modules_next)} new active modules in run {int(run_data[i][0])} ' +
-                                 f'relatively to run {int(run_data[i + 1][0])}.')
+                    basf2.B2INFO('There are %d new active modules in run %d '
+                                 'relatively to run %d.' %
+                                 (new_modules_next, run_data[i][0],
+                                  run_data[i + 1][0]))
                 if (i > 0):
                     new_modules_previous = run_data[i][3].getModuleStatus(). \
                         newNormalChannels(run_data[i - 1][3].getModuleStatus())
-                    basf2.B2INFO(f'There are {int(new_modules_previous)} new active modules in run {int(run_data[i][0])} ' +
-                                 f'relatively to run {int(run_data[i - 1][0])}.')
+                    basf2.B2INFO('There are %d new active modules in run %d '
+                                 'relatively to run %d.' %
+                                 (new_modules_previous, run_data[i][0],
+                                  run_data[i - 1][0]))
                 run_for_merging = -1
                 # If a forced merge of the normal run with another run from
                 # a different range of runs with not enough data has already
@@ -429,17 +445,19 @@ class KLMChannelStatus(AlgorithmStrategy):
                     else:
                         run_for_merging = i + 1
                 else:
-                    basf2.B2INFO(f'Cannot determine run for merging for run {int(run_data[i][0])}, performing its forced ' +
-                                 'calibration.')
+                    basf2.B2INFO('Cannot determine run for merging for run %d, '
+                                 'performing its forced calibration.' %
+                                 (run_data[i][0]))
                     self.execute_over_run_list(run_data[i][2], iteration, True)
                     run_data[i][1] = self.machine.result.result
                     run_data[i][3] = KLMChannelStatusAlgorithm.Results(
                         self.machine.algorithm.algorithm.getResults())
                     run_data[i][5] = self.machine.algorithm.algorithm.getPayloadValues()
                     result_str = calibration_result_string(run_data[i][1])
-                    basf2.B2INFO(f'Run {int(run_data[i][0])}: {result_str}.')
+                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                     if (run_data[i][1] != 0):
-                        basf2.B2FATAL(f'Forced calibration of run {int(run_data[i][0])} failed.')
+                        basf2.B2FATAL('Forced calibration of run %d failed.' %
+                                      (run_data[i][0]))
                 if (run_for_merging >= 0):
                     merge_runs(run_data, i, run_for_merging, True)
             else:
@@ -448,9 +466,10 @@ class KLMChannelStatus(AlgorithmStrategy):
         # Write the results.
         def commit_payload(run_data):
             if (run_data[1] == 2):
-                basf2.B2INFO(f'Run {int(run_data[0])} has no calibration result, skipped.')
+                basf2.B2INFO('Run %d has no calibration result, skipped.' %
+                             (run_data[0]))
                 return
-            basf2.B2INFO(f'Writing run {int(run_data[0])}.')
+            basf2.B2INFO('Writing run %d.' % (run_data[0]))
             self.machine.algorithm.algorithm.commit(run_data[5])
 
         def write_result(run_data, run):
@@ -512,8 +531,9 @@ class KLMChannelStatus(AlgorithmStrategy):
                 if (run_data[i][1] == 0 and run_data[i - 1][1] == 0):
                     if (run_data[i][3].getChannelStatus() ==
                             run_data[i - 1][3].getChannelStatus()):
-                        basf2.B2INFO(f'Run {int(run_data[i][0])}: result is the same as for the previous run ' +
-                                     f'{int(run_data[i - 1][0])}.')
+                        basf2.B2INFO('Run %d: result is the same as '
+                                     'for the previous run %d.' %
+                                     (run_data[i][0], run_data[i - 1][0]))
                         if (previous_run >= 0):
                             iov = run_data[previous_run][5].front().iov
                             run_data[previous_run][5].front().iov = \

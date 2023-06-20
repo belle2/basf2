@@ -79,7 +79,7 @@ if options.mode.isdecimal():
 else:
     mode = modes[options.mode] if options.mode in modes else -1
 if (mode < 0) or (mode >= 4):
-    print(f"Illegal lookback-window mode {options.mode}; use one of {modes}")
+    print("Illegal lookback-window mode {0}; use one of {1}".format(options.mode, modes))
     sys.exit()
 
 if options.window is None:
@@ -87,31 +87,31 @@ if options.window is None:
     sys.exit()
 if (options.window[0] < 0) or (options.window[1] < options.window[0]) or (options.window[2] <= 0):
     if options.window[0] < 0:
-        print(f"Lookback-window min value {options.window[0]} cannot be negative")
+        print("Lookback-window min value {0} cannot be negative".format(options.window[0]))
     if options.window[1] < options.window[0]:
-        print(f"Lookback-window max value {options.window[1]} cannot be less than min value {options.window[0]}")
+        print("Lookback-window max value {1} cannot be less than min value {0}".format(options.window[0], options.window[1]))
     if options.window[2] <= 0:
-        print(f"Lookback-window step value {options.window[2]} must be positive definite")
+        print("Lookback-window step value {0} must be positive definite".format(options.window[2]))
     sys.exit()
 window = options.window
 
 inputName = re.sub(r"HLT.\.f0....", "HLT*.f*", options.infilename)
 fileList = glob.glob(inputName)
 if len(fileList) == 0:
-    print(f"No file(s) match {inputName}")
+    print("No file(s) match {0}".format(inputName))
     sys.exit()
 print(fileList)
 if not options.eNumber.isdecimal():
-    print(f"Experiment number ({options.eNumber}) is not valid")
+    print("Experiment number ({0}) is not valid".format(options.eNumber))
     sys.exit()
-exp = f'{int(options.eNumber):04d}'
+exp = '{0:04d}'.format(int(options.eNumber))
 if not options.rNumber.isdecimal():
-    print(f"Run number ({options.rNumber}) is not valid")
+    print("Run number ({0}) is not valid".format(options.rNumber))
     sys.exit()
-run = f'{int(options.rNumber):05d}'
+run = '{0:05d}'.format(int(options.rNumber))
 
-histName = f'bklmHists-e{exp}r{run}.root'
-pdfName = f'bklmPlots-e{exp}r{run}.pdf'
+histName = 'bklmHists-e{0}r{1}.root'.format(exp, run)
+pdfName = 'bklmPlots-e{0}r{1}.pdf'.format(exp, run)
 
 print('bklm-windowstart: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze all events using ' + tagName)
 

@@ -1284,7 +1284,7 @@ def select_crop_parts(crops, select=None, exclude=None):
     if isinstance(exclude, str):
         exclude = [exclude, ]
 
-    if isinstance(crops, collections.abc.MutableMapping):
+    if isinstance(crops, collections.MutableMapping):
         part_names = list(crops.keys())
 
         if not select and not exclude:
@@ -1295,7 +1295,7 @@ def select_crop_parts(crops, select=None, exclude=None):
 
             # if the selection item is a callable function do not count it as not selectable yet
             select_not_in_part_names = [name for name in select
-                                        if not isinstance(name, collections.abc.Callable) and name not in part_names]
+                                        if not isinstance(name, collections.Callable) and name not in part_names]
             if select_not_in_part_names:
                 get_logger().warning("Cannot select %s, because they are not in crop part names %s",
                                      select_not_in_part_names, sorted(part_names))
@@ -1314,10 +1314,10 @@ def select_crop_parts(crops, select=None, exclude=None):
         for part_name in set(excluded_part_names):
             del selected_crops[part_name]
 
-        if isinstance(select, collections.abc.Mapping):
+        if isinstance(select, collections.Mapping):
             # select is a rename mapping
             for part_name, new_part_name in list(select.items()):
-                if isinstance(part_name, collections.abc.Callable):
+                if isinstance(part_name, collections.Callable):
                     selected_crops[new_part_name] = part_name(**crops)
                 elif part_name in selected_crops:
                     parts = selected_crops[part_name]
@@ -1340,7 +1340,7 @@ def filter_crops(crops, filter_function, part_name=None):
     if isinstance(crops, np.ndarray):
         return crops[filter_indices]
 
-    elif isinstance(crops, collections.abc.MutableMapping):
+    elif isinstance(crops, collections.MutableMapping):
         # Make a shallow copy
         filtered_crops = copy.copy(crops)
         for part_name, parts in list(crops.items()):

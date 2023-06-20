@@ -1719,7 +1719,7 @@ class ValidationPlot:
             # Special value for the flat distribution binning
             n_bins = None
 
-        elif isinstance(bins, collections.abc.Iterable):
+        elif isinstance(bins, collections.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins

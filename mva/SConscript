@@ -1,6 +1,6 @@
 Import('env')
 
-env.ParseConfig("python3 -c 'import numpy; print(f"-I{numpy.get_include():s}")'")
+env.ParseConfig("python3 -c 'import numpy; print(f\"-I{numpy.get_include():s}\")'")
 
 env['LIBS'] = ['framework', 'framework_io', 'mva_dataobjects', 'boost_program_options', '$ROOT_LIBS', 'fann', 'FastBDT_shared']
 

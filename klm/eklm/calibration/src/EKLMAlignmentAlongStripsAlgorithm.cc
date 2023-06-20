@@ -132,8 +132,9 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
       break;
     elementNumbers->segmentNumberToElementNumbers(
       it->first, &iSection, &iLayer, &iSector, &iPlane, &iSegment);
-    printf("Segment {it->first:d} (section {iSection:d}, layer {iLayer:d}, sector {iSector:d}, plane {iPlane:d}, " + \
-           f"segment {iSegment:d}): {it->second:.1f} sigma\n");
+    printf("Segment %d (section %d, layer %d, sector %d, plane %d, segment %d):"
+           " %.1f sigma\n", it->first, iSection, iLayer, iSector, iPlane,
+           iSegment, it->second);
     found = true;
   }
   if (!found)

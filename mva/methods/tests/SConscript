@@ -1,6 +1,6 @@
 Import('env')
 
-env.ParseConfig("python3 -c 'import numpy; print(f"-I{numpy.get_include():s}")'") 
+env.ParseConfig("python3 -c 'import numpy; print(f\"-I{numpy.get_include():s}\")'")
 env['LIBS'] = ['framework', 'mva', 'mva_dataobjects', '$ROOT_LIBS', 'boost_program_options']
 
 Return('env')

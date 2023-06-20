@@ -9,7 +9,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <pxd/dbobjects/PXDClusterPositionErrorPar.h>
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
@@ -44,6 +46,8 @@ namespace Belle2 {
 
       /** Initialize the module */
       virtual void initialize() override;
+      /** do at every run change */
+      virtual void beginRun() override;
       /** do the clustering */
       virtual void event() override;
 
@@ -82,6 +86,17 @@ namespace Belle2 {
        */
       void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary,
                                   double minPitch, double centerPitch, double maxPitch);
+
+      /** Assign position error for a given cluster from DB.
+       * @param primary Projection of the cluster to assign the position error for
+       * @param uv "U" or "V" error
+       * @param sensorID VxdID
+       * @param uCell u cell ID of the cluster position
+       * @param vCell v cell ID of the cluster position
+       */
+      void assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
+                                     VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
+                                     bool isAtEdge = false, bool isAtJoint = false, bool isAdjacentDead = false);
 
       /** Noise in ADU */
       double m_elNoise;
@@ -126,6 +141,18 @@ namespace Belle2 {
       RelationLookup m_mcRelation;
       /** Lookup table for PXDDigit->PXDTrueHit relation */
       RelationLookup m_trueRelation;
+
+      /** Flag to set cluster position error from DB (default = true) */
+      bool m_errorFromDB;
+      /** Name of the DB payload containing cluster posotion errors in U */
+      std::string m_positionErrorUName;
+      /** Name of the DB payload containing cluster posotion errors in V */
+      std::string m_positionErrorVName;
+      /** DB object for cluster posotion errors in U */
+      std::unique_ptr<DBObjPtr<PXDClusterPositionErrorPar>> m_clusterPositionErrorUPar;
+      /** DB object for cluster posotion errors in V */
+      std::unique_ptr<DBObjPtr<PXDClusterPositionErrorPar>> m_clusterPositionErrorVPar;
+
 
     };//end class declaration
 

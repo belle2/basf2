@@ -453,21 +453,21 @@ def add_svd_track_finding(
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "only_ckf":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "SVD_after":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
         add_svd_standalone_tracking(path, components=["SVD"],
                                     svd_standalone_mode=svd_standalone_mode,

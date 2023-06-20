@@ -48,7 +48,7 @@ def write_tracking_mva_filter_payloads_to_db(dbobj_name: str = None,
 
 if __name__ == "__main__":
 
-    validIoVs = [(0, 0, 0, -1), (1002, 0, 1002, -1), (1003, 0, 1003, -1), (1004, 0, 1004, -1)]
+    validIoVs = [(0, 0, 0, -1), (1003, 0, 1003, -1), (1004, 0, 1004, -1)]
     for iov in validIoVs:
 
         write_tracking_mva_filter_payloads_to_db("trackfindingcdc_TrackQualityEstimatorParameters",
@@ -80,12 +80,18 @@ if __name__ == "__main__":
         write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticSegmentRelationFilterParameters",
                                                  iov, "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
 
-        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_1Parameters",
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_1_backward_Parameters",
                                                  iov, "ckf_CDCSVDStateFilter_1", 0.1)
-        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_2Parameters",
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_2_backward_Parameters",
                                                  iov, "ckf_CDCSVDStateFilter_2", 0.1)
-        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_3Parameters",
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_3_backward_Parameters",
                                                  iov, "ckf_CDCSVDStateFilter_3", 0.1)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_1_forward_Parameters",
+                                                 iov, "ckf_CDCSVDStateFilter_1", 0.01)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_2_forward_Parameters",
+                                                 iov, "ckf_CDCSVDStateFilter_2", 0.01)
+        write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_3_forward_Parameters",
+                                                 iov, "ckf_CDCSVDStateFilter_3", 0.01)
         write_tracking_mva_filter_payloads_to_db("ckf_CDCToSVDResultParameters",
                                                  iov, "ckf_CDCToSVDResult", 0.2)
         write_tracking_mva_filter_payloads_to_db("ckf_ToPXDStateFilter_1Parameters",

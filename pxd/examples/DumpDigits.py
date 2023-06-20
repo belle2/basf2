@@ -45,8 +45,8 @@ class DumpDigits(b2.Module):
                 # Sesnor identification
                 sensorID = digit.getSensorID().getID()
                 [layer, ladder, sensor] = self.decode(sensorID)
-                s += f'{sensorID} {layer:3d} {ladder:3d} {sensor:3d} {digit.getUCellID():6d} ' \
-                    + f'{digit.getVCellID():6d} {digit.getCharge():8.1f}'
+                s += f'{sensorID} {layer:3d} {ladder:3d} {sensor:3d} {digit.getUCellID():6d} ' + \
+                    f'{digit.getVCellID():6d} {digit.getCharge():8.1f}'
                 s += '\n'
             dumpfile.write(s)
 

@@ -99,8 +99,8 @@ class PXDPositionEstimation(b2.Module):
 
                 for bin in range(3):
                     name = f'hist_map_residual_v_kind_{kind:d}_mode_{mode:d}_special_{bin:d}'
-                    title = f'PXD residual V kind={kind:d} mode={mode:d} ' \
-                        + f'{self.binlimits[bin][0]:.0f}<thetaV<{self.binlimits[bin][1]:.0f}'
+                    title = f'PXD residual V kind={kind:d} mode={mode:d} {self.binlimits[bin][0]:.0f}' + \
+                        f'<thetaV<{self.binlimits[bin][1]:.0f}'
                     self.hist_map_residual_v_special[(kind, mode, bin)] = ROOT.TH1F(name, title, 400, -0.007, +0.007)
 
     def event(self):

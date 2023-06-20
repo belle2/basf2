@@ -1191,7 +1191,7 @@ class Importance(Plotter):
 
         for y in range(importance_matrix.shape[0]):
             for x in range(importance_matrix.shape[1]):
-                txt = self.axis.text(x + 0.5, y + 0.5, '%.0f' % importance_matrix[y, x],
+                txt = self.axis.text(x + 0.5, y + 0.5, f'{importance_matrix[y, x]:.0f}',
                                      size=14,
                                      horizontalalignment='center',
                                      verticalalignment='center',
@@ -1280,7 +1280,7 @@ class CorrelationMatrix(Plotter):
 
         for y in range(signal_corr.shape[0]):
             for x in range(signal_corr.shape[1]):
-                txt = self.signal_axis.text(x + 0.5, y + 0.5, '%.0f' % signal_corr[y, x],
+                txt = self.signal_axis.text(x + 0.5, y + 0.5, f'{signal_corr[y, x]:.0f}',
                                             size=14,
                                             horizontalalignment='center',
                                             verticalalignment='center',
@@ -1289,7 +1289,7 @@ class CorrelationMatrix(Plotter):
 
         for y in range(bckgrd_corr.shape[0]):
             for x in range(bckgrd_corr.shape[1]):
-                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, '%.0f' % bckgrd_corr[y, x],
+                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, f'{bckgrd_corr[y, x]:.0f}',
                                             size=14,
                                             horizontalalignment='center',
                                             verticalalignment='center',

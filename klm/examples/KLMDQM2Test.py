@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,7 +38,7 @@ raw.add_unpackers(main)
 re.add_reconstruction(main, add_muid_hits=True)
 
 software_trigger = "software_trigger_cut&skim&accept_mumutight"
-cut_string = 'SoftwareTriggerResult(%s)>0' % (software_trigger)
+cut_string = f'SoftwareTriggerResult({software_trigger})>0'
 
 add_common_dqm(main, dqm_environment='HLT', dqm_mode='dont_care')
 ma.fillParticleList('mu+:all', cut="", path=main)

@@ -113,8 +113,8 @@ if __name__ == '__main__':
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)
 
-    print("- %d signal candidates selected." % n_sig)
-    print("- %d background candidates selected." % n_bkg)
+    print(f"- {n_sig:d} signal candidates selected.")
+    print(f"- {n_bkg:d} background candidates selected.")
 
     # Add signal column
     df_sig[args.signalcolumn] = True
@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     # Adjust the signal/background ratio if requested
     if args.fsig is not None:
-        print(f'Adjusting signal/background ratio from {n_sig/float(n_bkg+n_sig):f} to {args.fsig:f}.')
+        print(f'Adjusting signal/background ratio from {n_sig / float(n_bkg + n_sig):f} to {args.fsig:f}.')
         assert 0 < args.fsig < 1, 'Please provide a signal fraction within [0,1]'
 
         if n_sig >= n_bkg:
@@ -153,7 +153,7 @@ if __name__ == '__main__':
         if filename.endswith('.root'):
             filename = filename.split('.root')[0]
 
-        print(f'Creating output files\n\t -  {filename + "_train.root"} \n\t -  {filename + "_test.root"}')
+        print(f"Creating output files\n\t -  {filename + '_train.root'} \n\t -  {filename + '_test.root'}")
 
         with uproot.recreate(filename + '_train.root') as outfile:
             outfile[args.treename] = df_train
@@ -161,6 +161,6 @@ if __name__ == '__main__':
             outfile[args.treename] = df_test
 
     else:
-        print('Creating output file\n\t -  %s' % args.output)
+        print(f'Creating output file\n\t -  {args.output}')
         with uproot.recreate(args.output) as outfile:
             outfile[args.treename] = df

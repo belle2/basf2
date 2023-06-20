@@ -156,7 +156,7 @@ CDCTriggerNeuroModule::event()
     // check, if enough axials are there. first, we select the axial bits from the
     // hitpattern (341 = int('101010101',base=2)) and then check if the number of
     // ones is equal or greater than 4.
-    bool tmpvalid = true;
+    bool valtrack = true;
     if ((chitPattern & 341) != 341 && // this is an ugly workaround, because popcount is only
         (chitPattern & 341) != 340 && // available with c++20 and newer
         (chitPattern & 341) != 337 &&
@@ -165,7 +165,7 @@ CDCTriggerNeuroModule::event()
         (chitPattern & 341) != 85  &&
         m_min4axials == true) {
       B2DEBUG(250, "Not enough axial hits (<4), setting track invalid!");
-      tmpvalid = false;;
+      valtrack = false;
     }
     // get the pure driftthreshold vector
     unsigned long puredriftth =
@@ -198,7 +198,6 @@ CDCTriggerNeuroModule::event()
     double z = (zIndex >= 0) ? target[zIndex] : 0.;
     int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
     double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
-    bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
     std::vector<unsigned> tsvector(9, 0);
     for (unsigned i = 0; i < hitIds.size(); ++i) {
       tsvector[m_segmentHits[hitIds[i]]->getISuperLayer()] = m_segmentHits[hitIds[i]]->getLeftRight();

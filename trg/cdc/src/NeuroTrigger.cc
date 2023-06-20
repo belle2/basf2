@@ -417,9 +417,9 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
 {
 
   if (et_option != m_MLPs[isector].get_et_option()) {
-    B2WARNING("Used event time option is different to the one set in the MLP"
-              << LogVar("et_option", et_option) << LogVar("isector", isector)
-              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+    B2INFO("Used event time option is different to the one set in the MLP"
+           << LogVar("et_option", et_option) << LogVar("isector", isector)
+           << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
   }
   if (et_option == "fastestpriority") {
     B2DEBUG(200, "et_option is 'fastestpriority'");

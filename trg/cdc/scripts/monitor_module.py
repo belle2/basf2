@@ -140,28 +140,28 @@ class Monitor(b2.Module):
         width = 8
         for iax in range(5):
             ibin = iax + 1
-            p = hall.ProjectionY('all{}'.format(iax), ibin, ibin)
+            p = hall.ProjectionY(f'all{iax}', ibin, ibin)
             p.SetBins(nts[iax], 0, 2 * pi)
             p.Rebin(width)
             slall[iax] = p
 
-            q = hhit.ProjectionY('hit{}'.format(iax), ibin, ibin)
+            q = hhit.ProjectionY(f'hit{iax}', ibin, ibin)
             q.SetBins(nts[iax], 0, 2 * pi)
             q.Rebin(width)
             slhit[iax] = q
 
-            g = hghost.ProjectionY('ghost{}'.format(iax), ibin, ibin)
+            g = hghost.ProjectionY(f'ghost{iax}', ibin, ibin)
             g.SetBins(nts[iax], 0, 2 * pi)
             g.Rebin(width)
             slghost[iax] = g
 
-            s = hno_ghost.ProjectionY('ng{}'.format(iax), ibin, ibin)
+            s = hno_ghost.ProjectionY(f'ng{iax}', ibin, ibin)
             s.SetBins(nts[iax], 0, 2 * pi)
             s.Rebin(width)
             slng[iax] = s
 
-            r = g.Clone('ghost{}'.format(iax))
-            r2 = s.Clone('quong{}'.format(iax))
+            r = g.Clone(f'ghost{iax}')
+            r2 = s.Clone(f'quong{iax}')
             g.Sumw2()
             p.Sumw2()
             s.Sumw2()
@@ -195,14 +195,14 @@ class Monitor(b2.Module):
             hits[0].SetTitle(name + ' hit distribution in run {}; #phi (rad)'.format(
                 self.first_run))
             can.SaveAs('monitor_plots/' + name.split()[0] +
-                       '_ts_hits_{:05d}.{}'.format(self.first_run, file_type))
+                       f'_ts_hits_{self.first_run:05d}.{file_type}')
 
         for ratio, name in [(quos, 'ghost rate'), (quong, 'efficiency (w.r.t. fast TSIM)')]:
             upp = max([g.GetMaximum() for g in ratio])
             low = min([g.GetMinimum() for g in ratio])
             for i in range(5):
                 h = ratio[i]
-                h.SetTitle('SL{}'.format(2 * i))
+                h.SetTitle(f'SL{2 * i}')
                 h.SetMaximum(1.1 * upp)
                 h.SetMinimum(0.9 * low)
                 set_style(h, 1501 + i, 20 + i)
@@ -211,14 +211,13 @@ class Monitor(b2.Module):
                     options += ' same'
                 h.Draw(options)
             can.BuildLegend(.91, .76, .98, .95)
-            ratio[0].SetTitle('TSF ' + name + ' in run {};#phi (rad)'.format(
-                self.first_run))
+            ratio[0].SetTitle('TSF ' + name + f' in run {self.first_run};#phi (rad)')
             file_name = name.split()[0]
-            can.SaveAs('monitor_plots/ts_{}_{:05d}.{}'.format(file_name, self.first_run, file_type))
+            can.SaveAs(f'monitor_plots/ts_{file_name}_{self.first_run:05d}.{file_type}')
 
         # ghost distribution
         for h in [hlr, hpri, hpritime, hftime]:
             set_style(h, 1503)
             h.Draw()
             name = h.GetTitle().replace(' ', '_')
-            can.SaveAs('monitor_plots/ghost_{}_{:05d}.{}'.format(name, self.first_run, file_type))
+            can.SaveAs(f'monitor_plots/ghost_{name}_{self.first_run:05d}.{file_type}')

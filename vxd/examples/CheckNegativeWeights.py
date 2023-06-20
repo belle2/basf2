@@ -151,10 +151,7 @@ class CheckNegativeWeights(b2.Module):
     def terminate(self):
         """ Write results """
         b2.B2INFO(
-            '\nResults for PXD: \n{pxd}\nResults for SVD: \n{svd}\n'.format(
-                pxd=str(self.sign_stats_pxd),
-                svd=str(self.sign_stats_svd)
-            )
+            f'\nResults for PXD: \n{str(self.sign_stats_pxd)}\nResults for SVD: \n{str(self.sign_stats_svd)}\n'
         )
 
 

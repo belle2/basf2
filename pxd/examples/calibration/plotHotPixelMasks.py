@@ -61,7 +61,7 @@ run_list = list()
 
 for condition in b2.conditions:
     if condition.PXDMaskedPixelPar_valid:
-        print("Starting on run {}".format(condition.run))
+        print(f"Starting on run {condition.run}")
         run_list.append(condition.run)
 
         for sensorID in sensor_list:
@@ -78,8 +78,8 @@ for condition in b2.conditions:
             counter = len(hotpixelmap[sensorID.getID()])
 
             if args.maps:
-                name = "MaskedPixels_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
-                title = "Masked Pixels Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
+                name = f"MaskedPixels_{layer:d}_{ladder:d}_{sensor:d}_run_{condition.run:d}"
+                title = f"Masked Pixels Sensor={layer:d}.{ladder:d}.{sensor:d} run={condition.run:d}"
                 hot_map = ROOT.TH2F(name, title, nUCells, 0, nUCells, nVCells, 0, nVCells)
                 hot_map.GetXaxis().SetTitle("uCell")
                 hot_map.GetYaxis().SetTitle("vCell")
@@ -115,10 +115,10 @@ for sensorID in sensor_list:
     gr = ROOT.TGraph(n, x, y)
     gr.SetLineColor(ROOT.kBlue)
     gr.SetLineWidth(4)
-    gr.SetName("graph_{}".format(sensorID.getID()))
+    gr.SetName(f"graph_{sensorID.getID()}")
     gr.SetMarkerColor(ROOT.kBlue)
     gr.SetMarkerStyle(21)
-    gr.SetTitle('Hotpixel evolution Sensor={}'.format(sensorID))
+    gr.SetTitle(f'Hotpixel evolution Sensor={sensorID}')
     gr.GetXaxis().SetTitle('run number')
     gr.GetYaxis().SetTitle('hotpixel fraction')
     gr.GetYaxis().SetRangeUser(0.0, 1.0)
@@ -126,7 +126,7 @@ for sensorID in sensor_list:
 
     c.Update()
     c.Modified()
-    c.Print('hotpixel_vs_runno_{}.png'.format(sensorID.getID()))
+    c.Print(f'hotpixel_vs_runno_{sensorID.getID()}.png')
     c.Write()
 
 

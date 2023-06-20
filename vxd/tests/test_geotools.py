@@ -41,11 +41,11 @@ class CheckNumbering(basf2.Module):
         #
         # 0a. Layer counts
         if (self.gTools.getNumberOfLayers() != 6):
-            basf2.B2ERROR('Layer count failure: \n {} layers reported, 6 actually.'.format(self.gTools.getNumberOfLayers()))
+            basf2.B2ERROR(f'Layer count failure: \n {self.gTools.getNumberOfLayers()} layers reported, 6 actually.')
         if (self.gTools.getNumberOfPXDLayers() != 2):
-            basf2.B2ERROR('PXD layer count failure: \n {} layers reported, 2 actually.'.format(self.gTools.getNumberOfPXDLayers()))
+            basf2.B2ERROR(f'PXD layer count failure: \n {self.gTools.getNumberOfPXDLayers()} layers reported, 2 actually.')
         if (self.gTools.getNumberOfSVDLayers() != 4):
-            basf2.B2ERROR('SVD layer count failure: \n {} layers reported, 4 actually.'.format(self.gTools.getNumberOfSVDLayers()))
+            basf2.B2ERROR(f'SVD layer count failure: \n {self.gTools.getNumberOfSVDLayers()} layers reported, 4 actually.')
         # 0b. Layer numbers
         layers = self.gTools.getLayers()
         expected_layers = [1, 2, 3, 4, 5, 6]
@@ -57,7 +57,7 @@ class CheckNumbering(basf2.Module):
         if not match:
             l1_string = ' '.join([str(x) for x in layers])
             l2_string = ' '.join([str(x) for x in expected_layers])
-            basf2.B2ERROR('Layer numbers do not match, expected {}, got {}!'.format(l2_string, l1_string))
+            basf2.B2ERROR(f'Layer numbers do not match, expected {l2_string}, got {l1_string}!')
 
         layers = self.gTools.getPXDLayers()
         expected_layers = [1, 2]
@@ -69,7 +69,7 @@ class CheckNumbering(basf2.Module):
         if not match:
             l1_string = ' '.join([str(x) for x in layers])
             l2_string = ' '.join([str(x) for x in expected_layers])
-            basf2.B2ERROR('PXD layer numbers do not match, expected {}, got {}!'.format(l2_string, l1_string))
+            basf2.B2ERROR(f'PXD layer numbers do not match, expected {l2_string}, got {l1_string}!')
 
         layers = self.gTools.getSVDLayers()
         expected_layers = [3, 4, 5, 6]
@@ -81,21 +81,21 @@ class CheckNumbering(basf2.Module):
         if not match:
             l1_string = ' '.join([str(x) for x in layers])
             l2_string = ' '.join([str(x) for x in expected_layers])
-            basf2.B2ERROR('SVD layer numbers do not match, expected {}, got {}!'.format(l2_string, l1_string))
+            basf2.B2ERROR(f'SVD layer numbers do not match, expected {l2_string}, got {l1_string}!')
 
         # 0c. Layer ranges
         if (self.gTools.getFirstLayer() != 1):
-            basf2.B2ERROR('First layer number is 1, reported {}.'.format(self.gTools.getFirstLayer()))
+            basf2.B2ERROR(f'First layer number is 1, reported {self.gTools.getFirstLayer()}.')
         if (self.gTools.getLastLayer() != 6):
-            basf2.B2ERROR('Last layer number is 6, reported {}.'.format(self.gTools.getLastLayer()))
+            basf2.B2ERROR(f'Last layer number is 6, reported {self.gTools.getLastLayer()}.')
         if (self.gTools.getFirstPXDLayer() != 1):
-            basf2.B2ERROR('First PXD layer number is 1, reported {}.'.format(self.gTools.getFirstPXDLayer()))
+            basf2.B2ERROR(f'First PXD layer number is 1, reported {self.gTools.getFirstPXDLayer()}.')
         if (self.gTools.getLastPXDLayer() != 2):
-            basf2.B2ERROR('Last PXD layer number is 2, reported {}.'.format(self.gTools.getLastPXDLayer()))
+            basf2.B2ERROR(f'Last PXD layer number is 2, reported {self.gTools.getLastPXDLayer()}.')
         if (self.gTools.getFirstSVDLayer() != 3):
-            basf2.B2ERROR('First SVD layer number is 3, reported {}.'.format(self.gTools.getFirstSVDLayer()))
+            basf2.B2ERROR(f'First SVD layer number is 3, reported {self.gTools.getFirstSVDLayer()}.')
         if (self.gTools.getLastSVDLayer() != 6):
-            basf2.B2ERROR('Last SVD layer number is 6, reported {}.'.format(self.gTools.getLastSVDLayer()))
+            basf2.B2ERROR(f'Last SVD layer number is 6, reported {self.gTools.getLastSVDLayer()}.')
         # 0d. Sensor indexing range
         # PXD
         # First PXD sensor should be (first PXD layer)/1/1,
@@ -249,8 +249,7 @@ class CheckNumbering(basf2.Module):
         # 5a. Chip-on-sensor counts
         if self.gTools.getTotalPXDChips() != 400:
             basf2.B2ERROR('PXD chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              2120, self.gTools.getTotalPXDChips())
+                          f'Expected: {2120}, got {self.gTools.getTotalPXDChips()}.'
                           )
         if self.gTools.getNumberOfPXDUSideChips() != 4:
             basf2.B2ERROR('PXD u-side chip count mismatch: \n' +
@@ -264,8 +263,7 @@ class CheckNumbering(basf2.Module):
                           )
         if self.gTools.getTotalSVDChips() != 1748:
             basf2.B2ERROR('SVD chip count mismatch: \n' +
-                          'Expected: {}, got {}.'.format(
-                              2148, self.gTools.getTotalSVDChips())
+                          f'Expected: {2148}, got {self.gTools.getTotalSVDChips()}.'
                           )
         if self.gTools.getNumberOfSVDUSideChips() != 6:
             basf2.B2ERROR('SVD u-side chip count mismatch: \n' +

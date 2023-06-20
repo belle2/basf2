@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -102,13 +101,13 @@ if options.infilename != '':
     inputName = options.infilename
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
-        print('No file(s) match {0}'.format(inputName))
+        print(f'No file(s) match {inputName}')
         sys.exit()
 if options.eNumber != '':
     if not options.eNumber.isdecimal():
-        print('Experiment number ({0}) is not valid'.format(options.eNumber))
+        print(f'Experiment number ({options.eNumber}) is not valid')
         sys.exit()
-    exp = '{0:04d}'.format(int(options.eNumber))
+    exp = f'{int(options.eNumber):04d}'
 else:
     eStart = inputName.find('/e') + 2
     if eStart < 0:
@@ -117,13 +116,13 @@ else:
     eEnd = inputName.find('/', eStart)
     exp = inputName[eStart:eEnd]
     if not exp.isdecimal():
-        print('Input filename experiment number({0}) is not valid'.format(exp))
+        print(f'Input filename experiment number({exp}) is not valid')
         sys.exit()
 if options.rNumber != '':
     if not options.rNumber.isdecimal():
-        print('Run number ({0}) is not valid'.format(options.rNumber))
+        print(f'Run number ({options.rNumber}) is not valid')
         sys.exit()
-    run = '{0:05d}'.format(int(options.rNumber))
+    run = f'{int(options.rNumber):05d}'
 else:
     rStart = inputName.find('/r') + 2
     if rStart < 0:
@@ -132,16 +131,16 @@ else:
     rEnd = inputName.find('/', rStart)
     run = inputName[rStart:rEnd]
     if not run.isdecimal():
-        print('Input filename run number({0}) is not valid'.format(run))
+        print(f'Input filename run number({run}) is not valid')
         sys.exit()
 if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{0}/r{1}/sub00/*.{0}.{1}.HLT2.f00000.root'.format(exp, run))
+    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{exp}/r{run}/sub00/*.{exp}.{run}.HLT2.f00000.root')
     if len(fileList) == 0:
-        print('No file(s) found for experiment <{0}> run <{1}>'.format(options.eNumber, options.rNumber))
+        print(f'No file(s) found for experiment <{options.eNumber}> run <{options.rNumber}>')
         sys.exit()
     inputName = fileList[0].replace('f00000', 'f*')
 
-eventPdfName = 'bklmEvents-e{0}r{1}.pdf'.format(exp, run)
+eventPdfName = f'bklmEvents-e{exp}r{run}.pdf'
 
 if maxCount >= 0:
     print('bklm-display: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze', maxCount, 'events using ' + tagName)

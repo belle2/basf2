@@ -108,7 +108,7 @@ def compose_axis_label(quantity_name, unit=None):
     if unit is None:
         axis_label = quantity_name
     else:
-        axis_label = '{} ({})'.format(quantity_name, unit)
+        axis_label = f'{quantity_name} ({unit})'
 
     return axis_label
 
@@ -781,9 +781,9 @@ class ValidationPlot:
 
             # give a custom pvalue warning / error zone if requested
             if self.pvalue_error is not None:
-                meta_options.append("pvalue-error={}".format(self.pvalue_error))
+                meta_options.append(f"pvalue-error={self.pvalue_error}")
             if self.pvalue_warn is not None:
-                meta_options.append("pvalue-warn={}".format(self.pvalue_warn))
+                meta_options.append(f"pvalue-warn={self.pvalue_warn}")
 
             # Indicator if the y axes should be displayed as a logarithmic scale
             if self.y_log:
@@ -971,11 +971,11 @@ class ValidationPlot:
         if np.isfinite(value) and value == np.round(value):
             return str(int(value))
         else:
-            formated_value = "{:.5g}".format(value)
+            formated_value = f"{value:.5g}"
 
             # if the label is to long, switch to shorter "e" format
             if len(formated_value) > 8:
-                formated_value = "{:.3e}".format(value)
+                formated_value = f"{value:.3e}"
             return formated_value
 
     def create_1d(self,
@@ -1291,7 +1291,7 @@ class ValidationPlot:
                 get_logger().warning("Number of points in scatter graph %s exceed limit %s" %
                                      (self.name, max_n_data))
 
-                get_logger().warning("Cropping  %s" % max_n_data)
+                get_logger().warning(f"Cropping  {max_n_data}")
 
                 xs = xs[0:max_n_data]
                 ys = ys[0:max_n_data]
@@ -1737,7 +1737,7 @@ class ValidationPlot:
 
             # Do not allow negative bin numbers
             if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                message = f'Cannot accept n_bins={bins} as number of bins, because it is not a number greater than 0.'
                 raise ValueError(message)
 
         # Coerce values to a numpy array. Do not copy if already a numpy array.
@@ -1924,7 +1924,7 @@ class ValidationPlot:
             n_bins = int(n_bins)
             # Do not allow negative bin numbers
             if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % n_bins
+                message = f'Cannot accept n_bins={n_bins} as number of bins, because it is not a number greater than 0.'
                 raise ValueError(message)
 
         return n_bins, lower_bound, upper_bound

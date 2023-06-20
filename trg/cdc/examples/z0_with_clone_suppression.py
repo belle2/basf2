@@ -199,9 +199,9 @@ class Ana(b2.Module):
         if len(self.trk2d) == 0 or len(self.fast_trk2d) == 0:
             return
         ts_hits = self.trk2d[0].getRelationsTo('CDCTriggerSegmentHits')
-        b2.B2DEBUG(10, 'TS size: {}'.format(ts_hits.size()))
+        b2.B2DEBUG(10, f'TS size: {ts_hits.size()}')
         fast_ts_hits = self.fast_trk2d[0].getRelationsTo('CDCTriggerSegmentHits')
-        b2.B2DEBUG(10, 'fast TS size: {}'.format(fast_ts_hits.size()))
+        b2.B2DEBUG(10, f'fast TS size: {fast_ts_hits.size()}')
 
     def terminate(self):
         """Terminate Ana"""
@@ -212,12 +212,12 @@ class Ana(b2.Module):
         b2.B2INFO(all_numbers.format(self.n2d_finder, self.n2d_fitter, self.n3d_fitter, self.n3d_neuro,
                                      self.n2d_fast_finder, self.n2d_fast_fitter, self.n3d_fast_fitter, self.n3d_fast_neuro))
 
-        b2.B2INFO('2D fitter retention rate: {:.2%} (original)/ {:.2%} (fast)'.format(
-            self.n2d_fitter / total, self.n2d_fast_fitter / fast_total))
-        b2.B2INFO('3D fitter retention rate: {:.2%} (original)/ {:.2%} (fast)'.format(
-            self.n3d_fitter / self.n2d_fitter, self.n3d_fast_fitter / self.n2d_fast_fitter))
-        b2.B2INFO('3D neuro retention rate: {:.2%} (original)/ {:.2%} (fast)'.format(
-            self.n3d_neuro / total, self.n3d_fast_neuro / fast_total))
+        b2.B2INFO(f'2D fitter retention rate: {self.n2d_fitter / total:.2%} ' +
+                  f'(original)/ {self.n2d_fast_fitter / fast_total:.2%} (fast)')
+        b2.B2INFO(f'3D fitter retention rate: {self.n3d_fitter / self.n2d_fitter:.2%} ' +
+                  f'(original)/ {self.n3d_fast_fitter / self.n2d_fast_fitter:.2%} (fast)')
+        b2.B2INFO(f'3D neuro retention rate: {self.n3d_neuro / total:.2%} ' +
+                  f'(original)/ {self.n3d_fast_neuro / fast_total:.2%} (fast)')
 
 
 main.add_module(Ana())

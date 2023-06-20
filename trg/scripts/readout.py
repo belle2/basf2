@@ -92,7 +92,7 @@ class MinModule(b2.Module):
             print(len(trgary), 'copper(s)')
             for evt in trgary:
                 for entry in range(evt.GetNumEntries()):  # flattened. Usually only 1 entry
-                    print('{:0x}'.format(GetNodeID(evt, entry)))
+                    print(f'{GetNodeID(evt, entry):0x}')
                     for bid in range(4):
                         if (GetNodeID(evt, entry), bid) in hslb:
                             count = GetDetectorNwords(evt, entry, bid)

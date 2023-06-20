@@ -132,7 +132,7 @@ class CheckTrueHits(b2.Module):
                         v_in=simhit.getPosIn().Y(),
                         w_in=simhit.getPosIn().Z())
                 simhit_text += \
-                    '{time:8.5f}'.format(time=simhit.getGlobalTime())
+                    f'{simhit.getGlobalTime():8.5f}'
                 b2.B2INFO(simhit_text)
             # Print the truhit position
             midpoint_text = 'TrueHit position:\n'
@@ -169,8 +169,7 @@ class CheckTrueHits(b2.Module):
                     pv_out=truehit.getExitMomentum().Y(),
                     pw_out=truehit.getExitMomentum().Z())
             # Print the truhit time
-            midpoint_text += 'Time: {t:8.5f}\n'.format(
-                t=truehit.getGlobalTime())
+            midpoint_text += f'Time: {truehit.getGlobalTime():8.5f}\n'
             b2.B2INFO(midpoint_text)
 
         for truehit in svd_truehits:
@@ -250,7 +249,7 @@ class CheckTrueHits(b2.Module):
                         v_in=simhit.getPosIn().Y(),
                         w_in=simhit.getPosIn().Z())
                 simhit_text += \
-                    '{time:8.5f} '.format(time=simhit.getGlobalTime())
+                    f'{simhit.getGlobalTime():8.5f} '
                 b2.B2INFO(simhit_text)
             # Print the truhit position
             midpoint_text = 'TrueHit position:\n'
@@ -287,8 +286,7 @@ class CheckTrueHits(b2.Module):
                     pv_out=truehit.getExitMomentum().Y(),
                     pw_out=truehit.getExitMomentum().Z())
             # Print the truhit time
-            midpoint_text += 'Time: {t:8.5f}\n'.format(
-                t=truehit.getGlobalTime())
+            midpoint_text += f'Time: {truehit.getGlobalTime():8.5f}\n'
             b2.B2INFO(midpoint_text)
 
     def terminate(self):

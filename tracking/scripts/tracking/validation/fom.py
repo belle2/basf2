@@ -47,7 +47,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         """Informal string output listing the assigned figures of merit."""
 
         figures_by_name = self.figures_by_name
-        return '\n'.join('{} : {}'.format(key, figures_by_name[key])
+        return '\n'.join(f'{key} : {figures_by_name[key]}'
                          for key in
                          figures_by_name.keys())
 
@@ -63,7 +63,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         name = self.name
 
         if not self.figures_by_name:
-            get_logger().warning('Do not create Ntuple for empty ValidationFiguresOfMerit %s' % name)
+            get_logger().warning(f'Do not create Ntuple for empty ValidationFiguresOfMerit {name}')
             return
 
         title = self.title or name

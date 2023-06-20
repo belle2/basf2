@@ -55,7 +55,7 @@ def timeOfFlightToColor(timeOfFlight):
 
     (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    color = 'rgb({:.2%}, {:.2%}, {:.2%})'.format(red, green, blue)
+    color = f'rgb({red:.2%}, {green:.2%}, {blue:.2%})'
     return color
 
 
@@ -70,7 +70,7 @@ def inTrackIdToColor(inTrackId):
 
     (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    color = 'rgb({:.2%}, {:.2%}, {:.2%})'.format(red, green, blue)
+    color = f'rgb({red:.2%}, {green:.2%}, {blue:.2%})'
     return color
 
 
@@ -326,8 +326,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
         color = self.color_by_bkgtag.get(backgroundTag, None)
 
         if color is None:
-            print('Background tag %s not associated with a color.'
-                  % backgroundTag)
+            print(f'Background tag {backgroundTag} not associated with a color.')
             return 'orange'
         else:
             return color
@@ -375,7 +374,7 @@ class MCSegmentIdColorMap(CDCHitColorMap):
             (red, green, blue) = colorsys.hls_to_rgb(hue, lightness,
                                                      saturation)
 
-            color = 'rgb({:.2%}, {:.2%}, {:.2%})'.format(red, green, blue)
+            color = f'rgb({red:.2%}, {green:.2%}, {blue:.2%})'
             return color
 
 

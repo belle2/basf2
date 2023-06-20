@@ -371,7 +371,7 @@ def create_gitlab_issue(
 
     issue.labels = ["validation_issue"]
     issue.notes.create(
-        {"body": "See the [error plot]({})".format(uploaded_file["url"])}
+        {"body": f'See the [error plot]({uploaded_file["url"]})'}
     )
 
     issue.save()
@@ -400,10 +400,8 @@ def update_gitlab_issue(
     plot_package = file_path.split("/")[-2]
     issue.notes.create(
         {
-            "body": "Related observation in validation of `{}` package, `{}`\
-             plot in `{}` build. See the [error plot]({})".format(
-                plot_package, plot_name, rev_label, uploaded_file["url"]
-            )
+            "body": f"Related observation in validation of `{plot_package}` package, `{plot_name}`" +
+            f'plot in `{rev_label}` build. See the [error plot]({uploaded_file["url"]})'
         }
     )
 
@@ -934,8 +932,8 @@ def run_server(
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
         sys.exit(
-            "Result folder {} does not exist, run validate_basf2 first "
-            "to create validation output".format(results_folder)
+            f"Result folder {results_folder} does not exist, run validate_basf2 first " +
+            "to create validation output"
         )
 
     results_count = sum(

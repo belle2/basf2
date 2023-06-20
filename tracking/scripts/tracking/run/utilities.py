@@ -25,7 +25,7 @@ class ArgumentParser(argparse.ArgumentParser):
         Writes an extended help over the base ArgumentParser.
         """
         self.print_help()
-        sys.stderr.write('error: %s\n' % message)
+        sys.stderr.write(f'error: {message}\n')
         sys.exit(2)
 
 
@@ -157,4 +157,4 @@ def get_module_param(module, name):
         if name == parameter.name:
             return parameter.values
     else:
-        raise AttributeError('{} module does not have a parameter named {}'.format(module, name))
+        raise AttributeError(f'{module} module does not have a parameter named {name}')

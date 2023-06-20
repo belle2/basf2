@@ -129,7 +129,7 @@ def makeAtlas(signals, evtsize):
             pos += size
     if pos != sum(evtsize):
         raise ValueError(
-            'Size of atlas:{} does not match event size:{}'.format(pos, evtsize))
+            f'Size of atlas:{pos} does not match event size:{evtsize}')
     return atlas
 
 
@@ -141,15 +141,15 @@ def unpack(meta, headers, triggers, atlas, writer, evtsize):
     """
     transform into VCD signals from clock-seperated data and hitmap
     """
-    unpackwith = ', '.join(['bin:{}'.format(sig[4]) for sig in atlas])
+    unpackwith = ', '.join([f'bin:{sig[4]}' for sig in atlas])
     vcdVars = [writer.register_var(
-        sig[5], sig[0] + '[{}:{}]'.format(sig[1], sig[2]), 'wire', size=sig[4]) if
+        sig[5], sig[0] + f'[{sig[1]}:{sig[2]}]', 'wire', size=sig[4]) if
         not isUnamed(sig) else None for sig in atlas]
     event = writer.register_var('m', 'event', 'event')
     eventNo = writer.register_var('m', 'eventNo', 'integer')
     subrun = writer.register_var('m', 'subrun', 'integer')
     run = writer.register_var('m', 'run', 'integer')
-    delays = [writer.register_var('m', 'delay{}'.format(i), 'wire', size=9)
+    delays = [writer.register_var('m', f'delay{i}', 'wire', size=9)
               for i in range(len(evtsize))]
     lastvalues = [None] * len(atlas)
     iteration = 0
@@ -186,7 +186,7 @@ def unpack(meta, headers, triggers, atlas, writer, evtsize):
         # for clock in trg.cut(sum(evtsize)):
         for clock in clocks:
             if timestamp & 1023 == 0:
-                print('\r{} us converted'.format(str(timestamp)[:-3]), end="")
+                print(f'\r{str(timestamp)[:-3]} us converted', end="")
                 sys.stdout.flush()
             timestamp = iteration << power
             iteration += 1
@@ -194,8 +194,7 @@ def unpack(meta, headers, triggers, atlas, writer, evtsize):
             for i, sig in enumerate(atlas):
                 if isUnamed(sig):
                     if dummycheck and '1' in values[i] and '0' in values[i]:
-                        print('[Warning] non-uniform dummy value detected at {}ns: {}'.format(
-                            timestamp, sig[3] % sum(evtsize)))
+                        print(f'[Warning] non-uniform dummy value detected at {timestamp}ns: {sig[3] % sum(evtsize)}')
                         print(values[i])
                     continue
                 if values[i] != lastvalues[i]:

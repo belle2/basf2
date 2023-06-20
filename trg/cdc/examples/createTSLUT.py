@@ -34,8 +34,8 @@ b = 0.8
 p = 0.7
 
 # filenames for the new LUTs
-innerLUTFilename = "innerLUT_Bkg_p{:.2f}_b{:.2f}.coe".format(p, b)
-outerLUTFilename = "outerLUT_Bkg_p{:.2f}_b{:.2f}.coe".format(p, b)
+innerLUTFilename = f"innerLUT_Bkg_p{p:.2f}_b{p:.2f}.coe"
+outerLUTFilename = f"outerLUT_Bkg_p{p:.2f}_b{b:.2f}.coe"
 
 
 def isValidInnerPattern(pattern):

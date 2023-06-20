@@ -182,9 +182,7 @@ class ClassificationAnalysis:
 
             fom_check = "Check that the classifcation quality stays stable."
 
-            fom_title = "Summary of the classification quality with {quantity_name}".format(
-                quantity_name=quantity_name
-            )
+            fom_title = f"Summary of the classification quality with {quantity_name}"
 
             classification_fom = ValidationFiguresOfMerit(
                 name=fom_name,

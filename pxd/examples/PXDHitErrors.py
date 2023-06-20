@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ class PXDHitErrors(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(PXDHitErrors, self).__init__()
+        super().__init__()
         #: Input file object.
         self.file = open('PXDHitErrorOutput.txt', 'w')
         #: Factors for decoding VXDId's
@@ -78,23 +77,15 @@ class PXDHitErrors(b2.Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
 
-                s_id = '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '.format(
-                    sID=sensorID,
-                    layer=layer,
-                    ladder=ladder,
-                    sensor=sensor,
-                    indexT=truehit_index,
-                    indexC=cluster_index,
-                )
+                s_id = '{sensorID} {layer} {ladder} {sensor} {truehit_index:4d} {cluster_index:4d} '
                 s += s_id
                 # TrueHit information
                 thetaU = math.atan2(truehit.getExitU() - truehit.getEntryU(),
                                     0.0075)
                 thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                     0.0075)
-                s_th = '{uTH:10.5f} {vTH:10.5f} {tTH:10.2f} {eTH:10.7f} '.format(
-                    uTH=truehit.getU(), vTH=truehit.getV(), tTH=truehit.getGlobalTime(),
-                    eTH=truehit.getEnergyDep()) + '{thetaU:6.3f} {thetaV:6.3f} '.format(thetaU=thetaU, thetaV=thetaV)
+                s_th = f'{truehit.getU():10.5f} {truehit.getV():10.5f} {truehit.getGlobalTime():10.2f} ' + \
+                    f'{truehit.getEnergyDep():10.7f} {thetaU:6.3f} {thetaV:6.3f} '
                 s += s_th
                 # Cluster information
                 cluster_pull_u = 0
@@ -106,19 +97,15 @@ class PXDHitErrors(b2.Module):
                         / cluster.getVSigma()
                 except ZeroDivisionError:
                     if cluster.getUSigma() < 1.0e-8:
-                        b2.B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
+                        b2.B2ERROR(f'Zero error in u, clsize {cluster.getUSize()}.')
                     else:
-                        b2.B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
+                        b2.B2ERROR(f'Zero error in v, clsize {cluster.getVSize()}.')
 
                 s_cl = \
-                    '{u:10.5f} {v:10.5f} {uEr:10.5f} {vEr:10.5f} {rho:10.4f} '.format(
-                        u=cluster.getU(), v=cluster.getV(), uEr=cluster.getUSigma(),
-                        vEr=cluster.getVSigma(), rho=cluster.getRho()) \
-                    + '{eC:9.1f} {eSeed:9.1f} {size:5d} {uSize:5d} {vSize:5d} '.format(
-                        eC=cluster.getCharge(), eSeed=cluster.getSeedCharge(), size=cluster.getSize(),
-                        uSize=cluster.getUSize(), vSize=cluster.getVSize()) \
-                    + '{uPull:10.3f} {vPull:10.3f}'.format(
-                        uPull=cluster_pull_u, vPull=cluster_pull_v)
+                    f'{cluster.getU():10.5f} {cluster.getV():10.5f} {cluster.getUSigma():10.5f} {cluster.getVSigma():10.5f} ' + \
+                    f'{cluster.getRho():10.4f} {cluster.getCharge():9.1f} {cluster.getSeedCharge():9.1f} ' + \
+                    f'{cluster.getSize():5d} {cluster.getUSize():5d} {cluster.getVSize():5d} ' + \
+                    f'{cluster_pull_u:10.3f} {cluster_pull_v:10.3f}'
                 s += s_cl
                 # NO DIGITS by now.
                 s += '\n'

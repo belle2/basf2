@@ -178,7 +178,7 @@ class ResolutionAnalysis:
                         sel_residuals.append(residuals[i])
 
                 residuals_hist_name = formatter.format(plot_name, subplot_name="residuals") + \
-                    "{}_to_{}".format(lower_bin, upper_bin)
+                    f"{lower_bin}_to_{upper_bin}"
                 vplot = ValidationPlot(residuals_hist_name, self.referenceFileName)
                 vplot.hist(sel_residuals,
                            outlier_z_score=outlier_z_score,

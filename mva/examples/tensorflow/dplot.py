@@ -16,7 +16,7 @@ import basf2_mva
 from basf2_mva_python_interface.tensorflow import State
 
 
-class Prior(object):
+class Prior:
     """
     Calculates prior from signal and background pdfs of the fit variable
     """
@@ -216,7 +216,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
             optimizer.apply_gradients(zip(grads, trainable_variables))
 
-        print("Internal Epoch:", '%04d' % (i), "cost=", "{:.9f}".format(avg_cost))
+        print("Internal Epoch:", f'{i:04d}', "cost=", f"{avg_cost:.9f}")
     return True
 
 

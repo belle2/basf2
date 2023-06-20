@@ -129,7 +129,7 @@ def makeAtlas(signals, evtsize):
             pos += size
     if pos != sum(evtsize):
         raise ValueError(
-            'Size of atlas:{} does not match event size:{}'.format(pos, evtsize))
+            f'Size of atlas:{pos} does not match event size:{evtsize}')
     return atlas
 
 
@@ -141,9 +141,9 @@ def unpack(triggers, atlas, writer):
     """
     transform into VCD signals from clock-seperated data and hitmap
     """
-    unpackwith = ', '.join(['bin:{}'.format(sig[4]) for sig in atlas])
+    unpackwith = ', '.join([f'bin:{sig[4]}' for sig in atlas])
     vcdVars = [writer.register_var(
-        sig[5], sig[0] + '[{}:{}]'.format(sig[1], sig[2]), 'wire', size=sig[4]) if
+        sig[5], sig[0] + f'[{sig[1]}:{sig[2]}]', 'wire', size=sig[4]) if
         not isUnamed(sig) else None for sig in atlas]
     event = writer.register_var('m', 'event', 'event')
     lastvalues = [None] * len(atlas)
@@ -156,7 +156,7 @@ def unpack(triggers, atlas, writer):
         writer.change(event, timestamp, '1')
         for clock in trg.cut(sum(evtsize)):
             if timestamp & 1023 == 0:
-                print('\r{} us converted'.format(str(timestamp)[:-3]), end="")
+                print(f'\r{str(timestamp)[:-3]} us converted', end="")
                 sys.stdout.flush()
             timestamp = iteration << power
             iteration += 1
@@ -180,7 +180,7 @@ def literalVCD(triggers, atlas, writer):
     write a VCD file from clock-seperated data and hitmap
     """
     vcdVars = [writer.register_var(
-        'm', sig[0] + '[{}:{}]'.format(sig[1], sig[2]), 'wire', size=sig[4]) if
+        'm', sig[0] + f'[{sig[1]}:{sig[2]}]', 'wire', size=sig[4]) if
         sig[0] != 'unamed' else 0 for sig in atlas]
     event = writer.register_var('m', 'event', 'event')
     lastvalue = None
@@ -192,7 +192,7 @@ def literalVCD(triggers, atlas, writer):
         writer.change(event, timestamp, '1')
         for value in trg.cut(sum(evtsize)):
             if timestamp & 1023 == 0:
-                print('\r{} us completed'.format(str(timestamp)[:-3]),)
+                print(f'\r{str(timestamp)[:-3]} us completed',)
                 sys.stdout.flush()
             timestamp = iteration << power
             iteration += 1
@@ -229,7 +229,7 @@ def combVCD(clocks, atlas, writer):
             signal[0].extend(k)
         comAtlas.append(signal[0])
     vars = [writer.register_var(
-        'm', sig[0] + '[{}:{}]'.format(sig[1], sig[-3]), 'wire',
+        'm', sig[0] + f'[{sig[1]}:{sig[-3]}]', 'wire',
         size=sum(sig[4::5])) for sig in comAtlas]
     for timestamp, value in enumerate(clocks):
         for i, sig in enumerate(comAtlas):

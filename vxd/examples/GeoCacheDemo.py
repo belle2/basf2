@@ -55,15 +55,11 @@ class PrintPXDHits(b2.Module):
             if id != cluster.getSensorID():  # next sensor
                 id = cluster.getSensorID()
                 info = geoCache.get(id)
-                b2.B2INFO("Layer: {layer}, Ladder: {ladder}, Sensor: {sensor}"
-                          .format(layer=id.getLayerNumber(),
-                                  ladder=id.getLadderNumber(),
-                                  sensor=id.getSensorNumber()))
+                b2.B2INFO("Layer: {id.getLayerNumber()}, Ladder: {id.getLadderNumber()}, Sensor: {id.getSensorNumber()}")
 
             r_local = ROOT.TVector3(cluster.getU(), cluster.getV(), 0)
             r_global = info.pointToGlobal(r_local)
-            b2.B2INFO('PXD hit: {x:10.5f} {y:10.5f} {z:10.5f}'
-                      .format(x=r_global.X(), y=r_global.Y(), z=r_global.Z()))
+            b2.B2INFO(f'PXD hit: {r_global.X():10.5f} {r_global.Y():10.5f} {r_global.Z():10.5f}')
 
     def terminate(self):
         """ Do nothing """

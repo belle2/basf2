@@ -1917,7 +1917,7 @@ class TrackQEEvaluationBaseTask(Task):
         stderr_log_file_path = log_file_dir + "stderr"
         stdout_log_file_path = log_file_dir + "stdout"
         with open(stdout_log_file_path, "w") as stdout_file:
-            stdout_file.write("stdout output of the command:\n{}\n\n".format(" ".join(cmd)))
+            stdout_file.write(f'stdout output of the command:\n{" ".join(cmd)}\n\n')
         if os.path.exists(stderr_log_file_path):
             # remove stderr file if it already exists b/c in the following it will be opened in appending mode
             os.remove(stderr_log_file_path)

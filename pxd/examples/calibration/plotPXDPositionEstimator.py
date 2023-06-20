@@ -117,7 +117,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
             ax = fig.add_subplot(111)
             ax.set_xlabel('thetaU / degree', size=20)
             ax.set_ylabel('thetaV / degree', size=20)
-            ax.set_title('Number of corrections kind={:d}'.format(pixelkind), size=20)
+            ax.set_title(f'Number of corrections kind={pixelkind:d}', size=20)
             ax = sns.heatmap(
                 pivot_table,
                 mask=pivot_table.isnull(),
@@ -129,7 +129,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
                 cbar_kws={
                     'label': '#corrections'})
             ax.invert_yaxis()
-            fig.savefig(self.resultdir + '/Corrections_Heatmap_kind_{:d}.png'.format(pixelkind), dpi=100)
+            fig.savefig(self.resultdir + f'/Corrections_Heatmap_kind_{pixelkind:d}.png', dpi=100)
             fig.clf()
             plt.close(fig)
 
@@ -138,7 +138,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
             ax = fig.add_subplot(111)
             ax.set_xlabel('thetaU / degree', size=20)
             ax.set_ylabel('thetaV / degree', size=20)
-            ax.set_title('Number of shapes kind={:d}'.format(pixelkind), size=20)
+            ax.set_title(f'Number of shapes kind={pixelkind:d}', size=20)
             ax = sns.heatmap(
                 pivot_table,
                 mask=pivot_table.isnull(),
@@ -150,7 +150,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
                 cbar_kws={
                     'label': '#shapes'})
             ax.invert_yaxis()
-            fig.savefig(self.resultdir + '/Shapes_Heatmap_kind_{:d}.png'.format(pixelkind), dpi=100)
+            fig.savefig(self.resultdir + f'/Shapes_Heatmap_kind_{pixelkind:d}.png', dpi=100)
             fig.clf()
             plt.close(fig)
 
@@ -159,7 +159,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
             ax = fig.add_subplot(111)
             ax.set_xlabel('thetaU / degree', size=20)
             ax.set_ylabel('thetaV / degree', size=20)
-            ax.set_title('Coverage kind={:d}'.format(pixelkind), size=20)
+            ax.set_title(f'Coverage kind={pixelkind:d}', size=20)
             ax = sns.heatmap(
                 pivot_table,
                 mask=pivot_table.isnull(),
@@ -171,7 +171,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
                 cbar_kws={
                     'label': 'coverage / %'})
             ax.invert_yaxis()
-            fig.savefig(self.resultdir + '/Coverage_Heatmap_kind_{:d}.png'.format(pixelkind), dpi=100)
+            fig.savefig(self.resultdir + f'/Coverage_Heatmap_kind_{pixelkind:d}.png', dpi=100)
             fig.clf()
             plt.close(fig)
 
@@ -180,7 +180,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
             ax = fig.add_subplot(111)
             ax.set_xlabel('thetaU / degree', size=20)
             ax.set_ylabel('thetaV / degree', size=20)
-            ax.set_title('Average cluster sigma u kind={:d}'.format(pixelkind), size=20)
+            ax.set_title(f'Average cluster sigma u kind={pixelkind:d}', size=20)
             ax = sns.heatmap(
                 pivot_table,
                 mask=pivot_table.isnull(),
@@ -192,7 +192,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
                 cbar_kws={
                     'label': 'sigma u / um'})
             ax.invert_yaxis()
-            fig.savefig(self.resultdir + '/SigmaU_Heatmap_kind_{:d}.png'.format(pixelkind), dpi=100)
+            fig.savefig(self.resultdir + f'/SigmaU_Heatmap_kind_{pixelkind:d}.png', dpi=100)
             fig.clf()
             plt.close(fig)
 
@@ -201,7 +201,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
             ax = fig.add_subplot(111)
             ax.set_xlabel('thetaU / degree', size=20)
             ax.set_ylabel('thetaV / degree', size=20)
-            ax.set_title('Average cluster sigma v kind={:d}'.format(pixelkind), size=20)
+            ax.set_title(f'Average cluster sigma v kind={pixelkind:d}', size=20)
             ax = sns.heatmap(
                 pivot_table,
                 mask=pivot_table.isnull(),
@@ -213,7 +213,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
                 cbar_kws={
                     'label': 'sigma v / um'})
             ax.invert_yaxis()
-            fig.savefig(self.resultdir + '/SigmaV_Heatmap_kind_{:d}.png'.format(pixelkind), dpi=100)
+            fig.savefig(self.resultdir + f'/SigmaV_Heatmap_kind_{pixelkind:d}.png', dpi=100)
             fig.clf()
             plt.close(fig)
 
@@ -222,7 +222,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
             ax = fig.add_subplot(111)
             ax.set_xlabel('thetaU / degree', size=20)
             ax.set_ylabel('thetaV / degree', size=20)
-            ax.set_title('Average uv correlation kind={:d}'.format(pixelkind), size=20)
+            ax.set_title(f'Average uv correlation kind={pixelkind:d}', size=20)
             ax = sns.heatmap(
                 pivot_table,
                 mask=pivot_table.isnull(),
@@ -234,7 +234,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
                 cbar_kws={
                     'label': 'correlation'})
             ax.invert_yaxis()
-            fig.savefig(self.resultdir + '/CorrelationUV_Heatmap_kind_{:d}.png'.format(pixelkind), dpi=100)
+            fig.savefig(self.resultdir + f'/CorrelationUV_Heatmap_kind_{pixelkind:d}.png', dpi=100)
             fig.clf()
             plt.close(fig)
 

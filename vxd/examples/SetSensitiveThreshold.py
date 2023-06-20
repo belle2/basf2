@@ -50,7 +50,7 @@ class SetVXDSensitiveThreshold(b2.Module):
                 self.old_pxd_threshold = float(node.text)
             else:
                 self.old_svd_threshold = float(node.text)
-            node.text = '{val}'.format(val=value)
+            node.text = f'{value}'
 
         file = open(filename, 'w')
         tree.write(file, encoding='UTF-8', xml_declaration=True)

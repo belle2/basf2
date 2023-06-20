@@ -81,8 +81,7 @@ class WrapperModule(basf2.Module):
 
     def compose_wrapped_module_name(self, module):
         """Compose a name that indicates the wrapped module."""
-        return "{wrapper_name}({module_name})".format(module_name=module.name(),
-                                                      wrapper_name=self.wrapper_name)
+        return f"{self.wrapper_name}({module.name()})"
 
     def get_name(self):
         """Forwards the name()."""
@@ -351,8 +350,7 @@ class PathModule(basf2.Module):
             itemCount = 0
         else:
             itemCount = len(modules)
-        self.set_name("{path_module} ({items} modules):".format(path_module=self.__class__.__name__,
-                                                                items=itemCount))
+        self.set_name(f"{self.__class__.__name__} ({itemCount} modules):")
 
     def event(self):
         """Event method of the module

@@ -63,10 +63,10 @@ class PrintTRGTime(b2.Module):
         """
         Print TRG time of an event
         """
-        b2.B2INFO('Event {}:'.format(self.event_info.getEvent()))
+        b2.B2INFO(f'Event {self.event_info.getEvent()}:')
         for hit in self.cdc_hit:
             cdc_raw_hit = hit.getRelatedTo('CDCRawHits')
-            b2.B2INFO('Trigger time: {}'.format(cdc_raw_hit.getTriggerTime()))
+            b2.B2INFO(f'Trigger time: {cdc_raw_hit.getTriggerTime()}')
 
 
 # Create main path

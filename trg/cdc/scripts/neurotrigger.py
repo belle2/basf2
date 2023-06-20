@@ -426,11 +426,11 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
     if "InnerTSLUTFile" in kwargs:
         tsf.param("InnerTSLUTFile", kwargs["InnerTSLUTFile"])
     else:
-        tsf.param("InnerTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"))
+        tsf.param("InnerTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"))
     if "OuterTSLUTFile" in kwargs:
         tsf.param("OuterTSLUTFile", kwargs["OuterTSLUTFile"])
     else:
-        tsf.param("OuterTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"))
+        tsf.param("OuterTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
     tsf.param("TSHitCollectionName", simsegmenthits)
     tsf.param("CDCHitCollectionName", "CDCHits")
     if "relateAllHits" in kwargs:

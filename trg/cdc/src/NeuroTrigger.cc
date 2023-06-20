@@ -1139,7 +1139,7 @@ bool NeuroTrigger::loadIDHist(const std::string& filename)
   if (gzipfile.is_open()) {
     while (arrayStream >> hline) {
       for (unsigned i = 0; i < 18; ++i) {
-        m_MLPs[hline.exPert].relevantID[i] = hline.relID[i];
+        m_MLPs[hline.exPert].m_relevantID[i] = hline.relID[i];
       }
     }
   } else { return false;}

@@ -294,15 +294,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if dqm_environment == "expressreco" and (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]):
         # TRGCDCTNN
         neurotrigger.add_neurotrigger_hw(path)
-        useRecoTracks = False
-        if useRecoTracks:
-            path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
-                            hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
-            path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwsimneurotracks,
-                            hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
-            path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
-                            hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
-        path.add_module('CDCTriggerNeuroDQMOnline', histogramDirectoryName="TRGCDCTNN2", useRecoTracks=useRecoTracks)
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
+                        hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwsimneurotracks,
+                        hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
+                        hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+        path.add_module('CDCTriggerNeuroDQMOnline', histogramDirectoryName="TRGCDCTNN2", useRecoTracks=True)
 
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):

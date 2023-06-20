@@ -1,4 +1,4 @@
-[INFO] Steering file: ../mdst/tests/mdst_compatibility-v03-01-02.py
+[INFO] Steering file: mdst_compatibility-v03-01-02.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v03-01-02.root

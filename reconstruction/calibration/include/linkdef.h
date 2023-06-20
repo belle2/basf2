@@ -11,6 +11,7 @@
 #pragma link C++ class Belle2::CDCDedxCosEdgeAlgorithm-;
 #pragma link C++ class Belle2::CDCDedx2DCellAlgorithm-;
 #pragma link C++ class Belle2::CDCDedx1DCellAlgorithm-;
+#pragma link C++ class Belle2::CDCDedxBadWireAlgorithm-;
 #pragma link C++ class Belle2::CDCDedxMomentumAlgorithm-;
 #pragma link C++ class Belle2::CDCDedxInjectTimeAlgorithm-;
 

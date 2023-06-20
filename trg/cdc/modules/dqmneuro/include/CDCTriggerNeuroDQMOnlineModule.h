@@ -30,22 +30,9 @@ public:
   /** Destructor */
   virtual ~CDCTriggerNeuroDQMOnlineModule();
 
-  /** Module functions */
-  virtual void initialize() override;
-  virtual void beginRun() override;
-  virtual void event() override;
-  virtual void endRun() override;
-  virtual void terminate() override;
-  void fillHWPlots();
-  void fillSimPlots();
-  void makeDebugOutput();
-  void fillRecoPlots();
 
-  /**
-   * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-   * to be placed in this function.
-  */
-  virtual void defineHisto() override;
+private:
+
   struct TSLine {
     const CDCTriggerSegmentHit* hit;
     std::string strline;
@@ -58,7 +45,22 @@ public:
   };
   typedef std::vector<TSLine> TSLines;
 
-private:
+  /** Module functions */
+  void initialize() override;
+  void beginRun() override;
+  void event() override;
+  void endRun() override;
+  void terminate() override;
+  void fillHWPlots();
+  void fillSimPlots();
+  void makeDebugOutput();
+  void fillRecoPlots();
+
+  /**
+   * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+   * to be placed in this function.
+  */
+  void defineHisto() override;
   /** Fill a histogram only with non-zero values */
   void condFill(TH1F* histo, float value)
   {

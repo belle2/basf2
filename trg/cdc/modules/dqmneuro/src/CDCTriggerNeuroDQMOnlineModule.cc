@@ -412,9 +412,9 @@ void CDCTriggerNeuroDQMOnlineModule::fillSimPlots()
       m_neuroHWSimCosTheta->Fill(copysign(1.0,
                                           neuroSimTrack.getCotTheta()) / sqrt(1. / (neuroSimTrack.getCotTheta()*neuroSimTrack.getCotTheta())));
 
-      bool valhwtrack = false;
-      CDCTriggerTrack* neuroHWTrack = neuroSimTrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroTracksName);
+      neuroHWTrack = neuroSimTrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroTracksName);
       if (neuroHWTrack) {
+        bool valhwtrack = false;
         try {
           valhwtrack = neuroHWTrack->getValidStereoBit();
         } catch (...) {
@@ -478,7 +478,6 @@ void CDCTriggerNeuroDQMOnlineModule::makeDebugOutput()
   unsigned sthwts = 0;
 
   std::vector<TSLine> hwtsoutput;
-  std::vector<TSLine> swtsoutput;
   for (const CDCTriggerSegmentHit& xhit : m_unpackedNeuroInputSegmentHits) {
     if (xhit.getISuperLayer() % 2 == 0) {
       axhwts ++;

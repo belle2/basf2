@@ -383,7 +383,7 @@ def efficiencyCalculator(mc, data, method):
           r'\\ \hline\hline')
     for i in range(0, len(rbins) - 1):
         print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $' +
-              '{: 6.2f}'.format(data_event_fractionTotal[i] * 100) + '$ & $' +
+              f'{data_event_fractionTotal[i] * 100: 6.2f}' + '$ & $' +
               f'{data_wvalue[i] * 100: 6.2f}' + r" \pm " + f'{data_wvalueUncertainty[i] * 100:2.2f}' + r'\, $ & $' +
               f'{data_iEffEfficiency[i] * 100: 7.3f}' +  # + '$ & $' +
               r" \pm " + f'{data_iEffEfficiencyUncertainty[i] * 100:4.3f}' + r'\, $ \\ ')

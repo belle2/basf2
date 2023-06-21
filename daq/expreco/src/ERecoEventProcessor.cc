@@ -30,7 +30,7 @@ ERecoEventProcessor::ERecoEventProcessor(string conffile)
   //  char nodename[256];
   strcpy(m_nodename, "evp_");
 
-  gethostname(&m_nodename[4], sizeof(m_nodename));
+  gethostname(&m_nodename[4], sizeof(m_nodename) - 4);
   printf("nodename = %s\n", m_nodename);
 
   // 1. Set execution directory

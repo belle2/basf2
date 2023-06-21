@@ -106,7 +106,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         particle_lists = [particle_lists]
 
     if mode not in ['expert', 'teacher', 'sampler']:
-        B2FATAL('Invalid mode  %s' % mode)
+        B2FATAL(f'Invalid mode  {mode}')
 
     if variable_list is None and mode in ['sampler', 'teacher']:
         variable_list = [
@@ -177,7 +177,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
     if mode == 'sampler':
         if os.path.isfile(output_file_name) and not overwrite:
-            B2FATAL('Outputfile %s already exists. Aborting writeout.' % output_file_name)
+            B2FATAL(f'Outputfile {output_file_name} already exists. Aborting writeout.')
 
         # and add target
         all_variables = features + [target]

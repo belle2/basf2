@@ -109,7 +109,7 @@ for cat in categories:
 
 categoriesNtupleList = ''
 for category in usedCategories:
-    categoriesNtupleList = categoriesNtupleList + "Eff_%s:" % category
+    categoriesNtupleList = categoriesNtupleList + f"Eff_{category}:"
 
 
 # Output Validation file
@@ -304,20 +304,20 @@ for method in methods:
     print('*    __________________________________________________________________________________________    *')
     print('*   |                                                                                          |   *')
     print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
-          '{:<24}'.format("%.0f" % total_entries) + '{:>36}'.format('|   *'))
+          f"{f'{total_entries:.0f}':<24}" + f"{'|   *':>36}")
     print('*   |                                                                                          |   *')
-    print('*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) +
+    print('*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' + f'{average_eff * 100:.2f}' +
           ' %                                    |   *')
     print('*   |                                                                                          |   *')
     print('*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' +
-          '{:.2f}'.format(tot_eff_effB0 * 100) + ' % (q=+1)  ' +
-          '{:.2f}'.format(tot_eff_effB0bar * 100) + ' % (q=-1)  EffDiff=' +
-          '{:^5.2f}'.format(diff_eff * 100) + ' % |   *')
+          f'{tot_eff_effB0 * 100:.2f}' + ' % (q=+1)  ' +
+          f'{tot_eff_effB0bar * 100:.2f}' + ' % (q=-1)  EffDiff=' +
+          f'{diff_eff * 100:^5.2f}' + ' % |   *')
     print('*   |                                                                                          |   *')
     print('*   | FLAVOR PERCENTAGE (MC):                  ' +
-          '{:.2f}'.format(total_entries_B0 / total_entries * 100) + ' % (q=+1)  ' +
-          '{:.2f}'.format(total_entries_B0bar / total_entries * 100) + ' % (q=-1)  Diff=' +
-          '{:^5.2f}'.format((total_entries_B0 - total_entries_B0bar) / total_entries * 100) + ' %    |   *')
+          f'{total_entries_B0 / total_entries * 100:.2f}' + ' % (q=+1)  ' +
+          f'{total_entries_B0bar / total_entries * 100:.2f}' + ' % (q=-1)  Diff=' +
+          f'{(total_entries_B0 - total_entries_B0bar) / total_entries * 100:^5.2f}' + ' %    |   *')
     print('*   |__________________________________________________________________________________________|   *')
     print('*                                                                                                  *')
     print('****************************************************************************************************')
@@ -359,7 +359,7 @@ for method in methods:
     histo_belleplotB0bar.SetLineColor(ROOT.kRed)
     # SetLabelSize etc SetTitle
 
-    histo_belleplotB0.SetTitle('; #it{qr}_{' + method + '} ; Events  (Total = ' + '{:<1}'.format("%.0f" % total_entries) + ')'
+    histo_belleplotB0.SetTitle('; #it{qr}_{' + method + '} ; Events  (Total = ' + f"{f'{total_entries:.0f}':<1}" + ')'
                                )
     histo_belleplotB0.SetMinimum(0)
     histo_belleplotB0.SetMaximum(YmaxForQrPlot)
@@ -371,30 +371,20 @@ for method in methods:
         histo_belleplotB0,
         'true B^{0} ' +
         ' #varepsilon_{eff}(B^{0}) = ' +
-        '{:.2f}'.format(
-            tot_eff_effB0 *
-            100) +
+        f'{tot_eff_effB0 * 100:.2f}' +
         '%    #frac{n_{B^{0}}}{n} = ' +
-        '{:.2f}'.format(
-            total_entries_B0 /
-            total_entries *
-            100) +
+        f'{total_entries_B0 / total_entries * 100:.2f}' +
         '%')
     leg.AddEntry(
         histo_belleplotB0bar,
         'true #bar{B}^{0} ' +
         ' #varepsilon_{eff}(#bar{B}^{0}) = ' +
-        '{:.2f}'.format(
-            tot_eff_effB0bar *
-            100) +
+        f'{tot_eff_effB0bar * 100:.2f}' +
         '%    #frac{n_{#bar{B}^{0}}}{n} = ' +
-        '{:.2f}'.format(
-            total_entries_B0bar /
-            total_entries *
-            100) +
+        f'{total_entries_B0bar / total_entries * 100:.2f}' +
         '%')
-    leg.AddEntry("", "Avrg.     #bf{  #varepsilon_{eff} = " + '{:.2f}'.format(average_eff * 100) +
-                 '%}   #Delta#varepsilon_{eff} = ' + '{:^5.2f}'.format(diff_eff * 100) + '%')
+    leg.AddEntry("", "Avrg.     #bf{  #varepsilon_{eff} = " + f'{average_eff * 100:.2f}' +
+                 '%}   #Delta#varepsilon_{eff} = ' + f'{diff_eff * 100:^5.2f}' + '%')
     leg.SetTextSize(0.045)
     leg.Draw()
 
@@ -525,11 +515,9 @@ for method in methods:
     leg2.AddEntry(
         diag,
         "#it{m} = " +
-        '{:.2f}'.format(
-            diag.GetParameter("p1")) +
+        f"{diag.GetParameter('p1'):.2f}" +
         "    #it{c} = " +
-        '{:.2f}'.format(
-            diag.GetParameter("p0")))
+        f"{diag.GetParameter('p0'):.2f}")
     leg2.SetTextSize(0.05)
     leg2.Draw()
 
@@ -729,22 +717,17 @@ for category in usedCategories:
     effAverage = (tot_eff_effB0 + tot_eff_effB0bar) / 2
 
     print(
-        '{:<25}'.format("* " +
-                        category) +
+        f"{'* ' + category:<25}" +
         ' B0-Eff=' +
-        '{: 8.2f}'.format(
-            tot_eff_effB0 *
-            100) +
+        f'{tot_eff_effB0 * 100: 8.2f}' +
         ' %' +
         '   B0bar-Eff=' +
-        '{: 8.2f}'.format(
-            tot_eff_effB0bar *
-            100) +
+        f'{tot_eff_effB0bar * 100: 8.2f}' +
         ' %' +
         '   EffAverage=' +
-        '{: 8.2f}'.format(effAverage * 100) + ' %' +
+        f'{effAverage * 100: 8.2f}' + ' %' +
         '   EffDiff=' +
-        '{: 8.2f}'.format(effDiff * 100) + ' %   *')
+        f'{effDiff * 100: 8.2f}' + ' %   *')
 
     # ****** produce the input plots from combiner level ******
 
@@ -801,10 +784,10 @@ for category in usedCategories:
 
     l0 = ROOT.TLegend(0.13, 0.65, 0.33, 0.97)
     l0.SetFillColorAlpha(ROOT.kWhite, 0)
-    l0.AddEntry(hist_signal, ' #varepsilon_{eff}(B^{0}) = ' + '{:.2f}'.format(tot_eff_effB0 * 100) + "%")
-    l0.AddEntry(hist_background, ' #varepsilon_{eff}(#bar{B}^{0}) = ' + '{:.2f}'.format(tot_eff_effB0bar * 100) + "%")
-    l0.AddEntry("", "#bf{#varepsilon_{eff} = " + '{:.2f}'.format(effAverage * 100) + '%}')
-    l0.AddEntry("", '#Delta#varepsilon_{eff} = ' + '{:^5.2f}'.format(effDiff * 100) + '%')
+    l0.AddEntry(hist_signal, ' #varepsilon_{eff}(B^{0}) = ' + f'{tot_eff_effB0 * 100:.2f}' + "%")
+    l0.AddEntry(hist_background, ' #varepsilon_{eff}(#bar{B}^{0}) = ' + f'{tot_eff_effB0bar * 100:.2f}' + "%")
+    l0.AddEntry("", "#bf{#varepsilon_{eff} = " + f'{effAverage * 100:.2f}' + '%}')
+    l0.AddEntry("", '#Delta#varepsilon_{eff} = ' + f'{effDiff * 100:^5.2f}' + '%')
     l0.SetBorderSize(0)
     l0.SetTextSize(0.045)
     l0.Draw()

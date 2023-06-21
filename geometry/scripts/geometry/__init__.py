@@ -35,4 +35,4 @@ def check_components(components):
     allowed_components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']
     for component in components:
         if not (component in allowed_components):
-            basf2.B2FATAL('Geometry component %s is unknown or it cannot be used in standard scripts.' % (component))
+            basf2.B2FATAL(f'Geometry component {component} is unknown or it cannot be used in standard scripts.')

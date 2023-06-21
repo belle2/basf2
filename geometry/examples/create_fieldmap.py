@@ -18,14 +18,14 @@ import math
 from basf2 import Path, process
 import subprocess
 
-commit = subprocess.check_output(["git", "--git-dir=%s/.git" % os.environ["BELLE2_LOCAL_DIR"],
+commit = subprocess.check_output(["git", f"--git-dir={os.environ['BELLE2_LOCAL_DIR']}/.git",
                                   "rev-parse", "--short", "HEAD"]).decode().strip()
 
 path = Path()
 path.add_module("EventInfoSetter")
 path.add_module("CreateFieldMap", **{
     # Filename for the histograms
-    'filename': 'FieldMap-%s.root' % commit,
+    'filename': f'FieldMap-{commit}.root',
     # type of the scan: along xy, zx or zy
     "type": "zx",
     # number of steps along the first coordinate, in the case of a zx scan this

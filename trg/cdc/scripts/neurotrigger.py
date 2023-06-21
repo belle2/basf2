@@ -150,7 +150,7 @@ def add_nnta_gzip_test_output(
                         trainOnRecoTracks=True,
                         gzipFilename=baseGzipFileName+p[0]+".gz",
                         configFileName=configFileName,
-                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName,
+                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName.split('/')[-1],
                         )
         if p[0] == ".random_3":
             p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
@@ -188,7 +188,7 @@ def add_nnta_gzip_output(path, baseAnaFileName, configFileName, baseGzipFileName
                         trainOnRecoTracks=True,
                         gzipFilename=baseGzipFileName+p[0]+".gz",
                         configFileName=configFileName,
-                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName,
+                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName.split('/')[-1],
                         )
 
 
@@ -232,7 +232,7 @@ def add_all_output(
                         trainOnRecoTracks=True,
                         gzipFilename=baseGzipFileName+p[0]+".gz",
                         configFileName=configFileName,
-                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName,
+                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName.split('/')[-1],
                         )
 
 

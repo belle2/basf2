@@ -1,3 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroDataModule.h"
 
 #include <fstream>
@@ -121,7 +130,6 @@ namespace Belle2 {
   CDCTriggerNeuroDataModule::event()
   {
     StoreObjPtr<EventMetaData> evtmetadata;
-    //vector<CDCTriggerMLPData>* trainSets_current;
     for (int itrack = 0; itrack < m_tracks.getEntries(); ++itrack) {
       // get related MCParticle/RecoTrack for target
       // and retrieve track parameters

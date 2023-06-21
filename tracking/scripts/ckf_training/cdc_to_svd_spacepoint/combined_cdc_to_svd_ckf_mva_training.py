@@ -1045,7 +1045,7 @@ class MainTask(b2luigi.WrapperTask):
     num_processes = b2luigi.get_setting(
         #: \cond
         "basf2_processes_per_worker", default=0
-        #: \cond
+        #: \endcond
     )
 
     #: Dictionary with experiment numbers as keys and background directory paths as values

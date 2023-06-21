@@ -13,11 +13,7 @@
 # and can be installed with
 # pip3 install scikit-optimize
 
-# Training and test sample can be downloaded:
-# http://ekpwww.ekp.kit.edu/~tkeck/train.root
-# http://ekpwww.ekp.kit.edu/~tkeck/test.root
-
-
+from basf2 import find_file
 import basf2_mva
 import basf2_mva_util
 import skopt
@@ -43,8 +39,11 @@ def f(x, general_options, process_number):
 
 
 if __name__ == "__main__":
-    training_data = basf2_mva.vector("train.root")
-    test_data = basf2_mva.vector("test.root")
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    test_data = basf2_mva.vector(test_file)
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = training_data

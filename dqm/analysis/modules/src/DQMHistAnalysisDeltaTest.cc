@@ -35,7 +35,6 @@ DQMHistAnalysisDeltaTestModule::DQMHistAnalysisDeltaTestModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
   addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: Constructor done.");
 
 }
@@ -43,7 +42,7 @@ DQMHistAnalysisDeltaTestModule::DQMHistAnalysisDeltaTestModule()
 DQMHistAnalysisDeltaTestModule::~DQMHistAnalysisDeltaTestModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -63,7 +62,7 @@ void DQMHistAnalysisDeltaTestModule::initialize()
 
 #ifdef _BELLE2_EPICS
   mychid.resize(2);
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     SEVCHK(ca_create_channel((m_pvPrefix + "TEST1").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
     SEVCHK(ca_create_channel((m_pvPrefix + "TEST2").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
@@ -187,7 +186,7 @@ void DQMHistAnalysisDeltaTestModule::event()
     m_monObj->setVariable("data_Test2", data_Test2);
 
 #ifdef _BELLE2_EPICS
-    if (m_useEpics) {
+    if (getUseEpics()) {
       SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data_Test1), "ca_set failure");
       SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&data_Test2), "ca_set failure");
       // write out

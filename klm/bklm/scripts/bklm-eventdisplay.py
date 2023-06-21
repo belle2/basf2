@@ -134,7 +134,7 @@ else:
         print(f'Input filename run number({run}) is not valid')
         sys.exit()
 if len(inputName) == 0:
-    fileList = glob.glob('/ghi/fs01/belle2/bdata/Data/Raw/e{exp}/r{run}/sub00/*.{exp}.{run}.HLT2.f00000.root')
+    fileList = glob.glob(f'/ghi/fs01/belle2/bdata/Data/Raw/e{exp}/r{run}/sub00/*.{exp}.{run}.HLT2.f00000.root')
     if len(fileList) == 0:
         print(f'No file(s) found for experiment <{options.eNumber}> run <{options.rNumber}>')
         sys.exit()

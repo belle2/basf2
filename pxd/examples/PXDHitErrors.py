@@ -77,7 +77,7 @@ class PXDHitErrors(b2.Module):
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
 
-                s_id = '{sensorID} {layer} {ladder} {sensor} {truehit_index:4d} {cluster_index:4d} '
+                s_id = f'{sensorID} {layer} {ladder} {sensor} {truehit_index:4d} {cluster_index:4d} '
                 s += s_id
                 # TrueHit information
                 thetaU = math.atan2(truehit.getExitU() - truehit.getEntryU(),

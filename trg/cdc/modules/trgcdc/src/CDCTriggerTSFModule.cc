@@ -491,7 +491,7 @@ CDCTriggerTSFModule::event()
               outerTrueLRTable[s.lutPattern()][2] += 1;
           }
         }
-      } else {std::cout << "wrong!!!" << std::endl;}
+      }
     }
   }
 

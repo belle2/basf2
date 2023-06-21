@@ -15,6 +15,8 @@
 #include "boost/multi_array.hpp"
 #include <iostream>
 #include <fstream>
+#include <framework/core/Module.h>
+
 
 using namespace Belle2;
 
@@ -32,12 +34,12 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
   try {
     confile.open(filename, std::ifstream::in);
   } catch (int e) {
-    std::cout << "ERROR! While opening file: " << filename << "    Error code: " << e << std::endl;
+    B2ERROR("ERROR! While opening file: " + filename + "    Error code: " + e);
     exit(EXIT_FAILURE);
   }
   std::string line_all;
   if (!confile.is_open()) {
-    std::cout << "ERROR! While opening file: " << filename << std::endl;
+    B2ERROR("ERROR! While opening file: " + filename);
     exit(EXIT_FAILURE);
   }
   while (std::getline(confile, line_all)) {

@@ -295,9 +295,10 @@ namespace Belle2 {
       x.lock();
     }
     if (m_writeconfigFileName == "") {
+      B2INFO("write writeconfig now: " + m_configFileName);
       m_neuroParameters.saveconfigtxt(m_configFileName);
     } else {
-      std::cout << "write writeconfig now: " << m_writeconfigFileName << std::endl;
+      B2INFO("write writeconfig now: " + m_writeconfigFileName);
       m_neuroParameters.saveconfigtxt(m_writeconfigFileName);
     }
 

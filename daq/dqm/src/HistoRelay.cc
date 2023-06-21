@@ -7,46 +7,41 @@
  **************************************************************************/
 
 #include "daq/dqm/HistoRelay.h"
-
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 
 using namespace Belle2;
 using namespace std;
 
 HistoRelay::HistoRelay(string& file, string& dest, int port)
 {
-  //  m_map = TMapFile::Create(file.c_str());
+  m_dest = dest;
+  m_port = port;
   m_memfile = new DqmMemFile(file);
-  m_sock = new EvtSocketSend(dest.c_str(), port);
-  //  m_msg = new MsgHandler(0);
+  m_sock = new EvtSocketSend(m_dest, m_port);
 }
 
 HistoRelay::~HistoRelay()
 {
   delete m_sock;
-  delete m_msg;
+  delete m_memfile;
 }
 
 int HistoRelay::collect()
 {
   //  printf ( "HistoRelay : collect!!\n" );
-  //  m_map = TMapFile::Create(m_filename.c_str());
   EvtMessage* msg = m_memfile->StreamMemFile();
 
-  /* Old Impl.
-  EvtMessage* msg = m_msg->encode_msg(MSG_EVENT);
+  auto ret = m_sock->send(msg);
 
-  (msg->header())->reserved[0] = 0;
-  (msg->header())->reserved[1] = nobjs;
-  (msg->header())->reserved[2] = 0;
+  delete (msg);
 
-  //  printf("HistoRelay : Sending %d histograms\n", nobjs);
-  */
-
-  m_sock->send(msg);
-
-  delete(msg);
+  if (ret < 0) {
+    // Socket error, e.g server died
+    delete m_sock;
+    // try reconnect
+    printf("HistoRelay: socket seems dead -> reconnect\n");
+    m_sock = new EvtSocketSend(m_dest, m_port);
+  }
 
   return 0;
 }

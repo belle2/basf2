@@ -186,16 +186,13 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         ma.variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
 
         # write the command line output for the extern teacher to a file
-        extern_command = 'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' \
-                         ' --identifier {identifier} --variables "{variables_string}"  --target_variable {target}' \
-                         ' --method Python --training_fraction {fraction}' \
-                         " --config '{classifier_args}' --framework tensorflow" \
-                         ' --steering_file {steering_file}'\
-                         ''.format(output_file_name=output_file_name, tree_name=tree_name,
-                                   identifier=uniqueIdentifier,
-                                   variables_string='" "'.join(features), target=target,
-                                   classifier_args=json.dumps(classifier_args), fraction=train_valid_fraction,
-                                   steering_file=mva_steering_file)
+        extern_command = f'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' + \
+                         f' --identifier {uniqueIdentifier} ' + \
+                         f"--variables \"{(chr(34) + ' ' + chr(34)).join(features)}\"  " + \
+                         f'--target_variable {target}' + \
+                         f' --method Python --training_fraction {train_valid_fraction}' + \
+                         f" --config '{json.dumps(classifier_args)}' --framework tensorflow" + \
+                         f' --steering_file {mva_steering_file}'
 
         with open(os.path.join(working_dir, uniqueIdentifier + '_teacher_command'), 'w') as f:
             f.write(extern_command)

@@ -415,9 +415,7 @@ for method in methods:
         '; #it{qr}_{' +
         method +
         '} ; Events  (Total = ' +
-        '{:<1}'.format(
-            "%.0f" %
-            total_entries) +
+        f"{f'{total_entries:.0f}':<1}" +
         ')')
     histo_belleplotBoth.SetMinimum(0)
     histo_belleplotBoth.SetMaximum(YmaxForQrPlot)
@@ -434,9 +432,7 @@ for method in methods:
         ' for true B^{0}s; #it{qr}_{' +
         method +
         '} ; Events  (Total = ' +
-        '{:<1}'.format(
-            "%.0f" %
-            histo_belleplotB0.GetEntries()) +
+        f"{f'{histo_belleplotB0.GetEntries():.0f}':<1}" +
         ')')
     histo_belleplotB0.SetStats(False)
 
@@ -464,9 +460,7 @@ for method in methods:
         ' for true #bar{B}^{0}s; #it{qr}_{' +
         method +
         '} ; Events  (Total = ' +
-        '{:<1}'.format(
-            "%.0f" %
-            histo_belleplotB0bar.GetEntries()) +
+        f"{f'{histo_belleplotB0bar.GetEntries():.0f}':<1}" +
         ')')
     histo_belleplotB0bar.SetMinimum(0)
     histo_belleplotB0bar.SetMaximum(YmaxForQrPlot)
@@ -823,9 +817,7 @@ for category in usedCategories:
         '; #it{qp}_{' +
         catName +
         '} ; Events  (Total = ' +
-        '{:<1}'.format(
-            "%.0f" %
-            hist_both.GetEntries()) +
+        f"{f'{hist_both.GetEntries():.0f}':<1}" +
         ')')
     # hist_both.SetStats(False)
     hist_both.Write()

@@ -391,10 +391,9 @@ for method in methods:
         for category in usedCategories:
 
             exec(
-                "%s = %s" %
-                ("hasTrueTarget" +
-                 category,
-                 "ROOT.RooRealVar('hasTrueTarget' + category, 'hasTrueTarget' + category, 0, -2.1, 1.1)"))
+                f"{'hasTrueTarget' + category} = " +
+                "ROOT.RooRealVar('hasTrueTarget' + category, 'hasTrueTarget' + category, 0, -2.1, 1.1)"
+            )
             # exec("%s = %s" % ("isTrueCategory" + category,
             # "ROOT.RooRealVar('isRightCategory' + category, 'isRightCategory' +
             # category, 0, -1.0, 1.1)"))
@@ -460,18 +459,18 @@ for method in methods:
         event_fractionB0, event_fractionB0bar, event_fractionDiffUncertainty, event_fractionTotalUncertainty, muParam, \
         muParamUncertainty = efficiencyCalculator(data, total_notTagged, False, 'verbose')
 
-    efficiency = '% .2f' % efficiency
+    efficiency = f'{efficiency:.2f}'
     efficiencyDiff = f'{efficiencyDiff:.2f}'
-    efficiencyB0 = '% .2f' % efficiencyB0
-    efficiencyB0bar = '% .2f' % efficiencyB0bar
+    efficiencyB0 = f'{efficiencyB0:.2f}'
+    efficiencyB0bar = f'{efficiencyB0bar:.2f}'
 
     N = data.shape[0]
     NB0 = dataB0.shape[0] / N
     NB0 = 100 * NB0
-    NB0 = '% .2f' % NB0
+    NB0 = f'{NB0:.2f}'
     NB0bar = dataB0bar.shape[0] / N
     NB0bar = 100 * NB0bar
-    NB0bar = '% .2f' % NB0bar
+    NB0bar = f'{NB0bar:.2f}'
     NnoTrueCat = dataNoTrueCategory.shape[0]
     FracNoFTInfo = NnoTrueCat / N
 
@@ -1333,15 +1332,12 @@ for iCategory in usedCategories:
     #
     with Quiet(ROOT.kError):
         exec(
-            "%s = %s" %
-            ("hasTrueTarget" +
-             iCategory,
-             "ROOT.RooRealVar('hasTrueTarget' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"))
+            f"{'hasTrueTarget' + iCategory} = " +
+            "ROOT.RooRealVar('hasTrueTarget' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
+        )
         exec(
-            "%s = %s" %
-            ("qp" +
-             iCategory,
-             "ROOT.RooRealVar('qp' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"))
+            f"{'qp' + iCategory} = ROOT.RooRealVar('qp' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
+        )
         # exec("%s = %s" % ("isTrueCategory" + iCategory,
         # "ROOT.RooRealVar('isRightCategory' + iCategory, 'isRightCategory'
         # + iCategory, 0, -2.0, 1.1)"))
@@ -1411,16 +1407,16 @@ for category in usedCategories:
 
     noTargetEfficiency, noTargetEfficiencyDiff, noTargetEfficiencyB0, noTargetEfficiencyB0bar = categoriesEfficiencyCalculator(
         dataNoTarget)
-    print("Efficiencies for B0, B0bar If Not Target = ", '{: 6.2f}'.format(
-        noTargetEfficiencyB0), " %, ", f'{noTargetEfficiencyB0bar: 6.2f}', " %")
+    print("Efficiencies for B0, B0bar If Not Target = ", f'{noTargetEfficiencyB0: 6.2f}', " %, ",
+          f'{noTargetEfficiencyB0bar: 6.2f}', " %")
 
     NoTargetEfficiencies.append([noTargetEfficiencyB0, noTargetEfficiencyB0bar])
     categoryLabel.append(categoryLabelsDict[category])
 
     trueTargetEfficiency, trueTargetEfficiencyDiff, trueTargetEfficiencyB0, \
         trueTargetEfficiencyB0bar = categoriesEfficiencyCalculator(dataTruth)
-    print("Efficiencies for B0, B0bar If True Target= ", '{: 6.2f}'.format(
-        trueTargetEfficiencyB0), " %, ", f'{trueTargetEfficiencyB0bar: 6.2f}', " %")
+    print("Efficiencies for B0, B0bar If True Target= ", f'{trueTargetEfficiencyB0: 6.2f}', " %, ",
+          f'{trueTargetEfficiencyB0bar: 6.2f}', " %")
 
     # catLabel = r"${\rm " + category + "}$"
     # categoryLabel.append(catLabel)
@@ -1543,7 +1539,7 @@ for category in usedCategories:
     fig2c.clear()
 
     percentageCategory = dataTruth.shape[0] / data.shape[0] * 100
-    percentageCategory = '% .2f' % percentageCategory
+    percentageCategory = f'{percentageCategory:.2f}'
 
     print("Percentage of Category " + category + " is = " + percentageCategory + " %")
 

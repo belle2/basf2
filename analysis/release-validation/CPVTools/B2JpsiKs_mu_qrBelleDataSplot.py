@@ -257,8 +257,8 @@ def efficiencyCalculator(mc, data, method):
           r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip$ ' +
           r' & & & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i} $\\ \hline\hline')
     for i in range(0, r_size - 1):
-        print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $'
-              '{: 6.1f}'.format(mc_event_fractionTotal[i] * 100) + '$ & $' +
+        print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $' +
+              f'{mc_event_fractionTotal[i] * 100: 6.1f}' + '$ & $' +
               f'{mc_wvalue[i] * 100: 7.3f}' + r" \pm " + f'{mc_wvalueUncertainty[i] * 100:2.3f}' + r' $ & $' +
               f'{mc_wvalueDiff[i] * 100: 6.1f}' + r" \pm " +
               f'{mc_wvalueDiffUncertainty[i] * 100:2.3f}' + r'\, $ & $' +
@@ -382,7 +382,7 @@ def efficiencyCalculator(mc, data, method):
           r' & $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}$ ' +
           r'\\ \hline\hline')
     for i in range(0, len(rbins) - 1):
-        print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $'
+        print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $' +
               '{: 6.2f}'.format(data_event_fractionTotal[i] * 100) + '$ & $' +
               f'{data_wvalue[i] * 100: 6.2f}' + r" \pm " + f'{data_wvalueUncertainty[i] * 100:2.2f}' + r'\, $ & $' +
               f'{data_iEffEfficiency[i] * 100: 7.3f}' +  # + '$ & $' +

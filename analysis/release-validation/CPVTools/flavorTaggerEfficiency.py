@@ -615,7 +615,7 @@ for method in methods:
           r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip\, $ ' +
           r' & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i}\enskip\, $\\ \hline\hline')
     for i in range(1, r_size):
-        print('$ ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '$ & $'
+        print('$ ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '$ & $' +
               '{: 6.1f}'.format(event_fractionTotal[i] * 100) + r'$ & $' +
               f'{event_fractionDiff[i] * 100: 7.2f}' + r'\;$ & $' +
               f'{wvalue[i] * 100: 7.2f}' + r" \pm " + f'{wvalueUncertainty[i] * 100:2.2f}' + r'\enskip $ & $' +
@@ -642,7 +642,7 @@ for method in methods:
     print('')
 
     for i in range(1, r_size):
-        print('$ ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '$ & $'
+        print('$ ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '$ & $' +
               '{: 7.2f}'.format(muParam[i] * 100) + r" \pm " + f'{muParamUncertainty[i] * 100:2.2f}' + r' $ & ')
 # ************************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY

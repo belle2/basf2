@@ -159,16 +159,6 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
                                   "cos theta Distribution of Simulated HW Tracks; cos(#theta) ",
                                   100, -1, 1);
   m_neuroErrors = new TH1F("Neurotrigger-Errors", "Errors in the Neuro Hardware", m_errcount, 0, m_errcount);
-  //m_neuroErrors->SetDirectory(0);
-  //m_neuroErrors->SetOption("bar");
-  //m_neuroErrors->SetFillStyle(0);
-  //m_neuroErrors->SetMinimum(0);
-  //m_neuroErrors->SetStats(false);
-  //m_neuroErrors->Draw("hist");
-  //m_neuroErrors->SetDirectory(0);
-  //m_neuroErrors->SetDirectory(0);
-
-  //m_neuroErrorsRaw = new Th1F("Neurotrigger Errors");
   // cd back to root directory
   oldDir->cd();
 }
@@ -346,11 +336,6 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
           neuroHWTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();
         std::vector<float> simInput =
           neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getInput();
-        //unsigned unpackedSector =
-        //  neuroHWTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getSector();
-        //unsigned simSector =
-        //  neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getSector();
-        // m_neuroDeltaSector->Fill(unpackedSector - simSector);
         bool sameInputId = true;
         bool sameInputAlpha = true;
         bool scaleErr = false;
@@ -381,7 +366,6 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
         //m_neuroErrorsRaw->Fill(qvec);
         m_neuroErrors->Fill(8);
         for (unsigned k = 0; k < m_errcount; k++) {
-          //if (qvec & (1 << k)) {m_neuroErrors->Fill(m_errordict[k], 1);}
           if (qvec & (1 << k)) {m_neuroErrors->Fill(k);}
         }
       }
@@ -789,11 +773,6 @@ void CDCTriggerNeuroDQMOnlineModule::fillRecoPlots()
         genfit::MeasuredStateOnPlane state =
           recoTrack.getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), rep);
         rep->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
-        // get track parameters
-        //phi0Target = state.getMom().Phi() * 180. / M_PI ;
-        //if (phi0Target < 0.) {phi0Target = phi0Target + 360. ;}
-        //ptTarget = state.getCharge() * state.getMom().Pt();
-        //cosThetaTarget = state.getMom().CosTheta();
         zTarget = state.getPos().Z();
       } catch (...) {
         continue;

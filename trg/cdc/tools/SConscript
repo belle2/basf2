@@ -2,7 +2,7 @@ Import('env')
 env['TOOLS_LIBS']['trg-cdc-deadch-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['trg-cdc-2d-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['cdctriggerneuromlpdatadump'] = ['framework', 'trg_cdc_dataobjects', '$ROOT_LIBS']
-env['TOOLS_LIBS']['cdctrigger_externaltraining'] = ['framework', 'trg_cdc_dataobjects','trg_cdc', 'trg_cdc_dbobjects', 'fann', '$ROOT_LIBS']
+env['TOOLS_LIBS']['trgcdc_externaltraining'] = ['framework', 'trg_cdc_dataobjects','trg_cdc', 'trg_cdc_dbobjects', 'fann', '$ROOT_LIBS']
 env['TOOLS_LIBS']['trg-cdc-neurotrigger-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['NeuroTriggerMLPToTextfile'] = ['trg_cdc_dataobjects']
 env['TOOLS_LIBS']['cdctrigger_neurorootconverter'] = ['framework', '$ROOT_LIBS', 'trg_cdc', 'trg_cdc_dataobjects', 'trg_cdc_dbobjects']

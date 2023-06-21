@@ -125,9 +125,9 @@ namespace TreeFitter {
           auto part_dau2 = particle()->getDaughter(1);
 
           auto recotrack_dau1 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
-          [&part_dau1](RecoTrack * rt) { return rt->particle() == part_dau1; });
+          [&part_dau1](RecoTrack * rt) { return rt->particle()->getMdstArrayIndex() == part_dau1->getMdstArrayIndex(); });
           auto recotrack_dau2 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
-          [&part_dau2](RecoTrack * rt) { return rt->particle() == part_dau2; });
+          [&part_dau2](RecoTrack * rt) { return rt->particle()->getMdstArrayIndex() == part_dau2->getMdstArrayIndex(); });
 
           if (recotrack_dau1 == trkdaughters.end() || recotrack_dau2 == trkdaughters.end()) {
             B2WARNING("V0 daughter particles do not match with RecoTracks.");

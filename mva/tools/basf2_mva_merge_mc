@@ -113,8 +113,8 @@ if __name__ == '__main__':
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)
 
-    print(f"- {n_sig:d} signal candidates selected.")
-    print(f"- {n_bkg:d} background candidates selected.")
+    print(f"- {int(n_sig)} signal candidates selected.")
+    print(f"- {int(n_bkg)} background candidates selected.")
 
     # Add signal column
     df_sig[args.signalcolumn] = True

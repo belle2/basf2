@@ -216,7 +216,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
             optimizer.apply_gradients(zip(grads, trainable_variables))
 
-        print("Internal Epoch:", f'{i:04d}', "cost=", f"{avg_cost:.9f}")
+        print("Internal Epoch:", f'{int(i):04}', "cost=", f"{avg_cost:.9f}")
     return True
 
 

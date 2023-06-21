@@ -83,7 +83,7 @@ print(basf2.statistics)
 root_file = ROOT.TFile('ParticleGunMuonsKLM.root')
 tree = root_file.Get('tree')
 events = tree.GetEntriesFast()
-print(f'Events: {events:d}')
+print(f'Events: {int(events)}')
 for branch in tree.GetListOfBranches():
     name = branch.GetName()
     if name.startswith('Raw'):

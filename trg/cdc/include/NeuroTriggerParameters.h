@@ -12,14 +12,6 @@
 #include <iostream>
 #include <TObject.h>
 
-//#include <string>
-//#include <trg/cdc/dataobjects/CDCTriggerMLP.h>
-//#include <framework/datastore/StoreArray.h>
-//#include <framework/datastore/StoreObjPtr.h>
-//#include <framework/database/DBObjPtr.h>
-//#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-//#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-//#include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
@@ -153,8 +145,6 @@ namespace Belle2 {
     }
 
 
-    //void loadconfigroot(std::string& filename);
-    //void saveconfigroot(std::string& filename);
     /** Network parameters **/
 
     /** number of input nodes */

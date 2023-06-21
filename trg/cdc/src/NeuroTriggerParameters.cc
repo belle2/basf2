@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <trg/cdc/NeuroTriggerParameters.h>
 
 
@@ -45,9 +52,6 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
       // check, if line wasnt a pure comment line
     }
     bool locked = false; //check, if "==" was used and the variable should be registered as locked
-    //if (line.find('==') != std::string::npos) {
-    //    locked = true;
-    //}
     if (line.find('=') == std::string::npos) {
       continue;
     }

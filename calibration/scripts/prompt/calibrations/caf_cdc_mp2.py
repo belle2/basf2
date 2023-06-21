@@ -236,7 +236,7 @@ def pre_collector_cr(max_events=None):
         root_input = register_module('RootInput')
     else:
         root_input = register_module('RootInput',
-                                     entrySequences=['0:{max_events}']
+                                     entrySequences=[f'0:{max_events}']
                                      )
     reco_path.add_module(root_input)
 

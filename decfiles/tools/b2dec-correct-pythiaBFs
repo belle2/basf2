@@ -118,7 +118,7 @@ if __name__ == '__main__':
                                 or 'c' == line.split()[1] or 'anti-c' == line.split()[1]
                                 or 'cd' in line.split()[1] or 'anti-cd' in line.split()[1]
                                 or 'cs' in line.split()[1] or 'anti-cs' in line.split()[1]):
-                            bfstr = f'{float(line.split()[0])*jetsetscale[togglesave]:.8f}    '
+                            bfstr = f'{float(line.split()[0]) * jetsetscale[togglesave]:.8f}    '
                             bfstr += (line.split(None, 1)[-1])
                             outf.write(bfstr)
                         else:

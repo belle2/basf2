@@ -74,12 +74,12 @@ def run_validation(job_path, input_data_path, expert_config):
     # Summarize fit status
     hStatusgg = gg.Get("hStatus")
     success = 100. * (hStatusgg.GetBinContent(22) + hStatusgg.GetBinContent(14)) / 8736.
-    print("\nSummary of Gamma Gamma fit status. %.1f good fits:\n" % (success))
-    print("16 good fit:   %.4f \n" % (hStatusgg.GetBinContent(22)))
-    print(" 8 iterations: %.4f \n" % (hStatusgg.GetBinContent(14)))
-    print(" 4 at limit:   %.4f \n" % (hStatusgg.GetBinContent(10)))
-    print(" 3 poor fit:   %.4f \n" % (hStatusgg.GetBinContent(9)))
-    print("-1 low stats:  %.4f \n" % (hStatusgg.GetBinContent(5)))
+    print(f"\nSummary of Gamma Gamma fit status. {success:.1f} good fits:\n")
+    print(f"16 good fit:   {hStatusgg.GetBinContent(22):.4f} \n")
+    print(f" 8 iterations: {hStatusgg.GetBinContent(14):.4f} \n")
+    print(f" 4 at limit:   {hStatusgg.GetBinContent(10):.4f} \n")
+    print(f" 3 poor fit:   {hStatusgg.GetBinContent(9):.4f} \n")
+    print(f"-1 low stats:  {hStatusgg.GetBinContent(5):.4f} \n")
 
     # Compare output to input (gamma gamma) calibrations
     StatusVsCrysIDgg = gg.Get("StatusVsCrysID")
@@ -150,7 +150,7 @@ def run_validation(job_path, input_data_path, expert_config):
                 bigChange += 1
                 print(" %2d cellID %.4f %5.3f\n" % (bigChange, cellID, ratio))
 
-    print(f"Total calibrated crystals = {eeCalibrated:.4f} = {100. * eeCalibrated / 8736.:.1f} \n\n")
+    print(f"Total calibrated crystals = {eeCalibrated:.4f} = {100.0 * eeCalibrated / 8736.0:.1f} \n\n")
     eeRatio.Fit("gaus")
     myC.Print("plots/eeRatio.pdf")
 
@@ -211,12 +211,12 @@ def run_validation(job_path, input_data_path, expert_config):
     hStatusmumu = mumu.Get("hStatus")
     success = 100. * (hStatusmumu.GetBinContent(22) + hStatusmumu.GetBinContent(14)) / 8736.
     print(r"\nSummary of muon pair fit status. \%.1f good fits:\n", success)
-    print("16 good fit:   %.4f \n" % (hStatusmumu.GetBinContent(22)))
-    print(" 8 iterations: %.4f \n" % (hStatusmumu.GetBinContent(14)))
-    print(" 4 at limit:   %.4f \n" % (hStatusmumu.GetBinContent(10)))
-    print(" 3 poor fit:   %.4f \n" % (hStatusmumu.GetBinContent(9)))
-    print(" 2 no peak:    %.4f \n" % (hStatusmumu.GetBinContent(8)))
-    print("-1 low stats:  %.4f \n" % (hStatusmumu.GetBinContent(5)))
+    print(f"16 good fit:   {hStatusmumu.GetBinContent(22):.4f} \n")
+    print(f" 8 iterations: {hStatusmumu.GetBinContent(14):.4f} \n")
+    print(f" 4 at limit:   {hStatusmumu.GetBinContent(10):.4f} \n")
+    print(f" 3 poor fit:   {hStatusmumu.GetBinContent(9):.4f} \n")
+    print(f" 2 no peak:    {hStatusmumu.GetBinContent(8):.4f} \n")
+    print(f"-1 low stats:  {hStatusmumu.GetBinContent(5):.4f} \n")
 
     # ------------------------------------------------------------------------
     # Muon pair/gg comparison

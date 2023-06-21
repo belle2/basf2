@@ -125,10 +125,8 @@ class GenericOptionFile:
         """
         Specify options for .dec file.
         """
-        [self.AddOptionValue('ToolSvc.{}Decay.{}'.format(
-            eventtype.DecayEngine(), eventtype.DecayOptions().split()[2 * i]),
-            eventtype.DecayOptions().split()[2 * i + 1])
-         for i in range(len(eventtype.DecayOptions().split()) / 2)]
+        [self.AddOptionValue(f'ToolSvc.{eventtype.DecayEngine()}Decay.{eventtype.DecayOptions().split()[2 * i]}',
+                             eventtype.DecayOptions().split()[2 * i + 1]) for i in range(len(eventtype.DecayOptions().split()) / 2)]
 
 
 class TextOptionFile(GenericOptionFile):
@@ -498,7 +496,7 @@ class EventType:
             self.OptionFile = PythonOptionFile()
 
         if not filename:
-            filename = f'{os.environ["DECFILESROOT"]}/prod/{self.EventTypeNumber()}'
+            filename = f"{os.environ['DECFILESROOT']}/prod/{self.EventTypeNumber()}"
 
         self.OptionFile.SetFileName(filename)
         if os.path.exists(self.OptionFile.OptionFileName()):
@@ -747,7 +745,7 @@ def writeSQLTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = f'EVTTYPEID = {evttypeid}, DESCRIPTION = "{nick}", PRIMARY = "{desc}"\n'
+            line = f'EVTTYPEID = {evttypeid}, DESCRIPTION = "{nick}", PRIMARY = "{desc}\"\n'
             f.write(line)
 
 
@@ -866,8 +864,8 @@ def CheckFile(option, opt_str, value, parser):
     Check if file exists.
     """
 
-    if not os.path.exists(f'{os.environ["DECFILESROOT"]}/dec/{value}.dec'):
-        raise OptionValueError('Decay file %s.dec ' % value + 'does not ' +
+    if not os.path.exists(f"{os.environ['DECFILESROOT']}/dec/{value}.dec"):
+        raise OptionValueError(f'Decay file {value}.dec ' + 'does not ' +
                                'exist in the $DECFILESROOT/dec directory')
     setattr(parser.values, option.dest, value)
 
@@ -1017,7 +1015,7 @@ def main():
     if options.NickName:
         try:
             run_create(
-                f'{os.environ["DECFILESROOT"]}/dec/{options.NickName}.dec',
+                f"{os.environ['DECFILESROOT']}/dec/{options.NickName}.dec",
                 options.remove,
                 options.python,
                 options.force)

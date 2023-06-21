@@ -148,7 +148,7 @@ def run_validation(job_path, input_data_path, expert_config):
             eeRatio.Fill(ratio)
             if(ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
-                print(" %2d cellID %.4f %5.3f\n" % (bigChange, cellID, ratio))
+                print(f" {int(bigChange):2} cellID {cellID:.4f} {ratio:5.3f}\n")
 
     print(f"Total calibrated crystals = {eeCalibrated:.4f} = {100.0 * eeCalibrated / 8736.0:.1f} \n\n")
     eeRatio.Fit("gaus")

@@ -22,7 +22,7 @@ if len(argv) < 3:
     print()
     print('For more information see https://confluence.desy.de/display/BI/Develop+DQM+Analysis+Modules')
     print()
-    print('Usage: %s input_filename output_filename' % argv[0])
+    print(f'Usage: {argv[0]} input_filename output_filename')
     print()
     exit(1)
 

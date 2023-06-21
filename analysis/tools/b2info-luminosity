@@ -596,13 +596,18 @@ class Luminosity:
                     formatters={
                         "exp": "{:3d}".format,
                         "run": "{:5d}".format,
-                        "lumi": lambda x: f"{x * 1000:,.3f}",
-                        "lumiErr": lambda x: f"{x * 1000:,.3f}",
+                        "lumi": lambda x: "{:,.3f}".format(
+                            x*1000),
+                        "lumiErr": lambda x: "{:,.3f}".format(
+                            x*1000),
                         "date": lambda x: "{:%Y/%m/%d %H:%M}".format(
                             pd.to_datetime(
                                 x,
                                 unit='s')),
-                        "length": lambda x: f"{pd.to_datetime(x, unit='s'):%H:%M}",
+                        "length": lambda x: "{:%H:%M}".format(
+                                pd.to_datetime(
+                                    x,
+                                    unit='s')),
                         "intLumi": "{:,.3f}".format,
                         "intLumiErr": "{:,.3f}".format,
                         "intLumiDel": "{:,.3f}".format,

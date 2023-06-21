@@ -15,6 +15,7 @@
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dbobjects/ECLnOptimal.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/utility/Position.h>
@@ -24,11 +25,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-/* ROOT headers. */
-#include <TFile.h>
-#include <TGraph2D.h>
-#include <TH1F.h>
 
 /* C++ headers. */
 #include <algorithm>
@@ -79,14 +75,6 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
   // Neighbour definitions
   addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,
            "Optimize the number of digits for energy calculations.", 1);
-  addParam("fileBackgroundNormName", m_fileBackgroundNormName, "Background filename.",
-           FileSystem::findFile("/data/ecl/background_norm.root"));
-  addParam("fileNOptimalFWDName", m_fileNOptimalFWDName, "FWD number of optimal neighbours filename.",
-           FileSystem::findFile("/data/ecl/noptimal_fwd.root"));
-  addParam("fileNOptimalBarrelName", m_fileNOptimalBarrelName, "Barrel number of optimal neighbours filename.",
-           FileSystem::findFile("/data/ecl/noptimal_barrel.root"));
-  addParam("fileNOptimalBWDName", m_fileNOptimalBWDName, "BWD number of optimal neighbours filename.",
-           FileSystem::findFile("/data/ecl/noptimal_bwd.root"));
 
   // Position.
   addParam("positionMethod", m_positionMethod, "Position determination method.", std::string("lilo"));
@@ -138,42 +126,38 @@ void ECLSplitterN1Module::initialize()
   m_StoreArrPosition.resize(ECLElementNumbers::c_NCrystals + 1);
   m_StoreArrPositionLM.resize(ECLElementNumbers::c_NCrystals + 1);
 
-  // read the Background correction factors (for full background)
-  m_fileBackgroundNorm = new TFile(m_fileBackgroundNormName.c_str(), "READ");
-  if (!m_fileBackgroundNorm) B2FATAL("Could not find file: " << m_fileBackgroundNormName);
-  m_th1fBackgroundNorm = dynamic_cast<TH1F*>(m_fileBackgroundNorm->Get("background_norm"));
-  if (!m_th1fBackgroundNorm) B2FATAL("Could not find m_th1fBackgroundNorm");
-
-  // read the optimal neighbour maps
-  m_fileNOptimalFWD = new TFile(m_fileNOptimalFWDName.c_str(), "READ");
-  if (!m_fileNOptimalFWD) B2FATAL("Could not find file: " << m_fileNOptimalFWDName);
-  for (unsigned t = 0; t < 13; ++t) {
-    for (unsigned s = 0; s < c_nSectorCellIdFWD[t]; ++s) {
-      m_tg2dNOptimalFWD[t][s] = dynamic_cast<TGraph2D*>(m_fileNOptimalFWD->Get(Form("thetaid-%i_sectorcellid-%i", t, s)));
-      if (!m_tg2dNOptimalFWD[t][s]) B2FATAL("Could not find TGraph2D m_tg2dNOptimalFWD!");
-    }
-  }
-
-  m_fileNOptimalBarrel = new TFile(m_fileNOptimalBarrelName.c_str(), "READ");
-  if (!m_fileNOptimalBarrel) B2FATAL("Could not find file: " << m_fileNOptimalBarrelName);
-
-  m_tg2dNOptimalBarrel = dynamic_cast<TGraph2D*>(m_fileNOptimalBarrel->Get("thetaid-50_sectorcellid-8"));
-  if (!m_tg2dNOptimalBarrel) B2FATAL("Could not find TGraph2D m_tg2dNOptimalBarrel!");
-
-  m_fileNOptimalBWD = new TFile(m_fileNOptimalBWDName.c_str(), "READ");
-  if (!m_fileNOptimalBWD) B2FATAL("Could not find file: " << m_fileNOptimalBWDName);
-  for (unsigned t = 0; t < 10; ++t) {
-    for (unsigned s = 0; s < c_nSectorCellIdBWD[t]; ++s) {
-      m_tg2dNOptimalBWD[t][s] = dynamic_cast<TGraph2D*>(m_fileNOptimalBWD->Get(Form("thetaid-%i_sectorcellid-%i", t + 59, s)));
-      if (!m_tg2dNOptimalBWD[t][s]) B2FATAL("Could not find TGraph2D m_tg2dNOptimalBWD!");
-    }
-  }
-
 }
 
 void ECLSplitterN1Module::beginRun()
 {
-  ;
+  //..Read in nOptimal crystal payload from database
+  if (m_eclNOptimal.hasChanged()) {
+
+    //..Vectors of energy boundaries for each region
+    std::vector<float> eBoundariesFwd = m_eclNOptimal->getUpperBoundariesFwd();
+    std::vector<float> eBoundariesBrl = m_eclNOptimal->getUpperBoundariesBrl();
+    std::vector<float> eBoundariesBwd = m_eclNOptimal->getUpperBoundariesBwd();
+
+    //..Adjust the size of the vector of boundaries to match the number in the payload
+    m_nEnergyBins = eBoundariesBrl.size();
+    B2INFO("ECLSplitterN1 beginRun: number of nOptimal payload energies = " << m_nEnergyBins);
+    m_eBoundaries.resize(m_nLeakReg, std::vector<float>(m_nEnergyBins, 0.));
+
+    //..Copy values to m_eBoundaries
+    for (int ie = 0; ie < m_nEnergyBins; ie++) {
+      m_eBoundaries[0][ie] = eBoundariesFwd[ie];
+      m_eBoundaries[1][ie] = eBoundariesBrl[ie];
+      m_eBoundaries[2][ie] = eBoundariesBwd[ie];
+      B2INFO(" upper boundaries for energy point " << ie << " " << m_eBoundaries[0][ie] << " " << m_eBoundaries[1][ie] << " " <<
+             m_eBoundaries[2][ie]);
+    }
+
+    //..Group number of each crystal
+    m_groupNumber = m_eclNOptimal->getGroupNumber();
+
+    //..2D histogram of nOptimal for each group and energy point
+    m_nOptimal2D = m_eclNOptimal->getNOptimal();
+  }
 }
 
 void ECLSplitterN1Module::event()
@@ -224,12 +208,6 @@ void ECLSplitterN1Module::endRun()
 
 void ECLSplitterN1Module::terminate()
 {
-  // delete open TFiles
-  if (m_fileBackgroundNorm) delete m_fileBackgroundNorm;
-  if (m_fileNOptimalFWD) delete m_fileNOptimalFWD;
-  if (m_fileNOptimalBarrel) delete m_fileNOptimalBarrel;
-  if (m_fileNOptimalBWD) delete m_fileNOptimalBWD;
-
   if (m_NeighbourMap9) delete m_NeighbourMap9;
   if (m_NeighbourMap21) delete m_NeighbourMap21;
 }
@@ -247,16 +225,16 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   // Get the number of LMs in this CR
   const int nLocalMaximums = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName()).size();
 
-  B2DEBUG(175, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
+  B2DEBUG(170, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
 
   // Three cases:
-  // 1) There is no local maximum (most likely in presence of high background) or there are too many:
-  //    Make one photon around the highest largest energy deposition in this CR.
-  // 2) There is exactly one local maximum, this is the easiest (and most likely for true photons) case.
+  // 1) There is no local maximum (can only happen if the CR seed is not a LM itself).
+  // 2) There is exactly one local maximum.
   // 3) There are more than one, typically two or three, local maxima and we have to share energy between them.
+  //    If there are more than m_maxSplits local maxima, the m_maxSplits highest energy local maxima will be used.
 
   // ---------------------------------------------------------------------
-  if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
+  if (nLocalMaximums == 1) {
 
     // Create a shower.
     const auto aECLShower = m_eclShowers.appendNew();
@@ -313,9 +291,16 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     double showerEnergy = 0.0;
     if (m_useOptimalNumberOfDigitsForEnergy) {
 
-      // Get the optimal number of neighbours as function of raw energy and background level
-      const unsigned int nOptimal = getOptimalNumberOfDigits(highestEnergyID, energyEstimation, backgroundLevel);
+      // Get the optimal number of neighbours for this crystal and energy
+      std::vector<int> nOptimalVec = getOptimalNumberOfDigits(highestEnergyID, energyEstimation);
+      const unsigned int nOptimal = static_cast<unsigned int>(nOptimalVec[0]);
       aECLShower->setNominalNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
+
+      // Store the indices used; will be needed later for energy corrections.
+      // Also store energy, used along with cellID to find leakage corrections.
+      aECLShower->setNOptimalGroupIndex(nOptimalVec[1]);
+      aECLShower->setNOptimalEnergyBin(nOptimalVec[2]);
+      aECLShower->setNOptimalEnergy(energyEstimation);
 
       // Get the list of crystals used for the energy calculation
       std::vector< std::pair<unsigned int, double>> listCrystalPairs; // cell id and weighted reconstructed energy
@@ -344,7 +329,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
       showerEnergy = getEnergySum(weighteddigits, nOptimal);
-      B2DEBUG(150, "Shower Energy (1): " << showerEnergy);
+      B2DEBUG(175, "Shower Energy (1): " << showerEnergy);
 
     } else {
       showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
@@ -380,7 +365,27 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
   } // end case with one LM
-  else { // this is the really interesing part where showers are split. this alogorithm is based on BaBar code.
+  else { // More than one LM, energy must be split. This algorithm is inspired by BaBar code.
+
+    // check if we have too many local maximums. if yes: limit to user set maximum
+    // create a vector with all local maximums and its crystal energies
+    std::vector<std::pair<ECLLocalMaximum, double>> lm_energy_vector;
+    for (auto& aLocalMaximum :  aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
+      const int cellid = aLocalMaximum.getCellId();
+      const int pos = m_StoreArrPosition[cellid];
+      const double digitenergy = m_eclCalDigits[pos]->getEnergy();
+      lm_energy_vector.push_back(std::pair<ECLLocalMaximum, double>(aLocalMaximum, digitenergy));
+    };
+
+    // sort this vector in descending order and keep only up to m_maxSplits entries
+    if (lm_energy_vector.size() >= static_cast<size_t>(m_maxSplits)) {
+      std::sort(lm_energy_vector.begin(), lm_energy_vector.end(), [](const std::pair<ECLLocalMaximum, double>& x,
+      const std::pair<ECLLocalMaximum, double>& y) {
+        return x.second > y.second;
+      });
+
+      lm_energy_vector.resize(m_maxSplits);
+    }
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
@@ -393,9 +398,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // Fill the maxima positions in a map
     std::map<int, B2Vector3D> localMaximumsPoints; // key = locmaxid, value = maximum position
     std::map<int, B2Vector3D> centroidPoints; // key = locmaxid (as index), value = centroid position
-    for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
 
-      int cellid = aLocalMaximum.getCellId();
+    for (auto& aLocalMaximum : lm_energy_vector) {
+
+      int cellid = aLocalMaximum.first.getCellId();
 
       // Get the position of this crystal and fill it in two maps.
       B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);
@@ -723,9 +729,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       double showerEnergy = 0.0;
       if (m_useOptimalNumberOfDigitsForEnergy) {
 
-        // Get the optimal number of neighbours as function of raw energy and background level
-        const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
+
+        // Get the optimal number of neighbours for this crystal and energy
+        std::vector<int> nOptimalVec = getOptimalNumberOfDigits(locmaxcellid, energyEstimation);
+        const unsigned int nOptimal = static_cast<unsigned int>(nOptimalVec[0]);
         aECLShower->setNominalNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
+
+        // Store the indices used; will be needed later for energy corrections.
+        // Also store energy, used along with cellID to find leakage corrections.
+        aECLShower->setNOptimalGroupIndex(nOptimalVec[1]);
+        aECLShower->setNOptimalEnergyBin(nOptimalVec[2]);
+        aECLShower->setNOptimalEnergy(energyEstimation);
 
         // Get the list of crystals used for the energy calculation
         std::vector< std::pair<unsigned int, double>> listCrystalPairs; // cell id and weighted reconstructed energy
@@ -755,7 +769,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);
-        B2DEBUG(150, "Shower Energy (2): " << showerEnergy);
+        B2DEBUG(175, "Shower Energy (2): " << showerEnergy);
 
       } else {
         showerEnergy = Belle2::ECL::computeEnergySum(newdigits, newweights);
@@ -795,42 +809,34 @@ int ECLSplitterN1Module::getNeighbourMap(const double energy, const double backg
   }
 }
 
-unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const int cellid, const double energy, const double bg)
+std::vector<int> ECLSplitterN1Module::getOptimalNumberOfDigits(const int cellid, const double energy)
 {
-  int nOptimalNeighbours = 21;
 
-  // Get the corrected background level
-  const double bgCorrected = bg * m_th1fBackgroundNorm->GetBinContent(cellid);
+  //..nOptimal depends on the energy bin, which in turn depends on ECL region
+  int iRegion = 1; // barrel
+  if (ECLElementNumbers::isForward(cellid)) {iRegion = 0;}
+  if (ECLElementNumbers::isBackward(cellid)) {iRegion = 2;}
 
-  // For very small background levels, we always use 21 neighbours.
-  if (bgCorrected > 0.025) {
-    // Some checks to be within the limits of the tgraph2ds.
-    double energyChecked = energy;
-    double bgChecked = bgCorrected;
-    if (bgCorrected > 1.0) bgChecked = 1.0;
-    if (energyChecked < 30.0 * Belle2::Unit::MeV) energyChecked = 30.0 * Belle2::Unit::MeV;
-    if (energyChecked > 1.95 * Belle2::Unit::GeV)  energyChecked = 1.95 * Belle2::Unit::GeV;
+  //..Find the energy bin
+  int iEnergy = 0;
+  while (energy > m_eBoundaries[iRegion][iEnergy] and iEnergy < m_nEnergyBins - 1) {iEnergy++;}
 
-    // Find detector region and sector phi Id
-    m_geom->Mapping(cellid - 1);
-    const int thetaId = m_geom->GetThetaID();
-    const int crystalsPerSector = c_crystalsPerRing[thetaId] / 16;
-    const int phiIdInSector = m_geom->GetPhiID() % crystalsPerSector;
+  //..Group number just depends on the cellID
+  int iGroup = m_groupNumber[cellid - 1];
 
-    if (thetaId < 13) { //FWD
-      nOptimalNeighbours = static_cast<unsigned int>(m_tg2dNOptimalFWD[thetaId][phiIdInSector]->Interpolate(energyChecked, bgChecked));
-    } else if (thetaId < 59) { //Barrel
-      nOptimalNeighbours = static_cast<unsigned int>(m_tg2dNOptimalBarrel->Interpolate(energyChecked, bgChecked));
-    } else { // BWD
-      nOptimalNeighbours = static_cast<unsigned int>(m_tg2dNOptimalBWD[thetaId - 59][phiIdInSector]->Interpolate(energyChecked,
-                                                     bgChecked));
-    }
-    B2DEBUG(175, "ECLSplitterN1Module::getOptimalNumberOfDigits: theta ID: " << thetaId << ", bg: " << bg << " (after corr.: " <<
-            bgCorrected << "), energy: " << energy << ", n: " << nOptimalNeighbours);
-  } else B2DEBUG(175, "ECLSplitterN1Module::getOptimalNumberOfDigits: small bg: " << bg << " (after corr.: " << bgCorrected <<
-                   "), energy: " << energy << ", n: " << nOptimalNeighbours);
+  //..Optimal number of crystals from energy and group numbers
+  int nOptimalNeighbours = (int)(0.5 + m_nOptimal2D.GetBinContent(iGroup + 1, iEnergy + 1));
 
-  return nOptimalNeighbours;
+  //..Store these in a vector to return
+  std::vector<int> nOptimalVector;
+  nOptimalVector.push_back(nOptimalNeighbours);
+  nOptimalVector.push_back(iGroup);
+  nOptimalVector.push_back(iEnergy);
+
+  B2DEBUG(175, "ECLSplitterN1Module::getOptimalNumberOfDigits: cellID: " << cellid << " energy: " << energy << " iG: " << iGroup <<
+          " iE: " << iEnergy << " nOpt: " << nOptimalNeighbours);
+
+  return nOptimalVector;
 
 }
 
@@ -848,10 +854,10 @@ double ECLSplitterN1Module::getEnergySum(std::vector < std::pair<double, double>
   if (weighteddigits.size() < n) min = weighteddigits.size();
 
   for (unsigned int i = 0; i < min; ++i) {
-    B2DEBUG(150, "getEnergySum: " << weighteddigits.at(i).first << " " << weighteddigits.at(i).second);
+    B2DEBUG(175, "getEnergySum: " << weighteddigits.at(i).first << " " << weighteddigits.at(i).second);
     energysum += (weighteddigits.at(i).first * weighteddigits.at(i).second);
   }
-  B2DEBUG(150, "getEnergySum: energysum=" << energysum);
+  B2DEBUG(175, "getEnergySum: energysum=" << energysum);
 
   return energysum;
 }

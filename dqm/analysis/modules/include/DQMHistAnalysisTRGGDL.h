@@ -191,9 +191,6 @@ namespace Belle2 {
     TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
     TString m_runtype; /**< string with runtype: physics or cosmic */
 
-    /** flag if exporting to EPICS */
-    bool m_useEpics;
-
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters
     chid mychid_entry[nskim_gdldqm];

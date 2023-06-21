@@ -41,7 +41,7 @@ namespace NeuroTrainer {
       RecoTrack* recoTrack =
         twodtrack->getRelatedTo<RecoTrack>(targetcollectionname);
       if (!recoTrack) {
-        B2DEBUG(150, "Skipping CDCTriggerTrack without relation to RecoTrack.");
+        B2DEBUG(29, "Skipping CDCTriggerTrack without relation to RecoTrack.");
         isvalid = 0;
       } else {
         // a RecoTrack has multiple representations for different particle hypothesis
@@ -79,7 +79,7 @@ namespace NeuroTrainer {
       MCParticle* mcTrack =
         twodtrack->getRelatedTo<MCParticle>(targetcollectionname);
       if (not mcTrack) {
-        B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
+        B2DEBUG(29, "Skipping CDCTriggerTrack without relation to MCParticle.");
         isvalid = 0;
       } else {
         phi0Target = mcTrack->getMomentum().Phi();
@@ -105,14 +105,14 @@ namespace NeuroTrainer {
     for (unsigned iSL = 0; iSL < 9; ++iSL) {
       int nWires = cdc.nWiresInLayer(layerId);
       layerId += (iSL > 0 ? 6 : 7);
-      B2DEBUG(90, "SL " << iSL << " (" <<  nWires << " wires)");
+      B2DEBUG(28, "SL " << iSL << " (" <<  nWires << " wires)");
       // get maximum hit counter
       unsigned maxCounter = 0;
       int maxId = 0;
       unsigned counterSum = 0;
       for (int iTS = 0; iTS < nWires; ++iTS) {
         if (trainSet_prepare.getHitCounter(iSL, iTS) > 0)
-          B2DEBUG(90, iTS << " " << trainSet_prepare.getHitCounter(iSL, iTS));
+          B2DEBUG(28, iTS << " " << trainSet_prepare.getHitCounter(iSL, iTS));
         if (trainSet_prepare.getHitCounter(iSL, iTS) > maxCounter) {
           maxCounter = trainSet_prepare.getHitCounter(iSL, iTS);
           maxId = iTS;
@@ -127,7 +127,7 @@ namespace NeuroTrainer {
         // add neighboring wire with higher hit count
         // until sum over unused wires is less than relevantcut * sum over all wires
         double cut = relevantcut * counterSum;
-        B2DEBUG(50, "Threshold on counterSum: " << cut);
+        B2DEBUG(28, "Threshold on counterSum: " << cut);
         unsigned relevantSum = maxCounter;
         while (counterSum - relevantSum > cut) {
           int prev = trainSet_prepare.getHitCounter(iSL, relevantID[2 * iSL] - 1);
@@ -147,7 +147,7 @@ namespace NeuroTrainer {
       } else {
         // add wires from both sides until hit counter drops below relevantcut * track counter
         double cut = relevantcut * trainSet_prepare.getTrackCounter();
-        B2DEBUG(50, "Threshold on counter: " << cut);
+        B2DEBUG(28, "Threshold on counter: " << cut);
         while (trainSet_prepare.getHitCounter(iSL, relevantID[2 * iSL] - 1) > cut) {
           --relevantID[2 * iSL];
           if (relevantID[2 * iSL] <= -nWires) break;
@@ -160,7 +160,7 @@ namespace NeuroTrainer {
       // add +-0.5 to account for rounding during preparation
       relevantID[2 * iSL] -= 0.5;
       relevantID[2 * iSL + 1] += 0.5;
-      B2DEBUG(50, "SL " << iSL << ": "
+      B2DEBUG(28, "SL " << iSL << ": "
               << relevantID[2 * iSL] << " " << relevantID[2 * iSL + 1]);
     }
     return relevantID;

@@ -6,8 +6,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef NEUROTRIGGERPARAMETERS_H
-#define NEUROTRIGGERPARAMETERS_H
 #pragma once
 #include <iostream>
 #include <TObject.h>
@@ -244,4 +242,3 @@ namespace Belle2 {
   };
 }
 
-#endif

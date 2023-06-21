@@ -15,7 +15,9 @@
 
 // svd
 #include <svd/dbobjects/SVDRecoConfiguration.h>
+#include <svd/dbobjects/SVDSpacePointSelectionFunction.h>
 #include <svd/calibration/SVDHitTimeSelection.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
 
 // tracking
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -114,5 +116,10 @@ namespace Belle2 {
     bool m_useSVDGroupInfoIn3Sample = false; /**< Use SVD group info to reject combinations in 3-sample DAQ mode */
 
     bool   m_useDB = true;  /**< if true takes the configuration from the DB objects. */
+
+    SVDNoiseCalibrations m_NoiseCal; /**< SVDNoise calibrations db object*/
+
+    DBObjPtr<SVDSpacePointSelectionFunction> m_svdSpacePointSelectionFunction; /**< SVD Reconstruction Configuration payload*/
+
   };
 } // end namespace Belle2

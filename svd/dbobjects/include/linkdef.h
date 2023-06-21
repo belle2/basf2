@@ -72,6 +72,8 @@
 #pragma link C++ class Belle2::SVDTimeGroupingParameters +; // checksum=0xbd78f1eb, implicit, version=1
 #pragma link C++ class Belle2::SVDTimeGroupingConfiguration +; // checksum=0xfa3204bf, version=1
 
+#pragma link C++ class Belle2::SVDSpacePointSelectionFunction +; // checksum=0xe280f23c, version=1
+
 #endif
 
 

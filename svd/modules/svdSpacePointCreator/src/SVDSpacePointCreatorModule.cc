@@ -81,6 +81,11 @@ void SVDSpacePointCreatorModule::beginRun()
 
     m_useSVDGroupInfoIn6Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(6);
     m_useSVDGroupInfoIn3Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(3);
+
+    if (false) {
+      if (!m_svdSpacePointSelectionFunction.isValid())
+        B2FATAL("No valid SVDSpacePointSelectionFunction");
+    }
   }
 
   if (m_useSVDGroupInfoIn6Sample)
@@ -155,7 +160,8 @@ void SVDSpacePointCreatorModule::event()
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo);
+                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo,
+                                  m_NoiseCal, m_svdSpacePointSelectionFunction);
   }
 
 

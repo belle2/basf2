@@ -9,24 +9,10 @@
 #include <trg/cdc/NeuroTrigger.h>
 #include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
-//#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-//#include <framework/database/DBObjPtr.h>
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
 
-//std::vector<float> loadweights (std::string filename) {
-//    std::ifstream netfile(filename, std::ifstream::binary);
-//    nlohmann::json nets;
-//    netfile >> nets;
-//    std::cout << nets["model.net.0.weight"][0] << std::endl;
-//    std::vector<float> ret;
-//    ret.push_back(4.);
-//    return ret;
-//
-//
-//
-//}
 using namespace Belle2;
 
 int main(int argc, const char* argv[])

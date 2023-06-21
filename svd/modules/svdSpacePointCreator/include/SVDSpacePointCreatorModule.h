@@ -8,15 +8,24 @@
 
 #pragma once
 
+// framework
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+
+// svd
+#include <svd/dbobjects/SVDRecoConfiguration.h>
 #include <svd/calibration/SVDHitTimeSelection.h>
 
+// tracking
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+// std
 #include <string>
 
+// root
 #include <TFile.h>
+
 
 namespace Belle2 {
   /**
@@ -41,6 +50,10 @@ namespace Belle2 {
     virtual void initialize() override;
 
 
+    /** configure */
+    void beginRun() override;
+
+
     /** eventWise jobs (e.g. storing spacepoints */
     virtual void event() override;
 
@@ -55,6 +68,7 @@ namespace Belle2 {
 
   protected:
 
+    DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
 
     // Data members
     std::string m_svdClustersName = "SVDClusters"; /**< SVDCluster collection name */
@@ -68,6 +82,8 @@ namespace Belle2 {
     m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
 
     std::string m_eventLevelTrackingInfoName = ""; /**< Name of the EventLevelTrackingInfo */
+
+    std::string m_svdEventInfoName; /**< Name of the collection to use for the SVDEventInfo */
 
     float m_minClusterTime = -999; /**< clusters with time below this value are not considered to make spacePoints*/
 
@@ -93,5 +109,10 @@ namespace Belle2 {
     unsigned int m_numMaxSpacePoints = 7e4; /**< do not crete SPs if their number exceeds m_numMaxSpacePoints, tuned with BG19*/
 
     SVDHitTimeSelection m_HitTimeCut; /**< selection based on clustr time db object*/
+
+    bool m_useSVDGroupInfoIn6Sample = false; /**< Use SVD group info to reject combinations in 6-sample DAQ mode */
+    bool m_useSVDGroupInfoIn3Sample = false; /**< Use SVD group info to reject combinations in 3-sample DAQ mode */
+
+    bool   m_useDB = true;  /**< if true takes the configuration from the DB objects. */
   };
 } // end namespace Belle2

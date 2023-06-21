@@ -541,6 +541,15 @@ namespace Belle2 {
       double isTOPRecBunchReconstructed([[maybe_unused]] const Particle* particle);
 
       /**
+       * Returns whether the rec bunch is filled.
+       * Requires TOPRecBunch.
+       * Variable name: topBunchIsFilled
+       * @param particle unused
+       * @return 1 if filled, 0 if empty, -1 if unknown
+       */
+      double isTOPRecBunchFilled([[maybe_unused]] const Particle* particle);
+
+      /**
        * Returns the reconstructed bunch number relative to L1 trigger.
        * Requires TOPRecBunch.
        * Variable name: topBunchNumber
@@ -548,6 +557,15 @@ namespace Belle2 {
        * @return relative bunch number (NaN if N/A)
        */
       double TOPRecBunchNumber([[maybe_unused]] const Particle* particle);
+
+      /**
+       * Returns the reconstructed bucket number within the ring
+       * Requires TOPRecBunch.
+       * Variable name: topBucketNumber
+       * @param particle unused
+       * @return buncket number (NaN if N/A)
+       */
+      double TOPRecBucketNumber([[maybe_unused]] const Particle* particle);
 
       /**
        * Is the reconstructed bunch number equal to the simulated one?

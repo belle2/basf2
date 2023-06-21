@@ -11,27 +11,25 @@
 
 
 import basf2 as b2
-import sys
-argv = sys.argv
+import b2test_utils as b2tu
 
-# Set the log level to show only error and fatal messages
-# b2.set_log_level(b2.LogLevel.ERROR)
-# b2.set_log_level(b2.LogLevel.INFO)
-b2.set_log_level(b2.LogLevel.DEBUG)
-b2.set_debug_level(20)
+with b2tu.clean_working_directory():
+    # Set the log level to show only error and fatal messages
+    # b2.set_log_level(b2.LogLevel.ERROR)
+    # b2.set_log_level(b2.LogLevel.INFO)
+    b2.set_log_level(b2.LogLevel.DEBUG)
+    b2.set_debug_level(20)
 
-configs = [b2.find_file("dqm/tests/ipmon.json")]
+    configs = [b2.find_file("dqm/tests/ipmon.json")]
 
-# Create main path
-main = b2.create_path()
+    # Create main path
+    main = b2.create_path()
 
-# Modules
-main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=configs)
-main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_x", MonitorPrefix="ip", useEpics=False)
-main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_y", MonitorPrefix="ip", useEpics=False)
-main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_z", MonitorPrefix="ip", useEpics=False)
+    # Modules
+    main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=configs)
+    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_x", MonitorPrefix="ip")
+    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_y", MonitorPrefix="ip")
+    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_z", MonitorPrefix="ip")
 
-# main.add_module('DQMHistAnalysisOutputImages');
-
-# Process all events
-b2.process(main)
+    # Process all events
+    b2.process(main)

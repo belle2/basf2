@@ -1,7 +1,7 @@
 Information for skim experts
 ----------------------------
 
-.. tip:: 
+.. tip::
     The functions and tools documented here are intended for skim liaisons and developers. If you are only interested in the selection criteria, then this section is probably not relevant for you.
 
 .. _writing-skims:
@@ -259,12 +259,6 @@ In the skim package, there are command-line tools available for running skims, d
    :prog: b2skim-generate-validation
    :nodefaultconst:
    :nogroupsections:
-
-
-Skim tutorial
-~~~~~~~~~~~~~
-
-A Jupyter notebook skimming tutorial can be found in ``skim/tutorial/Skimming_Tutorial.ipynb`` in basf2.
 
 .. _skim-registry:
 

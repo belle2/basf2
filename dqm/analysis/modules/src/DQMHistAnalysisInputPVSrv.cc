@@ -211,6 +211,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
   for (auto n : pmynode) {
     if (m_callback && !n->changed) continue;
     n->changed = false;
+    if (ca_field_type(n->mychid) != DBF_LONG && ca_field_type(n->mychid) != DBF_FLOAT) continue;
 
     // FIXME: dbr_size_n is a preprocessor macro, it would be nice replacing it with something better
 #pragma GCC diagnostic push
@@ -221,58 +222,54 @@ void DQMHistAnalysisInputPVSrvModule::event()
     void* buffer = (void*) bufferorg;
     int status;
 
-    if (ca_field_type(n->mychid) != DBF_LONG && ca_field_type(n->mychid) != DBF_FLOAT) continue;
     status = ca_array_get(ca_field_type(n->mychid), ca_element_count(n->mychid), n->mychid, buffer);
     SEVCHK(status, "ca_array_get()");
     status = ca_pend_io(15.0);
     if (status != ECA_NORMAL) {
       B2WARNING("EPICS ca_array_get " << ca_name(n->mychid) <<  " didn't return a value.");
     } else {
-      if (!n->histo) {
-        // this should NEVER happen
-        continue;
-//         B2DEBUG(20, "Create Histo " << tok);
-//         n->histo=new TH1F(ca_name(n->mychid),ca_name(n->mychid),ca_element_count(n->mychid),0,ca_element_count(n->mychid));
-      }
-      unsigned int bins;
-      bins = ca_element_count(n->mychid) < n->binmax ? ca_element_count(n->mychid) : n->binmax;
-      TH1* histo = n->histo;
-      for (unsigned int j = ca_element_count(n->mychid); j < n->binmax; j++) histo->SetBinContent(j + 1, 0); // zero out undefined bins
-      switch (ca_field_type(n->mychid)) {
-        case DBF_CHAR: {
-          dbr_char_t* b = (dbr_char_t*)buffer;
-          for (unsigned int j = 0; j < bins; j++) {
-            histo->SetBinContent(j + 1, b[j]);
-          }
-        }; break;
+      if (n->histo) {
+        // this should always be the case
+        unsigned int bins;
+        bins = ca_element_count(n->mychid) < n->binmax ? ca_element_count(n->mychid) : n->binmax;
+        TH1* histo = n->histo;
+        for (unsigned int j = ca_element_count(n->mychid); j < n->binmax; j++) histo->SetBinContent(j + 1, 0); // zero out undefined bins
+        switch (ca_field_type(n->mychid)) {
+          case DBF_CHAR: {
+            dbr_char_t* b = (dbr_char_t*)buffer;
+            for (unsigned int j = 0; j < bins; j++) {
+              histo->SetBinContent(j + 1, b[j]);
+            }
+          }; break;
 //         case DBF_INT:
-        case DBF_SHORT: { // same as INT
-          dbr_short_t* b = (dbr_short_t*)buffer;
-          for (unsigned int j = 0; j < bins; j++) {
-            histo->SetBinContent(j + 1, b[j]);
-          }
-        }; break;
-        case DBF_LONG: {
-          dbr_long_t* b = (dbr_long_t*)buffer;
-          for (unsigned int j = 0; j < bins; j++) {
-            histo->SetBinContent(j + 1, b[j]);
-          }
-        }; break;
-        case DBF_FLOAT: {
-          dbr_float_t* b = (dbr_float_t*)buffer;
-          for (unsigned int j = 0; j < bins; j++) {
-            histo->SetBinContent(j + 1, b[j]);
-          }
-        }; break;
-        case DBF_DOUBLE: {
-          dbr_double_t* b = (dbr_double_t*)buffer;
-          for (unsigned int j = 0; j < bins; j++) {
-            histo->SetBinContent(j + 1, b[j]);
-          }
-        }; break;
-        default:
-          // type not supported
-          break;
+          case DBF_SHORT: { // same as INT
+            dbr_short_t* b = (dbr_short_t*)buffer;
+            for (unsigned int j = 0; j < bins; j++) {
+              histo->SetBinContent(j + 1, b[j]);
+            }
+          }; break;
+          case DBF_LONG: {
+            dbr_long_t* b = (dbr_long_t*)buffer;
+            for (unsigned int j = 0; j < bins; j++) {
+              histo->SetBinContent(j + 1, b[j]);
+            }
+          }; break;
+          case DBF_FLOAT: {
+            dbr_float_t* b = (dbr_float_t*)buffer;
+            for (unsigned int j = 0; j < bins; j++) {
+              histo->SetBinContent(j + 1, b[j]);
+            }
+          }; break;
+          case DBF_DOUBLE: {
+            dbr_double_t* b = (dbr_double_t*)buffer;
+            for (unsigned int j = 0; j < bins; j++) {
+              histo->SetBinContent(j + 1, b[j]);
+            }
+          }; break;
+          default:
+            // type not supported
+            break;
+        }
       }
     }
     delete[] bufferorg;

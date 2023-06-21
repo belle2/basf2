@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/ECLVariables.h>
 
 //framework
@@ -35,6 +35,51 @@
 
 namespace Belle2 {
   namespace Variable {
+    double distanceToMcKl(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mcdistanceKL")) {
+        return particle->getExtraInfo("mcdistanceKL");
+      } else {
+        B2WARNING("The extraInfo mcdistanceKL is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return Const::doubleNaN;
+      }
+    }
+
+    double distanceToMcNeutron(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mcdistanceNeutron")) {
+        return particle->getExtraInfo("mcdistanceNeutron");
+      } else {
+        B2WARNING("The extraInfo mcdistanceNeutron is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return Const::doubleNaN;
+      }
+    }
+
+    int mdstIndexMcKl(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mdstIndexTruthKL")) {
+        return int(particle->getExtraInfo("mdstIndexTruthKL") + 0.1);
+      } else {
+        B2WARNING("The extraInfo mdstIndexTruthKL is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return -1;
+      }
+    }
+
+    int mdstIndexMcNeutron(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("mdstIndexTruthNeutron")) {
+        return int(particle->getExtraInfo("mdstIndexTruthNeutron") + 0.1);
+      } else {
+        B2WARNING("The extraInfo mdstIndexTruthNeutron is not registered! \n"
+                  "This variable is only available for ECL based lists, and you have to run the function getNeutralHadronGeomMatches to use it");
+        return -1;
+      }
+    }
+
+
     double beamBackgroundSuppression(const Particle* particle)
     {
       if (particle->hasExtraInfo("beamBackgroundSuppression")) {
@@ -42,30 +87,36 @@ namespace Belle2 {
       } else {
         B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
                   "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
+      }
+    }
+
+    double fakePhotonSuppression(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("fakePhotonSuppression")) {
+        return particle->getExtraInfo("fakePhotonSuppression");
+      } else {
+        B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
+        return Const::doubleNaN;
       }
     }
 
     double hadronicSplitOffSuppression(const Particle* particle)
     {
-      if (particle->hasExtraInfo("hadronicSplitOffSuppression")) {
-        return particle->getExtraInfo("hadronicSplitOffSuppression");
-      } else {
-        B2WARNING("The extraInfo hadronicSplitOffSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getHadronicSplitOffProbability or turn the argument loadPhotonHadronicSplitOffMVA to True when using fillParticleList.");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      B2WARNING("This variable has been deprecated since light-2302-genetta and is no longer maintained with up to date weights. Please use the variable fakePhotonSuppression instead.");
+      return fakePhotonSuppression(particle);
     }
 
     double eclClusterKlId(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (!cluster) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       const KlId* klid = cluster->getRelatedTo<KlId>();
       if (!klid) {
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return klid->getKlId();
     }
@@ -78,10 +129,10 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getPulseShapeDiscriminationMVA();
         } else {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterNumberOfHadronDigits(const Particle* particle)
@@ -92,9 +143,9 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getNumberOfHadronDigits();
         } else
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterDetectionRegion(const Particle* particle)
@@ -104,7 +155,7 @@ namespace Belle2 {
       if (cluster)
         return cluster->getDetectorRegion();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterIsolation(const Particle* particle)
@@ -116,7 +167,7 @@ namespace Belle2 {
         if (minDist > 0)
           return minDist;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterIsolationID(const Particle* particle)
@@ -126,7 +177,7 @@ namespace Belle2 {
       if (cluster)
         return cluster->getMinTrkDistanceID();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     Manager::FunctionPtr eclClusterIsolationVar(const std::vector<std::string>& arguments)
@@ -148,9 +199,9 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
         const ECLCluster* cluster = particle->getECLCluster();
         if (!cluster)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         auto trackID = cluster->getMinTrkDistanceID();
-        double result = std::numeric_limits<float>::quiet_NaN();
+        double result = Const::doubleNaN;
         // Find particle with that track ID:
         for (unsigned int i = 0; i < particleList->getListSize(); i++)
         {
@@ -172,7 +223,7 @@ namespace Belle2 {
       if (cluster)
         return  cluster->getConnectedRegionId();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterDeltaL(const Particle* particle)
@@ -182,7 +233,7 @@ namespace Belle2 {
       if (cluster)
         return cluster->getDeltaL();
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorE(const Particle* particle)
@@ -192,7 +243,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getUncertaintyEnergy();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterUncorrectedE(const Particle* particle)
@@ -202,7 +253,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getEnergyRaw();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterE(const Particle* particle)
@@ -216,7 +267,7 @@ namespace Belle2 {
 
         return frame.getMomentum(p4Cluster).E();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHighestE(const Particle* particle)
@@ -226,7 +277,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getEnergyHighestCrystal();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterCellId(const Particle* particle)
@@ -236,7 +287,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getMaxECellId();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     // An array with each number representing the last number of the cellID per thetaID. There are 69 thetaIDs in total.
@@ -257,7 +308,7 @@ namespace Belle2 {
         return std::distance(lastCellIDperThetaID.begin(), std::lower_bound(lastCellIDperThetaID.begin(), lastCellIDperThetaID.end(),
                              cellID));
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterPhiId(const Particle* particle)
@@ -274,7 +325,7 @@ namespace Belle2 {
           return cellID - closestinlist - 1;
         }
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterTiming(const Particle* particle)
@@ -284,7 +335,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getTime();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasFailedTiming(const Particle* particle)
@@ -293,7 +344,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasFailedFitTime();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorTiming(const Particle* particle)
@@ -303,7 +354,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getDeltaTime99();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasFailedErrorTiming(const Particle* particle)
@@ -312,7 +363,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasFailedTimeResolution();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterTheta(const Particle* particle)
@@ -326,7 +377,7 @@ namespace Belle2 {
 
         return frame.getMomentum(p4Cluster).Theta();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorTheta(const Particle* particle)
@@ -336,7 +387,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getUncertaintyTheta();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterErrorPhi(const Particle* particle)
@@ -346,7 +397,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getUncertaintyPhi();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterPhi(const Particle* particle)
@@ -360,7 +411,7 @@ namespace Belle2 {
 
         return frame.getMomentum(p4Cluster).Phi();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterR(const Particle* particle)
@@ -370,7 +421,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getR();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterE1E9(const Particle* particle)
@@ -380,7 +431,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getE1oE9();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterE9E21(const Particle* particle)
@@ -390,7 +441,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getE9oE21();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterAbsZernikeMoment40(const Particle* particle)
@@ -400,7 +451,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getAbsZernike40();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterAbsZernikeMoment51(const Particle* particle)
@@ -410,7 +461,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getAbsZernike51();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterZernikeMVA(const Particle* particle)
@@ -420,7 +471,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getZernikeMVA();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterSecondMoment(const Particle* particle)
@@ -430,7 +481,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getSecondMoment();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterLAT(const Particle* particle)
@@ -440,7 +491,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getLAT();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterNHits(const Particle* particle)
@@ -450,7 +501,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getNumberOfCrystals();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterTrackMatched(const Particle* particle)
@@ -465,7 +516,7 @@ namespace Belle2 {
         else
           return 0.0;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double nECLClusterTrackMatches(const Particle* particle)
@@ -473,7 +524,7 @@ namespace Belle2 {
       // if no ECL cluster then nan
       const ECLCluster* cluster = particle->getECLCluster();
       if (!cluster)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       // one or more tracks may be matched to charged particles
       size_t out = cluster->getRelationsFrom<Track>().size();
@@ -486,7 +537,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getConnectedRegionId();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterId(const Particle* particle)
@@ -495,7 +546,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->getClusterId();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasNPhotonsHypothesis(const Particle* particle)
@@ -504,7 +555,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasNeutralHadronHypothesis(const Particle* particle)
@@ -513,7 +564,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
@@ -522,7 +573,7 @@ namespace Belle2 {
       if (cluster) {
         return cluster->hasPulseShapeDiscrimination();
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclExtTheta(const Particle* particle)
@@ -537,11 +588,11 @@ namespace Belle2 {
           return eclinfo->getExtTheta();
         } else {
           B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclExtPhi(const Particle* particle)
@@ -556,11 +607,11 @@ namespace Belle2 {
           return eclinfo->getExtPhi();
         } else {
           B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double eclExtPhiId(const Particle* particle)
@@ -574,11 +625,11 @@ namespace Belle2 {
           return eclinfo->getExtPhiId();
         } else {
           B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       }
 
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double weightedAverageECLTime(const Particle* particle)
@@ -586,7 +637,7 @@ namespace Belle2 {
       int nDaughters = particle->getNDaughters();
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       double numer = 0, denom = 0;
@@ -613,12 +664,12 @@ namespace Belle2 {
 
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       if (denom == 0) {
         B2WARNING("The denominator of the weighted mean is zero!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       } else {
         B2DEBUG(10, "numer/denom = " << numer / denom);
         return numer / denom;
@@ -630,7 +681,7 @@ namespace Belle2 {
       int nDaughters = particle->getNDaughters();
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       double maxTimeDiff = -DBL_MAX;
@@ -661,12 +712,12 @@ namespace Belle2 {
 
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       if (maxTimeDiff < 0) {
         B2WARNING("The max time difference is negative!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       } else {
         B2DEBUG(10, "maxTimeDiff = " << maxTimeDiff);
         return maxTimeDiff;
@@ -678,9 +729,9 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getArrayIndex();
-      } else return std::numeric_limits<double>::quiet_NaN();
+      } else return Const::doubleNaN;
 
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
 
@@ -690,56 +741,56 @@ namespace Belle2 {
     double nECLOutOfTimeCrystalsFWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTimeFWD();
     }
 
     double nECLOutOfTimeCrystalsBarrel(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTimeBarrel();
     }
 
     double nECLOutOfTimeCrystalsBWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTimeBWD();
     }
 
     double nECLOutOfTimeCrystals(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLCalDigitsOutOfTime();
     }
 
     double nRejectedECLShowersFWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLShowersRejectedFWD();
     }
 
     double nRejectedECLShowersBarrel(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLShowersRejectedBarrel();
     }
 
     double nRejectedECLShowersBWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double)elci->getNECLShowersRejectedBWD();
     }
 
     double nRejectedECLShowers(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      if (!elci) return Const::doubleNaN;
       return (double) elci->getNECLShowersRejected();
     }
 
@@ -750,7 +801,7 @@ namespace Belle2 {
         E += part->getExtraInfo("bremsCorrectedPhotonEnergy");
       }
       const double p =  part->getMomentumMagnitude();
-      if (0 == p) { return std::numeric_limits<float>::quiet_NaN();}
+      if (0 == p) { return Const::doubleNaN;}
       return E / p;
     }
 
@@ -787,7 +838,7 @@ namespace Belle2 {
 
         if (nClusterDaughters < 1) {
           B2WARNING("There are no clusters amongst the daughters of the provided particle!");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
         B2DEBUG(10, "Number of daughters with cluster associated = " << nClusterDaughters);
         return sum.M();
@@ -817,7 +868,7 @@ namespace Belle2 {
         if (particle->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The variable photonHasOverlap is supposed to be calculated for photons. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         StoreObjPtr<ParticleList> photonlist(photonlistname);
@@ -825,13 +876,13 @@ namespace Belle2 {
         {
           B2WARNING("The provided particle list " << photonlistname << " does not exist."
                     " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (photonlist->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The list " << photonlistname << " does not contain photons."
                     " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         StoreObjPtr<ParticleList> tracklist(tracklistname);
@@ -839,13 +890,13 @@ namespace Belle2 {
         {
           B2WARNING("The provided particle list " << tracklistname << " does not exist."
                     " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tracklist->getPDGCode()))))
         {
           B2WARNING("The list " << tracklistname << " does not contain charged final state particles."
                     " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
-          return std::numeric_limits<double>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         double connectedRegionID = eclClusterConnectedRegionID(particle);
@@ -897,9 +948,9 @@ alias for (clusterE / p).
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion, R"DOC(
 Returns an integer code for the ECL region of a cluster.
 
-    - 1: forward, 2: barrel, 3: backward,
-    - 11: between FWD and barrel, 13: between BWD and barrel,
-    - 0: otherwise
+- 1: forward, 2: barrel, 3: backward,
+- 11: between FWD and barrel, 13: between BWD and barrel,
+- 0: otherwise
 )DOC");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL, R"DOC(
 | Returns DeltaL for the shower shape.
@@ -923,8 +974,8 @@ Returns an integer code for the ECL region of a cluster.
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
 ..
-)DOC","cm");
 
+)DOC","cm");
 
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
 Returns the distance between the ECL cluster and its nearest track. 
@@ -945,6 +996,7 @@ If there are no extrapolated hits found in the ECL for the event, NaN will be re
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
 ..
+
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
 Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculcated 
@@ -968,17 +1020,17 @@ due to unavoidable longitudinal and transverse leakage that can be further modif
 algorithm and beam backgrounds.The peak position of the photon energy distributions are corrected to
 match the true photon energy in MC:
 
-    - Leakage correction: Using large MC samples of mono-energetic single photons, a correction factor
-      :math:`f` as function of reconstructed detector position, reconstructed photon energy and beam backgrounds
-      is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`.
+- Leakage correction: Using large MC samples of mono-energetic single photons, a correction factor
+  :math:`f` as function of reconstructed detector position, reconstructed photon energy and beam backgrounds
+  is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`.
 
-    - Cluster energy calibration (data only): To reach the target precision of :math:`< 1.8\%` energy
-      resolution for high energetic photons, the remaining difference between MC and data must be calibrated
-      using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
-      take time to develop.
-    
-    - Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy 
-      and momentum. Only applied to data.  
+- Cluster energy calibration (data only): To reach the target precision of :math:`< 1.8\%` energy
+  resolution for high energetic photons, the remaining difference between MC and data must be calibrated
+  using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
+  take time to develop.
+
+- Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy
+  and momentum. Only applied to data.
 
 It is important to note that after perfect leakage correction and cluster energy calibration,
 the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average
@@ -997,22 +1049,27 @@ will used mass constrained :math:`\pi^{0}` s anyhow.
     | Precision: :math:`18` bit
     | This value can be changed to a different reference frame with :b2:var:`useCMSFrame`.
 ..
+
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
 Returns ECL cluster's uncertainty on energy
 (from background level and energy dependent tabulation).
+
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi, R"DOC(
 Returns ECL cluster's uncertainty on :math:`\phi`
 (from background level and energy dependent tabulation).
+
 )DOC","rad");
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta, R"DOC(
 Returns ECL cluster's uncertainty on :math:`\theta`
 (from background level and energy dependent tabulation).
+
 )DOC","rad");
 
     REGISTER_VARIABLE("clusterR", eclClusterR, R"DOC(
 Returns ECL cluster's centroid distance from :math:`(0,0,0)`.
+
 )DOC","cm");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi, R"DOC(
 Returns ECL cluster's azimuthal angle :math:`\phi`
@@ -1045,6 +1102,7 @@ as function of true photon energy, true photon direction and beam background lev
     | Upper limit: :math:`\pi`
     | Precision: :math:`16` bit
 ..
+
 )DOC","rad");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
 Returns ECL cluster's connected region ID.
@@ -1080,8 +1138,10 @@ as function of true photon energy, true photon direction and beam background lev
     | Upper limit: :math:`\pi`
     | Precision: :math:`16` bit
 ..
+
 )DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
+**In Belle II:**
 Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
 Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
 cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction
@@ -1097,6 +1157,20 @@ documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corre
     | Upper limit: :math:`1000.0`
     | Precision: :math:`12` bit
 ..
+
+**In Belle:**
+Returns the trigger cell (TC) time of the ECL cluster (photon).
+This information is available only in Belle data since experiment 31, and not available in Belle MC.
+Clusters produced at the interaction point in time with the event, have TC time in the range of 9000-11000
+Calculated based on the Appendix of Belle note 831.
+
+.. note::
+    | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
+    | Lower limit: :math:`-1000.0`
+    | Upper limit: :math:`1000.0`
+    | Precision: :math:`12` bit
+..
+
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
 Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
@@ -1128,6 +1202,7 @@ We remove such clusters in most physics photon lists.
     However, these events create large ECL clusters that can overlap with other ECL clusters
     and it is not clear that a simple rejection is the correction strategy.
 ..
+
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
 Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
@@ -1148,6 +1223,7 @@ Returns energy of the highest energetic crystal in the ECL cluster after reweigh
     | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     | Precision: :math:`18` bit
 ..
+
 )DOC","GeV");
     REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
                       "Returns cellId of the crystal with highest energy in the ECLCluster.");
@@ -1243,6 +1319,7 @@ to a plane perpendicular to the shower axis.
     | Upper limit: :math:`40.0`
     | Precision: :math:`10` bit
 ..
+
 )DOC",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT, R"DOC(
 Returns lateral energy distribution (shower variable). It is defined as following:
@@ -1292,9 +1369,9 @@ Returns number of charged tracks matched to this cluster.
 .. note::
     Sometimes (perfectly correctly) two tracks are extrapolated into the same cluster.
 
-        - For charged particles, this should return at least 1 (but sometimes 2 or more).
-        - For neutrals, this should always return 0.
-        - Returns NaN if there is no cluster.
+    - For charged particles, this should return at least 1 (but sometimes 2 or more).
+    - For neutrals, this should always return 0.
+    - Returns NaN if there is no cluster.
 )DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
@@ -1302,50 +1379,68 @@ thresholds for computing PSD variables.
 )DOC");
     REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
-The classes are: 
+Class 1 is for true photon clusters while class 0 is for beam background clusters.
 
-    - 1 for true photon clusters
-    - 0 for beam background clusters
+The MVA has been trained using MC and the features used are:
 
-The MVA has been trained using samples of signal photons and beam background photons coming from MC. The features used are (in decreasing order of significance): 
+- `clusterTiming`
+- `clusterPulseShapeDiscriminationMVA`
+- `clusterE`
+- `clusterTheta`
+- `clusterZernikeMVA`
 
-    - `clusterTiming`
-    - `clusterPulseShapeDiscriminationMVA`
-    - `clusterE`
-    - `clusterTheta`
-    - `clusterZernikeMVA`
-    - `clusterE1E9`
-    - `clusterLAT`
-    - `clusterSecondMoment`    
+Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
+the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+)DOC");
+    REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
+track-cluster matching failures etc.). Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
+
+The MVA has been trained using MC and the features are:
+
+- `clusterPulseShapeDiscriminationMVA`
+- `minC2TDist`
+- `clusterZernikeMVA`
+- `clusterE`
+- `clusterTiming`
+- `clusterTheta`
+
+This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
+
+Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
+the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
 The classes are: 
 
-    - 1 for true photon clusters
-    - 0 for hadronic splitoff clusters
+- 1 for true photon clusters
+- 0 for hadronic splitoff clusters
 
 The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. The features used are (in decreasing order of significance): 
 
-    - `clusterPulseShapeDiscriminationMVA`
-    - `minC2TDist`
-    - `clusterZernikeMVA`
-    - `clusterE`
-    - `clusterLAT`
-    - `clusterE1E9`
-    - `clusterSecondMoment`
+- `clusterPulseShapeDiscriminationMVA`
+- `minC2TDist`
+- `clusterZernikeMVA`
+- `clusterE`
+- `clusterLAT`
+- `clusterE1E9`
+- `clusterSecondMoment`
+)DOC");
+    MAKE_DEPRECATED("hadronicSplitOffSuppression", false, "light-2302-genetta", R"DOC(
+                     Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
     
-    - 1 for Kl
-    - 0 for background
+- 1 for Kl
+- 0 for background
 )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.
 
-    - 1 for electromagnetic showers
-    - 0 for hadronic showers
+- 1 for electromagnetic showers
+- 0 for hadronic showers
 )DOC");
     REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits, R"DOC(
 Returns ECL cluster's number of hadron digits in cluster (pulse shape discrimination variable).
@@ -1372,9 +1467,11 @@ Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically ca
 )DOC");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, R"DOC(
 Returns extrapolated :math:`\theta` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed.
+
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, R"DOC(
 Returns extrapolated :math:`\phi` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
+
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, R"DOC(
 Returns extrapolated :math:`\phi` ID of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
@@ -1382,10 +1479,12 @@ Returns extrapolated :math:`\phi` ID of particle track associated to the cluster
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
 Returns ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters
 (of any generation) of the provided particle.
+
 )DOC", "ns");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime, R"DOC(
 Returns maximum weighted distance between time of the cluster of a photon and the ECL average time, amongst
 the clusters (neutrals) and matched clusters (charged) of daughters (of all generations) of the provided particle.
+
 )DOC", "ns");
     REGISTER_VARIABLE("clusterMdstIndex", eclClusterMdstIndex, R"DOC(
 StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based particles matched to a cluster).
@@ -1431,6 +1530,7 @@ If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 cluster-matched tracks using the cluster 4-momenta.
 
 Used for ECL-based dark sector physics and debugging track-cluster matching.
+
 )DOC","GeV/:math:`\\text{c}^2`");
 
     REGISTER_METAVARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
@@ -1447,7 +1547,34 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
 [Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.
 This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
+
 )DOC","GeV");
+
+    REGISTER_VARIABLE("distanceToMcKl",distanceToMcKl,R"DOC(
+Returns the distance to the nearest truth KL particle, extrapolated to the cluster radius. To use
+this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+to MC difference in KL efficiency.
+
+)DOC", "cm");
+
+    REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
+Returns the distance to the nearest truth (anti)neutron, extrapolated to the cluster radius. To use
+this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
+negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
+to MC difference in KL efficiency.
+
+)DOC", "cm");
+
+    REGISTER_VARIABLE("mdstIndexMcKl",mdstIndexMcKl,R"DOC(
+      Returns the mdst index of the nearest truth KL, extrapolated to the cluster radius, if it is
+      within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
+)DOC");
+
+    REGISTER_VARIABLE("mdstIndexMcNeutron",mdstIndexMcNeutron,R"DOC(
+      Returns the mdst index of the nearest truth (anti)neutron, extrapolated to the cluster radius, if it is
+      within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
+)DOC");
 
   }
 }

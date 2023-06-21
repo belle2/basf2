@@ -83,17 +83,6 @@ namespace Belle2 {
     /** threshold level/line for outside fraction */
     int m_upperLineAdhoc{};
 
-    /** warn level for mean adhoc plot */
-    double m_warnMeanFull{};
-    /** error level for mean adhoc plot */
-    double m_errorMeanFull{};
-    /** warn level for outside fraction */
-    double m_warnOutsideFull{};
-    /** error level for outside fraction */
-    double m_errorOutsideFull{};
-    /** threshold level/line for outside fraction */
-    int m_upperLineFull{};
-
     //! Module list for masking
     std::vector <std::string> m_parModuleList;
     //! Gate list for masking
@@ -106,27 +95,16 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
-    TH2D* m_hCommonMode = nullptr;
-    //! histogram covering all modules
     TH2D* m_hCommonModeDelta = nullptr;
-    //! histogram covering all modules
-    TH2D* m_hCommonModeOld = nullptr;
-    //! Final Canvas
-    TCanvas* m_cCommonMode = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonModeDelta = nullptr;
     //! Line in the Canvas to guide the eye
     TLine* m_line1 = nullptr;
     //! Line in the Canvas to guide the eye
     TLine* m_lineA = nullptr;
-    //! Line in the Canvas to guide the eye
-    TLine* m_lineF = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! epics PVs

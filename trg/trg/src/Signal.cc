@@ -186,10 +186,10 @@ namespace Belle2 {
     bool active = false;
     for (unsigned i = 0; i < sc2.size(); i++) {
       const int j = sc2[i];
-      if ((! active) & state(j) & left.state(j)) {
+      if ((! active) and state(j) and left.state(j)) {
         active = true;
         t._history.push_back(TRGTime(j, true, * _clock));
-      } else if (active & ((! state(j)) | (! left.state(j)))) {
+      } else if (active and ((! state(j)) or (! left.state(j)))) {
         active = false;
         t._history.push_back(TRGTime(j, false, * _clock));
       }

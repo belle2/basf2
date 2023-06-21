@@ -54,11 +54,6 @@ namespace Belle2 {
      */
     void event(void) override final;
 
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate(void) override final;
-
   private:
 
     // Data members
@@ -79,8 +74,6 @@ namespace Belle2 {
     TH1F* m_hMissingDHP = nullptr;
     //! Histogram covering stat
     TH1D* m_hStatistic = nullptr;
-    //! Histogram preserving last stat upd
-    TH1* m_hDaqStatOld = nullptr;
     //! Final Canvas
     TCanvas* m_cDAQError = nullptr;
     //! Final Canvas
@@ -97,9 +90,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

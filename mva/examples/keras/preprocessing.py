@@ -107,14 +107,20 @@ def apply(state, X):
 
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_identifier = "preprocessed_deep_keras"
     general_options.m_treename = "tree"
     variables = ['M', 'p', 'pt', 'pz',
@@ -142,8 +148,7 @@ if __name__ == "__main__":
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)
     inference_start = time.time()
-    test_data = ["test.root"] * 10
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)

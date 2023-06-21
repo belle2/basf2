@@ -23,7 +23,7 @@ TrackFitResult::TrackFitResult() :
   m_pdg(0), m_pValue(0),
   m_hitPatternCDCInitializer(0),
   m_hitPatternVXDInitializer(0),
-  m_NDF(c_NDFFlag)
+  m_NDF100(c_NDFFlag)
 {
   memset(m_tau, 0, sizeof(m_tau));
   memset(m_cov5, 0, sizeof(m_cov5));
@@ -35,11 +35,11 @@ TrackFitResult::TrackFitResult(const ROOT::Math::XYZVector& position, const ROOT
                                const float bField,
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
-                               const uint16_t NDF) :
+                               const float NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),
-  m_NDF(NDF)
+  m_NDF100(int(NDF * 100.))
 {
   UncertainHelix h(position, momentum, charge, bField, covariance, pValue);
 
@@ -64,11 +64,11 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
                                const Const::ParticleType& particleType, const float pValue,
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
-                               const uint16_t NDF) :
+                               const float_t NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),
-  m_NDF(NDF)
+  m_NDF100(int(NDF * 100.))
 {
   if (tau.size() != c_NPars
       || cov5.size() != c_NCovEntries)
@@ -86,7 +86,7 @@ void TrackFitResult::updateTrackFitResult(const TrackFitResult& input)
   if (this == &input) return;
   m_pdg = input.m_pdg;
   m_pValue = input.m_pValue;
-  m_NDF = input.m_NDF;
+  m_NDF100 = input.m_NDF100;
   m_hitPatternCDCInitializer = input.m_hitPatternCDCInitializer;
   m_hitPatternVXDInitializer = input.m_hitPatternVXDInitializer;
 
@@ -96,18 +96,18 @@ void TrackFitResult::updateTrackFitResult(const TrackFitResult& input)
 
 }
 
-int TrackFitResult::getNDF() const
+float TrackFitResult::getNDF() const
 {
-  if (m_NDF == c_NDFFlag) {
+  if (m_NDF100 == c_NDFFlag) {
     return -1;
   }
-  return m_NDF;
+  return (float)m_NDF100 / 100;
 }
 
 double TrackFitResult::getChi2() const
 {
   double pValue = getPValue();
-  int nDF    = getNDF();
+  float nDF    = getNDF();
   if (pValue == 0) {
     return std::numeric_limits<double>::infinity();
   }

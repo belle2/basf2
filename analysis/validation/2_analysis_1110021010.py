@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,8 +26,8 @@ from stdCharged import stdPi
 from validation_tools.metadata import create_validation_histograms
 
 DECAY_MODE_ID = 1110021010
-INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
-OUTPUT_FILENAME = "%i_Validation.root" % DECAY_MODE_ID
+INPUT_FILENAME = f"../{DECAY_MODE_ID}.dst.root"
+OUTPUT_FILENAME = f"{DECAY_MODE_ID}_Validation.root"
 
 main = basf2.Path()
 inputMdst(INPUT_FILENAME, path=main)
@@ -47,20 +46,20 @@ create_validation_histograms(
     variables_1d=[
         (
             "Mbc", 180, 5.2, 5.29,
-            r"$B^0\to\rho^0\gamma$ candidates' beam-constrained mass",
+            "Beam-constrained mass of #it{B^{0} #rightarrow #rho^{0}#gamma} candidates",
             "Frank Meier <frank.meier@duke.edu>",
             r"The beam-constrained mass distribution of $B^0\to\rho^0\gamma$ decays",
             "Distribution should be peaking at the nominal $B^0$ mass. Tail towards low mass.",
-            "M_{bc} [GeV/c^{2}]", "Candidates",
+            "M_{bc} [GeV/c^{2}]", "Candidates"
         ),
         (
             "useRestFrame(daughter(1, E))", 50, 1.5, 4.0,
-            r"The photon energy distribution for $B^0\to\rho^0\gamma$ decays",
+            "The photon energy distribution for #it{B^{0} #rightarrow #rho^{0}#gamma} decays",
             "Frank Meier <frank.meier@duke.edu>; Torben Ferber <torben.ferber@desy.de>",
             r"Photon energy distribution of $B^0\to\rho^0\gamma$ decays",
             "Sharp distribution at 2.5 GeV. Look for differences in "
             "the absolute scale. This could be an indication of a loss of photon efficiency.",
-            "E_{#gamma} [GeV]", "Candidates",
+            "E_{#gamma} [GeV]", "Candidates"
         ),
     ]
 )

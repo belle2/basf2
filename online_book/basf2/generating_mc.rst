@@ -188,7 +188,6 @@ Now we have to add to the steering path the relevant functions for:
 
      .. literalinclude:: steering_files/065_generate_mc.py
         :language: python
-        :linenos:
 
 
 .. tip::
@@ -246,7 +245,7 @@ All the known decay channels of the generated :math:`B^0` and :math:`\bar{B}^0` 
 `main decay file`_. This file is automatically loaded by the function :py:func:`generators.add_evtgen_generator` and
 it is then passed to the `EvtGen generator`_.
 
-.. _main decay file: https://stash.desy.de/projects/B2/repos/basf2/browse/decfiles/dec/DECAY_BELLE2.DEC
+.. _main decay file: https://gitlab.desy.de/belle2/software/basf2/-/tree/main/decfiles/dec/DECAY_BELLE2.DEC
 
 .. _EvtGen generator: https://evtgen.hepforge.org/
 
@@ -259,7 +258,6 @@ Suppose that we want to study the :math:`B^0 \to J/\Psi K^0_S` decay, with :math
 ``my_decay_file.dec`` or something similar):
 
 .. literalinclude:: steering_files/my_decay_file.dec
-    :linenos:
 
 Looking at this simple decay file, it is not difficult to understand its structure:
 
@@ -304,7 +302,7 @@ scheme is quite obvious, this is not the same for ``K_S0``). These names are def
 luckily you do not have to go through it, because we have a dedicated tool that parses the file and allows you to
 easily get all the relevant information: :ref:`b2help-particles`.
 
-.. _evt.pdl: https://stash.desy.de/projects/B2/repos/basf2/browse/framework/particledb/data/evt.pdl
+.. _evt.pdl: https://gitlab.desy.de/belle2/software/basf2/-/tree/main/framework/particledb/data/evt.pdl
 
 .. admonition:: Question
      :class: exercise stacked
@@ -336,7 +334,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
 
      .. literalinclude:: steering_files/067_generate_mc.py
         :language: python
-        :linenos:
 
 
 .. admonition:: Question
@@ -358,7 +355,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :class: toggle solution
 
      .. code-block::
-        :linenos:
 
         Decay Upsilon(4S)
         1.0 B0 anti-B0  VSS_BMIX dm;

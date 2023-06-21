@@ -660,6 +660,7 @@ namespace Belle2 {
     static const ParticleType photon;    /**< photon particle */
     static const ParticleType pi0;       /**< neutral pion particle */
     static const ParticleType neutron;   /**< neutron particle */
+    static const ParticleType antiNeutron;   /**< Anti-neutron particle */
     static const ParticleType Kshort;    /**< K^0_S particle */
     static const ParticleType Klong;     /**< K^0_L particle */
     static const ParticleType Lambda;    /**< Lambda particle */
@@ -685,6 +686,8 @@ namespace Belle2 {
     static const double permSi;       /**< Permittivity of Silicon */
     static const double uTherm;       /**< Thermal Voltage at room temperature */
     static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
+
+    static const double doubleNaN; /**< quiet_NaN */
 
   private:
     /**

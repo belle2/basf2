@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBunchFinder/TOPBunchFinderModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
@@ -98,7 +100,7 @@ namespace Belle2 {
     addParam("useTimeSeed",  m_useTimeSeed, "use SVD or CDC event T0 as a seed "
              "(only when running in data processing mode and autoRange turned off).", true);
     addParam("useFillPattern", m_useFillPattern, "use known accelerator fill pattern to enhance efficiency "
-             "(only when running in data processing mode).", true);
+             "(only when running in data processing mode).", false);
   }
 
 
@@ -482,10 +484,11 @@ namespace Belle2 {
     double err2 = (1 - a) * error;
     m_runningError = sqrt(err1 * err1 + err2 * err2);
 
-    // check if reconstructed bunch is filled; return if not.
+    // when not running in HLT mode, check if reconstructed bunch is filled
 
-    if (m_useFillPattern and not m_HLTmode) {
-      if (not isBucketFilled(bunchNo)) return;
+    if (not m_HLTmode) {
+      bool isFilled = isBucketFilled(bunchNo); // stores in addition the bucket number and fill status in m_recBunch
+      if (m_useFillPattern and not isFilled) return;
     }
 
     // store the results
@@ -662,21 +665,32 @@ namespace Belle2 {
 
   bool TOPBunchFinderModule::isBucketFilled(int bunchNo)
   {
-    // return true if needed information not available
+    // return true if needed information is not available
 
     if (not m_bunchStructure->isSet()) return true;
-    if (not m_fillPatternOffset.isValid()) return true;
-    if (not m_fillPatternOffset->isCalibrated()) return true;
     if (m_revo9Counter == 0xFFFF) return true;
 
-    // corresponding bucket number
+    // fill pattern offset; it is always zero on MC.
 
-    auto RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
-    int offset = m_isMC ? 0 : m_fillPatternOffset->get();
-    int bucket = (bunchNo + m_revo9Counter * 4 - offset) % RFBuckets;
-    if (bucket < 0) bucket += RFBuckets;
+    int offset = 0;
+    if (not m_isMC) {
+      if (not m_fillPatternOffset.isValid()) return true;
+      if (not m_fillPatternOffset->isCalibrated()) return true;
+      offset = m_fillPatternOffset->get();
+    }
 
-    return m_bunchStructure->getBucket(bucket);
+    // corresponding bucket number and fill status
+
+    int RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
+    int bucket = TOPRecBunch::getBucketNumber(bunchNo, m_revo9Counter, offset, RFBuckets);
+    bool isFilled = m_bunchStructure->getBucket(bucket);
+
+    // store them in TOPRecBunch
+
+    m_recBunch->setBucketNumber(bucket);
+    m_recBunch->setBucketFillStatus(isFilled);
+
+    return isFilled;
   }
 
 

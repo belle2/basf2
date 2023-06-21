@@ -9,8 +9,7 @@
 #include <simulation/physicslist/PionPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4PionPlusInelasticProcess.hh"
-#include "G4PionMinusInelasticProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronicAbsorptionBertini.hh"
 
@@ -94,7 +93,7 @@ void PionPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(pipProcEl);
 
   // inelastic
-  G4PionPlusInelasticProcess* pipProcInel = new G4PionPlusInelasticProcess;
+  G4HadronInelasticProcess* pipProcInel = new G4HadronInelasticProcess("pi+Inelastic", G4PionPlus::Definition());
   pipProcInel->RegisterMe(loInelModel);
   pipProcInel->RegisterMe(m_ftfp);
   pipProcInel->AddDataSet(new G4BGGPionInelasticXS(G4PionPlus::PionPlus()));
@@ -114,7 +113,7 @@ void PionPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(pimProcEl);
 
   // inelastic
-  G4PionMinusInelasticProcess* pimProcInel = new G4PionMinusInelasticProcess;
+  G4HadronInelasticProcess* pimProcInel = new G4HadronInelasticProcess("pi-Inelastic", G4PionMinus::Definition());
   pimProcInel->RegisterMe(loInelModel);
   pimProcInel->RegisterMe(m_ftfp);
   pimProcInel->AddDataSet(new G4BGGPionInelasticXS(G4PionMinus::PionMinus()));

@@ -6,8 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLDIGITTIMECONSTANTS_H
-#define ECLDIGITTIMECONSTANTS_H
+# pragma once
+
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {
@@ -62,4 +63,3 @@ namespace Belle2 {
     ClassDef(ECLDigitTimeConstants, 2); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

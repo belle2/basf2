@@ -6,37 +6,36 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclDQM/eclDQM.h>
 
-//Boost
-#include <boost/format.hpp>
-#include <boost/range/combine.hpp>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
-//FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-//TRG
 #include <mdst/dataobjects/TRGSummary.h>
 
-//ROOT
-#include <TProfile.h>
+/* Boost headers. */
+#include <boost/format.hpp>
+#include <boost/range/combine.hpp>
+
+/* ROOT headers. */
+#include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
+#include <TProfile.h>
 
-//STL
+/* C++ headers. */
 #include <iostream>
 #include <iterator>
 #include <cmath>
@@ -99,7 +98,8 @@ void ECLDQMModule::defineHisto()
   h_quality_other->GetXaxis()->SetTitle("Flag number. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
   h_quality_other->SetFillColor(kPink - 4);
 
-  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID", 8736, 1, 8737);
+  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID",
+                           ECLElementNumbers::c_NCrystals, 1, 8737);
   h_bad_quality->GetXaxis()->SetTitle("Cell ID");
   h_bad_quality->GetYaxis()->SetTitle("ECL hits count");
 
@@ -123,7 +123,7 @@ void ECLDQMModule::defineHisto()
     std::string h_name, h_title;
     h_name = str(boost::format("cid_Thr%1%MeV") % id);
     h_title = str(boost::format("Occupancy per Cell ID (E > %1% MeV)") % id);
-    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8736, 1, 8737);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), ECLElementNumbers::c_NCrystals, 1, 8737);
     h->GetXaxis()->SetTitle("Cell ID");
     h->GetYaxis()->SetTitle("Occupancy (hits / events_count)");
     h_cids.push_back(h);
@@ -186,10 +186,10 @@ void ECLDQMModule::defineHisto()
     if (id == "dphy") h_title = "#frac{Saved}{Expected} waveforms for delayed bhabha (DPHY) events";
     if (id == "all") h_title = "#frac{Saved}{Expected} waveforms for all events";
     h_cell_name = str(boost::format("wf_cid_%1%") % (id));
-    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), 8736, 1, 8737);
+    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), ECLElementNumbers::c_NCrystals, 1, 8737);
     h_cell->GetXaxis()->SetTitle("Cell ID");
     if (id == "psd") {
-      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid", 8736, 1, 8737);
+      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid", ECLElementNumbers::c_NCrystals, 1, 8737);
     }
     if (id == "logic") {
       h_evtot_logic = new TH1F("event_logic", "Event bank for logic", 1, 0, 1);
@@ -210,12 +210,12 @@ void ECLDQMModule::defineHisto()
   h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Data consistency flag");
 
-  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", 8736, 1, 8737);
+  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", ECLElementNumbers::c_NCrystals, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC units, #approx 0.05 MeV)");
 
   h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal stddev vs Cell ID",
-                                 8736, 1, 8737);
+                                 ECLElementNumbers::c_NCrystals, 1, 8737);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
 

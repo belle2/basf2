@@ -17,7 +17,7 @@
 #include <klm/dbobjects/KLMTimeResolution.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 /* ROOT headers. */

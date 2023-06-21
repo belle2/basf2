@@ -81,11 +81,6 @@ namespace Belle2 {
     double m_mapPar[2]; /**< Parameters for neighbour maps.*/
     int m_skipFailedTimeFitDigits; /**< Handling of digits with failed time fits.*/
 
-    /** Other variables. */
-    bool m_isOnlineProcessing{false}; /**< flag for identifying the online processing. */
-
-    int m_tempCRId = -1; /**< Temporary CR ID*/
-
     /** Digit vectors. */
     std::vector <int>  m_cellIdToCheckVec; /**< cellid -> check digit. */
     std::vector <int>  m_cellIdToSeedVec; /**< cellid -> seed digit. */
@@ -107,13 +102,13 @@ namespace Belle2 {
     bool areNeighbours(const int cellid1, const int cellid2, const int maptype);
 
     /** Convert vector of cell ids to 0/1 vectors from 1-8737. */
-    std::vector<int> oneHotVector(std::vector<int> A, const int n);
+    std::vector<int> oneHotVector(std::vector<int>& A, const int n);
 
     /** Convert vector of vectors to one long vector. */
-    std::vector<int> flattenVector(std::vector<std::vector<int>> A);
+    std::vector<int> flattenVector(std::vector<std::vector<int>>& A);
 
     /** Find all lists of cell-ids that share at least one cell. */
-    std::vector<std::set<int>> mergeVectorsUsingSets(std::vector<std::vector<int>> A);
+    std::vector<std::set<int>> mergeVectorsUsingSets(std::vector<std::vector<int>>& A);
 
     /** Get all connected regions. */
     std::vector<std::vector<int>> getConnectedRegions(const std::vector<int>& A, const std::vector<int>& B, const int maptype);

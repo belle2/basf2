@@ -141,9 +141,6 @@ void ECLCRFinderModule::event()
   // Clear the map(s).
   m_cellIdToTempCRIdMap.clear();
 
-  // Init variables.
-  m_tempCRId = 1;
-
   //-------------------------------------------------------
   // fill digits into maps
   for (const auto& eclCalDigit : m_eclCalDigits) {
@@ -168,11 +165,10 @@ void ECLCRFinderModule::event()
         if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
       }
       m_cellIdToDigitVec[cellid] = 1;
-      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed digit' with cellid = " << cellid);
+      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'all digit' with cellid = " << cellid);
 
       // check growth only if they already passed the digit check
       if (std::isgreaterequal(energy, m_energyCut[1])) {
-        if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
         if (!fitfailed
             and energy < m_timeCut_maxEnergy[1]) { //check timing cuts only if we have a good fit and if the energy is below threshold
           if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
@@ -183,7 +179,6 @@ void ECLCRFinderModule::event()
 
         // check seed only if they already passed the growth check
         if (std::isgreaterequal(energy, m_energyCut[0])) {
-          if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
           if (!fitfailed
               and energy < m_timeCut_maxEnergy[0]) { //check timing cuts only if we have a good fit and if the energy is below threshold
             if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
@@ -198,11 +193,13 @@ void ECLCRFinderModule::event()
 
   // we start with seed crystals A and attach all growth crystals B
   std::vector<std::vector<int>> connectedRegions_AB = getConnectedRegions(m_cellIdToSeedVec, m_cellIdToGrowthVec, 0);
-  std::vector<int> AB = oneHotVector(flattenVector(connectedRegions_AB), m_cellIdToSeedVec.size());
+  std::vector<int> connectedRegions_AB_flattened = flattenVector(connectedRegions_AB);
+  std::vector<int> AB = oneHotVector(connectedRegions_AB_flattened, m_cellIdToSeedVec.size());
 
   // Check if any of the growth crystals could grow to other growth crystals
   std::vector<std::vector<int>> connectedRegions_ABB = getConnectedRegions(AB, m_cellIdToGrowthVec, 0);
-  std::vector<int> ABB = oneHotVector(flattenVector(connectedRegions_ABB), AB.size());
+  std::vector<int> connectedRegions_ABB_flattened = flattenVector(connectedRegions_ABB);
+  std::vector<int> ABB = oneHotVector(connectedRegions_ABB_flattened, AB.size());
 
   // and finally: attach all normal digits
   std::vector<std::vector<int>> connectedRegions_ABBC = getConnectedRegions(ABB, m_cellIdToDigitVec, 0);
@@ -211,13 +208,14 @@ void ECLCRFinderModule::event()
   std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingSets(connectedRegions_ABBC);
 
   // // format must be a vector of cellid -> CR
-  // unsigned int id = 0;
-  // for (auto xcr : connectedRegionsMerged_ABBC_sets) {
-  //     for (int x : xcr) {
-  //       std::cout << x << " -> " << id << " " << m_cellIdToSeedVec[x]<< " " << m_cellIdToGrowthVec[x]<< " " << m_cellIdToDigitVec[x] << std::endl;
-  //     }
-  //   id++;
-  // }
+  unsigned int id = 0;
+  for (auto xcr : connectedRegionsMerged_ABBC_sets) {
+    for (int x : xcr) {
+      std::cout << x << " -> " << id << " " << m_cellIdToSeedVec[x] << " " << m_cellIdToGrowthVec[x] << " " << m_cellIdToDigitVec[x] <<
+                " " << std::endl;
+    }
+    id++;
+  }
 
   // Create CRs and add relations to digits.
   unsigned int connectedRegionID = 0;
@@ -228,6 +226,7 @@ void ECLCRFinderModule::event()
 
     // Set CR ID
     aCR->setCRId(connectedRegionID);
+    connectedRegionID++;
 
     // Add all digits
     for (int x : xcr) {
@@ -261,7 +260,7 @@ bool ECLCRFinderModule::areNeighbours(const int cellid1, const int cellid2, cons
   return false;
 }
 
-std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>> A)
+std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>& A)
 {
   std::vector<int> C;
   for (const auto& B : A) {
@@ -272,7 +271,7 @@ std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>> 
   return C;
 }
 
-std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int> A, const int n)
+std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int>& A, const int n)
 {
   std::vector<int> C(n, 0);
   for (int x : A) {
@@ -283,7 +282,7 @@ std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int> A, const int n
   return C;
 }
 
-std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingSets(std::vector<std::vector<int>> A)
+std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingSets(std::vector<std::vector<int>>& A)
 {
 
   // Make empty list of sets "output"

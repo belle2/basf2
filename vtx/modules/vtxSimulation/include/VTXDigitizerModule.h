@@ -85,11 +85,7 @@ namespace Belle2 {
 
     /** The VTX Digitizer module.
      * This module is responsible for converting the simulated energy
-     * deposition from Geant4 into real VTX detector response of single pixles.
-     * This is a much simplified version from the PXDDigitizer.
-     * TODO: Include Lorentz shift
-     * TODO: Not full thickness is depleted
-     * TODO: Charge sharing by diffusion
+     * deposition from Geant4 into real VTX detector response of single pixels.
      */
     class VTXDigitizerModule : public Module {
     public:
@@ -142,6 +138,20 @@ namespace Belle2 {
       std::string m_relTrueHitSimHitName;
       /** Name of the relation between VTXDigits and VTXTrueHits */
       std::string m_relDigitTrueHitName;
+      /** Flag for using ToT calibration curve*/
+      bool m_use_tot_calibration;
+      /** ToT calibration coefficient a: y = a*x + b - c/(x-t)*/
+      float m_tot_calibration_a;
+      /** ToT calibration coefficient b: y = a*x + b - c/(x-t)*/
+      float m_tot_calibration_b;
+      /** ToT calibration coefficient c: y = a*x + b - c/(x-t)*/
+      float m_tot_calibration_c;
+      /** ToT calibration coefficient t: y = a*x + b - c/(x-t)*/
+      float m_tot_calibration_t;
+      /** Charge collection efficiency. Fraction of deposited charge that is collected*/
+      float m_cce;
+      /** ToT to DAC conversion factor*/
+      float m_tot2dac;
 
       /** Structure containing all existing sensors */
       Sensors m_sensors;

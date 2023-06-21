@@ -52,6 +52,15 @@ VTXDigitizerModule::VTXDigitizerModule() :
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name", string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name", string(""));
+  addParam("UseToTCalibration", m_use_tot_calibration, "Apply ToT calibration", false);
+  addParam("ToT2DAC", m_tot2dac, "ToT to DAC conversion factor", float(10.1));
+  addParam("ToTCoefficient_a", m_tot_calibration_a, "ToT calibration coefficient a: ToT = a*Q + b - c/(Q-t) ", float(0.118));
+  addParam("ToTCoefficient_b", m_tot_calibration_b, "ToT calibration coefficient b: ToT = a*Q + b - c/(Q-t) ", float(1.3));
+  addParam("ToTCoefficient_c", m_tot_calibration_c, "ToT calibration coefficient c: ToT = a*Q + b - c/(Q-t) ", float(1.4e2));
+  addParam("ToTCoefficient_t", m_tot_calibration_t, "ToT calibration coefficient t: ToT = a*Q + b - c/(Q-t) ", float(4e1));
+  addParam("ChargeCollectionEfficiency", m_cce, "Fraction CE of deposited charge that is collected", float(1.0));
+
+
 
   m_currentSensor = nullptr;
 }
@@ -397,8 +406,8 @@ void VTXDigitizerModule::saveDigits()
       const DigitValue& v = digitAndValue.second;
 
       // Check if the readout digit is coming from a masked or dead area
-      // if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
-      //     || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
+      // if (VTX::VTXPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
+      //     || !VTX::VTXPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
       //   continue;
       // }
 
@@ -410,15 +419,22 @@ void VTXDigitizerModule::saveDigits()
         if (charge < info.getBinaryHitThreshold()) continue;
         else charge = 1.0;
       } else {
-        // Remove threshold for value of TOT
-        charge -= m_chargeThreshold * info.getElectronToADU();
+        if (m_use_tot_calibration) {
+          // Apply ToT testbeam calibration
+          double charge_dac = m_cce * charge / m_tot2dac;
+          double y = m_tot_calibration_a * charge_dac + m_tot_calibration_b - m_tot_calibration_c / (charge_dac - m_tot_calibration_t);
+          if (y < 0 || charge <= info.getBinaryHitThreshold()) charge = 0;
+          else charge = y;
+        } else {
+          // Remove threshold in electrons
+          charge -= info.getChargeThreshold() * info.getElectronToADU();
 
-        // Check if under threshold
-        if (charge < 0) continue;
+          // Check if under threshold
+          if (charge < 0) continue;
 
-        // Amplifiy and digitize charge
-        charge = round(charge / info.getElectronToADU());
-
+          // Amplifiy and digitize charge
+          charge = round(charge / info.getElectronToADU());
+        }
         // Clipping of ADC codes
         charge = (int) charge % (int) info.getMaxADUCode();
       }

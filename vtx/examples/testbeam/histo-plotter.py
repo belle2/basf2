@@ -25,18 +25,19 @@ from plots.efficiency import plot_super_inpix as efficiencyPlotSuperInpix
 
 import argparse
 parser = argparse.ArgumentParser(description="Perform plotting of test beam runs")
-parser.add_argument('--ifile', dest='ifile', default='*', type=str, help='Input file pattern of runs to process')
+parser.add_argument('--ifile', dest='ifile', default='', type=str, help='Input file of run to process')
+parser.add_argument('--ofile', dest='ofile', default='', type=str, help='Output file pattern of runs')
 args = parser.parse_args()
 
 
 # Define ucell_axis & vcell_axis
 u_axis_min = 0
 v_axis_min = 0
-u_axis_max = 450
-v_axis_max = 3330
+u_axis_max = 546
+v_axis_max = 3640
 
-pitch_u = 0.04
-pitch_v = 0.036
+pitch_u = 0.033
+pitch_v = 0.033
 
 # Every plotting axis is given as a tuple (nbins,min,max)
 DUTConfig = {'pitch_u':          pitch_u,              # in mm
@@ -59,7 +60,19 @@ for inputfilename in glob.glob(args.ifile):
     inputfile = ROOT.TFile(inputfilename, 'READ')
 
     # Create one histofile per run
-    histofile = ROOT.TFile('Plotter-' + os.path.basename(inputfilename), 'RECREATE', 'Histos created from file ' + inputfilename)
+    if args.ofile == "":
+        histofile = ROOT.TFile(
+            'Plotter-' +
+            os.path.basename(inputfilename),
+            'RECREATE',
+            'Histos created from file ' +
+            inputfilename)
+    else:
+        histofile = ROOT.TFile(
+            args.ofile,
+            'RECREATE',
+            'Histos created from file ' +
+            inputfilename)
 
     # Add residual plots
     residualsPlot(inputfile, histofile, basecut="hasTrack==0", Config=DUTConfig)

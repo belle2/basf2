@@ -171,6 +171,9 @@
   <DetectorComponent name="VTX-CMOS-testbeam-2020-03-12" isDefault="false">
     <xi:include href="../vtx/VTX-testbeam-2020-03-12.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-testbeam-2022-07-01" isDefault="false">
+    <xi:include href="../vtx/VTX-testbeam-2022-07-01.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
 
   <!-- CDC without SL0 -->
   <DetectorComponent name="CDCReduced" isDefault="false">

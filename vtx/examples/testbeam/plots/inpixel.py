@@ -5,10 +5,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-from ROOT import TFile, TH1F, TH2F
-from ROOT import gROOT, Double, TCut
+from ROOT import TH1F, TH2F
 import numpy
-import math
 
 
 def plot(inputfile=None, histofile=None, uaxis=(10, 0, 0), vaxis=(10, 0, 0)):

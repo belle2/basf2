@@ -3,8 +3,8 @@
 Particles
 =========
 
-Particles in basf2 are created from reconstructed dataobjects: Tracks, tracking vertices (V0s), ECLClusters, and KLMClusters. 
-The `Particle`_ class, provides a unified way to treat different objects at a high level interpreting them as phsical particles.
+Particles in basf2 are created from reconstructed dataobjects: Tracks, tracking vertices (V0s), ECLClusters, and KLMClusters.
+The `Particle`_ class, provides a unified way to treat different objects at a high level interpreting them as physical particles.
 All of the `Particle`_ s in an event that fall within certain criteria are collected into `ParticleList`_ s.
 
 The Belle II physics performance group already has several predefined `ParticleList`_ s.

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # disable doxygen check for this file
 # @cond
 
@@ -347,7 +345,7 @@ def read_Combined_data(outputDir):
     """
 
     arr = []
-    with open(outputDir + '/finalEcmsCalib.txt', "r") as text_file:
+    with open(outputDir + '/finalEcmsCalib.txt') as text_file:
         for i, ll in enumerate(text_file):
             if i == 0:
                 continue
@@ -375,7 +373,7 @@ def read_Bonly_data(outputDir):
     """
 
     arr = []
-    with open(outputDir + '/BonlyEcmsCalib.txt', "r") as text_file:
+    with open(outputDir + '/BonlyEcmsCalib.txt') as text_file:
         for i, ll in enumerate(text_file):
             if i == 0:
                 continue
@@ -395,7 +393,7 @@ def read_mumu_data(outputDir):
     """
 
     arr = []
-    with open(outputDir + '/mumuEcalib.txt', "r") as text_file:
+    with open(outputDir + '/mumuEcalib.txt') as text_file:
         for i, ll in enumerate(text_file):
             if i == 0:
                 continue
@@ -747,3 +745,5 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
 if __name__ == "__main__":
     run_validation(*sys.argv[1:])
+
+# @endcond

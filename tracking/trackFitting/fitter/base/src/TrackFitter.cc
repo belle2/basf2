@@ -93,7 +93,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
       } else {
         std::vector<double> weights = kalmanFitterInfo->getWeights();
         for (const double weight : weights) {
-          if (weight == 0) {
+          if (weight < 1.e-9) {
             recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
           }
         }

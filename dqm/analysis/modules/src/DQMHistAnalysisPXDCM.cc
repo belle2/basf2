@@ -38,7 +38,6 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
 
   addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 2.0);
@@ -56,7 +55,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -118,7 +117,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     mychid.resize(3);
     SEVCHK(ca_create_channel((m_pvPrefix + "Status_Adhoc").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
@@ -245,7 +244,7 @@ void DQMHistAnalysisPXDCMModule::event()
           }
           m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
 #ifdef _BELLE2_EPICS
-          if (m_useEpics) {
+          if (getUseEpics()) {
             auto my = mychid_mean[m_PXDModules[i]];
             if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
           }
@@ -280,7 +279,7 @@ void DQMHistAnalysisPXDCMModule::event()
       }
     }
 #ifdef _BELLE2_EPICS
-    if (m_useEpics && anyupdate) {
+    if (getUseEpics() && anyupdate) {
       double dataoutside = all > 0 ? (all_outside / all) : 0;
       double datacm = all > 0 ? (all_cm / all) : 0;
       SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status_adhoc), "ca_set failure");
@@ -312,7 +311,7 @@ void DQMHistAnalysisPXDCMModule::terminate()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
     for (auto& m : mychid_mean) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

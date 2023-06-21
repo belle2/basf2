@@ -130,7 +130,7 @@ void FillTrackFitNtupleModule::event()
       if (isnan(chi2)) chi2 = -10;
       if (isinf(chi2)) chi2 = -20;
       trk_chi2[pdgIter] =  chi2;
-      trk_ndf[pdgIter] =  recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(pdgIter.getPDGCode()))->getNdf();
+      trk_ndf[pdgIter] =  fitResult->getNDF();
       trk_pvalue[pdgIter] =  fitResult->getPValue();
       trk_nfailed[pdgIter] = recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(
                                                             pdgIter.getPDGCode()))->getNFailedPoints();

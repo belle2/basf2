@@ -8,15 +8,15 @@
 
 #pragma once
 
-//STL
-#include <string>
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-//ECL
-#include <ecl/utility/ECLChannelMapper.h>
+/* C++ headers. */
+#include <string>
 
 class TApplication;
 class TFile;

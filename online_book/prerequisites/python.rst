@@ -403,7 +403,6 @@ tools for Python, see `here
 You can load in an example file using the ``open`` function from the ``uproot`` package.
 
 .. code:: ipython3
-  :linenos:
 
   file_path = "https://rebrand.ly/00vvyzg"
   file = uproot.open(file_path)
@@ -733,7 +732,6 @@ reconstructed. Now we will use these candidates to plot example
 distributions. We use the ``uproot`` package to read the data
 
 .. code:: ipython3
-  :linenos:
 
   import uproot
 
@@ -797,7 +795,6 @@ figure ``fig`` and axes ``ax``.
 These are the equivalent of our canvas where we paint our code art.
 
 .. code:: ipython3
-  :linenos:
 
   # Here we set up the "canvas" to show two plots side by side
   fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
@@ -843,7 +840,6 @@ These are the equivalent of our canvas where we paint our code art.
   yourself.
 
   .. code:: ipython3
-    :linenos:
 
     fig, ax = plt.subplots(1,2,figsize=(10,6))
 
@@ -869,7 +865,6 @@ These are the equivalent of our canvas where we paint our code art.
 The implementation of 2D histograms are often very useful and are easily done:
 
 .. code:: ipython3
-  :linenos:
 
   plt.figure(figsize=(15,10))
   cut = '(B0_mbc>5.2) & (B0_phi_M<1.1)'

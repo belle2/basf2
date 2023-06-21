@@ -14,6 +14,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dbobjects/KLMTimeResolution.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
@@ -181,6 +182,24 @@ namespace Belle2 {
      */
     std::pair<int, double> tS_lowerStrip(const KLMChannelIndex& klmChannel);
 
+    /**
+    * Estimate value of calibration constant for calibrated channels.
+    * @param[in] klmChannel KLM channel index.
+    */
+    double esti_timeRes(const KLMChannelIndex& klmChannel);
+
+    /**
+     * Tracing avaiable channels with increasing strip number.
+     * @param[in] klmChannel KLM channel index.
+     */
+    std::pair<int, double> tR_upperStrip(const KLMChannelIndex& klmChannel);
+
+    /**
+     * Tracing avaiable channels with decreasing strip number.
+     * @param[in] klmChannel KLM channel index.
+     */
+    std::pair<int, double> tR_lowerStrip(const KLMChannelIndex& klmChannel);
+
 
   protected:
 
@@ -261,14 +280,23 @@ namespace Belle2 {
      */
     std::map<KLMChannelNumber, int> m_cFlag;
 
-    /** Shift values of ecah channel. */
+    /** Shift values of each channel. */
     std::map<KLMChannelNumber, double> m_timeShift;
+
+    /** Resolution values of each channel. */
+    std::map<KLMChannelNumber, double> m_timeRes;
 
     /** Time distribution central value of each channel. */
     std::map<KLMChannelNumber, double> m_time_channel;
 
     /** Time distribution central value Error of each channel. */
     std::map<KLMChannelNumber, double> m_etime_channel;
+
+    /** Calibrated time distribution central value of each channel. */
+    std::map<KLMChannelNumber, double> m_ctime_channel;
+
+    /** Calibrated time distribution central value Error of each channel. */
+    std::map<KLMChannelNumber, double> mc_etime_channel;
 
     /** Lower time boundary for RPC. */
     double m_LowerTimeBoundaryRPC = -10.0;
@@ -295,16 +323,16 @@ namespace Belle2 {
     double m_UpperTimeBoundaryCalibratedRPC = 40.0;
 
     /** Lower time boundary for BKLM scintillators (calibrated data). */
-    double m_LowerTimeBoundaryCalibratedScintilltorsBKLM = -20.0;
+    double m_LowerTimeBoundaryCalibratedScintilltorsBKLM = -40.0;
 
     /** Upper time boundary for BKLM scintillators (calibrated data). */
-    double m_UpperTimeBoundaryCalibratedScintilltorsBKLM = 20.0;
+    double m_UpperTimeBoundaryCalibratedScintilltorsBKLM = 40.0;
 
     /** Lower time boundary for EKLM scintillators (calibrated data). */
-    double m_LowerTimeBoundaryCalibratedScintilltorsEKLM = -20.0;
+    double m_LowerTimeBoundaryCalibratedScintilltorsEKLM = -40.0;
 
     /** Upper time boundary for BKLM scintillators (calibrated data). */
-    double m_UpperTimeBoundaryCalibratedScintilltorsEKLM = 20.0;
+    double m_UpperTimeBoundaryCalibratedScintilltorsEKLM = 40.0;
 
     /** Central value of the global time distribution (BKLM RPC part). */
     double m_time_channelAvg_rpc = 0.0;
@@ -313,26 +341,42 @@ namespace Belle2 {
     double m_etime_channelAvg_rpc = 0.0;
 
     /**
-     * Central value of the global time distribution (BKLM scintillator part).
-     */
+     * Central value of the global time distribution (BKLM scintillator part).*/
     double m_time_channelAvg_scint = 0.0;
 
     /**
-     * Central value error of the global time distribution
-     * (BKLM scintillator part).
-     */
+     * Central value error of the global time distribution (BKLM scintillator part).*/
     double m_etime_channelAvg_scint = 0.0;
 
     /**
-     * Central value of the global time distribution (EKLM scintillator part).
-     */
+     * Central value of the global time distribution (EKLM scintillator part).*/
     double m_time_channelAvg_scint_end = 0.0;
 
     /**
-     * Central value error of the global time distribution
-     * (EKLM scintillator part).
-     */
+     * Central value error of the global time distribution (EKLM scintillator part).*/
     double m_etime_channelAvg_scint_end = 0.0;
+
+    /** Calibrated central value of the global time distribution (BKLM RPC part). */
+    double m_ctime_channelAvg_rpc = 0.0;
+
+    /** Calibrated central value error of the global time distribution (BKLM RPC part). */
+    double mc_etime_channelAvg_rpc = 0.0;
+
+    /**
+     * Calibrated central value of the global time distribution (BKLM scintillator part).*/
+    double m_ctime_channelAvg_scint = 0.0;
+
+    /**
+     * Calibrated central value error of the global time distribution (BKLM scintillator part).*/
+    double mc_etime_channelAvg_scint = 0.0;
+
+    /**
+     * Calibrated central value of the global time distribution (EKLM scintillator part).*/
+    double m_ctime_channelAvg_scint_end = 0.0;
+
+    /**
+     * Calibrated central value error of the global time distribution (EKLM scintillator part).*/
+    double mc_etime_channelAvg_scint_end = 0.0;
 
     /** Minimal digit number (total). */
     int m_MinimalDigitNumber = 100000000;
@@ -364,6 +408,9 @@ namespace Belle2 {
      */
     KLMTimeCableDelay* m_timeCableDelay = nullptr;
 
+    /** DBObject of time resolution. */
+    KLMTimeResolution* m_timeResolution = nullptr;
+
     /** Debug mode. */
     bool m_debug = false;
 
@@ -375,6 +422,9 @@ namespace Belle2 {
 
     /** Calibration statistics for each channel. */
     TH1I* h_calibrated = nullptr;
+
+    /** Calibration statistics for each channel. */
+    TH1I* hc_calibrated = nullptr;
 
     /** Distance between global and local position. */
     TH1F* h_diff = nullptr;
@@ -390,6 +440,17 @@ namespace Belle2 {
     /** EKLM. */
     TGraphErrors* gre_time_channel_scint_end = nullptr;
 
+    /* Monitor graphs of peak value of calibrated time distribution for each channel. */
+
+    /** BKLM RPC. */
+    TGraphErrors* gre_ctime_channel_rpc = nullptr;
+
+    /** BKLM Scintillator. */
+    TGraphErrors* gre_ctime_channel_scint = nullptr;
+
+    /** EKLM. */
+    TGraphErrors* gre_ctime_channel_scint_end = nullptr;
+
     /* Monitor graphs of calibration constant value of each channel. */
 
     /** BKLM RPC. */
@@ -400,6 +461,17 @@ namespace Belle2 {
 
     /** EKLM */
     TGraph* gr_timeShift_channel_scint_end = nullptr;
+
+    /* Monitor graphs of calibrated time resolution value of each channel. */
+
+    /** BKLM RPC. */
+    TGraph* gr_timeRes_channel_rpc = nullptr;
+
+    /** BKLM scintillator. */
+    TGraph* gr_timeRes_channel_scint = nullptr;
+
+    /** EKLM */
+    TGraph* gr_timeRes_channel_scint_end = nullptr;
 
     /* Profiles used for effective light speed estimation. */
 
@@ -679,3 +751,4 @@ namespace Belle2 {
   };
 
 }
+

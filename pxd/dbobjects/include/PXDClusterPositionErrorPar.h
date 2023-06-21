@@ -31,7 +31,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    PXDClusterPositionErrorPar(int nBinsU = 1, int nBinsV = 3, int maxSize = 8, float defaultValue = 0.0, float factorSensorEdge = 1.0,
+    PXDClusterPositionErrorPar(unsigned short nBinsU = 1, unsigned short nBinsV = 3, unsigned short maxSize = 8,
+                               float defaultValue = 0.0, float factorSensorEdge = 1.0,
                                float factorLadderJoint = 1.0, float factorDeadNeighbour = 1.0) :
       m_nBinsU(nBinsU), m_nBinsV(nBinsV), m_maxSize(maxSize), m_defaultValue(defaultValue), m_factorSensorEdge(factorSensorEdge),
       m_factorLadderJoint(factorLadderJoint), m_factorDeadNeighbour(factorDeadNeighbour), m_clusterPositionErrorMap() {}
@@ -161,13 +162,13 @@ namespace Belle2 {
   private:
 
     /** Number of bins per sensor along u side */
-    int m_nBinsU;
+    unsigned short m_nBinsU;
 
     /** Number of bins per sensor along v side */
-    int m_nBinsV;
+    unsigned short m_nBinsV;
 
     /** Maximum cluster size */
-    int m_maxSize;
+    unsigned short m_maxSize;
 
     /** Default value for map */
     float m_defaultValue;
@@ -184,6 +185,6 @@ namespace Belle2 {
     /** Map for holding the cluster position errors for all PXD sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, std::vector<float> > m_clusterPositionErrorMap;
 
-    ClassDef(PXDClusterPositionErrorPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDClusterPositionErrorPar, 3);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

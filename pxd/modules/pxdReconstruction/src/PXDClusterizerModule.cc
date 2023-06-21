@@ -360,9 +360,11 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     calculatePositionError(cls, projV, projU, info.getVPitch(projV.getMinPos()), pitchV, info.getVPitch(projV.getMaxPos()));
 
     if (m_errorFromDB) { // Overwrite cluster position error with value from DB (keep the above calculation untouched for now)
-      assignPositionErrorFromDB(projU, **m_clusterPositionErrorUPar, sensorID, projU.getPos(),  projV.getPos(), pitchU,
+      unsigned int uID = info.getUCellID(projU.getPos());
+      unsigned int vID = info.getVCellID(projV.getPos());
+      assignPositionErrorFromDB(projU, **m_clusterPositionErrorUPar, sensorID, uID, vID, pitchU,
                                 PXD::isClusterAtUEdge(sensorID, projU.getMinCell(), projU.getMaxCell()));
-      assignPositionErrorFromDB(projV, **m_clusterPositionErrorVPar, sensorID, projU.getPos(),  projV.getPos(), pitchV,
+      assignPositionErrorFromDB(projV, **m_clusterPositionErrorVPar, sensorID, uID, vID, pitchV,
                                 PXD::isClusterAtVEdge(sensorID, projV.getMinCell(), projV.getMaxCell()),
                                 PXD::isClusterAtLadderJoint(sensorID, projV.getMinCell(), projV.getMaxCell()));
     }
@@ -447,16 +449,16 @@ void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary,
                                                      bool isAtEdge, bool isAtJoint, bool isAdjacentDead)
 {
   // Get bins from cell ID
-  int uBin = PXD::getBinU(sensorID, uCell, vCell, errorPar.getBinsU());
-  int vBin = PXD::getBinV(sensorID, vCell, errorPar.getBinsV());
+  unsigned short uBin = PXD::getBinU(sensorID, uCell, vCell, errorPar.getBinsU());
+  unsigned short vBin = PXD::getBinV(sensorID, vCell, errorPar.getBinsV());
   // Get error from DB [in units of pix]
-  double error = errorPar.getContent(sensorID, uBin, vBin, primary.getSize());
+  double error = errorPar.getContent(sensorID.getID(), uBin, vBin, primary.getSize());
   // Apply additional factor if at sensor edges or adjacent to daed rows/colums
   // (N.B. payload may not yet contain the corresponding values and simply set to 1)
-  //if (isAtEdge)       error *= errorPar.getSensorEdgeFactor();
-  //if (isAtJoint)      error *= errorPar.getLadderJointFactor();
-  //if (isAdjacentDead) error *= errorPar.getDeadNeighbourFactor();
+  if (isAtEdge)       error *= errorPar.getSensorEdgeFactor();
+  if (isAtJoint)      error *= errorPar.getLadderJointFactor();
+  if (isAdjacentDead) error *= errorPar.getDeadNeighbourFactor();
   // Set error (convert to [um])
-  primary.setError(error * centerPitch);
+  if (error) primary.setError(error * centerPitch); // zero means default values to use analytic error
 
 }

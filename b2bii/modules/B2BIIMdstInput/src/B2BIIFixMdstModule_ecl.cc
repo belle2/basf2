@@ -993,10 +993,9 @@ namespace Belle2 {
                     + (pbuf * pbuf * pbuf * error[3]) * (pbuf * pbuf * pbuf * error[3]);
     eresol = sqrt(eresol) / 1000.;
 
-    //     dout(Debugout::INFO,"B2BIIFixMdst_ecl") <<" theta="<<theta<<" p="<<pbuf
-    //     <<" para="<< para[0]<<", "<< para[1]<<", "
-    //     << para[2]<<", "<<para[3]
-    //     <<" resol="<<resol<<" er="<<eresol<<std::endl;
+    B2DEBUG(19, "B2BIIFixMdst_ecl" << LogVar("theta", theta) << LogVar("p", pbuf)
+            << LogVar("para0", para[0]) << LogVar("para1", para[1]) << LogVar("para2", para[2]) << LogVar("para3", para[3])
+            << LogVar("resol", resol) << LogVar("er", eresol));
     return resol;
   }
 // Following lines were commented out, because asymmetric line shape is
@@ -1617,7 +1616,7 @@ namespace Belle2 {
         if (0.0 < low_limit || up_limit < 0.0) {
           B2ERROR("option=2 was selected. ");
           B2ERROR("Invalid mass window! " << low_limit);
-          B2ERROR(" sould be negative, or " << up_limit);
+          B2ERROR(" should be negative, and " << up_limit);
           B2ERROR(" should be positive.");
           return;
         }

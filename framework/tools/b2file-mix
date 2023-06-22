@@ -199,7 +199,7 @@ if __name__ == "__main__":
         if (curr_time-last_time) > 2 and evt >= 10:
             elapsed = curr_time - start
             eta = (elapsed/evt)*(total_events-evt)
-            basf2.B2INFO(f"{evt:{{len}}d}/{total_events} events done ({100 * evt / total_events:5.2f}%), approx {eta:.0f} seconds remaining")
+            basf2.B2INFO(f"{evt:{total_events_len}d}/{total_events} events done ({100 * evt / total_events:5.2f}%), approx {eta:.0f} seconds remaining")
             last_time = curr_time
 
     low = (9999, 9999, 99999)

@@ -116,6 +116,68 @@ void SVDDQMHitTimeModule::defineHisto()
   m_SVD6EventT0->GetXaxis()->SetTitle("SVD EventT0 time (ns)");
   m_SVD6EventT0->GetYaxis()->SetTitle("count");
 
+  m_SVD3EventT0_bhabha_L1_ECLTRG = new TH1F("SVD3EventT0_bhabha_L1_ECLTRG",
+                                            "SVD EventT0 3 samples : bhabhas, ECLTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD3EventT0_bhabha_L1_ECLTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD3EventT0_hadron_L1_ECLTRG = new TH1F("SVD3EventT0_hadron_L1_ECLTRG",
+                                            "SVD EventT0 3 samples : hadrons, ECLTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD3EventT0_hadron_L1_ECLTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD3EventT0_mumu_L1_ECLTRG = new TH1F("SVD3EventT0_mumu_L1_ECLTRG",
+                                          "SVD EventT0 3 samples : mumus, ECLTRG time",
+                                          nBins, minT0, maxT0);
+  m_SVD3EventT0_mumu_L1_ECLTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD3EventT0_bhabha_L1_CDCTRG = new TH1F("SVD3EventT0_bhabha_L1_CDCTRG",
+                                            "SVD EventT0 3 samples : bhabhas, CDCTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD3EventT0_bhabha_L1_CDCTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD3EventT0_hadron_L1_CDCTRG = new TH1F("SVD3EventT0_hadron_L1_CDCTRG",
+                                            "SVD EventT0 3 samples : hadrons, CDCTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD3EventT0_hadron_L1_CDCTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD3EventT0_mumu_L1_CDCTRG = new TH1F("SVD3EventT0_mumu_L1_CDCTRG",
+                                          "SVD EventT0 3 samples : mumus, CDCTRG time",
+                                          nBins, minT0, maxT0);
+  m_SVD3EventT0_mumu_L1_CDCTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+
+
+  m_SVD6EventT0_bhabha_L1_ECLTRG = new TH1F("SVD6EventT0_bhabha_L1_ECLTRG",
+                                            "SVD EventT0 6 samples : bhabhas, ECLTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD6EventT0_bhabha_L1_ECLTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD6EventT0_hadron_L1_ECLTRG = new TH1F("SVD6EventT0_hadron_L1_ECLTRG",
+                                            "SVD EventT0 6 samples : hadrons, ECLTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD6EventT0_hadron_L1_ECLTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD6EventT0_mumu_L1_ECLTRG = new TH1F("SVD6EventT0_mumu_L1_ECLTRG",
+                                          "SVD EventT0 6 samples : mumus, ECLTRG time",
+                                          nBins, minT0, maxT0);
+  m_SVD6EventT0_mumu_L1_ECLTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD6EventT0_bhabha_L1_CDCTRG = new TH1F("SVD6EventT0_bhabha_L1_CDCTRG",
+                                            "SVD EventT0 6 samples : bhabhas, CDCTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD6EventT0_bhabha_L1_CDCTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD6EventT0_hadron_L1_CDCTRG = new TH1F("SVD6EventT0_hadron_L1_CDCTRG",
+                                            "SVD EventT0 6 samples : hadrons, CDCTRG time",
+                                            nBins, minT0, maxT0);
+  m_SVD6EventT0_hadron_L1_CDCTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
+  m_SVD6EventT0_mumu_L1_CDCTRG = new TH1F("SVD6EventT0_mumu_L1_CDCTRG",
+                                          "SVD EventT0 6 samples : mumus, CDCTRG time",
+                                          nBins, minT0, maxT0);
+  m_SVD6EventT0_mumu_L1_CDCTRG->GetXaxis()->SetTitle("SVD EventT0 (ns)");
+
   oldDir->cd();
 
 }
@@ -157,6 +219,20 @@ void SVDDQMHitTimeModule::beginRun()
   m_SVDEventT0->Reset();
   m_SVD3EventT0->Reset();
   m_SVD6EventT0->Reset();
+
+  m_SVD3EventT0_bhabha_L1_ECLTRG->Reset();
+  m_SVD3EventT0_hadron_L1_ECLTRG->Reset();
+  m_SVD3EventT0_mumu_L1_ECLTRG->Reset();
+  m_SVD3EventT0_bhabha_L1_CDCTRG->Reset();
+  m_SVD3EventT0_hadron_L1_CDCTRG->Reset();
+  m_SVD3EventT0_mumu_L1_CDCTRG->Reset();
+
+  m_SVD6EventT0_bhabha_L1_ECLTRG->Reset();
+  m_SVD6EventT0_hadron_L1_ECLTRG->Reset();
+  m_SVD6EventT0_mumu_L1_ECLTRG->Reset();
+  m_SVD6EventT0_bhabha_L1_CDCTRG->Reset();
+  m_SVD3EventT0_hadron_L1_CDCTRG->Reset();
+  m_SVD6EventT0_mumu_L1_CDCTRG->Reset();
 }
 
 
@@ -256,6 +332,55 @@ void SVDDQMHitTimeModule::event()
       m_SVD3EventT0->Fill(svdEventT0);
     } else  {
       m_SVD6EventT0->Fill(svdEventT0);
+    }
+
+    if (Is_ECL_L1TriggerSource) {
+      if (IsEvtAcceptedBhabha) {
+        if (nSamples == 3) {
+          m_SVD3EventT0_bhabha_L1_ECLTRG->Fill(svdEventT0);
+        } else {
+          m_SVD6EventT0_bhabha_L1_ECLTRG->Fill(svdEventT0);
+        }
+      }
+      if (IsEvtAcceptedHadron) {
+        if (nSamples == 3) {
+          m_SVD3EventT0_hadron_L1_ECLTRG->Fill(svdEventT0);
+        } else {
+          m_SVD6EventT0_hadron_L1_ECLTRG->Fill(svdEventT0);
+        }
+      }
+      if (IsEvtAcceptedMumu) {
+        if (nSamples == 3) {
+          m_SVD3EventT0_mumu_L1_ECLTRG->Fill(svdEventT0);
+        } else {
+          m_SVD6EventT0_mumu_L1_ECLTRG->Fill(svdEventT0);
+        }
+      }
+    }
+
+    // Fill the plots that used the CDC trigger as the L1 timing source
+    else if (Is_CDC_L1TriggerSource) {
+      if (IsEvtAcceptedBhabha) {
+        if (nSamples == 3) {
+          m_SVD3EventT0_bhabha_L1_CDCTRG->Fill(svdEventT0);
+        } else {
+          m_SVD6EventT0_bhabha_L1_CDCTRG->Fill(svdEventT0);
+        }
+      }
+      if (IsEvtAcceptedHadron) {
+        if (nSamples == 3) {
+          m_SVD3EventT0_hadron_L1_CDCTRG->Fill(svdEventT0);
+        } else {
+          m_SVD6EventT0_hadron_L1_CDCTRG->Fill(svdEventT0);
+        }
+      }
+      if (IsEvtAcceptedMumu) {
+        if (nSamples == 3) {
+          m_SVD3EventT0_mumu_L1_CDCTRG->Fill(svdEventT0);
+        } else {
+          m_SVD6EventT0_mumu_L1_CDCTRG->Fill(svdEventT0);
+        }
+      }
     }
   }
 

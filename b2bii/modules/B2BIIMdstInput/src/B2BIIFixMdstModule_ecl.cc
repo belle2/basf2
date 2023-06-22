@@ -2179,7 +2179,6 @@ namespace Belle2 {
           //const double pull     = residual / dmass;
           if (it >= iter_max ||
               mass < low_default || mass > up_default) {
-            it = -it;
             //sdev = (dmass > 0.0) ? pull : -100;
             break;
           }

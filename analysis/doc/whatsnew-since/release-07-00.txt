@@ -33,6 +33,11 @@ Command line tools
 * The command line tool :ref:`b2help-variables <b2help-variables>` is extended to get a description of specific variables and to
   display only their data.
 
+FEI
++++
+* Since the gamma cuts for Belle II inside FEI are loosened starting this release, the FEI calibration performed with MC15ri are not valid anymore
+  if FEI is reconstructed with this release or later. So, either use FEI skims (recommended), or run FEI with an older releases until new FEI
+  calibration with MC16 will be available.
 
 Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------

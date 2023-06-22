@@ -82,6 +82,7 @@ main.add_module('SetupGenfitExtrapolation')
 main.add_module('TrackFinderMCTruthRecoTracks', RecoTracksStoreArrayName='RecoTracks',
                 UseSecondCDCHits=False, UsePXDHits=True, UseSVDHits=True, UseCDCHits=True)
 main.add_module('TrackCreator', recoTrackColName='RecoTracks',  pdgCodes=[211, 321, 2212])
+main.add_module('TrackToMCParticleRelator')
 main.add_module('Ext')
 main.add_module('ARICHFillHits')
 main.add_module('ARICHReconstructor', storePhotons=1)

@@ -84,6 +84,7 @@ void BaseRecoFitterModule::event()
   unsigned int recoTrackCounter = 0;
 
   for (RecoTrack& recoTrack : m_recoTracks) {
+
     if (recoTrack.getNumberOfTotalHits() < 3) {
       B2WARNING("Genfit2Module: only " << recoTrack.getNumberOfTotalHits() << " were assigned to the Track! " <<
                 "This Track will not be fitted!");
@@ -99,8 +100,12 @@ void BaseRecoFitterModule::event()
     B2DEBUG(29, "Charge: " << recoTrack.getChargeSeed());
     B2DEBUG(29, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
+
+
+    bool flippedCharge = false;
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
       bool wasFitSuccessful;
+
       if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
         Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
@@ -109,11 +114,13 @@ void BaseRecoFitterModule::event()
         if (wasFitSuccessful) { // charge flipping
           // If the charge after the fit (cardinal rep) is different from the seed charge,
           // we change the charge seed and refit the track
-          if (recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge()) {
-            recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
+          flippedCharge |= recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge();
+
+          // debug
+          if (flippedCharge) {
             B2DEBUG(29, "Refitting with opposite charge PDG: " << pdgCodeToUseForFitting);
-            wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
           }
+
         }  // end of charge flipping
 
       } else {
@@ -143,7 +150,17 @@ void BaseRecoFitterModule::event()
       } else {
         B2DEBUG(28, "       fit failed!");
       }
+    } // loop over hypothesis
+
+    // if charge has been flipped reset seed charge and refit all track representations
+    if (flippedCharge) {
+      recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
+      // refit all present track representations
+      for (const auto  trackRep : recoTrack.getRepresentations()) {
+        Const::ChargedStable particleUsedForFitting(abs(trackRep->getPDG()));
+        fitter.fit(recoTrack, particleUsedForFitting);
+      }
     }
     recoTrackCounter += 1;
-  }
+  } // loop tracks
 }

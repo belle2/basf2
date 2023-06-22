@@ -67,6 +67,11 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
   addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
 
+  addParam("useSVDSpacePointSelectionFunctionFor6Samples", m_useSVDSpacePointSelectionFunctionFor6Samples,
+           "Use SVDSpacePointSelectionFunction to apply a selection on combinations of clusters in 6-sample DAQ mode", bool(false));
+  addParam("useSVDSpacePointSelectionFunctionFor3Samples", m_useSVDSpacePointSelectionFunctionFor3Samples,
+           "Use SVDSpacePointSelectionFunction to apply a selection on combinations of clusters in 3-sample DAQ mode", bool(false));
+
 }
 
 
@@ -84,11 +89,6 @@ void SVDSpacePointCreatorModule::beginRun()
 
     m_useSVDSpacePointSelectionFunctionFor6Samples = m_recoConfig->useSVDSpacePointSelectionFunction(6);
     m_useSVDSpacePointSelectionFunctionFor3Samples = m_recoConfig->useSVDSpacePointSelectionFunction(3);
-
-    if (m_useSVDSpacePointSelectionFunctionFor6Samples || m_useSVDSpacePointSelectionFunctionFor3Samples) {
-      if (!m_svdSpacePointSelectionFunction.isValid())
-        B2FATAL("No valid SVDSpacePointSelectionFunction");
-    }
   }
 
   if (m_useSVDGroupInfoIn6Sample)
@@ -100,6 +100,12 @@ void SVDSpacePointCreatorModule::beginRun()
     B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 3-sample DAQ mode.");
   else
     B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
+
+  if (m_useSVDSpacePointSelectionFunctionFor6Samples || m_useSVDSpacePointSelectionFunctionFor3Samples) {
+    if (!m_svdSpacePointSelectionFunction.isValid())
+      B2FATAL("No valid SVDSpacePointSelectionFunction");
+  }
+
 }
 
 

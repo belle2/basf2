@@ -11835,7 +11835,7 @@ CDecay anti-Lambda_c(2625)-
 # Lambda0
 # Updated Feb 2009
 Decay Lambda0
-0.638719992   p+  pi-                                      HypNonLepton 0.748 -6.6; #[PDG2023]
+0.638719992   p+  pi-                                      HypNonLepton 0.748 -6.5; #[PDG2023]
 0.357719992   n0  pi0                                      PHSP; #[Reconstructed PDG2011]
 0.001741600   n0  gamma                                    PHSP; #[Reconstructed PDG2011]
 0.000832160   p+  pi-  gamma                               PHSP; #[Reconstructed PDG2011]

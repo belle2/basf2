@@ -46,6 +46,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_c_avgMaxBinClusterOnTrack = new TCanvas("svd_avgMaxBin", "average MaxBin", 0, 0, 800, 600);
   m_c_MeanSVD3EventT0 = new TCanvas("svd_MeanSVD3EventT0", "Mean Event T0 from SVD for 3 samples", 0, 0, 400, 400);
   m_c_MeanSVD6EventT0 = new TCanvas("svd_MeanSVD6EventT0", "Mean Event T0 from SVD for 6 samples", 0, 0, 400, 400);
+  m_c_MeanSVDEventT0 = new TCanvas("svd_MeanSVD6EventT0", "Mean Event T0 from SVD for all samples", 0, 0, 400, 400);
 
   // add canvases used to create monitoring variables to MonitoringObject
   m_monObj->addCanvas(m_c_avgEfficiency);
@@ -56,6 +57,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_monObj->addCanvas(m_c_avgMaxBinClusterOnTrack);
   m_monObj->addCanvas(m_c_MeanSVD3EventT0);
   m_monObj->addCanvas(m_c_MeanSVD6EventT0);
+  m_monObj->addCanvas(m_c_MeanSVDEventT0);
 
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: initialized.");
 }
@@ -601,8 +603,9 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   TH1F* h_clusterTime_L3V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV3");
   TH1F* h_clusterTime_L456U = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeU456");
   TH1F* h_clusterTime_L456V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
-  TH1F* h_MeanSVD3EventT0    = (TH1F*)findHist("SVDHitTime/SVD3EventT0");
-  TH1F* h_MeanSVD6EventT0    = (TH1F*)findHist("SVDHitTime/SVD6EventT0");
+  TH1F* h_MeanSVD3EventT0   = (TH1F*)findHist("SVDHitTime/SVD3EventT0");
+  TH1F* h_MeanSVD6EventT0   = (TH1F*)findHist("SVDHitTime/SVD6EventT0");
+  TH1F* h_MeanSVDEventT0    = (TH1F*)findHist("SVDHitTime/SVDEventT0");
 
   m_c_MPVTimeClusterOnTrack->Clear();
   m_c_MPVTimeClusterOnTrack->Divide(2, 2);
@@ -619,6 +622,8 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_MeanSVD3EventT0) h_MeanSVD3EventT0->Draw();
   m_c_MeanSVD6EventT0->Clear();
   if (h_MeanSVD6EventT0) h_MeanSVD6EventT0->Draw();
+  m_c_MeanSVDEventT0->Clear();
+  if (h_MeanSVDEventT0) h_MeanSVDEventT0->Draw();
 
 
   float MPVClusterTimeL3U = -1;
@@ -643,6 +648,9 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   float MeanSVD6EventT0 = -1;
   if (h_MeanSVD6EventT0) MeanSVD6EventT0 = xForMaxY(h_MeanSVD6EventT0);
+
+  float MeanSVDEventT0 = -1;
+  if (h_MeanSVDEventT0) MeanSVDEventT0 = xForMaxY(h_MeanSVDEventT0);
 
   if (h_clusterTime_L3U == NULL || h_clusterTime_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster time on U side are not found");
@@ -682,6 +690,13 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("MeanSVD6EventT0", -1);
   } else {
     m_monObj->setVariable("MeanSVD6EventT0", MeanSVD6EventT0);
+  }
+
+  if (h_MeanSVDEventT0 == NULL) {
+    B2INFO("Histograms needed for SVD Event T0 (all samples) not found");
+    m_monObj->setVariable("MeanSVDEventT0", -1);
+  } else {
+    m_monObj->setVariable("MeanSVDEventT0", MeanSVDEventT0);
   }
 
   // average maxBin for clusters on track

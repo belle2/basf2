@@ -9,6 +9,7 @@
 #define NEUROTRIGGER_H
 #pragma once
 #include <string>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -105,7 +106,6 @@ namespace Belle2 {
       */
       std::string et_option = "etf_or_fastestpriority";
       /** DEPRECATED!! If true, determine event time from relevant hits if it is missing. */
-      bool T0fromHits = false;
 
     };
 
@@ -117,8 +117,10 @@ namespace Belle2 {
 
     /** Set parameters and get some network independent parameters. */
     void initialize(const Parameters& p);
+    void initialize(const NeuroTriggerParameters& p);
 
     /** Get indices for sector ranges in parameter lists. */
+    std::vector<unsigned> getRangeIndices(const NeuroTriggerParameters& p, unsigned isector);
     std::vector<unsigned> getRangeIndices(const Parameters& p, unsigned isector);
 
     /** Save MLPs to file.
@@ -126,6 +128,9 @@ namespace Belle2 {
      * @param arrayname name of the TObjArray holding the MLPs in the file
      */
     void save(const std::string& filename, const std::string& arrayname = "MLPs");
+    /** function to load idhist from file */
+    bool loadIDHist(const std::string& filename);
+
     /** Load MLPs from file.
      * @param filename name of the TFile to read from
      * @param arrayname name of the TObjArray holding the MLPs in the file
@@ -164,6 +169,15 @@ namespace Belle2 {
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
     std::vector<int> selectMLPs(float phi0, float invpt, float theta);
+
+    /** Select all matching expert MLPs based on the given track parameters.
+     * If the sectors are overlapping, there may be more than one matching expert.
+     * During training this is intended, afterwards sectors should be redefined to be unique.
+     * For unique geometrical sectors, this function can still find several experts
+     * with different sector patterns.
+     * @return indices of the selected MLPs, empty if the track does not fit any sector
+     */
+    std::vector<int> selectMLPsTrain(float phi0, float invpt, float theta);
 
     /** Select one MLP from a list of sector indices.
      * The selected expert either matches the given sector pattern,

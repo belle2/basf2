@@ -37,13 +37,19 @@ DAFRecoFitterModule::DAFRecoFitterModule() : BaseRecoFitterModule()
 /** Create a DAF fitter */
 std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
 {
-  if (m_param_deltaPValue != TrackFitter::s_defaultDeltaPValue or
-      m_param_maxNumberOfFailedHits != TrackFitter::s_defaultMaxFailedHits or
-      m_param_probabilityCut != TrackFitter::s_defaultProbCut) {
-    std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>(true, m_param_deltaPValue);
-    fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
+  if (!m_DAFparameters.isValid())
+    B2FATAL("DAF parameters are not available.");
 
-    fitter->setProbCut(m_param_probabilityCut);
+  if (m_param_probabilityCut != m_DAFparameters->getProbabilityCut()) {
+    std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>(m_DAFparameters->getAnnealingScheme(),
+                                          m_DAFparameters->getMinimumIterations(),
+                                          m_DAFparameters->getMaximumIterations(),
+                                          m_DAFparameters->getMinimumIterationsForPVal(),
+                                          true,
+                                          m_DAFparameters->getDeltaPValue(),
+                                          m_DAFparameters->getDeltaWeight(),
+                                          m_param_probabilityCut);
+    fitter->setMaxFailedHits(m_DAFparameters->getMaximumFailedHits());
 
     return fitter;
   } else {

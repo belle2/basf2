@@ -10,6 +10,8 @@
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
 #include <genfit/DAF.h>
 
+#include <tracking/dbobjects/DAFparameters.h>
+
 namespace Belle2 {
 
   /** DAF fitter. */
@@ -31,5 +33,8 @@ namespace Belle2 {
 
     /** Maximum number of failed hits before aborting the fit. */
     int m_param_maxNumberOfFailedHits = -1;
+
+    /// DAF parameters Database OjbPtr
+    DBObjPtr<DAFparameters> m_DAFparameters;
   };
 }

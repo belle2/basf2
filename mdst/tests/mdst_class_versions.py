@@ -39,7 +39,7 @@ EXPECTED_CHECKSUMS = {
     'Belle2::TRGSummary': (7, 1658421299),
     'Belle2::Track': (6, 327743743),
     'Belle2::TrackFitResult': (10, 1213379524),
-    'Belle2::V0': (3, 4006259140),
+    'Belle2::V0': (4, 422320450),
 }
 
 #: Object names part of mdst

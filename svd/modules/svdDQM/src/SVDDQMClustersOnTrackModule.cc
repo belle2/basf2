@@ -240,30 +240,6 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_histoList->Add(m_cls6TrkTimeV456);
 
   //----------------------------------------------------------------
-  // SVD T0
-  //----------------------------------------------------------------
-  name = "SVD_T0";
-  title = Form("SVD T0");
-  m_SVDT0 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_SVDT0->GetXaxis()->SetTitle("cluster time (ns)");
-  m_SVDT0->GetYaxis()->SetTitle("count");
-  m_histoList->Add(m_SVDT0);
-
-  name = "SVD3_T0";
-  title = Form("SVD T0 3 samples");
-  m_SVD3T0 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_SVD3T0->GetXaxis()->SetTitle("cluster time (ns)");
-  m_SVD3T0->GetYaxis()->SetTitle("count");
-  m_histoList->Add(m_SVD3T0);
-
-  name = "SVD6_T0";
-  title = Form("SVD T0 6 samples");
-  m_SVD6T0 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_SVD6T0->GetXaxis()->SetTitle("cluster time (ns)");
-  m_SVD6T0->GetYaxis()->SetTitle("count");
-  m_histoList->Add(m_SVD6T0);
-
-  //----------------------------------------------------------------
   // EventT0 vs Time of clusters for U and V sides
   //----------------------------------------------------------------
   name = "SVDTRK_ClusterTimeUvsEventT0";
@@ -362,18 +338,6 @@ void SVDDQMClustersOnTrackModule::event()
   // if svd time in SVD time reference is shown, eventT0 is also synchronized with SVD reference frame, firstFrame = 0
   if (m_desynchSVDTime && m_svdEventInfo.isValid())
     eventT0 = eventT0 - m_svdEventInfo->getSVD2FTSWTimeShift(0);
-
-  if (m_EventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
-    auto evtT0List_SVD = m_EventT0->getTemporaryEventT0s(Const::EDetector::SVD) ;
-    //    There is only one estimate of SVD EVentT0 for the moment
-    float svdEventT0 = evtT0List_SVD.back().eventT0 ;
-    m_SVDT0->Fill(svdEventT0);
-    if (nSamples == 3) {
-      m_SVD3T0->Fill(svdEventT0);
-    } else  {
-      m_SVD6T0->Fill(svdEventT0);
-    }
-  }
 
   //check HLT decision and increase number of events only if the event has been accepted
 

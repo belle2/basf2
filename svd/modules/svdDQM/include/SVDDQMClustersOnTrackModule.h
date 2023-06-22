@@ -141,13 +141,6 @@ namespace Belle2 {
     /** v Time of clusters related to tracks for layer 4,5,6 sensors  for 6 samples*/
     TH1F* m_cls6TrkTimeV456 = nullptr;
 
-    /** SVD T0  */
-    TH1F* m_SVDT0 = nullptr;
-    /** SVD T0  for 3 sampels */
-    TH1F* m_SVD3T0 = nullptr;
-    /** SVD T0  for 6 samples*/
-    TH1F* m_SVD6T0 = nullptr;
-
   };
 
 }

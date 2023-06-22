@@ -6,16 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef KLMTRIGGERMODULE_H
-#define KLMTRIGGERMODULE_H
+#pragma once
 
+#include <memory>
+#include <vector>
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <trg/klm/dataobjects/KLMTrgSummary.h>
-#include <trg/klm/dbobjects/KLMTriggerParameters.h>
+
+
+
 
 namespace Belle2 {
+
 
   class KLMTriggerModule : public Module {
   public:
@@ -33,15 +34,17 @@ namespace Belle2 {
     virtual void terminate() override { };
 
   private: // Parameters
-
-    StoreObjPtr<KLMTrgSummary> m_KLMTrgSummary;
-
-    DBObjPtr<KLMTriggerParameters> m_KLMTriggerParameters;
-
     int m_nLayerTrigger = 0;
+
+
+
+    int m_event_nr = 0;
+
+    struct geometry_data;
+    std::shared_ptr<geometry_data>  m_geometry;
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;
+    std::string m_geometry_fileName;
+
   };
 } // namespace Belle2
-
-#endif // KLMTRIGGERMODULE_H

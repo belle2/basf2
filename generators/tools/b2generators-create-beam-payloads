@@ -28,7 +28,7 @@ def __parse_floatlist(string):
     try:
         return [float(e) for e in string.split(",")]
     except:
-        raise argparse.ArgumentTypeError("'%s' is not a valid list of comma separated float values" % string)
+        raise argparse.ArgumentTypeError(f"'{string}' is not a valid list of comma separated float values")
 
 
 def __parse_bool(string):
@@ -36,7 +36,7 @@ def __parse_bool(string):
     is_true = string.lower() in ["1", "true", "yes", "on"]
     is_false = string.lower() in ["0", "false", "no", "off"]
     if not is_true and not is_false:
-        raise argparse.ArgumentTypeError("'%s' is not a valid bool value" % string)
+        raise argparse.ArgumentTypeError(f"'{string}' is not a valid bool value")
     return is_true
 
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         argument_type = {"float": float, "int": int, "bool": __parse_bool,
                          "list(float)": __parse_floatlist}[param.type]
         # add a new argument to override the parameter
-        parser.add_argument("--%s" % param.name, type=argument_type, help=param.description + ". Type: " + param.type,
+        parser.add_argument(f"--{param.name}", type=argument_type, help=param.description + ". Type: " + param.type,
                             metavar=param.name.upper(), dest="param_" + param.name)
 
     #: command line arguments

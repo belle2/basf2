@@ -42,7 +42,7 @@ class CheckEventNumbers(basf2.Module):
         for evtNr in all_numbers:
             c = seen.count(evtNr)
             if not (evtNr in should and c == 1):
-                basf2.B2ERROR("event number %d seen %d times" % (evtNr, c))
+                basf2.B2ERROR(f"event number {int(evtNr)} seen {int(c)} times")
                 all_ok = False
         if not all_ok:
             basf2.B2FATAL("Missing/extra events")

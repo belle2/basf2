@@ -11,7 +11,6 @@
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
 # (both files)
 
-import os
 import basf2
 from ROOT import Belle2
 import gzip
@@ -42,7 +41,7 @@ class TestModule(basf2.Module):
         truehits = Belle2.PyStoreArray('PXDTrueHits')
         for truehit in truehits:
             relations = truehit.getRelationsTo("PXDSimHits")
-            print("truehit %d => hits " % truehit.getArrayIndex(), end="")
+            print(f"truehit {int(truehit.getArrayIndex())} => hits ", end="")
             for hit in relations:
                 print(hit.getArrayIndex(), end=", ")
             print()

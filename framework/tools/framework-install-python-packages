@@ -94,6 +94,5 @@ if __name__ == "__main__":
                In order to use the installed optional python packages, you need to add
                the target folder to your PYTHONPATH environment variable before running basf2.
                You can do this by executing the following command after you called setuprel:""".format(target_path_abs) +
-    
               os.linesep + 'export PYTHONPATH="' + target_path_abs + ':${PYTHONPATH}"')
 

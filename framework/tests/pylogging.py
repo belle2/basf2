@@ -138,8 +138,7 @@ class PythonLogInterface(unittest.TestCase):
         basf2.B2INFO("show current frame info", why="because we can")
         self.check_logs(
             "[INFO] show current frame info\n"
-            "\twhy = because we can  { package: steering function: test_inspect @%s:%d }\n" %
-            (filename, lineno))
+            "\twhy = because we can  { package: steering function: test_inspect @%s:%d }\n" % (filename, lineno))
 
 
 class PythonLogJSON(unittest.TestCase):

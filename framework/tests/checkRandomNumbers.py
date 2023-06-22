@@ -30,7 +30,7 @@ def double_to_hex(double):
     """Convert a double to a hex string representation"""
     # we pack the float to a little-endian double end interpret it as
     # little-endian unsigned 64 bit int
-    return "%016X" % struct.unpack("<Q", struct.pack("<d", double))[0]
+    return f"{struct.unpack('<Q', struct.pack('<d', double))[0]:016X}"
 
 
 class RandomTestModule(basf2.Module):

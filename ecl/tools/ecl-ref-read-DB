@@ -37,23 +37,23 @@ def print_diff(mset, prev_set):
 
 	print('\nDifference between sets '+str(mset[0][0])+' and '+str(prev_set[0][0])+':')
 
-	print('{:<32}{:<20}{:<20}'.format('Histogram name','Set ID '+str(mset[0][0])+' exp, run','Set ID '+str(prev_set[0][0])+' exp, run'))
+	print(f"{'Histogram name':<32}{'Set ID ' + str(mset[0][0]) + ' exp, run':<20}{'Set ID ' + str(prev_set[0][0]) + ' exp, run':<20}")
 
 	for item_l in from_last:
 
 		if item_l[2] not in [item_p[2] for item_p in from_prev]:
-			print('{:<32}{:<20}{:<20}'.format(item_l[2], str(item_l[0]) + ', ' +str(item_l[1]), '---'))
+			print(f"{item_l[2]:<32}{str(item_l[0]) + ', ' + str(item_l[1]):<20}{'---':<20}")
 			continue
 
 		for item_p in from_prev:
 			if (item_p[2] == item_l[2]):
-				print('{:<32}{:<20}{:<20}'.format(item_l[2], str(item_l[0]) + ', ' +str(item_l[1]), str(item_p[0]) + ', ' +str(item_p[1])))
+				print(f"{item_l[2]:<32}{str(item_l[0]) + ', ' + str(item_l[1]):<20}{str(item_p[0]) + ', ' + str(item_p[1]):<20}")
 				break
 
 	for item_p in from_prev:
 
 		if item_p[2] not in [item_l[2] for item_l in from_last]:
-			print('{:<32}{:<20}{:<20}'.format(item_p[2], '---', str(item_p[0]) + ', ' +str(item_p[1])))
+			print(f"{item_p[2]:<32}{'---':<20}{str(item_p[0]) + ', ' + str(item_p[1]):<20}")
 			continue
 
 #print info and histograms for one set
@@ -61,9 +61,9 @@ def print_set_info(mset):
 	#set = (info, hists)
 	print('\nSet ID:', mset[0][0], '  Date:', mset[0][1], '  Type:', mset[0][2])
 	print('\nHistograms in the set:')
-	print('{:<35}{:<8}{:<8}'.format('Histogram name','exp','run'))
+	print(f"{'Histogram name':<35}{'exp':<8}{'run':<8}")
 	for hist in mset[1]:
-		print('{:<35}{:<8}{:<8}'.format(hist[2],hist[0],hist[1]))
+		print(f'{hist[2]:<35}{hist[0]:<8}{hist[1]:<8}')
 
 #print info about previous or next set
 def print_near_info(set_info, near_info, which):

@@ -65,7 +65,7 @@ def read_tree(tree):
     """
     for entry in range(tree.GetEntries()):
         if tree.GetEntry(entry, 1) <= 0:
-            print('Failed to read entry %d in "%s"! (no further entries will be checked.)' % (entry, tree.GetName()))
+            print(f'Failed to read entry {int(entry)} in "{tree.GetName()}"! (no further entries will be checked.)')
             return False
     return True
 
@@ -112,12 +112,12 @@ def checkFile(args):
             if args.expected_no_of_mcevents is not None:
                 checks_passed['mcevents_eq_expectation'] = mcevents == args.expected_no_of_mcevents
                 if not checks_passed['mcevents_eq_expectation']:
-                    print('Expected %d MC events, but file contains %d!' % (args.expected_no_of_mcevents, mcevents))
+                    print(f'Expected {int(args.expected_no_of_mcevents)} MC events, but file contains {int(mcevents)}!')
 
         if args.expected_no_of_events is not None:
             checks_passed['entries_eq_expectation'] = nevents == args.expected_no_of_events
             if not checks_passed['entries_eq_expectation']:
-                print('Expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
+                print(f'Expected {int(args.expected_no_of_events)} events, but file contains {int(nevents)}!')
 
         if args.BRANCH:
             checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])

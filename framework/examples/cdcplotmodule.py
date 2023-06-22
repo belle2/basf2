@@ -98,7 +98,7 @@ class CDCPlotModule(Module):
             col = [colormap.jet(1.0 * c / (npart - 1)) for c in range(npart)]
             fig = plot(trackhits_x, trackhits_y, col)
 
-            filename = 'cdchits_%i.png' % (self.num_events)
+            filename = f'cdchits_{int(self.num_events)}.png'
             if os.path.lexists(filename):
                 B2WARNING(filename + ' exists, overwriting ...')
             else:

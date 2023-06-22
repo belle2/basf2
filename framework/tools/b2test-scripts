@@ -117,11 +117,11 @@ def format_output(name, out, err):
         return ""
     output = []
     if out and out.strip():
-        output += ["=== stdout of %s ===\n" % name, out.decode(errors="replace")]
+        output += [f"=== stdout of {name} ===\n", out.decode(errors="replace")]
     if err and err.strip():
-        output += ["=== stderr of %s ===\n" % name, err.decode(errors="replace")]
+        output += [f"=== stderr of {name} ===\n", err.decode(errors="replace")]
     if len(output):
-        output.append("=== end %s ===\n" % name)
+        output.append(f"=== end {name} ===\n")
     return "".join(output)
 
 
@@ -236,7 +236,7 @@ def run_test_py(argument, prepare_step=False):
                 message = skipped.group(1).decode()
             else:
                 result = False
-                message = "exited with return code %d" % process.returncode
+                message = f"exited with return code {int(process.returncode)}"
                 extra = format_output(name, process.stdout, process.stderr)
         else:
             log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),

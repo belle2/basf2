@@ -34,7 +34,7 @@ ECL_FWD_CRATES = 8
 def main():
     if len(sys.argv) < 3:
         print()
-        print('Usage: %s file1 file2' % sys.argv[0])
+        print(f'Usage: {sys.argv[0]} file1 file2')
         print('  file1 Path to text file or root file with ECL channel map')
         print('  file2 Path to text file or root file with ECL channel map')
         print()
@@ -84,7 +84,7 @@ def loadFile(path):
         return loadRootFile(path)
     else:
         print()
-        print('Error: The script only supports *.txt and *.root. Input file: %s' % path)
+        print(f'Error: The script only supports *.txt and *.root. Input file: {path}')
         print()
         exit(255)
 

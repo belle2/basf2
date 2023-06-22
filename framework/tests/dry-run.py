@@ -18,7 +18,7 @@ def add_inout(path, basename):
     path.add_module("RootOutput", outputFileName="out-" + basename + ".root")
 
 
-path.add_module("RootInput", inputFileNames=["in-%d.root" % d for d in range(10)])
+path.add_module("RootInput", inputFileNames=[f"in-{int(d)}.root" for d in range(10)])
 add_inout(path, "normal")
 
 path1 = basf2.create_path()

@@ -44,7 +44,7 @@ logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE |
 # show default loginfo for all levels
 for (name, value) in LogLevel.names.items():
     if name != 'default':
-        print('LogInfo for level %8s: %3d' % (name, logging.get_info(value)))
+        print(f'LogInfo for level {name:8}: {int(logging.get_info(value)):3}')
 
 # reset logging connections (default log connection to the console is deleted)
 logging.reset()
@@ -74,7 +74,7 @@ B2INFO('Some other message')
 
 # show number of log_messages per level
 for (level, num) in logging.log_stats.items():
-    print('Messages for level %8s: %2d' % (level.name, num))
+    print(f'Messages for level {level.name:8}: {int(num):2}')
 
 main = Path()
 eventinfosetter = main.add_module('EventInfoSetter')

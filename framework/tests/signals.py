@@ -40,7 +40,7 @@ class TestModule(basf2.Module):
 
         if self.init_signal:
             pid = os.getpid()
-            basf2.B2INFO("Killing %s in init (sig %d)" % (pid, self.init_signal))
+            basf2.B2INFO(f"Killing {pid} in init (sig {int(self.init_signal)})")
             os.kill(pid, self.init_signal)
         basf2.B2INFO("initialize()")
 
@@ -50,7 +50,7 @@ class TestModule(basf2.Module):
             basf2.B2FATAL("Processing should have been stopped in init!")
         if self.event_signal:
             pid = os.getpid()
-            basf2.B2INFO("Killing %s in event (sig %d)" % (pid, self.event_signal))
+            basf2.B2INFO(f"Killing {pid} in event (sig {int(self.event_signal)})")
             os.kill(pid, self.event_signal)
         basf2.B2INFO("event()")
 
@@ -96,9 +96,9 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         if not status_ok:
             print(killsig, retcode)
             if killsig:
-                raise RuntimeError("Killed with wrong signal %d?" % (killsig))
+                raise RuntimeError(f"Killed with wrong signal {int(killsig)}?")
             else:
-                raise RuntimeError("Wrong exit code %d" % (retcode))
+                raise RuntimeError(f"Wrong exit code {int(retcode)}")
 
         fileExists = os.path.isfile(testFile.name)
         if fileExists and (not abort or event_signal == signal.SIGINT):
@@ -145,7 +145,7 @@ for nproc in [0, 3]:
     for in_proc in [0, 1, 2]:
         if nproc == 0 and in_proc != 0:
             break  # running more tests in single process mode doesn't make sense
-        basf2.B2WARNING("== starting tests with nproc=%d, test_in_process=%d" % (nproc, in_proc))
+        basf2.B2WARNING(f"== starting tests with nproc={int(nproc)}, test_in_process={int(in_proc)}")
 
         try:
             run_test(None, None, abort=False, test_in_process=in_proc)
@@ -164,7 +164,7 @@ for nproc in [0, 3]:
             # SIGPIPE would be nice, too. just stops immediately now
         except Exception as e:
             # Note: Without specifying exception type, we might get those from forked processes, too
-            basf2.B2WARNING("Exception occured for nproc=%d, test_in_process=%d" % (nproc, in_proc))
+            basf2.B2WARNING(f"Exception occured for nproc={int(nproc)}, test_in_process={int(in_proc)}")
             raise e
 
 print("\n")

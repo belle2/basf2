@@ -87,11 +87,11 @@ class ShapeFitterModule(b2.Module):
 
             if amp != amp2 or time != time2 or qual != qual2:
                 print()
-                print('RealData: %4d %6d %6d %6d' % (cid, amp, time, qual))
-                print('Emulator: %4d %6d %6d %6d' % (cid, amp2, time2, qual2))
+                print(f'RealData: {int(cid):4} {int(amp):6} {int(time):6} {int(qual):6}')
+                print(f'Emulator: {int(cid):4} {int(amp2):6} {int(time2):6} {int(qual2):6}')
                 if verbose:
-                    print('Event : %d Trigger time: %d' % (self.evtn, trigger_time))
-                    print('CellID: %d AmpData: %d TimeData: %d QualityData: %d' % (cid, amp, time, qual))
+                    print(f'Event : {int(self.evtn)} Trigger time: {int(trigger_time)}')
+                    print(f'CellID: {int(cid)} AmpData: {int(amp)} TimeData: {int(time)} QualityData: {int(qual)}')
                     print(' '.join([str(x) for x in adc]), end='')
                     print(' ')
 

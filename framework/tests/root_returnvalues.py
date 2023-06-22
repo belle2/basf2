@@ -40,7 +40,7 @@ floating_expressions = {
 
 for width in integral_types:
     # check signed types, we want min, max -1, 0 and 1
-    dtype = np.dtype("int%d" % width)
+    dtype = np.dtype(f"int{int(width)}")
     for i, value in enumerate([-2**(width - 1), -1, 0, 1, 2**(width - 1) - 1]):
         # create a unique member name
         func_name = f"int{width}test{i}"
@@ -48,14 +48,13 @@ for width in integral_types:
         prefix = "ull" if width > 32 else ""
         # append it to the test class
         testclass.append(f"int{width}_t {func_name}() const {{ return {value}{prefix}; }}")
-        testclass.append("int{0}_t& ref_{1}() {{ static int{0}_t val = {2}{3}; return val; }}".format(
-            width, func_name, value, prefix))
+        testclass.append(f"int{width}_t& ref_{func_name}() {{ static int{width}_t val = {value}{prefix}; return val; }}")
         # and remember name and result for checking
         results.append([func_name, value, dtype])
         results.append(['ref_' + func_name, value, dtype])
 
     # check unsigned types, just 0, 1, and max
-    dtype = np.dtype("uint%d" % width)
+    dtype = np.dtype(f"uint{int(width)}")
     for i, value in enumerate([0, 1, 2**(width) - 1]):
         # create a unique member name
         func_name = f"uint{width}test{i}"
@@ -79,7 +78,7 @@ for t in floating_types:
         # see if we can just have the literal or if we need a mapping
         expression = repr(value) if value not in floating_expressions else floating_expressions[value].format(t)
         testclass.append(f"{t} {func_name}() const {{ return {expression}; }}")
-        testclass.append("{0}& ref_{1}() {{ static {0} val = {2}; return val; }}".format(t, func_name, expression))
+        testclass.append(f"{t}& ref_{func_name}() {{ static {t} val = {expression}; return val; }}")
         results.append([func_name, value, info.dtype])
         results.append(['ref_' + func_name, value, info.dtype])
 

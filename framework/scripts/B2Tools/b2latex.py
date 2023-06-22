@@ -241,7 +241,7 @@ class DefineColourList(LatexObject):
         Calls super-class init, adds definition of colourlist to latex code.
         """
         super().__init__()
-        self.output += r"\def\colourlist{{" + ', '.join('"%s"' % (c) for c in self.colours) + r"}}" + '\n'
+        self.output += r"\def\colourlist{{" + ', '.join(f'"{c}"' for c in self.colours) + r"}}" + '\n'
         self.output += r"""
             \tikzset{nodeStyle/.style={text height=\heightof{A},text depth=\depthof{g}, inner sep = 0pt, node distance = -0.15mm}}
             \newcount\colourindex \colourindex=-1

@@ -188,7 +188,7 @@ def print_3_columns(mylist):
         third.append("")
         
     for f,s,t in zip(first, second, third):
-        print('{:<29}{:<29}{:<}'.format(f,s,t))
+        print(f'{f:<29}{s:<29}{t:<}')
 
 #-----------------------------------------------------
 

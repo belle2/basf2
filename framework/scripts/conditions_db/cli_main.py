@@ -64,7 +64,7 @@ def escape_ctrl_chars(name):
     def escape(match):
         if match.group(0).isspace():
             return match.group(0)
-        return "\\x{:02x}".format(ord(match.group(0)))
+        return f"\\x{ord(match.group(0)):02x}"
 
     return escape_ctrl_chars._regex.sub(escape, name)
 
@@ -135,7 +135,7 @@ def command_tag_list(args, db=None):
 
     # and print, either detailed info for each tag or summary table at the end
     table = []
-    with Pager("List of globaltags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else ""), True):
+    with Pager(f"List of globaltags{tagfilter}{' (detailed)' if getattr(args, 'detail', False) else ''}", True):
         for item in taglist:
             if getattr(args, "detail", False):
                 print_globaltag(db, item)
@@ -164,7 +164,7 @@ def print_globaltag(db, *tags):
 
         if isinstance(info, str):
             try:
-                req = db.request("GET", "/globalTag/{}".format(encode_name(info)),
+                req = db.request("GET", f"/globalTag/{encode_name(info)}",
                                  f"Getting info for globaltag {info}")
             except ConditionsDB.RequestError as e:
                 # ok, there's an error for this one, let's continue with the other
@@ -262,7 +262,7 @@ def command_tag_create(args, db=None):
     if typeinfo is None:
         return 1
 
-    req = db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
+    req = db.request("POST", f"/globalTag/{encode_name(typeinfo['name'])}",
                      "Creating globaltag {name}".format(**info),
                      json=info)
     B2INFO("Successfully created globaltag {name} (id={globalTagId})".format(**req.json()))
@@ -286,7 +286,7 @@ def command_tag_modify(args, db=None):
         return
 
     # first we need to get the old tag information
-    req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
+    req = db.request("GET", f"/globalTag/{encode_name(args.tag)}",
                      f"Getting info for globaltag {args.tag}")
 
     # now we update the tag information
@@ -336,7 +336,7 @@ def command_tag_clone(args, db=None):
         return
 
     # first we need to get the old tag information
-    req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
+    req = db.request("GET", f"/globalTag/{encode_name(args.tag)}",
                      f"Getting info for globaltag {args.tag}")
     info = req.json()
 
@@ -622,15 +622,14 @@ def command_iov(args, db):
         return 1
 
     if args.run is not None:
-        msg = "Obtaining list of iovs for globaltag {tag}, exp={exp}, run={run}{filter}".format(
-            tag=args.tag, exp=args.run[0], run=args.run[1], filter=iovfilter)
+        msg = f"Obtaining list of iovs for globaltag {args.tag}, exp={args.run[0]}, run={args.run[1]}{iovfilter}"
         req = db.request("GET", "/iovPayloads", msg, params={'gtName': args.tag, 'expNumber': args.run[0],
                                                              'runNumber': args.run[1]})
     else:
         msg = f"Obtaining list of iovs for globaltag {args.tag}{iovfilter}"
-        req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)), msg)
+        req = db.request("GET", f"/globalTag/{encode_name(args.tag)}/globalTagPayloads", msg)
 
-    with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
+    with Pager(f"List of IoVs{iovfilter}{' (detailed)' if args.detail else ''}", True):
         payloads = []
         for item in req.json():
             payload = item["payload" if 'payload' in item else "payloadId"]

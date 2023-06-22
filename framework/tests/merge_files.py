@@ -284,7 +284,7 @@ def check_18_checkEventNr():
         meta.setNEvents(e)
         meta.setMcEvents(m)
         meta.setRandomSeed(str(i))
-        files.append("test%d.root" % i)
+        files.append(f"test{int(i)}.root")
         create_testfile_direct(files[-1], meta)
     merge_files(*files)
     meta = get_metadata()
@@ -308,7 +308,7 @@ def check_19_lowhigh():
         meta.setRandomSeed(str(i))
         meta.setLow(e[0], e[1], e[2])
         meta.setHigh(e[0], e[1], e[2])
-        files.append("test%d.root" % i)
+        files.append(f"test{int(i)}.root")
         create_testfile_direct(files[-1], meta)
 
     # test all possible combinations taking 2 elements from the list plus the

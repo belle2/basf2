@@ -97,14 +97,14 @@ if __name__ == "__main__":
 
     # check whether the testing payload storage file exist
     if not os.path.isfile(payloadsFile):
-        sys.stderr.write('ERROR: The testing payload storage file %s does not exist.\n' % (payloadsFile))
+        sys.stderr.write(f'ERROR: The testing payload storage file {payloadsFile} does not exist.\n')
         sys.exit(1)
 
     # get testing payload storage content
     data = {}
     data['content'] = open(payloadsFile).read()
     if not args.confirm:
-        print('The content of the testing payload storage file %s is:' % payloadsFile)
+        print(f'The content of the testing payload storage file {payloadsFile} is:')
         print(data['content'])
         print('If you want to select a subset, quit now and create a new testing payload storage file with the desired subset of IoVs.')
         if input('- Continue (y/n) [y]? ').lower() not in ['y', '']:
@@ -235,7 +235,7 @@ Details:""")
             sys.exit(1)
     if not password and not args.oauth:
         while True:
-            username = input('\nConfirm your DESY user name by pressing enter or type the correct one [%s]: ' % data['user'])
+            username = input(f"\nConfirm your DESY user name by pressing enter or type the correct one [{data['user']}]: ")
             if username != '':
                 data['user'] = username
             password = getpass.getpass("\nPlease give your DESY password to authenticate the request: ")

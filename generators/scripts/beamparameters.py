@@ -201,7 +201,7 @@ def add_beamparameters(path, name, E_cms=None, **argk):
     values = calculate_beamparameters(name, E_cms)
     # add a BeamParametes module to the path
     module = path.add_module("BeamParameters")
-    module.set_name("BeamParameters:%s" % name)
+    module.set_name(f"BeamParameters:{name}")
     # finally, set all parameters and return the module
     module.param(values)
     # and override parameters with any additional keyword arguments
@@ -349,11 +349,10 @@ if __name__ == "__main__":
     for name, energy in sorted(targets.items()):
         #: scaling between nominal and target CMS energy
         scale = energy / mass
-        print("""\
-            "{}": ("SuperKEKB", {{  # m({}) = {:.3f} GeV
-                "energyHER": {:.3f},
-                "energyLER": {:.3f},
-            }}),""".format(name, name, energy, eher * scale, eler * scale))
+        print(f"""            "{name}": ("SuperKEKB", {{  # m({name}) = {energy:.3f} GeV
+                "energyHER": {eher * scale:.3f},
+                "energyLER": {eler * scale:.3f},
+            }}),""")
 
     for name, energy in sorted(targets.items()):
         #: scaling between nominal and target CMS energy for off resoncane, i.e. 60MeV lower

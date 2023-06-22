@@ -342,7 +342,7 @@ def printMatrix(matrix, nrows):
         if prev_a != a:
             print()
             prev_a = a
-        print('%9.2e' % matrix[a][b], end=' ')
+        print(f'{matrix[a][b]:9.2e}', end=' ')
 
 
 def readMatrix(fname):
@@ -398,7 +398,7 @@ def iovToString(iov):
     exp_max = iov.getExperimentHigh()
     run_min = iov.getRunLow()
     run_max = iov.getRunHigh()
-    return '(%d, %d, %d, %d)' % (exp_min, run_min, exp_max, run_max)
+    return f'({int(exp_min)}, {int(run_min)}, {int(exp_max)}, {int(run_max)})'
 
 ################################################
 # ECL NOISE DATA

@@ -70,8 +70,8 @@ with TemporaryDirectory() as tmp:
     t1 = fi.Get('darkphoton')
     t2 = fi.Get('gammas')
 
-    assert t1.GetEntries() == 1, 'Output contains %i entries' % t1.GetEntries()
-    assert t2.GetEntries() == 1, 'Output contains %i entries' % t1.GetEntries()
+    assert t1.GetEntries() == 1, f'Output contains {int(t1.GetEntries())} entries'
+    assert t2.GetEntries() == 1, f'Output contains {int(t1.GetEntries())} entries'
 
     t1.GetEntry(0)
     t2.GetEntry(0)

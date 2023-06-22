@@ -144,11 +144,11 @@ if __name__ == "__main__":
     for index, events in enumerate(inputevents):
         # check branches
         if get_branchnames(events) != branch_names:
-            basf2.B2FATAL("branches in input file {} are different, cannot continue".format(args.inputfile[index]))
+            basf2.B2FATAL(f"branches in input file {args.inputfile[index]} are different, cannot continue")
         # get number of entries
         entries = events.GetEntries()
         indexlist += [(index, e) for e in range(entries)]
-        basf2.B2INFO("{}: found {} events".format(args.inputfile[index], entries))
+        basf2.B2INFO(f"{args.inputfile[index]}: found {entries} events")
 
     basf2.B2INFO(f"Found a total of {len(indexlist)} events in {len(inputevents)} files, shuffling ...")
     # make sure events are randomized.
@@ -199,8 +199,7 @@ if __name__ == "__main__":
         if (curr_time-last_time) > 2 and evt >= 10:
             elapsed = curr_time - start
             eta = (elapsed/evt)*(total_events-evt)
-            basf2.B2INFO("{:{len}d}/{} events done ({:5.2f}%), approx {:.0f} seconds remaining".format(
-                evt, total_events, 100*evt/total_events, eta, len=total_events_len))
+            basf2.B2INFO(f"{evt:{{len}}d}/{total_events} events done ({100 * evt / total_events:5.2f}%), approx {eta:.0f} seconds remaining")
             last_time = curr_time
 
     low = (9999, 9999, 99999)
@@ -237,7 +236,7 @@ if __name__ == "__main__":
     # done, print final timing
     end = time.process_time()
     elapsed = end - start
-    basf2.B2INFO("Finished in {:.2f} seconds, {:.3f} milliseconds per event".format(elapsed, elapsed*1000/len(indexlist)))
+    basf2.B2INFO(f"Finished in {elapsed:.2f} seconds, {elapsed * 1000 / len(indexlist):.3f} milliseconds per event")
 
     # create event index
     ROOT.Belle2.RootIOUtilities.buildIndex(output_tree)

@@ -188,7 +188,7 @@ def find_children(rootpid):
         try:
             # since we read the stat files of all processes very often we
             # optimize this using native os.open instead of file objects
-            fd = os.open("/proc/%d/stat" % pid, os.O_RDONLY)
+            fd = os.open(f"/proc/{int(pid)}/stat", os.O_RDONLY)
             stat = os.read(fd, 1024)
             os.close(fd)
             # stat has ppid in the fourth field but the process name (second
@@ -216,7 +216,7 @@ def get_memory_usage(pid):
     try:
         # Open the smaps file and look for all defined fields
         sizes = np.zeros(ntypes)
-        with open("/proc/%s/smaps" % pid) as smaps:
+        with open(f"/proc/{pid}/smaps") as smaps:
             # there are a lot of memory segments in smaps, add them all up
             for line in smaps:
                 for i, (name, field) in enumerate(memory_types):
@@ -234,7 +234,7 @@ def get_memory_usage(pid):
 def get_cmdline(pid):
     """Return command line of a process given by PID"""
     try:
-        args = open("/proc/%s/cmdline" % pid).read().strip("\0").split("\0")
+        args = open(f"/proc/{pid}/cmdline").read().strip("\0").split("\0")
         return " ".join(args)
     except OSError:
         return ""
@@ -392,7 +392,7 @@ if __name__ == "__main__":
         try:
             child = subprocess.Popen(args, stdout=subprocess.PIPE)
         except OSError as e:
-            print("Problem running '{}': {}".format(" ".join(args), e),
+            print(f"Problem running '{' '.join(args)}': {e}",
                   file=sys.stderr)
             sys.exit(1)
         # we want to check the output for process spawn messages but we don't want
@@ -443,7 +443,7 @@ if __name__ == "__main__":
         # make annotations a structured array, otherwise numpy will convert
         # timestamps to strings
         annot_max_length = max(len(e[1]) for e in annotations) if len(annotations) else ""
-        annotations = np.array(annotations, dtype=[("time", "f4"), ("text", "U%s" % annot_max_length)])
+        annotations = np.array(annotations, dtype=[("time", "f4"), ("text", f"U{annot_max_length}")])
         exit_code = child.returncode
         if exit_code != 0:
             print(f"Program exited with non-zero exit code: {exit_code}", file=sys.stderr)
@@ -516,7 +516,7 @@ if __name__ == "__main__":
 
         # and plot all processes
         for i, (pid, val) in enumerate(sorted(process_memory.items())):
-            label = "%s (%d)" % (process_names[pid], pid)
+            label = f"{process_names[pid]} ({int(pid)})"
             plot_memory(val, label, get_color(i, len(process_memory)))
 
         # finalize all plots
@@ -539,7 +539,7 @@ if __name__ == "__main__":
             # add max line and label it
             maxvalue = total_memory[:, i + 1].max() / 1000
             a.axhline(maxvalue, c="k", ls="--", zorder=-1)
-            a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
+            a.annotate(f"{maxvalue:.2f} MB", (0, maxvalue), xytext=(5, 5),
                        textcoords="offset points")
 
             # add annotations if any. As the annotations are not necessarily at the
@@ -569,13 +569,13 @@ if __name__ == "__main__":
 
     # finally, print values, first we get the values formated correctly in MB for
     # max, mean and standard deviation and that for each memory type
-    values = np.array([["%.2f" % (fct(m)/1000) for m in total_memory.T[1:]]
+    values = np.array([[f"{fct(m) / 1000:.2f}" for m in total_memory.T[1:]]
                       for fct in(np.max, np.mean, np.std)])
     # now lets find out how many digits we need for each type of value
     digits = [max(map(len, v)) for v in values]
 
     # now print execution time
-    print("{:20}: {:.2f} sec".format("execution time", total_memory[:, 0].max()),
+    print(f"{'execution time':20}: {total_memory[:, (0)].max():.2f} sec",
           file=sys.stderr)
     # then memory consumption
     for i, (name, field) in enumerate(memory_types):

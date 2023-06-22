@@ -73,8 +73,7 @@ if __name__ == "__main__":
 
     # check whether the files already exist
     if os.path.isfile(header) or os.path.isfile(src):
-        sys.stderr.write('ERROR: The file {} or {} already exists.\n'.format(header,
-                        src))
+        sys.stderr.write(f'ERROR: The file {header} or {src} already exists.\n')
         sys.exit(1)
 
     # make sure we have an analysis or local release directory
@@ -121,14 +120,11 @@ if __name__ == "__main__":
                 if not param_def.startswith('"'):
                     param_def = '"' + param_def + '"'
                 param_def = 'std::string(' + param_def + ')'
-        params_header = params_header + '    %s m_%s;  /**< %s */\n' \
-            % (param_type, param_name, param_desc)
+        params_header = params_header + f'    {param_type} m_{param_name};  /**< {param_desc} */\n'
         if param_def == '':
-            params_src = params_src + '  addParam("%s", m_%s, "%s");\n' \
-                % (param_name, param_name, param_desc)
+            params_src = params_src + f'  addParam("{param_name}", m_{param_name}, "{param_desc}");\n'
         else:
-            params_src = params_src + '  addParam("%s", m_%s, "%s", %s);\n' \
-                % (param_name, param_name, param_desc, param_def)
+            params_src = params_src + f'  addParam("{param_name}", m_{param_name}, "{param_desc}", {param_def});\n'
 
     # get module input and output
     header_includes = []
@@ -149,13 +145,12 @@ if __name__ == "__main__":
             io_required = 'optional'
         io_branch = input('    Branch name [default]: ')
         io_default_name = default_member_name(io_class)
-        io_name = input('    Variable name [%s]: ' % io_default_name)
+        io_name = input(f'    Variable name [{io_default_name}]: ')
         if not io_name:
             io_name = io_default_name
         io_desc = input('    Description          : ')
-        init_header = init_header + '    Store%s<%s> m_%s; /**< %s */\n' \
-            % (io_type, io_class, io_name, io_desc)
-        header_includes.append('Store%s' % io_type)
+        init_header = init_header + f'    Store{io_type}<{io_class}> m_{io_name}; /**< {io_desc} */\n'
+        header_includes.append(f'Store{io_type}')
         header_includes.append(io_class)
         if io_branch != '':
             ctor_src = ctor_src + f', m_{io_name}("{io_branch}")'
@@ -175,13 +170,12 @@ if __name__ == "__main__":
             io_storeFlag = 'DataStore::c_DontWriteOut'
         io_branch = input('    Branch name [default]: ')
         io_default_name = default_member_name(io_class)
-        io_name = input('    Variable name [%s]: ' % io_default_name)
+        io_name = input(f'    Variable name [{io_default_name}]: ')
         if not io_name:
             io_name = io_default_name
         io_desc = input('    Description          : ')
-        init_header = init_header + '    Store%s<%s> m_%s; /**< %s */\n' \
-            % (io_type, io_class, io_name, io_desc)
-        header_includes.append('Store%s' % io_type)
+        init_header = init_header + f'    Store{io_type}<{io_class}> m_{io_name}; /**< {io_desc} */\n'
+        header_includes.append(f'Store{io_type}')
         header_includes.append(io_class)
         if io_branch != '':
             ctor_src = ctor_src + f', m_{io_name}("{io_branch}")'
@@ -201,24 +195,22 @@ if __name__ == "__main__":
                 method_desc = input('    description       : ')
         if selected:
             if method == 'destructor':
-                methods_header = '''    /** %s */
-        ~%sModule() override;
+                methods_header = f'''    /** {method_desc} */
+        ~{module}Module() override;
+
+    ''' + methods_header
+                methods_src = f'''{module}Module::~{module}Module()
+    {{
+    }}
 
     ''' \
-                    % (method_desc, module) + methods_header
-                methods_src = '''%sModule::~%sModule()
-    {
-    }
-
-    ''' % (module, module) \
                     + methods_src
             else:
                 methods_header = methods_header \
-                    + '''    /** %s */
-        void %s() override;
+                    + f'''    /** {method_desc} */
+        void {method}() override;
 
-    ''' % (method_desc,
-                        method)
+    '''
                 if method == 'initialize':
                     methods_src = methods_src + '''void %sModule::%s()
     {
@@ -251,20 +243,17 @@ if __name__ == "__main__":
                 continue
             for name in files:
                 if name in header_includes:
-                    includes_header = includes_header + '#include <%s>\n' \
-                        % os.path.relpath(os.path.join(root, name), include_dir)
+                    includes_header = includes_header + f'#include <{os.path.relpath(os.path.join(root, name), include_dir)}>\n'
                     header_includes.remove(name)
                 elif name in src_includes:
-                    includes_src = includes_src + '#include <%s>\n' \
-                        % os.path.relpath(os.path.join(root, name), include_dir)
+                    includes_src = includes_src + f'#include <{os.path.relpath(os.path.join(root, name), include_dir)}>\n'
                     src_includes.remove(name)
 
     if len(header_includes + src_includes) > 0:
         sys.stderr.write('''
     WARNING: The header files for the following classes were not found:
     %s
-    '''
-                        % ', '.join(header_includes + src_includes))
+    '''   % ', '.join(header_includes + src_includes))
 
     # write the header file
     f = open(header, 'w')
@@ -279,33 +268,33 @@ if __name__ == "__main__":
     #pragma once
 
     #include <framework/core/Module.h>
-    %(includes)s
+    {includes}
 
-    namespace Belle2 {
+    namespace Belle2 {{
     /**
-     * %(module_description)s
+     * {module_description}
      */
-    class %(module)sModule : public Module {
+    class {module}Module : public Module {{
 
     public:
 
         /**
          * Constructor: Sets the description, the properties and the parameters of the module.
          */
-        %(module)sModule();
+        {module}Module();
 
-    %(methods)s
+    {methods}
     private:
 
-    %(members)s  };
-    }
-    """ % {
-        'includes': includes_header,
-        'module_description': module_desc,
-        'module': module,
-        'methods': methods_header,
-        'members': params_header + init_header,
-    })
+    {members}  }};
+    }}
+    """.format(
+        includes=includes_header,
+        module_description=module_desc,
+        module=module,
+        methods=methods_header,
+        members=params_header + init_header,
+    ))
     f.close()
 
     # write the source file
@@ -319,7 +308,7 @@ if __name__ == "__main__":
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-    #include <%(module_header)s>
+    #include <{module_header}>
 
     /* --------------- WARNING ---------------------------------------------- *
     If you have more complex parameter types in your class then simple int,
@@ -328,31 +317,31 @@ if __name__ == "__main__":
     * ---------------------------------------------------------------------- */
     // #include <framework/core/ModuleParam.templateDetails.h>
 
-    %(includes)s
+    {includes}
 
     using namespace Belle2;
 
-    REG_MODULE(%(module)s);
+    REG_MODULE({module});
 
-    %(module)sModule::%(module)sModule() : Module()%(constructor)s
-    {
+    {module}Module::{module}Module() : Module(){constructor}
+    {{
     // Set module properties
-    setDescription(R"DOC(%(module_description)s)DOC");
+    setDescription(R"DOC({module_description})DOC");
 
     // Parameter definitions
-    %(params)s
-    }
+    {params}
+    }}
 
-    %(methods)s
-    """ % {
-        'module_header': os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir),
-        'includes': includes_src,
-        'module_description': module_desc,
-        'module': module,
-        'constructor': ctor_src,
-        'methods': methods_src,
-        'params': params_src,
-    })
+    {methods}
+    """.format(
+        module_header=os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir),
+        includes=includes_src,
+        module_description=module_desc,
+        module=module,
+        constructor=ctor_src,
+        methods=methods_src,
+        params=params_src,
+    ))
     f.close()
 
     # fix the style of the new files and add them to git

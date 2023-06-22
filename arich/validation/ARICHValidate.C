@@ -26,6 +26,7 @@ void ARICHValidate(){
 
   // output file
   TFile* output = TFile::Open("ARICHValidate.root", "recreate");
+  gROOT->SetBatch(true);
 
   // define histograms for likelihood distributions
   TH1F* hpi = new TH1F("hpi","#pi;L_{#pi}-L_{K}",500000,-200,200);

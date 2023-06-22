@@ -68,7 +68,6 @@ particlegun.param('xVertexParams', [0.0, 0.0])
 particlegun.param('yVertexParams', [0.0, 0.0])
 particlegun.param('zVertexParams', [0.0, 0.0])
 particlegun.param('independentVertices', False)
-# Print the parameters of the particle gun
 main.add_module(particlegun)
 
 # Add simulation

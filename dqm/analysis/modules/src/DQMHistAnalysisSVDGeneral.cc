@@ -210,6 +210,10 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
   m_cClusterOnTrack3Time_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrack3Time_L456V");
 
+  m_cCluster3TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster3TimeGroupId");
+  m_cCluster6TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster6TimeGroupId");
+
+
   const int nY = 19;
   TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
                          "", "L4.x.1", "L4.x.2", "L4.x.3",
@@ -255,8 +259,9 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_h3OccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_h3OccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  //rtype = findHist("DQMInfo/rtype");
+//rtype = findHist("DQMInfo/rtype");
   runtype = "physics"; //rtype ? rtype->GetTitle() : "";
+
 }
 
 
@@ -277,6 +282,8 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   }
   m_cClusterOnTrackTime_L456V->Clear();
   m_cClusterOnTrack3Time_L456V->Clear();
+  m_cCluster3TimeGroupId->Clear();
+  m_cCluster6TimeGroupId->Clear();
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -452,6 +459,58 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_printCanvas)
     m_cClusterOnTrack3Time_L456V->Print("c_SVDClusterOnTrack3Time_L456V.pdf");
 
+
+  // cluster time for clusters of track
+  m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  if (m_h != NULL) {
+    m_hClusterOnTrackTime_L456V.Clear();
+    m_h->Copy(m_hClusterOnTrackTime_L456V);
+    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
+    Float_t mean_PeakInCenter = m_hClusterOnTrackTime_L456V.GetMean(); //
+    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
+    m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
+    bool hasError = false;
+    if (nEvents > m_statThreshold) {
+      if (runtype == "physics") {
+        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
+        if (difference_physics > m_timeThreshold) {
+          hasError = true;
+        }
+      } else if (runtype == "cosmic") {
+        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
+        if (difference_cosmic > m_timeThreshold) {
+          hasError = true;
+        }
+      } else {
+        B2WARNING("Run type:" << runtype);
+      }
+    } else {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    }
+    if (! hasError) {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    } else {
+      m_legError->Draw("same");
+      m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    }
+  } else {
+    B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
+    m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
+  }
+
+  m_cClusterOnTrackTime_L456V->cd();
+  m_hClusterOnTrackTime_L456V.Draw();
+
+  m_cClusterOnTrackTime_L456V->Modified();
+  m_cClusterOnTrackTime_L456V->Update();
+
+  if (m_printCanvas)
+    m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
+
+
   //check MODULE OCCUPANCY online & offline
 
   //reset canvas color
@@ -566,6 +625,78 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       }
     }
+
+    // Cluster Group Id
+    TH2F* htmp2 = NULL;
+
+    htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster3TimeGroupId");
+    if (htmp2 != NULL) {
+      m_hCluster3TimeGroupId.Clear();
+      htmp2->Copy(m_hCluster3TimeGroupId);
+      m_hCluster3TimeGroupId.SetTitle("Cluster Time GroupIds for 3 samples" + runID);
+      bool hasError = false;
+      if (nEvents > m_statThreshold) {
+
+      } else {
+        m_cCluster3TimeGroupId->SetFillColor(kGray);
+        m_cCluster3TimeGroupId->SetFrameFillColor(10);
+      }
+      if (! hasError) {
+        m_cCluster3TimeGroupId->SetFillColor(kGreen);
+        m_cCluster3TimeGroupId->SetFrameFillColor(10);
+      } else {
+        m_legError->Draw("same");
+        m_cCluster3TimeGroupId->SetFillColor(kRed);
+        m_cCluster3TimeGroupId->SetFrameFillColor(10);
+      }
+    } else {
+      B2INFO("Histogram SVDExpReco/SVDDQM_Cluster3TimeGroupId from SVDDQMExpReco module not found!");
+      m_cCluster3TimeGroupId->SetFillColor(kRed);
+    }
+
+    m_cCluster3TimeGroupId->cd();
+    m_hCluster3TimeGroupId.Draw();
+
+    m_cCluster3TimeGroupId->Modified();
+    m_cCluster3TimeGroupId->Update();
+
+    if (m_printCanvas)
+      m_cCluster3TimeGroupId->Print("c_SVDCluster3TimeGoupId.pdf");
+
+    htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster6TimeGroupId");
+    if (htmp2 != NULL) {
+      m_hCluster6TimeGroupId.Clear();
+      htmp2->Copy(m_hCluster6TimeGroupId);
+      m_hCluster6TimeGroupId.SetTitle("Cluster Time GroupIds for 6 samples" + runID);
+      bool hasError = false;
+      if (nEvents > m_statThreshold) {
+
+      } else {
+        m_cCluster6TimeGroupId->SetFillColor(kGray);
+        m_cCluster6TimeGroupId->SetFrameFillColor(10);
+      }
+      if (! hasError) {
+        m_cCluster6TimeGroupId->SetFillColor(kGreen);
+        m_cCluster6TimeGroupId->SetFrameFillColor(10);
+      } else {
+        m_legError->Draw("same");
+        m_cCluster6TimeGroupId->SetFillColor(kRed);
+        m_cCluster6TimeGroupId->SetFrameFillColor(10);
+      }
+    } else {
+      B2INFO("Histogram SVDExpReco/SVDDQM_Cluster6TimeGroupId from SVDDQMExpReco module not found!");
+      m_cCluster6TimeGroupId->SetFillColor(kRed);
+    }
+
+    m_cCluster6TimeGroupId->cd();
+    m_hCluster6TimeGroupId.Draw();
+
+    m_cCluster6TimeGroupId->Modified();
+    m_cCluster6TimeGroupId->Update();
+
+    if (m_printCanvas)
+      m_cCluster6TimeGroupId->Print("c_SVDCluster6TimeGoupId.pdf");
+
 
     //look for V histogram - OFFLINE ZS
     tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountV", tmp_layer, tmp_ladder, tmp_sensor);

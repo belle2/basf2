@@ -197,6 +197,12 @@ namespace Belle2 {
     /** v size */
     TH1F** m_clusterSizeV = nullptr;
 
+    /** time group id for 3 samples**/
+    TH2F* m_cluster3TimeGroupId = nullptr;
+
+    /** time group id for 6 samples**/
+    TH2F* m_cluster6TimeGroupId = nullptr;
+
     /** u time */
     TH1F** m_clusterTimeU = nullptr;
     /** v time */

@@ -99,6 +99,11 @@ namespace Belle2 {
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
     TCanvas* m_c3OccupancyV = nullptr; /**< occupancy V histo canvas  for 3 samples*/
 
+    TCanvas* m_cCluster3TimeGroupId = nullptr; /**< cluster time groupd Id histo canvas  for 3 samples*/
+    TH2F m_hCluster3TimeGroupId;  /**< clusters time group id  histo for 3 samples */
+    TCanvas* m_cCluster6TimeGroupId = nullptr; /**< cluster time groupd Id histo canvas  for 6 samples*/
+    TH2F m_hCluster6TimeGroupId;  /**< clusters time group id  histo for 6 samples */
+
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 

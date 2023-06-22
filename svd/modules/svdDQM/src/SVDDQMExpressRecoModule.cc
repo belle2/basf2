@@ -185,6 +185,10 @@ void SVDDQMExpressRecoModule::defineHisto()
   float TimeMin = -150;
   float TimeMax = 150;
 
+  int GroupIdBins = 21;
+  float GroupIdMin = -1.5;
+  float GroupIdMax = 19.5;
+
   int MaxBinBins = 6;
   int MaxBinMax = 6;
 
@@ -383,6 +387,23 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_cluster6TimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_cluster6TimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_cluster6TimeV456);
+
+
+  //----------------------------------------------------------------
+  // Cluster time group Id vs cluster time for 3-6 samples
+  //----------------------------------------------------------------
+  Name = "SVDDQM_Cluster3TimeGroupId";
+  Title = Form("SVD cluster Time GourpId %s vs cluster time for 3 samples", refFrame.Data());
+  m_cluster3TimeGroupId = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_cluster3TimeGroupId->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster3TimeGroupId->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_cluster3TimeGroupId);
+  Name = "SVDDQM_Cluster6TimeGroupId";
+  Title =  Form("SVD cluster Time GourpId %s vs cluster time for 6 samples", refFrame.Data());
+  m_cluster6TimeGroupId = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_cluster6TimeGroupId->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cluster6TimeGroupId->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_cluster6TimeGroupId);
 
   //----------------------------------------------------------------
   // MaxBin of strips for all sensors (offline ZS)
@@ -932,6 +953,19 @@ void SVDDQMExpressRecoModule::event()
     float time = cluster.getClsTime();
     if (m_desynchSVDTime && m_svdEventInfo.isValid())
       time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
+
+    int groupId = -99;
+    vector<int> vec = cluster.getTimeGroupId();
+    auto minElement = min_element(vec.begin(), vec.end());
+    if (vec.size() > 0) {
+      groupId = *minElement;
+
+      if (iLayer == 3) {
+        if (m_cluster3TimeGroupId != nullptr) m_cluster3TimeGroupId->Fill(time, groupId);
+      } else {
+        if (m_cluster6TimeGroupId != nullptr) m_cluster6TimeGroupId->Fill(time, groupId);
+      }
+    }
 
     if (cluster.isUCluster()) {
       countsU.at(index).insert(SensorInfo.getUCellID(cluster.getPosition()));

@@ -121,5 +121,10 @@ namespace Belle2 {
 
     DBObjPtr<SVDSpacePointSelectionFunction> m_svdSpacePointSelectionFunction; /**< SVD Reconstruction Configuration payload*/
 
+    bool m_useSVDSpacePointSelectionFunctionFor6Samples =
+      false; /**< Use SVDSpacePointSelectionFunction to reject combinations in 6-sample DAQ mode */
+    bool m_useSVDSpacePointSelectionFunctionFor3Samples =
+      false; /**< Use SVDSpacePointSelectionFunction to reject combinations in 3-sample DAQ mode */
+
   };
 } // end namespace Belle2

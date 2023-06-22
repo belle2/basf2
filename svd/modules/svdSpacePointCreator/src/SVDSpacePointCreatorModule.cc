@@ -82,7 +82,10 @@ void SVDSpacePointCreatorModule::beginRun()
     m_useSVDGroupInfoIn6Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(6);
     m_useSVDGroupInfoIn3Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(3);
 
-    if (false) {
+    m_useSVDSpacePointSelectionFunctionFor6Samples = m_recoConfig->useSVDSpacePointSelectionFunction(6);
+    m_useSVDSpacePointSelectionFunctionFor3Samples = m_recoConfig->useSVDSpacePointSelectionFunction(3);
+
+    if (m_useSVDSpacePointSelectionFunctionFor6Samples || m_useSVDSpacePointSelectionFunctionFor3Samples) {
       if (!m_svdSpacePointSelectionFunction.isValid())
         B2FATAL("No valid SVDSpacePointSelectionFunction");
     }
@@ -140,7 +143,9 @@ void SVDSpacePointCreatorModule::event()
 {
 
   bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
-  if (useSVDGroupInfo) {
+  bool useSVDSpacePointSelectionFunction = m_useSVDSpacePointSelectionFunctionFor6Samples
+                                           || m_useSVDSpacePointSelectionFunctionFor3Samples;
+  if (useSVDGroupInfo || useSVDSpacePointSelectionFunction) {
     // first take Event Informations:
     StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
     if (!temp_eventinfo.isValid())
@@ -149,10 +154,13 @@ void SVDSpacePointCreatorModule::event()
     if (!eventinfo) B2ERROR("No SVDEventInfo!");
     int numberOfAcquiredSamples = eventinfo->getNSamples();
     // then use the respective parameters
-    if (numberOfAcquiredSamples == 6)
+    if (numberOfAcquiredSamples == 6) {
       useSVDGroupInfo = m_useSVDGroupInfoIn6Sample;
-    else if (numberOfAcquiredSamples == 3)
+      useSVDSpacePointSelectionFunction = m_useSVDSpacePointSelectionFunctionFor6Samples;
+    } else if (numberOfAcquiredSamples == 3) {
       useSVDGroupInfo = m_useSVDGroupInfoIn3Sample;
+      useSVDSpacePointSelectionFunction = m_useSVDSpacePointSelectionFunctionFor3Samples;
+    }
   }
 
   if (m_onlySingleClusterSpacePoints == true) {
@@ -161,7 +169,7 @@ void SVDSpacePointCreatorModule::event()
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
                                   m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo,
-                                  m_NoiseCal, m_svdSpacePointSelectionFunction);
+                                  m_NoiseCal, m_svdSpacePointSelectionFunction, useSVDSpacePointSelectionFunction);
   }
 
 

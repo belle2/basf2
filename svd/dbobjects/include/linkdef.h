@@ -68,7 +68,7 @@
 #pragma link C++ class Belle2::SVDLocalConfigParameters +; // checksum=0x56a63232, version=1
 #pragma link C++ class Belle2::SVDGlobalConfigParameters +; // , checksum=0x1694a3c, version=3
 
-#pragma link C++ class Belle2::SVDRecoConfiguration +; // checksum=0xc7b6bb94, version=2
+#pragma link C++ class Belle2::SVDRecoConfiguration +; // checksum=0xb4cdeccb, version=3
 #pragma link C++ class Belle2::SVDTimeGroupingParameters +; // checksum=0xbd78f1eb, implicit, version=1
 #pragma link C++ class Belle2::SVDTimeGroupingConfiguration +; // checksum=0xfa3204bf, version=1
 
@@ -129,3 +129,24 @@
   targetClass="Belle2::SVDClusterCuts"\
   target="UnfoldingCoeff"          \
   code="{ UnfoldingCoeff = 0;}" \
+
+
+// SVDRecoConfiguration
+// New member object, m_useSVDSpacePointSelectionFunctionFor6Samples is added in verion 3.
+#pragma read \
+  sourceClass="Belle2::SVDRecoConfiguration"\
+  source=""\
+  version="[-2]" \
+  targetClass="Belle2::SVDRecoConfiguration"\
+  target="m_useSVDSpacePointSelectionFunctionFor6Samples"          \
+  code="{ m_useSVDSpacePointSelectionFunctionFor6Samples = false;}" \
+
+// SVDRecoConfiguration
+// New member object, m_useSVDSpacePointSelectionFunctionFor3Samples is added in verion 3.
+#pragma read \
+  sourceClass="Belle2::SVDRecoConfiguration"\
+  source=""\
+  version="[-2]" \
+  targetClass="Belle2::SVDRecoConfiguration"\
+  target="m_useSVDSpacePointSelectionFunctionFor3Samples"          \
+  code="{ m_useSVDSpacePointSelectionFunctionFor3Samples = false;}" \

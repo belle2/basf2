@@ -5,30 +5,26 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef HISTORELAY_H
-#define HISTORELAY_H
 
-#include <string>
 
-#include <daq/dataflow/EvtSocket.h>
-#include <daq/dqm/DqmMemFile.h>
+#pragma once
+#include <vector>
+#include "trg/klm/modules/klmtrigger/KLMAxis.h"
+
 
 namespace Belle2 {
-  class HistoRelay {
+  class KLM_TRG_definitions {
   public:
-    HistoRelay(std::string& filename, std::string& dest, int port);
-    ~HistoRelay();
-
-    int collect();
-  private:
-    std::string m_filename;
-    DqmMemFile* m_memfile;
-    EvtSocketSend* m_sock;
-    std::string m_dest;
-    int m_port;
-
+    enum SubdetectorSector {
+      c_forward_eklm = 0,
+      c_forward_bklm = 1,
+      c_backward_bklm = 2,
+      c_backward_eklm = 3
+    };
   };
+
+
+  Belle2::group_helper::KLM_trg_summery  make_trg(const  std::vector<Belle2::group_helper::KLM_Digit_compact>& hits, int eventNR,
+                                                  int NLayerTrigger);
+
 }
-
-#endif
-

@@ -11,6 +11,7 @@
 // TOP headers.
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPTimeZero.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 
 // Basf2 headers.
@@ -88,6 +89,7 @@ namespace Belle2 {
     // histograms
     TH1D* m_BoolEvtMonitor = 0; /**< Event desynchronization monitoring */
     TH2F* m_window_vs_slot = 0; /**< Histogram window w.r.t reference vs. slot number */
+    TH1F* m_eventT0 = 0; /**< reconstructed event T0 */
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
     TH1F* m_time = 0; /**< time distribution of good hits */
     TProfile* m_signalHits = 0; /**< number of hits in the signal time window vs. slot number */
@@ -120,7 +122,8 @@ namespace Belle2 {
     // dataobjects
     StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
-    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch and event T0 */
+    StoreArray<TOPTimeZero> m_timeZeros; /**< reconstructed event T0 in case of cosmics */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
 
     // dbobjects

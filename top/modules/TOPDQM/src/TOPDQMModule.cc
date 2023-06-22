@@ -80,6 +80,10 @@ namespace Belle2 {
     m_window_vs_slot->SetStats(kFALSE);
     m_window_vs_slot->SetMinimum(0);
 
+    int nbinsT0 = 75;
+    double rangeT0 = nbinsT0 * bunchTimeSep;
+    m_eventT0 = new TH1F("eventT0", "reconstructed event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
+
     m_bunchOffset = new TH1F("bunchOffset", "Reconstructed bunch: current offset", 100, -bunchTimeSep / 2, bunchTimeSep / 2);
     m_bunchOffset->SetXTitle("offset [ns]");
     m_bunchOffset->SetYTitle("events per bin");
@@ -233,6 +237,7 @@ namespace Belle2 {
     m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
     m_digits.isRequired();
     m_recBunch.isOptional();
+    m_timeZeros.isOptional();
     m_tracks.isOptional();
 
   }
@@ -241,6 +246,7 @@ namespace Belle2 {
   {
     m_BoolEvtMonitor->Reset();
     m_window_vs_slot->Reset();
+    m_eventT0->Reset();
     m_bunchOffset->Reset();
     m_time->Reset();
     m_signalHits->Reset();
@@ -271,11 +277,15 @@ namespace Belle2 {
   void TOPDQMModule::event()
   {
 
-    // set flag denoting that bunch is reconstructed
+    // check if event time is reconstructed; distinguish collision data and cosmics
 
     bool recBunchValid = false;
-    if (m_recBunch.isValid()) {
-      recBunchValid = m_recBunch->isReconstructed();
+    bool cosmics = false;
+    if (m_recBunch.isValid()) { // collision data
+      recBunchValid = m_recBunch->isReconstructed(); // event time is reconstructed
+    } else if (m_timeZeros.getEntries() ==  1) { // cosmics w/ reconstructed event time
+      cosmics = true;
+      m_eventT0->Fill(m_timeZeros[0]->getTime());
     }
 
     // fill bunch offset
@@ -283,6 +293,7 @@ namespace Belle2 {
     if (recBunchValid) {
       double t0 = m_commonT0->isRoughlyCalibrated() ? m_commonT0->getT0() : 0;
       m_bunchOffset->Fill(m_recBunch->getCurrentOffset() - t0);
+      m_eventT0->Fill(m_recBunch->getTime());
     }
 
     // fill event desynchronization
@@ -307,11 +318,11 @@ namespace Belle2 {
       trackMomenta[slot - 1] = std::max(trackMomenta[slot - 1], fitResult->getMomentum().R());
     }
 
-    // select modules for counting the hits in signal and background time windows
+    // select modules for counting hits in signal and background time windows
 
     std::vector<bool> selectedSlots(m_numModules, false);
     for (size_t i = 0; i < selectedSlots.size(); i++) {
-      selectedSlots[i] = recBunchValid and numTracks[i] == 1 and trackMomenta[i] > m_momentumCut;
+      selectedSlots[i] = (recBunchValid or cosmics) and numTracks[i] == 1 and trackMomenta[i] > m_momentumCut;
     }
 
     // prepare counters
@@ -342,14 +353,17 @@ namespace Belle2 {
         m_goodTDCAll->Fill(digit.getRawTime());
         m_goodChannelHits[slot - 1]->Fill(digit.getChannel());
         nHits_good++;
-        double time = digit.getTime();
-        if (recBunchValid and numTracks[slot - 1] > 0) {
-          m_goodTiming[slot - 1]->Fill(time);
-          m_time->Fill(time);
-        }
-        if (selectedSlots[slot - 1] and abs(time) < 50) {
-          if (time > 0) numSignalHits[slot - 1]++;
-          else numBackgroundHits[slot - 1]++;
+        if (digit.hasStatus(TOPDigit::c_EventT0Subtracted)) {
+          double time = digit.getTime();
+          if (cosmics) time += 10; // move for 10 ns in order to get the complete signal at positive times
+          if (numTracks[slot - 1] > 0) {
+            m_goodTiming[slot - 1]->Fill(time);
+            m_time->Fill(time);
+          }
+          if (selectedSlots[slot - 1] and abs(time) < 50) {
+            if (time > 0) numSignalHits[slot - 1]++;
+            else numBackgroundHits[slot - 1]++;
+          }
         }
       } else { // bad hits: FE not valid, pedestal jump, too short or too wide pulses
         m_badHitsXY[slot - 1]->Fill(digit.getPixelCol(), digit.getPixelRow());
@@ -361,7 +375,7 @@ namespace Belle2 {
       }
     }
 
-    // fill counters
+    // histogram counters
 
     m_goodHitsPerEventAll->Fill(nHits_good);
     m_badHitsPerEventAll->Fill(nHits_bad);

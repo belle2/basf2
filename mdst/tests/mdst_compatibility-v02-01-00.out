@@ -25,6 +25,7 @@ Untested method Track::getTrackFitResultsByName
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
 Untested method Track::setTrackTime
+Untested method V0::getFittedVertexPosition
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
@@ -621,6 +622,9 @@ Track#17:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#49
@@ -630,6 +634,9 @@ V0#0:
     -> Tracks#2
   getV0Hypothesis(): <type: Lambda0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#51
@@ -639,6 +646,9 @@ V0#1:
     -> Tracks#3
   getV0Hypothesis(): <type: Lambda0>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#53
@@ -11505,6 +11515,9 @@ Track#16:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#44
@@ -11514,6 +11527,9 @@ V0#0:
     -> Tracks#14
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#46
@@ -11523,6 +11539,9 @@ V0#1:
     -> Tracks#14
   getV0Hypothesis(): <type: gamma>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#48
@@ -11532,6 +11551,9 @@ V0#2:
     -> Tracks#14
   getV0Hypothesis(): <type: Lambda0>
 V0#3:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#50
@@ -11541,6 +11563,9 @@ V0#3:
     -> Tracks#11
   getV0Hypothesis(): <type: anti-Lambda0>
 V0#4:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#52
@@ -11550,6 +11575,9 @@ V0#4:
     -> Tracks#11
   getV0Hypothesis(): <type: K_S0>
 V0#5:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#54
@@ -11559,6 +11587,9 @@ V0#5:
     -> Tracks#11
   getV0Hypothesis(): <type: gamma>
 V0#6:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#56
@@ -11568,6 +11599,9 @@ V0#6:
     -> Tracks#11
   getV0Hypothesis(): <type: Lambda0>
 V0#7:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#58
@@ -11577,6 +11611,9 @@ V0#7:
     -> Tracks#11
   getV0Hypothesis(): <type: anti-Lambda0>
 V0#8:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#60
@@ -11586,6 +11623,9 @@ V0#8:
     -> Tracks#12
   getV0Hypothesis(): <type: K_S0>
 V0#9:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#62
@@ -11595,6 +11635,9 @@ V0#9:
     -> Tracks#12
   getV0Hypothesis(): <type: gamma>
 V0#10:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#64
@@ -11604,6 +11647,9 @@ V0#10:
     -> Tracks#12
   getV0Hypothesis(): <type: Lambda0>
 V0#11:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#66
@@ -11613,6 +11659,9 @@ V0#11:
     -> Tracks#12
   getV0Hypothesis(): <type: anti-Lambda0>
 V0#12:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#68
@@ -11622,6 +11671,9 @@ V0#12:
     -> Tracks#12
   getV0Hypothesis(): <type: K_S0>
 V0#13:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#70
@@ -11631,6 +11683,9 @@ V0#13:
     -> Tracks#12
   getV0Hypothesis(): <type: gamma>
 V0#14:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#72
@@ -11640,6 +11695,9 @@ V0#14:
     -> Tracks#12
   getV0Hypothesis(): <type: Lambda0>
 V0#15:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#74
@@ -21096,6 +21154,9 @@ Track#8:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#24
@@ -21105,6 +21166,9 @@ V0#0:
     -> Tracks#4
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#26
@@ -21114,6 +21178,9 @@ V0#1:
     -> Tracks#4
   getV0Hypothesis(): <type: gamma>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#28
@@ -21123,6 +21190,9 @@ V0#2:
     -> Tracks#4
   getV0Hypothesis(): <type: Lambda0>
 V0#3:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#30

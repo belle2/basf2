@@ -2,6 +2,7 @@ import basf2
 from ROOT import Belle2
 import numpy as np
 import pickle
+import os
 
 
 class nntd(basf2.Module):
@@ -85,6 +86,8 @@ class nntd(basf2.Module):
         # setup histograms
         self.data = None  # np.array([[[]]])
         self.eventlist = []
+        self.networkname = "unspecified net"
+        self.dataname = "unspecified runs"
         # TODO
         # # dict of plots, which should be plotted during the processing and updated every 5000 events.
         # self.plotdict = {}
@@ -100,13 +103,34 @@ class nntd(basf2.Module):
 
         # storearrays
         self.recotracks = Belle2.PyStoreArray(self.recotracksname)
-        self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
-        self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
-        self.swneurotracks = Belle2.PyStoreArray(self.swneurotracksname)
-        self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
-        self.swtwodtracks = Belle2.PyStoreArray(self.swtwodtracksname)
-        self.ts = Belle2.PyStoreArray(self.tsname)
-        self.etf = Belle2.PyStoreObj(self.etfname)
+        try:
+            self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
+        except ValueError:
+            self.neurotracks = None
+        try:
+            self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
+        except ValueError:
+            self.hwneurotracks = None
+        try:
+            self.swneurotracks = Belle2.PyStoreArray(self.swneurotracksname)
+        except ValueError:
+            self.swneurotracks = None
+        try:
+            self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
+        except ValueError:
+            self.twodtracks = None
+        try:
+            self.swtwodtracks = Belle2.PyStoreArray(self.swtwodtracksname)
+        except ValueError:
+            self.swtwodtracks = None
+        try:
+            self.ts = Belle2.PyStoreArray(self.tsname)
+        except ValueError:
+            self.ts = None
+        try:
+            self.etf = Belle2.PyStoreObj(self.etfname)
+        except ValueError:
+            self.etf = None
 
         self.varnum = nntd.varnum
 
@@ -300,17 +324,20 @@ class nntd(basf2.Module):
         # both save histograms to file and show them in the plots
         self.save()
 
-    def save(self, filename=None, netname=None):
+    def save(self, filename=None, netname=None, dataname=None):
         if not filename:
             filename = self.filename
         if not netname:
             netname = self.netname
+        if not dataname:
+            dataname = self.dataname
         # save the dataset as an array, the corresponding varnum,
         # and a description about the dataset into a pickle file
         savedict = {}
         savedict["eventlist"] = self.eventlist
         savedict["varnum"] = self.varnum
         savedict["networkname"] = netname
+        savedict["dataname"] = dataname
         savedict["version"] = nntd.version
         f = open(filename, 'wb')
         pickle.dump(savedict, f)
@@ -318,6 +345,24 @@ class nntd(basf2.Module):
         print('file ' + filename + ' has been saved. ')
 
     def loadmore(self, filenames):
+        # first, check the amount of events and limit them to NNTD_EVLIMIT
+        evlim = 0
+        evnumber = 0
+        skipev = 0
+        if "NNTD_EVLIMIT" in os.environ:
+            evlim = int(os.environ["NNTD_EVLIMIT"])
+        else:
+            evlim = 50000
+        for i, x in enumerate(filenames):
+            print("checking file: " + str(i) + "/" + str(len(filenames)))
+            f = open(x, 'rb')
+            evnumber += len(pickle.load(f)["eventlist"])
+        if evnumber > evlim:
+            print("total number of available events is " + str(evnumber))
+            skipev = int(evnumber/evlim)
+            print("Number of events more than " + str(evlim) + " only taking every " + str(skipev) + " event")
+        else:
+            skipev = 1
         for x in filenames:
             f = open(x, 'rb')
             savedict = pickle.load(f)
@@ -326,10 +371,18 @@ class nntd(basf2.Module):
                 print("Error! loaded file was made with different version of nntd! exiting ... ")
                 exit()
             self.networkname = savedict["networkname"]
-            self.eventlist += savedict["eventlist"]
+            if "dataname" in savedict:
+                self.dataname = savedict["dataname"]
+            templim = evlim-len(self.eventlist)
+            self.eventlist += savedict["eventlist"][::skipev][:templim]
             self.varnum = savedict["varnum"]
             print("Loaded file: " + x)
+            print("length of eventlist: " + str(len(self.eventlist)))
+            if evlim <= len(self.eventlist):
+                print("stop loading, maximum event number reached")
+                break
         self.makearray(self.eventlist)
+        print("all files loaded, array.size: " + str(self.data.size) + ", array.shape: " + str(self.data.shape))
 
     def load(self, filename):
         # load a given pickle file
@@ -342,6 +395,7 @@ class nntd(basf2.Module):
         self.eventlist = savedict["eventlist"]
         self.varnum = savedict["varnum"]
         self.networkname = savedict["networkname"]
+        self.dataname = savedict["dataname"]
         # self.eventfilters()
         self.makearray(self.eventlist)
 

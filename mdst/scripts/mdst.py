@@ -103,7 +103,10 @@ def add_mdst_dump(path, print_untested=False):
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
         }),
-        DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
+        DataStorePrinter("V0", [
+            "getTracks", "getTrackFitResults", "getV0Hypothesis",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ"
+            ], {
             "getRelationsWith": ["MCParticles"],
         }),
         DataStorePrinter("TrackFitResult", [

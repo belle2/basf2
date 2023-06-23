@@ -58,16 +58,24 @@ void DQMHistAnalysisEventT0Module::initialize()
   m_pad2CDCTRG = new TPad("pad2CDCTRG", "pad2 CDCTRG", 0.35, 0.02, 0.65, 0.98);
   m_pad3CDCTRG = new TPad("pad3CDCTRG", "pad3 CDCTRG", 0.67, 0.02, 0.97, 0.98);
 
-  //SVDTRG canvases
-  m_cSVDTRG = new TCanvas("EventT0/c_SVDTRGjitter", "SVDTRG jitter", 1200, 400);
-  m_pad1SVDTRG = new TPad("pad1SVDTRG", "pad1 SVDTRG", 0.03, 0.02, 0.33, 0.98);
-  m_pad2SVDTRG = new TPad("pad2SVDTRG", "pad2 SVDTRG", 0.35, 0.02, 0.65, 0.98);
-  m_pad3SVDTRG = new TPad("pad3SVDTRG", "pad3 SVDTRG", 0.67, 0.02, 0.97, 0.98);
+  //SVD canvases
+  //ECLTRG canvas
+  m_cSVDECLTRG = new TCanvas("EventT0/c_SVDECLTRGjitter", "SVD ECLTRG jitter", 1200, 400);
+  m_svdPad1ECLTRG = new TPad("svdPad1ECLTRG", "pad1 ECLTRG", 0.03, 0.02, 0.33, 0.98);
+  m_svdPad2ECLTRG = new TPad("svdPad2ECLTRG", "pad2 ECLTRG", 0.35, 0.02, 0.65, 0.98);
+  m_svdPad3ECLTRG = new TPad("svdPad3ECLTRG", "pad3 ECLTRG", 0.67, 0.02, 0.97, 0.98);
+
+  // CDC TRG canvas
+  m_cSVDCDCTRG = new TCanvas("EventT0/c_SVDCDCTRGjitter", "SVD CDCTRG jitter", 1200, 400);
+  m_svdPad1CDCTRG = new TPad("svdPad1CDCTRG", "pad1 SVD CDCTRG", 0.03, 0.02, 0.33, 0.98);
+  m_svdPad2CDCTRG = new TPad("svdPad2CDCTRG", "pad2 SVD CDCTRG", 0.35, 0.02, 0.65, 0.98);
+  m_svdPad3CDCTRG = new TPad("svdPad3CDCTRG", "pad3 SVD CDCTRG", 0.67, 0.02, 0.97, 0.98);
 
   m_monObj = getMonitoringObject("eventT0");
   m_monObj->addCanvas(m_cECLTRG);
   m_monObj->addCanvas(m_cCDCTRG);
-  m_monObj->addCanvas(m_cSVDTRG);
+  m_monObj->addCanvas(m_cSVDECLTRG);
+  m_monObj->addCanvas(m_cSVDCDCTRG);
 }
 
 
@@ -75,7 +83,8 @@ void DQMHistAnalysisEventT0Module::beginRun()
 {
   m_cECLTRG->Clear();
   m_cCDCTRG->Clear();
-  m_cSVDTRG->Clear();
+  m_cSVDECLTRG->Clear();
+  m_cSVDCDCTRG->Clear();
 }
 
 void DQMHistAnalysisEventT0Module::endRun()
@@ -196,28 +205,120 @@ void DQMHistAnalysisEventT0Module::endRun()
   if (m_printCanvas)
     m_cCDCTRG->Print(Form("%s_CDCTRG.pdf", m_prefixCanvas.c_str()));
 
+  // ---SVD  ECLTRG ---
 
-  //find SVD EventT0 Mumus SVDTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_TOP_mumu_L1_SVDTRG");
-  tag = "mumuSVDTRG";
-  m_pad3SVDTRG->cd();
+  //find SVD EventT0 Hadrons ECLTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_SVD_hadron_L1_ECLTRG");
+  tag = "hadronECLTRG";
+  m_svdPad1ECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_pad3SVDTRG->SetFillColor(0);
-    m_pad3SVDTRG->Modified();
-    m_pad3SVDTRG->Update();
+    m_svdPad1ECLTRG->SetFillColor(0);
+    m_svdPad1ECLTRG->Modified();
+    m_svdPad1ECLTRG->Update();
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    h->Draw();
+    m_svdPad1ECLTRG->SetFillColor(kGray);
+  }
+
+  //find SVD EventT0 Bhabhas ECLTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_SVD_bhabha_L1_ECLTRG");
+  tag = "bhabhaECLTRG";
+  m_svdPad2ECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_svdPad2ECLTRG->SetFillColor(0);
+    m_svdPad2ECLTRG->Modified();
+    m_svdPad2ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
-    m_pad3SVDTRG->SetFillColor(kGray);
+    m_svdPad2ECLTRG->SetFillColor(kGray);
   }
 
-  m_cSVDTRG->cd();
-  m_pad1SVDTRG->Draw();
-  m_pad2SVDTRG->Draw();
-  m_pad3SVDTRG->Draw();
+
+  //find SVD EventT0 Mumus ECLTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_SVD_mumu_L1_ECLTRG");
+  tag = "mumuECLTRG";
+  m_svdPad3ECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_svdPad3ECLTRG->SetFillColor(0);
+    m_svdPad3ECLTRG->Modified();
+    m_svdPad3ECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    h->Draw();
+    m_svdPad3ECLTRG->SetFillColor(kGray);
+  }
+
+  m_cSVDECLTRG->cd();
+  m_svdPad1ECLTRG->Draw();
+  m_svdPad2ECLTRG->Draw();
+  m_svdPad3ECLTRG->Draw();
 
   if (m_printCanvas)
-    m_cSVDTRG->Print(Form("%s_SVDTRG.pdf", m_prefixCanvas.c_str()));
+    m_cSVDECLTRG->Print(Form("%s_SVDECLTRG.pdf", m_prefixCanvas.c_str()));
+
+
+  // --- CDCTRG ---
+
+  //find SVD EventT0 Hadrons CDCTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_SVD_hadron_L1_CDCTRG");
+  tag = "hadronCDCTRG";
+  m_svdPad1CDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_svdPad1CDCTRG->SetFillColor(0);
+    m_svdPad1CDCTRG->Modified();
+    m_svdPad1CDCTRG->Update();
+    m_cSVDCDCTRG->cd();
+    m_svdPad1CDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    h->Draw();
+    m_svdPad1CDCTRG->SetFillColor(kGray);
+    m_cSVDCDCTRG->cd();
+    m_svdPad1CDCTRG->Draw();
+  }
+
+  //find SVD EventT0 Bhabhas CDCTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_SVD_bhabha_L1_CDCTRG");
+  tag = "bhabhaCDCTRG";
+  m_svdPad2CDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_svdPad2CDCTRG->SetFillColor(0);
+    m_svdPad2CDCTRG->Modified();
+    m_svdPad2CDCTRG->Update();
+    m_cSVDCDCTRG->cd();
+    m_svdPad2CDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    h->Draw();
+    m_svdPad2CDCTRG->SetFillColor(kGray);
+    m_cSVDCDCTRG->cd();
+    m_svdPad2CDCTRG->Draw();
+  }
+
+
+  //find SVD EventT0 Mumus CDCTRG histogram and process it
+  h = findHist("EventT0DQMdir/m_histEventT0_SVD_mumu_L1_CDCTRG");
+  tag = "mumuCDCTRG";
+  m_svdPad3CDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_svdPad3CDCTRG->SetFillColor(0);
+    m_svdPad3CDCTRG->Modified();
+    m_svdPad3CDCTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    h->Draw();
+    m_svdPad3CDCTRG->SetFillColor(kGray);
+  }
+
+  m_cSVDCDCTRG->cd();
+  m_svdPad1CDCTRG->Draw();
+  m_svdPad2CDCTRG->Draw();
+  m_svdPad3CDCTRG->Draw();
+
+  if (m_printCanvas)
+    m_cSVDCDCTRG->Print(Form("%s_SVDCDCTRG.pdf", m_prefixCanvas.c_str()));
+
 }
 
 void DQMHistAnalysisEventT0Module::terminate()
@@ -225,7 +326,8 @@ void DQMHistAnalysisEventT0Module::terminate()
 
   delete m_cECLTRG;
   delete m_cCDCTRG;
-  delete m_cSVDTRG;
+  delete m_cSVDECLTRG;
+  delete m_cSVDCDCTRG;
 
 }
 

@@ -62,7 +62,9 @@ namespace Belle2 {
 
     TCanvas* m_cECLTRG = nullptr; /**< TOP EventT0 for ECLTRG plots canvas */
     TCanvas* m_cCDCTRG = nullptr; /**< CDC EventT0 for Hadron CDCTRG plots canvas */
-    TCanvas* m_cSVDTRG = nullptr; /**< SVD EventT0 for Hadron CDCTRG plots canvas */
+    TCanvas* m_cSVDECLTRG = nullptr; /**< SVD EventT0 for Hadron ECLTRG plots canvas */
+    TCanvas* m_cSVDCDCTRG = nullptr; /**< SVD EventT0 for Hadron CDCTRG plots canvas */
+
     TPad* m_pad1ECLTRG = nullptr; /**< pad for ECLTRG hadrons */
     TPad* m_pad2ECLTRG = nullptr; /**< pad for ECLTRG bhabhas */
     TPad* m_pad3ECLTRG = nullptr; /**< pad for ECLTRG mumuss */
@@ -71,9 +73,13 @@ namespace Belle2 {
     TPad* m_pad2CDCTRG = nullptr; /**< pad for CDCTRG bhabhas */
     TPad* m_pad3CDCTRG = nullptr; /**< pad for CDCTRG mumus */
 
-    TPad* m_pad1SVDTRG = nullptr; /**< pad for SVDTRG hadrons */
-    TPad* m_pad2SVDTRG = nullptr; /**< pad for SVDTRG bhabhas */
-    TPad* m_pad3SVDTRG = nullptr; /**< pad for SVDTRG mumus */
+    TPad* m_svdPad1ECLTRG = nullptr; /**< SVD pad for ECLTRG hadrons */
+    TPad* m_svdPad2ECLTRG = nullptr; /**< SVD pad for ECLTRG bhabhas */
+    TPad* m_svdPad3ECLTRG = nullptr; /**< SVD pad for ECLTRG mumus */
+
+    TPad* m_svdPad1CDCTRG = nullptr; /**< SVD pad for CDCTRG hadrons */
+    TPad* m_svdPad2CDCTRG = nullptr; /**< SVD pad for CDCTRG bhabhas */
+    TPad* m_svdPad3CDCTRG = nullptr; /**< SVD pad for CDCTRG mumus */
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
   };

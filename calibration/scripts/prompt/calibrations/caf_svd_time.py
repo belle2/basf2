@@ -59,7 +59,9 @@ settings = CalibrationSettings(name="caf_svd_time",
                                    "lowerLineParameters": [-134.0, 1.264],
                                    "rangeRawTimeForIoVCoG6": [20., 80.],
                                    "rangeRawTimeForIoVCoG3": [70., 140.],
-                                   "rangeRawTimeForIoVELS3": [20., 80.]
+                                   "rangeRawTimeForIoVELS3": [20., 80.],
+                                   "useRawtimeForTracking": False,
+                                   "useSVDGrouping": True
                                })
 
 ##################################################################
@@ -204,7 +206,13 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     return cluster
 
 
-def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000, is_validation=False):
+def create_pre_collector_path(
+        clusterizers,
+        isMC=False,
+        max_events_per_run=10000,
+        useSVDGrouping=True,
+        useRawtimeForTracking=False,
+        is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
     modules with different configurations. This way they re-use the same reconstructed objects.
@@ -245,7 +253,28 @@ def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000
         add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True)
         path = remove_module(path, "V0Finder")
         if not is_validation:
-            b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
+            # if we would like using the grouping (True by default), we should use the calibrated cluster time
+            # if we would like to use the raw time, than the cluster grouping parameters are OK only for CoG3
+            # in the reconstruction (default in reconstruction)
+            if useSVDGrouping:
+                if useRawtimeForTracking:
+                    b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
+                    b2.set_module_parameters(path, 'SVDTimeGrouping', useDB=False,
+                                             isEnabledIn6Samples=True,
+                                             acceptSigmaN=5, removeSigmaN=5,
+                                             expectedSignalTimeCenter=100,
+                                             expectedSignalTimeMin=70, expectedSignalTimeMax=130,
+                                             tRangeLow=-20, tRangeHigh=220,
+                                             numberOfSignalGroups=2, formSingleSignalGroup=True)
+                else:
+                    b2.set_module_parameters(path, 'SVDTimeGrouping', useDB=False,
+                                             isEnabledIn6Samples=True, acceptSigmaN=3,
+                                             expectedSignalTimeMin=-30, expectedSignalTimeMax=30)
+                b2.set_module_parameters(path, 'SVDSpacePointCreator', useDB=False,
+                                         useSVDGroupInfoIn6Sample=True)
+            else:
+                b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
+                b2.set_module_parameters(path, 'SVDTimeGrouping', useDB=False, isEnabledIn6Samples=False)
 
         # repeat svd reconstruction using only SVDShaperDigitsFromTracks
         path.add_module("SVDShaperDigitsFromTracks")
@@ -271,6 +300,8 @@ def get_calibrations(input_data, **kwargs):
     rangeRawTimeForIoVCoG6 = expert_config["rangeRawTimeForIoVCoG6"]
     rangeRawTimeForIoVCoG3 = expert_config["rangeRawTimeForIoVCoG3"]
     rangeRawTimeForIoVELS3 = expert_config["rangeRawTimeForIoVELS3"]
+    useSVDGrouping = expert_config["useSVDGrouping"]
+    useRawtimeForTracking = expert_config["useRawtimeForTracking"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
                                                                max_events_per_run, random_select=True)
@@ -412,7 +443,8 @@ def get_calibrations(input_data, **kwargs):
 
     pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_clusterizers,
-        isMC=isMC, max_events_per_run=max_events_per_run)
+        isMC=isMC, max_events_per_run=max_events_per_run,
+        useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking)
 
     # Decide what collector will be "managed" by the CAF
     collector_managed_by_CAF = coll_els3
@@ -531,7 +563,9 @@ def get_calibrations(input_data, **kwargs):
 
     val_pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_val_clusterizers,
-        isMC=isMC, max_events_per_run=max_events_per_run, is_validation=True)
+        isMC=isMC, max_events_per_run=max_events_per_run,
+        useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking,
+        is_validation=True)
 
     val_collector_managed_by_CAF = val_coll_els3
     if "ELS3" in timeAlgorithms:

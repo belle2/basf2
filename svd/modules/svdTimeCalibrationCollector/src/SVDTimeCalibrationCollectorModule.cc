@@ -40,7 +40,7 @@ void SVDTimeCalibrationCollectorModule::prepare()
 {
   TH2F hEventT0vsCoG("eventT0vsCoG__L@layerL@ladderS@sensor@view",
                      "EventT0Sync vs rawTime in @layer.@ladder.@sensor @view/@side",
-                     int(200 / m_rawCoGBinWidth), -100, 100, 100, -100, 100);
+                     int(200 / m_rawCoGBinWidth), -100, 100, 60, -100, 20);
   hEventT0vsCoG.GetYaxis()->SetTitle("EventT0Sync (ns)");
   hEventT0vsCoG.GetXaxis()->SetTitle("raw_time (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);

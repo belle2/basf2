@@ -601,7 +601,8 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   TH1F* h_clusterTime_L456V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   TH1F* h_MeanSVD3EventT0   = (TH1F*)findHist("SVDHitTime/SVD3EventT0");
   TH1F* h_MeanSVD6EventT0   = (TH1F*)findHist("SVDHitTime/SVD6EventT0");
-  TH1F* h_MeanSVDEventT0    = (TH1F*)findHist("SVDHitTime/SVDEventT0");
+  TH1F* h_MeanSVDEventT0    = (TH1F*)h_MeanSVD3EventT0->Clone();
+  h_MeanSVDEventT0->Add(h_MeanSVD6EventT0);
 
   m_c_MPVTimeClusterOnTrack->Clear();
   m_c_MPVTimeClusterOnTrack->Divide(2, 2);

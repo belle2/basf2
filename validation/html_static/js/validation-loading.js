@@ -850,11 +850,20 @@ function getNewestRevision(index=0) {
         return "reference";
     }
 
+    // If at least one nightly revision is selected, pick the newest nightly instead of the newest overall
+    let nightlySelected = false;
+    for (let revision of revisionsData["revisions"]){
+        if (revision.startsWith("nightly")) {
+            nightlySelected = true;
+        }
+    }
+
     let date2rev = {};
     for (let revision of revisionsData["revisions"]){
         let label = revision["label"];
         if ( ! selectedRevs.includes(label)) continue;
         if ( label === "reference" ) continue;
+        if ( nightlySelected && ! label.startsWith("nightly")) continue;
         let date = revision["creation_date"];
         date2rev[date] = label;
     }

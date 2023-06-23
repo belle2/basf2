@@ -49,8 +49,6 @@ namespace Belle2 {
     TCanvas* m_c_MPVTimeClusterOnTrack = nullptr; /**< time for clusters on track */
     TCanvas* m_c_avgMaxBinClusterOnTrack =
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
-    TCanvas* m_c_MeanSVD3EventT0 = nullptr; /**< Mean Event T0 from SVD  for 3 samples*/
-    TCanvas* m_c_MeanSVD6EventT0 = nullptr; /**< Mean Event T0 from SVD  for 6 samples*/
     TCanvas* m_c_MeanSVDEventT0 = nullptr; /**< Mean Event T0 from SVD */
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */

@@ -44,8 +44,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_c_MPVSNRClusterOnTrack = new TCanvas("svd_MPVSNRClusterOnTrack", "SNR from Clusters on Track Charge", 0, 0, 400, 400);
   m_c_MPVTimeClusterOnTrack = new TCanvas("svd_MPVTimeClusterOnTrack", "time from Clusters on Track Charge", 0, 0, 400, 400);
   m_c_avgMaxBinClusterOnTrack = new TCanvas("svd_avgMaxBin", "average MaxBin", 0, 0, 800, 600);
-  m_c_MeanSVD3EventT0 = new TCanvas("svd_MeanSVD3EventT0", "Mean Event T0 from SVD for 3 samples", 0, 0, 400, 400);
-  m_c_MeanSVD6EventT0 = new TCanvas("svd_MeanSVD6EventT0", "Mean Event T0 from SVD for 6 samples", 0, 0, 400, 400);
   m_c_MeanSVDEventT0 = new TCanvas("svd_MeanSVD6EventT0", "Mean Event T0 from SVD for all samples", 0, 0, 400, 400);
 
   // add canvases used to create monitoring variables to MonitoringObject
@@ -55,8 +53,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_monObj->addCanvas(m_c_MPVSNRClusterOnTrack);
   m_monObj->addCanvas(m_c_MPVTimeClusterOnTrack);
   m_monObj->addCanvas(m_c_avgMaxBinClusterOnTrack);
-  m_monObj->addCanvas(m_c_MeanSVD3EventT0);
-  m_monObj->addCanvas(m_c_MeanSVD6EventT0);
   m_monObj->addCanvas(m_c_MeanSVDEventT0);
 
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: initialized.");
@@ -618,11 +614,13 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_MPVTimeClusterOnTrack->cd(4);
   if (h_clusterTime_L456V) h_clusterTime_L456V->Draw();
 
-  m_c_MeanSVD3EventT0->Clear();
-  if (h_MeanSVD3EventT0) h_MeanSVD3EventT0->Draw();
-  m_c_MeanSVD6EventT0->Clear();
-  if (h_MeanSVD6EventT0) h_MeanSVD6EventT0->Draw();
   m_c_MeanSVDEventT0->Clear();
+  m_c_MeanSVDEventT0->Divide(2, 2);
+  m_c_MeanSVDEventT0->cd(1);
+  if (h_MeanSVD3EventT0) h_MeanSVD3EventT0->Draw();
+  m_c_MeanSVDEventT0->cd(2);
+  if (h_MeanSVD6EventT0) h_MeanSVD6EventT0->Draw();
+  m_c_MeanSVDEventT0->cd(3);
   if (h_MeanSVDEventT0) h_MeanSVDEventT0->Draw();
 
 

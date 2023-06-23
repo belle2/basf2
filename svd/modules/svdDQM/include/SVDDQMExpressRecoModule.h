@@ -62,6 +62,9 @@ namespace Belle2 {
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
 
+    /** additional plots flag*/
+    bool m_additionalPlots = false;
+
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
 

@@ -48,7 +48,7 @@ parser.add_argument("--doSVDGrouping", action="store_true",
                     help="Perform grouping of SVD Clusters")
 parser.add_argument("--signalLifetime", type=float, default=30,
                     help="Lifetime of Signal when computing exponential-weigth for sorting signal groups")
-parser.add_argument("--numberOfSignalGroups", type=int, default=20,
+parser.add_argument("--numberOfSignalGroups", type=int, default=1,
                     help="Select only few signal groups")
 parser.add_argument("--formSingleSignalGroup", action="store_true",
                     help="Assign groupId 0 to every signal groups")
@@ -505,7 +505,7 @@ class SVDGroupingPerformance(b2.Module):
                         - par1 * TMath.Sin(TMath.PiOver4()) + cdcEventT0 * TMath.Cos(TMath.PiOver4()))
                 fillOnce += 1
 
-            if par1 > sigMin and par1 < sigMax:
+            if minId == 0:
                 self.TH1F_Store[self.TH1F_Index["th1f_sigClsTime_PreTracking"]].Fill(clsTime)
             else:
                 self.TH1F_Store[self.TH1F_Index["th1f_bkgClsTime_PreTracking"]].Fill(clsTime)
@@ -702,7 +702,10 @@ for moda in main.modules():
         moda.param("returnClusterRawTime", args.isRawTime)
     if moda.name() == 'SVDTimeGrouping':
         if args.doSVDGrouping:
-            moda.param("useDB", False)
+            moda.param("forceGroupingFromDB", False)
+            moda.param("isEnabledIn6Samples", True)
+            moda.param("isEnabledIn3Samples", True)
+            moda.param("useParamFromDB", False)
             moda.param('tRangeLow',  minTime)
             moda.param('tRangeHigh', maxTime)
             moda.param("expectedSignalTimeCenter",    sigLoc)
@@ -710,14 +713,14 @@ for moda in main.modules():
             moda.param('expectedSignalTimeMax', sigMax)
             moda.param("isEnabledIn6Samples", True)
             moda.param("isEnabledIn3Samples", True)
-            moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
-            moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
             moda.param("signalLifetime", args.signalLifetime)
     if moda.name() == 'SVDSpacePointCreator':
         if args.useSVDGroupInfo:
             moda.param("useDB", False)
             moda.param("useSVDGroupInfoIn6Sample", True)
             moda.param("useSVDGroupInfoIn3Sample", True)
+            moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
+            moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
 
 
 if args.executionTime:

@@ -81,9 +81,11 @@ namespace Belle2 {
      */
     StoreArray<SVDCluster> m_svdClusters;
 
-    bool m_useDB; /**< if true takes the configuration from the DB objects. */
+    bool m_forceGroupingFromDB; /**< if true use configuration from the SVDRecConfiguration DB. */
     bool m_isEnabledIn6Samples; /**< Enables the module if true for 6-sample DAQ mode. */
     bool m_isEnabledIn3Samples; /**< Enables the module if true for 3-sample DAQ mode. */
+
+    bool m_useParamFromDB; /**< if true use the configuration from SVDTimeGroupingConfiguration DB. */
 
     /**
      * module parameter values for 6-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.

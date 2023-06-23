@@ -122,7 +122,7 @@ function triggerPopup(itemId) {
 
 /**
  * This function call is triggered by the button under the revisions list
- * "Load selected" and sets up the page with the new set of revisions.
+ * "Load custom selection" and sets up the page with the new set of revisions.
  */
 function loadSelectedRevisions() {
 

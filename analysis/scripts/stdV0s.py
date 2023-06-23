@@ -14,7 +14,7 @@ from stdCharged import stdPi, stdPr
 import vertex
 
 
-def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False):
+def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False, writeOut=False):
     """
     Load a combined list of the Kshorts list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.
@@ -32,16 +32,18 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         updateAllDaughters (bool): see the ``updateAllDaughters`` parameter of `vertex.treeFit`
             or the ``daughtersUpdate`` parameter of `vertex.kFit` / `vertex.raveFit`.
 
-    .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
-        to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
-        return meaningful results if the daughters momenta are updated.
+            .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
+                to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
+                return meaningful results if the daughters momenta are updated.
 
-        This happens because variables like `daughterAngle` assume the direction of the
-        daughers momenta *at the Ks vertex* to be provided, while non-updated daughters will
-        provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
+                This happens because variables like `daughterAngle` assume the direction of the
+                daughers momenta *at the Ks vertex* to be provided, while non-updated daughters will
+                provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
+
+        writeOut (bool): whether RootOutput module should save the created ParticleList
     """
     # Fill one list from V0
-    ma.fillParticleList('K_S0:V0_ToFit -> pi+ pi-', '', True, path=path)
+    ma.fillParticleList('K_S0:V0_ToFit -> pi+ pi-', '', writeOut=writeOut, path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:V0_ToFit', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
@@ -53,8 +55,8 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
     ma.applyCuts('K_S0:V0_ToFit', '0.450 < M < 0.550', path=path)
     # Reconstruct a second list
-    stdPi('all', path=path)  # no quality cuts
-    ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
+    stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
+    ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:RD', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
@@ -177,7 +179,7 @@ def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
-def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False):
+def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False, writeOut=False):
     """
     Load a combined list of the Lambda list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.
@@ -195,17 +197,19 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
         updateAllDaughters (bool): see the ``updateAllDaughters`` parameter of `vertex.treeFit`
             or the ``daughtersUpdate`` parameter of `vertex.kFit` / `vertex.raveFit`.
 
-    .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
-        to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
-        return meaningful results if the daughters momenta are updated.
+            .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
+                to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
+                return meaningful results if the daughters momenta are updated.
 
-        This happens because variables like `daughterAngle` assume the direction of the
-        daughers momenta *at the Lambda vertex* to be provided, while non-updated daughters
-        will provide their momenta direction at the point-of-closest-approach (POCA) to the
-        beam axis.
+                This happens because variables like `daughterAngle` assume the direction of the
+                daughers momenta *at the Lambda vertex* to be provided, while non-updated daughters
+                will provide their momenta direction at the point-of-closest-approach (POCA) to the
+                beam axis.
+
+        writeOut (bool): whether RootOutput module should save the created ParticleList
     """
     # Fill one list from V0
-    ma.fillParticleList('Lambda0:V0_ToFit -> p+ pi-', '', True, path=path)
+    ma.fillParticleList('Lambda0:V0_ToFit -> p+ pi-', '', writeOut=writeOut, path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
@@ -220,9 +224,9 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     ma.markDuplicate('Lambda0:V0_ToFit', False, path=path)
     ma.applyCuts('Lambda0:V0_ToFit', 'extraInfo(highQualityVertex)', path=path)
     # Reconstruct a second list
-    stdPi('all', path=path)  # no quality cuts
-    stdPr('all', path=path)  # no quality cuts
-    ma.reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, True, path=path)
+    stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
+    stdPr('all', path=path, writeOut=writeOut)  # no quality cuts
+    ma.reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('Lambda0:RD', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)

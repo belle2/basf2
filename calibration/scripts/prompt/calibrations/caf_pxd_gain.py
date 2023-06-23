@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -106,7 +104,7 @@ def get_calibrations(input_data, **kwargs):
 
     # input_files_physics = list(reduced_file_to_iov_physics.keys())
     input_iov_set_physics = set(reduced_file_to_iov_physics.values())
-    exp_set = set([iov.exp_low for iov in input_iov_set_physics])
+    exp_set = {iov.exp_low for iov in input_iov_set_physics}
 
     # boundaries setting for run chunks (At certain runs, gain was tuned)
     payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]

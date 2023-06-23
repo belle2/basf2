@@ -53,6 +53,8 @@ namespace Belle2 {
     std::vector<Variable::Manager::FunctionPtr> m_functions;
     /** Vector of extra info names */
     std::vector<std::string> m_extraInfoNames;
+
+    bool m_allVariablesEventbased = true; /**< Whether all variables are event-based */
   };
 }
 

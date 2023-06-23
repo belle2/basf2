@@ -53,7 +53,7 @@ namespace Belle2 {
        *  @param track   track for which we try to find merging partner
        *  @param tracks  search range of tracks
        *  @return        a pointer to the best fit candidate including a fit probability
-       *  @retval        <tt>{nullptr, 0}<\tt> in case no match was found
+       *  @retval        {nullptr, 0} in case no match was found
        */
       template <class ACDCTracks>
       static WithWeight<MayBePtr<CDCTrack> > calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks);

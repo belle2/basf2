@@ -82,15 +82,33 @@ void ECLShowerCorrectorModule::beginRun()
       leakLogE[2][ie] = logEnergiesBwd[ie];
     }
 
-    //..Position and nCrys dependent corrections
+    //..Position dependent corrections
     thetaCorrection = m_eclLeakageCorrections->getThetaCorrections();
     phiCorrection = m_eclLeakageCorrections->getPhiCorrections();
-    crysCorrection = m_eclLeakageCorrections->getnCrystalCorrections();
 
     //..Relevant parameters
     nPositionBins = thetaCorrection.GetNbinsY();
-    nCrysMax = crysCorrection.GetNbinsY();
     nXBins = nThetaID * nEnergies;
+  }
+
+  //-----------------------------------------------------------------
+  //..Get correction histograms related to the nOptimal number of crystals.
+  //  All three have energy bin as y, crystals group number as x.
+  //  Energy bin and group number for the shower are found in
+  //  eclSplitterN1 and are stored in the ECLShower dataobject.
+
+  if (m_eclNOptimal.hasChanged()) {
+
+    //..Bias is the difference between the peak energy in nOptimal crystals
+    //  before bias correction and the mc true deposited energy.
+    m_bias = m_eclNOptimal->getBias();
+
+    //..Log of the peak energy contained in nOptimal crystals after bias correction
+    m_logPeakEnergy = m_eclNOptimal->getLogPeakEnergy();
+
+    //..peakFracEnergy is the peak energy after subtracting the beam bias
+    //  divided by the generated photon energy.
+    m_peakFracEnergy = m_eclNOptimal->getPeakFracEnergy();
   }
 }
 
@@ -104,14 +122,67 @@ void ECLShowerCorrectorModule::event()
     //..Only want to correct EM showers
     if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {break;}
 
-    //-----------------------------------------------------------------
-    //..Shower quantities needed to find the correction.
+    //..Will correct both raw cluster energy and energy of the center crystal
     const double energyRaw = eclShower.getEnergy();
     const double energyRawHighest = eclShower.getEnergyHighestCrystal();
 
-    //..Crystals used to calculate energy
-    int nForEnergy = (int)(eclShower.getNumberOfCrystalsForEnergy() + 0.001);
-    const int nCrys = std::min(nCrysMax, nForEnergy);
+    //-----------------------------------------------------------------
+    //..Correct for bias and peak value corresponding to nOptimal crystals
+    const int iGroup = eclShower.getNOptimalGroupIndex();
+    const int iEnergy = eclShower.getNOptimalEnergyBin();
+    const double e3x3 = eclShower.getNOptimalEnergy(); // only for debugging
+
+    //..The optimal number of crystals for generated energy iEnergy and
+    //  group of crystals iGroup is nOptimal. There are three corresponding bins for
+    //  each of the 2D correction histograms m_logPeakEnergy, m_bias, and
+    //  m_peakFracEnergy. For example, the bias for nOptimal crystals in group iGroup is
+    //  m_bias(3*iGroup+1, iEnergy+1) for generated energy point iEnergy,
+    //  m_bias(3*iGroup+2, iEnergy+1) for generated energy point iEnergy-1, and
+    //  m_bias(3*iGroup+3, iEnergy+1) for generated energy point iEnergy+1
+    //  This allows the correction to be interpolated to an arbitrary observed energy.
+    const int iy = iEnergy + 1;
+
+    const int ixNom = 3 * iGroup + 1;
+    const int ixLowerE = ixNom + 1;
+    const int ixHigherE = ixNom + 2;
+
+    const double logENom = m_logPeakEnergy.GetBinContent(ixNom, iy);
+    const double logELower = m_logPeakEnergy.GetBinContent(ixLowerE, iy);
+    const double logEHigher = m_logPeakEnergy.GetBinContent(ixHigherE, iy);
+
+    const double biasNom = m_bias.GetBinContent(ixNom, iy);
+    const double biasLower = m_bias.GetBinContent(ixLowerE, iy);
+    const double biasHigher = m_bias.GetBinContent(ixHigherE, iy);
+
+    const double peakNom = m_peakFracEnergy.GetBinContent(ixNom, iy);
+    const double peakLower = m_peakFracEnergy.GetBinContent(ixLowerE, iy);
+    const double peakHigher = m_peakFracEnergy.GetBinContent(ixHigherE, iy);
+
+    //..Interpolate in log of raw energy
+    const double logESumN = log(energyRaw);
+
+    double logEOther = logELower;
+    double biasOther = biasLower;
+    double peakOther = peakLower;
+    if (logESumN > logENom) {
+      logEOther = logEHigher;
+      biasOther = biasHigher;
+      peakOther = peakHigher;
+    }
+
+    //..The nominal and "other" energies may be identical if this is the first or last energy
+    double bias = biasNom;
+    double peak = peakNom;
+    if (abs(logEOther - logENom) > 0.0001) {
+      bias = biasNom + (biasOther - biasNom) * (logESumN - logENom) / (logEOther - logENom);
+      peak = peakNom + (peakOther - peakNom) * (logESumN - logENom) / (logEOther - logENom);
+    }
+
+    //..Correct raw energy for bias and peak
+    const double ePartialCorr = (energyRaw - bias) / peak;
+
+    //-----------------------------------------------------------------
+    //..Shower quantities needed to find the correction.
 
     //..Location starting point
     const int icellIDMaxE = eclShower.getCentralCellId();
@@ -128,50 +199,48 @@ void ECLShowerCorrectorModule::event()
     const int iPhiMech = positionVector[5];
 
     //-----------------------------------------------------------------
-    //..The correction is a function of corrected energy, so will need to iterate
-    double correction = 0.96; // typical correction as starting point
-    for (int iter = 0; iter < 2; iter++) {
-
-      //..Energy points that bracket this value
-      float logEnergy = log(energyRaw / correction);
-      int ie0 = 0;
-      if (logEnergy < leakLogE[iRegion][0]) {
-        ie0 = 0;
-      } else if (logEnergy > leakLogE[iRegion][nEnergies - 1]) {
-        ie0 = nEnergies - 2;
-      } else {
-        while (logEnergy > leakLogE[iRegion][ie0 + 1]) {ie0++;}
-      }
-
-      //..Correction from lower energy point.
-      //  The following include +1 because first histogram bin is 1 not 0.
-      int iXBin = iThetaID + ie0 * nThetaID + 1; // thetaID / energy bin
-      double thetaCor = thetaCorrection.GetBinContent(iXBin, iThetaBin + 1);
-      double phiCor = phiCorrection.GetBinContent(iXBin + iPhiMech * nXBins, iPhiBin + 1);
-      double crysCor = crysCorrection.GetBinContent(iXBin, nCrys + 1);
-      const double cor0 = thetaCor * phiCor * crysCor;
-
-      //..Correction from upper energy point
-      iXBin = iThetaID + (ie0 + 1) * nThetaID + 1;
-      thetaCor = thetaCorrection.GetBinContent(iXBin, iThetaBin + 1);
-      phiCor = phiCorrection.GetBinContent(iXBin + iPhiMech * nXBins, iPhiBin + 1);
-      crysCor = crysCorrection.GetBinContent(iXBin, nCrys + 1);
-      const double cor1 = thetaCor * phiCor * crysCor;
-
-      //..Interpolate (in logE)
-      correction = cor0 + (cor1 - cor0) * (logEnergy - leakLogE[iRegion][ie0]) / (leakLogE[iRegion][ie0 + 1] - leakLogE[iRegion][ie0]);
+    //..Energy points that bracket this value
+    float logEnergy = log(ePartialCorr);
+    int ie0 = 0;
+    if (logEnergy < leakLogE[iRegion][0]) {
+      ie0 = 0;
+    } else if (logEnergy > leakLogE[iRegion][nEnergies - 1]) {
+      ie0 = nEnergies - 2;
+    } else {
+      while (logEnergy > leakLogE[iRegion][ie0 + 1]) {ie0++;}
     }
 
+    //..Correction from lower energy point.
+    //  The following include +1 because first histogram bin is 1 not 0.
+    int iXBin = iThetaID + ie0 * nThetaID + 1; // thetaID / energy bin
+    double thetaCor = thetaCorrection.GetBinContent(iXBin, iThetaBin + 1);
+    double phiCor = phiCorrection.GetBinContent(iXBin + iPhiMech * nXBins, iPhiBin + 1);
+    const double cor0 = thetaCor * phiCor;
+
+    //..Correction from upper energy point
+    iXBin = iThetaID + (ie0 + 1) * nThetaID + 1;
+    thetaCor = thetaCorrection.GetBinContent(iXBin, iThetaBin + 1);
+    phiCor = phiCorrection.GetBinContent(iXBin + iPhiMech * nXBins, iPhiBin + 1);
+    const double cor1 = thetaCor * phiCor;
+
+    //..Interpolate (in logE)
+    const double positionCor = cor0 + (cor1 - cor0) * (logEnergy - leakLogE[iRegion][ie0]) / (leakLogE[iRegion][ie0 + 1] -
+                               leakLogE[iRegion][ie0]);
+
     //-----------------------------------------------------------------
-    //..Apply correction
-    const double correctedEnergy = energyRaw  / correction;
-    const double correctedEnergyHighest = energyRawHighest / correction;
-    B2DEBUG(28, "Correction factor=" << correction << ", correctedEnergy=" << correctedEnergy << ", correctedEnergyHighest=" <<
-            correctedEnergyHighest);
+    //..Apply correction. Assume the same correction for the maximum energy crystal.
+    const double correctedEnergy = ePartialCorr  / positionCor;
+    const double overallCorrection = energyRaw / correctedEnergy;
+    const double correctedEnergyHighest = energyRawHighest / overallCorrection;
 
     //..Set the corrected energies
     eclShower.setEnergy(correctedEnergy);
     eclShower.setEnergyHighestCrystal(correctedEnergyHighest);
+
+    B2DEBUG(28, "ECLShowerCorrectorModule: cellID: " << positionVector[0] << " iG: " << iGroup << " iE: " << iEnergy << " Eraw: " <<
+            energyRaw << " E3x3: " << e3x3 << " Ecor: " << correctedEnergy);
+    B2DEBUG(28, " peakNom: " << peakNom << " biasNom: " << biasNom << " positionCor: " << positionCor << " overallCor: " <<
+            overallCorrection);
 
   } // end loop over showers
 

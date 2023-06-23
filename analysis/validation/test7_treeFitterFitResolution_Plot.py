@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,9 +24,9 @@ import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))  # noqa
 
-workingFiles = glob.glob(str("../TreeFitted_B0ToJPsiKs.root"))
+workingFiles = glob.glob("../TreeFitted_B0ToJPsiKs.root")
 
-chain = ROOT.TChain(str("B0TreeFit"))
+chain = ROOT.TChain("B0TreeFit")
 for iFile in workingFiles:
     chain.AddFile(iFile)
 

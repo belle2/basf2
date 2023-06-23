@@ -155,6 +155,8 @@ void KLMDigitizerModule::digitizeRPC()
     lowerBound = it;
     upperBound = m_MapChannelSimHit.upper_bound(it->first);
     it = upperBound;
+    if (not lowerBound->second->inRPC())
+      B2FATAL("KLMDigitizer::digitizeRPC is trying to process a scintillator hit.");
     if (m_EfficiencyMode == c_Strip) {
       float efficiency = m_StripEfficiency->getEfficiency(lowerBound->first);
       if (!efficiencyCorrection(efficiency))
@@ -199,6 +201,8 @@ void KLMDigitizerModule::digitizeScintillator()
     lowerBound = it;
     upperBound = m_MapChannelSimHit.upper_bound(it->first);
     it = upperBound;
+    if (lowerBound->second->inRPC())
+      B2FATAL("KLMDigitizer::digitizeScintillator is trying to process a RPC hit.");
     const KLMSimHit* simHit = lowerBound->second;
     if (m_EfficiencyMode == c_Strip) {
       float efficiency = m_StripEfficiency->getEfficiency(lowerBound->first);
@@ -393,9 +397,19 @@ void KLMDigitizerModule::event()
           m_ElementNumbers->channelNumber(
             hit->getSubdetector(), hit->getSection(), hit->getSector(),
             hit->getLayer(), hit->getPlane(), hit->getStrip());
-        if (checkActive(channel))
-          m_MapChannelSimHit.insert(
-            std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
+        if (checkActive(channel)) {
+          bool rpc = hit->inRPC();
+          if (rpc) {
+            m_MapChannelSimHit.insert(std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
+          } else {
+            const KLMElectronicsChannel* electronicsChannel =
+              m_ElectronicsMap->getElectronicsChannel(channel);
+            if (electronicsChannel == nullptr)
+              B2FATAL("Incomplete electronics map.");
+            KLMElectronicsChannel asic = electronicsChannel->getAsic();
+            m_MapAsicSimHit.insert(std::pair<KLMElectronicsChannel, const KLMSimHit*>(asic, hit));
+          }
+        }
       }
     }
     std::multimap<KLMPlaneNumber, const KLMSimHit*>::iterator it, it2;

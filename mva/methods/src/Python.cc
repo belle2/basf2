@@ -15,6 +15,8 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/TRandomWrapper.h>
+
 #include <fstream>
 #include <numeric>
 

@@ -146,14 +146,6 @@ void KlongMomentumCalculatorExpertModule::event()
     if (!is_physical)
       continue;
 
-    Particle* kparticle = nullptr;
-    for (auto daughter : daughters) {
-      if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
-        kparticle = ParticleCopy::copyParticle(daughter);
-        kparticle->set4Vector(KMomentum);
-        break;
-      }
-    }
     particle.set4Vector(BMomentum);
 
     if (!m_cut->check(&particle))
@@ -166,8 +158,15 @@ void KlongMomentumCalculatorExpertModule::event()
       break;
     }
 
-    m_koutputList->addParticle(kparticle);
-    kparticle->addExtraInfo("permID", idx);
+    for (auto daughter : daughters) {
+      if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+        Particle* kparticle = ParticleCopy::copyParticle(daughter);
+        kparticle->set4Vector(KMomentum);
+        m_koutputList->addParticle(kparticle);
+        kparticle->addExtraInfo("permID", idx);
+        break;
+      }
+    }
 
   } //while
 

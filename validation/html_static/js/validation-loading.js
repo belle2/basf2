@@ -301,8 +301,8 @@ function onReferenceSelectionChanged(){
 /**
  * Sets the state of the revision checkboxes
  * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
- *  nightly only), "b" (last build only), "nnn" (all nightlies), "rbn"
- *  (default, last build, nightly and revision).
+ *  nightly only), "nnn" (all nightlies), "rbn"
+ *  (default, nightly and revision).
  */
 function getDefaultRevisions(mode="rbn") {
 
@@ -310,16 +310,12 @@ function getDefaultRevisions(mode="rbn") {
 
     let referenceRevision = "reference";
     let releaseRevisions = [];
-    let buildRevisions = [];
     let nightlyRevisions = [];
 
     for (let rev of allRevisions){
         // fixme: This will have problems with sorting. Probably we rather want to have prerelease as a new category!
         if (rev.startsWith("release") || rev.startsWith("prerelease")) {
             releaseRevisions.push(rev);
-        }
-        if (rev.startsWith("build")) {
-            buildRevisions.push(rev);
         }
         if (rev.startsWith("nightly")) {
             nightlyRevisions.push(rev);
@@ -333,7 +329,7 @@ function getDefaultRevisions(mode="rbn") {
     // First, we cache the case of running locally: There all of the above
     // revision lists are empty and our only guess is to return allRevisions, which
     // in particular will include 'reference' and 'current' etc.
-    if (!nightlyRevisions.length && !buildRevisions.length && !releaseRevisions.length){
+    if (!nightlyRevisions.length && !releaseRevisions.length){
         return allRevisions;
     }
 
@@ -342,9 +338,6 @@ function getDefaultRevisions(mode="rbn") {
     }
     else if (mode === "r"){
         return [referenceRevision].concat(releaseRevisions.slice(0, 1));
-    }
-    else if (mode === "b"){
-        return [referenceRevision].concat(buildRevisions.slice(0,1));
     }
     else if (mode === "n"){
         return [referenceRevision].concat(nightlyRevisions.slice(0, 1));
@@ -362,9 +355,6 @@ function getDefaultRevisions(mode="rbn") {
     let rbnRevisions = [referenceRevision];
     if (releaseRevisions.length >= 1){
         rbnRevisions.push(releaseRevisions[0])
-    }
-    if (buildRevisions.length >= 1){
-        rbnRevisions.push(buildRevisions[0])
     }
     if (nightlyRevisions.length >= 1){
         rbnRevisions.push(nightlyRevisions[0])

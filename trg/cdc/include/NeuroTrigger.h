@@ -103,6 +103,7 @@ namespace Belle2 {
       *                                  "fastestppriority" is used.
       *   "etf_or_zero"              :   the event time is obtained by the ETF, if
       *                                  not possible, it es set to 0
+      *   "min_etf_fastestpriority"  :   take whichever is smaller
       */
       std::string et_option = "etf_or_fastestpriority";
       /** DEPRECATED!! If true, determine event time from relevant hits if it is missing. */

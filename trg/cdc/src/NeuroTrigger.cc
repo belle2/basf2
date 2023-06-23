@@ -486,9 +486,9 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
 {
 
   if (et_option != m_MLPs[isector].get_et_option()) {
-    B2WARNING("Used event time option is different to the one set in the MLP"
-              << LogVar("et_option", et_option) << LogVar("isector", isector)
-              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+    B2INFO("Used event time option is different to the one set in the MLP"
+           << LogVar("et_option", et_option) << LogVar("isector", isector)
+           << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
   }
   if (et_option == "fastestpriority") {
     B2DEBUG(200, "et_option is 'fastestpriority'");
@@ -548,6 +548,17 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
              m_T0 = 0;
              m_hasT0 = false;
            }*/
+    }
+  } else if (et_option == "min_etf_fastestpriority") {
+    bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
+    int T0_etf = 9999;
+    if (hasT0) {
+      T0_etf = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_hasT0 = true;
+    }
+    getEventTime(isector, track, "fastestpriority", neuroinputmode);
+    if (m_T0 > T0_etf) {
+      m_T0 = T0_etf;
     }
   } else if (et_option == "etf_or_fastest2d") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;

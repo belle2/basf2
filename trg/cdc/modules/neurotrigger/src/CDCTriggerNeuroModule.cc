@@ -64,7 +64,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "option on how to obtain the event time. When left blank, the value "
            "is loaded from the Conditions Database. Possibilities are: "
            "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
-           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d', 'etfcc' for the unpacked etf in the corresponding cc, 'etfcc_or_fastestpriority', 'etfcc_or_zero', 'etfhwin' for the recalculated time used in hw input. Last two options are only available for neurotrackinputode.",
+           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d','min_etf_fastestpriority' (take the smaller one), 'etfcc' for the unpacked etf in the corresponding cc, 'etfcc_or_fastestpriority', 'etfcc_or_zero', 'etfhwin' for the recalculated time used in hw input. Last two options are only available for neurotrackinputode.",
            string(""));
   addParam("writeMLPinput", m_writeMLPinput,
            "if true, the MLP input vector will be written to the datastore "

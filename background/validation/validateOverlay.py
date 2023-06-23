@@ -41,7 +41,6 @@ class Histogrammer(b2.Module):
                               200, 20000, 40000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
-        self.hist.append(TH1F('SVDShaperDigitsZS5L3', 'ZS5 L3 Occupancy (%)', 100, 0, 20))
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
@@ -49,17 +48,48 @@ class Histogrammer(b2.Module):
                               100, 0, 200))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
-        #: number of L3 strips
+        self.hist2 = []
+        self.hist2.append(TH1F('PXDOccupancy', 'PXD Occupancy', 100, 0, 5))
+        self.hist2.append(TH1F('SVDOccupancy', 'SVD Occupancy', 100, 0, 20))
+        self.hist2.append(TH1F('CDCHitRate', 'CDC Hit Rate per wire', 100, 0, 1000))
+
+        #: number of PXD pixels (L1+L2)
+        self.nPXD = 7.68e6
+
+        #: number of L3 strips (u+v)
         self.nSVDL3 = 768 * 7 * 2
 
-        for h in self.hist:
-            if h.GetName() == 'SVDShaperDigitsZS5L3':
-                h.SetXTitle('ZS5 L3 occupancy (%)')
+        #: number of inner CDC wires & integration time
+        self.nCDCin = 1280
+        self.CDCITIn = 408.7 * 1e-6
+        #: number of outer CDC wires & integration time
+        self.nCDCout = 13060
+        self.CDCITout = 754.6 * 1e-6
+
+        self.allh = self.hist+self.hist2
+
+        for h in self.allh:
+            if h.GetName() == 'PXDOccupancy':
+                h.SetXTitle('PXD occupancy [%]')
+                descr = TNamed(
+                    'Description',
+                    'PXD L1+L2 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
+            elif h.GetName() == 'SVDOccupancy':
+                h.SetXTitle('SVD L3 ZS5 occupancy - average u,v [%]')
+                descr = TNamed(
+                    'Description',
+                    'SVD ZS5 L3 Occupancy per event average u,v (with BG overlay only and no event generator)')
+            elif h.GetName() == 'CDCHitRate':
+                h.SetXTitle('CDC Hit Rate [kHz/wire]')
+                descr = TNamed(
+                    'Description',
+                    'CDC Hit Rate, averaged inner/outer wires (with BG overlay only and no event generator)')
             else:
                 h.SetXTitle('number of digits in event')
+                descr = TNamed('Description', 'Number of background ' + h.GetName() +
+                               ' per event (with BG overlay only and no event generator)')
+
             h.SetYTitle('entries per bin')
-            descr = TNamed('Description', 'Number of background ' + h.GetName() +
-                           ' per event (with BG overlay only and no event generator)')
             h.GetListOfFunctions().Add(descr)
             check = TNamed('Check', 'Distribution must agree with its reference')
             h.GetListOfFunctions().Add(check)
@@ -73,27 +103,36 @@ class Histogrammer(b2.Module):
 
         for h in self.hist:
             digits = Belle2.PyStoreArray(h.GetName())
-            svdDigits = Belle2.PyStoreArray('SVDShaperDigitsZS5')
             if h.GetName() == 'ECLDigits':
                 n = 0
                 for digit in digits:
                     if digit.getAmp() > 500:  # roughly 25 MeV
                         n += 1
                 h.Fill(n)
-            elif h.GetName() == 'SVDShaperDigitsZS5L3':
-                nL3 = 0
-                for svdDigit in svdDigits:
-                    if svdDigit.getSensorID().getLayerNumber() == 3:  # only check SVD L3
-                        nL3 += 1
-                h.Fill(nL3/self.nSVDL3 * 100)
             else:
                 h.Fill(digits.getEntries())
+
+        # PXD
+        pxdDigits = Belle2.PyStoreArray('PXDDigits')
+        self.hist2[0].Fill(pxdDigits.getEntries()/self.nPXD * 100)
+
+        # SVD
+        svdDigits = Belle2.PyStoreArray('SVDShaperDigitsZS5')
+        nL3 = 0
+        for svdDigit in svdDigits:
+            if svdDigit.getSensorID().getLayerNumber() == 3:  # only check SVD L3
+                nL3 += 1
+        self.hist2[1].Fill(nL3/self.nSVDL3 * 100)
+
+        # CDC
+        cdcHits = Belle2.PyStoreArray('CDCHits')
+        self.hist2[2].Fill(cdcHits.getEntries() / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
 
     def terminate(self):
         """ Write histograms to file."""
 
         tfile = TFile('overlayPlots.root', 'recreate')
-        for h in self.hist:
+        for h in self.allh:
             h.Write()
         tfile.Close()
 

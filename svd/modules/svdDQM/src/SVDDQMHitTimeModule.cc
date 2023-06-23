@@ -104,10 +104,6 @@ void SVDDQMHitTimeModule::defineHisto()
                                        nBins, minT0, maxT0);
   m_l3vEvtT0_mumu_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
-  m_SVDEventT0 = new TH1F("SVDEventT0", "SVD EventT0", nBins, minT0, maxT0);
-  m_SVDEventT0->GetXaxis()->SetTitle("SVD EventT0 time (ns)");
-  m_SVDEventT0->GetYaxis()->SetTitle("count");
-
   m_SVD3EventT0 = new TH1F("SVD3EventT0", "SVD EventT0 for 3 samples", nBins, minT0, maxT0);
   m_SVD3EventT0->GetXaxis()->SetTitle("SVD EventT0 time (ns)");
   m_SVD3EventT0->GetYaxis()->SetTitle("count");
@@ -216,7 +212,6 @@ void SVDDQMHitTimeModule::beginRun()
   m_l3v_mumu_L1_CDCTRG->Reset();
   m_l3vEvtT0_mumu_L1_CDCTRG->Reset();
 
-  m_SVDEventT0->Reset();
   m_SVD3EventT0->Reset();
   m_SVD6EventT0->Reset();
 
@@ -327,7 +322,7 @@ void SVDDQMHitTimeModule::event()
     auto evtT0List_SVD = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD) ;
     //    There is only one estimate of SVD EVentT0 for the moment
     float svdEventT0 = evtT0List_SVD.back().eventT0 ;
-    m_SVDEventT0->Fill(svdEventT0);
+
     if (nSamples == 3) {
       m_SVD3EventT0->Fill(svdEventT0);
     } else  {

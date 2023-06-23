@@ -62,10 +62,15 @@ namespace Belle2 {
       // Reject values that exceed the number of layers in backward EKLM,
       // since it is the part with the smallest number of layers.
       int32_t threshold{static_cast<int32_t>(EKLMElementNumbers::Instance().getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection))};
-      if (nLayers > threshold)
+      if (nLayers > threshold) {
         B2FATAL("The value passed to 'setNLayers' exceed the maximum allowed number of layers."
                 << LogVar("nLayers", nLayers)
                 << LogVar("layers threshold", threshold));
+      } else if (nLayers < 0) {
+        B2FATAL("The value passed to 'setNLayers' is smaller than zero."
+                << LogVar("nLayers", nLayers)
+               );
+      }
       m_nLayers = nLayers;
     }
 
@@ -188,7 +193,7 @@ namespace Belle2 {
     /**
      * Class version.
      */
-    ClassDef(KLMTriggerParameters, 1);
+    ClassDef(KLMTriggerParameters, 2);
 
   };
 

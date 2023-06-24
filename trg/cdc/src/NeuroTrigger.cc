@@ -486,7 +486,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
 {
 
   if (et_option != m_MLPs[isector].get_et_option()) {
-    B2DEBUG(2, "Used event time option is different to the one set in the MLP"
+    B2DEBUG(20, "Used event time option is different to the one set in the MLP"
             << LogVar("et_option", et_option) << LogVar("isector", isector)
             << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
   }

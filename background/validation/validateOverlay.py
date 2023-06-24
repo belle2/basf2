@@ -22,6 +22,7 @@ import os
 import glob
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
+import sys
 
 b2.set_random_seed(123452)
 
@@ -35,7 +36,7 @@ class Histogrammer(b2.Module):
     def initialize(self):
         ''' Initialize the Module: book histograms and set descriptions and checks'''
 
-        #: list of histograms
+        #: list of digits histograms
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
                               200, 20000, 40000))
@@ -48,6 +49,7 @@ class Histogrammer(b2.Module):
                               100, 0, 200))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
+        #: list of occupancy-like histograms
         self.hist2 = []
         self.hist2.append(TH1F('PXDOccupancy', 'PXD Occupancy', 100, 0, 5))
         self.hist2.append(TH1F('SVDOccupancy', 'SVD Occupancy', 100, 0, 20))
@@ -57,15 +59,18 @@ class Histogrammer(b2.Module):
         self.nPXD = 7.68e6
 
         #: number of L3 strips (u+v)
-        self.nSVDL3 = 768 * 7 * 2
+        self.nSVDL3 = 768 * 7 * 2 * 2
 
-        #: number of inner CDC wires & integration time
+        #: number of inner CDC wires
         self.nCDCin = 1280
+        #: integration time of the inner CDC layers
         self.CDCITIn = 408.7 * 1e-6
-        #: number of outer CDC wires & integration time
+        #: number of outer CDC wires
         self.nCDCout = 13060
+        #: integration time of the outer CDC layers
         self.CDCITout = 754.6 * 1e-6
 
+        #: merged list of all histograms
         self.allh = self.hist+self.hist2
 
         for h in self.allh:
@@ -138,7 +143,9 @@ class Histogrammer(b2.Module):
 
 
 bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
+if len(sys.argv) == 2:
+    bg = glob.glob(str(sys.argv[1]) + '/*.root')
+elif 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
     if bg is None:
         b2.B2FATAL('No beam background samples found in folder ' +

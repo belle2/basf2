@@ -4242,10 +4242,10 @@ Decay B+
 # B -> D X  Exclusive Modes
 #
 # 1-pi
-0.004675170   anti-D0  pi+                                 PHSP;# Based on PDG 2022 [BF update - NR]
+0.004675170   anti-D0  pi+                                 PHSP; # Based on PDG 2022 [BF update - NR]
 
 # 2-pi
-0.013448300   rho+  anti-D0                                SVS;  ##Based on PDG 2022 [BF update - NR] check if it for D0pipi0?
+0.013448300   rho+  anti-D0                                SVS;  #Based on PDG 2022 [BF update - NR] check if it for D0pipi0?
 0.000000000   anti-D0  pi0  pi+                            PHSP; #Put NR BF to be zero to avoid PYTHIA, dominated by D0rho component. #[BF update - NR]
 
 # 3-pi
@@ -4264,7 +4264,7 @@ Decay B+
 0.000000000   b_1+  anti-D0                                SVS; #Put BF to be zero to avoid PYTHIA [BF update - NR]
 ### 
 0.000000000   anti-D0  pi-  pi+  pi+  pi0                  PHSP; #Put NR BF to be zero to avoid PYTHIA [BF update - NR]
-
+###
 0.004100000   anti-D0  omega  pi+                          PHSP; #[BF update from PDG 2022 - NR]
 0.000400000   anti-D0  eta  pi+                            PHSP; #Limit provided to invalidate eta as a candidate for SL gap (to be measured)  [BF update - NR]
 
@@ -4272,10 +4272,11 @@ Decay B+
 # 1-pi
 0.004900860   anti-D*0  pi+                                SVS;  #[BF update from 2022 PDG - NR]
 
-#2-pi
+# 2-pi
 0.009811760   anti-D*0  rho+                               SVV_HELAMP 0.283 1.13 0.932 0.0 0.228 0.95; ##Based on PDG 2022 [BF update - NR] check if it for D*0pipi0?
 0.000000000   anti-D*0  pi0  pi+                           PHSP; #Put NR BF to be zero to avoid PYTHIA, dominated by D*0rho component. #[BF update - NR]
 
+# 3-pi
 0.018000000   anti-D*0  a_1+                               SVV_HELAMP 0.458 0.0 0.866 0.0 0.200 0.0; #Interpreting D*03pi BF as fully (D*0 a1(->3pi)) decay #[BF update - NR]
 0.000000000   anti-D*0  rho0  pi+                          PHSP; #Put to zero to avoid PYTHIA; dominated by (D*0 a1) decay#[BF update - NR]
 0.000000000   anti-D*0  pi-  pi+  pi+                      PHSP; #Put NR BF to be zero to avoid PYTHIA; dominated by (D*0 a1) #[BF update - NR]
@@ -4300,13 +4301,11 @@ Decay B+
 0.00030000   D-  pi+  pi+                                 PHSP; #remaining after D**pi BFs [BF update - NR]
 0.00000000   D*-  pi+  pi+                                PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR]
 
-
 0.000000000   D-  rho+  pi+                                PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR]
 0.000000000   D-  pi0  pi+  pi+                            PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR]
 
 0.000000000   D*-  rho+  pi+                               PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR]
 0.000000000   D*-  pi0  pi+  pi+                           PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR]
-
 
 # B->D** pi and D** rho, recommendation, http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/151.html, further update October 26, 2004 Lange.
 
@@ -4320,7 +4319,6 @@ Decay B+
 0.003720000   anti-D_10  rho+                              PHSP; #rho+ decays are double BF of pi+ decays [BF update - NR]
 0.000620000   anti-D'_10  pi+                              SVS;
 0.001240000   anti-D'_10  rho+                             PHSP; #rho+ decays are double BF of pi+ decays [BF update - NR]
-
 
 # Freeze to 0 to avoid PYTHIA #accounted by rho+ decays already [BF update - NR]
 0.000000000   anti-D_0*0 pi+ pi0                           PHSP;
@@ -5790,9 +5788,8 @@ Decay B-
 0.004675170   D0  pi-                                      PHSP; # Based on PDG 2022 [BF update - NR]
 
 # 2-pi
-0.013448300   rho-  D0                                     SVS;  ##Based on PDG 2022 [BF update - NR] check if it for D0pipi0?
+0.013448300   rho-  D0                                     SVS;  #Based on PDG 2022 [BF update - NR] check if it for D0pipi0?
 0.000000000   D0  pi0  pi-                                 PHSP; #Put NR BF to be zero to avoid PYTHIA, dominated by D0rho component. #[BF update - NR]
-
 
 # 3-pi
 0.010000000   a_1-  D0                                     SVS;  #Interpreting D03pi BF as fully (D0 a1(->3pi)) decay #[BF update - NR]

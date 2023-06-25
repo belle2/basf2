@@ -49,6 +49,10 @@ def arg_parser():
                         default='',
                         type=str,
                         help='Output file name. Default is \'\'.')
+    parser.add_argument('--output_file_mva2',
+                        default='',
+                        type=str,
+                        help='Output file2 name. Default is \'\'.')
     parser.add_argument('--num',
                         default=1,
                         type=int,
@@ -116,8 +120,11 @@ if __name__ == "__main__":
     # Save data to train the first MVA. After that, we're done
     if (training_mva_number == 1 or training_mva_number == 2):
         main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
-                        identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
+                        identifier='/home/belle2/hanyubo/basf2/test_scripts/mva/localdb/dbstore_Weightfile_rev_535330.root',
                         indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
+
+        """identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
+            identifier='/home/belle2/hanyubo/basf2/test_scripts/mva/localdb/dbstore_Weightfile_rev_172bba.root',"""
 
     # elif (training_mva_number == 2):
         reco_tracks_flipped = "RecoTracks_flipped"
@@ -139,11 +146,11 @@ if __name__ == "__main__":
                 name="saving1stMVA_BBbar",
                 output_file_name=outputfile)
             main.add_module(saveFirstMVAData)
-        if training_mva_number == 2:
-            saveSecondMVAData = Saving2ndMVAData(
-                name="saving2ndMVA_BBbar",
-                output_file_name=outputfile)
-            main.add_module(saveSecondMVAData)
+            if args.output_file_mva2 != '':
+                saveSecondMVAData = Saving2ndMVAData(
+                    name="saving2ndMVA_BBbar",
+                    output_file_name=args.output_file_mva2)
+                main.add_module(saveSecondMVAData)
 
     # Process events
     print_path(main)

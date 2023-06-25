@@ -87,6 +87,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         n_svd_hits = nan
         phi0_estimate = nan
         n_cdc_hits = nan
+        n_pxd_hits = nan
         svd_layer3_positionSigma = nan
         first_cdc_layer = nan
         last_cdc_layer = nan
@@ -234,6 +235,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             n_svd_hits=n_svd_hits,
             phi0_estimate=phi0_estimate,
             n_cdc_hits=n_cdc_hits,
+            n_pxd_hits=n_pxd_hits,
             svd_layer3_positionSigma=svd_layer3_positionSigma,
             first_cdc_layer=first_cdc_layer,
             last_cdc_layer=last_cdc_layer,

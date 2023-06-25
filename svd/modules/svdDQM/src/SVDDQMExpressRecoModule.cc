@@ -537,21 +537,7 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_clusterSNRV[i]->GetXaxis()->SetTitle("cluster SNR");
     m_clusterSNRV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterSNRV[i]);
-    //----------------------------------------------------------------
-    // Charge of strips
-    //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ADCStripU") % sensorDescr);
-    title = str(format("SVD Sensor %1% U-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
-    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
-    m_stripSignalU[i]->GetXaxis()->SetTitle("signal ADC");
-    m_stripSignalU[i]->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_stripSignalU[i]);
-    name = str(format("SVDDQM_%1%_ADCStripV") % sensorDescr);
-    title = str(format("SVD Sensor %1% V-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
-    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
-    m_stripSignalV[i]->GetXaxis()->SetTitle("signal ADC");
-    m_stripSignalV[i]->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_stripSignalV[i]);
+
     //----------------------------------------------------------------
     // Strips Counts
     //----------------------------------------------------------------

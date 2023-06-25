@@ -29,14 +29,40 @@ namespace Belle2 {
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
+     * DEPRECATED since light-2302-genetta
      * return MVA output that uses shower-related variables to distinguish between true photon and hadronic splitoff clusters
      */
     double hadronicSplitOffSuppression(const Particle* particle);
 
     /**
+     * return MVA output that uses shower-related variables to distinguish between true photon and fake photon clusters
+     */
+    double fakePhotonSuppression(const Particle* particle);
+
+    /**
      * return MVA output that uses shower-related variables to distinguish between true photon and beam background clusters
      */
     double beamBackgroundSuppression(const Particle* particle);
+
+    /**
+     * return distance to the nearest MC KL extrapolated to the radius of the cluster
+     */
+    double distanceToMcKl(const Particle* particle);
+
+    /**
+     * return distance to the nearest MC neutron extrapolated to the radius of the cluster
+     */
+    double distanceToMcNeutron(const Particle* particle);
+
+    /**
+     * return mdstIndex of the nearest MC KL
+     */
+    int mdstIndexMcKl(const Particle* particle);
+
+    /**
+     * return mdstIndex of the nearest MC neutron
+     */
+    int mdstIndexMcNeutron(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
@@ -109,7 +135,7 @@ namespace Belle2 {
     double eclClusterTheta(const Particle* particle);
 
     /**
-     * return ECL cluster's timing
+     * return ECL cluster's timing in Belle II and ECL cluster's TC timing in Belle
      */
     double eclClusterTiming(const Particle* particle);
 

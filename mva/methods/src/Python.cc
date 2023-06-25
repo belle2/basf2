@@ -15,6 +15,8 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/TRandomWrapper.h>
+
 #include <fstream>
 #include <numeric>
 
@@ -221,13 +223,11 @@ namespace Belle2 {
         auto weights = training_data.getWeights();
         for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
           double wSum = 0.0;
-          double wSum2 = 0.0;
           double mean = 0.0;
           double running_std = 0.0;
           auto feature = training_data.getFeature(iFeature);
           for (uint64_t i = 0; i < weights.size(); ++i) {
             wSum += weights[i];
-            wSum2 += weights[i] * weights[i];
             double meanOld = mean;
             mean += (weights[i] / wSum) * (feature[i] - meanOld);
             running_std += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);

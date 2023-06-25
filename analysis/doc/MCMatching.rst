@@ -7,26 +7,30 @@ Truth-matching
 MC matching
 -----------
 
+A general overview of the main MC matching algorithm and its user interface can be found in the
+proceeding `Monte Carlo matching in the Belle II software <https://doi.org/10.1051/epjconf/202125103021>`_
+for the CHEP 2021 conference.
+
 ~~~~~~~~~~~~~~~~~~~~~~
 First, you must run it
 ~~~~~~~~~~~~~~~~~~~~~~
-MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
-.. important:: 
+MCMatching relates ``Particle`` and ``MCParticle`` objects.
+
+.. important::
         Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatcherParticles` module is actually executed.
         It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
-
 
 ~~~~
 Core
 ~~~~
 
-MC matching at Belle II returns two important pieces of information: 
-the true PDG id of the particle :b2:var:`mcPDG`, 
-and an error flag :b2:var:`mcErrors`. 
+MC matching at Belle II returns two important pieces of information:
+the true PDG id of the particle :b2:var:`mcPDG`,
+and an error flag :b2:var:`mcErrors`.
 
-Both variables will have non-trivial values only if the MCMatching module, 
-which relates composite ``Particle`` (s) and ``MCParticle`` (s), is executed. 
+Both variables will have non-trivial values only if the MCMatching module,
+which relates composite ``Particle`` (s) and ``MCParticle`` (s), is executed.
 :b2:var:`mcPDG` is set to the PDG code of the first common mother ``MCParticle`` of the daughters of this ``Particle``.
 
 
@@ -38,7 +42,7 @@ which relates composite ``Particle`` (s) and ``MCParticle`` (s), is executed.
 Extra variables
 ~~~~~~~~~~~~~~~
 
-There are several extra variables relating to MCMatching. 
+There are several extra variables relating to MCMatching.
 Many are defined for convenience and can be recreated logically from :b2:var:`mcPDG` and :b2:var:`mcErrors`.
 Some extra variables are provided externally, for example :b2:var:`isCloneTrack` from the tracking-level MC matching.
 
@@ -69,25 +73,25 @@ Full documentation of the MCMatching algorithm is described in `BELLE2-CONF-PROC
 ==============================  ================================================================================================
 Flag                            Explanation
 ==============================  ================================================================================================
- c_Correct       = 0             This Particle and all its daughters are perfectly reconstructed. 
- c_MissFSR       = 1             A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle: :c_IsFSRPhoton). 
+ c_Correct       = 0             This Particle and all its daughters are perfectly reconstructed.
+ c_MissFSR       = 1             A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle: :c_IsFSRPhoton).
  c_MissingResonance = 2          The associated MCParticle decay contained additional non-final-state particles (e.g. a rho)
-                                 that weren't reconstructed. This is probably O.K. in most cases. 
- c_DecayInFlight = 4             A Particle was reconstructed from the secondary decay product of the actual particle. 
+                                 that weren't reconstructed. This is probably O.K. in most cases.
+ c_DecayInFlight = 4             A Particle was reconstructed from the secondary decay product of the actual particle.
                                  This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean
-                                 a pion hypothesis was used for a secondary electron. 
- c_MissNeutrino  = 8             A neutrino is missing (not reconstructed). 
- c_MissGamma     = 16            A photon (not FSR) is missing (not reconstructed). 
- c_MissMassiveParticle = 32      A generated massive FSP is missing (not reconstructed). 
- c_MissKlong     = 64            A Klong is missing (not reconstructed).  
+                                 a pion hypothesis was used for a secondary electron.
+ c_MissNeutrino  = 8             A neutrino is missing (not reconstructed).
+ c_MissGamma     = 16            A photon (not FSR) is missing (not reconstructed).
+ c_MissMassiveParticle = 32      A generated massive FSP is missing (not reconstructed).
+ c_MissKlong     = 64            A Klong is missing (not reconstructed).
  c_MisID = 128                   One of the charged final state particles is mis-identified (wrong signed PDG code).
  c_AddedWrongParticle = 256      A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters)
-                                 belongs to another Particle. 
+                                 belongs to another Particle.
  c_InternalError = 512           No valid match was found. For tracks, it indicates that there
-                                 is not a true track related to the reconstructed one. Might indicate fake or background 
-                                 track or cluster. 
- c_MissPHOTOS    = 1024          A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton). 
- c_AddedRecoBremsPhoton = 2048   A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has 
+                                 is not a true track related to the reconstructed one. Might indicate fake or background
+                                 track or cluster.
+ c_MissPHOTOS    = 1024          A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton).
+ c_AddedRecoBremsPhoton = 2048   A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has
                                  no MC particle assigned, or it doesn't belong to the decay chain of the corrected lepton mother
 ==============================  ================================================================================================
 
@@ -96,10 +100,10 @@ Flag                            Explanation
 Example of use
 ~~~~~~~~~~~~~~
 
-The two variables together allow the user not only to distinguish signal (correctly reconstructed) 
-and background (incorrectly reconstructed) candidates, but also to study and identify various types of physics background 
-(e.g. mis-ID, partly reconstructed decays, ...). 
-To select candidates that have a certain flag set, you can use bitwise and to select only this flag from :b2:var:`mcErrors` 
+The two variables together allow the user not only to distinguish signal (correctly reconstructed)
+and background (incorrectly reconstructed) candidates, but also to study and identify various types of physics background
+(e.g. mis-ID, partly reconstructed decays, ...).
+To select candidates that have a certain flag set, you can use bitwise and to select only this flag from :b2:var:`mcErrors`
 and check if this value is non-zero: ``(mcErrors & MCMatching::c_MisID) != 0`` .
 For use in a ``TTree`` selector, you'll need to use the integer value of the flag instead:
 
@@ -107,7 +111,7 @@ For use in a ``TTree`` selector, you'll need to use the integer value of the fla
 
         ntuple->Draw("M", "(mcErrors & 128) != 0")
 
-You can also make use of ``MCMatching::explainFlags()`` which prints a human-readable 
+You can also make use of ``MCMatching::explainFlags()`` which prints a human-readable
 list of flags present in a given bitset. Can also be used in both C++ and python:
 
 .. code-block:: python
@@ -115,10 +119,10 @@ list of flags present in a given bitset. Can also be used in both C++ and python
         import basf2
         from ROOT import Belle2, gInterpreter
         gInterpreter.ProcessLine('#include "analysis/utility/MCMatching.h"')
-        print(Belle2.MCMatching.explainFlags(a_weird_mcError_number)) 
+        print(Belle2.MCMatching.explainFlags(a_weird_mcError_number))
 
 
-If instead only binary decision (1 = signal, 0 = background) is needed, 
+If instead only binary decision (1 = signal, 0 = background) is needed,
 then for convenience one can use :b2:var:`isSignal` (or :b2:var:`isSignalAcceptMissingNeutrino` for semileptonic decays).
 
 .. code-block:: python
@@ -175,7 +179,7 @@ The module can be used for:
     '',
     path=main)
 
-  # One can directly reconstruct pi0:gg in same decay string. 
+  # One can directly reconstruct pi0:gg in same decay string.
   # But in this case, one have to write sub-decay of pi0:gg only once. Otherwise same particles are registered twice.
   # ma.reconstructMCDecay(
   #     'B+:DstENu =direct=>\
@@ -192,7 +196,7 @@ The module can be used for:
   are matched, too. If there is a match found, save to ParticleList 'B+:testB'
   """
   # Reconstruct B+ from [anti-D0 =direct=> K+ pi-] accepting missing daughters
-  ma.reconstructMCDecay('B+:D0Kpi =direct=> [anti-D0:Kpi =direct=> K+:MC pi-:MC] ... ?gamma ?nu', '', path=main)  
+  ma.reconstructMCDecay('B+:D0Kpi =direct=> [anti-D0:Kpi =direct=> K+:MC pi-:MC] ... ?gamma ?nu', '', path=main)
   
 
   ...
@@ -226,7 +230,7 @@ The module can be used for:
   # Search for B+ decaying to anti-D0 + anything, where the anti-D0 decays to K+ pi-.
   # Ignore additional photons emitted in the anti-D0 decay. Charge conjugated decays
   # are matched, too. If there is a match found, save to ParticleList 'B+:testB'
-  ma.findMCDecay('B+:testB', 'B+ =direct=> [anti-D0 =direct=> K+ pi-] ... ?gamma ?nu', path=main)  
+  ma.findMCDecay('B+:testB', 'B+ =direct=> [anti-D0 =direct=> K+ pi-] ... ?gamma ?nu', path=main)
   
   # Modules which can use the matched decays saved as Particle in the ParticleList 'B+:testB'
   ...
@@ -258,9 +262,9 @@ An example of this using python is shown in :code:`B2A503-ReadDecayHash.py`.
 
   path.add_module('ParticleMCDecayString', listName='my_particle_list', fileName='my_hashmap.root')
 
-This will produce a file with all of the decay strings in it, along with the decayHash 
-(hashes the MC decay string of the mother particle) and decayHashExtended 
-(hashes the decay string of the mother and daughter particles).  
+This will produce a file with all of the decay strings in it, along with the decayHash
+(hashes the MC decay string of the mother particle) and decayHashExtended
+(hashes the decay string of the mother and daughter particles).
 The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
 Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
@@ -367,15 +371,15 @@ Track matching
 
 A reconstructed track can be:
 
-1) **matched**, the reconstructed track is matched to a true track and it is its best description. 
+1) **matched**, the reconstructed track is matched to a true track and it is its best description.
 2) **clone**, the reconstructed track is matched to a true track, but there is another reconstructed track that better describes the true track (this second reconstructed track will therefore be matched)
 3) **fake**, the reconstructed track is not matched to any true track. It can be a beam-background track or a track built out of noise hits in the detector, or a mixture of these two.
 
-.. note:: 
+.. note::
         In case of matched or clone tracks, the charge of the reconstructed track is **not checked** against the charge of the true track.
         The charge check is anyway included in the MCMatching that sets the :ref:`Error_flags`.
 
-More details on the track matching can be found in the :ref:`trk_matching` section of the Tracking chapter, in particular :ref:`trk_matching_analysis`. 
+More details on the track matching can be found in the :ref:`trk_matching` section of the Tracking chapter, in particular :ref:`trk_matching_analysis`.
 Here is a table to translate the matching status at tracking level with the one at analysis level:
 
 =================  ===============
@@ -392,7 +396,54 @@ tracking-level     analysis-level
 ---------------
 Photon matching
 ---------------
-Details of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to contribute, please feel free to move material from the talk to this section (:issue:`BII-5316`).
+
+To understand the method of photon matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
+
+Starting with ``ECLSimHits`` from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and
+time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. The shower objects are corrected and calibrated, and used to
+calculate shower-shape quantities and certain particle likelihoods (these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the
+shower). Following this, track matching is performed between reconstructed tracks and shower objects. The last step is the conversion of the ``ECLShower`` object into a mdst
+``ECLCluster`` object which is the highest level ECL reconstruction object.
+
+Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights
+calculated using the fraction of energy each ``ECLCalDigit`` contributes to each shower. In addition to this, the ``ECLCalDigit`` can itself have a weighted relation to none, one or many ``MCParticles``. This is calculated
+using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. A diagram that visualises these relations is given in :numref:`photon_matching`.
+
+.. _photon_matching:
+
+.. figure:: figs/photon_matching.png
+   :width: 45em
+   :align: center
+
+   Schematic diagram showing the weighted relations between ECL reconstruction objects and simulated particles.
+
+The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight
+between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.
+
+An ``ECLCluster`` that is not matched to any track is reconstructed as a photon ``Particle``, and relations between the photon ``Particle`` and ``MCParticles`` are only set at the user-analysis level if the following conditions
+are met:
+
+1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2` GeV
+2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3` GeV
+
+where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``Particle`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
+corresponding ``MCParticle`` with this relation will be used to decide the photon matching.
+
+A photon match is made if `mcErrors` == 0 and the ``MCParticle`` has a `mcPDG` == 22. If the chosen ``MCParticle`` does not correspond to a true photon, then the `mcErrors` :math:`\neq` 0 and no correct match will be made (even if
+another one of the smaller-weighted relations for the particle is correct).
+
+Information regarding these weights can be accessed on a user-analysis level using the following variables:
+
+* `mcMatchWeight`
+* `clusterTotalMCMatchWeight`
+* `clusterBestMCMatchWeight`
+* `clusterMCMatchWeight`
+
+.. note::
+        These weight variables can be used to help isolate photons that originate from **beam background processes**. Such photons typically have a very low total weight.
+
+This information has been extracted from `this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_.
+More details about MC matching for photons can be found there and from the references therein.
 
 .. _TopologyAnalysis:
 

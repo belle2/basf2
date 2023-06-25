@@ -21,9 +21,6 @@ using namespace boost;
 using namespace Belle2;
 using namespace csi;
 
-#define PI 3.14159265358979323846
-
-
 CsiGeometryPar* CsiGeometryPar::m_B4CsiGeometryParDB = 0;
 
 CsiGeometryPar* CsiGeometryPar::Instance()

@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::ExtHit+; // checksum=0x6b296224, version=8
 #pragma link C++ class Belle2::TrackClusterSeparation+; // checksum=0x8d25ce5e, version=3
-#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0xce9006fc, version=2
+#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0x1b03f08a, version=3
 #pragma link C++ class Belle2::FullSecID+; // checksum=0xa4543536, version=-1
 
 #pragma link C++ class pair <bool, double>+; // checksum=0x90c0afc6, version=-1
@@ -27,7 +27,7 @@
 #pragma link C++ class Belle2::VXDIntercept+; // checksum=0xbb836403, version=1
 #pragma link C++ class Belle2::PXDIntercept+; // checksum=0x756ab835, version=2
 #pragma link C++ class Belle2::SVDIntercept+; // checksum=0x14d0197f, version=4
-#pragma link C++ class Belle2::RecoTrack+; // checksum=0x980d7fa7, version=13
+#pragma link C++ class Belle2::RecoTrack+; // checksum=0xf8191917, version=14
 #pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
 #pragma link C++ class Belle2::BremHit+; // checksum=0xc51e119f, version=2
 #pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
@@ -113,14 +113,24 @@
 
 // V0ValidationVertex evolution
 // In version 2- (1)
-//   o   m_fittedVertexPosition is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_fittedVertexPosition (TVector3) moved to V0::m_fittedVertex{X,Y,Z}
 #pragma read \
   sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[-1]" \
-  targetClass="Belle2::V0ValidationVertex" target="m_fittedVertexPosition" \
+  targetClass="Belle2::V0" target="m_fittedVertexX,m_fittedVertexY,m_fittedVertexZ" \
   code = "{ \
-            m_fittedVertexPosition.SetXYZ(onfile.m_fittedVertexPosition.X(), \
-                                          onfile.m_fittedVertexPosition.Y(), \
-                                          onfile.m_fittedVertexPosition.Z()); \
+            m_fittedVertexX = onfile.m_fittedVertexPosition.X(); \
+            m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); \
+            m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); \
+          }"
+// In version 3- (2)
+//   o   m_fittedVertexPosition (ROOT::Math::XYZVector) moved to V0::m_fittedVertex{X,Y,Z}
+#pragma read \
+  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[2]" \
+  targetClass="Belle2::V0" target="m_fittedVertexX,m_fittedVertexY,m_fittedVertexZ" \
+  code = "{ \
+            m_fittedVertexX = onfile.m_fittedVertexPosition.X(); \
+            m_fittedVertexY = onfile.m_fittedVertexPosition.Y(); \
+            m_fittedVertexZ = onfile.m_fittedVertexPosition.Z(); \
           }"
 
 // BremHit evolution

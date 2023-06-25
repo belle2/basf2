@@ -14,7 +14,7 @@ from stdCharged import stdPi, stdPr
 import vertex
 
 
-def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
+def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False, writeOut=False):
     """
     Load a combined list of the Kshorts list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.
@@ -29,33 +29,44 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
         fitter (str): vertex fitter name, valid options are ``TreeFit``, ``KFit``, and ``Rave``.
         path (basf2.Path): the path to load the modules
+        updateAllDaughters (bool): see the ``updateAllDaughters`` parameter of `vertex.treeFit`
+            or the ``daughtersUpdate`` parameter of `vertex.kFit` / `vertex.raveFit`.
+
+            .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
+                to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
+                return meaningful results if the daughters momenta are updated.
+
+                This happens because variables like `daughterAngle` assume the direction of the
+                daughers momenta *at the Ks vertex* to be provided, while non-updated daughters will
+                provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
+
+        writeOut (bool): whether RootOutput module should save the created ParticleList
     """
     # Fill one list from V0
-    ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', True, path=path)
-    ma.cutAndCopyList('K_S0:V0_MassWindow', 'K_S0:V0', '0.3 < M < 0.7', path=path)
+    ma.fillParticleList('K_S0:V0_ToFit -> pi+ pi-', '', writeOut=writeOut, path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('K_S0:V0_MassWindow', conf_level=0.0, path=path)
+        vertex.treeFit('K_S0:V0_ToFit', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
     elif fitter == 'KFit':
-        vertex.kFit('K_S0:V0_MassWindow', conf_level=0.0, path=path)
+        vertex.kFit('K_S0:V0_ToFit', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
     elif fitter == 'Rave':
-        vertex.raveFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('K_S0:V0_ToFit', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     else:
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    ma.applyCuts('K_S0:V0_MassWindow', '0.450 < M < 0.550', path=path)
+    ma.applyCuts('K_S0:V0_ToFit', '0.450 < M < 0.550', path=path)
     # Reconstruct a second list
-    stdPi('all', path=path)  # no quality cuts
-    ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
+    stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
+    ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('K_S0:RD', conf_level=0.0, path=path)
+        vertex.treeFit('K_S0:RD', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
     elif fitter == 'KFit':
-        vertex.kFit('K_S0:RD', conf_level=0.0, path=path)
+        vertex.kFit('K_S0:RD', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
     elif fitter == 'Rave':
-        vertex.raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     ma.applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
-    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0_MassWindow', 'K_S0:RD'],
+    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0_ToFit', 'K_S0:RD'],
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
@@ -132,7 +143,6 @@ def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
     scaler_V0.param('z0MomentumThreshold', z0MomThr_V0)
     path.add_module(scaler_V0)
 
-    ma.applyCuts('K_S0:V0_scaled', '0.3 < M < 0.7', path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:V0_scaled', conf_level=0.0, path=path)
@@ -169,7 +179,7 @@ def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
-def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
+def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughters=False, writeOut=False):
     """
     Load a combined list of the Lambda list from V0 objects merged with
     a list of particles combined using the analysis ParticleCombiner module.
@@ -184,37 +194,49 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
         fitter (str): vertex fitter name, valid options are ``TreeFit``, ``KFit``, and ``Rave``.
         path (basf2.Path): the path to load the modules
+        updateAllDaughters (bool): see the ``updateAllDaughters`` parameter of `vertex.treeFit`
+            or the ``daughtersUpdate`` parameter of `vertex.kFit` / `vertex.raveFit`.
+
+            .. warning:: The momenta of the daughters are updated only if ``updateAllDaughters`` is set
+                to ``True`` (i.e. **not** by default). Some variables, e.g. `daughterAngle`, will only
+                return meaningful results if the daughters momenta are updated.
+
+                This happens because variables like `daughterAngle` assume the direction of the
+                daughers momenta *at the Lambda vertex* to be provided, while non-updated daughters
+                will provide their momenta direction at the point-of-closest-approach (POCA) to the
+                beam axis.
+
+        writeOut (bool): whether RootOutput module should save the created ParticleList
     """
     # Fill one list from V0
-    ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', True, path=path)
-    ma.cutAndCopyList('Lambda0:V0_MassWindow', 'Lambda0:V0', '0.9 < M < 1.3', path=path)
+    ma.fillParticleList('Lambda0:V0_ToFit -> p+ pi-', '', writeOut=writeOut, path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path)
+        vertex.treeFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
     elif fitter == 'KFit':
-        vertex.kFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path)
+        vertex.kFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
     elif fitter == 'Rave':
-        vertex.raveFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('Lambda0:V0_ToFit', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     else:
         B2ERROR("Valid fitter options for Lambdas are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    ma.applyCuts('Lambda0:V0_MassWindow', '1.10 < M < 1.13', path=path)
+    ma.applyCuts('Lambda0:V0_ToFit', '1.10 < M < 1.13', path=path)
     # Find V0 duplicate with better vertex fit quality
-    ma.markDuplicate('Lambda0:V0_MassWindow', False, path=path)
-    ma.applyCuts('Lambda0:V0_MassWindow', 'extraInfo(highQualityVertex)', path=path)
+    ma.markDuplicate('Lambda0:V0_ToFit', False, path=path)
+    ma.applyCuts('Lambda0:V0_ToFit', 'extraInfo(highQualityVertex)', path=path)
     # Reconstruct a second list
-    stdPi('all', path=path)  # no quality cuts
-    stdPr('all', path=path)  # no quality cuts
-    ma.reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, True, path=path)
+    stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
+    stdPr('all', path=path, writeOut=writeOut)  # no quality cuts
+    ma.reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('Lambda0:RD', conf_level=0.0, path=path)
+        vertex.treeFit('Lambda0:RD', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)
     elif fitter == 'KFit':
-        vertex.kFit('Lambda0:RD', conf_level=0.0, path=path)
+        vertex.kFit('Lambda0:RD', conf_level=0.0, path=path, daughtersUpdate=updateAllDaughters)
     elif fitter == 'Rave':
-        vertex.raveFit('Lambda0:RD', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('Lambda0:RD', conf_level=0.0, path=path, silence_warning=True, daughtersUpdate=updateAllDaughters)
     ma.applyCuts('Lambda0:RD', '1.10 < M < 1.13', path=path)
     # Find RD duplicate with better vertex fit quality
     ma.markDuplicate('Lambda0:RD', False, path=path)
     ma.applyCuts('Lambda0:RD', 'extraInfo(highQualityVertex)', path=path)
-    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0_MassWindow', 'Lambda0:RD'],
+    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0_ToFit', 'Lambda0:RD'],
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)

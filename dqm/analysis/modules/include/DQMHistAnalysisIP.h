@@ -82,8 +82,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if exporting to EPICS */
-    bool m_useEpics;
     /** number of EPICS PVs */
     static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleVertexFitter/ParticleVertexFitterModule.h>
 
 // framework aux
@@ -19,6 +19,7 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/Btube.h>
+#include <mdst/dataobjects/V0.h>
 
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
@@ -505,6 +506,13 @@ bool ParticleVertexFitterModule::doKVertexFit(Particle* mother, bool ipProfileCo
   analysis::VertexFitKFit kv;
   kv.setMagneticField(m_Bfield);
 
+  if (mother->getV0()) {
+    HepPoint3D V0vertex_heppoint(mother->getV0()->getFittedVertexX(),
+                                 mother->getV0()->getFittedVertexY(),
+                                 mother->getV0()->getFittedVertexZ());
+    kv.setInitialVertex(V0vertex_heppoint);
+  }
+
   for (auto& child : fitChildren)
     kv.addParticle(child);
 
@@ -594,6 +602,13 @@ bool ParticleVertexFitterModule::doKMassVertexFit(Particle* mother)
     // Initialise the Fitter
     analysis::MassVertexFitKFit kmv;
     kmv.setMagneticField(m_Bfield);
+
+    if (mother->getV0()) {
+      HepPoint3D V0vertex_heppoint(mother->getV0()->getFittedVertexX(),
+                                   mother->getV0()->getFittedVertexY(),
+                                   mother->getV0()->getFittedVertexZ());
+      kmv.setInitialVertex(V0vertex_heppoint);
+    }
 
     for (auto child : fitChildren)
       kmv.addParticle(child);

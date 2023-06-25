@@ -11,7 +11,7 @@
 /* KoralW header. */
 #include <generators/koralw/KoralW.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <mdst/dataobjects/MCParticleGraph.h>

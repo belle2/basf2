@@ -1,4 +1,4 @@
-.. _DeepFlavorTagger: 
+.. _DeepFlavorTagger:
 
 Deep Flavor Tagger
 ==================
@@ -51,9 +51,9 @@ The scheme of the input parameters are shown below:
   :align: center
 
 
-The output of the algorithm is the variable ``'DNN_qrCombined'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm DNN}` 
-times the dilution factor :math:`r_{\rm DNN}`. The range of ``'DNN_qrCombined'`` is :math:`[-1, 1]`. 
-The output is close to :math:`-1` if the tag side of an event is likely to be related to a :math:`\bar{B}^0`, 
+The output of the algorithm is the variable ``'DNN_qrCombined'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm DNN}`
+times the dilution factor :math:`r_{\rm DNN}`. The range of ``'DNN_qrCombined'`` is :math:`[-1, 1]`.
+The output is close to :math:`-1` if the tag side of an event is likely to be related to a :math:`\bar{B}^0`,
 and close to :math:`1` for a :math:`B^0`. The value :math:`0` corresponds to a random decision.
 
 
@@ -108,7 +108,7 @@ To use on Belle data or MC with ``b2bii``, you need a special identifier and a s
         'chiProb',
     ]
 
-    DeepFlavorTagger(..., uniqueIdentifier=BELLE_IDENTIFIER, 
+    DeepFlavorTagger(..., uniqueIdentifier=BELLE_IDENTIFIER,
                           variable_list=BELLE_FLAVOR_TAG_VARIABLES)
 
 Studies have shown, that we can reduce a certain kind of bias, by applying additional rest of event cuts, you can do

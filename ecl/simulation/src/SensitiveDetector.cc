@@ -5,10 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/simulation/SensitiveDetector.h>
+
+/* ECL headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/gearbox/Unit.h>
+
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
 #include <simulation/background/BkgNeutronWeight.h>
 
 using namespace std;
@@ -281,10 +287,6 @@ void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
       tsum += t.t * t.e;
     }
     tsum /= esum;
-
-    double trms = 0;
-    for (const dep_t& t : v) trms += pow(t.t - tsum, 2) * t.e ;
-    trms /= esum;
 
     tsum *= 1 / CLHEP::ns;
     esum *= 1 / CLHEP::GeV;

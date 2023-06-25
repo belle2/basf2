@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/Variables.h>
 
 // include VariableManager
@@ -47,6 +47,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <boost/algorithm/string.hpp>
 
 
 using namespace std;
@@ -75,7 +76,7 @@ namespace Belle2 {
         const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
         return std::sqrt(EPhiThetaCov[0][0]);
       }
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double particlePx(const Particle* part)
@@ -109,11 +110,11 @@ namespace Belle2 {
 
       if (elementI < 0 || elementI > 6) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]:" << LogVar("i", elementI));
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (elementJ < 0 || elementJ > 6) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]:" << LogVar("j", elementJ));
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
@@ -128,7 +129,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePErr(const Particle* part)
@@ -158,7 +159,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePxErr(const Particle* part)
@@ -170,7 +171,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePyErr(const Particle* part)
@@ -181,7 +182,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePzErr(const Particle* part)
@@ -192,7 +193,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePtErr(const Particle* part)
@@ -216,12 +217,12 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double momentumDeviationChi2(const Particle* part)
     {
-      double result = std::numeric_limits<double>::quiet_NaN();
+      double result = Const::doubleNaN;
 
       // check if error matrix is set
       if (part->getPValue() < 0.0)
@@ -272,7 +273,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particleCosTheta(const Particle* part)
@@ -313,7 +314,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particleXp(const Particle* part)
@@ -387,7 +388,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find thrust of event information, did you forget to load the event shape calculation?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       PCmsLabTransform T;
       B2Vector3D th = evtShape->getThrustAxis();
@@ -558,7 +559,7 @@ namespace Belle2 {
       double result = jacobian * (covarianceMatrix * jacobian);
 
       if (result < 0.0)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       return TMath::Sqrt(result);
     }
@@ -596,7 +597,7 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      if (!cluster) return Const::doubleNaN;
       const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
@@ -615,7 +616,7 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      if (!cluster) return Const::doubleNaN;
       const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
@@ -663,7 +664,7 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * part->get4Vector();
       double E = T.getCMSEnergy() / 2;
       double m2 = E * E - vec.P2();
-      double mbc = m2 >= 0 ? sqrt(m2) : std::numeric_limits<double>::quiet_NaN();
+      double mbc = m2 >= 0 ? sqrt(m2) : Const::doubleNaN;
       return mbc;
     }
 
@@ -713,14 +714,14 @@ namespace Belle2 {
       const MCParticle* mcB = part->getMCParticle();
 
       if (!mcB)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector pB = mcB->get4Vector();
 
       std::vector<MCParticle*> mcDaug = mcB->getDaughters();
 
       if (mcDaug.empty())
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       // B -> X l nu
       // q = pB - pX
@@ -851,7 +852,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
-      if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
+      if (part->getNDaughters() != 2) return Const::doubleNaN;
       ROOT::Math::PxPyPzEVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
       ROOT::Math::PxPyPzEVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       tagVec.SetE(-beamEnergy);
@@ -863,17 +864,17 @@ namespace Belle2 {
       auto* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       MCParticle* mcMother = mcp->getMother();
 
       if (!mcMother)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       std::vector<MCParticle*> daughters = mcMother->getDaughters();
 
       if (daughters.size() != 2)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       MCParticle* recoilMC = nullptr;
       if (daughters[0]->getArrayIndex() == mcp->getArrayIndex())
@@ -882,7 +883,7 @@ namespace Belle2 {
         recoilMC = daughters[0];
 
       if (!recoilMC->hasStatus(MCParticle::c_PrimaryParticle))
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       int decayType = 0;
       checkMCParticleDecay(recoilMC, decayType, false);
@@ -955,7 +956,7 @@ namespace Belle2 {
     double trackMatchType(const Particle* particle)
     {
       // Particle does not contain a ECL Cluster
-      double result = std::numeric_limits<double>::quiet_NaN();
+      double result = Const::doubleNaN;
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
@@ -1030,7 +1031,7 @@ namespace Belle2 {
       std::string extraInfo = "distToClosestTrkAt" + detName + detLayer + "_VS_" + referenceListName + extraSuffix;
 
       auto func = [ = ](const Particle * part) -> double {
-        auto dist = (part->hasExtraInfo(extraInfo)) ? part->getExtraInfo(extraInfo) : std::numeric_limits<float>::quiet_NaN();
+        auto dist = (part->hasExtraInfo(extraInfo)) ? part->getExtraInfo(extraInfo) : Const::doubleNaN;
         return dist;
       };
 
@@ -1063,7 +1064,7 @@ namespace Belle2 {
 
         if (!part->hasExtraInfo(extraInfo))
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
@@ -1096,6 +1097,14 @@ namespace Belle2 {
 
       std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
 
+      std::string detNamesConcat("");
+      for (auto& detName : detectorNames) {
+        boost::to_upper(detName);
+        detNamesConcat += "_" + detName;
+      }
+
+      std::string extraInfo = "trkIsoScore" + detNamesConcat + "_VS_" + referenceListName + extraSuffix;
+
       auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
@@ -1104,24 +1113,71 @@ namespace Belle2 {
           B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScore!");
         }
 
-        double scoreSum(0.0);
-        for (auto& detName : detectorNames)
+        if (!part->hasExtraInfo(extraInfo))
         {
-          std::string extraInfo = "trkIsoScore" + detName + "_VS_" + referenceListName + extraSuffix;
-          if (!part->hasExtraInfo(extraInfo)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          auto scoreDet = part->getExtraInfo(extraInfo);
-          if (std::isnan(scoreDet)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          scoreSum += scoreDet;
+          return Const::doubleNaN;
+        }
+        auto scoreDet = part->getExtraInfo(extraInfo);
+        if (std::isnan(scoreDet))
+        {
+          return Const::doubleNaN;
         }
 
-        // Normalise sum of scores between [0, 1]
-        auto minScore = 0.;
-        auto maxScore = detectorNames.size();
-        return (scoreSum - minScore) / (maxScore - minScore);
+        return scoreDet;
+
+      };
+
+      return func;
+    }
+
+
+    Manager::FunctionPtr particleExtTrkIsoScoreVarAsWeightedAvg(const std::vector<std::string>& arguments)
+    {
+
+      if (arguments.size() < 3) {
+        B2ERROR("Wrong number of arguments (at least 3 required) for meta variable minET2ETIsoScoreAsWeightedAvg");
+        return nullptr;
+      }
+
+      std::string referenceListName = arguments[0];
+      bool useHighestProbMassForExt;
+      try {
+        useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[1]));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument must be an integer flag.");
+        return nullptr;
+      }
+      std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+
+      std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
+
+      std::string detNamesConcat("");
+      for (auto& detName : detectorNames) {
+        boost::to_upper(detName);
+        detNamesConcat += "_" + detName;
+      }
+
+      std::string extraInfo = "trkIsoScoreAsWeightedAvg" + detNamesConcat + "_VS_" + referenceListName + extraSuffix;
+
+      auto func = [ = ](const Particle * part) -> double {
+
+        StoreObjPtr<ParticleList> refPartList(referenceListName);
+        if (!refPartList.isValid())
+        {
+          B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScoreAsWeightedAvg!");
+        }
+
+        if (!part->hasExtraInfo(extraInfo))
+        {
+          return Const::doubleNaN;
+        }
+        auto scoreDet = part->getExtraInfo(extraInfo);
+        if (std::isnan(scoreDet))
+        {
+          return Const::doubleNaN;
+        }
+
+        return scoreDet;
 
       };
 
@@ -1129,36 +1185,39 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Kinematics");
-    REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
-    REGISTER_VARIABLE("E", particleE, "energy", "GeV");
+    REGISTER_VARIABLE("p", particleP, "momentum magnitude\n\n", "GeV/c");
+    REGISTER_VARIABLE("E", particleE, "energy\n\n", "GeV");
 
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(energy uncertainty (:math:`\sqrt{\sigma^2}`))DOC", "GeV");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(
+                      energy uncertainty (:math:`\sqrt{\sigma^2}`)
+
+                      )DOC", "GeV");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
-                      "energy uncertainty as given by the underlying ECL cluster", "GeV");
-    REGISTER_VARIABLE("px", particlePx, "momentum component x", "GeV/c");
-    REGISTER_VARIABLE("py", particlePy, "momentum component y", "GeV/c");
-    REGISTER_VARIABLE("pz", particlePz, "momentum component z", "GeV/c");
-    REGISTER_VARIABLE("pt", particlePt, "transverse momentum", "GeV/c");
+                      "energy uncertainty as given by the underlying ECL cluster\n\n", "GeV");
+    REGISTER_VARIABLE("px", particlePx, "momentum component x\n\n", "GeV/c");
+    REGISTER_VARIABLE("py", particlePy, "momentum component y\n\n", "GeV/c");
+    REGISTER_VARIABLE("pz", particlePz, "momentum component z\n\n", "GeV/c");
+    REGISTER_VARIABLE("pt", particlePt, "transverse momentum\n\n", "GeV/c");
     REGISTER_VARIABLE("xp", particleXp,
                       "scaled momentum: the momentum of the particle in the CMS as a fraction of its maximum available momentum in the collision");
-    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude", "GeV/c");
-    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x", "GeV/c");
-    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y", "GeV/c");
-    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z", "GeV/c");
-    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum", "GeV/c");
+    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude\n\n", "GeV/c");
+    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x\n\n", "GeV/c");
+    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y\n\n", "GeV/c");
+    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z\n\n", "GeV/c");
+    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum\n\n", "GeV/c");
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
-                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
+                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.\n\n", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2, R"DOC(
 momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`,
 where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector
 )DOC");
-    REGISTER_VARIABLE("theta", particleTheta, "polar angle", "rad");
-    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle", "rad");
+    REGISTER_VARIABLE("theta", particleTheta, "polar angle\n\n", "rad");
+    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle\n\n", "rad");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle", "rad");
-    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle", "rad");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle\n\n", "rad");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle\n\n", "rad");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
                       cosAngleBetweenMomentumAndVertexVectorInXYPlane,
@@ -1172,90 +1231,101 @@ where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth 
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
-    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane", "cm");
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane\n\n", "cm");
 
     REGISTER_VARIABLE("M", particleMass, R"DOC(
 The particle's mass.
 
-Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best" value possible with the information provided.
+Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best"
+value possible with the information provided.
 
 - If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
 - If this particle is an MC particle then this is the mass of that particle.
 - If this particle is composite, then *initially* this takes the value of the invariant mass of the daughters.
 - If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
 
-  * You will see a difference between this mass and the :b2:var:`InvM`.
-  )DOC", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("Q", particleQ, "energy released in decay", "GeV");
-    REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay", "GeV");
-    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("deltaE", particleDeltaE, "difference between :b2:var:`E` and half the center of mass energy", "GeV");
-    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+* You will see a difference between this mass and the :b2:var:`InvM`.
+
+)DOC", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass\n\n", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("Q", particleQ, "energy released in decay\n\n", "GeV");
+    REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay\n\n", "GeV");
+    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass\n\n", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("deltaE", particleDeltaE, "difference between :b2:var:`E` and half the center of mass energy\n\n", "GeV");
+    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.\n\n", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
                       "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
-                      "If this particle has no daughters, defaults to :b2:var:`M`.", "GeV/:math:`\\text{c}^2`");
+                      "If this particle has no daughters, defaults to :b2:var:`M`.\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
-                      "If the particle has not 2 daughters, it returns just the mass value.", "GeV/:math:`\\text{c}^2`");
+                      "If the particle has not 2 daughters, it returns just the mass value.\n\n", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass", "GeV/:math:`\\text{c}^2`");
+                      "uncertainty of invariant mass\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
                       "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (:b2:var:`dM`/:b2:var:`ErrM`)");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
-                      "component x of 3-momentum recoiling against given Particle", "GeV/c");
+                      "component x of 3-momentum recoiling against given Particle\n\n", "GeV/c");
     REGISTER_VARIABLE("pyRecoil", recoilPy,
-                      "component y of 3-momentum recoiling against given Particle", "GeV/c");
+                      "component y of 3-momentum recoiling against given Particle\n\n", "GeV/c");
     REGISTER_VARIABLE("pzRecoil", recoilPz,
-                      "component z of 3-momentum recoiling against given Particle", "GeV/c");
+                      "component z of 3-momentum recoiling against given Particle\n\n", "GeV/c");
 
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle", "GeV/c");
+                      "magnitude of 3 - momentum recoiling against given Particle\n\n", "GeV/c");
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
-                      "Polar angle of a particle's missing momentum", "rad");
+                      "Polar angle of a particle's missing momentum\n\n", "rad");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimuthal angle of a particle's missing momentum", "rad");
+                      "Azimuthal angle of a particle's missing momentum\n\n", "rad");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle", "GeV");
+                      "energy recoiling against given Particle\n\n", "GeV");
     REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "Invariant mass of the system recoiling against given Particle", "GeV/:math:`\\text{c}^2`");
+                      "Invariant mass of the system recoiling against given Particle\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
-    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
-                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter",
-                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+                      "invariant mass squared of the system recoiling against given Particle\n\n", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide, R"DOC(
+                       Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the
+                       signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable
+                       must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.\n\n", "rad");
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.\n\n",
+                      "rad");
     REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.\n\n",
                       "rad");
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.\n\n",
                       "rad");
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
                       "The mother (V0) is required to have exactly two daughters");
-    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
-                      "Transverse momentum of the first daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", "GeV/c");
-    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
-                      "Transverse momentum of the second daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", "GeV/c");
+    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt, R"DOC(
+                       Transverse momentum of the first daughter with respect to the V0 mother.
+                       The mother is required to have exactly two daughters
+
+                       )DOC", "GeV/c");
+    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt, R"DOC(
+                       Transverse momentum of the second daughter with respect to the V0 mother.
+                       The mother is required to have exactly two daughters
+
+                       )DOC", "GeV/c");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
 
-                      * -1 particle has no ECL cluster
-                      *  0 particle has no associated track
-                      *  1 there is a matched track called connected - region(CR) track match
+* -1 particle has no ECL cluster
+*  0 particle has no associated track
+*  1 there is a matched track called connected - region(CR) track match
+
                       )DOC");
     MAKE_DEPRECATED("trackMatchType", true, "light-2012-minos", R"DOC(
                      Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
@@ -1267,7 +1337,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
-                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.", "GeV/c");
+                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.\n\n", "GeV/c");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
@@ -1280,7 +1350,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("eventRandom", eventRandom,
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
     REGISTER_METAVARIABLE("minET2ETDist(detName, detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
-                          R"DOC(Returns the distance in [cm] between the particle and the nearest particle in the reference list at the given detector layer surface.
+                          R"DOC(Returns the distance :math:`d_{\mathrm{i}}` in [cm] between the particle and the nearest particle in the reference list at the given detector :math:`i`-th layer surface.
 The definition is based on the track helices extrapolation.
 
 * The first argument is the name of the detector to consider.
@@ -1296,7 +1366,7 @@ The definition is based on the track helices extrapolation.
 			  Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("minET2ETDistVar(detName, detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
-			  R"DOC(Returns the value of the variable for the nearest neighbour to this particle as taken from the reference list at the given detector layer surface.
+			  R"DOC(Returns the value of the variable for the nearest neighbour to this particle as taken from the reference list at the given detector :math:`i`-th layer surface
 , according to the distance definition of `minET2ETDist`.
 
 * The first argument is the name of the detector to consider.
@@ -1311,24 +1381,71 @@ The definition is based on the track helices extrapolation.
 			  Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
-			  R"DOC(Returns the particle's isolation score based on:
+			  R"DOC(Returns a particle's isolation score :math:`s` defined as:
 
-* The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsoCalculator`` module.
-* A set of per-detector weights quantifying the impact of each detector on the PID for this particle type.
+.. math::
+   :nowrap:
+
+   \begin{split}
+
+     s &= \sum_{\mathrm{det}} 1 - \left(-w_{\mathrm{det}} \cdot \frac{\sum_{i}^{N_{\mathrm{det}}^{\mathrm{layers}}} H(i)}{N_{\mathrm{det}}^{\mathrm{layers}}}\right), \\
+
+     H(i) &=
+       \begin{cases}
+         0 & d_{\mathrm{i}} > D_{\mathrm{det}}^{\mathrm{thresh}} \\
+         1 & d_{\mathrm{i}} <= D_{\mathrm{det}}^{\mathrm{thresh}}, \\
+       \end{cases}
+
+   \end{split}
+
+where :math:`d_{\mathrm{i}}` is the distance to the closest neighbour at the :math:`i`-th layer of the given detector (c.f., `minET2ETDist`), :math:`N_{\mathrm{det}}^{\mathrm{layers}}` is the
+number of layers of the detector, :math:`D_{\mathrm{det}}^{\mathrm{thresh}}` is a threshold length related to the detector's granularity defined in the ``TrackIsoCalculator`` module,
+and :math:`w_{\mathrm{det}}` are (negative) weights associated to the detector's impact on PID for this particle type, read from a CDB payload.
 
 The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
-
-.. note::
-    The detector weights are considered for the score definition only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
 
 * The first argument is the reference particle list name used to search for the nearest neighbour.
 * The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
   if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
-* The remaining arguments are a comma-separated list of detector names. At least one must be chosen among {CDC, TOP, ARICH, ECL, KLM}.
+* The remaining arguments are a comma-separated list of detector names, which must correspond to the one given to the `TrackIsoCalculator` module.
 
 .. note::
-    This variable requires to run the ``TrackIsoCalculator`` module first.
+    The PID detector weights :math:`w_{\mathrm{det}}` are non-trivial only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
+    Otherwise :math:`w_{\mathrm{det}} = -1`.
+
+.. note::
+    This variable requires to run the `TrackIsoCalculator` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
+
+)DOC",
+			  Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("minET2ETIsoScoreAsWeightedAvg(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVarAsWeightedAvg,
+			  R"DOC(Returns a particle's isolation score :math:`s` based on the weighted average:
+
+.. math::
+
+   s = 1 - \frac{\sum_{\mathrm{det}} \sum_{i}^{N_{\mathrm{det}}^{\mathrm{layers}}} w_{\mathrm{det}} \cdot \frac{D_{\mathrm{det}}^{\mathrm{thresh}}}{d_{\mathrm{i}}} }{ \sum_{\mathrm{det}} w_{\mathrm{det}}},
+
+where :math:`d_{\mathrm{i}}` is the distance to the closest neighbour at the :math:`i`-th layer of the given detector (c.f., `minET2ETDist`), :math:`N_{\mathrm{det}}^{\mathrm{layers}}` is the
+number of layers of the detector, :math:`D_{\mathrm{det}}^{\mathrm{thresh}}` is a threshold length related to the detector's granularity defined in the ``TrackIsoCalculator`` module,
+and :math:`w_{\mathrm{det}}` are (negative) weights associated to the detector's impact on PID for this particle type, read from a CDB payload.
+
+The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
+
+* The first argument is the reference particle list name used to search for the nearest neighbour.
+* The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
+  if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
+* The remaining arguments are a comma-separated list of detector names, which must correspond to the one given to the `TrackIsoCalculator` module.
+
+.. note::
+    The PID detector weights :math:`w_{\mathrm{det}}` are non-trivial only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
+    Otherwise :math:`\lvert w_{\mathrm{det}} \rvert = 1`.
+
+.. note::
+    This variable requires to run the `TrackIsoCalculator` module first.
+    Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
+
 )DOC",
 			  Manager::VariableDataType::c_double);
 

@@ -25,7 +25,6 @@
 #include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -49,7 +48,7 @@
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ColorPalette.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <Math/VectorUtil.h>
 #include <TEveArrow.h>
@@ -1074,14 +1073,7 @@ void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particl
   const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
-void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
-{
-  TVector3 global_pos;
-  BKLMSimHitPosition* p = hit->getRelatedFrom<BKLMSimHitPosition>();
-  if (p) global_pos = p->getPosition();
-  addSimHit(global_pos, particle);
-}
-void EVEVisualization::addSimHit(const EKLMSimHit* hit, const MCParticle* particle)
+void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
 {
   const TVector3& global_pos = hit->getPosition();
   addSimHit(global_pos, particle);
@@ -1437,7 +1429,9 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
   const double layerThicknessCm = 3.16; //TDR, Fig 10.2
   const double layerDistanceCm = 9.1 - layerThicknessCm;
 
-  TVector3 startPos = cluster->getClusterPosition(); //position of first RPC plane
+  // Pposition of first RPC plane.
+  ROOT::Math::XYZVector position = cluster->getClusterPosition();
+  TVector3 startPos(position.X(), position.Y(), position.Z());
   TVector3 dir; //direction of cluster stack, Mag() == distance between planes
   TVector3 a, b; //defines RPC plane
   bool isBarrel = (startPos.Z() > -175.0 and startPos.Z() < 270.0);

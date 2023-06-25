@@ -18,29 +18,35 @@ import basf2 as b2
 from ROOT.Belle2 import TOPDatabaseImporter
 
 # define local database with write access
-b2.use_local_database("localDB/localDB.txt", "localDB", False)
+b2.conditions.expert_settings(save_payloads="localDB/localDB.txt")
+
+
+class PayloadImporter(b2.Module):
+    ''' Payload importer using TOPDatabaseImporter '''
+
+    def initialize(self):
+        ''' Import dummy payloads '''
+
+        dbImporter = TOPDatabaseImporter()
+        dbImporter.importDummyCalTimebase(0, 0, 0, -1)
+        dbImporter.importDummyCalChannelT0(0, 0, 0, -1)
+        dbImporter.importDummyCalModuleT0(0, 0, 0, -1)
+
 
 # create path
 main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1])
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter')
 
-# Gearbox - access to xml files
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+# Gearbox
+main.add_module('Gearbox')
 
-# Geometry
-geometry = b2.register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Geometry parameters
+main.add_module('TOPGeometryParInitializer', useDB=False)
+
+# Importer
+main.add_module(PayloadImporter())
 
 # process single event
 b2.process(main)
-
-# and then run the importer
-dbImporter = TOPDatabaseImporter()
-dbImporter.importDummyCalTimebase(0, 0, 0, -1)

@@ -35,7 +35,6 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:DAQ:"));
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: Constructor done.");
 
 }
@@ -43,7 +42,7 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
 DQMHistAnalysisPXDDAQModule::~DQMHistAnalysisPXDDAQModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -63,6 +62,8 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_cMissingDHP = new TCanvas((m_histogramDirectoryName + "/c_MissingDHP").data());
   m_cStatistic = new TCanvas((m_histogramDirectoryName + "/c_Statistic").data());
   m_cStatisticUpd = new TCanvas((m_histogramDirectoryName + "/c_StatisticUpd").data());
+  if (!hasDeltaPar(m_histogramDirectoryName, "PXDDAQStat")) addDeltaPar(m_histogramDirectoryName, "PXDDAQStat",
+        HistDelta::c_Underflow, m_minEntries, 1); // register delta
 
   m_monObj->addCanvas(m_cDAQError);
   m_monObj->addCanvas(m_cMissingDHC);
@@ -75,7 +76,7 @@ void DQMHistAnalysisPXDDAQModule::initialize()
 
 #ifdef _BELLE2_EPICS
   mychid.resize(20);
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     SEVCHK(ca_create_channel((m_pvPrefix + "HLTRej").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
     SEVCHK(ca_create_channel((m_pvPrefix + "Trunc").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
@@ -108,7 +109,6 @@ void DQMHistAnalysisPXDDAQModule::beginRun()
 
   m_cMissingDHP->Clear();
   m_cStatisticUpd->Clear();
-  if (m_hDaqStatOld) m_hDaqStatOld->Reset();
 }
 
 void DQMHistAnalysisPXDDAQModule::event()
@@ -217,6 +217,23 @@ void DQMHistAnalysisPXDDAQModule::event()
     m_cMissingDHP->Update();
   }
 
+  std::string name = "PXDDAQStat";
+
+  auto* statsum = findHist(m_histogramDirectoryName, name, true);
+  if (statsum) {
+    // Stat histogram
+    if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
+    m_cStatistic->cd();
+    m_hStatistic = (TH1D*)statsum->DrawClone("text");
+    if (m_hStatistic->GetBinContent(0)) {
+      m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
+      m_hStatistic->Draw("text");
+    }
+    m_cStatistic->Modified();
+    m_cStatistic->Update();
+  }
+
+  // now the important part, check fraction of "errors" and export
   double data_HLTRej = 0.0;
   double data_Trunc = 0.0;
   double data_HER_Trunc = 0.0;
@@ -238,42 +255,18 @@ void DQMHistAnalysisPXDDAQModule::event()
   double data_LER_Miss_1ms = 0.0;
   double data_unused = 0.0;
 
-  // Stat histogram
-  if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
-
-  std::string name = "PXDDAQStat";
-
   bool update_epics = false;
 
-  TH1* hh1 = findHist(name);
-  if (hh1 == NULL) {
-    hh1 = findHist(m_histogramDirectoryName, name);
-  }
-  if (hh1) {
-    if (!m_hDaqStatOld) {
-      B2DEBUG(20, "Initial Clone");
-      gROOT->cd();
-      m_hDaqStatOld = (TH1*)hh1->Clone();
-      m_hDaqStatOld->SetName(TString(hh1->GetName()) + "_last");
-      m_hDaqStatOld->Reset();
-    }
-
-    double last = m_hDaqStatOld->GetEntries();
-    double current = hh1->GetEntries();
-    B2DEBUG(20, "Entries: " << last << "," << current);
-    if (current - last >= m_minEntries) {
-      B2DEBUG(20, "Update Delta & Fit");
-      gROOT->cd();
-      TH1* delta = (TH1*)hh1->Clone();
-      delta->Add(m_hDaqStatOld, -1.);
-      m_cStatisticUpd->Clear();
-      m_cStatisticUpd->cd();// necessary!
-      delta->Draw("hist");
-      m_hDaqStatOld->Reset();
-      m_hDaqStatOld->Add(hh1);
-
-      double scale = delta->GetBinContent(0);// underflow is event counter
-      if (scale != 0.0) scale = 1.0 / scale; // just avoid dive by zero
+  auto* delta = getDelta(m_histogramDirectoryName, name); // only updated by default
+  if (delta) {
+    gROOT->cd();
+    m_cStatisticUpd->Clear();
+    m_cStatisticUpd->cd();// necessary!
+    delta->Draw("hist");
+    // now check that we have enough stats for useful export
+    double scale = delta->GetBinContent(0);// underflow is event counter
+    if (scale >= m_minEntries) {
+      if (scale != 0.0) scale = 1.0 / scale; // just avoid divide by zero, should never happen
       data_HLTRej = delta->GetBinContent(1 + 0) * scale;
       data_Trunc = delta->GetBinContent(1 + 1) * scale;
       data_HER_Trunc = delta->GetBinContent(1 + 2) * scale;
@@ -296,18 +289,9 @@ void DQMHistAnalysisPXDDAQModule::event()
       data_unused = delta->GetBinContent(1 + 19) * scale;
       update_epics = true;
     }
-    m_cStatistic->cd();
-    m_hStatistic = (TH1D*)hh1->DrawClone("text");
-    if (m_hStatistic->GetBinContent(0)) {
-      m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
-      m_hStatistic->Draw("text");
-    }
+    m_cStatisticUpd->Modified();
+    m_cStatisticUpd->Update();
   }
-
-  m_cStatisticUpd->Modified();
-  m_cStatisticUpd->Update();
-  m_cStatistic->Modified();
-  m_cStatistic->Update();
 
   if (update_epics) {
     m_monObj->setVariable("HLTReject", data_HLTRej);
@@ -331,7 +315,7 @@ void DQMHistAnalysisPXDDAQModule::event()
     m_monObj->setVariable("LER_Miss_1ms", data_LER_Miss_1ms);
 
 #ifdef _BELLE2_EPICS
-    if (m_useEpics) {
+    if (getUseEpics()) {
       SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data_HLTRej), "ca_set failure");
       SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&data_Trunc), "ca_set failure");
       SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&data_HER_Trunc), "ca_set failure");
@@ -358,10 +342,3 @@ void DQMHistAnalysisPXDDAQModule::event()
 #endif
   }
 }
-
-void DQMHistAnalysisPXDDAQModule::terminate()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDDAQ: terminate called");
-  // should delete canvas here, maybe hist, too? Who owns it?
-}
-

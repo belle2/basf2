@@ -20,8 +20,8 @@
 #pragma link C++ class Belle2::Track+; // checksum=0x1388f8ff, version=6
 #pragma link C++ class Belle2::HitPatternCDC+; // checksum=0x8d86d89e, version=-1
 #pragma link C++ class Belle2::HitPatternVXD+; // checksum=0x5599d6f5, version=-1
-#pragma link C++ class Belle2::TrackFitResult+; // checksum=0x87046527, version=9
-#pragma link C++ class Belle2::V0+; // checksum=0xeecaa9c4, version=3
+#pragma link C++ class Belle2::TrackFitResult+; // checksum=0x4852b3c4, version=10
+#pragma link C++ class Belle2::V0+; // checksum=0x192c1942, version=4
 #pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+; // checksum=0x62cc1b16, version=-1
 #pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+; // checksum=0x43730546, version=-1
 #pragma link C++ class pair<short, short>+; // checksum=0x7069a6e4, version=-1
@@ -95,6 +95,7 @@
   source="Double32_t m_cov5[15]; Double32_t m_tau[5];"      \
   targetClass="Belle2::TrackFitResult"          \
   target="m_cov5"                 \
+  include="TMath.h,TMatrixD.h,TMatrixDSym.h" \
   code="{							      \
   /* Translate the false covariance matrix back to the 6x6 matrix */  \
   TMatrixDSym oldCov5(5);					      \
@@ -166,6 +167,16 @@
     }                 \
   }                 \
   }"
+
+#pragma read sourceClass="Belle2::TrackFitResult" version="[-7]" \
+  source="" \
+  targetClass="Belle2::TrackFitResult" target="m_NDF100" \
+  code="{m_NDF100 = 0xFFFF;}"
+
+#pragma read sourceClass="Belle2::TrackFitResult" version="[8-9]" \
+  source="uint16_t m_NDF" \
+  targetClass="Belle2::TrackFitResult" target="m_NDF100" \
+  code="{m_NDF100 = onfile.m_NDF*100;}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="float m_Energy" \
@@ -246,6 +257,21 @@
   code="{ if(onfile.m_hypothesisId == 5) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_nPhotons); \
         else if(onfile.m_hypothesisId == 6) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
         else m_hypotheses = 0;}"
+
+#pragma read sourceClass="Belle2::V0" version="[-3]" \
+  source="" \
+  targetClass="Belle2::V0" target="m_fittedVertexX" \
+  code="{m_fittedVertexX = 0;}"
+
+#pragma read sourceClass="Belle2::V0" version="[-3]" \
+  source="" \
+  targetClass="Belle2::V0" target="m_fittedVertexY" \
+  code="{m_fittedVertexY = 0;}"
+
+#pragma read sourceClass="Belle2::V0" version="[-3]" \
+  source="" \
+  targetClass="Belle2::V0" target="m_fittedVertexZ" \
+  code="{m_fittedVertexZ = 0;}"
 
 
 #endif

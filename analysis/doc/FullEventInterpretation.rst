@@ -204,7 +204,7 @@ Some basic facts:
 *    It can be used for hadronic and semileptonic tagging.
 *    The algorithm has to be trained on MC, and can afterwards be applied on data.
 *    The training requires O(100) million MC events
-*    The weightfiles are stored in the Belle 2 Condition database
+*    The weightfiles are stored in the Belle II Condition database
 
 Read this file if you want to understand the technical details of the FEI.
 
@@ -282,7 +282,7 @@ This script can be used to train the FEI on a cluster like available at KEKCC. A
 
 The script will automatically create some directories collection containing weightfiles, monitoring files and other stuff jobs containing temporary files during the training (can be deleted afterwards)
 
-The distributed script automatically spawns jobs on the cluster (or local machine), and runs the steering file on the provided MC. Since a FEI training requires multiple runs over the same MC, it does so multiple times. The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput). In between it calls the do_trainings function of the FEI, to train the multivariate classifiers of the FEI at each stage. At the end it produces summary outputs using printReporting.py and latexReporting.py (this will only work of you use the monitoring mode). And a summary file for each mva training using basf2_mva_evaluate. If your training fails for some reason (e.g. a job fails on the cluster), the FEI will stop, you can fix the problem and resume the training using the `-x` option. This requires some expert knowledge, because you have to know how to fix the occurred problem and at which step you have to resume the training. After the training the weightfiles will be stored in the localdb in the collection directory. You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere. Alternatively you can just copy the localdb to somewhere and use it directly, however, this is recommended only for testing as it is not reproducible.
+The distributed script automatically spawns jobs on the cluster (or local machine), and runs the steering file on the provided MC. Since a FEI training requires multiple runs over the same MC, it does so multiple times. The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput). In between it calls the do_trainings function of the FEI, to train the multivariate classifiers of the FEI at each stage. At the end it produces summary outputs using printReporting.py and latexReporting.py (this will only work of you use the monitoring mode). And a summary file for each mva training using basf2_mva_evaluate. If your training fails for some reason (e.g. a job fails on the cluster), the FEI will stop, you can fix the problem and resume the training using the `-x` option. This requires some expert knowledge, because you have to know how to fix the occurred problem and at which step you have to resume the training. After the training the weightfiles will be stored in the localdb in the collection directory. You have to upload these local database to the Belle II Condition Database if you want to use the FEI everywhere. Alternatively you can just copy the localdb to somewhere and use it directly, however, this is recommended only for testing as it is not reproducible.
 
 You have to adjust the following parameters:
 
@@ -382,8 +382,8 @@ that they do not work properly because of missing ``python`` packages. In that c
 The last step is to install `gbasf2`_. For that purpose, please switch to a new terminal window with fresh environment
 on your machine, and follow the steps for `gbasf2 installation <https://confluence.desy.de/display/BI/Computing+GBasf2#ComputingGBasf2-gBasf2installationprocedure>`_.
 
-In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the JIRA issue
-`BIIDCD-1256 <https://agira.desy.de/browse/BIIDCD-1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
+In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the GitLab issue
+`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
 

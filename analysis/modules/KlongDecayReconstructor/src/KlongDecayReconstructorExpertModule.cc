@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/KlongDecayReconstructor/KlongDecayReconstructorExpertModule.h>
 
 // framework aux
@@ -19,6 +19,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <Math/Vector4D.h>
+#include <TMath.h>
 
 #include <memory>
 

@@ -458,10 +458,11 @@ void SVDDQMExpressRecoModule::defineHisto()
     VxdID sensorID(iLayer, iLadder, iSensor);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-    //----------------------------------------------------------------
-    // Number of fired strips per sensor
-    //----------------------------------------------------------------
+
     if (m_additionalPlots) {
+      //----------------------------------------------------------------
+      // Number of fired strips per sensor
+      //----------------------------------------------------------------
       name = str(format("SVDDQM_%1%_FiredU") % sensorDescr);
       title = str(format("SVD Sensor %1% Number of Fired U-Strips") % sensorDescr);
       m_firedU[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
@@ -474,11 +475,9 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_firedV[i]->GetXaxis()->SetTitle("# fired strips");
       m_firedV[i]->GetYaxis()->SetTitle("count");
       m_histoList->Add(m_firedV[i]);
-    }
-    //----------------------------------------------------------------
-    // Number of clusters per sensor
-    //----------------------------------------------------------------
-    if (m_additionalPlots) {
+      //----------------------------------------------------------------
+      // Number of clusters per sensor
+      //----------------------------------------------------------------
       name = str(format("SVDDQM_%1%_ClustersU") % sensorDescr);
       title = str(format("SVD Sensor %1% Number of U-Clusters") % sensorDescr);
       m_clustersU[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
@@ -491,7 +490,23 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_clustersV[i]->GetXaxis()->SetTitle("# clusters");
       m_clustersV[i]->GetYaxis()->SetTitle("count");
       m_histoList->Add(m_clustersV[i]);
+      //----------------------------------------------------------------
+      // Charge of strips
+      //----------------------------------------------------------------
+      name = str(format("SVDDQM_%1%_ADCStripU") % sensorDescr);
+      title = str(format("SVD Sensor %1% U-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
+      m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+      m_stripSignalU[i]->GetXaxis()->SetTitle("signal ADC");
+      m_stripSignalU[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_stripSignalU[i]);
+      name = str(format("SVDDQM_%1%_ADCStripV") % sensorDescr);
+      title = str(format("SVD Sensor %1% V-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
+      m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+      m_stripSignalV[i]->GetXaxis()->SetTitle("signal ADC");
+      m_stripSignalV[i]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_stripSignalV[i]);
     }
+
     //----------------------------------------------------------------
     // Charge of clusters
     //----------------------------------------------------------------
@@ -525,21 +540,18 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Charge of strips
     //----------------------------------------------------------------
-
-    if (m_additionalPlots) {
-      name = str(format("SVDDQM_%1%_ADCStripU") % sensorDescr);
-      title = str(format("SVD Sensor %1% U-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
-      m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
-      m_stripSignalU[i]->GetXaxis()->SetTitle("signal ADC");
-      m_stripSignalU[i]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_stripSignalU[i]);
-      name = str(format("SVDDQM_%1%_ADCStripV") % sensorDescr);
-      title = str(format("SVD Sensor %1% V-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
-      m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
-      m_stripSignalV[i]->GetXaxis()->SetTitle("signal ADC");
-      m_stripSignalV[i]->GetYaxis()->SetTitle("count");
-      m_histoList->Add(m_stripSignalV[i]);
-    }
+    name = str(format("SVDDQM_%1%_ADCStripU") % sensorDescr);
+    title = str(format("SVD Sensor %1% U-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
+    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+    m_stripSignalU[i]->GetXaxis()->SetTitle("signal ADC");
+    m_stripSignalU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripSignalU[i]);
+    name = str(format("SVDDQM_%1%_ADCStripV") % sensorDescr);
+    title = str(format("SVD Sensor %1% V-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
+    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+    m_stripSignalV[i]->GetXaxis()->SetTitle("signal ADC");
+    m_stripSignalV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripSignalV[i]);
     //----------------------------------------------------------------
     // Strips Counts
     //----------------------------------------------------------------
@@ -968,11 +980,10 @@ void SVDDQMExpressRecoModule::event()
     if (m_desynchSVDTime && m_svdEventInfo.isValid())
       time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
 
-    int groupId = -99;
     vector<int> vec = cluster.getTimeGroupId();
     auto minElement = min_element(vec.begin(), vec.end());
     if (vec.size() > 0) {
-      groupId = *minElement;
+      int groupId = *minElement;
 
       if (iLayer == 3) {
         if (m_cluster3TimeGroupId != nullptr) m_cluster3TimeGroupId->Fill(time, groupId);

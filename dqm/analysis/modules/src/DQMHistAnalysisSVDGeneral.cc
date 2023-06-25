@@ -210,8 +210,8 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
   m_cClusterOnTrack3Time_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrack3Time_L456V");
 
-  m_cCluster3TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster3TimeGroupId");
-  m_cCluster6TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster6TimeGroupId");
+//  m_cCluster3TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster3TimeGroupId");
+//  m_cCluster6TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster6TimeGroupId");
 
 
   const int nY = 19;
@@ -282,8 +282,8 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   }
   m_cClusterOnTrackTime_L456V->Clear();
   m_cClusterOnTrack3Time_L456V->Clear();
-  m_cCluster3TimeGroupId->Clear();
-  m_cCluster6TimeGroupId->Clear();
+//   m_cCluster3TimeGroupId->Clear();
+//   m_cCluster6TimeGroupId->Clear();
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -627,75 +627,75 @@ void DQMHistAnalysisSVDGeneralModule::event()
     }
 
     // Cluster Group Id
-    TH2F* htmp2 = NULL;
-
-    htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster3TimeGroupId");
-    if (htmp2 != NULL) {
-      m_hCluster3TimeGroupId.Clear();
-      htmp2->Copy(m_hCluster3TimeGroupId);
-      m_hCluster3TimeGroupId.SetTitle("Cluster Time GroupIds for 3 samples" + runID);
-      bool hasError = false;
-      if (nEvents > m_statThreshold) {
-
-      } else {
-        m_cCluster3TimeGroupId->SetFillColor(kGray);
-        m_cCluster3TimeGroupId->SetFrameFillColor(10);
-      }
-      if (! hasError) {
-        m_cCluster3TimeGroupId->SetFillColor(kGreen);
-        m_cCluster3TimeGroupId->SetFrameFillColor(10);
-      } else {
-        m_legError->Draw("same");
-        m_cCluster3TimeGroupId->SetFillColor(kRed);
-        m_cCluster3TimeGroupId->SetFrameFillColor(10);
-      }
-    } else {
-      B2INFO("Histogram SVDExpReco/SVDDQM_Cluster3TimeGroupId from SVDDQMExpReco module not found!");
-      m_cCluster3TimeGroupId->SetFillColor(kRed);
-    }
-
-    m_cCluster3TimeGroupId->cd();
-    m_hCluster3TimeGroupId.Draw();
-
-    m_cCluster3TimeGroupId->Modified();
-    m_cCluster3TimeGroupId->Update();
-
-    if (m_printCanvas)
-      m_cCluster3TimeGroupId->Print("c_SVDCluster3TimeGoupId.pdf");
-
-    htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster6TimeGroupId");
-    if (htmp2 != NULL) {
-      m_hCluster6TimeGroupId.Clear();
-      htmp2->Copy(m_hCluster6TimeGroupId);
-      m_hCluster6TimeGroupId.SetTitle("Cluster Time GroupIds for 6 samples" + runID);
-      bool hasError = false;
-      if (nEvents > m_statThreshold) {
-
-      } else {
-        m_cCluster6TimeGroupId->SetFillColor(kGray);
-        m_cCluster6TimeGroupId->SetFrameFillColor(10);
-      }
-      if (! hasError) {
-        m_cCluster6TimeGroupId->SetFillColor(kGreen);
-        m_cCluster6TimeGroupId->SetFrameFillColor(10);
-      } else {
-        m_legError->Draw("same");
-        m_cCluster6TimeGroupId->SetFillColor(kRed);
-        m_cCluster6TimeGroupId->SetFrameFillColor(10);
-      }
-    } else {
-      B2INFO("Histogram SVDExpReco/SVDDQM_Cluster6TimeGroupId from SVDDQMExpReco module not found!");
-      m_cCluster6TimeGroupId->SetFillColor(kRed);
-    }
-
-    m_cCluster6TimeGroupId->cd();
-    m_hCluster6TimeGroupId.Draw();
-
-    m_cCluster6TimeGroupId->Modified();
-    m_cCluster6TimeGroupId->Update();
-
-    if (m_printCanvas)
-      m_cCluster6TimeGroupId->Print("c_SVDCluster6TimeGoupId.pdf");
+//     TH2F* htmp2 = NULL;
+//
+//     htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster3TimeGroupId");
+//     if (htmp2 != NULL) {
+//        m_hCluster3TimeGroupId.Clear();
+//        htmp2->Copy(m_hCluster3TimeGroupId);
+//        m_hCluster3TimeGroupId.SetTitle("Cluster Time GroupIds for 3 samples" + runID);
+//        bool hasError = false;
+//        if (nEvents > m_statThreshold) {
+//
+//        } else {
+//           m_cCluster3TimeGroupId->SetFillColor(kGray);
+//           m_cCluster3TimeGroupId->SetFrameFillColor(10);
+//        }
+//        if (! hasError) {
+//           m_cCluster3TimeGroupId->SetFillColor(kGreen);
+//           m_cCluster3TimeGroupId->SetFrameFillColor(10);
+//        } else {
+//           m_legError->Draw("same");
+//           m_cCluster3TimeGroupId->SetFillColor(kRed);
+//           m_cCluster3TimeGroupId->SetFrameFillColor(10);
+//        }
+//     } else {
+//        B2INFO("Histogram SVDExpReco/SVDDQM_Cluster3TimeGroupId from SVDDQMExpReco module not found!");
+//        m_cCluster3TimeGroupId->SetFillColor(kRed);
+//     }
+//
+//     m_cCluster3TimeGroupId->cd();
+//     m_hCluster3TimeGroupId.Draw();
+//
+//     m_cCluster3TimeGroupId->Modified();
+//     m_cCluster3TimeGroupId->Update();
+//
+//     if (m_printCanvas)
+//        m_cCluster3TimeGroupId->Print("c_SVDCluster3TimeGoupId.pdf");
+//
+//     htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster6TimeGroupId");
+//     if (htmp2 != NULL) {
+//        m_hCluster6TimeGroupId.Clear();
+//        htmp2->Copy(m_hCluster6TimeGroupId);
+//        m_hCluster6TimeGroupId.SetTitle("Cluster Time GroupIds for 6 samples" + runID);
+//        bool hasError = false;
+//        if (nEvents > m_statThreshold) {
+//
+//        } else {
+//           m_cCluster6TimeGroupId->SetFillColor(kGray);
+//           m_cCluster6TimeGroupId->SetFrameFillColor(10);
+//        }
+//        if (! hasError) {
+//           m_cCluster6TimeGroupId->SetFillColor(kGreen);
+//           m_cCluster6TimeGroupId->SetFrameFillColor(10);
+//        } else {
+//           m_legError->Draw("same");
+//           m_cCluster6TimeGroupId->SetFillColor(kRed);
+//           m_cCluster6TimeGroupId->SetFrameFillColor(10);
+//        }
+//     } else {
+//        B2INFO("Histogram SVDExpReco/SVDDQM_Cluster6TimeGroupId from SVDDQMExpReco module not found!");
+//        m_cCluster6TimeGroupId->SetFillColor(kRed);
+//     }
+//
+//     m_cCluster6TimeGroupId->cd();
+//     m_hCluster6TimeGroupId.Draw();
+//
+//     m_cCluster6TimeGroupId->Modified();
+//     m_cCluster6TimeGroupId->Update();
+//
+//     if (m_printCanvas)
+//        m_cCluster6TimeGroupId->Print("c_SVDCluster6TimeGoupId.pdf");
 
 
     //look for V histogram - OFFLINE ZS

@@ -35,9 +35,9 @@ Command line tools
 
 FEI
 +++
-* Since the gamma cuts for Belle II inside FEI are loosened starting this release, the FEI calibration performed with MC15ri are not valid anymore
-  if FEI is reconstructed with this release or later. So, either use FEI skims (recommended), or run FEI with an older releases until new FEI
-  calibration with MC16 will be available.
+* The gamma cuts for Belle II inside FEI are loosened (to match goodBelleGamma i.e., 0.09 --> 0.05 MeV in barrel and 0.16 --> 0.15 MeV in backward endcap) starting this release.
+  Hence, the FEI calibration performed with MC15ri are not valid anymore if FEI is reconstructed with this release or later.
+  So, either use FEI skims (recommended), or run FEI with an older releases until new FEI calibration with MC16 will be available.
 
 Changes in the analysis package in light-2303-iriomote
 ------------------------------------------------------

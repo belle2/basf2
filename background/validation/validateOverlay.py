@@ -21,8 +21,9 @@ from simulation import add_simulation
 import os
 import glob
 from ROOT import Belle2
-from ROOT import TH1F, TFile, TNamed
+from ROOT import TH1F, TFile, TNamed, TNtuple
 import sys
+import array
 
 b2.set_random_seed(123452)
 
@@ -53,23 +54,31 @@ class Histogrammer(b2.Module):
 
         #: list of occupancy-like histograms
         self.hist2 = []
-        self.hist2.append(TH1F('PXDOccupancy', 'PXD Occupancy', 100, 0, 5))
-        self.hist2.append(TH1F('SVDOccupancy', 'SVD Occupancy', 100, 0, 20))
+        self.hist2.append(TH1F('PXDL1Occupancy', 'PXD L1 Occupancy', 100, 0, 4))
+        self.hist2.append(TH1F('PXDL2Occupancy', 'PXD L2 Occupancy', 100, 0, 4))
+        self.hist2.append(TH1F('PXDOccupancy', 'PXD Occupancy', 100, 0, 4))
+        self.hist2.append(TH1F('SVDOccupancy', 'SVD L3 Occupancy', 100, 0, 15))
+        self.hist2.append(TH1F('CDCInnerHitRate', 'CDC Hit Rate per wire for the Inner layers', 100, 0, 1000))
+        self.hist2.append(TH1F('CDCOuterHitRate', 'CDC Hit Rate per wire for the Outer layers', 100, 0, 1000))
         self.hist2.append(TH1F('CDCHitRate', 'CDC Hit Rate per wire', 100, 0, 1000))
 
+        #: number of PXD pixels (L1)
+        self.nPXDL1 = 250*768*2 * 8
+        #: number of PXD pixels (L2)
+        self.nPXDL2 = 250*768*2 * 12
         #: number of PXD pixels (L1+L2)
-        self.nPXD = 7.68e6
+        self.nPXD = self.nPXDL1 + self.nPXDL2
 
         #: number of L3 strips (u+v)
         self.nSVDL3 = 768 * 7 * 2 * 2
 
         #: number of inner CDC wires
-        self.nCDCin = 1280
-        #: integration time of the inner CDC layers
+        self.nCDCin = 160 * 8
+        #: integration time of the inner CDC layers [ms]
         self.CDCITIn = 408.7 * 1e-6
         #: number of outer CDC wires
-        self.nCDCout = 13056
-        #: integration time of the outer CDC layers
+        self.nCDCout = 160*6 + 192*6 + 224*6 + 256*6 + 288*6 + 320*6 + 352*6 + 384 * 6
+        #: integration time of the outer CDC layers [ms]
         self.CDCITout = 754.6 * 1e-6
 
         #: merged list of all histograms
@@ -81,6 +90,16 @@ class Histogrammer(b2.Module):
                 descr = TNamed(
                     'Description',
                     'PXD L1+L2 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
+            elif h.GetName() == 'PXDL1Occupancy':
+                h.SetXTitle('PXD L1 occupancy [%]')
+                descr = TNamed(
+                    'Description',
+                    'PXD L1 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
+            elif h.GetName() == 'PXDL2Occupancy':
+                h.SetXTitle('PXD L2 occupancy [%]')
+                descr = TNamed(
+                    'Description',
+                    'PXD L2 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
             elif h.GetName() == 'SVDOccupancy':
                 h.SetXTitle('SVD L3 ZS5 occupancy - average u,v [%]')
                 descr = TNamed(
@@ -91,6 +110,16 @@ class Histogrammer(b2.Module):
                 descr = TNamed(
                     'Description',
                     'CDC Hit Rate, averaged inner/outer wires (with BG overlay only and no event generator)')
+            elif h.GetName() == 'CDCInnerHitRate':
+                h.SetXTitle('CDC Hit Rate for Inner Layers [kHz/wire]')
+                descr = TNamed(
+                    'Description',
+                    'CDC Hit Rate per wire, for the Inner layers (with BG overlay only and no event generator)')
+            elif h.GetName() == 'CDCOuterHitRate':
+                h.SetXTitle('CDC Hit Rate for Outer Layers [kHz/wire]')
+                descr = TNamed(
+                    'Description',
+                    'CDC Hit Rate per wire, for the Outer layers (with BG overlay only and no event generator)')
             else:
                 h.SetXTitle('number of digits in event')
                 descr = TNamed('Description', 'Number of background ' + h.GetName() +
@@ -104,6 +133,10 @@ class Histogrammer(b2.Module):
             h.GetListOfFunctions().Add(contact)
             options = TNamed('MetaOptions', 'shifter')
             h.GetListOfFunctions().Add(options)
+
+            ntplvar = "PXDL1_occupancy:PXDL2_occupancy:PXD_occupancy:SVDL3ZS5_occupancy"
+            ntplvar += ":CDCInner_hitRate:CDCOuter_hitRate:CDC_hitRate"
+            self.ntpl = TNtuple("ntpl", "Average Background Levels", (ntplvar))
 
     def event(self):
         ''' Event processor: fill histograms '''
@@ -121,7 +154,16 @@ class Histogrammer(b2.Module):
 
         # PXD
         pxdDigits = Belle2.PyStoreArray('PXDDigits')
-        self.hist2[0].Fill(pxdDigits.getEntries()/self.nPXD * 100)
+        self.hist2[2].Fill(pxdDigits.getEntries()/self.nPXD * 100)
+        nL1 = 0
+        nL2 = 0
+        for pxdDigit in pxdDigits:
+            if pxdDigit.getSensorID().getLayerNumber() == 1:  # check L1/L2
+                nL1 += 1
+            else:
+                nL2 += 1
+        self.hist2[0].Fill(nL1/self.nPXDL1 * 100)
+        self.hist2[1].Fill(nL2/self.nPXDL2 * 100)
 
         # SVD
         svdDigits = Belle2.PyStoreArray('SVDShaperDigitsZS5')
@@ -129,16 +171,32 @@ class Histogrammer(b2.Module):
         for svdDigit in svdDigits:
             if svdDigit.getSensorID().getLayerNumber() == 3:  # only check SVD L3
                 nL3 += 1
-        self.hist2[1].Fill(nL3/self.nSVDL3 * 100)
+        self.hist2[3].Fill(nL3/self.nSVDL3 * 100)
 
         # CDC
         cdcHits = Belle2.PyStoreArray('CDCHits')
-        self.hist2[2].Fill(cdcHits.getEntries() / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
+        self.hist2[6].Fill(cdcHits.getEntries() / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
+        nCDC_in = 0
+        nCDC_out = 0
+        for cdcHit in cdcHits:
+            if cdcHit.getICLayer() < 8:  # count wires of inner/outer layers
+                nCDC_in += 1
+            else:
+                nCDC_out += 1
+        self.hist2[4].Fill(nCDC_in/self.nCDCin / self.CDCITIn)
+        self.hist2[5].Fill(nCDC_out/self.nCDCout / self.CDCITout)
 
     def terminate(self):
         """ Write histograms to file."""
 
+        # ntpl content "PXDL1:PXDL2:PXD:SVDL3ZS5:CDCInner:CDCOuter:CDC");
+        values = [self.hist2[0].GetMean(), self.hist2[1].GetMean(), self.hist2[2].GetMean(),
+                  self.hist2[3].GetMean(), self.hist2[4].GetMean(), self.hist2[5].GetMean(),
+                  self.hist2[6].GetMean()]
+
+        self.ntpl.Fill(array.array("f", values),)
         tfile = TFile('overlayPlots.root', 'recreate')
+        self.ntpl.Write()
         for h in self.allh:
             h.Write()
         tfile.Close()

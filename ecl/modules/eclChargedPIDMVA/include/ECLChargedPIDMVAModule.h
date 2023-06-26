@@ -150,7 +150,7 @@ namespace Belle2 {
      * This leads to a null contribution in the PID likelihood ratio.
      * Used when the pdf value is (0 | subnormal | inf | NaN).
     */
-    static constexpr float c_dummyLogL = -std::numeric_limits<float>::max();
+    static constexpr float c_dummyLogL = std::log(std::numeric_limits<float>::min());
 
     /**
      * Vector of variables used to define the regions in which the MVAs are trained.

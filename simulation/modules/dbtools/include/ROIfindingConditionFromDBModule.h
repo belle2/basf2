@@ -11,7 +11,7 @@
 
 #include <framework/database/DBObjPtr.h>
 
-#include <simulation/dbobjects/ROIParameters.h>
+#include <simulation/dbobjects/ROISimulationParameters.h>
 
 
 namespace Belle2 {
@@ -29,7 +29,7 @@ namespace Belle2 {
     bool m_roiEnabled = true;
 
     /// Configuration parameters for ROIs
-    DBObjPtr<ROIParameters> m_roiParameters;
+    DBObjPtr<ROISimulationParameters> m_ROISimulationParameters;
   };
 
 }

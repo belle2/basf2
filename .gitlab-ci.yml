@@ -84,6 +84,7 @@ build-gcc:
     - b2setup
     - scons --no-debuginfo
     - basf2 --info
+    - which root
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 run-tests:

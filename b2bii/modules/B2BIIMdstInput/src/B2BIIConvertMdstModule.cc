@@ -718,7 +718,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TrackFitResult* trackFitP = m_trackFitResults[trackFitPIndex];
     TrackFitResult* trackFitM = m_trackFitResults[trackFitMIndex];
 
-    m_v0s.appendNew(std::make_pair(trackP, trackFitP), std::make_pair(trackM, trackFitM));
+    m_v0s.appendNew(std::make_pair(trackP, trackFitP), std::make_pair(trackM, trackFitM), belleV0.vx(), belleV0.vy(), belleV0.vz());
 
     // create Ks Particle and add it to the 'K_S0:mdst' ParticleList
     const PIDLikelihood* pidP = trackP->getRelated<PIDLikelihood>();
@@ -2328,4 +2328,3 @@ void B2BIIConvertMdstModule::terminate()
 {
   B2DEBUG(99, "B2BIIConvertMdst: terminate called");
 }
-

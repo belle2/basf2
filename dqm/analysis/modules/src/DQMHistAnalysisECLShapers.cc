@@ -20,15 +20,13 @@ DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLShapers: Constructor done.");
-
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
 
 DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -37,7 +35,7 @@ DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule()
 void DQMHistAnalysisECLShapersModule::initialize()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     for (int i = 0; i < c_collector_count; i++) {
       std::string pv_name = "ECL:logic_check:crate" + std::to_string(i + 1);
@@ -109,7 +107,7 @@ void DQMHistAnalysisECLShapersModule::event()
   //== Set EPICS PVs
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (h_fail_crateid != NULL) {
       // Set fit consistency check PVs
       for (int i = 0; i < c_collector_count; i++) {
@@ -159,7 +157,7 @@ void DQMHistAnalysisECLShapersModule::terminate()
   B2DEBUG(20, "terminate called");
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (int i = 0; i < c_collector_count; i++) {
       if (chid_logic[i]) SEVCHK(ca_clear_channel(chid_logic[i]), "ca_clear_channel failure");
     }

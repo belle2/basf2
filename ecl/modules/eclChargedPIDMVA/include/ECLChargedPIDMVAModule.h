@@ -153,7 +153,7 @@ namespace Belle2 {
      * (log is not constexpr safe for clang, but gcc does not like const)
      * Relevant in two cases:
      * 1. A likelihood is exactly 0, then this is the correct closest value.
-     * 2. Unable to calculate likelhiids for the track (out of phase-space etc.),
+     * 2. Unable to calculate likelihoods for the track (outside of acceptance etc.),
      *    then this leads to a null contribution to the global PID likelihood ratio.
     */
     static constexpr float c_dummyLogL = -87.3365;

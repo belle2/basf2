@@ -147,10 +147,16 @@ namespace Belle2 {
 
     /**
      * Dummy value of log Likelihood for a particle hypothesis.
-     * This leads to a null contribution in the PID likelihood ratio.
      * Used when the pdf value is (0 | subnormal | inf | NaN).
+     * Equivalent to std::log(std::numeric_limits<float>::min());
+     * ie. the log of the closest possible value to 0.
+     * (log is not constexpr safe for clang, but gcc does not like const)
+     * Relevant in two cases:
+     * 1. A likelihood is exactly 0, then this is the correct closest value.
+     * 2. Unable to calculate likelhiids for the track (out of phase-space etc.),
+     *    then this leads to a null contribution to the global PID likelihood ratio.
     */
-    static const float c_dummyLogL = std::log(std::numeric_limits<float>::min());
+    static constexpr float c_dummyLogL = -87.3365;
 
     /**
      * Vector of variables used to define the regions in which the MVAs are trained.

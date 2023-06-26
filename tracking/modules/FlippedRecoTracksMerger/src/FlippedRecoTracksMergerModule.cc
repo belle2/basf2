@@ -45,6 +45,15 @@ void FlippedRecoTracksMergerModule::initialize()
 
 void FlippedRecoTracksMergerModule::event()
 {
+  // get the cut from DB
+  if (!m_flipCutsFromDB.isValid()) {
+    B2WARNING("DBobjects : TrackFlippingCuts not found!");
+    return;
+  }
+
+  // check if the flip&refit is switched on (or off)
+  if (!(*m_flipCutsFromDB).getOnOffInfo()) return;
+
 
   // loop all the recoTracks
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
@@ -58,8 +67,6 @@ void FlippedRecoTracksMergerModule::event()
 
     if (!track) continue;
 
-    // get the cut from DB
-    if (!m_flipCutsFromDB.isValid()) continue;
     double mvaFlipCut = (*m_flipCutsFromDB).getSecondCut();
 
     // if we should not flip the tracks: the 2nd MVA QI is nan (aka didn't pass the 1st MVA filter) or smaller than the cut

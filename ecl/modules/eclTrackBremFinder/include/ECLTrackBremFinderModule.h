@@ -60,7 +60,7 @@ namespace Belle2 {
     /**
      * Factor which is multiplied onto the cluster position error to check for matches
      */
-    double m_clusterAcceptanceFactor = 3.0f;
+    double m_clusterAcceptanceFactor = 10.0f;
 
     /**
      * Radii where virtual hits for the extrapolation will be generated

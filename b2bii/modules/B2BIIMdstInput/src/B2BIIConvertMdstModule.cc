@@ -840,7 +840,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     }
     // append extra info: nisKsFinder quality indicators
     if (m_nisEnable) {
-      if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+      if (belleV0.kind() > 0 and belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
         Belle::nisKsFinder ksnb;
         double protIDP = atcPID(pidP, 2, 4);
         double protIDM = atcPID(pidM, 2, 4);

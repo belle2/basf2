@@ -55,17 +55,6 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   addParam("virtualHitRadii", m_virtualHitRadii, "Radii where virtual hits for the extrapolation will be generated",
            m_virtualHitRadii);
 
-  addParam("relativeClusterEnergy", m_relativeClusterEnergy, "Fraction of the tracks energy the ECL cluster has "
-           "to possess to be considered for bremsstrahlung finding",
-           m_relativeClusterEnergy);
-
-  addParam("requestedNumberOfCDCHits", m_requestedNumberOfCDCHits, "Minimal/Maximal number of CDC hits, the track has to possess "
-           "to be considered for bremsstrahlung finding",
-           m_requestedNumberOfCDCHits);
-
-  addParam("electronProbabilityCut", m_electronProbabilityCut, "Cut on the electron probability (from pid) of track",
-           m_electronProbabilityCut);
-
   addParam("clusterDistanceCut", m_clusterDistanceCut,
            "Cut on the distance between the cluster position angle and the extrapolation angle",
            m_clusterDistanceCut);
@@ -98,26 +87,6 @@ void ECLTrackBremFinderModule::event()
   // sort tracks by Pt, as high energy tracks are more likely to radiate bremsstrahlung photons
   // with sufficient energy to be detected and reconstructed
   for (auto& track : m_tracks) {
-
-    // since the module runs after the reconstruction the pid likelihood can be checked to sort out tracks,
-    // which are not expected to be from electrons
-    const PIDLikelihood* pid = track.getRelated<PIDLikelihood>();
-    if (pid) {
-      Const::ChargedStable possiblePDGs[6] = {Const::electron, Const::pion, Const::kaon, Const::proton, Const::muon, Const::deuteron};
-      Const::ChargedStable mostLikelyPDG = Const::electron;
-      double highestProb = 0;
-      for (Const::ChargedStable pdg : possiblePDGs) {
-        double probability = pid->getProbability(pdg);
-        if (probability > highestProb) {
-          highestProb = probability;
-          mostLikelyPDG = pdg;
-        }
-      }
-      if (mostLikelyPDG != Const::electron || highestProb <= m_electronProbabilityCut) {
-        B2DEBUG(20, "Track is expected not to be from electron");
-        continue;
-      }
-    }
 
     const TrackFitResult* trackFitResult = track.getTrackFitResult(Const::ChargedStable(211));
     double trackMomentum;
@@ -156,12 +125,6 @@ void ECLTrackBremFinderModule::event()
       continue;
     }
 
-    // check if the RecoTrack has the requested number of CDC hits
-    if (recoTrack->getNumberOfCDCHits() < std::get<0>(m_requestedNumberOfCDCHits) ||
-        recoTrack->getNumberOfCDCHits() > std::get<1>(m_requestedNumberOfCDCHits)) {
-      B2DEBUG(20, "RecoTrack has not requested number of CDC hits");
-      continue;
-    }
 
     // set the params for the virtual hits
     std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = {};
@@ -206,11 +169,6 @@ void ECLTrackBremFinderModule::event()
     // possible improvement: use fast lookup using kd-tree, this is nasty
     // iterate over full cluster list to find possible compatible clusters
     for (ECLCluster& cluster : m_eclClusters) {
-      //check if the cluster belongs to a photon or electron
-      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        B2DEBUG(20, "Cluster has wrong hypothesis!");
-        continue;
-      }
 
       //check if cluster is already related to a track -> if true, can't be bremsstrahlung cluster
       auto relatedTrack = cluster.getRelatedFrom<Track>();
@@ -224,14 +182,6 @@ void ECLTrackBremFinderModule::event()
       auto relatedBremHit = cluster.getRelated<BremHit>();
       if (relatedBremHit) {
         B2DEBUG(20, "Cluster already assumed to be bremsstrahlung cluster!");
-        continue;
-      }
-
-      // check if the cluster energy is higher than the track momentum itself
-      // also check that cluster has more than 2% of the track momentum
-      double relativeEnergy = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / trackMomentum;
-      if (relativeEnergy > 1 || relativeEnergy < m_relativeClusterEnergy) {
-        B2DEBUG(20, "Relative energy of cluster higher than 1 or below threshold!");
         continue;
       }
 

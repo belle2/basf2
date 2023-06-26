@@ -70,21 +70,6 @@ namespace Belle2 {
     std::vector<float> m_virtualHitRadii = {1.05, 16.0};
 
     /**
-     * Fraction of the tracks energy the ECL cluster has to possess to be considered for bremsstrahlung finding
-     */
-    double m_relativeClusterEnergy = 0.02f;
-
-    /**
-     * Minimal/Maximal number of CDC hits, the track has to possess to be considered for bremsstrahlung finding
-     */
-    std::tuple<unsigned int, unsigned int> m_requestedNumberOfCDCHits = {1, 100};
-
-    /**
-     * Cut on the electron probability (from pid) of track
-     */
-    float m_electronProbabilityCut = 0;
-
-    /**
      * Cut on the distance between the cluster position angle and the extrapolation angle
      */
     float m_clusterDistanceCut = 0.05;

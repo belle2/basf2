@@ -96,7 +96,7 @@ namespace Belle2 {
        */
       void assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
                                      VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
-                                     bool isAtEdge = false, bool isAtJoint = false, bool isAdjacentDead = false);
+                                     bool isAtUEdge = false, bool isAtVEdge = false, bool isAdjacentDead = false);
 
       /** Noise in ADU */
       double m_elNoise;

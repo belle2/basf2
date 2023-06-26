@@ -32,10 +32,9 @@ namespace Belle2 {
 
     /** Default constructor */
     PXDClusterPositionErrorPar(unsigned short nBinsU = 1, unsigned short nBinsV = 3, unsigned short maxSize = 8,
-                               float defaultValue = 0.0, float factorSensorEdge = 1.0,
-                               float factorLadderJoint = 1.0, float factorDeadNeighbour = 1.0) :
-      m_nBinsU(nBinsU), m_nBinsV(nBinsV), m_maxSize(maxSize), m_defaultValue(defaultValue), m_factorSensorEdge(factorSensorEdge),
-      m_factorLadderJoint(factorLadderJoint), m_factorDeadNeighbour(factorDeadNeighbour), m_clusterPositionErrorMap() {}
+                               float defaultValue = 0.0, float defaultFactor = 1.0):
+      m_nBinsU(nBinsU), m_nBinsV(nBinsV), m_maxSize(maxSize), m_defaultValue(defaultValue), m_defaultFactor(defaultFactor),
+      m_factorSensorUEdgeMap(), m_factorSensorVEdgeMap(), m_factorDeadNeighbourMap(), m_clusterPositionErrorMap() { }
 
     /** Get number of bins along sensor u side
      */
@@ -55,7 +54,7 @@ namespace Belle2 {
      */
     unsigned short getGlobalID(unsigned short uBin, unsigned short vBin, unsigned short size) const
     {
-      if (size > m_maxSize) size = m_maxSize + 1;
+      if (size > m_maxSize) size = m_maxSize;
       return uBin * (m_nBinsV * m_maxSize) + vBin * m_maxSize + size - 1;
     }
 
@@ -124,36 +123,187 @@ namespace Belle2 {
       return getContent(sensorID, getGlobalID(uBin, vBin, size));
     }
 
-    /** Set scaling factor at sensor edge */
-    void setSensorEdgeFactor(float factorSensorEdge)
+    /** Set scaling factor at sensor U edge
+     * @param sensorID unique ID of the sensor
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param factor scale factor value to store
+     */
+    void setSensorUEdgeFactor(unsigned short sensorID, unsigned short globalID, float factor)
     {
-      m_factorSensorEdge = factorSensorEdge;
+      auto mapIter = m_factorSensorUEdgeMap.find(sensorID);
+      if (mapIter != m_factorSensorUEdgeMap.end()) {
+        // Already some values stored
+        auto& facVec = mapIter->second;
+        // Set the value
+        facVec[globalID] = factor;
+      } else {
+        // Create a fresh scale factor vector
+        std::vector<float> facVec(m_nBinsU * m_nBinsV * m_maxSize, m_defaultFactor);
+        // Set the value
+        facVec[globalID] = factor;
+        // Add vector to map
+        m_factorSensorUEdgeMap[sensorID] = facVec;
+      }
     }
-    /** Set scaling factor at ladder joint */
-    void setLadderJointFactor(float factorLadderJoint)
+    /** Set scaling factor at sensor U edge
+     * @param sensorID unique ID of the sensor
+     * @param uBin position error bin along u side of sensor
+     * @param vBin position error bin along v side of sensor
+     * @param factor scale factor value to store
+     */
+    void setSensorUEdgeFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float factor)
     {
-      m_factorLadderJoint = factorLadderJoint;
-    }
-    /** Set scaling factor when neighbouring dead rows/columns */
-    void setDeadNeighbourFactor(float factorDeadNeighbour)
-    {
-      m_factorDeadNeighbour = factorDeadNeighbour;
+      setSensorUEdgeFactor(sensorID, getGlobalID(uBin, vBin, size), factor);
     }
 
-    /** Get scaling factor at sensor edge */
-    float getSensorEdgeFactor() const
+    /** Set scaling factor at sensor V edge
+     * @param sensorID unique ID of the sensor
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param factor scale factor value to store
+     */
+    void setSensorVEdgeFactor(unsigned short sensorID, unsigned short globalID, float factor)
     {
-      return m_factorSensorEdge;
+      auto mapIter = m_factorSensorVEdgeMap.find(sensorID);
+      if (mapIter != m_factorSensorVEdgeMap.end()) {
+        // Already some values stored
+        auto& facVec = mapIter->second;
+        // Set the value
+        facVec[globalID] = factor;
+      } else {
+        // Create a fresh scale factor vector
+        std::vector<float> facVec(m_nBinsU * m_nBinsV * m_maxSize, m_defaultFactor);
+        // Set the value
+        facVec[globalID] = factor;
+        // Add vector to map
+        m_factorSensorVEdgeMap[sensorID] = facVec;
+      }
     }
-    /** Get scaling factor at ladder joint */
-    float getLadderJointFactor() const
+    /** Set scaling factor at sensor V edge
+     * @param sensorID unique ID of the sensor
+     * @param uBin position error bin along u side of sensor
+     * @param vBin position error bin along v side of sensor
+     * @param factor scale factor value to store
+     */
+    void setSensorVEdgeFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float factor)
     {
-      return m_factorLadderJoint;
+      setSensorVEdgeFactor(sensorID, getGlobalID(uBin, vBin, size), factor);
     }
-    /** Get scaling factor when neighbouring dead rows/columns */
-    float getDeadNeighbourFactor() const
+
+    /** Set scaling factor when neighbouring dead rows/columns
+     * @param sensorID unique ID of the sensor
+     * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
+     * @param factor scale factor value to store
+     */
+    void setDeadNeighbourFactor(unsigned short sensorID, unsigned short globalID, float factor)
     {
-      return m_factorDeadNeighbour;
+      auto mapIter = m_factorDeadNeighbourMap.find(sensorID);
+      if (mapIter != m_factorDeadNeighbourMap.end()) {
+        // Already some values stored
+        auto& facVec = mapIter->second;
+        // Set the value
+        facVec[globalID] = factor;
+      } else {
+        // Create a fresh scale factor vector
+        std::vector<float> facVec(m_nBinsU * m_nBinsV * m_maxSize, m_defaultFactor);
+        // Set the value
+        facVec[globalID] = factor;
+        // Add vector to map
+        m_factorDeadNeighbourMap[sensorID] = facVec;
+      }
+    }
+    /** Set scaling factor when neighbouring dead rows/columns
+     * @param sensorID unique ID of the sensor
+     * @param uBin position error bin along u side of sensor
+     * @param vBin position error bin along v side of sensor
+     * @param factor scale factor value to store
+     */
+    void setDeadNeighbourFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float factor)
+    {
+      setDeadNeighbourFactor(sensorID, getGlobalID(uBin, vBin, size), factor);
+    }
+
+    /** Get scaling factor at sensor edge in U
+     * @param sensorID unique ID of the sensor
+     * @param globalID unique ID for part of sensor (uBin,vBin,size)
+     * @return value scale factor at sensor edge in U
+     */
+    float getSensorUEdgeFactor(unsigned short sensorID, unsigned short globalID) const
+    {
+      auto mapIter = m_factorSensorUEdgeMap.find(sensorID);
+      if (mapIter != m_factorSensorUEdgeMap.end()) {
+        // Found sensor, return scale factor value
+        auto& facVec = mapIter->second;
+        return facVec[globalID];
+      }
+      // Sensor not found, keep low profile and return default scale factor value
+      return m_defaultFactor;
+    }
+    /** Get scaling factor at sensor edge in U
+     * @param sensorID unique ID of the sensor
+     * @param uBin position error bin along u side of sensor
+     * @param vBin position error bin along v side of sensor
+     * @param size cluster size
+     * @return value scale factor at sensor edge in U
+     */
+    float getSensorUEdgeFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size) const
+    {
+      return getSensorUEdgeFactor(sensorID, getGlobalID(uBin, vBin, size));
+    }
+
+    /** Get scaling factor at sensor edge in V
+     * @param sensorID unique ID of the sensor
+     * @param globalID unique ID for part of sensor (uBin,vBin,size)
+     * @return value scale factor at sensor edge in V
+     */
+    float getSensorVEdgeFactor(unsigned short sensorID, unsigned short globalID) const
+    {
+      auto mapIter = m_factorSensorVEdgeMap.find(sensorID);
+      if (mapIter != m_factorSensorVEdgeMap.end()) {
+        // Found sensor, return scale factor value
+        auto& facVec = mapIter->second;
+        return facVec[globalID];
+      }
+      // Sensor not found, keep low profile and return default scale factor value
+      return m_defaultFactor;
+    }
+    /** Get scaling factor at sensor edge in V
+     * @param sensorID unique ID of the sensor
+     * @param uBin position error bin along u side of sensor
+     * @param vBin position error bin along v side of sensor
+     * @param size cluster size
+     * @return value scale factor at sensor edge in V
+     */
+    float getSensorVEdgeFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size) const
+    {
+      return getSensorVEdgeFactor(sensorID, getGlobalID(uBin, vBin, size));
+    }
+
+    /** Get scaling factor when neighbouring dead rows/column
+     * @param sensorID unique ID of the sensor
+     * @param globalID unique ID for part of sensor (uBin,vBin,size)
+     * @return value scale factor when neighbouring dead rows/column
+     */
+    float getDeadNeighbourFactor(unsigned short sensorID, unsigned short globalID) const
+    {
+      auto mapIter = m_factorDeadNeighbourMap.find(sensorID);
+      if (mapIter != m_factorDeadNeighbourMap.end()) {
+        // Found sensor, return scale factor value
+        auto& facVec = mapIter->second;
+        return facVec[globalID];
+      }
+      // Sensor not found, keep low profile and return default scale factor value
+      return m_defaultFactor;
+    }
+    /** Get scaling factor when neighbouring dead rows/column
+     * @param sensorID unique ID of the sensor
+     * @param uBin position error bin along u side of sensor
+     * @param vBin position error bin along v side of sensor
+     * @param size cluster size
+     * @return value scale factor when  neighbouring dead rows/columns
+     */
+    float getDeadNeighbourFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size) const
+    {
+      return getDeadNeighbourFactor(sensorID, getGlobalID(uBin, vBin, size));
     }
 
     /** Return unordered_map with all PXD cluster position errors */
@@ -173,18 +323,19 @@ namespace Belle2 {
     /** Default value for map */
     float m_defaultValue;
 
-    /** Scaling factor at sensor edge */
-    float m_factorSensorEdge;
+    /** Default value for scale factor map */
+    float m_defaultFactor;
 
-    /** Scaling factor at ladder joint */
-    float m_factorLadderJoint;
+    /** Scaling factor at sensor edge for layers 1 or 2 and FWD/BWD sensors with sensor number 1 or 2*/
+    std::unordered_map<unsigned short, std::vector<float> > m_factorSensorUEdgeMap;
+    std::unordered_map<unsigned short, std::vector<float> > m_factorSensorVEdgeMap;
 
-    /** Scaling factor when neighbouring dead rows/colums */
-    float m_factorDeadNeighbour;
+    /** Scaling factor when neighbouring dead rows/colums for FWD/BWD sensors by sensor number 1 or 2 */
+    std::unordered_map<unsigned short, std::vector<float> > m_factorDeadNeighbourMap;
 
     /** Map for holding the cluster position errors for all PXD sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, std::vector<float> > m_clusterPositionErrorMap;
 
-    ClassDef(PXDClusterPositionErrorPar, 3);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDClusterPositionErrorPar, 8);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

@@ -362,11 +362,11 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     if (m_errorFromDB) { // Overwrite cluster position error with value from DB (keep the above calculation untouched for now)
       unsigned int uID = info.getUCellID(projU.getPos());
       unsigned int vID = info.getVCellID(projV.getPos());
-      assignPositionErrorFromDB(projU, **m_clusterPositionErrorUPar, sensorID, uID, vID, pitchU,
-                                PXD::isClusterAtUEdge(sensorID, projU.getMinCell(), projU.getMaxCell()));
-      assignPositionErrorFromDB(projV, **m_clusterPositionErrorVPar, sensorID, uID, vID, pitchV,
-                                PXD::isClusterAtVEdge(sensorID, projV.getMinCell(), projV.getMaxCell()),
-                                PXD::isClusterAtLadderJoint(sensorID, projV.getMinCell(), projV.getMaxCell()));
+      bool isUedge = PXD::isClusterAtUEdge(sensorID, projU.getMinCell(), projU.getMaxCell());
+      bool isVedge = (PXD::isClusterAtVEdge(sensorID, projV.getMinCell(), projV.getMaxCell())
+                      || PXD::isClusterAtLadderJoint(sensorID, projV.getMinCell(), projV.getMaxCell()));
+      assignPositionErrorFromDB(projU, **m_clusterPositionErrorUPar, sensorID, uID, vID, pitchU, isUedge, isVedge);
+      assignPositionErrorFromDB(projV, **m_clusterPositionErrorVPar, sensorID, uID, vID, pitchV, isUedge, isVedge);
     }
 
     ROOT::Math::XYZVector lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
@@ -446,19 +446,19 @@ void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, C
 
 void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
                                                      VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
-                                                     bool isAtEdge, bool isAtJoint, bool isAdjacentDead)
+                                                     bool isAtUEdge, bool isAtVEdge, bool isAdjacentDead)
 {
   // Get bins from cell ID
   unsigned short uBin = PXD::getBinU(sensorID, uCell, vCell, errorPar.getBinsU());
   unsigned short vBin = PXD::getBinV(sensorID, vCell, errorPar.getBinsV());
   // Get error from DB [in units of pix]
   double error = errorPar.getContent(sensorID.getID(), uBin, vBin, primary.getSize());
+  double sf = 1.;
   // Apply additional factor if at sensor edges or adjacent to daed rows/colums
-  // (N.B. payload may not yet contain the corresponding values and simply set to 1)
-  if (isAtEdge)       error *= errorPar.getSensorEdgeFactor();
-  if (isAtJoint)      error *= errorPar.getLadderJointFactor();
-  if (isAdjacentDead) error *= errorPar.getDeadNeighbourFactor();
+  if (isAtUEdge)      sf *= errorPar.getSensorUEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
+  if (isAtVEdge)      sf *= errorPar.getSensorVEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
+  if (isAdjacentDead) sf *= errorPar.getDeadNeighbourFactor(sensorID.getID(), uBin, vBin, primary.getSize());
   // Set error (convert to [um])
-  if (error) primary.setError(error * centerPitch); // zero means default values to use analytic error
+  if (error) primary.setError(sf * error * centerPitch); // zero means default values to use analytic error
 
 }

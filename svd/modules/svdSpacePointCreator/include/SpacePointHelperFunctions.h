@@ -14,7 +14,7 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dbobjects/SVDSpacePointSelectionFunction.h>
+#include <svd/dbobjects/SVDSpacePointSNRSelectionFunction.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -124,7 +124,7 @@ namespace Belle2 {
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
                                        std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut,
                                        const bool& useSVDGroupInfo, const SVDNoiseCalibrations& noiseCal,
-                                       const DBObjPtr<SVDSpacePointSelectionFunction>& svdSpacePointSelectionFunction, bool useSVDSpacePointSelectionFunction)
+                                       const DBObjPtr<SVDSpacePointSNRSelectionFunction>& svdSpacePointSelectionFunction, bool useSVDSpacePointSNRSelectionFunction)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
@@ -164,7 +164,7 @@ namespace Belle2 {
           }
         }
 
-        if (useSVDSpacePointSelectionFunction) {
+        if (useSVDSpacePointSNRSelectionFunction) {
           std::vector<float> inputU;
           std::vector<float> inputV;
 
@@ -173,7 +173,7 @@ namespace Belle2 {
 
           bool pass = svdSpacePointSelectionFunction->passSNRFractionSelection(inputU, inputV);
           if (!pass) {
-            B2DEBUG(29, "Cluster combination rejected due to SVDSpacePointSelectionFunction");
+            B2DEBUG(29, "Cluster combination rejected due to SVDSpacePointSNRSelectionFunction");
             continue;
           }
         }
@@ -312,8 +312,8 @@ namespace Belle2 {
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
       bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName, const bool& useSVDGroupInfo,
-      const SVDNoiseCalibrations& noiseCal, const DBObjPtr<SVDSpacePointSelectionFunction>& svdSpacePointSelectionFunction,
-      bool useSVDSpacePointSelectionFunction)
+      const SVDNoiseCalibrations& noiseCal, const DBObjPtr<SVDSpacePointSNRSelectionFunction>& svdSpacePointSelectionFunction,
+      bool useSVDSpacePointSNRSelectionFunction)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -330,7 +330,7 @@ namespace Belle2 {
 
     for (auto& aSensor : activatedSensors)
       findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo,
-                               noiseCal, svdSpacePointSelectionFunction, useSVDSpacePointSelectionFunction);
+                               noiseCal, svdSpacePointSelectionFunction, useSVDSpacePointSNRSelectionFunction);
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {

@@ -67,10 +67,10 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
   addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
 
-  addParam("useSVDSpacePointSelectionFunctionFor6Samples", m_useSVDSpacePointSelectionFunctionFor6Samples,
-           "Use SVDSpacePointSelectionFunction to apply a selection on combinations of clusters in 6-sample DAQ mode", bool(false));
-  addParam("useSVDSpacePointSelectionFunctionFor3Samples", m_useSVDSpacePointSelectionFunctionFor3Samples,
-           "Use SVDSpacePointSelectionFunction to apply a selection on combinations of clusters in 3-sample DAQ mode", bool(false));
+  addParam("useSVDSpacePointSNRSelectionFunctionFor6Samples", m_useSVDSpacePointSNRSelectionFunctionFor6Samples,
+           "Use SVDSpacePointSNRSelectionFunction to apply a selection on combinations of clusters in 6-sample DAQ mode", bool(false));
+  addParam("useSVDSpacePointSNRSelectionFunctionFor3Samples", m_useSVDSpacePointSNRSelectionFunctionFor3Samples,
+           "Use SVDSpacePointSNRSelectionFunction to apply a selection on combinations of clusters in 3-sample DAQ mode", bool(false));
 
 }
 
@@ -78,17 +78,21 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
 void SVDSpacePointCreatorModule::beginRun()
 {
-  if (m_useDB) {
+  if (m_useDB || m_useDBForSNR) {
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
     else
       B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
-    m_useSVDGroupInfoIn6Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(6);
-    m_useSVDGroupInfoIn3Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(3);
+    if (m_useDB) {
+      m_useSVDGroupInfoIn6Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(6);
+      m_useSVDGroupInfoIn3Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(3);
+    }
 
-    m_useSVDSpacePointSelectionFunctionFor6Samples = m_recoConfig->useSVDSpacePointSelectionFunction(6);
-    m_useSVDSpacePointSelectionFunctionFor3Samples = m_recoConfig->useSVDSpacePointSelectionFunction(3);
+    if (m_useDBForSNR) {
+      m_useSVDSpacePointSNRSelectionFunctionFor6Samples = m_recoConfig->useSVDSpacePointSNRSelectionFunction(6);
+      m_useSVDSpacePointSNRSelectionFunctionFor3Samples = m_recoConfig->useSVDSpacePointSNRSelectionFunction(3);
+    }
   }
 
   if (m_useSVDGroupInfoIn6Sample)
@@ -101,9 +105,9 @@ void SVDSpacePointCreatorModule::beginRun()
   else
     B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
 
-  if (m_useSVDSpacePointSelectionFunctionFor6Samples || m_useSVDSpacePointSelectionFunctionFor3Samples) {
-    if (!m_svdSpacePointSelectionFunction.isValid())
-      B2FATAL("No valid SVDSpacePointSelectionFunction");
+  if (m_useSVDSpacePointSNRSelectionFunctionFor6Samples || m_useSVDSpacePointSNRSelectionFunctionFor3Samples) {
+    if (!m_svdSpacePointSNRSelectionFunction.isValid())
+      B2FATAL("No valid SVDSpacePointSNRSelectionFunction");
   }
 
 }
@@ -149,9 +153,9 @@ void SVDSpacePointCreatorModule::event()
 {
 
   bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
-  bool useSVDSpacePointSelectionFunction = m_useSVDSpacePointSelectionFunctionFor6Samples
-                                           || m_useSVDSpacePointSelectionFunctionFor3Samples;
-  if (useSVDGroupInfo || useSVDSpacePointSelectionFunction) {
+  bool useSVDSpacePointSNRSelectionFunction = m_useSVDSpacePointSNRSelectionFunctionFor6Samples
+                                              || m_useSVDSpacePointSNRSelectionFunctionFor3Samples;
+  if (useSVDGroupInfo || useSVDSpacePointSNRSelectionFunction) {
     // first take Event Informations:
     StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
     if (!temp_eventinfo.isValid())
@@ -162,10 +166,10 @@ void SVDSpacePointCreatorModule::event()
     // then use the respective parameters
     if (numberOfAcquiredSamples == 6) {
       useSVDGroupInfo = m_useSVDGroupInfoIn6Sample;
-      useSVDSpacePointSelectionFunction = m_useSVDSpacePointSelectionFunctionFor6Samples;
+      useSVDSpacePointSNRSelectionFunction = m_useSVDSpacePointSNRSelectionFunctionFor6Samples;
     } else if (numberOfAcquiredSamples == 3) {
       useSVDGroupInfo = m_useSVDGroupInfoIn3Sample;
-      useSVDSpacePointSelectionFunction = m_useSVDSpacePointSelectionFunctionFor3Samples;
+      useSVDSpacePointSNRSelectionFunction = m_useSVDSpacePointSNRSelectionFunctionFor3Samples;
     }
   }
 
@@ -175,7 +179,7 @@ void SVDSpacePointCreatorModule::event()
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
                                   m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo,
-                                  m_NoiseCal, m_svdSpacePointSelectionFunction, useSVDSpacePointSelectionFunction);
+                                  m_NoiseCal, m_svdSpacePointSNRSelectionFunction, useSVDSpacePointSNRSelectionFunction);
   }
 
 

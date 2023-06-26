@@ -15,7 +15,7 @@
 
 // svd
 #include <svd/dbobjects/SVDRecoConfiguration.h>
-#include <svd/dbobjects/SVDSpacePointSelectionFunction.h>
+#include <svd/dbobjects/SVDSpacePointSNRSelectionFunction.h>
 #include <svd/calibration/SVDHitTimeSelection.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -115,16 +115,18 @@ namespace Belle2 {
     bool m_useSVDGroupInfoIn6Sample = false; /**< Use SVD group info to reject combinations in 6-sample DAQ mode */
     bool m_useSVDGroupInfoIn3Sample = false; /**< Use SVD group info to reject combinations in 3-sample DAQ mode */
 
-    bool   m_useDB = true;  /**< if true takes the configuration from the DB objects. */
+    bool m_useDB = true;  /**< if true takes the configuration from the DB objects for grouping. */
 
     SVDNoiseCalibrations m_NoiseCal; /**< SVDNoise calibrations db object*/
 
-    DBObjPtr<SVDSpacePointSelectionFunction> m_svdSpacePointSelectionFunction; /**< SVD Reconstruction Configuration payload*/
+    DBObjPtr<SVDSpacePointSNRSelectionFunction>
+    m_svdSpacePointSNRSelectionFunction; /**< Payload of selection functions and thresholds applied on SVDSpacePoint */
 
-    bool m_useSVDSpacePointSelectionFunctionFor6Samples =
-      false; /**< Use SVDSpacePointSelectionFunction to reject combinations in 6-sample DAQ mode */
-    bool m_useSVDSpacePointSelectionFunctionFor3Samples =
-      false; /**< Use SVDSpacePointSelectionFunction to reject combinations in 3-sample DAQ mode */
+    bool m_useDBForSNR = true;  /**< if true takes the configuration from the DB objects for SVDSpacePointSNRSelectionSelection. */
+    bool m_useSVDSpacePointSNRSelectionFunctionFor6Samples =
+      false; /**< Use SVDSpacePointSNRSelectionFunction to reject combinations in 6-sample DAQ mode */
+    bool m_useSVDSpacePointSNRSelectionFunctionFor3Samples =
+      false; /**< Use SVDSpacePointSNRSelectionFunction to reject combinations in 3-sample DAQ mode */
 
   };
 } // end namespace Belle2

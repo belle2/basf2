@@ -16,13 +16,13 @@ class svdSpacePointSelectionFunctionImporter(basf2.Module):
     def initialize(self):
         from ROOT import Belle2
 
-        payload = Belle2.SVDSpacePointSelectionFunction()
+        payload = Belle2.SVDSpacePointSNRSelectionFunction()
         payload.setFraction0Max(0.45)
         payload.setFraction1Min(0.30)
         payload.setFraction0MaxForFraction1Cut(0.10)
 
         iov = Belle2.IntervalOfValidity.always()
-        Belle2.Database.Instance().storeData("SVDSpacePointSelectionFunction", payload, iov)
+        Belle2.Database.Instance().storeData("SVDSpacePointSNRSelectionFunction", payload, iov)
 
 
 main = basf2.create_path()

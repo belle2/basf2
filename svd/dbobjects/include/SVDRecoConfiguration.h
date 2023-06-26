@@ -36,8 +36,8 @@ namespace Belle2 {
       , m_assignSVDGroupIn3Samples(false)
       , m_useSVDGroupInfoInSPfor6Samples(false)
       , m_useSVDGroupInfoInSPfor3Samples(false)
-      , m_useSVDSpacePointSelectionFunctionFor6Samples(false)
-      , m_useSVDSpacePointSelectionFunctionFor3Samples(false)
+      , m_useSVDSpacePointSNRSelectionFunctionFor6Samples(false)
+      , m_useSVDSpacePointSNRSelectionFunctionFor3Samples(false)
     {};
 
     /**
@@ -239,29 +239,29 @@ namespace Belle2 {
     TString get_uniqueID() const {return m_uniqueID;}
 
     /**
-     * Returns the parameter which turns On/Off usage of SVDSpacePointSelectionFunction
+     * Returns the parameter which turns On/Off usage of SVDSpacePointSNRSelectionFunction
      * in the SVDSpacePointCreator for 3/6-sample acquisition mode
      */
-    Bool_t useSVDSpacePointSelectionFunction(const Int_t& numberOfAcquiredSamples) const
+    Bool_t useSVDSpacePointSNRSelectionFunction(const Int_t& numberOfAcquiredSamples) const
     {
       if (numberOfAcquiredSamples == 6)
-        return m_useSVDSpacePointSelectionFunctionFor6Samples;
+        return m_useSVDSpacePointSNRSelectionFunctionFor6Samples;
       else if (numberOfAcquiredSamples == 3)
-        return m_useSVDSpacePointSelectionFunctionFor3Samples;
+        return m_useSVDSpacePointSNRSelectionFunctionFor3Samples;
       else
         return false;
     }
 
     /**
-     * Set the parameter which turns On/Off usage of SVDSpacePointSelectionFunction
+     * Set the parameter which turns On/Off usage of SVDSpacePointSNRSelectionFunction
      * in the SVDSpacePointCreator for 3/6-sample acquisition mode
      */
-    void setUseOfSVDSpacePointSelectionFunction(const Int_t& numberOfAcquiredSamples, const Bool_t& state = false)
+    void setUseOfSVDSpacePointSNRSelectionFunction(const Int_t& numberOfAcquiredSamples, const Bool_t& state = false)
     {
       if (numberOfAcquiredSamples == 3)
-        m_useSVDSpacePointSelectionFunctionFor3Samples = state;
+        m_useSVDSpacePointSNRSelectionFunctionFor3Samples = state;
       else if (numberOfAcquiredSamples == 6)
-        m_useSVDSpacePointSelectionFunctionFor6Samples = state;
+        m_useSVDSpacePointSNRSelectionFunctionFor6Samples = state;
     }
 
     /** name of the payload */
@@ -305,10 +305,10 @@ namespace Belle2 {
     /** Use SVD clusters groupId in SVDSpacePointCreator for 3-sample acquisition mode */
     Bool_t m_useSVDGroupInfoInSPfor3Samples;
 
-    /** Use SVDSpacePointSelectionFunction in SVDSpacePointCreator for 6-sample acquisition mode */
-    Bool_t m_useSVDSpacePointSelectionFunctionFor6Samples;
-    /** Use SVDSpacePointSelectionFunction in SVDSpacePointCreator for 3-sample acquisition mode */
-    Bool_t m_useSVDSpacePointSelectionFunctionFor3Samples;
+    /** Use SVDSpacePointSNRSelectionFunction in SVDSpacePointCreator for 6-sample acquisition mode */
+    Bool_t m_useSVDSpacePointSNRSelectionFunctionFor6Samples;
+    /** Use SVDSpacePointSNRSelectionFunction in SVDSpacePointCreator for 3-sample acquisition mode */
+    Bool_t m_useSVDSpacePointSNRSelectionFunctionFor3Samples;
 
     ClassDef(SVDRecoConfiguration, 3); /**< needed by root*/
 

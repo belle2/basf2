@@ -31,6 +31,8 @@ class Histogrammer(b2.Module):
 
     '''
     Make validation histograms for BG overlay.
+    This validation assumes that all channels are active
+    (no masked strip, dead pixels, ...)
     '''
 
     def initialize(self):
@@ -66,7 +68,7 @@ class Histogrammer(b2.Module):
         #: integration time of the inner CDC layers
         self.CDCITIn = 408.7 * 1e-6
         #: number of outer CDC wires
-        self.nCDCout = 13060
+        self.nCDCout = 13056
         #: integration time of the outer CDC layers
         self.CDCITout = 754.6 * 1e-6
 

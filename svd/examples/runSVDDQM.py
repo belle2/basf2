@@ -24,7 +24,13 @@ from rawdata import add_unpackers
 
 # needed for some temporary issues with BKLMDisplacement payload
 b2conditions.override_globaltags()
-b2conditions.globaltags = ['klm_alignment_testing', 'online']
+b2conditions.globaltags = [
+    'patch_main_release-08',
+    'patch_main_release-07',
+    'data_reprocessing_prompt',
+    'dp_recon_release6_patch',
+    'online',
+    'svd_basic']
 
 # main main
 main = b2.create_path()
@@ -65,27 +71,39 @@ main.add_module(
     FADCmode=True)
 
 
+# SVD space point
+b2.set_module_parameters(main, 'SVDSpacePointCreator', useDB=False, useSVDGroupInfoIn3Sample=False, useSVDGroupInfoIn6Sample=False)
+
+# SVD grouping
+main.add_module("SVDTimeGrouping",
+                useDB=False,
+                isEnabledIn6Samples=True,
+                isEnabledIn3Samples=True,
+                maxGroups=20,
+                numberOfSignalGroups=20,
+                formSingleSignalGroup=False)
+
 # ** SVD DATA FORMAT - available only with unpacking
 # -> it needs SVDDAQDiagnostic
-# unpacker = main.add_module('SVDUnpackerDQM')
+unpacker = main.add_module('SVDUnpackerDQM')
 # unpacker.set_log_level(LogLevel.DEBUG)  # LogLevel.DEBUG / LogLevel.INFO
 # unpacker.set_debug_level(100)
 
 # ** SVD ExpressReco General
-# main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
+main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
 # ** SVD Efficiency - available only with full reconstruction
 # -> it neeeds Tracks and relations
-# main.add_module('SetupGenfitExtrapolation')
-# main.add_module('SVDROIFinder', recoTrackListName='RecoTracks', SVDInterceptListName='SVDIntercepts')
-# main.add_module('SVDDQMEfficiency')
+main.add_module('SetupGenfitExtrapolation')
+main.add_module('SVDROIFinder', recoTrackListName='RecoTracks', SVDInterceptListName='SVDIntercepts')
+main.add_module('SVDDQMEfficiency')
 
 # ** SVD Clusters On Track - available only with full reconstruction
 # -> it neeeds Tracks and relations
-# main.add_module('SVDDQMClustersOnTrack')
+main.add_module('SVDDQMClustersOnTrack')
 
 # ** SVD Occupancy after Injection - need RawFTSW & Offline ZS
-# injection = main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
+injection = main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
 # injection.set_log_level(LogLevel.DEBUG)  # LogLevel.DEBUG / LogLevel.INFO
 # injection.set_debug_level(30)
 

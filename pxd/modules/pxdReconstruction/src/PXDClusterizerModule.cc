@@ -162,7 +162,7 @@ void PXDClusterizerModule::initialize()
 void PXDClusterizerModule::beginRun()
 {
   // Need to check if payload should be re-loaded at run change (currently just one revision for the entire period)
-  if (!m_clusterPositionErrorUPar->isValid() || !m_clusterPositionErrorVPar.get()->isValid()) {
+  if (m_errorFromDB && (!m_clusterPositionErrorUPar->isValid() || !m_clusterPositionErrorVPar.get()->isValid())) {
     B2FATAL("DB objects for ClusterPositionError not valid for this run");
   }
 }

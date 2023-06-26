@@ -174,6 +174,7 @@ class SVDTimeResolution(b2.Module):
     def initialize(self):
         '''define histograms'''
 
+        #: \cond Doxygen_suppress
         self.c1 = TCanvas("c1", "c1", 640, 480)
         self.onePad = TPad("onePad", "onePad", 0, 0, 1, 1)
         self.onePad.SetFillColor(0)
@@ -223,6 +224,7 @@ class SVDTimeResolution(b2.Module):
                     self.TH1F_Store[-1].GetXaxis().SetTitle("SVD Cluster Time Residual (ns)")
                     self.TH1F_Index[name] = TH1F_Store_Count
                     TH1F_Store_Count += 1
+        #: \endcond
 
     def event(self):
         ''' Event loop'''

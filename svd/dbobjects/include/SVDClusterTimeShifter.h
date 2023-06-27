@@ -63,13 +63,6 @@ namespace Belle2 {
     Double_t getClusterTimeShift(const TString& alg,
                                  const VxdID& sensorId, const bool& isU, const int& size) const
     {
-      std::cout << " shift in alg" << alg
-                << " layer " << sensorId.getLayerNumber()
-                << " sensor " << sensorId.getSensorNumber()
-                << " isU " << isU
-                << " size " << size
-                << " is " << getClusterTimeShift(alg, sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size)
-                << std::endl;
       return getClusterTimeShift(alg, sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size);
     };
 

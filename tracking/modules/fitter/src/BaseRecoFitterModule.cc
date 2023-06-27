@@ -51,6 +51,10 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("monopoleMagCharge", Monopoles::monopoleMagCharge,
            "Sets monopole magnetic charge hypothesis if it is in the pdgCodesToUseForFitting",
            Monopoles::monopoleMagCharge);
+
+  addParam("correctSeedCharge", m_correctSeedCharge,
+           "If true changes seed charge of the RecoTrack to the one found by the track fit (if it differs).",
+           m_correctSeedCharge);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -111,7 +115,9 @@ void BaseRecoFitterModule::event()
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
 
-        if (wasFitSuccessful) { // charge flipping
+        // only flip if the current fit was the cardinal rep. and seed charge differs from fitted charge
+        if (m_correctSeedCharge && wasFitSuccessful
+            && recoTrack.getCardinalRepresentation() == recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting)) {  // charge flipping
           // If the charge after the fit (cardinal rep) is different from the seed charge,
           // we change the charge seed and refit the track
           flippedCharge |= recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge();

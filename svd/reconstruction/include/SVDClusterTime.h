@@ -11,10 +11,12 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
+#include <framework/database/DBObjPtr.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
+#include <svd/dbobjects/SVDClusterTimeShifter.h>
 #include <vector>
 
 namespace Belle2::SVD {
@@ -88,6 +90,8 @@ namespace Belle2::SVD {
     /** ELS3 time calibration wrapper*/
     SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
 
+    /** SVDCluster time shift*/
+    OptionalDBObjPtr<Belle2::SVDClusterTimeShifter> m_svdClusterTimeShifter;
   };
 
 }

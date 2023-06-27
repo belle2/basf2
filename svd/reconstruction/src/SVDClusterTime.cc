@@ -95,9 +95,11 @@ namespace Belle2 {
 
       if (m_returnRawClusterTime)
         time = rawtime;
-      else
+      else {
         //cellID = 10 not used for calibration
         time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
+        time -= m_svdClusterTimeShifter->getClusterTimeShift(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getSize());
+      }
 
 
 

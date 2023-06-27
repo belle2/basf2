@@ -10,6 +10,8 @@
 #include "TObject.h"
 #include "TString.h"
 #include <map>
+#include <iostream>
+#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
   /**
@@ -21,10 +23,13 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDClusterTimeShifter(const TString& uniqueID = "")
+    SVDClusterTimeShifter(const TString& uniqueID = "",
+                          const std::vector<TString>& description = {})
       : m_uniqueID(uniqueID)
-      , m_svdClusterTimeShift()
-    {};
+      , m_description(description)
+    {
+      m_svdClusterTimeShift.clear();
+    };
 
     /**
      * Returns cluster time shift in ns
@@ -47,12 +52,32 @@ namespace Belle2 {
     };
 
     /**
+     * Returns cluster time shift in ns.
+     * (Alternate function)
+     **/
+    Double_t getClusterTimeShift(const VxdID& sensorId,
+                                 const bool& isU, const int& size) const
+    {
+      return getClusterTimeShift(sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size);
+    };
+
+    /**
      * Sets the cluster time shift in ns
      */
     void setClusterTimeShift(const int& layer, const int& sensor, const bool& isU,
                              const std::vector<Double_t>& shiftValues)
     {
       TString sensorType = getSensorType(layer, sensor, isU);
+      m_svdClusterTimeShift[sensorType] = shiftValues;
+    };
+
+    /**
+     * Sets the cluster time shift in ns
+     */
+    void setClusterTimeShift(const TString& sensorType,
+                             const std::vector<Double_t>& shiftValues)
+    {
+      std::cout << "Shift values for " << sensorType << " is set." << std::endl;
       m_svdClusterTimeShift[sensorType] = shiftValues;
     };
 
@@ -92,11 +117,13 @@ namespace Belle2 {
 
     /** unique identifier of the SVD reconstruction configuration payload */
     TString m_uniqueID;
+    /** short descrition of the payload */
+    std::vector<TString> m_description;
 
     /** cluster time shifts */
     std::map<TString, std::vector<Double_t>> m_svdClusterTimeShift;
 
-    ClassDef(SVDClusterTimeShifter, 0); /**< needed by root*/
+    ClassDef(SVDClusterTimeShifter, 1); /**< needed by root*/
 
   };
 

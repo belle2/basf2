@@ -14,6 +14,9 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 
+/* ROOT headers. */
+#include <TMatrixD.h>
+
 using namespace Belle2;
 
 KLMCluster::KLMCluster() : m_time(0), m_layers(0), m_innermostLayer(0),

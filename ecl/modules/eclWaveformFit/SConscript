@@ -2,4 +2,7 @@ Import('env')
 
 env['LIBS'] = ['framework', 'Core', 'ecl', 'ecl_dataobjects', 'ecl_dbobjects', '$ROOT_LIBS', '-lMinuit']
 
+env['CXXFLAGS'] += ['-fopenmp-simd']
+env['F90FLAGS'] += ['-fopenmp-simd']
+
 Return('env')

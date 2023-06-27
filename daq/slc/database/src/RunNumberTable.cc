@@ -69,7 +69,7 @@ RunNumber RunNumberTable::add(const RunNumber& rn)
   return add(rn.getNode(), rn.getRunType(), rn.getExpNumber(), rn.getRunNumber());
 }
 
-int RunNumberTable::getRunNumber(const std::string& node, int expno)
+int RunNumberTable::getRunNumber(const std::string& /*node*/, int expno)
 {
   if (expno <= 0) return -1;
   int runno = 1;

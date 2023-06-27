@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>

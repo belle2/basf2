@@ -188,7 +188,6 @@ Now we have to add to the steering path the relevant functions for:
 
      .. literalinclude:: steering_files/065_generate_mc.py
         :language: python
-        :linenos:
 
 
 .. tip::
@@ -259,7 +258,6 @@ Suppose that we want to study the :math:`B^0 \to J/\Psi K^0_S` decay, with :math
 ``my_decay_file.dec`` or something similar):
 
 .. literalinclude:: steering_files/my_decay_file.dec
-    :linenos:
 
 Looking at this simple decay file, it is not difficult to understand its structure:
 
@@ -336,7 +334,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
 
      .. literalinclude:: steering_files/067_generate_mc.py
         :language: python
-        :linenos:
 
 
 .. admonition:: Question
@@ -358,7 +355,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :class: toggle solution
 
      .. code-block::
-        :linenos:
 
         Decay Upsilon(4S)
         1.0 B0 anti-B0  VSS_BMIX dm;

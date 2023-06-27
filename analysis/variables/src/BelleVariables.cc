@@ -159,7 +159,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackFirstX();
     }
@@ -169,7 +169,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackFirstY();
     }
@@ -179,7 +179,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackFirstZ();
     }
@@ -189,7 +189,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackLastX();
     }
@@ -199,7 +199,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackLastY();
     }
@@ -209,7 +209,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackLastZ();
     }
@@ -230,7 +230,7 @@ namespace Belle2 {
       double massErrSquared = jacobian * (covarianceMatrix * jacobian);
 
       if (massErrSquared < 0.0)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       double invMass = particleInvariantMassFromDaughters(particle);
       double nomMass = particle->getPDGMass();
@@ -243,7 +243,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTof();
     }
@@ -253,7 +253,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTofQuality();
     }
@@ -263,7 +263,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTofSigma();
     }
@@ -273,7 +273,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getPathLength();
     }
@@ -283,7 +283,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getdEdx();
     }
@@ -293,7 +293,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getdEdxQuality();
     }
@@ -303,7 +303,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getACCPe();
     }
@@ -313,7 +313,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getACCQuality();
     }

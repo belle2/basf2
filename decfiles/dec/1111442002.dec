@@ -1,7 +1,7 @@
 # EventType: 1111442002 
 # Descriptor: [B0 -> (J/psi(1S) -> mu+ mu-) (omega -> pi+ pi- pi0(gamma gamma))]cc
 # NickName: Bd_JpsiOmega_mumu_piplus_piminus_pizero
-# Tested: No
+# Tested: Yes
 # Physics WG: EWP
 # Responsible: Noah Brenny
 # Email:  nbrenny@iastate.edu

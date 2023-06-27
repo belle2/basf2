@@ -4,16 +4,10 @@
     "uniqueID": {
 	"INFO": { "source": "exp24run1726",
 		  "useFor": "CoG3",
-		  "special": "7types",
+		  "config": "7typesOfSensors",
 		  "tag": "rel08-v1"
 		}
     },
-
-    "_DESCRIPTION": [
-	"Shift of svdCluster time depending on the cluster size.",
-	"To be subtracted from calibrated cluster time.",
-	"Payload is designed to store shift values for any number of time algorithms."
-    ],
 
     "shiftValues" : {
 	"CoG3" : {

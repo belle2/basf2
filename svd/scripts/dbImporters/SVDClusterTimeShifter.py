@@ -50,12 +50,12 @@ class timeClusterTimeShifterImporter(b2.Module):
         uniqueID = "SVDClusterTimeShifter_" + str(now.isoformat())
         uniqueID += "_in-" + param["uniqueID"]["INFO"]["source"]
         uniqueID += "_useFor-" + param["uniqueID"]["INFO"]["useFor"]
-        uniqueID += "_" + param["uniqueID"]["INFO"]["special"]
+        uniqueID += "_" + param["uniqueID"]["INFO"]["config"]
         uniqueID += "_" + param["uniqueID"]["INFO"]["tag"]
         print("uniqueID ->", uniqueID)
         print("")
 
-        payload = Belle2.SVDClusterTimeShifter(uniqueID, param["_DESCRIPTION"])
+        payload = Belle2.SVDClusterTimeShifter(uniqueID)
 
         for alg in param["shiftValues"]:
             for sType in param["shiftValues"][alg]:

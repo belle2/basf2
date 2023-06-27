@@ -70,7 +70,9 @@ namespace Belle2 {
       //finally compute cluster time
       time = time / sumAmplitudes;
       if (m_svdClusterTimeShifter.isValid())
-        time -= m_svdClusterTimeShifter->getClusterTimeShift("CoG6", rawCluster.getSensorID(),
+        time -= m_svdClusterTimeShifter->getClusterTimeShift("CoG6",
+                                                             rawCluster.getSensorID().getLayerNumber(),
+                                                             rawCluster.getSensorID().getSensorNumber(),
                                                              rawCluster.isUSide(), rawCluster.getSize());
     }
 
@@ -102,7 +104,9 @@ namespace Belle2 {
         //cellID = 10 not used for calibration
         time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
         if (m_svdClusterTimeShifter.isValid())
-          time -= m_svdClusterTimeShifter->getClusterTimeShift("CoG3", rawCluster.getSensorID(),
+          time -= m_svdClusterTimeShifter->getClusterTimeShift("CoG3",
+                                                               rawCluster.getSensorID().getLayerNumber(),
+                                                               rawCluster.getSensorID().getSensorNumber(),
                                                                rawCluster.isUSide(), rawCluster.getSize());
       }
 
@@ -172,7 +176,9 @@ namespace Belle2 {
       else {
         time = m_ELS3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
         if (m_svdClusterTimeShifter.isValid())
-          time -= m_svdClusterTimeShifter->getClusterTimeShift("ELS3", rawCluster.getSensorID(),
+          time -= m_svdClusterTimeShifter->getClusterTimeShift("ELS3",
+                                                               rawCluster.getSensorID().getLayerNumber(),
+                                                               rawCluster.getSensorID().getSensorNumber(),
                                                                rawCluster.isUSide(), rawCluster.getSize());
       }
 

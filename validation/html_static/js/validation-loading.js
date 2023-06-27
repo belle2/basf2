@@ -843,7 +843,8 @@ function getNewestRevision(index=0) {
     // If at least one nightly revision is selected, pick the newest nightly instead of the newest overall
     let nightlySelected = false;
     for (let revision of revisionsData["revisions"]){
-        if (revision.startsWith("nightly")) {
+        let label = revision["label"];
+        if (label.startsWith("nightly")) {
             nightlySelected = true;
         }
     }

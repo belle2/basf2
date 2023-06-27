@@ -33,15 +33,14 @@ namespace Belle2 {
     };
 
     /**
-     * Returns cluster time shift in ns
+     * Returns cluster time shift in ns.
      **/
     Double_t getClusterTimeShift(const TString& alg,
-                                 const int& layer, const int& sensor,
-                                 const bool& isU, const int& size) const
+                                 const VxdID& sensorId, const bool& isU, const int& size) const
     {
       if (auto searchAlg = m_svdClusterTimeShift.find(alg); // search for time alg
           searchAlg != m_svdClusterTimeShift.end()) {
-        TString sensorType = getSensorType(layer, sensor, isU);
+        TString sensorType = getSensorType(sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU);
         if (auto searchShift = (searchAlg->second).find(sensorType); // search for shift values
             searchShift != (searchAlg->second).end()) {
           int maxClusters = (searchShift->second).size();
@@ -54,27 +53,6 @@ namespace Belle2 {
         }
       }
       return 0.;    // returns zero if map is empty
-    };
-
-    /**
-     * Returns cluster time shift in ns.
-     * (Alternate function)
-     **/
-    Double_t getClusterTimeShift(const TString& alg,
-                                 const VxdID& sensorId, const bool& isU, const int& size) const
-    {
-      return getClusterTimeShift(alg, sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size);
-    };
-
-    /**
-     * Sets the cluster time shift in ns
-     */
-    void setClusterTimeShift(const TString& alg,
-                             const int& layer, const int& sensor, const bool& isU,
-                             const std::vector<Double_t>& shiftValues)
-    {
-      TString sensorType = getSensorType(layer, sensor, isU);
-      m_svdClusterTimeShift[alg][sensorType] = shiftValues;
     };
 
     /**

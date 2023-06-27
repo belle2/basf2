@@ -54,7 +54,7 @@ namespace Belle2 {
 
   private:
     /** The status of the flip&refit*/
-    float m_status;
+    bool m_status;
     /** The cuts for the 1st filter*/
     float m_cutFirst;
     /** The cuts for the 2nd filter*/

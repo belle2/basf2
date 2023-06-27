@@ -12,7 +12,6 @@ from ROOT import Belle2
 
 
 parameters = Belle2.TrackFlippingCuts()
-'''parameters.setCuts(true ,0.01, 0.8)'''
 
 parameters.setCuts(True, 0.01, 0.8)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)

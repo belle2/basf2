@@ -15,7 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
-    name="ecl_WaveC4",
+    name="ecl_WaveformTemplateShapeCalibration",
     expert_username="longos",
     description=__doc__,
     input_data_formats=["cdst"],
@@ -24,7 +24,6 @@ settings = CalibrationSettings(
         "gamma_gamma_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
-            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],

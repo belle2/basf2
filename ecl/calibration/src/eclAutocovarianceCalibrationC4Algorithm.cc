@@ -21,7 +21,6 @@
 #include <TGraph.h>
 #include <TH2.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace ECL;
 

@@ -18,7 +18,6 @@
 #include <TGraph.h>
 #include <TH2F.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace ECL;
 

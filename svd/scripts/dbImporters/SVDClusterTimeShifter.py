@@ -8,6 +8,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 #                                                                        #
 # Usage: basf2 <script> -- -j ../../data/SVDClusterTimeShift.json        #
+#                                                                        #
+# Add shift values of other time algorithm in json file if needed.       #
+#                                                                        #
 ##########################################################################
 
 
@@ -45,7 +48,8 @@ class timeClusterTimeShifterImporter(b2.Module):
         iov = Belle2.IntervalOfValidity.always()
 
         uniqueID = "SVDClusterTimeShifter_" + str(now.isoformat())
-        uniqueID += "_in" + param["uniqueID"]["INFO"]["source"]
+        uniqueID += "_in-" + param["uniqueID"]["INFO"]["source"]
+        uniqueID += "_useFor-" + param["uniqueID"]["INFO"]["useFor"]
         uniqueID += "_" + param["uniqueID"]["INFO"]["special"]
         uniqueID += "_" + param["uniqueID"]["INFO"]["tag"]
         print("uniqueID ->", uniqueID)
@@ -53,8 +57,9 @@ class timeClusterTimeShifterImporter(b2.Module):
 
         payload = Belle2.SVDClusterTimeShifter(uniqueID, param["_DESCRIPTION"])
 
-        for sType in param["shiftValues"]:
-            payload.setClusterTimeShift(sType, param["shiftValues"][sType])
+        for alg in param["shiftValues"]:
+            for sType in param["shiftValues"][alg]:
+                payload.setClusterTimeShift(alg, sType, param["shiftValues"][alg][sType])
 
         # write out the payload to localdb directory
         Belle2.Database.Instance().storeData(Belle2.SVDClusterTimeShifter.name, payload, iov)

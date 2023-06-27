@@ -15,7 +15,8 @@
 
 namespace Belle2 {
   /**
-   * This class store the reconstruction configuration of SVD
+   * This class store the shift in svd time w.r.t. cluster time
+   * also for any possible time algorithm
    */
 
   class SVDClusterTimeShifter: public TObject {
@@ -34,55 +35,67 @@ namespace Belle2 {
     /**
      * Returns cluster time shift in ns
      **/
-    Double_t getClusterTimeShift(const int& layer, const int& sensor,
+    Double_t getClusterTimeShift(const TString& alg,
+                                 const int& layer, const int& sensor,
                                  const bool& isU, const int& size) const
     {
-      TString sensorType = getSensorType(layer, sensor, isU);
-      if (auto search = m_svdClusterTimeShift.find(sensorType);
-          search != m_svdClusterTimeShift.end()) {
-        int maxClusters = (search->second).size();
-        if (maxClusters == 0)
-          return 0.;
-        else if (size > maxClusters)
-          return (search->second)[maxClusters - 1];
-        else
-          return (search->second)[size - 1];
-      } else
-        return 0.;
+      if (auto searchAlg = m_svdClusterTimeShift.find(alg); // search for time alg
+          searchAlg != m_svdClusterTimeShift.end()) {
+        TString sensorType = getSensorType(layer, sensor, isU);
+        if (auto searchShift = (searchAlg->second).find(sensorType); // search for shift values
+            searchShift != (searchAlg->second).end()) {
+          int maxClusters = (searchShift->second).size();
+          if (maxClusters == 0)
+            return 0.;
+          else if (size > maxClusters)
+            return (searchShift->second)[maxClusters - 1];
+          else
+            return (searchShift->second)[size - 1];
+        }
+      }
+      return 0.;    // returns zero if map is empty
     };
 
     /**
      * Returns cluster time shift in ns.
      * (Alternate function)
      **/
-    Double_t getClusterTimeShift(const VxdID& sensorId,
-                                 const bool& isU, const int& size) const
+    Double_t getClusterTimeShift(const TString& alg,
+                                 const VxdID& sensorId, const bool& isU, const int& size) const
     {
-      return getClusterTimeShift(sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size);
+      std::cout << " shift in alg" << alg
+                << " layer " << sensorId.getLayerNumber()
+                << " sensor " << sensorId.getSensorNumber()
+                << " isU " << isU
+                << " size " << size
+                << " is " << getClusterTimeShift(alg, sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size)
+                << std::endl;
+      return getClusterTimeShift(alg, sensorId.getLayerNumber(), sensorId.getSensorNumber(), isU, size);
     };
 
     /**
      * Sets the cluster time shift in ns
      */
-    void setClusterTimeShift(const int& layer, const int& sensor, const bool& isU,
+    void setClusterTimeShift(const TString& alg,
+                             const int& layer, const int& sensor, const bool& isU,
                              const std::vector<Double_t>& shiftValues)
     {
       TString sensorType = getSensorType(layer, sensor, isU);
-      m_svdClusterTimeShift[sensorType] = shiftValues;
+      m_svdClusterTimeShift[alg][sensorType] = shiftValues;
     };
 
     /**
      * Sets the cluster time shift in ns
      */
-    void setClusterTimeShift(const TString& sensorType,
+    void setClusterTimeShift(const TString& alg, const TString& sensorType,
                              const std::vector<Double_t>& shiftValues)
     {
-      std::cout << "Shift values for " << sensorType << " is set." << std::endl;
-      m_svdClusterTimeShift[sensorType] = shiftValues;
+      std::cout << "Shift values for " << alg << " and " << sensorType << " is set." << std::endl;
+      m_svdClusterTimeShift[alg][sensorType] = shiftValues;
     };
 
     /**
-     * Get the unique ID  of the calibration
+     * Get the unique ID  of the payload
      */
     TString get_uniqueID() const {return m_uniqueID;}
 
@@ -121,7 +134,7 @@ namespace Belle2 {
     std::vector<TString> m_description;
 
     /** cluster time shifts */
-    std::map<TString, std::vector<Double_t>> m_svdClusterTimeShift;
+    std::map<TString, std::map<TString, std::vector<Double_t>>> m_svdClusterTimeShift;
 
     ClassDef(SVDClusterTimeShifter, 1); /**< needed by root*/
 

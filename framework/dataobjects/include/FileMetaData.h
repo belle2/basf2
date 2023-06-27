@@ -36,6 +36,10 @@ namespace Belle2 {
      */
     unsigned int getNEvents() const {return m_nEvents;}
 
+    /** Number of full events getter.
+     */
+    unsigned int getNFullEvents() const {return m_nFullEvents;}
+
     /** Lowest experiment number getter.
      */
     int getExperimentLow() const {return m_experimentLow;}
@@ -135,6 +139,12 @@ namespace Belle2 {
      *  @param nEvents The number of events.
      */
     void setNEvents(unsigned int nEvents) {m_nEvents = nEvents;}
+
+    /** Number of full events setter.
+     *
+     *  @param nFullEvents The number of full events.
+     */
+    void setNFullEvents(unsigned int nEvents) {m_nFullEvents = nEvents;}
 
     /** Lowest experiment, run and event number setter.
      *
@@ -239,6 +249,8 @@ namespace Belle2 {
 
     unsigned int m_nEvents; /**< Number of events.  */
 
+    unsigned int m_nFullEvents; /**< Number of full events.  */
+
     int m_experimentLow; /**< Lowest experiment number.  */
 
     int m_runLow; /**< Lowest run number.  */
@@ -282,8 +294,9 @@ namespace Belle2 {
     friend class RootOutputModule;
     friend class B2BIIMdstInputModule;
     friend class BeamBkgHitRateMonitorModule;
+    friend class StorageRootOutputModule;
 
-    ClassDefOverride(FileMetaData, 10); /**< Metadata information about a file. */
+    ClassDefOverride(FileMetaData, 11); /**< Metadata information about a file. */
 
   }; //class
 

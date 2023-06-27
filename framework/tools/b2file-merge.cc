@@ -238,6 +238,7 @@ The following restrictions apply:
         // update event numbers ...
         outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData.getMcEvents());
         outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData.getNEvents());
+        outputMetaData->setNFullEvents(outputMetaData->getNFullEvents() + fileMetaData.getNFullEvents());
       }
       if(fileMetaData.getNEvents() < 1) {
         B2WARNING("File " << std::quoted(input) << " is empty.");

@@ -191,6 +191,9 @@ class nntd(basf2.Module):
                 eft = self.etf.getBinnedEventT0(Belle2.Const.CDC)
             else:
                 eft = None
+
+            # overwrite the etf temporarily with the etfcc
+
             evlist[self.varnum[pre + "neurofp"][0]] = fpt
             evlist[self.varnum[pre + "neuroetf"][0]] = eft
             if pre != "sw":

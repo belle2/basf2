@@ -13,6 +13,7 @@ from basf2 import process, set_random_seed, create_path, statistics, print_path,
 from basf2 import conditions as b2c
 from simulation import add_simulation
 from tracking import add_prefilter_tracking_reconstruction
+from tracking.path_utils import add_mc_matcher
 from tracking.FlippingMVA.savingFlippingVariables import Saving1stMVAData
 from tracking.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
 from background import get_background_files
@@ -116,17 +117,14 @@ if __name__ == "__main__":
     add_prefilter_tracking_reconstruction(main)
 
     main.add_module('TrackTimeEstimator')
+    add_mc_matcher(main, reco_tracks="RecoTracks")
 
-    # Save data to train the first MVA. After that, we're done
-    if (training_mva_number == 1 or training_mva_number == 2):
+    # here we save two samples for MVA1 and MVA2
+    if (training_mva_number):
         main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
-                        identifier='/home/belle2/hanyubo/basf2/test_scripts/mva/localdb/dbstore_Weightfile_rev_535330.root',
+                        identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                         indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
 
-        """identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
-            identifier='/home/belle2/hanyubo/basf2/test_scripts/mva/localdb/dbstore_Weightfile_rev_172bba.root',"""
-
-    # elif (training_mva_number == 2):
         reco_tracks_flipped = "RecoTracks_flipped"
         main.add_module("RecoTracksReverter", inputStoreArrayName="RecoTracks",
                         outputStoreArrayName=reco_tracks_flipped)
@@ -141,16 +139,15 @@ if __name__ == "__main__":
                         identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
                         indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
 
-        if training_mva_number == 1:
-            saveFirstMVAData = Saving1stMVAData(
-                name="saving1stMVA_BBbar",
-                output_file_name=outputfile)
-            main.add_module(saveFirstMVAData)
-            if args.output_file_mva2 != '':
-                saveSecondMVAData = Saving2ndMVAData(
-                    name="saving2ndMVA_BBbar",
-                    output_file_name=args.output_file_mva2)
-                main.add_module(saveSecondMVAData)
+        saveFirstMVAData = Saving1stMVAData(
+            name="saving1stMVA_BBbar",
+            output_file_name=outputfile)
+        main.add_module(saveFirstMVAData)
+        if args.output_file_mva2 != '':
+            saveSecondMVAData = Saving2ndMVAData(
+                name="saving2ndMVA_BBbar",
+                output_file_name=args.output_file_mva2)
+            main.add_module(saveSecondMVAData)
 
     # Process events
     print_path(main)

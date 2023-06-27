@@ -28,38 +28,24 @@ namespace Belle2 {
       VariableExtractor(), m_prefix(prefix)
     {
       /// Adding variables for 1st mva
-      // addVariable(prefix + "d0_variance", variableSet);
       addVariable(prefix + "seed_pz_estimate", variableSet);
-      // addVariable(prefix + "n_hits", variableSet);
-      // addVariable(prefix + "z0_estimate", variableSet);
       addVariable(prefix + "seed_pz_variance", variableSet);
-      // addVariable(prefix + "phi0_variance", variableSet);
       addVariable(prefix + "seed_z_estimate", variableSet);
-      // addVariable(prefix + "tan_lambda_estimate", variableSet);
-      // addVariable(prefix + "omega_variance", variableSet);
       addVariable(prefix + "seed_tan_lambda_estimate", variableSet);
-      // addVariable(prefix + "d0_estimate", variableSet);
       addVariable(prefix + "seed_pt_estimate", variableSet);
-      // addVariable(prefix + "cdc_qualityindicator", variableSet);
-      // addVariable(prefix + "omega_estimate", variableSet);
-      // addVariable(prefix + "z0_variance", variableSet);
       addVariable(prefix + "seed_x_estimate", variableSet);
       addVariable(prefix + "seed_y_estimate", variableSet);
-      // addVariable(prefix + "seed_pt_resolution", variableSet);
       addVariable(prefix + "seed_py_variance", variableSet);
       addVariable(prefix + "seed_d0_estimate", variableSet);
       addVariable(prefix + "seed_omega_variance", variableSet);
-      // addVariable(prefix + "tan_lambda_variance", variableSet);
       addVariable(prefix + "svd_layer6_clsTime", variableSet);
       addVariable(prefix + "seed_tan_lambda_variance", variableSet);
       addVariable(prefix + "seed_z_variance", variableSet);
       addVariable(prefix + "n_svd_hits", variableSet);
-      // addVariable(prefix + "phi0_estimate", variableSet);
       addVariable(prefix + "n_cdc_hits", variableSet);
       addVariable(prefix + "svd_layer3_positionSigma", variableSet);
       addVariable(prefix + "first_cdc_layer", variableSet);
       addVariable(prefix + "last_cdc_layer", variableSet);
-      // addVariable(prefix + "ndf_hits", variableSet);
       addVariable(prefix + "InOutArmTimeDifference", variableSet);
       addVariable(prefix + "InOutArmTimeDifferenceError", variableSet);
       addVariable(prefix + "inGoingArmTime", variableSet);
@@ -102,19 +88,6 @@ namespace Belle2 {
           m_variables.at(m_prefix + "last_cdc_layer") = trackFitResult->getHitPatternCDC().getLastLayer();
         }
       }
-      // m_variables.at(m_prefix + "z0_estimate") = z0;
-      // m_variables.at(m_prefix + "d0_estimate") = d0;
-      // m_variables.at(m_prefix + "phi0_estimate") = phi0_estimate;
-      // m_variables.at(m_prefix + "omega_estimate") = omega_estimate;
-      //  m_variables.at(m_prefix + "tan_lambda_estimate") = tan_lambda_estimate;
-
-      // m_variables.at(m_prefix + "z0_variance") = z0_variance;
-      // m_variables.at(m_prefix + "d0_variance") = d0_variance;
-      // m_variables.at(m_prefix + "phi0_variance") = phi0_variance ;
-      // m_variables.at(m_prefix + "omega_variance") = omega_variance;
-      // m_variables.at(m_prefix + "tan_lambda_variance") = tan_lambda_variance;
-
-      // m_variables.at(m_prefix + "n_hits") = recoTrack.getNumberOfTrackingHits();
       m_variables.at(m_prefix + "n_svd_hits") = recoTrack.getNumberOfSVDHits();
       m_variables.at(m_prefix + "n_cdc_hits") = recoTrack.getNumberOfCDCHits();
 
@@ -143,7 +116,6 @@ namespace Belle2 {
         m_variables.at(m_prefix + "seed_pt_estimate") = seed_pt_estimate;
         m_variables.at(m_prefix + "seed_x_estimate") = svdcdc_pos.X();
         m_variables.at(m_prefix + "seed_y_estimate") = svdcdc_pos.Y();
-        // m_variables.at(m_prefix + "seed_pt_resolution") = seed_pt_resolution;
         m_variables.at(m_prefix + "seed_py_variance") = svdcdc_cov(4, 4);
         m_variables.at(m_prefix + "seed_d0_estimate") = svdcdc_FitResult.getD0();
         m_variables.at(m_prefix + "seed_omega_variance") = svdcdc_FitResult.getCov()[9];
@@ -152,10 +124,6 @@ namespace Belle2 {
 
       }
 
-      //Belle2::RecoTrack*  cdc_track_cand = recoTrack.getRelated<RecoTrack>("CDCRecoTracks");
-      //if (cdc_track_cand) {
-      // m_variables.at(m_prefix + "cdc_qualityindicator") = cdc_track_cand->getQualityIndicator();
-      //}
       for (auto* svdHit : recoTrack.getSVDHitList()) {
         if (svdHit->getSensorID().getLayerNumber() == 3) {
           m_variables.at(m_prefix + "svd_layer3_positionSigma") = svdHit->getPositionSigma();

@@ -36,38 +36,24 @@ def get_argument_parser() -> argparse.ArgumentParser:
 def get_variables(index=1):
     var = []
     if index == 1:
-        var = ["d0_variance",
-               "seed_pz_estimate",
-               "n_hits",
-               "z0_estimate",
+        var = ["seed_pz_estimate",
                "seed_pz_variance",
-               "phi0_variance",
                "seed_z_estimate",
-               "tan_lambda_estimate",
-               "omega_variance",
                "seed_tan_lambda_estimate",
-               "d0_estimate",
                "seed_pt_estimate",
-               # "cdc_qualityindicator",
-               "omega_estimate",
-               "z0_variance",
                "seed_x_estimate",
                "seed_y_estimate",
-               # "seed_pt_resolution",
                "seed_py_variance",
                "seed_d0_estimate",
                "seed_omega_variance",
-               # "tan_lambda_variance",
                "svd_layer6_clsTime",
                "seed_tan_lambda_variance",
                "seed_z_variance",
                "n_svd_hits",
-               "phi0_estimate",
                "n_cdc_hits",
                "svd_layer3_positionSigma",
                "first_cdc_layer",
                "last_cdc_layer",
-               "ndf_hits",
                "InOutArmTimeDifference",
                "InOutArmTimeDifferenceError",
                "inGoingArmTime",
@@ -79,48 +65,23 @@ def get_variables(index=1):
         # training variables
         var = [
               "flipped_pz_estimate",
-              # "y_variance",
               "tan_lambda_estimate",
               "d0_variance",
-              # "x_variance",
               "z_estimate",
-              # "phi0_variance",
               "px_variance",
-              # "pz_estimate",
               "p_value",
               "pt_estimate",
               "y_estimate",
               "d0_estimate",
               "x_estimate",
-              # "py_variance",
               "pz_variance",
-              # "omega_variance",
-              # "tan_lambda_variance",
-              # "z_variance",
               "omega_estimate",
-              # "pt_resolution",
               "px_estimate",
-              # "pt_variance",
-              # "phi0_estimate",
               "flipped_z_estimate",
               "py_estimate",
-              # "flipped_z_variance",
-              # "flipped_pz_variance",
-              # "flipped_pt_variance",
-              # "flipped_py_estimate",
-              # "z0_variance",
-              # "flipped_p_value",
-              # "flipped_px_variance",
-              # "flipped_py_variance",
-              # "flipped_x_estimate",
               "outGoingArmTime",
-              # "outGoingArmTimeError",
               "quality_flip_indicator",
-              # "InOutArmTimeDifference",
-              # "InOutArmTimeDifferenceError",
-              "inGoingArmTime",
-              # "inGoingArmTimeError"
-              ]
+              "inGoingArmTime"]
 
     return var
 
@@ -156,20 +117,32 @@ if __name__ == "__main__":
     general_options.m_identifier = "TRKTrackFlipAndRefit_MVA1_weightfile"
     or "TRKTrackFlipAndRefit_MVA2_weightfile" for second MVA
     '''
-    general_options.m_identifier = "Weightfile"
+    general_options.m_identifier = f"TRKTrackFlipAndRefit_MVA{args.mva}_weightfile"
     general_options.m_treename = args.tree
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "ismatched_WC"
     general_options.m_max_events = 0
 
     fastbdt_options = basf2_mva.FastBDTOptions()
-    fastbdt_options.m_nTrees = 400
-    fastbdt_options.m_nCuts = 25
-    fastbdt_options.m_nLevels = 2
-    fastbdt_options.m_shrinkage = 0.6
-    fastbdt_options.m_randRatio = 0.5
-    fastbdt_options.m_purityTransformation = False
-    fastbdt_options.m_sPlot = False
+    if args.mva == 1:
+        # configurations for MVA1
+        fastbdt_options.m_nTrees = 150
+        fastbdt_options.m_nCuts = 18
+        fastbdt_options.m_nLevels = 4
+        fastbdt_options.m_shrinkage = 0.2
+        fastbdt_options.m_randRatio = 0.5
+        fastbdt_options.m_purityTransformation = False
+        fastbdt_options.m_sPlot = False
+
+    if args.mva == 2:
+        # configurations for MVA2
+        fastbdt_options.m_nTrees = 400
+        fastbdt_options.m_nCuts = 25
+        fastbdt_options.m_nLevels = 2
+        fastbdt_options.m_shrinkage = 0.6
+        fastbdt_options.m_randRatio = 0.5
+        fastbdt_options.m_purityTransformation = False
+        fastbdt_options.m_sPlot = False
     basf2_mva.teacher(general_options, fastbdt_options)
 
     m = basf2_mva_util.Method(general_options.m_identifier)

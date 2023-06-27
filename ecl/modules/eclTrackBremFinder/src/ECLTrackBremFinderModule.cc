@@ -89,9 +89,8 @@ void ECLTrackBremFinderModule::event()
   for (auto& track : m_tracks) {
 
     const TrackFitResult* trackFitResult = track.getTrackFitResult(Const::ChargedStable(211));
-    double trackMomentum;
     if (trackFitResult) {
-      trackMomentum = trackFitResult->getMomentum().R();
+      double trackMomentum = trackFitResult->getMomentum().R();
       // if the momentum of the track is higher than 5 GeV, do not use this track
       if (trackMomentum > 5.0) {
         B2DEBUG(20, "Track momentum higher than 5GeV! Track is not used for bremsstrahlung finding");

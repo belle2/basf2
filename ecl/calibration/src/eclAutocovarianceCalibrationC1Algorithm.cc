@@ -56,7 +56,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
     if (Total < m_TotalCountsThreshold) {
       B2INFO("eclAutocovarianceCalibrationC1Algorithm: warning total entries for cell ID " << crysID + 1 << " is only: " << Total <<
              " Requirement is m_TotalCountsThreshold: " << m_TotalCountsThreshold);
-      counter = -1;
       /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
       return c_NotEnoughData;
     } else {

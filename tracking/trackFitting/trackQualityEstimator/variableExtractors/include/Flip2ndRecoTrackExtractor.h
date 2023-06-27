@@ -46,7 +46,7 @@ namespace Belle2 {
       addVariable(prefix + "inGoingArmTime", variableSet);
     }
     /// extract the actual variables and write into a variable set
-    void extractVariables(const RecoTrack& recoTrack)
+    void extractVariables(RecoTrack& recoTrack)
     {
 
       m_variables.at(m_prefix + "inGoingArmTime") = recoTrack.getIngoingArmTime();
@@ -84,14 +84,6 @@ namespace Belle2 {
               m_variables.at(m_prefix + "pz_variance") = cov6(5, 5);
               m_variables.at(m_prefix + "omega_estimate") = trackFitResult->getOmega();
               m_variables.at(m_prefix + "quality_flip_indicator") = recoTrack.getFlipQualityIndicator();
-              float pt_estimate = mom.Rho();
-              float pt_variance = (pow(mom.X(), 2) * cov6(3, 3) + pow(mom.Y(), 2) * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3,
-                                   4)) / mom.Perp2();
-              float pt_resolution = pt_variance / pt_estimate;
-
-              float flipped_pt_variance = (pow(mom_flipped.X(), 2) * cov6_flipped(3, 3) + pow(mom_flipped.Y(), 2) * cov6_flipped(4,
-                                           4) - 2 * mom_flipped.X() * mom_flipped.Y() * cov6_flipped(3, 4)) / mom_flipped.Perp2();
-
               m_variables.at(m_prefix + "px_estimate") = mom.X();
               m_variables.at(m_prefix + "flipped_z_estimate") = pos_flipped.Z();
               m_variables.at(m_prefix + "py_estimate") = mom.Y();

@@ -159,14 +159,12 @@ void DQMHistAnalysisKLMModule::endRun()
 
 double DQMHistAnalysisKLMModule::getProcessedEvents()
 {
-  TH1* histogram = findHist("DAQ/Nevent");
-  if (histogram == nullptr) {
-    B2WARNING("DAQ DQM histogram DAQ/Nevent is not found.");
+  if (DQMHistAnalysisModule::getEventProcessed() == 0.) {
+    B2WARNING("Either DAQ/Nevent is not found or Nevent = 0.");
     /* Set the minimal number of processed events to 0 if we can't determine the processed events. */
     m_MinProcessedEventsForMessages = 0.;
-    return 0.;
   }
-  return histogram->GetEntries();
+  return DQMHistAnalysisModule::getEventProcessed();
 }
 
 void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas)

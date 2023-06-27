@@ -601,8 +601,10 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   TH1F* h_clusterTime_L456V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   TH1F* h_MeanSVD3EventT0   = (TH1F*)findHist("SVDHitTime/SVD3EventT0");
   TH1F* h_MeanSVD6EventT0   = (TH1F*)findHist("SVDHitTime/SVD6EventT0");
-  TH1F* h_MeanSVDEventT0    = (TH1F*)h_MeanSVD3EventT0->Clone();
-  h_MeanSVDEventT0->Add(h_MeanSVD6EventT0);
+  TH1F* h_MeanSVDEventT0    = 0x0;
+
+  if (h_MeanSVD3EventT0)
+    h_MeanSVDEventT0 = (TH1F*)h_MeanSVD3EventT0->Clone();
 
   m_c_MPVTimeClusterOnTrack->Clear();
   m_c_MPVTimeClusterOnTrack->Divide(2, 2);
@@ -622,8 +624,11 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_MeanSVDEventT0->cd(2);
   if (h_MeanSVD6EventT0) h_MeanSVD6EventT0->Draw();
   m_c_MeanSVDEventT0->cd(3);
-  if (h_MeanSVDEventT0) h_MeanSVDEventT0->Draw();
-
+  if (h_MeanSVDEventT0) {
+    if (h_MeanSVD6EventT0)
+      h_MeanSVDEventT0->Add(h_MeanSVD6EventT0);
+    h_MeanSVDEventT0->Draw();
+  }
 
   float MPVClusterTimeL3U = -1;
   if (h_clusterTime_L3U) MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);

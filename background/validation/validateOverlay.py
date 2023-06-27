@@ -42,7 +42,7 @@ class Histogrammer(b2.Module):
         #: list of digits histograms
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
-                              200, 20000, 40000))
+                              200, 20000, 80000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))

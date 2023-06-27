@@ -11586,7 +11586,7 @@ Decay Lambda_c+
 # Contributes 0.0207*0.665 = 0.01376 to pKpi+ and 0.0207*0.333 = 0.0689 to pK0pi0 
 0.005290000   Delta+  anti-K0                              PYTHIA         0; # [produces ppi0K0 and npiK0]
 0.005290000   Delta+  anti-K*0                             PYTHIA         0;
-0.013750000   Lambda0  pi+                                 PYTHIA         0; # [PDG2021]
+0.013750000   Lambda0  pi+                                 HypNonLepton   -0.84 3; # [PDG2023 and PHYSICAL REVIEW D 100, 072004 (2019)]
 0.006340000   Lambda0  rho+                                PYTHIA         0; # [ESTIMATE goes into L0pipi0] 
 0.013650000   Sigma0  pi+                                  PYTHIA         0; # [PDG2021]
 0.005290000   Sigma0  rho+                                 PYTHIA         0; # [ESTIMATE goes into S0pipi0]
@@ -11835,7 +11835,7 @@ CDecay anti-Lambda_c(2625)-
 # Lambda0
 # Updated Feb 2009
 Decay Lambda0
-0.638719992   p+  pi-                                      PHSP; #[Reconstructed PDG2011]
+0.638719992   p+  pi-                                      HypNonLepton 0.748 -6.5; #[PDG2023]
 0.357719992   n0  pi0                                      PHSP; #[Reconstructed PDG2011]
 0.001741600   n0  gamma                                    PHSP; #[Reconstructed PDG2011]
 0.000832160   p+  pi-  gamma                               PHSP; #[Reconstructed PDG2011]

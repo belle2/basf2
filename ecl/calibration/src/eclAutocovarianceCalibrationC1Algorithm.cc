@@ -44,8 +44,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   std::vector<float> PPamps;
   std::vector<float> PPampsErrorVector;
 
-  std::vector<int> cellIDsWithLowEntries;
-
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
     TH1F* hPP = (TH1F*)PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);

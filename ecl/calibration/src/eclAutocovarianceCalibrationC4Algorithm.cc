@@ -69,8 +69,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
 
   }
 
-
-
+  /** Preparing TGraphs for output file */
   auto gMeanVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), means.data());
   gMeanVsCrysID->SetName("gMeanVsCrysID");
   gMeanVsCrysID->SetMarkerStyle(20);

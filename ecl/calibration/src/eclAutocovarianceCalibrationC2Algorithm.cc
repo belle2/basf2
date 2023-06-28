@@ -46,6 +46,13 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
     double totalCounts = m_CounterVsCrysID->GetBinContent(m_CounterVsCrysID->GetBin(crysID + 1));
 
+    if (totalCounts < m_TotalCountsThreshold) {
+      B2INFO("eclAutocovarianceCalibrationC2Algorithm: warning total entries for cell ID " << crysID + 1 << " is only: " << totalCounts <<
+             " Requirement is m_TotalCountsThreshold: " << m_TotalCountsThreshold);
+      /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
+      return c_NotEnoughData;
+    }
+
     ///** Note min number of entries requirement is present in the C1 Algorithm */
     double baseline = m_BaselineVsCrysID->GetBinContent(m_BaselineVsCrysID->GetBin(crysID + 1));;
     baseline /= float(m_numberofADCPoints);

@@ -152,10 +152,14 @@ namespace Belle2 {
      * ie. the log of the closest possible value to 0.
      * (log is not constexpr safe for clang, but gcc does not like const)
      * Relevant in two cases:
-     * 1. A likelihood is exactly 0, then this is the correct closest value.
+     * 1. A likelihood is exactly 0, then std::numeric_limits<float>::min()
+          is the correct closest value for which the log can be calculated.
      * 2. Unable to calculate likelihoods for the track (outside of acceptance etc.),
-     *    then this leads to a null contribution to the global PID likelihood ratio.
-    */
+     *    then this leads to equally probable ECL PID outcomes for the track regardless
+     *    of the tested mass hypothesis (e.g.,
+     *    \f$ \Delta logL^{ECL}{i,j} = L^{ECL}{i} - L^{ECL}{j} = 0 \f$ or equivalently,
+     *    \f$ \frac{L^{ECL}{i}}{L^{ECL}{i}+L^{ECL}{j}} = 0.5 \f$)
+     */
     static constexpr float c_dummyLogL = -87.3365;
 
     /**

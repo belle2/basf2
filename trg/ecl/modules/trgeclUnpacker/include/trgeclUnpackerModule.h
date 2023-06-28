@@ -17,8 +17,11 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
 
@@ -83,6 +86,10 @@ namespace Belle2 {
     StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
     //! ECL Trigger Cluster output
     StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
+
   };
 
 } // end namespace Belle2

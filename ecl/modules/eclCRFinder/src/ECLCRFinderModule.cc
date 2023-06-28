@@ -81,7 +81,7 @@ void ECLCRFinderModule::initialize()
   // Register dataobjects.
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
+  m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
 
   // Register relations.
   m_eclConnectedRegions.registerRelationTo(m_eclCalDigits);

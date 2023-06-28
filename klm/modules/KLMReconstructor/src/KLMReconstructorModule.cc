@@ -103,6 +103,11 @@ void KLMReconstructorModule::initialize()
   m_Digits.isRequired();
   if (m_EventT0Correction)
     m_EventT0.isRequired();
+  // This object is registered by both ECL and KLM packages. Let's be agnostic about the
+  // execution order of ecl and klm modules: the first package run registers the module
+  m_EventLevelClusteringInfo.isOptional() ?
+  m_EventLevelClusteringInfo.isRequired() :
+  m_EventLevelClusteringInfo.registerInDataStore();
   m_Hit2ds.registerInDataStore();
   m_Hit2ds.registerRelationTo(m_bklmHit1ds);
   m_Hit2ds.registerRelationTo(m_Digits);
@@ -156,6 +161,8 @@ void KLMReconstructorModule::event()
   if (m_EventT0.isValid())
     if (m_EventT0->hasEventT0())
       m_EventT0Value = m_EventT0->getEventT0();
+  if (not m_EventLevelClusteringInfo.isValid())
+    m_EventLevelClusteringInfo.construct();
   reconstructBKLMHits();
   reconstructEKLMHits();
 }
@@ -203,6 +210,8 @@ bool KLMReconstructorModule::isNormal(const KLMDigit* digit) const
 
 void KLMReconstructorModule::reconstructBKLMHits()
 {
+  /* Let's count the multi-strip KLMDigits. */
+  uint16_t nKLMDigitsMultiStripBarrel{0};
   /* Construct BKLMHit1Ds from KLMDigits. */
   /* Sort KLMDigits by module and strip number. */
   std::map<KLMChannelNumber, int> channelDigitMap;
@@ -210,8 +219,10 @@ void KLMReconstructorModule::reconstructBKLMHits()
     const KLMDigit* digit = m_Digits[index];
     if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
-    if (digit->isMultiStrip())
+    if (digit->isMultiStrip()) {
+      nKLMDigitsMultiStripBarrel++;
       continue;
+    }
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
     if (m_IgnoreHotChannels && !isNormal(digit))
@@ -301,11 +312,15 @@ void KLMReconstructorModule::reconstructBKLMHits()
         hit2d->isOutOfTime(true);
     }
   }
+  m_EventLevelClusteringInfo->setNKLMDigitsMultiStripBarrel(nKLMDigitsMultiStripBarrel);
 }
 
 
 void KLMReconstructorModule::reconstructEKLMHits()
 {
+  /* Let's count the multi-strip KLMDigits. */
+  uint16_t nKLMDigitsMultiStripFWD{0};
+  uint16_t nKLMDigitsMultiStripBWD{0};
   int i, n;
   double d1, d2, time, t1, t2, sd;
   std::vector<KLMDigit*> digitVector;
@@ -315,8 +330,10 @@ void KLMReconstructorModule::reconstructEKLMHits()
     KLMDigit* digit = m_Digits[i];
     if (digit->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
-    if (digit->isMultiStrip())
+    if (digit->isMultiStrip()) {
+      digit->getSection() == EKLMElementNumbers::c_BackwardSection ? nKLMDigitsMultiStripBWD++ : nKLMDigitsMultiStripFWD++;
       continue;
+    }
     if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->isGood())
@@ -456,6 +473,8 @@ void KLMReconstructorModule::reconstructEKLMHits()
     }
     it1 = it2;
   }
+  m_EventLevelClusteringInfo->setNKLMDigitsMultiStripBWD(nKLMDigitsMultiStripBWD);
+  m_EventLevelClusteringInfo->setNKLMDigitsMultiStripFWD(nKLMDigitsMultiStripFWD);
 }
 
 void KLMReconstructorModule::endRun()

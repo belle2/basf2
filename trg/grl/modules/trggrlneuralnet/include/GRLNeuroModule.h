@@ -13,7 +13,6 @@
 #include <trg/grl/GRLNeuro.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/grl/dataobjects/GRLMLPData.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <TH1D.h>
 

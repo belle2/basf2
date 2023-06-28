@@ -40,6 +40,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
   std::vector<float> cryIDs;
   std::vector<float> baselines;
+  std::vector<float> baselinesError;
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
@@ -54,6 +55,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
     cryIDs.push_back(crysID);
     baselines.push_back(baseline);
+    baselinesError.push_back(0);
 
     B2INFO("eclAutocovarianceCalibrationC2Algorithm crysID baseline totalCounts  " << crysID << " " << baseline << " " << totalCounts);
 
@@ -73,7 +75,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
   /** Saving baseline results to db for access in stage C3 */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(baselines, cryIDs);
+  PPThreshold->setCalibVector(baselines, baselinesError);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC2Baseline");
 
   return c_OK;

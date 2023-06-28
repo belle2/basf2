@@ -91,7 +91,7 @@ namespace Belle2::SVD {
     SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
 
     /** SVDCluster time shift*/
-    OptionalDBObjPtr<Belle2::SVDClusterTimeShifter> m_svdClusterTimeShifter;
+    DBObjPtr<Belle2::SVDClusterTimeShifter> m_svdClusterTimeShifter;
   };
 
 }

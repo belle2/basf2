@@ -53,7 +53,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
       return c_NotEnoughData;
     }
 
-    ///** Note min number of entries requirement is present in the C1 Algorithm */
     double baseline = m_BaselineVsCrysID->GetBinContent(m_BaselineVsCrysID->GetBin(crysID + 1));;
     baseline /= float(m_numberofADCPoints);
     baseline /= totalCounts;

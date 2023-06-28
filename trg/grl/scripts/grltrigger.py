@@ -30,8 +30,8 @@ def add_grl_trigger(path, SimulationMode=1):
     grl.param('n_ecl_sector', 1)
     grl.param('i_cdc_sector', [0*35*3])
     grl.param('i_ecl_sector', [1*6*3+1])
-    grl.param('weightFiles', [b2.find_file("trg/grl/data/weights.dat")])
-    grl.param('biasFiles', [b2.find_file("trg/grl/data/bias.dat")])
+    grl.param('weightFiles', [b2.find_file("data/trg/grl/weights.dat")])
+    grl.param('biasFiles', [b2.find_file("data/trg/grl/bias.dat")])
     path.add_module(grl)
 
     objects = b2.register_module('TRGGRLProjects')

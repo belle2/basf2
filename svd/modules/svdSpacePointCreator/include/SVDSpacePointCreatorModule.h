@@ -125,6 +125,7 @@ namespace Belle2 {
      */
     SVDTimeGroupingParameters m_usedParsIn3Samples;
 
-    bool   m_useDB = true;  /**< if true takes the configuration from the DB objects. */
+    bool m_forceGroupingFromDB = true; /**< use the configuration from SVDRecConfiguration DB. */
+    bool m_useParamFromDB = true; /**< use the configuration from SVDTimeGroupingConfiguration DB. */
   };
 } // end namespace Belle2

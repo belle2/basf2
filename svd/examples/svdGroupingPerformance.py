@@ -716,9 +716,10 @@ for moda in main.modules():
             moda.param("signalLifetime", args.signalLifetime)
     if moda.name() == 'SVDSpacePointCreator':
         if args.useSVDGroupInfo:
-            moda.param("useDB", False)
+            moda.param("forceGroupingFromDB", False)
             moda.param("useSVDGroupInfoIn6Sample", True)
             moda.param("useSVDGroupInfoIn3Sample", True)
+            moda.param("useParamFromDB", False)
             moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
             moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
 

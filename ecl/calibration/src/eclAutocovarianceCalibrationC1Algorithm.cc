@@ -49,7 +49,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
     TH1F* hPP = (TH1F*)PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
 
     int Total = hPP->GetEntries();
-    int subTotal = 0;
     float fraction = 0.0;
     int counter = 0;
 
@@ -59,6 +58,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
       /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
       return c_NotEnoughData;
     } else {
+      int subTotal = 0;
       while (fraction < m_lowestEnergyFraction) {
         subTotal += hPP->GetBinContent(counter);
         fraction = ((float)subTotal) / ((float)Total);

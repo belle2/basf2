@@ -40,8 +40,6 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
   ///** Put root into batch mode so that we don't try to open a graphics window */
   gROOT->SetBatch();
 
-  int m_CountLimit = 1000;
-
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histograms containing the data collected by eclAutocovarianceCalibrationC4Collector */
   auto Chi2VsCrysID = getObjectPtr<TH2F>("Chi2VsCrysID");
@@ -57,9 +55,9 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
 
     int totalCounts = hChi2->GetEntries();
 
-    if (totalCounts < m_CountLimit) {
-      B2INFO("eclAutocovarianceCalibrationC4Algorithm: Warning Below Count Limit: crysID totalCounts m_CountLimit: " << crysID << " " <<
-             totalCounts << " " << m_CountLimit);
+    if (totalCounts < m_minEntries) {
+      B2INFO("eclAutocovarianceCalibrationC4Algorithm: Warning Below Count Limit: crysID totalCounts m_minEntries: " << crysID << " " <<
+             totalCounts << " " << m_minEntries);
     }
 
     float mean = hChi2->GetMean();
@@ -91,6 +89,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
   gRMSVsCrysID->Write();
   gCountsVsCrysID->Write();
   Chi2VsCrysID->Write();
+  histfile->Close();
 
   return c_OK;
 }

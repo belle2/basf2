@@ -207,16 +207,6 @@ void ECLCRFinderModule::event()
   //final step: merge all CRs that share at least one crystal
   std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingSets(connectedRegions_ABBC);
 
-  // // format must be a vector of cellid -> CR
-  unsigned int id = 0;
-  for (auto xcr : connectedRegionsMerged_ABBC_sets) {
-    for (int x : xcr) {
-      std::cout << x << " -> " << id << " " << m_cellIdToSeedVec[x] << " " << m_cellIdToGrowthVec[x] << " " << m_cellIdToDigitVec[x] <<
-                " " << std::endl;
-    }
-    id++;
-  }
-
   // Create CRs and add relations to digits.
   unsigned int connectedRegionID = 0;
   for (const auto& xcr : connectedRegionsMerged_ABBC_sets) {

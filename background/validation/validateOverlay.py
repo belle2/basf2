@@ -136,6 +136,8 @@ class Histogrammer(b2.Module):
 
             ntplvar = "PXDL1_occupancy:PXDL2_occupancy:PXD_occupancy:SVDL3ZS5_occupancy"
             ntplvar += ":CDCInner_hitRate:CDCOuter_hitRate:CDC_hitRate"
+
+            #: ntuple to store background levels
             self.ntpl = TNtuple("ntpl", "Average Background Levels", (ntplvar))
 
     def event(self):

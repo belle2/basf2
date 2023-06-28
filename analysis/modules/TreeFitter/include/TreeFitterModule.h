@@ -161,7 +161,5 @@ namespace Belle2 {
     /** StoreArray of Particles */
     StoreArray<Particle> m_particles;
 
-    /** Pointer to the BeamParameters */
-    DBObjPtr<BeamParameters> m_beamparams;
   };
 }

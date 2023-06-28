@@ -17,6 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
@@ -126,23 +127,23 @@ void TreeFitterModule::initialize()
 
 void TreeFitterModule::beginRun()
 {
-  if (!m_beamparams.isValid())
-    B2FATAL("BeamParameters are not available!");
-
-  const ROOT::Math::PxPyPzEVector& her = m_beamparams->getHER();
-  const ROOT::Math::PxPyPzEVector& ler = m_beamparams->getLER();
-  const ROOT::Math::PxPyPzEVector& cms = her + ler;
+  PCmsLabTransform T;
+  const ROOT::Math::PxPyPzEVector cms = T.getBeamFourMomentum();
 
   m_beamMomE(0) = cms.X();
   m_beamMomE(1) = cms.Y();
   m_beamMomE(2) = cms.Z();
   m_beamMomE(3) = cms.E();
 
-  const TMatrixDSym& HERcoma = m_beamparams->getCovHER();
-  const TMatrixDSym& LERcoma = m_beamparams->getCovLER();
+  const ROOT::Math::PxPyPzEVector cmsError = T.getBeamFourMomentumError();
 
   m_beamCovariance = Eigen::Matrix4d::Zero();
-  const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
+  double covE = cmsError.E();
+  if (covE == 0)
+    covE = 3.19575e-05; // it seems nominal, e.g. basf2/framework/tests/conditions.out
+  else
+    covE = covE * covE;
+
   for (size_t i = 0; i < 4; ++i) {
     m_beamCovariance(i, i) =
       covE;

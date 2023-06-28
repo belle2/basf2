@@ -67,7 +67,7 @@ namespace Belle2 {
      * The default values are taken from bremsstrahlung studies
      * They represent the edge of the beampipe, the outer SVD wall and the inner CDC wall
      */
-    std::vector<float> m_virtualHitRadii = {1.05, 16.0};
+    std::vector<float> m_virtualHitRadii = {};
 
     /**
      * Cut on the distance between the cluster position angle and the extrapolation angle

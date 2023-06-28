@@ -343,6 +343,86 @@ namespace Belle2 {
      */
     double nRejectedECLShowers(const Particle*);
 
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM forward endcap (data only in release-08)
+     */
+    double nKLMMultistripHitsFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM barrel (data only in release-08)
+     */
+    double nKLMMultistripHitsBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM backward endcap (data only in release-08)
+     */
+    double nKLMMultistripHitsBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM (data only in release-08)
+     */
+    double nKLMMultistripHits(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers in the forward endcap
+     */
+    double nECLShowersFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers in the barrel
+     */
+    double nECLShowersBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers in the backward endcap
+     */
+    double nECLShowersBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers
+     */
+    double nECLShowers(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL forward endcap
+     */
+    double nECLLocalMaximumsFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL barrel
+     */
+    double nECLLocalMaximumsBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL backward endcap
+     */
+    double nECLLocalMaximumsBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL
+     */
+    double nECLLocalMaximums(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV in the forward endcap
+     */
+    double nECLTriggerCellsFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV in the barrel
+     */
+    double nECLTriggerCellsBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV in the backward endcap
+     */
+    double nECLTriggerCellsBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV
+     */
+    double nECLTriggerCells(const Particle*);
+
     /** energy over momentum can be used to separate electrons from muons*/
     double eclClusterEoP(const Particle* part);
 

@@ -64,6 +64,22 @@ event_level_cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+    'nKLMMultistripHits',
+    'nKLMMultistripHitsFWDEndcap',
+    'nKLMMultistripHitsBarrel',
+    'nKLMMultistripHitsBWDEndcap',
+    'nECLShowers',
+    'nECLShowersFWDEndcap',
+    'nECLShowersBarrel',
+    'nECLShowersBWDEndcap',
+    'nECLLocalMaximums',
+    'nECLLocalMaximumsFWDEndcap',
+    'nECLLocalMaximumsBarrel',
+    'nECLLocalMaximumsBWDEndcap',
+    'nECLTriggerCells',
+    'nECLTriggerCellsFWDEndcap',
+    'nECLTriggerCellsBarrel',
+    'nECLTriggerCellsBWDEndcap'
 ]
 
 #: Cluster averages

@@ -44,7 +44,7 @@ namespace Belle2 {
      * * while monitoring their status
      * * in the end kill remaining processes (if needed) and re-raise any collected signals
      */
-    void process(PathPtr spath, bool restartFailedWorkers, bool appendProcessNoToModuleName = false);
+    void process(PathPtr spath, bool restartFailedWorkers, bool appendProcessNumberToModuleName = false);
 
   private:
     /// An instance of a ZMQParent to create sockets for unregistering workers
@@ -57,7 +57,7 @@ namespace Belle2 {
     /// Send an unregister message to all sockets if the given PID died. Wait at max 10s for the confirmation (if requested)
     void sendTerminatedMessage(unsigned int pid, bool waitForConfirmation);
     /// Fork out as much workers as requested and in each run the given path using processCore
-    void runWorkers(PathPtr path, unsigned int numProcesses, bool appendProcessNoToModuleName = false);
+    void runWorkers(PathPtr path, unsigned int numProcesses, bool appendProcessNumberToModuleName = false);
     /**
      * Process the path by basically calling processEvent until a termination is requested. #
      * Will not any initialization - it is assumed this has already happened before.

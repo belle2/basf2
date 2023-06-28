@@ -39,7 +39,7 @@ namespace {
   static int g_signalReceived = 0;
 
   // For processor unique ID
-  static int g_processNo = 1;
+  static int g_processNumber = 1;
 
   static void storeSignal(int signalNumber)
   {
@@ -81,7 +81,7 @@ HLTEventProcessor::HLTEventProcessor(const std::vector<std::string>& outputAddre
   }
 }
 
-void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool appendProcessNoToModuleName)
+void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool appendProcessNumberToModuleName)
 {
   using namespace std::chrono_literals;
 
@@ -120,7 +120,7 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
 
   // Start the workers, which call the main loop
   const int numProcesses = Environment::Instance().getNumberProcesses();
-  runWorkers(path, numProcesses, appendProcessNoToModuleName);
+  runWorkers(path, numProcesses, appendProcessNumberToModuleName);
 
   installMainSignalHandlers(storeSignal);
   // Back in the main process: wait for the processes and monitor them
@@ -160,9 +160,9 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
     std::this_thread::sleep_for(10ms);
   }
 
-  if (appendProcessNoToModuleName) {
+  if (appendProcessNumberToModuleName) {
     for (const int& pid : m_processList) {
-      B2INFO(g_processNo << ": Send SIGINT to " << pid);
+      B2INFO(g_processNumber << ": Send SIGINT to " << pid);
       kill(pid, SIGINT);
     }
     for (const int& pid : m_processList) {
@@ -171,7 +171,7 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
         if (kill(pid, 0) == 0) {
           break;
         }
-        B2DEBUG(10, g_processNo << ": Checking process termination, count = " << count);
+        B2DEBUG(10, g_processNumber << ": Checking process termination, count = " << count);
         std::this_thread::sleep_for(1000ms);
         // Force to leave the loop after 20min
         // Before this, slow control app will send SIGKILL in normal case
@@ -206,7 +206,7 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
   }
 }
 
-void HLTEventProcessor::runWorkers(PathPtr path, unsigned int numProcesses, bool appendProcessNoToModuleName)
+void HLTEventProcessor::runWorkers(PathPtr path, unsigned int numProcesses, bool appendProcessNumberToModuleName)
 {
   for (unsigned int i = 0; i < numProcesses; i++) {
     if (forkOut()) {
@@ -218,9 +218,9 @@ void HLTEventProcessor::runWorkers(PathPtr path, unsigned int numProcesses, bool
       // Start the main loop with our signal handling and error catching
       installMainSignalHandlers(storeSignal);
       try {
-        if (appendProcessNoToModuleName) {
+        if (appendProcessNumberToModuleName) {
           for (const auto& module : m_moduleList) {
-            module->setName(std::to_string(g_processNo) + std::string("_") + module->getName());
+            module->setName(std::to_string(g_processNumber) + std::string("_") + module->getName());
             B2INFO("New worker name is " << module->getName());
           }
         }
@@ -450,7 +450,7 @@ bool HLTEventProcessor::forkOut()
   pid_t pid = fork();
 
   if (pid > 0) {
-    g_processNo++;
+    g_processNumber++;
     m_processList.push_back(pid);
     return false;
   } else if (pid < 0) {
@@ -470,7 +470,7 @@ bool HLTEventProcessor::forkOut()
 }
 
 void processNumbered(PathPtr startPath, const boost::python::list& outputAddresses, bool restartFailedWorkers = false,
-                     bool appendProcessNoToModuleName = true)
+                     bool appendProcessNumberToModuleName = true)
 {
   static bool already_executed = false;
   B2ASSERT("Can not run process() on HLT twice per file!", not already_executed);
@@ -493,7 +493,7 @@ void processNumbered(PathPtr startPath, const boost::python::list& outputAddress
     already_executed = true;
 
     HLTEventProcessor processor(outputAddressesAsString);
-    processor.process(startPath, restartFailedWorkers, appendProcessNoToModuleName);
+    processor.process(startPath, restartFailedWorkers, appendProcessNumberToModuleName);
 
     DBStore::Instance().reset();
   } catch (std::exception& e) {

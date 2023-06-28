@@ -168,6 +168,12 @@ void ECLTrackBremFinderModule::event()
     // possible improvement: use fast lookup using kd-tree, this is nasty
     // iterate over full cluster list to find possible compatible clusters
     for (ECLCluster& cluster : m_eclClusters) {
+      //check if the cluster belongs to a photon or electron
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        B2DEBUG(20, "Cluster has wrong hypothesis!");
+        continue;
+      }
+
 
       //check if cluster is already related to a track -> if true, can't be bremsstrahlung cluster
       auto relatedTrack = cluster.getRelatedFrom<Track>();

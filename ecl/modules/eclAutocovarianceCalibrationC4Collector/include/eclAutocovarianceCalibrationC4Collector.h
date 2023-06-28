@@ -61,5 +61,8 @@ namespace Belle2 {
 
     static constexpr int m_numberofADCPoints = 31; /**< length of ECLDsp waveform */
 
+    int m_upperThresholdForChi2Histogram = 1000; /**< Upper Threshold For Chi2 Histogram */
+    int m_NbinsForChi2Histogram = 1000; /**< Number of bins For Chi2 Histogram */
+
   };
 } // end Belle2 namespace

@@ -51,7 +51,8 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  Chi2VsCrysID = new TH2F("Chi2VsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 1000, 0, 1000);
+  Chi2VsCrysID = new TH2F("Chi2VsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals,
+                          m_NbinsForChi2Histogram, 0, m_upperThresholdForChi2Histogram);
   registerObject<TH2F>("Chi2VsCrysID", Chi2VsCrysID);
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
@@ -102,17 +103,17 @@ void eclAutocovarianceCalibrationC4CollectorModule::collect()
 
         float baseline = m_Baselines[id];
 
-        vector<double> waveform(31);
-        for (int i = 0; i < 31; i++) waveform[i] = aECLDsp.getDspA()[i] - baseline;
+        vector<double> waveform(m_numberofADCPoints);
+        for (int i = 0; i < m_numberofADCPoints; i++) waveform[i] = aECLDsp.getDspA()[i] - baseline;
 
-        vector<double> temp(31, 0);
-        for (int i = 0; i < 31; i++) {
-          for (int j = 0; j < 31; j++) {
+        vector<double> temp(m_numberofADCPoints, 0);
+        for (int i = 0; i < m_numberofADCPoints; i++) {
+          for (int j = 0; j < m_numberofADCPoints; j++) {
             temp[i] += m_NoiseMatrix[id](i, j) * (waveform[j]);
           }
         }
         double chi2val = 0;
-        for (int i = 0; i < 31; i++) chi2val += (temp[i] * waveform[i]);
+        for (int i = 0; i < m_numberofADCPoints; i++) chi2val += (temp[i] * waveform[i]);
 
         Chi2VsCrysID->Fill(id, chi2val);
       }
@@ -124,7 +125,7 @@ void eclAutocovarianceCalibrationC4CollectorModule::collect()
 void eclAutocovarianceCalibrationC4CollectorModule::closeRun()
 {
   for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
-    for (int j = 0; j < 1000; j++) {
+    for (int j = 0; j < m_NbinsForChi2Histogram; j++) {
       getObjectPtr<TH2>("Chi2VsCrysID")->SetBinContent(i + 1, j + 1, Chi2VsCrysID->GetBinContent(i + 1, j + 1));
     }
   }

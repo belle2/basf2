@@ -18,8 +18,6 @@
 #include <TString.h>
 #include <TFitResult.h>
 
-#include <ctime>
-
 using namespace std;
 using namespace Belle2;
 
@@ -76,9 +74,6 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
   m_tree->Branch("chi2", &chi2, "chi2/F");
   m_tree->Branch("ndf", &ndf, "ndf/I");
   m_tree->Branch("p", &p, "p/F");
-
-  Long64_t start_s = clock();
-  B2INFO(" time - start: " << start_s / Double_t(CLOCKS_PER_SEC));
 
   if (m_applyLinearCutsToRemoveBkg) {
     B2INFO("--------- Applyingselection, 2D-region selection parameters: ");
@@ -173,8 +168,6 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
             p    = tfr->Prob();
             m_tree->Fill();
 
-            Long64_t stop_s = clock();
-            B2INFO(" time - stop: " << (stop_s - start_s) / Double_t(CLOCKS_PER_SEC));
           }
         }
       }

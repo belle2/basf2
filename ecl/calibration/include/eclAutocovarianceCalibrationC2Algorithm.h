@@ -40,6 +40,7 @@ namespace Belle2 {
 
     private:
 
+      const int m_numberofADCPoints = 31; /**< length of ECLDsp waveform */
       std::string m_outputName = "eclAutocovarianceCalibrationC2Algorithm.root"; /**< file name for histogram output */
 
     };

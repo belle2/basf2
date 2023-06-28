@@ -80,10 +80,12 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   gPPVsCellID->SetName("gPPVsCellID");
 
   TString fName = m_outputName;
+  TDirectory::TContext context;
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
   PPVsCrysID->Write();
   gPPVsCellID->Write();
+  histfile->Write();
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Write output to DB */

@@ -48,7 +48,7 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   CovarianceMatrixInfoVsCrysID = new TH2F("CovarianceMatrixInfoVsCrysID", "", ECLElementNumbers::c_NCrystals, 0,
-                                          ECLElementNumbers::c_NCrystals, nADCWaveformPoints + 1, 0, nADCWaveformPoints + 1);
+                                          ECLElementNumbers::c_NCrystals, m_nADCWaveformPoints + 1, 0, m_nADCWaveformPoints + 1);
 
   registerObject<TH2F>("CovarianceMatrixInfoVsCrysID", CovarianceMatrixInfoVsCrysID);
 
@@ -84,7 +84,7 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
 
         // Computing baseline subtracted waveform
         m_tempArray.clear();
-        for (int i = 0; i < nADCWaveformPoints; i++) m_tempArray.push_back(aECLDsp.getDspA()[i] - baseline);
+        for (int i = 0; i < m_nADCWaveformPoints; i++) m_tempArray.push_back(aECLDsp.getDspA()[i] - baseline);
 
         /*
         Info on convariance matrix calucation:
@@ -98,18 +98,18 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
            Element 1 is the value of the 30 off diagonals
         */
 
-        for (int i = 0; i < nADCWaveformPoints; i++) {
+        for (int i = 0; i < m_nADCWaveformPoints; i++) {
 
           float value_i = m_tempArray[i];
 
-          for (int j = i; j < nADCWaveformPoints; j++) {
+          for (int j = i; j < m_nADCWaveformPoints; j++) {
 
             int tempIndex = abs(i - j);
 
             m_CovarianceMatrixInfoVsCrysIDHistogram[id][tempIndex] += (value_i * m_tempArray[j]);
 
           }
-          m_CovarianceMatrixInfoVsCrysIDHistogram[id][31]++;
+          m_CovarianceMatrixInfoVsCrysIDHistogram[id][m_nADCWaveformPoints]++;
         }
       }
     }
@@ -120,7 +120,7 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
 void eclAutocovarianceCalibrationC3CollectorModule::closeRun()
 {
   for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
-    for (int j = 0; j < (nADCWaveformPoints + 1); j++) {
+    for (int j = 0; j < (m_nADCWaveformPoints + 1); j++) {
       getObjectPtr<TH2>("CovarianceMatrixInfoVsCrysID")->SetBinContent(i + 1, j + 1, m_CovarianceMatrixInfoVsCrysIDHistogram[i][j]);
     }
   }

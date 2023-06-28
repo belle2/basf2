@@ -17,6 +17,7 @@
 #include <TFile.h>
 #include <TGraph.h>
 #include <TH1D.h>
+#include <TDirectory.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -32,7 +33,6 @@ eclAutocovarianceCalibrationC2Algorithm::eclAutocovarianceCalibrationC2Algorithm
 
 CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate()
 {
-
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histograms containing the data collected by eclAutocovarianceCalibrationC2CollectorModule */
   auto m_BaselineVsCrysID = getObjectPtr<TH1D>("BaselineVsCrysID");
@@ -46,8 +46,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
     double totalCounts = m_CounterVsCrysID->GetBinContent(m_CounterVsCrysID->GetBin(crysID + 1));
 
     ///** Note min number of entries requirement is present in the C1 Algorithm */
-    double baseline = baseline = m_BaselineVsCrysID->GetBinContent(m_BaselineVsCrysID->GetBin(crysID + 1));;
-    baseline /= 31.0;
+    double baseline = m_BaselineVsCrysID->GetBinContent(m_BaselineVsCrysID->GetBin(crysID + 1));;
+    baseline /= float(m_numberofADCPoints);
     baseline /= totalCounts;
 
     B2INFO("crysID " << crysID << " baseline: " << baseline);
@@ -64,11 +64,12 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
   /** Write out the baseline results */
   TString fName = m_outputName;
+  TDirectory::TContext context;
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
-
   m_BaselineVsCrysID->Write();
   gBaselineVsCrysID->Write();
+  histfile->Close();
 
   /** Saving baseline results to db for access in stage C3 */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();

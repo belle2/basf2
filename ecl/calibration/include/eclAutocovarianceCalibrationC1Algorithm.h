@@ -54,6 +54,8 @@ namespace Belle2 {
 
       std::string m_outputName = "eclAutocovarianceCalibrationC1Algorithm.root"; /**< file name for histogram output */
 
+      const int m_numberofADCPoints = 31; /**< length of ECLDsp waveform */
+
       float m_lowestEnergyFraction = 0.75;  /**< Fraction of noise waveforms to use */
 
       int m_TotalCountsThreshold = 10000; /**< min number of counts needed to compute calibration */

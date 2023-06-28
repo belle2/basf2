@@ -83,6 +83,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
 
   /** Write out the basic histograms in all cases */
   TString fName = m_outputName;
+  TDirectory::TContext context;
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
   gMeanVsCrysID->Write();

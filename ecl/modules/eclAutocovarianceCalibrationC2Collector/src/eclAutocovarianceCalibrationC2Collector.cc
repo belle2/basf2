@@ -71,18 +71,16 @@ void eclAutocovarianceCalibrationC2CollectorModule::collect()
 
       float peakToPeakThreshold =  m_PeakToPeakThresholds[id];
 
-      if (peakToPeakThreshold > 0) {
+      //Peak to peak amplitude used to gauge noise level
+      float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
 
-        //Peak to peak amplitude used to gauge noise level
-        float PeakToPeak = (float) aECLDsp.computePeaktoPeakAmp();
+      if (PeakToPeak < peakToPeakThreshold) {
 
-        if (PeakToPeak < peakToPeakThreshold) {
+        for (int i = 0; i < m_numberofADCPoints; i++) m_sumOfSamples[id] += aECLDsp.getDspA()[i];
+        m_nSelectedWaveforms[id]++;
 
-          for (int i = 0; i < 31; i++) m_sumOfSamples[id] += aECLDsp.getDspA()[i];
-          m_nSelectedWaveforms[id]++;
-
-        }
       }
+
     }
   }
 }

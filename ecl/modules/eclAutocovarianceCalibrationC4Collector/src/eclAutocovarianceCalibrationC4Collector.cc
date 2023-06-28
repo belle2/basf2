@@ -59,16 +59,15 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
 
   m_eclDsps.registerInDataStore();
 
-  constexpr int N = 31;
-  std::vector<double> buf(N);
+  std::vector<double> buf(m_numberofADCPoints);
 
   m_NoiseMatrix.resize(ECLElementNumbers::c_NCrystals);
 
   for (int id = 0; id < ECLElementNumbers::c_NCrystals; id++) {
     m_ECLAutocovarianceCalibrationC3Autocovariances->getAutoCovariance(id + 1, buf.data());
-    m_NoiseMatrix[id].ResizeTo(31, 31);
-    for (int i = 0; i < 31; i++) {
-      for (int j = 0; j < 31; j++) {
+    m_NoiseMatrix[id].ResizeTo(m_numberofADCPoints, m_numberofADCPoints);
+    for (int i = 0; i < m_numberofADCPoints; i++) {
+      for (int j = 0; j < m_numberofADCPoints; j++) {
         m_NoiseMatrix[id](i, j) = buf[abs(i - j)];
       }
     }

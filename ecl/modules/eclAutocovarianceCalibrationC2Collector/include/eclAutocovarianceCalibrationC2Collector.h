@@ -57,5 +57,7 @@ namespace Belle2 {
     TH1D* m_BaselineVsCrysID; /**< final histogram returned by collector contains baseline */
     TH1D* m_CounterVsCrysID; /**< final histogram returned by collector contains counter */
 
+    const int m_numberofADCPoints = 31; /**< length of ECLDsp waveform */
+
   };
 } // end Belle2 namespace

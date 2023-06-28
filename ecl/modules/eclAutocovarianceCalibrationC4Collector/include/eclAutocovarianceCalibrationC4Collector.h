@@ -59,5 +59,7 @@ namespace Belle2 {
 
     std::vector<TMatrixDSym> m_NoiseMatrix; /**< Stores noise matrix derived from  the input Autocovariances */
 
+    static constexpr int m_numberofADCPoints = 31; /**< length of ECLDsp waveform */
+
   };
 } // end Belle2 namespace

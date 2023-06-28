@@ -135,9 +135,6 @@ GRLNeuroModule::initialize()
     TCThetaCOM.push_back(CellCOM.Theta()*TMath::RadToDeg());
     TCPhiCOM.push_back(CellCOM.Phi()*TMath::RadToDeg() + 180.0);
 
-
-    //..Scale to give 1 GeV in the COM frame
-    TC1GeV.push_back(1. / CellCOM.E());
   }
   if (m_saveHist) {
     for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {

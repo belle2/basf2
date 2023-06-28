@@ -82,13 +82,13 @@ namespace Belle2 {
     /** name of TRG GRL information object */
     std::string m_TrgGrlInformationName;
 
-    //..ECL look up tables
-    //std::vector<float> TCPhiLab;
-    //std::vector<float> TCcotThetaLab;
+    /** TCID of a given TRGcluster */
     std::vector<int> TCThetaID;
+    /** Azimuth angle  of a given TRGcluster */
     std::vector<float> TCPhiCOM;
+    /** Polar angle  of a given TRGcluster */
     std::vector<float> TCThetaCOM;
-    std::vector<float> TC1GeV;
+    /** Histograms to save the NN classifiers */
     std::vector<TH1D*> h_target;
 
   };

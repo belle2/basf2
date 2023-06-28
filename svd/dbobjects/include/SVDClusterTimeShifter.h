@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #pragma once
+
+#include <framework/logging/Logger.h>
+
 #include "TObject.h"
 #include "TString.h"
 #include <map>
-#include <iostream>
 
 namespace Belle2 {
   /**
@@ -70,7 +72,7 @@ namespace Belle2 {
     void setClusterTimeShift(const TString& alg, const TString& sensorType,
                              const std::vector<Double_t>& shiftValues)
     {
-      std::cout << "Shift values for " << alg << " and " << sensorType << " is set." << std::endl;
+      B2INFO("Shift values for " << alg << " and " << sensorType << " is set.");
       m_svdClusterTimeShift[alg][sensorType] = shiftValues;
     };
 

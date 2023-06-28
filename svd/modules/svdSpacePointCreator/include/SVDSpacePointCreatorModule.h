@@ -70,7 +70,7 @@ namespace Belle2 {
   protected:
 
     DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
-    OptionalDBObjPtr<SVDTimeGroupingConfiguration> m_groupingConfig; /**< SVDTimeGrouping Configuration payload*/
+    DBObjPtr<SVDTimeGroupingConfiguration> m_groupingConfig; /**< SVDTimeGrouping Configuration payload*/
 
     // Data members
     std::string m_svdClustersName = "SVDClusters"; /**< SVDCluster collection name */

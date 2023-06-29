@@ -142,7 +142,7 @@ namespace Belle2 {
 
     /** Number of full events setter.
      *
-     *  @param nFullEvents The number of full events.
+     *  @param nEvents The number of full events.
      */
     void setNFullEvents(unsigned int nEvents) {m_nFullEvents = nEvents;}
 

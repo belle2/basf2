@@ -36,10 +36,11 @@ namespace Belle2 {
     KLMHit2d();
 
     /**
-     * Constructor from KLMDigit (EKLM).
-     * @param[in] digit One of KLMDigits.
+     * Constructor from two orthogonal KLMDigits (EKLM).
+     * @param[in] digit1 KLMDigit in plane 1.
+     * @param[in] digit2 KLMDigit in plane 2.
      */
-    explicit KLMHit2d(KLMDigit* digit);
+    explicit KLMHit2d(KLMDigit* digits, KLMDigit* digit2);
 
     /**
      * Constructor with initial values (BKLM).

@@ -1544,6 +1544,11 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       dn = nStrips - 1.5;
       factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.55; // measured-in-Belle resolution
       localVariance[1] = m_BarrelZStripVariance[intersection.layer] * factor;
+    } else {
+      int nStrips = hit->getPhiStripMax() - hit->getPhiStripMin() + 1;
+      localVariance[0] = m_BarrelScintVariance * nStrips;
+      nStrips = hit->getZStripMax() - hit->getZStripMin() + 1;
+      localVariance[1] = m_BarrelScintVariance * nStrips;
     }
     G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(),
                          hit->getPositionZ());
@@ -1603,6 +1608,10 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
+    int nStrips = hit->getPhiStripMax() - hit->getPhiStripMin() + 1; // EKLM x-measuring strips
+    localVariance[0] = m_EndcapScintVariance * nStrips; // variance inflated for multi-strip hit
+    nStrips = hit->getZStripMax() - hit->getZStripMin() + 1; // EKLM y-measuring strips
+    localVariance[1] = m_EndcapScintVariance * nStrips; // variance inflated for multi-strip hit
     G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(), hit->getPositionZ());
     adjustIntersection(intersection, localVariance, hitPos, intersection.position);
     if (intersection.chi2 >= 0.0) {

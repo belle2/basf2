@@ -80,6 +80,7 @@ void KLMUnpackerModule::beginRun()
     B2FATAL("KLM electronics map is not available.");
   if (!m_FEEParameters.isValid())
     B2FATAL("KLM scintillator FEE parameters are not available.");
+
   m_triggerCTimeOfPreviousEvent = 0;
   m_Time->updateConstants();
 }
@@ -114,8 +115,14 @@ void KLMUnpackerModule::createDigit(
      * trigger ctime.
      */
     klmDigitEventInfo->increaseSciHits();
-    double time = m_Time->getScintillatorTime(
-                    raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
+    double time;
+    if (raw->getType() == 0x4) { // old firmware has ~8ns time resolution
+      time = m_Time->getScintillatorTime(raw->getCTime(), 0,
+                                         klmDigitEventInfo->getTriggerCTime());
+    } else { // new firmware has ~1ns time resolution
+      time = m_Time->getScintillatorTime(raw->getCTime(), raw->getTDC(),
+                                         klmDigitEventInfo->getTriggerCTime());
+    }
     klmDigit->setTime(time);
     KLMChannelNumber channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     const KLMScintillatorFEEData* FEEData =
@@ -196,7 +203,7 @@ void KLMUnpackerModule::unpackKLMDigit(
       /*
        * Multiple-strip hit. It is necessary to find matching detector channels
        * for all DAQ channels, because all channels in the group may not
-       * be necessary connected to strips in case of BKLM.
+       * be necessarily connected to strips in BKLM.
        */
       bool firstMatchedChannel = true;
       for (int channel = channelGroup.firstChannel;
@@ -237,7 +244,7 @@ void KLMUnpackerModule::unpackKLMDigit(
     if (!(m_WriteWrongHits || m_DebugElectronicsMap))
       return;
     /*
-     * Try to find channel from the same plane.
+     * Try to find channel from the same scintillator plane.
      * BKLM phi-plane channels may start from 3 or 5.
      */
     electronicsChannel.setChannel(5);

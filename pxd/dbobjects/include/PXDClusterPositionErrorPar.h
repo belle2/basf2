@@ -59,7 +59,6 @@ namespace Belle2 {
     }
 
     /** Set map content
-     *
      * @param sensorID unique ID of the sensor
      * @param globalID unique ID for part of sensor (uBin,vBin) and cluser size
      * @param value cluster position error value to store
@@ -83,10 +82,10 @@ namespace Belle2 {
     }
 
     /** Set map content
-     *
      * @param sensorID unique ID of the sensor
      * @param uBin position error bin along u side of sensor
      * @param vBin position error bin along v side of sensor
+     * @param size cluster size
      * @param value cluster position error value to store
      */
     void setContent(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float value)
@@ -149,6 +148,7 @@ namespace Belle2 {
      * @param sensorID unique ID of the sensor
      * @param uBin position error bin along u side of sensor
      * @param vBin position error bin along v side of sensor
+     * @param size cluster size
      * @param factor scale factor value to store
      */
     void setSensorUEdgeFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float factor)
@@ -182,6 +182,7 @@ namespace Belle2 {
      * @param sensorID unique ID of the sensor
      * @param uBin position error bin along u side of sensor
      * @param vBin position error bin along v side of sensor
+     * @param size cluster size
      * @param factor scale factor value to store
      */
     void setSensorVEdgeFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float factor)
@@ -215,6 +216,7 @@ namespace Belle2 {
      * @param sensorID unique ID of the sensor
      * @param uBin position error bin along u side of sensor
      * @param vBin position error bin along v side of sensor
+     * @param size cluster size
      * @param factor scale factor value to store
      */
     void setDeadNeighbourFactor(unsigned short sensorID, unsigned short uBin, unsigned short vBin, unsigned short size, float factor)
@@ -326,8 +328,10 @@ namespace Belle2 {
     /** Default value for scale factor map */
     float m_defaultFactor;
 
-    /** Scaling factor at sensor edge for layers 1 or 2 and FWD/BWD sensors with sensor number 1 or 2*/
+    /** Scaling factor at sensor U edge for layers 1 or 2 and FWD/BWD sensors with sensor number 1 or 2*/
     std::unordered_map<unsigned short, std::vector<float> > m_factorSensorUEdgeMap;
+
+    /** Scaling factor at sensor V edge for layers 1 or 2 and FWD/BWD sensors with sensor number 1 or 2*/
     std::unordered_map<unsigned short, std::vector<float> > m_factorSensorVEdgeMap;
 
     /** Scaling factor when neighbouring dead rows/colums for FWD/BWD sensors by sensor number 1 or 2 */

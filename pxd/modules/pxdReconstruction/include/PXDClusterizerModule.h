@@ -89,10 +89,14 @@ namespace Belle2 {
 
       /** Assign position error for a given cluster from DB.
        * @param primary Projection of the cluster to assign the position error for
-       * @param uv "U" or "V" error
+       * @param errorPar DB payload containing PXDClusterPositionErrorPar
        * @param sensorID VxdID
        * @param uCell u cell ID of the cluster position
        * @param vCell v cell ID of the cluster position
+       * @param centerPitch Pitch between pixel cells
+       * @param isAtUEdge true if the cluster is at sensor U edge
+       * @param isAtVEdge true if the cluster is at sensor V edge
+       * @param isAdjacentDead true if the cluster is neighbouring dead pixels
        */
       void assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
                                      VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,

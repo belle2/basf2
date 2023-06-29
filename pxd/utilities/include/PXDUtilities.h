@@ -116,7 +116,8 @@ namespace Belle2 {
     /** Helper function to check if one of the end pixels are at the edge of the sensor
      * @param id VxdID of the sensor
      * @param umin minimum uID within the cluster
-     * @param umin maximum uID within the cluster
+     * @param umax maximum uID within the cluster
+     * @return true if one of the end pixels are at the edge of the sensor
      */
     inline bool isClusterAtUEdge(VxdID id, unsigned int umin, unsigned int umax)
     {
@@ -126,7 +127,8 @@ namespace Belle2 {
     /** Helper function to check if one of the end pixels are at the edge of the sensor
      * @param id VxdID of the sensor
      * @param vmin minimum vID within the cluster
-     * @param vmin maximum vID within the cluster
+     * @param vmax maximum vID within the cluster
+     * @return true if one of the end pixels are at the edge of the sensor
      */
     inline bool isClusterAtVEdge(VxdID id, unsigned int vmin, unsigned int vmax)
     {
@@ -137,7 +139,8 @@ namespace Belle2 {
     /** Helper function to check if one of the end pixels are at the ladder joint
      * @param id VxdID of the sensor
      * @param vmin minimum vID within the cluster
-     * @param vmin maximum vID within the cluster
+     * @param vmax maximum vID within the cluster
+     * @return true if one of the end pixels are at the ladder joint
      */
     inline bool isClusterAtLadderJoint(VxdID id, unsigned int vmin, unsigned int vmax)
     {

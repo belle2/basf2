@@ -346,6 +346,12 @@ The following restrictions apply:
   outputEventTree->Write();
   B2INFO("Done processing events");
 
+  // check if the number of full events in the metadata is zero:
+  // if so calculate number of full events now:
+  if (outputMetaData->getNFullEvents() == 0) {
+    outputMetaData->setNFullEvents(outputEventTree->GetEntries("EventMetaData.m_errorFlag == 0"));
+  }
+
   // we need to set the LFN to the absolute path name
   outputMetaData->setLfn(fs::absolute(outputfilename, fs::initial_path()).string());
   // and maybe register it in the file catalog

@@ -15,6 +15,7 @@
 #include <TString.h>
 #include <TLine.h>
 #include <TPaveText.h>
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -23,7 +24,6 @@ namespace Belle2 {
 
   class DQMHistAnalysisTOPModule final : public DQMHistAnalysisModule {
 
-    // Public functions
   public:
 
     /**
@@ -61,55 +61,70 @@ namespace Belle2 {
      */
     void terminate() override final;
 
-    //! Data members
+
   private:
-    /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = nullptr;
 
-    /** String with run type. */
-    TString m_RunTypeString;
+    /**
+     * Remakes plots of 2D hit distributions
+     * @param name the name of histograms
+     * @param canvases list of canvases
+     * @scale scale scale factor for the histogram range (maximum = average * scale)
+     */
+    void remake2DHistograms(const TString& name, const std::vector<TCanvas*>& canvases, double scale);
 
-    /** Run type flag for null runs. */
-    bool m_IsNullRun;
+    /**
+     * Sets MiraBelle variables from the histogram where each bin corresponds to a slot number
+     * @param variableName variable name
+     * @param histogram histogram with bins corresponding to slot numbers
+     */
+    void setMiraBelleVariables(const TString& variableName, const TH1* histogram);
 
-    /** Canvas for the mean of the good hits. */
-    TCanvas* m_c_goodHitsMean = nullptr;
-    /** Canvas for the RMS of the good hits. */
-    TCanvas* m_c_goodHitsRMS = nullptr;
-    /** Canvas for the mean of the bad hits. */
-    TCanvas* m_c_badHitsMean = nullptr;
-    /** Canvas for the RMS of the bad hits. */
-    TCanvas* m_c_badHitsRMS = nullptr;
+    /**
+     * Returns alarm colors
+     * @param value value to translate to color
+     * @param alarmBorders alarm borders
+     * @return root color index
+     */
+    int getAlarmColor(double value, const std::vector<double>& alarmBorders) const;
 
-    /** Canvas for 16 good Hits XY */
-    TCanvas* m_c_good_hits_xy_[17] = {};
-    /** Canvas for 16 bad Hits XY */
-    TCanvas* m_c_bad_hits_xy_[17] = {};
-    /** Canvas for 16 good Hits ASICS */
-    TCanvas* m_c_good_hits_asics_[17] = {};
-    /** Canvas for 16 bad Hits ASICS */
-    TCanvas* m_c_bad_hits_asics_[17] = {};
+    // module parameters
 
-    /** Histogram for the mean of the good hits. */
-    TH1F* m_h_goodHitsMean = nullptr;
-    /** Histogram for the RMS of the good hits. */
-    TH1F* m_h_goodHitsRMS = nullptr;
-    /** Histogram for the mean of the bad hits. */
-    TH1F* m_h_badHitsMean = nullptr;
-    /** Histogram for the RMS of the bad hits. */
-    TH1F* m_h_badHitsRMS = nullptr;
+    std::vector<int> m_rawTimingBand = {215, 235}; /**< lower and upper bin of a band */
+    std::vector<double> m_rawTimingAlarmBorders = {0.001, 0.01}; /**< alarm borders for raw timing */
+    std::vector<double> m_eventMonitorAlarmBorders = {0.00001, 0.0001}; /**< alarm borders for event desynchronization monitor */
+    std::vector<double> m_badHitsAlarmBorders = {0.05, 0.25}; /**< alarm borders for the fraction of junk hits */
+    std::vector<double> m_deadChannelsAlarmBorders = {0.05, 0.25}; /**< alarm borders for the fraction of dead + hot channels */
 
-    /** The line for the upper bound of the nornal window. */
-    TLine* m_line1 = nullptr;
-    /** The line for the lower bound of the nornal window. */
-    TLine* m_line2 = nullptr;
-    /** The text for the conditions of the nornal window. */
-    TPaveText* m_text1 = nullptr;
-    /** The text for the conditions of the nornal window. */
-    TPaveText* m_text2 = nullptr;
+    // other
 
-    /** Monitoring object. */
-    MonitoringObject* m_monObj {};
+    TH1* m_RunType = nullptr; /**< Histogram from DQMInfo with run type. */
+    TString m_RunTypeString; /**< String with run type. */
+    bool m_IsNullRun = false; /**< Run type flag for null runs. */
+
+    TH1D* m_windowFractions = nullptr; /**< fraction of windows outside the band per slot */
+    double m_totalWindowFraction = 0;  /**< total fraction of windows outside the band */
+
+    std::vector<TCanvas*> m_c_good_hits_xy; /**< Canvases for good hits in pixels */
+    std::vector<TCanvas*> m_c_bad_hits_xy;  /**< Canvases for bad hits in pixels */
+    std::vector<TCanvas*> m_c_good_hits_asics; /**< Canvases for good hits in asics */
+    std::vector<TCanvas*> m_c_bad_hits_asics;  /**< Canvases for bad hits in asics */
+
+    TH1D* m_photonYields = nullptr; /**< photon yields per slot (corrected for active channels) */
+    TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
+
+    TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
+    TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
+
+    TH1F* m_hotFraction = nullptr; /**< Histogram: fractin of hot channels per slot */
+    TH1F* m_deadFraction = nullptr; /**< Histogram: fractin of dead channels per slot */
+    TH1F* m_activeFraction = nullptr; /**< Histogram: fractin of active channels per slot */
+    TCanvas* m_c_deadAndHot = nullptr; /**< Canvas: fractin of dead and hot channels */
+
+    TLine* m_line1 = nullptr; /**< The line for the upper bound of the nornal window. */
+    TLine* m_line2 = nullptr; /**< The line for the lower bound of the nornal window. */
+    TPaveText* m_text1 = nullptr; /**< The text for the conditions of the nornal window. */
+
+    MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object. */
 
   };
 } // end namespace Belle2

@@ -28,7 +28,7 @@ namespace Belle2 {
     template <typename Container_T>
     auto  operator()(const Container_T& container) const
     {
-      int sumX = 0, sumY = 0, sumXX = 0, sumXY = 0, sumYY = 0;
+      int64_t sumX = 0, sumY = 0, sumXX = 0, sumXY = 0, sumYY = 0;
       for (const auto& e : container) {
         sumX += x_pos(e);
         sumXX += x_pos(e) * x_pos(e);
@@ -39,7 +39,7 @@ namespace Belle2 {
         sumXY += x_pos(e) * y_pos(e);
       }
       auto nHits = Nhits_t(container.size());
-      int denom = sumXX * nHits - sumX * sumX;
+      int64_t denom = sumXX * nHits - sumX * sumX;
       if (denom == 0) {
         return std::tuple(slopeXY_t(1e100), interceptXY_t(1e100), ipXY_t(1e100), chisqXY_t(1e100), nHits);
       }

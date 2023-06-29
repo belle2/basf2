@@ -258,22 +258,31 @@ def create_pre_collector_path(
             if useSVDGrouping:
                 if useRawtimeForTracking:
                     b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
-                    b2.set_module_parameters(path, 'SVDTimeGrouping', useDB=False,
+                    b2.set_module_parameters(path, 'SVDTimeGrouping',
+                                             forceGroupingFromDB=False,
+                                             useParamFromDB=False,
                                              isEnabledIn6Samples=True,
-                                             acceptSigmaN=5, removeSigmaN=5,
+                                             acceptSigmaN=5,
                                              expectedSignalTimeCenter=100,
                                              expectedSignalTimeMin=70, expectedSignalTimeMax=130,
-                                             tRangeLow=-20, tRangeHigh=220,
+                                             tRangeLow=-20, tRangeHigh=220)
+                    b2.set_module_parameters(path, 'SVDSpacePointCreator',
+                                             forceGroupingFromDB=False,
+                                             useParamFromDB=False,
+                                             useSVDGroupInfoIn6Sample=True,
                                              numberOfSignalGroups=2, formSingleSignalGroup=True)
                 else:
-                    b2.set_module_parameters(path, 'SVDTimeGrouping', useDB=False,
+                    b2.set_module_parameters(path, 'SVDTimeGrouping',
+                                             forceGroupingFromDB=False,
+                                             useParamFromDB=False,
                                              isEnabledIn6Samples=True, acceptSigmaN=3,
                                              expectedSignalTimeMin=-30, expectedSignalTimeMax=30)
-                b2.set_module_parameters(path, 'SVDSpacePointCreator', useDB=False,
-                                         useSVDGroupInfoIn6Sample=True)
+                    b2.set_module_parameters(path, 'SVDSpacePointCreator',
+                                             forceGroupingFromDB=False,
+                                             useSVDGroupInfoIn6Sample=True)
             else:
                 b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
-                b2.set_module_parameters(path, 'SVDTimeGrouping', useDB=False, isEnabledIn6Samples=False)
+                b2.set_module_parameters(path, 'SVDTimeGrouping', forceGroupingFromDB=False, isEnabledIn6Samples=False)
 
         # repeat svd reconstruction using only SVDShaperDigitsFromTracks
         path.add_module("SVDShaperDigitsFromTracks")

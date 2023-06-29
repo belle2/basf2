@@ -80,7 +80,6 @@ void KLMUnpackerModule::beginRun()
     B2FATAL("KLM electronics map is not available.");
   if (!m_FEEParameters.isValid())
     B2FATAL("KLM scintillator FEE parameters are not available.");
-
   m_triggerCTimeOfPreviousEvent = 0;
   m_Time->updateConstants();
 }

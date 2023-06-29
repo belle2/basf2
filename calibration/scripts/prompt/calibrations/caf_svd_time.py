@@ -255,9 +255,9 @@ def create_pre_collector_path(
             # if we would like using the grouping (True by default), we should use the calibrated cluster time
             # if we would like to use the raw time, than the cluster grouping parameters are OK only for CoG3
             # in the reconstruction (default in reconstruction)
+            b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=useRawtimeForTracking)
             if useSVDGrouping:
                 if useRawtimeForTracking:
-                    b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
                     b2.set_module_parameters(path, 'SVDTimeGrouping',
                                              forceGroupingFromDB=False,
                                              useParamFromDB=False,
@@ -281,8 +281,8 @@ def create_pre_collector_path(
                                              forceGroupingFromDB=False,
                                              useSVDGroupInfoIn6Sample=True)
             else:
-                b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
                 b2.set_module_parameters(path, 'SVDTimeGrouping', forceGroupingFromDB=False, isEnabledIn6Samples=False)
+                b2.set_module_parameters(path, 'SVDSpacePointCreator', forceGroupingFromDB=False, useSVDGroupInfoIn6Sample=False)
 
         # repeat svd reconstruction using only SVDShaperDigitsFromTracks
         path.add_module("SVDShaperDigitsFromTracks")

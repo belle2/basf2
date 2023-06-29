@@ -23,6 +23,8 @@ namespace Belle2 {
     ~TrackFlippingCuts() {}
 
     /** Set the cuts for the two filters
+     * @param status the option ot trun on/off flip&refit
+     * @param cutPt the cut on Pt to do flip&refit
      * @param cutFirst the cut for the 1st MVA
      * @param cutSecond the cut for the 2nd MVA
      */
@@ -62,7 +64,7 @@ namespace Belle2 {
   private:
     /** whether to switch on or off the flip&refit. Should be True or False */
     bool m_status;
-    /** The cuts on Transverse Momentum to do flip&refit*/
+    /** The cuts on Transverse Momentum to do flip&refit. tracks with Pt higher than this value will not be flip&refitted*/
     float m_cutPt;
     /** The cuts for the 1st filter*/
     float m_cutFirst;

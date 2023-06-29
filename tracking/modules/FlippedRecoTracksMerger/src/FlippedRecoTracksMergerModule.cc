@@ -69,7 +69,7 @@ void FlippedRecoTracksMergerModule::event()
 
     // do not change the tracks with Pt > 0.3 GeV
     auto trackFitResult = track->getTrackFitResultWithClosestMass(Const::pion);
-    if (trackFitResult->getTransverseMomentum() > 0.3) continue;
+    if (trackFitResult->getTransverseMomentum() > (*m_flipCutsFromDB).getPtCut()) continue;
 
     double mvaFlipCut = (*m_flipCutsFromDB).getSecondCut();
 

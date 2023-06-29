@@ -176,13 +176,14 @@ namespace Belle2 {
     template <class _Ty>
     using _Remove_cvref_t = std::remove_cv_t<std::remove_reference_t<_Ty>>;
 
-    template <typename... FUNC_T>
-    auto fill_vector(size_t entries, FUNC_T&& ... func)
+
+    template <typename FUNC_T>
+    auto fill_vector(size_t entries, FUNC_T&& func)
     {
-      std::vector<std::tuple<  decltype(func(size_t(0)))...  >> ret ;
+      std::vector< decltype(func(size_t(0))) > ret ;
       ret.reserve(entries);
       for (size_t i = 0; i < entries; ++i) {
-        ret.emplace_back(func(i)...);
+        ret.emplace_back(func(i));
       }
       return ret;
     }

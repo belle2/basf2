@@ -12,6 +12,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dbobjects/ECLnOptimal.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 #include <TH2F.h>
 
 namespace Belle2 {
@@ -52,6 +53,9 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
+
     /** location of cluster; cellID and position within the crystal*/
     ECL::ECLLeakagePosition* m_leakagePosition{nullptr};
 
@@ -61,8 +65,8 @@ namespace Belle2 {
     TH2F phiCorrection; /**< histogram of phi-dependent corrections */
 
     //..Parameters derived from payload (except for nThetaID & nLeakReg, which are fixed)
-    const int nThetaID = 69; /**< 69 thetaIDs */
-    const int nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
+    const unsigned int nThetaID = 69; /**< 69 thetaIDs */
+    static constexpr unsigned int nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
     int nPositionBins = 0; /**< number of locations across crystal */
     int nXBins = 0; /**< number of thetaID x energy bins  */
     int nEnergies = 0; /**< number of energies for which there are leakage corrections */

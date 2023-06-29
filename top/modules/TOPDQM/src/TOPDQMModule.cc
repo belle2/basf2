@@ -79,6 +79,7 @@ namespace Belle2 {
     m_window_vs_slot->SetYTitle("window number w.r.t reference window");
     m_window_vs_slot->SetStats(kFALSE);
     m_window_vs_slot->SetMinimum(0);
+    m_window_vs_slot->GetXaxis()->SetNdivisions(16);
 
     int nbinsT0 = 75;
     double rangeT0 = nbinsT0 * bunchTimeSep;
@@ -98,11 +99,13 @@ namespace Belle2 {
     m_signalHits->SetXTitle("slot number");
     m_signalHits->SetYTitle("hits per track");
     m_signalHits->SetMinimum(0);
+    m_signalHits->GetXaxis()->SetNdivisions(16);
 
     m_backgroundHits = new TProfile("backgroundHits", "Number of good hits pet track in [-50, 0] ns", 16, 0.5, 16.5, 0, 1000);
     m_backgroundHits->SetXTitle("slot number");
     m_backgroundHits->SetYTitle("hits per track");
     m_backgroundHits->SetMinimum(0);
+    m_backgroundHits->GetXaxis()->SetNdivisions(16);
 
     int nbinsHits = 1000;
     double xmaxHits = 10000;

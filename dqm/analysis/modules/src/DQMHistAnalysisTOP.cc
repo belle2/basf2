@@ -65,7 +65,6 @@ void DQMHistAnalysisTOPModule::initialize()
   m_monObj = getMonitoringObject("top");
 
   gROOT->cd();
-  B2DEBUG(20, "DQMHistAnalysisTOP: initialized.");
 
   m_c_photonYields = new TCanvas("TOP/c_photonYields");
   m_c_backgroundRates = new TCanvas("TOP/c_backgroundRates");
@@ -75,12 +74,15 @@ void DQMHistAnalysisTOPModule::initialize()
   m_activeFraction = new TH1F("TOP/activeFraction", "Fraction of active channels; slot number; fraction", 16, 0.5, 16.5);
   m_c_deadAndHot = new TCanvas("TOP/c_deadAndHotChannels");
 
-  //using c2_Name to avoid an overlap on default c_Name
-  for (int i = 1; i <= 16; i++) {
-    m_c_good_hits_xy.push_back(new TCanvas(Form("TOP/c2_good_hits_xy_%d", i)));
-    m_c_bad_hits_xy.push_back(new TCanvas(Form("TOP/c2_bad_hits_xy_%d", i)));
-    m_c_good_hits_asics.push_back(new TCanvas(Form("TOP/c2_good_hits_asics_%d", i)));
-    m_c_bad_hits_asics.push_back(new TCanvas(Form("TOP/c2_bad_hits_asics_%d", i)));
+  m_junkFraction = new TH1F("TOP/junkFraction", "Fraction of bad hits; slot number; fraction", 64, 0.5, 16.5);
+  m_c_junkFraction = new TCanvas("TOP/c_junkFraction");
+
+  // using c2_Name to avoid an overlap on default c_Name
+  for (int slot = 1; slot <= 16; slot++) {
+    m_c_good_hits_xy.push_back(new TCanvas(Form("TOP/c2_good_hits_xy_%d", slot)));
+    m_c_bad_hits_xy.push_back(new TCanvas(Form("TOP/c2_bad_hits_xy_%d", slot)));
+    m_c_good_hits_asics.push_back(new TCanvas(Form("TOP/c2_good_hits_asics_%d", slot)));
+    m_c_bad_hits_asics.push_back(new TCanvas(Form("TOP/c2_bad_hits_asics_%d", slot)));
   }
 
   m_line1 = new TLine(0.5, m_rawTimingBand[0], 16.5, m_rawTimingBand[0]);
@@ -93,20 +95,53 @@ void DQMHistAnalysisTOPModule::initialize()
   m_text1 = new TPaveText(1, 435, 10, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
+  m_text2 = new TPaveText(0.55, 0.8, 0.85, 0.89, "NDC");
+  m_text2->SetFillColorAlpha(kWhite, 0);
+  m_text2->SetBorderSize(0);
+
+  for (int slot = 1; slot < 16; slot++) {
+    auto* line = new TLine(slot + 0.5, 0, slot + 0.5, 1);
+    line->SetLineWidth(1);
+    line->SetLineStyle(2);
+    m_verticalLines.push_back(line);
+  }
+
+  std::vector<int> colors = {kYellow, kRed};
+  for (size_t i = 0; i < colors.size(); i++) {
+    auto* line = new TLine(0.5, m_badHitsAlarmBorders[i], 16.5, m_badHitsAlarmBorders[i]);
+    line->SetLineWidth(2);
+    line->SetLineStyle(2);
+    line->SetLineColor(colors[i]);
+    m_badHitsAlarmLines.push_back(line);
+  }
+  for (size_t i = 0; i < colors.size(); i++) {
+    auto* line = new TLine(0.5, m_deadChannelsAlarmBorders[i], 16.5, m_deadChannelsAlarmBorders[i]);
+    line->SetLineWidth(2);
+    line->SetLineStyle(2);
+    line->SetLineColor(colors[i]);
+    m_deadChannelsAlarmLines.push_back(line);
+  }
+
+  B2DEBUG(20, "DQMHistAnalysisTOP: initialized.");
 }
 
 
 void DQMHistAnalysisTOPModule::beginRun()
 {
-  B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
   m_RunType = findHist("DQMInfo/rtype");
   m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
   m_IsNullRun = (m_RunTypeString == "null");
+
+  B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
 
 void DQMHistAnalysisTOPModule::event()
 {
+
+  TCanvas* canvas = nullptr;
+  int alarmColor = 0;
+
   // window_vs_slot
 
   auto* hraw = (TH2F*) findHist("TOP/window_vs_slot");
@@ -122,17 +157,17 @@ void DQMHistAnalysisTOPModule::event()
     delete px;
   }
 
-  TCanvas* c2 = findCanvas("TOP/c_window_vs_slot");
-  if (c2) {
-    c2->cd();
+  canvas = findCanvas("TOP/c_window_vs_slot");
+  if (canvas) {
+    canvas->cd();
     m_text1->Clear();
-    m_text1->AddText(Form("Ratio of entries outside of red lines: %.2f %%", m_totalWindowFraction * 100.0));
+    m_text1->AddText(Form("Fraction outside red lines: %.2f %%", m_totalWindowFraction * 100.0));
     m_text1->Draw();
     m_line1->Draw();
     m_line2->Draw();
-    int alarmColor = m_IsNullRun ? kWhite : getAlarmColor(m_totalWindowFraction, m_rawTimingAlarmBorders);
-    c2->Pad()->SetFillColor(alarmColor);
-    c2->Modified();
+    alarmColor = getAlarmColor(m_totalWindowFraction, m_rawTimingAlarmBorders);
+    canvas->Pad()->SetFillColor(alarmColor);
+    canvas->Modified();
   }
 
   // Event desynchronization monitor
@@ -145,12 +180,15 @@ void DQMHistAnalysisTOPModule::event()
     if (totalEvts > 0) badRatio = badEvts / totalEvts;
   }
 
-  TCanvas* c3 = findCanvas("TOP/c_BoolEvtMonitor");
-  if (c3) {
-    c3->cd();
-    int alarmColor = m_IsNullRun ? kWhite : getAlarmColor(badRatio, m_eventMonitorAlarmBorders);
-    c3->Pad()->SetFillColor(alarmColor);
-    c3->Modified();
+  canvas = findCanvas("TOP/c_BoolEvtMonitor");
+  if (canvas) {
+    canvas->cd();
+    m_text2->Clear();
+    m_text2->AddText(Form("Fraction: %.4f %%", badRatio * 100.0));
+    m_text2->Draw();
+    alarmColor = getAlarmColor(badRatio, m_eventMonitorAlarmBorders);
+    canvas->Pad()->SetFillColor(alarmColor);
+    canvas->Modified();
   }
 
   // Fraction of dead and hot channels
@@ -160,9 +198,7 @@ void DQMHistAnalysisTOPModule::event()
   m_activeFraction->Reset();
 
   for (int slot = 1; slot <= 16; slot++) {
-    TString hname = "TOP/good_channel_hits_";
-    hname += slot;
-    auto* h = (TH1F*) findHist(std::string(hname));
+    auto* h = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
     if (not h) continue;
     double mean = 0;
     int n = 0;
@@ -190,14 +226,17 @@ void DQMHistAnalysisTOPModule::event()
 
   m_deadFraction->Scale(1.0 / 512, "nosw2");
   m_deadFraction->SetFillColor(1);
+  m_deadFraction->GetXaxis()->SetNdivisions(16);
   m_deadFraction->GetYaxis()->SetRangeUser(0, 1);
 
   m_hotFraction->Scale(1.0 / 512, "nosw2");
   m_hotFraction->SetFillColor(2);
+  m_hotFraction->GetXaxis()->SetNdivisions(16);
   m_hotFraction->GetYaxis()->SetRangeUser(0, 1);
 
   m_activeFraction->Scale(1.0 / 512, "nosw2");
   m_activeFraction->SetFillColor(0);
+  m_activeFraction->GetXaxis()->SetNdivisions(16);
   m_activeFraction->GetYaxis()->SetRangeUser(0, 1);
 
   auto* stack = new THStack("TOP/stack", "Fraction of dead and hot channels; slot number; fraction");
@@ -205,18 +244,22 @@ void DQMHistAnalysisTOPModule::event()
   stack->Add(m_hotFraction);
   stack->Add(m_activeFraction);
 
-  m_c_deadAndHot->cd();
-  m_c_deadAndHot->Pad()->SetFrameFillColor(10);
+  canvas = m_c_deadAndHot;
+  canvas->Clear();
+  canvas->cd();
+  canvas->Pad()->SetFrameFillColor(10);
   stack->Draw();
+
+  for (auto* line : m_deadChannelsAlarmLines) line->Draw("same");
 
   auto* legend = new TLegend(0.8, 0.87, 0.99, 0.99);
   legend->AddEntry(m_hotFraction, "hot");
   legend->AddEntry(m_deadFraction, "dead");
   legend->Draw("same");
 
-  int alarmColor = m_IsNullRun ? kWhite : getAlarmColor(1 - m_activeFraction->GetMinimum(), m_deadChannelsAlarmBorders);
-  m_c_deadAndHot->Pad()->SetFillColor(alarmColor);
-  m_c_deadAndHot->Modified();
+  alarmColor = getAlarmColor(1 - m_activeFraction->GetMinimum(), m_deadChannelsAlarmBorders);
+  canvas->Pad()->SetFillColor(alarmColor);
+  canvas->Modified();
 
   // Photon yields and background rates
 
@@ -232,22 +275,62 @@ void DQMHistAnalysisTOPModule::event()
     m_photonYields->SetTitle("Number of photons per track");
     m_photonYields->SetYTitle("photons per track");
     m_photonYields->SetMarkerStyle(24);
+    m_photonYields->GetXaxis()->SetNdivisions(16);
     m_photonYields->Divide(m_photonYields, activeFract);
-    m_c_photonYields->cd();
+    canvas = m_c_photonYields;
+    canvas->Clear();
+    canvas->cd();
     m_photonYields->Draw();
-    m_c_photonYields->Modified();
+    canvas->Modified();
 
     m_backgroundRates->Scale(1.0 / 50.0e-3 / 32);  // measured in 50 ns window, 32 PMT's ==> rate in MHz/PMT
     m_backgroundRates->Divide(m_backgroundRates, activeFract);
     m_backgroundRates->SetTitle("Background rates");
     m_backgroundRates->SetYTitle("background rate [MHz/PMT]");
     m_backgroundRates->SetMarkerStyle(24);
-    m_c_backgroundRates->cd();
+    m_backgroundRates->GetXaxis()->SetNdivisions(16);
+    canvas = m_c_backgroundRates;
+    canvas->Clear();
+    canvas->cd();
     m_backgroundRates->Draw();
-    m_c_backgroundRates->Modified();
+    canvas->Modified();
 
     delete activeFract;
   }
+
+  // Fractions of junk hits
+
+  m_junkFraction->Reset();
+  auto* allHits = (TH1D*) m_junkFraction->Clone("tmp");
+  for (int slot = 1; slot <= 16; slot++) {
+    auto* good = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
+    if (not good) continue;
+    auto* bad = (TH1F*) findHist("TOP/bad_channel_hits_" + std::to_string(slot));
+    if (not bad) continue;
+    for (int i = 0; i < 512; i++) {
+      int bs = i / 128;
+      allHits->Fill(slot + bs / 4. - 0.5, good->GetBinContent(i + 1) + bad->GetBinContent(i + 1));
+      m_junkFraction->Fill(slot + bs / 4. - 0.5, bad->GetBinContent(i + 1));
+    }
+  }
+
+  m_junkFraction->Divide(m_junkFraction, allHits, 1, 1, "B");
+  delete allHits;
+
+  canvas = m_c_junkFraction;
+  canvas->Clear();
+  canvas->cd();
+  canvas->Pad()->SetFrameFillColor(10);
+  m_junkFraction->SetMarkerStyle(24);
+  m_junkFraction->GetXaxis()->SetNdivisions(16);
+  m_junkFraction->GetYaxis()->SetRangeUser(0, 1);
+  m_junkFraction->Draw();
+  for (auto* line : m_verticalLines) line->Draw("same");
+  for (auto* line : m_badHitsAlarmLines) line->Draw("same");
+
+  alarmColor = getAlarmColor(m_junkFraction->GetMaximum(), m_badHitsAlarmBorders);
+  canvas->Pad()->SetFillColor(alarmColor);
+  canvas->Modified();
 
   // Remake plots of 2D hit distributions: set z-axis range to 3 times the average for good hits, 30 times the average for bad hits
 
@@ -261,17 +344,15 @@ void DQMHistAnalysisTOPModule::event()
 
 void DQMHistAnalysisTOPModule::endRun()
 {
-  B2DEBUG(20, "DQMHistAnalysisTOP : endRun called");
-
   // add MiraBelle monitoring
 
   setMiraBelleVariables("RateBadRaw_slot", m_windowFractions);
   m_monObj->setVariable("RateBadRaw_all", m_totalWindowFraction);
-  B2INFO("RateBadRaw_all " << m_totalWindowFraction); //TODO rm
   setMiraBelleVariables("PhotonsPerTrack_slot", m_photonYields);
   setMiraBelleVariables("BackgroundRate_slot", m_backgroundRates);
   setMiraBelleVariables("ActiveChannelFraction_slot", m_activeFraction);
 
+  B2DEBUG(20, "DQMHistAnalysisTOP : endRun called");
 }
 
 
@@ -281,15 +362,13 @@ void DQMHistAnalysisTOPModule::terminate()
 }
 
 
-void DQMHistAnalysisTOPModule::remake2DHistograms(const TString& name, const std::vector<TCanvas*>& canvases, double scale)
+void DQMHistAnalysisTOPModule::remake2DHistograms(const std::string& name, const std::vector<TCanvas*>& canvases, double scale)
 {
 
   double totalHits = 0;
   std::vector<TH2F*> histos;
-  for (int module = 1; module <= 16; module++) {
-    TString hname = name;
-    hname += module;
-    TH2F* h = (TH2F*) findHist(std::string(hname));
+  for (int slot = 1; slot <= 16; slot++) {
+    TH2F* h = (TH2F*) findHist(name + std::to_string(slot));
     histos.push_back(h);
     if (not h) continue;
     totalHits += h->Integral();
@@ -317,21 +396,22 @@ void DQMHistAnalysisTOPModule::remake2DHistograms(const TString& name, const std
 }
 
 
-void DQMHistAnalysisTOPModule::setMiraBelleVariables(const TString& variableName, const TH1* histogram)
+void DQMHistAnalysisTOPModule::setMiraBelleVariables(const std::string& variableName, const TH1* histogram)
 {
   for (int slot = 1; slot <= 16; slot++) {
-    TString vname = variableName + TString::Format("%d", slot);
+    auto vname = variableName + std::to_string(slot);
     double value = histogram ? histogram->GetBinContent(slot) : 0;
-    m_monObj->setVariable(std::string(vname), value);
-    B2DEBUG(20, vname << " " << value);
+    m_monObj->setVariable(vname, value);
 
-    B2INFO(vname << " " << value); //TODO rm
+    B2DEBUG(20, vname << " " << value);
   }
 }
 
 
 int DQMHistAnalysisTOPModule::getAlarmColor(double value, const std::vector<double>& alarmBorders) const
 {
+  if (m_IsNullRun) return kWhite;
+
   if (value < alarmBorders[0]) return kGreen;
   else if (value < alarmBorders[1]) return kYellow;
   else return kRed;

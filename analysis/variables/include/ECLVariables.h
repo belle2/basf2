@@ -344,22 +344,22 @@ namespace Belle2 {
     double nRejectedECLShowers(const Particle*);
 
     /**
-     * [Eventbased] Returns the number of multi-strip hits in the KLM forward endcap (data only in release-08)
+     * [Eventbased] Returns the number of multi-strip hits in the KLM forward endcap (not available for mc produced in or before release-08)
      */
     double nKLMMultistripHitsFWDEndcap(const Particle*);
 
     /**
-     * [Eventbased] Returns the number of multi-strip hits in the KLM barrel (data only in release-08)
+     * [Eventbased] Returns the number of multi-strip hits in the KLM barrel (not available for mc produced in or before release-08)
      */
     double nKLMMultistripHitsBarrel(const Particle*);
 
     /**
-     * [Eventbased] Returns the number of multi-strip hits in the KLM backward endcap (data only in release-08)
+     * [Eventbased] Returns the number of multi-strip hits in the KLM backward endcap (not available for mc produced in or before release-08)
      */
     double nKLMMultistripHitsBWDEndcap(const Particle*);
 
     /**
-     * [Eventbased] Returns the number of multi-strip hits in the KLM (data only in release-08)
+     * [Eventbased] Returns the number of multi-strip hits in the KLM (not available for mc produced in or before release-08)
      */
     double nKLMMultistripHits(const Particle*);
 

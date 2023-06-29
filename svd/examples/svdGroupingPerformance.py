@@ -648,6 +648,7 @@ else:
     b2conditions.globaltags = ["online"]
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
+    b2conditions.prepend_globaltag("patch_main_release-08")
     if args.CoG3TimeCalibration_bucket36:
         b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36_withGrouping_pol3")
     if args.CoG3TimeCalibration_bucket32:
@@ -711,8 +712,6 @@ for moda in main.modules():
             moda.param("expectedSignalTimeCenter",    sigLoc)
             moda.param('expectedSignalTimeMin',  sigMin)
             moda.param('expectedSignalTimeMax', sigMax)
-            moda.param("isEnabledIn6Samples", True)
-            moda.param("isEnabledIn3Samples", True)
             moda.param("signalLifetime", args.signalLifetime)
     if moda.name() == 'SVDSpacePointCreator':
         if args.useSVDGroupInfo:

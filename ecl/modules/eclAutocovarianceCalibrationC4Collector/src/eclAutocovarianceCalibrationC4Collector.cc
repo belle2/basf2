@@ -103,9 +103,11 @@ void eclAutocovarianceCalibrationC4CollectorModule::collect()
 
         float baseline = m_Baselines[id];
 
+        //Computing baselin subtracted waveform. aECLDsp.getDspA() is the raw ECLDsp waveform.
         vector<double> waveform(m_numberofADCPoints);
         for (int i = 0; i < m_numberofADCPoints; i++) waveform[i] = aECLDsp.getDspA()[i] - baseline;
 
+        //After subtraccting baseline, expected value is 0.  Assuming noise is properly modelld by the cov. mat. (computed by this calibration) then a "fit" to a constant should give a good chi2.  Below computes the resulting chi2 for a fit to 0 and used the calibrated cov. mat. to model the noise.
         vector<double> temp(m_numberofADCPoints, 0);
         for (int i = 0; i < m_numberofADCPoints; i++) {
           for (int j = 0; j < m_numberofADCPoints; j++) {

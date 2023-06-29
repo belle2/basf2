@@ -67,6 +67,10 @@ void FlippedRecoTracksMergerModule::event()
 
     if (!track) continue;
 
+    // do not change the tracks with Pt > 0.3 GeV
+    auto trackFitResult = track->getTrackFitResultWithClosestMass(Const::pion);
+    if (trackFitResult->getTransverseMomentum() > 0.3) continue;
+
     double mvaFlipCut = (*m_flipCutsFromDB).getSecondCut();
 
     // if we should not flip the tracks: the 2nd MVA QI is nan (aka didn't pass the 1st MVA filter) or smaller than the cut

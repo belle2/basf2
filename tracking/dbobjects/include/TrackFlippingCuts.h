@@ -53,13 +53,13 @@ namespace Belle2 {
     }
 
   private:
-    /** The status of the flip&refit*/
+    /** whether to switch on or off the flip&refit. Should be True or False */
     bool m_status;
     /** The cuts for the 1st filter*/
     float m_cutFirst;
     /** The cuts for the 2nd filter*/
     float m_cutSecond;
 
-    ClassDef(TrackFlippingCuts, 2);  /**< ClassDef, necessary for ROOT */
+    ClassDef(TrackFlippingCuts, 3);  /**< ClassDef, necessary for ROOT */
   };
 }

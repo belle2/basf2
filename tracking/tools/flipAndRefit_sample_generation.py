@@ -47,11 +47,11 @@ def arg_parser():
                         help='Global Tags to be prepended',
                         metavar='GTs')
     parser.add_argument('--output_file_mva',
-                        default='',
+                        default='BBbar_mva1.root',
                         type=str,
                         help='Output file name. Default is \'\'.')
     parser.add_argument('--output_file_mva2',
-                        default='',
+                        default='BBbar_mva2.root',
                         type=str,
                         help='Output file2 name. Default is \'\'.')
     parser.add_argument('--num',
@@ -85,10 +85,6 @@ if __name__ == "__main__":
 
     if args.output_file_mva == '':
         B2FATAL("Empty output file name. Terminating here.")
-
-    outputfile = args.output_file_mva
-    if not outputfile.endswith(".root"):
-        outputfile + ".root"
 
     # Setting the random seed for particle generation
     set_random_seed(args.randseed)
@@ -138,12 +134,12 @@ if __name__ == "__main__":
         main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
                         identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
                         indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
-
-        saveFirstMVAData = Saving1stMVAData(
-            name="saving1stMVA_BBbar",
-            output_file_name=outputfile)
-        main.add_module(saveFirstMVAData)
-        if args.output_file_mva2 != '':
+        if (training_mva_number == 1):
+            saveFirstMVAData = Saving1stMVAData(
+                name="saving1stMVA_BBbar",
+                output_file_name=args.output_file_mva)
+            main.add_module(saveFirstMVAData)
+        else:
             saveSecondMVAData = Saving2ndMVAData(
                 name="saving2ndMVA_BBbar",
                 output_file_name=args.output_file_mva2)

@@ -1638,19 +1638,19 @@ If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHitsFWDEndcap", nKLMMultistripHitsFWDEndcap, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM forward endcap (data only in release-08).
+[Eventbased] Returns the number of multi-strip hits in the KLM forward endcap.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHitsBarrel", nKLMMultistripHitsBarrel, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM barrel (data only in release-08).
+[Eventbased] Returns the number of multi-strip hits in the KLM barrel.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHitsBWDEndcap", nKLMMultistripHitsBWDEndcap, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM backward endcap (data only in release-08).
+[Eventbased] Returns the number of multi-strip hits in the KLM backward endcap.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHits", nKLMMultistripHits, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM (data only in release-08).
+[Eventbased] Returns the number of multi-strip hits in the KLM.
 )DOC");
   
   REGISTER_VARIABLE("nECLShowersFWDEndcap", nECLShowersFWDEndcap, R"DOC(

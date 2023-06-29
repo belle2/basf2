@@ -158,7 +158,7 @@ namespace Belle2 {
        */
       static uint16_t unpackType(uint16_t raw)
       {
-        return (raw >> 13) & 0x3;
+        return (raw >> 13) & 0x7;
       }
 
       /**

@@ -57,6 +57,9 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            float(6)); // 6 ns
   addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
   addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
+  addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",
+           bool(false));
+
 }
 
 DQMHistAnalysisSVDGeneralModule::~DQMHistAnalysisSVDGeneralModule() { }
@@ -124,14 +127,16 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_cOccupancyChartChip = new TCanvas("SVDOccupancy/c_OccupancyChartChip");
 
   //strip occupancy per sensor
-  m_cStripOccupancyU = new TCanvas*[nSensors];
-  m_cStripOccupancyV = new TCanvas*[nSensors];
-  for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-    int tmp_layer = m_SVDModules[i].getLayerNumber();
-    int tmp_ladder = m_SVDModules[i].getLadderNumber();
-    int tmp_sensor = m_SVDModules[i].getSensorNumber();
-    m_cStripOccupancyU[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
-    m_cStripOccupancyV[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+  if (m_additionalPlots) {
+    m_cStripOccupancyU = new TCanvas*[nSensors];
+    m_cStripOccupancyV = new TCanvas*[nSensors];
+    for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
+      int tmp_layer = m_SVDModules[i].getLayerNumber();
+      int tmp_ladder = m_SVDModules[i].getLadderNumber();
+      int tmp_sensor = m_SVDModules[i].getSensorNumber();
+      m_cStripOccupancyU[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyU_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+      m_cStripOccupancyV[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
+    }
   }
 
 
@@ -276,14 +281,14 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   m_cOnlineOccupancyU->Clear();
   m_cOnlineOccupancyV->Clear();
   m_cOccupancyChartChip->Clear();
-  for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-    m_cStripOccupancyU[i]->Clear();
-    m_cStripOccupancyV[i]->Clear();
+  if (m_additionalPlots) {
+    for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
+      m_cStripOccupancyU[i]->Clear();
+      m_cStripOccupancyV[i]->Clear();
+    }
   }
   m_cClusterOnTrackTime_L456V->Clear();
   m_cClusterOnTrack3Time_L456V->Clear();
-//   m_cCluster3TimeGroupId->Clear();
-//   m_cCluster6TimeGroupId->Clear();
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -592,12 +597,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
       //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
-      m_hStripOccupancyU[i].Clear();
-      htmp->Copy(m_hStripOccupancyU[i]);
-      m_hStripOccupancyU[i].Scale(1 / nEvents);
-      m_hStripOccupancyU[i].SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
-      m_hStripOccupancyU[i].SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
-                                          tmp_sensor));
+      if (m_additionalPlots) {
+        m_hStripOccupancyU[i].Clear();
+        htmp->Copy(m_hStripOccupancyU[i]);
+        m_hStripOccupancyU[i].Scale(1 / nEvents);
+        m_hStripOccupancyU[i].SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
+        m_hStripOccupancyU[i].SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
+                                            tmp_sensor));
+      }
     }
 
     //look for U histogram - OFFLINE ZS for 3 samples
@@ -626,76 +633,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
       }
     }
 
-    // Cluster Group Id
-//     TH2F* htmp2 = NULL;
-//
-//     htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster3TimeGroupId");
-//     if (htmp2 != NULL) {
-//        m_hCluster3TimeGroupId.Clear();
-//        htmp2->Copy(m_hCluster3TimeGroupId);
-//        m_hCluster3TimeGroupId.SetTitle("Cluster Time GroupIds for 3 samples" + runID);
-//        bool hasError = false;
-//        if (nEvents > m_statThreshold) {
-//
-//        } else {
-//           m_cCluster3TimeGroupId->SetFillColor(kGray);
-//           m_cCluster3TimeGroupId->SetFrameFillColor(10);
-//        }
-//        if (! hasError) {
-//           m_cCluster3TimeGroupId->SetFillColor(kGreen);
-//           m_cCluster3TimeGroupId->SetFrameFillColor(10);
-//        } else {
-//           m_legError->Draw("same");
-//           m_cCluster3TimeGroupId->SetFillColor(kRed);
-//           m_cCluster3TimeGroupId->SetFrameFillColor(10);
-//        }
-//     } else {
-//        B2INFO("Histogram SVDExpReco/SVDDQM_Cluster3TimeGroupId from SVDDQMExpReco module not found!");
-//        m_cCluster3TimeGroupId->SetFillColor(kRed);
-//     }
-//
-//     m_cCluster3TimeGroupId->cd();
-//     m_hCluster3TimeGroupId.Draw();
-//
-//     m_cCluster3TimeGroupId->Modified();
-//     m_cCluster3TimeGroupId->Update();
-//
-//     if (m_printCanvas)
-//        m_cCluster3TimeGroupId->Print("c_SVDCluster3TimeGoupId.pdf");
-//
-//     htmp2 = (TH2F*)findHist("SVDExpReco/SVDDQM_Cluster6TimeGroupId");
-//     if (htmp2 != NULL) {
-//        m_hCluster6TimeGroupId.Clear();
-//        htmp2->Copy(m_hCluster6TimeGroupId);
-//        m_hCluster6TimeGroupId.SetTitle("Cluster Time GroupIds for 6 samples" + runID);
-//        bool hasError = false;
-//        if (nEvents > m_statThreshold) {
-//
-//        } else {
-//           m_cCluster6TimeGroupId->SetFillColor(kGray);
-//           m_cCluster6TimeGroupId->SetFrameFillColor(10);
-//        }
-//        if (! hasError) {
-//           m_cCluster6TimeGroupId->SetFillColor(kGreen);
-//           m_cCluster6TimeGroupId->SetFrameFillColor(10);
-//        } else {
-//           m_legError->Draw("same");
-//           m_cCluster6TimeGroupId->SetFillColor(kRed);
-//           m_cCluster6TimeGroupId->SetFrameFillColor(10);
-//        }
-//     } else {
-//        B2INFO("Histogram SVDExpReco/SVDDQM_Cluster6TimeGroupId from SVDDQMExpReco module not found!");
-//        m_cCluster6TimeGroupId->SetFillColor(kRed);
-//     }
-//
-//     m_cCluster6TimeGroupId->cd();
-//     m_hCluster6TimeGroupId.Draw();
-//
-//     m_cCluster6TimeGroupId->Modified();
-//     m_cCluster6TimeGroupId->Update();
-//
-//     if (m_printCanvas)
-//        m_cCluster6TimeGroupId->Print("c_SVDCluster6TimeGoupId.pdf");
 
 
     //look for V histogram - OFFLINE ZS
@@ -732,12 +669,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
         }
       }
       //produce the occupancy plot
-      m_hStripOccupancyV[i].Clear();
-      htmp->Copy(m_hStripOccupancyV[i]);
-      m_hStripOccupancyV[i].Scale(1 / nEvents);
-      m_hStripOccupancyV[i].SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
-      m_hStripOccupancyV[i].SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
-                                          tmp_sensor));
+      if (m_additionalPlots) {
+        m_hStripOccupancyV[i].Clear();
+        htmp->Copy(m_hStripOccupancyV[i]);
+        m_hStripOccupancyV[i].Scale(1 / nEvents);
+        m_hStripOccupancyV[i].SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
+        m_hStripOccupancyV[i].SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
+                                            tmp_sensor));
+      }
 
     }
     //look for V histogram - OFFLINE ZS for 3 samples
@@ -847,10 +786,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
     }
 
     //update sensor occupancy canvas U and V
-    m_cStripOccupancyU[i]->cd();
-    m_hStripOccupancyU[i].Draw("histo");
-    m_cStripOccupancyV[i]->cd();
-    m_hStripOccupancyV[i].Draw("histo");
+    if (m_additionalPlots) {
+      m_cStripOccupancyU[i]->cd();
+      m_hStripOccupancyU[i].Draw("histo");
+      m_cStripOccupancyV[i]->cd();
+      m_hStripOccupancyV[i].Draw("histo");
+    }
   }
 
   //update summary offline occupancy U canvas
@@ -1091,14 +1032,14 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
 
   delete m_cOccupancyChartChip;
 
-  for (int module = 0; module < nSensors; module++) {
-    delete m_cStripOccupancyU[module];
-    delete m_cStripOccupancyV[module];
+  if (m_additionalPlots) {
+    for (int module = 0; module < nSensors; module++) {
+      delete m_cStripOccupancyU[module];
+      delete m_cStripOccupancyV[module];
+    }
+    delete m_cStripOccupancyU;
+    delete m_cStripOccupancyV;
   }
-
-  delete m_cStripOccupancyU;
-  delete m_cStripOccupancyV;
-
   delete m_cClusterOnTrackTime_L456V;
 }
 

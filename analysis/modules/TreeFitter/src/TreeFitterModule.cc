@@ -135,18 +135,12 @@ void TreeFitterModule::beginRun()
   m_beamMomE(2) = cms.Z();
   m_beamMomE(3) = cms.E();
 
-  const ROOT::Math::PxPyPzEVector cmsError = T.getBeamFourMomentumError();
-
   m_beamCovariance = Eigen::Matrix4d::Zero();
-  double covE = cmsError.E();
-  if (covE == 0)
-    covE = 3.19575e-05; // it seems nominal, e.g. basf2/framework/tests/conditions.out
-  else
-    covE = covE * covE;
+  const double covE = 3.19575e-05; // TODO Avoid using the hard coded value.
+  // It is taked from the BeamParameter which was used previously. The uncertainty from the CollisionInvariantMass is a possibility.
 
   for (size_t i = 0; i < 4; ++i) {
-    m_beamCovariance(i, i) =
-      covE;
+    m_beamCovariance(i, i) = covE;
     // TODO Currently, we do not get a full covariance matrix from beamparams, and the py value is zero, which means there is no constraint on py. Therefore, we approximate it by a diagonal matrix using the energy value for all components. This is based on the assumption that the components of the beam four-momentum are independent and of comparable size.
   }
 }

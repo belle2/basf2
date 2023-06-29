@@ -50,27 +50,11 @@ namespace Belle2 {
     }
 
     /**
-     * Returns CMS energy of e+e- (aka. invariant mass in any system)
-     */
-    double getCMSEnergyError() const
-    {
-      return m_invariantMassDB->getMassError();
-    }
-
-    /**
      * Returns LAB four-momentum of e+e-, i.e. pHER + pLER
      */
     ROOT::Math::PxPyPzEVector getBeamFourMomentum() const
     {
       return rotateCmsToLab() * ROOT::Math::PxPyPzEVector(0, 0, 0, getCMSEnergy());
-    }
-
-    /**
-     * Returns LAB four-momentum of e+e-, i.e. pHER + pLER
-     */
-    ROOT::Math::PxPyPzEVector getBeamFourMomentumError() const
-    {
-      return rotateCmsToLab() * ROOT::Math::PxPyPzEVector(0, 0, 0, getCMSEnergyError());
     }
 
     /**

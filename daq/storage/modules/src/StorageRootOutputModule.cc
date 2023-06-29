@@ -371,7 +371,7 @@ void StorageRootOutputModule::event()
     m_runno = m_eventMetaData->getRun();
     m_processNumber = atoi(getName().substr(0, getName().find(std::string("_"))).c_str());
     m_outputFileName = StringUtil::form("/rawdata/disk%02d/belle/Raw/%4.4d/%5.5d/%s.%4.4d.%5.5d.%s.p%02d.root", 
-                                        (m_processNumber&m_nDisk)+1, m_expno, m_runno, m_runType.c_str(), 
+                                        (m_processNumber%m_nDisk)+1, m_expno, m_runno, m_runType.c_str(), 
                                         m_expno, m_runno, m_HLTName.c_str(), m_processNumber);
   }
 

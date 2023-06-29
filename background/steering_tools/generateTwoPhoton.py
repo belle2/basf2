@@ -153,7 +153,7 @@ main.add_module(aafh)
 geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 addComp = ["MagneticField3dQuadBeamline"]
-# add beast detectors for early phase3
+# add beast detectors
 if sampleType == 'study' and (phase == 31 or phase == 32):
     addComp.extend(["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
 

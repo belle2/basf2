@@ -163,7 +163,7 @@ main.add_module(generator)
 # Geant geometry
 geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
-# add beast detectors for early phase3
+# add beast detectors
 if sampleType == 'study' and (phase == 31 or phase == 32):
     geometry.param('additionalComponents', ["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
 main.add_module(geometry)

@@ -40,7 +40,7 @@ namespace Belle2 {
      * @param[in] digit1 KLMDigit in plane 1.
      * @param[in] digit2 KLMDigit in plane 2.
      */
-    explicit KLMHit2d(KLMDigit* digits, KLMDigit* digit2);
+    explicit KLMHit2d(KLMDigit* digit1, KLMDigit* digit2);
 
     /**
      * Constructor with initial values (BKLM).

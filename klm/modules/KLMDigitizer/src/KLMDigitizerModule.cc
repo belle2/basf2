@@ -131,17 +131,6 @@ void KLMDigitizerModule::beginRun()
       (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Run1)) {  // for data up to and including 2022b
     m_CreateMultiStripDigitsByRun = m_CreateMultiStripDigits;
   }
-  if (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Invalid) {
-    B2ERROR("ScintillatorFirmwareVersion = Invalid");
-  } else if (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Phase2) {
-    B2ERROR("ScintillatorFirmwareVersion = Phase2");
-  } else if (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Run1) {
-    B2ERROR("ScintillatorFirmwareVersion = Run1");
-  } else if (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Run2) {
-    B2ERROR("ScintillatorFirmwareVersion = Run2");
-  } else {
-    B2ERROR("ScintillatorFirmwareVersion = Unknown");
-  }
 }
 
 /*

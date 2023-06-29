@@ -66,15 +66,14 @@ namespace Belle2 {
       m_variables.at(m_prefix + "outGoingArmTime") = recoTrack.getOutgoingArmTime();
       m_variables.at(m_prefix + "outGoingArmTimeError") = recoTrack.getOutgoingArmTimeError();
 
-      auto genfitTrack = recoTrack.getRelated<Track>("Tracks");
-      if (genfitTrack) {
-        auto trackFitResult = genfitTrack->getTrackFitResultWithClosestMass(Const::pion);
-        if (trackFitResult) {
-
-          m_variables.at(m_prefix + "first_cdc_layer") = trackFitResult->getHitPatternCDC().getFirstLayer();
-          m_variables.at(m_prefix + "last_cdc_layer") = trackFitResult->getHitPatternCDC().getLastLayer();
-        }
+      auto cdc_list = recoTrack.getSortedCDCHitList();
+      if (cdc_list.size() > 0) {
+        auto first_cdc_list = cdc_list.front();
+        auto last_cdc_list = cdc_list.back();
+        m_variables.at(m_prefix + "first_cdc_layer") =  first_cdc_list->getICLayer();
+        m_variables.at(m_prefix + "last_cdc_layer") =  last_cdc_list->getICLayer();
       }
+
       m_variables.at(m_prefix + "n_svd_hits") = recoTrack.getNumberOfSVDHits();
       m_variables.at(m_prefix + "n_cdc_hits") = recoTrack.getNumberOfCDCHits();
 

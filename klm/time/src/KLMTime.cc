@@ -38,7 +38,7 @@ double KLMTime::getScintillatorTime(int ctime, int tdc, int triggerCTime) const
   if (correctedCTime <= correctedTriggerCTime)
     relativeTime = correctedCTime - correctedTriggerCTime;
   else
-    relativeTime = correctedCTime - correctedTriggerCTime - 0x10000;
+    relativeTime = correctedCTime - correctedTriggerCTime - (0x10000 << 3);
   /* Get time in TDC periods. */
   return relativeTime * m_TDCPeriod;
 }

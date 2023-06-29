@@ -31,19 +31,17 @@ KLMHit2d::KLMHit2d(KLMDigit* digit1, KLMDigit* digit2) :
   // multi-strip hit will have a range of struck scintillators => worse position resolution in ext/muid
   // see docs.belle2.org/record/255 Figure 2 for strip orientations of planes 1 and 2 in each sector
   if (getSector() <= 2) { // sectors 1 and 2
-    // digit1 from EKLM plane 1 measures global y coordinate: treat as a z-plane hit
-    m_Strip[BKLMElementNumbers::c_ZPlane] = digit1->getStrip();
-    m_LastStrip[BKLMElementNumbers::c_ZPlane] = std::max(digit1->getStrip(), digit1->getLastStrip());
-    // digit2 from EKLM plane 2 measures global x coordinate: treat as a phi-plane hit
-    m_Strip[BKLMElementNumbers::c_PhiPlane] = digit2->getStrip();
-    m_LastStrip[BKLMElementNumbers::c_PhiPlane] = std::max(digit2->getStrip(), digit2->getLastStrip());
+    // digit1 (digit2) from EKLM plane 1 (2) measures global y (x) coordinate
+    setYStripMin(digit1->getStrip());
+    setYStripMax(std::max(digit1->getStrip(), digit1->getLastStrip()));
+    setXStripMin(digit2->getStrip());
+    setXStripMax(std::max(digit2->getStrip(), digit2->getLastStrip()));
   } else { // sectors 3 and 4
-    // digit1 from EKLM plane 1 measures global x coordinate: treat as a phi-plane hit
-    m_Strip[BKLMElementNumbers::c_PhiPlane] = digit1->getStrip();
-    m_LastStrip[BKLMElementNumbers::c_PhiPlane] = std::max(digit1->getStrip(), digit1->getLastStrip());
-    // digit2 from EKLM plane 2 measures global y coordinate: treat as a z-plane hit
-    m_Strip[BKLMElementNumbers::c_ZPlane] = digit2->getStrip();
-    m_LastStrip[BKLMElementNumbers::c_ZPlane] = std::max(digit2->getStrip(), digit2->getLastStrip());
+    // digit1 (digit2) from EKLM plane 1 (2) measures global x (y) coordinate
+    setXStripMin(digit1->getStrip());
+    setXStripMax(std::max(digit1->getStrip(), digit1->getLastStrip()));
+    setYStripMin(digit2->getStrip());
+    setYStripMax(std::max(digit2->getStrip(), digit2->getLastStrip()));
   }
 }
 

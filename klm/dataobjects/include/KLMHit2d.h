@@ -140,6 +140,42 @@ namespace Belle2 {
     }
 
     /**
+     * Set first strip number for EKLM hit in the x-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setXStripMin(int strip)
+    {
+      m_Strip[BKLMElementNumbers::c_PhiPlane] = strip;
+    }
+
+    /**
+     * Set last strip number for EKLM hit in the x-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setXStripMax(int strip)
+    {
+      m_LastStrip[BKLMElementNumbers::c_PhiPlane] = strip;
+    }
+
+    /**
+     * Set first strip number for EKLM hit in the y-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setYStripMin(int strip)
+    {
+      m_Strip[BKLMElementNumbers::c_ZPlane] = strip;
+    }
+
+    /**
+     * Set last strip number for EKLM hit in y-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setYStripMax(int strip)
+    {
+      m_LastStrip[BKLMElementNumbers::c_ZPlane] = strip;
+    }
+
+    /**
      * Determine whether this 2D hit is in RPC or scintillator.
      */
     bool inRPC() const
@@ -194,6 +230,38 @@ namespace Belle2 {
     double getPhiStripAve() const
     {
       return 0.5 * (getPhiStripMin() + getPhiStripMax());
+    }
+
+    /**
+     * Get first strip number for EKLM hit in the x-measuring plane.
+     */
+    int getXStripMin() const
+    {
+      return m_Strip[BKLMElementNumbers::c_PhiPlane];
+    }
+
+    /**
+     * Get last strip number for EKLM hit in the x-measuring plane.
+     */
+    int getXStripMax() const
+    {
+      return m_LastStrip[BKLMElementNumbers::c_PhiPlane];
+    }
+
+    /**
+     * Get first strip number for EKLM hit in the y-measuring plane.
+     */
+    int getYStripMin() const
+    {
+      return m_Strip[BKLMElementNumbers::c_ZPlane];
+    }
+
+    /**
+     * Get last strip number for EKLM hit in the y-measuring plane.
+     */
+    int getYStripMax() const
+    {
+      return m_LastStrip[BKLMElementNumbers::c_ZPlane];
     }
 
     /**

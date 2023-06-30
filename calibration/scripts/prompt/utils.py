@@ -115,6 +115,13 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select
         run = ExpRun(iov.exp_low, iov.run_low)
         total = 0
         remaining_files = files[:]
+
+        # checking if limiting the contribution from each file is enough
+        if max_events_per_file > 0:
+            requiredNumberOfFiles = int(1. * max_events_per_run / max_events_per_file) + 1
+            if requiredNumberOfFiles > len(remaining_files):
+                max_events_per_file = int(1. * max_events_per_run / len(remaining_files))
+
         chosen_files = []
         while total < max_events_per_run and remaining_files:
             if random_select:
@@ -127,7 +134,7 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select
             if not events:
                 B2INFO(f"No events in {file_path}, skipping...")
                 continue
-            total += events if max_events_per_file == 0 or events < max_events_per_file else max_events_per_file
+            total += events if max_events_per_file <= 0 or events <= max_events_per_file else max_events_per_file
             chosen_files.append(file_path)
             B2INFO(f"Choosing input file for {run}: {file_path} and total events so far {total}")
 

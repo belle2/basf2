@@ -30,8 +30,9 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
   if (!m_DAFparameters.isValid())
     B2FATAL("DAF parameters are not available.");
 
-  if (m_param_probabilityCut != m_DAFparameters->getProbabilityCut()) {
-    B2WARNING("DAF was called with a different probability cut than the database one. This new value will be used, the other parameters are read from the database");
+  if (static_cast<float>(m_param_probabilityCut) != m_DAFparameters->getProbabilityCut()) {
+    B2WARNING("DAF was called with a different probability cut than the database one (new: " << m_param_probabilityCut << " ; DB: " <<
+              m_DAFparameters->getProbabilityCut() << " ). This new value will be used, the other parameters are read from the database");
     std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>(m_DAFparameters->getAnnealingScheme(),
                                           m_DAFparameters->getMinimumIterations(),
                                           m_DAFparameters->getMaximumIterations(),

@@ -89,9 +89,21 @@ Untested method ECLCluster::setdeltaL
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBWD
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBarrel
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeFWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBarrel
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsFWD
+Untested method EventLevelClusteringInfo::setNECLShowersBWD
+Untested method EventLevelClusteringInfo::setNECLShowersBarrel
+Untested method EventLevelClusteringInfo::setNECLShowersFWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBarrel
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedFWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBarrel
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsFWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
 Untested method KLMCluster::setErrorP
 Untested method KLMCluster::setErrorX
@@ -6585,10 +6597,26 @@ EventLevelClusteringInfo:
   getNECLCalDigitsOutOfTimeBWD(): 0
   getNECLCalDigitsOutOfTimeBarrel(): 1
   getNECLCalDigitsOutOfTimeFWD(): 1
+  getNECLLocalMaximums(): 0
+  getNECLLocalMaximumsBWD(): 0
+  getNECLLocalMaximumsBarrel(): 0
+  getNECLLocalMaximumsFWD(): 0
+  getNECLShowers(): 0
+  getNECLShowersBWD(): 0
+  getNECLShowersBarrel(): 0
+  getNECLShowersFWD(): 0
   getNECLShowersRejected(): 2
   getNECLShowersRejectedBWD(): 0
   getNECLShowersRejectedBarrel(): 0
   getNECLShowersRejectedFWD(): 2
+  getNECLTriggerCells(): 0
+  getNECLTriggerCellsBWD(): 0
+  getNECLTriggerCellsBarrel(): 0
+  getNECLTriggerCellsFWD(): 0
+  getNKLMDigitsMultiStrip(): 0
+  getNKLMDigitsMultiStripBWD(): 0
+  getNKLMDigitsMultiStripBarrel(): 0
+  getNKLMDigitsMultiStripFWD(): 0
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -16487,10 +16515,26 @@ EventLevelClusteringInfo:
   getNECLCalDigitsOutOfTimeBWD(): 1
   getNECLCalDigitsOutOfTimeBarrel(): 2
   getNECLCalDigitsOutOfTimeFWD(): 2
+  getNECLLocalMaximums(): 0
+  getNECLLocalMaximumsBWD(): 0
+  getNECLLocalMaximumsBarrel(): 0
+  getNECLLocalMaximumsFWD(): 0
+  getNECLShowers(): 0
+  getNECLShowersBWD(): 0
+  getNECLShowersBarrel(): 0
+  getNECLShowersFWD(): 0
   getNECLShowersRejected(): 0
   getNECLShowersRejectedBWD(): 0
   getNECLShowersRejectedBarrel(): 0
   getNECLShowersRejectedFWD(): 0
+  getNECLTriggerCells(): 0
+  getNECLTriggerCellsBWD(): 0
+  getNECLTriggerCellsBarrel(): 0
+  getNECLTriggerCellsFWD(): 0
+  getNKLMDigitsMultiStrip(): 0
+  getNKLMDigitsMultiStripBWD(): 0
+  getNKLMDigitsMultiStripBarrel(): 0
+  getNKLMDigitsMultiStripFWD(): 0
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -25352,10 +25396,26 @@ EventLevelClusteringInfo:
   getNECLCalDigitsOutOfTimeBWD(): 0
   getNECLCalDigitsOutOfTimeBarrel(): 0
   getNECLCalDigitsOutOfTimeFWD(): 1
+  getNECLLocalMaximums(): 0
+  getNECLLocalMaximumsBWD(): 0
+  getNECLLocalMaximumsBarrel(): 0
+  getNECLLocalMaximumsFWD(): 0
+  getNECLShowers(): 0
+  getNECLShowersBWD(): 0
+  getNECLShowersBarrel(): 0
+  getNECLShowersFWD(): 0
   getNECLShowersRejected(): 2
   getNECLShowersRejectedBWD(): 0
   getNECLShowersRejectedBarrel(): 2
   getNECLShowersRejectedFWD(): 0
+  getNECLTriggerCells(): 0
+  getNECLTriggerCellsBWD(): 0
+  getNECLTriggerCellsBarrel(): 0
+  getNECLTriggerCellsFWD(): 0
+  getNKLMDigitsMultiStrip(): 0
+  getNKLMDigitsMultiStripBWD(): 0
+  getNKLMDigitsMultiStripBarrel(): 0
+  getNKLMDigitsMultiStripFWD(): 0
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False

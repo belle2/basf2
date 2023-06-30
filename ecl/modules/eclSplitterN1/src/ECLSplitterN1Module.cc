@@ -108,7 +108,9 @@ void ECLSplitterN1Module::initialize()
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
+
+  // mDST dataobjects.
+  m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
 
   // Register relations (we probably dont need all, but keep them for now for debugging).
   m_eclShowers.registerRelationTo(m_eclConnectedRegions);

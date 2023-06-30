@@ -14,6 +14,12 @@ Test backwards compatibility for an mdst file produced with release-01-02-11.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-01-02-11:
+
+- EventLevelClusteringInfo
+  + nKLMDigitsMultiStrip
+  + nECLShowers
+  + nECLLocalMaximums
+  + nECLTriggerCells
 - EventMetaData:
   + isEndOfRun
 - EventLevelTrackingInfo:

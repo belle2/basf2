@@ -14,6 +14,9 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/TrackingMVAFilterParameters.h>
+
 #include <memory>
 #include <string>
 #include <cmath>
@@ -44,7 +47,8 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit MVA(std::unique_ptr<AVarSet> varSet,
                    const std::string& identifier = "",
-                   double defaultCut = NAN);
+                   double defaultCut = NAN,
+                   const std::string& dbObjectName = "");
 
       /// Default destructor
       virtual ~MVA();
@@ -66,11 +70,14 @@ namespace Belle2 {
       virtual double predict(const Object& obj);
 
     private:
-      /// The cut on the MVA output.
-      double m_param_cut;
-
       /// Database identifier of the expert or weight file name
-      std::string m_param_identifier;
+      std::string m_identifier = "";
+
+      /// The cut on the MVA output.
+      double m_cutValue;
+
+      /// Name of the DB payload
+      std::string m_DBPayloadName = "";
 
       /// MVA Expert to examine the object
       std::unique_ptr<MVAExpert> m_mvaExpert;
@@ -90,7 +97,8 @@ namespace Belle2 {
 
       /// Constructor of the filter.
       explicit MVAFilter(const std::string& defaultTrainingName = "",
-                         double defaultCut = NAN);
+                         double defaultCut = NAN,
+                         const std::string& defaultDBObjectName = "");
 
       /// Default destructor
       ~MVAFilter();

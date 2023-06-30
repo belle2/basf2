@@ -19,7 +19,7 @@
 """
 <header>
     <output>muon-KLMValidation.root</output>
-    <contact>martina.laurenza@roma3.infn.it</contact>
+    <contact>Laura.Salutari@uniroma3.it</contact>
     <description>Create events with 1 muon track for BKLM and EKLM validation.</description>
 </header>
 """

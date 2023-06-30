@@ -6,8 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/EclConfiguration.h>
+
+#include <algorithm>
 #include <math.h>
 
 using namespace Belle2;

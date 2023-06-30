@@ -102,7 +102,7 @@ def add_pxd_reconstruction(
         path,
         clusterName=None,
         digitsName=None,
-        usePXDClusterShapes=False,
+        usePXDClusterShapes=True,
         spacePointsName='PXDSpacePoints'):
     """
     Add the PXD reconstruction modules

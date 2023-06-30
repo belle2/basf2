@@ -24,6 +24,7 @@ import basf2
 VALIDATION_OUTPUT_FILE = 'FullTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
+basf2.conditions.prepend_testing_payloads('/afs/desy.de/user/g/giampi/b2tracking10/localdb/database.txt')
 
 basf2.set_random_seed(1337)
 
@@ -45,6 +46,7 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         "UseReassignedHits": True,
+        'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }
     #: tracks will be already fitted by
@@ -52,7 +54,7 @@ class Full(TrackingValidationRun):
     fit_tracks = False
     #: But we need to tell the validation module to use the fit information
     use_fit_information = True
-    #: do not create expert-level output histograms
+    #: do not create expert-level output histograms in dedicated folder but in the main folder
     use_expert_folder = False
     #: Include pulls in the validation output
     pulls = True

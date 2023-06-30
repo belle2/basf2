@@ -94,7 +94,8 @@ namespace Belle2 {
       SensitiveDetectorDebugHelper& debug = SensitiveDetectorDebugHelper::getInstance();
       debug.startTraversal(getSensorID(), traversal);
 #endif
-      bool save = traversal.getElectrons() >= m_minimumElectrons || m_seeNeutrons;
+      bool save = traversal.getElectrons() >= m_minimumElectrons || (m_seeNeutrons
+                  && (abs(traversal.getPDGCode()) == Const::neutron.getPDGCode()));
       if (save) {
         int trueHitIndex = -1;
         if (!m_onlyPrimaryTrueHits || traversal.isPrimary()) {

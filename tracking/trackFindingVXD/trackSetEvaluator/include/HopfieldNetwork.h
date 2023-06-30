@@ -10,9 +10,6 @@
 //basf2
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 
-//ROOT
-#include <TRandom.h>
-
 
 namespace Belle2 {
 
@@ -61,20 +58,5 @@ namespace Belle2 {
     float m_Tmin; /**< minimal temperature allowed */
     float m_cmax; /**< maximal change of weights between iterations */
 
-    //--- Structs to help simplify the process ------------------------------------------------------------------------
-    /** Wrap TRandom to be useable as a uniform random number generator with std algorithms like std::shuffle. */
-    struct TRandomWrapper {
-      /** Define the result type to be a normal unsigned int. */
-      typedef unsigned int result_type;
-
-      /** Minimum value returned by the random number generator. */
-      static constexpr result_type min() { return 0; }
-
-      /** Maximum value returned by the random number generator. */
-      static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-
-      /** Return a random value in the range [min(), max()]. */
-      result_type operator()() { return gRandom->Integer(max()); }
-    };
   };
 }

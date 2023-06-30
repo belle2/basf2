@@ -65,12 +65,17 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
            "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode", bool(false));
 
-  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
+  addParam("useDB", m_useDB, "if False, use configuration module parameters for grouping", bool(true));
 
   addParam("useSVDSpacePointSNRSelectionFunctionFor6Samples", m_useSVDSpacePointSNRSelectionFunctionFor6Samples,
            "Use SVDSpacePointSNRSelectionFunction to apply a selection on combinations of clusters in 6-sample DAQ mode", bool(false));
   addParam("useSVDSpacePointSNRSelectionFunctionFor3Samples", m_useSVDSpacePointSNRSelectionFunctionFor3Samples,
            "Use SVDSpacePointSNRSelectionFunction to apply a selection on combinations of clusters in 3-sample DAQ mode", bool(false));
+
+  addParam("useDBForSNR", m_useDBForSNR,
+           "if False, use configuration module parameters for SVDSPacePointSNRSelectionFunction",
+           bool(true));
+
 
 }
 

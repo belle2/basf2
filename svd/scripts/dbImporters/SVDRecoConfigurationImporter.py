@@ -75,11 +75,11 @@ class recoConfigurationImporter(basf2.Module):
 
         cutOnSampleSNRSpecificString = ""
         if snr_useOfSVDSpacePointSNRSelectionFunctionIn6Samples and snr_useOfSVDSpacePointSNRSelectionFunctionIn3Samples:
-            cutOnSampleSNRSpecificString = "_cutOnSampleSNRON"
+            cutOnSampleSNRSpecificString = "_cutOnSampleSNRFractionON"
         elif snr_useOfSVDSpacePointSNRSelectionFunctionIn6Samples:
-            cutOnSampleSNRSpecificString = "_6cutOnSampleSNRON"
+            cutOnSampleSNRSpecificString = "_cutOn6SampleSNRFractionON"
         elif snr_useOfSVDSpacePointSNRSelectionFunctionIn3Samples:
-            cutOnSampleSNRSpecificString = "_3cutOnSampleSNRON"
+            cutOnSampleSNRSpecificString = "_cutOn3SampleSNRFractionON"
 
         uniqueID += cutOnSampleSNRSpecificString
 

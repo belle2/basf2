@@ -32,7 +32,6 @@ from caf.utils import IoV
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import filter_by_max_events_per_run
 
-
 b2.set_log_level(b2.LogLevel.INFO)
 
 random.seed(42)
@@ -52,8 +51,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[],
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3"],
-                                   "max_events_per_run": 300000,
-                                   "max_events_per_file": 30000,
+                                   "max_events_per_run": 1000000,
+                                   "max_events_per_file":  30000,
                                    "isMC": False,
                                    "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],

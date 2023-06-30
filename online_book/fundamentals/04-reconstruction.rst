@@ -121,7 +121,7 @@ process. It would be impossible to describe it properly here. You can find more
 details in the Belle II physics book and there is also a paper describing `track
 finding at Belle II <https://arxiv.org/abs/2003.12466>`_
 
-What we can say that track finding and fitting requires a lot of computing time
+What we can say is that track finding and fitting requires a lot of computing time
 to find all the tracks in our events. As a matter of fact currently our tracking
 reconstruction takes about twice as long as the simulation of an event.
 

@@ -316,7 +316,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 
   int uBin(-1), vBin(-1);
   int binID = 0;
-  VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
+  VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();

@@ -80,7 +80,7 @@ namespace Belle2 {
             etaCP * Abar * cos(dm * t / (2 * EvtConst::c));
     }
 
-    vertex(amp);
+    setProb(abs2(amp));
 
     return;
   }

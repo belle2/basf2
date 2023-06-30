@@ -12,7 +12,6 @@
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
 #include <framework/database/DBObjPtr.h>
-
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace Belle2 {
@@ -99,7 +98,6 @@ void MVAExpert::Impl::beginRun()
       for (int iVar = 0; iVar < nExpectedVars; ++iVar) {
         std::string variableElementName = "variable" + std::to_string(iVar);
         std::string expectedName = weightfile->getElement<std::string>(variableElementName);
-
         auto itNamedVariable = std::find_if(m_allNamedVariables.begin(),
                                             m_allNamedVariables.end(),
         [expectedName](const Named<Float_t*>& namedVariable) {
@@ -160,9 +158,13 @@ double MVAExpert::Impl::predict()
 }
 
 /** PImpl Interface **/
+// Silence Doxygen which is complaining that "no matching class member found for"
+// But there should be a better way that I just don't know of / find
+//! @cond Doxygen_Suppress
 MVAExpert::MVAExpert(const std::string& identifier,
                      std::vector<Named<Float_t*> > namedVariables)
   : m_impl(std::make_unique<MVAExpert::Impl>(identifier, std::move(namedVariables)))
+//! @endcond
 {
 }
 

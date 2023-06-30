@@ -20,7 +20,6 @@
 #include <vector>
 #include <math.h>
 
-#include <pxd/utilities/PXDUtilities.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>

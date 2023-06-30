@@ -133,6 +133,7 @@ namespace Belle2 {
         std::string scaled = "scaled:" + std::to_string(*m_densityScale) + ":" + name;
         G4Material* scaledMat = findMaterial(scaled);
         if (!scaledMat) {
+          assert(mat);
           scaledMat = new G4Material(scaled, mat->GetDensity() * *m_densityScale, mat,
                                      mat->GetState(), mat->GetTemperature(), mat->GetPressure());
           m_materialCache.insert(scaled, scaledMat);
@@ -203,7 +204,11 @@ namespace Belle2 {
           G4Material* cmp = getMaterial(component.getName());
           if (!cmp) {
             B2ERROR("Cannot create material " << parameters.getName() << ": material " << component.getName() << " not found");
+#ifdef __clang_analyzer__
+            continue;
+#else
             return nullptr;
+#endif
           }
           mat->AddMaterial(cmp, component.getFraction());
         }

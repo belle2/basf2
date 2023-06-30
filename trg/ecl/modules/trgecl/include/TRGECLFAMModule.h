@@ -13,6 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 #include "trg/ecl/dataobjects/TRGECLFAMAna.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
@@ -100,6 +103,9 @@ namespace Belle2 {
     StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
     StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
     DBArray<TRGECLFAMPara> m_FAMPara; /**< FAM Parameters */
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
   };
 

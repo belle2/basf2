@@ -230,7 +230,7 @@ A helpful function to get common data files from the examples directory is
     :class: toggle solution
 
     .. literalinclude:: steering_files/010_first_steering_file.py
-        :linenos:
+        :language: python        
 
 In the solution to the last task we have added empty lines, some comments, and used shortcuts for the
 imports. This helps to give the script a better structure
@@ -284,7 +284,7 @@ having to change anything in the script itself.
     :class: toggle solution
 
     .. literalinclude:: steering_files/011_first_steering_file.py
-        :linenos:
+        :language: python        
 
 
 .. admonition:: Tip
@@ -401,7 +401,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
     :class: toggle solution
 
     .. literalinclude:: steering_files/012_first_steering_file.py
-        :linenos:
+        :language: python        
 
     In the solution we gave the electrons the label ``uncorrected``. This is
     already in anticipation of a future extension in which Bremsstrahlung
@@ -496,6 +496,7 @@ of the CDC (`thetaInCDCAcceptance`).
     .. literalinclude:: steering_files/013_first_steering_file.py
         :start-at: S10
         :end-at: E10 
+        :language: python        
 
 
 .. note:: Marker comments in the solution code
@@ -520,8 +521,8 @@ analysis software is the `ParticleCombiner`. It takes those particle lists and
 finds all **unique** combinations. The same particle can of course not be used
 twice, e.g. the two positive pions in :math:`D^0 \to K^- \pi^+ \pi^+ \pi^-`
 have to be different mdst track objects. However, all of this is taken care of
-internally. For multi-body decays like the one described above there, can
-easily be many multiple candidates, which share some particles but differ by
+internally. For multi-body decays like the one described above, there can
+easily be many multiple candidates which share some particles but differ by
 at least one final state particle.
 
 The wrapper function for the `ParticleCombiner` is
@@ -579,13 +580,14 @@ particles themselves need to be written in the decay string.
     .. literalinclude:: steering_files/013_first_steering_file.py
         :start-at: S20
         :end-at: E20
+        :language: python        
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :end-at: E30
-        :linenos:
+        :language: python        
 
 Writing out information to an ntuple
 ------------------------------------
@@ -643,7 +645,7 @@ mass.
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :linenos:
+        :language: python
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -677,7 +679,6 @@ happen to fulfill all your selection criteria.
     :class: toggle solution
 
     .. code-block:: python
-        :linenos:
 
         import matplotlib.pyplot as plt
         import uproot
@@ -755,7 +756,7 @@ definitely read it to understand at least the basics.
     :class: toggle solution
 
     .. literalinclude:: steering_files/014_first_steering_file.py
-        :linenos:
+        :language: python        
 
 .. --------------
 
@@ -776,7 +777,6 @@ definitely read it to understand at least the basics.
     :class: toggle solution
 
     .. code-block:: python
-        :linenos:
 
         import matplotlib.pyplot as plt
         import uproot
@@ -817,6 +817,7 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     .. literalinclude:: steering_files/015_first_steering_file.py
         :start-at: S40
         :end-at: E40
+        :language: python        
 
 Variable collections
 --------------------
@@ -861,7 +862,7 @@ documentation.
     :class: toggle solution
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :linenos:
+        :language: python
 
 .. hint::
 
@@ -953,6 +954,7 @@ or `matchedMC`.
     .. literalinclude:: steering_files/019_first_steering_file.py
         :start-at: S50
         :end-at: E50
+        :language: python        
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
     fashion.
@@ -975,12 +977,13 @@ or `matchedMC`.
     .. literalinclude:: steering_files/019_first_steering_file.py
         :start-at: S60
         :end-at: E60
+        :language: python        
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :linenos:
+        :language: python        
 
 .. hint::
 

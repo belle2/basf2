@@ -20,6 +20,7 @@ import b2biiConversion
 os.environ['PGUSER'] = 'g0db'
 # Add the necessary global tag
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+b2.conditions.append_globaltag('Legacy_CollisionAxisCMS_Belle')
 
 # Create path
 path = b2.create_path()

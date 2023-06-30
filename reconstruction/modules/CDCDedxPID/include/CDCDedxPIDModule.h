@@ -16,6 +16,8 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -32,6 +34,7 @@
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
 #include <vector>
@@ -100,7 +103,7 @@ namespace Belle2 {
     double sigmaCurve(double* x, const double* par, int version) const;
 
     /** calculate the predicted resolution using the parameterized resolution */
-    double getSigma(double dedx, double nhit, double sin) const;
+    double getSigma(double dedx, double nhit, double cos, double timereso) const;
 
     /** hadron saturation parameterization part 1 */
     double I2D(double cosTheta, double I) const;
@@ -124,11 +127,12 @@ namespace Belle2 {
      * @param predres   predicted resolution for each hypothesis
      * @param p         track momentum valid in the cdc
      * @param dedx      dE/dx value
-     * @param sin       track sin(theta)
+     * @param cos       track cos(theta)
      * @param nhit      number of hits used for this track
+     * @param timereso  time resolution from database
      * */
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
-                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
+                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double cos, int nhit, double timereso) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.
@@ -136,7 +140,6 @@ namespace Belle2 {
      * @param logl  array of log-likelihood to be modified
      * @param p     track momentum
      * @param dedx  dE/dx value
-     * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
     void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
 
@@ -164,13 +167,14 @@ namespace Belle2 {
 
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< time gain/reso DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< non-lineary ACD correction DB object */
-    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */

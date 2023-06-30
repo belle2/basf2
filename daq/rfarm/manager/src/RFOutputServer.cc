@@ -85,7 +85,7 @@ RFOutputServer::~RFOutputServer()
 
 // Functions hooked up by NSM2
 
-int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
+int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
   // Start processes from down stream
 
@@ -102,16 +102,16 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
                    string(m_conf->getconf("collector", "nodename"));
 
   // 1. Histogram Receiver
-  char* hrecv = m_conf->getconf("collector", "historecv", "script");
+  // char* hrecv = m_conf->getconf("collector", "historecv", "script");
   char* hport = m_conf->getconf("collector", "historecv", "port");
-  char* mapfile = m_conf->getconf("collector", "historecv", "mapfile");
+  // char* mapfile = m_conf->getconf("collector", "historecv", "mapfile");
   //  m_pid_hrecv = m_proc->Execute(hrecv, hport, mapfile);
 
   // 2. Histogram Relay
-  char* hrelay = m_conf->getconf("collector", "historelay", "script");
-  char* dqmdest = m_conf->getconf("dqmserver", "host");
-  char* dqmport = m_conf->getconf("dqmserver", "port");
-  char* interval = m_conf->getconf("collector", "historelay", "interval");
+  // char* hrelay = m_conf->getconf("collector", "historelay", "script");
+  // char* dqmdest = m_conf->getconf("dqmserver", "host");
+  // char* dqmport = m_conf->getconf("dqmserver", "port");
+  // char* interval = m_conf->getconf("collector", "historelay", "interval");
   //  m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
 
   // 3. Run sender / logger

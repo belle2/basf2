@@ -290,7 +290,12 @@ if __name__ == "__main__":
     import shutil
     parser = argparse.ArgumentParser(description="Plot summary of hit estimator")
     parser.add_argument('--resultdir', default="results", type=str, help='Put all plots in this directory')
+    parser.add_argument('--dbfile', default="./localdb/database.txt", type=str,
+                        help='Path to database.txt file for testing payloads')
     args = parser.parse_args()
+
+    # For quick testing before upload to db
+    b2.conditions.append_testing_payloads(args.dbfile)
 
     # Remove old stuff
     if os.path.isdir(os.getcwd() + '/' + args.resultdir):

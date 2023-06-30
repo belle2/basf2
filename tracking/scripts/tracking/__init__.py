@@ -624,14 +624,6 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
         'recoTrackListName': reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': roiName,
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)

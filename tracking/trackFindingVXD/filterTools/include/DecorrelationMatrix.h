@@ -96,6 +96,9 @@ namespace Belle2 {
     calculateDecorrMatrix(calculateCovMatrix(inputData), normalise);
   }
 
+  // Silence Doxygen which is complaining that "no matching class member found for"
+  // But there should be a better way that I just don't know of / find
+  //! @cond Doxygen_Suppress
   template<size_t Ndims>
   void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(const DecorrelationMatrix<Ndims>::MatrixT& covMatrix, bool normalise)
   {
@@ -112,6 +115,7 @@ namespace Belle2 {
       m_matrix = U;
     }
   }
+  //! @endcond
 
   template<size_t Ndims>
   std::vector<double> DecorrelationMatrix<Ndims>::decorrelate(const std::vector<double>& inputVec) const

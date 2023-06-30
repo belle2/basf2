@@ -217,7 +217,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -248,8 +248,11 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                   'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    training_data = basf2_mva.vector(train_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_spectators = basf2_mva.vector('daughterInvM(0, 1)', 'daughterInvM(0, 2)')

@@ -37,6 +37,30 @@ namespace Belle2 {
     /** Get the minimum entries required in the histograms */
     int getMinEntries() {return m_minEntries;}
 
+    /** Set the parameters of the two-line-based selection to remove background clusters from CoG3 calibration */
+    void setTwoLineSelectionParameters(bool linearCutsOnCoG3, float interceptUpperLine, float angularCoefficientUpperLine,
+                                       float interceptLowerLine,
+                                       float angularCoefficientLowerLine)
+    {
+      m_applyLinearCutsToRemoveBkg = linearCutsOnCoG3;
+      m_interceptUpperLine =  interceptUpperLine;
+      m_angularCoefficientUpperLine =  angularCoefficientUpperLine;
+      m_interceptLowerLine =  interceptLowerLine;
+      m_angularCoefficientLowerLine =  angularCoefficientLowerLine;
+    }
+
+    /** Get the parameters of the two-line-based selection to remove background clusters from CoG3 calibration */
+    std::vector<float> getTwoLineSelectionParameters()
+    {
+      std::vector<float> twoLineSelectionParameters;
+      twoLineSelectionParameters.push_back(m_interceptUpperLine);
+      twoLineSelectionParameters.push_back(m_angularCoefficientUpperLine);
+      twoLineSelectionParameters.push_back(m_interceptLowerLine);
+      twoLineSelectionParameters.push_back(m_angularCoefficientLowerLine);
+
+      return twoLineSelectionParameters;
+    }
+
   protected:
 
     /** Run algo on data */
@@ -59,5 +83,16 @@ namespace Belle2 {
     std::optional<float> m_previousRawTimeMeanL3V; /**< Raw CoG of the previous run*/
     float m_allowedTimeShift = 2.; /**< Allowed Raw CoGshift*/
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
+
+    // straight lines used to reject off-time clusters from 2D-distribution
+    bool m_applyLinearCutsToRemoveBkg = false; /**< if true turns on the selection to remove background clusters from CoG3 calibration*/
+    float m_interceptUpperLine =
+      -94.0; /**< Intercept of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+    float m_angularCoefficientUpperLine =
+      1.264; /**< Angular coefficient of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+    float m_interceptLowerLine =
+      -134.0; /**< Intercept of one of the two lines that define the signal region used in the CoG3 calibration (to remove background clusters) */
+    float m_angularCoefficientLowerLine =
+      1.264; /**< Angulat coefficienct of one of the two lines that define the signal region used in the CoG3 calibration (to remove bakground clusters) */
   };
 } // namespace Belle2

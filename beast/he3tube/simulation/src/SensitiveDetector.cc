@@ -84,7 +84,7 @@ namespace Belle2 {
       if (step->GetTrack()->GetCreatorProcess() != 0) {
         const  G4VProcess* creator = step->GetTrack()->GetCreatorProcess();
         CPName = creator->GetProcessName();
-        if (CPName.contains("Neutron")) neuProc = true;
+        if (G4StrUtil::contains(CPName, "Neutron")) neuProc = true;
       }
 
       //set TrackID

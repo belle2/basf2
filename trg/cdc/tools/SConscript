@@ -1,8 +1,11 @@
 Import('env')
 env['TOOLS_LIBS']['trg-cdc-deadch-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['trg-cdc-2d-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
+env['TOOLS_LIBS']['cdctriggerneuromlpdatadump'] = ['framework', 'trg_cdc_dataobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['trg-cdc-neurotrigger-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['NeuroTriggerMLPToTextfile'] = ['trg_cdc_dataobjects']
+env['TOOLS_LIBS']['trgcdc_neurorootconverter'] = ['framework', '$ROOT_LIBS', 'trg_cdc', 'trg_cdc_dataobjects', 'trg_cdc_dbobjects']
+env['TOOLS_LIBS']['cdctrigger_testparams'] = ['framework', '$ROOT_LIBS', 'trg_cdc', 'trg_cdc_dataobjects', 'trg_cdc_dbobjects']
 env['TOOLS_LIBS']['TRGCDCHoughMapping'] = ['trg_cdc','trg_trg']
 env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg_cdc','trg_trg']
 env['TOOLS_LIBS']['TRGCDCInterfaceBuilder'] = ['trg_cdc','trg_trg']

@@ -131,6 +131,7 @@ void KLMDigitizerModule::beginRun()
       (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Run1)) {  // for data up to and including 2022b
     m_CreateMultiStripDigitsByRun = m_CreateMultiStripDigits;
   }
+  B2INFO("KLM multi-strip digits are " << (m_CreateMultiStripDigitsByRun ? "" : "NOT") << " simulated");
 }
 
 /*

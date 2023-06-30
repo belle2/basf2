@@ -145,7 +145,7 @@ namespace Belle2 {
      */
     void setXStripMin(int strip)
     {
-      m_Strip[BKLMElementNumbers::c_PhiPlane] = strip;
+      m_Strip[0] = strip;
     }
 
     /**
@@ -154,7 +154,7 @@ namespace Belle2 {
      */
     void setXStripMax(int strip)
     {
-      m_LastStrip[BKLMElementNumbers::c_PhiPlane] = strip;
+      m_LastStrip[0] = strip;
     }
 
     /**
@@ -163,7 +163,7 @@ namespace Belle2 {
      */
     void setYStripMin(int strip)
     {
-      m_Strip[BKLMElementNumbers::c_ZPlane] = strip;
+      m_Strip[1] = strip;
     }
 
     /**
@@ -172,7 +172,7 @@ namespace Belle2 {
      */
     void setYStripMax(int strip)
     {
-      m_LastStrip[BKLMElementNumbers::c_ZPlane] = strip;
+      m_LastStrip[1] = strip;
     }
 
     /**

@@ -237,7 +237,7 @@ namespace Belle2 {
      */
     int getXStripMin() const
     {
-      return m_Strip[BKLMElementNumbers::c_PhiPlane];
+      return m_Strip[0];
     }
 
     /**
@@ -245,7 +245,7 @@ namespace Belle2 {
      */
     int getXStripMax() const
     {
-      return m_LastStrip[BKLMElementNumbers::c_PhiPlane];
+      return m_LastStrip[0];
     }
 
     /**
@@ -253,7 +253,7 @@ namespace Belle2 {
      */
     int getYStripMin() const
     {
-      return m_Strip[BKLMElementNumbers::c_ZPlane];
+      return m_Strip[1];
     }
 
     /**
@@ -261,7 +261,7 @@ namespace Belle2 {
      */
     int getYStripMax() const
     {
-      return m_LastStrip[BKLMElementNumbers::c_ZPlane];
+      return m_LastStrip[1];
     }
 
     /**

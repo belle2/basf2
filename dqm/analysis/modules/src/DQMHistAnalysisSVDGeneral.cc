@@ -215,10 +215,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
   m_cClusterOnTrack3Time_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrack3Time_L456V");
 
-//  m_cCluster3TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster3TimeGroupId");
-//  m_cCluster6TimeGroupId = new TCanvas("SVDAnalysis/c_Cluster6TimeGroupId");
-
-
   const int nY = 19;
   TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
                          "", "L4.x.1", "L4.x.2", "L4.x.3",
@@ -264,8 +260,8 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_h3OccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_h3OccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-//rtype = findHist("DQMInfo/rtype");
-  runtype = "physics"; //rtype ? rtype->GetTitle() : "";
+  rtype = findHist("DQMInfo/rtype");
+// runtype = "physics"; //rtype ? rtype->GetTitle() : "";
 
 }
 

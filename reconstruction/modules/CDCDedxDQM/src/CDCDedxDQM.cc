@@ -48,13 +48,13 @@ void CDCDedxDQMModule::defineHisto()
   hMeta->GetXaxis()->SetBinLabel(2, "nbhabha");
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
 
-  hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 250, 0., 2.5);
+  hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 100, 0., 2.5);
   hinjtimeHer = new TH2D("hinjtimeHer", ";injection time (#mu s); CDC dE/dx", 40, 0, 80e3, 50, 0, 2.5);
   hinjtimeLer = new TH2D("hinjtimeLer", ";injection time (#mu s); CDC dE/dx", 40, 0, 80e3, 50, 0, 2.5);
-  hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 800, 0.35, 20.35);
-  hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
-  hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
-  hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 100, -3.20, 3.20, 250, 0.00, 2.5);
+  hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 100, 0.05, 2.50, 100, 0.35, 10.0);
+  hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 50, 0, 200, 50, 0.00, 2.0);
+  hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 50, -1.00, 1.00, 50, 0.00, 2.5);
+  hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 50, -3.20, 3.20, 50, 0.00, 2.5);
   if (mmode != "basic") {
     hWires = new TH2F("hWires", "All Wires;", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
     hWires->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");

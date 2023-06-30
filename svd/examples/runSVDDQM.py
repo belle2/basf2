@@ -18,19 +18,13 @@
 #############################################################
 
 import basf2 as b2
-from basf2 import conditions as b2conditions
 from tracking import add_tracking_reconstruction
 from rawdata import add_unpackers
 
 # needed for some temporary issues with BKLMDisplacement payload
-b2conditions.override_globaltags()
-b2conditions.globaltags = [
-    'patch_main_release-08',
-    'patch_main_release-07',
-    'data_reprocessing_prompt',
-    'dp_recon_release6_patch',
-    'online',
-    'svd_basic']
+# b2conditions.override_globaltags()
+# b2conditions.globaltags = ['patch_main_release-08', 'patch_main_release-07',
+# 'data_reprocessing_prompt', 'dp_recon_release6_patch','online', 'svd_basic']
 
 # main main
 main = b2.create_path()

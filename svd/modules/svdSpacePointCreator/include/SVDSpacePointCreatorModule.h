@@ -16,6 +16,7 @@
 // svd
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 #include <svd/dbobjects/SVDSpacePointSNRFractionSelector.h>
+#include <svd/dbobjects/SVDTimeGroupingConfiguration.h>
 #include <svd/calibration/SVDHitTimeSelection.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -71,6 +72,7 @@ namespace Belle2 {
   protected:
 
     DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
+    DBObjPtr<SVDTimeGroupingConfiguration> m_groupingConfig; /**< SVDTimeGrouping Configuration payload*/
 
     // Data members
     std::string m_svdClustersName = "SVDClusters"; /**< SVDCluster collection name */
@@ -115,8 +117,6 @@ namespace Belle2 {
     bool m_useSVDGroupInfoIn6Sample = false; /**< Use SVD group info to reject combinations in 6-sample DAQ mode */
     bool m_useSVDGroupInfoIn3Sample = false; /**< Use SVD group info to reject combinations in 3-sample DAQ mode */
 
-    bool m_useDB = true;  /**< if true takes the configuration from the DB objects for grouping. */
-
     SVDNoiseCalibrations m_NoiseCal; /**< SVDNoise calibrations db object*/
 
     DBObjPtr<SVDSpacePointSNRFractionSelector>
@@ -129,5 +129,17 @@ namespace Belle2 {
     bool m_useSVDSpacePointSNRFractionFor3Samples =
       false; /**< Use SVDSpacePointSNRFractionSelector to reject combinations in 3-sample DAQ mode */
 
+    /**
+     * module parameter values for 6-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
+     */
+    SVDTimeGroupingParameters m_usedParsIn6Samples;
+
+    /**
+     * module parameter values for 3-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
+     */
+    SVDTimeGroupingParameters m_usedParsIn3Samples;
+
+    bool m_forceGroupingFromDB = true; /**< use the configuration from SVDRecConfiguration DB. */
+    bool m_useParamFromDB = true; /**< use the configuration from SVDTimeGroupingConfiguration DB. */
   };
 } // end namespace Belle2

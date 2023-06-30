@@ -28,6 +28,7 @@
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 namespace Belle2 {
 
@@ -172,6 +173,9 @@ namespace Belle2 {
 
     /** EventT0. */
     StoreObjPtr<EventT0> m_EventT0;
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_EventLevelClusteringInfo;
 
     /* BKLM member variables. */
 

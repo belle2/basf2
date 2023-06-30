@@ -45,10 +45,6 @@ namespace Belle2 {
      */
     DQMHistAnalysisKLMModule();
 
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLMModule();
 
     /**
      * Initializer.
@@ -89,12 +85,13 @@ namespace Belle2 {
      * @param[in]  sector       Sector.
      * @param[in]  index        Histogram Index.
      * @param[in]  histogram    Histogram.
+     * @param[in]  delta        Delta Histogram.
      * @param[in]  canvas       Canvas.
      * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector, int index,
-      TH1* histogram, TCanvas* canvas, TLatex& latex);
+      TH1* histogram, TH1* delta, TCanvas* canvas, TLatex& latex);
 
     /**
      * Process spatial 2D hits histograms for endcap.
@@ -106,17 +103,32 @@ namespace Belle2 {
       uint16_t section, TH2F* histogram, TCanvas* canvas);
 
     /**
+     * Process histogram containing the hit times.
+     * @param[in]  histName  Histogram name.
+     */
+    void processTimeHistogram(const std::string& histName);
+
+    /**
      * Process histogram containing the number of hits in plane.
      * @param[in]  histName  Histogram name.
      * @param[out] latex     TLatex to draw messages.
      */
     void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
+
     /**
      * Fill histogram containing masked channels per sector.
      * @param[in] histName  Histogram name.
      */
     void fillMaskedChannelsHistogram(const std::string& histName);
+
+    /**
+     * Scales and draws desired delta histogram for current canvas.
+     * @param[in] delta  Delta histogram.
+     * @param[in] histogram  Base histogram (for normalization).
+     * @param[in] canvas  Canvas with delta histogram.
+     */
+    void deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas);
 
     /** Number of processed events. */
     double m_ProcessedEvents;
@@ -138,6 +150,12 @@ namespace Belle2 {
 
     /** Minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessages;
+
+    /** Minimal number of entries for delta histogram update. */
+    double m_minEntries;
+
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;

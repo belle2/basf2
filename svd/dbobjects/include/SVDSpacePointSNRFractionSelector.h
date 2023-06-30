@@ -14,19 +14,19 @@
 namespace Belle2 {
 
   /** class to contain the cut on SVDSpacePoint */
-  class SVDSpacePointSNRSelectionFunction : public TObject {
+  class SVDSpacePointSNRFractionSelector : public TObject {
 
   public:
 
     /** constructor */
-    SVDSpacePointSNRSelectionFunction() {};
+    SVDSpacePointSNRFractionSelector() {};
 
     /** Determine if the combination of U and V clusters passes the SNR fraction cuts */
     bool passSNRFractionSelection(const std::vector<float>& inputU,
                                   const std::vector<float>& inputV) const
     {
       if (inputU.size() < 3 || inputV.size() < 3) {
-        B2ERROR("The size of input vectors for SVDSpacePointSNRSelectionFunction::passSNRFractionSelection is invalid. " <<
+        B2ERROR("The size of input vectors for SVDSpacePointSNRFractionSelector::passSNRFractionSelection is invalid. " <<
                 "It must be grater than 2, but inputU.size() = " << inputU.size() << ", inputV.size() = " << inputV.size());
         return false;
       }
@@ -71,6 +71,6 @@ namespace Belle2 {
     /** Max of SNR0 fraction that is used together with SNR1 fraction cut */
     float m_fraction0_max_for_fraction1_cut = 0.10;
 
-    ClassDef(SVDSpacePointSNRSelectionFunction, 1) /**< needed by root*/
+    ClassDef(SVDSpacePointSNRFractionSelector, 1) /**< needed by root*/
   };
 }

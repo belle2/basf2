@@ -104,7 +104,7 @@ namespace Belle2 {
      * @return true if the pixel is close to border
      */
     bool isCloseToBorder(int u, int v, int checkDistance);
-    /** Helper function to chheck if a defective (hot/dead) pixel is close
+    /** Helper function to check if a defective (hot/dead) pixel is close
      * @param u uID of the pixel of interest
      * @param v vID of the pixel of interest
      * @param checkDistance the distance along u/v
@@ -112,5 +112,64 @@ namespace Belle2 {
      * @return true if a defective pixel is found in matrix
      */
     bool isDefectivePixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
+
+    /** Helper function to check if one of the end pixels are at the edge of the sensor
+     * @param id VxdID of the sensor
+     * @param umin minimum uID within the cluster
+     * @param umax maximum uID within the cluster
+     * @return true if one of the end pixels are at the edge of the sensor
+     */
+    inline bool isClusterAtUEdge(VxdID id, unsigned int umin, unsigned int umax)
+    {
+      unsigned int uedgemax = Belle2::VXD::GeoCache::getInstance().get(id).getUCells();
+      return (umin == 0 || umax == (uedgemax - 1));
+    }
+    /** Helper function to check if one of the end pixels are at the edge of the sensor
+     * @param id VxdID of the sensor
+     * @param vmin minimum vID within the cluster
+     * @param vmax maximum vID within the cluster
+     * @return true if one of the end pixels are at the edge of the sensor
+     */
+    inline bool isClusterAtVEdge(VxdID id, unsigned int vmin, unsigned int vmax)
+    {
+      unsigned int vedgemax = Belle2::VXD::GeoCache::getInstance().get(id).getVCells();
+      return ((id.getSensorNumber() == 1 && vmax == (vedgemax - 1))
+              || (id.getSensorNumber() == 2 && vmin == 0));
+    }
+    /** Helper function to check if one of the end pixels are at the ladder joint
+     * @param id VxdID of the sensor
+     * @param vmin minimum vID within the cluster
+     * @param vmax maximum vID within the cluster
+     * @return true if one of the end pixels are at the ladder joint
+     */
+    inline bool isClusterAtLadderJoint(VxdID id, unsigned int vmin, unsigned int vmax)
+    {
+      unsigned int vedgemax = Belle2::VXD::GeoCache::getInstance().get(id).getVCells();
+      return ((id.getSensorNumber() == 2 && vmax == (vedgemax - 1))
+              || (id.getSensorNumber() == 1 && vmin == 0));
+    }
+
+    /** Function to return a bin number for equal sized binning in U
+     * @param id VxdID of the sensor
+     * @param uid uID of the pixel
+     * @param vid vID of the pixel
+     * @param nBinsU number of bins in U within a sensor
+     */
+    inline unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU)
+    {
+      unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().get(id).getUCells() / nBinsU;
+      return (uid * 4 + vid % 4) / drainsPerBin;
+    }
+    /** Function to return a bin number for equal sized binning in V
+     * @param id VxdID of the sensor
+     * @param vid vID of the pixel
+     * @param nBinsV number of bins in V within a sensor
+     */
+    inline unsigned short getBinV(VxdID id, unsigned int vid, unsigned short nBinsV)
+    {
+      unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().get(id).getVCells() / nBinsV;
+      return vid / rowsPerBin;
+    }
+
   } // end namespace PXD
 } // end namespace Belle2

@@ -62,6 +62,9 @@ namespace Belle2 {
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
 
+    /** additional plots flag*/
+    bool m_additionalPlots = false;
+
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
 
@@ -172,10 +175,36 @@ namespace Belle2 {
     TH1F** m_onlineZSstripCountU = nullptr;
     /** v strip count (online Zero Suppression */
     TH1F** m_onlineZSstripCountV = nullptr;
+
+    /** u strip count for 3 samples */
+    TH1F** m_strip3CountU = nullptr;
+    /** v strip count  for 3 samples*/
+    TH1F** m_strip3CountV = nullptr;
+    /** u strip count (online Zero Suppression)  for 3 samples*/
+    TH1F** m_onlineZSstrip3CountU = nullptr;
+    /** v strip count (online Zero Suppression  for 3 samples*/
+    TH1F** m_onlineZSstrip3CountV = nullptr;
+
+
+    /** u strip count for 6 samples */
+    TH1F** m_strip6CountU = nullptr;
+    /** v strip count  for 3 samples*/
+    TH1F** m_strip6CountV = nullptr;
+    /** u strip count (online Zero Suppression)  for 6 samples*/
+    TH1F** m_onlineZSstrip6CountU = nullptr;
+    /** v strip count (online Zero Suppression  for 6 samples*/
+    TH1F** m_onlineZSstrip6CountV = nullptr;
+
     /** u size */
     TH1F** m_clusterSizeU = nullptr;
     /** v size */
     TH1F** m_clusterSizeV = nullptr;
+
+    /** time group id for 3 samples**/
+    TH2F* m_cluster3TimeGroupId = nullptr;
+
+    /** time group id for 6 samples**/
+    TH2F* m_cluster6TimeGroupId = nullptr;
 
     /** u time */
     TH1F** m_clusterTimeU = nullptr;
@@ -193,6 +222,24 @@ namespace Belle2 {
     TH1F* m_clusterTimeU456 = nullptr;
     /** v Time of clusters for layer 4,5,6 sensors */
     TH1F* m_clusterTimeV456 = nullptr;
+
+    /** u Time of clusters for layer 3 sensors  for 3 samples*/
+    TH1F* m_cluster3TimeU3 = nullptr;
+    /** v Time of clusters for layer 3  sensors   for 3 samples*/
+    TH1F* m_cluster3TimeV3 = nullptr;
+    /** u Time of clusters for layer 4,5,6 sensors  for 3 samples*/
+    TH1F* m_cluster3TimeU456 = nullptr;
+    /** v Time of clusters for layer 4,5,6 sensors  for 3 samples*/
+    TH1F* m_cluster3TimeV456 = nullptr;
+
+    /** u Time of clusters for layer 3 sensors   for 6 samples*/
+    TH1F* m_cluster6TimeU3 = nullptr;
+    /** v Time of clusters for layer 3  sensors  for 6 samples*/
+    TH1F* m_cluster6TimeV3 = nullptr;
+    /** u Time of clusters for layer 4,5,6 sensors  for 6 samples */
+    TH1F* m_cluster6TimeU456 = nullptr;
+    /** v Time of clusters for layer 4,5,6 sensors  for 6 samples */
+    TH1F* m_cluster6TimeV456 = nullptr;
 
     //----------------------------------------------------------------
     // Additional histograms for out of ExpressReco

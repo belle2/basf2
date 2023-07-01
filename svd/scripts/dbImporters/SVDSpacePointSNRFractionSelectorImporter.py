@@ -12,9 +12,11 @@ import basf2
 
 
 class svdSpacePointSelectionFunctionImporter(basf2.Module):
+    '''SVD space point selection function importer module'''
 
     def initialize(self):
-        from ROOT import Belle2
+        '''Initialize'''
+        from ROOT import Belle2  # noqa
 
         payload = Belle2.SVDSpacePointSNRFractionSelector()
         payload.setFraction0Max(0.45)

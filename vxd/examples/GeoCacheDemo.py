@@ -55,7 +55,7 @@ class PrintPXDHits(b2.Module):
             if id != cluster.getSensorID():  # next sensor
                 id = cluster.getSensorID()
                 info = geoCache.get(id)
-                b2.B2INFO("Layer: {id.getLayerNumber()}, Ladder: {id.getLadderNumber()}, Sensor: {id.getSensorNumber()}")
+                b2.B2INFO(f"Layer: {id.getLayerNumber()}, Ladder: {id.getLadderNumber()}, Sensor: {id.getSensorNumber()}")
 
             r_local = ROOT.TVector3(cluster.getU(), cluster.getV(), 0)
             r_global = info.pointToGlobal(r_local)

@@ -51,6 +51,10 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("monopoleMagCharge", Monopoles::monopoleMagCharge,
            "Sets monopole magnetic charge hypothesis if it is in the pdgCodesToUseForFitting",
            Monopoles::monopoleMagCharge);
+
+  addParam("correctSeedCharge", m_correctSeedCharge,
+           "If true changes seed charge of the RecoTrack to the one found by the track fit (if it differs).",
+           m_correctSeedCharge);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -84,6 +88,7 @@ void BaseRecoFitterModule::event()
   unsigned int recoTrackCounter = 0;
 
   for (RecoTrack& recoTrack : m_recoTracks) {
+
     if (recoTrack.getNumberOfTotalHits() < 3) {
       B2WARNING("Genfit2Module: only " << recoTrack.getNumberOfTotalHits() << " were assigned to the Track! " <<
                 "This Track will not be fitted!");
@@ -99,21 +104,29 @@ void BaseRecoFitterModule::event()
     B2DEBUG(29, "Charge: " << recoTrack.getChargeSeed());
     B2DEBUG(29, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
+
+
+    bool flippedCharge = false;
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
       bool wasFitSuccessful;
+
       if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
         Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
 
-        if (wasFitSuccessful) { // charge flipping
+        // only flip if the current fit was the cardinal rep. and seed charge differs from fitted charge
+        if (m_correctSeedCharge && wasFitSuccessful
+            && recoTrack.getCardinalRepresentation() == recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting)) {  // charge flipping
           // If the charge after the fit (cardinal rep) is different from the seed charge,
           // we change the charge seed and refit the track
-          if (recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge()) {
-            recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
+          flippedCharge |= recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge();
+
+          // debug
+          if (flippedCharge) {
             B2DEBUG(29, "Refitting with opposite charge PDG: " << pdgCodeToUseForFitting);
-            wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
           }
+
         }  // end of charge flipping
 
       } else {
@@ -143,7 +156,17 @@ void BaseRecoFitterModule::event()
       } else {
         B2DEBUG(28, "       fit failed!");
       }
+    } // loop over hypothesis
+
+    // if charge has been flipped reset seed charge and refit all track representations
+    if (flippedCharge) {
+      recoTrack.setChargeSeed(-recoTrack.getChargeSeed());
+      // refit all present track representations
+      for (const auto  trackRep : recoTrack.getRepresentations()) {
+        Const::ChargedStable particleUsedForFitting(abs(trackRep->getPDG()));
+        fitter.fit(recoTrack, particleUsedForFitting);
+      }
     }
     recoTrackCounter += 1;
-  }
+  } // loop tracks
 }

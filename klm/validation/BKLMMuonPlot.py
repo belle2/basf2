@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,7 +18,7 @@
 """
 <header>
     <input>muon-KLMValidation.root</input>
-    <contact>martina.laurenza@roma3.infn.it</contact>
+    <contact>Laura.Salutari@uniroma3.it</contact>
     <description>Create validation plots for BKLM</description>
 </header>
 """
@@ -35,8 +34,8 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Martina Laurenza',
-                  'Email': 'martina.laurenza@roma3.infn.it'}
+CONTACT_PERSON = {'Name': 'Laura Salutari',
+                  'Email': 'Laura.Salutari@uniroma3.it'}
 
 
 def main():
@@ -65,10 +64,10 @@ def main():
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % args.input_file)
+        print(f'Could not load input file(s) {args.input_file}.')
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % args.input_file)
+        print(f'Data tree is empty or does not exist in file(s) {args.input_file}. Exit.')
         sys.exit(0)
 
     # open the output root file
@@ -91,7 +90,7 @@ def draw_bklmhists(file_chain):
     Draw the KLMHit2d-related distributions.
     """
 
-    contact = 'Martina Laurenza (martina.laurenza@roma3.infn.it)'
+    contact = 'Laura Salutari (Laura.Salutari@uniroma3.it)'
 
     # Shifter plots
 

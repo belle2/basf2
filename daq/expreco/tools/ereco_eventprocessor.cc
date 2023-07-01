@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
   char nodename[256 + 4];
   strcpy(nodename, "evp_");
-  gethostname(&nodename[4], sizeof(nodename));
+  gethostname(&nodename[4], sizeof(nodename) - 4);
 
   RFNSM nsm(nodename, evproc);
   nsm.AllocMem(conf.getconf("system", "nsmdata"));

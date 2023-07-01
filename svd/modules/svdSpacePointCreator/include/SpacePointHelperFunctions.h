@@ -89,7 +89,7 @@ namespace Belle2 {
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
                                        std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut,
-                                       const bool& useSVDGroupInfo)
+                                       const bool& useSVDGroupInfo, const int& numberOfSignalGroups, const bool& formSingleSignalGroup)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
@@ -116,9 +116,11 @@ namespace Belle2 {
           if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) { // indirect check if the clusterizer module is disabled
             bool isContinue = true;
             for (auto& uitem : uTimeGroupId) {
-              if (uitem < 0) continue;
-              for (auto& vitem : vTimeGroupId)
-                if (vitem >= 0 && uitem == vitem) { isContinue = false; break; }
+              if (uitem < 0 || uitem >= numberOfSignalGroups) continue;
+              for (auto& vitem : vTimeGroupId) {
+                if (vitem < 0 || vitem >= numberOfSignalGroups) continue;
+                if ((uitem == vitem) || formSingleSignalGroup) { isContinue = false; break; }
+              }
               if (!isContinue) break;
             }
 
@@ -262,7 +264,8 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName, const bool& useSVDGroupInfo)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName, const bool& useSVDGroupInfo,
+      const int& numberOfSignalGroups, const bool& formSingleSignalGroup)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -278,7 +281,8 @@ namespace Belle2 {
 
 
     for (auto& aSensor : activatedSensors)
-      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo);
+      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo,
+                               numberOfSignalGroups, formSingleSignalGroup);
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {

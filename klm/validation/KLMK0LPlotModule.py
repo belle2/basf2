@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ class KLMK0LPlotModule(basf2.Module):
 
     def __init__(self, output_file, evtgen, check_eklm):
         """Initialization."""
-        super(KLMK0LPlotModule, self).__init__()
+        super().__init__()
         #: True for evtgen events, false for particle gun.
         self.evtgen = evtgen
         #: Whether to check if cluster is in EKLM.

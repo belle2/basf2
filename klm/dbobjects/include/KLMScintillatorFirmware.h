@@ -78,7 +78,7 @@ namespace Belle2 {
     /** KLM scintillator firmware version. */
     enum FirmwareVersion m_FirmwareVersion {c_Invalid};
 
-    /** Class version, */
+    /** Class version. */
     ClassDef(KLMScintillatorFirmware, 1);
 
   };

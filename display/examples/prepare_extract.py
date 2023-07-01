@@ -53,10 +53,10 @@ main.add_module('EventInfoSetter')
 # WARNING: ECL cannot be displayed (will crash due to unsupported volumes)
 if phase2:
     main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
-    main.add_module('Geometry', components=['FANGS', 'CLAWS', 'PLUME', 'PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'])
+    main.add_module('Geometry', components=['FANGS', 'CLAWS', 'PLUME', 'PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'], useDB=False)
 else:
     main.add_module('Gearbox')
-    main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'])
+    main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'], useDB=False)
 
 display = b2.register_module('Display')
 
@@ -156,7 +156,7 @@ display.param('deleteVolumes', [
 # To use custom extract afterwards in Display, you need to set
 # fullGeometry=False (default) and change the path to the extract used (in your own display script):
 #
-display.param('customGeometryExtractPath', 'geometry_extract.root')
+# display.param('customGeometryExtractPath', 'geometry_extract.root')
 
 main.add_module(display)
 

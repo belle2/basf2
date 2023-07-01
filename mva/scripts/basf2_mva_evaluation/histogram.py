@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -40,7 +39,7 @@ def weighted_mean_and_std(x, w):
     return (mean, numpy.sqrt(var))
 
 
-class Histograms(object):
+class Histograms:
     """
     Extracts information from a pandas.DataFrame and stores it
     in a binned format.

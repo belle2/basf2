@@ -25,6 +25,7 @@ Untested method Track::getTrackFitResultsByName
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
 Untested method Track::setTrackTime
+Untested method V0::getFittedVertexPosition
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
@@ -88,9 +89,21 @@ Untested method ECLCluster::setdeltaL
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBWD
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBarrel
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeFWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBarrel
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsFWD
+Untested method EventLevelClusteringInfo::setNECLShowersBWD
+Untested method EventLevelClusteringInfo::setNECLShowersBarrel
+Untested method EventLevelClusteringInfo::setNECLShowersFWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBarrel
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedFWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBarrel
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsFWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
 Untested method KLMCluster::setErrorP
 Untested method KLMCluster::setErrorX
@@ -3727,10 +3740,26 @@ EventLevelClusteringInfo:
   getNECLCalDigitsOutOfTimeBWD(): 0
   getNECLCalDigitsOutOfTimeBarrel(): 1
   getNECLCalDigitsOutOfTimeFWD(): 0
+  getNECLLocalMaximums(): 0
+  getNECLLocalMaximumsBWD(): 0
+  getNECLLocalMaximumsBarrel(): 0
+  getNECLLocalMaximumsFWD(): 0
+  getNECLShowers(): 0
+  getNECLShowersBWD(): 0
+  getNECLShowersBarrel(): 0
+  getNECLShowersFWD(): 0
   getNECLShowersRejected(): 4
   getNECLShowersRejectedBWD(): 0
   getNECLShowersRejectedBarrel(): 1
   getNECLShowersRejectedFWD(): 3
+  getNECLTriggerCells(): 0
+  getNECLTriggerCellsBWD(): 0
+  getNECLTriggerCellsBarrel(): 0
+  getNECLTriggerCellsFWD(): 0
+  getNKLMDigitsMultiStrip(): 0
+  getNKLMDigitsMultiStripBWD(): 0
+  getNKLMDigitsMultiStripBarrel(): 0
+  getNKLMDigitsMultiStripFWD(): 0
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
@@ -8063,6 +8092,9 @@ Track#12:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#39
@@ -8072,6 +8104,9 @@ V0#0:
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#41
@@ -8081,6 +8116,9 @@ V0#1:
     -> Tracks#6
   getV0Hypothesis(): <type: gamma>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#43
@@ -8090,6 +8128,9 @@ V0#2:
     -> Tracks#6
   getV0Hypothesis(): <type: anti-Lambda0>
 V0#3:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#45
@@ -8099,6 +8140,9 @@ V0#3:
     -> Tracks#8
   getV0Hypothesis(): <type: K_S0>
 V0#4:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#47
@@ -8108,6 +8152,9 @@ V0#4:
     -> Tracks#8
   getV0Hypothesis(): <type: gamma>
 V0#5:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#49
@@ -12697,10 +12744,26 @@ EventLevelClusteringInfo:
   getNECLCalDigitsOutOfTimeBWD(): 0
   getNECLCalDigitsOutOfTimeBarrel(): 4
   getNECLCalDigitsOutOfTimeFWD(): 0
+  getNECLLocalMaximums(): 0
+  getNECLLocalMaximumsBWD(): 0
+  getNECLLocalMaximumsBarrel(): 0
+  getNECLLocalMaximumsFWD(): 0
+  getNECLShowers(): 0
+  getNECLShowersBWD(): 0
+  getNECLShowersBarrel(): 0
+  getNECLShowersFWD(): 0
   getNECLShowersRejected(): 2
   getNECLShowersRejectedBWD(): 0
   getNECLShowersRejectedBarrel(): 1
   getNECLShowersRejectedFWD(): 1
+  getNECLTriggerCells(): 0
+  getNECLTriggerCellsBWD(): 0
+  getNECLTriggerCellsBarrel(): 0
+  getNECLTriggerCellsFWD(): 0
+  getNKLMDigitsMultiStrip(): 0
+  getNKLMDigitsMultiStripBWD(): 0
+  getNKLMDigitsMultiStripBarrel(): 0
+  getNKLMDigitsMultiStripFWD(): 0
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
@@ -19805,10 +19868,26 @@ EventLevelClusteringInfo:
   getNECLCalDigitsOutOfTimeBWD(): 0
   getNECLCalDigitsOutOfTimeBarrel(): 3
   getNECLCalDigitsOutOfTimeFWD(): 0
+  getNECLLocalMaximums(): 0
+  getNECLLocalMaximumsBWD(): 0
+  getNECLLocalMaximumsBarrel(): 0
+  getNECLLocalMaximumsFWD(): 0
+  getNECLShowers(): 0
+  getNECLShowersBWD(): 0
+  getNECLShowersBarrel(): 0
+  getNECLShowersFWD(): 0
   getNECLShowersRejected(): 3
   getNECLShowersRejectedBWD(): 0
   getNECLShowersRejectedBarrel(): 2
   getNECLShowersRejectedFWD(): 1
+  getNECLTriggerCells(): 0
+  getNECLTriggerCellsBWD(): 0
+  getNECLTriggerCellsBarrel(): 0
+  getNECLTriggerCellsFWD(): 0
+  getNKLMDigitsMultiStrip(): 0
+  getNKLMDigitsMultiStripBWD(): 0
+  getNKLMDigitsMultiStripBarrel(): 0
+  getNKLMDigitsMultiStripFWD(): 0
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True

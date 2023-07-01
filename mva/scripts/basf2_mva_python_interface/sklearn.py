@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ except ImportError:
 import collections
 
 
-class State(object):
+class State:
     """
     SKLearn state
     """

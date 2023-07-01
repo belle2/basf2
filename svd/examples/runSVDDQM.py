@@ -73,11 +73,12 @@ b2.set_module_parameters(
     useSVDGroupInfoIn6Sample=False)
 
 # SVD grouping
-for moda in main.modules():
-    if moda.name() == 'SVDTimeGrouping':
-        moda.param("forceGroupingFromDB", False)
-        moda.param("isEnabledIn6Samples", True)
-        moda.param("isEnabledIn3Samples", True)
+b2.set_module_parameters(
+    main,
+    'SVDTimeGrouping',
+    forceGroupingFromDB=False,
+    isEnabledIn6Samples=True,
+    isEnabledIn3Samples=True)
 
 # ** SVD DATA FORMAT - available only with unpacking
 # -> it needs SVDDAQDiagnostic

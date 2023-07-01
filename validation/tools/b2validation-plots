@@ -64,10 +64,6 @@ def get_popular_revision_combinations(work_folder):
         revision for revision in available
         if revision.startswith("release") or revision.startswith("prerelease")
     ]
-    available_builds = [
-        revision for revision in available
-        if revision.startswith("build")
-    ]
     available_nightlies = [
         revision for revision in available
         if revision.startswith("nightly")
@@ -100,7 +96,6 @@ def get_popular_revision_combinations(work_folder):
 
         # Latest X + reference
         ["reference", atindex_or_none(available_releases, 0)],
-        ["reference", atindex_or_none(available_builds, 0)],
         ["reference", atindex_or_none(available_nightlies, 0)],
 
         # All latest + reference
@@ -108,7 +103,6 @@ def get_popular_revision_combinations(work_folder):
             None,
             [
                 atindex_or_none(available_releases, 0),
-                atindex_or_none(available_builds, 0),
                 atindex_or_none(available_nightlies, 0)
             ]
         ))),

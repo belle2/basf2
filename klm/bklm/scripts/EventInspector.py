@@ -612,17 +612,17 @@ class EventInspector(basf2.Module):
         self.hist_nHit1dPrompt = ROOT.TH1F('NHit1dPrompt', expRun + '# of prompt BKLMHit1ds', 100, -0.5, 99.5)
         #: histogram of the number of out-of-time scint BKLMHit1ds
         self.hist_nHit1dBkgd = ROOT.TH1F('NHit1dBkgd', expRun + '# of bkgd BKLMHit1ds', 100, -0.5, 99.5)
-        #: scatterplot of #Z BKLMHit1ds vs #Phi BKLMHit1ds
+        #: scatterplot of number of Z BKLMHit1ds vs number of Phi BKLMHit1ds
         self.hist_n1dPhiZ = ROOT.TH2F('NHit1dPhiZ',
                                       expRun + 'Distribution of BKLMHit1ds;# of phi BKLMHit1ds;# of z BKLMHit1ds',
                                       60, -0.5, 59.5, 60, -0.5, 59.5)
-        #: scatterplot of #Phi BKLMHit1ds vs sector
+        #: scatterplot of number of Phi BKLMHit1ds vs sector
         self.hist_multiplicityPhiBySector = ROOT.TH2F('Hit1dMultiplicityPhiBySector',
                                                       expRun + 'BKLMHit1d phi-strip multiplicity;' +
                                                       'sector # (0-7 = backward, 8-15 = forward);' +
                                                       '# of strips',
                                                       16, -0.5, 15.5, 8, -0.5, 7.5)
-        #: scatterplot of #Z BKLMHit1ds vs sector
+        #: scatterplot of number of Z BKLMHit1ds vs sector
         self.hist_multiplicityZBySector = ROOT.TH2F('Hit1dMultiplicityZBySector',
                                                     expRun + 'BKLMHit1d z-strip multiplicity;' +
                                                     'sector # (0-7 = backward, 8-15 = forward);' +

@@ -5,7 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <ecl/dataobjects/ECLWaveforms.h>
+#include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <gtest/gtest.h>
 

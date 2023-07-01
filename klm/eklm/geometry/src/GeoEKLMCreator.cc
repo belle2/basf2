@@ -1867,6 +1867,10 @@ bool EKLM::GeoEKLMCreator::detectorLayer(int section, int layer) const
 
 void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
 {
+// The clang analyzer reports correctly that this function has a memory leak
+// but that is by the design of user volumes in GEANT4 (create once, persist
+// to end of job).
+#ifndef __clang_analyzer__
   /* cppcheck-suppress variableScope */
   int i, j, imin, imax;
   /* cppcheck-suppress variableScope */
@@ -1941,6 +1945,7 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
       }
     }
   }
+#endif
 }
 
 void EKLM::GeoEKLMCreator::create(const GearDir& content,

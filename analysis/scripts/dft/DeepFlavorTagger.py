@@ -188,7 +188,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         # write the command line output for the extern teacher to a file
         extern_command = f'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' + \
                          f' --identifier {uniqueIdentifier} ' + \
-                         f"--variables \"{(chr(34) + ' ' + chr(34)).join(features)}\"  " + \
+                         '--variables "{}"  '.format('" "'.join(features)) + \
                          f'--target_variable {target}' + \
                          f' --method Python --training_fraction {train_valid_fraction}' + \
                          f" --config '{json.dumps(classifier_args)}' --framework tensorflow" + \

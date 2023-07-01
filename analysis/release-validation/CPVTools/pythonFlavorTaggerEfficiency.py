@@ -391,13 +391,13 @@ for method in methods:
         for category in usedCategories:
 
             exec(
-                f"{'hasTrueTarget' + category} = " +
+                f"hasTrueTarget + {category} = " +
                 "ROOT.RooRealVar('hasTrueTarget' + category, 'hasTrueTarget' + category, 0, -2.1, 1.1)"
             )
             # exec("%s = %s" % ("isTrueCategory" + category,
             # "ROOT.RooRealVar('isRightCategory' + category, 'isRightCategory' +
             # category, 0, -1.0, 1.1)"))
-            exec(f"{'argSet.add(hasTrueTarget'}" + category + ")")
+            exec(f"argSet.add(hasTrueTarget{category})")
 
         rooDataSet = ROOT.RooDataSet("data", "data", tree, argSet, "")
 
@@ -1332,17 +1332,17 @@ for iCategory in usedCategories:
     #
     with Quiet(ROOT.kError):
         exec(
-            f"{'hasTrueTarget' + iCategory} = " +
+            f"hasTrueTarget + {iCategory} = " +
             "ROOT.RooRealVar('hasTrueTarget' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
         )
         exec(
-            f"{'qp' + iCategory} = ROOT.RooRealVar('qp' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
+            f"qp + {iCategory} = ROOT.RooRealVar('qp' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
         )
         # exec("%s = %s" % ("isTrueCategory" + iCategory,
         # "ROOT.RooRealVar('isRightCategory' + iCategory, 'isRightCategory'
         # + iCategory, 0, -2.0, 1.1)"))
-        exec(f"{'argSet.add(hasTrueTarget'}" + iCategory + ")")
-        exec(f"{'argSet.add(qp'}" + iCategory + ")")
+        exec(f"argSet.add(hasTrueTarget{iCategory})")
+        exec(f"argSet.add(qp{iCategory})")
 rooDataSet = ROOT.RooDataSet("data", "data", tree, argSet, "")
 
 for category in usedCategories:

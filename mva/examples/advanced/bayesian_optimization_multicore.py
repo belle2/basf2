@@ -28,7 +28,7 @@ def f(x, general_options, process_number):
     calculates the AUC on the independent test sample.
     """
     g_options = general_options
-    g_options.m_identifier = "test{}.xml".format(process_number)
+    g_options.m_identifier = f"test{process_number}.xml"
     options = basf2_mva.FastBDTOptions()
     options.m_nTrees = int(x[0])
     options.m_nLevels = int(x[1])

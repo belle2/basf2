@@ -2,9 +2,6 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e-:all (e+:all)
 [INFO]    -> MDST source: Tracks
@@ -124,6 +121,9 @@
 [INFO] Will use track fit result for the most probable mass hypothesis in helix extrapolation.
 [INFO] Calculating track-based isolation variables for the decay string: K_S0:merged -> pi+ ^pi- using the reference ParticleList: pi+:all.
 [INFO] Will use track fit result for the most probable mass hypothesis in helix extrapolation.
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e-:ref (8+0) + e+:ref (8+0)
 [INFO]  - 2 = 11[0]

@@ -543,7 +543,7 @@ class ValidationRoot:
 
         # Sorting
 
-        # Order by categories (nightly, build, etc.) first, then by date
+        # Order by categories (nightly, release, etc.) first, then by date
         # A pure chronological order doesn't make sense, because we do not
         # have a linear history ((pre)releases branch off) and for the builds
         # the date corresponds to the build date, not to the date of the
@@ -560,7 +560,7 @@ class ValidationRoot:
             # Will later reverse order to bring items in the same category
             # in reverse chronological order, so the following list will have
             # the items in reverse order as well:
-            order = ["release", "prerelease", "build", "nightly"]
+            order = ["release", "prerelease", "nightly"]
             try:
                 index = order.index(category)
             except ValueError:

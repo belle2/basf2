@@ -18,6 +18,7 @@
 #pragma link C++ class Belle2::PXDClusterShapeClassifierPar+; // checksum=0xc13167d6, version=2
 #pragma link C++ class Belle2::PXDClusterPositionEstimatorPar+; // checksum=0x80b330bd, version=2
 #pragma link C++ class Belle2::PXDClusterShapeIndexPar+; // checksum=0xd9068b87, version=1
+#pragma link C++ class Belle2::PXDClusterPositionErrorPar+; // checksum=0xe73ee04b, version=8
 
 #pragma link C++ class Belle2::PXDDHHFirmwareVersionPar+; // checksum=0x4bd49ebe, version=1
 

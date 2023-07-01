@@ -117,6 +117,8 @@ void SVDClusterizerModule::beginRun()
       B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
     m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+    //m_timeRecoWith6SamplesAlgorithm = "ELS3";
+    //m_timeRecoWith3SamplesAlgorithm = "ELS3";
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
     m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getChargeRecoWith6Samples();
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();

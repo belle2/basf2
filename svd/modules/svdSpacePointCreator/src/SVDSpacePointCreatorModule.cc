@@ -64,16 +64,25 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode", bool(false));
   addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
            "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode", bool(false));
+  addParam("numberOfSignalGroups", m_usedParsIn6Samples.numberOfSignalGroups,
+           "Number of groups expected to contain the signal clusters.",
+           int(1));
+  addParam("formSingleSignalGroup", m_usedParsIn6Samples.formSingleSignalGroup,
+           "Form a single super-group.",
+           bool(false));
 
-  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
+  addParam("forceGroupingFromDB", m_forceGroupingFromDB, "use SVDRecoConfiguration from DB", bool(true));
+  addParam("useParamFromDB", m_useParamFromDB, "use SVDTimeGroupingConfiguration from DB", bool(true));
 
+  m_usedParsIn3Samples.numberOfSignalGroups  = m_usedParsIn6Samples.numberOfSignalGroups;
+  m_usedParsIn3Samples.formSingleSignalGroup = m_usedParsIn6Samples.formSingleSignalGroup;
 }
 
 
 
 void SVDSpacePointCreatorModule::beginRun()
 {
-  if (m_useDB) {
+  if (m_forceGroupingFromDB) {
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
     else
@@ -92,6 +101,26 @@ void SVDSpacePointCreatorModule::beginRun()
     B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 3-sample DAQ mode.");
   else
     B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
+
+  if (m_useParamFromDB &&
+      (m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample)) {
+
+    if (!m_recoConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+
+    TString timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+    TString timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
+
+    if (!m_groupingConfig.isValid())
+      B2FATAL("no valid configuration found for SVDTimeGrouping");
+    else
+      B2DEBUG(20, "SVDTimeGroupingConfiguration: from now on we are using " << m_groupingConfig->get_uniqueID());
+
+    m_usedParsIn6Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 6);
+    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith3SamplesAlgorithm, 3);
+  }
 }
 
 
@@ -135,6 +164,8 @@ void SVDSpacePointCreatorModule::event()
 {
 
   bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
+  int  numberOfSignalGroups;
+  bool formSingleSignalGroup;
   if (useSVDGroupInfo) {
     // first take Event Informations:
     StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
@@ -144,10 +175,15 @@ void SVDSpacePointCreatorModule::event()
     if (!eventinfo) B2ERROR("No SVDEventInfo!");
     int numberOfAcquiredSamples = eventinfo->getNSamples();
     // then use the respective parameters
-    if (numberOfAcquiredSamples == 6)
-      useSVDGroupInfo = m_useSVDGroupInfoIn6Sample;
-    else if (numberOfAcquiredSamples == 3)
-      useSVDGroupInfo = m_useSVDGroupInfoIn3Sample;
+    if (numberOfAcquiredSamples == 6) {
+      useSVDGroupInfo       = m_useSVDGroupInfoIn6Sample;
+      numberOfSignalGroups  = m_usedParsIn6Samples.numberOfSignalGroups;
+      formSingleSignalGroup = m_usedParsIn6Samples.formSingleSignalGroup;
+    } else if (numberOfAcquiredSamples == 3) {
+      useSVDGroupInfo       = m_useSVDGroupInfoIn3Sample;
+      numberOfSignalGroups  = m_usedParsIn3Samples.numberOfSignalGroups;
+      formSingleSignalGroup = m_usedParsIn3Samples.formSingleSignalGroup;
+    }
   }
 
   if (m_onlySingleClusterSpacePoints == true) {
@@ -155,7 +191,8 @@ void SVDSpacePointCreatorModule::event()
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo);
+                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo,
+                                  numberOfSignalGroups, formSingleSignalGroup);
   }
 
 

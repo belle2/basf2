@@ -57,18 +57,18 @@ void SVDTimeCalibrationCollectorModule::prepare()
   hEventT0NoSync.GetXaxis()->SetTitle("event_t0 (ns)");
   m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
 
-  m_hEventT0FromCDC = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
-  registerObject<TH1F>("hEventT0FromCDC", m_hEventT0FromCDC);
-  m_hEventT0FromCDCSync = new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100);
-  registerObject<TH1F>("hEventT0FromCDCSync", m_hEventT0FromCDCSync);
-  m_hRawTimeL3V = new TH1F("hRawTimeL3V", "RawTimeL3V", 150, 0, 150);
-  registerObject<TH1F>("hRawTimeL3V", m_hRawTimeL3V);
-  m_hRawTimeL3VFullRange = new TH1F("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150, 250);
-  registerObject<TH1F>("hRawTimeL3VFullRange", m_hRawTimeL3VFullRange);
+  // m_containerObject->m_TH1F["hEventT0FromCDC"] = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
+  // m_containerObject->m_TH1F["hEventT0FromCDCSync"] = new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100);
+  // m_containerObject->m_TH1F["hRawTimeL3V"] = new TH1F("hRawTimeL3V", "RawTimeL3V", 150, 0, 150);
+  // m_containerObject->m_TH1F["hRawTimeL3VFullRange"] = new TH1F("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150, 250);
+  m_containerObject->SetTH1FHistogram("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
+  m_containerObject->SetTH1FHistogram(new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100));
+  m_containerObject->SetTH1FHistogram(new TH1F("hRawTimeL3V", "RawTimeL3V", 150, 0, 150));
+  m_containerObject->SetTH1FHistogram(new TH1F("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150, 250));
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
-//  m_svdEI.isRequired(m_svdEventInfo);
+  //  m_svdEI.isRequired(m_svdEventInfo);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -76,13 +76,14 @@ void SVDTimeCalibrationCollectorModule::prepare()
     for (auto ladder : geoCache.getLadders(layer)) {
       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
         for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-          registerObject<TH2F>(m_hEventT0vsCoG->getHistogram(sensor, view)->GetName(), m_hEventT0vsCoG->getHistogram(sensor, view));
-          registerObject<TH1F>(m_hEventT0->getHistogram(sensor, view)->GetName(), m_hEventT0->getHistogram(sensor, view));
-          registerObject<TH1F>(m_hEventT0nosync->getHistogram(sensor, view)->GetName(), m_hEventT0nosync->getHistogram(sensor, view));
+          m_containerObject->m_TH2F[m_hEventT0vsCoG->getHistogram(sensor, view)->GetName()] = m_hEventT0vsCoG->getHistogram(sensor, view);
+          m_containerObject->m_TH1F[m_hEventT0->getHistogram(sensor, view)->GetName()] = m_hEventT0->getHistogram(sensor, view);
+          m_containerObject->m_TH1F[m_hEventT0nosync->getHistogram(sensor, view)->GetName()] = m_hEventT0nosync->getHistogram(sensor, view);
         }
       }
     }
   }
+  registerObject<SVDTimeCalibrationCollectorContainer>("SVDTimeCalibrationHistograms", m_containerObject);
 }
 
 void SVDTimeCalibrationCollectorModule::startRun()
@@ -98,9 +99,10 @@ void SVDTimeCalibrationCollectorModule::startRun()
           // std::string v = std::to_string(view);
           // std::string name = string("eventT0vsCog_")+s+string("_")+v;
           // registerObject<TH2F>(name.c_str(),m_hEventT0vsCoG->getHistogram(sensor, view));
-          getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(sensor, view)->GetName())->Reset();
-          getObjectPtr<TH1F>(m_hEventT0->getHistogram(sensor, view)->GetName())->Reset();
-          getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(sensor, view)->GetName())->Reset();
+          auto containerObject = getObjectPtr<SVDTimeCalibrationCollectorContainer>("SVDTimeCalibrationHistograms");
+          (containerObject->m_TH2F[m_hEventT0vsCoG->getHistogram(sensor, view)->GetName()])->Reset();
+          (containerObject->m_TH1F[m_hEventT0->getHistogram(sensor, view)->GetName()])->Reset();
+          (containerObject->m_TH1F[m_hEventT0nosync->getHistogram(sensor, view)->GetName()])->Reset();
         }
       }
     }
@@ -109,6 +111,8 @@ void SVDTimeCalibrationCollectorModule::startRun()
 
 void SVDTimeCalibrationCollectorModule::collect()
 {
+  auto containerObject = getObjectPtr<SVDTimeCalibrationCollectorContainer>("SVDTimeCalibrationHistograms");
+
   float eventT0 = 0;
   // Set the CDC event t0 value if it exists
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
@@ -116,7 +120,7 @@ void SVDTimeCalibrationCollectorModule::collect()
     // Set the CDC event t0 value for filling into the histogram
     // The most accurate CDC event t0 value is the last one in the list.
     eventT0 = evtT0List_CDC.back().eventT0;
-    getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(eventT0);
+    (containerObject->m_TH1F["hEventT0FromCDC"])->Fill(eventT0);
   } else {return;}
 
   if (!m_svdCls.isValid()) {
@@ -152,15 +156,15 @@ void SVDTimeCalibrationCollectorModule::collect()
 
       float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, m_svdCls[cl]->getFirstFrame());
 
-      getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
-      getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
-      getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
-      getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
+      (containerObject->m_TH2F[m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName()])->Fill(clTime, eventT0Sync);
+      (containerObject->m_TH1F[m_hEventT0->getHistogram(theVxdID, side)->GetName()])->Fill(eventT0Sync);
+      (containerObject->m_TH1F[m_hEventT0nosync->getHistogram(theVxdID, side)->GetName()])->Fill(eventT0);
+      (containerObject->m_TH1F["hEventT0FromCDCSync"])->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {
         if (clTime_ftsw >= m_minRawTimeForIoV && clTime_ftsw <= m_maxRawTimeForIoV) {
-          getObjectPtr<TH1F>("hRawTimeL3V")->Fill(clTime_ftsw);
+          (containerObject->m_TH1F["hRawTimeL3V"])->Fill(clTime_ftsw);
         }
-        getObjectPtr<TH1F>("hRawTimeL3VFullRange")->Fill(clTime_ftsw);
+        (containerObject->m_TH1F["hRawTimeL3VFullRange"])->Fill(clTime_ftsw);
       }
     }
   };

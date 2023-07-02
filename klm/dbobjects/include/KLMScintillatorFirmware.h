@@ -47,7 +47,7 @@ namespace Belle2 {
     /**
      * Specialized constructor.
      */
-    explicit KLMScintillatorFirmware(enum FirmwareVersion firmwareVersion) :
+    explicit KLMScintillatorFirmware(FirmwareVersion firmwareVersion) :
       m_FirmwareVersion{firmwareVersion}
     {
     };
@@ -60,7 +60,7 @@ namespace Belle2 {
     /**
      * Set firmware version.
      */
-    void setFirmwareVersion(enum FirmwareVersion firmwareVersion)
+    void setFirmwareVersion(FirmwareVersion firmwareVersion)
     {
       m_FirmwareVersion = firmwareVersion;
     };
@@ -68,7 +68,7 @@ namespace Belle2 {
     /**
      * Get firmware version.
      */
-    enum FirmwareVersion getFirmwareVersion() const
+    FirmwareVersion getFirmwareVersion() const
     {
       return m_FirmwareVersion;
     };
@@ -76,7 +76,7 @@ namespace Belle2 {
   private:
 
     /** KLM scintillator firmware version. */
-    enum FirmwareVersion m_FirmwareVersion {c_Invalid};
+    FirmwareVersion m_FirmwareVersion {c_Invalid};
 
     /** Class version. */
     ClassDef(KLMScintillatorFirmware, 1);

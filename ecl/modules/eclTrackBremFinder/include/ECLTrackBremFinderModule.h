@@ -8,10 +8,11 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/ModuleParam.templateDetails.h>
 
 namespace Belle2 {
   class ECLCluster;
@@ -59,29 +60,14 @@ namespace Belle2 {
     /**
      * Factor which is multiplied onto the cluster position error to check for matches
      */
-    double m_clusterAcceptanceFactor = 3.0f;
+    double m_clusterAcceptanceFactor = 10.0f;
 
     /**
      * Radii where virtual hits for the extrapolation will be generated
      * The default values are taken from bremsstrahlung studies
      * They represent the edge of the beampipe, the outer SVD wall and the inner CDC wall
      */
-    std::vector<float> m_virtualHitRadii = {1.05, 16.0};
-
-    /**
-     * Fraction of the tracks energy the ECL cluster has to possess to be considered for bremsstrahlung finding
-     */
-    double m_relativeClusterEnergy = 0.02f;
-
-    /**
-     * Minimal/Maximal number of CDC hits, the track has to possess to be considered for bremsstrahlung finding
-     */
-    std::tuple<unsigned int, unsigned int> m_requestedNumberOfCDCHits = {1, 100};
-
-    /**
-     * Cut on the electron probability (from pid) of track
-     */
-    float m_electronProbabilityCut = 0;
+    std::vector<float> m_virtualHitRadii = {};
 
     /**
      * Cut on the distance between the cluster position angle and the extrapolation angle

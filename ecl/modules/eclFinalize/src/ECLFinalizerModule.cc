@@ -63,7 +63,7 @@ void ECLFinalizerModule::initialize()
   m_eclShowers.isRequired(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
   m_eclCalDigits.isRequired(eclCalDigitArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore();
+  m_eventLevelClusteringInfo.isRequired();
   m_eventT0.isRequired();
 
   // Register relations.

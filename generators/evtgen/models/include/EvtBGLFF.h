@@ -62,6 +62,10 @@ private:
 
       Fitted values cited from
       R.Glattauer, etc. (Belle) Phys. Rev. D 93,032006 (2016).
+      a+0, a+1, a+2, a+3 : 0.0126, -0.094, 0.34, -0.1
+      a00, a01, a02, a03 : 0.0115, -0.057, 0.12, 0.4
+
+      NOTE : This is the default BGL model in Belle II.
 
       B -> D*lnu (l=e, mu):
       a_n, b_n (n = 0,1) and c_n (n = 0,1,2) are free coefficients of z expansion parametrization from

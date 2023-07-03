@@ -404,7 +404,7 @@ namespace Belle2 {
     std::pair<unsigned short int, unsigned short int> getClusterSizes(Belle2::SpacePoint* spacePoint, e_detTypes detType);
 
     /** get the position error of SpacePoints in local coordinates
-     * @retuns .first is U position error, .second is V position error
+     * @returns A pair of doubles. .first is U position error, .second is V position error
      */
     std::pair<double, double> getLocalError(Belle2::SpacePoint* spacePoint);
 

@@ -216,8 +216,6 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     geometry = register_module('Geometry', useDB=True)
     genFitExtrapolation = register_module('SetupGenfitExtrapolation')
     roiFinder = register_module('PXDROIFinder')
-    # roiFinder.param('tolerancePhi', 0.15)  # default: 0.15
-    # roiFinder.param('toleranceZ', 0.5)  # default 0.5
 
     main = create_path()
     main.add_module(gearbox)

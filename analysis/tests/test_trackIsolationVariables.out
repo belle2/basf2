@@ -2,9 +2,6 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is release-05-01-03
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e-:all (e+:all)
 [INFO]    -> MDST source: Tracks
@@ -92,9 +89,9 @@
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
-[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO] ParticleSelector: Lambda0:V0_ToFit
 [INFO]    -> With cuts  : 1.10 < M < 1.13
-[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO] ParticleSelector: Lambda0:V0_ToFit
 [INFO]    -> With cuts  : extraInfo(highQualityVertex)
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
@@ -113,7 +110,7 @@
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
-[INFO] ParticleSelector: K_S0:V0_MassWindow
+[INFO] ParticleSelector: K_S0:V0_ToFit
 [INFO]    -> With cuts  : 0.450 < M < 0.550
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
@@ -124,6 +121,9 @@
 [INFO] Will use track fit result for the most probable mass hypothesis in helix extrapolation.
 [INFO] Calculating track-based isolation variables for the decay string: K_S0:merged -> pi+ ^pi- using the reference ParticleList: pi+:all.
 [INFO] Will use track fit result for the most probable mass hypothesis in helix extrapolation.
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e-:ref (8+0) + e+:ref (8+0)
 [INFO]  - 2 = 11[0]
@@ -3560,7 +3560,7 @@
 [INFO]      o) pi_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.993889
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_S0:merged (0+8)
+[INFO]  ParticleList : K_S0:merged (0+9)
 [INFO]  - 160 = 310[0]
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 0.0646942
@@ -3764,7 +3764,41 @@
 [INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 22.2751
 [INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
 [INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.986105
-[INFO]  - 201 = 310[6]
+[INFO]  - 187 = 310[6]
+[INFO]      o) daughter indices = 42 43
+[INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
+[INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 3.7651
+[INFO]      o) pi_0_minET2ETDist_CDC_1_pi_all_1 = 5.27617
+[INFO]      o) pi_0_minET2ETDist_CDC_2_pi_all_1 = 6.48256
+[INFO]      o) pi_0_minET2ETDist_CDC_3_pi_all_1 = 1.41529
+[INFO]      o) pi_0_minET2ETDist_CDC_4_pi_all_1 = 6.997
+[INFO]      o) pi_0_minET2ETDist_CDC_5_pi_all_1 = 6.21494
+[INFO]      o) pi_0_minET2ETDist_CDC_6_pi_all_1 = 4.74644
+[INFO]      o) pi_0_minET2ETDist_CDC_7_pi_all_1 = 2.43015
+[INFO]      o) pi_0_minET2ETDist_CDC_8_pi_all_1 = 0.629972
+[INFO]      o) pi_0_minET2ETDist_ECL_0_pi_all_1 = 16.6508
+[INFO]      o) pi_0_minET2ETDist_ECL_1_pi_all_1 = 24.1556
+[INFO]      o) pi_0_minET2ETDist_KLM_0_pi_all_1 = 105.837
+[INFO]      o) pi_0_minET2ETDist_TOP_0_pi_all_1 = 6.75024
+[INFO]      o) pi_0_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.6
+[INFO]      o) pi_0_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.947506
+[INFO]      o) pi_1_minET2ETDist_ARICH_0_pi_all_1 = nan
+[INFO]      o) pi_1_minET2ETDist_CDC_0_pi_all_1 = 7.90381
+[INFO]      o) pi_1_minET2ETDist_CDC_1_pi_all_1 = 15.0135
+[INFO]      o) pi_1_minET2ETDist_CDC_2_pi_all_1 = 21.5983
+[INFO]      o) pi_1_minET2ETDist_CDC_3_pi_all_1 = 23.1585
+[INFO]      o) pi_1_minET2ETDist_CDC_4_pi_all_1 = 22.5238
+[INFO]      o) pi_1_minET2ETDist_CDC_5_pi_all_1 = 19.5847
+[INFO]      o) pi_1_minET2ETDist_CDC_6_pi_all_1 = 11.0272
+[INFO]      o) pi_1_minET2ETDist_CDC_7_pi_all_1 = 3.67913
+[INFO]      o) pi_1_minET2ETDist_CDC_8_pi_all_1 = 3.18384
+[INFO]      o) pi_1_minET2ETDist_ECL_0_pi_all_1 = 110.894
+[INFO]      o) pi_1_minET2ETDist_ECL_1_pi_all_1 = 134.826
+[INFO]      o) pi_1_minET2ETDist_KLM_0_pi_all_1 = 211.053
+[INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 22.2751
+[INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
+[INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.986105
+[INFO]  - 201 = 310[7]
 [INFO]      o) daughter indices = 44 46
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 4.77403
@@ -3798,7 +3832,7 @@
 [INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 62.4687
 [INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
 [INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.964691
-[INFO]  - 207 = 310[7]
+[INFO]  - 207 = 310[8]
 [INFO]      o) daughter indices = 44 47
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 4.77403
@@ -5865,10 +5899,10 @@
 [INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
 [INFO] [1;39mTarget particle list: K_S0:RD[0m
 [INFO] [1;39mCandidates before fit: 59[0m
-[INFO] [1;39mCandidates after fit:  53[0m
-[INFO] [1;39mA total of 6 candidates were removed during the fit.[0m
-[INFO] [1;39m89.8305% of candidates survived the fit.[0m
-[INFO] [1;39m10.1695% of candidates did not.[0m
+[INFO] [1;39mCandidates after fit:  56[0m
+[INFO] [1;39mA total of 3 candidates were removed during the fit.[0m
+[INFO] [1;39m94.9153% of candidates survived the fit.[0m
+[INFO] [1;39m5.08475% of candidates did not.[0m
 [INFO] [1;39mYou chose to drop all candidates with pValue < 0.[0m
 [INFO] [1;35m================================================================================[0m
 [INFO] [1;35m================================================================================[0m
@@ -5893,7 +5927,7 @@
 [INFO] [40;97m      (_)                 (_)                                                   [0m
 [INFO] [40;97m                                                                                [0m
 [INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
-[INFO] [1;39mTarget particle list: K_S0:V0_MassWindow[0m
+[INFO] [1;39mTarget particle list: K_S0:V0_ToFit[0m
 [INFO] [1;39mCandidates before fit: 1[0m
 [INFO] [1;39mCandidates after fit:  1[0m
 [INFO] [1;39mA total of 0 candidates were removed during the fit.[0m

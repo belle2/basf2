@@ -19,6 +19,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <Math/Vector4D.h>
+#include <TMath.h>
 
 #include <memory>
 

@@ -25,7 +25,7 @@ from b2test_utils import get_object_with_name, get_streamer_checksums
 EXPECTED_CHECKSUMS = {
     'Belle2::Const::DetectorSet': (1, 1222446098),
     'Belle2::ECLCluster': (15, 835771092),
-    'Belle2::EventLevelClusteringInfo': (1, 162935545),
+    'Belle2::EventLevelClusteringInfo': (4, 1906636092),
     'Belle2::EventLevelTrackingInfo': (2, 1667284927),
     'Belle2::EventMetaData': (4, 2999207747),
     'Belle2::FileMetaData': (10, 3436593892),
@@ -38,8 +38,8 @@ EXPECTED_CHECKSUMS = {
     'Belle2::SoftwareTriggerResult': (5, 241059817),
     'Belle2::TRGSummary': (7, 1658421299),
     'Belle2::Track': (6, 327743743),
-    'Belle2::TrackFitResult': (9, 2265212199),
-    'Belle2::V0': (3, 4006259140),
+    'Belle2::TrackFitResult': (10, 1213379524),
+    'Belle2::V0': (4, 422320450),
 }
 
 #: Object names part of mdst

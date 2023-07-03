@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -104,8 +103,8 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[1].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[2].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[3].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
-        self.assertEqual(particles[4].preCutConfig.userCut, '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09]'
-                         ' or [clusterReg == 3 and E > 0.16]] and isInRestOfEvent > 0.5')
+        self.assertEqual(particles[4].preCutConfig.userCut, '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.05]'
+                         ' or [clusterReg == 3 and E > 0.15]] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[6].preCutConfig.userCut, '0.4 < M < 0.6')
         self.assertEqual(particles[6].channels[2].preCutConfig.userCut, '0.4 < M < 0.6 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')

@@ -95,7 +95,7 @@ namespace Belle2 {
 
         return std::cos(motherMomentum.Angle(n));
 
-      }  else return std::numeric_limits<float>::quiet_NaN();
+      }  else return Const::doubleNaN;
 
     }
 
@@ -120,7 +120,7 @@ namespace Belle2 {
 
         return std::cos(motherMomentum.Angle(pGamma.Vect()));
 
-      }  else return std::numeric_limits<float>::quiet_NaN();
+      }  else return Const::doubleNaN;
 
     }
 
@@ -262,18 +262,18 @@ namespace Belle2 {
       }
 
       if (mother->getNDaughters() != 3)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       int iDau = std::lround(indices[0]);
       int jDau = std::lround(indices[1]);
 
       const Particle* iDaughter = mother->getDaughter(iDau);
       if (!iDaughter)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       const Particle* jDaughter = mother->getDaughter(jDau);
       if (!jDaughter)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PxPyPzEVector mother4Vector = mother->get4Vector();
       PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();

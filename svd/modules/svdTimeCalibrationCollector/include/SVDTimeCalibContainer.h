@@ -42,19 +42,6 @@ namespace Belle2 {
     ~SVDTimeCalibContainer()
     {
       std::cout << " SVDTimeCalibContainer destructor called " << std::endl;
-      // for (auto hist : m_TH1F)
-      //  m_TH1F[hist.first] = std::make_shared<TH1F>();
-      // for (auto hist : m_TH2F)
-      //  m_TH2F[hist.first] = std::make_shared<TH2F>();
-      // for (auto hist : m_TH1F)
-      //  hist.second->SetDirectory(0);
-      // for (auto hist : m_TH2F)
-      //  hist.second->SetDirectory(0);
-      // for (auto hist : m_TH1F)
-      //   if(hist.second) hist.second = nullptr;
-      // for (auto hist : m_TH2F)
-      //   if(hist.second) hist.second = nullptr;
-      writeCurrentObjects();
       m_TH1F.clear();
       m_TH2F.clear();
       if (fDirectory) {
@@ -73,18 +60,10 @@ namespace Belle2 {
       if (fDirectory) {
         fDirectory->Append(this);
       }
-      // for (auto hist : m_TH1F)
-      //  hist.second->SetDirectory(fDirectory);
-      // for (auto hist : m_TH2F)
-      //  hist.second->SetDirectory(fDirectory);
-      m_histoPath = fDirectory->GetPath();
-      m_histoPath.ReplaceAll("Collector_", "Collector_Histograms_");
-      std::cout << " m_histoPath " << m_histoPath << std::endl;
-      m_Dir = gDirectory->GetDirectory(m_histoPath.Data());
       for (auto hist : m_TH1F)
-        hist.second->SetDirectory(m_Dir);
+        hist.second->SetDirectory(fDirectory);
       for (auto hist : m_TH2F)
-        hist.second->SetDirectory(m_Dir);
+        hist.second->SetDirectory(fDirectory);
     }
 
     bool AddDirectoryStatus() { return fgAddDirectory; }
@@ -143,22 +122,6 @@ namespace Belle2 {
         hist.second->Merge(&list);
       }
     }
-
-    void writeCurrentObjects()
-    {
-      // TDirectory* dir = (new TDirectory("test","test"))->GetDirectory(m_histoPath);
-      // std::cout << " dir " << m_histoPath << " " << dir->GetPath() << std::endl;
-      m_Dir = gDirectory->GetDirectory(m_histoPath.Data());
-      std::cout << " m_Dir " << m_histoPath << " " << m_Dir->GetPath() << std::endl;
-      for (auto key : * (m_Dir->GetList())) {
-        std::cout << "Writing for " << key->GetName() << std::endl;
-        TNamed* objMemory = dynamic_cast<TNamed*>(m_Dir->FindObject(key->GetName()));
-        if (objMemory) {
-          m_Dir->WriteTObject(objMemory, key->GetName(), "Overwrite");
-        }
-      }
-    }
-
 
     bool fgAddDirectory = true;   ///<! Flag to add histograms to the directory
 

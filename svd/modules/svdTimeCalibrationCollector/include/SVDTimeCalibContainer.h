@@ -9,19 +9,15 @@
 #pragma once
 
 
-#include <string>
 #include <map>
-#include <memory>
+#include <iostream>
 
 #include "TNamed.h"
-// #include "TH1F.h"
-// #include "TH2F.h"
-// #include "TString.h"
-
-class TDirectory;
-class TH1F;
-class TH2F;
-class TString;
+#include "TDirectory.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TCollection.h"
+#include "TString.h"
 
 namespace Belle2 {
 
@@ -31,34 +27,149 @@ namespace Belle2 {
   class SVDTimeCalibContainer : public TNamed {
   public:
     /** Default Constructor */
-    SVDTimeCalibContainer(TString name, TString title);
-    ~SVDTimeCalibContainer();
+    SVDTimeCalibContainer(TString name = "name", TString title = "title")
+      : TNamed(name, title)
+    {
+      fDirectory = nullptr;
+
+      if (AddDirectoryStatus()) {
+        fDirectory = gDirectory;
+        if (fDirectory) {
+          fDirectory->Append(this, true);
+        }
+      }
+    }
+    ~SVDTimeCalibContainer()
+    {
+      std::cout << " SVDTimeCalibContainer destructor called " << std::endl;
+      // for (auto hist : m_TH1F)
+      //  m_TH1F[hist.first] = std::make_shared<TH1F>();
+      // for (auto hist : m_TH2F)
+      //  m_TH2F[hist.first] = std::make_shared<TH2F>();
+      // for (auto hist : m_TH1F)
+      //  hist.second->SetDirectory(0);
+      // for (auto hist : m_TH2F)
+      //  hist.second->SetDirectory(0);
+      // for (auto hist : m_TH1F)
+      //   if(hist.second) hist.second = nullptr;
+      // for (auto hist : m_TH2F)
+      //   if(hist.second) hist.second = nullptr;
+      writeCurrentObjects();
+      m_TH1F.clear();
+      m_TH2F.clear();
+      if (fDirectory) {
+        fDirectory->Remove(this);
+        fDirectory = nullptr;
+      }
+      std::cout << " SVDTimeCalibContainer destructor exited " << std::endl;
+    };
 
     /** Setter for directory  */
-    void SetDirectory(TDirectory* dir);
+    void SetDirectory(TDirectory* dir)
+    {
+      if (fDirectory == dir) return;
+      if (fDirectory) fDirectory->Remove(this);
+      fDirectory = dir;
+      if (fDirectory) {
+        fDirectory->Append(this);
+      }
+      // for (auto hist : m_TH1F)
+      //  hist.second->SetDirectory(fDirectory);
+      // for (auto hist : m_TH2F)
+      //  hist.second->SetDirectory(fDirectory);
+      m_histoPath = fDirectory->GetPath();
+      m_histoPath.ReplaceAll("Collector_", "Collector_Histograms_");
+      std::cout << " m_histoPath " << m_histoPath << std::endl;
+      m_Dir = gDirectory->GetDirectory(m_histoPath.Data());
+      for (auto hist : m_TH1F)
+        hist.second->SetDirectory(m_Dir);
+      for (auto hist : m_TH2F)
+        hist.second->SetDirectory(m_Dir);
+    }
 
     bool AddDirectoryStatus() { return fgAddDirectory; }
     void AddDirectory(bool add) { fgAddDirectory = add; }
 
-    void Reset();
+    void Reset()
+    {
+      for (auto hist : m_TH1F)
+        hist.second->Reset();
+      for (auto hist : m_TH2F)
+        hist.second->Reset();
+    }
 
-    TObject* Clone(const char* newname = "") const override;
-    void     Copy(TObject& hnew) const override;
+    void Copy(TObject& obj) const override
+    {
+      if (((SVDTimeCalibContainer&)obj).fDirectory) {
+        ((SVDTimeCalibContainer&)obj).fDirectory->Remove(&obj);
+        ((SVDTimeCalibContainer&)obj).fDirectory = nullptr;
+      }
+      TNamed::Copy(obj);
+      ((SVDTimeCalibContainer&)obj).m_TH1F = m_TH1F;
+      ((SVDTimeCalibContainer&)obj).m_TH2F = m_TH2F;
+      if (fgAddDirectory && gDirectory) {
+        gDirectory->Append(&obj);
+        ((SVDTimeCalibContainer&)obj).fDirectory = gDirectory;
+      } else
+        ((SVDTimeCalibContainer&)obj).fDirectory = nullptr;
+    }
 
-    void SetTH1FHistogram(TH1F* hist);
-    void SetTH2FHistogram(TH2F* hist);
+    TObject* Clone(const char* newname = "") const override
+    {
+      SVDTimeCalibContainer* obj = new SVDTimeCalibContainer(newname);
+      Copy(*obj);
+      if (newname && strlen(newname)) {
+        obj->SetName(newname);
+      }
+      return obj;
+    }
 
-    static bool fgAddDirectory;   ///<! Flag to add histograms to the directory
+    void Merge(TCollection* li)
+    {
+      Merge<TH1F>(li, m_TH1F);
+      Merge<TH2F>(li, m_TH2F);
+    }
+
+    template<class T>
+    void Merge(TCollection* li, std::map<TString, std::shared_ptr<T>> histMap)
+    {
+      for (auto hist : histMap) {
+        auto name = hist.second->GetName();
+        TList list;
+        list.SetOwner(false);
+        TIter next(li);
+        while (TObject* obj = next())
+          list.Add(obj->FindObject(name));
+        hist.second->Merge(&list);
+      }
+    }
+
+    void writeCurrentObjects()
+    {
+      // TDirectory* dir = (new TDirectory("test","test"))->GetDirectory(m_histoPath);
+      // std::cout << " dir " << m_histoPath << " " << dir->GetPath() << std::endl;
+      m_Dir = gDirectory->GetDirectory(m_histoPath.Data());
+      std::cout << " m_Dir " << m_histoPath << " " << m_Dir->GetPath() << std::endl;
+      for (auto key : * (m_Dir->GetList())) {
+        std::cout << "Writing for " << key->GetName() << std::endl;
+        TNamed* objMemory = dynamic_cast<TNamed*>(m_Dir->FindObject(key->GetName()));
+        if (objMemory) {
+          m_Dir->WriteTObject(objMemory, key->GetName(), "Overwrite");
+        }
+      }
+    }
+
+
+    bool fgAddDirectory = true;   ///<! Flag to add histograms to the directory
 
     /** All Histograms */
-    std::map<TString, TH1F*> m_TH1F; /**< 1D Histograms */
-    std::map<TString, TH2F*> m_TH2F; /**< 2D Histograms */
+    std::map<TString, std::shared_ptr<TH1F>> m_TH1F; /**< 1D Histograms */
+    std::map<TString, std::shared_ptr<TH2F>> m_TH2F; /**< 2D Histograms */
 
   private:
     TDirectory* fDirectory; /**< Pointer to directory holding this */
-    std::map<std::string, int> histoNames;
-    std::vector<TH1F*> histos;
-    int somevalue;
+    TDirectory* m_Dir;
+    TString m_histoPath;
 
     SVDTimeCalibContainer(const SVDTimeCalibContainer&) = delete;
     SVDTimeCalibContainer& operator=(const SVDTimeCalibContainer&) = delete;

@@ -59,19 +59,14 @@ void SVDTimeCalibrationCollectorModule::prepare()
   m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
 
   /** Container to store all the histograms */
-  // auto m_containerObject = std::make_shared<SVDTimeCalibContainer>();
-  auto m_containerObject = new SVDTimeCalibContainer("SVDCalibHistos", "SVDCalibHistos");
-  // SVDTimeCalibContainer* m_containerObject;
-  // m_containerObject->SetDirectory(0);
+  auto containerObject = new SVDTimeCalibContainer("SVDCalibHistos", "SVDCalibHistos");
 
-  // m_containerObject->m_TH1F["hEventT0FromCDC"] = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
-  // m_containerObject->m_TH1F["hEventT0FromCDCSync"] = new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100);
-  // m_containerObject->m_TH1F["hRawTimeL3V"] = new TH1F("hRawTimeL3V", "RawTimeL3V", 150, 0, 150);
-  // m_containerObject->m_TH1F["hRawTimeL3VFullRange"] = new TH1F("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150, 250);
-  m_containerObject->SetTH1FHistogram(new TH1F("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100));
-  m_containerObject->SetTH1FHistogram(new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100));
-  m_containerObject->SetTH1FHistogram(new TH1F("hRawTimeL3V", "RawTimeL3V", 150, 0, 150));
-  m_containerObject->SetTH1FHistogram(new TH1F("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150, 250));
+  containerObject->m_TH1F["hEventT0FromCDC"] = std::make_shared<TH1F>("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
+  containerObject->m_TH1F["hEventT0FromCDCSync"] = std::make_shared<TH1F>("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100,
+                                                   100);
+  containerObject->m_TH1F["hRawTimeL3V"] = std::make_shared<TH1F>("hRawTimeL3V", "RawTimeL3V", 150, 0, 150);
+  containerObject->m_TH1F["hRawTimeL3VFullRange"] = std::make_shared<TH1F>("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150,
+                                                    250);
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
@@ -83,14 +78,17 @@ void SVDTimeCalibrationCollectorModule::prepare()
     for (auto ladder : geoCache.getLadders(layer)) {
       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
         for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-          m_containerObject->m_TH2F[m_hEventT0vsCoG->getHistogram(sensor, view)->GetName()] = m_hEventT0vsCoG->getHistogram(sensor, view);
-          m_containerObject->m_TH1F[m_hEventT0->getHistogram(sensor, view)->GetName()] = m_hEventT0->getHistogram(sensor, view);
-          m_containerObject->m_TH1F[m_hEventT0nosync->getHistogram(sensor, view)->GetName()] = m_hEventT0nosync->getHistogram(sensor, view);
+          containerObject->m_TH2F[m_hEventT0vsCoG->getHistogram(sensor,
+                                                                view)->GetName()] = std::make_shared<TH2F>(*m_hEventT0vsCoG->getHistogram(sensor, view));
+          containerObject->m_TH1F[m_hEventT0->getHistogram(sensor,
+                                                           view)->GetName()] = std::make_shared<TH1F>(*m_hEventT0->getHistogram(sensor, view));
+          containerObject->m_TH1F[m_hEventT0nosync->getHistogram(sensor,
+                                                                 view)->GetName()] = std::make_shared<TH1F>(*m_hEventT0nosync->getHistogram(sensor, view));
         }
       }
     }
   }
-  registerObject<SVDTimeCalibContainer>("SVDCalibHistos", m_containerObject);
+  registerObject<SVDTimeCalibContainer>("SVDCalibHistos", containerObject);
 }
 
 void SVDTimeCalibrationCollectorModule::startRun()

@@ -60,7 +60,7 @@ void SVDTimeCalibrationCollectorModule::prepare()
 
   /** Container to store all the histograms */
   // auto m_containerObject = std::make_shared<SVDTimeCalibContainer>();
-  auto m_containerObject = new SVDTimeCalibContainer();
+  auto m_containerObject = new SVDTimeCalibContainer("SVDCalibHistos", "SVDCalibHistos");
   // SVDTimeCalibContainer* m_containerObject;
   // m_containerObject->SetDirectory(0);
 
@@ -96,6 +96,8 @@ void SVDTimeCalibrationCollectorModule::prepare()
 void SVDTimeCalibrationCollectorModule::startRun()
 {
 
+  auto containerObject = getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos");
+
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
@@ -106,10 +108,9 @@ void SVDTimeCalibrationCollectorModule::startRun()
           // std::string v = std::to_string(view);
           // std::string name = string("eventT0vsCog_")+s+string("_")+v;
           // registerObject<TH2F>(name.c_str(),m_hEventT0vsCoG->getHistogram(sensor, view));
-          // auto containerObject = getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos");
-          (getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos")->m_TH2F[m_hEventT0vsCoG->getHistogram(sensor, view)->GetName()])->Reset();
-          (getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos")->m_TH1F[m_hEventT0->getHistogram(sensor, view)->GetName()])->Reset();
-          (getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos")->m_TH1F[m_hEventT0nosync->getHistogram(sensor, view)->GetName()])->Reset();
+          (containerObject->m_TH2F[m_hEventT0vsCoG->getHistogram(sensor, view)->GetName()])->Reset();
+          (containerObject->m_TH1F[m_hEventT0->getHistogram(sensor, view)->GetName()])->Reset();
+          (containerObject->m_TH1F[m_hEventT0nosync->getHistogram(sensor, view)->GetName()])->Reset();
         }
       }
     }
@@ -118,6 +119,7 @@ void SVDTimeCalibrationCollectorModule::startRun()
 
 void SVDTimeCalibrationCollectorModule::collect()
 {
+
   auto containerObject = getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos");
 
   float eventT0 = 0;
@@ -127,7 +129,7 @@ void SVDTimeCalibrationCollectorModule::collect()
     // Set the CDC event t0 value for filling into the histogram
     // The most accurate CDC event t0 value is the last one in the list.
     eventT0 = evtT0List_CDC.back().eventT0;
-    (containerObject->m_TH1F["hEventT0FromCDC"])->Fill(eventT0);
+    (getObjectPtr<SVDTimeCalibContainer>("SVDCalibHistos")->m_TH1F["hEventT0FromCDC"])->Fill(eventT0);
   } else {return;}
 
   if (!m_svdCls.isValid()) {

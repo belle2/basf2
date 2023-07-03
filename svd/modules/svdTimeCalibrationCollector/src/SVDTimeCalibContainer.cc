@@ -8,26 +8,22 @@
 
 #include <svd/modules/svdTimeCalibrationCollector/SVDTimeCalibContainer.h>
 
+#include "TDirectory.h"
+#include "TH1F.h"
+#include "TH2F.h"
+
+#include <iostream>
+
 using namespace Belle2;
 
 
 
 bool SVDTimeCalibContainer::fgAddDirectory = true;
 
-SVDTimeCalibContainer::SVDTimeCalibContainer()
-/* : // m_TH1F({}) */
-/* // , m_TH2F({}) */
-/* // , */
-// /* m_name("name") */ {
-// for (int ij=0;ij<500;ij++) {
-//  m_TH1F[TString::Format("%i",ij)] = new TH1F();
-//  m_TH2F[TString::Format("%i",ij)] = new TH2F();
-// }
+SVDTimeCalibContainer::SVDTimeCalibContainer(TString name = "name", TString title = "title")
+  : TNamed(name, title)
 {
-  fDirectory = 0;
-
-  histoNames["Surya"] = 0;
-  histoNames["Chandrani"] = 1;
+  fDirectory = nullptr;
 
   if (AddDirectoryStatus()) {
     fDirectory = gDirectory;
@@ -37,30 +33,80 @@ SVDTimeCalibContainer::SVDTimeCalibContainer()
   }
 }
 
+SVDTimeCalibContainer::~SVDTimeCalibContainer()
+{
+  // for (auto hist : m_TH1F)
+  //   delete hist.second;
+  // for (auto hist : m_TH2F)
+  //   delete hist.second;
+  // if (fDirectory) {
+  //   fDirectory->Remove(this);
+  //   fDirectory = nullptr;
+  // }
+}
+
 
 void SVDTimeCalibContainer::SetDirectory(TDirectory* dir)
 {
-  // for (auto hist : m_TH1F)
-  //  hist.second->SetDirectory(dir);
-  // for (auto hist : m_TH2F)
-  //  hist.second->SetDirectory(dir);
   if (fDirectory == dir) return;
   if (fDirectory) fDirectory->Remove(this);
   fDirectory = dir;
   if (fDirectory) {
     fDirectory->Append(this);
   }
+  for (auto hist : m_TH1F)
+    hist.second->SetDirectory(fDirectory);
+  for (auto hist : m_TH2F)
+    hist.second->SetDirectory(fDirectory);
 }
 
 
 
 void SVDTimeCalibContainer::Reset()
 {
-  // m_TH1F.clear();
-  // m_TH2F.clear();
-  /* m_name = "name"; */
   for (auto hist : m_TH1F)
     hist.second->Reset();
   for (auto hist : m_TH2F)
     hist.second->Reset();
+}
+
+
+TObject* SVDTimeCalibContainer::Clone(const char* newname) const
+{
+  SVDTimeCalibContainer* obj = new SVDTimeCalibContainer(newname);
+  Copy(*obj);
+
+  if (newname && strlen(newname)) {
+    obj->SetName(newname);
+  }
+  return obj;
+}
+
+void SVDTimeCalibContainer::Copy(TObject& obj) const
+{
+  if (((SVDTimeCalibContainer&)obj).fDirectory) {
+    ((SVDTimeCalibContainer&)obj).fDirectory->Remove(&obj);
+    ((SVDTimeCalibContainer&)obj).fDirectory = nullptr;
+  }
+  TNamed::Copy(obj);
+  ((SVDTimeCalibContainer&)obj).m_TH1F = m_TH1F;
+  ((SVDTimeCalibContainer&)obj).m_TH2F = m_TH2F;
+  if (fgAddDirectory && gDirectory) {
+    gDirectory->Append(&obj);
+    ((SVDTimeCalibContainer&)obj).fDirectory = gDirectory;
+  } else
+    ((SVDTimeCalibContainer&)obj).fDirectory = nullptr;
+}
+
+void SVDTimeCalibContainer::SetTH1FHistogram(TH1F* hist)
+{
+  // hist->SetDirectory(fDirectory);
+  m_TH1F[TString(hist->GetName())] = hist;
+}
+
+
+void SVDTimeCalibContainer::SetTH2FHistogram(TH2F* hist)
+{
+  // hist->SetDirectory(fDirectory);
+  m_TH2F[hist->GetName()] = hist;
 }

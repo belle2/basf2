@@ -14,11 +14,14 @@
 #include <memory>
 
 #include "TNamed.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TString.h"
-#include "TDirectory.h"
+// #include "TH1F.h"
+// #include "TH2F.h"
+// #include "TString.h"
 
+class TDirectory;
+class TH1F;
+class TH2F;
+class TString;
 
 namespace Belle2 {
 
@@ -28,8 +31,8 @@ namespace Belle2 {
   class SVDTimeCalibContainer : public TNamed {
   public:
     /** Default Constructor */
-    SVDTimeCalibContainer();
-    ~SVDTimeCalibContainer() {}
+    SVDTimeCalibContainer(TString name, TString title);
+    ~SVDTimeCalibContainer();
 
     /** Setter for directory  */
     void SetDirectory(TDirectory* dir);
@@ -39,25 +42,11 @@ namespace Belle2 {
 
     void Reset();
 
-    // void SetTH1FHistogram(TString name, TString title, int bins, double xmin, double xmax)
-    // {
-    //   m_TH1F[name] = new TH1F(name, title, bins, xmin, xmax);
-    // }
-    void SetTH1FHistogram(TH1F* hist)
-    {
-      somevalue = 0;
-      histoNames["Surya"] = 5;
-      // hist->SetDirectory(0);
-      // histoNames.emplace(std::make_pair(hist->GetName(), 2));
-      // histos.push_back(hist);
-      m_TH1F[TString(hist->GetName())] = hist;
-    }
+    TObject* Clone(const char* newname = "") const override;
+    void     Copy(TObject& hnew) const override;
 
-    void SetTH2FHistogram(TH2F* hist)
-    {
-      // hist->SetDirectory(0);
-      m_TH2F[hist->GetName()] = hist;
-    }
+    void SetTH1FHistogram(TH1F* hist);
+    void SetTH2FHistogram(TH2F* hist);
 
     static bool fgAddDirectory;   ///<! Flag to add histograms to the directory
 
@@ -66,11 +55,13 @@ namespace Belle2 {
     std::map<TString, TH2F*> m_TH2F; /**< 2D Histograms */
 
   private:
-    TDirectory* fDirectory; /**< Pointer to directory holding this histogram */
+    TDirectory* fDirectory; /**< Pointer to directory holding this */
     std::map<std::string, int> histoNames;
     std::vector<TH1F*> histos;
     int somevalue;
 
+    SVDTimeCalibContainer(const SVDTimeCalibContainer&) = delete;
+    SVDTimeCalibContainer& operator=(const SVDTimeCalibContainer&) = delete;
   };
 
 } // end namespace Belle2

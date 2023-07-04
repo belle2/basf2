@@ -12,7 +12,9 @@
 
 #include <TF1.h>
 #include <TProfile.h>
+#include <TH1F.h>
 #include <TH2F.h>
+#include <TH3F.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
 #include <TString.h>
@@ -71,6 +73,10 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
   m_tree->Branch("ndf", &ndf, "ndf/I");
   m_tree->Branch("p", &p, "p/F");
 
+  auto __hEventT0vsCoG__ = getObjectPtr<TH3F>("__hEventT0vsCoG__");
+  auto __hEventT0__ = getObjectPtr<TH2F>("__hEventT0__");
+  auto __hEventT0NoSync__ = getObjectPtr<TH2F>("__hEventT0NoSync__");
+
   for (int layer = 0; layer < 4; layer++) {
     layer_num = layer + 3;
     for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
@@ -81,9 +87,12 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           char side = 'U';
           if (view == 0)
             side = 'V';
-          auto hEventT0vsELS = getObjectPtr<TH2F>(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          TString binLabel = TString::Format("L%iL%iS%i%c", layer, ladder, sensor, side);
+          int sensorBin = __hEventT0vsCoG__->GetZaxis()->FindBin(binLabel);
+          __hEventT0vsCoG__->GetZaxis()->SetRange(sensorBin, sensorBin);
+          auto hEventT0vsELS  = (TH2D*)__hEventT0vsCoG__->Project3D("yx");
+          auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", sensorBin, sensorBin);
+          auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", sensorBin, sensorBin);
           B2INFO("Histogram: " << hEventT0vsELS->GetName() <<
                  " Entries (n. clusters): " << hEventT0vsELS->GetEntries());
           if (layer_num == 3 && hEventT0vsELS->GetEntries() < m_minEntries) {

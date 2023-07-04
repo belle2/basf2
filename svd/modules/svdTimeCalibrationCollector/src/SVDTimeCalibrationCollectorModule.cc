@@ -73,22 +73,23 @@ void SVDTimeCalibrationCollectorModule::prepare()
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
   auto allSensors = geoCache.getListOfSensors();
+  B2INFO("Number of SensorBin: " << 2 * int(allSensors.size()));
 
   TH3F* __hEventT0vsCoG__ = new TH3F("__hEventT0vsCoG__", "__EventT0vsCoG__",
                                      int(200 / m_rawCoGBinWidth), -100, 100, 60, -100, 20,
-                                     2 * int(allSensors.size()), -0.5, 2 * int(allSensors.size()) - 0.5);
+                                     2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
   TH2F* __hEventT0__ = new TH2F("__hEventT0__", "__EventT0Sync__",
                                 100, -100, 100,
-                                2 * int(allSensors.size()), -0.5, 2 * int(allSensors.size()) - 0.5);
+                                2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
   TH2F* __hEventT0NoSync__ = new TH2F("__hEventT0NoSync__", "__EventT0NoSync__",
                                       100, -100, 100,
-                                      2 * int(allSensors.size()), -0.5, 2 * int(allSensors.size()) - 0.5);
+                                      2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
 
   int tmpBinCnt = 0;
   for (auto sensor : allSensors) {
-    for (auto view : {"U", "V"}) {
+    for (auto view : {'U', 'V'}) {
       tmpBinCnt++;
-      TString binLabel = TString::Format("L%iL%iS%i%s",
+      TString binLabel = TString::Format("L%iL%iS%i%c",
                                          sensor.getLayerNumber(),
                                          sensor.getLadderNumber(),
                                          sensor.getSensorNumber(),
@@ -154,15 +155,19 @@ void SVDTimeCalibrationCollectorModule::collect()
 
       float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, m_svdCls[cl]->getFirstFrame());
 
-      TString binLabel = TString::Format("L%iL%iS%i%s",
+      TString binLabel = TString::Format("L%iL%iS%i%c",
                                          m_svdCls[cl]->getSensorID().getLayerNumber(),
                                          m_svdCls[cl]->getSensorID().getLadderNumber(),
                                          m_svdCls[cl]->getSensorID().getSensorNumber(),
-                                         side ? "U" : "V");
-      int sensorBin = getObjectPtr<TH3F>("__hEventT0vsCoG__")->GetZaxis()->FindBin(binLabel);
+                                         side ? 'U' : 'V');
+      int sensorBin = getObjectPtr<TH3F>("__hEventT0vsCoG__")->GetZaxis()->FindBin(binLabel.Data());
+      std::cout << " binLabel " << binLabel << " " << sensorBin << endl;
       getObjectPtr<TH3F>("__hEventT0vsCoG__")->Fill(clTime, eventT0Sync, sensorBin);
       getObjectPtr<TH2F>("__hEventT0__")->Fill(eventT0Sync, sensorBin);
       getObjectPtr<TH2F>("__hEventT0NoSync__")->Fill(eventT0, sensorBin);
+      // getObjectPtr<TH3F>("__hEventT0vsCoG__")->Fill(clTime, eventT0Sync, binLabel.Data(), 1.);
+      // getObjectPtr<TH2F>("__hEventT0__")->Fill(eventT0Sync, binLabel.Data(), 1.);
+      // getObjectPtr<TH2F>("__hEventT0NoSync__")->Fill(eventT0, binLabel.Data(), 1.);
 
       getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {

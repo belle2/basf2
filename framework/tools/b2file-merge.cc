@@ -238,6 +238,7 @@ The following restrictions apply:
         // update event numbers ...
         outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData.getMcEvents());
         outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData.getNEvents());
+        outputMetaData->setNFullEvents(outputMetaData->getNFullEvents() + fileMetaData.getNFullEvents());
       }
       if(fileMetaData.getNEvents() < 1) {
         B2WARNING("File " << std::quoted(input) << " is empty.");
@@ -344,6 +345,12 @@ The following restrictions apply:
   output.cd();
   outputEventTree->Write();
   B2INFO("Done processing events");
+
+  // check if the number of full events in the metadata is zero:
+  // if so calculate number of full events now:
+  if (outputMetaData->getNFullEvents() == 0) {
+    outputMetaData->setNFullEvents(outputEventTree->GetEntries("EventMetaData.m_errorFlag == 0"));
+  }
 
   // we need to set the LFN to the absolute path name
   outputMetaData->setLfn(fs::absolute(outputfilename, fs::initial_path()).string());

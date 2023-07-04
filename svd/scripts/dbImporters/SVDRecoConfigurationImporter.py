@@ -35,6 +35,9 @@ grouping_stateOfTimeGroupingInClusterizerIn6Samples = True  # in 6 Samples DAQ M
 grouping_useOfSVDGroupInfoInSPCreatorIn6Samples = True
 grouping_stateOfTimeGroupingInClusterizerIn3Samples = False  # in 3 Samples DAQ Mode
 grouping_useOfSVDGroupInfoInSPCreatorIn3Samples = False
+# cut on sample SNR
+snr_useOfSVDSpacePointSNRFractionIn6Samples = False
+snr_useOfSVDSpacePointSNRFractionIn3Samples = False
 
 
 class recoConfigurationImporter(basf2.Module):
@@ -70,6 +73,16 @@ class recoConfigurationImporter(basf2.Module):
 
         uniqueID += groupingSpecificString
 
+        cutOnSampleSNRSpecificString = ""
+        if snr_useOfSVDSpacePointSNRFractionIn6Samples and snr_useOfSVDSpacePointSNRFractionIn3Samples:
+            cutOnSampleSNRSpecificString = "_cutOnSampleSNRFractionON"
+        elif snr_useOfSVDSpacePointSNRFractionIn6Samples:
+            cutOnSampleSNRSpecificString = "_cutOn6SampleSNRFractionON"
+        elif snr_useOfSVDSpacePointSNRFractionIn3Samples:
+            cutOnSampleSNRSpecificString = "_cutOn3SampleSNRFractionON"
+
+        uniqueID += cutOnSampleSNRSpecificString
+
         payload = Belle2.SVDRecoConfiguration(uniqueID)
 
         # cluster time
@@ -92,6 +105,9 @@ class recoConfigurationImporter(basf2.Module):
         payload.setUseOfSVDGroupInfoInSPCreator(6, grouping_useOfSVDGroupInfoInSPCreatorIn6Samples)
         payload.setStateOfSVDTimeGrouping(3, grouping_stateOfTimeGroupingInClusterizerIn3Samples)
         payload.setUseOfSVDGroupInfoInSPCreator(3, grouping_useOfSVDGroupInfoInSPCreatorIn3Samples)
+        # Cut on sample SNR
+        payload.setUseOfSVDSpacePointSNRFraction(6, snr_useOfSVDSpacePointSNRFractionIn6Samples)
+        payload.setUseOfSVDSpacePointSNRFraction(3, snr_useOfSVDSpacePointSNRFractionIn3Samples)
 
         Belle2.Database.Instance().storeData(Belle2.SVDRecoConfiguration.name, payload, iov)
 

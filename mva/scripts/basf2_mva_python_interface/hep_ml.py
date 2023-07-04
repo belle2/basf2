@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ import collections
 from basf2 import B2WARNING
 
 
-class State(object):
+class State:
     """
     hep_ml state
     """

@@ -87,10 +87,11 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           char side = 'U';
           if (view == 0)
             side = 'V';
-          TString binLabel = TString::Format("L%iL%iS%i%c", layer, ladder, sensor, side);
+          TString binLabel = TString::Format("L%iL%iS%i%c", layer_num, ladder_num, sensor_num, side);
           int sensorBin = __hEventT0vsCoG__->GetZaxis()->FindBin(binLabel);
+          B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << sensorBin);
           __hEventT0vsCoG__->GetZaxis()->SetRange(sensorBin, sensorBin);
-          auto hEventT0vsELS  = (TH2D*)__hEventT0vsCoG__->Project3D("yx");
+          auto hEventT0vsELS  = (TH2D*)__hEventT0vsCoG__->Project3D("yxe");
           auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", sensorBin, sensorBin);
           auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", sensorBin, sensorBin);
           B2INFO("Histogram: " << hEventT0vsELS->GetName() <<

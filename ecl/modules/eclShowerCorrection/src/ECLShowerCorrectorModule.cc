@@ -274,6 +274,7 @@ void ECLShowerCorrectorModule::event()
   //..Count number of showers in each region for EventLevelClusteringInfo
   uint16_t nShowersPerRegion[nLeakReg] = {};
   for (auto& eclShower : m_eclShowers) {
+    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {break;}
     const int iCellId = eclShower.getCentralCellId();
     if (ECLElementNumbers::isForward(iCellId)) {nShowersPerRegion[0]++;}
     if (ECLElementNumbers::isBarrel(iCellId)) {nShowersPerRegion[1]++;}

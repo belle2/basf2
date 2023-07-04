@@ -49,7 +49,7 @@ KLMDigitizerModule::KLMDigitizerModule() :
            "Efficiency determination mode (\"Strip\" or \"Plane\").",
            std::string("Plane"));
   addParam("CreateMultiStripDigits", m_CreateMultiStripDigits,
-           "Whether to create multi-strip digits.", false);
+           "Whether to create multi-strip digits in Run 1 data (not used for Run 2+).", true);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
@@ -118,10 +118,20 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM channel status data are not available.");
   if (!m_StripEfficiency.isValid())
     B2FATAL("KLM strip efficiency data are not available.");
+  if (!m_ScintillatorFirmware.isValid())
+    B2FATAL("KLM scintillator firmware version is not available.");
   if (m_ChannelSpecificSimulation)
     checkScintillatorFEEParameters();
   m_Time->updateConstants();
   m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
+  KLMScintillatorFirmware::FirmwareVersion fwVersion = m_ScintillatorFirmware->getFirmwareVersion();
+  m_CreateMultiStripDigitsByRun = false; // do not make multi-strip KLMDigits for Run 2+ events
+  if ((fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Invalid) || // this should never happen!
+      (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Phase2) ||  // for very early data (deprecated)
+      (fwVersion == KLMScintillatorFirmware::FirmwareVersion::c_Run1)) {  // for data up to and including 2022b
+    m_CreateMultiStripDigitsByRun = m_CreateMultiStripDigits;
+  }
+  B2INFO("KLM multi-strip digits are " << (m_CreateMultiStripDigitsByRun ? "" : "NOT") << " simulated");
 }
 
 /*
@@ -271,7 +281,7 @@ void KLMDigitizerModule::digitizeAsic()
         std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
     }
     digitizeScintillator();
-    if (m_CreateMultiStripDigits) {
+    if (m_CreateMultiStripDigitsByRun) {
       int nDigits = 0;
       for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
         if (m_AsicDigits[i] != nullptr)
@@ -285,20 +295,11 @@ void KLMDigitizerModule::digitizeAsic()
           ++i;
           continue;
         }
-        int minGroupChannel, maxGroupChannel;
-        if (i < 4) {
-          minGroupChannel = 1;
-          maxGroupChannel = 4;
-        } else if (i < 8) {
-          minGroupChannel = 5;
-          maxGroupChannel = 8;
-        } else if (i < 12) {
-          minGroupChannel = 9;
-          maxGroupChannel = 12;
-        } else {
-          minGroupChannel = 13;
-          maxGroupChannel = KLM::c_NChannelsAsic;
-        }
+        // Firmware bug (used OR of struck channel numbers in range 1..15) defeated the
+        // expected by-4 grouping so we assume the worst case: all 15 channels are struck.
+        // This will be reduced for BKLM scintillators if there are missing detectorChannels.
+        int minGroupChannel = 1;
+        int maxGroupChannel = KLM::c_NChannelsAsic;
         KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
         KLMElectronicsChannel electronicsChannel(it->first);
         int asic = electronicsChannel.getChannel();

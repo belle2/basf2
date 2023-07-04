@@ -177,7 +177,7 @@ clusterFound:;
     p = klmClusterHits.size() * 0.215;
     /* FIXME: Reimplement time calculation after completion of time calibration.
     } else {
-      v = clusterPosition.Mag() / minTime / Const::speedOfLight;
+      v = clusterPosition.R() / minTime / Const::speedOfLight;
       if (v < 0.999999)
         p = mass * v / sqrt(1.0 - v * v);
       else

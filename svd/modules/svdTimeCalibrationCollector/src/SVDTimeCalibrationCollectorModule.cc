@@ -75,15 +75,21 @@ void SVDTimeCalibrationCollectorModule::prepare()
   auto allSensors = geoCache.getListOfSensors();
   B2INFO("Number of SensorBin: " << 2 * int(allSensors.size()));
 
-  TH3F* __hEventT0vsCoG__ = new TH3F("__hEventT0vsCoG__", "__EventT0vsCoG__",
-                                     int(200 / m_rawCoGBinWidth), -100, 100, 60, -100, 20,
-                                     2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
-  TH2F* __hEventT0__ = new TH2F("__hEventT0__", "__EventT0Sync__",
-                                100, -100, 100,
-                                2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
-  TH2F* __hEventT0NoSync__ = new TH2F("__hEventT0NoSync__", "__EventT0NoSync__",
-                                      100, -100, 100,
-                                      2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
+  TH3F* __hEventT0vsCoG__   = new TH3F("__hEventT0vsCoG__", "EventT0Sync vs rawTime",
+                                       int(200 / m_rawCoGBinWidth), -100, 100, 60, -100, 20,
+                                       2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
+  TH2F* __hEventT0__        = new TH2F("__hEventT0__", "EventT0Sync",
+                                       100, -100, 100,
+                                       2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
+  TH2F* __hEventT0NoSync__  = new TH2F("__hEventT0NoSync__", "EventT0NoSync",
+                                       100, -100, 100,
+                                       2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
+  TH1F* __hBinToSensorMap__ = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
+                                       2 * int(allSensors.size()), + 0.5, 2 * int(allSensors.size()) + 0.5);
+  __hEventT0vsCoG__->GetYaxis()->SetTitle("EventT0Sync (ns)");
+  __hEventT0vsCoG__->GetXaxis()->SetTitle("raw_time (ns)");
+  __hEventT0__->GetXaxis()->SetTitle("event_t0 (ns)");
+  __hEventT0NoSync__->GetXaxis()->SetTitle("event_t0 (ns)");
 
   int tmpBinCnt = 0;
   for (auto sensor : allSensors) {
@@ -94,14 +100,13 @@ void SVDTimeCalibrationCollectorModule::prepare()
                                          sensor.getLadderNumber(),
                                          sensor.getSensorNumber(),
                                          view);
-      __hEventT0vsCoG__->GetZaxis()->SetBinLabel(tmpBinCnt, binLabel);
-      __hEventT0__->GetYaxis()->SetBinLabel(tmpBinCnt, binLabel);
-      __hEventT0NoSync__->GetYaxis()->SetBinLabel(tmpBinCnt, binLabel);
+      __hBinToSensorMap__->GetXaxis()->SetBinLabel(tmpBinCnt, binLabel);
     }
   }
   registerObject<TH3F>(__hEventT0vsCoG__->GetName(), __hEventT0vsCoG__);
   registerObject<TH2F>(__hEventT0__->GetName(), __hEventT0__);
   registerObject<TH2F>(__hEventT0NoSync__->GetName(), __hEventT0NoSync__);
+  registerObject<TH1F>(__hBinToSensorMap__->GetName(), __hBinToSensorMap__);
 }
 
 void SVDTimeCalibrationCollectorModule::startRun()
@@ -160,14 +165,11 @@ void SVDTimeCalibrationCollectorModule::collect()
                                          m_svdCls[cl]->getSensorID().getLadderNumber(),
                                          m_svdCls[cl]->getSensorID().getSensorNumber(),
                                          side ? 'U' : 'V');
-      int sensorBin = getObjectPtr<TH3F>("__hEventT0vsCoG__")->GetZaxis()->FindBin(binLabel.Data());
-      std::cout << " binLabel " << binLabel << " " << sensorBin << endl;
-      getObjectPtr<TH3F>("__hEventT0vsCoG__")->Fill(clTime, eventT0Sync, sensorBin);
-      getObjectPtr<TH2F>("__hEventT0__")->Fill(eventT0Sync, sensorBin);
-      getObjectPtr<TH2F>("__hEventT0NoSync__")->Fill(eventT0, sensorBin);
-      // getObjectPtr<TH3F>("__hEventT0vsCoG__")->Fill(clTime, eventT0Sync, binLabel.Data(), 1.);
-      // getObjectPtr<TH2F>("__hEventT0__")->Fill(eventT0Sync, binLabel.Data(), 1.);
-      // getObjectPtr<TH2F>("__hEventT0NoSync__")->Fill(eventT0, binLabel.Data(), 1.);
+      int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
+      double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
+      getObjectPtr<TH3F>("__hEventT0vsCoG__")->Fill(clTime, eventT0Sync, sensorBinCenter);
+      getObjectPtr<TH2F>("__hEventT0__")->Fill(eventT0Sync, sensorBinCenter);
+      getObjectPtr<TH2F>("__hEventT0NoSync__")->Fill(eventT0, sensorBinCenter);
 
       getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {

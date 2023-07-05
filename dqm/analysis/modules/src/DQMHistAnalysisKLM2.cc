@@ -14,8 +14,8 @@
 
 /* ROOT headers. */
 #include <TROOT.h>
-
-
+#include <TStyle.h>
+#include <TColor.h>
 
 using namespace Belle2;
 
@@ -28,6 +28,12 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   setDescription("Module used to analyze KLM Efficiency DQM histograms.");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
+  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
+  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0));
+  addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
+  addParam("Max2DEff", m_max, "2D efficiency max", float(2));
+  addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
+
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -43,11 +49,35 @@ void DQMHistAnalysisKLM2Module::initialize()
 {
   m_monObj = getMonitoringObject("klm");
 
+  if (m_refFileName != "") {
+    m_refFile = TFile::Open(m_refFileName.data(), "READ");
+  }
+
+  // Get Reference Histograms
+  if (m_refFile && m_refFile->IsOpen()) {
+    B2INFO("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
+
+    m_ref_efficiencies_bklm = (TH1F*)m_refFile->Get((m_histogramDirectoryName + "/eff_bklm_plane").data());
+    m_ref_efficiencies_bklm->SetLineColor(2);
+    m_ref_efficiencies_bklm->SetOption("HIST");
+    m_ref_efficiencies_bklm->SetStats(false);
+
+    m_ref_efficiencies_eklm = (TH1F*)m_refFile->Get((m_histogramDirectoryName + "/eff_eklm_plane").data());
+    m_ref_efficiencies_eklm->SetLineColor(2);
+    m_ref_efficiencies_eklm->SetOption("HIST");
+    m_ref_efficiencies_eklm->SetStats(false);
+
+  } else {
+    B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
+  }
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());
   m_c_eff_eklm = new TCanvas((m_histogramDirectoryName + "/c_eff_eklm_plane").data());
   m_c_eff_bklm_sector = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_sector").data());
   m_c_eff_eklm_sector = new TCanvas((m_histogramDirectoryName + "/c_eff_eklm_sector").data());
+
+  m_c_eff2d_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff2d_bklm").data());
+  m_c_eff2d_eklm = new TCanvas((m_histogramDirectoryName + "/c_eff2d_eklm").data());
 
   m_eff_bklm = new TH1F((m_histogramDirectoryName + "/eff_bklm_plane").data(),
                         "Plane Efficiency in BKLM",
@@ -89,6 +119,81 @@ void DQMHistAnalysisKLM2Module::initialize()
   addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLM", HistDelta::c_Events, m_minEvents, 1);
   addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLMSector", HistDelta::c_Events, m_minEvents, 1);
   addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLMSector", HistDelta::c_Events, m_minEvents, 1);
+
+  // 2D Efficiency Histograms
+  TString eff2d_hist_bklm_title;
+  TString eff2d_hist_eklm_title;
+  if (m_ratio) {
+    eff2d_hist_bklm_title = "Plane Efficiency Ratios in BKLM";
+    eff2d_hist_eklm_title = "Plane Efficiency Ratios in EKLM";
+  } else {
+    eff2d_hist_bklm_title = "Plane Efficiency Diffs in BKLM";
+    eff2d_hist_eklm_title = "Plane Efficiency Diffs in EKLM";
+  }
+
+  // BKLM
+  m_eff2d_bklm = new TH2F((m_histogramDirectoryName + "/eff2d_bklm_sector").data(), eff2d_hist_bklm_title,
+                          BKLMElementNumbers::getMaximalSectorGlobalNumber(), 0.5, BKLMElementNumbers::getMaximalSectorGlobalNumber() + 0.5,
+                          BKLMElementNumbers::getMaximalLayerNumber(),  0.5, BKLMElementNumbers::getMaximalLayerNumber() + 0.5);
+  m_eff2d_bklm->GetXaxis()->SetTitle("Sector");
+  m_eff2d_bklm->GetYaxis()->SetTitle("Layer");
+  m_eff2d_bklm->SetStats(false);
+
+  m_err_bklm = new TH2F((m_histogramDirectoryName + "/err_bklm_sector").data(), eff2d_hist_bklm_title,
+                        BKLMElementNumbers::getMaximalSectorGlobalNumber(), 0.5, BKLMElementNumbers::getMaximalSectorGlobalNumber() + 0.5,
+                        BKLMElementNumbers::getMaximalLayerNumber(),  0.5, BKLMElementNumbers::getMaximalLayerNumber() + 0.5);
+  m_err_bklm->GetXaxis()->SetTitle("Sector");
+  m_err_bklm->GetYaxis()->SetTitle("Layer");
+  m_err_bklm->SetStats(false);
+
+  for (int sec_id = 0; sec_id < BKLMElementNumbers::getMaximalSectorNumber(); sec_id++) {
+    std::string BB_sec = "BB" + std::to_string(sec_id);
+    m_eff2d_bklm->GetXaxis()->SetBinLabel(sec_id + 1, BB_sec.c_str());
+
+    std::string BF_sec = "BF" + std::to_string(sec_id);
+    m_eff2d_bklm->GetXaxis()->SetBinLabel(BKLMElementNumbers::getMaximalSectorNumber() + sec_id + 1, BF_sec.c_str());
+  }
+
+  for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerNumber(); lay_id++) {
+    std::string B_lay = std::to_string(lay_id);
+    m_eff2d_bklm->GetYaxis()->SetBinLabel(lay_id + 1, B_lay.c_str());
+  }
+
+  // EKLM
+  int n_sectors_eklm = EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();
+
+  m_eff2d_eklm = new TH2F((m_histogramDirectoryName + "/eff2d_eklm_sector").data(), eff2d_hist_eklm_title,
+                          n_sectors_eklm, 0.5, n_sectors_eklm + 0.5,
+                          EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),  0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
+  m_eff2d_eklm->GetXaxis()->SetTitle("Sector");
+  m_eff2d_eklm->GetYaxis()->SetTitle("Layer");
+  m_eff2d_eklm->SetStats(false);
+
+  m_err_eklm = new TH2F((m_histogramDirectoryName + "/err_bklm_sector").data(), eff2d_hist_eklm_title,
+                        n_sectors_eklm, 0.5, n_sectors_eklm + 0.5,
+                        EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),  0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
+  m_err_eklm->GetXaxis()->SetTitle("Sector");
+  m_err_eklm->GetYaxis()->SetTitle("Layer");
+  m_err_eklm->SetStats(false);
+
+  std::string name;
+  const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+  for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
+    int section, layer;
+    m_EklmElementNumbers->layerNumberToElementNumbers(
+      layerGlobal, &section, &layer);
+    if (section == EKLMElementNumbers::c_BackwardSection)
+      name = "B";
+    else
+      name = "F";
+    name += std::to_string(layer);
+    m_eff2d_eklm->GetXaxis()->SetBinLabel(layerGlobal, name.c_str());
+  }
+
+  for (int lay_id = 0; lay_id < EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(); lay_id++) {
+    std::string E_lay = std::to_string(lay_id);
+    m_eff2d_eklm->GetYaxis()->SetBinLabel(lay_id + 1, E_lay.c_str());
+  }
 
 
 }
@@ -238,6 +343,85 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
   }
 }
 
+void DQMHistAnalysisKLM2Module::process2DEffHistogram(
+  TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot, TCanvas* eff2dCanv)
+{
+
+  int i = 0;
+  float mainEff = 0;
+  float refEff = 0;
+  float mainErr = 0;
+  float refErr = 0;
+  float maxVal = m_max;
+  float minVal = m_min;
+  float eff2dVal;
+  bool setAlarm = false;
+
+  for (int binx = 0; binx < sectors; binx++) {
+
+    for (int biny = 0; biny < layers; biny++) {
+
+      mainEff = mainHist->GetBinContent(i + 1);
+      refEff = refHist->GetBinContent(i + 1);
+      mainErr = mainHist->GetBinError(i + 1);
+      refErr = refHist->GetBinError(i + 1);
+
+      if ((mainEff == 0) and (refEff == 0)) {
+        // empty histograms, draw blank bin
+        eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
+      } else if (refEff == 0) {
+        // no reference, set maximum value
+        eff2dHist->SetBinContent(binx + 1, biny + 1, maxVal);
+      } else if (mainEff == 0) {
+        // no data, set zero
+        eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
+        errHist->SetBinContent(binx + 1, biny + 1, 0);
+      } else {
+
+        if (ratioPlot) {
+          eff2dVal = mainEff / refEff;
+          if (eff2dVal < m_alarmThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
+        } else {
+          eff2dVal = (mainEff - refEff) / pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
+        }
+
+        // main histogram
+        if ((eff2dVal > minVal) and (eff2dVal < maxVal)) {
+          // value within display window
+          eff2dHist->SetBinContent(binx + 1, biny + 1, eff2dVal);
+        } else if (eff2dVal > maxVal) {
+          // value above display window
+          eff2dHist->SetBinContent(binx + 1, biny + 1, maxVal);
+        } else if (eff2dVal < minVal) {
+          // value below display window
+          eff2dHist->SetBinContent(binx + 1, biny + 1, minVal);
+        }
+
+        // set alarm
+        if (eff2dVal < m_alarmThr) {
+          setAlarm = true;
+        }
+
+      }
+
+      i++;
+    }
+
+  }
+
+  eff2dHist->SetMinimum(m_min);
+  eff2dHist->SetMaximum(m_max);
+
+  eff2dCanv->cd();
+  eff2dHist->Draw("COLZ");
+  errHist->Draw("TEXT SAME");
+  if (setAlarm) {
+    eff2dCanv->Pad()->SetFillColor(kRed);
+  }
+  eff2dCanv->Modified();
+
+}
+
 void DQMHistAnalysisKLM2Module::event()
 {
   /* If KLM is not included, stop here and return. */
@@ -288,6 +472,15 @@ void DQMHistAnalysisKLM2Module::event()
 
   processPlaneHistogram("eff_bklm_plane", m_eff_bklm);
   processPlaneHistogram("eff_eklm_plane", m_eff_eklm);
+
+  /* Make Diff 2D plots */
+  process2DEffHistogram(m_eff_bklm, m_ref_efficiencies_bklm, m_eff2d_bklm, m_err_bklm,
+                        BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(), m_ratio, m_c_eff2d_bklm);
+
+  process2DEffHistogram(m_eff_eklm, m_ref_efficiencies_eklm, m_eff2d_eklm, m_err_eklm,
+                        EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
+                        EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(), m_ratio,
+                        m_c_eff2d_eklm);
 
 }
 

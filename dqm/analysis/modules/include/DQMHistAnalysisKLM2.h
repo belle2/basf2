@@ -19,6 +19,7 @@
 /* ROOT headers. */
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TString.h>
 #include <TText.h>
 #include <TLine.h>
@@ -80,6 +81,11 @@ namespace Belle2 {
      */
     void processPlaneHistogram(const std::string& histName, TH1* histogram);
 
+    /**
+     * Process 2D efficiency histograms.
+     */
+    void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
+                               TCanvas* eff2dCanv);
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
@@ -123,9 +129,32 @@ namespace Belle2 {
     /** Monitoring object. */
     MonitoringObject* m_monObj {};
 
-
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_EklmElementNumbers;
+
+    /** 2D layer-sector efficiency differences */
+
+    // reference histogram
+    std::string m_refFileName;
+    TFile* m_refFile = nullptr;
+
+    // configurable plotting parameters
+    float m_alarmThr = 0;
+    float m_min = 0;
+    float m_max = 2;
+    bool m_ratio = true;
+
+    // bklm
+    TH1* m_ref_efficiencies_bklm = NULL;
+    TH2* m_eff2d_bklm = NULL;
+    TH2* m_err_bklm = NULL;
+    TCanvas* m_c_eff2d_bklm = NULL;
+
+    // eklm
+    TH1* m_ref_efficiencies_eklm = NULL;
+    TH2* m_eff2d_eklm = NULL;
+    TH2* m_err_eklm = NULL;
+    TCanvas* m_c_eff2d_eklm = NULL;
 
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;

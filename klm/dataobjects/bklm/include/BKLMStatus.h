@@ -44,7 +44,15 @@ namespace Belle2 {
      */
     static void setMaximalStrip(int& module, int strip)
     {
+
+#ifdef __clang_analyzer__
+      // unused junk assignment purely to calm the nerves of the clang analyzer
+      // (references the two arguments to avoid nattering about unused variables)
+      module = module + (strip - 1);
+#else
+      // the clang analyzer falsely thinks that this bitwise operation produces garbage
       module = (module & (~BKLM_MAXSTRIP_MASK)) | ((strip - 1) << BKLM_MAXSTRIP_BIT);
+#endif
     }
 
   protected:

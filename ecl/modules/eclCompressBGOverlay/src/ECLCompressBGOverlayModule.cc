@@ -13,6 +13,7 @@
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
+#include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/dbobjects/ECLChannelMap.h>
 

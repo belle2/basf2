@@ -221,7 +221,6 @@ void KLMReconstructorModule::reconstructBKLMHits()
       continue;
     if (digit->isMultiStrip()) {
       nKLMDigitsMultiStripBarrel++;
-      continue;
     }
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
@@ -332,13 +331,15 @@ void KLMReconstructorModule::reconstructEKLMHits()
       continue;
     if (digit->isMultiStrip()) {
       digit->getSection() == EKLMElementNumbers::c_BackwardSection ? nKLMDigitsMultiStripBWD++ : nKLMDigitsMultiStripFWD++;
-      continue;
     }
     if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->isGood())
       digitVector.push_back(digit);
   }
+  KLMDigit plane1Digit; // to look for geometric intersection of a multi-strip hit
+  KLMDigit plane2Digit; // to look for geometric intersection of a multi-strip hit
+  HepGeom::Point3D<double> crossPoint(0, 0, 0); // (x,y,z) of geometric intersection
   /* Sort by sector. */
   sort(digitVector.begin(), digitVector.end(), compareSector);
   it1 = digitVector.begin();
@@ -415,19 +416,52 @@ void KLMReconstructorModule::reconstructEKLMHits()
             break;
         }
         /*
-         * Now it4 .. it5 - hits from a single fisrt-plane strip amd
+         * Now it4 .. it5 - hits from a single first-plane strip and
          * it6 .. it7 - hits from a single second-plane strip.
-         * If strips do not intersect, then continue.
          */
-        HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        if (!m_eklmTransformData->intersection(*it4, *it6, &crossPoint,
-                                               &d1, &d2, &sd,
-                                               m_eklmCheckSegmentIntersection)) {
-          it6 = it7;
-          continue;
-        }
         for (it8 = it4; it8 != it5; ++it8) {
           for (it9 = it6; it9 != it7; ++it9) {
+            /*
+             * Check for intersection of the two orthogonal strips. On one strip,
+             * one hit might be multi-strip and another single-strip, so the
+             * intersection check must be done here rather than before the loop.
+             */
+            bool intersect = false;
+            if ((*it8)->isMultiStrip() || (*it9)->isMultiStrip()) {
+              plane1Digit = **it8;
+              plane2Digit = **it9;
+              int s1First = plane1Digit.getStrip();
+              int s1Last = std::max(s1First, plane1Digit.getLastStrip());
+              int s2First = plane2Digit.getStrip();
+              int s2Last = std::max(s2First, plane2Digit.getLastStrip());
+              for (int s1 = s1First; s1 <= s1Last; s1++) {
+                plane1Digit.setStrip(s1);
+                for (int s2 = s2First; s2 <= s2Last; s2++) {
+                  plane2Digit.setStrip(s2);
+                  intersect = m_eklmTransformData->intersection(&plane1Digit, &plane2Digit, &crossPoint,
+                                                                &d1, &d2, &sd,
+                                                                m_eklmCheckSegmentIntersection);
+                  if (intersect)
+                    break;
+                }
+                if (intersect)
+                  break;
+              }
+              if (intersect) {
+                // use the middle strip in the multi-strip group to get the 2D intersection point
+                plane1Digit.setStrip((s1First + s1Last) / 2);
+                plane2Digit.setStrip((s2First + s2Last) / 2);
+                intersect = m_eklmTransformData->intersection(&plane1Digit, &plane2Digit, &crossPoint,
+                                                              &d1, &d2, &sd,
+                                                              false); // crossPoint MIGHT be outside fiducial area
+              }
+            } else {
+              intersect = m_eklmTransformData->intersection(*it8, *it9, &crossPoint,
+                                                            &d1, &d2, &sd,
+                                                            m_eklmCheckSegmentIntersection);
+            }
+            if (!intersect)
+              continue;
             t1 = (*it8)->getTime() - d1 * m_DelayEKLMScintillators
                  + 0.5 * sd / Const::speedOfLight;
             t2 = (*it9)->getTime() - d2 * m_DelayEKLMScintillators
@@ -441,7 +475,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
             time = (t1 + t2) / 2;
             if (m_EventT0Correction)
               time -= m_EventT0Value;
-            KLMHit2d* hit2d = m_Hit2ds.appendNew(*it8);
+            KLMHit2d* hit2d = m_Hit2ds.appendNew(*it8, *it9);
             hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() +
                                     (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());

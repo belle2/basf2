@@ -103,7 +103,7 @@ for file_iov in input_file_iov_set:
         subruns = [k for k, v in files_to_iovs.items() if v == file_iov]
         input_files.extend(subruns[:args.maxSubRuns])
 
-print('Number selected input files:  {}'.format(len(input_files)))
+print(f'Number selected input files:  {len(input_files)}')
 
 
 # Access files_to_iovs for MC runs
@@ -113,7 +113,7 @@ with open("mc_file_iov_map.pkl", 'br') as map_file:
 mc_input_files = list(mc_files_to_iovs.keys())
 
 
-print('Number selected mc input files:  {}'.format(len(mc_input_files)))
+print(f'Number selected mc input files:  {len(mc_input_files)}')
 
 
 # HOTPIXEl CALIBRATION
@@ -303,6 +303,5 @@ cal_fw.add_calibration(charge_cal)
 cal_fw.add_calibration(gain_cal)
 # cal_fw.backend = backends.Local(max_processes=20)
 cal_fw.backend = LSF()
-cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}_{}'.format(
-    args.runLow, args.runHigh, args.expNo)
+cal_fw.output_dir = f'pxd_calibration_results_range_{args.runLow}_{args.runHigh}_{args.expNo}'
 cal_fw.run(iov=iov_to_calibrate)

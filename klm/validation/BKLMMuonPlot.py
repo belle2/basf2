@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -65,10 +64,10 @@ def main():
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % args.input_file)
+        print(f'Could not load input file(s) {args.input_file}.')
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % args.input_file)
+        print(f'Data tree is empty or does not exist in file(s) {args.input_file}. Exit.')
         sys.exit(0)
 
     # open the output root file

@@ -19,6 +19,7 @@
 /* ROOT headers. */
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TString.h>
 #include <TText.h>
 #include <TLine.h>
@@ -80,6 +81,11 @@ namespace Belle2 {
      */
     void processPlaneHistogram(const std::string& histName, TH1* histogram);
 
+    /**
+     * Process 2D efficiency histograms.
+     */
+    void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors,
+                               bool ratioPlot, int* pvcount, TCanvas* eff2dCanv);
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
@@ -123,9 +129,46 @@ namespace Belle2 {
     /** Monitoring object. */
     MonitoringObject* m_monObj {};
 
-
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_EklmElementNumbers;
+
+    /** 2D layer-sector efficiency differences */
+
+    /** reference file name*/
+    std::string m_refFileName;
+
+    /** reference file*/
+    TFile* m_refFile = nullptr;
+
+    // configurable plotting parameters
+    /** alarm threshold*/
+    float m_alarmThr = 0;
+    /** min value of 2d shifter histogram*/
+    float m_min = 0;
+    /** max value of 2d shifer histogram*/
+    float m_max = 2;
+    /** enable ratio mode (true) or difference mode (false)*/
+    bool m_ratio = true;
+
+    // bklm
+    /** reference bklm eff histogram*/
+    TH1* m_ref_efficiencies_bklm = NULL;
+    /** 2d bklm shifter histogram*/
+    TH2* m_eff2d_bklm = NULL;
+    /** 2d bklm shifter text*/
+    TH2* m_err_bklm = NULL;
+    /** 2d bklm shifter canvas*/
+    TCanvas* m_c_eff2d_bklm = NULL;
+
+    // eklm
+    /** reference eklm eff histogram histogram*/
+    TH1* m_ref_efficiencies_eklm = NULL;
+    /** 2d eklm shifter histogram*/
+    TH2* m_eff2d_eklm = NULL;
+    /** 2d eklm shifter text*/
+    TH2* m_err_eklm = NULL;
+    /** 2d eklm shifter canvas*/
+    TCanvas* m_c_eff2d_eklm = NULL;
 
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;
@@ -134,10 +177,10 @@ namespace Belle2 {
     double m_minEvents;
 
     /** Number of inefficient BKLM layers. */
-    double m_nEffBKLMLayers;
+    int m_nEffBKLMLayers;
 
     /** Number of inefficient EKLM Layers*/
-    double m_nEffEKLMLayers;
+    int m_nEffEKLMLayers;
 
 
   };

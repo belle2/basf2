@@ -16,12 +16,6 @@
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
-//std
-#include <set>
-
-//ECL
-#include <ecl/dbobjects/ECLChannelMap.h>
-
 namespace Belle2 {
 
   /**

@@ -18,9 +18,6 @@
 /* ROOT headers. */
 #include <TDirectory.h>
 
-/* C++ headers. */
-#include <stdexcept>
-
 //NAMESPACE(S)
 using namespace Belle2;
 

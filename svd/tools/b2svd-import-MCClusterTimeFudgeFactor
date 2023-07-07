@@ -14,7 +14,6 @@ json files can be found in the svd_cdb_json repository (B2SVD).
 """
 import basf2 as b2
 from ROOT import Belle2
-from basf2 import conditions as b2conditions
 import datetime
 import argparse
 import json
@@ -114,7 +113,6 @@ class jsonSVDMCClusterTimeFudgeFactorImporter(b2.Module):
                             fudge_map_vals[side][f'L{layerNumber:d}'][f'S{sensorNumber:d}'] = sigma
                     break
         print("Fudge Factors:", fudge_map_vals)
-
 
 
 if __name__ == "__main__":

@@ -57,6 +57,7 @@ class jsonSVDMCClusterTimeFudgeFactorImporter(b2.Module):
         uniqueID = "MCClusterTimeFudgeFactor_" + \
             param["uniqueID"]["INFO"]["first"] + "_" + \
             param["uniqueID"]["INFO"]["second"] + "_" + \
+            param["uniqueID"]["INFO"]["third"] + "_" + \
             str(now.isoformat()) + \
             "_INFO:_current=" + \
             param["uniqueID"]["INFO"]["current"] + "_" + \
@@ -95,24 +96,24 @@ class jsonSVDMCClusterTimeFudgeFactorImporter(b2.Module):
 
         Belle2.Database.Instance().storeData(Belle2.SVDMCClusterTimeFudgeFactor.name, cls_payload, iov)
 
-        sigma_map_vals = {}
+        fudge_map_vals = {}
         for side in ['U', 'V']:
-            sigma_map_vals[side] = {}
+            fudge_map_vals[side] = {}
             for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
                 layerNumber = layer.getLayerNumber()
                 for ladder in geoCache.getLadders(layer):
                     ladderNumber = ladder.getLadderNumber()
-                    sigma_map_vals[side][f'L{layerNumber:d}'] = {}
+                    fudge_map_vals[side][f'L{layerNumber:d}'] = {}
                     for sensor in geoCache.getSensors(ladder):
                         sensorNumber = sensor.getSensorNumber()
-                        sigma_map_vals[side][f'L{layerNumber:d}'][f'S{sensorNumber:d}'] = 0
+                        fudge_map_vals[side][f'L{layerNumber:d}'][f'S{sensorNumber:d}'] = 0
                         sigmaData = sigmaValuesData[side]["L"+str(layerNumber)]["S"+str(sensorNumber)]
                         sigmaMC = sigmaValuesMC[side]["L"+str(layerNumber)]["S"+str(sensorNumber)]
                         if sigmaMC <= sigmaData:
                             sigma = round(math.sqrt(sigmaData * sigmaData - sigmaMC * sigmaMC), 6)
-                            sigma_map_vals[side][f'L{layerNumber:d}'][f'S{sensorNumber:d}'] = sigma
+                            fudge_map_vals[side][f'L{layerNumber:d}'][f'S{sensorNumber:d}'] = sigma
                     break
-        print(sigma_map_vals)
+        print("Fudge Factors:", fudge_map_vals)
 
 
 

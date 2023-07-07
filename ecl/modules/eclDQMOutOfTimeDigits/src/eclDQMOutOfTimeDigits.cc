@@ -85,7 +85,7 @@ void ECLDQMOutOfTimeDigitsModule::beginRun()
 
 std::string ECLDQMOutOfTimeDigitsModule::getEventType()
 {
-  // Could not get TRGSummary, hoping that all events are physics events
+  // If TRGSummary is not available, we assume that all events are physics events
   if (!m_l1Trigger.isValid()) return "physics";
 
   if (isRandomTrigger()) return "rand";
@@ -110,8 +110,6 @@ void ECLDQMOutOfTimeDigitsModule::event()
     auto var = Variable::Manager::Instance().getVariable(var_name);
     if (!var) continue;
     double value =  std::get<double>(var->function(nullptr));
-    // double value =  var->function(nullptr);
-    // printf("%s <- %lf\n", key_name.c_str(), value);
     h_out_of_time[key_name]->Fill(0.0, value);
   }
 }

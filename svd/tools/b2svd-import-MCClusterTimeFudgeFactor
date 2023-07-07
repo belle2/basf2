@@ -84,12 +84,12 @@ class jsonSVDMCClusterTimeFudgeFactorImporter(b2.Module):
                             sigma = 0
                             b2.B2WARNING(f"Resolution in MC ({sigmaMC:.6f}) is higher than data ({sigmaData:.6f}) " +
                                          f"for L{layerNumber:1}{f'L{ladderNumber}':>3}S{sensorNumber:1}{get_side(side)}.\t" +
-                                         f"Setting sigma = {sigma:.06f}")
+                                         f"Setting Fudge = {sigma:.06f}")
                         else:
                             sigma = round(math.sqrt(sigmaData * sigmaData - sigmaMC * sigmaMC), 6)
                             b2.B2INFO(f"Resolution in MC = ({sigmaMC:.6f}) and data = ({sigmaData:.6f}) " +
                                       f"for L{layerNumber}{f'L{ladderNumber}':>3}S{sensorNumber}{get_side(side)}.\t" +
-                                      f"Sigma = {sigma:.06f}")
+                                      f"Fudge = {sigma:.06f}")
 
                         cls_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, sigma)
 

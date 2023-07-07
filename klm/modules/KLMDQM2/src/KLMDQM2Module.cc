@@ -227,15 +227,26 @@ void KLMDQM2Module::findMatchingDigit(
      * TODO: multi-strip digits are ignored for now.
      * It is necessary to take them into account.
      */
-    if (digit.isMultiStrip())
-      continue;
+    /* FIXME: Get rid of the uncommented section*/
+    //if (digit.isMultiStrip())
+    //  continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
           digit.getPlane() == hitData->plane))
       continue;
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+
+    // Defining quantities for distance cut
+    auto allowedDistance1D = m_AllowedDistance1D;
+    auto stripPosition = digit.getStrip();
+
+    if (digit.isMultiStrip()) {
+      // Due to a firmware bug, we have to be wary with the allowed distance...
+      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
+      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
+    }
+    if (fabs(stripPosition - hitData->strip) < m_AllowedDistance1D) {
       hitData->digit = &digit;
       return;
     }

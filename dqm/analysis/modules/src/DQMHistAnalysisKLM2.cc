@@ -348,10 +348,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 {
 
   int i = 0;
-  float mainEff = 0;
-  float refEff = 0;
-  float mainErr = 0;
-  float refErr = 0;
+  float mainEff;
+  float refEff;
+  float mainErr;
+  float refErr;
   float maxVal = m_max;
   float minVal = m_min;
   float eff2dVal;

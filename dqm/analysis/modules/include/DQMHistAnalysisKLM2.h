@@ -83,6 +83,14 @@ namespace Belle2 {
 
     /**
      * Process 2D efficiency histograms.
+     * @param[in]  mainHist Live efficiency histogram.
+     * @param[in]  refHist Reference efficiency histogram
+     * @param[in]  planeHist Live ratio histogram
+     * @param[in]  errHist Error histogram
+     * @param[in]  layers Number of layers
+     * @param[in]  sectors Number of sectors
+     * @param[in]  ratioPlot True if ratio plot, False if difference plot
+     * @param[in]  eff2dCanv Canvas
      */
     void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
                                TCanvas* eff2dCanv);
@@ -134,26 +142,46 @@ namespace Belle2 {
 
     /** 2D layer-sector efficiency differences */
 
-    // reference histogram
+    /** reference histogram file path **/
     std::string m_refFileName;
+
+    /** reference histogram file **/
     TFile* m_refFile = nullptr;
 
-    // configurable plotting parameters
+    /** efficiency ratio alarm threshold **/
     float m_alarmThr = 0;
+
+    /** efficiency ratio min z scale **/
     float m_min = 0;
+
+    /** efficiency ratio max z scale **/
     float m_max = 2;
+
+    /** show efficiency ratio or difference **/
     bool m_ratio = true;
 
-    // bklm
+    /** BKLM efficiencies reference histogram **/
     TH1* m_ref_efficiencies_bklm = NULL;
+
+    /** BKLM efficiencies 2dim histogram **/
     TH2* m_eff2d_bklm = NULL;
+
+    /** BKLM efficiencies error histogram **/
     TH2* m_err_bklm = NULL;
+
+    /** BKLM efficiencies ratio canvas **/
     TCanvas* m_c_eff2d_bklm = NULL;
 
-    // eklm
+    /** ELM efficiencies reference histogram **/
     TH1* m_ref_efficiencies_eklm = NULL;
+
+    /** EKLM efficiencies 2dim histogram **/
     TH2* m_eff2d_eklm = NULL;
+
+    /** EKLM efficiencies error histogram **/
     TH2* m_err_eklm = NULL;
+
+    /** EKLM efficiencies ratio canvas **/
     TCanvas* m_c_eff2d_eklm = NULL;
 
     /** Name of histogram directory */
@@ -161,7 +189,6 @@ namespace Belle2 {
 
     /** Minimal number of entries for delta histogram update. */
     double m_minEvents;
-
 
   };
 

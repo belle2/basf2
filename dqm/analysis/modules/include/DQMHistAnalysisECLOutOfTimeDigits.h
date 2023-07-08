@@ -52,9 +52,6 @@ namespace Belle2 {
 
   private:
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
 #ifdef _BELLE2_EPICS
     /** EPICS channels for ECL out of time digits */
     std::map<std::string, chid> chid_out_of_time_digits;

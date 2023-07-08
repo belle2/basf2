@@ -20,15 +20,13 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: Constructor done.");
-
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
 
 DQMHistAnalysisECLOutOfTimeDigitsModule::~DQMHistAnalysisECLOutOfTimeDigitsModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -37,7 +35,7 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::~DQMHistAnalysisECLOutOfTimeDigitsModul
 void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     // Register EPICS PVs
     for (auto& event_type : {"rand", "dphy", "physics"}) {
@@ -89,7 +87,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
   //== Set EPICS PVs
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto& event_type : {"rand", "dphy", "physics"}) {
       for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
         std::string key_name = event_type + std::string("_") + ecl_part;
@@ -132,7 +130,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::terminate()
   B2DEBUG(20, "terminate called");
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto& event_type : {"rand", "dphy", "physics"}) {
       for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
         std::string key_name = event_type + std::string("_") + ecl_part;

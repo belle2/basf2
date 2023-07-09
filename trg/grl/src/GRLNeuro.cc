@@ -215,6 +215,7 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
 
 float GRLNeuro::float_to_fixed(float num, int m, int n)
 {
+  // integer: 1 bit for sign and others are values
   //Get integer and decimal digits
   int integer_part = num;
   float fractional_part = num - integer_part;
@@ -223,13 +224,22 @@ float GRLNeuro::float_to_fixed(float num, int m, int n)
   fractional_part =  floor(fractional_part * (1 << n)) * (1.0 / (1 << n)) ;
 
   //Remove the overflow of integer bits
-  //int final_integer = 0;
-  //if( m >0 ){
-  // final_integer = (integer_part & ((1 << m) -1)) ;
-  //}
+  int final_integer = 0;
+  if (m > 0) {
+    if (std::abs(integer_part) < ((1 << (m - 1)) - 1)) {
+      final_integer = std::abs(integer_part);
+      final_integer = (final_integer & ((1 << (m - 1)) - 1)) ;
+      final_integer = (integer_part & (1 << (m - 1))) > 0 ? (final_integer) * (-1) : final_integer;
+    } else {
+      final_integer = integer_part;
+      final_integer = (final_integer & ((1 << (m - 1)) - 1)) ;
+      final_integer = (integer_part & (1 << (m - 1))) > 0 ? (final_integer) * (-1) : final_integer;
+    }
+  }
 
-  float final_value = integer_part + fractional_part;
+  float final_value = final_integer  + fractional_part;
   return final_value;
+
 }
 
 float GRLNeuro::mysigmiod(float num)

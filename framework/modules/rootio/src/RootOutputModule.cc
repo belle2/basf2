@@ -166,13 +166,14 @@ void RootOutputModule::initialize()
       m_regularFile = false;
     }
   }
-  // Just to be safe, reset the number of full events
-  m_nFullEvents = 0;
   openFile();
 }
 
 void RootOutputModule::openFile()
 {
+  // Since we open a new file, we also have to reset the number of full events
+  m_nFullEvents = 0;
+  // Continue with opening the file
   TDirectory* dir = gDirectory;
   boost::filesystem::path out{m_outputFileName};
   if (m_outputSplitSize) {
@@ -294,10 +295,8 @@ void RootOutputModule::openFile()
 void RootOutputModule::event()
 {
   // if we closed after last event ... make a new one
-  if (!m_file) {
-    // Since we open a new file, we also reset the number of full events
+  if (!m_file)
     openFile();
-  }
 
   if (!m_keepParents) {
     if (m_fileMetaData) {

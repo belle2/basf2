@@ -13,9 +13,9 @@ using namespace Belle2;
 
 KLMMuidHit::KLMMuidHit() :
   m_PdgCode(0),
-  m_ExtPosition(0, 0, 0),
+  m_ExtPosition{0.0, 0.0, 0.0},
   m_ExtTime(0.0),
-  m_HitPosition(0, 0, 0),
+  m_HitPosition{0.0, 0.0, 0.0},
   m_HitTime(0.0),
   m_InBarrel(false),
   m_IsForward(false),
@@ -25,12 +25,13 @@ KLMMuidHit::KLMMuidHit() :
 {
 }
 
-KLMMuidHit::KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition,
-                       const TVector3& hitPosition, double extTime, double hitTime, double chiSquared) :
+KLMMuidHit::KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer,
+                       const ROOT::Math::XYZVector& extPosition, const ROOT::Math::XYZVector& hitPosition,
+                       double extTime, double hitTime, double chiSquared) :
   m_PdgCode(pdgCode),
-  m_ExtPosition(extPosition),
+  m_ExtPosition{extPosition.X(), extPosition.Y(), extPosition.Z()},
   m_ExtTime(extTime),
-  m_HitPosition(hitPosition),
+  m_HitPosition{hitPosition.X(), hitPosition.Y(), hitPosition.Z()},
   m_HitTime(hitTime),
   m_InBarrel(inBarrel),
   m_IsForward(isForward),

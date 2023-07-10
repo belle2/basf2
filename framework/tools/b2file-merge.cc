@@ -353,7 +353,7 @@ The following restrictions apply:
   }
 
   // we need to set the LFN to the absolute path name
-  outputMetaData->setLfn(fs::absolute(outputfilename, fs::initial_path()).string());
+  outputMetaData->setLfn(fs::absolute(outputfilename).string());
   // and maybe register it in the file catalog
   if(variables.count("add-to-catalog")>0) {
     FileCatalog::Instance().registerFile(outputfilename, *outputMetaData);

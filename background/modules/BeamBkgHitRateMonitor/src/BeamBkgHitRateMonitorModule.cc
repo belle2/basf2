@@ -355,7 +355,7 @@ void BeamBkgHitRateMonitorModule::setFileMetaData()
   }
 
   std::string lfn = m_file->GetName();
-  lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+  lfn = std::filesystem::absolute(lfn).string();
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
   if (!format.empty()) {
     auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");

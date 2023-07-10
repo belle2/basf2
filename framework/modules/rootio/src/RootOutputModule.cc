@@ -406,7 +406,7 @@ void RootOutputModule::fillFileMetaData()
   // Set the LFN to the filename: if it's a URL to directly, otherwise make sure it's absolute
   std::string lfn = m_file->GetName();
   if(m_regularFile) {
-    lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+    lfn = std::filesystem::absolute(lfn).string();
   }
   // Format LFN if BELLE2_LFN_FORMATSTRING is set
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");

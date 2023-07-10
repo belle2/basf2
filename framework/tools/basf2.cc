@@ -70,8 +70,8 @@ namespace {
       return;
     }
     // otherwise execute the steering file
-    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
-    if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
+    auto fullPath = std::filesystem::absolute(std::filesystem::path(pythonFile));
+    if ((!(std::filesystem::is_directory(fullPath))) && (std::filesystem::exists(fullPath))) {
 
       std::ifstream file(fullPath.string().c_str());
       std::stringstream buffer;

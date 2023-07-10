@@ -148,7 +148,7 @@ namespace Belle2::Conditions {
     }
     return store(name, iov, resolved.string(), [&resolved](const std::string & destination) {
       // copy payload file to payload directory and rename it to follow the file name convention
-      fs::copy_file(resolved, destination, fs::copy_option::overwrite_if_exists);
+      fs::copy_file(resolved, destination, fs::copy_options::overwrite_existing);
       return true;
     });
   }
@@ -222,7 +222,7 @@ namespace Belle2::Conditions {
           fs::rename(sourcefile, filename);
           delete_srcfile.release();
         } else {
-          fs::copy_file(source, filename, fs::copy_option::overwrite_if_exists);
+          fs::copy_file(source, filename, fs::copy_options::overwrite_existing);
         }
       }
       found = true;

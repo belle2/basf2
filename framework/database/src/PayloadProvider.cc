@@ -130,8 +130,8 @@ namespace Belle2::Conditions {
         throw std::runtime_error("cannot open file for writing????");
       }
       // and make sure it's readable for all
-      boost::filesystem::permissions(local, boost::filesystem::all_all &
-                                     ~(boost::filesystem::owner_exe | boost::filesystem::group_exe | boost::filesystem::others_exe));
+      fs::permissions(local, fs::perms::all &
+                      ~(fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec));
       // File is open. Someone might have downloaded the file
       // while we waited, check md5sum again.
       B2DEBUG(37, "Ok, check digest in case another process downloaded already...");

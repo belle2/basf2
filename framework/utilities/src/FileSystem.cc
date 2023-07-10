@@ -118,7 +118,9 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
   for (auto dir : dirs) {
     if (dir.empty())
       continue;
-    fullpath = (fs::path(dir) / path).string();
+    if (fs::path(path).is_absolute())
+      fullpath = (fs::path(dir) += path).string();
+    else fullpath = (fs::path(dir) / path).string();
     if (fileExists(fullpath)) {
       if (isSymLink(fullpath) or isSymLink(dir))
         return fullpath;

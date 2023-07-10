@@ -52,14 +52,18 @@ void RawData::getChannelGroups(std::vector<ChannelGroup>& channelGroups) const
   ChannelGroup group;
   if (multipleStripHit()) {
     int asic = (m_Channel - 1) / c_NChannelsAsic;
-    int channelBase = 15 * asic;
+    int channelBase = c_NChannelsAsic * asic;
     channelGroups.clear();
     if (m_Type == 0x4) { // for old scintillator-readout firmware with bug
       if ((m_TriggerBits & 0xF) != 0) {
         group.firstChannel = channelBase + 1;
-        group.lastChannel = channelBase + 15;
+        group.lastChannel = channelBase + c_NChannelsAsic;
         channelGroups.push_back(group);
       }
+    } else if ((m_Type == 0x5) && (m_FE != 0)) { // for new scintillator-readout firmware
+      group.firstChannel = m_Channel;
+      group.lastChannel = 0;
+      channelGroups.push_back(group);
     } else if ((m_Type == 0x5) && (m_FE == 0)) { // for new scintillator-readout firmware
       if ((m_TriggerBits & 0x1) != 0) {
         group.firstChannel = channelBase + 1;
@@ -78,7 +82,7 @@ void RawData::getChannelGroups(std::vector<ChannelGroup>& channelGroups) const
       }
       if ((m_TriggerBits & 0x8) != 0) {
         group.firstChannel = channelBase + 13;
-        group.lastChannel = channelBase + 15;
+        group.lastChannel = channelBase + c_NChannelsAsic;
         channelGroups.push_back(group);
       }
     }

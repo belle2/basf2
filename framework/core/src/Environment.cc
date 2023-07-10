@@ -120,7 +120,7 @@ Environment::Environment() :
   }
 
   // add module directories for current build options, starting with the working directory on program startup
-  std::string added_dirs = fs::initial_path().string();
+  std::string added_dirs = fs::current_path().string();
   ModuleManager::Instance().addModuleSearchPath(added_dirs);
 
   if (envarAnalysisDir) {

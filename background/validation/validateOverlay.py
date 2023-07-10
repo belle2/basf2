@@ -196,16 +196,16 @@ class Histogrammer(b2.Module):
 
         # CDC
         cdcHits = Belle2.PyStoreArray('CDCHits')
-        self.hist2[6].Fill(cdcHits.getEntries() / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
         nCDC_in = 0
         nCDC_out = 0
-        for cdcHit in cdcHits:
-            if cdcHit.getICLayer() < 8:  # count wires of inner/outer layers
+        for cdcHit in cdcHits:  # count wires of inner/outer layers
+            if cdcHit.getISuperLayer() == 0 and cdcHit.getADCCount() > 15:
                 nCDC_in += 1
-            else:
+            if cdcHit.getISuperLayer() != 0 and cdcHit.getADCCount() > 18:
                 nCDC_out += 1
         self.hist2[4].Fill(nCDC_in/self.nCDCin / self.CDCITIn)
         self.hist2[5].Fill(nCDC_out/self.nCDCout / self.CDCITout)
+        self.hist2[6].Fill((nCDC_in+nCDC_out) / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
 
     def terminate(self):
         """ Write histograms to file."""

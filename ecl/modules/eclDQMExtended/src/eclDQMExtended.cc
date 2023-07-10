@@ -344,13 +344,13 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
 
 void ECLDQMEXTENDEDModule::initDspfromFile()
 {
-  const boost::filesystem::path MainDir(m_DSPDirectoryName);
-  const boost::filesystem::path RunSubDir(m_RunName);
+  const std::filesystem::path MainDir(m_DSPDirectoryName);
+  const std::filesystem::path RunSubDir(m_RunName);
   const std::regex Filter(".*(crate)([0-9]{2})/.*(dsp)([0-9]{2})(.dat)");
   if (!exists(MainDir / RunSubDir)) B2FATAL("ECL DQM logic test FATAL: Directory w/ DSP files don't exist" << LogVar("Directory",
                                               MainDir / RunSubDir));
-  for (boost::filesystem::directory_entry& x : boost::filesystem::recursive_directory_iterator(MainDir / RunSubDir)) {
-    if (!std::regex_match(x.path().string(), Filter) || !boost::filesystem::is_regular_file(x.path())) continue;
+  for (const std::filesystem::directory_entry& x : std::filesystem::recursive_directory_iterator(MainDir / RunSubDir)) {
+    if (!std::regex_match(x.path().string(), Filter) || !std::filesystem::is_regular_file(x.path())) continue;
     int iCrate = atoi(std::regex_replace(x.path().string(), Filter, "$2").c_str());
     int iShaperPosition = atoi(std::regex_replace(x.path().string(), Filter, "$4").c_str());
     int iShaper = (iCrate - 1) * 12 + iShaperPosition;

@@ -280,7 +280,7 @@ namespace Belle2 {
       delete background_tree;
 
       if (specific_options.m_workingDirectory.empty()) {
-        boost::filesystem::remove_all(directory);
+        std::filesystem::remove_all(directory);
       }
 
       return weightfile;
@@ -371,7 +371,7 @@ namespace Belle2 {
       delete regression_tree;
 
       if (specific_options.m_workingDirectory.empty()) {
-        boost::filesystem::remove_all(directory);
+        std::filesystem::remove_all(directory);
       }
 
       return weightfile;

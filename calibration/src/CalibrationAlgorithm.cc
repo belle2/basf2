@@ -20,7 +20,7 @@
 using namespace Belle2;
 using namespace std;
 using namespace Calibration;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 const ExpRun CalibrationAlgorithm::m_allExpRun = make_pair(-1, -1);
 

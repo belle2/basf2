@@ -26,7 +26,7 @@
 
 using namespace std;
 using namespace Belle2;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 bool FileSystem::fileExists(const string& filename)
 {

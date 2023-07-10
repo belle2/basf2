@@ -352,7 +352,7 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
     B2FATAL("Sorry, you must only import one file at a time for now!");
 
   //Expect a root file
-  boost::filesystem::path path(m_inputFileNames[0]);
+  std::filesystem::path path(m_inputFileNames[0]);
   if (path.extension() != ".root")
     B2FATAL("Expecting a .root file. Aborting");
 
@@ -430,7 +430,7 @@ void ECLDatabaseImporter::importTrackClusterMatchingThresholds()
     B2FATAL("Sorry, you must only import one file at a time for now!");
 
   //Expect a txt file
-  boost::filesystem::path path(m_inputFileNames[0]);
+  std::filesystem::path path(m_inputFileNames[0]);
   if (path.extension() != ".txt")
     B2FATAL("Expecting a .txt file. Aborting");
 

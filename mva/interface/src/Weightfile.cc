@@ -46,9 +46,9 @@ namespace Belle2 {
     Weightfile::~Weightfile()
     {
       for (auto& filename : m_filenames) {
-        if (boost::filesystem::exists(filename)) {
+        if (std::filesystem::exists(filename)) {
           if (m_remove_temporary_directories)
-            boost::filesystem::remove_all(filename);
+            std::filesystem::remove_all(filename);
         }
       }
     }
@@ -211,7 +211,7 @@ namespace Belle2 {
     Weightfile Weightfile::loadFromROOTFile(const std::string& filename)
     {
 
-      if (not boost::filesystem::exists(filename)) {
+      if (not std::filesystem::exists(filename)) {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 
@@ -233,7 +233,7 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromXMLFile(const std::string& filename)
     {
-      if (not boost::filesystem::exists(filename)) {
+      if (not std::filesystem::exists(filename)) {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 

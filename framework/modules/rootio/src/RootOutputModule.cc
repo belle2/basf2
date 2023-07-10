@@ -173,7 +173,7 @@ void RootOutputModule::openFile()
   m_nFullEvents = 0;
   // Continue with opening the file
   TDirectory* dir = gDirectory;
-  boost::filesystem::path out{m_outputFileName};
+  std::filesystem::path out{m_outputFileName};
   if (m_outputSplitSize) {
     // Mangle the filename to add the fNNNNN part. However we need to be
     // careful since the file name could be non-local and have some options or
@@ -181,7 +181,7 @@ void RootOutputModule::openFile()
     // http://mydomain.org/filename.root?foo=bar#baz). So use "TUrl" *sigh* to
     // do the parsing and only replace the extension of the file part.
     TUrl fileUrl(m_outputFileName.c_str(), m_regularFile);
-    boost::filesystem::path file{fileUrl.GetFile()};
+    std::filesystem::path file{fileUrl.GetFile()};
     file.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
     fileUrl.SetFile(file.c_str());
     // In case of regular files we don't want the protocol or anything, just the file
@@ -192,7 +192,7 @@ void RootOutputModule::openFile()
     //try creating necessary directories since this is a local file
     auto dirpath = out.parent_path();
 
-    if (boost::filesystem::create_directories(dirpath)) {
+    if (std::filesystem::create_directories(dirpath)) {
       B2INFO("Created missing directory " << dirpath << ".");
       //try again
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");

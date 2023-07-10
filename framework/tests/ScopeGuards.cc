@@ -150,20 +150,20 @@ namespace {
   /** Test guarding the current working directory */
   TEST(ScopeGuards, WorkingDirectory)
   {
-    std::string start{boost::filesystem::current_path().c_str()};
+    std::string start{std::filesystem::current_path().c_str()};
     std::string tmpdir("/tmp");
     std::string root("/");
     {
       auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory("/tmp"); // cppcheck-suppress unreadVariable
-      ASSERT_EQ(tmpdir, boost::filesystem::current_path().c_str());
+      ASSERT_EQ(tmpdir, std::filesystem::current_path().c_str());
       {
         auto guard2 = Belle2::ScopeGuard::guardWorkingDirectory("/");
-        ASSERT_EQ(root, boost::filesystem::current_path().c_str());
+        ASSERT_EQ(root, std::filesystem::current_path().c_str());
         guard2.release();
       }
-      ASSERT_EQ(root, boost::filesystem::current_path().c_str());
+      ASSERT_EQ(root, std::filesystem::current_path().c_str());
     }
-    ASSERT_EQ(start, boost::filesystem::current_path().c_str());
+    ASSERT_EQ(start, std::filesystem::current_path().c_str());
   }
 
 

@@ -152,7 +152,7 @@ namespace {
 
     EXPECT_THROW(MVA::Weightfile::loadFromDatabase("DOES_NOT_EXIST"), std::runtime_error);
 
-    boost::filesystem::remove_all("testPayloads");
+    std::filesystem::remove_all("testPayloads");
     Database::reset();
 
   }
@@ -223,7 +223,7 @@ namespace {
 
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
-    boost::filesystem::remove_all("testPayloads");
+    std::filesystem::remove_all("testPayloads");
     Database::reset();
 
   }
@@ -246,7 +246,7 @@ namespace {
 
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
-    boost::filesystem::remove_all("testPayloads");
+    std::filesystem::remove_all("testPayloads");
     Database::reset();
 
   }
@@ -317,9 +317,9 @@ namespace {
       {
         std::ofstream a(filename);
       }
-      EXPECT_TRUE(boost::filesystem::exists(filename));
+      EXPECT_TRUE(std::filesystem::exists(filename));
     }
-    EXPECT_FALSE(boost::filesystem::exists(filename));
+    EXPECT_FALSE(std::filesystem::exists(filename));
 
     {
       MVA::Weightfile weightfile2;
@@ -328,11 +328,11 @@ namespace {
       {
         std::ofstream a(filename);
       }
-      EXPECT_TRUE(boost::filesystem::exists(filename));
+      EXPECT_TRUE(std::filesystem::exists(filename));
     }
-    EXPECT_TRUE(boost::filesystem::exists(filename));
-    boost::filesystem::remove_all(boost::filesystem::path(filename).parent_path());
-    EXPECT_FALSE(boost::filesystem::exists(boost::filesystem::path(filename).parent_path()));
+    EXPECT_TRUE(std::filesystem::exists(filename));
+    std::filesystem::remove_all(std::filesystem::path(filename).parent_path());
+    EXPECT_FALSE(std::filesystem::exists(std::filesystem::path(filename).parent_path()));
 
     char* directory_template = strdup("/tmp/Basf2Sub.XXXXXX");
     auto tempdir = std::string(mkdtemp(directory_template));
@@ -343,8 +343,8 @@ namespace {
       EXPECT_EQ(filename.substr(0, tempdir.size()), tempdir);
     }
     free(directory_template);
-    boost::filesystem::remove_all(tempdir);
-    EXPECT_FALSE(boost::filesystem::exists(tempdir));
+    std::filesystem::remove_all(tempdir);
+    EXPECT_FALSE(std::filesystem::exists(tempdir));
 
   }
 

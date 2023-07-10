@@ -51,7 +51,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
 
 
     map<string, string> moduleNameLibMap;
-    for (boost::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
+    for (std::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
       //Only files in the given folder are taken, subfolders are not used.
       if (boost::filesystem::is_regular_file(dirItr->status())) {
         if (boost::filesystem::extension(dirItr->path()) == MAP_FILE_EXTENSION) {
@@ -152,7 +152,7 @@ bool ModuleManager::allModulesHaveFlag(const ModulePtrList& list, unsigned int f
 //============================================================================
 
 void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap,
-                                         const boost::filesystem::directory_entry& mapPath)
+                                         const std::filesystem::directory_entry& mapPath)
 {
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();

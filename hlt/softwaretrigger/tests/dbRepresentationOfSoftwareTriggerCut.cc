@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Destroy the DB and the DataStore.
       void TearDown()
       {
-        boost::filesystem::remove_all("testPayloads");
+        std::filesystem::remove_all("testPayloads");
         DataStore::Instance().reset();
       }
     };

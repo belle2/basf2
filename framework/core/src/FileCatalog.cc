@@ -16,7 +16,7 @@
 #include <filesystem>
 
 using namespace Belle2;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 
 

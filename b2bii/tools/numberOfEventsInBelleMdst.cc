@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   // delete existing FileIO
   BsClrTab(BBS_CLEAR_ALL);
   // Check if file exists
-  if (!boost::filesystem::exists(filename)) {
+  if (!std::filesystem::exists(filename)) {
     std::cout << "Couldn't find file!" << std::endl;
     return 1;
   }

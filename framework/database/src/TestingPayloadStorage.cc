@@ -20,7 +20,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Belle2::Conditions {
   TestingPayloadStorage::TestingPayloadStorage(const std::string& filename):

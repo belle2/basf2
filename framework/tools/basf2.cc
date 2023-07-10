@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
   //Get the lib path (checked for NULL in Environment)
   const char* belle2SubDir = getenv("BELLE2_SUBDIR");
-  boost::filesystem::path libPath = "lib";
+  std::filesystem::path libPath = "lib";
   libPath /= belle2SubDir;
 
   string runModuleIOVisualization(""); //nothing done if empty
@@ -421,7 +421,7 @@ int main(int argc, char* argv[])
   //---------------------------------------------------
   if (!pythonFile.empty()) {
     //Search in local or central lib/ if this isn't a direct path
-    if (!boost::filesystem::exists(pythonFile)) {
+    if (!std::filesystem::exists(pythonFile)) {
       std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
       if (!libFile.empty())
         pythonFile = libFile;

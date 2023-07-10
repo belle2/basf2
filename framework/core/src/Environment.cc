@@ -22,7 +22,7 @@
 
 using namespace Belle2;
 using namespace std;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 
 Environment& Environment::Instance()

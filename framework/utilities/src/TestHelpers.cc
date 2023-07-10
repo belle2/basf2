@@ -20,7 +20,7 @@
 #include <vector>
 
 using namespace Belle2::TestHelpers;
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 void TestWithGearbox::SetUpTestCase()
 {

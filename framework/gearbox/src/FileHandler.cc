@@ -21,7 +21,7 @@
 
 using namespace std;
 namespace io = boost::iostreams;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Belle2::gearbox {
 

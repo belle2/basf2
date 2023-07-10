@@ -79,7 +79,7 @@ manager (using the :ref:`b2conditionsdb-request <b2conditionsdb-request>` tool) 
 cases:
 
 .. warning::
-   The IoV (1002,0,1002,-1), covering Phase 2, was supported until the globaltag `main_2023-06-29`.
+   The IoV (1002,0,1002,-1), covering Phase 2, was supported until the globaltag ``main_2023-06-29``.
 
 
 Create a new payload

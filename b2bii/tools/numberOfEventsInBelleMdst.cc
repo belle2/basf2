@@ -22,7 +22,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;

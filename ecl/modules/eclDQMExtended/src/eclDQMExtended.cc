@@ -24,10 +24,10 @@
 #include <TH2F.h>
 
 /* Boost headers. */
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
 /* C++ headers. */
+#include <filesystem>
 #include <iostream>
 #include <map>
 #include <regex>

@@ -9,10 +9,9 @@
 #include <mva/interface/Dataset.h>
 #include <framework/utilities/TestHelpers.h>
 
-#include <boost/filesystem/operations.hpp>
-
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <fstream>
 #include <numeric>
 

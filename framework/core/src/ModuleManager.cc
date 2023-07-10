@@ -11,9 +11,7 @@
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/filesystem.hpp>
 #include <regex>
-
 #include <fstream>
 
 using namespace Belle2;

@@ -27,9 +27,9 @@
 #include <framework/utilities/EnvironmentVariables.h>
 
 #include <boost/python.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;

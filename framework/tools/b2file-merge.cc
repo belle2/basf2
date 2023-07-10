@@ -14,13 +14,13 @@
 #include <framework/utilities/KeyValuePrinter.h>
 
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranchElement.h>
 
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <string>

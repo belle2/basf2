@@ -16,7 +16,8 @@
 #include <TFile.h>
 #include <TObject.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
+
 #include <boost/algorithm/string.hpp>
 
 namespace fs = boost::filesystem;

@@ -19,8 +19,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/EnvironmentVariables.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -30,7 +28,7 @@
 
 #include <memory>
 #include <regex>
-
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;

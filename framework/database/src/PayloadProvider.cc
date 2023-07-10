@@ -10,9 +10,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <filesystem>
 #include <sys/stat.h>
 
 namespace fs = boost::filesystem;

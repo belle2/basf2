@@ -14,7 +14,7 @@
 #include <TPluginManager.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 #include <memory>
 
 namespace Belle2 {

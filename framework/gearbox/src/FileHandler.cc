@@ -14,7 +14,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <regex>
-#include <boost/filesystem.hpp>
+#include <filesystem>
+
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 

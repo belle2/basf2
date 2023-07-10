@@ -27,7 +27,6 @@
 #include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
 #include <csignal>
@@ -39,6 +38,7 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
+#include <filesystem>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/valgrind.h>

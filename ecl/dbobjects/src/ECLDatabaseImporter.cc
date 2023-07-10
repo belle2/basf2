@@ -11,9 +11,7 @@
 #include <sstream>
 #include <fstream>
 #include <string>
-
-//Boost
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 // ECL
 #include <ecl/dbobjects/ECLDigitEnergyConstants.h>

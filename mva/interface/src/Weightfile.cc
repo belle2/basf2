@@ -17,7 +17,6 @@
 #include <boost/archive/iterators/transform_width.hpp>
 
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -26,7 +25,7 @@
 #include <TFile.h>
 
 #include <sstream>
-
+#include <filesystem>
 
 namespace Belle2 {
   namespace MVA {

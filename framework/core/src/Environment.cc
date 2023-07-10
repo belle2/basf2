@@ -15,11 +15,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/FileMetaData.h>
 
-#include <boost/filesystem.hpp>
 #include <memory>
-
 #include <iostream>
 #include <cstdlib>
+#include <filesystem>
 
 using namespace Belle2;
 using namespace std;

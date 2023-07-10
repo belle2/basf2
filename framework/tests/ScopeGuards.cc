@@ -9,7 +9,7 @@
 #include <framework/utilities/ScopeGuard.h>
 #include <framework/utilities/Utils.h>
 #include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace {
   /** Simple functor to set and get the values of an integer */

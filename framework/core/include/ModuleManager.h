@@ -15,12 +15,7 @@
 #include <string>
 #include <map>
 #include <list>
-
-namespace boost {
-  namespace filesystem {
-    class directory_entry;
-  }
-}
+#include <filesystem>
 
 namespace Belle2 {
 

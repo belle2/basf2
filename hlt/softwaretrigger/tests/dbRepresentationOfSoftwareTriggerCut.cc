@@ -9,7 +9,7 @@
 #include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>

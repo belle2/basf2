@@ -14,7 +14,7 @@
 
 #include <TLeaf.h>
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 
 namespace Belle2 {
   namespace MVA {

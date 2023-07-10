@@ -12,10 +12,10 @@
 
 #include <framework/database/Configuration.h>
 #include <framework/database/Database.h>
-#include <boost/filesystem/operations.hpp>
 
 #include <TFile.h>
 
+#include <filesystem>
 #include <fstream>
 
 #include <gtest/gtest.h>

@@ -11,7 +11,7 @@
 //-
 
 
-#include <dqm/analysis/shminput/DQMHistAnalysisInput.h>
+#include <dqm/analysis/shminput/modules/DQMHistAnalysisInput.h>
 
 #include <TROOT.h>
 #include <TKey.h>
@@ -130,6 +130,8 @@ void DQMHistAnalysisInputModule::event()
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
+    m_expno = 22;
+    m_runno = 1;
     if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString()).c_str());
   } else {
     if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated "

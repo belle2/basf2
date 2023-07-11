@@ -42,7 +42,7 @@ class Histogrammer(b2.Module):
         #: list of digits histograms
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
-                              200, 20000, 80000))
+                              200, 10000, 80000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
@@ -66,6 +66,8 @@ class Histogrammer(b2.Module):
         self.nPXDL1 = 250*768*2 * 8
         #: number of PXD pixels (L2)
         self.nPXDL2 = 250*768*2 * 12
+        if len(sys.argv) == 3 and int(sys.argv[2]) == 1003:
+            self.nPXDL2 = 250*768*2 * 2
         #: number of PXD pixels (L1+L2)
         self.nPXD = self.nPXDL1 + self.nPXDL2
 
@@ -87,43 +89,60 @@ class Histogrammer(b2.Module):
         for h in self.allh:
             if h.GetName() == 'PXDOccupancy':
                 h.SetXTitle('PXD occupancy [%]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'PXD L1+L2 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
             elif h.GetName() == 'PXDL1Occupancy':
                 h.SetXTitle('PXD L1 occupancy [%]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'PXD L1 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
             elif h.GetName() == 'PXDL2Occupancy':
                 h.SetXTitle('PXD L2 occupancy [%]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'PXD L2 Occupancy per event - no data reduction (with BG overlay only and no event generator)')
             elif h.GetName() == 'SVDOccupancy':
                 h.SetXTitle('SVD L3 ZS5 occupancy - average u,v [%]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'SVD ZS5 L3 Occupancy per event average u,v (with BG overlay only and no event generator)')
             elif h.GetName() == 'CDCHitRate':
                 h.SetXTitle('CDC Hit Rate [kHz/wire]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'CDC Hit Rate, averaged inner/outer wires (with BG overlay only and no event generator)')
             elif h.GetName() == 'CDCInnerHitRate':
                 h.SetXTitle('CDC Hit Rate for Inner Layers [kHz/wire]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'CDC Hit Rate per wire, for the Inner layers (with BG overlay only and no event generator)')
             elif h.GetName() == 'CDCOuterHitRate':
                 h.SetXTitle('CDC Hit Rate for Outer Layers [kHz/wire]')
+                option = 'shifter'
                 descr = TNamed(
                     'Description',
                     'CDC Hit Rate per wire, for the Outer layers (with BG overlay only and no event generator)')
             else:
                 h.SetXTitle('number of digits in event')
+                option = 'shifter'
                 descr = TNamed('Description', 'Number of background ' + h.GetName() +
                                ' per event (with BG overlay only and no event generator)')
+
+            if h.GetName() == 'PXDDigits':
+                option = 'expert'
+            elif h.GetName() == 'SVDShaperDigits':
+                option = 'expert'
+            elif h.GetName() == 'SVDShaperDigitsZS5':
+                option = 'expert'
+            elif h.GetName() == 'CDCHits':
+                option = 'expert'
 
             h.SetYTitle('entries per bin')
             h.GetListOfFunctions().Add(descr)
@@ -131,7 +150,7 @@ class Histogrammer(b2.Module):
             h.GetListOfFunctions().Add(check)
             contact = TNamed('Contact', 'marko.staric@ijs.si')
             h.GetListOfFunctions().Add(contact)
-            options = TNamed('MetaOptions', 'shifter')
+            options = TNamed('MetaOptions', option)
             h.GetListOfFunctions().Add(options)
 
             ntplvar = "PXDL1_occupancy:PXDL2_occupancy:PXD_occupancy:SVDL3ZS5_occupancy"
@@ -177,16 +196,16 @@ class Histogrammer(b2.Module):
 
         # CDC
         cdcHits = Belle2.PyStoreArray('CDCHits')
-        self.hist2[6].Fill(cdcHits.getEntries() / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
         nCDC_in = 0
         nCDC_out = 0
-        for cdcHit in cdcHits:
-            if cdcHit.getICLayer() < 8:  # count wires of inner/outer layers
+        for cdcHit in cdcHits:  # count wires of inner/outer layers
+            if cdcHit.getISuperLayer() == 0 and cdcHit.getADCCount() > 15:
                 nCDC_in += 1
-            else:
+            if cdcHit.getISuperLayer() != 0 and cdcHit.getADCCount() > 18:
                 nCDC_out += 1
         self.hist2[4].Fill(nCDC_in/self.nCDCin / self.CDCITIn)
         self.hist2[5].Fill(nCDC_out/self.nCDCout / self.CDCITout)
+        self.hist2[6].Fill((nCDC_in+nCDC_out) / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
 
     def terminate(self):
         """ Write histograms to file."""
@@ -205,8 +224,11 @@ class Histogrammer(b2.Module):
 
 
 bg = None
-if len(sys.argv) == 2:
+exp = 0
+if len(sys.argv) == 3:
+    b2.B2INFO('Using background samples for experiment ' + sys.argv[2] + ' at ' + sys.argv[1])
     bg = glob.glob(str(sys.argv[1]) + '/*.root')
+    exp = int(sys.argv[2])
 elif 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
     if bg is None:
@@ -221,7 +243,7 @@ main = b2.create_path()
 
 # Set number of events to generate
 eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1000], 'runList': [1], 'expList': [exp]})
 main.add_module(eventinfosetter)
 
 # Simulation

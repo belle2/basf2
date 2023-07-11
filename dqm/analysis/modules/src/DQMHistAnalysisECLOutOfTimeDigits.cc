@@ -117,7 +117,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
       std::string key_name = event_type + std::string("_") + ecl_part;
       // set values of monitoring variables (if variable already exists this will
       // change its value, otherwise it will insert new variable)
-      m_monObj->setVariable("out_of_time_" + key_name,
+      m_monObj->setVariable("out_of_time_digits_" + key_name,
                             m_out_of_time_digits[key_name]);
     }
   }

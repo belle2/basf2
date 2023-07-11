@@ -132,28 +132,28 @@ void SVDTimeCalibrationCollectorModule::collect()
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
   eventinfo->setAPVClock(m_hwClock);
 
-  for (int cl = 0 ; cl < m_svdClsOnTrk.getEntries(); cl++) {
+  for (const auto& svdCluster : m_svdClsOnTrk) {
     // get cluster time
-    float clTime_ftsw = m_svdClsOnTrk[cl]->getClsTime();
+    float clTime_ftsw = svdCluster.getClsTime();
 
     //remove firstFrame and triggerBin correction applied in the clusterizer AND relative shift 3/6 mixed sample DAQ
-    float clTime = eventinfo->getTimeInSVDReference(clTime_ftsw, m_svdClsOnTrk[cl]->getFirstFrame());
+    float clTime = eventinfo->getTimeInSVDReference(clTime_ftsw, svdCluster.getFirstFrame());
 
     //get cluster side
-    int side = m_svdClsOnTrk[cl]->isUCluster();
+    int side = svdCluster.isUCluster();
 
     //get layer
-    short unsigned int layer = m_svdClsOnTrk[cl]->getSensorID().getLayerNumber();
+    short unsigned int layer = svdCluster.getSensorID().getLayerNumber();
 
     //fill histograms only if EventT0 is there
     if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
 
-      float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, m_svdClsOnTrk[cl]->getFirstFrame());
+      float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, svdCluster.getFirstFrame());
 
       TString binLabel = TString::Format("L%iL%iS%i%c",
-                                         m_svdClsOnTrk[cl]->getSensorID().getLayerNumber(),
-                                         m_svdClsOnTrk[cl]->getSensorID().getLadderNumber(),
-                                         m_svdClsOnTrk[cl]->getSensorID().getSensorNumber(),
+                                         svdCluster.getSensorID().getLayerNumber(),
+                                         svdCluster.getSensorID().getLadderNumber(),
+                                         svdCluster.getSensorID().getSensorNumber(),
                                          side ? 'U' : 'V');
       int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
       double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);

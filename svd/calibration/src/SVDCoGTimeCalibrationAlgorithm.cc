@@ -82,7 +82,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 
     auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
     char side;
-    std::sscanf(binLabel.Data(), "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
+    std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
     view = 0;
     if (side == 'U')
       view = 1;

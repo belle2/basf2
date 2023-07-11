@@ -65,12 +65,14 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           TString binLabel = TString::Format("L%iL%iS%i%c", layer_num, ladder_num, sensor_num, side);
           int sensorBin = __hBinToSensorMap__->GetXaxis()->FindBin(binLabel.Data());
           B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << sensorBin);
+
           auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", sensorBin, sensorBin);
           if (!hClsTimeOnTracks)
             B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
           hClsTimeOnTracks->SetName(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           char sidePN = (side == 'U' ? 'P' : 'N');
           hClsTimeOnTracks->SetTitle(Form("clsTimeOnTracks in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hClsTimeOnTracks->SetDirectory(0);
 
           float clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
           auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
@@ -82,6 +84,7 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           if (abs(deviation) > m_allowedDeviationMean)
             B2ERROR("Histogram: " << hClsTimeOnTracks->GetName() << " deviates from EventT0 by" << deviation << " times the EventT0 RMS");
 
+          delete hClsTimeOnTracks;
         }
       }
     }

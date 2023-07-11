@@ -9,6 +9,8 @@
 
 #include <svd/dbobjects/SVDCoGCalibrationFunction.h>
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
+#include <svd/dataobjects/SVDHistograms.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <TF1.h>
 #include <TProfile.h>

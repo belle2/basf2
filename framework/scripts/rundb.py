@@ -47,7 +47,7 @@ class RunDB:
             self._session.auth = (username, getpass.getpass(f"DESY password ({username}): "))
         else:
             # Otherwise use the api key
-            self._session.headers.update({'Authorization': f'Bearer {apikey}'})
+            self._session.headers.update({'X-Authorization': f'Bearer {apikey}'})
         # And request json output ...
         self._session.headers.update({'Content-Type': 'application/json'})
 

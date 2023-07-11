@@ -307,7 +307,7 @@ def command_tag_modify(args, db=None):
         if typeinfo is None:
             return 1
         # seems so, ok modify the tag info
-        if info['gloalTagType'] != typeinfo:
+        if info['globalTagType'] != typeinfo:
             info["globalTagType"] = typeinfo
             changed = True
 

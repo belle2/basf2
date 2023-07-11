@@ -78,13 +78,9 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   auto __hEventT0NoSync__ = getObjectPtr<TH2F>("__hEventT0NoSync__");
   auto __hBinToSensorMap__ = getObjectPtr<TH1F>("__hBinToSensorMap__");
 
-  std::vector<TString> allSensors;
-  for (int ij = 0; ij < (__hBinToSensorMap__->GetNbinsX()); ij++)
-    allSensors.push_back(__hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1));
+  for (int ij = 0; ij < (__hBinToSensorMap__->GetNbinsX()); ij++) {
 
-  for (int ij = 0; ij < int(allSensors.size()); ij++) {
-
-    auto binLabel = allSensors[ij];
+    auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
     char side;
     std::sscanf(binLabel.Data(), "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
     view = 0;

@@ -9,8 +9,6 @@
 
 #include <svd/dbobjects/SVDCoGCalibrationFunction.h>
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
-#include <svd/dataobjects/SVDHistograms.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <TF1.h>
 #include <TProfile.h>
@@ -36,6 +34,9 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
   gROOT->SetBatch(true);
+
+  int ladderOfLayer[4] = {7, 10, 12, 16};
+  int sensorOnLayer[4] = {2, 3, 4, 5};
 
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
@@ -80,11 +81,13 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   auto __hEventT0NoSync__ = getObjectPtr<TH2F>("__hEventT0NoSync__");
   auto __hBinToSensorMap__ = getObjectPtr<TH1F>("__hBinToSensorMap__");
 
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
+  for (int layer = 0; layer < 4; layer++) {
+    layer_num = layer + 3;
+    for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
+      ladder_num = ladder + 1;
+      for (int sensor = 0; sensor < (int)sensorOnLayer[layer]; sensor++) {
+        sensor_num = sensor + 1;
+        for (view  = 1; view > -1; view--) {
           char side = 'U';
           if (view == 0)
             side = 'V';

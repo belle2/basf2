@@ -76,6 +76,7 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
 
           float clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
           auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
+          B2INFO(f"deviation = {deviation} in {binLabel.Data()}");
 
           B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<
                   " Entries (n. clusters): " << hClsTimeOnTracks->GetEntries() <<

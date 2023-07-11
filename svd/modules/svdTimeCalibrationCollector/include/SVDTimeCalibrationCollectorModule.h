@@ -69,8 +69,9 @@ namespace Belle2 {
     DBObjPtr<HardwareClockSettings> m_hwClock;  /**< systems clock*/
 
     /**SVDCluster */
-    std::string m_svdClusters = "SVDClustersFromTracks"; /**< Name of the SVDClusters store array used as parameter of the module*/
-    StoreArray<SVDCluster> m_svdCls; /**< SVDClusters store array*/
+    std::string m_svdClustersOnTracks =
+      "SVDClustersFromTracks"; /**< Name of the SVDClusters store array used as parameter of the module*/
+    StoreArray<SVDCluster> m_svdClsOnTrk; /**< SVDClusters store array*/
 
     /**EventT0 */
     std::string m_eventTime = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/

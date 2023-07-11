@@ -45,6 +45,11 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           " Entries (n. clusters): " << hEventT0->GetEntries() <<
           " Mean: " << eventT0_mean);
 
+  auto __hClsTimeOnTracks__     = getObjectPtr<TH2F>("__hClsTimeOnTracks__");
+  // auto __hClsTimeAll__          = getObjectPtr<TH2F>("__hClsTimeAll__");
+  // auto __hClsDiffTimeOnTracks__ = getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__");
+  auto __hBinToSensorMap__      = getObjectPtr<TH1F>("__hBinToSensorMap__");
+
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
     for (auto ladder : geoCache.getLadders(layer)) {
@@ -56,12 +61,18 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           auto layer_num = sensor.getLayerNumber();
           auto ladder_num = sensor.getLadderNumber();
           auto sensor_num = sensor.getSensorNumber();
-          auto hClsTimeOnTracks = getObjectPtr<TH1F>(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          float clsTimeOnTracks_mean = 0.;
-          if (hClsTimeOnTracks)
-            clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
-          else
+
+          TString binLabel = TString::Format("L%iL%iS%i%c", layer_num, ladder_num, sensor_num, side);
+          int sensorBin = __hBinToSensorMap__->GetXaxis()->FindBin(binLabel.Data());
+          B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << sensorBin);
+          auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", sensorBin, sensorBin);
+          if (!hClsTimeOnTracks)
             B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
+          hClsTimeOnTracks->SetName(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          char sidePN = (side == 'U' ? 'P' : 'N');
+          hClsTimeOnTracks->SetTitle(Form("clsTimeOnTracks in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+
+          float clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
           auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
 
           B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<

@@ -15,6 +15,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
 #include "TH1F.h"
+#include "TH2F.h"
+#include "TH3F.h"
 
 #include <svd/dataobjects/SVDHistograms.h>
 

@@ -41,7 +41,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
     for (auto& event_type : {"rand", "dphy", "physics"}) {
       for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
         std::string key_name = event_type + std::string("_") + ecl_part;
-        std::string pv_name = std::string("ECL:out_of_time_digits:") + event_type + ":" + ecl_part;
+        std::string pv_name = std::string("ECL:DQM:out_of_time_digits:") + event_type + ":" + ecl_part;
 
         // chid_out_of_time_digits[key_name] = 0;
         SEVCHK(ca_create_channel(pv_name.c_str(), NULL, NULL, 10,

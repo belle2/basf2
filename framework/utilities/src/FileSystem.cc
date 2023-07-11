@@ -218,7 +218,7 @@ bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
 
 FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fstream()
 {
-  fs::path filename = fs::temp_directory_path() / std::tmpnam(nullptr);
+  fs::path filename = std::tmpnam(nullptr);
   m_filename = filename.native();
   open(m_filename.c_str(), mode);
   if (!is_open()) {

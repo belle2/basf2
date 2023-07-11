@@ -229,7 +229,7 @@ namespace Belle2::Conditions {
       break;
     }
     if (!found) {
-      B2ERROR("Cannot create payload file: checksum mistmatch for existing files");
+      B2ERROR("Cannot create payload file: checksum mismatch for existing files");
       return false;
     }
     // Ok, add to the text file

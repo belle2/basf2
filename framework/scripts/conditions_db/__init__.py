@@ -56,6 +56,7 @@ def chunks(container, chunk_size):
 
 class BearerAuth(requests.auth.AuthBase):
     """Simple class to present bearer token instead of username/password"""
+
     def __init__(self, token):
         """Construct from a token"""
         #: Authorization header to send with each request
@@ -63,7 +64,7 @@ class BearerAuth(requests.auth.AuthBase):
 
     def __call__(self, r):
         """Update headers to include token"""
-        r.headers["authorization"] = self._authtoken
+        r.headers["X-Authorization"] = self._authtoken
         return r
 
 

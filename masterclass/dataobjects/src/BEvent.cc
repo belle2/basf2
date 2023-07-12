@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include "masterclass/dataobjects/BEvent.h"
+#include <iostream>
 
 BEvent::BEvent() :
   m_evno{0},
@@ -33,8 +34,9 @@ int BEvent::EventNo()
 void BEvent::AddTrack(float px, float py, float pz, float e,
                       float charge, SIMPLEPID pid)
 {
-  const TClonesArray& particles = *m_particles;
-  new (particles[m_nprt++]) BParticle(px, py, pz, e, charge, pid);
+  // const TClonesArray& particles = *m_particles;
+  // new (particles[m_nprt++]) BParticle(px, py, pz, e, charge, pid);
+  new ((*m_particles)[m_nprt++]) BParticle(px, py, pz, e, charge, pid);
 }
 
 int BEvent::NParticles()

@@ -103,15 +103,11 @@ void SVDTimeValidationCollectorModule::collect()
       // get cluster time
       float clTime = svdCluster.getClsTime();
 
-      char side = 'V';
-      if (svdCluster.isUCluster())
-        side = 'U';
-
       TString binLabel = TString::Format("L%iL%iS%i%c",
                                          svdCluster.getSensorID().getLayerNumber(),
                                          svdCluster.getSensorID().getLadderNumber(),
                                          svdCluster.getSensorID().getSensorNumber(),
-                                         side ? 'U' : 'V');
+                                         svdCluster.isUCluster() ? 'U' : 'V');
       int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
       double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
 
@@ -124,15 +120,11 @@ void SVDTimeValidationCollectorModule::collect()
       // get cluster time
       float clTime = svdCluster.getClsTime();
 
-      char side = 'V';
-      if (svdCluster.isUCluster())
-        side = 'U';
-
       TString binLabel = TString::Format("L%iL%iS%i%c",
                                          svdCluster.getSensorID().getLayerNumber(),
                                          svdCluster.getSensorID().getLadderNumber(),
                                          svdCluster.getSensorID().getSensorNumber(),
-                                         side ? 'U' : 'V');
+                                         svdCluster.isUCluster() ? 'U' : 'V');
       int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
       double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
 

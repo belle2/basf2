@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include "masterclass/dataobjects/BParticle.h"
-
+#include <iostream>
 
 BParticle::BParticle(float px, float py, float pz, float e,
                      float charge, SIMPLEPID pid)
@@ -41,7 +41,7 @@ float BParticle::GetMass(SIMPLEPID pid)
 
   switch (pid) {
     case PHOTON:   return 0;
-    case ELECTRON: return 0.51;
+    case ELECTRON: return 0.00051;
     case PION:     return 0.139;
     case MUON:     return 0.105;
     case KAON:     return 0.497;

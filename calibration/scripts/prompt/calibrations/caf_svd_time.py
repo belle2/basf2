@@ -50,7 +50,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "timeAlgorithms": ["CoG3", "ELS3"],
+                                   "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
                                    "max_events_per_run":  60000,
                                    "max_events_per_file": 30000,
                                    "isMC": False,

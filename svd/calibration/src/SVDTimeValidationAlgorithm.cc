@@ -58,9 +58,6 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
     char side;
     int layer_num, ladder_num, sensor_num;
     std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
-    int view = 0;
-    if (side == 'U')
-      view = 1;
 
     B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 

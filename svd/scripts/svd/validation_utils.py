@@ -280,6 +280,8 @@ def get_merged_collector_histograms(files):
         # Show the progress
         progress(count+1, num_files)
 
+    print()
+
     for algo in CollectorHistograms:
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:

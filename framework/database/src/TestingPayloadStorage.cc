@@ -173,7 +173,7 @@ namespace Belle2::Conditions {
     if (source.empty()) {
       while (true) {
         fs::path tmpfilename(std::tmpnam(nullptr));
-        sourcefile = fs::path(m_payloadDir) / tmpfilename.string().erase(0, 5);
+        sourcefile = fs::path(m_payloadDir) / tmpfilename.filename();
         auto fd = open(sourcefile.c_str(), O_CREAT | O_EXCL);
         if (fd >= 0) {
           close(fd);

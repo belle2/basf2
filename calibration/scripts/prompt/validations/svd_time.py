@@ -9,7 +9,6 @@
 ##########################################################################
 
 from pathlib import Path
-import sys
 
 import pandas as pd
 import seaborn as sns
@@ -31,15 +30,6 @@ settings = ValidationSettings(name="caf_svd_time",
                               description=__doc__,
                               download_files=[],
                               expert_config=None)
-
-
-def progress(count, total):
-    bar_len = 60
-    filled_len = int(round(bar_len * count / total))
-    percents = round(100 * count / total, 1)
-    bar = '=' * filled_len + '-' * (bar_len - filled_len)
-    sys.stdout.write(f'[{bar}] {percents}%\r')
-    sys.stdout.flush()
 
 
 def run_validation(job_path, input_data_path=None, **kwargs):
@@ -64,56 +54,58 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     roc_U = {algo: {} for algo in vu.time_algorithms}
     roc_V = {algo: {} for algo in vu.time_algorithms}
 
-    num_files = len(files)
-    print(f'Looping over {num_files} files')
-    progress(0, num_files)
-    for count, in_file_name in enumerate(files):
+    CollectorHistograms = vu.get_merged_collector_histograms(files)
 
-        in_file = r.TFile(str(in_file_name))
+    max_total_run = 0
+    for algo in CollectorHistograms:
+        for exp in CollectorHistograms[algo]:
+            for run in CollectorHistograms[algo][exp]:
+                total_run = len(CollectorHistograms[algo][exp])
+                if total_run > max_total_run:
+                    max_total_run = total_run
+    max_total_run *= 3          # for max 3 algo
 
-        for algo in vu.time_algorithms:
+    for algo in vu.time_algorithms:
+        for exp in CollectorHistograms[algo]:
+            for run in CollectorHistograms[algo][exp]:
+                print(f"working with : algo {algo} exp {exp} run {run}")
 
-            histos, exp, run = vu.get_histos(in_file, algo)
+                histos = vu.get_histos(CollectorHistograms[algo][exp][run])
 
-            if histos is None:
-                print(f'Skipping file {in_file_name} for {algo}')
-                continue
+                if histos is None:
+                    print(f'Skipping file algo {algo} exp {exp} run {run}')
+                    continue
 
-            # if some histogram is empty (too little stat) do not crash but skip that file for that calibration
-            try:
-                entries_eventT0_ = histos['eventT0'].GetEntries()
-                if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
-                    agreements[algo][run] = {key: vu.get_agreament(histos['eventT0'], h_diff)
-                                             for key, h_diff in histos['diff'].items()}
-                    precisions[algo][run] = {key: vu.get_precision(h_diff)
-                                             for key, h_diff in histos['diff'].items()}
-                    discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
-                                                  for key in histos['onTracks']}
-                    entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
-                    entries_eventT0[algo][run] = entries_eventT0_
+                # if some histogram is empty (too little stat) do not crash but skip that file for that calibration
+                try:
+                    entries_eventT0_ = histos['eventT0'].GetEntries()
+                    if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
+                        agreements[algo][run] = {key: vu.get_agreament(histos['eventT0'], h_diff)
+                                                 for key, h_diff in histos['diff'].items()}
+                        precisions[algo][run] = {key: vu.get_precision(h_diff)
+                                                 for key, h_diff in histos['diff'].items()}
+                        discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
+                                                      for key in histos['onTracks']}
+                        entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
+                        entries_eventT0[algo][run] = entries_eventT0_
 
-                    vu.make_combined_plot('*U', histos,
-                                          title=f'exp {exp} run {run} U {algo}')
-                    plt.savefig(plots_per_run / f'{exp}_{run}_U_{algo}.pdf')
-                    plt.close()
+                        vu.make_combined_plot('*U', histos,
+                                              title=f'exp {exp} run {run} U {algo}')
+                        plt.savefig(plots_per_run / f'{exp}_{run}_U_{algo}.pdf')
+                        plt.close()
 
-                    vu.make_combined_plot('*V', histos,
-                                          title=f'exp {exp} run {run} V {algo}')
-                    plt.savefig(plots_per_run / f'{exp}_{run}_V_{algo}.pdf')
-                    plt.close()
+                        vu.make_combined_plot('*V', histos,
+                                              title=f'exp {exp} run {run} V {algo}')
+                        plt.savefig(plots_per_run / f'{exp}_{run}_V_{algo}.pdf')
+                        plt.close()
 
-                    roc_U[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*U'),
-                                                   vu.get_combined(histos['offTracks'], '*U'))
-                    roc_V[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*V'),
-                                                   vu.get_combined(histos['offTracks'], '*V'))
-            except AttributeError:
-                print(f'Skipping file {in_file_name} for {algo}')
-                continue
-
-        in_file.Close()
-
-        # Show the progress
-        progress(count+1, num_files)
+                        roc_U[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*U'),
+                                                       vu.get_combined(histos['offTracks'], '*U'))
+                        roc_V[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*V'),
+                                                       vu.get_combined(histos['offTracks'], '*V'))
+                except AttributeError:
+                    print(f'Skipping file algo {algo} exp {exp} run {run}')
+                    continue
 
     print()
 
@@ -157,7 +149,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     print('Making combined plots')
 
     for algo in vu.time_algorithms:
-        plt.figure(figsize=(6.4*max(2, num_files/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'agreement_{algo}', hue='side', data=df, split=True)
         ax.set_ylim([-2, 2])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
@@ -169,7 +161,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'agreement_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, num_files/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'precision_{algo}', hue='side', data=df, split=True)
         ax.set_ylim([0, 50])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
@@ -180,7 +172,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'precision_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, num_files/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'discrimination_{algo}', hue='side', data=df, split=True)
         ax.set_ylim([0.5, 1])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
@@ -191,7 +183,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'discrimination_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, num_files/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'entries_onTracks_{algo}', hue='side', data=df, split=True, cut=0)
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.setp(ax.get_xticklabels(), rotation=90)
@@ -199,7 +191,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'entries_onTracks_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, num_files/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'entries_eventT0_{algo}', hue='side', data=df, split=True)
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.setp(ax.get_xticklabels(), rotation=90)

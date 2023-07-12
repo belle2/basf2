@@ -9,6 +9,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import sys
+
 import fnmatch
 import math
 
@@ -21,6 +23,15 @@ r.PyConfig.IgnoreCommandLineOptions = True
 
 matplotlib.use('Agg')
 plt.style.use("belle2")
+
+
+def progress(count, total):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / total))
+    percents = round(100 * count / total, 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+    sys.stdout.write(f'[{bar}] {percents}%\r')
+    sys.stdout.flush()
 
 
 def get_full_path(name, exp, run, base_dir):
@@ -174,32 +185,106 @@ for layer in range(3, 7):
 time_algorithms = ['CoG6', 'CoG3', 'ELS3']
 
 
-def get_histos(in_file, algo='CoG3',
-               names_sides=names_sides,
-               base_dirs={algo: f'SVDTimeValidationCollector_{algo}'
-                          for algo in time_algorithms}):
+def get_histos(CollectorHistograms):
 
     histos = {}
 
-    base_dir = base_dirs[algo]
-    iov = in_file.Get(f'{base_dir}/RunRange').getIntervalOfValidity()
-    exp, run = iov.getExperimentLow(), iov.getRunLow()
+    histos['eventT0'] = CollectorHistograms['hEventT0'][0]
 
-    histos['eventT0'] = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
+    histos_all = {}
+    histos['onTracks'] = {}
+    histos['diff'] = {}
 
-    histos_all = {name_side: in_file.Get(get_full_path(f'clsTimeAll__{name_side}', exp, run, base_dir))
-                  for name_side in names_sides}
-    histos['onTracks'] = {name_side: in_file.Get(get_full_path(f'clsTimeOnTracks__{name_side}', exp, run, base_dir))
-                          for name_side in names_sides}
+    __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks'][0]
+    __hClsTimeAll__ = CollectorHistograms['hClsTimeAll'][0]
+    __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks'][0]
+    __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap'][0]
+
+    for name_side in names_sides:
+        sensorBin = __hBinToSensorMap__.GetXaxis().FindBin(name_side)
+        hClsTimeOnTracks = __hClsTimeOnTracks__.ProjectionX("hClsTimeOnTracks_tmp", sensorBin, sensorBin)
+        hClsTimeAll = __hClsTimeAll__.ProjectionX("hClsTimeAll_tmp", sensorBin, sensorBin)
+        hClsDiffTimeOnTracks = __hClsDiffTimeOnTracks__.ProjectionX("hClsDiffTimeOnTracks_tmp", sensorBin, sensorBin)
+        hClsTimeOnTracks.SetNameTitle(f"clsTimeOnTracks__{name_side}", f"clsTimeOnTracks__{name_side}")
+        hClsTimeAll.SetNameTitle(f"clsTimeAll__{name_side}", f"clsTimeAll__{name_side}")
+        hClsDiffTimeOnTracks.SetNameTitle(f"clsDiffTimeOnTracks__{name_side}", f"clsDiffTimeOnTracks__{name_side}")
+        hClsTimeOnTracks.SetDirectory(0)
+        hClsTimeAll.SetDirectory(0)
+        hClsDiffTimeOnTracks.SetDirectory(0)
+        histos['onTracks'][name_side] = hClsTimeOnTracks
+        histos_all[name_side] = hClsTimeAll
+        histos['diff'][name_side] = hClsDiffTimeOnTracks
+
     histos['offTracks'] = {key: get_histo_offTracks(histos_all[key], histos['onTracks'][key])
                            for key in histos['onTracks']}
-    histos['diff'] = {name_side: in_file.Get(get_full_path(f'clsDiffTimeOnTracks__{name_side}', exp, run, base_dir))
-                      for name_side in names_sides}
 
     # replace None with empty histograms
     for kind in ['onTracks', 'offTracks', 'diff']:
         for key, value in histos[kind].items():
             if not isinstance(value, r.TH1):
-                histos[kind][key] = r.TH1F(f'{kind}_{key}_{algo}', f'{kind}_{key}_{algo}', 300, -150, 150)
+                histos[kind][key] = r.TH1F(f'{kind}_{key}', f'{kind}_{key}', 300, -150, 150)
 
-    return histos, exp, run
+    return histos
+
+
+def get_merged_collector_histograms(files):
+
+    CollectorHistograms = {}
+
+    num_files = len(files)
+    print(f'Looping over {num_files} files')
+    progress(0, num_files)
+    for count, in_file_name in enumerate(files):
+
+        in_file = r.TFile(str(in_file_name))
+
+        for algo in time_algorithms:
+
+            base_dir = f'SVDTimeValidationCollector_{algo}'
+            iov = in_file.Get(f'{base_dir}/RunRange').getIntervalOfValidity()
+            exp, run = iov.getExperimentLow(), iov.getRunLow()
+
+            if algo not in CollectorHistograms:
+                CollectorHistograms[algo] = {}
+            if exp not in CollectorHistograms[algo]:
+                CollectorHistograms[algo][exp] = {}
+            if run not in CollectorHistograms[algo][exp]:
+                CollectorHistograms[algo][exp][run] = {"hEventT0": [],
+                                                       "hClsTimeOnTracks": [],
+                                                       "hClsTimeAll": [],
+                                                       "hClsDiffTimeOnTracks": [],
+                                                       "hBinToSensorMap": []}
+
+            __hEventT0__ = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
+            __hClsTimeOnTracks__ = in_file.Get(get_full_path('__hClsTimeOnTracks__',
+                                                             exp, run, base_dir))
+            __hClsTimeAll__ = in_file.Get(get_full_path('__hClsTimeAll__',
+                                                        exp, run, base_dir))
+            __hClsDiffTimeOnTracks__ = in_file.Get(get_full_path('__hClsDiffTimeOnTracks__',
+                                                                 exp, run, base_dir))
+            __hBinToSensorMap__ = in_file.Get(get_full_path('__hBinToSensorMap__',
+                                                            exp, run, base_dir))
+            __hEventT0__.SetDirectory(0)
+            __hClsTimeOnTracks__.SetDirectory(0)
+            __hClsTimeAll__.SetDirectory(0)
+            __hClsDiffTimeOnTracks__.SetDirectory(0)
+            __hBinToSensorMap__.SetDirectory(0)
+            CollectorHistograms[algo][exp][run]["hEventT0"].append(__hEventT0__)
+            CollectorHistograms[algo][exp][run]["hClsTimeOnTracks"].append(__hClsTimeOnTracks__)
+            CollectorHistograms[algo][exp][run]["hClsTimeAll"].append(__hClsTimeAll__)
+            CollectorHistograms[algo][exp][run]["hClsDiffTimeOnTracks"].append(__hClsDiffTimeOnTracks__)
+            CollectorHistograms[algo][exp][run]["hBinToSensorMap"].append(__hBinToSensorMap__)
+
+        in_file.Close()
+
+        # Show the progress
+        progress(count+1, num_files)
+
+    for algo in CollectorHistograms:
+        for exp in CollectorHistograms[algo]:
+            for run in CollectorHistograms[algo][exp]:
+                for key in CollectorHistograms[algo][exp][run]:
+                    for hist in CollectorHistograms[algo][exp][run][key][1:]:
+                        CollectorHistograms[algo][exp][run][key][0].Add(hist)
+
+    return CollectorHistograms

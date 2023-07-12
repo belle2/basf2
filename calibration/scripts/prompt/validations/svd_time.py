@@ -63,7 +63,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 total_run = len(CollectorHistograms[algo][exp])
                 if total_run > max_total_run:
                     max_total_run = total_run
-    max_total_run *= 3          # for max 3 algo
+    max_total_run *= len(vu.time_algorithms)
 
     for algo in vu.time_algorithms:
         for exp in CollectorHistograms[algo]:

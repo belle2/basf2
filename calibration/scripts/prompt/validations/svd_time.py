@@ -57,18 +57,23 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     CollectorHistograms = vu.get_merged_collector_histograms(files)
 
     max_total_run = 0
+    total_item = 0
     for algo in CollectorHistograms:
         for exp in CollectorHistograms[algo]:
-            for run in CollectorHistograms[algo][exp]:
-                total_run = len(CollectorHistograms[algo][exp])
-                if total_run > max_total_run:
-                    max_total_run = total_run
-    max_total_run *= len(vu.time_algorithms)
+            nRun = len(CollectorHistograms[algo][exp])
+            total_item += nRun
+            if nRun > max_total_run:
+                max_total_run = nRun
+    total_length = max_total_run * len(vu.time_algorithms)
+
+    print(f'Looping over {total_item} items')
+    count = 0
+    vu.progress(0, total_item)
 
     for algo in vu.time_algorithms:
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
-                print(f"working with : algo {algo} exp {exp} run {run}")
+                # print(f"working with : algo {algo} exp {exp} run {run}")
 
                 histos = vu.get_histos(CollectorHistograms[algo][exp][run])
 
@@ -106,6 +111,8 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 except AttributeError:
                     print(f'Skipping file algo {algo} exp {exp} run {run}')
                     continue
+                vu.progress(count + 1, total_item)
+                count += 1
 
     print()
 
@@ -149,7 +156,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     print('Making combined plots')
 
     for algo in vu.time_algorithms:
-        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'agreement_{algo}', hue='side', data=df, split=True)
         ax.set_ylim([-2, 2])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
@@ -161,7 +168,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'agreement_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'precision_{algo}', hue='side', data=df, split=True)
         ax.set_ylim([0, 50])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
@@ -172,7 +179,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'precision_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'discrimination_{algo}', hue='side', data=df, split=True)
         ax.set_ylim([0.5, 1])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
@@ -183,7 +190,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'discrimination_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'entries_onTracks_{algo}', hue='side', data=df, split=True, cut=0)
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.setp(ax.get_xticklabels(), rotation=90)
@@ -191,7 +198,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'entries_onTracks_{algo}.pdf')
         plt.close()
 
-        plt.figure(figsize=(6.4*max(2, max_total_run/30), 4.8*2))
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
         ax = sns.violinplot(x='run', y=f'entries_eventT0_{algo}', hue='side', data=df, split=True)
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.setp(ax.get_xticklabels(), rotation=90)

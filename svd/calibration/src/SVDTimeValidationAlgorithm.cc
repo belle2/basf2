@@ -20,7 +20,6 @@
 #include <TString.h>
 #include <TFitResult.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVDTimeValidationAlgorithm::SVDTimeValidationAlgorithm() :
@@ -65,10 +64,9 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
           auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", ij + 1, ij + 1);
-          if (!hClsTimeOnTracks) {
+          if (!hClsTimeOnTracks)
             B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
-            return c_Failure;
-          }
+
           hClsTimeOnTracks->SetName(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           char sidePN = (side == 'U' ? 'P' : 'N');
           hClsTimeOnTracks->SetTitle(Form("clsTimeOnTracks in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
@@ -81,10 +79,8 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
                   " Entries (n. clusters): " << hClsTimeOnTracks->GetEntries() <<
                   " Mean: " << clsTimeOnTracks_mean <<
                   " Deviation: " << deviation << " EventT0 RMS");
-          if (abs(deviation) > m_allowedDeviationMean) {
+          if (std::fabs(deviation) > m_allowedDeviationMean)
             B2ERROR("Histogram: " << hClsTimeOnTracks->GetName() << " deviates from EventT0 by" << deviation << " times the EventT0 RMS");
-            return c_Failure;
-          }
 
           delete hClsTimeOnTracks;
         }

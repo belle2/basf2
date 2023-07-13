@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -202,15 +201,19 @@ def get_histos(CollectorHistograms):
 
     for name_side in names_sides:
         sensorBin = __hBinToSensorMap__.GetXaxis().FindBin(name_side)
+
         hClsTimeOnTracks = __hClsTimeOnTracks__.ProjectionX("hClsTimeOnTracks_tmp", sensorBin, sensorBin)
         hClsTimeAll = __hClsTimeAll__.ProjectionX("hClsTimeAll_tmp", sensorBin, sensorBin)
         hClsDiffTimeOnTracks = __hClsDiffTimeOnTracks__.ProjectionX("hClsDiffTimeOnTracks_tmp", sensorBin, sensorBin)
+
         hClsTimeOnTracks.SetNameTitle(f"clsTimeOnTracks__{name_side}", f"clsTimeOnTracks__{name_side}")
         hClsTimeAll.SetNameTitle(f"clsTimeAll__{name_side}", f"clsTimeAll__{name_side}")
         hClsDiffTimeOnTracks.SetNameTitle(f"clsDiffTimeOnTracks__{name_side}", f"clsDiffTimeOnTracks__{name_side}")
+
         hClsTimeOnTracks.SetDirectory(0)
         hClsTimeAll.SetDirectory(0)
         hClsDiffTimeOnTracks.SetDirectory(0)
+
         histos['onTracks'][name_side] = hClsTimeOnTracks
         histos_all[name_side] = hClsTimeAll
         histos['diff'][name_side] = hClsDiffTimeOnTracks

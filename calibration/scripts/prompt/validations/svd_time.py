@@ -70,7 +70,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     count = 0
     vu.progress(0, total_item)
 
-    for algo in vu.time_algorithms:
+    for algo in CollectorHistograms:
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
                 # print(f"working with : algo {algo} exp {exp} run {run}")

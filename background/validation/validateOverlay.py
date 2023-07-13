@@ -61,6 +61,10 @@ class Histogrammer(b2.Module):
         self.hist2.append(TH1F('CDCInnerHitRate', 'CDC Hit Rate per wire for the Inner layers', 100, 0, 1000))
         self.hist2.append(TH1F('CDCOuterHitRate', 'CDC Hit Rate per wire for the Outer layers', 100, 0, 1000))
         self.hist2.append(TH1F('CDCHitRate', 'CDC Hit Rate per wire', 100, 0, 1000))
+        self.hist2.append(TH1F("TOPHitTime", "TOP Hit Time Distribution; time [ns]", 300, -150, 150))
+        self.nTOPev = 0
+        self.minTOPTime = None
+        self.maxTOPTime = None
 
         #: number of PXD pixels (L1)
         self.nPXDL1 = 250*768*2 * 8
@@ -143,6 +147,8 @@ class Histogrammer(b2.Module):
                 option = 'expert'
             elif h.GetName() == 'CDCHits':
                 option = 'expert'
+            elif h.GetName() == 'TOPHitTime':
+                option = 'expert'
 
             h.SetYTitle('entries per bin')
             h.GetListOfFunctions().Add(descr)
@@ -154,7 +160,7 @@ class Histogrammer(b2.Module):
             h.GetListOfFunctions().Add(options)
 
             ntplvar = "PXDL1_occupancy:PXDL2_occupancy:PXD_occupancy:SVDL3ZS5_occupancy"
-            ntplvar += ":CDCInner_hitRate:CDCOuter_hitRate:CDC_hitRate"
+            ntplvar += ":CDCInner_hitRate:CDCOuter_hitRate:CDC_hitRate:TOP_hitRate"
 
             #: ntuple to store background levels
             self.ntpl = TNtuple("ntpl", "Average Background Levels", (ntplvar))
@@ -207,13 +213,28 @@ class Histogrammer(b2.Module):
         self.hist2[5].Fill(nCDC_out/self.nCDCout / self.CDCITout)
         self.hist2[6].Fill((nCDC_in+nCDC_out) / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
 
+        # TOP
+        self.nTOPev += 1
+        for TOPDigit in Belle2.PyStoreArray('TOPDigits'):
+            if TOPDigit.getHitQuality() != Belle2.TOPDigit.c_Good:
+                continue
+            self.hist2[7].Fill(TOPDigit.getTime())
+            if self.minTOPTime:
+                self.minTOPTime = min(self.minTOPTime, TOPDigit.getTime())
+                self.maxTOPTime = max(self.maxTOPTime, TOPDigit.getTime())
+            else:
+                self.minTOPTime = TOPDigit.getTime()
+                self.maxTOPTime = TOPDigit.getTime()
+
     def terminate(self):
         """ Write histograms to file."""
 
-        # ntpl content "PXDL1:PXDL2:PXD:SVDL3ZS5:CDCInner:CDCOuter:CDC");
+        TOPbg = self.hist2[7].Integral(101, 150)/self.nTOPev/50e-3/16/32
+
+        # ntpl content "PXDL1:PXDL2:PXD:SVDL3ZS5:CDCInner:CDCOuter:CDC:TOP");
         values = [self.hist2[0].GetMean(), self.hist2[1].GetMean(), self.hist2[2].GetMean(),
                   self.hist2[3].GetMean(), self.hist2[4].GetMean(), self.hist2[5].GetMean(),
-                  self.hist2[6].GetMean()]
+                  self.hist2[6].GetMean(), float(TOPbg)]
 
         self.ntpl.Fill(array.array("f", values),)
         tfile = TFile('overlayPlots.root', 'recreate')

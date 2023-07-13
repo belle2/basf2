@@ -285,6 +285,12 @@ def create_pre_collector_path(
             else:
                 b2.set_module_parameters(path, 'SVDTimeGrouping', forceGroupingFromDB=False, isEnabledIn6Samples=False)
                 b2.set_module_parameters(path, 'SVDSpacePointCreator', forceGroupingFromDB=False, useSVDGroupInfoIn6Sample=False)
+        else:
+            # use grouping also for validation
+            b2.set_module_parameters(path, 'SVDTimeGrouping', forceGroupingFromDB=False,
+                                     isEnabledIn6Samples=useSVDGrouping)
+            b2.set_module_parameters(path, 'SVDSpacePointCreator', forceGroupingFromDB=False,
+                                     useSVDGroupInfoIn6Sample=useSVDGrouping)
 
         # repeat svd reconstruction using only SVDShaperDigitsFromTracks
         path.add_module("SVDShaperDigitsFromTracks")

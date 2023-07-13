@@ -179,9 +179,9 @@ namespace Belle2 {
     /**
      * G4LongLivedNeutralTransportation::ProcessDescription()
      *
-     * @outfile Description of process
+     * @param outStream Output file with a description of process
      */
-    virtual void ProcessDescription(std::ostream& outFile) const;
+    virtual void ProcessDescription(std::ostream& outStream) const;
 
     void PrintStatistics(std::ostream& outStr) const;
     /**< returns current logging info of the algorithm */

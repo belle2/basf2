@@ -95,7 +95,7 @@ namespace Belle2 {
      * but does not limit the step
      */
     G4double PostStepGetPhysicalInteractionLength(
-      const G4Track&,
+      const G4Track& track,
       G4double   previousStepSize,
       G4ForceCondition* pForceCond
     );

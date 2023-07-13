@@ -14,11 +14,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
+
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
-
-#include <svd/dataobjects/SVDHistograms.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 #include <framework/dataobjects/EventT0.h>
@@ -42,6 +41,11 @@ namespace Belle2 {
      * Initialize the module
      */
     void prepare() override final;
+
+    /**
+     * Called when entering a new run
+     */
+    void startRun() override final;
 
     /**
      * Event processor

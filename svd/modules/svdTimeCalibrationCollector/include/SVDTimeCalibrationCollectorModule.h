@@ -15,8 +15,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
 
-#include <svd/dataobjects/SVDHistograms.h>
-
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
@@ -76,11 +74,6 @@ namespace Belle2 {
     /**EventT0 */
     std::string m_eventTime = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/
     StoreObjPtr<EventT0> m_eventT0; /**< EventT0 store object pointer*/
-
-    /**SVDHistograms */
-    SVDHistograms<TH2F>* m_hEventT0vsCoG = nullptr; /**< Scatter plot t0 vs t_raw (CoG)*/
-    SVDHistograms<TH1F>* m_hEventT0 = nullptr; /**< EventT0 synchronized distribution*/
-    SVDHistograms<TH1F>* m_hEventT0nosync = nullptr; /**< EventT0 NOT synchroinized distribution*/
 
     TH1F* m_hEventT0FromCDC = nullptr; /**< Distribution of EventT0 reconstructed by the CDC for all sensos/side*/
     TH1F* m_hEventT0FromCDCSync = nullptr; /**< Distribution of EventT0 reconstructed by the CDC and synchronized for all sensos/side*/

@@ -91,6 +91,12 @@ void SVDTimeValidationCollectorModule::prepare()
   registerObject<TH1F>(__hBinToSensorMap__->GetName(), __hBinToSensorMap__);
 }
 
+void SVDTimeValidationCollectorModule::startRun()
+{
+  getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
+  getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
+  getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
+}
 
 void SVDTimeValidationCollectorModule::collect()
 {

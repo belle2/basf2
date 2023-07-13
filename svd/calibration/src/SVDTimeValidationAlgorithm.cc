@@ -53,33 +53,39 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
   auto __hBinToSensorMap__      = getObjectPtr<TH1F>("__hBinToSensorMap__");
 
   for (int ij = 0; ij < (__hBinToSensorMap__->GetNbinsX()); ij++) {
+    {
+      {
+        {
 
-    auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
-    char side;
-    int layer_num, ladder_num, sensor_num;
-    std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
+          auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
+          char side;
+          int layer_num, ladder_num, sensor_num;
+          std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
 
-    B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
+          B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
-    auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", ij + 1, ij + 1);
-    if (!hClsTimeOnTracks)
-      B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
-    hClsTimeOnTracks->SetName(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-    char sidePN = (side == 'U' ? 'P' : 'N');
-    hClsTimeOnTracks->SetTitle(Form("clsTimeOnTracks in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
-    hClsTimeOnTracks->SetDirectory(0);
+          auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", ij + 1, ij + 1);
+          if (!hClsTimeOnTracks)
+            B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
+          hClsTimeOnTracks->SetName(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          char sidePN = (side == 'U' ? 'P' : 'N');
+          hClsTimeOnTracks->SetTitle(Form("clsTimeOnTracks in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hClsTimeOnTracks->SetDirectory(0);
 
-    float clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
-    auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
+          float clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
+          auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
 
-    B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<
-            " Entries (n. clusters): " << hClsTimeOnTracks->GetEntries() <<
-            " Mean: " << clsTimeOnTracks_mean <<
-            " Deviation: " << deviation << " EventT0 RMS");
-    if (abs(deviation) > m_allowedDeviationMean)
-      B2ERROR("Histogram: " << hClsTimeOnTracks->GetName() << " deviates from EventT0 by" << deviation << " times the EventT0 RMS");
+          B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<
+                  " Entries (n. clusters): " << hClsTimeOnTracks->GetEntries() <<
+                  " Mean: " << clsTimeOnTracks_mean <<
+                  " Deviation: " << deviation << " EventT0 RMS");
+          if (abs(deviation) > m_allowedDeviationMean)
+            B2ERROR("Histogram: " << hClsTimeOnTracks->GetName() << " deviates from EventT0 by" << deviation << " times the EventT0 RMS");
 
-    delete hClsTimeOnTracks;
+          delete hClsTimeOnTracks;
+        }
+      }
+    }
   }
   return c_OK;
 }

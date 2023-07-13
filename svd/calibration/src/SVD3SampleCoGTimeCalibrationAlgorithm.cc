@@ -86,112 +86,117 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
   auto __hBinToSensorMap__ = getObjectPtr<TH1F>("__hBinToSensorMap__");
 
   for (int ij = 0; ij < (__hBinToSensorMap__->GetNbinsX()); ij++) {
+    {
+      {
+        {
 
-    auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
-    char side;
-    std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
-    view = 0;
-    if (side == 'U')
-      view = 1;
+          auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
+          char side;
+          std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
+          view = 0;
+          if (side == 'U')
+            view = 1;
 
-    B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
+          B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
-    __hEventT0vsCoG__->GetZaxis()->SetRange(ij + 1, ij + 1);
-    auto hEventT0vsCoG  = (TH2D*)__hEventT0vsCoG__->Project3D("yxe");
-    auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1);
-    auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1);
+          __hEventT0vsCoG__->GetZaxis()->SetRange(ij + 1, ij + 1);
+          auto hEventT0vsCoG  = (TH2D*)__hEventT0vsCoG__->Project3D("yxe");
+          auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1);
+          auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1);
 
-    hEventT0vsCoG->SetName(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-    hEventT0->SetName(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-    hEventT0nosync->SetName(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          hEventT0vsCoG->SetName(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          hEventT0->SetName(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          hEventT0nosync->SetName(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
 
-    char sidePN = (side == 'U' ? 'P' : 'N');
-    hEventT0vsCoG->SetTitle(Form("EventT0Sync vs rawTime in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
-    hEventT0->SetTitle(Form("EventT0Sync in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
-    hEventT0nosync->SetTitle(Form("EventT0NoSync in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          char sidePN = (side == 'U' ? 'P' : 'N');
+          hEventT0vsCoG->SetTitle(Form("EventT0Sync vs rawTime in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hEventT0->SetTitle(Form("EventT0Sync in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hEventT0nosync->SetTitle(Form("EventT0NoSync in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
 
-    hEventT0vsCoG->SetDirectory(0);
-    hEventT0->SetDirectory(0);
-    hEventT0nosync->SetDirectory(0);
+          hEventT0vsCoG->SetDirectory(0);
+          hEventT0->SetDirectory(0);
+          hEventT0nosync->SetDirectory(0);
 
-    int nEntriesForFilter = hEventT0vsCoG->GetEntries();
-    B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
-           " Entries (n. clusters): " << hEventT0vsCoG->GetEntries());
-    if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
-      B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
-             " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() <<
-             " Entries required: " << m_minEntries);
-      B2WARNING("Not enough data, adding one run to the collector");
-      f->Close();
-      gSystem->Unlink(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev));
-      return c_NotEnoughData;
-    }
-    if (layer_num != 3 && hEventT0vsCoG->GetEntries() < m_minEntries / 10) {
-      B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
-             " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() <<
-             " Entries required: " << m_minEntries / 10);
-      B2WARNING("Not enough data, adding one run to the collector");
-      f->Close();
-      gSystem->Unlink(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev));
-      return c_NotEnoughData;
-    }
-    TF1* f1 = new TF1("f1", "[0]+[1]*x", -100, 100);
-    f1->SetParameters(m_interceptUpperLine, m_angularCoefficientUpperLine);
-    TF1* f2 = new TF1("f1", "[0]+[1]*x", -100, 100);
-    f2->SetParameters(m_interceptLowerLine, m_angularCoefficientLowerLine);
-    for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
-      for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
-        double bcx = ((TAxis*)hEventT0vsCoG->GetXaxis())->GetBinCenter(i);
-        double bcy = ((TAxis*)hEventT0vsCoG->GetYaxis())->GetBinCenter(j);
-        if (m_applyLinearCutsToRemoveBkg && (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx)))) {
-          hEventT0vsCoG->SetBinContent(i, j, 0);
-        } else if (hEventT0vsCoG->GetBinContent(i, j) > 0
-                   && (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(nEntriesForFilter * 0.001)))) {
-          hEventT0vsCoG->SetBinContent(i, j, 0);
+          int nEntriesForFilter = hEventT0vsCoG->GetEntries();
+          B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
+                 " Entries (n. clusters): " << hEventT0vsCoG->GetEntries());
+          if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
+            B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
+                   " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() <<
+                   " Entries required: " << m_minEntries);
+            B2WARNING("Not enough data, adding one run to the collector");
+            f->Close();
+            gSystem->Unlink(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev));
+            return c_NotEnoughData;
+          }
+          if (layer_num != 3 && hEventT0vsCoG->GetEntries() < m_minEntries / 10) {
+            B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
+                   " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() <<
+                   " Entries required: " << m_minEntries / 10);
+            B2WARNING("Not enough data, adding one run to the collector");
+            f->Close();
+            gSystem->Unlink(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev));
+            return c_NotEnoughData;
+          }
+          TF1* f1 = new TF1("f1", "[0]+[1]*x", -100, 100);
+          f1->SetParameters(m_interceptUpperLine, m_angularCoefficientUpperLine);
+          TF1* f2 = new TF1("f1", "[0]+[1]*x", -100, 100);
+          f2->SetParameters(m_interceptLowerLine, m_angularCoefficientLowerLine);
+          for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
+            for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
+              double bcx = ((TAxis*)hEventT0vsCoG->GetXaxis())->GetBinCenter(i);
+              double bcy = ((TAxis*)hEventT0vsCoG->GetYaxis())->GetBinCenter(j);
+              if (m_applyLinearCutsToRemoveBkg && (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx)))) {
+                hEventT0vsCoG->SetBinContent(i, j, 0);
+              } else if (hEventT0vsCoG->GetBinContent(i, j) > 0
+                         && (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(nEntriesForFilter * 0.001)))) {
+                hEventT0vsCoG->SetBinContent(i, j, 0);
+              }
+            }
+          }
+
+          TProfile* pfx = hEventT0vsCoG->ProfileX();
+          std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
+          pfx->SetName(name.c_str());
+          // set initial value for d, which is quadratic in the formula.
+          // also for b and c, with the nominal value in data.
+          pol3->SetParameter(1, 1.75);
+          pol3->SetParameter(2, 0.005);
+          pol3->SetParameter(3, 40);
+          TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
+          double par[4];
+          pol3->GetParameters(par);
+          // double meanT0 = hEventT0->GetMean();
+          // double meanT0NoSync = hEventT0nosync->GetMean();
+          timeCal->set_current(1);
+          timeCal->set_pol3parameters(par[0], par[1] + par[2]*par[3]*par[3], -par[2]*par[3], par[2] / 3);
+          payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
+          f->cd();
+          hEventT0->Write();
+          hEventT0vsCoG->Write();
+          hEventT0nosync->Write();
+          pfx->Write();
+
+          delete pfx;
+          delete hEventT0vsCoG;
+          delete hEventT0;
+          delete hEventT0nosync;
+
+
+          if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
+            f->Close();
+            B2FATAL("Fit to the histogram failed in SVD3SampleCoGTimeCalibrationAlgorithm. "
+                    << "Check the 2-D histogram to clarify the reason.");
+          } else {
+            a = par[0]; b = par[1]; c = par[2]; d = par[3];
+            a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
+            chi2 = tfr->Chi2();
+            ndf  = tfr->Ndf();
+            p    = tfr->Prob();
+            m_tree->Fill();
+          }
         }
       }
-    }
-
-    TProfile* pfx = hEventT0vsCoG->ProfileX();
-    std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
-    pfx->SetName(name.c_str());
-    // set initial value for d, which is quadratic in the formula.
-    // also for b and c, with the nominal value in data.
-    pol3->SetParameter(1, 1.75);
-    pol3->SetParameter(2, 0.005);
-    pol3->SetParameter(3, 40);
-    TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
-    double par[4];
-    pol3->GetParameters(par);
-    // double meanT0 = hEventT0->GetMean();
-    // double meanT0NoSync = hEventT0nosync->GetMean();
-    timeCal->set_current(1);
-    timeCal->set_pol3parameters(par[0], par[1] + par[2]*par[3]*par[3], -par[2]*par[3], par[2] / 3);
-    payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
-    f->cd();
-    hEventT0->Write();
-    hEventT0vsCoG->Write();
-    hEventT0nosync->Write();
-    pfx->Write();
-
-    delete pfx;
-    delete hEventT0vsCoG;
-    delete hEventT0;
-    delete hEventT0nosync;
-
-
-    if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
-      f->Close();
-      B2FATAL("Fit to the histogram failed in SVD3SampleCoGTimeCalibrationAlgorithm. "
-              << "Check the 2-D histogram to clarify the reason.");
-    } else {
-      a = par[0]; b = par[1]; c = par[2]; d = par[3];
-      a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
-      chi2 = tfr->Chi2();
-      ndf  = tfr->Ndf();
-      p    = tfr->Prob();
-      m_tree->Fill();
-
     }
   }
   m_tree->Write();

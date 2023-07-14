@@ -231,8 +231,8 @@ void KLMDQM2Module::findMatchingDigit(
       continue;
 
     // Defining quantities for distance cut
-    auto allowedDistance1D = m_AllowedDistance1D;
     auto stripPosition = digit.getStrip();
+    auto allowedDistance1D = m_AllowedDistance1D;
 
     if (digit.isMultiStrip()) {
       // Due to a firmware bug, we have to be wary with the allowed distance...

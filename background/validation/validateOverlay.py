@@ -45,7 +45,7 @@ class Histogrammer(b2.Module):
                               200, 10000, 80000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
-        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
+        self.hist.append(TH1F('CDCHits', 'CDCHits above threshold', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
@@ -62,8 +62,11 @@ class Histogrammer(b2.Module):
         self.hist2.append(TH1F('CDCOuterHitRate', 'CDC Hit Rate per wire for the Outer layers', 100, 0, 1000))
         self.hist2.append(TH1F('CDCHitRate', 'CDC Hit Rate per wire', 100, 0, 1000))
         self.hist2.append(TH1F("TOPHitTime", "TOP Hit Time Distribution; time [ns]", 300, -150, 150))
+        #: numnber of events
         self.nTOPev = 0
+        #: min TOP hit time
         self.minTOPTime = None
+        #: max TOP hit time
         self.maxTOPTime = None
 
         #: number of PXD pixels (L1)
@@ -170,6 +173,8 @@ class Histogrammer(b2.Module):
 
         for h in self.hist:
             digits = Belle2.PyStoreArray(h.GetName())
+            if h.GetName() == 'CDCHits':
+                continue
             if h.GetName() == 'ECLDigits':
                 n = 0
                 for digit in digits:
@@ -212,6 +217,7 @@ class Histogrammer(b2.Module):
         self.hist2[4].Fill(nCDC_in/self.nCDCin / self.CDCITIn)
         self.hist2[5].Fill(nCDC_out/self.nCDCout / self.CDCITout)
         self.hist2[6].Fill((nCDC_in+nCDC_out) / (self.nCDCin * self.CDCITIn + self.nCDCout * self.CDCITout))
+        self.hist[3].Fill(nCDC_in+nCDC_out)
 
         # TOP
         self.nTOPev += 1

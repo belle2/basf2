@@ -15,7 +15,8 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVA<BaseTrackRelationFilter>;
 
 MVARealisticTrackRelationFilter::MVARealisticTrackRelationFilter()
-  : Super(std::make_unique<VarSet>(), "trackfindingcdc_RealisticTrackRelationFilter", 0.80)
+  : Super(std::make_unique<VarSet>(), "trackfindingcdc_RealisticTrackRelationFilter", 0.80,
+          "trackfindingcdc_RealisticTrackRelationFilterParameters")
 {
   this->addProcessingSignalListener(&m_feasibleTrackRelationFilter);
 }

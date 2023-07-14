@@ -202,8 +202,8 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
           digit.getPlane() == hitData->plane))
       continue;
 
-    auto allowedDistance1D = m_AllowedDistance1D;
     auto stripPosition = digit.getStrip();
+    auto allowedDistance1D = m_AllowedDistance1D;
 
     if (digit.isMultiStrip()) {
       stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());

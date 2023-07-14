@@ -195,18 +195,20 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   struct HitData* hitData)
 {
   for (const KLMDigit& digit : m_Digits) {
-    /*
-     * TODO: multi-strip digits are ugnored for now.
-     * It is necessary to take them into account.
-     */
-    if (digit.isMultiStrip())
-      continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
           digit.getPlane() == hitData->plane))
       continue;
+
+    auto allowedDistance1D = m_AllowedDistance1D;
+    auto stripPosition = digit.getStrip();
+
+    if (digit.isMultiStrip()) {
+      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
+      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
+    }
     if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
       hitData->digit = &digit;
       return;

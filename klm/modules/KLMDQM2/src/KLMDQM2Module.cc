@@ -223,13 +223,6 @@ void KLMDQM2Module::findMatchingDigit(
   struct HitData* hitData)
 {
   for (const KLMDigit& digit : m_Digits) {
-    /*
-     * TODO: multi-strip digits are ignored for now.
-     * It is necessary to take them into account.
-     */
-    /* FIXME: Get rid of the uncommented section*/
-    //if (digit.isMultiStrip())
-    //  continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&

@@ -17,7 +17,7 @@ are a few requirements for this globaltag:
 - The globaltag should not contain run-dependent calibrations for data.
 
 - The globaltag should clearly fail when running on data. Running with wrong calibrations is worse than not running
-  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1002 (Phase 2), 1003 (early
+  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1003 (early
   Phase 3, pre LS1) and 1004 (early Phase 3, post LS1).
 
 .. tip::
@@ -67,7 +67,6 @@ Valid values for IoVs to be included in the main globaltag are listed in the fol
 IoV             Valid for
 ==============  ======================================
 0,0,0,-1        Valid only for nominal Phase 3
-1002,0,1002,-1  Valid only for Phase 2
 1003,0,1003,-1  Valid only for early Phase 3, pre LS1
 1004,0,1004,-1  Valid only for early Phase 3, post LS1
 0,0,-1,-1       Valid for all the phases
@@ -78,6 +77,9 @@ review it and make sure all payloads have the correct IoV and make sure it conta
 and nothing else. The ``database.txt`` and the corresponding payload files should then be provided to the globaltag
 manager (using the :ref:`b2conditionsdb-request <b2conditionsdb-request>` tool) for each of the three following use
 cases:
+
+.. warning::
+   The IoV (1002,0,1002,-1), covering Phase 2, was supported until the globaltag ``main_2023-06-29``.
 
 
 Create a new payload

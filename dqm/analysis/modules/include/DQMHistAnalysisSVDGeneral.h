@@ -91,9 +91,16 @@ namespace Belle2 {
 
     TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
     TH2F* m_hOccupancyU = nullptr; /**< occupancy U histo */
+    TH2F* m_h3OccupancyU = nullptr; /**< occupancy U histo  for 3 samples*/
     TCanvas* m_cOccupancyU = nullptr; /**< occupancy U histo canvas */
+    TCanvas* m_c3OccupancyU = nullptr; /**< occupancy U histo canvas for 3 sampes */
     TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
+    TH2F* m_h3OccupancyV = nullptr; /**< occupancy V histo  for 3 samples*/
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
+    TCanvas* m_c3OccupancyV = nullptr; /**< occupancy V histo canvas  for 3 samples*/
+
+    /** additional plots flag*/
+    bool m_additionalPlots = false;
 
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
@@ -112,6 +119,9 @@ namespace Belle2 {
     TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
 
+    TH1F m_hClusterOnTrack3Time_L456V; /**< time for clusters on Track for L456V histo for 3 samples*/
+    TCanvas* m_cClusterOnTrack3Time_L456V = nullptr; /**< time for clusters on Track for L456V canvas for 3 sampples */
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
     TPaveText* m_legProblem = nullptr; /**< OfflineOccupancy plot legend, problem */
@@ -129,6 +139,9 @@ namespace Belle2 {
     Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed before throwing ERROR*/
     Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_occUstatus3 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
+    Int_t m_occVstatus3 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
+
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 

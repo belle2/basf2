@@ -46,7 +46,6 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 //   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
 
@@ -56,7 +55,7 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -153,7 +152,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     mychid.resize(3);
     SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
@@ -423,7 +422,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
   }
@@ -454,7 +453,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
@@ -473,7 +472,7 @@ void DQMHistAnalysisPXDTrackChargeModule::terminate()
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: terminate called");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }

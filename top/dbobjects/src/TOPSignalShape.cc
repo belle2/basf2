@@ -74,6 +74,7 @@ namespace Belle2 {
       B2ERROR("TOPSignalShape::getValue: object not initialized");
       return 0;
     }
+    if (isnan(t)) return 0; // to prevent interpolator to crash with seg. fault
     if (t < m_tmin) return 0;
     if (t > m_tmax) return m_shape.back() * exp(-(t - m_tmax) / m_tau);
     if (!m_interpolator) {

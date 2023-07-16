@@ -15,6 +15,6 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVAFilter<BasicClusterVarSet>;
 
 MVABackgroundClusterFilter::MVABackgroundClusterFilter()
-  : Super("trackfindingcdc_BackgroundClusterFilter", 0.2)
+  : Super("trackfindingcdc_BackgroundClusterFilter", 0.2, "trackfindingcdc_ClusterFilterParameters")
 {
 }

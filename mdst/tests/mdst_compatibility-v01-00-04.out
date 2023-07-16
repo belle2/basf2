@@ -25,6 +25,7 @@ Untested method Track::getTrackFitResultsByName
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
 Untested method Track::setTrackTime
+Untested method V0::getFittedVertexPosition
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
@@ -88,9 +89,21 @@ Untested method ECLCluster::setdeltaL
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBWD
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeBarrel
 Untested method EventLevelClusteringInfo::setNECLCalDigitsOutOfTimeFWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBWD
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsBarrel
+Untested method EventLevelClusteringInfo::setNECLLocalMaximumsFWD
+Untested method EventLevelClusteringInfo::setNECLShowersBWD
+Untested method EventLevelClusteringInfo::setNECLShowersBarrel
+Untested method EventLevelClusteringInfo::setNECLShowersFWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBWD
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedBarrel
 Untested method EventLevelClusteringInfo::setNECLShowersRejectedFWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBWD
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsBarrel
+Untested method EventLevelClusteringInfo::setNECLTriggerCellsFWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
+Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
 Untested method KLMCluster::setErrorP
 Untested method KLMCluster::setErrorX
@@ -324,7 +337,7 @@ Track#5:
 TrackFitResult#0:
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are GT_gen_prod_004.10_release-01-00-00, Legacy_IP_Information
+[INFO] Conditions data: configured globaltags (highest priority first) are GT_gen_prod_004.10_release-01-00-00, Legacy_IP_Information, Legacy_CollisionAxisCMS
   get4Momentum(): (-0.159463,0.323374,0.355817,0.525438)
   getChargeSign(): -1
   getChi2(): nan
@@ -16632,6 +16645,9 @@ Track#15:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#48
@@ -16641,6 +16657,9 @@ V0#0:
     -> Tracks#12
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#50
@@ -16650,6 +16669,9 @@ V0#1:
     -> Tracks#12
   getV0Hypothesis(): <type: gamma>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#52
@@ -16659,6 +16681,9 @@ V0#2:
     -> Tracks#12
   getV0Hypothesis(): <type: Lambda0>
 V0#3:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#54
@@ -25595,6 +25620,9 @@ Track#11:
   isFlippedAndRefitted(): False
   wasRefined(): False
 V0#0:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#35
@@ -25604,6 +25632,9 @@ V0#0:
     -> Tracks#5
   getV0Hypothesis(): <type: K_S0>
 V0#1:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#37
@@ -25613,6 +25644,9 @@ V0#1:
     -> Tracks#5
   getV0Hypothesis(): <type: gamma>
 V0#2:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#39
@@ -25622,6 +25656,9 @@ V0#2:
     -> Tracks#5
   getV0Hypothesis(): <type: Lambda0>
 V0#3:
+  getFittedVertexX(): 0
+  getFittedVertexY(): 0
+  getFittedVertexZ(): 0
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
     -> TrackFitResults#41

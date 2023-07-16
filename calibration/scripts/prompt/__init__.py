@@ -255,3 +255,5 @@ class ValidationSettings(namedtuple('ValSet_Factory', ["name", "description", "d
         output_str += f"  download_files='{self.download_files}'\n"
         output_str += f"  expert_config={self.expert_config}"
         return output_str
+
+# @endcond

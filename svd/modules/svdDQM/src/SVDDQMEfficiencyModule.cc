@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMEfficiencyModule.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+
 #include "TDirectory.h"
 
 using namespace Belle2;
@@ -89,6 +91,10 @@ void SVDDQMEfficiencyModule::event()
     return;
   }
 
+  std::string m_svdEventInfoName = "SVDEventInfo";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+
+  int nSamples = eventinfo->getNSamples();
 
   //intercepts
   for (int inter = 0 ; inter < m_intercepts.getEntries(); inter++) {
@@ -114,6 +120,14 @@ void SVDDQMEfficiencyModule::event()
 
       m_TrackHits->fill(theVxdID, 0, 1);
       m_TrackHits->fill(theVxdID, 1, 1);
+
+      if (nSamples == 3) {
+        m_TrackHits3->fill(theVxdID, 0, 1);
+        m_TrackHits3->fill(theVxdID, 1, 1);
+      } else {
+        m_TrackHits6->fill(theVxdID, 0, 1);
+        m_TrackHits6->fill(theVxdID, 1, 1);
+      }
 
       bool foundU = false;
       bool foundV = false;
@@ -148,12 +162,34 @@ void SVDDQMEfficiencyModule::event()
 
       if (foundU) {
         m_MatchedHits->fill(theVxdID, 1, 1);
-        if (m_saveExpertHistos) m_h_matched_clusterU[theVxdID]->Fill(cellU, cellV);
+        if (nSamples == 3)
+          m_MatchedHits3->fill(theVxdID, 1, 1);
+        else
+          m_MatchedHits6->fill(theVxdID, 1, 1);
+
+        if (m_saveExpertHistos) {
+          m_h_matched_clusterU[theVxdID]->Fill(cellU, cellV);
+          if (nSamples == 3)
+            m_h_matched3_clusterU[theVxdID]->Fill(cellU, cellV);
+          else
+            m_h_matched6_clusterU[theVxdID]->Fill(cellU, cellV);
+        }
       }
 
       if (foundV) {
         m_MatchedHits->fill(theVxdID, 0, 1);
-        if (m_saveExpertHistos)m_h_matched_clusterV[theVxdID]->Fill(cellU, cellV);
+        if (nSamples == 3)
+          m_MatchedHits3->fill(theVxdID, 0, 1);
+        else
+          m_MatchedHits6->fill(theVxdID, 0, 1);
+
+        if (m_saveExpertHistos) {
+          m_h_matched_clusterV[theVxdID]->Fill(cellU, cellV);
+          if (nSamples == 3)
+            m_h_matched3_clusterV[theVxdID]->Fill(cellU, cellV);
+          else
+            m_h_matched6_clusterV[theVxdID]->Fill(cellU, cellV);
+        }
       }
 
     }
@@ -172,7 +208,11 @@ void SVDDQMEfficiencyModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
   m_TrackHits = new SVDSummaryPlots("TrackHits@view", "Number of Tracks intercepting the @view/@side Side");
+  m_TrackHits3 = new SVDSummaryPlots("TrackHits3@view", "Number of Tracks intercepting the @view/@side Side for 3 samples");
+  m_TrackHits6 = new SVDSummaryPlots("TrackHits6@view", "Number of Tracks intercepting the @view/@side Side for 6 samples");
   m_MatchedHits = new SVDSummaryPlots("MatchedHits@view", "Number of Matched Clusters on the @view/@side Side");
+  m_MatchedHits3 = new SVDSummaryPlots("MatchedHits3@view", "Number of Matched Clusters on the @view/@side Side for 3 samples");
+  m_MatchedHits6 = new SVDSummaryPlots("MatchedHits6@view", "Number of Matched Clusters on the @view/@side Side for 6 samples");
 
   if (!m_saveExpertHistos) {
     oldDir->cd();
@@ -197,6 +237,20 @@ void SVDDQMEfficiencyModule::defineHisto()
                                             m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_h_matched_clusterV[avxdid] = new TH2D("matched_clusterV_" + buff, "track intersections with a matched V cluster" + buff,
                                             m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
+
+    m_h_matched3_clusterU[avxdid] = new TH2D("matched3_clusterU_" + buff,
+                                             "track intersections with a matched U cluster for 3 samples" + buff,
+                                             m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
+    m_h_matched3_clusterV[avxdid] = new TH2D("matched3_clusterV_" + buff,
+                                             "track intersections with a matched V cluster for 3 samples" + buff,
+                                             m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
+
+    m_h_matched6_clusterU[avxdid] = new TH2D("matched6_clusterU_" + buff,
+                                             "track intersections with a matched U cluster for 6 samples" + buff,
+                                             m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
+    m_h_matched6_clusterV[avxdid] = new TH2D("matched6_clusterV_" + buff,
+                                             "track intersections with a matched V cluster for 6 samples" + buff,
+                                             m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
   // cd back to root directory
   oldDir->cd();

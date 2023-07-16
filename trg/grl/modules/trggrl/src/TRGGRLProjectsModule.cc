@@ -743,6 +743,8 @@ void TRGGRLProjectsModule::event()
   int n_secl = trgInfo->getNsecl();
   int n_iecl = trgInfo->getNiecl();
 
+  bool ecltaunn = trgInfo->getTauNN();
+
   //std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
   //std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;
   //std::cout << "2dklm  " << nTrk2D << " " << cdcklm_0 << " " << cdcklm_1 << std::endl;
@@ -969,6 +971,9 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "inp157") {bit = false;}
     else if (bitname == "inp158") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
+
+    //new tau bit
+    else if (bitname == "ecl_taunn") {bit = ecltaunn;}
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.

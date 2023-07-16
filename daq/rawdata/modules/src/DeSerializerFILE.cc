@@ -92,7 +92,7 @@ void DeSerializerFILEModule::initialize()
 }
 
 
-int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, int* data_type)
+int* DeSerializerFILEModule::readOneDataBlock(int* /*delete_flag*/, int* /*size_word*/, int* /*data_type*/)
 {
 #ifdef USE_PCIE40
   char err_buf[500];

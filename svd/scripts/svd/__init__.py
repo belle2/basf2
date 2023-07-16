@@ -45,6 +45,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
+        timeGroupComposerName = '__ROISVDTimeGrouping'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
         # recoDigitsName = '__ROIsvdRecoDigits'
@@ -53,6 +54,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         clusterizerName = 'SVDClusterizer'
+        timeGroupComposerName = 'SVDTimeGrouping'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
         # recoDigitsName = ""
@@ -98,6 +100,12 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
+
+    if timeGroupComposerName not in [e.name() for e in path.modules()]:
+        svdTimeGrouping = b2.register_module('SVDTimeGrouping')
+        svdTimeGrouping.set_name(timeGroupComposerName)
+        svdTimeGrouping.param('SVDClusters', clustersName)
+        path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -163,6 +171,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
+        timeGroupComposerName = '__ROISVDTimeGrouping'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
@@ -171,6 +180,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
+        timeGroupComposerName = 'SVDTimeGrouping'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
         recoDigitsName = ""
@@ -221,6 +231,12 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clusterName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
+
+    if timeGroupComposerName not in [e.name() for e in path.modules()]:
+        svdTimeGrouping = b2.register_module('SVDTimeGrouping')
+        svdTimeGrouping.set_name(timeGroupComposerName)
+        svdTimeGrouping.param('SVDClusters', clusterName)
+        path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)

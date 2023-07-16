@@ -9,6 +9,7 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/TRandomWrapper.h>
 
 #include <Eigen/Dense>
 

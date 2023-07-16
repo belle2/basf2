@@ -14,9 +14,6 @@
 
 namespace Belle2 {
 
-  using namespace Belle2::PXD;
-
-
   /** Class PXD2TrackEvent: Event data container for performance and calibration studies.
    * This class holds all required variables for TTree creation and
    * the analysis, such that no relation lookup is needed.
@@ -24,7 +21,7 @@ namespace Belle2 {
    * Caveat: this class is not placed in the dataobjects folder
    * to avoid dependency cycles.
    */
-  class PXD2TrackEvent : public PXD2TrackBase<Track_t >  {
+  class PXD2TrackEvent : public PXD2TrackBase<Belle2::PXD::Track_t>  {
 
     ClassDef(PXD2TrackEvent, 1)
   };

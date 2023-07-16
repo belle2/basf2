@@ -29,7 +29,6 @@ SVDTimeValidationCollectorModule::SVDTimeValidationCollectorModule() : Calibrati
   addParam("SVDClustersName", m_svdClusters, "Name of the SVDClusters list", m_svdClusters);
   addParam("SVDClustersOnTracksName", m_svdClustersOnTracks, "Name of the SVDClustersOnTracks list", m_svdClustersOnTracks);
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
-  addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", m_svdEventInfo);
   addParam("RecoTracksName", m_recotrack, "Name of the RecoTracks list", m_recotrack);
   addParam("TracksName", m_track, "Name of the Tracks list", m_track);
 }
@@ -61,7 +60,6 @@ void SVDTimeValidationCollectorModule::prepare()
   m_svdCls.isRequired(m_svdClusters);
   m_svdClsOnTrk.isRequired(m_svdClustersOnTracks);
   m_eventT0.isRequired(m_eventTime);
-  m_svdEI.isRequired(m_svdEventInfo);
   m_recoTrk.isRequired(m_recotrack);
   m_trk.isRequired(m_track);
 

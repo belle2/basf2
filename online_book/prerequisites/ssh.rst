@@ -358,7 +358,6 @@ simply write the following in the file:
 .. literalinclude:: ssh_config.txt
    :start-at: S10
    :end-at: E10
-   :linenos:
 
 .. note:: Marker comments in the solution code
     :class: toggle
@@ -378,7 +377,6 @@ should only apply for these hosts
 .. literalinclude:: ssh_config.txt
    :start-at: S20
    :end-at: E20
-   :linenos:
 
 This now allows us to just execute ``ssh desy`` and the correct username and
 full hostname are taken from the configuration file. This will also work with
@@ -394,7 +392,6 @@ the login to KEKCC via the gateway server
 .. literalinclude:: ssh_config.txt
    :start-at: S30
    :end-at: E30
-   :linenos:
 
 The line containing ``ProxyJump`` tells ssh to not directly connect to the host
 but first connect to the gateway host and then connect from there. We could make
@@ -544,7 +541,6 @@ use the password at all but just the listed keys.
 .. literalinclude:: ssh_config.txt
    :start-at: S40
    :end-at: E40
-   :linenos:
 
 But if the remote server doesn't know your identity it will reject it. So we
 need to give the public key to the remote server. This is very simple, all
@@ -834,7 +830,6 @@ authentication doesn't work. All we have to do is put the following in the
 configuration file
 
 .. code-block::
-    :linenos:
 
     ControlMaster auto
     ControlPath ~/.ssh/%r@%h:%p.control
@@ -992,7 +987,6 @@ also find keyboard shortcuts for most of them.
    .. literalinclude:: ssh_config.txt
       :start-at: S50
       :end-at: E50
-      :linenos:
 
    Then ``ssh ccw01`` will also work from outside KEKCC.
 

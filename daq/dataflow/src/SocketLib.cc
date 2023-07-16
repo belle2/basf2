@@ -127,8 +127,8 @@ int SocketIO::get_pxd(int sock, char* data, int len)
 {
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  int* pxdheader = (int*) data;
-  int* pxdheadertable = (int*) &data[headerlen];
+  int* pxdheader = (int*) data;            // TODO should it be unsigned int?
+  int* pxdheadertable = (int*) &data[headerlen];  // TODO should it be unsigned int?
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(sock, data, headerlen);
   if (br <= 0) return br;

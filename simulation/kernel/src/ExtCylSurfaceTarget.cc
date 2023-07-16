@@ -9,6 +9,7 @@
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <G4GeometryTolerance.hh>
 #include <geomdefs.hh>
+#include <G4Normal3D.hh>
 #include <G4Plane3D.hh>
 #include <framework/logging/Logger.h>
 

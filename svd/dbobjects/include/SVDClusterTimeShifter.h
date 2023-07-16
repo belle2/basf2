@@ -88,8 +88,6 @@ namespace Belle2 {
 
     /**
      * Returns the types of sensor grouping.
-     * A total of 7 types of sensors are grouped;
-     * L3, L4/5/6-Forward, L4/5/6-Barrel.
      * @param layer : layer number
      * @param sensor : sensor number
      * @param isU : is U side?

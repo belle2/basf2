@@ -16,9 +16,8 @@ Python interface to the ConditionsDB
 """
 
 import os
-from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING
+from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING, find_file
 import requests
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
@@ -52,6 +51,25 @@ def chunks(container, chunk_size):
         if not chunk:
             return
         yield chunk
+
+
+def get_cdb_authentication_token():
+    """Helper function for correctly retrieving the CDB authentication token."""
+    path_to_token = os.getenv('BELLE2_CDB_AUTH_TOKEN', None)
+    # If the env. variable is not set, throw a B2FATAL
+    if path_to_token is None:
+        B2FATAL('The environment variable $BELLE2_CDB_AUTH_TOKEN is not set.')
+    else:
+        # Let's first check if the path pointed by the env. variable actually exists
+        path_to_token = find_file(path_to_token, silent=True)
+        if path_to_token == '':
+            B2FATAL('The environment variable $BELLE2_CDB_AUTH_TOKEN points to a file which does not exist.\n'
+                    'For accessing the CDB you need a valid authentication token and store it in the file '
+                    'pointed by $BELLE2_CDB_AUTH_TOKEN')
+        try:  # Read and return the token
+            return path_to_token.read().strip()
+        except BaseException:  # But something may go wrong: let's throw a B2FATAL to inform the user
+            B2FATAL(f'Could not read the CDB authentication token from the file {path_to_token}')
 
 
 class BearerAuth(requests.auth.AuthBase):
@@ -251,18 +269,6 @@ class ConditionsDB:
         # this now because for the server check above we're fine with cached
         # results.
         self._session.headers.update({"Accept": "application/json", "Cache-Control": "no-cache"})
-
-    def set_authentication(self, user, password, basic=True):
-        """
-        Set authentication credentials when talking to the database
-
-        Args:
-            user (str): username
-            password (str): password
-            basic (bool): if True us HTTP Basic authentication, otherwise HTTP Digest
-        """
-        authtype = HTTPBasicAuth if basic else HTTPDigestAuth
-        self._session.auth = authtype(user, password)
 
     def set_authentication_token(self, token):
         """

@@ -16,9 +16,12 @@ Test for checking if b2conditionsdb-tag-merge behaves as expted:
 import subprocess
 
 import conditions_db as cdb
+from b2test_utils import skip_test
 
 
 if __name__ == '__main__':
+
+    skip_test("Disabled until new CDB authentication is deployed")
 
     tags = ['main_tag_merge_test_1', 'main_tag_merge_test_2', 'main_tag_merge_test_3']
     final_tag = 'main_tag_merge_test_0'

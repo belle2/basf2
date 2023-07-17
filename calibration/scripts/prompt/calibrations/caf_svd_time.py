@@ -18,6 +18,7 @@ import random
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
 from ROOT.Belle2 import SVDTimeValidationAlgorithm
 
 import basf2 as b2
@@ -484,6 +485,52 @@ def get_calibrations(input_data, **kwargs):
         algorithm.params = {"iov_coverage": output_iov}
 
     #########################################################
+    # SVD Cluster Time Shifter                              #
+    #########################################################
+
+    shift_clusterizers_onTracks = []
+    for alg in timeAlgorithms:
+        cluster = b2.register_module("SVDClusterizer")
+        cluster.set_name(f"ClusterReconstruction_{alg}")
+        cluster.param("Clusters", f"SVDClustersOnTracks_{alg}")
+        if NEW_SHAPER_DIGITS_NAME is not None:
+            cluster.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
+        cluster.param("timeAlgorithm6Samples", alg)
+        cluster.param("useDB", False)
+        shift_clusterizers_onTracks.append(cluster)
+
+    shift_pre_collector_path = create_pre_collector_path(
+        clusterizers=shift_clusterizers_onTracks,
+        isMC=isMC, max_events_per_run=max_events_per_run,
+        useSVDGrouping=useSVDGrouping, useRawtimeForTracking=False)
+
+    shift_collector = b2.register_module("SVDClusterTimeShifterCollector")
+    shift_collector.set_name("SVDClusterTimeShifterCollector")
+    shift_collector.param("MaxClusterSize", 6)
+    shift_collector.param("EventT0Name", "EventT0")
+    shift_collector.setSVDClusterOnTracksPrefix("SVDClustersOnTracks")
+    shift_collector.setTimeAlgorithm(timeAlgorithms)
+
+    shift_algo = SVDClusterTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
+                                                f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
+    shift_algo.setMinEntries(1000)
+    shift_algo.setAllowedTimeShift(15.)
+    shift_algo.setTimeAlgorithm(timeAlgorithms)
+
+    shift_calibration = Calibration("SVDClusterTimeShifter",
+                                    collector=shift_collector,
+                                    algorithms=shift_algo,
+                                    input_files=good_input_files,
+                                    pre_collector_path=shift_pre_collector_path)
+
+    shift_calibration.strategies = strategies.SequentialRunByRun
+
+    for algorithm in shift_calibration.algorithms:
+        algorithm.params = {"iov_coverage": output_iov}
+
+    shift_calibration.depends_on(calibration)
+
+    #########################################################
     # Add new fake calibration to run validation collectors #
     #########################################################
 
@@ -600,6 +647,6 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in val_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    val_calibration.depends_on(calibration)
+    val_calibration.depends_on(shift_calibration)
 
-    return [calibration, val_calibration]
+    return [calibration, shift_calibration, val_calibration]

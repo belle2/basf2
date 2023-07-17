@@ -103,7 +103,7 @@ namespace Belle2 {
       else {
         //cellID = 10 not used for calibration
         time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
-        if (m_svdClusterTimeShifter.isValid() && !m_returnRawClusterTime)
+        if (m_svdClusterTimeShifter.isValid())
           time -= m_svdClusterTimeShifter->getClusterTimeShift("CoG3",
                                                                rawCluster.getSensorID().getLayerNumber(),
                                                                rawCluster.getSensorID().getSensorNumber(),
@@ -175,7 +175,7 @@ namespace Belle2 {
         time = rawtime;
       else {
         time = m_ELS3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
-        if (m_svdClusterTimeShifter.isValid() && !m_returnRawClusterTime)
+        if (m_svdClusterTimeShifter.isValid())
           time -= m_svdClusterTimeShifter->getClusterTimeShift("ELS3",
                                                                rawCluster.getSensorID().getLayerNumber(),
                                                                rawCluster.getSensorID().getSensorNumber(),

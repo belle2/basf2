@@ -12,6 +12,9 @@
 //ROOT
 #include <TProfile.h>
 
+//boost
+#include "boost/format.hpp"
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisECLShapers);
@@ -39,16 +42,17 @@ void DQMHistAnalysisECLShapersModule::initialize()
   if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     for (int i = 0; i < c_collector_count; i++) {
-      std::string pv_name = "ECL:logic_check:crate" + std::to_string(i + 1);
+      std::string pv_name = (boost::format("ECL:DQM:logic_check:crate%02d") %
+                             (i + 1)).str();
       SEVCHK(ca_create_channel(pv_name.c_str(), NULL, NULL, 10, &chid_logic[i]), "ca_create_channel failure");
     }
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_fw", NULL, NULL, 10,
+    SEVCHK(ca_create_channel("ECL:DQM:pedwidth:max_fw", NULL, NULL, 10,
                              &chid_pedwidth[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_br", NULL, NULL, 10,
+    SEVCHK(ca_create_channel("ECL:DQM:pedwidth:max_br", NULL, NULL, 10,
                              &chid_pedwidth[1]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_bw", NULL, NULL, 10,
+    SEVCHK(ca_create_channel("ECL:DQM:pedwidth:max_bw", NULL, NULL, 10,
                              &chid_pedwidth[2]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_al", NULL, NULL, 10,
+    SEVCHK(ca_create_channel("ECL:DQM:pedwidth:max_al", NULL, NULL, 10,
                              &chid_pedwidth[3]), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }

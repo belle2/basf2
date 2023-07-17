@@ -531,15 +531,6 @@ namespace Belle2 {
       return double(out);
     }
 
-    double eclClusterConnectedRegionId(const Particle* particle)
-    {
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        return cluster->getConnectedRegionId();
-      }
-      return Const::doubleNaN;
-    }
-
     double eclClusterId(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();

@@ -246,7 +246,7 @@ namespace Belle2 {
     /**
      * return the ConnectedRegion ID of this cluster
      */
-    double eclClusterConnectedRegionId(const Particle* particle);
+    double eclClusterConnectedRegionID(const Particle* particle);
 
     /**
      * return the Cluster ID within the connected region of this cluster

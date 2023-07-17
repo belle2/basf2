@@ -64,8 +64,9 @@ namespace Belle2 {
      *
      * @param sop Predicted state of the track as linearization point around
      * which derivatives of alignment/calibration parameters shall be computed
-     * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
-     * #columns must match vector<int>.size().
+     * @return pair<vector<int>, TMatrixD> With matrix with
+    * number of rows = dimension of residual, number of columns = number of parameters.
+    * number of columns must match vector<int>.size().
      */
     virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 

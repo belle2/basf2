@@ -126,7 +126,7 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
   int nTarget = (int) p.targetZ + (int) p.targetTheta;
   if (p.outputScale.size() == p.nMLP || p.outputScale.size() == 1) {
     for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
-      if (p.outputScale[iScale].size() != 2 * nTarget) {
+      if (p.outputScale[iScale].size() != 2 * static_cast<unsigned int>(nTarget)) {
         B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
         okay = false;
       }

@@ -16,7 +16,8 @@ Python interface to the ConditionsDB
 """
 
 import os
-from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING, find_file
+import stat
+from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING
 import requests
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
@@ -28,6 +29,7 @@ from concurrent.futures import ThreadPoolExecutor, wait as futures_wait
 import hashlib
 import itertools
 from typing import Union  # noqa
+import getpass
 
 
 def encode_name(name):
@@ -55,21 +57,35 @@ def chunks(container, chunk_size):
 
 def get_cdb_authentication_token():
     """Helper function for correctly retrieving the CDB authentication token."""
-    path_to_token = os.getenv('BELLE2_CDB_AUTH_TOKEN', None)
-    # If the env. variable is not set, throw a B2FATAL
-    if path_to_token is None:
-        B2FATAL('The environment variable $BELLE2_CDB_AUTH_TOKEN is not set.')
-    else:
-        # Let's first check if the path pointed by the env. variable actually exists
-        path_to_token = find_file(path_to_token, silent=True)
-        if path_to_token == '':
-            B2FATAL('The environment variable $BELLE2_CDB_AUTH_TOKEN points to a file which does not exist.\n'
-                    'For accessing the CDB you need a valid authentication token and store it in the file '
-                    'pointed by $BELLE2_CDB_AUTH_TOKEN')
-        try:  # Read and return the token
-            return path_to_token.read().strip()
-        except BaseException:  # But something may go wrong: let's throw a B2FATAL to inform the user
-            B2FATAL(f'Could not read the CDB authentication token from the file {path_to_token}')
+    path_to_token = f'/tmp/b2cdb_{os.getenv("BELLE2_USER", None)}.token'
+
+    # check validity of existing token
+    if os.path.isfile(path_to_token):
+        with open(path_to_token) as token_file:
+            response = requests.get('https://token.belle2.org/check', verify=False, params={'token': token_file.read().strip()})
+            if response.status_code == 400:
+                os.unlink(path_to_token)
+
+    # request a token if there is none
+    if not os.path.isfile(path_to_token):
+        username = os.environ['BELLE2_USER']
+        othername = input(f'\nConfirm your DESY user name by pressing enter or type the correct one [{username}]: ')
+        if othername != '':
+            username = othername
+        password = getpass.getpass("Please type your DESY password to request a CDB token: ")
+        response = requests.get('https://token.belle2.org', verify=False, auth=(username, password))
+        print(response.content)
+        if response.status_code == requests.codes.ok:
+            with open(path_to_token, 'wb') as token_file:
+                os.chmod(path_to_token, stat.S_IRUSR | stat.S_IWUSR)
+                token_file.write(response.content)
+        else:
+            B2ERROR('Failed to get token')
+            return None
+
+    # read and return token
+    with open(path_to_token) as token_file:
+        return token_file.read().strip()
 
 
 class BearerAuth(requests.auth.AuthBase):

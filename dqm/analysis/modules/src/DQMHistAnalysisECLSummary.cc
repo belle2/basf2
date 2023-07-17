@@ -302,18 +302,18 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
   static const int MASK_SIZE = 200;
   /* structure to get an array of long values from EPICS */
   struct dbr_ctrl_long_array {
-    dbr_short_t     status;                 /* status of value */
-    dbr_short_t     severity;               /* severity of alarm */
-    char            units[MAX_UNITS_SIZE];  /* units of value */
-    dbr_long_t      upper_disp_limit;       /* upper limit of graph */
-    dbr_long_t      lower_disp_limit;       /* lower limit of graph */
+    dbr_short_t     status;                     /* status of value */
+    dbr_short_t     severity;                   /* severity of alarm */
+    char            /*units*/[MAX_UNITS_SIZE];  /* units of value */
+    dbr_long_t      upper_disp_limit;           /* upper limit of graph */
+    dbr_long_t      lower_disp_limit;           /* lower limit of graph */
     dbr_long_t      upper_alarm_limit;
     dbr_long_t      upper_warning_limit;
     dbr_long_t      lower_warning_limit;
     dbr_long_t      lower_alarm_limit;
-    dbr_long_t      upper_ctrl_limit;       /* upper control limit */
-    dbr_long_t      lower_ctrl_limit;       /* lower control limit */
-    dbr_long_t      value[MASK_SIZE];       /* current value */
+    dbr_long_t      upper_ctrl_limit;           /* upper control limit */
+    dbr_long_t      lower_ctrl_limit;           /* lower control limit */
+    dbr_long_t      value[MASK_SIZE];           /* current value */
   };
 
   static std::map<std::string, dbr_ctrl_long> limits_info;
@@ -373,7 +373,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   TH1* h_fail_crateid = findHist("ECL/fail_crateid");
 
-  const auto& [fit_alarm_index, fit_alarm_info] = getAlarmByName("bad_fit");
+  const int fit_alarm_index = getAlarmByName("bad_fit").first;
   for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
     int errors_count = 0;
     if (h_fail_crateid) {
@@ -389,12 +389,16 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
   std::map<int, int> error_bitmasks;
 
   //=== Get number of dead/cold/hot channels
-  for (auto& [cid, error_bitmask] : getChannelsWithOccupancyProblems()) {
-    error_bitmasks[cid] |= error_bitmask;
+  for (auto& item : getChannelsWithOccupancyProblems()) {
+    int cell_id       = item.first;
+    int error_bitmask = item.second;
+    error_bitmasks[cell_id] |= error_bitmask;
   }
   //=== Get number of channels with bad_chi2
-  for (auto& [cid, error_bitmask] : getChannelsWithChi2Problems()) {
-    error_bitmasks[cid] |= error_bitmask;
+  for (auto& item : getChannelsWithChi2Problems()) {
+    int cell_id       = item.first;
+    int error_bitmask = item.second;
+    error_bitmasks[cell_id] |= error_bitmask;
   }
 
   //=== Combine the information
@@ -513,8 +517,6 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
 std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithOccupancyProblems()
 {
-  std::map<int, int> retval;
-
   static std::vector< std::vector<short> > neighbours(ECL::ECL_TOTAL_CHANNELS);
   if (neighbours[0].size() == 0) {
     for (int cid0 = 0; cid0 < ECL::ECL_TOTAL_CHANNELS; cid0++) {
@@ -538,8 +540,6 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithOccupancyProb
 
 std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithChi2Problems()
 {
-  std::map<int, int> retval;
-
   ECL::ECLGeometryPar* geom = ECL::ECLGeometryPar::Instance();
 
   static std::vector< std::vector<short> > neighbours(ECL::ECL_TOTAL_CHANNELS);
@@ -583,10 +583,15 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
   //   filled histograms
   if (hist->Integral() <= 0) return retval;
 
-  const auto& [dead_index, dead_alarm] = getAlarmByName("dead");
-  const auto& [cold_index, cold_alarm] = getAlarmByName("cold");
-  const auto& [hot_index,  hot_alarm ] = getAlarmByName("hot");
-  const auto& [chi2_index, chi2_alarm] = getAlarmByName("bad_chi2");
+  // Extract alarm details
+  const auto dead = getAlarmByName("dead");
+  const auto cold = getAlarmByName("cold");
+  const auto  hot = getAlarmByName("hot");
+  const auto chi2 = getAlarmByName("bad_chi2");
+  auto dead_index = dead.first, auto dead_alarm = dead.second;
+  auto cold_index = cold.first, auto cold_alarm = cold.second;
+  auto hot_index  = hot.first,  auto hot_alarm  = hot.second;
+  auto chi2_index = chi2.first, auto chi2_alarm = chi2.second;
 
   double min_required_events;
 

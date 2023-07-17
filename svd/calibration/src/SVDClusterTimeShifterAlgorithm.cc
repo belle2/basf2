@@ -158,10 +158,17 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         if (status) {
           B2WARNING("Fit failed for " << hist->GetName());
           f->Close();
+          gSystem->Unlink(Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.root", alg.Data(), cal_rev));
           return c_Failure;
         }
 
         shiftValues[binLabel].push_back(doubleGaus->GetParameter(2));
+        if (std::fabs(shiftValues[binLabel].back()) > m_allowedDeviationMean) {
+          B2WARNING("Shift valus is more than allowed in " << hist->GetName() << " : " << shiftValues[binLabel].back());
+          f->Close();
+          gSystem->Unlink(Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.root", alg.Data(), cal_rev));
+          return c_Failure;
+        }
 
         f->cd();
         hist->Write();

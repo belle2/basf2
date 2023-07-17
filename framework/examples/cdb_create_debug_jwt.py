@@ -27,4 +27,4 @@ payload = {
 
 with open(filename, "bw") as f:
     token = jwt.encode(payload, secret)
-    f.write(token)
+    f.write(token.encode('utf8'))

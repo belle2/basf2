@@ -90,7 +90,8 @@ void SVDClusterTimeShifterCollectorModule::collect()
       for (const auto& svdCluster : m_svdClsOnTrk[alg]) {
         // get cluster time
         float clTime = svdCluster.getClsTime();
-        float clSize = svdCluster.getSize();
+        int clSize = svdCluster.getSize();
+        if (clSize > m_maxClusterSize) clSize = m_maxClusterSize;
 
         TString binLabel = TString::Format("L%iS%iS%c",
                                            svdCluster.getSensorID().getLayerNumber(),

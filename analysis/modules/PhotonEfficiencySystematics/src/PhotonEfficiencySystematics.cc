@@ -94,11 +94,12 @@ void PhotonEfficiencySystematicsModule::addPhotonDetectionEfficiencyRatios(Parti
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {
-      if (particle->hasExtraInfo(m_tableName + "_" + entry.first)) {
-        B2INFO("extraInfo " << m_tableName << "_" << entry.first << " has been already set and will be overwritten");
-        particle->setExtraInfo(m_tableName + "_" + entry.first, entry.second);
+      const std::string extraInfoName = m_tableName + "_" + entry.first;
+      if (particle->hasExtraInfo(extraInfoName)) {
+        B2INFO("extraInfo " << extraInfoName << " has been already set and will be overwritten");
+        particle->setExtraInfo(extraInfoName, entry.second);
       } else {
-        particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+        particle->addExtraInfo(extraInfoName, entry.second);
       }
     }
   }

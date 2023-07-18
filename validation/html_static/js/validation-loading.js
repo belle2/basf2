@@ -844,7 +844,8 @@ function getNewestRevision(index=0) {
     let nightlySelected = false;
     for (let revision of revisionsData["revisions"]){
         let label = revision["label"];
-        if (label.startsWith("nightly")) {
+        if ( ! selectedRevs.includes(label)) continue;
+	if (label.startsWith("nightly")) {
             nightlySelected = true;
         }
     }

@@ -389,15 +389,13 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
   std::map<int, int> error_bitmasks;
 
   //=== Get number of dead/cold/hot channels
-  for (auto& item : getChannelsWithOccupancyProblems()) {
-    int cell_id       = item.first;
-    int error_bitmask = item.second;
+  // cppcheck-suppress unassignedVariable
+  for (auto& [cell_id, error_bitmask] : getChannelsWithOccupancyProblems()) {
     error_bitmasks[cell_id] |= error_bitmask;
   }
   //=== Get number of channels with bad_chi2
-  for (auto& item : getChannelsWithChi2Problems()) {
-    int cell_id       = item.first;
-    int error_bitmask = item.second;
+  // cppcheck-suppress unassignedVariable
+  for (auto& [cell_id, error_bitmask] : getChannelsWithChi2Problems()) {
     error_bitmasks[cell_id] |= error_bitmask;
   }
 
@@ -583,15 +581,15 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
   //   filled histograms
   if (hist->Integral() <= 0) return retval;
 
-  // Extract alarm details
-  const auto dead = getAlarmByName("dead");
-  const auto cold = getAlarmByName("cold");
-  const auto  hot = getAlarmByName("hot");
-  const auto chi2 = getAlarmByName("bad_chi2");
-  auto dead_index = dead.first, auto dead_alarm = dead.second;
-  auto cold_index = cold.first, auto cold_alarm = cold.second;
-  auto hot_index  = hot.first,  auto hot_alarm  = hot.second;
-  auto chi2_index = chi2.first, auto chi2_alarm = chi2.second;
+  //=== Extract alarm details
+  // cppcheck-suppress unassignedVariable
+  const auto& [dead_index, dead_alarm] = getAlarmByName("dead");
+  // cppcheck-suppress unassignedVariable
+  const auto& [cold_index, cold_alarm] = getAlarmByName("cold");
+  // cppcheck-suppress unassignedVariable
+  const auto& [hot_index,  hot_alarm ] = getAlarmByName("hot");
+  // cppcheck-suppress unassignedVariable
+  const auto& [chi2_index, chi2_alarm] = getAlarmByName("bad_chi2");
 
   double min_required_events;
 

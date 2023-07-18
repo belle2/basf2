@@ -605,7 +605,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
   if (occupancy_histogram) {
     if (total_events >= dead_alarm.required_statistics) {
       // There should be registered signals in at least 1% of all events.
-      double min_occupancy = 0.01;
+      double min_occupancy = 0.001;
       if (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr) {
         // The histogram is not normalized, multiply the threshold by evt count
         min_occupancy *= total_events;

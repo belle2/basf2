@@ -20,6 +20,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
+
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -551,6 +553,23 @@ namespace Belle2 {
       return (abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
     }
 
+    double isTrackFound(const Particle* p)
+    {
+      if (p->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
+        return Const::doubleNaN;
+      StoreArray<MCParticle> mcParticles{};
+      MCParticle* tmp_mcP = mcParticles[p->getMdstArrayIndex()];
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tmp_mcP->getPDG()))))
+        return Const::doubleNaN;
+      Track* tmp_track = tmp_mcP->getRelated<Track>();
+      if (tmp_track) {
+        const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
+        if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
+          return true;
+      }
+      return false;
+    }
+
     double seenInPXD(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
@@ -1064,6 +1083,8 @@ List of possible values (taken from the Geant4 source of
                       "Checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
                       "Returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
+    REGISTER_VARIABLE("isTrackFound", isTrackFound,
+                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge; return 0.0 otherways.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
                       "Returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,

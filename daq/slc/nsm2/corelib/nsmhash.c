@@ -26,7 +26,7 @@
 #define HASHMAX 2039
 
 //static char *hashtable[HASHMAX]; //TODO can this be removed?
-static int deltatable[HASHMAX];
+//static int deltatable[HASHMAX]; //TODO can this be removed?
 
 struct NSMsys;
 #define SYSPOS(ptr) ((char *)(ptr) - (char *)nsmd_sysp)

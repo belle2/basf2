@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -641,7 +640,7 @@ def merge_local_databases(list_database_dirs, output_database_dir):
                 for file_name in file_names:
                     shutil.copy(file_name, output_database_dir)
                 # Now grab all the IoV stuff from each database.txt files and merge it.
-                with open(os.path.join(directory, 'database.txt'), 'r') as f:
+                with open(os.path.join(directory, 'database.txt')) as f:
                     for line in f.readlines():
                         db_file.write(line)
 
@@ -834,3 +833,5 @@ def parse_file_uri(file_uri):
 
 
 UNBOUND_EXPRUN = ExpRun(-1, -1)
+
+# @endcond

@@ -143,6 +143,8 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
+          delete pfx;
+
           if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
             f->Close();
             B2FATAL("Fit to the histogram failed in SVD3SampleELSTimeCalibrationAlgorithm. "

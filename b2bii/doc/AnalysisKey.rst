@@ -8,7 +8,7 @@ PID corrections and systematic errors
 -------------------------------------
 Efficiency correction factors and systematic errors for Belle PID
 were obtained using corresponding MC and data samples.
-Those studies were done for different PID selections, and 
+Those studies were done for different PID selections, and
 possible selections differ for different hypotheses.
 
 There are three groups of lookup tables in Belle:
@@ -21,7 +21,7 @@ There are three groups of lookup tables in Belle:
 * Proton ID:
    * Possible cuts for proton: [0.6, 0.7, 0.8, 0.9]
 
-Details of these tables and how they were studies can be found at 
+Details of these tables and how they were studies can be found at
 `Belle PID Joint Homepage <https://belle.kek.jp/group/pid_joint/>`_.
 
 The weights for LID and KID are available in basf2 and can be retrieved via payloads in ``Belle_PID``;
@@ -110,7 +110,7 @@ To append PID correction information for pion efficiency selected as kaons with
    my_path.add_module(reweighter2)
 
 .. note::
-   ``fit_flag`` indicates if the fits failed; ``fit_flag = 0`` is for successful fit, while 
+   ``fit_flag`` indicates if the fits failed; ``fit_flag = 0`` is for successful fit, while
    any non-zero values of fit_flag are for failed fit. Please only use ``fit_flag==0``
    when evaluating PID contributions.
 

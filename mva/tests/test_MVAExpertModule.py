@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,8 +26,10 @@ class MVAExtraInfoChecker(basf2.Module):
 
     def initialize(self):
         """Create particle list object"""
-        #: particle list object
+        #: Particle list object
         self.plist = Belle2.PyStoreObj("pi+:test")
+        #: Composite particle list object
+        self.comp_plist = Belle2.PyStoreObj("Lambda0:test")
 
         #: event extra info object
         self.eventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
@@ -51,8 +52,16 @@ class MVAExtraInfoChecker(basf2.Module):
                         for index in range(3):
                             compare_val = index + value
                             extra_info_name = f'multiclass_{name}_{index}'
+                            # FSP use case
                             for p in self.plist:
                                 ei_value = p.getExtraInfo(extra_info_name)
+                                assert ei_value == compare_val,\
+                                    f'ExtraInfo "{extra_info_name}" value "{ei_value}" not what was expected {compare_val}'
+                            # Decay string use case
+                            for p in self.comp_plist:
+                                if 'multi_' in extra_info_name:
+                                    continue
+                                ei_value = p.getDaughter(0).getExtraInfo(extra_info_name)
                                 assert ei_value == compare_val,\
                                     f'ExtraInfo "{extra_info_name}" value "{ei_value}" not what was expected {compare_val}'
 
@@ -61,8 +70,16 @@ class MVAExtraInfoChecker(basf2.Module):
                                 f'eventExtraInfo "{extra_info_name}" value "{ei_value}" not what was expected {compare_val}'
                     else:
                         extra_info_name = name
+                        # FSP use case
                         for p in self.plist:
                             ei_value = p.getExtraInfo(name)
+                            assert ei_value == value,\
+                                f'ExtraInfo "{name}" value "{ei_value}" not what was expected "{value}"'
+                        # Decay string use case
+                        for p in self.comp_plist:
+                            if 'multi_' in extra_info_name:
+                                continue
+                            ei_value = p.getDaughter(0).getExtraInfo(name)
                             assert ei_value == value,\
                                 f'ExtraInfo "{name}" value "{ei_value}" not what was expected "{value}"'
                         ei_value = self.eventExtraInfo.getExtraInfo(name)
@@ -124,6 +141,7 @@ if __name__ == "__main__":
     ma.inputMdst(b2test_utils.require_file('analysis/tests/mdst.root'), path=path)
 
     ma.fillParticleList('pi+:test', '', path=path)
+    ma.fillParticleList('Lambda0:test -> p+ pi-', '', path=path)
 
     # test all combinations of [single expert, multiexpert] x [binary, multiclass]
     for prefix in ['', 'multiclass_']:
@@ -152,6 +170,12 @@ if __name__ == "__main__":
             path.add_module(
                 'MVAExpert',
                 listNames=['pi+:test'],
+                extraInfoName=extra_info_name,
+                identifier=identifier,
+                overwriteExistingExtraInfo=overwrite_option)
+            path.add_module(
+                'MVAExpert',
+                listNames=['Lambda0:test -> ^p+ pi-'],
                 extraInfoName=extra_info_name,
                 identifier=identifier,
                 overwriteExistingExtraInfo=overwrite_option)

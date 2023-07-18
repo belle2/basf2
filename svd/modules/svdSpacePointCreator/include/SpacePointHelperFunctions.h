@@ -11,10 +11,14 @@
 #include <vector>
 
 #include <svd/calibration/SVDHitTimeSelection.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dbobjects/SVDSpacePointSNRFractionSelector.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -79,6 +83,36 @@ namespace Belle2 {
 
 
 
+  /** Store the input values for SVDSpacePoint selection from the given SVDCluster  */
+  inline void storeInputVectorFromSingleCluster(const SVDCluster* cls,
+                                                std::vector<float>& inputVector,
+                                                const SVDNoiseCalibrations& noiseCal)
+  {
+    inputVector.clear();
+    inputVector.resize(3, 0.0);
+
+    auto shaperDigits = cls->getRelationsTo<SVDShaperDigit>();
+    float noise = 0;
+    for (auto iSD : shaperDigits) {
+      auto samples = iSD.getSamples();
+
+      inputVector[0] += samples[0];
+      inputVector[1] += samples[1];
+      inputVector[2] += samples[2];
+
+      VxdID thisSensorID = iSD.getSensorID();
+      bool thisSide = iSD.isUStrip();
+      int thisCellID = iSD.getCellID();
+      float thisNoise = noiseCal.getNoise(thisSensorID, thisSide, thisCellID);
+
+      noise += thisNoise * thisNoise;
+    }
+    noise = sqrt(noise);
+    inputVector[0] = inputVector[0] / noise;
+    inputVector[1] = inputVector[1] / noise;
+    inputVector[2] = inputVector[2] / noise;
+  }
+
   /** stores all possible 2-Cluster-combinations.
    *
    * first parameter is a struct containing all clusters on current sensor.
@@ -88,26 +122,64 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut,
+                                       const bool& useSVDGroupInfo,  const int& numberOfSignalGroups, const bool& formSingleSignalGroup,
+                                       const SVDNoiseCalibrations& noiseCal, const DBObjPtr<SVDSpacePointSNRFractionSelector>& svdSpacePointSelectionFunction,
+                                       bool useSVDSpacePointSNRFractionSelector)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
       if (! hitTimeCut.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
-        B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
+        B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
         if (! hitTimeCut.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
-          B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
+          B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
 
         if (! hitTimeCut.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
-          B2DEBUG(1, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
+          B2DEBUG(29, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
                   ") is incompatible with Cluster time V (" << vCluster->getClsTime() << ")");
           continue;
         }
 
+        if (useSVDGroupInfo) {
+          const std::vector<int>& uTimeGroupId = uCluster->getTimeGroupId();
+          const std::vector<int>& vTimeGroupId = vCluster->getTimeGroupId();
+
+          if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) { // indirect check if the clusterizer module is disabled
+            bool isContinue = true;
+            for (auto& uitem : uTimeGroupId) {
+              if (uitem < 0 || uitem >= numberOfSignalGroups) continue;
+              for (auto& vitem : vTimeGroupId) {
+                if (vitem < 0 || vitem >= numberOfSignalGroups) continue;
+                if ((uitem == vitem) || formSingleSignalGroup) { isContinue = false; break; }
+              }
+              if (!isContinue) break;
+            }
+
+            if (isContinue) {
+              B2DEBUG(29, "Cluster combination rejected due to different time-group Id.");
+              continue;
+            }
+          }
+        }
+
+        if (useSVDSpacePointSNRFractionSelector) {
+          std::vector<float> inputU;
+          std::vector<float> inputV;
+
+          storeInputVectorFromSingleCluster(uCluster, inputU, noiseCal);
+          storeInputVectorFromSingleCluster(vCluster, inputV, noiseCal);
+
+          bool pass = svdSpacePointSelectionFunction->passSNRFractionSelection(inputU, inputV);
+          if (!pass) {
+            B2DEBUG(29, "Cluster combination rejected due to SVDSpacePointSNRFractionSelector");
+            continue;
+          }
+        }
 
         foundCombinations.push_back({uCluster, vCluster});
 
@@ -222,7 +294,7 @@ namespace Belle2 {
 
 
     if (chargeProbError == 0) {
-      B2DEBUG(1, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
+      B2DEBUG(21, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
@@ -242,7 +314,10 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName, const bool& useSVDGroupInfo,
+      const int& numberOfSignalGroups, const bool& formSingleSignalGroup,
+      const SVDNoiseCalibrations& noiseCal, const DBObjPtr<SVDSpacePointSNRFractionSelector>& svdSpacePointSelectionFunction,
+      bool useSVDSpacePointSNRFractionSelector)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -258,7 +333,9 @@ namespace Belle2 {
 
 
     for (auto& aSensor : activatedSensors)
-      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut);
+      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo, numberOfSignalGroups,
+                               formSingleSignalGroup,
+                               noiseCal, svdSpacePointSelectionFunction, useSVDSpacePointSNRFractionSelector);
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {

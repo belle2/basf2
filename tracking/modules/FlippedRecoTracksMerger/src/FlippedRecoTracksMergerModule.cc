@@ -45,6 +45,15 @@ void FlippedRecoTracksMergerModule::initialize()
 
 void FlippedRecoTracksMergerModule::event()
 {
+  // get the cut from DB
+  if (!m_flipCutsFromDB.isValid()) {
+    B2WARNING("DBobjects : TrackFlippingCuts not found!");
+    return;
+  }
+
+  // check if the flip&refit is switched on (or off)
+  if (!(*m_flipCutsFromDB).getOnOffInfo()) return;
+
 
   // loop all the recoTracks
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
@@ -58,8 +67,10 @@ void FlippedRecoTracksMergerModule::event()
 
     if (!track) continue;
 
-    // get the cut from DB
-    if (!m_flipCutsFromDB.isValid()) continue;
+    // do not change the tracks with Pt > 0.3 GeV
+    auto trackFitResult = track->getTrackFitResultWithClosestMass(Const::pion);
+    if (trackFitResult->getTransverseMomentum() > (*m_flipCutsFromDB).getPtCut()) continue;
+
     double mvaFlipCut = (*m_flipCutsFromDB).getSecondCut();
 
     // if we should not flip the tracks: the 2nd MVA QI is nan (aka didn't pass the 1st MVA filter) or smaller than the cut
@@ -109,11 +120,9 @@ void FlippedRecoTracksMergerModule::event()
     }
 
     recoTrack.flipTrackDirectionAndCharge();
-    // Initialise the TrackFitter to refit the recoTrack and provide a valid genfit state
-    TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
-                       m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
-    // PDG code 211 for pion is enough to get a valid track fit with a valid genfit::MeasuredStateOnPlane
-    Const::ChargedStable particleUsedForFitting(211);
-    fitter.fit(recoTrack, particleUsedForFitting);
+
+    // swapping the flipped genfit::Track into the main RecoTrack, to store the new fitted values (useful for V0Finder)
+    genfit::Track flipTrack = RecoTrackGenfitAccess::getGenfitTrack(*flippedRecoTrack);
+    RecoTrackGenfitAccess::swapGenfitTrack(recoTrack, &flipTrack);
   }
 }

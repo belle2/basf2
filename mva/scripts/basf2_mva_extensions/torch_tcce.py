@@ -59,7 +59,7 @@ class TCCE(nn.Module):
             n (int)(optional): Number of Taylor series terms to be used for loss calculation.
 
         """
-        super(TCCE, self).__init__()
+        super().__init__()
         #: Number of Taylor terms.
         self.n = n
 

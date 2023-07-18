@@ -18,7 +18,7 @@ from pxd import add_pxd_reconstruction
 
 from rawdata import add_unpackers
 
-from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
     add_mc_tracking_reconstruction,
@@ -75,7 +75,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                       legacy_ecl_charged_pid=False):
+                       legacy_ecl_charged_pid=False, emulate_HLT=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -84,9 +84,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     | ├── :func:`add_prefilter_reconstruction()`
     | │ ├── :func:`add_prefilter_pretracking_reconstruction()`   : Clustering
     | │ ├── ``add_prefilter_tracking_reconstruction()``          : Tracking essential for HLT filter calculation
-    | │ └── :func:`add_prefilter_posttracking_reconstruction()`  : PID and clustering
+    | │ └── :func:`add_prefilter_posttracking_reconstruction()`  : PID and clustering essential for HLT
     | └── :func:`add_postfilter_reconstruction()`
-    |   └── ``add_postfilter_tracking_reconstruction()``         : Rest of the tracking
+    |   ├── ``add_postfilter_tracking_reconstruction()``         : Rest of the tracking
+    |   └── :func:`add_postfilter_posttracking_reconstruction()` : Rest of PID and clustering
 
     plus the modules to calculate the software trigger cuts.
 
@@ -117,7 +118,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
+        MVA based charged particle ID (false).
+    :param emulate_HLT: if True, it runs the reconstruction as it is run on HLT (e.g. without PXD).
+        If you want to use this flag on raw data, you should also exclude the following branches from RootInput: ROIs, ROIpayload
     """
 
     # By default, the FullGrid module is not used in the reconstruction chain.
@@ -125,6 +128,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     if reconstruct_cdst == 'rawFormat':
         append_full_grid_cdc_eventt0 = True
 
+    if emulate_HLT:
+        components = DEFAULT_HLT_COMPONENTS
+
+    # pre-filter reconstruction
     add_prefilter_reconstruction(path,
                                  components=components,
                                  add_modules_for_trigger_calculation=add_trigger_calculation,
@@ -133,50 +140,47 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  use_second_cdc_hits=use_second_cdc_hits,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
-                                 addClusterExpertModules=addClusterExpertModules,
-                                 pruneTracks=False,
                                  event_abort=event_abort,
-                                 use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
                                  pxd_filtering_offline=pxd_filtering_offline,
-                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-                                 legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
         add_filter_software_trigger(path,
                                     use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
 
+    # post-filter reconstruction
     add_postfilter_reconstruction(path,
+                                  components=components,
                                   pruneTracks=pruneTracks,
-                                  components=components)
+                                  addClusterExpertModules=addClusterExpertModules,
+                                  reconstruct_cdst=reconstruct_cdst,
+                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
     # Add the modules calculating the software trigger skims
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(
-        path,
-        components=None,
-        add_modules_for_trigger_calculation=True,
-        skipGeometryAdding=False,
-        trackFitHypotheses=None,
-        use_second_cdc_hits=False,
-        add_muid_hits=False,
-        reconstruct_cdst=None,
-        addClusterExpertModules=True,
-        pruneTracks=True,
-        event_abort=default_event_abort,
-        use_random_numbers_for_hlt_prescale=True,
-        pxd_filtering_offline=False,
-        append_full_grid_cdc_eventt0=False,
-        legacy_ecl_charged_pid=False):
+def add_prefilter_reconstruction(path,
+                                 components=None,
+                                 add_modules_for_trigger_calculation=True,
+                                 skipGeometryAdding=False,
+                                 trackFitHypotheses=None,
+                                 use_second_cdc_hits=False,
+                                 add_muid_hits=False,
+                                 reconstruct_cdst=None,
+                                 event_abort=default_event_abort,
+                                 pxd_filtering_offline=False,
+                                 append_full_grid_cdc_eventt0=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param add_modules_for_trigger_calculation: add the modules necessary for computing the software trigger decision
+        during later stages (do not make any cut), relevant only when reconstruct_cdst is not None.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
@@ -185,26 +189,16 @@ def add_prefilter_reconstruction(
         the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param add_modules_for_trigger_calculation: add the modules necessary for computing the software trigger decision
-        during later stages (do not make any cut), relevant only when reconstruct_cdst is not None.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
     :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
         the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
         but just remove all data except for the event information.
-    :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
-        generated numbers, otherwise are applied using an internal counter.
-    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to
-        reduce execution time.
-    :param pruneTracks: Delete all hits except the first and last of the tracks (it must be set to False if the
-        post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
-    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
     """
 
     # Always avoid the top-level 'import ROOT'.
@@ -219,8 +213,7 @@ def add_prefilter_reconstruction(
     path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
     # Add modules that have to be run BEFORE track reconstruction
-    add_prefilter_pretracking_reconstruction(path,
-                                             components=components)
+    add_prefilter_pretracking_reconstruction(path, components=components)
 
     # Add prefilter tracking reconstruction modules
     add_prefilter_tracking_reconstruction(path,
@@ -235,79 +228,65 @@ def add_prefilter_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
 
-    #
-    # RAW CDST CASE
-    #
-    # If you are reconstructing a raw cdsts, add only the dE/dx calculation, PXDClustersFromTrack, SVDShaperDigitsFromTracks,
-    # and pruning. Full post-tracking recon won't be run unless add_trigger_calculation is set to True.
-    if reconstruct_cdst == 'rawFormat':
-        # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
-        if not components or ('PXD' in components):
-            path.add_module("PXDClustersFromTracks")
-        if not components or ('SVD' in components):
-            path.add_module("SVDShaperDigitsFromTracks")
+    # In case of cdst reconstruction ...
+    if reconstruct_cdst:
+        add_special_vxd_modules(path, components=components)
+    if reconstruct_cdst == 'rawFormat' and not add_modules_for_trigger_calculation:
+        add_dedx_modules(path, components=components)
+        return
 
-        # if you need to calculate the software trigger result, then you will need the full pre-filter post-tracking reconstruction
-        if add_modules_for_trigger_calculation and (not components or (
-                "CDC" in components and "ECL" in components and "KLM" in components)):
-            add_prefilter_posttracking_reconstruction(path,
-                                                      components=components,
-                                                      pruneTracks=pruneTracks,
-                                                      add_muid_hits=add_muid_hits,
-                                                      addClusterExpertModules=addClusterExpertModules,
-                                                      legacy_ecl_charged_pid=legacy_ecl_charged_pid)
-        # if you don't need the software trigger result, it's enough to add only
-        # these two modules of the pre-filter post-tracking reconstruction
-        else:
-            add_dedx_modules(path)
-            if pruneTracks:
-                add_prune_tracks(path, components=components)
+    # Add prefilter posttracking modules
+    add_prefilter_posttracking_reconstruction(path,
+                                              components=components,
+                                              add_muid_hits=add_muid_hits)
 
-    #
-    # FULL (aka old) CDST CASE
-    #
-    # if you are reconstructing a full cdst you need full post-tracking and the extra PXD and SVD modules
-    elif reconstruct_cdst == 'fullFormat':
-        # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
-        if not components or ('PXD' in components):
-            path.add_module("PXDClustersFromTracks")
-        if not components or ('SVD' in components):
-            path.add_module("SVDShaperDigitsFromTracks")
-
-        # Add further reconstruction modules, This part is the same for mdst and full cdsts
-        add_prefilter_posttracking_reconstruction(path,
-                                                  components=components,
-                                                  pruneTracks=pruneTracks,
-                                                  add_muid_hits=add_muid_hits,
-                                                  addClusterExpertModules=addClusterExpertModules,
-                                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid)
-
-    #
-    # ANYTING ELSE CASE
-    #
-    # if you are not reconstucting cdsts just run the post-tracking stuff
-    else:
-        add_prefilter_posttracking_reconstruction(path,
-                                                  components=components,
-                                                  pruneTracks=pruneTracks,
-                                                  add_muid_hits=add_muid_hits,
-                                                  addClusterExpertModules=addClusterExpertModules,
-                                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Prefilter_PostTracking')
 
 
-def add_postfilter_reconstruction(path, components=None, pruneTracks=False):
+def add_postfilter_reconstruction(path,
+                                  components=None,
+                                  pruneTracks=False,
+                                  addClusterExpertModules=True,
+                                  reconstruct_cdst=None,
+                                  legacy_ecl_charged_pid=False):
     """
     This function adds the reconstruction modules not required to calculate HLT filter decision to a path.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to
+        reduce execution time.
+    :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
+        full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
+        required PXD objects won't be added.
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     """
 
     # Add postfilter tracking reconstruction modules
-    add_postfilter_tracking_reconstruction(path, components=components, pruneTracks=pruneTracks)
+    add_postfilter_tracking_reconstruction(path, components=components, pruneTracks=False)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Postfilter_Reconstruction')
+    path.add_module('StatisticsSummary').set_name('Sum_Postfilter_Tracking')
+
+    # Skip postfilter posttracking modules for raw format cdst reconstruction
+    if reconstruct_cdst == 'rawFormat':
+        if pruneTracks:
+            add_prune_tracks(path, components)
+        return
+
+    # Add postfilter posttracking modules
+    add_postfilter_posttracking_reconstruction(path,
+                                               components=components,
+                                               addClusterExpertModules=addClusterExpertModules,
+                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+    # Prune tracks
+    if pruneTracks:
+        add_prune_tracks(path, components)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Postfilter_PostTracking')
 
 
 def add_cosmics_reconstruction(
@@ -327,7 +306,7 @@ def add_cosmics_reconstruction(
         ):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
-    Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,
+    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
     plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
@@ -372,27 +351,23 @@ def add_cosmics_reconstruction(
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+
     if posttracking:
         if reconstruct_cdst:
-            # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
-            if not components or ('PXD' in components):
-                path.add_module("PXDClustersFromTracks")
-            if not components or ('SVD' in components):
-                path.add_module("SVDShaperDigitsFromTracks")
-            # And add only the dE/dx calculation and prune the tracks
-            add_dedx_modules(path)
+            add_special_vxd_modules(path, components=components)
+            add_dedx_modules(path, components=components)
             add_prune_tracks(path, components=components)
 
         else:
             # Add further reconstruction modules
-            add_prefilter_posttracking_reconstruction(path,
-                                                      components=components,
-                                                      pruneTracks=pruneTracks,
-                                                      addClusterExpertModules=addClusterExpertModules,
-                                                      add_muid_hits=add_muid_hits,
-                                                      cosmics=True,
-                                                      eventt0_combiner_mode=eventt0_combiner_mode,
-                                                      legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+            add_posttracking_reconstruction(path,
+                                            components=components,
+                                            pruneTracks=pruneTracks,
+                                            addClusterExpertModules=addClusterExpertModules,
+                                            add_muid_hits=add_muid_hits,
+                                            cosmics=True,
+                                            eventt0_combiner_mode=eventt0_combiner_mode,
+                                            legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -422,12 +397,12 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
     path.add_module('StatisticsSummary').set_name('Sum_MC_Tracking')
 
     # add further reconstruction modules
-    add_prefilter_posttracking_reconstruction(path,
-                                              components=components,
-                                              pruneTracks=pruneTracks,
-                                              add_muid_hits=add_muid_hits,
-                                              addClusterExpertModules=addClusterExpertModules,
-                                              legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    pruneTracks=pruneTracks,
+                                    add_muid_hits=add_muid_hits,
+                                    addClusterExpertModules=addClusterExpertModules,
+                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def add_prefilter_pretracking_reconstruction(path, components=None):
@@ -447,14 +422,91 @@ def add_prefilter_pretracking_reconstruction(path, components=None):
 
 def add_prefilter_posttracking_reconstruction(path,
                                               components=None,
-                                              pruneTracks=True,
-                                              addClusterExpertModules=True,
                                               add_muid_hits=False,
-                                              cosmics=False,
                                               for_cdst_analysis=False,
                                               add_eventt0_combiner_for_cdst=False,
-                                              eventt0_combiner_mode="prefer_svd",
-                                              legacy_ecl_charged_pid=False):
+                                              eventt0_combiner_mode="prefer_svd"):
+    """
+    This function adds to the path the standard reconstruction modules after prefilter tracking
+    whoose outputs are also needed in the filter.
+
+    :param path: The path to add the modules to.
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+    :param for_cdst_analysis: if True, EventT0Combiner is not added to path.
+           This is only needed by prepare_cdst_analysis().
+    :param add_eventt0_combiner_for_cdst: if True, the EventT0Combiner module is added to the path even if
+           for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
+           add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
+           add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
+    """
+
+    # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        add_dedx_modules(path, components)
+
+    add_ext_module(path, components)
+
+    # Add EventT0Combiner, if this function is not called from prepare_cdst_analysis() or if requested also there.
+    if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
+        path.add_module("EventT0Combiner", combinationLogic=eventt0_combiner_mode)
+    add_ecl_finalizer_module(path, components)
+    add_ecl_mc_matcher_module(path, components)
+    add_klm_modules(path, components)
+    add_klm_mc_matcher_module(path, components)
+    add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
+    add_ecl_track_cluster_modules(path, components)
+    add_ecl_cluster_properties_modules(path, components)
+
+
+def add_postfilter_posttracking_reconstruction(path,
+                                               components=None,
+                                               addClusterExpertModules=True,
+                                               cosmics=False,
+                                               for_cdst_analysis=False,
+                                               legacy_ecl_charged_pid=False):
+    """
+    This function adds to the path the standard reconstruction modules whoose outputs are not needed in the filter.
+
+    :param path: The path to add the modules to.
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
+    :param cosmics: if True, steer TOP for cosmic reconstruction.
+    :param for_cdst_analysis: if True, dEdx and OnlineEventT0Creator modules are not added to the path.
+           This is only needed by prepare_cdst_analysis().
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
+    """
+
+    add_top_modules(path, components, cosmics=cosmics)
+    add_arich_modules(path, components)
+
+    # only add the OnlineEventT0Creator if not preparing cDST
+    if not for_cdst_analysis:
+        path.add_module("OnlineEventT0Creator")
+
+    add_ecl_chargedpid_module(path, components, legacy_ecl_charged_pid)
+    add_pid_module(path, components)
+
+    if addClusterExpertModules:
+        # FIXME: Disabled for HLT until execution time bug is fixed
+        add_cluster_expert_modules(path, components)
+
+    add_ecl_track_brem_finder(path, components)
+
+
+def add_posttracking_reconstruction(path,
+                                    components=None,
+                                    pruneTracks=True,
+                                    addClusterExpertModules=True,
+                                    add_muid_hits=False,
+                                    cosmics=False,
+                                    for_cdst_analysis=False,
+                                    add_eventt0_combiner_for_cdst=False,
+                                    eventt0_combiner_mode="prefer_svd",
+                                    legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -477,49 +529,19 @@ def add_prefilter_posttracking_reconstruction(path,
       MVA based charged particle ID (false).
     """
 
-    # Not add dEdx modules in prepare_cdst_analysis()
-    if not for_cdst_analysis:
-        add_dedx_modules(path, components)
+    add_prefilter_posttracking_reconstruction(path,
+                                              components=components,
+                                              add_muid_hits=add_muid_hits,
+                                              for_cdst_analysis=for_cdst_analysis,
+                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner_for_cdst,
+                                              eventt0_combiner_mode=eventt0_combiner_mode)
 
-    add_ext_module(path, components)
-
-    add_top_modules(path, components, cosmics=cosmics)
-
-    add_arich_modules(path, components)
-
-    # Not add EventT0Combiner module in prepare_cdst_analysis() by default,
-    # but be lenient and add it if requested.
-    # By default, since for_cdst_analysis is False, the module is added by this function.
-    if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
-        path.add_module("EventT0Combiner", combinationLogic=eventt0_combiner_mode)
-
-    # only add the OnlineEventT0Creator if not preparing cDST
-    if not for_cdst_analysis:
-        path.add_module("OnlineEventT0Creator")
-
-    add_ecl_finalizer_module(path, components)
-
-    add_ecl_mc_matcher_module(path, components)
-
-    add_klm_modules(path, components)
-
-    add_klm_mc_matcher_module(path, components)
-
-    add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
-
-    add_ecl_track_cluster_modules(path, components)
-
-    add_ecl_cluster_properties_modules(path, components)
-
-    add_ecl_chargedpid_module(path, components, legacy_ecl_charged_pid)
-
-    add_pid_module(path, components)
-
-    if addClusterExpertModules:
-        # FIXME: Disabled for HLT until execution time bug is fixed
-        add_cluster_expert_modules(path, components)
-
-    add_ecl_track_brem_finder(path, components)
+    add_postfilter_posttracking_reconstruction(path,
+                                               components=components,
+                                               addClusterExpertModules=addClusterExpertModules,
+                                               cosmics=cosmics,
+                                               for_cdst_analysis=for_cdst_analysis,
+                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
     # Prune tracks as soon as the post-tracking steps are complete
     # Not add prune tracks modules in prepare_cdst_analysis()
@@ -549,14 +571,12 @@ def add_mdst_output(*args, **kwargs):
                   "Please use the equivalent function from the mdst package.")
 
 
-def add_cdst_output(
-    path,
-    mc=True,
-    filename='cdst.root',
-    additionalBranches=None,
-    dataDescription=None,
-    ignoreInputModulesCheck=False
-):
+def add_cdst_output(path,
+                    mc=True,
+                    filename='cdst.root',
+                    additionalBranches=None,
+                    dataDescription=None,
+                    ignoreInputModulesCheck=False):
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
     The actual cDST output content depends on the value of the parameter `mc`:
@@ -822,6 +842,20 @@ def add_dedx_modules(path, components=None):
         path.add_module('VXDDedxPID')
 
 
+def add_special_vxd_modules(path, components=None):
+    """
+    Add two modules that are not part of the standard reconstruction.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+
+    if not components or ('PXD' in components):
+        path.add_module("PXDClustersFromTracks")
+    if not components or ('SVD' in components):
+        path.add_module("SVDShaperDigitsFromTracks")
+
+
 def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
@@ -862,11 +896,11 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
                     noiseBrems=False)
 
     # Add the posttracking modules needed for the cDST analysis
-    add_prefilter_posttracking_reconstruction(path,
-                                              components=components,
-                                              for_cdst_analysis=True,
-                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner,
-                                              legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    for_cdst_analysis=True,
+                                    add_eventt0_combiner_for_cdst=add_eventt0_combiner,
+                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def prepare_user_cdst_analysis(path, components=None, mc=False):

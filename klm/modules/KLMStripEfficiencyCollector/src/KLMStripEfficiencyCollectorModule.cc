@@ -33,7 +33,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Maximal distance in the units of strip number from ExtHit to "
-           "matching KLMDigit.", double(8));
+           "matching KLMDigit (not for multi-strip hits).", double(8));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("MinimalMatchingDigitsOuterLayers",
@@ -202,14 +202,14 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
           digit.getPlane() == hitData->plane))
       continue;
 
-    auto stripPosition = digit.getStrip();
-    auto allowedDistance1D = m_AllowedDistance1D;
+    double stripPosition = digit.getStrip();
+    double allowedDistance1D = m_AllowedDistance1D;
 
     if (digit.isMultiStrip()) {
       stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
       allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
     }
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+    if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
       hitData->digit = &digit;
       return;
     }

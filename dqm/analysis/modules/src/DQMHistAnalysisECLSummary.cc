@@ -463,10 +463,9 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   //== Update EPICS PVs or MiraBelle monObjs
 
-  std::map<std::string, int> total;
-
   for (size_t alarm_idx = 0; alarm_idx < alarm_counts.size(); alarm_idx++) {
     auto& alarm = m_ecl_alarms[alarm_idx];
+    std::map<std::string, int> total;
     // Convert values per crate to totals
     for (size_t crate = 0; crate < alarm_counts[alarm_idx].size(); crate++) {
       int crate_id = crate + 1;

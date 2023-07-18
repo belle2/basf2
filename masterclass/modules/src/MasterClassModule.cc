@@ -50,6 +50,21 @@ void MasterClassModule::event()
     auto pid = track.getRelated<PIDLikelihood>();
     const double priors[] = {0.05, 0.05, 0.65, 0.24, 0.01, 0};
     auto type = pid->getMostLikely(priors);
+
+    // CUSTOM cuts! (fine tune for datasample)
+    Const::PIDDetectorSet detectorSet = Const::PIDDetectors::set();
+    const unsigned int n = Const::ChargedStable::c_SetSize;
+    double frac[n];
+    for (double& i : frac) i = 1.0;  // flat priors
+    auto hypType_mu = Const::ChargedStable(13); // muon
+    auto hypType_e = Const::ChargedStable(11); // e
+    auto muonPID = pid->getProbability(hypType_mu, frac, detectorSet);
+    auto ePID = pid->getProbability(hypType_e, frac, detectorSet);
+    // std::cout << "pids: " << muonPID << ", " << ePID << std::endl;
+    if ((muonPID > 0.2) && (ePID < muonPID)) {
+      type = hypType_mu;
+    }
+
     auto trackFit = track.getTrackFitResultWithClosestMass(type);
     auto p = trackFit->getMomentum();
     double m = type.getMass();

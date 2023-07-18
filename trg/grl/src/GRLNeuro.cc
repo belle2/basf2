@@ -193,13 +193,13 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
           return false;
         }
         //change the precision based in FPGA (hls4ml)
-        for (int it = 0; it < warray.size(); it++) {
+        for (uint it = 0; it < warray.size(); it++) {
           if (it < 380)      warray[it] = float_to_fixed(warray[it], 2, 13);
           else if (it < 780) warray[it] = float_to_fixed(warray[it], 1, 13);
           else            warray[it] = float_to_fixed(warray[it], 2, 11);
         }
 
-        for (int it = 0; it < barray.size(); it++) {
+        for (uint it = 0; it < barray.size(); it++) {
           if (it < 20)      barray[it] = float_to_fixed(barray[it], 4, 2);
           else if (it < 40) barray[it] = float_to_fixed(barray[it], 4, 3);
           else           barray[it] = float_to_fixed(barray[it], 0, 2);

@@ -28,8 +28,6 @@ namespace Belle2 {
 
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-
     // Generate Vertex information
 
     double mcDecayVertexX(const Particle* part)

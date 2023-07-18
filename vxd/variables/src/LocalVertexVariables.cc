@@ -22,7 +22,6 @@ namespace Belle2 {
 
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
     // MC Local coordinates and sensor ID from getDecayVertex global coordinates
 
@@ -31,7 +30,7 @@ namespace Belle2 {
       VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle)
-        return std::make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+        return std::make_tuple(ROOT::Math::XYZVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN), 0, 0, 0);
 
       const auto& mcglobal = mcparticle->getDecayVertex();
 
@@ -45,7 +44,7 @@ namespace Belle2 {
           }
         }
       }
-      return std::make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+      return std::make_tuple(ROOT::Math::XYZVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN), 0, 0, 0);
     }
 
     double mcDecayVertexU(const Particle* part)
@@ -104,7 +103,7 @@ namespace Belle2 {
           }
         }
       }
-      return std::make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+      return std::make_tuple(ROOT::Math::XYZVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN), 0, 0, 0);
     }
 
     double particleU(const Particle* part)

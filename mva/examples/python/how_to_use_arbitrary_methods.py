@@ -18,7 +18,7 @@ import basf2_mva
 import basf2_mva_util
 
 
-class MyFancyClassifier(object):
+class MyFancyClassifier:
     """ Let's assume we have written our own classifier (or installed something from github) """
 
     def __init__(self, *my_fancy_parameters):
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     Other Python-based frameworks like sklearn, tensorflow, xgboost, ... have predefined hooks,
     but you can overwrite all of them.
     """
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -183,8 +183,14 @@ if __name__ == "__main__":
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_identifier = "MyFancyModel"
     general_options.m_variables = basf2_mva.vector(*variables)
@@ -238,7 +244,7 @@ if __name__ == "__main__":
     # Because then it is very easy to apply the method to a test file,
     # of course you can also apply the method using the MVAExpert module directly in basf2
     # Or (if you do reconstruction and not analysis) the corresponding modules.
-    p, t = method.apply_expert(basf2_mva.vector("test.root"), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
 
     # We calculate the AUC ROC value of the returned probability and target,
     # our method is very simple, so the AUC won't be good :-)

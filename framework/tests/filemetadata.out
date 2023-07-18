@@ -4,5 +4,6 @@
 === FileMetaData ===
 LFN:        /logical/file/name
 nEvents:    10
+nFullEvents: 10
 range:      7/1/1 - 7/15/1
 parents:    []

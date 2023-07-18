@@ -34,12 +34,12 @@ class ConstraintsGenerator(b2.Module):
 
         """
 
-        super(ConstraintsGenerator, self).__init__()
+        super().__init__()
         #: The generator: alignment.Constraints
         self.generator = generator
         #: Generated constraints (key is constraint checksum)
         self.consts = dict()
-        super(ConstraintsGenerator, self).set_name(super(ConstraintsGenerator, self).name() + ":" + generator.filename)
+        super().set_name(super().name() + ":" + generator.filename)
 
     def event(self):
         """ Event: attempt to add constraints

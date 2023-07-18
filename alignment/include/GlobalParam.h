@@ -49,11 +49,11 @@ namespace Belle2 {
       virtual ~IGlobalParamInterface() {}
       /// Implement this to be called after Millepede finishes and all global parameters are filled
       /// in DB objects (which allow this) in GlobalParam
-      /// @param std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& tuple with result <unique id, element, param, value>
-      /// @param GlobalParamVector& the GlobalVector which you have to update, extend or just read jsu after it is filled
+      /// @param results Vector with a tuple representing <unique id, element, param, value> per result
+      /// @param globalParams The GlobalParamVector which you have to update, extend or just read jsu after it is filled
       /// automatically (for DB objects which support it) and before its DBObjects are stored back into DB.
-      virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&,
-                                  GlobalParamVector&) {};
+      virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& results,
+                                  GlobalParamVector& globalParams) {};
       /// Super-tentavive: not yet used
       virtual void setupAlignmentHierarchy(GlobalDerivativesHierarchy&) {}
     };

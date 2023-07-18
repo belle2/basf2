@@ -76,7 +76,7 @@ namespace Belle2 {
         const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
         return std::sqrt(EPhiThetaCov[0][0]);
       }
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double particlePx(const Particle* part)
@@ -110,11 +110,11 @@ namespace Belle2 {
 
       if (elementI < 0 || elementI > 6) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]:" << LogVar("i", elementI));
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       if (elementJ < 0 || elementJ > 6) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]:" << LogVar("j", elementJ));
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
@@ -129,7 +129,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePErr(const Particle* part)
@@ -159,7 +159,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePxErr(const Particle* part)
@@ -171,7 +171,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePyErr(const Particle* part)
@@ -182,7 +182,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePzErr(const Particle* part)
@@ -193,7 +193,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particlePtErr(const Particle* part)
@@ -217,12 +217,12 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double momentumDeviationChi2(const Particle* part)
     {
-      double result = std::numeric_limits<double>::quiet_NaN();
+      double result = Const::doubleNaN;
 
       // check if error matrix is set
       if (part->getPValue() < 0.0)
@@ -273,7 +273,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particleCosTheta(const Particle* part)
@@ -314,7 +314,7 @@ namespace Belle2 {
       if (errorSquared >= 0.0)
         return sqrt(errorSquared);
       else
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
     }
 
     double particleXp(const Particle* part)
@@ -388,7 +388,7 @@ namespace Belle2 {
       StoreObjPtr<EventShapeContainer> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find thrust of event information, did you forget to load the event shape calculation?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       PCmsLabTransform T;
       B2Vector3D th = evtShape->getThrustAxis();
@@ -559,7 +559,7 @@ namespace Belle2 {
       double result = jacobian * (covarianceMatrix * jacobian);
 
       if (result < 0.0)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       return TMath::Sqrt(result);
     }
@@ -597,7 +597,7 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      if (!cluster) return Const::doubleNaN;
       const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
@@ -616,7 +616,7 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      if (!cluster) return Const::doubleNaN;
       const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
@@ -664,7 +664,7 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * part->get4Vector();
       double E = T.getCMSEnergy() / 2;
       double m2 = E * E - vec.P2();
-      double mbc = m2 >= 0 ? sqrt(m2) : std::numeric_limits<double>::quiet_NaN();
+      double mbc = m2 >= 0 ? sqrt(m2) : Const::doubleNaN;
       return mbc;
     }
 
@@ -714,14 +714,14 @@ namespace Belle2 {
       const MCParticle* mcB = part->getMCParticle();
 
       if (!mcB)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       ROOT::Math::PxPyPzEVector pB = mcB->get4Vector();
 
       std::vector<MCParticle*> mcDaug = mcB->getDaughters();
 
       if (mcDaug.empty())
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       // B -> X l nu
       // q = pB - pX
@@ -852,7 +852,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
-      if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
+      if (part->getNDaughters() != 2) return Const::doubleNaN;
       ROOT::Math::PxPyPzEVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
       ROOT::Math::PxPyPzEVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       tagVec.SetE(-beamEnergy);
@@ -864,17 +864,17 @@ namespace Belle2 {
       auto* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       MCParticle* mcMother = mcp->getMother();
 
       if (!mcMother)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       std::vector<MCParticle*> daughters = mcMother->getDaughters();
 
       if (daughters.size() != 2)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       MCParticle* recoilMC = nullptr;
       if (daughters[0]->getArrayIndex() == mcp->getArrayIndex())
@@ -883,7 +883,7 @@ namespace Belle2 {
         recoilMC = daughters[0];
 
       if (!recoilMC->hasStatus(MCParticle::c_PrimaryParticle))
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       int decayType = 0;
       checkMCParticleDecay(recoilMC, decayType, false);
@@ -956,7 +956,7 @@ namespace Belle2 {
     double trackMatchType(const Particle* particle)
     {
       // Particle does not contain a ECL Cluster
-      double result = std::numeric_limits<double>::quiet_NaN();
+      double result = Const::doubleNaN;
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
@@ -1031,7 +1031,7 @@ namespace Belle2 {
       std::string extraInfo = "distToClosestTrkAt" + detName + detLayer + "_VS_" + referenceListName + extraSuffix;
 
       auto func = [ = ](const Particle * part) -> double {
-        auto dist = (part->hasExtraInfo(extraInfo)) ? part->getExtraInfo(extraInfo) : std::numeric_limits<float>::quiet_NaN();
+        auto dist = (part->hasExtraInfo(extraInfo)) ? part->getExtraInfo(extraInfo) : Const::doubleNaN;
         return dist;
       };
 
@@ -1064,7 +1064,7 @@ namespace Belle2 {
 
         if (!part->hasExtraInfo(extraInfo))
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
@@ -1115,12 +1115,12 @@ namespace Belle2 {
 
         if (!part->hasExtraInfo(extraInfo))
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         auto scoreDet = part->getExtraInfo(extraInfo);
         if (std::isnan(scoreDet))
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return scoreDet;
@@ -1169,12 +1169,12 @@ namespace Belle2 {
 
         if (!part->hasExtraInfo(extraInfo))
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         auto scoreDet = part->getExtraInfo(extraInfo);
         if (std::isnan(scoreDet))
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return scoreDet;

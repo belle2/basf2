@@ -31,7 +31,7 @@ namespace Belle2 {
    * VXDTF sector map. The data are saved on a root file that eventually
    * will be chained and used by the training module.
    *
-  . */
+   */
   class VXDTFTrainingDataCollectorModule : public Module {
 
 

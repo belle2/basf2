@@ -107,7 +107,6 @@ namespace Belle2 {
      * @param logl  array of log-likelihood to be modified
      * @param p     track momentum
      * @param dedx  dE/dx value
-     * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
     void savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
 
@@ -116,7 +115,6 @@ namespace Belle2 {
      * @param logl  array of log-likelihood to be modified
      * @param p     track momentum
      * @param dedx  dE/dx value
-     * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
     void saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
 

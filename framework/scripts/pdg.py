@@ -130,7 +130,8 @@ def load_default():
     _get_instance().ReadEvtGenTable()
 
 
-def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifetime=0, pythiaID=0):
+def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifetime=0, pythiaID=0,
+                 define_anti_particle=False):
     """
     Add a new particle to the list of known particles.
 
@@ -146,6 +147,7 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
         max_width (float): max width, if omitted 3*width will be used
         lifetime (float): lifetime in ns, should be 0 as geant4 cannot handle it correctly otherwise
         pythiaID (int): pythiaID of the particle (if any), if omitted 0 will be used
+        define_anti_particle (bool): if True, an anti-particle with the default name anti-{name} is defined and added.
     """
     if lifetime > 0:
         basf2.B2WARNING("Userdefined particle with non-zero lifetime will not be simulated correctly")
@@ -159,6 +161,15 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
     if particle:
         basf2.B2INFO("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
                      (name, pdgCode, mass, width, charge, spin))
+
+        if define_anti_particle:
+            anti_particle = _get_instance().AddParticle(
+                f'anti-{name}', f'anti-{name}', mass, False, width, -charge * 3, "userdefined", -pdgCode, 0, 0,
+                lifetime, spin, max_width, pythiaID
+            )
+            particle.SetAntiParticle(anti_particle)
+            basf2.B2INFO(f"Adding new particle 'anti-{name}' as anti-particle of '{name}'")
+
         return True
 
     return False

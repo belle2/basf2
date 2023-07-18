@@ -506,7 +506,7 @@ GRLNeuroTrainerModule::terminate()
     train(isector);
     m_GRLNeuro[isector].Trained(true);
     // save all networks (including the newly trained)
-    m_GRLNeuro.save(m_filename, m_arrayname);
+    //m_GRLNeuro.save(m_filename, m_arrayname);
   }
 
   // save the training data
@@ -634,12 +634,12 @@ GRLNeuroTrainerModule::train(unsigned isector)
   }
   if (m_saveDebug) {
     for (unsigned i = nTrain + m_nValid; i < m_trainSets[isector].getNumberOfSamples(); ++i) {
-      vector<float> output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
+      float output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
       vector<float> target = m_trainSets[isector].getTarget(i);
-      for (unsigned iout = 0; iout < output.size(); ++iout) {
-        if (((int)target[0]) == 1)h_result_sig[isector]->Fill(output[iout]);
-        else                    h_result_bg[isector]->Fill(output[iout]);
-      }
+      //for (unsigned iout = 0; iout < output.size(); ++iout) {
+      if (((int)target[0]) == 1)h_result_sig[isector]->Fill(output);
+      else                    h_result_bg[isector]->Fill(output);
+      //}
     }
   }
   // free memory

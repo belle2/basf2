@@ -687,7 +687,7 @@ namespace VXDTFObserversTest {
    * */
 
 
-  /** this observer does simply collect other observers which are to be executed during ::notify */
+  /** this observer does simply collect other observers which are to be executed during the call of the corresponding notify function(s) */
   template<class FilterType> class VectorOfObservers : public VoidObserver {
   public:
 

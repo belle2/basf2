@@ -13,8 +13,9 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 
@@ -45,11 +46,13 @@ namespace Belle2 {
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
     std::string m_SVDRecoDigitsName; /**< reco digit list name*/
+    std::string m_SVDClustersName; /**< cluster list name*/
 
     StoreArray<ROIid> m_ROIs; /**< ROis store array*/
-    StoreArray<SVDIntercept> m_Intercepts; /**< SVDINtercept Store Arrays*/
-    StoreArray<SVDShaperDigit> m_SVDShaperDigits; /**< shaper digits sotre array */
-    StoreArray<SVDRecoDigit> m_SVDRecoDigits; /**< reco digit store array*/
+    StoreArray<SVDIntercept> m_Intercepts; /**< SVDIntercept Store Arrays*/
+    StoreArray<SVDShaperDigit> m_SVDShaperDigits; /**< shaper digit store array */
+    StoreArray<SVDRecoDigit> m_SVDRecoDigits; /**< reco digit store array */
+    StoreArray<SVDCluster> m_SVDClusters; /**< svd cluster store array*/
 
     VXD::GeoCache& m_geoCache = VXD::GeoCache::getInstance(); /**< the geo cache instance*/
 
@@ -85,6 +88,9 @@ namespace Belle2 {
     void fillSensorInterHistos(const SVDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
     int m_numModules; /**< number of hardware modules*/
+    int m_specificLayer =
+      -1; /**< specific layer selected for which to produce the plots. If it is not a SVD layer (3, 4, 5, 6) than the plots for all layers are produced. Default is (-1), i.e. plots for all SVD layers are produced.*/
+    bool m_plotRecoDigits = false; /**< Produce plots for SVDRecoDigits when True */
 
     TH1F* hnROIs; /**< number of ROIs*/
     TH1F* hnInter; /**< number of intercpets*/

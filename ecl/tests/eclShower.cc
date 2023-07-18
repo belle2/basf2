@@ -5,8 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* ECL headers. */
 #include <ecl/dataobjects/ECLShower.h>
 
+/* Gtest headers. */
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -58,7 +61,7 @@ namespace Belle2 {
     EXPECT_EQ(errorArray[4], 0);
     EXPECT_EQ(errorArray[5], 0);
 
-    TVector3 momentum(myECLShower.getMomentum());
+    ROOT::Math::XYZVector momentum(myECLShower.getMomentum());
     EXPECT_EQ(momentum.X(), 0);
     EXPECT_EQ(momentum.Y(), 0);
     EXPECT_EQ(momentum.Z(), 0);
@@ -158,7 +161,7 @@ namespace Belle2 {
     EXPECT_EQ(errorArray[4], error[4]);
     EXPECT_EQ(errorArray[5], error[5]);
 
-    TVector3 momentum(myECLShower.getMomentum());
+    ROOT::Math::XYZVector momentum(myECLShower.getMomentum());
     EXPECT_FLOAT_EQ(momentum.X(), energy * sin(theta) * cos(phi));
     EXPECT_FLOAT_EQ(momentum.Y(), energy * sin(theta) * sin(phi));
     EXPECT_FLOAT_EQ(momentum.Z(), energy * cos(theta));

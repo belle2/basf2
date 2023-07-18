@@ -13,7 +13,10 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 /* ROOT headers. */
 #include <TCanvas.h>
@@ -70,6 +73,14 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   /* Conversion coefficient from ADC ticks to nanoseconds
      1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
      Same for all crystals.  */
+
+  //..First need to set event, run, exp number
+  const auto expRunList =  getRunList();
+  const int iEvt = 1;
+  const int iRun = expRunList[0].second;
+  const int iExp = expRunList[0].first;
+  DBObjPtr<Belle2::HardwareClockSettings> clock_info("HardwareClockSettings");
+  updateDBObjPtrs(iEvt, iRun, iExp);
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 

@@ -41,11 +41,6 @@ namespace Belle2 {
     DQMHistAnalysisKLM2Module();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLM2Module();
-
-    /**
      * Initializer.
      */
     void initialize() override final;
@@ -67,6 +62,15 @@ namespace Belle2 {
 
 
   private:
+
+    /**
+     * Process histogram containing the efficiencies.
+     * @param[in]  effHist  Histogram itself.
+     * @param[in]  denominator Denominator for efficiency hist.
+     * @param[in]  numerator Numerator for efficiency hist.
+     * @param[in]  canvas Canvas of interest.
+     */
+    void processEfficiencyHistogram(TH1* effHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
 
 
     /**
@@ -122,6 +126,12 @@ namespace Belle2 {
 
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_EklmElementNumbers;
+
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
+
+    /** Minimal number of entries for delta histogram update. */
+    double m_minEvents;
 
 
   };

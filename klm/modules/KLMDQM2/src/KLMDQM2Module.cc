@@ -367,10 +367,10 @@ bool KLMDQM2Module::collectDataTrack(
          * not available in ExtHit. For now, 2 entries are created (one for
          * each plane) for the first hit, and the second one is removed.
          */
-        if (hitData.subdetector == hitDataPrevious.subdetector &&
-            hitData.section == hitDataPrevious.section &&
-            hitData.sector == hitDataPrevious.sector &&
-            hitData.layer == hitDataPrevious.layer)
+        if ((hitData.subdetector == hitDataPrevious.subdetector) &&
+            (hitData.section == hitDataPrevious.section) &&
+            (hitData.sector == hitDataPrevious.sector) &&
+            (hitData.layer == hitDataPrevious.layer))
           continue;
         std::memcpy(&hitDataPrevious, &hitData, sizeof(struct HitData));
         /* The returned strip may be out of the valid range. */

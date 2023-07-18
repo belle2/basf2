@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -50,6 +49,9 @@ def get_argument_parser() -> argparse.ArgumentParser:
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
                         help='Compile latex to pdf directly')
+    parser.add_argument('-a', '--abbreviation_length', dest='abbreviation_length',
+                        action='store', type=int, default=5,
+                        help='Number of characters to which variable names are abbreviated.')
     return parser
 
 
@@ -106,7 +108,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     identifiers = flatten(args.identifiers)
-    identifier_abbreviations = create_abbreviations(identifiers)
+    identifier_abbreviations = create_abbreviations(identifiers, args.abbreviation_length)
 
     datafiles = flatten(args.datafiles)
     if args.localdb is not None:
@@ -139,11 +141,11 @@ if __name__ == '__main__':
             train_target[identifier_abbreviations[method.identifier]] = t
 
     variables = unique(v for method in methods for v in method.variables)
-    variable_abbreviations = create_abbreviations(variables)
+    variable_abbreviations = create_abbreviations(variables, args.abbreviation_length)
     root_variables = unique(v for method in methods for v in method.root_variables)
 
     spectators = unique(v for method in methods for v in method.spectators)
-    spectator_abbreviations = create_abbreviations(spectators)
+    spectator_abbreviations = create_abbreviations(spectators, args.abbreviation_length)
     root_spectators = unique(v for method in methods for v in method.root_spectators)
 
     print("Load variables array")
@@ -169,6 +171,17 @@ if __name__ == '__main__':
             os.chdir(tempdir)
         else:
             os.chdir(args.working_directory)
+
+        with open('abbreviations.txt', 'w') as f:
+            f.write('Identifier Abbreviation : Identifier \n')
+            for name, abbrev in identifier_abbreviations.items():
+                f.write(f'\t{abbrev} : {name}\n')
+            f.write('\n\n\nVariable Abbreviation : Variable \n')
+            for name, abbrev in variable_abbreviations.items():
+                f.write(f'\t{abbrev} : {name}\n')
+            f.write('\n\n\nSpectator Abbreviation : Spectator \n')
+            for name, abbrev in spectator_abbreviations.items():
+                f.write(f'\t{abbrev} : {name}\n')
 
         o = b2latex.LatexFile()
         o += b2latex.TitlePage(title='Automatic MVA Evaluation',
@@ -238,8 +251,8 @@ if __name__ == '__main__':
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
-            p.save('variable_{}.pdf'.format(hash(v)))
-            graphics.add('variable_{}.pdf'.format(hash(v)), width=1.0)
+            p.save(f'variable_{hash(v)}.pdf')
+            graphics.add(f'variable_{hash(v)}.pdf', width=1.0)
             o += graphics.finish()
 
         o += b2latex.Section("Classifier Plot")
@@ -270,8 +283,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 0, label='Test')
                 p.finish()
                 p.axis.set_title(identifier)
-                p.save('roc_test_{}.pdf'.format(hash(identifier)))
-                graphics.add('roc_test_{}.pdf'.format(hash(identifier)), width=1.0)
+                p.save(f'roc_test_{hash(identifier)}.pdf')
+                graphics.add(f'roc_test_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Classification Results")
@@ -283,15 +296,15 @@ if __name__ == '__main__':
             p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] == 0, normed=True)
-            p.sub_plots[0].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
+            p.sub_plots[0].axis.set_title(f"Classification result in test data for {identifier}")
 
             p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                   test_target[identifier_abbr] == 0, normed=False)
-            p.sub_plots[1].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
+            p.sub_plots[1].axis.set_title(f"Classification result in test data for {identifier}")
             p.finish()
 
-            p.save('classification_result_{identifier}.pdf'.format(identifier=hash(identifier)))
-            graphics.add('classification_result_{identifier}.pdf'.format(identifier=hash(identifier)), width=1)
+            p.save(f'classification_result_{hash(identifier)}.pdf')
+            graphics.add(f'classification_result_{hash(identifier)}.pdf', width=1)
             o += graphics.finish()
 
         o += b2latex.Section("Diagonal Plot")
@@ -320,9 +333,9 @@ if __name__ == '__main__':
                       train_mask == 1, train_mask == 0,
                       target == 1, target == 0, )
                 p.finish()
-                p.axis.set_title("Overtraining check for {}".format(identifier))
-                p.save('overtraining_plot_{}.pdf'.format(hash(identifier)))
-                graphics.add('overtraining_plot_{}.pdf'.format(hash(identifier)), width=1.0)
+                p.axis.set_title(f"Overtraining check for {identifier}")
+                p.save(f'overtraining_plot_{hash(identifier)}.pdf')
+                graphics.add(f'overtraining_plot_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Spectators")
@@ -342,8 +355,8 @@ if __name__ == '__main__':
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
-            p.save('spectator_{}.pdf'.format(hash(spectator)))
-            graphics.add('spectator_{}.pdf'.format(hash(spectator)), width=1.0)
+            p.save(f'spectator_{hash(spectator)}.pdf')
+            graphics.add(f'spectator_{hash(spectator)}.pdf', width=1.0)
             o += graphics.finish()
 
             for identifier in identifiers:
@@ -356,8 +369,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] == 0)
                 p.finish()
-                p.save('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)))
-                graphics.add('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)), width=1.0)
+                p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
+                graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
 
         if args.compile:

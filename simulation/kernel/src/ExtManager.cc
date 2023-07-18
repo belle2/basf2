@@ -157,7 +157,7 @@ void ExtManager::RunTermination()
   } else {
     // Copied from FullSimModule
     //We used one Geant4 run for all Belle2 runs so end the geant4 run here
-    Simulation::RunManager& myRunMgr = Simulation::RunManager::Instance();
+    RunManager& myRunMgr = RunManager::Instance();
     myRunMgr.endRun();
     //And clean up the run manager
     if (m_VisManager) delete m_VisManager;
@@ -200,14 +200,14 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
     m_SteppingAction = const_cast<G4UserSteppingAction*>(m_G4RunMgr->GetUserSteppingAction());
   } else { // status == 0
 
-    Simulation::RunManager& myRunMgr = Simulation::RunManager::Instance();
+    RunManager& myRunMgr = RunManager::Instance();
 
     // This is duplicated from FullSimModule::initialize() to use the Geant4/Geant4e
     // machinery for extrapolation only (no simulation)
 
     // Create the magnetic field for the geant4e extrapolation
     if (magneticFieldName != "none") {
-      m_MagneticField = new Simulation::MagneticField();
+      m_MagneticField = new MagneticField();
       if (magneticCacheDistance > 0.0) {
         m_UncachedField = m_MagneticField;
         m_MagneticField = new G4CachedMagneticField(m_UncachedField, magneticCacheDistance);
@@ -275,7 +275,7 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
     myRunMgr.SetUserInitialization(new DetectorConstruction());
     G4Region* region = (*(G4RegionStore::GetInstance()))[0];
     region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-    myRunMgr.SetUserInitialization(new Simulation::ExtPhysicsList());
+    myRunMgr.SetUserInitialization(new ExtPhysicsList());
     myRunMgr.Initialize();
     B2INFO("ExtManager::Initialize(): Perform Geant4 final initialization: Geometry optimization, ExtPhysicsList calculations...");
     myRunMgr.beginRun(0);

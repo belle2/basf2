@@ -63,8 +63,8 @@ class SVDHoughTrackingValidation(TrackingValidationRun):
     fit_tracks = True
     #: plot pull distributions
     pulls = True
-    #: create expert-level histograms
-    use_expert_folder = True
+    #: do not create expert-level output histograms in dedicated folder but in the main folder
+    use_expert_folder = False
     #: Include resolution information in the validation output
     resolution = True
     #: Use the fit information in validation

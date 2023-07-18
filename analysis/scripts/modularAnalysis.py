@@ -4259,22 +4259,25 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
-def getNbarIDMVA(particleList, path=None):
+def getNbarIDMVA(particleList: str, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
     It is not used to predict n0.
     Currently, this can be used only for ECL cluster.
     output will be stored in extraInfo(nbarID); -1 means MVA invalid
 
-    @param particleList     The input ParticleList
+    @param particleList     The input ParticleList name or a decay string which contains a full mother particle list name.
+                            Only one selected daughter is supported.
     @param path             modules are added to this path
     """
-
     import b2bii
+    from ROOT import Belle2
+
     if b2bii.isB2BII():
         B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
 
     from variables import variables
+
     variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
     variables.addAlias('V2', 'clusterE')
     variables.addAlias('V3', 'clusterLAT')
@@ -4284,12 +4287,20 @@ def getNbarIDMVA(particleList, path=None):
     variables.addAlias('V7', 'clusterAbsZernikeMoment40')
     variables.addAlias('V8', 'clusterAbsZernikeMoment51')
 
-    variables.addAlias('nbarIDValid',
-                       'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
+    variables.addAlias(
+        'nbarIDValid',
+        'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
     variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
 
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
-    variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(particleList):
+        raise ValueError(f"Provided decay string is invalid: {particleList}")
+    if decayDescriptor.getNDaughters() == 0:
+        variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+    else:
+        listname = decayDescriptor.getMother().getFullName()
+        variablesToDaughterExtraInfo(listname, particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
 def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowAnyParticleSource=False, path=None, **kwargs):

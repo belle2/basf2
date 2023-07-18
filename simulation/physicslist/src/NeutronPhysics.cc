@@ -9,9 +9,9 @@
 #include <simulation/physicslist/NeutronPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4NeutronInelasticProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4HadronElasticProcess.hh"
-#include "G4HadronCaptureProcess.hh"
+#include "G4NeutronCaptureProcess.hh"
 #include "G4NeutronKiller.hh"
 
 #include "G4CascadeInterface.hh"
@@ -92,14 +92,14 @@ void NeutronPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(nProcEl);
 
   // Inelastic process
-  G4NeutronInelasticProcess* nProcInel = new G4NeutronInelasticProcess;
+  G4HadronInelasticProcess* nProcInel = new G4HadronInelasticProcess("neutronInelastic", G4Neutron::Definition());
   nProcInel->RegisterMe(loInelModel);
   nProcInel->RegisterMe(m_ftfp);
   nProcInel->AddDataSet(inelCS);
   procMan->AddDiscreteProcess(nProcInel);
 
   // Capture process
-  G4HadronCaptureProcess* nProcCap = new G4HadronCaptureProcess("nCapture");
+  G4NeutronCaptureProcess* nProcCap = new G4NeutronCaptureProcess;
   nProcCap->RegisterMe(capModel);
   nProcCap->AddDataSet(capCS);
   procMan->AddDiscreteProcess(nProcCap);

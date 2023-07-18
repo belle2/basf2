@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -7,7 +7,7 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-##########################################################################
+# #########################################################################
 
 import copy
 import math
@@ -40,7 +40,7 @@ matplotlib.rcParams.update({'font.size': 36})
 plt.style.use("belle2")
 
 
-class Plotter(object):
+class Plotter:
     """
     Base class for all Plotters.
     """
@@ -229,7 +229,12 @@ class Plotter(object):
                 f = axis.fill_between(x, y - yerr, y + yerr, interpolate=True, rasterized=True, **errorband_kwargs)
 
         if fill_kwargs is not None:
-            axis.fill_between(x, y, 0, rasterized=True, **fill_kwargs)
+            # to fill the last bin of a histogram
+            x = numpy.append(x, x[-1]+2*xerr[-1])
+            y = numpy.append(y, y[-1])
+            xerr = numpy.append(xerr, xerr[-1])
+
+            axis.fill_between(x-xerr, y, 0, rasterized=True, **fill_kwargs)
 
         return (tuple(patches), p, e, f)
 
@@ -449,9 +454,9 @@ class RejectionOverEfficiency(Plotter):
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
         if label is not None:
-            self.labels.append(label[:10] + " ({:.2f})".format(auc))
+            self.labels.append(label[:10] + f" ({auc:.2f})")
         else:
-            self.labels.append(column[:10] + " ({:.2f})".format(auc))
+            self.labels.append(column[:10] + f" ({auc:.2f})")
         return self
 
     def finish(self):
@@ -499,7 +504,7 @@ class Multiplot(Plotter):
         #: the subplots which are displayed in the grid
         self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
         self.axis = self.sub_plots[0].axis
-        super(Multiplot, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, i, *args, **kwargs):
         """
@@ -577,7 +582,7 @@ class Distribution(Plotter):
         @param keep_first_binning use the binning of the first distribution for further plots
         @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
-        super(Distribution, self).__init__(figure, axis)
+        super().__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed_to_all_entries = normed_to_all_entries
         #: Normalize histograms before drawing them
@@ -771,7 +776,7 @@ class Difference(Plotter):
         @param normed normalize minuend and subtrahend before comparing them
         @param shift_to_zero mean difference is shifted to zero, to remove constant offset due to e.g. different sample sizes
         """
-        super(Difference, self).__init__(figure, axis)
+        super().__init__(figure, axis)
         self.normed = normed
         self.shift_to_zero = shift_to_zero
         if self.normed:
@@ -865,11 +870,11 @@ class Overtraining(Plotter):
         self.axis_d1 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
         self.axis_d2 = self.figure.add_subplot(gs[4, :], sharex=self.axis)
 
-        super(Overtraining, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, data, column, train_mask, test_mask, signal_mask, bckgrd_mask, weight_column=None):
         """
-        Add a new overtraining plot, I recommend to raw only one overtraining plot at the time,
+        Add a new overtraining plot, I recommend to draw only one overtraining plot at the time,
         otherwise there are too many curves in the plot to recognize anything in the plot.
         @param data pandas.DataFrame containing all data
         @param column which is used to calculate distribution histogram
@@ -889,13 +894,13 @@ class Overtraining(Plotter):
 
         distribution.set_plot_options(
             {'color': distribution.plots[0][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
-        distribution.set_fill_options({'color': distribution.plots[0][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
+        distribution.set_fill_options({'color': distribution.plots[0][0][0].get_color(), 'alpha': 0.5, 'step': 'post'})
         distribution.set_errorbar_options(None)
         distribution.set_errorband_options(None)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
         distribution.set_plot_options(
             {'color': distribution.plots[1][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
-        distribution.set_fill_options({'color': distribution.plots[1][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
+        distribution.set_fill_options({'color': distribution.plots[1][0][0].get_color(), 'alpha': 0.5, 'step': 'post'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 
         distribution.labels = ['Test-Signal', 'Test-Background', 'Train-Signal', 'Train-Background']
@@ -977,7 +982,7 @@ class VerboseDistribution(Plotter):
         @param normed true if the histograms should be normed before drawing
         @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
-        super(VerboseDistribution, self).__init__(figure, axis)
+        super().__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed = normed
         #: Show only a certain range in terms of standard deviations of the data
@@ -1065,7 +1070,7 @@ class Correlation(Plotter):
         self.axis_d1 = self.figure.add_subplot(gs[1, :], sharex=self.axis)
         self.axis_d2 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
 
-        super(Correlation, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, data, column, cut_column, quantiles, signal_mask=None, bckgrd_mask=None, weight_column=None):
         """
@@ -1093,7 +1098,7 @@ class Correlation(Plotter):
 
             colormap = plt.get_cmap('coolwarm')
             tmp, x = numpy.histogram(data[column][m], bins=100,
-                                     range=xrange, normed=True, weights=weights)
+                                     range=xrange, density=True, weights=weights)
             bin_center = ((x + numpy.roll(x, 1)) / 2)[1:]
             axes[i].plot(bin_center, tmp, color='black', lw=1)
 
@@ -1101,7 +1106,7 @@ class Correlation(Plotter):
                 cut = numpy.percentile(data[cut_column][m], quantil)
                 sel = data[cut_column][m] >= cut
                 y, x = numpy.histogram(data[column][m][sel], bins=100,
-                                       range=xrange, normed=True, weights=weights[sel])
+                                       range=xrange, density=True, weights=weights[sel])
                 bin_center = ((x + numpy.roll(x, 1)) / 2)[1:]
                 axes[i].fill_between(bin_center, tmp, y, color=colormap(quantil / 100.0))
                 tmp = y
@@ -1186,7 +1191,7 @@ class Importance(Plotter):
 
         for y in range(importance_matrix.shape[0]):
             for x in range(importance_matrix.shape[1]):
-                txt = self.axis.text(x + 0.5, y + 0.5, '%.0f' % importance_matrix[y, x],
+                txt = self.axis.text(x + 0.5, y + 0.5, f'{importance_matrix[y, x]:.0f}',
                                      size=14,
                                      horizontalalignment='center',
                                      verticalalignment='center',
@@ -1240,7 +1245,7 @@ class CorrelationMatrix(Plotter):
         #: Usual axis object which every Plotter object needs, here it is just a dummy
         self.axis = self.signal_axis
 
-        super(CorrelationMatrix, self).__init__(self.figure, self.axis)
+        super().__init__(self.figure, self.axis)
 
     def add(self, data, columns, signal_mask, bckgrd_mask):
         """
@@ -1275,7 +1280,7 @@ class CorrelationMatrix(Plotter):
 
         for y in range(signal_corr.shape[0]):
             for x in range(signal_corr.shape[1]):
-                txt = self.signal_axis.text(x + 0.5, y + 0.5, '%.0f' % signal_corr[y, x],
+                txt = self.signal_axis.text(x + 0.5, y + 0.5, f'{signal_corr[y, x]:.0f}',
                                             size=14,
                                             horizontalalignment='center',
                                             verticalalignment='center',
@@ -1284,7 +1289,7 @@ class CorrelationMatrix(Plotter):
 
         for y in range(bckgrd_corr.shape[0]):
             for x in range(bckgrd_corr.shape[1]):
-                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, '%.0f' % bckgrd_corr[y, x],
+                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, f'{bckgrd_corr[y, x]:.0f}',
                                             size=14,
                                             horizontalalignment='center',
                                             verticalalignment='center',

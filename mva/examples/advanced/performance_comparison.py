@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import basf2
 import basf2_mva
 import basf2_mva_util
 import time
@@ -18,6 +19,11 @@ if __name__ == "__main__":
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
+    train_file = basf2.find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = basf2.find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
 
     variables = [
         'M',
@@ -51,7 +57,7 @@ if __name__ == "__main__":
 
     # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector(*variables)
@@ -102,7 +108,6 @@ if __name__ == "__main__":
     xgboost_options.m_config = param
 
     stats = []
-    test_data = ["validation.root"]
     for label, options in [("DataLoading", data_options), ("FastBDT", fastbdt_options), ("FANN", fann_options),
                            ("TMVA-BDT", tmva_bdt_options), ("TMVA-NN", tmva_nn_options),
                            ("SKLearn-BDT", sklearn_bdt_options), ("XGBoost", xgboost_options), ("Trivial", trivial_options)]:
@@ -113,7 +118,7 @@ if __name__ == "__main__":
         training_time = training_stop - training_start
         method = basf2_mva_util.Method(general_options.m_identifier)
         inference_start = time.time()
-        p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+        p, t = method.apply_expert(basf2_mva.vector(testing_data), general_options.m_treename)
         inference_stop = time.time()
         inference_time = inference_stop - inference_start
         auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)

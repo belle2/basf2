@@ -146,10 +146,10 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   B2INFO("Time to fill histograms: " << timer.RealTime() << "s");
 
   B2INFO("Start to obtain the biased and unbiased sigmas...");
-  TF1* gb = new TF1("gb", "gausn", -0.05, 0.05);
-  TF1* gu = new TF1("gu", "gausn", -0.06, 0.06);
-  TF1* g0b = new TF1("g0b", "gausn", -0.015, 0.07);
-  TF1* g0u = new TF1("g0u", "gausn", -0.015, 0.08);
+  TF1* gb = new TF1("gb", "gaus", -0.05, 0.05);
+  TF1* gu = new TF1("gu", "gaus", -0.06, 0.06);
+  TF1* g0b = new TF1("g0b", "gaus", -0.015, 0.07);
+  TF1* g0u = new TF1("g0u", "gaus", -0.015, 0.08);
 
   std::vector<double> sigma;
   std::vector<double> dsigma;

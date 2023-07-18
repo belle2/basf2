@@ -9,13 +9,7 @@
 #include <simulation/physicslist/HyperonPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4LambdaInelasticProcess.hh"
-#include "G4SigmaPlusInelasticProcess.hh"
-#include "G4SigmaMinusInelasticProcess.hh"
-#include "G4XiZeroInelasticProcess.hh"
-#include "G4XiMinusInelasticProcess.hh"
-#include "G4OmegaMinusInelasticProcess.hh"
-
+#include "G4HadronInelasticProcess.hh"
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronicAbsorptionBertini.hh"
 
@@ -96,7 +90,7 @@ void HyperonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(lamProcEl);
 
   // inelastic
-  G4LambdaInelasticProcess* lamProcInel = new G4LambdaInelasticProcess;
+  G4HadronInelasticProcess* lamProcInel = new G4HadronInelasticProcess("lambdaInelastic", G4Lambda::Definition());
   lamProcInel->RegisterMe(loInelModel);
   lamProcInel->RegisterMe(m_ftfp);
   lamProcInel->AddDataSet(chipsInelastic);
@@ -115,7 +109,7 @@ void HyperonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(spProcEl);
 
   // inelastic
-  G4SigmaPlusInelasticProcess* spProcInel = new G4SigmaPlusInelasticProcess;
+  G4HadronInelasticProcess* spProcInel = new G4HadronInelasticProcess("sigma+Inelastic", G4SigmaPlus::Definition());
   spProcInel->RegisterMe(loInelModel);
   spProcInel->RegisterMe(m_ftfp);
   spProcInel->AddDataSet(chipsInelastic);
@@ -134,7 +128,7 @@ void HyperonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(smProcEl);
 
   // inelastic
-  G4SigmaMinusInelasticProcess* smProcInel = new G4SigmaMinusInelasticProcess;
+  G4HadronInelasticProcess* smProcInel = new G4HadronInelasticProcess("sigma-Inelastic", G4SigmaMinus::Definition());
   smProcInel->RegisterMe(loInelModel);
   smProcInel->RegisterMe(m_ftfp);
   smProcInel->AddDataSet(chipsInelastic);
@@ -157,7 +151,7 @@ void HyperonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(xzProcEl);
 
   // inelastic
-  G4XiZeroInelasticProcess* xzProcInel = new G4XiZeroInelasticProcess;
+  G4HadronInelasticProcess* xzProcInel = new G4HadronInelasticProcess("xi0Inelastic", G4XiZero::Definition());
   xzProcInel->RegisterMe(loInelModel);
   xzProcInel->RegisterMe(m_ftfp);
   xzProcInel->AddDataSet(chipsInelastic);
@@ -176,7 +170,7 @@ void HyperonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(xmProcEl);
 
   // inelastic
-  G4XiMinusInelasticProcess* xmProcInel = new G4XiMinusInelasticProcess;
+  G4HadronInelasticProcess* xmProcInel = new G4HadronInelasticProcess("xi-Inelastic", G4XiMinus::Definition());
   xmProcInel->RegisterMe(loInelModel);
   xmProcInel->RegisterMe(m_ftfp);
   xmProcInel->AddDataSet(chipsInelastic);
@@ -199,7 +193,7 @@ void HyperonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(omProcEl);
 
   // inelastic
-  G4OmegaMinusInelasticProcess* omProcInel = new G4OmegaMinusInelasticProcess;
+  G4HadronInelasticProcess* omProcInel = new G4HadronInelasticProcess("omega-Inelastic", G4OmegaMinus::Definition());
   omProcInel->RegisterMe(loInelModel);
   omProcInel->RegisterMe(m_ftfp);
   omProcInel->AddDataSet(chipsInelastic);

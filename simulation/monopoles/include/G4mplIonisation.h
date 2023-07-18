@@ -56,9 +56,15 @@ namespace Belle2 {
                                         const G4Material*, G4double cut) final;
 
       /**
-       * Print out of the class parameters
+       * Assignment operator should be hidden.
+       * @param right Assign reference
        */
-      virtual void PrintInfo() override;
+      G4mplIonisation& operator=(const G4mplIonisation& right) = delete;
+      /**
+       * Copy constructor should be hidden.
+       * @param copy Copy reference
+       */
+      G4mplIonisation(const G4mplIonisation& copy) = delete;
 
     protected:
 
@@ -72,17 +78,6 @@ namespace Belle2 {
                                                const G4ParticleDefinition*) override;
 
     private:
-
-      /**
-       * Assignment operator should be hidden.
-       * @param right Assign reference
-       */
-      G4mplIonisation& operator=(const G4mplIonisation& right) = delete;
-      /**
-       * Copy constructor should be hidden.
-       * @param copy Copy reference
-       */
-      G4mplIonisation(const G4mplIonisation& copy) = delete;
 
       G4double    magneticCharge; /**< Monopole charge, in e+ units*/
       G4bool      isInitialised; /**< Is the process initialised*/

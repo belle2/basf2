@@ -31,7 +31,7 @@ namespace Belle2::KLM {
    *       print(bklm.getLayerInnerRadius(5))
    *     eklm = ROOT.Belle2.KLMGeometryPar.EndcapInstance()
    *     if eklm:
-   *       print(eklm.eklm.getStripLength(21))
+   *       print(eklm.getStripLength(21))
    * @endcode
    *
    * @note In order to return something meaningful, the python module

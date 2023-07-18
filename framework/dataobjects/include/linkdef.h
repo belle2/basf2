@@ -8,7 +8,7 @@
 #pragma link C++ class Belle2::RelationElement+; // checksum=0x70423e46, version=1
 #pragma link C++ class Belle2::RelationContainer+; // checksum=0x66dbc4f5, version=1
 #pragma link C++ class Belle2::EventMetaData+; // checksum=0xb2c44743, version=4
-#pragma link C++ class Belle2::FileMetaData+; // checksum=0xccd642e4, version=10
+#pragma link C++ class Belle2::FileMetaData+; // checksum=0xcccf5ab6, version=11
 #pragma link C++ class Belle2::ProfileInfo+; // checksum=0xf2e3190a, version=2
 #pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x77c00ada, version=5
 #pragma link C++ class Belle2::DigitBase+; // checksum=0xd2fac950, version=2

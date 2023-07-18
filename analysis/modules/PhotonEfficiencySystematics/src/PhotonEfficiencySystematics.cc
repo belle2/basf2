@@ -96,9 +96,7 @@ void PhotonEfficiencySystematicsModule::addPhotonDetectionEfficiencyRatios(Parti
     for (const auto& entry : info) {
       const std::string extraInfoName = m_tableName + "_" + entry.first;
       if (particle->hasExtraInfo(extraInfoName)) {
-        if (particle->getExtraInfo(extraInfoName) == entry.second) {
-          B2INFO("extraInfo " << extraInfoName << " has been already set.");
-        } else {
+        if (particle->getExtraInfo(extraInfoName) != entry.second) {
           B2INFO("extraInfo " << extraInfoName << " has been already set and will be overwritten. Original: "
                  << particle->getExtraInfo(extraInfoName) << ", New: " << entry.second);
           particle->setExtraInfo(extraInfoName, entry.second);

@@ -13,14 +13,14 @@
 
 #include <TVector3.h>
 #include <cmath>
+#include <filesystem>
 
-#include <boost/filesystem.hpp>
 #include <boost/math/special_functions/sign.hpp>
 
 #include <vector>
 
 using namespace Belle2::TestHelpers;
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 void TestWithGearbox::SetUpTestCase()
 {
@@ -45,7 +45,7 @@ void TestWithGearbox::TearDownTestCase()
 TempDirCreator::TempDirCreator():
   m_oldpwd(current_path().string())
 {
-  path tmpdir = temp_directory_path() / unique_path();
+  path tmpdir = std::tmpnam(nullptr);
   create_directories(tmpdir);
   current_path(tmpdir);
   m_tmpdir = tmpdir.string();

@@ -301,23 +301,14 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
 {
   static const int MASK_SIZE = 200;
   /* structure to get an array of long values from EPICS */
-  struct dbr_ctrl_long_array {
-    dbr_short_t     status;                     /* status of value */
-    dbr_short_t     severity;                   /* severity of alarm */
-    char            /*units*/[MAX_UNITS_SIZE];  /* units of value */
-    dbr_long_t      upper_disp_limit;           /* upper limit of graph */
-    dbr_long_t      lower_disp_limit;           /* lower limit of graph */
-    dbr_long_t      upper_alarm_limit;
-    dbr_long_t      upper_warning_limit;
-    dbr_long_t      lower_warning_limit;
-    dbr_long_t      lower_alarm_limit;
-    dbr_long_t      upper_ctrl_limit;           /* upper control limit */
-    dbr_long_t      lower_ctrl_limit;           /* lower control limit */
-    dbr_long_t      value[MASK_SIZE];           /* current value */
+  struct dbr_sts_long_array {
+    dbr_short_t     status;                 /* status of value */
+    dbr_short_t     severity;               /* severity of alarm */
+    dbr_long_t      value[MASK_SIZE];       /* current value */
   };
 
   static std::map<std::string, dbr_ctrl_long> limits_info;
-  static std::map<std::string, dbr_ctrl_long_array> mask_info;
+  static std::map<std::string, dbr_sts_long_array> mask_info;
 
   for (auto& alarm : m_ecl_alarms) {
     // In the current version, use only first crate PV to get alarm limits
@@ -335,7 +326,7 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
 
     if (mask_chid == nullptr) return;
     // ca_array_get data is only valid after ca_pend_io
-    r = ca_array_get(DBR_CTRL_LONG, MASK_SIZE, mask_chid, &mask_info[alarm.name]);
+    r = ca_array_get(DBR_STS_LONG, MASK_SIZE, mask_chid, &mask_info[alarm.name]);
     if (r != ECA_NORMAL) return;
   }
 

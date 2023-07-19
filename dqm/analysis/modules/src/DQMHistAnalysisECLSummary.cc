@@ -491,6 +491,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       if (update_mirabelle) {
         std::string var_name = pv_name;
         std::replace(var_name.begin(), var_name.end(), ':', '_');
+        B2DEBUG(100, var_name << " = " << total[ecl_part]);
         m_monObj->setVariable(var_name, total[ecl_part]);
       } else {
         setEpicsPV(pv_name, total[ecl_part]);
@@ -605,7 +606,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
   if (occupancy_histogram) {
     if (total_events >= dead_alarm.required_statistics) {
       // There should be registered signals in at least 1% of all events.
-      double min_occupancy = 0.001;
+      double min_occupancy = 0.0001;
       if (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr) {
         // The histogram is not normalized, multiply the threshold by evt count
         min_occupancy *= total_events;

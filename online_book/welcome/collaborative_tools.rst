@@ -208,6 +208,26 @@ Some tips
 
 .. _onlinebook_collaborative_tools_b2chat_howto:
 
+
+Changing your name in our chat
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's important that you set your name in the chat to your real name (first and last name).
+Not only does this make it easier for other people to find you, it's also the only way for other
+people to tag you directly in a chat. This does not even work if people use "@yourusername" if
+your actual name isn't stored in the chat system. To add your name, perform the following steps:
+
+1. Login to `the chat <https://chat.belle2.org>`_
+2. Click on your avatar / profile picture in the top left corner
+3. Click on "My Account"
+4. Go to "Profile"
+5. Fill your name in the "Name" field, which is next to the field with your "Username"
+6. Click "Save changes" in the top right corner
+
+You follow the same steps if you want to change your name later on, but please be aware that this
+might again cause some confusion, so please use your given name (first and last name) right from
+the beginning.
+
 Asking a question in #starterkit-workshop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

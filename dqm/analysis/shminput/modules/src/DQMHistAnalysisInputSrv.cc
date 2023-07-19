@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <dqm/analysis/shminput/DQMHistAnalysisInputSrv.h>
+#include <dqm/analysis/shminput/modules/DQMHistAnalysisInputSrv.h>
 
 #include <TKey.h>
 #include <TSystem.h>

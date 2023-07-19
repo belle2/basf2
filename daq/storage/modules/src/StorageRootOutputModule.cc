@@ -558,12 +558,14 @@ void StorageRootOutputModule::closeFile()
     m_db->connect();
     m_db->execute("UPDATE datafiles_root SET "
                   "correct_close = TRUE, "
-                  "will_merge = TRUE ,"
+                  "will_merge = %s ,"
                   "nevents = %lu, "
                   "nfullevents = %lu, "
                   "size = %lu, "
                   "time_close = '%s' "
                   "WHERE name = '%s' AND host = '%s';",
+                  //(boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize ? "true" : "false",
+                  "TRUE", // temporary with small ramdisk
                   m_fileMetaData->getNEvents(), m_fileMetaData->getNFullEvents(), m_file->GetSize(),
                   (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str(),
                   filename_path.filename().c_str(), m_HLTName.c_str());

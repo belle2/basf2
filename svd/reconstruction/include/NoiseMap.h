@@ -63,10 +63,10 @@ namespace Belle2 {
       virtual float getNoise(short) const { return m_noiseLevel; }
 
       /** Return the noise value for a given strip
-       * @param Sample at whose position we want noise level (Sample not used)
+       * @param sample Sample at whose position we want noise level (Sample not used)
        * @return noise level for the Sample's strip
        */
-      virtual float getNoise(const Sample&) const { return m_noiseLevel; }
+      virtual float getNoise(const Sample& sample) const { return m_noiseLevel; }
 
       /** Check whether a signal exceeds a given significance
        * @param sample strip to check

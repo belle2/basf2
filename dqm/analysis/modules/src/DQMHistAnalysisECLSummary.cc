@@ -631,8 +631,8 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
     double expected_value;
     if (occupancy_histogram) {
-      // Use median value:
-      expected_value = *std::next(values_sorted.begin(), neighb.size() / 2);
+      // Use "lower 25%" value:
+      expected_value = *std::next(values_sorted.begin(), 1 * neighb.size() / 4);
     } else {
       // Use "upper ~75%" value (48 is the expected number of neighbours)
       expected_value = *std::next(values_sorted.begin(), 35 * neighb.size() / 48);
@@ -642,7 +642,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
     if (!occupancy_histogram) {
       // Min occupancy for high-energy (> 1GeV) hits
-      double min_occupancy = 1.51e-5;
+      double min_occupancy = 1.41e-5;
       if (findCanvas("ECL/c_bad_quality_analysis") == nullptr) {
         // The histogram is not normalized, multiply the threshold by evt count
         min_occupancy *= total_events;
@@ -654,8 +654,8 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     if (deviation < max_deviation) continue;
 
     if (occupancy_histogram) {
-      if (actual_value < expected_value) retval[cid] |= cold_bit;
-      if (actual_value > expected_value) retval[cid] |= hot_bit;
+      if (actual_value <     expected_value) retval[cid] |= cold_bit;
+      if (actual_value > 2 * expected_value) retval[cid] |= hot_bit;
     } else {
       if (actual_value > expected_value) retval[cid] |= chi2_bit;
     }

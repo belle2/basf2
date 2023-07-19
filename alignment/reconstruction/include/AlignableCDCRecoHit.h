@@ -74,7 +74,7 @@ namespace Belle2 {
      * @brief Derivatives for (local) fit parameters
      *
      * @param sop State on virtual plane to calculate derivatives
-     * @return TMatrixD of local derivatives, #columns=#params, #row=2 (or measurement dimension if > 2)
+     * @return TMatrixD of local derivatives, number of columns = number of params, number of rows = 2 (or measurement dimension if > 2)
      */
     virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop) override;
 

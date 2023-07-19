@@ -16,7 +16,6 @@
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
-#include <svd/dbobjects/SVDClusterTimeShifter.h>
 #include <vector>
 
 namespace Belle2::SVD {
@@ -89,9 +88,6 @@ namespace Belle2::SVD {
     SVD3SampleCoGTimeCalibrations m_CoG3TimeCal;
     /** ELS3 time calibration wrapper*/
     SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
-
-    /** SVDCluster time shift*/
-    DBObjPtr<Belle2::SVDClusterTimeShifter> m_svdClusterTimeShifter;
   };
 
 }

@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
@@ -56,9 +61,14 @@ namespace Belle2 {
     double m_CrateTimeOffsetsMax;
     /** Maximum of fails for logic test. */
     int m_LogicTestMax;
+    /** Prefix to use for PVs registered by this module */
+    std::string m_pvPrefix;
 
     /** Vector for crates IDs w/ low statistics. */
     std::vector<short> m_low{};
+
+    /** Values of crate time offsets */
+    double m_crate_time_offsets[52];
 
     /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
     TLine* m_lower_boundary_trigtag2 = nullptr;
@@ -107,6 +117,8 @@ namespace Belle2 {
 
     /**Vector of TCanvases for waveforms .*/
     std::vector<TCanvas*> c_wf_analysis{};
+
+    MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
 
     /** Normalize histograms. */
     void normalize(TCanvas*, const std::string&, const Double_t&);

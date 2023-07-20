@@ -23,7 +23,6 @@
 
 //std
 #include <set>
-#include <functional>
 
 //ECL
 #include <ecl/mapper/ECLChannelMapper.h>
@@ -55,7 +54,6 @@ namespace Belle2 {
     void endRun() override final;
     /** Terminate. */
     void terminate() override final;
-
 
     /**
      * Get outlier channels, ones with values (occupancy, errors, etc) that are much
@@ -146,7 +144,7 @@ namespace Belle2 {
     TH1F* h_bad_occ_overlay_green = nullptr;  /**< Overlay to indicate masked bad channels on occupancy histogram */
     TH1F* h_bad_chi2_overlay_green = nullptr; /**< Overlay to indicate masked bad channels on chi2 histogram */
 
-    MonitoringObject* m_monObj = nullptr; /**< monitoring object */
+    MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
   };
 } // end namespace Belle2
 

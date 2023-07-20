@@ -297,11 +297,16 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
+     *
+     * If you register large number of PVs at once, consider setting
+     * update_pvs = false and explicitly running updateEpicsPVs()
+     *
      * @param pvname full PV name
      * @param keyname key name for easier access
+     * @param update_pvs if true, update all PVs (flush network) after new PV is registered
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(std::string pvname, std::string keyname = "");
+    int registerEpicsPV(std::string pvname, std::string keyname = "", bool update_pvs = true);
 
     /**
      * Write value to a EPICS PV

@@ -285,7 +285,7 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
 }
 
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname, bool update_pvs)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -303,7 +303,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   SEVCHK(ca_create_channel(pvname.data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;

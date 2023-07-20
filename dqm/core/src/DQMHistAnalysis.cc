@@ -286,7 +286,7 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
 }
 
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname, bool update_pvs)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -305,7 +305,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   // the subscribed name includes the prefix, he map below *not*
   SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;

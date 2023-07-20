@@ -101,21 +101,28 @@ void eclAutocovarianceCalibrationC4CollectorModule::collect()
 
       if (PeakToPeak < m_PeakToPeakThresholds[id]) {
 
-        float baseline = m_Baselines[id];
-
-        //Computing baselin subtracted waveform. aECLDsp.getDspA() is the raw ECLDsp waveform.
+        //Computing baselinw subtracted waveform. aECLDsp.getDspA() is the raw ECLDsp waveform.
         vector<double> waveform(m_numberofADCPoints);
-        for (int i = 0; i < m_numberofADCPoints; i++) waveform[i] = aECLDsp.getDspA()[i] - baseline;
+        //for (int i = 0; i < m_numberofADCPoints; i++) waveform[i] = aECLDsp.getDspA()[i] - baseline;
+        for (int i = 0; i < m_numberofADCPoints; i++) waveform[i] = aECLDsp.getDspA()[i];
 
         //After subtraccting baseline, expected value is 0.  Assuming noise is properly modelld by the cov. mat. (computed by this calibration) then a "fit" to a constant should give a good chi2.  Below computes the resulting chi2 for a fit to 0 and used the calibrated cov. mat. to model the noise.
-        vector<double> temp(m_numberofADCPoints, 0);
-        for (int i = 0; i < m_numberofADCPoints; i++) {
-          for (int j = 0; j < m_numberofADCPoints; j++) {
-            temp[i] += m_NoiseMatrix[id](i, j) * (waveform[j]);
+
+        // chi^2(B) = a*B^2 - 2*B*b + c
+        double aconst = 0, bconst = 0, cconst = 0;
+        for (int i = 0; i < 31; i++) {
+          double sum = 0, sumQ = 0;
+          for (int j = 0; j < 31; j++) {
+            sum += m_NoiseMatrix[id](i, j);
+            sumQ += m_NoiseMatrix[id](i, j) * waveform[j];
           }
+          aconst += sum;
+          bconst += sum * waveform[i];
+          cconst += sumQ * waveform[i];
         }
-        double chi2val = 0;
-        for (int i = 0; i < m_numberofADCPoints; i++) chi2val += (temp[i] * waveform[i]);
+
+        const double Bconst = bconst / aconst;
+        const double chi2val = ((aconst * Bconst - 2 * bconst) * Bconst + cconst);
 
         Chi2VsCrysID->Fill(id, chi2val);
       }

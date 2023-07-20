@@ -45,10 +45,12 @@ void eclAutocovarianceCalibrationC2CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  m_BaselineVsCrysID = new TH1D("BaselineVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)",
+  m_BaselineVsCrysID = new TH1D("m_BaselineVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)",
                                 ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
-  m_CounterVsCrysID = new TH1D("CounterVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)",
+  registerObject<TH1D>("m_BaselineVsCrysID", m_BaselineVsCrysID);
+  m_CounterVsCrysID = new TH1D("m_CounterVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)",
                                ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  registerObject<TH1D>("m_CounterVsCrysID", m_CounterVsCrysID);
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
 
@@ -88,8 +90,8 @@ void eclAutocovarianceCalibrationC2CollectorModule::collect()
 void eclAutocovarianceCalibrationC2CollectorModule::closeRun()
 {
   for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
+    B2INFO(i << " " << getObjectPtr<TH1>("m_BaselineVsCrysID")->GetBinContent(i + 1));
     getObjectPtr<TH1D>("m_BaselineVsCrysID")->SetBinContent(i + 1, m_sumOfSamples[i]);
     getObjectPtr<TH1D>("m_CounterVsCrysID")->SetBinContent(i + 1,  m_nSelectedWaveforms[i]);
-    B2INFO(i << getObjectPtr<TH2>("m_BaselineVsCrysID")->GetBinContent(i + 1));
   }
 }

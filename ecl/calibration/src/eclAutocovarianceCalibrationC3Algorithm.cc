@@ -72,7 +72,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
       for (int j = 0; j < m_numberofADCPoints; j++) {
         int index = abs(i - j);
         NoiseMatrix(i, j) = float(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(ID + 1,
-                                  index + 1))) / totalCounts / (float(m_numberofADCPoints - index));
+                                  index + 1))) / (totalCounts - 1) / (float(m_numberofADCPoints - index));
       }
     }
 

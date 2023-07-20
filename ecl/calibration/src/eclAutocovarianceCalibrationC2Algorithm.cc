@@ -35,8 +35,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 {
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histograms containing the data collected by eclAutocovarianceCalibrationC2CollectorModule */
-  auto m_BaselineVsCrysID = getObjectPtr<TH1D>("BaselineVsCrysID");
-  auto m_CounterVsCrysID = getObjectPtr<TH1D>("CounterVsCrysID");
+  auto m_BaselineVsCrysID = getObjectPtr<TH1D>("m_BaselineVsCrysID");
+  auto m_CounterVsCrysID = getObjectPtr<TH1D>("m_CounterVsCrysID");
 
   std::vector<float> cryIDs;
   std::vector<float> baselines;

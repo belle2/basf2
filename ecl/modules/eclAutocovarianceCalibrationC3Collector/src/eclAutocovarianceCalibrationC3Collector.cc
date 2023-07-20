@@ -109,8 +109,8 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
             m_CovarianceMatrixInfoVsCrysIDHistogram[id][tempIndex] += (value_i * m_tempArray[j]);
 
           }
-          m_CovarianceMatrixInfoVsCrysIDHistogram[id][m_nADCWaveformPoints]++;
         }
+        m_CovarianceMatrixInfoVsCrysIDHistogram[id][m_nADCWaveformPoints]++;
       }
     }
   }

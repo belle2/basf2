@@ -116,7 +116,11 @@ void DQMHistAnalysisECLModule::initialize()
 
   //EPICS PVs for 'crate_time_offset' plot
   for (unsigned short i = 0; i < 52; i++) {
-    auto pv_name = (boost::format("time_offset:crate%02d") % i).str();
+    auto pv_name = (boost::format("time_offset:crate%02d") % (i + 1)).str();
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+  }
+  for (auto wf_option : m_WaveformOption) {
+    auto pv_name = (boost::format("wf_frac:%s:min") % wf_option).str();
     registerEpicsPV(m_pvPrefix + pv_name, pv_name);
   }
 
@@ -359,7 +363,7 @@ void DQMHistAnalysisECLModule::event()
         m_low.push_back(i + 1);
       }
     }
-    auto pv_name = (boost::format("time_offset:crate%02d") % i).str();
+    auto pv_name = (boost::format("time_offset:crate%02d") % (i + 1)).str();
     setEpicsPV(pv_name, m_crate_time_offsets[i]);
   }
 
@@ -441,14 +445,33 @@ void DQMHistAnalysisECLModule::event()
     c_logic_summary->Modified();
     c_logic_summary->Update();
   }
+
+  //Set EPICS PVs
+  if (h_evtot == NULL) return;
+
+  Double_t events = h_evtot->GetBinContent(1);
+  for (auto wf_option : m_WaveformOption) {
+    m_wf_fraction[wf_option] = std::numeric_limits<double>::quiet_NaN();
+    // Get minimal value for each type of saved waveforms
+    if (events > 100000) {
+      TH1* hist = findHist(str(boost::format("ECL/wf_cid_%1%") % wf_option));
+      m_wf_fraction[wf_option] = hist->GetMinimum();
+    }
+    auto pv_name = (boost::format("wf_frac:%s:min") % wf_option).str();
+    setEpicsPV(pv_name, m_wf_fraction[wf_option]);
+  }
 }
 
 void DQMHistAnalysisECLModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisECL: endRun called");
   for (unsigned short i = 0; i < 52; i++) {
-    auto var_name = (boost::format("time_offset_crate%02d") % i).str();
+    auto var_name = (boost::format("time_offset_crate%02d") % (i + 1)).str();
     m_monObj->setVariable(var_name, m_crate_time_offsets[i]);
+  }
+  for (auto wf_option : m_WaveformOption) {
+    auto var_name = (boost::format("wf_frac_%s_min") % wf_option).str();
+    m_monObj->setVariable(var_name, m_wf_fraction[wf_option]);
   }
 }
 

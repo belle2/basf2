@@ -68,7 +68,9 @@ namespace Belle2 {
     std::vector<short> m_low{};
 
     /** Values of crate time offsets */
-    double m_crate_time_offsets[52];
+    double m_crate_time_offsets[52] = {};
+    /** Minimum fraction of saved waveforms for each waveform type */
+    std::map<std::string, double> m_wf_fraction;
 
     /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
     TLine* m_lower_boundary_trigtag2 = nullptr;

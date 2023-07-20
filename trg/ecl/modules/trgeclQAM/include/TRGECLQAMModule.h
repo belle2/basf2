@@ -23,8 +23,6 @@
 #include <TH1.h>
 
 
-//using namespace std;
-
 namespace Belle2 {
 
   class TRGECLQAMModule : public Module {

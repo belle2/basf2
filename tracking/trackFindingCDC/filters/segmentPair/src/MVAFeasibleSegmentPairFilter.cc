@@ -15,6 +15,6 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVAFilter<MVAFeasibleSegmentPairVarSet>;
 
 MVAFeasibleSegmentPairFilter::MVAFeasibleSegmentPairFilter()
-  : Super("trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
+  : Super("trackfindingcdc_FeasibleSegmentPairFilter", 0.004, "trackfindingcdc_FeasibleSegmentPairFilterParameters")
 {
 }

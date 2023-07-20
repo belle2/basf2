@@ -200,10 +200,10 @@ TBranch: e_0_E, 1.964
 TBranch: e_0_theta, 1.047
 TBranch: e_0_charge, 1
 TBranch: e_0_minET2ETIsoScore, 1
-TBranch: e_0_CMS_px, -1.738
+TBranch: e_0_CMS_px, -1.741
 TBranch: e_0_CMS_py, 0.3816
-TBranch: e_0_CMS_pz, 0.4537
-TBranch: e_0_CMS_pt, 1.78
+TBranch: e_0_CMS_pz, 0.4437
+TBranch: e_0_CMS_pt, 1.782
 TBranch: e_0_CMS_p, 1.837
 TBranch: e_0_CMS_E, 1.837
 TBranch: e_0_binaryElectronID_noSVD_noTOP_pi, 1
@@ -234,10 +234,10 @@ TBranch: e_1_E, 1.332
 TBranch: e_1_theta, 1.56
 TBranch: e_1_charge, -1
 TBranch: e_1_minET2ETIsoScore, 1
-TBranch: e_1_CMS_px, 1.097
+TBranch: e_1_CMS_px, 1.099
 TBranch: e_1_CMS_py, -0.6662
-TBranch: e_1_CMS_pz, -0.3554
-TBranch: e_1_CMS_pt, 1.283
+TBranch: e_1_CMS_pz, -0.349
+TBranch: e_1_CMS_pt, 1.285
 TBranch: e_1_CMS_p, 1.331
 TBranch: e_1_CMS_E, 1.331
 TBranch: e_1_binaryElectronID_noSVD_noTOP_pi, 0.9996

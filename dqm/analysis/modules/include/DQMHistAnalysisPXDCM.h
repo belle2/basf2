@@ -106,9 +106,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
 #ifdef _BELLE2_EPICS
     //! epics PVs
     std::vector <chid> mychid;

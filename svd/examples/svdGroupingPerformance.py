@@ -48,7 +48,7 @@ parser.add_argument("--doSVDGrouping", action="store_true",
                     help="Perform grouping of SVD Clusters")
 parser.add_argument("--signalLifetime", type=float, default=30,
                     help="Lifetime of Signal when computing exponential-weigth for sorting signal groups")
-parser.add_argument("--numberOfSignalGroups", type=int, default=20,
+parser.add_argument("--numberOfSignalGroups", type=int, default=1,
                     help="Select only few signal groups")
 parser.add_argument("--formSingleSignalGroup", action="store_true",
                     help="Assign groupId 0 to every signal groups")
@@ -505,7 +505,7 @@ class SVDGroupingPerformance(b2.Module):
                         - par1 * TMath.Sin(TMath.PiOver4()) + cdcEventT0 * TMath.Cos(TMath.PiOver4()))
                 fillOnce += 1
 
-            if par1 > sigMin and par1 < sigMax:
+            if minId == 0:
                 self.TH1F_Store[self.TH1F_Index["th1f_sigClsTime_PreTracking"]].Fill(clsTime)
             else:
                 self.TH1F_Store[self.TH1F_Index["th1f_bkgClsTime_PreTracking"]].Fill(clsTime)
@@ -638,6 +638,7 @@ if args.isMC:
             if m.name() == "SVDEventInfoSetter":
                 m.param("daqMode", 1)
                 m.param("relativeShift", 7)
+                m.param("useDB", False)
 
 
 else:
@@ -647,6 +648,7 @@ else:
     b2conditions.globaltags = ["online"]
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
+    b2conditions.prepend_globaltag("patch_main_release-08")
     if args.CoG3TimeCalibration_bucket36:
         b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36_withGrouping_pol3")
     if args.CoG3TimeCalibration_bucket32:
@@ -654,8 +656,6 @@ else:
 
     MCTracking = False
 
-
-if not args.isMC:
     if args.test:
         main.add_module('RootInput', entrySequences=['0:100'])
     else:
@@ -703,19 +703,24 @@ for moda in main.modules():
         moda.param("returnClusterRawTime", args.isRawTime)
     if moda.name() == 'SVDTimeGrouping':
         if args.doSVDGrouping:
+            moda.param("forceGroupingFromDB", False)
+            moda.param("isEnabledIn6Samples", True)
+            moda.param("isEnabledIn3Samples", True)
+            moda.param("useParamFromDB", False)
             moda.param('tRangeLow',  minTime)
             moda.param('tRangeHigh', maxTime)
             moda.param("expectedSignalTimeCenter",    sigLoc)
             moda.param('expectedSignalTimeMin',  sigMin)
             moda.param('expectedSignalTimeMax', sigMax)
-            moda.param("rebinningFactor", 2)
+            moda.param("signalLifetime", args.signalLifetime)
+    if moda.name() == 'SVDSpacePointCreator':
+        if args.useSVDGroupInfo:
+            moda.param("forceGroupingFromDB", False)
+            moda.param("useSVDGroupInfoIn6Sample", True)
+            moda.param("useSVDGroupInfoIn3Sample", True)
+            moda.param("useParamFromDB", False)
             moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
             moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
-            moda.param("signalLifetime", args.signalLifetime)
-        else:
-            moda.param("rebinningFactor", 0)
-    if moda.name() == 'SVDSpacePointCreator':
-        moda.param("useSVDGroupInfo", args.useSVDGroupInfo)
 
 
 if args.executionTime:

@@ -353,7 +353,7 @@ namespace Belle2 {
         auto p = mom.P();
         auto theta = mom.Theta();
 
-        double LogL[Const::ChargedStable::c_SetSize];
+        std::vector<double> LogL(Const::ChargedStable::c_SetSize);
         double LogL_max = 0;
         bool hasMax = false;
         for (const auto& pdgIter : Const::chargedStableSet)
@@ -373,8 +373,8 @@ namespace Belle2 {
         }
 
         double norm = 0;
-        for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; ++i)
-          norm += exp(LogL[i] - LogL_max);
+        for (auto LogL_i : LogL)
+          norm += exp(LogL_i - LogL_max);
 
         if (norm > 0)
           return exp(LogL[hypType.getIndex()] - LogL_max) / norm;

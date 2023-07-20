@@ -1075,7 +1075,7 @@ void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particl
 }
 void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
 {
-  const TVector3& global_pos = hit->getPosition();
+  const ROOT::Math::XYZVector& global_pos = hit->getPosition();
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)

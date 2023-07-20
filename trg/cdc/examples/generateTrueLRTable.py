@@ -13,6 +13,9 @@ import basf2
 import os
 import glob
 from ROOT import gROOT, Belle2
+import reconstruction
+import simulation
+
 gROOT.ProcessLine("gErrorIgnoreLevel = 4000;")  # ignore endless root errors for background files...
 
 """
@@ -27,10 +30,10 @@ or to evaluate it (see evaluateTSLUT.py).
 
 # general options
 seed = 1
-evtnum = 100000
+evtnum = 1000  # 00
 clock = False
 backgroundLevel = 0.
-bkgdir = '/sw/belle2/bkg/'
+bkgdir = '/remote/neurobelle/bkg/'
 particlegun_params = {
     'pdgCodes': [-13, 13],
     'nTracks': 1,
@@ -48,6 +51,8 @@ particlegun_params = {
 # including the seed in the filename allows to combine several runs later
 innerFilename = 'innerTrueLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
 outerFilename = 'outerTrueLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
+innerrecoFilename = 'innerRecoLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
+outerrecoFilename = 'outerRecoLRTable_Bkg%.1f_%d.dat' % (backgroundLevel, seed)
 
 # ------------------------- #
 # create path up to trigger #
@@ -63,12 +68,13 @@ main = basf2.create_path()
 main.add_module('EventInfoSetter', evtNumList=evtnum)
 main.add_module('Progress')
 main.add_module('Gearbox')
-main.add_module('Geometry', components=['CDC',
-                                        'MagneticFieldConstant4LimitedRCDC'])
+main.add_module('Geometry')  # , components=['CDC',
+#            'MagneticFieldConstant4LimitedRCDC'])
 particlegun = basf2.register_module('ParticleGun')
 particlegun.param(particlegun_params)
 main.add_module(particlegun)
-main.add_module('FullSim')
+simulation.add_simulation(main)
+# main.add_module('FullSim')
 if backgroundLevel > 0:
     bkgmixer = basf2.register_module('BeamBkgMixer')
     bkgfiles = glob.glob(os.path.join(bkgdir, '*[!(PXD)(ECL)]??.root'))
@@ -80,15 +86,18 @@ cdcdigitizer = basf2.register_module('CDCDigitizer')
 if clock:
     cdcdigitizer.param('TrigTimeJitter', 32.)
 main.add_module(cdcdigitizer)
-
+reconstruction.add_reconstruction(main)
 tsf = basf2.register_module('CDCTriggerTSF')
 tsf_params = {
     'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
     'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"),
     'ClockSimulation': clock,
     'makeTrueLRTable': True,
+    'makeRecoLRTable': True,
     'innerTrueLRTableFilename': innerFilename,
-    'outerTrueLRTableFilename': outerFilename}
+    'outerTrueLRTableFilename': outerFilename,
+    'innerRecoLRTableFilename': innerrecoFilename,
+    'outerRecoLRTableFilename': outerrecoFilename}
 tsf.param(tsf_params)
 if clock:
     tsf.param('CDCHitCollectionName', 'CDCHits4Trg')

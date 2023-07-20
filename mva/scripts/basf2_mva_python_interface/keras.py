@@ -17,7 +17,7 @@ import tensorflow as tf
 from basf2 import B2WARNING
 
 
-class State(object):
+class State:
     """
     Tensorflow.keras state
     """

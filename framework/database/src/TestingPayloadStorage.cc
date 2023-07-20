@@ -16,10 +16,11 @@
 #include <TFile.h>
 #include <TObject.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
+
 #include <boost/algorithm/string.hpp>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Belle2::Conditions {
   TestingPayloadStorage::TestingPayloadStorage(const std::string& filename):
@@ -147,7 +148,7 @@ namespace Belle2::Conditions {
     }
     return store(name, iov, resolved.string(), [&resolved](const std::string & destination) {
       // copy payload file to payload directory and rename it to follow the file name convention
-      fs::copy_file(resolved, destination, fs::copy_option::overwrite_if_exists);
+      fs::copy_file(resolved, destination, fs::copy_options::overwrite_existing);
       return true;
     });
   }
@@ -171,7 +172,8 @@ namespace Belle2::Conditions {
     fs::path sourcefile{source};
     if (source.empty()) {
       while (true) {
-        sourcefile = fs::path(m_payloadDir) / fs::unique_path();
+        fs::path tmpfilename(std::tmpnam(nullptr));
+        sourcefile = fs::path(m_payloadDir) / tmpfilename.filename();
         auto fd = open(sourcefile.c_str(), O_CREAT | O_EXCL);
         if (fd >= 0) {
           close(fd);
@@ -221,14 +223,14 @@ namespace Belle2::Conditions {
           fs::rename(sourcefile, filename);
           delete_srcfile.release();
         } else {
-          fs::copy_file(source, filename, fs::copy_option::overwrite_if_exists);
+          fs::copy_file(source, filename, fs::copy_options::overwrite_existing);
         }
       }
       found = true;
       break;
     }
     if (!found) {
-      B2ERROR("Cannot create payload file: checksum mistmatch for existing files");
+      B2ERROR("Cannot create payload file: checksum mismatch for existing files");
       return false;
     }
     // Ok, add to the text file

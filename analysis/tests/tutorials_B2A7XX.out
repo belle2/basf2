@@ -52,8 +52,8 @@ TBranch: R2, 0.2085
 TBranch: thrustBm, 0.9919
 TBranch: thrustOm, 0.679
 TBranch: cosTBTO, 0.4734
-TBranch: cosTBz, 0.4852
-TBranch: KSFWVariables__boet__bc, 10.34
+TBranch: cosTBz, 0.4902
+TBranch: KSFWVariables__boet__bc, 10.33
 TBranch: KSFWVariables__bomm2__bc, -2.208
 TBranch: KSFWVariables__bohso00__bc, 0.8699
 TBranch: KSFWVariables__bohso02__bc, -0.04065
@@ -109,10 +109,10 @@ TBranch: cleoConeThrust8, 0.7161
 TBranch: sphericity, 0.2883
 TBranch: aplanarity, 0.07883
 TBranch: thrust, 0.6887
-TBranch: thrustAxisCosTheta, 0.04926
+TBranch: thrustAxisCosTheta, 0.04676
 TBranch: backwardHemisphereEnergy, 5.231
 TBranch: forwardHemisphereEnergy, 4.849
-TBranch: harmonicMoment__bo2__cm__spcollision__bc, -0.2307
+TBranch: harmonicMoment__bo2__cm__spcollision__bc, -0.2323
 TFile: B2A705-EventKinematics.root
 TTree: variables
 TBranch: __experiment__, 0
@@ -126,9 +126,9 @@ TBranch: missingMomentumOfEvent_Py, 0.6938
 TBranch: missingMomentumOfEvent_Pz, 0.7489
 TBranch: missingMomentumOfEvent_theta, 0.7473
 TBranch: missingMomentumOfEventCMS, 0.7029
-TBranch: missingMomentumOfEventCMS_Px, -0.1075
+TBranch: missingMomentumOfEventCMS_Px, -0.1073
 TBranch: missingMomentumOfEventCMS_Py, 0.6938
-TBranch: missingMomentumOfEventCMS_Pz, -0.03213
+TBranch: missingMomentumOfEventCMS_Pz, -0.03275
 TBranch: missingMomentumOfEventCMS_theta, 1.617
 TBranch: missingEnergyOfEventCMS, 2.762
 TBranch: missingMass2OfEvent, 7.132

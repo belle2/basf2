@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,7 +24,7 @@ from array import array
 ROOT.gROOT.SetBatch(True)
 
 workingFiles = ["../CPVToolsOutput.root"]
-treeName = str("B0tree")
+treeName = "B0tree"
 
 
 workingDirectory = '.'
@@ -108,7 +107,7 @@ for cat in categories:
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
-categoriesNtupleList = str()
+categoriesNtupleList = ''
 for category in usedCategories:
     categoriesNtupleList = categoriesNtupleList + "Eff_%s:" % category
 

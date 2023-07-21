@@ -565,9 +565,11 @@ namespace Belle2 {
       if (tmp_track) {
         const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(tmp_mcP->getPDG())));
         if (tmp_tfr->getChargeSign()*tmp_mcP->getCharge() > 0)
-          return true;
+          return 1;
+        else
+          return -1;
       }
-      return false;
+      return 0;
     }
 
     double seenInPXD(const Particle* p)
@@ -1084,7 +1086,7 @@ List of possible values (taken from the Geant4 source of
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
                       "Returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("isTrackFound", isTrackFound,
-                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge; return 0.0 otherways.");
+                      "works on charged stable particle list created from MCParticles, returns NaN if not ; returns 1.0 if there is a reconstructed track related to the charged stable MCParticle with the correct charge, return -1.0 if the reconstucted track has the wrong charge, return 0.0 when no reconstructed track is found.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
                       "Returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,

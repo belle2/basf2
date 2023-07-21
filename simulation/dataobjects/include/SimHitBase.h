@@ -47,7 +47,7 @@ namespace Belle2 {
      * is needed.
      * @param delta The desired time shift.
      */
-    virtual void shiftInTime(float /*delta*/) {}
+    virtual void shiftInTime(float delta) {}
 
     /**
      * Get time of the hit.

@@ -1,7 +1,7 @@
 # EventType: 4010150000 
 # Descriptor: [B+ -> K+ LLP LLP [-> mu+ mu-] ]
 # NickName: Bp_kp2LLP_2LLPTo2tr
-# Documentation:BtoK-LLP signal for dark LLP studies.The LLP are long-lived dark matter particles decaying into 2 tracks (2e, 2mu, 2pi , 2K, or some combination)
+# Documentation:BtoK-LLP signal for dark LLP studies.The LLP are long-lived dark matter particles decaying into 2 tracks (2e, 2mu, 2pi #, 2K, or some combination)
 # Tested:No
 # Physics WG: Ds&LM
 # Responsible: Trevor Shillington 

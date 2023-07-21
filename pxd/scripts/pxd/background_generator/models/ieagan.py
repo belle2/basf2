@@ -218,6 +218,7 @@ class identity(nn.Module):
     Convenience passthrough function
     """
 
+    #: forward
     def forward(self, tensor: torch.Tensor):
         return tensor
 
@@ -229,13 +230,15 @@ class SN(object):
     # pylint: disable=no-member
 
     def __init__(self, num_svs, num_itrs, num_outputs, transpose=False, eps=1e-12):
-        # Number of power iterations per step
+        """constructor"""
+
+        #: Number of power iterations per step
         self.num_itrs = num_itrs
-        # Number of singular values
+        #: Number of singular values
         self.num_svs = num_svs
-        # Transposed?
+        #: Transposed?
         self.transpose = transpose
-        # Epsilon value for avoiding divide-by-0
+        #: Epsilon value for avoiding divide-by-0
         self.eps = eps
         # Register a singular vector for each sv
         for i in range(self.num_svs):
@@ -283,6 +286,7 @@ class SNConv2d(nn.Conv2d, SN):
     2D Conv layer with spectral norm
     """
 
+    #: Constructor
     def __init__(
         self,
         in_channels,
@@ -310,6 +314,7 @@ class SNConv2d(nn.Conv2d, SN):
         )
         SN.__init__(self, num_svs, num_itrs, out_channels, eps=eps)
 
+    #: forward
     def forward(self, x):
         return F.conv2d(
             x,
@@ -327,6 +332,7 @@ class SNLinear(nn.Linear, SN):
     Linear layer with spectral norm
     """
 
+    #: Constructor
     def __init__(
         self,
         in_features,
@@ -339,12 +345,14 @@ class SNLinear(nn.Linear, SN):
         nn.Linear.__init__(self, in_features, out_features, bias)
         SN.__init__(self, num_svs, num_itrs, out_features, eps=eps)
 
+    #: forward
     def forward(self, x):
         return F.linear(x, self.W_(), self.bias)
 
 
-# Fused batchnorm op
 def fused_bn(x, mean, var, gain=None, bias=None, eps=1e-5):
+    """Fused batchnorm op"""
+
     # Apply scale and shift--if gain and bias are provided, fuse them here
     # Prepare scale
     scale = torch.rsqrt(var + eps)
@@ -360,9 +368,12 @@ def fused_bn(x, mean, var, gain=None, bias=None, eps=1e-5):
     # return ((x - mean) / ((var + eps) ** 0.5)) * gain + bias # The unfused way.  # noqa
 
 
-# Manual BN
-# Calculate means and variances using mean-of-squares minus mean-squared
 def manual_bn(x, gain=None, bias=None, return_mean_var=False, eps=1e-5):
+    """
+    Manual BN
+    Calculate means and variances using mean-of-squares minus mean-squared
+    """
+
     # Cast x to float32 if necessary
     float_x = x.float()
     # Calculate expected value of x (m) and expected value of x**2 (m2)
@@ -391,11 +402,12 @@ class myBN(nn.Module):
     My batchnorm, supports standing stats
     """
 
+    #: Constructor
     def __init__(self, num_channels, eps=1e-5, momentum=0.1):
         super(myBN, self).__init__()
-        # momentum for updating running stats
+        #: momentum for updating running stats
         self.momentum = momentum
-        # epsilon to avoid dividing by 0
+        #: epsilon to avoid dividing by 0
         self.eps = eps
         # Momentum
         self.momentum = momentum
@@ -403,16 +415,17 @@ class myBN(nn.Module):
         self.register_buffer("stored_mean", torch.zeros(num_channels))
         self.register_buffer("stored_var", torch.ones(num_channels))
         self.register_buffer("accumulation_counter", torch.zeros(1))
-        # Accumulate running means and vars
+        #: Accumulate running means and vars
         self.accumulate_standing = False
 
-    # reset standing stats
+    #: reset standing stats
     def reset_stats(self):
         # pylint: disable=no-member
         self.stored_mean[:] = 0
         self.stored_var[:] = 0
         self.accumulation_counter[:] = 0
 
+    #: forward
     def forward(self, x, gain, bias):
         # pylint: disable=no-member
         if self.training:
@@ -449,6 +462,7 @@ class bn(nn.Module):
     Normal, non-class-conditional BN
     """
 
+    #: Constructor
     def __init__(
         self,
         output_size,
@@ -458,17 +472,19 @@ class bn(nn.Module):
         mybn=False,
     ):
         super(bn, self).__init__()
+        #: output size
         self.output_size = output_size
-        # Prepare gain and bias layers
+        #: Prepare gain and bias layers
         self.gain = P(torch.ones(output_size), requires_grad=True)
+        #: bias
         self.bias = P(torch.zeros(output_size), requires_grad=True)
-        # epsilon to avoid dividing by 0
+        #: epsilon to avoid dividing by 0
         self.eps = eps
-        # Momentum
+        #: Momentum
         self.momentum = momentum
-        # Use cross-replica batchnorm?
+        #: Use cross-replica batchnorm?
         self.cross_replica = cross_replica
-        # Use my batchnorm?
+        #: Use my batchnorm?
         self.mybn = mybn
 
         if mybn:
@@ -478,6 +494,7 @@ class bn(nn.Module):
             self.register_buffer("stored_mean", torch.zeros(output_size))
             self.register_buffer("stored_var", torch.ones(output_size))
 
+    #: forward
     def forward(self, x):
         if self.mybn:
             gain = self.gain.view(1, -1, 1, 1)
@@ -505,6 +522,7 @@ class ccbn(nn.Module):
     if you want to make this more readable/usable).
     """
 
+    #: Constructor
     def __init__(
         self,
         output_size,
@@ -517,27 +535,31 @@ class ccbn(nn.Module):
         norm_style="bn",
     ):
         super(ccbn, self).__init__()
+        #: output size
         self.output_size, self.input_size = output_size, input_size
-        # Prepare gain and bias layers
+        #: Prepare gain and bias layers
         self.gain = which_linear(input_size, output_size)
+        #: bias
         self.bias = which_linear(input_size, output_size)
-        # epsilon to avoid dividing by 0
+        #: epsilon to avoid dividing by 0
         self.eps = eps
-        # Momentum
+        #: Momentum
         self.momentum = momentum
-        # Use cross-replica batchnorm?
+        #: Use cross-replica batchnorm?
         self.cross_replica = cross_replica
-        # Use my batchnorm?
+        #: Use my batchnorm?
         self.mybn = mybn
-        # Norm style?
+        #: Norm style?
         self.norm_style = norm_style
 
         if self.mybn:
+            #: bn
             self.bn = myBN(output_size, self.eps, self.momentum)
         elif self.norm_style in ["bn", "in"]:
             self.register_buffer("stored_mean", torch.zeros(output_size))
             self.register_buffer("stored_var", torch.ones(output_size))
 
+    #: forward
     def forward(self, x, y):
         # Calculate class-conditional gains and biases
         gain = (1 + self.gain(y)).view(y.size(0), -1, 1, 1)
@@ -575,6 +597,7 @@ class ccbn(nn.Module):
                 out = x
             return out * gain + bias
 
+    #: extra_repr
     def extra_repr(self):
         s = "out: {output_size}, in: {input_size},"
         s += " cross_replica={cross_replica}"
@@ -586,6 +609,7 @@ class ILA(nn.Module):
     Image_Linear_Attention
     """
 
+    #: Constructor
     def __init__(
         self,
         chan,
@@ -599,25 +623,35 @@ class ILA(nn.Module):
         norm_queries=True,
     ):
         super().__init__()
+        #: chan
         self.chan = chan
         chan_out = chan if chan_out is None else chan_out
 
+        #: key dimension
         self.key_dim = key_dim
+        #: value dimension
         self.value_dim = value_dim
+        #: heads
         self.heads = heads
 
+        #: norm queries
         self.norm_queries = norm_queries
 
         conv_kwargs = {"padding": padding, "stride": stride}
+        #: q
         self.to_q = nn.Conv2d(chan, key_dim * heads, kernel_size, **conv_kwargs)
+        #: k
         self.to_k = nn.Conv2d(chan, key_dim * heads, kernel_size, **conv_kwargs)
+        #: v
         self.to_v = nn.Conv2d(chan, value_dim * heads, kernel_size, **conv_kwargs)
 
         out_conv_kwargs = {"padding": padding}
+        #: to out
         self.to_out = nn.Conv2d(
             value_dim * heads, chan_out, kernel_size, **out_conv_kwargs
         )
 
+    #: forward
     def forward(self, x, context=None):
         b, c, h, w, k_dim, heads = *x.shape, self.key_dim, self.heads
 
@@ -647,6 +681,9 @@ class ILA(nn.Module):
 
 
 class CBAM_attention(nn.Module):
+    """CBAM attention"""
+
+    #: Constructor
     def __init__(
         self,
         channels,
@@ -655,16 +692,23 @@ class CBAM_attention(nn.Module):
         attention_kernel_size=3,
     ):
         super(CBAM_attention, self).__init__()
+        #: average pooling
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        #: max pooling
         self.max_pool = nn.AdaptiveMaxPool2d(1)
+        #: fcl
         self.fc1 = which_conv(
             channels, channels // reduction, kernel_size=1, padding=0
         )
+        #: relu
         self.relu = nn.ReLU(inplace=True)
+        #: f2c
         self.fc2 = which_conv(
             channels // reduction, channels, kernel_size=1, padding=0
         )
+        #: sigmoid channel
         self.sigmoid_channel = nn.Sigmoid()
+        #: convolution after concatenation
         self.conv_after_concat = which_conv(
             2,
             1,
@@ -672,8 +716,10 @@ class CBAM_attention(nn.Module):
             stride=1,
             padding=attention_kernel_size // 2,
         )
+        #: sigmoid_spatial
         self.sigmoid_spatial = nn.Sigmoid()
 
+    #: forward
     def forward(self, x):
         # Channel attention module
         module_input = x
@@ -701,26 +747,35 @@ class CBAM_attention(nn.Module):
 
 
 class Attention(nn.Module):
+    """Attention"""
+
+    #: Constructor
     def __init__(self, ch, which_conv=SNConv2d):
         super(Attention, self).__init__()
-        # Channel multiplier
+        #: Channel multiplier
         self.ch = ch
+        #: which_conv
         self.which_conv = which_conv
+        #: theta
         self.theta = self.which_conv(
             self.ch, self.ch // 8, kernel_size=1, padding=0, bias=False
         )
+        #: phi
         self.phi = self.which_conv(
             self.ch, self.ch // 8, kernel_size=1, padding=0, bias=False
         )
+        #: g
         self.g = self.which_conv(
             self.ch, self.ch // 2, kernel_size=1, padding=0, bias=False
         )
+        #: o
         self.o = self.which_conv(
             self.ch // 2, self.ch, kernel_size=1, padding=0, bias=False
         )
-        # Learnable gain parameter
+        #: Learnable gain parameter
         self.gamma = P(torch.tensor(0.0), requires_grad=True)
 
+    #: forward
     def forward(self, x):
         # Apply convs
         theta = self.theta(x)
@@ -748,6 +803,7 @@ class SNEmbedding(nn.Embedding, SN):
     for convenience sake
     """
 
+    #: Constructor
     def __init__(
         self,
         num_embeddings,
@@ -775,6 +831,7 @@ class SNEmbedding(nn.Embedding, SN):
         )
         SN.__init__(self, num_svs, num_itrs, num_embeddings, eps=eps)
 
+    #: forward
     def forward(self, x):
         return F.embedding(x, self.W_())
 
@@ -789,23 +846,33 @@ def scaled_dot_product(q, k, v):
 
 
 class MultiheadAttention(nn.Module):
+    """MultiheadAttention"""
+
+    #: Constructor
     def __init__(self, input_dim, embed_dim, num_heads, which_linear):
         super().__init__()
         assert (
             embed_dim % num_heads == 0
         ), "Embedding dimension must be 0 modulo number of heads."
 
+        #: embedding dimension
         self.embed_dim = embed_dim
+        #: number of heads
         self.num_heads = num_heads
+        #: head dimension
         self.head_dim = embed_dim // num_heads
+        #: which linear
         self.which_linear = which_linear
 
         # Stack all weight matrices 1...h together for efficiency
+        #: qkv projection
         self.qkv_proj = self.which_linear(input_dim, 3 * embed_dim)
+        #: o projection
         self.o_proj = self.which_linear(embed_dim, embed_dim)
 
         self._reset_parameters()
 
+    #: reset parameters
     def _reset_parameters(self):
         # Original Transformer initialization, see PyTorch documentation
         nn.init.xavier_uniform_(self.qkv_proj.weight)
@@ -813,6 +880,7 @@ class MultiheadAttention(nn.Module):
         nn.init.xavier_uniform_(self.o_proj.weight)
         self.o_proj.bias.data.fill_(0)
 
+    #: forward
     def forward(self, x, return_attention=False):
         batch_size, seq_length, embed_dim = x.size()
         qkv = self.qkv_proj(x)
@@ -835,6 +903,9 @@ class MultiheadAttention(nn.Module):
 
 
 class EncoderBlock(nn.Module):
+    """EncoderBlock"""
+
+    #: Constructor
     def __init__(self, input_dim, num_heads, dim_feedforward, dropout, which_linear):
         """
         Inputs:
@@ -845,13 +916,14 @@ class EncoderBlock(nn.Module):
         """
         super().__init__()
 
+        #: which linear
         self.which_linear = which_linear
-        # Attention layer
+        #: Attention layer
         self.self_attn = MultiheadAttention(
             input_dim, input_dim, num_heads, which_linear
         )
 
-        # Two-layer MLP
+        #: Two-layer MLP
         self.linear_net = nn.Sequential(
             self.which_linear(input_dim, dim_feedforward),
             nn.Dropout(dropout),
@@ -860,10 +932,14 @@ class EncoderBlock(nn.Module):
         )
 
         # Layers to apply in between the main layers
+        #: norm1
         self.norm1 = nn.LayerNorm(input_dim)
+        #: norm2
         self.norm2 = nn.LayerNorm(input_dim)
+        #: dropout
         self.dropout = nn.Dropout(dropout)
 
+    #: forward
     def forward(self, x):
         # Attention part
         x_pre1 = self.norm1(x)
@@ -881,13 +957,19 @@ class EncoderBlock(nn.Module):
 
 
 class RelationalReasoning(nn.Module):
+    """RelationalReasoning"""
+
+    #: Constructor
     def __init__(self, num_layers, hidden_dim, **block_args):
         super().__init__()
+        #: layers
         self.layers = nn.ModuleList(
             [EncoderBlock(**block_args) for _ in range(num_layers)]
         )
+        #: normalization
         self.norm = nn.LayerNorm(hidden_dim)
 
+    #: forward
     def forward(self, x):
         for layer in self.layers:
             x = layer(x)
@@ -895,6 +977,7 @@ class RelationalReasoning(nn.Module):
         x = self.norm(x)
         return x
 
+    #: get attention maps
     def get_attention_maps(self, x):
         attention_maps = []
         for layer in self.layers:
@@ -905,6 +988,9 @@ class RelationalReasoning(nn.Module):
 
 
 class GBlock(nn.Module):
+    """GBlock"""
+
+    #: Constructor
     def __init__(
         self,
         in_channels,
@@ -917,27 +1003,40 @@ class GBlock(nn.Module):
     ):
         super(GBlock, self).__init__()
 
+        #: input channels
         self.in_channels, self.out_channels = in_channels, out_channels
+        #: hidden channels
         self.hidden_channels = self.in_channels // channel_ratio
+        #: which convolution
         self.which_conv, self.which_bn = which_conv, which_bn
+        #: activation
         self.activation = activation
         # Conv layers
+        #: conv1
         self.conv1 = self.which_conv(
             self.in_channels, self.hidden_channels, kernel_size=1, padding=0
         )
+        #: conv2
         self.conv2 = self.which_conv(self.hidden_channels, self.hidden_channels)
+        #: conv3
         self.conv3 = self.which_conv(self.hidden_channels, self.hidden_channels)
+        #: conv4
         self.conv4 = self.which_conv(
             self.hidden_channels, self.out_channels, kernel_size=1, padding=0
         )
         # Batchnorm layers
+        #: bn1
         self.bn1 = self.which_bn(self.in_channels)
+        #: bn2
         self.bn2 = self.which_bn(self.hidden_channels)
+        #: bn3
         self.bn3 = self.which_bn(self.hidden_channels)
+        #: bn4
         self.bn4 = self.which_bn(self.hidden_channels)
-        # upsample layers
+        #: upsample layers
         self.upsample = upsample
 
+    #: forward
     def forward(self, x, y):
         # Project down to channel ratio
         h = self.conv1(self.activation(self.bn1(x, y)))
@@ -1026,6 +1125,9 @@ def G_arch(ch=64, attention="64"):
 
 
 class Generator(nn.Module):
+    """Generator"""
+
+    #: Constructor
     def __init__(
         self,
         G_ch=64,
@@ -1065,36 +1167,37 @@ class Generator(nn.Module):
         **kwargs
     ):
         super(Generator, self).__init__()
-        # Channel width mulitplier
+        #: Channel width mulitplier
         self.ch = G_ch
-        # Number of resblocks per stage
+        #: Number of resblocks per stage
         self.G_depth = G_depth
-        # Dimensionality of the latent space
+        #: Dimensionality of the latent space
         self.dim_z = dim_z
-        # The initial spatial dimensions
+        #: The initial spatial dimensions
         self.bottom_width = bottom_width
-        # The initial harizontal dimension
+        #: The initial harizontal dimension
         self.H_base = H_base
-        # Resolution of the output
+        #: Resolution of the output
         self.resolution = resolution
-        # Kernel size?
+        #: Kernel size?
         self.kernel_size = G_kernel_size
-        # Attention?
+        #: Attention?
         self.attention = G_attn
-        # number of classes, for use in categorical conditional generation
+        #: number of classes, for use in categorical conditional generation
         self.n_classes = n_classes
-        # Use shared embeddings?
+        #: Use shared embeddings?
         self.G_shared = G_shared
-        # Dimensionality of the shared embedding? Unused if not using G_shared
+        #: Dimensionality of the shared embedding? Unused if not using G_shared
         self.shared_dim = shared_dim if shared_dim > 0 else dim_z
-        # Hierarchical latent space?
+        #: Hierarchical latent space?
         self.hier = hier
-        # Cross replica batchnorm?
+        #: Cross replica batchnorm?
         self.cross_replica = cross_replica
-        # Use my batchnorm?
+        #: Use my batchnorm?
         self.mybn = mybn
         # nonlinearity for residual blocks
         if G_activation == "inplace_relu":
+            #: activation
             self.activation = torch.nn.ReLU(inplace=True)
         elif G_activation == "relu":
             self.activation = torch.nn.ReLU(inplace=False)
@@ -1102,25 +1205,28 @@ class Generator(nn.Module):
             self.activation = torch.nn.LeakyReLU(0.2, inplace=False)
         else:
             raise NotImplementedError("activation function not implemented")
-        # Initialization style
+        #: Initialization style
         self.init = G_init
-        # Parameterization style
+        #: Parameterization style
         self.G_param = G_param
-        # Normalization style
+        #: Normalization style
         self.norm_style = norm_style
-        # Epsilon for BatchNorm?
+        #: Epsilon for BatchNorm?
         self.BN_eps = BN_eps
-        # Epsilon for Spectral Norm?
+        #: Epsilon for Spectral Norm?
         self.SN_eps = SN_eps
-        # fp16?
+        #: fp16?
         self.fp16 = G_fp16
-        # Architecture dict
+        #: Architecture dict
         self.arch = G_arch(self.ch, self.attention)[resolution]
+        #: RRM_prx_G
         self.RRM_prx_G = RRM_prx_G
+        #: n_head_G
         self.n_head_G = n_head_G
 
         # Which convs, batchnorms, and linear layers to use
         if self.G_param == "SN":
+            #: which conv
             self.which_conv = functools.partial(
                 SNConv2d,
                 kernel_size=3,
@@ -1129,6 +1235,7 @@ class Generator(nn.Module):
                 num_itrs=num_G_SV_itrs,
                 eps=self.SN_eps,
             )
+            #: which linear
             self.which_linear = functools.partial(
                 SNLinear,
                 num_svs=num_G_SVs,
@@ -1141,12 +1248,14 @@ class Generator(nn.Module):
 
         # We use a non-spectral-normed embedding here regardless;
         # For some reason applying SN to G's embedding seems to randomly cripple G  # noqa
+        #: which embedding
         self.which_embedding = nn.Embedding
         bn_linear = (
             functools.partial(self.which_linear, bias=False)
             if self.G_shared
             else self.which_embedding
         )
+        #: which bn
         self.which_bn = functools.partial(
             ccbn,
             which_linear=bn_linear,
@@ -1158,6 +1267,7 @@ class Generator(nn.Module):
             norm_style=self.norm_style,
             eps=self.BN_eps,
         )
+        #: shared
         self.shared = (
             self.which_embedding(n_classes, self.shared_dim)
             if G_shared
@@ -1165,7 +1275,7 @@ class Generator(nn.Module):
         )
 
         if self.RRM_prx_G:
-            # RRM on proxy embeddings
+            #: RRM on proxy embeddings
             self.RR_G = RelationalReasoning(
                 num_layers=1,
                 input_dim=128,
@@ -1176,7 +1286,7 @@ class Generator(nn.Module):
                 hidden_dim=128,
             )
 
-        # First linear layer
+        #: First linear layer
         self.linear = self.which_linear(
             self.dim_z + self.shared_dim,
             self.arch["in_channels"][0] * ((self.bottom_width**2) * self.H_base),
@@ -1185,6 +1295,7 @@ class Generator(nn.Module):
         # self.blocks is a doubly-nested list of modules, the outer loop intended  # noqa
         # to be over blocks at a given resolution (resblocks and/or self-attention)  # noqa
         # while the inner loop is over a given block
+        #: blocks
         self.blocks = []
         for index in range(len(self.arch["out_channels"])):
             self.blocks += [
@@ -1232,6 +1343,7 @@ class Generator(nn.Module):
 
         # output layer: batchnorm-relu-conv.
         # Consider using a non-spectral conv here
+        #: output layer
         self.output_layer = nn.Sequential(
             bn(
                 self.arch["out_channels"][-1],
@@ -1250,7 +1362,14 @@ class Generator(nn.Module):
         # If this is an EMA copy, no need for an optim, so just return now
         if no_optim:
             return
-        self.lr, self.B1, self.B2, self.adam_eps = G_lr, G_B1, G_B2, adam_eps
+        #: lr
+        self.lr = G_lr
+        #: B1
+        self.B1 = G_B1
+        #: B2
+        self.B2 = G_B2
+        #: adam_eps
+        self.adam_eps = adam_eps
         if G_mixed_precision:
             print("Using fp16 adam in G...")
             import utils
@@ -1263,6 +1382,7 @@ class Generator(nn.Module):
                 eps=self.adam_eps,
             )
 
+        #: optim
         self.optim = optim.Adam(
             params=self.parameters(),
             lr=self.lr,
@@ -1272,6 +1392,7 @@ class Generator(nn.Module):
         )
         # LR scheduling
         if sched_version == "default":
+            #:  lr sched
             self.lr_sched = None
         elif sched_version == "CosAnnealLR":
             self.lr_sched = optim.lr_scheduler.CosineAnnealingLR(
@@ -1287,8 +1408,9 @@ class Generator(nn.Module):
         else:
             self.lr_sched = None
 
-    # Initialize
+    #: Initialize
     def init_weights(self):
+        #: parameter count
         self.param_count = 0
         for module in self.modules():
             if (
@@ -1309,6 +1431,7 @@ class Generator(nn.Module):
                 )
         print(f"Param count for G's initialized parameters: {self.param_count}")
 
+    #: forward
     def forward(self, z, y):
         y = self.shared(y)
         # If relational embedding
@@ -1339,6 +1462,7 @@ class Model(Generator):
     default initializing with CONFIG dict
     """
 
+    #: Constructor
     def __init__(self):
         super().__init__(**CONFIG)
 

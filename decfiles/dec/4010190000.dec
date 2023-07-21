@@ -1,0 +1,39 @@
+# EventType: 4010190000
+# Descriptor: [B+ -> K+ LLP LLP [-> mu+ mu- mu+ mu-] ]
+# NickName: Bp_kp2LLP_2LLPTo4tr
+# Documentation:BtoK-LLP signal for dark LLP studies.The LLP are long-lived dark matter particles decaying into 4 tracks (2e, 2mu, 2pi , 2K, or some combination)
+# Tested:No
+# Physics WG: Ds&LM
+# Responsible: Trevor Shillington
+# Email: trshillington@gmail.com
+# Cuts: None
+# Date: 20230721
+
+
+
+
+#Decay file for 
+# Trevor Shillington 2023
+#
+
+Alias BtoS+ B+sig 
+Alias BtoS- B-sig
+
+Decay Upsilon(4S)
+0.500 BtoS+  B- VSS;
+0.500 BtoS-  B+ VSS;
+Enddecay
+
+Decay BtoS+
+1.000 K+ LLP LLP PHSP;
+Enddecay
+
+Decay BtoS-
+1.000 K- LLP LLP PHSP;
+Enddecay
+
+Decay LLP
+1.000 mu+ mu- mu+ mu- PHSP;
+Enddecay
+
+End

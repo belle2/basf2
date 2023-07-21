@@ -28,7 +28,8 @@ namespace Belle2 {
 
   namespace Variable {
 
-    // Generated vertex information
+    // Generate Vertex information
+
     double mcDecayVertexX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();

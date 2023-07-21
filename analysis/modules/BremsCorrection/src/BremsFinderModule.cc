@@ -237,8 +237,7 @@ void BremsFinderModule::event()
         Particle* gamma = m_gammaList->getParticle(k);
         auto cluster = gamma->getECLCluster();
 
-        if (bremCluster->getClusterId() == cluster->getClusterId() and
-            bremCluster->getConnectedRegionId() == cluster->getConnectedRegionId()) {
+        if (bremCluster->getUniqueClusterId() == cluster->getUniqueClusterId()) {
           if (m_usePhotonOnlyOnce) { //If only one track per photon should be used...
             if (track->getArrayIndex() == static_cast<int>
                 (gamma->getExtraInfo("bestMatchIndex")))      //... check if this track is the best match ...

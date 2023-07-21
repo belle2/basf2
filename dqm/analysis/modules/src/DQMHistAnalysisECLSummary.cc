@@ -36,7 +36,7 @@ DQMHistAnalysisECLSummaryModule::DQMHistAnalysisECLSummaryModule()
 
   B2DEBUG(20, "DQMHistAnalysisECLSummary: Constructor done.");
   addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
-           std::string("ECL:DQM:channels_info:"));
+           std::string("ECL:channels_info:"));
   addParam("useChannelMask", m_useChannelMask,
            "Mask Cell IDs based on information from ECL PVs",
            true);
@@ -66,17 +66,18 @@ void DQMHistAnalysisECLSummaryModule::initialize()
     // By crate
     for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
       std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
-      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name, false);
     }
     // Totals
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = (boost::format("%s:%s") % ecl_part % alarm.name).str();
-      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name, false);
     }
     // Masked Cell IDs
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
-    registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name);
+    registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name, false);
   }
+  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -292,9 +293,8 @@ std::pair<int, DQMHistAnalysisECLSummaryModule::ECLAlarmType> DQMHistAnalysisECL
     if (alarm_info.name == name) return {index, alarm_info};
     index++;
   }
-  // TODO: Do only one of those?
   B2FATAL("Could not get ECL alarm " + name);
-  throw std::out_of_range("Could not get ECL alarm " + name);
+  return {-1, m_ecl_alarms[0]};
 }
 
 void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()

@@ -289,7 +289,7 @@ void KlongValidationModule::terminate()
 
   // tuple: pointer to the plot, name of the plot, true for shifter plots
   std::vector<std::tuple<TH1F*, std::string, std::string, bool>> histograms;
-  std::string defaultCheck{"Nightly result should not different significantly from the reference"};
+  std::string defaultCheck{"Nightly result should not differ significantly from the reference"};
   histograms.push_back(make_tuple(m_klidAll, "KlId distribution", defaultCheck, true));
   histograms.push_back(make_tuple(m_Mom_all_plot, "All Momenta generated", defaultCheck, false));
   histograms.push_back(make_tuple(m_effPhi, "KlId efficiency in Phi", defaultCheck, false));

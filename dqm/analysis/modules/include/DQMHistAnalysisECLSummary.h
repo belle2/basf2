@@ -108,9 +108,11 @@ namespace Belle2 {
     void drawGrid(TH2* hist);
 
   private:
-    /** Prefix to use for PVs registered by this module */
+    /** Prefix to use for PVs registered by this module.
+     *  DQM framework will also prepend either 'TEST:' or 'DQM:' prefix.
+     */
     std::string m_pvPrefix;
-    /** If true, mask Cell IDs based on ECL:DQM:channels_info:{alarm_type} PV info */
+    /** If true, mask Cell IDs based on DQM:ECL:channels_info:{alarm_type} PV info */
     bool m_useChannelMask;
 
     /** Different alarms monitored in h_channels_summary */

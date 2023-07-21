@@ -41,7 +41,7 @@ DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
   addParam("CrateTimeOffsetsMax", m_CrateTimeOffsetsMax, "Maximum boundary for crate time offsets", 20.);
   addParam("LogicTestMax", m_LogicTestMax, " Maximum of fails for logic test", 50);
   addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
-           std::string("ECL:DQM:"));
+           std::string("ECL:"));
 }
 
 

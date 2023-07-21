@@ -90,6 +90,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
   gCountsVsCrysID->Write();
   Chi2VsCrysID->Write();
   histfile->Close();
+  delete histfile;
 
   return c_OK;
 }

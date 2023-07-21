@@ -78,6 +78,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
   m_BaselineVsCrysID->Write();
   gBaselineVsCrysID->Write();
   histfile->Close();
+  delete histfile;
 
   /** Saving baseline results to db for access in stage C3 */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();

@@ -86,6 +86,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   PPVsCrysID->Write();
   gPPVsCellID->Write();
   histfile->Close();
+  delete histfile;
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Write output to DB */

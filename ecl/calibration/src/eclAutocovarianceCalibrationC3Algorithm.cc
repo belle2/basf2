@@ -115,6 +115,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   gnoiseMatrix00Vector->Write();
   gtotalCountsVector->Write();
   histfile->Close();
+  delete histfile;
 
   return c_OK;
 }

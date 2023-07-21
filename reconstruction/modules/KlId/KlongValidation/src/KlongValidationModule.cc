@@ -51,37 +51,36 @@ void KlongValidationModule::initialize()
   // initialize root tree to write stuff into
   m_f =     new TFile(m_outputName.c_str(), "recreate");
   /** using TH1F because the validation server does not support TEfficiency  */
-  m_Phi_Pass      = new TH1F("Phi Passed", "Passed #Phi;#Phi;Count", 32, -3.2, 3.2);
-  m_Phi_all  = new TH1F("Phi All", "All #Phi;#Phi;Count", 32, -3.2, 3.2);
-  m_effPhi      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 32, -3.2, 3.2);
+  m_Phi_Pass      = new TH1F("Phi Passed", "Passed #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
+  m_Phi_all  = new TH1F("Phi All", "All #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
+  m_effPhi      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi [rad];Efficiency", 32, -3.2, 3.2);
 
-  m_Theta_Pass    = new TH1F("Theta Passed", "Passed #Theta;#Theta;Count", 32, 0, 3.2);
-  m_Theta_all  = new TH1F("Theta All", "All #Theta;#Theta;Count", 32, 0, 3.2);
-  m_effTheta  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 32, 0, 3.2);
+  m_Theta_Pass    = new TH1F("Theta Passed", "Passed #Theta;#Theta [rad];Count", 32, 0, 3.2);
+  m_Theta_all  = new TH1F("Theta All", "All #Theta;#Theta [rad];Count", 32, 0, 3.2);
+  m_effTheta  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta [rad];Efficiency", 32, 0, 3.2);
 
-  m_Mom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
-  m_Mom_all    = new TH1F("Momentum Efficiency normalise", "Efficiency Momentum;Momentum;Count", 25, 0, 5);
-  m_Mom_all_plot    = new TH1F("Momentum Efficiency all, obtained from clusters", "Efficiency Momentum;Momentum;Count", 25, 0, 5);
-  m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum;Efficiency", 25, 0, 5);
+  m_Mom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum [GeV];Efficiency", 25, 0, 5);
+  m_Mom_all    = new TH1F("Momentum Efficiency normalise", "Efficiency Momentum;Momentum [GeV];Count", 25, 0, 5);
+  m_Mom_all_plot    = new TH1F("Momentum Efficiency all, obtained from clusters", "Efficiency Momentum;Momentum [GeV];Count", 25, 0,
+                               5);
+  m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum [GeV];Efficiency", 25, 0, 5);
 
-  m_fakePhi_Pass     = new TH1F("Phi Fake Passsed", "Fake Passed #Phi;#Phi;Count", 32, -3.2, 3.2);
-  m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 32, -3.2, 3.2);
+  m_fakePhi_Pass     = new TH1F("Phi Fake Passsed", "Fake Passed #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
+  m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi [rad];Fake Rate", 32, -3.2, 3.2);
 
-  m_fakeTheta_Pass = new TH1F("Theta Fake Passed", "Fake Passed #Theta;#Theta;Count", 32, 0, 3.2);
-  m_fakeTheta = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 32, 0, 3.2);
+  m_fakeTheta_Pass = new TH1F("Theta Fake Passed", "Fake Passed #Theta;#Theta [rad];Count", 32, 0, 3.2);
+  m_fakeTheta = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta [rad];Fake Rate", 32, 0, 3.2);
 
-  m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum;Count", 25, 0, 5);
-  m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
+  m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum [GeV];Count", 25, 0, 5);
+  m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum [GeV];Fake Rate", 25, 0, 5);
 
-//  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 125, -5, 20);
-  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 1000, -50, 150);
-  m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance;Count", 100, 0, 4000);
-  m_energy     = new TH1F("KLM Energy", "KLM Energy;Energy;count", 25, 0, 5);
+  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time [ns];Count", 200, -30, 70);
+  m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance [mm];Count", 100, 0, 4000);
   m_nLayer     = new TH1F("KLM N-Layer", "N-layer;N-layer;count", 20, 0, 20);
 
-  m_bkgPhi      = new TH1F("Phi Beam BKG", "BeamBKG #Phi;#Phi;Background count", 32, -3.2, 3.2);
-  m_bkgTheta      = new TH1F("Theta Beam BKG", "BeamBKG #Theta;#Theta;Background count", 32, 0, 3.2);
-  m_bkgMom      = new TH1F("Momentum Beam BKG", "BeamBKG #Momentum;#Momentum;Background count", 25, 0, 5);
+  m_bkgPhi      = new TH1F("Phi Beam BKG", "BeamBKG #Phi;#Phi [rad];Background count", 32, -3.2, 3.2);
+  m_bkgTheta      = new TH1F("Theta Beam BKG", "BeamBKG #Theta;#Theta [rad];Background count", 32, 0, 3.2);
+  m_bkgMom      = new TH1F("Momentum Beam BKG", "BeamBKG #Momentum;#Momentum [GeV];Background count", 25, 0, 5);
 
   m_innermostLayer = new TH1F("Innermost layer", "Innermost layer;Innermost layer; Count", 20, 0, 20);
   m_trackFlag      = new TH1F("Track flag", "TrackFlag;Flag; Count", 2, 0, 1);
@@ -148,7 +147,6 @@ void KlongValidationModule::event()
 
     double time = cluster.getTime();
     double nLayer = cluster.getLayers();
-    double energy = cluster.getEnergy();
     double trackSep = 1.0e20;
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     for (auto trackSeperation :  trackSeperations) {
@@ -197,7 +195,6 @@ void KlongValidationModule::event()
     m_fakeMom->SetMinimum(0.);
     m_time->SetMinimum(0.);
     m_trackSep->SetMinimum(0.);
-    m_energy->SetMinimum(0.);
     m_nLayer->SetMinimum(0.);
     m_bkgPhi->SetMinimum(0.);
     m_bkgTheta->SetMinimum(0.);
@@ -214,7 +211,6 @@ void KlongValidationModule::event()
 
     m_time ->Fill(time);
     m_trackSep->Fill(trackSep);
-    m_energy->Fill(energy);
     m_nLayer->Fill(nLayer);
     m_innermostLayer->Fill(cluster.getInnermostLayer());
     m_trackFlag->Fill(cluster.getAssociatedTrackFlag());
@@ -292,32 +288,35 @@ void KlongValidationModule::terminate()
   m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
 
   // tuple: pointer to the plot, name of the plot, true for shifter plots
-  std::vector<std::tuple<TH1F*, std::string, bool>> histograms;
-  histograms.push_back(make_tuple(m_klidAll, "KlId distribution", true));
-  histograms.push_back(make_tuple(m_Mom_all_plot, "All Momenta generated", false));
-  histograms.push_back(make_tuple(m_effPhi, "KlId efficiency in Phi", false));
-  histograms.push_back(make_tuple(m_effTheta, "KlId efficiency in Theta", true));
-  histograms.push_back(make_tuple(m_effMom, "KlId efficiency in Momentum", true));
-  histograms.push_back(make_tuple(m_fakePhi, "KlId fake rate in Phi", false));
-  histograms.push_back(make_tuple(m_fakeTheta, "KlId fake rate in Theta", true));
-  histograms.push_back(make_tuple(m_fakeMom, "KlId fake rate in Momentum", true));
-  histograms.push_back(make_tuple(m_time, "KLMClusters time", true));
-  histograms.push_back(make_tuple(m_trackSep, "Distance of KLMCluster to closest Track", true));
-  histograms.push_back(make_tuple(m_energy, "KLMClusters energy", false));
-  histograms.push_back(make_tuple(m_nLayer, "KLMClusters nLayer", false));
-  histograms.push_back(make_tuple(m_innermostLayer, "KLMClusters innermostLayer", false));
-  histograms.push_back(make_tuple(m_bkgPhi, "Beam bkg in Phi", false));
-  histograms.push_back(make_tuple(m_bkgTheta, "Beam bkg in Theta", false));
-  histograms.push_back(make_tuple(m_bkgMom, "Beam bkg in Momentum", false));
-  histograms.push_back(make_tuple(m_trackFlag, "Track flag", false));
-  histograms.push_back(make_tuple(m_ECLFlag, "ECLCluster flag", false));
+  std::vector<std::tuple<TH1F*, std::string, std::string, bool>> histograms;
+  std::string defaultCheck{"Nightly result should not different significantly from the reference"};
+  histograms.push_back(make_tuple(m_klidAll, "KlId distribution", defaultCheck, true));
+  histograms.push_back(make_tuple(m_Mom_all_plot, "All Momenta generated", defaultCheck, false));
+  histograms.push_back(make_tuple(m_effPhi, "KlId efficiency in Phi", defaultCheck, false));
+  histograms.push_back(make_tuple(m_effTheta, "KlId efficiency in Theta",
+                                  defaultCheck + "; efficiency must be 0 below 0.3 rad and above 2.7 rad", true));
+  histograms.push_back(make_tuple(m_effMom, "KlId efficiency in Momentum", defaultCheck, true));
+  histograms.push_back(make_tuple(m_fakePhi, "KlId fake rate in Phi", defaultCheck, false));
+  histograms.push_back(make_tuple(m_fakeTheta, "KlId fake rate in Theta",
+                                  defaultCheck + "; fake rate must be 0 below 0.3 rad and above 2.7 rad", true));
+  histograms.push_back(make_tuple(m_fakeMom, "KlId fake rate in Momentum", defaultCheck, true));
+  histograms.push_back(make_tuple(m_time, "KLMClusters time", defaultCheck + "; no secondary peaks", true));
+  histograms.push_back(make_tuple(m_trackSep, "Distance of KLMCluster to closest Track", defaultCheck, true));
+  histograms.push_back(make_tuple(m_nLayer, "KLMClusters nLayer", defaultCheck, false));
+  histograms.push_back(make_tuple(m_innermostLayer, "KLMClusters innermostLayer", defaultCheck, false));
+  histograms.push_back(make_tuple(m_bkgPhi, "Beam bkg in Phi", defaultCheck, false));
+  histograms.push_back(make_tuple(m_bkgTheta, "Beam bkg in Theta",
+                                  defaultCheck + "; background must be 0 below 0.3 rad and above 2.7 rad", false));
+  histograms.push_back(make_tuple(m_bkgMom, "Beam bkg in Momentum", defaultCheck, false));
+  histograms.push_back(make_tuple(m_trackFlag, "Track flag", defaultCheck, false));
+  histograms.push_back(make_tuple(m_ECLFlag, "ECLCluster flag", defaultCheck, false));
 
   for (auto hist  : histograms) {
     std::get<0>(hist) -> SetTitle(std::get<1>(hist).c_str());
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Description", std::get<1>(hist)));
-    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Check", "Should not change"));
+    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Check", std::get<2>(hist).c_str()));
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
-    if (std::get<2>(hist))
+    if (std::get<3>(hist))
       std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.99,pvalue-error=0.02"));
     else
       std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "pvalue-warn=0.99,pvalue-error=0.1"));

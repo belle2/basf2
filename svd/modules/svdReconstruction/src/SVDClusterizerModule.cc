@@ -420,11 +420,6 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
         shiftSVDClusterTime();
       }
     }
-    if (m_svdClusterTimeShifter.isValid() &&
-        !m_returnRawClusterTime &&
-        m_shiftSVDClusterTime) {
-      shiftSVDClusterTime();
-    }
   }
 }
 

@@ -566,7 +566,7 @@ void SVDClusterizerModule::shiftSVDClusterTime()
   float clsTime = m_storeClusters[clsIndex]->getClsTime();
 
   TString algo = m_timeRecoWith6SamplesAlgorithm;
-  if (m_numberOfAcquiredSamples = 3) algo = m_timeRecoWith3SamplesAlgorithm;
+  if (m_numberOfAcquiredSamples == 3) algo = m_timeRecoWith3SamplesAlgorithm;
 
   clsTime -= m_svdClusterTimeShifter->getClusterTimeShift(algo,
                                                           m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),

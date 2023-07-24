@@ -138,8 +138,7 @@ namespace Belle2 {
 
       // 4. Calibration Objects
       bool m_returnRawClusterTime = false; /**< if true cluster time is not calibrated, to be used for time calibration */
-      /** if true applies SVDCluster time shift based on cluster-size*/
-      bool m_shiftSVDClusterTime = true;
+      bool m_shiftSVDClusterTime = true; /**< if true applies SVDCluster time shift based on cluster-size*/
 
       DBObjPtr<HardwareClockSettings> m_hwClock;  /**< systems clock*/
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/

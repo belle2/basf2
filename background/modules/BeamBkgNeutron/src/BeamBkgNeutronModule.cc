@@ -97,6 +97,8 @@ namespace Belle2 {
     tree1->Branch("trj_pz", &trj_pz);
 
     tree2->Branch("nSimHits", nSimHits, "nSimHits[13]/I");
+    tree2->Branch("hitPDG", hitPDG, "hitPDG[13]/I");
+    tree2->Branch("momPDG", momPDG, "momPDG[13]/I");
 //    std::string xyzvector_typedef = "std::vector<ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag>>";
 //    tt->Branch("vtxProd", "xyzvector_typedef.c_str()", &vtxProd);
   }
@@ -109,6 +111,9 @@ namespace Belle2 {
 
   void BeamBkgNeutronModule::event()
   {
+    // MCParticles
+    StoreArray<MCParticle>  McParticles;
+
     // SimHits
     StoreArray<PXDSimHit>   PXDSimHits;
     StoreArray<SVDSimHit>   SVDSimHits;
@@ -119,7 +124,12 @@ namespace Belle2 {
     StoreArray<EKLMSimHit>  EKLMSimHits;
     StoreArray<BKLMSimHit>  BKLMSimHits;
 
-    nSimHits[0] = -1;
+    for (Int_t i = 0; i < 13; i++) {
+      nSimHits[i] = 0;
+      hitPDG[i] = 0;
+      momPDG[i] = 0;
+    }
+
     nSimHits[1] = PXDSimHits.getEntries();
     nSimHits[2] = SVDSimHits.getEntries();
     nSimHits[3] = CDCSimHits.getEntries();
@@ -130,10 +140,6 @@ namespace Belle2 {
     nSimHits[8] = BKLMSimHits.getEntries();
 
     // loop over EKLM simHits
-    nSimHits[9] = 0;
-    nSimHits[10] = 0;
-    nSimHits[11] = 0;
-    nSimHits[12] = 0;
     for (Int_t hit = 0; hit < nSimHits[7]; hit++) {
       // get EKLMSimHit
       EKLMSimHit* simHit = EKLMSimHits[hit];
@@ -144,17 +150,155 @@ namespace Belle2 {
       else if (-294.0 < posZ && posZ < -286.0) nSimHits[12]++; // BWD EKLM outermost layer
     }
 
+    RelationIndex<MCParticle, PXDSimHit> relPXDSimHitToMCParticle(McParticles, PXDSimHits);
+    RelationIndex<MCParticle, SVDSimHit> relSVDSimHitToMCParticle(McParticles, SVDSimHits);
+    RelationIndex<MCParticle, CDCSimHit> relCDCSimHitToMCParticle(McParticles, CDCSimHits);
+    RelationIndex<MCParticle, ARICHSimHit> relARICHSimHitToMCParticle(McParticles, ARICHSimHits);
+    RelationIndex<MCParticle, TOPSimHit> relTOPSimHitToMCParticle(McParticles, TOPSimHits);
+    RelationIndex<MCParticle, ECLSimHit> relECLSimHitToMCParticle(McParticles, ECLSimHits);
+    RelationIndex<MCParticle, EKLMSimHit> relEKLMSimHitToMCParticle(McParticles, EKLMSimHits);
+    RelationIndex<MCParticle, BKLMSimHit> relBKLMSimHitToMCParticle(McParticles, BKLMSimHits);
+
+    Int_t detID;
+
+    //--- PXD
+    detID = 1;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      PXDSimHit* simHit = PXDSimHits[iHit];
+      // get related MCparticle
+      if (relPXDSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relPXDSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- SVD
+    detID = 2;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      SVDSimHit* simHit = SVDSimHits[iHit];
+      // get related MCparticle
+      if (relSVDSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relSVDSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- CDC
+    detID = 3;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      CDCSimHit* simHit = CDCSimHits[iHit];
+      // get related MCparticle
+      if (relCDCSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relCDCSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- ARICH
+    detID = 4;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      ARICHSimHit* simHit = ARICHSimHits[iHit];
+      // get related MCparticle
+      if (relARICHSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relARICHSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- TOP
+    detID = 5;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      TOPSimHit* simHit = TOPSimHits[iHit];
+      // get related MCparticle
+      if (relTOPSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relTOPSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- ECL
+    detID = 6;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      ECLSimHit* simHit = ECLSimHits[iHit];
+      // get related MCparticle
+      if (relECLSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relECLSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- EKLM
+    detID = 7;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      EKLMSimHit* simHit = EKLMSimHits[iHit];
+      // get related MCparticle
+      if (relEKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relEKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
+    //--- BKLM
+    detID = 8;
+    // loop over simhits
+    for (Int_t iHit = 0; iHit < nSimHits[detID]; iHit++) {
+      BKLMSimHit* simHit = BKLMSimHits[iHit];
+      // get related MCparticle
+      if (relBKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
+        const MCParticle* currParticle = relBKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        hitPDG[detID] = currParticle->getPDG();
+        if (!currParticle->isPrimaryParticle()) {
+          const MCParticle* momParticle = currParticle->getMother();
+          momPDG[detID] = momParticle->getPDG();
+        }
+      }
+    }
+
     // fill the tree
     tree2->Fill();
 
     // BeamBkgHits
-    StoreArray<MCParticle>  McParticles;
     StoreArray<BeamBackHit> BeamBackHits;
     RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(McParticles, BeamBackHits);
 
     Int_t nHits = BeamBackHits.getEntries();
 
-    // looop over bkgHits
+    // loop over bkgHits
     for (Int_t iHit = 0; iHit < nHits; iHit++) {
       // get one bkgHit
       BeamBackHit* bkgHit = BeamBackHits[iHit];

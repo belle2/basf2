@@ -74,7 +74,7 @@ namespace Belle2 {
     Float_t E_init;   /**< McParticle energy [GeV] */
     Float_t mass;   /**< McParticle mass [GeV] */
     Float_t lifeTime;   /**< McParticle lifetime [ns] */
-    Int_t PDG, subDet, iden, trackID, iEvent, iEntry, nSimHits[13];
+    Int_t PDG, subDet, iden, trackID, iEvent, iEntry, nSimHits[13], hitPDG[13], momPDG[13];
     Float_t E_start, E_end, eDep, trackLength, momentumX, momentumY, momentumZ, positionX, positionY, positionZ, nWeight;
 
     TFile* ff;    /**< Output root file.   */

@@ -361,5 +361,51 @@
     </Components>
   </Material>
 
+  <!-- 3D-printing material (C19H12O3 from https://gemc.jlab.org/work/doxy/1.8/cpp__materials_8cc_source.html) -->
+  <Material name="PEEK">
+    <state>Solid</state>
+    <density unit="g/cm3">1.31</density>
+    <Components>
+       <Element  fraction="0.76">C</Element>
+       <Element  fraction="0.08">H</Element>
+       <Element  fraction="0.16">O</Element>
+    </Components>
+  </Material>
+
+  <!-- Epoxy resin (FANGS-Epoxy from https://stash.desy.de/projects/B2/repos/basf2/browse/beast/fangs/data/FANGS-Materials.xml) -->
+  <Material name="EPOXY1">
+    <state>Solid</state>
+    <density unit="g/cm3">1.13</density>
+    <Components>
+       <Element  fraction="0.4390">C</Element>
+       <Element  fraction="0.0732">O</Element>
+       <Element  fraction="0.4878">H</Element>
+    </Components>
+  </Material>
+
+  <!-- Epoxy resin (Epoxy_C15H44O7 from https://stash.desy.de/projects/B2/repos/basf2/browse/beast/ph1sustr/data/PH1SUSTR-Materials.xml) -->
+  <Material name="EPOXY2">
+    <state>Solid</state>
+    <density unit="g/cm3">1.3</density>
+    <Components>
+       <Element  fraction="0.227273">C</Element>
+       <Element  fraction="0.666667">H</Element>
+       <Element  fraction="0.106060">O</Element>
+    </Components>
+  </Material>
+
+  <!-- Epoxy resin (Cryo_Epoxy from https://stash.desy.de/projects/B2/repos/basf2/browse/ir/data/IR-Materials.xml) -->
+  <Material name="EPOXY3">
+    <state>Solid</state>
+    <density unit="g/cm3">1.3</density>
+    <Components>
+       <Element fraction="0.461">C</Element>
+       <Element fraction="0.292">H</Element>
+       <Element fraction="0.025">Cl</Element>
+       <Element fraction="0.040">O</Element>
+       <Element fraction="0.182">N</Element>
+    </Components>
+  </Material>
+
 </Materials>
 

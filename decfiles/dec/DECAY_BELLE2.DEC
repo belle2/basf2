@@ -9861,8 +9861,9 @@ CDecay anti-K*0T
 
 # K_0*(1430)+
 Decay K_0*+
-0.666700000   K0  pi+                                      PHSP;
-0.333300000   K+  pi0                                      PHSP;
+0.613300000   K0  pi+                                      PHSP;
+0.306700000   K+  pi0                                      PHSP;
+0.080000000   K+  eta                                      PHSP; # [PDG2023 BF(Keta)/BF(Kpi) = 0.092]
 Enddecay
 
 CDecay K_0*-
@@ -9871,7 +9872,7 @@ CDecay K_0*-
 Decay K_0*0
 0.613300000   K+  pi-                                      PHSP;
 0.306700000   K0  pi0                                      PHSP;
-0.080000000   K0  eta                                      PHSP; # [PDG2023 BF(Keta)/BF(Kpi) = 0.0092]
+0.080000000   K0  eta                                      PHSP; # [PDG2023 BF(Keta)/BF(Kpi) = 0.092]
 Enddecay
 
 CDecay anti-K_0*0

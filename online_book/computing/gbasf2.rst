@@ -12,39 +12,38 @@ Gbasf2
 
     **Prerequisites**:
 
-    * `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
-    * A system with SL6 or CentOS 7.
-    * Grid certificate installed in ``~/.globus`` and on the web browser.
-    * :ref:`onlinebook_first_steering_file` lesson.
+    * See `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
+    * A system with SL6 or CentOS 7 (or access to KEKCC).
+    * A valid `grid certificate <https://confluence.desy.de/display/BI/Computing+Belle-II-Grid-Certificate>`_ installed in ``~/.globus`` and in a web browser.
+    * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
     **Questions**:
 
     * What is gbasf2?
-    * Where to search files on the grid?
-    * How I monitor my jobs?
-    * What to do if I need help?
+    * How do I find input files on the grid?
+    * How do I monitor my jobs?
+    * What do I do if I need help?
 
     **Objectives**:
 
-    * Install gbasf2 and set the environment for using grid tools.
-    * Search datasets stored on the grid.
+    * Set up the gbasf2 environment.
+    * Search for datasets stored on the grid.
     * Submit jobs using gbasf2.
-    * Monitor your jobs and take action if there are issues.
+    * Monitor jobs and take action if there are issues.
     * Check the documentation and ask for help if necessary.
     * Download the output for offline analysis.
 
-
 Gbasf2 is the command-line client for submitting grid-based basf2 jobs.
-Data and MC samples are distributed in many storage sites around the world, and the gbasf2 tools allow you to access and
+Belle II data and MC samples are distributed in many storage sites around the world. Gbasf2 and a set of grid-based user tools (gb2 tools) allow you to access and
 analyze them.
 
-The same steering files used with basf2 work with gbasf2, and the usual workflow is:
+The same basf2 steering files are used when running on the grid. The usual workflow is:
 
-* First developing a basf2 steering file.
-* Testing it locally.
-* Locate your input files.
-* Submit jobs to the grid with the same steering file.
-* Download the output to perform the offline analysis (plots, fits, etc.)
+* Develop a basf2 steering file.
+* Test it locally (don't skip this step!).
+* Locate your input files on the grid.
+* Submit jobs to the grid with the same basf2 steering file.
+* Download the output to perform offline analysis (plots, fits, etc.).
 
 .. warning::
 
@@ -52,22 +51,40 @@ The same steering files used with basf2 work with gbasf2, and the usual workflow
 
     * The GRID is NOT a local computing system like KEKCC.
     * Once you submit jobs, they will be assigned to computing systems around the world.
-    * If your job is problematic, it will be distributed to the world and all sites will be affected.
+    * If your job is problematic, it will be distributed to the world and many sites will be affected.
+    * Remember, always test your jobs locally before submitting to the grid!
 
 
 Go to `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_
 and verify that you have the prerequisites. You need:
 
-* A system with SL6 or CentOS 7.
-* A valid grid certificate issued within a year and installed in ``~/.globus`` in ``.pem`` format.
-* Belle Virtual Organization (VO) membership registered or renewed within a year at the
+* A system with SL6 or CentOS 7 (or access to KEKCC).
+* A valid grid certificate issued within a year and `installed <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
+* Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
   `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
-* Registration in `DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
+* Registration in `DIRAC <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-7.RegisterwithDIRAC>`_.
 
 .. note::
 
-    It is required to join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
+    It is required that you join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
     where you can ask for help and receive announcements on releases and system issues.
+
+
+Setting up gbasf2 via cvmfs
+---------------------------
+
+If your computing system has access to cvmfs (e.g. at KEKCC), the simplest way to use gbasf2 is via a central installation. The following command sets all the necessary environment variables and initializes a grid proxy for you (you will be asked to enter your credentials for this).
+
+.. code-block:: bash
+
+    source /cvmfs/belle.kek.jp/grid/gbasf2/pro/setup.sh
+
+That's it! You are ready to run grid jobs!
+
+.. note::
+
+    You can also pass arguments when setting up gbasf2, e.g. if you need to setup a grid proxy with permissions beyond the default user (with option -g).
+
 
 
 Installing gbasf2

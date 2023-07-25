@@ -38,6 +38,8 @@ eclWaveformTemplateCalibrationC1CollectorModule::eclWaveformTemplateCalibrationC
   addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Maximum energy threshold of online fit result for Fitting Waveforms (GeV).",
            4.0);
   addParam("baselineLimit", m_baselineLimit, "Number of ADC points used to define baseline.", 12);
+  addParam("maxResvsCrysIDHistogramLimit", m_maxResvsCrysIDHistogramLimit, "upper limit of histogram.", 100);
+  addParam("maxResvsCrysIDHistogramNBins", m_maxResvsCrysIDHistogramNBins, "histogram number of bins.", 1000);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -50,7 +52,8 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  maxResvsCrysID = new TH2F("maxResvsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 1000, 0, 100);
+  maxResvsCrysID = new TH2F("maxResvsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals,
+                            m_maxResvsCrysIDHistogramNBins, 0, m_maxResvsCrysIDHistogramLimit);
   registerObject<TH2F>("maxResvsCrysID", maxResvsCrysID);
 
   m_eclDsps.registerInDataStore();
@@ -88,6 +91,7 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 
     // only select high energy crystals
     if (energy < m_MinEnergyThreshold)  continue;
+    // avoid very high energy crystals due to potential photodiode interactions
     if (energy > m_MaxEnergyThreshold)  continue;
 
     //compute mean of baseline
@@ -97,10 +101,8 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 
     //compute max residual in baseline
     float maxRes = 0.0;
-
     for (int i = 0; i < m_baselineLimit; i++) {
       float temp = fabs(aECLDsp.getDspA()[i] - baseline);
-      float tempSq = temp * temp;
       if (temp > maxRes)  maxRes = temp;
     }
 
@@ -114,7 +116,7 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
 void eclWaveformTemplateCalibrationC1CollectorModule::closeRun()
 {
   for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
-    for (int j = 0; j < 1000; j++) {
+    for (int j = 0; j < m_maxResvsCrysIDHistogramNBins; j++) {
       getObjectPtr<TH2>("maxResvsCrysID")->SetBinContent(i + 1, j + 1, maxResvsCrysID->GetBinContent(i + 1, j + 1));
     }
   }

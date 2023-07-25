@@ -29,8 +29,6 @@ eclWaveformTemplateCalibrationC1Algorithm::eclWaveformTemplateCalibrationC1Algor
   setDescription(
     "Used to determine the baseline noise level of crystals in e+e- --> gamma gamma"
   );
-
-  m_lowestEnergyFraction = 0.5;
 }
 
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibrate()
@@ -52,15 +50,25 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
     TH1F* hMaxResx = (TH1F*)maxResvsCrysID->ProjectionY("hMaxResx", id + 1, id + 1);
 
     int Total = hMaxResx->GetEntries();
+
+    if (Total < m_minWaveformLimit) {
+      B2INFO("eclWaveformTemplateCalibrationC1Algorithm: warning total entries for cell ID " << id + 1 << " is only: " << Total <<
+             " Requirement is : " << m_minWaveformLimit);
+      /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
+      return c_NotEnoughData;
+    }
+
     int subTotal = 0;
     float fraction = 0.0;
     int counter = 0;
 
-    float fractionLimit = m_lowestEnergyFraction;
+    float fractionLimit = m_fractionLimitGeneral;
 
-    // If number of waveforms is low use most of them
-    if (Total < 10) fractionLimit = 0.9;
+    /** If number of waveforms is low use most of them */
+    if (Total < m_LowCountThreshold) fractionLimit = m_fractionLimitLowCounts;
 
+
+    /** determining the threshold needed to select corresponding fraction of lowest noise waveforms  */
     while (fraction < fractionLimit) {
       subTotal += hMaxResx->GetBinContent(counter);
       fraction = ((float)subTotal) / ((float)Total);
@@ -96,6 +104,8 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
   gmaxResvsCrysID->Write();
   maxResvsCrysID->Write();
   gTotalvsCrysID->Write();
+  histfile->Close();
+  delete histfile;
 
   return c_OK;
 }

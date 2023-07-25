@@ -40,6 +40,7 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
+    /** called at end of run */
     void closeRun() override;
 
   private:
@@ -56,6 +57,9 @@ namespace Belle2 {
 
     double m_MinEnergyThreshold; /**< Minimum energy threshold of online fit result for Fitting Waveforms */
     double m_MaxEnergyThreshold; /**< Maximum energy threshold of online fit result for Fitting Waveforms */
+
+    int m_maxResvsCrysIDHistogramLimit; /**< upper limit of histogram */
+    int m_maxResvsCrysIDHistogramNBins; /**< histogram number of bins */
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};

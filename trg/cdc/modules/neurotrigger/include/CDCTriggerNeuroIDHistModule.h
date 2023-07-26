@@ -45,13 +45,13 @@ namespace Belle2 {
     /** Instance of the NeuroTrigger. */
     NeuroTrigger m_NeuroTrigger;
     /** Switch to rescale out of range target values or ignore them. */
-    bool m_rescaleTarget;
+    //bool m_rescaleTarget;
     /** Number of samples to prepare input ranges. */
     int m_nPrepare;
     /** Cut on the hit counters to get relevant ID ranges. */
-    double m_relevantCut;
+    //double m_relevantCut;
     /** Switch to apply cut to single hit counter or to sum over counters. */
-    bool m_cutSum;
+    //bool m_cutSum;
     /** Parameters for the NeuroTrigger. */
     NeuroTrigger::Parameters m_parameters;
     /** Parameters for the NeuroTrigger. */

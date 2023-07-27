@@ -117,7 +117,11 @@ We have two alternative algorithms to compute the cluster time that can be selec
       t_{\rm hit} = f(t_{\rm raw}) + r_{\rm shift} + \frac{\Delta t}{4} \cdot (3 - TB + 4\ FF)
    
    where :math:`f(t_{\rm raw})` is the calibrated time, :math:`r_{\rm shift}` is the relative shift among 3-sample and 6-sample event (= 0 in 6-sample events), :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`TB` is the :ref:`TriggerBin<svdtb>` and :math:`FF` is the :ref:`FirstFrame<svdff>`.
-   
+
+Shifting of SVD-cluster-time based on Cluster-size:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mean of cluster-times shifts with size of the clusters as strips with lower amplitude delays the time. This is not simulated and only should be seen in Data. To compensate this, a shift is added to the calibrated time. The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
+
 
 Cluster Position Reconstruction
 -------------------------------
@@ -210,6 +214,12 @@ Method in :b2:mod:`SVDTimeGrouping` module:
 +--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Assign GroupId to SVD-Clusters | All the clusters are now compared against the surviving groups. The clusters within 5 sigma of a group center are then assigned the groupId and groupInfo. Hence, one cluster shared between two groups can have two groupId. (default **acceptSigmaN=7**)                                                                                                                      |
 +--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Payloads related to SVDTimeGrouping:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. :ref:`SVDRecoConfiguration<svdrecoconfiguration>` : The switiching ON/OFF of SVDTimeGrouping is controlled by this DBObject.
+#. :ref:`SVDTimeGroupingConfiguration<svdtimegroupingconfiguration>` : All the parameters used by this module is stored in this DBObject.
+
 
 :ref:`SpacePoint<svdsps>` Creation
 ----------------------------------

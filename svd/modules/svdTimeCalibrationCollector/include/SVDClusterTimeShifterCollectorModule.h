@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
+#include "vector"
+#include "TString.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
@@ -49,16 +51,11 @@ namespace Belle2 {
      */
     void collect() override final;
 
-    /** set prefix of the list of clusters on track */
-    void setSVDClusterOnTracksPrefix(const TString& str) {m_svdClsOnTrksPrefix = str;}
-    /** set list of time algorithm */
-    void setTimeAlgorithm(const std::vector<TString>& lst) {m_timeAlgorithms = lst;}
-
   private:
 
     int m_maxClusterSize = 6; /**< Maximum size of SVD clusters */
-    std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
-    TString m_svdClsOnTrksPrefix = "SVDClustersOnTracks"; /**< SVDClusterOnTracks */
+    std::vector<std::string> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
+    std::string m_svdClsOnTrksPrefix = "SVDClustersOnTracks"; /**< SVDClusterOnTracks */
     std::map<TString, StoreArray<SVDCluster>> m_svdClsOnTrk; /**< SVDClusters store array*/
 
     StoreObjPtr<EventMetaData> m_emdata; /**< EventMetaData store object pointer*/

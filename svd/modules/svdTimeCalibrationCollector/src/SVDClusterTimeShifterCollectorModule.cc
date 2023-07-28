@@ -25,6 +25,8 @@ SVDClusterTimeShifterCollectorModule::SVDClusterTimeShifterCollectorModule() : C
   setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDClusterOnTracksPrefix", m_svdClsOnTrksPrefix, "set prefix of the list of clusters on track", m_svdClsOnTrksPrefix);
+  addParam("TimeAlgorithms", m_timeAlgorithms, "set list of time algorithms", m_timeAlgorithms);
   addParam("MaxClusterSize", m_maxClusterSize, "Maximum size of SVD clusters", m_maxClusterSize);
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
 }
@@ -34,7 +36,7 @@ void SVDClusterTimeShifterCollectorModule::prepare()
 
   for (auto alg : m_timeAlgorithms) {
     m_svdClsOnTrk[alg] = StoreArray<SVDCluster>();
-    m_svdClsOnTrk[alg].isRequired((m_svdClsOnTrksPrefix + '_' + alg).Data());
+    m_svdClsOnTrk[alg].isRequired((m_svdClsOnTrksPrefix + '_' + alg).data());
   }
   m_eventT0.isRequired(m_eventTime);
 
@@ -42,17 +44,19 @@ void SVDClusterTimeShifterCollectorModule::prepare()
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
   std::vector<Belle2::VxdID> allSensors;
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
-    for (auto ladder : geoCache.getLadders(layer))
+    for (auto ladder : geoCache.getLadders(layer)) {
       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
         allSensors.push_back(sensor);
+      break;
+    }
 
   int numberOfSensorBin = 2 * int(allSensors.size());
   B2INFO("Number of SensorBin: " << numberOfSensorBin);
 
   for (auto alg : m_timeAlgorithms) {
-    TH3F* __hClusterSizeVsTimeResidual__  = new TH3F(("__hClusterSizeVsTimeResidual__" + alg).Data(),
-                                                     ("ClusterSize vs " + alg + " Time Residual").Data(),
-                                                     100, -25., 25., m_maxClusterSize, 0.5, m_maxClusterSize + 0.5,
+    TH3F* __hClusterSizeVsTimeResidual__  = new TH3F(("__hClusterSizeVsTimeResidual__" + alg).data(),
+                                                     ("ClusterSize vs " + alg + " Time Residual").data(),
+                                                     400, -50., 50., m_maxClusterSize, 0.5, m_maxClusterSize + 0.5,
                                                      numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
     __hClusterSizeVsTimeResidual__->GetZaxis()->SetTitle("Sensor");
     __hClusterSizeVsTimeResidual__->GetYaxis()->SetTitle("Cluster Size");
@@ -76,30 +80,40 @@ void SVDClusterTimeShifterCollectorModule::prepare()
 void SVDClusterTimeShifterCollectorModule::startRun()
 {
   for (auto alg : m_timeAlgorithms)
-    getObjectPtr<TH3F>(("__hClusterSizeVsTimeResidual__" + alg).Data())->Reset();
+    getObjectPtr<TH3F>(("__hClusterSizeVsTimeResidual__" + alg).data())->Reset();
 }
 
 void SVDClusterTimeShifterCollectorModule::collect()
 {
-  if (m_eventT0->hasEventT0()) {
-    float eventT0 = m_eventT0->getEventT0();
-    getObjectPtr<TH1F>("hEventT0")->Fill(eventT0);
+  float eventT0 = 0;
+  // Set the CDC event t0 value if it exists
+  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+    auto evtT0List_CDC = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+    // The most accurate CDC event t0 value is the last one in the list.
+    eventT0 = evtT0List_CDC.back().eventT0;
+  } else {return;}
 
-    // Fill histograms clusters on tracks
-    for (auto alg : m_timeAlgorithms)
-      for (const auto& svdCluster : m_svdClsOnTrk[alg]) {
-        // get cluster time
-        float clTime = svdCluster.getClsTime();
-        int clSize = svdCluster.getSize();
-        if (clSize > m_maxClusterSize) clSize = m_maxClusterSize;
+  // Fill histograms clusters on tracks
+  for (auto alg : m_timeAlgorithms) {
 
-        TString binLabel = TString::Format("L%iS%iS%c",
-                                           svdCluster.getSensorID().getLayerNumber(),
-                                           svdCluster.getSensorID().getSensorNumber(),
-                                           svdCluster.isUCluster() ? 'U' : 'V');
-        int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
-        double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
-        getObjectPtr<TH3F>(("__hClusterSizeVsTimeResidual__" + alg).Data())->Fill(clTime - eventT0, clSize, sensorBinCenter);
-      }
-  }
+    if (!m_svdClsOnTrk[alg].isValid()) {
+      B2WARNING("!!!! List is not Valid: isValid() = " << m_svdClsOnTrk[alg].isValid());
+      return;
+    }
+    for (const auto& svdCluster : m_svdClsOnTrk[alg]) {
+
+      // get cluster time
+      float clTime = svdCluster.getClsTime();
+      int clSize = svdCluster.getSize();
+      if (clSize > m_maxClusterSize) clSize = m_maxClusterSize;
+
+      TString binLabel = TString::Format("L%iS%iS%c",
+                                         svdCluster.getSensorID().getLayerNumber(),
+                                         svdCluster.getSensorID().getSensorNumber(),
+                                         svdCluster.isUCluster() ? 'U' : 'V');
+      int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
+      double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
+      getObjectPtr<TH3F>(("__hClusterSizeVsTimeResidual__" + alg).data())->Fill(clTime - eventT0, clSize, sensorBinCenter);
+    }
+  } // loop over alg
 }

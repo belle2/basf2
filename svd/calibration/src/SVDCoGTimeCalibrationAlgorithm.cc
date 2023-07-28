@@ -12,7 +12,9 @@
 
 #include <TF1.h>
 #include <TProfile.h>
+#include <TH1F.h>
 #include <TH2F.h>
+#include <TH3F.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
 #include <TString.h>
@@ -32,9 +34,6 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
   gROOT->SetBatch(true);
-
-  int ladderOfLayer[4] = {7, 10, 12, 16};
-  int sensorOnLayer[4] = {2, 3, 4, 5};
 
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
@@ -74,19 +73,43 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   m_tree->Branch("ndf", &ndf, "ndf/I");
   m_tree->Branch("p", &p, "p/F");
 
-  for (int layer = 0; layer < 4; layer++) {
-    layer_num = layer + 3;
-    for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
-      ladder_num = ladder + 1;
-      for (int sensor = 0; sensor < (int)sensorOnLayer[layer]; sensor++) {
-        sensor_num = sensor + 1;
-        for (view  = 1; view > -1; view--) {
-          char side = 'U';
-          if (view == 0)
-            side = 'V';
-          auto hEventT0vsCoG = getObjectPtr<TH2F>(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+  auto __hEventT0vsCoG__ = getObjectPtr<TH3F>("__hEventT0vsCoG__");
+  auto __hEventT0__ = getObjectPtr<TH2F>("__hEventT0__");
+  auto __hEventT0NoSync__ = getObjectPtr<TH2F>("__hEventT0NoSync__");
+  auto __hBinToSensorMap__ = getObjectPtr<TH1F>("__hBinToSensorMap__");
+
+  for (int ij = 0; ij < (__hBinToSensorMap__->GetNbinsX()); ij++) {
+    {
+      {
+        {
+
+          auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
+          char side;
+          std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
+          view = 0;
+          if (side == 'U')
+            view = 1;
+
+          B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
+
+          __hEventT0vsCoG__->GetZaxis()->SetRange(ij + 1, ij + 1);
+          auto hEventT0vsCoG  = (TH2D*)__hEventT0vsCoG__->Project3D("yxe");
+          auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1);
+          auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1);
+
+          hEventT0vsCoG->SetName(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          hEventT0->SetName(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          hEventT0nosync->SetName(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+
+          char sidePN = (side == 'U' ? 'P' : 'N');
+          hEventT0vsCoG->SetTitle(Form("EventT0Sync vs rawTime in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hEventT0->SetTitle(Form("EventT0Sync in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hEventT0nosync->SetTitle(Form("EventT0NoSync in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+
+          hEventT0vsCoG->SetDirectory(0);
+          hEventT0->SetDirectory(0);
+          hEventT0nosync->SetDirectory(0);
+
           B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
                  " Entries (n. clusters): " << hEventT0vsCoG->GetEntries());
           if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
@@ -141,6 +164,9 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           pfx->Write();
 
           delete pfx;
+          delete hEventT0vsCoG;
+          delete hEventT0;
+          delete hEventT0nosync;
 
           if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
             f->Close();
@@ -154,7 +180,6 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
             p    = tfr->Prob();
             m_tree->Fill();
           }
-
         }
       }
     }

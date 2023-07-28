@@ -67,6 +67,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("returnClusterRawTime", m_returnRawClusterTime,
            "if True, returns the raw cluster time (to be used for time calibration).",
            m_returnRawClusterTime);
+  addParam("shiftSVDClusterTime", m_shiftSVDClusterTime,
+           "if True, applies SVDCluster time shift based on cluster-size.", m_shiftSVDClusterTime);
   addParam("SeedSN", m_cutSeed,
            "minimum SNR for strips to be considered as cluster seed. Overwritten by the dbobject, unless you set useDB = False.", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
@@ -411,6 +413,12 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     if (isMC) {
       alterClusterPosition();
       alterClusterTime();
+    } else {
+      if (m_svdClusterTimeShifter.isValid() &&
+          !m_returnRawClusterTime &&
+          m_shiftSVDClusterTime) {
+        shiftSVDClusterTime();
+      }
     }
   }
 }
@@ -547,6 +555,26 @@ void SVDClusterizerModule::alterClusterTime()
 
   B2DEBUG(20, "Layer number: " << sensorID.getLayerNumber() << ", is U side: " << isU << ", sigma: " << sigma <<
           ", cluster time: " << clsTime << ", fudge factor: " << fudgeFactor);
+}
+
+void SVDClusterizerModule::shiftSVDClusterTime()
+{
+  // alter the time of the last cluster in the array
+  int clsIndex = m_storeClusters.getEntries() - 1;
+
+  // get the necessary information on the cluster
+  float clsTime = m_storeClusters[clsIndex]->getClsTime();
+
+  TString algo = m_timeRecoWith6SamplesAlgorithm;
+  if (m_numberOfAcquiredSamples == 3) algo = m_timeRecoWith3SamplesAlgorithm;
+
+  clsTime -= m_svdClusterTimeShifter->getClusterTimeShift(algo,
+                                                          m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
+                                                          m_storeClusters[clsIndex]->getSensorID().getSensorNumber(),
+                                                          m_storeClusters[clsIndex]->isUCluster(),
+                                                          m_storeClusters[clsIndex]->getSize());
+
+  m_storeClusters[clsIndex]->setClsTime(clsTime);
 }
 
 void SVDClusterizerModule::endRun()

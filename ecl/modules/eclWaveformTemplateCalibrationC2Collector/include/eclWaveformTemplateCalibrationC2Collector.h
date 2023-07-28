@@ -50,6 +50,10 @@ namespace Belle2 {
     int m_MinCellID; /**< Minimum Cell ID  */
     int m_MaxCellID; /**< Maximum Cell ID  */
 
+    int m_ADCFloorThreshold; /**< Used to determine if waveform hit ADC floor */
+    int m_baselineLimit; /**< Number of points to compute baseline */
+    const int m_numberofADCPoints = 31; /**< Number of ADC points in waveform */
+
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
 

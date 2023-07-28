@@ -33,7 +33,7 @@ eclWaveformTemplateCalibrationC2Algorithm::eclWaveformTemplateCalibrationC2Algor
   CalibrationAlgorithm("eclWaveformTemplateCalibrationC2Collector")
 {
   setDescription(
-    "Perform the photon template shape calibration usin high energy crystals from e+e- --> gamma gamma events"
+    "Perform the photon template shape calibration using waveforms from high energy crystals from e+e- --> gamma gamma events"
   );
 
 }
@@ -47,8 +47,8 @@ namespace {
   double fitf(double* x, double* par)
   {
 
-    double xtoeval = std::fmod(x[0], 31);
-    int whichFitFunctions = x[0] / 31;
+    double xtoeval = std::fmod(x[0], m_NumberofADCPoints);
+    int whichFitFunctions = x[0] / m_NumberofADCPoints;
 
     for (int i = 0; i < FitFunctions.size(); i++) {
       FitFunctions[i]->SetParameter(0, par[i]);
@@ -87,7 +87,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   TFile* histfile = new TFile(m_outputName.c_str(), "recreate");
 
   /** File to save arrays of photon templates, once determined. Needed in for C3 algorithm to follow */
-  TFile* f = new TFile(Form("PhotonShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID), "RECREATE");
+  TFile* f_PhotonTemplateOutput = new TFile(Form("PhotonShapes_Low%d_High%d.root", m_firstCellID, m_lastCellID), "RECREATE");
   TTree* mtree = new TTree("mtree", "");
   std::vector<double> PhotonWaveformArray(100000);
   mtree->Branch("PhotonArray", PhotonWaveformArray.data(), "PhotonWaveformArray[100000]/D");
@@ -96,9 +96,9 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   auto tree = getObjectPtr<TTree>("tree");
   int CellID;
   tree->SetBranchAddress("CellID", &CellID);
-  std::vector<int> Waveform(31);
-  std::vector<int> XValues(31);
-  for (int i = 0; i < 31; i++) {
+  std::vector<int> Waveform(m_NumberofADCPoints);
+  std::vector<int> XValues(m_NumberofADCPoints);
+  for (int i = 0; i < m_NumberofADCPoints; i++) {
     tree->SetBranchAddress(Form("ADC%d", i), &Waveform[i]);
     XValues[i] = i;
   }
@@ -189,7 +189,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
         double maxval = 0;
         double maxIndex = 0;
-        for (int j = 0; j < 31; j++) {
+        for (int j = 0; j < m_NumberofADCPoints; j++) {
           xValuesToFit.push_back(counter);
           yValuesToFit.push_back(Waveform[j]);
           if (Waveform[j] > maxval) {
@@ -237,7 +237,8 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
       }
 
       /** fitf defined in namespace above calls FitFunctions[i] */
-      TF1* TotalFitFunction = new TF1("TotalFitFunction", fitf, 0, counterWaveforms * 31, (3 * FitFunctions.size()) + 10);
+      TF1* TotalFitFunction = new TF1("TotalFitFunction", fitf, 0, counterWaveforms * m_NumberofADCPoints,
+                                      (3 * FitFunctions.size()) + 10);
 
       /** Initializing parameters for TotalFitFunction */
       int FFsize = FitFunctions.size();
@@ -257,7 +258,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
       }
 
       /** Performing the simultaneous fit */
-      gWaveformToFit->Fit("TotalFitFunction", "Q M W N 0 R", "", 0, counterWaveforms  * 31);
+      gWaveformToFit->Fit("TotalFitFunction", "Q M W N 0 R", "", 0, counterWaveforms  * m_NumberofADCPoints);
 
       /** next checking fit result by computing maximum value of Data/Fit */
       std::vector<int> FitResultY;
@@ -276,7 +277,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         double diff = fabs(yValuesToFit[k] - yVal);
         if (diff > maxResidual) {
           maxResidual = diff;
-          maxResidualWaveformID = (k / 31);
+          maxResidualWaveformID = (k / m_NumberofADCPoints);
           maxResidualOld = fabs(yValuesToFit[k] / yVal);
         }
       }
@@ -321,12 +322,12 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         AttemptCounter++;
 
         /** Ensure at least 3 waveforms used in simultaneous fit  */
-        if (counterWaveforms < 3)  AttemptCounter = m_AttemptLimit;
+        if (counterWaveforms < m_SimutaniousFitLimit)  AttemptCounter = m_AttemptLimit;
 
         /** If fit is not successful after several attempts, parameter limits are increased.  */
         if (AttemptCounter == m_AttemptLimit) {
 
-          m_ParamLimitFactor += 0.5;
+          m_ParamLimitFactor += m_ParLimitFactorIterator;
 
           B2INFO("AttemptCounter reach limit: " << AttemptCounter << " counterWaveforms: " << counterWaveforms);
           B2INFO("Increasing m_ParamLimitFactor to " << m_ParamLimitFactor);
@@ -336,10 +337,10 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
           AttemptCounter = 0;
 
           /** If fit is still not successful after several increases to the parameter limits, then resLimit is relaxed.  */
-          if (m_ParamLimitFactor > 2.1) {
-            resLimit *= 1.5;
+          if (m_ParamLimitFactor > m_ParLimitFactorLimit) {
+            resLimit *= m_ResLimitIterator;
             B2INFO("Increasing resLimit to " << resLimit);
-            m_ParamLimitFactor = 0.25;
+            m_ParamLimitFactor = m_BaseParamLimitFactor;
           }
         }
 
@@ -355,7 +356,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
         /** reseting for next crystal  */
         AttemptCounter = 0;
-        m_ParamLimitFactor = 0.25;
+        m_ParamLimitFactor = m_BaseParamLimitFactor;
 
         auto gFitResult = new TGraph(FitResultX.size(), FitResultX.data(), FitResultY.data());
         gFitResult->SetName(Form("gFitResult_%d", int(cellid)));
@@ -394,7 +395,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         double MaxVal = -1.0;
         const double cnpts = 2000;
         for (int k = 0; k < cnpts; k++) {
-          double xVal = (k * 31.0 / cnpts);
+          double xVal = (k * double(m_NumberofADCPoints) / cnpts);
           double yVal = FitFunctions[0]->Eval(xVal);
           if (yVal > MaxVal) MaxVal = yVal;
         }
@@ -429,9 +430,15 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   gmaxResidual->Write();
   glimitResidualArray->Write();
   gparLimitFactorArray->Write();
-  f->cd();
+  histfile->Write();
+  histfile->Close();
+  delete histfile;
+
+  f_PhotonTemplateOutput->cd();
   mtree->Write();
-  f->Write();
+  f_PhotonTemplateOutput->Write();
+  f_PhotonTemplateOutput->Close();
+  delete f_PhotonTemplateOutput;
 
   /** Storing dbobject.  Will be accessed in merging stage (C4). */
   saveCalibration(PhotonParameters, Form("PhotonParameters_CellID%d_CellID%d", m_firstCellID, m_lastCellID));

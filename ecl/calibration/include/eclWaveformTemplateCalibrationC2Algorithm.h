@@ -64,6 +64,12 @@ namespace Belle2 {
       int m_CollectorLimit = 6; /**< max number of waveforms to simultaneously fit */
       double m_ParamLimitFactor = 0.25; /** Factor to determine parameter limits in fit */
       int m_AttemptLimit = 10;  /** Number of attempts before increasing parameter limits or resLimt */
+      const int m_NumberofADCPoints = 31;  /** Number of adc points in waveform */
+      const int m_SimutaniousFitLimit = 3;  /** Min number waveforms required for simultaneous fit */
+      double m_ParLimitFactorIterator = 0.5; /** Amount to increase m_ParamLimitFactor */
+      double m_ParLimitFactorLimit = 2.1; /** Max limit to increase m_ParamLimitFactor */
+      double m_ResLimitIterator = 1.5; /** Factor to increase resLimit*/
+      const double m_BaseParamLimitFactor = 0.25; /** Reset value of m_ParamLimitFactor */
 
     };
   }

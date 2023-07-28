@@ -33,13 +33,15 @@ eclWaveformTemplateCalibrationC2CollectorModule::eclWaveformTemplateCalibrationC
   m_eclWaveformTemplateCalibrationC1MaxResLimit("eclWaveformTemplateCalibrationC1MaxResLimit")
 {
   // Set module properties
-  setDescription("Module to export histogram of noise in waveforms from random trigger events");
+  setDescription("Module to export waveforms from gamma gamma events for waveform template calibrations");
   addParam("MinEnergyThreshold", m_MinEnergyThreshold, "Minimum energy threshold of online fit result for Fitting Waveforms (GeV).",
            2.0);
   addParam("MaxEnergyThreshold", m_MaxEnergyThreshold, "Maximum energy threshold of online fit result for Fitting Waveforms (GeV).",
            4.0);
   addParam("MinCellID", m_MinCellID, "Minimum CellID to run collector on", 0);
   addParam("MaxCellID", m_MaxCellID, "Maximum CellID to run collector on", 0);
+  addParam("BaselineLimit", m_baselineLimit, "Number of points to compute baseline", 12);
+  addParam("ADCFloorThreshold", m_ADCFloorThreshold, "Used to determine if waveform hit ADC floor", 10)
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -111,8 +113,6 @@ void eclWaveformTemplateCalibrationC2CollectorModule::prepare()
 void eclWaveformTemplateCalibrationC2CollectorModule::collect()
 {
 
-  int m_baselineLimit = 12;
-
   for (auto& aECLDsp : m_eclDsps) {
 
     const int CellId = aECLDsp.getCellId();
@@ -130,14 +130,15 @@ void eclWaveformTemplateCalibrationC2CollectorModule::collect()
       }
     }
 
-    // estimate crystal energy, only select high energy crystals
+    // estimate crystal energy, only select high energy crystals.
     if (energy < m_MinEnergyThreshold)  continue;
+    // Dont select very high amplitude to avoid diode-crossings
     if (energy > m_MaxEnergyThreshold)  continue;
 
-    // check if waveform has energy below 10 (indicates waveform hit ADC floor)
+    // check if waveform has point below m_ADCFloorThreshold (indicates waveform hit ADC floor)
     bool skipWaveform = false;
-    for (int i = 0; i < 31; i++) {
-      if (aECLDsp.getDspA()[i] < 10) skipWaveform = true;
+    for (int i = 0; i < m_numberofADCPoints; i++) {
+      if (aECLDsp.getDspA()[i] < m_ADCFloorThreshold) skipWaveform = true;
     }
     if (skipWaveform) continue;
 

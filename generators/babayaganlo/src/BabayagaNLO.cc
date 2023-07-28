@@ -335,9 +335,9 @@ void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, ROOT::Math
   int mode = 1;
   main_belle2_(&mode, &ecm, m_xpar, m_npar);
 
-  //Store the initial particles as virtual particles into the MCParticleGraph
-  storeParticle(mcGraph, momset_.bq1, 11, vertex, boost, true);
-  storeParticle(mcGraph, momset_.bp1, -11, vertex, boost, true);
+  //Store the initial particles as initial (non-virtual) particles into the MCParticleGraph
+  storeParticle(mcGraph, momset_.bq1, 11, vertex, boost, false, true, false);
+  storeParticle(mcGraph, momset_.bp1, -11, vertex, boost, false, true, false);
 
   //Store the final state fermions or photons (for 'gg') as real particle into the MCParticleGraph
   int pdg = 11;

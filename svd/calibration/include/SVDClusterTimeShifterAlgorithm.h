@@ -41,7 +41,6 @@ namespace Belle2 {
     /** Run algo on data*/
     virtual EResult calibrate() override;
 
-
   private:
 
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
@@ -50,16 +49,26 @@ namespace Belle2 {
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
   };
 
+  /** return a single gaus*/
+  inline double mySingleGaus(const double* x, const double* par)
+  {
+    double N = std::fabs(par[0]);
+    double a = par[1];
+    double b = par[2];
+    double e = std::fabs(par[3]);
+    return N * TMath::Gaus(x[0], a, b, true) + e;
+  };
+
   /** return a double gaus*/
   inline double myDoubleGaus(const double* x, const double* par)
   {
-    double N = par[0];
-    double f = par[1];
+    double N = std::fabs(par[0]);
+    double f = std::fabs(par[1]);
     double a = par[2];
     double b = par[3];
     double c = par[4];
     double d = par[5];
-    double e = par[6];
+    double e = std::fabs(par[6]);
     return (N * (f * TMath::Gaus(x[0], a, b) + (1 - f) * TMath::Gaus(x[0], c, d)) /
             (TMath::Sqrt(2. * TMath::Pi()) * ((b - d) * f + d)) + e);
   };

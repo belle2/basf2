@@ -252,7 +252,6 @@ namespace Belle2 {
     static ROOT::Math::PxPyPzEVector getMcBeamMomentum(int charge)
     {
       StoreArray<MCParticle> mcps;
-      ROOT::Math::PxPyPzEVector p;
       for (const auto& mcp : mcps) {
         if (mcp.isInitial() && mcp.getPDG() == -charge * 11) {
           return mcp.get4Vector();

@@ -557,8 +557,7 @@ namespace Belle2 {
     {
       if (p->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
         return Const::doubleNaN;
-      StoreArray<MCParticle> mcParticles{};
-      MCParticle* tmp_mcP = mcParticles[p->getMdstArrayIndex()];
+      const MCParticle* tmp_mcP = p->getMCParticle();
       if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tmp_mcP->getPDG()))))
         return Const::doubleNaN;
       Track* tmp_track = tmp_mcP->getRelated<Track>();

@@ -920,13 +920,19 @@ def run_server(
 
     if static_folder is None:
         sys.exit(
-            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
+            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to set "
             "to provide static HTML content. Did you run b2setup ?"
         )
 
     # join the paths of the various result folders
     results_folder = validationpath.get_results_folder(cwd_folder)
     comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
+
+    logging.info("Removing old plots and unpopular combinations")
+    validationfunctions.clear_plots(
+        comparison_folder,
+        validationfunctions.get_popular_revision_combinations(cwd_folder)
+    )
 
     logging.info(f"Serving static content from {static_folder}")
     logging.info(f"Serving result content and plots from {cwd_folder}")

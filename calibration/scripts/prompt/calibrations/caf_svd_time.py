@@ -51,8 +51,9 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "timeAlgorithms": ["CoG3", "ELS3"],
-                                   "max_events_per_run": 30000,
+                                   "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
+                                   "max_events_per_run":  60000,
+                                   "max_events_per_file": 30000,
                                    "isMC": False,
                                    "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],
@@ -210,6 +211,7 @@ def create_pre_collector_path(
         clusterizers,
         isMC=False,
         max_events_per_run=10000,
+        max_events_per_file=10000,
         useSVDGrouping=True,
         useRawtimeForTracking=False,
         is_validation=False):
@@ -231,7 +233,7 @@ def create_pre_collector_path(
 
     # Read from file only what is needed
     if not isMC:
-        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS, entrySequences=[f'0:{max_events_per_run}'])
+        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS, entrySequences=[f'0:{max_events_per_file - 1}'])
     else:
         path.add_module("RootInput")
 
@@ -302,6 +304,7 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     timeAlgorithms = expert_config["timeAlgorithms"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
+    max_events_per_file = expert_config["max_events_per_file"]  # Maximum number of events selected per each file
     isMC = expert_config["isMC"]
     linearCutsOnCoG3 = expert_config["linearCutsOnCoG3"]
     upperLineParameters = expert_config["upperLineParameters"]
@@ -313,7 +316,8 @@ def get_calibrations(input_data, **kwargs):
     useRawtimeForTracking = expert_config["useRawtimeForTracking"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
-                                                               max_events_per_run, random_select=True)
+                                                               max_events_per_run, random_select=True,
+                                                               max_events_per_file=max_events_per_file)
     good_input_files = list(reduced_file_to_iov_physics.keys())
 
     b2.B2INFO(f"Total number of files used as input = {len(good_input_files)}")
@@ -453,6 +457,7 @@ def get_calibrations(input_data, **kwargs):
     pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_clusterizers,
         isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
         useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking)
 
     # Decide what collector will be "managed" by the CAF
@@ -619,6 +624,7 @@ def get_calibrations(input_data, **kwargs):
     val_pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_val_clusterizers,
         isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
         useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking,
         is_validation=True)
 

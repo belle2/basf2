@@ -36,6 +36,9 @@ namespace Belle2 {
     /** Set the minimum entries required in the histograms */
     void setMinEntries(const int& minEntries) {m_minEntries = minEntries;}
 
+    /** Set algorithm for creating payload boundary */
+    void setTimeAlgorithmForIoV(const TString& alg) {m_timeAlgorithmForIoV = alg;}
+
   protected:
 
     /** Run algo on data*/
@@ -43,10 +46,22 @@ namespace Belle2 {
 
   private:
 
+    /** If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function
+    in the base class. */
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
+
+    /** setup the boundary finding*/
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
+    {
+      m_previousTimeMeanL3V.reset();
+    }
+
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
+    std::optional<float> m_previousTimeMeanL3V; /**< CoG of the previous run*/
     float m_allowedDeviationMean = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
     int m_minEntries = 1000; /**< Set the minimun number of entries required in the histograms*/
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
+    TString m_timeAlgorithmForIoV = "CoG3"; /**< Histogram of one algorithm is used to produce payload boundaries */
   };
 
   /** return a single gaus*/

@@ -62,6 +62,9 @@ void SVDClusterTimeShifterCollectorModule::prepare()
     __hClusterSizeVsTimeResidual__->GetYaxis()->SetTitle("Cluster Size");
     __hClusterSizeVsTimeResidual__->GetXaxis()->SetTitle("Cluster Time - EventT0 (ns)");
     registerObject<TH3F>(__hClusterSizeVsTimeResidual__->GetName(), __hClusterSizeVsTimeResidual__);
+
+    auto __hTimeL3V__ = new TH1F(("__hTimeL3V__" + alg).data(), (alg + "Time L3V").data(), 150, 0, 150);
+    registerObject<TH1F>(__hTimeL3V__->GetName(), __hTimeL3V__);
   }
 
   TH1F* __hBinToSensorMap__ = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
@@ -114,6 +117,9 @@ void SVDClusterTimeShifterCollectorModule::collect()
       int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
       double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
       getObjectPtr<TH3F>(("__hClusterSizeVsTimeResidual__" + alg).data())->Fill(clTime - eventT0, clSize, sensorBinCenter);
+
+      if (svdCluster.getSensorID().getLayerNumber() == 3 && svdCluster.isUCluster() == 0)
+        getObjectPtr<TH1F>(("__hTimeL3V__" + alg).data())->Fill(clTime);
     }
   } // loop over alg
 }

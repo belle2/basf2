@@ -64,8 +64,8 @@ void SVDTimeValidationCollectorModule::prepare()
   TH2F* __hClsDiffTimeOnTracks__ = new TH2F("__hClsDiffTimeOnTracks__", "clsDiffTimeOnTracks",
                                             300, -150, 150,
                                             numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
-  TH1F* __hBinToSensorMap__     = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
-                                           numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH1F* __hBinToSensorMap__      = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
+                                            numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
   __hClsTimeOnTracks__->GetYaxis()->SetTitle("sensor");
   __hClsTimeOnTracks__->GetXaxis()->SetTitle("clsTime_onTracks (ns)");
   __hClsTimeAll__->GetYaxis()->SetTitle("sensor");
@@ -93,9 +93,11 @@ void SVDTimeValidationCollectorModule::prepare()
 
 void SVDTimeValidationCollectorModule::startRun()
 {
+  getObjectPtr<TH1F>("hEventT0")->Reset();
   getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
   getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
   getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
+  getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
 }
 
 void SVDTimeValidationCollectorModule::collect()

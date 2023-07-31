@@ -43,12 +43,13 @@ namespace {
 
   // Used to perform simultaneous fits of multiple waveforms
   std::vector<TF1*> FitFunctions;
+  const double numberofADCPoints = 31.0;
 
   double fitf(double* x, double* par)
   {
 
-    double xtoeval = std::fmod(x[0], m_NumberofADCPoints);
-    int whichFitFunctions = x[0] / m_NumberofADCPoints;
+    double xtoeval = std::fmod(x[0], numberofADCPoints);
+    int whichFitFunctions = x[0] / numberofADCPoints;
 
     for (int i = 0; i < FitFunctions.size(); i++) {
       FitFunctions[i]->SetParameter(0, par[i]);
@@ -202,7 +203,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         /** guess arrays have one enrgy per waveform */
         guessBaseline.push_back(Waveform[0]);
         guessAmp.push_back(maxval);
-        guessTime.push_back((maxIndex - 4.5) * 0.5);
+        guessTime.push_back((maxIndex - 4.5) * 0.5);  /** rough estimate where t0 should occur */
 
         NtupleEntries.push_back(i);
         B2INFO("Entry: " << i);
@@ -215,6 +216,15 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
       /** waveforms to fit have been extracted from ttree  */
       B2INFO("CellID " << cellid << " counterWaveforms = " << counterWaveforms);
+
+      if (counterWaveforms < m_TotalCountsThreshold) {
+        B2INFO("eclWaveformTemplateCalibrationC2Algorithm: warning total entries for cell ID " <<  cellid << " is only: " <<
+               m_TotalCountsThreshold <<
+               " Requirement is : " << m_TotalCountsThreshold);
+        /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
+        return c_NotEnoughData;
+      }
+
 
       /** TGraph to fit */
       auto gWaveformToFit = new TGraph(xValuesToFit.size(), xValuesToFit.data(), yValuesToFit.data());

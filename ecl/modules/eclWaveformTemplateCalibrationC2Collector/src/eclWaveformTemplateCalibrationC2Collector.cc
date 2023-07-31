@@ -41,7 +41,7 @@ eclWaveformTemplateCalibrationC2CollectorModule::eclWaveformTemplateCalibrationC
   addParam("MinCellID", m_MinCellID, "Minimum CellID to run collector on", 0);
   addParam("MaxCellID", m_MaxCellID, "Maximum CellID to run collector on", 0);
   addParam("BaselineLimit", m_baselineLimit, "Number of points to compute baseline", 12);
-  addParam("ADCFloorThreshold", m_ADCFloorThreshold, "Used to determine if waveform hit ADC floor", 10)
+  addParam("ADCFloorThreshold", m_ADCFloorThreshold, "Used to determine if waveform hit ADC floor", 10);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 

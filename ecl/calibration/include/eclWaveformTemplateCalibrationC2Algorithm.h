@@ -66,6 +66,7 @@ namespace Belle2 {
       int m_AttemptLimit = 10;  /** Number of attempts before increasing parameter limits or resLimt */
       const int m_NumberofADCPoints = 31;  /** Number of adc points in waveform */
       const int m_SimutaniousFitLimit = 3;  /** Min number waveforms required for simultaneous fit */
+      const int m_TotalCountsThreshold = 6;  /** Min number waveforms required per crystal */
       double m_ParLimitFactorIterator = 0.5; /** Amount to increase m_ParamLimitFactor */
       double m_ParLimitFactorLimit = 2.1; /** Max limit to increase m_ParamLimitFactor */
       double m_ResLimitIterator = 1.5; /** Factor to increase resLimit*/

@@ -51,3 +51,24 @@ For ``ELS3`` we use the following calibration function:
 .. math::
 
    t_{\rm ELS3} = a + b t_{\rm raw} + \frac{c}{t_{\rm raw} - d}\quad {\rm for} \quad x < d - \frac{\sqrt{-c}}{4}
+
+
+.. _svdclustertimeshifting:
+
+SVD Cluster-Time Shift w.r.t. Cluster-Size
+------------------------------------------
+Mean of cluster-times shifts with size of the clusters as strips with lower amplitude delays the time. This is not simulated and only should be seen in Data. To compensate this, a shift is added to the calibrated time.
+
+The calculation of shift values is implemented in the :ref:`calibration_caf` and is run on **6-sample data** with AirFlow and depends on :ref:`svdtimecalib`.
+
+For all three time estimators ``CoG6``, ``CoG3`` and ``ELS3``, we build the 1D plot of the cluster-time :math:`\left[t^{\rm Calibrated}_{\rm Cluster} - t_0^{\rm Event}\right]`; where :math:`t_{\rm Cluster}` is calibrated time of clusters in an event and :math:`t_0^{\rm Event}` is the EventT0 (mainly from CDC). Then the 1D plots are processed to find the peak.
+
+#. First a plot is fitted with a single Gaussian function.
+#. Then the plot is fitted with a double Gaussian, using the fit result of the single Gaussian as initial parameters.
+#. The value of shift is then taken from
+
+   #. if double Gaussian fit is successful, mean of the smallest Gaussian
+   #. else if sigle Gaussian fit is successful, mean of the sigle Gaussian
+   #. else mean of the histogram.
+
+The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.

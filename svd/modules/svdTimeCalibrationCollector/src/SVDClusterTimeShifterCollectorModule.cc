@@ -82,8 +82,11 @@ void SVDClusterTimeShifterCollectorModule::prepare()
 
 void SVDClusterTimeShifterCollectorModule::startRun()
 {
-  for (auto alg : m_timeAlgorithms)
+  for (auto alg : m_timeAlgorithms) {
     getObjectPtr<TH3F>(("__hClusterSizeVsTimeResidual__" + alg).data())->Reset();
+    getObjectPtr<TH1F>(("__hTimeL3V__" + alg).data())->Reset();
+  }
+  getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
 }
 
 void SVDClusterTimeShifterCollectorModule::collect()

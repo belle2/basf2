@@ -179,6 +179,14 @@ Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTim
 
 	       wrapper with the hot strips as determined by ``SVDHotStripFinder``, strip granularity_
 
+.. _svdtimegroupingconfiguration:
+
+.. cpp:class:: SVDTimeGroupingConfiguration
+
+	       Stores parameters used in SVDTimeGrouping module, with detector granularity_
+
+   Check `SVDTimeGroupingConfiguration@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDTimeGroupingConfiguration&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003/4, revision **4** is calculated from *Exp24-Run1726* and should be used for data.
+
 
 Time Calibrations
 -----------------
@@ -215,11 +223,3 @@ Check `ELS3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleELSTime
 	       Time shift adjustment depending on cluster-size, with sensor-on-ladder granularity_
 
    Check `SVDClusterTimeShifter@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterTimeShifter&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1002/3/4 which corresponds to no shift, revision **3** is calculated from *Exp24,Run1726* and should only be used for data.
-
-.. _svdtimegroupingconfiguration:
-
-.. cpp:class:: SVDTimeGroupingConfiguration
-
-	       Stores parameters used in SVDTimeGrouping module, with detector granularity_
-
-   Check `SVDTimeGroupingConfiguration@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDTimeGroupingConfiguration&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003/4, revision **4** is calculated from *Exp24-Run1726* and should be used for data.

@@ -928,12 +928,6 @@ def run_server(
     results_folder = validationpath.get_results_folder(cwd_folder)
     comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
 
-    logging.info("Removing old plots and unpopular combinations")
-    validationfunctions.clear_plots(
-        comparison_folder,
-        validationfunctions.get_popular_revision_combinations(cwd_folder)
-    )
-
     logging.info(f"Serving static content from {static_folder}")
     logging.info(f"Serving result content and plots from {cwd_folder}")
 
@@ -963,6 +957,13 @@ def run_server(
 
     if not os.path.exists("plots"):
         os.mkdir("plots")
+
+    if os.path.exists("plots/rainbow.json"):
+        logging.info("Removing old plots and unpopular combinations")
+        validationfunctions.clear_plots(
+            comparison_folder,
+            validationfunctions.get_popular_revision_combinations(cwd_folder)
+        )
 
     # export js, css and html templates
     cherry_config["/static"] = {

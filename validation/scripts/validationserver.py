@@ -920,7 +920,7 @@ def run_server(
 
     if static_folder is None:
         sys.exit(
-            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
+            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to set "
             "to provide static HTML content. Did you run b2setup ?"
         )
 
@@ -957,6 +957,13 @@ def run_server(
 
     if not os.path.exists("plots"):
         os.mkdir("plots")
+
+    if os.path.exists("plots/rainbow.json"):
+        logging.info("Removing old plots and unpopular combinations")
+        validationfunctions.clear_plots(
+            comparison_folder,
+            validationfunctions.get_popular_revision_combinations(cwd_folder)
+        )
 
     # export js, css and html templates
     cherry_config["/static"] = {

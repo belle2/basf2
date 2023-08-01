@@ -2401,6 +2401,7 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00761719
   getUncertaintyPhi(): 0.0101563
   getUncertaintyTheta(): 0.00390625
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.165039
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2450,6 +2451,7 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00849609
   getUncertaintyPhi(): 0.00683594
   getUncertaintyTheta(): 0.00546875
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.195312
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2499,6 +2501,7 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00761719
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.469727
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2548,6 +2551,7 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.0351562
   getUncertaintyPhi(): 0.00332031
   getUncertaintyTheta(): 0.003125
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.734375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2597,6 +2601,7 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00732422
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.148438
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2647,6 +2652,7 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.0202148
   getUncertaintyPhi(): 0.00449219
   getUncertaintyTheta(): 0.00390625
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.775391
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2696,6 +2702,7 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.749023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2745,6 +2752,7 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.00976562
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2794,6 +2802,7 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00683594
+  getUniqueClusterId(): 8002
   getZernikeMVA(): 0.0175781
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2843,6 +2852,7 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
+  getUniqueClusterId(): 9001
   getZernikeMVA(): 0.62793
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2892,6 +2902,7 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00263672
   getUncertaintyPhi(): 0.0134766
   getUncertaintyTheta(): 0.00957031
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.09375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2943,6 +2954,7 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.00820313
+  getUniqueClusterId(): 10002
   getZernikeMVA(): 0.167969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3001,6 +3013,7 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.834961
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3050,6 +3063,7 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.530273
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3099,6 +3113,7 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.265625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3148,6 +3163,7 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3199,6 +3215,7 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.984375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8791,6 +8808,7 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00966797
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00351563
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.835938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8840,6 +8858,7 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.0125
   getUncertaintyTheta(): 0.00488281
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.181641
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8889,6 +8908,7 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00761719
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.212891
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8950,6 +8970,7 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.0140625
   getUncertaintyPhi(): 0.00546875
   getUncertaintyTheta(): 0.00449219
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.0537109
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9000,6 +9021,7 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.418945
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9049,6 +9071,7 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.553711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9098,6 +9121,7 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.618164
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9147,6 +9171,7 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00908203
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.598633
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9197,6 +9222,7 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 9001
   getZernikeMVA(): 0.371094
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9246,6 +9272,7 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.210938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9296,6 +9323,7 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.0249023
   getUncertaintyPhi(): 0.00410156
   getUncertaintyTheta(): 0.00351563
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.869141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9345,6 +9373,7 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 13001
   getZernikeMVA(): 0.0175781
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9395,6 +9424,7 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
+  getUniqueClusterId(): 13002
   getZernikeMVA(): 0.0126953
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9444,6 +9474,7 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
+  getUniqueClusterId(): 14001
   getZernikeMVA(): 0.474609
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9493,6 +9524,7 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
+  getUniqueClusterId(): 15001
   getZernikeMVA(): 0.210938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9542,6 +9574,7 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0136719
   getUncertaintyTheta(): 0.00957031
+  getUniqueClusterId(): 17001
   getZernikeMVA(): 0.0947266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9591,6 +9624,7 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.00820313
+  getUniqueClusterId(): 18001
   getZernikeMVA(): 0.283203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9653,6 +9687,7 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.946289
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9703,6 +9738,7 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 13001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -15955,6 +15991,7 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00703125
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00410156
+  getUniqueClusterId(): 1001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16004,6 +16041,7 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.0115234
   getUncertaintyTheta(): 0.00449219
+  getUniqueClusterId(): 2001
   getZernikeMVA(): 0.126953
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16057,6 +16095,7 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.261719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16106,6 +16145,7 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
+  getUniqueClusterId(): 3002
   getZernikeMVA(): 0.120117
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16155,6 +16195,7 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.009375
   getUncertaintyPhi(): 0.00644531
   getUncertaintyTheta(): 0.00527344
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.677734
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16206,6 +16247,7 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.0126953
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16256,6 +16298,7 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.0105469
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
+  getUniqueClusterId(): 6001
   getZernikeMVA(): 0.90332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16306,6 +16349,7 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.0131836
   getUncertaintyPhi(): 0.00566406
   getUncertaintyTheta(): 0.00449219
+  getUniqueClusterId(): 7001
   getZernikeMVA(): 0.925781
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16355,6 +16399,7 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
+  getUniqueClusterId(): 8001
   getZernikeMVA(): 0.638672
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16404,6 +16449,7 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00683594
+  getUniqueClusterId(): 9001
   getZernikeMVA(): 0.453125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16454,6 +16500,7 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00263672
   getUncertaintyPhi(): 0.0134766
   getUncertaintyTheta(): 0.009375
+  getUniqueClusterId(): 10001
   getZernikeMVA(): 0.611328
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16504,6 +16551,7 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00703125
+  getUniqueClusterId(): 11001
   getZernikeMVA(): 0.516602
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16553,6 +16601,7 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0140625
   getUncertaintyTheta(): 0.00996094
+  getUniqueClusterId(): 12001
   getZernikeMVA(): 0.408203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16607,6 +16656,7 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 3001
   getZernikeMVA(): 0.96875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16656,6 +16706,7 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 4001
   getZernikeMVA(): 0.322266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -16708,6 +16759,7 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
+  getUniqueClusterId(): 5001
   getZernikeMVA(): 0.987305
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False

@@ -19,9 +19,9 @@
 Alias eta'sig      eta'
 Alias etasig       eta
 
-Alias Kst+sig       K*+
-Alias Kst-sig       K*-
-ChargeConj Kst+sig Kst-sig
+Alias K*+sig       K*+
+Alias K*-sig       K*-
+ChargeConj K*+sig K*-sig
 
 Alias K_S0sig K_S0
 
@@ -39,7 +39,7 @@ Enddecay
 #
 
 Decay B+sig
-1.0 Kst+sig   eta'sig      PHOTOS SVS;
+1.0 K*+sig   eta'sig      PHOTOS SVS;
 Enddecay
 CDecay B-sig
 
@@ -63,10 +63,10 @@ Enddecay
 # K*+ -> Ks pi+
 #
 
-Decay Kst+sig
+Decay K*+sig
 1.0      K_S0sig  pi+                        PHOTOS VSS;
 Enddecay
-CDecay Kst-sig
+CDecay K*-sig
 
 #
 # Ks -> pi+ pi-

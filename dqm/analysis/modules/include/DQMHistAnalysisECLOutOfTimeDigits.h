@@ -37,28 +37,23 @@ namespace Belle2 {
     DQMHistAnalysisECLOutOfTimeDigitsModule();
 
     /** Destructor. */
-    ~DQMHistAnalysisECLOutOfTimeDigitsModule();
+    ~DQMHistAnalysisECLOutOfTimeDigitsModule() {}
 
     /** Initialize the module. */
     void initialize() override final;
-    /** Call when a run begins. */
-    void beginRun() override final;
     /** Event processor. */
     void event() override final;
     /** Call when a run ends. */
     void endRun() override final;
     /** Terminate. */
-    void terminate() override final;
+    void terminate() override final {}
 
   private:
-
-#ifdef _BELLE2_EPICS
-    /** EPICS channels for ECL out of time digits */
-    std::map<std::string, chid> chid_out_of_time_digits;
-#endif
-
     /**  Out-of-time ECLCalDigits for several cases */
     std::map<std::string, double> m_out_of_time_digits = {};
+
+    /** Prefix to use for PVs registered by this module */
+    std::string m_pvPrefix;
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
     TCanvas* m_c_main = nullptr; /**< main panel for monitoring object */

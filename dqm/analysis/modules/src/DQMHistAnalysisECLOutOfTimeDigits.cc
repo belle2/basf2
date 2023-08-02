@@ -20,50 +20,25 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: Constructor done.");
+  addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
+           std::string("DQM:ECL:out_of_time_digits:"));
 }
 
-
-DQMHistAnalysisECLOutOfTimeDigitsModule::~DQMHistAnalysisECLOutOfTimeDigitsModule()
-{
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
-}
 
 void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    // Register EPICS PVs
-    for (auto& event_type : {"rand", "dphy", "physics"}) {
-      for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
-        std::string key_name = event_type + std::string("_") + ecl_part;
-        std::string pv_name = std::string("ECL:DQM:out_of_time_digits:") + event_type + ":" + ecl_part;
-
-        // chid_out_of_time_digits[key_name] = 0;
-        SEVCHK(ca_create_channel(pv_name.c_str(), NULL, NULL, 10,
-                                 &chid_out_of_time_digits[key_name]),
-               "ca_create_channel failure");
-      }
+  // Register EPICS PVs
+  for (auto& event_type : {"rand", "dphy", "physics"}) {
+    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+      std::string pv_name  = event_type + std::string(":") + ecl_part;
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-#endif
+  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
-  m_c_main = new TCanvas("ecl_main");
-  m_monObj->addCanvas(m_c_main);
-
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: initialized.");
-}
-
-void DQMHistAnalysisECLOutOfTimeDigitsModule::beginRun()
-{
-  B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: beginRun called.");
 }
 
 void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
@@ -71,35 +46,29 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
   //== Get DQM info
   for (auto& event_type : {"rand", "dphy", "physics"}) {
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
-      std::string key_name = event_type + std::string("_") + ecl_part;
+      std::string pv_name = event_type + std::string(":") + ecl_part;
 
-      m_out_of_time_digits[key_name] = 0;
+      m_out_of_time_digits[pv_name] = 0;
 
-      std::string hist_name    = "ECL/out_of_time_" + key_name;
+      std::string hist_name    = "ECL/out_of_time_" + pv_name;
       TProfile* prof = (TProfile*)findHist(hist_name);
 
       if (!prof) continue;
 
-      m_out_of_time_digits[key_name] = prof->GetBinContent(1);
+      m_out_of_time_digits[pv_name] = prof->GetBinContent(1);
     }
   }
 
   //== Set EPICS PVs
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    for (auto& event_type : {"rand", "dphy", "physics"}) {
-      for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
-        std::string key_name = event_type + std::string("_") + ecl_part;
-        chid selected_chid = chid_out_of_time_digits[key_name];
-        double selected_value =  m_out_of_time_digits[key_name];
-        if (!selected_chid) continue;
-        SEVCHK(ca_put(DBR_DOUBLE, selected_chid, (void*)&selected_value), "ca_set failure");
-      }
+  for (auto& event_type : {"rand", "dphy", "physics"}) {
+    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+      std::string pv_name = event_type + std::string(":") + ecl_part;
+      double selected_value =  m_out_of_time_digits[pv_name];
+      setEpicsPV(pv_name, selected_value);
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-#endif
+  updateEpicsPVs(5.0);
 }
 
 void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
@@ -114,34 +83,14 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
 
   for (auto& event_type : {"rand", "dphy", "physics"}) {
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
-      std::string key_name = event_type + std::string("_") + ecl_part;
+      std::string pv_name  = event_type + std::string(":") + ecl_part;
+      std::string var_name = "out_of_time_digits_" + pv_name;
+      std::replace(var_name.begin(), var_name.end(), ':', '_');
       // set values of monitoring variables (if variable already exists this will
       // change its value, otherwise it will insert new variable)
-      m_monObj->setVariable("out_of_time_digits_" + key_name,
-                            m_out_of_time_digits[key_name]);
+      m_monObj->setVariable(var_name, m_out_of_time_digits[pv_name]);
     }
   }
-
 }
 
-
-void DQMHistAnalysisECLOutOfTimeDigitsModule::terminate()
-{
-  B2DEBUG(20, "terminate called");
-
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    for (auto& event_type : {"rand", "dphy", "physics"}) {
-      for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
-        std::string key_name = event_type + std::string("_") + ecl_part;
-
-        chid selected_chid = chid_out_of_time_digits[key_name];
-        if (!selected_chid) continue;
-        SEVCHK(ca_clear_channel(selected_chid), "ca_clear_channel failure");
-      }
-    }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
-}
 

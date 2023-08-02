@@ -22,6 +22,7 @@ Variables
   momenta of colliding electron/positron for the event. These are available only for MC.
   For `EvtGen` and `BabaYaga` generators these variables have dummy value for MC15 or older.
 
+* Added new variable `isTrackFound` for particles created from MCParticles.
 
 
 Changes in the analysis package in light-2305-korat

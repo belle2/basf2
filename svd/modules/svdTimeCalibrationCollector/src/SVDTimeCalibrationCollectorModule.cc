@@ -26,7 +26,7 @@ SVDTimeCalibrationCollectorModule::SVDTimeCalibrationCollectorModule() : Calibra
   setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", m_svdClusters);
+  addParam("SVDClustersFromTracksName", m_svdClustersOnTracks, "Name of the SVDClusters list", m_svdClustersOnTracks);
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
   addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", m_svdEventInfo);
   addParam("RawCoGBinWidth", m_rawCoGBinWidth, "Bin Width [ns] for raw CoG time", m_rawCoGBinWidth);
@@ -38,24 +38,6 @@ SVDTimeCalibrationCollectorModule::SVDTimeCalibrationCollectorModule() : Calibra
 
 void SVDTimeCalibrationCollectorModule::prepare()
 {
-  TH2F hEventT0vsCoG("eventT0vsCoG__L@layerL@ladderS@sensor@view",
-                     "EventT0Sync vs rawTime in @layer.@ladder.@sensor @view/@side",
-                     int(200 / m_rawCoGBinWidth), -100, 100, 60, -100, 20);
-  hEventT0vsCoG.GetYaxis()->SetTitle("EventT0Sync (ns)");
-  hEventT0vsCoG.GetXaxis()->SetTitle("raw_time (ns)");
-  m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
-
-  TH1F hEventT0("eventT0__L@layerL@ladderS@sensor@view",
-                "EventT0Sync in @layer.@ladder.@sensor @view/@side",
-                100, -100, 100);
-  hEventT0.GetXaxis()->SetTitle("event_t0 (ns)");
-  m_hEventT0 = new SVDHistograms<TH1F>(hEventT0);
-
-  TH1F hEventT0NoSync("eventT0nosync__L@layerL@ladderS@sensor@view",
-                      "EventT0NoSync in @layer.@ladder.@sensor @view/@side",
-                      100, -100, 100);
-  hEventT0NoSync.GetXaxis()->SetTitle("event_t0 (ns)");
-  m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
 
   m_hEventT0FromCDC = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
   registerObject<TH1F>("hEventT0FromCDC", m_hEventT0FromCDC);
@@ -66,45 +48,62 @@ void SVDTimeCalibrationCollectorModule::prepare()
   m_hRawTimeL3VFullRange = new TH1F("hRawTimeL3VFullRange", "RawTimeL3V full range", 400, -150, 250);
   registerObject<TH1F>("hRawTimeL3VFullRange", m_hRawTimeL3VFullRange);
 
-  m_svdCls.isRequired(m_svdClusters);
+  m_svdClsOnTrk.isRequired(m_svdClustersOnTracks);
   m_eventT0.isRequired(m_eventTime);
-//  m_svdEI.isRequired(m_svdEventInfo);
+  //  m_svdEI.isRequired(m_svdEventInfo);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+  std::vector<Belle2::VxdID> allSensors;
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+    for (auto ladder : geoCache.getLadders(layer))
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+        allSensors.push_back(sensor);
 
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-          registerObject<TH2F>(m_hEventT0vsCoG->getHistogram(sensor, view)->GetName(), m_hEventT0vsCoG->getHistogram(sensor, view));
-          registerObject<TH1F>(m_hEventT0->getHistogram(sensor, view)->GetName(), m_hEventT0->getHistogram(sensor, view));
-          registerObject<TH1F>(m_hEventT0nosync->getHistogram(sensor, view)->GetName(), m_hEventT0nosync->getHistogram(sensor, view));
-        }
-      }
+  int numberOfSensorBin = 2 * int(allSensors.size());
+  B2INFO("Number of SensorBin: " << numberOfSensorBin);
+
+  TH3F* __hEventT0vsCoG__   = new TH3F("__hEventT0vsCoG__", "EventT0Sync vs rawTime",
+                                       int(200 / m_rawCoGBinWidth), -100, 100, 60, -100, 20,
+                                       numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH2F* __hEventT0__        = new TH2F("__hEventT0__", "EventT0Sync",
+                                       100, -100, 100,
+                                       numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH2F* __hEventT0NoSync__  = new TH2F("__hEventT0NoSync__", "EventT0NoSync",
+                                       100, -100, 100,
+                                       numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH1F* __hBinToSensorMap__ = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
+                                       numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  __hEventT0vsCoG__->GetZaxis()->SetTitle("Sensor");
+  __hEventT0vsCoG__->GetYaxis()->SetTitle("EventT0Sync (ns)");
+  __hEventT0vsCoG__->GetXaxis()->SetTitle("raw_time (ns)");
+  __hEventT0__->GetYaxis()->SetTitle("Sensor");
+  __hEventT0__->GetXaxis()->SetTitle("event_t0 (ns)");
+  __hEventT0NoSync__->GetYaxis()->SetTitle("sensor");
+  __hEventT0NoSync__->GetXaxis()->SetTitle("event_t0 (ns)");
+
+  int tmpBinCnt = 0;
+  for (auto sensor : allSensors) {
+    for (auto view : {'U', 'V'}) {
+      tmpBinCnt++;
+      TString binLabel = TString::Format("L%iL%iS%i%c",
+                                         sensor.getLayerNumber(),
+                                         sensor.getLadderNumber(),
+                                         sensor.getSensorNumber(),
+                                         view);
+      __hBinToSensorMap__->GetXaxis()->SetBinLabel(tmpBinCnt, binLabel);
     }
   }
+  registerObject<TH3F>(__hEventT0vsCoG__->GetName(), __hEventT0vsCoG__);
+  registerObject<TH2F>(__hEventT0__->GetName(), __hEventT0__);
+  registerObject<TH2F>(__hEventT0NoSync__->GetName(), __hEventT0NoSync__);
+  registerObject<TH1F>(__hBinToSensorMap__->GetName(), __hBinToSensorMap__);
 }
 
 void SVDTimeCalibrationCollectorModule::startRun()
 {
-
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (int view = SVDHistograms<TH2F>::VIndex ; view < SVDHistograms<TH2F>::UIndex + 1; view++) {
-          // std::string s = std::string(sensor);
-          // std::string v = std::to_string(view);
-          // std::string name = string("eventT0vsCog_")+s+string("_")+v;
-          // registerObject<TH2F>(name.c_str(),m_hEventT0vsCoG->getHistogram(sensor, view));
-          getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(sensor, view)->GetName())->Reset();
-          getObjectPtr<TH1F>(m_hEventT0->getHistogram(sensor, view)->GetName())->Reset();
-          getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(sensor, view)->GetName())->Reset();
-        }
-      }
-    }
-  }
+  getObjectPtr<TH3F>("__hEventT0vsCoG__")->Reset();
+  getObjectPtr<TH2F>("__hEventT0__")->Reset();
+  getObjectPtr<TH2F>("__hEventT0NoSync__")->Reset();
 }
 
 void SVDTimeCalibrationCollectorModule::collect()
@@ -119,8 +118,8 @@ void SVDTimeCalibrationCollectorModule::collect()
     getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(eventT0);
   } else {return;}
 
-  if (!m_svdCls.isValid()) {
-    B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
+  if (!m_svdClsOnTrk.isValid()) {
+    B2WARNING("!!!! File is not Valid: isValid() = " << m_svdClsOnTrk.isValid());
     return;
   }
 
@@ -133,28 +132,35 @@ void SVDTimeCalibrationCollectorModule::collect()
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
   eventinfo->setAPVClock(m_hwClock);
 
-  for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
+  for (const auto& svdCluster : m_svdClsOnTrk) {
     // get cluster time
-    float clTime_ftsw = m_svdCls[cl]->getClsTime();
+    float clTime_ftsw = svdCluster.getClsTime();
 
     //remove firstFrame and triggerBin correction applied in the clusterizer AND relative shift 3/6 mixed sample DAQ
-    float clTime = eventinfo->getTimeInSVDReference(clTime_ftsw, m_svdCls[cl]->getFirstFrame());
+    float clTime = eventinfo->getTimeInSVDReference(clTime_ftsw, svdCluster.getFirstFrame());
 
     //get cluster side
-    int side = m_svdCls[cl]->isUCluster();
+    int side = svdCluster.isUCluster();
 
-    //get VxdID
-    VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
-    short unsigned int layer = m_svdCls[cl]->getSensorID().getLayerNumber();
+    //get layer
+    short unsigned int layer = svdCluster.getSensorID().getLayerNumber();
 
     //fill histograms only if EventT0 is there
     if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
 
-      float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, m_svdCls[cl]->getFirstFrame());
+      float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, svdCluster.getFirstFrame());
 
-      getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
-      getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
-      getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
+      TString binLabel = TString::Format("L%iL%iS%i%c",
+                                         svdCluster.getSensorID().getLayerNumber(),
+                                         svdCluster.getSensorID().getLadderNumber(),
+                                         svdCluster.getSensorID().getSensorNumber(),
+                                         side ? 'U' : 'V');
+      int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
+      double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
+      getObjectPtr<TH3F>("__hEventT0vsCoG__")->Fill(clTime, eventT0Sync, sensorBinCenter);
+      getObjectPtr<TH2F>("__hEventT0__")->Fill(eventT0Sync, sensorBinCenter);
+      getObjectPtr<TH2F>("__hEventT0NoSync__")->Fill(eventT0, sensorBinCenter);
+
       getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {
         if (clTime_ftsw >= m_minRawTimeForIoV && clTime_ftsw <= m_maxRawTimeForIoV) {

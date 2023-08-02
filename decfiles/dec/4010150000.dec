@@ -1,34 +1,34 @@
 # EventType: 4010150000 
 # Descriptor: [B+ -> K+ LLP LLP [-> mu+ mu-] ]
 # NickName: Bp_kp2LLP_2LLPTo2tr
-# Documentation:BtoK-LLP signal for dark LLP studies.The LLP are long-lived dark matter particles decaying into 2 tracks (2e, 2mu, 2pi #, 2K, or some combination)
-# Tested:No
+# Documentation: BtoK-LLP signal for dark LLP studies. The LLP are long-lived dark matter particles decaying into 2 muons
+# Tested: No
 # Physics WG: Ds&LM
 # Responsible: Trevor Shillington 
 # Email: trshillington@gmail.com
 # Cuts: None
 # Date: 20230721
 
+# LLP particle generated with parameters:
+# pdg_LLP = 100, mass_LLP = [0.45, 0.8, 1.5, 2.2], width_LLP = 0, charge_LLP = 0, spin_LLP = 0
+# via the basf2 module:
+# pdg.add_particle('LLP', pdg_LLP, mass_LLP, width_LLP, charge_LLP, spin_LLP)
+# and displaced with lifetimeOption = 'flat' and maxDecayTime = 60, via: 
+# displacer = b2.register_module("GeneratedVertexDisplacer")
 
 # Decay file for 
 # Trevor Shillington 2023
 #
 
-Alias BtoS+ B+sig 
-Alias BtoS- B-sig
-
 Decay Upsilon(4S)
-0.500 BtoS+  B- VSS;
-0.500 BtoS-  B+ VSS;
+0.500 B+sig  B- VSS;
+0.500 B-sig  B+ VSS;
 Enddecay
 
-Decay BtoS+
+Decay B+sig
 1.000 K+ LLP LLP PHSP;
 Enddecay
-
-Decay BtoS-
-1.000 K- LLP LLP PHSP;
-Enddecay
+CDecay B-sig
 
 Decay LLP
 1.000 mu+ mu- PHSP;

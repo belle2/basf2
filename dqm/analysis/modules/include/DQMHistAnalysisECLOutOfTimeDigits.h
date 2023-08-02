@@ -8,19 +8,11 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
-#endif
 
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
-
-//std
-#include <set>
-
-//ECL
-#include <ecl/dbobjects/ECLChannelMap.h>
 
 namespace Belle2 {
 
@@ -56,7 +48,6 @@ namespace Belle2 {
     std::string m_pvPrefix;
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
-    TCanvas* m_c_main = nullptr; /**< main panel for monitoring object */
   };
 } // end namespace Belle2
 

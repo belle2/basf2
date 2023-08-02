@@ -51,7 +51,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
       m_out_of_time_digits[pv_name] = 0;
 
       std::string hist_name    = "ECL/out_of_time_" + pv_name;
-      TProfile* prof = (TProfile*)findHist(hist_name);
+      auto prof = (TProfile*)findHist(hist_name);
 
       if (!prof) continue;
 

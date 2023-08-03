@@ -10,6 +10,9 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -29,11 +32,10 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
   if (not fromStateCache.isHitState) {
-    // We are coming from an SVD track, so we can use its position to only look for matching ladders
-    if (abs(phiDiff) < 0.2f) {
+    // We are coming from an SVD / CDC-SVD track, so we can use its position to only look for matching ladders
+    if (abs(phiDiff) < m_param_PhiRecoTrackToHitCut) {
       return 1.0;
     }
-
     return NAN;
   }
 
@@ -44,9 +46,17 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
     return 1.0;
   }
 
-  if (abs(phiDiff) < 0.05f) {
+  if (abs(phiDiff) < m_param_PhiHitHitCut) {
     return 1.0;
   }
 
   return NAN;
+}
+
+void DistancePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+                                "Cut in phi for the difference between RecoTrack (seed) mSoP.getPos() and current hit-based state.", m_param_PhiRecoTrackToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
+                                "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
 }

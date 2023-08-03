@@ -143,25 +143,11 @@ namespace Belle2 {
       return ROOT::Math::XYZVector(m_Position[0], m_Position[1], m_Position[2]);
     }
 
-    //! Get position of this extrapolation hit
-    //! @return position (cm) of this extrapolation hit
-    TVector3 getPositionTVector3() const
-    {
-      return TVector3(m_Position[0], m_Position[1], m_Position[2]);
-    }
-
     //! Get momentum at this extrapolation hit
     //! @return momentum (GeV/c) at this extrapolation hit
     ROOT::Math::XYZVector getMomentum() const
     {
       return ROOT::Math::XYZVector(m_Momentum[0], m_Momentum[1], m_Momentum[2]);
-    }
-
-    //! Get momentum at this extrapolation hit
-    //! @return momentum (GeV/c) at this extrapolation hit
-    TVector3 getMomentumTVector3() const
-    {
-      return TVector3(m_Momentum[0], m_Momentum[1], m_Momentum[2]);
     }
 
     //! Get phase-space covariance at this extrapolation hit

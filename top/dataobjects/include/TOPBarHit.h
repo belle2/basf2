@@ -102,13 +102,6 @@ namespace Belle2 {
 
     /**
      * Returns impact point
-     * TODO: to be removed when the constructor from GenVector classes is provided in ExtHit
-     * @return impact position
-     */
-    TVector3 getPositionTVector3() const { return TVector3(m_x, m_y, m_z);}
-
-    /**
-     * Returns impact point
      * @return impact position
      */
     ROOT::Math::XYZPoint getLocalPosition() const { return ROOT::Math::XYZPoint(m_xloc, m_yloc, m_zloc);}
@@ -118,13 +111,6 @@ namespace Belle2 {
      * @return impact momentum vector
      */
     ROOT::Math::XYZVector getMomentum() const {return ROOT::Math::XYZVector(m_px, m_py, m_pz);}
-
-    /**
-     * Returns impact momentum
-     * TODO: to be removed when the constructor from GenVector classes is provided in ExtHit
-     * @return impact momentum vector
-     */
-    TVector3 getMomentumTVector3() const {return TVector3(m_px, m_py, m_pz);}
 
     /**
      * Returns tract length from production to impact point

@@ -33,7 +33,7 @@
 #pragma link C++ class Belle2::CDCGeometry::OuterWall+; // checksum=0xb1927149, version=1
 #pragma link C++ class Belle2::CDCGeometry::SenseLayer+; // checksum=0xc500e4df, version=1
 #pragma link C++ class Belle2::CDCGeometry::FieldLayer+; // checksum=0x4f3b3d3c, version=1
-#pragma link C++ class Belle2::CDCTriggerPlane+; // checksum=0xf09a69e5, version=1
+#pragma link C++ class Belle2::CDCTriggerPlane+; // checksum=0x7cd1e0e8, version=2
 #pragma link C++ class Belle2::CDCADCDeltaPedestals+; // checksum=0x4f3c632d, version=1
 #pragma link C++ class Belle2::CDCFEElectronics+; // checksum=0x14613816, version=2
 #pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=3
@@ -93,6 +93,7 @@
 #pragma read \
   sourceClass="Belle2::CDCDisplacement" source="TVector3 m_fwd" version="[-3]" \
   targetClass="Belle2::CDCDisplacement" target="m_fwd" \
+  include="TVector3.h" \
   code = "{ \
             m_fwd.SetXYZ(onfile.m_fwd.X(), \
                          onfile.m_fwd.Y(), \
@@ -105,6 +106,7 @@
 #pragma read \
   sourceClass="Belle2::CDCDisplacement" source="TVector3 m_bwd" version="[-3]" \
   targetClass="Belle2::CDCDisplacement" target="m_bwd" \
+  include="TVector3.h" \
   code = "{ \
             m_bwd.SetXYZ(onfile.m_bwd.X(), \
                          onfile.m_bwd.Y(), \

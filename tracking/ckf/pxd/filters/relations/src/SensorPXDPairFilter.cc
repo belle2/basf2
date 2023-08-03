@@ -66,7 +66,9 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
 void SensorPXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
-                                "Cut in phi for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_PhiRecoTrackToHitCut);
+                                "Cut in phi for the difference between RecoTrack (seed) mSoP.getPos().Phi() and current hit-based state using its sensor centre phi.",
+                                m_param_PhiRecoTrackToHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
-                                "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
+                                "Cut in phi between two hit-based states comparing the sensor centre phi of both states.",
+                                m_param_PhiHitHitCut);
 }

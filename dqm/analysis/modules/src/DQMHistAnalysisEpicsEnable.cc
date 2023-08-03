@@ -47,7 +47,7 @@ void DQMHistAnalysisEpicsEnableModule::initialize()
 #ifdef _BELLE2_EPICS
   setUseEpics(true); // set always true
   setUseEpicsReadOnly(m_useEpicsRO);
-  setPVprefix(m_locPVPrefix);
+  setPVPrefix(m_locPVPrefix);
 #endif
 }
 

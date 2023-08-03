@@ -380,9 +380,9 @@ void CDCDedxPIDModule::event()
       }
 
       // find the position of the endpoints of the sense wire
-      const TVector3& wirePosF = cdcgeo.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
-      const TVector3& wirePosB = cdcgeo.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
-      const TVector3 wireDir = (wirePosB - wirePosF).Unit();
+      const ROOT::Math::XYZVector& wirePosF = cdcgeo.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
+      const ROOT::Math::XYZVector& wirePosB = cdcgeo.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
+      const ROOT::Math::XYZVector wireDir = (wirePosB - wirePosF).Unit();
 
       int nWires = cdcgeo.nWiresInLayer(currentLayer);
 
@@ -390,12 +390,12 @@ void CDCDedxPIDModule::event()
       double inner = cdcgeo.innerRadiusWireLayer()[currentLayer];
       double outer = cdcgeo.outerRadiusWireLayer()[currentLayer];
 
-      double topHeight = outer - wirePosF.Perp();
-      double bottomHeight = wirePosF.Perp() - inner;
+      double topHeight = outer - wirePosF.Rho();
+      double bottomHeight = wirePosF.Rho() - inner;
       double cellHeight = topHeight + bottomHeight;
       double topHalfWidth = M_PI * outer / nWires;
       double bottomHalfWidth = M_PI * inner / nWires;
-      double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
+      double cellHalfWidth = M_PI * wirePosF.Rho() / nWires;
 
       // first construct the boundary lines, then create the cell
       const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);

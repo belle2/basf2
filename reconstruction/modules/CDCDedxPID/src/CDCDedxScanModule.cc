@@ -73,20 +73,20 @@ void CDCDedxScanModule::event()
     int nWires = cdcgeo.nWiresInLayer(i);
 
     // position of a sense wire in this layer at endpoints
-    const TVector3& wirePosF = cdcgeo.wireForwardPosition(i, 0);
-    const TVector3& wirePosB = cdcgeo.wireBackwardPosition(i, 0);
-    const TVector3 wireDir = (wirePosB - wirePosF).Unit();
+    const ROOT::Math::XYZVector& wirePosF = cdcgeo.wireForwardPosition(i, 0);
+    const ROOT::Math::XYZVector& wirePosB = cdcgeo.wireBackwardPosition(i, 0);
+    const ROOT::Math::XYZVector wireDir = (wirePosB - wirePosF).Unit();
 
     // radii of field wires for this layer
     double inner = cdcgeo.innerRadiusWireLayer()[i];
     double outer = cdcgeo.outerRadiusWireLayer()[i];
 
     double cellHeight = outer - inner;
-    double topHeight = outer - wirePosF.Perp();
-    double bottomHeight = wirePosF.Perp() - inner;
+    double topHeight = outer - wirePosF.Rho();
+    double bottomHeight = wirePosF.Rho() - inner;
     double topHalfWidth = M_PI * outer / nWires;
     double bottomHalfWidth = M_PI * inner / nWires;
-    double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
+    double cellHalfWidth = M_PI * wirePosF.Rho() / nWires;
 
     // first construct the boundary lines, then create the cell
     const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);

@@ -9,7 +9,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
 #include <Math/Vector3D.h>
 #include <Math/Point3D.h>
 

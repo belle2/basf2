@@ -12,7 +12,7 @@
 #pragma link C++ class Belle2::CDCTimeWalks+; // checksum=0xa0bbe541, version=2
 #pragma link C++ class Belle2::CDCXtRelations+; // checksum=0x4c48166, version=2
 #pragma link C++ class Belle2::CDCSpaceResols+; // checksum=0xbbc7719, version=2
-#pragma link C++ class Belle2::CDCDisplacement+; // checksum=0xfde3a407, version=3
+#pragma link C++ class Belle2::CDCDisplacement+; // checksum=0xf22e0113, version=4
 #pragma link C++ class Belle2::CDCAlignment+; // checksum=0x93495a07, version=2
 #pragma link C++ class Belle2::CDCLayerAlignment+; // checksum=0x84c87874, version=1
 #pragma link C++ class Belle2::CDCMisalignment+; // checksum=0x67b5fdae, version=1
@@ -85,4 +85,30 @@
     /* set 325um for an old object */ \
     m_maxSpaceResol = 0.0325; \
   }"
+
+
+// CDCDisplacement evolution
+// In version 4- (3)
+//   o   m_fwd is of type ROOT::Math::XYZVector (was TVector3)
+#pragma read \
+  sourceClass="Belle2::CDCDisplacement" source="TVector3 m_fwd" version="[-3]" \
+  targetClass="Belle2::CDCDisplacement" target="m_fwd" \
+  code = "{ \
+            m_fwd.SetXYZ(onfile.m_fwd.X(), \
+                         onfile.m_fwd.Y(), \
+                         onfile.m_fwd.Z()); \
+          }"
+
+// CDCDisplacement evolution
+// In version 4- (3)
+//   o   m_bwd is of type ROOT::Math::XYZVector (was TVector3)
+#pragma read \
+  sourceClass="Belle2::CDCDisplacement" source="TVector3 m_bwd" version="[-3]" \
+  targetClass="Belle2::CDCDisplacement" target="m_bwd" \
+  code = "{ \
+            m_bwd.SetXYZ(onfile.m_bwd.X(), \
+                         onfile.m_bwd.Y(), \
+                         onfile.m_bwd.Z()); \
+          }"
+
 #endif

@@ -39,6 +39,8 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
     return NAN;
   }
 
+  // On same layer we already know from LayerPXDRelationFilter, that we only deal with overlaps in r-phi.
+  // So it's sufficient here to check for same layer number to accept states in the overlap region.
   if (fromStateCache.geoLayer == toStateCache.geoLayer and
       fromStateCache.sensorID.getSensorNumber() == toStateCache.sensorID.getSensorNumber()) {
     // TODO: Checking for equality of sensor numbers seems not to harm the hit efficiency,

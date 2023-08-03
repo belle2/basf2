@@ -8,9 +8,6 @@
 
 #pragma once
 
-// EPICS
-#include "cadef.h"
-
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 

@@ -21,7 +21,7 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
 {
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: Constructor done.");
   addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
-           std::string("DQM:ECL:out_of_time_digits:"));
+           std::string("ECL:out_of_time_digits:"));
 }
 
 
@@ -56,15 +56,10 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
       if (!prof) continue;
 
       m_out_of_time_digits[pv_name] = prof->GetBinContent(1);
-    }
-  }
 
-  //== Set EPICS PVs
+      //== Set EPICS PVs
 
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
-      std::string pv_name = event_type + std::string(":") + ecl_part;
-      double selected_value =  m_out_of_time_digits[pv_name];
+      double selected_value = m_out_of_time_digits[pv_name];
       setEpicsPV(pv_name, selected_value);
     }
   }

@@ -10,6 +10,7 @@
 
 #include <TObject.h>
 #include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <cdc/dataobjects/WireID.h>
 
 
@@ -33,7 +34,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    CDCDisplacement(const WireID& wire, TVector3 fwd, TVector3 bwd, float tension) :
+    CDCDisplacement(const WireID& wire, ROOT::Math::XYZVector fwd, ROOT::Math::XYZVector bwd, float tension) :
       m_wire(wire), m_fwd(fwd), m_bwd(bwd), m_tension(tension)
     {
     }
@@ -97,11 +98,10 @@ namespace Belle2 {
 
   private:
     unsigned short m_wire; /**< Wire ID */
-    //TODO: replace TVector3s with simple arrays to save memory.
-    TVector3 m_fwd; /**< Displacement of forward side */
-    TVector3 m_bwd; /**< Displacement of backward side */
+    ROOT::Math::XYZVector m_fwd; /**< Displacement of forward side */
+    ROOT::Math::XYZVector m_bwd; /**< Displacement of backward side */
     float        m_tension; /**< Displacement of wire tension (grW) */
-    ClassDef(CDCDisplacement, 3); /**< ClassDef */
+    ClassDef(CDCDisplacement, 4); /**< ClassDef */
   };
 
 } // end namespace Belle2

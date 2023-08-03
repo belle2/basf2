@@ -13,7 +13,6 @@
 
 /* C++ headers. */
 #include <Math/Vector3D.h>
-#include <TVector3.h> // needed for schema evolution in linkdef.h
 
 namespace Belle2 {
 

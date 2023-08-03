@@ -302,7 +302,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   m_epicsChID.emplace_back();
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  // the subscribed name includes the prefix, he map below *not*
+  // the subscribed name includes the prefix, the map below does *not*
   SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
   if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

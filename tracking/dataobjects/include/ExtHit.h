@@ -13,7 +13,6 @@
 #include <Math/Vector3D.h>
 #include <Math/Point3D.h>
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 #include <G4ThreeVector.hh>
 #include <G4ErrorSymMatrix.hh>
 

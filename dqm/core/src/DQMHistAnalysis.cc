@@ -35,7 +35,7 @@ DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedL
 bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
 bool DQMHistAnalysisModule::m_epicsReadOnly =
   false; // special for second "online" use (reading limits). default to false, to enable EPICS, add special EPICS Module parameter
-bool DQMHistAnalysisModule::m_PVPrefix = "TEST:"; // default to "TEST:", for production, set in EPICS enabler to e.g. "DQM:"
+std::string DQMHistAnalysisModule::m_PVPrefix = "TEST:"; // default to "TEST:", for production, set in EPICS enabler to e.g. "DQM:"
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {

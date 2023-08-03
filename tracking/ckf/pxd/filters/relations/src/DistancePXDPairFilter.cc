@@ -8,8 +8,6 @@
 #include <tracking/ckf/pxd/filters/relations/DistancePXDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 

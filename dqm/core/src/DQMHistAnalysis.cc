@@ -35,6 +35,7 @@ DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedL
 bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
 bool DQMHistAnalysisModule::m_epicsReadOnly =
   false; // special for second "online" use (reading limits). default to false, to enable EPICS, add special EPICS Module parameter
+bool DQMHistAnalysisModule::m_PVPrefix = "TEST:"; // default to "TEST:", for production, set in EPICS enabler to e.g. "DQM:"
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
@@ -301,7 +302,8 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   m_epicsChID.emplace_back();
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(pvname.data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
+  // the subscribed name includes the prefix, he map below *not*
+  SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 

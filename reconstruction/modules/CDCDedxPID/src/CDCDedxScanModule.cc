@@ -74,8 +74,6 @@ void CDCDedxScanModule::event()
 
     // position of a sense wire in this layer at endpoints
     const ROOT::Math::XYZVector& wirePosF = cdcgeo.wireForwardPosition(i, 0);
-    const ROOT::Math::XYZVector& wirePosB = cdcgeo.wireBackwardPosition(i, 0);
-    const ROOT::Math::XYZVector wireDir = (wirePosB - wirePosF).Unit();
 
     // radii of field wires for this layer
     double inner = cdcgeo.innerRadiusWireLayer()[i];

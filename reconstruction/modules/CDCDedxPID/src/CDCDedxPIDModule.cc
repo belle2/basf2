@@ -381,8 +381,6 @@ void CDCDedxPIDModule::event()
 
       // find the position of the endpoints of the sense wire
       const ROOT::Math::XYZVector& wirePosF = cdcgeo.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
-      const ROOT::Math::XYZVector& wirePosB = cdcgeo.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
-      const ROOT::Math::XYZVector wireDir = (wirePosB - wirePosF).Unit();
 
       int nWires = cdcgeo.nWiresInLayer(currentLayer);
 

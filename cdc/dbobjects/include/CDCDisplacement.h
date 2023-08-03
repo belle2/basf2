@@ -9,7 +9,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <TVector3.h>
 #include <Math/Vector3D.h>
 #include <cdc/dataobjects/WireID.h>
 

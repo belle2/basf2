@@ -14,22 +14,22 @@ using namespace Belle2;
 
 
 
-TVector3 ARICHGeoMasterVolume::pointToGlobal(const TVector3& point) const
+ROOT::Math::XYZVector  ARICHGeoMasterVolume::pointToGlobal(const ROOT::Math::XYZVector& point) const
 {
   return (*m_rotation) * point + (*m_translation);
 }
 
-TVector3 ARICHGeoMasterVolume::momentumToGlobal(const TVector3& momentum) const
+ROOT::Math::XYZVector  ARICHGeoMasterVolume::momentumToGlobal(const ROOT::Math::XYZVector& momentum) const
 {
   return (*m_rotation) * momentum;
 }
 
-TVector3 ARICHGeoMasterVolume::pointToLocal(const TVector3& point) const
+ROOT::Math::XYZVector  ARICHGeoMasterVolume::pointToLocal(const ROOT::Math::XYZVector& point) const
 {
   return (*m_rotationInverse) * (point - (*m_translation));
 }
 
-TVector3 ARICHGeoMasterVolume::momentumToLocal(const TVector3& momentum) const
+ROOT::Math::XYZVector  ARICHGeoMasterVolume::momentumToLocal(const ROOT::Math::XYZVector& momentum) const
 {
   return (*m_rotationInverse) * momentum;
 }
@@ -39,15 +39,21 @@ void ARICHGeoMasterVolume::setPlacement(double x, double y, double z, double rx,
 
   m_x = x; m_y = y; m_z = z; m_rx = rx; m_ry = ry; m_rz = rz;
 
-  TVector3 translation(x, y, z);
+  ROOT::Math::XYZVector  translation(x, y, z);
 
-  m_rotation =  new TRotation();
-  m_rotation->RotateX(rx);
-  m_rotation->RotateY(ry);
-  m_rotation->RotateZ(rz);
+  m_rotation =  new ROOT::Math::Rotation3D();
+  // m_rotation->RotateX(rx);
+  // m_rotation->RotateY(ry);
+  // m_rotation->RotateZ(rz);
+  ROOT::Math::RotationX rotX(m_rx);
+  ROOT::Math::RotationY rotY(m_ry);
+  ROOT::Math::RotationZ rotZ(m_rz);
+  (*m_rotation) = (*m_rotation) * rotX;
+  (*m_rotation) = (*m_rotation) * rotY;
+  (*m_rotation) = (*m_rotation) * rotZ;
 
-  m_rotationInverse = new TRotation(m_rotation->Inverse());
-  m_translation = new TVector3(x, y, z);
+  m_rotationInverse = new ROOT::Math::Rotation3D(m_rotation->Inverse());
+  m_translation = new ROOT::Math::XYZVector(x, y, z);
 
 }
 

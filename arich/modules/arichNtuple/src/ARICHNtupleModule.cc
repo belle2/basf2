@@ -32,7 +32,7 @@
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -277,13 +277,13 @@ namespace Belle2 {
         m_arich.photons.push_back(iph);
       }
 
-      TVector3 recPos = arichTrack.getPosition();
+      ROOT::Math::XYZVector recPos = arichTrack.getPosition();
       m_arich.recHit.x = recPos.X();
       m_arich.recHit.y = recPos.Y();
       m_arich.recHit.z = recPos.Z();
 
-      TVector3 recMom = arichTrack.getDirection() * arichTrack.getMomentum();
-      m_arich.recHit.p = recMom.Mag();
+      ROOT::Math::XYZVector recMom = arichTrack.getDirection() * arichTrack.getMomentum();
+      m_arich.recHit.p = recMom.R();
       m_arich.recHit.theta = recMom.Theta();
       m_arich.recHit.phi = recMom.Phi();
 

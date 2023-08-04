@@ -7,8 +7,8 @@
  **************************************************************************/
 
 #include "arich/modules/arichReconstruction/Utility.h"
-#include "TVector3.h"
-#include "TRotation.h"
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 #include <cmath>
 
 
@@ -62,83 +62,83 @@ namespace Belle2 {
 
     //*******************************************************************************
 
-    TVector3 Refraction(const TVector3 s,  const double n)
+    ROOT::Math::XYZVector Refraction(const ROOT::Math::XYZVector s,  const double n)
     {
       double x = s.X() / n;
       double y = s.Y() / n;
 
-      if (x * x + y * y > 1) return TVector3();
-      if (s.Z() < 0) return  TVector3(x, y, -sqrt(1 - x * x - y * y));
-      else   return  TVector3(x, y, sqrt(1 - x * x - y * y));
+      if (x * x + y * y > 1) return ROOT::Math::XYZVector();
+      if (s.Z() < 0) return  ROOT::Math::XYZVector(x, y, -sqrt(1 - x * x - y * y));
+      else   return  ROOT::Math::XYZVector(x, y, sqrt(1 - x * x - y * y));
     }
     //---------------------------------------------------------------
 
 
-    int Refraction(TVector3 s, TVector3 norm, double n, TVector3
+    int Refraction(ROOT::Math::XYZVector s, ROOT::Math::XYZVector norm, double n, ROOT::Math::XYZVector
                    &newdir)
     {
-      double sp = s * norm;
+      double sp = s.Dot(norm);
       double sign = (sp > 0) * 2 - 1;
-      TVector3 vsth = (s - sp * norm) * (1 / n);
+      ROOT::Math::XYZVector vsth = (s - sp * norm) * (1 / n);
       double cth = sqrt(1 - vsth.Mag2());
       newdir = vsth + cth * norm * sign;
       return 1;
     }
 
     //---------------------------------------------------------------
-    TVector3 setThetaPhi(double theta, double fi)
+    ROOT::Math::XYZVector setThetaPhi(double theta, double fi)
     {
-      TVector3 r;
-      r[0] = cos(fi) * sin(theta);
-      r[1] = sin(fi) * sin(theta);
-      r[2] = cos(theta);
+      ROOT::Math::XYZVector r;
+      r.SetXYZ(cos(fi) * sin(theta),
+               sin(fi) * sin(theta),
+               cos(theta));
       return r;
 
     }
     //---------------------------------------------------------------
 
-    TRotation TransformToFixed(TVector3 r)
+    ROOT::Math::Rotation3D TransformToFixed(ROOT::Math::XYZVector r)
     {
       // Description: Calculates the base vectors of the track system
       // Output:
-      TVector3  fX, fY, fZ;// base vectors
+      ROOT::Math::XYZVector  fX, fY, fZ;// base vectors
 
       double ss = 1 - r.Y() * r.Y();
       if (ss > 0) {
         ss = sqrt(ss);
         fZ = r;
-        fX = TVector3(fZ.Z() / ss, 0, -fZ.X() / ss);
+        fX = ROOT::Math::XYZVector(fZ.Z() / ss, 0, -fZ.X() / ss);
         fY = fZ.Cross(fX);
       } else {
-        fZ = TVector3(0, 1, 0);
-        fX = TVector3(0, 0, 1);
-        fY = TVector3(1, 0, 0);
+        fZ = ROOT::Math::XYZVector(0, 1, 0);
+        fX = ROOT::Math::XYZVector(0, 0, 1);
+        fY = ROOT::Math::XYZVector(1, 0, 0);
       }
-      TRotation transform;
-      transform.RotateAxes(fX, fY, fZ);
+      ROOT::Math::Rotation3D transform;
+      // transform.RotateAxes(fX, fY, fZ); TODO
       transform.Invert();
       return transform;
     }
 
-    TRotation TransformFromFixed(TVector3 r)
+    ROOT::Math::Rotation3D TransformFromFixed(ROOT::Math::XYZVector r)
     {
       // Description: Calculates the base vectors of the track system
       // Output:
-      TVector3  fX, fY, fZ;// base vectors
+      ROOT::Math::XYZVector  fX, fY, fZ;// base vectors
 
       double ss = 1 - r.Y() * r.Y();
       if (ss > 0) {
         ss = sqrt(ss);
         fZ = r;
-        fX = TVector3(fZ.Z() / ss, 0, -fZ.X() / ss);
+        fX = ROOT::Math::XYZVector(fZ.Z() / ss, 0, -fZ.X() / ss);
         fY = fZ.Cross(fX);
       } else {
-        fZ = TVector3(0, 1, 0);
-        fX = TVector3(0, 0, 1);
-        fY = TVector3(1, 0, 0);
+        fZ = ROOT::Math::XYZVector(0, 1, 0);
+        fX = ROOT::Math::XYZVector(0, 0, 1);
+        fY = ROOT::Math::XYZVector(1, 0, 0);
       }
-      TRotation transform;
-      transform.RotateAxes(fX, fY, fZ);
+      ROOT::Math::Rotation3D transform;
+      // transform.RotateAxes(fX, fY, fZ); TODO
       return transform;
     }
 

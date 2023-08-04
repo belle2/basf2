@@ -111,7 +111,8 @@ namespace Belle2 {
         }
 
         TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
-        TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+        ROOT::Math::XYZVector hitpos3D(hitpos2D.X(), hitpos2D.Y(),
+                                       m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
         hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
 
         if (m_bcorrect) magFieldCorrection(hitpos3D);
@@ -136,7 +137,8 @@ namespace Belle2 {
           }
 
           TVector2 hitpos2D = m_geoPar->getChannelPosition(imod, xCh, yCh);
-          TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+          ROOT::Math::XYZVector hitpos3D(hitpos2D.X(), hitpos2D.Y(),
+                                         m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
           hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
           if (m_bcorrect) magFieldCorrection(hitpos3D);
           arichHits.appendNew(hitpos3D, imod, ichn);
@@ -146,9 +148,9 @@ namespace Belle2 {
 
   }
 
-  void ARICHFillHitsModule::magFieldCorrection(TVector3& hitpos)
+  void ARICHFillHitsModule::magFieldCorrection(ROOT::Math::XYZVector& hitpos)
   {
-    ROOT::Math::XYZVector Bfield = BFieldManager::getField(ROOT::Math::XYZVector(hitpos));
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(hitpos);
     ROOT::Math::XYZVector shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());

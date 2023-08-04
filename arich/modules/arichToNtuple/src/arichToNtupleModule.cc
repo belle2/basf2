@@ -304,13 +304,13 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
 
       m_arich[iTree]->photons = atrk->getPhotons();
 
-      TVector3 recPos = atrk->getPosition();
+      ROOT::Math::XYZVector recPos = atrk->getPosition();
       m_arich[iTree]->recHit.x = recPos.X();
       m_arich[iTree]->recHit.y = recPos.Y();
       m_arich[iTree]->recHit.z = recPos.Z();
 
-      TVector3 recMom = atrk->getDirection() * atrk->getMomentum();
-      m_arich[iTree]->recHit.p = recMom.Mag();
+      ROOT::Math::XYZVector recMom = atrk->getDirection() * atrk->getMomentum();
+      m_arich[iTree]->recHit.p = recMom.R();
       m_arich[iTree]->recHit.theta = recMom.Theta();
       m_arich[iTree]->recHit.phi = recMom.Phi();
 

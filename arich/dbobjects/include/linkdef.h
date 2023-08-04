@@ -30,7 +30,7 @@
 #pragma link C++ class Belle2::ARICHSensorModuleInfo+; // checksum=0xf6819991, version=2
 #pragma link C++ class Belle2::ARICHSensorModuleMap+; // checksum=0x7f7ae362, version=2
 #pragma link C++ class Belle2::ARICHGeoBase+; // checksum=0x21c6da01, version=2
-#pragma link C++ class Belle2::ARICHGeoMasterVolume+; // checksum=0xb4f48841, version=1
+#pragma link C++ class Belle2::ARICHGeoMasterVolume+; // checksum=0xd106fe48, version=2
 #pragma link C++ class Belle2::ARICHGeoAerogelPlane+; // checksum=0xd45f1d13, version=3
 #pragma link C++ class Belle2::ARICHGeoDetectorPlane+; // checksum=0xed2bcb49, version=1
 #pragma link C++ class Belle2::ARICHGeoHAPD+; // checksum=0x11d6f4d9, version=1
@@ -41,7 +41,7 @@
 #pragma link C++ class Belle2::ARICHGeoMergerCooling+; // checksum=0x77af821e, version=1
 #pragma link C++ class Belle2::tessellatedSolidStr+; // checksum=0xa5063eee, version=-1
 #pragma link C++ class Belle2::ARICHGeoSupport+; // checksum=0xc4292f59, version=1
-#pragma link C++ class Belle2::ARICHGeoMirrors+; // checksum=0x737f5e00, version=1
+#pragma link C++ class Belle2::ARICHGeoMirrors+; // checksum=0xa7a75d54, version=2
 #pragma link C++ class Belle2::ARICHGeometryConfig+; // checksum=0xf1561a50, version=5
 #pragma link C++ class Belle2::ARICHModulesInfo+; // checksum=0xb4f2e8d1, version=1
 #pragma link C++ class Belle2::ARICHChannelMapping+; // checksum=0xe87dff92, version=1
@@ -60,7 +60,7 @@
 #pragma link C++ class Belle2::ARICHHvCablesMapping+; // checksum=0x5dccb59a, version=1
 #pragma link C++ class Belle2::ARICHHvCrateCableMapping+; // checksum=0x9665991f, version=1
 #pragma link C++ class Belle2::ARICHAeroTilesInfo+; // checksum=0xbbc51b99, version=2
-#pragma link C++ class Belle2::ARICHGlobalAlignment+; // checksum=0xfc142dad, version=1
+#pragma link C++ class Belle2::ARICHGlobalAlignment+; // checksum=0x61104b94, version=2
 #pragma link C++ class Belle2::ARICHPositionElement+; // checksum=0xec484344, version=1
 #pragma link C++ class Belle2::ARICHGeoGlobalDisplacement+; // checksum=0xf36738c8, version=1
 #pragma link C++ class Belle2::ARICHGeoMirrorDisplacement+; // checksum=0x2deaf4ca, version=1

@@ -39,14 +39,14 @@ namespace Belle2 {
      * @param position   position vector of track on aerogel plane
      * @param momentum   momentum vector of track on aerogel plane
      */
-    ARICHTrack(TVector3 position,
-               TVector3 momentum)
+    ARICHTrack(ROOT::Math::XYZVector position,
+               ROOT::Math::XYZVector momentum)
     {
 
       m_x = (float) position.X();
       m_y = (float) position.Y();
       m_z = (float) position.Z();
-      m_momentum = (float) momentum.Mag();
+      m_momentum = (float) momentum.R();
       momentum = momentum.Unit();
       m_dx = (float) momentum.X();
       m_dy = (float) momentum.Y();
@@ -126,13 +126,13 @@ namespace Belle2 {
      * returns track position vector
      * @return track position vector
      */
-    TVector3 getPosition() const { return TVector3(m_x, m_y, m_z);}
+    ROOT::Math::XYZVector getPosition() const { return ROOT::Math::XYZVector(m_x, m_y, m_z);}
 
     /**
      * returns track direction vector
      * @return track direction vector
      */
-    TVector3 getDirection() const { return TVector3(m_dx, m_dy, m_dz);}
+    ROOT::Math::XYZVector getDirection() const { return ROOT::Math::XYZVector(m_dx, m_dy, m_dz);}
 
     /**
      * returns track momentum
@@ -159,7 +159,7 @@ namespace Belle2 {
      * @param dir   direction vector of track (unit vector)
      * @param p     track momentum
      */
-    void  setReconstructedValues(TVector3 r, TVector3 dir, double p)
+    void  setReconstructedValues(ROOT::Math::XYZVector r, ROOT::Math::XYZVector dir, double p)
     {
       m_x = (float) r.X();
       m_y = (float) r.Y();

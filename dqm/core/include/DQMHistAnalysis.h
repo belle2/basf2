@@ -100,6 +100,12 @@ namespace Belle2 {
      */
     static bool m_epicsReadOnly;
 
+    /**
+     * The Prefix for EPICS PVs
+     */
+    static std::string m_PVPrefix;
+
+
 #ifdef _BELLE2_EPICS
     //! Vector of EPICS PVs
     std::vector <chid>  m_epicsChID;
@@ -381,9 +387,21 @@ namespace Belle2 {
     bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     /**
-     * Unsubsribe from EPICS PVs on terminate
+     * Unsubscribe from EPICS PVs on terminate
      */
     void cleanupEpicsPVs(void);
+
+    /**
+     * get global Prefix for EPICS PVs
+     * @return prefix in use
+     */
+    std::string& getPVPrefix(void) {return m_PVPrefix;};
+
+    /**
+     * set global Prefix for EPICS PVs
+     * @param prefix Prefix to set
+     */
+    void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
 
     // Public functions
   public:

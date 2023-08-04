@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 #include <framework/gearbox/GearDir.h>
-#include "TRotation.h"
-#include "TVector3.h"
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 
 namespace Belle2 {
   //!  Beamtest ARICH Geometry Tracking Class
@@ -130,18 +130,18 @@ namespace Belle2 {
 
 
     //! Set the tracking shift
-    void setTrackingShift(const TVector3&);
+    void setTrackingShift(const ROOT::Math::XYZVector&);
     //! Get the tracking shift
-    TVector3 getTrackingShift();
+    ROOT::Math::XYZVector getTrackingShift();
     //! Set the rotation center of the Aerogel RICH frame
-    void setRotationCenter(const TVector3&);
+    void setRotationCenter(const ROOT::Math::XYZVector&);
     //! Get the rotation center of the Aerogel RICH frame
-    TVector3 getRotationCenter();
+    ROOT::Math::XYZVector getRotationCenter();
 
     //! Set the rotation angle of the Aerogel RICH frame
     void setFrameRotation(double);
     //! Get the rotation matrix of the Aerogel RICH frame
-    TRotation getFrameRotation();
+    ROOT::Math::Rotation3D getFrameRotation();
     //! Set the flag for the reconstruction by using the average aerogel refractive index
     void setAverageAgel(bool);
     //! Get the flag for the reconstruction by using the average aerogel refractive index
@@ -159,22 +159,22 @@ namespace Belle2 {
     //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
     int AddHapdElectronicMapPair(int, int);
     //! Set of the setup global offset
-    void setOffset(const TVector3&);
+    void setOffset(const ROOT::Math::XYZVector&);
     //! Get the setup global offset
-    TVector3 getOffset();
+    ROOT::Math::XYZVector getOffset();
 
 
   private:
     //! Pointer to the tracking chambers
     ARICHTracking* m_mwpc;
     //! Global offset
-    TVector3       m_offset;
+    ROOT::Math::XYZVector       m_offset;
     //! Tracking shift
-    TVector3       m_trackingShift;
+    ROOT::Math::XYZVector       m_trackingShift;
     //! rotation center of the Aerogel RICH frame
-    TVector3       m_rotationCenter;
+    ROOT::Math::XYZVector       m_rotationCenter;
     //! rotation matrix of the Aerogel RICH frame
-    TRotation      m_frameRotation;
+    ROOT::Math::Rotation3D      m_frameRotation;
     //! flag for the reconstruction by using the average aerogel refractive index
     bool           m_averageAgel;
     //! the position of the HAPD channels

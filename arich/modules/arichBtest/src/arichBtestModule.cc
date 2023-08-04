@@ -37,6 +37,8 @@
 #include <TFile.h>
 #include <TNtuple.h>
 #include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 #include <TAxis.h>
 
 // ifstream constructor.
@@ -310,7 +312,7 @@ namespace Belle2 {
   }
 
 
-  int arichBtestModule::getTrack(int mask, TVector3& r, TVector3& dir)
+  int arichBtestModule::getTrack(int mask, ROOT::Math::XYZVector& r, ROOT::Math::XYZVector& dir)
   {
     int retval = 0;
     //const int trgch = 13;
@@ -372,14 +374,14 @@ namespace Belle2 {
       for (int i = 0; i < 4; i++) {
         ARICHTracking* w = &m_mwpc[i];
         double l = (w->reco[2] - r.Z()) / dir.Z() ;
-        TVector3 rext = r + dir * l;
+        ROOT::Math::XYZVector rext = r + dir * l;
         if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.Y());
         if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.X());
 
         TAxis* axis =  mwpc_residualsz[i][1]->GetYaxis();
         for (int k = 0; k < axis->GetNbins(); k++) {
           double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.Z()) / dir.Z();
-          TVector3 rextt = r + dir * ll;
+          ROOT::Math::XYZVector rextt = r + dir * ll;
           mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.Y(), axis->GetBinCenter(k + 1));
           mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.X(), axis->GetBinCenter(k + 1));
 
@@ -398,8 +400,8 @@ namespace Belle2 {
     //if (print) printf( "[%3d]   %d: ", len, rec_id );
     gzread(fp, data, sizeof(unsigned int)*len);
 
-    TVector3 r;
-    TVector3 dir;
+    ROOT::Math::XYZVector r;
+    ROOT::Math::XYZVector dir;
     if (rec_id == 1) {
       readmwpc(data, len);
       int retval = getTrack(*(m_MwpcTrackMask.begin()), r, dir);
@@ -413,17 +415,17 @@ namespace Belle2 {
         dir *= m_beamMomentum * Unit::GeV;
         r *= Unit::mm /*/ CLHEP::mm*/;
         static ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
-        static TVector3 dr =  _arichbtgp->getTrackingShift();
+        static ROOT::Math::XYZVector dr =  _arichbtgp->getTrackingShift();
 
         r += dr;
 
         //----------------------------------------
         // Track rotation
         //
-        TRotation rot  =  _arichbtgp->getFrameRotation();
-        TVector3  rc   =  _arichbtgp->getRotationCenter();
+        ROOT::Math::Rotation3D rot  =  _arichbtgp->getFrameRotation();
+        ROOT::Math::XYZVector  rc   =  _arichbtgp->getRotationCenter();
 
-        TVector3 rrel  =  rc - rot * rc;
+        ROOT::Math::XYZVector rrel  =  rc - rot * rc;
         r = rot * r + rrel;
         dir = rot * dir;
         r.SetX(-r.X()); dir.SetX(-dir.X());
@@ -431,8 +433,8 @@ namespace Belle2 {
         //
         // end track rotation
         //----------------------------------------
-        r[1]  = -r.Y();
-        dir[1] = -dir.Y();
+        r.SetY(-r.Y());
+        dir.SetY(-dir.Y());
         B2DEBUG(50, "-----------> " <<  rc.X() <<  " " << rc.Y() << " " <<   rc.Z() << "::::" << rrel.X() <<  " " << rrel.Y() << " " <<
                 rrel.Z()  << " ----> R " <<   r.X() <<  " " << r.Y() << " " <<   r.Z() << " ----> S " <<   dir.X() <<  " " << dir.Y() << " " <<
                 dir.Z());

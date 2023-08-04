@@ -336,13 +336,13 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
 
       const ARICHAeroHit* aeroHit = atrk->getRelated<ARICHAeroHit>();
       if (aeroHit) {
-        TVector3 truePos = aeroHit->getPosition();
+        ROOT::Math::XYZVector truePos = aeroHit->getPosition();
         m_arich[iTree]->mcHit.x = truePos.X();
         m_arich[iTree]->mcHit.y = truePos.Y();
         m_arich[iTree]->mcHit.z = truePos.Z();
 
-        TVector3 trueMom = aeroHit->getMomentum();
-        m_arich[iTree]->mcHit.p = trueMom.Mag();
+        ROOT::Math::XYZVector trueMom = aeroHit->getMomentum();
+        m_arich[iTree]->mcHit.p = trueMom.R();
         m_arich[iTree]->mcHit.theta = trueMom.Theta();
         m_arich[iTree]->mcHit.phi = trueMom.Phi();
         m_arich[iTree]->mcHit.PDG = aeroHit->getPDG();

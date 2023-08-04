@@ -369,8 +369,8 @@ namespace Belle2 {
       double zoffset = boxParams.getLength("beamcenter/z")  * CLHEP::mm  / Unit::mm - zBox / 2.;
       G4ThreeVector roffset(xoffset, yoffset, zoffset);
 
-      TVector3 sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"),
-                  boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
+      ROOT::Math::XYZVector sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"),
+                               boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
       m_arichbtgp->setOffset(sh);
 
       string boxMat = boxParams.getString("material");
@@ -380,17 +380,17 @@ namespace Belle2 {
       new G4PVPlacement(G4Transform3D(), topVolume, "ARICH.experimentalbox", &topWorld, false, 1);
       setVisibility(*topVolume, false);
 
-      TVector3 trackingshift(content.getLength("tracking/shift/x"),
-                             content.getLength("tracking/shift/y"),
-                             content.getLength("tracking/shift/z"));
+      ROOT::Math::XYZVector trackingshift(content.getLength("tracking/shift/x"),
+                                          content.getLength("tracking/shift/y"),
+                                          content.getLength("tracking/shift/z"));
 
       char mnodestr[256];
       sprintf(mnodestr, "tracking/shift/run[@id=\"%d\"]", m_runno);
       if (content.exists(mnodestr)) {
         GearDir runtrackingshift(content, mnodestr);
-        trackingshift[0] = runtrackingshift.getLength("x");
-        trackingshift[1] = runtrackingshift.getLength("y");
-        trackingshift[2] = runtrackingshift.getLength("z");
+        trackingshift.SetX(runtrackingshift.getLength("x"));
+        trackingshift.SetY(runtrackingshift.getLength("y"));
+        trackingshift.SetZ(runtrackingshift.getLength("z"));
       }
       m_arichbtgp->setTrackingShift(trackingshift);
       ARICHTracking* m_mwpc = new ARICHTracking[4];
@@ -475,8 +475,9 @@ namespace Belle2 {
       new G4PVPlacement(frameTransformation, lenvBox, "ARICH.frame", topVolume, false, 1);
       //setVisibility(*lenvBox, false);
 
-      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / CLHEP::mm, frameOrigin0.y() *  Unit::mm / CLHEP::mm,
-                                          frameOrigin0.z() *  Unit::mm / CLHEP::mm);
+      ROOT::Math::XYZVector rotationCenter(frameOrigin0.x() *  Unit::mm / CLHEP::mm,
+                                           frameOrigin0.y() *  Unit::mm / CLHEP::mm,
+                                           frameOrigin0.z() *  Unit::mm / CLHEP::mm);
       m_arichbtgp->setFrameRotation(m_rotation1 * CLHEP::degree);
       m_arichbtgp->setRotationCenter(rotationCenter);
 

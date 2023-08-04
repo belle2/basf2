@@ -15,8 +15,8 @@
 #include <time.h>
 #include <zlib.h>
 
+#include <Math/Vector3D.h>
 class TFile;
-class TVector3;
 
 namespace Belle2 {
 
@@ -103,7 +103,7 @@ namespace Belle2 {
     //! raw MWPC TDC buffer
     int m_tdc[32];
     //! Beamtest Track reconstruction
-    int getTrack(int mask, TVector3& r, TVector3& dir);
+    int getTrack(int mask, ROOT::Math::XYZVector& r, ROOT::Math::XYZVector& dir);
 
   private:
 

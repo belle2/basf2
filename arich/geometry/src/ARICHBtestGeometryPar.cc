@@ -10,6 +10,8 @@
 
 #include <arich/geometry/ARICHBtestGeometryPar.h>
 
+#include <Math/RotationY.h>
+
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
@@ -30,9 +32,9 @@ namespace Belle2 {
 
   ARICHBtestGeometryPar::ARICHBtestGeometryPar():
     m_mwpc(new ARICHTracking),
-    m_trackingShift(TVector3()),
-    m_rotationCenter(TVector3()),
-    m_frameRotation(TRotation()),
+    m_trackingShift(ROOT::Math::XYZVector()),
+    m_rotationCenter(ROOT::Math::XYZVector()),
+    m_frameRotation(ROOT::Math::Rotation3D()),
     m_averageAgel(0),
     m_nPads(0),
     m_init(0),
@@ -96,7 +98,7 @@ namespace Belle2 {
     return m_hapdeid.size();
   }
 
-  void ARICHBtestGeometryPar::setTrackingShift(const TVector3& v)
+  void ARICHBtestGeometryPar::setTrackingShift(const ROOT::Math::XYZVector& v)
   {
     m_trackingShift = v;
     B2INFO("ARICHBtestGeometryPar::setTrackingShift=" << m_trackingShift.X() << ","  << m_trackingShift.Y() << ","  <<
@@ -105,12 +107,12 @@ namespace Belle2 {
   }
 
 
-  TVector3 ARICHBtestGeometryPar::getTrackingShift()
+  ROOT::Math::XYZVector ARICHBtestGeometryPar::getTrackingShift()
   {
     return m_trackingShift;
   }
 
-  void ARICHBtestGeometryPar::setRotationCenter(const TVector3& v)
+  void ARICHBtestGeometryPar::setRotationCenter(const ROOT::Math::XYZVector& v)
   {
     m_rotationCenter = v;
     B2INFO("ARICHBtestGeometryPar::setRotationCenter=" << m_rotationCenter.X() << ","  << m_rotationCenter.Y() << ","  <<
@@ -118,20 +120,20 @@ namespace Belle2 {
 
   }
 
-  TVector3 ARICHBtestGeometryPar::getRotationCenter()
+  ROOT::Math::XYZVector ARICHBtestGeometryPar::getRotationCenter()
   {
     return m_rotationCenter;
   }
 
   void ARICHBtestGeometryPar::setFrameRotation(double v)
   {
-    m_frameRotation = TRotation();
-    m_frameRotation.RotateY(v);
+    m_frameRotation = ROOT::Math::Rotation3D() * ROOT::Math::RotationY(v);
+    // m_frameRotation.RotateY(v);
     B2INFO("ARICHBtestGeometryPar::setFrameRotation=" << v);
 
   }
 
-  TRotation ARICHBtestGeometryPar::getFrameRotation()
+  ROOT::Math::Rotation3D  ARICHBtestGeometryPar::getFrameRotation()
   {
     return m_frameRotation;
   }
@@ -152,19 +154,19 @@ namespace Belle2 {
   {
     m_init = false;
     m_simple = false;
-    m_trackingShift = TVector3();
-    m_frameRotation   = TRotation();
-    m_rotationCenter  = TVector3();
+    m_trackingShift = ROOT::Math::XYZVector();
+    m_frameRotation   = ROOT::Math::Rotation3D();
+    m_rotationCenter  = ROOT::Math::XYZVector();
   }
 
-  void ARICHBtestGeometryPar::setOffset(const TVector3& v)
+  void ARICHBtestGeometryPar::setOffset(const ROOT::Math::XYZVector& v)
   {
     m_offset = v;
     B2INFO("ARICHBtestGeometryPar::setOffset=" << m_offset.X() << ","  << m_offset.Y() << ","  <<  m_offset.Z());
 
   }
 
-  TVector3 ARICHBtestGeometryPar::getOffset()
+  ROOT::Math::XYZVector ARICHBtestGeometryPar::getOffset()
   {
     return m_offset;
   }

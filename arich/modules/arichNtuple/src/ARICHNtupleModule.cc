@@ -288,13 +288,13 @@ namespace Belle2 {
       m_arich.recHit.phi = recMom.Phi();
 
       if (aeroHit) {
-        TVector3 truePos = aeroHit->getPosition();
+        ROOT::Math::XYZVector truePos = aeroHit->getPosition();
         m_arich.mcHit.x = truePos.X();
         m_arich.mcHit.y = truePos.Y();
         m_arich.mcHit.z = truePos.Z();
 
-        TVector3 trueMom = aeroHit->getMomentum();
-        m_arich.mcHit.p = trueMom.Mag();
+        ROOT::Math::XYZVector trueMom = aeroHit->getMomentum();
+        m_arich.mcHit.p = trueMom.R();
         m_arich.mcHit.theta = trueMom.Theta();
         m_arich.mcHit.phi = trueMom.Phi();
 

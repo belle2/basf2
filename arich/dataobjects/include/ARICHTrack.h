@@ -62,13 +62,13 @@ namespace Belle2 {
     explicit ARICHTrack(const ARICHAeroHit* aeroHit)
     {
 
-      TVector3 pos = aeroHit->getPosition();
+      ROOT::Math::XYZVector pos = aeroHit->getPosition();
       m_x = (float) pos.X();
       m_y = (float) pos.Y();
       m_z = (float) pos.Z();
 
-      TVector3 mom = aeroHit->getMomentum();
-      m_momentum = (float) mom.Mag();
+      ROOT::Math::XYZVector mom = aeroHit->getMomentum();
+      m_momentum = (float) mom.R();
       mom = mom.Unit();
       m_dx = (float) mom.X();
       m_dy = (float) mom.Y();

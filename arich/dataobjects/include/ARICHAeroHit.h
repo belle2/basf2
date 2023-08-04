@@ -10,7 +10,7 @@
 #define ARICHAEROHIT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -45,8 +45,8 @@ namespace Belle2 {
       \param momentum vector of track momentum on aerogel plane
     */
     ARICHAeroHit(int particleId,
-                 TVector3 position,
-                 TVector3 momentum)
+                 ROOT::Math::XYZVector position,
+                 ROOT::Math::XYZVector momentum)
     {
       m_particleID = particleId;
       m_x = (float) position.X();
@@ -61,10 +61,10 @@ namespace Belle2 {
     int getPDG() const { return m_particleID; }
 
     //! Get track position (at entrance in 1. aerogel plane)
-    TVector3 getPosition() const { TVector3 vec(m_x, m_y, m_z); return vec; }
+    ROOT::Math::XYZVector getPosition() const { ROOT::Math::XYZVector vec(m_x, m_y, m_z); return vec; }
 
     //! Get track momentum  (at entrance in 1. aerogel plane)
-    TVector3 getMomentum() const { TVector3 vec(m_px, m_py, m_pz); return vec; }
+    ROOT::Math::XYZVector getMomentum() const { ROOT::Math::XYZVector vec(m_px, m_py, m_pz); return vec; }
 
   private:
 

@@ -293,7 +293,7 @@ namespace Belle2 {
               if ((channel < 108 && channel > 71) || channel < 36) channel = 108 - (int(channel / 6) * 2 + 1) * 6 +
                     channel;
               else channel = 144 - (int((channel - 36) / 6) * 2 + 1) * 6 + channel - 36;
-              TVector2 loc = _arichgp->getChannelCenterLoc(channel);
+              ROOT::Math::XYVector loc = _arichgp->getChannelCenterLoc(channel);
               if (abs(loc.X()) > 2.3 || abs(loc.Y()) > 2.3) continue;
 
               arichDigits.appendNew(module + 1, channel, globalTime);

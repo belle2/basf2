@@ -9,7 +9,6 @@
 #pragma once
 
 #include <framework/gearbox/GearDir.h>
-#include "TVector2.h"
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 #include <arich/dbobjects/ARICHGeoMerger.h>
 #include <arich/dbobjects/ARICHGeoCablesEnvelope.h>
@@ -22,6 +21,8 @@
 #include <arich/dbobjects/ARICHGeoSupport.h>
 #include <arich/dbobjects/ARICHGeoGlobalDisplacement.h>
 #include <arich/dbobjects/ARICHGeoMirrorDisplacement.h>
+
+#include <Math/Vector2D.h>
 
 #define MAX_N_ALAYERS 5
 #define MAXPTS_QE 100
@@ -77,7 +78,7 @@ namespace Belle2 {
      * @param yChn HAPD y channel
      * @return channel position
      */
-    TVector2 getChannelPosition(unsigned moduleID, unsigned xChn, unsigned yChn) const;
+    ROOT::Math::XYVector getChannelPosition(unsigned moduleID, unsigned xChn, unsigned yChn) const;
 
     /**
      * Get geometry configuration of HAPD plane

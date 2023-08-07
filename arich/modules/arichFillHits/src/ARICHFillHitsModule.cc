@@ -110,7 +110,7 @@ namespace Belle2 {
           continue;
         }
 
-        TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
+        ROOT::Math::XYVector hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
         ROOT::Math::XYZVector hitpos3D(hitpos2D.X(), hitpos2D.Y(),
                                        m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
         hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
@@ -136,7 +136,7 @@ namespace Belle2 {
             continue;
           }
 
-          TVector2 hitpos2D = m_geoPar->getChannelPosition(imod, xCh, yCh);
+          ROOT::Math::XYVector hitpos2D = m_geoPar->getChannelPosition(imod, xCh, yCh);
           ROOT::Math::XYZVector hitpos3D(hitpos2D.X(), hitpos2D.Y(),
                                          m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
           hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);

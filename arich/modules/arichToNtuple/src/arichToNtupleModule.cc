@@ -297,9 +297,8 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
       if (!atrk) continue;
 
       if (atrk->hitsWindow()) {
-        TVector2 winHit = atrk->windowHitPosition();
-        m_arich[iTree]->winHit[0] = winHit.X();
-        m_arich[iTree]->winHit[1] = winHit.Y();
+        m_arich[iTree]->winHit[0] = atrk->windowHitPosition().X();
+        m_arich[iTree]->winHit[1] = atrk->windowHitPosition().Y();
       }
 
       m_arich[iTree]->photons = atrk->getPhotons();

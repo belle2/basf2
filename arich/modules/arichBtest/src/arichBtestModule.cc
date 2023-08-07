@@ -36,7 +36,6 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TNtuple.h>
-#include <TVector3.h>
 #include <Math/Vector3D.h>
 #include <Math/Rotation3D.h>
 #include <TAxis.h>
@@ -134,7 +133,7 @@ namespace Belle2 {
      dout.open ("ChannelCenterGlob.txt");
      for (int i=0;i<6;i++){
       for (int k=0;k<144;k++){
-        TVector3 r = _arichgp->getChannelCenterGlob(i + 1, k);
+        ROOT::Math::XYZVector r = _arichgp->getChannelCenterGlob(i + 1, k);
         dout  << r.X() << " " << r.Y() << endl;
       }
      }
@@ -299,7 +298,7 @@ namespace Belle2 {
 
               arichDigits.appendNew(module + 1, channel, globalTime);
 
-              TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
+              ROOT::Math::XYZVector rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
               std::pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
               m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.X(), rechit.Y(), module, channelID, rposx, rposy);
             }
@@ -405,7 +404,7 @@ namespace Belle2 {
     if (rec_id == 1) {
       readmwpc(data, len);
       int retval = getTrack(*(m_MwpcTrackMask.begin()), r, dir);
-      //dir = TVector3(0,0,1);
+      //dir = ROOT::Math::XYZVector(0,0,1);
 
       if (!retval) {
         // global transf, add track to datastore

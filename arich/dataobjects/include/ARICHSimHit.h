@@ -11,7 +11,7 @@
 
 #include <simulation/dataobjects/SimHitBase.h>
 
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
 
@@ -47,7 +47,7 @@ namespace Belle2 {
 
     ARICHSimHit(
       int moduleID,
-      TVector2 position,
+      ROOT::Math::XYVector position,
       double globalTime,
       double energy): SimHitBase()
     {
@@ -62,7 +62,7 @@ namespace Belle2 {
     int getModuleID() const { return m_moduleID; }
 
     //! Get local position of hit (in module coordinates)
-    TVector2 getLocalPosition() const { TVector2 vec(m_x, m_y); return vec; }
+    ROOT::Math::XYVector getLocalPosition() const { return ROOT::Math::XYVector(m_x, m_y); }
 
     //! Get global time of hit
     float getGlobalTime() const override { return m_globalTime; }

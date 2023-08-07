@@ -367,7 +367,7 @@ namespace Belle2 {
     B2INFO("Altogether " << m_fR.size() << " ARICH photon detector modules will be placed.");
   }
 
-  int ARICHGeometryPar::getCopyNo(TVector3 hit)
+  int ARICHGeometryPar::getCopyNo(ROOT::Math::XYZVector hit)
   {
     double x = hit.X();
     double y = hit.Y();
@@ -384,22 +384,22 @@ namespace Belle2 {
     return -1;
   }
 
-  int ARICHGeometryPar::getCopyNo(const ROOT::Math::XYZVector& hit)
-  {
-    TVector3 hitVector(hit.X(), hit.Y(), hit.Z());
-    return getCopyNo(hitVector);
-  }
+  // int ARICHGeometryPar::getCopyNo(const ROOT::Math::XYZVector& hit)
+  // {
+  //   ROOT::Math::XYZVector hitVector(hit.X(), hit.Y(), hit.Z());
+  //   return getCopyNo(hitVector);
+  // }
 
-  TVector3 ARICHGeometryPar::getOrigin(int copyNo)
+  ROOT::Math::XYZVector ARICHGeometryPar::getOrigin(int copyNo)
   {
     TVector2 origin;
     origin.SetMagPhi(m_fR[copyNo - 1], m_fFi[copyNo - 1]);
-    return TVector3(origin.X(), origin.Y(), m_detZpos + m_modZSize / 2.);
+    return ROOT::Math::XYZVector(origin.X(), origin.Y(), m_detZpos + m_modZSize / 2.);
   }
 
   G4ThreeVector ARICHGeometryPar::getOriginG4(int copyNo)
   {
-    TVector3 origin = getOrigin(copyNo);
+    ROOT::Math::XYZVector origin = getOrigin(copyNo);
     return G4ThreeVector(origin.X() / Unit::mm, origin.Y() / Unit::mm, origin.Z() / Unit::mm);
   }
 
@@ -429,10 +429,10 @@ namespace Belle2 {
   }
 
 
-  TVector3 ARICHGeometryPar::getChannelCenterGlob(int modID, int chanID)
+  ROOT::Math::XYZVector ARICHGeometryPar::getChannelCenterGlob(int modID, int chanID)
   {
     int id = (modID - 1) * m_nPads + chanID;
-    return TVector3(m_padWorldPositions.at(id).X(), m_padWorldPositions.at(id).Y(), m_detZpos + m_winThick);
+    return ROOT::Math::XYZVector(m_padWorldPositions.at(id).X(), m_padWorldPositions.at(id).Y(), m_detZpos + m_winThick);
   }
 
   TVector2 ARICHGeometryPar::getChannelCenterLoc(int chID)
@@ -472,8 +472,8 @@ namespace Belle2 {
   {
     double rmir = m_mirrorOuterRad * cos(M_PI / m_nMirrors) - m_mirrorThickness;
     for (int i = 0; i < m_nMirrors; i++) {
-      TVector3 norm(cos(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng),
-                    sin(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), 0);
+      ROOT::Math::XYZVector norm(cos(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng),
+                                 sin(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), 0);
       m_mirrornorm.push_back(norm);
       m_mirrorpoint.push_back(rmir * norm);
     }
@@ -485,8 +485,8 @@ namespace Belle2 {
     double thick = content.getLength("Mirrors/thickness");
     BOOST_FOREACH(const GearDir & mirror, content.getNodes("Mirrors/Mirror")) {
       double angle = mirror.getAngle("angle");
-      TVector3 point(mirror.getLength("xPos") - cos(angle)*thick / 2., mirror.getLength("yPos") - sin(angle)*thick / 2., 0);
-      TVector3 norm(cos(angle), sin(angle), 0);
+      ROOT::Math::XYZVector point(mirror.getLength("xPos") - cos(angle)*thick / 2., mirror.getLength("yPos") - sin(angle)*thick / 2., 0);
+      ROOT::Math::XYZVector norm(cos(angle), sin(angle), 0);
       m_mirrorpoint.push_back(point);
       m_mirrornorm.push_back(norm);
       m_mirrorZPos = mirror.getLength("zPos");
@@ -494,12 +494,12 @@ namespace Belle2 {
     }
   }
 
-  TVector3 ARICHGeometryPar::getMirrorNormal(int mirID)
+  ROOT::Math::XYZVector ARICHGeometryPar::getMirrorNormal(int mirID)
   {
     return m_mirrornorm[mirID];
   }
 
-  TVector3 ARICHGeometryPar::getMirrorPoint(int mirID)
+  ROOT::Math::XYZVector ARICHGeometryPar::getMirrorPoint(int mirID)
   {
     return m_mirrorpoint[mirID];
   }

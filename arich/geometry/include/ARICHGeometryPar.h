@@ -15,7 +15,6 @@
 #include <unordered_set>
 #include <framework/gearbox/GearDir.h>
 #include <Math/Vector3D.h>
-#include "TVector3.h"
 #include "TVector2.h"
 #include <G4ThreeVector.hh>
 
@@ -71,11 +70,11 @@ namespace Belle2 {
     //! get the total number of HAPD modules
     int getNMCopies() const;
     //! get the copy number of HAPD module containing point "hit"
-    int getCopyNo(TVector3 hit);
+    int getCopyNo(ROOT::Math::XYZVector hit);
     //! get the copy number of HAPD module containing point "hit"
-    int getCopyNo(const ROOT::Math::XYZVector& hit);
+    // int getCopyNo(const ROOT::Math::XYZVector& hit);
     //! get the position of copyno-th HAPD module origin
-    TVector3 getOrigin(int copyno);
+    ROOT::Math::XYZVector getOrigin(int copyno);
     //! get the position of copyNo-th HAPD module origin (returns G4ThreeVector)
     G4ThreeVector getOriginG4(int copyNo);
     //! get the angle of copyno-th HAPD rotation
@@ -91,11 +90,11 @@ namespace Belle2 {
     //! get ID number of chip containing point "locpos"
     int getChipID(TVector2 locpos);
     //! get center of chanID channel of modID detector module (in global coordinates)
-    TVector3 getChannelCenterGlob(int modID, int chanID);
+    ROOT::Math::XYZVector getChannelCenterGlob(int modID, int chanID);
     //! get normal vector of mirID-th mirror plate
-    TVector3 getMirrorNormal(int mirID);
+    ROOT::Math::XYZVector getMirrorNormal(int mirID);
     //! get one point lying on mirID-th mirror plate
-    TVector3 getMirrorPoint(int mirID);
+    ROOT::Math::XYZVector getMirrorPoint(int mirID);
     //! get transmission length of "ilayer" aerogel layer
     double getAerogelTransmissionLength(int ilayer);
     //! get refractive index of "ilayer" aerogel layer
@@ -259,8 +258,8 @@ namespace Belle2 {
     std::vector<TVector2> m_chipLocPos;   /*!< vector holding chip positions (in detector module local coordinates) */
     std::map<int, TVector2> m_padLocPositions; /*!< map holding channel local positions (in detector module local coordinates) */
     std::vector<TVector2> m_padWorldPositions; /*!< map holding channel global positions  */
-    std::vector<TVector3> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
-    std::vector<TVector3> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
+    std::vector<ROOT::Math::XYZVector> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
+    std::vector<ROOT::Math::XYZVector> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
 
     std::map<std::pair<unsigned, int>, unsigned> m_copper2merger; /*!< mapping of merger boards to cooper boards */
     std::map<int, std::vector<unsigned>> m_merger2feb; /*!< mapping of front-end boards to mergers */

@@ -12,6 +12,9 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHPhoton.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
+
+#include <Math/Vector2D.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -150,7 +153,7 @@ namespace Belle2 {
      * Get HAPD window hit position
      * @return HAPD window hit position
      */
-    TVector2 windowHitPosition() const {return TVector2(m_winX, m_winY);}
+    ROOT::Math::XYVector windowHitPosition() const {return ROOT::Math::XYVector(m_winX, m_winY);}
 
 
     /**

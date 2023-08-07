@@ -23,7 +23,6 @@
 
 #include <vector>
 #include <Math/Vector3D.h>
-#include <TRotation.h>
 #include <TRandom3.h>
 
 using namespace boost;

@@ -13,7 +13,6 @@
 #include <string>
 #include <Math/Vector3D.h>
 #include <Math/Rotation3D.h>
-#include <TRotation.h>
 
 namespace Belle2 {
 

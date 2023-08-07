@@ -15,7 +15,6 @@
 #include <Math/RotationX.h>
 #include <Math/RotationY.h>
 #include <Math/RotationZ.h>
-#include <TRotation.h>
 
 namespace Belle2 {
 

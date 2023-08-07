@@ -179,9 +179,8 @@ namespace Belle2 {
 
       // set hapd window hit if available
       if (arichTrack.hitsWindow()) {
-        TVector2 winHit = arichTrack.windowHitPosition();
-        m_arich.winHit[0] = winHit.X();
-        m_arich.winHit[1] = winHit.Y();
+        m_arich.winHit[0] = arichTrack.windowHitPosition().X();
+        m_arich.winHit[1] = arichTrack.windowHitPosition().Y();
       }
 
       if (lkh->getFlag() == 1) m_arich.inAcc = 1;

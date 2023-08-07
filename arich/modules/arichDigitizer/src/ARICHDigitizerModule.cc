@@ -25,7 +25,7 @@
 
 
 // ROOT
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 #include <Math/Vector3D.h>
 #include <TRandom3.h>
 
@@ -108,7 +108,7 @@ namespace Belle2 {
 
       if (time < 0 || time > m_timeWindow) continue;
 
-      TVector2 locpos(aSimHit.getLocalPosition().X(), aSimHit.getLocalPosition().Y());
+      ROOT::Math::XYVector locpos = aSimHit.getLocalPosition();
 
       // Get id of module
       int moduleID = aSimHit.getModuleID();
@@ -183,22 +183,28 @@ namespace Belle2 {
 
   }
 
-  void ARICHDigitizerModule::magFieldDistorsion(TVector2& hit, int copyno)
+  void ARICHDigitizerModule::magFieldDistorsion(ROOT::Math::XYVector& hit, int copyno)
   {
 
-    TVector2 hitGlob;
+    ROOT::Math::XYVector hitGlob;
     double phi = m_geoPar->getDetectorPlane().getSlotPhi(copyno);
     double r = m_geoPar->getDetectorPlane().getSlotR(copyno);
     double z = m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness();
-    hitGlob.SetMagPhi(r, phi);
-    TVector2 shift = hit;
-    hitGlob += shift.Rotate(phi);
+    hitGlob.SetXY(r * std::cos(phi), r * std::sin(phi));
+    ROOT::Math::XYVector shift = hit;
+    // anonymous function to rotate a 2D vector by an angle
+    auto rotate = [](const ROOT::Math::XYVector & aVector, const double angle) {
+      const double newX = aVector.X() * std::cos(angle) - aVector.Y() * std::sin(angle);
+      const double newY = aVector.X() * std::sin(angle) + aVector.Y() * std::cos(angle);
+      return ROOT::Math::XYVector(newX, newY);
+    };
+    hitGlob += rotate(shift, phi);
     ROOT::Math::XYZVector Bfield = BFieldManager::getField(m_geoPar->getMasterVolume().pointToGlobal(ROOT::Math::XYZVector(hitGlob.X(),
                                                            hitGlob.Y(), z)));
     double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
     shift.SetX(cc * Bfield.X());
     shift.SetY(cc * Bfield.Y());
-    shift = shift.Rotate(-phi);
+    shift = rotate(shift, -phi);
     hit.SetX(hit.X() + shift.X());
     hit.SetY(hit.Y() + shift.Y());
   }

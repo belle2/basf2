@@ -12,7 +12,10 @@
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
 #include <Math/Vector3D.h>
-#include <TRotation.h>
+#include <Math/Rotation3D.h>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
 
 
 namespace Belle2 {
@@ -109,12 +112,19 @@ namespace Belle2 {
 
     /**
      * Get rotation matrix
-     * @return rotation matrix (TRotation)
+     * @return rotation matrix (ROOT::Math::Rotation3D)
      */
-    TRotation getRotation() const
+    ROOT::Math::Rotation3D getRotation() const
     {
-      TRotation rot;
-      rot.RotateX(m_rx).RotateY(m_ry).RotateZ(m_rz);
+      ROOT::Math::Rotation3D rot;
+      // With "TRotation rot" the call was
+      // rot.RotateX(m_rx).RotateY(m_ry).RotateZ(m_rz);
+      ROOT::Math::RotationX rotX(m_rx);
+      ROOT::Math::RotationY rotY(m_ry);
+      ROOT::Math::RotationZ rotZ(m_rz);
+      rot *= rotX;
+      rot *= rotY;
+      rot *= rotZ;
       return rot;
     }
 

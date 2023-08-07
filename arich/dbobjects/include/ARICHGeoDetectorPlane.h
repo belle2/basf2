@@ -11,7 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TRotation.h>
 
 
@@ -103,9 +103,9 @@ namespace Belle2 {
 
     /**
      * Get center point
-     * @return center point (TVector3)
+     * @return center point (ROOT::Math::XYZVector)
      */
-    TVector3 getPosition() const {return TVector3(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
+    ROOT::Math::XYZVector getPosition() const {return ROOT::Math::XYZVector(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
 
     /**
      * Get rotation matrix

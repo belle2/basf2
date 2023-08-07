@@ -26,7 +26,7 @@
 
 // ROOT
 #include <TVector2.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TRandom3.h>
 
 using namespace boost;

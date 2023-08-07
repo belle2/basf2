@@ -66,6 +66,29 @@
 #pragma link C++ class Belle2::ARICHGeoMirrorDisplacement+; // checksum=0x2deaf4ca, version=1
 #pragma link C++ class Belle2::ARICHMirrorAlignment+; // checksum=0xd4f6fc8d, version=1
 #pragma link C++ class Belle2::ARICHAeroTilesAlignment+; // checksum=0xe98f9a64, version=1
+
+#pragma read                                                                                                  \
+  sourceClass="Belle2::ARICHGeoMirrors"                                                                       \
+  source="std::vector<TVector3> m_normVector"                                                                 \
+  version="[1]"                                                                                               \
+  targetClass="Belle2::ARICHGeoMirrors"                                                                       \
+  target="m_normVector"                                                                                       \
+  include="TVector3.h"                                                                                        \
+  code="{for (const auto& normVector : onfile.m_normVector)                                                   \
+           m_normVector.emplace_back(ROOT::Math::XYZVector(normVector.X(), normVector.Y(), normVector.Z()));  \
+        }"                                                                                                    \
+
+#pragma read                                                                              \
+  sourceClass="Belle2::ARICHGeoMirrors"                                                   \
+  source="std::vector<TVector3> m_point"                                                  \
+  version="[1]"                                                                           \
+  targetClass="Belle2::ARICHGeoMirrors"                                                   \
+  target="m_point"                                                                        \
+  include="TVector3.h"                                                                    \
+  code="{for (const auto& point : onfile.m_point)                                         \
+           m_point.emplace_back(ROOT::Math::XYZVector(point.X(), point.Y(), point.Z()));  \
+        }"                                                                                \
+
 #endif
 
 

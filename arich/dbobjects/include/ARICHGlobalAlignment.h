@@ -125,9 +125,9 @@ namespace Belle2 {
 
     ARICHPositionElement m_alignPars;
 
-    mutable ROOT::Math::Rotation3D* m_rotation = 0 ;
-    mutable ROOT::Math::Rotation3D* m_rotationInverse = 0;
-    mutable ROOT::Math::XYZVector*  m_translation = 0;
+    mutable ROOT::Math::Rotation3D* m_rotation = nullptr;
+    mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr;
+    mutable ROOT::Math::XYZVector*  m_translation = nullptr;
 
     ClassDef(ARICHGlobalAlignment, 2); /**< ClassDef */
 

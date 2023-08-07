@@ -106,12 +106,15 @@ namespace Belle2 {
   int ARICHReconstruction::InsideDetector(ROOT::Math::XYZVector  a, int copyno)
   {
     if (copyno == -1) return 0;
-    TVector2 origin;
-    origin.SetMagPhi(m_arichgp->getDetectorPlane().getSlotR(copyno), m_arichgp->getDetectorPlane().getSlotPhi(copyno));
-    TVector2 a2(a.X(), a.Y());
+    ROOT::Math::XYVector origin;
+    origin.SetXY(m_arichgp->getDetectorPlane().getSlotR(copyno) * std::cos(m_arichgp->getDetectorPlane().getSlotPhi(copyno)),
+                 m_arichgp->getDetectorPlane().getSlotR(copyno) * std::sin(m_arichgp->getDetectorPlane().getSlotPhi(copyno)));
+    ROOT::Math::XYVector a2(a);
     double phi = m_arichgp->getDetectorPlane().getSlotPhi(copyno);
-    TVector2 diff = a2 - origin;
-    diff = diff.Rotate(-phi);
+    ROOT::Math::XYVector diff = a2 - origin;
+    const double newX = diff.X() * std::cos(-phi) - diff.Y() * sin(-phi);
+    const double newY = diff.Y() * std::sin(-phi) + diff.Y() * cos(-phi);
+    diff.SetXY(newX, newY);
     const double size = m_arichgp->getHAPDGeometry().getAPDSizeX();
     if (fabs(diff.X()) < size / 2. && fabs(diff.Y()) < size / 2.) {
       int chX, chY;
@@ -187,7 +190,7 @@ namespace Belle2 {
         if (m_arichgp->getAerogelPlane().getAerogelTileID(r.X(), r.Y()) != tileID) return ROOT::Math::XYZVector();
       }
       r += dirf * path;
-      TVector2 rxy(r.X(), r.Y());
+      ROOT::Math::XYVector rxy(r);
       // check for possible reflections
       if (a != n || nmir == 0) continue;
       double angle = rxy.Phi() - angmir;

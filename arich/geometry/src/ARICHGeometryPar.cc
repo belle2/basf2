@@ -11,6 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <Math/VectorUtil.h>
 
@@ -569,9 +570,9 @@ namespace Belle2 {
       double dr = plate.getLength("dr");
       double dphi = plate.getAngle("dphi");
       double dtheta = plate.getAngle("dtheta");
-      m_mirrorpoint[id - 1].SetMag(m_mirrorpoint[id - 1].Mag() + dr);
-      m_mirrornorm[id - 1].SetTheta(m_mirrornorm[id - 1].Theta() + dtheta);
-      m_mirrornorm[id - 1].SetPhi(m_mirrornorm[id - 1].Phi() + dphi);
+      VectorUtil::setMag(m_mirrorpoint[id - 1], m_mirrorpoint[id - 1].R() + dr);
+      VectorUtil::setTheta(m_mirrornorm[id - 1], m_mirrornorm[id - 1].Theta() + dtheta);
+      VectorUtil::setPhi(m_mirrornorm[id - 1], m_mirrornorm[id - 1].Phi() + dphi);
     }
   }
 

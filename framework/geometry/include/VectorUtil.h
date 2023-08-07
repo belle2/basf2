@@ -43,7 +43,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set vector polar angle phi
+     * Set vector magnitude mag
      * @param[inout] vector Vector
      * @param[in]    mag    Magnitude
      */
@@ -53,7 +53,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set vector polar angle phi
+     * Set vector azimuthal angle theta
      * @param[inout] vector Vector
      * @param[in]    theta  Azimuthal angle
      */

@@ -91,13 +91,14 @@ namespace Belle2 {
     ROOT::Math::Rotation3D getRotation() const
     {
       ROOT::Math::Rotation3D rot;
+      // With "TRotation rot" the call was
+      // rot.RotateX(m_rx).RotateY(m_ry).RotateZ(m_rz);
       ROOT::Math::RotationX rotX(m_rx);
       ROOT::Math::RotationY rotY(m_ry);
       ROOT::Math::RotationZ rotZ(m_rz);
       rot *= rotX;
       rot *= rotY;
       rot *= rotZ;
-      // rot.RotateX(m_rx).RotateY(m_ry).RotateZ(m_rz);
       return rot;
     }
 

@@ -89,6 +89,66 @@
            m_point.emplace_back(ROOT::Math::XYZVector(point.X(), point.Y(), point.Z()));  \
         }"                                                                                \
 
+#pragma read                                    \
+  sourceClass="Belle2::ARICHGeoMasterVolume"    \
+  source="TRotation* m_rotation"                \
+  version="[1]"                                 \
+  targetClass="Belle2::ARICHGeoMasterVolume"    \
+  target="m_rotation"                           \
+  include="TRotation.h"                         \
+  code="{                                       \
+    m_rotation = new ROOT::Math::Rotation3D;    \
+    m_rotation->SetComponents(                  \
+      onfile.m_rotation->XX(),                  \
+      onfile.m_rotation->XY(),                  \
+      onfile.m_rotation->XZ(),                  \
+      onfile.m_rotation->YX(),                  \
+      onfile.m_rotation->YY(),                  \
+      onfile.m_rotation->YZ(),                  \
+      onfile.m_rotation->ZX(),                  \
+      onfile.m_rotation->ZY(),                  \
+      onfile.m_rotation->ZZ()                   \
+    );                                          \
+  }"                                            \
+
+#pragma read                                        \
+  sourceClass="Belle2::ARICHGeoMasterVolume"        \
+  source="TRotation* m_rotationInverse"             \
+  version="[1]"                                     \
+  targetClass="Belle2::ARICHGeoMasterVolume"        \
+  target="m_rotationInverse"                        \
+  include="TRotation.h"                             \
+  code="{                                           \
+    m_rotationInverse = new ROOT::Math::Rotation3D; \
+    m_rotationInverse->SetComponents(               \
+      onfile.m_rotationInverse->XX(),               \
+      onfile.m_rotationInverse->XY(),               \
+      onfile.m_rotationInverse->XZ(),               \
+      onfile.m_rotationInverse->YX(),               \
+      onfile.m_rotationInverse->YY(),               \
+      onfile.m_rotationInverse->YZ(),               \
+      onfile.m_rotationInverse->ZX(),               \
+      onfile.m_rotationInverse->ZY(),               \
+      onfile.m_rotationInverse->ZZ()                \
+    );                                              \
+  }"                                                \
+
+#pragma read                                    \
+  sourceClass="Belle2::ARICHGeoMasterVolume"    \
+  source="TVector3* m_translation"              \
+  version="[1]"                                 \
+  targetClass="Belle2::ARICHGeoMasterVolume"    \
+  target="m_translation"                        \
+  include="TVector3.h"                          \
+  code="{                                       \
+    m_translation = new ROOT::Math::XYZVector;  \
+    m_translation->SetXYZ(                      \
+      onfile.m_translation->X(),                \
+      onfile.m_translation->Y(),                \
+      onfile.m_translation->Z()                 \
+    );                                          \
+  }"                                            \
+
 #endif
 
 

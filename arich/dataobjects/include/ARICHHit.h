@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     //! Get photon hit position
-    ROOT::Math::XYZVector getPosition() const { ROOT::Math::XYZVector vec(m_x, m_y, m_z); return vec; }
+    ROOT::Math::XYZVector getPosition() const { return ROOT::Math::XYZVector(m_x, m_y, m_z); }
 
     //! Get channel ID
     int getChannel() const {return m_ch;}

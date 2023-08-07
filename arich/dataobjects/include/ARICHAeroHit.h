@@ -61,10 +61,10 @@ namespace Belle2 {
     int getPDG() const { return m_particleID; }
 
     //! Get track position (at entrance in 1. aerogel plane)
-    ROOT::Math::XYZVector getPosition() const { ROOT::Math::XYZVector vec(m_x, m_y, m_z); return vec; }
+    ROOT::Math::XYZVector getPosition() const { return ROOT::Math::XYZVector(m_x, m_y, m_z); }
 
     //! Get track momentum  (at entrance in 1. aerogel plane)
-    ROOT::Math::XYZVector getMomentum() const { ROOT::Math::XYZVector vec(m_px, m_py, m_pz); return vec; }
+    ROOT::Math::XYZVector getMomentum() const { return ROOT::Math::XYZVector(m_px, m_py, m_pz); }
 
   private:
 

@@ -38,9 +38,9 @@ namespace Belle2 {
     ARICHGlobalAlignment(const ARICHGlobalAlignment& align): ARICHGeoBase()
     {
       *this = align;
-      m_rotation = 0;
-      m_rotationInverse = 0;
-      m_translation = 0;
+      m_rotation = nullptr;
+      m_rotationInverse = nullptr;
+      m_translation = nullptr;
     }
 
 
@@ -55,9 +55,9 @@ namespace Belle2 {
         if (m_rotation) delete m_rotation;
         if (m_rotationInverse) delete m_rotationInverse;
         if (m_translation) delete m_translation;
-        m_rotation = 0;
-        m_rotationInverse = 0;
-        m_translation = 0;
+        m_rotation = nullptr;
+        m_rotationInverse = nullptr;
+        m_translation = nullptr;
       }
       return *this;
     }

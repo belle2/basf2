@@ -368,7 +368,7 @@ namespace Belle2 {
     B2INFO("Altogether " << m_fR.size() << " ARICH photon detector modules will be placed.");
   }
 
-  int ARICHGeometryPar::getCopyNo(ROOT::Math::XYZVector hit)
+  int ARICHGeometryPar::getCopyNo(const ROOT::Math::XYZVector& hit)
   {
     double x = hit.X();
     double y = hit.Y();
@@ -384,12 +384,6 @@ namespace Belle2 {
     }
     return -1;
   }
-
-  // int ARICHGeometryPar::getCopyNo(const ROOT::Math::XYZVector& hit)
-  // {
-  //   ROOT::Math::XYZVector hitVector(hit.X(), hit.Y(), hit.Z());
-  //   return getCopyNo(hitVector);
-  // }
 
   ROOT::Math::XYZVector ARICHGeometryPar::getOrigin(int copyNo)
   {

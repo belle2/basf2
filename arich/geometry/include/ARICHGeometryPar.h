@@ -70,9 +70,7 @@ namespace Belle2 {
     //! get the total number of HAPD modules
     int getNMCopies() const;
     //! get the copy number of HAPD module containing point "hit"
-    int getCopyNo(ROOT::Math::XYZVector hit);
-    //! get the copy number of HAPD module containing point "hit"
-    // int getCopyNo(const ROOT::Math::XYZVector& hit);
+    int getCopyNo(const ROOT::Math::XYZVector& hit);
     //! get the position of copyno-th HAPD module origin
     ROOT::Math::XYZVector getOrigin(int copyno);
     //! get the position of copyNo-th HAPD module origin (returns G4ThreeVector)

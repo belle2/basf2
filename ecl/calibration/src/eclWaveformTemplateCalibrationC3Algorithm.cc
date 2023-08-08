@@ -37,10 +37,10 @@ eclWaveformTemplateCalibrationC3Algorithm::eclWaveformTemplateCalibrationC3Algor
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibrate()
 {
 
-  B2INFO("RUNNING eclComputePulseTemplates_Step2.py");
-  system(Form("basf2 eclComputePulseTemplates_Step2.py %d %d", (m_firstCellID), (m_lastCellID)));
+  B2INFO("RUNNING" << Form("eclComputePulseTemplates_Step2.py %d %d", (m_firstCellID), (m_lastCellID)));
+  system(Form("eclComputePulseTemplates_Step2.py %d %d", (m_firstCellID), (m_lastCellID)));
 
-  B2INFO("RUNNING eclComputePulseTemplates_Step3");
+  B2INFO("RUNNING " << Form("eclComputePulseTemplates_Step3 %d %d", m_firstCellID, m_lastCellID));
   system(Form("eclComputePulseTemplates_Step3 %d %d", m_firstCellID, m_lastCellID));
 
   //save to db
@@ -65,6 +65,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibra
   for (int j = 0; j <= batch; j++) {
     int tCellID = m_firstCellID + j;
     if (tCellID > ECLElementNumbers::c_NCrystals)continue;
+    B2INFO("tCellID=" << tCellID << " j=" << j);
     TempTree->GetEntry(j);
     float tHadronShapePars_float[11];
     float tDiodeShapePars_float[11];

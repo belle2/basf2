@@ -219,7 +219,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
 
       if (counterWaveforms < m_TotalCountsThreshold) {
         B2INFO("eclWaveformTemplateCalibrationC2Algorithm: warning total entries for cell ID " <<  cellid << " is only: " <<
-               m_TotalCountsThreshold <<
+               counterWaveforms <<
                " Requirement is : " << m_TotalCountsThreshold);
         /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
         return c_NotEnoughData;

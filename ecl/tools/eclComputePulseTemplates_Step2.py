@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -5,6 +7,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import numpy as np
 from scipy.fftpack import fft, ifft
 import ROOT
@@ -13,10 +16,10 @@ import sys
 from array import array
 import argparse
 
-'''
-Third step in waveform template calibrations.  Computes hadron pulse shape using photon template input.
-See eclComputePulseTemplates_Step0.cc for README instructions.
-'''
+# '''
+# Third step in waveform template calibrations.  Computes hadron pulse shape using photon template input.
+# See eclComputePulseTemplates_Step0.cc for README instructions.
+# '''
 
 
 def EvalGamComp(tin, ttrg):

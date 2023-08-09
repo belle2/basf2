@@ -1730,7 +1730,7 @@ void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName
   // draw all cells in segment
   for (unsigned il = 0; il < layershift.size(); ++il) {
     for (unsigned ic = 0; ic < cellshift[il].size(); ++ic) {
-      TVector3 corners[2][2];
+      ROOT::Math::XYZVector corners[2][2];
       for (unsigned ir = 0; ir < 2; ++ir) {
         double r = cdcgeo.fieldWireR(iL + layershift[il] - ir);
         double fz = cdcgeo.fieldWireFZ(iL + layershift[il] - ir);
@@ -1739,9 +1739,9 @@ void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName
           double phib = (iCenter + cellshift[il][ic] + iphi - 0.5) * 2 * M_PI / nWires;
           double phif = phib + cdcgeo.nShifts(iL + layershift[il]) * M_PI / nWires;
 
-          TVector3 pos_f = TVector3(cos(phif) * r, sin(phif) * r, fz);
-          TVector3 pos_b = TVector3(cos(phib) * r, sin(phib) * r, bz);
-          TVector3 zaxis = pos_b - pos_f;
+          ROOT::Math::XYZVector pos_f = ROOT::Math::XYZVector(cos(phif) * r, sin(phif) * r, fz);
+          ROOT::Math::XYZVector pos_b = ROOT::Math::XYZVector(cos(phib) * r, sin(phib) * r, bz);
+          ROOT::Math::XYZVector zaxis = pos_b - pos_f;
           corners[ir][iphi] = pos_f - zaxis * (pos_f.Z() / zaxis.Z());
         }
       }

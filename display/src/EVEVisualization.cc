@@ -1357,11 +1357,11 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   fixGeoShapeRefCount(det_shape);
   const TVectorD& ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
   const TMatrixD& eVec = eigen_values.GetEigenVectors();  //Assigns the eigenvalues into the "eVec" matrix.
-  TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2,
-                                              0));   //Define the 3 eigenvectors of the covariance matrix as objects of the TVector3 class using constructor.
-  TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2,
-                                              1));   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
-  TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+  //Define the 3 eigenvectors of the covariance matrix as objects of the ROOT::Math::XYZVector class using constructor.
+  ROOT::Math::XYZVector eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+  //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
+  ROOT::Math::XYZVector eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+  ROOT::Math::XYZVector eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
   // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
 
 

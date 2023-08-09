@@ -1817,13 +1817,8 @@ void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
     VectorUtil::setMagThetaPhi(centerPos3D, r_center, M_PI / 2, phi);
     centerPos3D.SetZ(z);
 
-    auto rotateZ = [](ROOT::Math::XYZVector & aVector, const double angle) {
-      const double xRot = aVector.X() * std::cos(angle) - aVector.Y() * std::sin(angle);
-      const double yRot = aVector.X() * std::sin(angle) + aVector.Y() * std::cos(angle);
-      aVector.SetXYZ(xRot, yRot, aVector.Z());
-    };
-    ROOT::Math::XYZVector channelX(1, 0, 0); rotateZ(channelX, phi);  //    channelX.RotateZ(phi);
-    ROOT::Math::XYZVector channelY(0, 1, 0); rotateZ(channelY, phi);  //    channelY.RotateZ(phi);
+    B2Vector3D channelX(1, 0, 0);     channelX.RotateZ(phi);
+    B2Vector3D channelY(0, 1, 0);     channelY.RotateZ(phi);
 
     //bar is a bit thicker so we can mouse over without getting the geometry
     auto* moduleBox = boxCreator(centerPos3D, channelX, channelY,

@@ -1415,10 +1415,12 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
     }
 
     //convert theta +- dTheta into eta +- dEta
-    TVector3 thetaLow;
-    thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
-    TVector3 thetaHigh;
-    thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
+    ROOT::Math::XYZVector thetaLow;
+    // thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
+    VectorUtil::setPtThetaPhi(thetaLow, 1.0, cluster->getTheta() - dTheta, phi);
+    ROOT::Math::XYZVector thetaHigh;
+    // thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
+    VectorUtil::setPtThetaPhi(thetaHigh, 1.0, cluster->getTheta() + dTheta, phi);
     float etaLow = thetaLow.Eta();
     float etaHigh = thetaHigh.Eta();
     if (etaLow > etaHigh) {

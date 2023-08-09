@@ -1777,12 +1777,12 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   int hitModule = hit->getModule();
   float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
 
-  TVector3 centerPos3D =  hit->getPosition();
+  B2Vector3D centerPos3D =  hit->getPosition();
 
-  TVector3 channelX(1, 0, 0);    channelX.RotateZ(fi);
-  TVector3 channelY(0, 1, 0);    channelY.RotateZ(fi);
+  B2Vector3D channelX(1, 0, 0);    channelX.RotateZ(fi);
+  B2Vector3D channelY(0, 1, 0);    channelY.RotateZ(fi);
 
-  auto* arichbox = boxCreator(ROOT::Math::XYZVector(centerPos3D),
+  auto* arichbox = boxCreator(centerPos3D,
                               ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelX)),
                               ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelY)),
                               0.49, 0.49, 0.05);

@@ -268,7 +268,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   // Create a track as a polyline through reconstructed points
   // FIXME this is snatched from PrimitivePlotter, need to add extrapolation out of CDC
   TEveLine* track = new TEveLine(); // We are going to just add points with SetNextPoint
-  std::vector<TVector3> posPoints; // But first we'll have to sort them as in RecoHits axial and stereo come in blocks
+  std::vector<ROOT::Math::XYZVector> posPoints; // But first we'll have to sort them as in RecoHits axial and stereo come in blocks
   track->SetName(label); //popup label set at end of function
   track->SetLineColor(c_recoTrackColor);
   track->SetLineWidth(3);
@@ -280,6 +280,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
     if (!recoHit->useInFit())
       continue;
 
+    // Need TVector3 here for genfit interface below
     TVector3 pos;
     TVector3 mom;
     TMatrixDSym cov;
@@ -298,11 +299,11 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
       continue;
     }
 
-    posPoints.push_back(TVector3(pos.X(), pos.Y(), pos.Z()));
+    posPoints.push_back(ROOT::Math::XYZVector(pos.X(), pos.Y(), pos.Z()));
   }
 
   sort(posPoints.begin(), posPoints.end(),
-  [](const TVector3 & a, const TVector3 & b) -> bool {
+  [](const ROOT::Math::XYZVector & a, const ROOT::Math::XYZVector & b) -> bool {
     return a.X() * a.X() + a.Y() * a.Y() > b.X() * b.X() + b.Y() * b.Y();
   });
   for (auto vec : posPoints) {

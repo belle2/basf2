@@ -1614,8 +1614,8 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-  const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
-  const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+  const B2Vector3D& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+  const B2Vector3D& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
   static CDC::RealisticTDCCountTranslator tdcTranslator;
   TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
   //TODO: leftrightflag not set! (same for other parameters, unsure which ones should be set)
@@ -1625,12 +1625,12 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   const double lengthOfWireSection = 3.0;
 
   //z in wire direction, x,y orthogonal
-  const TVector3 zaxis = wire_pos_b - wire_pos_f;
-  const TVector3 xaxis = zaxis.Orthogonal();
-  const TVector3 yaxis = xaxis.Cross(zaxis);
+  const B2Vector3D zaxis = wire_pos_b - wire_pos_f;
+  const B2Vector3D xaxis = zaxis.Orthogonal();
+  const B2Vector3D yaxis = xaxis.Cross(zaxis);
 
   // move to z=0
-  const TVector3 midPoint = wire_pos_f - zaxis * (wire_pos_f.Z() / zaxis.Z());
+  const B2Vector3D midPoint = wire_pos_f - zaxis * (wire_pos_f.Z() / zaxis.Z());
 
   cov_shape->SetShape(new TGeoTube(std::max(0., (double)(driftLength - driftLengthRes)), driftLength + driftLengthRes,
                                    lengthOfWireSection));

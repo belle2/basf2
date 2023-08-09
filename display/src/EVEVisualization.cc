@@ -1779,8 +1779,10 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   TVector3 channelX(1, 0, 0);    channelX.RotateZ(fi);
   TVector3 channelY(0, 1, 0);    channelY.RotateZ(fi);
 
-  auto* arichbox = boxCreator(centerPos3D, arichGeo->getMasterVolume().momentumToGlobal(channelX),
-                              arichGeo->getMasterVolume().momentumToGlobal(channelY), 0.49, 0.49, 0.05);
+  auto* arichbox = boxCreator(ROOT::Math::XYZVector(centerPos3D),
+                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelX)),
+                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelY)),
+                              0.49, 0.49, 0.05);
   arichbox->SetMainColor(kOrange + 10);
   arichbox->SetName((std::to_string(hitModule)).c_str());
 

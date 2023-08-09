@@ -203,7 +203,6 @@ void TpcDigitizerModule::event()
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
 
           //drift ionization to GEM 1 plane
-          //const TLorentzVector driftGap(Drift(chipPosition.X(), chipPosition.Y(), chipPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
           double x_DG, y_DG, z_DG, t_DG;
           Drift(ChipPosition.X(),
                 ChipPosition.Y(),
@@ -223,7 +222,6 @@ void TpcDigitizerModule::event()
             //const TVector2 GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
             const TVector2 GEM1(GEMGeo1(x_DG, y_DG));
             //drift 1st amplication to 2nd GEM
-            //const TLorentzVector transferGap(Drift(GEM1.X(), GEM1.Y(), m_z_TG, m_Dt_TG, m_Dl_TG, m_v_TG));
             double x_TG, y_TG, z_TG, t_TG;
             Drift(GEM1.X(), GEM1.Y(), m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
 
@@ -234,7 +232,6 @@ void TpcDigitizerModule::event()
               //const TVector2 GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
               const TVector2 GEM2(GEMGeo2(x_TG, y_TG));
               //drift 2nd amplification to chip
-              //const TLorentzVector collectionGap(Drift(GEM2.X(), GEM2.Y(), m_z_CG, m_Dt_CG, m_Dl_CG, m_v_CG));
               double x_CG, y_CG, z_CG, t_CG;
               Drift(GEM2.X(), GEM2.Y(), m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
 
@@ -295,31 +292,7 @@ void TpcDigitizerModule::event()
   m_dchip_pdg_map.clear();
   m_dchip_trkID_map.clear();
 }
-/*
-TLorentzVector TpcDigitizerModule::Drift(
-  double x1, double y1, double z1,
-  double st, double sl, double vd
-)
-{
-  double x2 = 0;
-  double y2 = 0;
-  double z2 = 0;
-  double t2 = 0;
-  if (z1 > 0.) {
-    //transverse diffusion
-    x2 = x1 + gRandom->Gaus(0., sqrt(z1) * st);
-    //transverse diffusion
-    y2 = y1 + gRandom->Gaus(0., sqrt(z1) * st);
-    //longitidinal diffusion
-    z2 = z1 + gRandom->Gaus(0., sqrt(z1) * sl);
-    //time to diffuse
-    t2 = z2 / vd;
-  } else {
-    x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
-  }
-  return TLorentzVector(x2, y2, z2, t2);
-}
-*/
+
 void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, double& y2, double& z2, double& t2, double st,
                                double sl, double vd)
 {

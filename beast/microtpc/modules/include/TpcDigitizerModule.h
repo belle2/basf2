@@ -83,10 +83,6 @@ namespace Belle2 {
       /** Drift ionization
        * Make the ionization drifting from (x,y,z) to GEM1 top plane
        * */
-      /*TLorentzVector Drift(
-        double x1, double y1, double z1,
-        double st, double sl, double vd
-      );*/
       virtual void Drift(double, double, double, double&, double&, double&, double&, double, double, double);
 
       /** GEMazition of GEM1 */

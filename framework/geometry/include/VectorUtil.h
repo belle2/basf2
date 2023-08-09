@@ -42,6 +42,36 @@ namespace Belle2 {
       vector.SetXYZ(x, y, z);
     }
 
+    /**
+     * Set vector magnitude mag
+     * @param[inout] vector Vector
+     * @param[in]    mag    Magnitude
+     */
+    inline void setMag(ROOT::Math::XYZVector& vector, double mag)
+    {
+      setMagThetaPhi(vector, mag, vector.Theta(), vector.Phi());
+    }
+
+    /**
+     * Set vector azimuthal angle theta
+     * @param[inout] vector Vector
+     * @param[in]    theta  Azimuthal angle
+     */
+    inline void setTheta(ROOT::Math::XYZVector& vector, double theta)
+    {
+      setMagThetaPhi(vector, vector.R(), theta, vector.Phi());
+    }
+
+    /**
+     * Set vector polar angle phi
+     * @param[inout] vector Vector
+     * @param[in]    phi    Polar angle
+     */
+    inline void setPhi(ROOT::Math::XYZVector& vector, double phi)
+    {
+      setMagThetaPhi(vector, vector.R(), vector.Theta(), phi);
+    }
+
   }
 
 }

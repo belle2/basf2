@@ -1604,8 +1604,8 @@ void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* li
 void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-  const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
-  const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+  const ROOT::Math::XYZVector& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+  const ROOT::Math::XYZVector& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
 
   lines->AddLine(wire_pos_f.X(), wire_pos_f.Y(), wire_pos_f.Z(), wire_pos_b.X(), wire_pos_b.Y(), wire_pos_b.Z());
   m_shownRecohits.insert(hit);

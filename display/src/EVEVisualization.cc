@@ -886,6 +886,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 {
   using namespace genfit;
 
+  // Need TVector3 for genfit interface
   TVector3 pos, dir, oldPos, oldDir;
   rep->getPosDir(*state, pos, dir);
   rep->getPosDir(*prevState, oldPos, oldDir);
@@ -924,6 +925,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
       // get cov at first plane
       TMatrixDSym cov;
+      // Need TVector3 for genfit interface
       TVector3 position, direction;
       rep->getPosMomCov(*measuredState, position, direction, cov);
 

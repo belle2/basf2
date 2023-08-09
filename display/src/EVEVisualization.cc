@@ -1445,14 +1445,17 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
     a = startPos.Cross(b).Unit();
     double c = M_PI / 4.0;
     double offset = c / 2.0 + M_PI;
-    a.SetPhi(int((a.Phi() + offset) / (c))*c - M_PI);
+    // a.SetPhi(int((a.Phi() + offset) / (c))*c - M_PI);
+    VectorUtil::setPhi(a, int((a.Phi() + offset) / (c))*c - M_PI);
     ROOT::Math::XYZVector perp = b.Cross(a);
 
     const double barrelRadiusCm = 204.0;
-    startPos.SetMag(barrelRadiusCm / perp.Dot(startPos.Unit()));
+    // startPos.SetMag(barrelRadiusCm / perp.Dot(startPos.Unit()));
+    VectorUtil::setMag(startPos, barrelRadiusCm / perp.Dot(startPos.Unit()));
 
     dir = startPos.Unit();
-    dir.SetMag((layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
+    // dir.SetMag((layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
+    VectorUtil::setMag(dir, (layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
   } else {
     //endcap
     b = ROOT::Math::XYZVector(startPos.X(), startPos.Y(), 0).Unit();
@@ -1462,10 +1465,12 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
       endcapStartZ = -189.5;
 
     double scaleFac = endcapStartZ / startPos.Z();
-    startPos.SetMag(startPos.Mag() * scaleFac);
+    // startPos.SetMag(startPos.Mag() * scaleFac);
+    VectorUtil::setMag(startPos, startPos.R() * scaleFac);
 
     dir = startPos.Unit();
-    dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
+    // dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
+    VectorUtil::setMag(dir, (layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
   }
 
   for (int i = 0; i < cluster->getLayers(); i++) {

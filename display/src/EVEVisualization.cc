@@ -341,7 +341,7 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
 {
   const TString label = ObjectInfo::getIdentifier(&trgTrack);
 
-  TVector3 track_pos = TVector3(0, 0, trgTrack.getZ0());
+  B2Vector3D track_pos = B2Vector3D(0, 0, trgTrack.getZ0());
   B2Vector3D track_mom = (trgTrack.getChargeSign() == 0) ?
                          trgTrack.getDirection() * 1000 :
                          trgTrack.getMomentum(1.5);

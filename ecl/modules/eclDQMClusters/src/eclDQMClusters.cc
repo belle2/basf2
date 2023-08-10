@@ -37,10 +37,6 @@ ECLDQMClustersModule::ECLDQMClustersModule()
            "Crystals number threshold above this number assume that cluster is bad", 400);
 }
 
-ECLDQMClustersModule::~ECLDQMClustersModule()
-{
-}
-
 
 void ECLDQMClustersModule::defineHisto()
 {
@@ -76,18 +72,11 @@ void ECLDQMClustersModule::event()
 {
   StoreArray<ECLCluster> ecl_clusters;
   for (int i = 0; i < ecl_clusters.getEntries(); i++) {
-    auto crystalsNum = ecl_clusters[i]->getNumberOfCrystals();
-    m_CrystalsInClustersHistogram->Fill(0., crystalsNum);
-    m_BadClustersHistogram->Fill(0., (Double_t)(crystalsNum > m_BadCrystalsThreshold));
-    m_ClustersCrystalsNumHistogram->Fill(crystalsNum);
+    if (ecl_clusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      auto crystalsNum = ecl_clusters[i]->getNumberOfCrystals();
+      m_CrystalsInClustersHistogram->Fill(0., crystalsNum);
+      m_BadClustersHistogram->Fill(0., (Double_t)(crystalsNum > m_BadCrystalsThreshold));
+      m_ClustersCrystalsNumHistogram->Fill(crystalsNum);
+    }
   }
-}
-
-void ECLDQMClustersModule::endRun()
-{
-}
-
-
-void ECLDQMClustersModule::terminate()
-{
 }

@@ -134,8 +134,8 @@ void CsIDigitizerModule::event()
       CsiGeometryPar* csip = CsiGeometryPar::Instance();
 
       ROOT::Math::XYZVector hitPos    = aCsISimHit->getPosition();
-      ROOT::Math::XYZVector cellPos   = csip->GetPositionTV3(m_cellID);
-      ROOT::Math::XYZVector cellAngle = csip->GetOrientationTV3(m_cellID);
+      ROOT::Math::XYZVector cellPos   = csip->GetPosition(m_cellID);
+      ROOT::Math::XYZVector cellAngle = csip->GetOrientation(m_cellID);
 
       double localPos = (15. - (hitPos  - cellPos).Dot(
                            cellAngle));  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/

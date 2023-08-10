@@ -76,24 +76,11 @@ namespace Belle2 {
       /** Get pointer to the Geant4 Material */
       G4Material* GetMaterial(int cid);
 
-      /** Get the position of the crystal*/
-      ThreeVector GetPosition(int cid) { return m_Position.at(cid); };
+      /** Get the position of the crystal */
+      ROOT::Math::XYZVector GetPosition(int cid) { return m_Position.at(cid); };
 
-      /** Get the position of the crystal*/
-      ThreeVector GetOrientation(int cid) { return m_Orientation.at(cid); };
-
-      /** Get the position of the crystal in a ROOT::Math::XYZVector*/
-      ROOT::Math::XYZVector GetPositionTV3(int cid) { return m_PositionTV3.at(cid); };
-
-      /** Get the orientation of the crystal in a ROOT::Math::XYZVector*/
-      ROOT::Math::XYZVector GetOrientationTV3(int cid) { return m_OrientationTV3.at(cid); };
-
-      /** Converts to a ROOT::Math::XYZVector */
-      ROOT::Math::XYZVector ConvertToTVector3(ThreeVector _hepTV)
-      {
-        ROOT::Math::XYZVector pos(_hepTV.x(), _hepTV.y(), _hepTV.z());
-        return pos;
-      };
+      /** Get the orientation of the crystal */
+      ROOT::Math::XYZVector GetOrientation(int cid) { return m_Orientation.at(cid); };
 
       /** Get Enclosure ID from cell ID*/
       int GetEnclosureID(int cid) { return m_BoxID.at(cid); };
@@ -129,15 +116,11 @@ namespace Belle2 {
       /** The slot index of the crystal in the enclosure*/
       std::vector<int> m_SlotID;
 
-      /** Position of the nominal centre of the crystal (as a HEP ThreeVector)*/
-      std::vector<ThreeVector> m_Position;
-      /** Position of the nominal centre of the crystal (as a ROOT::Math::XYZVector)*/
-      std::vector<ROOT::Math::XYZVector> m_PositionTV3;
+      /** Position of the nominal centre of the crystal*/
+      std::vector<ROOT::Math::XYZVector> m_Position;
 
-      /** Orientation of the crystal (as a HEP ThreeVector)*/
-      std::vector<ThreeVector> m_Orientation;
-      /** Orientation of the crystal (as ROOT::Math::XYZVector)*/
-      std::vector<ROOT::Math::XYZVector> m_OrientationTV3;
+      /** Orientation of the crystal*/
+      std::vector<ROOT::Math::XYZVector> m_Orientation;
 
       /** Pointer that saves the instance of this class. */
       static CsiGeometryPar* m_B4CsiGeometryParDB;

@@ -2177,7 +2177,7 @@ namespace Belle2 {
           // Calculated impact position
           ROOT::Math::XYZVector vertex = trackMCParticle.getVertex();
           ROOT::Math::PxPyPzEVector vector4 = trackMCParticle.get4Vector();
-          TVector2 helixCenter;
+          ROOT::Math::XYVector helixCenter;
           ROOT::Math::XYZVector impactPosition;
           Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);
           double mcZ0 = impactPosition.Z();

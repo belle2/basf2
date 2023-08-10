@@ -12,7 +12,7 @@
 #include <TVectorD.h>
 #include <Math/Vector4D.h>
 #include <Math/Vector3D.h>
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 #include <map>
 #include <string>
 
@@ -162,7 +162,7 @@ public:
   /// MC calculation functions
   /// Calculates the impact position of track.
   static void findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
-                                 TVector2& helixCenter,
+                                 ROOT::Math::XYVector& helixCenter,
                                  ROOT::Math::XYZVector& impactPosition);
 
   /// HelixParameters: dR, phi0, keppa, dz, tanLambda

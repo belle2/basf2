@@ -21,7 +21,6 @@
 #include <utility>
 #include <iostream>
 #include <fstream>
-#include "TVector2.h"
 
 using std::cout;
 using std::endl;
@@ -1921,7 +1920,7 @@ void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD,
 }
 
 void Fitter3DUtility::findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
-                                         TVector2& helixCenter,
+                                         ROOT::Math::XYVector& helixCenter,
                                          ROOT::Math::XYZVector& impactPosition)
 {
 
@@ -1935,9 +1934,9 @@ void Fitter3DUtility::findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT
   double rho = sqrt(pow(mcMomentum->X(), 2) + pow(mcMomentum->Y(), 2)) / 0.3 / 1.5 * 100;
   double hcx = mcPosition->X() + rho * cos(atan2(mcMomentum->Y(), mcMomentum->X()) - charge * M_PI_2);
   double hcy = mcPosition->Y() + rho * sin(atan2(mcMomentum->Y(), mcMomentum->X()) - charge * M_PI_2);
-  helixCenter.Set(hcx, hcy);
-  double impactX = (helixCenter.Mod() - rho) / helixCenter.Mod() * helixCenter.X();
-  double impactY = (helixCenter.Mod() - rho) / helixCenter.Mod() * helixCenter.Y();
+  helixCenter.SetXY(hcx, hcy);
+  double impactX = (helixCenter.R() - rho) / helixCenter.R() * helixCenter.X();
+  double impactY = (helixCenter.R() - rho) / helixCenter.R() * helixCenter.Y();
   int signdS;
   if (atan2(impactY, impactX) < atan2(mcPosition->Y(), mcPosition->X())) signdS = -1;
   else signdS = 1;

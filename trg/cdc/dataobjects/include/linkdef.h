@@ -15,7 +15,7 @@
 #pragma link C++ class Belle2::CDCTriggerMLP+; // checksum=0x2a3c1c8d, version=10
 #pragma link C++ class Belle2::CDCTriggerMLPData+; // checksum=0x62b29f0b, version=3
 #pragma link C++ class Belle2::CDCTriggerMLPInput+; // checksum=0x6fd59940, version=1
-#pragma link C++ class Belle2::CDCTriggerHoughCluster+; // checksum=0x3b4ff2ce, version=2
+#pragma link C++ class Belle2::CDCTriggerHoughCluster+; // checksum=0x219165f4, version=2
 #pragma link C++ class Belle2::CDCTriggerFinderClone+; // checksum=0x6581a3cf, version=1
 #pragma link C++ class Belle2::TRGCDCTSFUnpackerStore+; // checksum=0x8b9e5f2, version=1
 #pragma link C++ class Belle2::TRGCDCETFUnpackerStore+; // checksum=0x3723963b, version=2
@@ -39,10 +39,10 @@
   source="std::vector<TVector2> cells"                                      \
   version="[1]"                                                             \
   targetClass="Belle2::CDCTriggerHoughCluster"                              \
-  target="cells"                                                            \
+  target="m_cells"                                                            \
   include="TVector2.h"                                                      \
   code="{for (const auto& cell : onfile.cells)                              \
-           cells.emplace_back(ROOT::Math::XYVector(cell.X(), cell.Y()));    \
+           m_cells.emplace_back(ROOT::Math::XYVector(cell.X(), cell.Y()));    \
         }"
 
 #endif

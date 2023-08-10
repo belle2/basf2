@@ -19,37 +19,37 @@ namespace Belle2 {
   public:
     /** default constructor */
     CDCTriggerHoughCluster():
-      xmin(0), xmax(0), ymin(0), ymax(0) { }
+      m_xmin(0), m_xmax(0), m_ymin(0), m_ymax(0) { }
 
     /** constructor with arguments */
     CDCTriggerHoughCluster(int x1, int x2, int y1, int y2,
                            const std::vector<ROOT::Math::XYVector>& cellList):
-      xmin(x1), xmax(x2), ymin(y1), ymax(y2), cells(cellList) { }
+      m_xmin(x1), m_xmax(x2), m_ymin(y1), m_ymax(y2), m_cells(cellList) { }
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerHoughCluster() { }
 
     // accessors
     /** get size of bounding rectangle of cluster */
-    ROOT::Math::XYVector getClusterArea() const { return ROOT::Math::XYVector(xmax - xmin + 1, ymax - ymin + 1); }
+    ROOT::Math::XYVector getClusterArea() const { return ROOT::Math::XYVector(m_xmax - m_xmin + 1, m_ymax - m_ymin + 1); }
     /** get left bottom corner */
-    ROOT::Math::XYVector getCornerBL() const { return ROOT::Math::XYVector(xmin, ymin); }
+    ROOT::Math::XYVector getCornerBL() const { return ROOT::Math::XYVector(m_xmin, m_ymin); }
     /** get top right corner */
-    ROOT::Math::XYVector getCornerTR() const { return ROOT::Math::XYVector(xmax, ymax); }
+    ROOT::Math::XYVector getCornerTR() const { return ROOT::Math::XYVector(m_xmax, m_ymax); }
     /** get list of cell indices */
-    std::vector<ROOT::Math::XYVector> getCells() const { return cells; }
+    std::vector<ROOT::Math::XYVector> getCells() const { return m_cells; }
 
   protected:
     /** x index of left boundary cell */
-    int xmin;
+    int m_xmin;
     /** x index of right boundary cell */
-    int xmax;
+    int m_xmax;
     /** y index of bottom boundary cell */
-    int ymin;
+    int m_ymin;
     /** y index of top boundary cell */
-    int ymax;
+    int m_ymax;
     /** list of cell indices in the cluster */
-    std::vector<ROOT::Math::XYVector> cells = {};
+    std::vector<ROOT::Math::XYVector> m_cells = {};
 
     //! Needed to make the ROOT object storable
     ClassDef(CDCTriggerHoughCluster, 2);

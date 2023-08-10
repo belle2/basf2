@@ -21,7 +21,6 @@
 #include <utility>
 #include <iostream>
 #include <fstream>
-#include "TVector3.h"
 #include "TVector2.h"
 
 using std::cout;
@@ -1921,9 +1920,9 @@ void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD,
   }
 }
 
-void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
+void Fitter3DUtility::findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
                                          TVector2& helixCenter,
-                                         TVector3& impactPosition)
+                                         ROOT::Math::XYZVector& impactPosition)
 {
 
   // Finds the impact position. Everything is in cm, and GeV.
@@ -1933,9 +1932,9 @@ void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyP
   // Output:  helix center's coordiante (hcx, hcy)
   //          impact position (impactX, impactY, impactZ)
 
-  double rho = sqrt(pow(mcMomentum->Px(), 2) + pow(mcMomentum->Py(), 2)) / 0.3 / 1.5 * 100;
-  double hcx = mcPosition->X() + rho * cos(atan2(mcMomentum->Py(), mcMomentum->Px()) - charge * TMath::Pi() / 2);
-  double hcy = mcPosition->Y() + rho * sin(atan2(mcMomentum->Py(), mcMomentum->Px()) - charge * TMath::Pi() / 2);
+  double rho = sqrt(pow(mcMomentum->X(), 2) + pow(mcMomentum->Y(), 2)) / 0.3 / 1.5 * 100;
+  double hcx = mcPosition->X() + rho * cos(atan2(mcMomentum->Y(), mcMomentum->X()) - charge * M_PI_2);
+  double hcy = mcPosition->Y() + rho * sin(atan2(mcMomentum->Y(), mcMomentum->X()) - charge * M_PI_2);
   helixCenter.Set(hcx, hcy);
   double impactX = (helixCenter.Mod() - rho) / helixCenter.Mod() * helixCenter.X();
   double impactY = (helixCenter.Mod() - rho) / helixCenter.Mod() * helixCenter.Y();
@@ -1948,11 +1947,12 @@ void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyP
 
 }
 
-void Fitter3DUtility::calHelixParameters(TVector3 position, TVector3 momentum, int charge, TVectorD& helixParameters)
+void Fitter3DUtility::calHelixParameters(ROOT::Math::XYZVector position, ROOT::Math::XYZVector momentum, int charge,
+                                         TVectorD& helixParameters)
 {
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
   double t_alpha = 1 / 0.3 / 1.5 * 100;
-  double t_pT = momentum.Perp();
+  double t_pT = momentum.Rho();
   double t_R = t_pT * t_alpha;
   helixParameters.Clear();
   helixParameters.ResizeTo(5);
@@ -1965,8 +1965,8 @@ void Fitter3DUtility::calHelixParameters(TVector3 position, TVector3 momentum, i
   helixParameters[4] = momentum.Z() / t_pT * charge;
   helixParameters[3] = position.Z() + helixParameters[4] * t_R * t_phi;
 }
-void Fitter3DUtility::calVectorsAtR(const TVectorD& helixParameters, int charge, double cdcRadius, TVector3& position,
-                                    TVector3& momentum)
+void Fitter3DUtility::calVectorsAtR(const TVectorD& helixParameters, int charge, double cdcRadius, ROOT::Math::XYZVector& position,
+                                    ROOT::Math::XYZVector& momentum)
 {
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
   double t_alpha = 1 / 0.3 / 1.5 * 100;

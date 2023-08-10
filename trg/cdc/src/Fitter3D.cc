@@ -965,10 +965,10 @@ namespace Belle2 {
     const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
 
     // Calculated impact position
-    TVector3 vertex = B2Vector3D(trackMCParticle.getVertex());
+    ROOT::Math::XYZVector vertex = trackMCParticle.getVertex();
     ROOT::Math::PxPyPzEVector vector4 = trackMCParticle.get4Vector();
     TVector2 helixCenter;
-    TVector3 impactPosition;
+    ROOT::Math::XYZVector impactPosition;
     Fitter3DUtility::findImpactPosition(&vertex, &vector4, int(m_mDouble_in["mcCharge"]), helixCenter, impactPosition);
     m_mVector_in["mcVertex"] = vector<double> ({vertex.X(), vertex.Y(), vertex.Z()});
     m_mVector_in["mcMomentum"] = vector<double> ({vector4.Px(), vector4.Py(), vector4.Pz()});
@@ -1035,7 +1035,7 @@ namespace Belle2 {
     m_mVector_in["mcPosZ"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
     for (unsigned iSL = 0; iSL < 9; iSL++) {
       if (mcTSList[iSL] != 0) {
-        TVector3 posTrack = mcTSList[iSL]->simHit()->getPosTrack();
+        ROOT::Math::XYZVector posTrack = mcTSList[iSL]->simHit()->getPosTrack();
         m_mVector_in["mcPosX"][iSL] = posTrack.X();
         m_mVector_in["mcPosY"][iSL] = posTrack.Y();
         m_mVector_in["mcPosZ"][iSL] = posTrack.Z();

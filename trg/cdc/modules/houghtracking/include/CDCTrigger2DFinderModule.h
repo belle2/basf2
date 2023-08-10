@@ -24,6 +24,8 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 
+#include <TMatrix.h>
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, TVector2> cdcPair;

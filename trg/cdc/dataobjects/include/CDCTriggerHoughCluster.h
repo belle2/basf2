@@ -10,6 +10,8 @@
 
 #include <framework/datastore/RelationsObject.h>
 
+#include <TVector2.h>
+
 namespace Belle2 {
 
   /** Cluster created by the Hough finder of the CDC trigger. */

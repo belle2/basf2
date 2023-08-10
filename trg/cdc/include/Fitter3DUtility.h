@@ -11,7 +11,7 @@
 
 #include <TVectorD.h>
 #include <Math/Vector4D.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TVector2.h>
 #include <map>
 #include <string>
@@ -161,15 +161,18 @@ public:
 
   /// MC calculation functions
   /// Calculates the impact position of track.
-  static void findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge, TVector2& helixCenter,
-                                 TVector3& impactPosition);
+  static void findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
+                                 TVector2& helixCenter,
+                                 ROOT::Math::XYZVector& impactPosition);
 
   /// HelixParameters: dR, phi0, keppa, dz, tanLambda
   /// Calculates the helix parameters of track.
-  static void calHelixParameters(TVector3 position, TVector3 momentum, int charge, TVectorD& helixParameters);
+  static void calHelixParameters(ROOT::Math::XYZVector position, ROOT::Math::XYZVector momentum, int charge,
+                                 TVectorD& helixParameters);
 
   /// Calculates position and momentum at a certain radius.
-  static void calVectorsAtR(const TVectorD& helixParameters, int charge, double radius, TVector3& position, TVector3& momentum);
+  static void calVectorsAtR(const TVectorD& helixParameters, int charge, double radius, ROOT::Math::XYZVector& position,
+                            ROOT::Math::XYZVector& momentum);
 
   /// Firmware convert functions
 

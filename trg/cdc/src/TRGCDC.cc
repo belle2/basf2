@@ -2175,10 +2175,10 @@ namespace Belle2 {
           // Change range to [0,2pi]
           if (mcPhi0 < 0) mcPhi0 += 2 * M_PI;
           // Calculated impact position
-          TVector3 vertex = B2Vector3D(trackMCParticle.getVertex());
+          ROOT::Math::XYZVector vertex = trackMCParticle.getVertex();
           ROOT::Math::PxPyPzEVector vector4 = trackMCParticle.get4Vector();
           TVector2 helixCenter;
-          TVector3 impactPosition;
+          ROOT::Math::XYZVector impactPosition;
           Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);
           double mcZ0 = impactPosition.Z();
           double mcCot = trackMCParticle.getMomentum().z() / trackMCParticle.getMomentum().Rho();

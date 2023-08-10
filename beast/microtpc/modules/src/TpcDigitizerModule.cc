@@ -220,8 +220,8 @@ void TpcDigitizerModule::event()
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
             //1st GEM geometrical effect
-            //const TVector2 GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
-            const TVector2 GEM1(GEMGeo1(x_DG, y_DG));
+            //const ROOT::Math::XYVector GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
+            const ROOT::Math::XYVector GEM1(GEMGeo1(x_DG, y_DG));
             //drift 1st amplication to 2nd GEM
             double x_TG, y_TG, z_TG, t_TG;
             Drift(GEM1.X(), GEM1.Y(), m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
@@ -230,8 +230,8 @@ void TpcDigitizerModule::event()
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
               //2nd GEN geometrical effect
-              //const TVector2 GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
-              const TVector2 GEM2(GEMGeo2(x_TG, y_TG));
+              //const ROOT::Math::XYVector GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
+              const ROOT::Math::XYVector GEM2(GEMGeo2(x_TG, y_TG));
               //drift 2nd amplification to chip
               double x_CG, y_CG, z_CG, t_CG;
               Drift(GEM2.X(), GEM2.Y(), m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
@@ -311,7 +311,7 @@ void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, doub
     x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
   }
 }
-TVector2 TpcDigitizerModule::GEMGeo1(double x1, double y1)
+ROOT::Math::XYVector TpcDigitizerModule::GEMGeo1(double x1, double y1)
 {
   static const double sqrt3o4 = std::sqrt(3. / 4.);
   double x2 = 0;
@@ -323,10 +323,10 @@ TVector2 TpcDigitizerModule::GEMGeo1(double x1, double y1)
     //everysecond row is shifted with half a pitch
     x2 = (static_cast<int>(x1 / m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
   }
-  return TVector2(x2, y2);
+  return ROOT::Math::XYVector(x2, y2);
 }
 
-TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
+ROOT::Math::XYVector TpcDigitizerModule::GEMGeo2(double x1, double y1)
 {
   static const double sqrt3o4 = std::sqrt(3. / 4.);
   double x2 = (int)(x1 / (sqrt3o4 * m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * sqrt3o4 * m_GEMpitch;
@@ -338,7 +338,7 @@ TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
     //everysecond row is shifted with half a pitch
     y2 = (static_cast<int>(y1 / m_GEMpitch) + (y1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
   }
-  return TVector2(x2, y2);
+  return ROOT::Math::XYVector(x2, y2);
 }
 
 

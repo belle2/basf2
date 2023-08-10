@@ -93,17 +93,16 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
   B2INFO("eclWaveformTemplateCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 
   /** Write out the basic histograms in all cases */
-  auto gmaxResvsCrysID = new TGraph(cellIDs.size(), cellIDs.data(), maxResiduals.data());
-  gmaxResvsCrysID->SetName("gmaxResvsCrysID");
-  auto gTotalvsCrysID = new TGraph(cellIDs.size(), cellIDs.data(), Counts.data());
-  gTotalvsCrysID->SetName("gTotalvsCrysID");
+  auto gmaxResvsCellID = new TGraph(cellIDs.size(), cellIDs.data(), maxResiduals.data());
+  gmaxResvsCellID->SetName("gmaxResvsCellID");
+  auto gTotalvsCellID = new TGraph(cellIDs.size(), cellIDs.data(), Counts.data());
+  gTotalvsCellID->SetName("gTotalvsCellID");
 
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
   histfile->cd();
-  gmaxResvsCrysID->Write();
-  maxResvsCrysID->Write();
-  gTotalvsCrysID->Write();
+  gmaxResvsCellID->Write();
+  gTotalvsCellID->Write();
   histfile->Close();
   delete histfile;
 

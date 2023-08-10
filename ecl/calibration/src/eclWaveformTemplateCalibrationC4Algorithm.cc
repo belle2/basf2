@@ -41,7 +41,10 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
   //save to db
   ECLDigitWaveformParameters* PhotonHadronDiodeParameters = new ECLDigitWaveformParameters();
 
-  std::vector<bool> checkID(ECLElementNumbers::c_NCrystals, false);
+  std::vector<float> cellIDs;
+  std::vector<float> photonNorms;
+  std::vector<float> hadronNorms;
+  std::vector<float> diodeNorms;
 
   B2INFO("eclWaveformTemplateCalibrationC4Algorithm m_firstCellID, m_lastCellID " << m_firstCellID << " " << m_lastCellID);
 
@@ -65,6 +68,12 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
     B2INFO("P " << j << " " << tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
     B2INFO("H " << j << " " << tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[0]);
     B2INFO("D " << j << " " << tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[0]);
+
+    cellIDs.push_back(j);
+    photonNorms.push_back(tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
+    hadronNorms.push_back(tempexistingPhotonWaveformParameters->getHadronParameters(j)[0]);
+    diodeNorms.push_back(tempexistingPhotonWaveformParameters->getDiodeParameters(j)[0]);
+
     float tempPhotonWaveformParameters[11];
     float tempHadronWaveformParameters[11];
     float tempDiodeWaveformParameters[11];
@@ -74,29 +83,30 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
       tempHadronWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[k];
       tempDiodeWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[k];
     }
-    checkID[j - 1] = true;
     PhotonHadronDiodeParameters->setTemplateParameters(j, tempPhotonWaveformParameters, tempHadronWaveformParameters,
                                                        tempDiodeWaveformParameters);
   }
 
+  auto gphotonNorms = new TGraph(cellIDs.size(), cellIDs.data(), photonNorms.data());
+  gphotonNorms->SetName("gphotonNorms");
+  auto ghadronNorms = new TGraph(cellIDs.size(), cellIDs.data(), hadronNorms.data());
+  ghadronNorms->SetName("ghadronNorms");
+  auto gdiodeNorms = new TGraph(cellIDs.size(), cellIDs.data(), diodeNorms.data());
+  gdiodeNorms->SetName("gdiodeNorms");
+
+  TString fName = m_outputName;
+  TFile* histfile = new TFile(fName, "recreate");
+  histfile->cd();
+  gphotonNorms->Write();
+  ghadronNorms->Write();
+  gdiodeNorms->Write();
+  histfile->Close();
+  delete histfile;
 
 
-  bool Pass = true;
-  for (int k = 0; k < checkID.size(); k++) {
-
-    if (checkID[k] == false) {
-      B2INFO("eclWaveformTemplateCalibrationC4Algorithm:  ERROR checkID false at entry " << k);
-      Pass = false;
-    }
-
-  }
-
-  if (Pass == true) {
-
-    B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload, chosenRun.second = " << experimentNumber);
-    saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters", IntervalOfValidity(experimentNumber, -1,
-                    experimentNumber, -1));
-  }
+  B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload, chosenRun.second = " << experimentNumber);
+  saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters", IntervalOfValidity(experimentNumber, -1,
+                  experimentNumber, -1));
 
   return c_OK;
 }

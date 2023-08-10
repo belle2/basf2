@@ -34,4 +34,15 @@
 #pragma link C++ class Belle2::Bitstream<array<array<char, NN_OUT_WIDTH>, NUM_2D> >+; // checksum=0x689d6f35, version=4
 #pragma link C++ class Belle2::Bitstream<array<array<char, NN_WIDTH>, NUM_2D> >+; // checksum=0x9e8c810d, version=4
 
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerHoughCluster"                              \
+  source="std::vector<TVector2> cells"                                      \
+  version="[1]"                                                             \
+  targetClass="Belle2::CDCTriggerHoughCluster"                              \
+  target="cells"                                                            \
+  include="TVector2.h"                                                      \
+  code="{for (const auto& cell : onfile.cells)                              \
+           cells.emplace_back(ROOT::Math::XYVector(cell.X(), cell.Y()));    \
+        }"
+
 #endif

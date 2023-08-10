@@ -309,12 +309,12 @@ void MicrotpcStudyModule::event()
   auto esumArray = new vector<double>[8](); // esum
   auto trlArray = new vector<double>[8](); // trl
 
-  TVector3 EndPoint;
+  ROOT::Math::XYZVector EndPoint;
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     MicrotpcSimHit* aHit = SimHits[i];
     int detNb = aHit->getdetNb();
-    TVector3 position = aHit->gettkPos();
+    ROOT::Math::XYZVector position = aHit->gettkPos();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG / 2.;
@@ -337,7 +337,7 @@ void MicrotpcStudyModule::event()
       h_zx[detNb]->Fill(zpos, xpos, ioni);
       h_xy[detNb]->Fill(xpos, ypos, ioni);
       h_zy[detNb]->Fill(zpos, ypos, ioni);
-      TVector3 direction = aHit->gettkMomDir();
+      ROOT::Math::XYZVector direction = aHit->gettkMomDir();
       double theta = direction.Theta() * TMath::RadToDeg();
       double phi = direction.Phi() * TMath::RadToDeg();
 
@@ -353,10 +353,10 @@ void MicrotpcStudyModule::event()
       if (pid_old[detNb] != PDGid) {
         if (esum[detNb] > 0) {
           esumArray[detNb].push_back(esum[detNb]);
-          TVector3 BeginPoint;
+          ROOT::Math::XYZVector BeginPoint;
           BeginPoint.SetXYZ(xpos, ypos, zpos);
-          double trl0 = BeginPoint * direction.Unit();
-          double trl1 = EndPoint * direction.Unit();
+          double trl0 = BeginPoint.Dot(direction.Unit());
+          double trl1 = EndPoint.Dot(direction.Unit());
           trlArray[detNb].push_back(fabs(trl0 - trl1));
           /*
             double trl = fabs(trl0 - trl1);

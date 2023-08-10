@@ -96,7 +96,7 @@ void TpcDigitizerModule::event()
 
   for (const auto& microtpcSimHit : microtpcSimHits) {
     const int detNb = microtpcSimHit.getdetNb();
-    const TVector3 simHitPosition = microtpcSimHit.gettkPos();
+    const ROOT::Math::XYZVector simHitPosition = microtpcSimHit.gettkPos();
     TVector3 chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
@@ -135,7 +135,7 @@ void TpcDigitizerModule::event()
     const int pdg = microtpcSimHit.gettkPDG();
     const int trkID = microtpcSimHit.gettkID();
 
-    const TVector3 simHitPosition = microtpcSimHit.gettkPos();
+    const ROOT::Math::XYZVector simHitPosition = microtpcSimHit.gettkPos();
     TVector3 chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),

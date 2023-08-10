@@ -125,8 +125,8 @@ void TPCStudyModule::event()
     int detNb = MicrotpcSimHit.getdetNb();
     int pdg = MicrotpcSimHit.gettkPDG();
     int trkID = MicrotpcSimHit.gettkID();
-    TVector3 position = MicrotpcSimHit.gettkPos();
-    TVector3 direction = MicrotpcSimHit.gettkMomDir();
+    ROOT::Math::XYZVector position = MicrotpcSimHit.gettkPos();
+    ROOT::Math::XYZVector direction = MicrotpcSimHit.gettkMomDir();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG / 2.;

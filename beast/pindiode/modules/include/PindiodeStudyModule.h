@@ -77,7 +77,7 @@ namespace Belle2 {
       /** number of detectors. Read from PINDIODE.xml*/
       //int nPIN = 0;
       /** PIN coordinate */
-      //std::vector<TVector3> PINCenter;
+      //std::vector<ROOT::Math::XYZVector> PINCenter;
       /** Cremat gain */
       double m_CrematGain;
       /** Work function */

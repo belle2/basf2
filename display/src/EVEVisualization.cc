@@ -1415,10 +1415,8 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
 
     //convert theta +- dTheta into eta +- dEta
     ROOT::Math::XYZVector thetaLow;
-    // thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
     VectorUtil::setPtThetaPhi(thetaLow, 1.0, cluster->getTheta() - dTheta, phi);
     ROOT::Math::XYZVector thetaHigh;
-    // thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
     VectorUtil::setPtThetaPhi(thetaHigh, 1.0, cluster->getTheta() + dTheta, phi);
     float etaLow = thetaLow.Eta();
     float etaHigh = thetaHigh.Eta();
@@ -1449,16 +1447,13 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
     a = startPos.Cross(b).Unit();
     double c = M_PI / 4.0;
     double offset = c / 2.0 + M_PI;
-    // a.SetPhi(int((a.Phi() + offset) / (c))*c - M_PI);
     VectorUtil::setPhi(a, int((a.Phi() + offset) / (c))*c - M_PI);
     ROOT::Math::XYZVector perp = b.Cross(a);
 
     const double barrelRadiusCm = 204.0;
-    // startPos.SetMag(barrelRadiusCm / perp.Dot(startPos.Unit()));
     VectorUtil::setMag(startPos, barrelRadiusCm / perp.Dot(startPos.Unit()));
 
     dir = startPos.Unit();
-    // dir.SetMag((layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
     VectorUtil::setMag(dir, (layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
   } else {
     //endcap
@@ -1469,11 +1464,9 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
       endcapStartZ = -189.5;
 
     double scaleFac = endcapStartZ / startPos.Z();
-    // startPos.SetMag(startPos.Mag() * scaleFac);
     VectorUtil::setMag(startPos, startPos.R() * scaleFac);
 
     dir = startPos.Unit();
-    // dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
     VectorUtil::setMag(dir, (layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
   }
 
@@ -1493,7 +1486,6 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
 
 void EVEVisualization::addBKLMHit2d(const KLMHit2d* bklm2dhit)
 {
-  //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
   const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getSection(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
@@ -1813,7 +1805,6 @@ void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
     double z = topmod.getZc();
 
     ROOT::Math::XYZVector centerPos3D;
-    // centerPos3D.SetMagThetaPhi(r_center, M_PI / 2, phi);
     VectorUtil::setMagThetaPhi(centerPos3D, r_center, M_PI / 2, phi);
     centerPos3D.SetZ(z);
 

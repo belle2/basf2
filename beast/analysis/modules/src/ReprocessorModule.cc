@@ -120,8 +120,8 @@ void ReprocessorModule::event()
     for (const auto& mcpart : mc_he3_parts) { // start loop over all Tracks
       const int PDG = mcpart.getPDG();
       const double energy = mcpart.getEnergy();
-      TVector3 Momentum = mcpart.getMomentum();
-      TVector3 ProductionVertex = mcpart.getProductionVertex();
+      ROOT::Math::XYZVector Momentum = mcpart.getMomentum();
+      ROOT::Math::XYZVector ProductionVertex = mcpart.getProductionVertex();
       if (m_input_HE3_PDG == PDG) {
         for (int i = 0; i < m_input_HE3_Ntimes; i ++) {
           // store generated particle

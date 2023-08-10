@@ -349,9 +349,9 @@ bool TrgEclBhabha::GetBhabha01()
     int maxTCId    = aTRGECLCluster->getMaxTCId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
+    ROOT::Math::XYZVector clusterposition(aTRGECLCluster->getPositionX(),
+                                          aTRGECLCluster->getPositionY(),
+                                          aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     ClusterPosition.push_back(clusterposition);
@@ -445,9 +445,9 @@ bool TrgEclBhabha::GetBhabha02()
     int maxTCId    = aTRGECLCluster->getMaxTCId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
+    ROOT::Math::XYZVector clusterposition(aTRGECLCluster->getPositionX(),
+                                          aTRGECLCluster->getPositionY(),
+                                          aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     ClusterPosition.push_back(clusterposition);
@@ -543,9 +543,9 @@ bool TrgEclBhabha::Getmumu()
     int maxTCId    = aTRGECLCluster->getMaxTCId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
+    ROOT::Math::XYZVector clusterposition(aTRGECLCluster->getPositionX(),
+                                          aTRGECLCluster->getPositionY(),
+                                          aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     ClusterPosition.push_back(clusterposition);

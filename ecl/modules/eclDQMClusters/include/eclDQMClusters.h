@@ -28,20 +28,12 @@ namespace Belle2 {
     /** Constructor. */
     ECLDQMClustersModule();
 
-    /** Destructor. */
-    virtual ~ECLDQMClustersModule();
-
     /** Initialize the module. */
     virtual void initialize() override;
     /** Call when a run begins. */
     virtual void beginRun() override;
     /** Event processor. */
     virtual void event() override;
-    /** Call when a run ends. */
-    virtual void endRun() override;
-    /** Terminate. */
-    virtual void terminate() override;
-
     /** Function to define histograms. */
     virtual void defineHisto() override;
 

@@ -30,7 +30,7 @@ namespace Belle2 {
     DQMHistAnalysisECLClustersModule();
 
     /** Destructor. */
-    ~DQMHistAnalysisECLClustersModule();
+    ~DQMHistAnalysisECLClustersModule() {};
 
     /** Initialize the module. */
     void initialize() override final;
@@ -45,15 +45,8 @@ namespace Belle2 {
 
   private:
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    /** EPICS channel for average number of crystals in ECL Clusters */
-    chid avgCrystalsInCluster;
-    /** EPICS channel for number of bad ECL Clusters */
-    chid badClustersNum;
-#endif
+    /** Prefix to use for PVs registered by this module */
+    std::string m_pvPrefix;
 
     /** Number of bad ECL Clusters */
     double m_badClustersNumber = 0;

@@ -146,8 +146,8 @@ CDCTriggerHoughETFModule::fastInterceptFinder(cdcMap& hits,
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
-          TVector2 v1(x1_d, y1_d);
-          TVector2 v2(x2_d, y2_d);
+          ROOT::Math::XYVector v1(x1_d, y1_d);
+          ROOT::Math::XYVector v2(x2_d, y2_d);
           houghCand.push_back(CDCTriggerHoughCand(idx_list, make_pair(v1, v2),
                                                   nSL, houghCand.size()));
           if (m_storePlane > 0) {

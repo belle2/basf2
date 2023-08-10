@@ -12,7 +12,6 @@
 #include <framework/logging/Logger.h>
 #include <trg/ecl/TrgEclMapping.h>
 
-#include "TVector3.h"
 
 using namespace std;
 using namespace Belle2;
@@ -242,7 +241,7 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
 //
 //
 //
-TVector3 TrgEclMapping::getTCPosition(int TCId)
+ROOT::Math::XYZVector TrgEclMapping::getTCPosition(int TCId)
 {
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
@@ -830,7 +829,7 @@ TVector3 TrgEclMapping::getTCPosition(int TCId)
 
 
 
-  TVector3 xyz(TCPosition[TCId - 1][0], TCPosition[TCId - 1][1], TCPosition[TCId - 1][2]);
+  ROOT::Math::XYZVector xyz(TCPosition[TCId - 1][0], TCPosition[TCId - 1][1], TCPosition[TCId - 1][2]);
 
   return xyz;
 

@@ -14,6 +14,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/geometry/B2Vector3.h>
 
 //c++
 #include <cmath>
@@ -97,7 +98,7 @@ void TpcDigitizerModule::event()
   for (const auto& microtpcSimHit : microtpcSimHits) {
     const int detNb = microtpcSimHit.getdetNb();
     const ROOT::Math::XYZVector simHitPosition = microtpcSimHit.gettkPos();
-    TVector3 chipPosition(
+    B2Vector3D chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z()
@@ -136,7 +137,7 @@ void TpcDigitizerModule::event()
     const int trkID = microtpcSimHit.gettkID();
 
     const ROOT::Math::XYZVector simHitPosition = microtpcSimHit.gettkPos();
-    TVector3 chipPosition(
+    B2Vector3D chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z()
@@ -144,7 +145,7 @@ void TpcDigitizerModule::event()
     chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
     chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
 
-    TVector3 ChipPosition(0, 0, 0);
+    ROOT::Math::XYZVector ChipPosition(0, 0, 0);
     if (m_phase == 1) {
       if (detNb == 0 || detNb == 3) {
         ChipPosition.SetX(-chipPosition.Y());
@@ -663,8 +664,9 @@ void TpcDigitizerModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    m_TPCCenter.push_back(TVector3(activeParams.getLength("SensVol_x"), activeParams.getLength("SensVol_y"),
-                                   activeParams.getLength("SensVol_z")));
+    m_TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("SensVol_x"),
+                                                activeParams.getLength("SensVol_y"),
+                                                activeParams.getLength("SensVol_z")));
     m_TPCAngleX.push_back(activeParams.getLength("AngleX"));
     m_TPCAngleZ.push_back(activeParams.getLength("AngleZ"));
 

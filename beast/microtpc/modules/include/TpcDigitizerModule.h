@@ -14,7 +14,7 @@
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
 
 #include <TF1.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TVector2.h>
 
 #include <vector>
@@ -189,7 +189,7 @@ namespace Belle2 {
       /** number of detectors. Read from MICROTPC.xml*/
       int m_nTPC = 0;
       /** TPC coordinate */
-      std::vector<TVector3> m_TPCCenter;
+      std::vector<ROOT::Math::XYZVector> m_TPCCenter;
       /** TPC angle X */
       std::vector<float> m_TPCAngleX;
       /** TPC angle Z */

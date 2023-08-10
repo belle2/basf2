@@ -18,7 +18,7 @@
 #include <string>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TH1.h>
 #include <TH2.h>
 
@@ -290,8 +290,9 @@ void TPCStudyModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
-                                 activeParams.getLength("TPCpos_z")));
+    TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("TPCpos_x"),
+                                              activeParams.getLength("TPCpos_y"),
+                                              activeParams.getLength("TPCpos_z")));
     nTPC++;
   }
 

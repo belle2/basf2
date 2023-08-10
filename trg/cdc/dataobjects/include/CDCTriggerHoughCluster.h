@@ -10,7 +10,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
 
@@ -23,7 +23,7 @@ namespace Belle2 {
 
     /** constructor with arguments */
     CDCTriggerHoughCluster(int x1, int x2, int y1, int y2,
-                           const std::vector<TVector2>& cellList):
+                           const std::vector<ROOT::Math::XYVector>& cellList):
       xmin(x1), xmax(x2), ymin(y1), ymax(y2), cells(cellList) { }
 
     /** destructor, empty because we don't allocate memory anywhere. */
@@ -31,13 +31,13 @@ namespace Belle2 {
 
     // accessors
     /** get size of bounding rectangle of cluster */
-    TVector2 getClusterArea() const { return TVector2(xmax - xmin + 1, ymax - ymin + 1); }
+    ROOT::Math::XYVector getClusterArea() const { return ROOT::Math::XYVector(xmax - xmin + 1, ymax - ymin + 1); }
     /** get left bottom corner */
-    TVector2 getCornerBL() const { return TVector2(xmin, ymin); }
+    ROOT::Math::XYVector getCornerBL() const { return ROOT::Math::XYVector(xmin, ymin); }
     /** get top right corner */
-    TVector2 getCornerTR() const { return TVector2(xmax, ymax); }
+    ROOT::Math::XYVector getCornerTR() const { return ROOT::Math::XYVector(xmax, ymax); }
     /** get list of cell indices */
-    std::vector<TVector2> getCells() const { return cells; }
+    std::vector<ROOT::Math::XYVector> getCells() const { return cells; }
 
   protected:
     /** x index of left boundary cell */
@@ -49,10 +49,10 @@ namespace Belle2 {
     /** y index of top boundary cell */
     int ymax;
     /** list of cell indices in the cluster */
-    std::vector<TVector2> cells = {};
+    std::vector<ROOT::Math::XYVector> cells = {};
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerHoughCluster, 1);
+    ClassDef(CDCTriggerHoughCluster, 2);
   };
 }
 #endif

@@ -269,7 +269,7 @@ class PXDBackgroundGenerator(basf2.Module):
         torch.manual_seed(seed)
 
         # instantiate objects for specifying distinct PXD modules
-        self._vxdids = tuple(VxdID(arg) for arg in VXDID_ARGS)
+        self._vxdids = tuple(VxdID(*arg) for arg in VXDID_ARGS)
 
         # get the name of the extension used by BGOverlayInput for background collections
         bkginfo = PyStoreObj("BackgroundInfo", DataStore.c_Persistent)

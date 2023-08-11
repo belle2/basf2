@@ -22,7 +22,6 @@
 
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 
-#include "TVector3.h"
 #include "TFile.h"
 #include "TNtuple.h"
 

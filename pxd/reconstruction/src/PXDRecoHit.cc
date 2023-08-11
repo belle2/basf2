@@ -18,7 +18,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
 #include <TRandom.h>
 
 using namespace std;

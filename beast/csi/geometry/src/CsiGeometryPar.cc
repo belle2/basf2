@@ -117,8 +117,8 @@ void CsiGeometryPar::read()
       Transform3D CrystalPos = Tr * Pos;
       RotationMatrix CrystalRot = CrystalPos.getRotation();
 
-      m_Position.push_back(CrystalPos.getTranslation() * 1.0 / CLHEP::cm);
-      m_Orientation.push_back(CrystalRot.colZ());
+      m_Position.push_back(ROOT::Math::XYZVector(CrystalPos.getTranslation()) * 1.0 / CLHEP::cm);
+      m_Orientation.push_back(ROOT::Math::XYZVector(CrystalRot.colZ()));
 
       m_thetaID.push_back(CrystalPos.getTranslation().z() > 0 ? 0 : 1);
       m_phiID.push_back(iCell - 9 * m_thetaID.back());
@@ -128,18 +128,6 @@ void CsiGeometryPar::read()
     }
     //
   }
-
-  //comnvert all that to tvector3's for speed
-
-  vector<ThreeVector>::iterator it;
-  for (it = m_Position.begin(); it != m_Position.end(); ++it) {
-    m_PositionTV3.push_back(ConvertToTVector3(*it));
-  }
-  for (it = m_Orientation.begin(); it != m_Orientation.end(); ++it) {
-    m_OrientationTV3.push_back(ConvertToTVector3(*it));
-  }
-
-
 }
 
 

@@ -18,7 +18,7 @@
 #include <string>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TH1.h>
 #include <TH2.h>
 
@@ -125,8 +125,8 @@ void TPCStudyModule::event()
     int detNb = MicrotpcSimHit.getdetNb();
     int pdg = MicrotpcSimHit.gettkPDG();
     int trkID = MicrotpcSimHit.gettkID();
-    TVector3 position = MicrotpcSimHit.gettkPos();
-    TVector3 direction = MicrotpcSimHit.gettkMomDir();
+    ROOT::Math::XYZVector position = MicrotpcSimHit.gettkPos();
+    ROOT::Math::XYZVector direction = MicrotpcSimHit.gettkMomDir();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG / 2.;
@@ -290,8 +290,9 @@ void TPCStudyModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
-                                 activeParams.getLength("TPCpos_z")));
+    TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("TPCpos_x"),
+                                              activeParams.getLength("TPCpos_y"),
+                                              activeParams.getLength("TPCpos_z")));
     nTPC++;
   }
 

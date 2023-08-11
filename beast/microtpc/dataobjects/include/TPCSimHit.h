@@ -12,7 +12,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -36,8 +36,8 @@ namespace Belle2 {
       int Pdg,               /**< Particle PDG (can be one of secondaries) */
       float FlightTime,      /**< Flight time from IP */
       float Edep,            /**< Deposit energy */
-      TVector3 Momentum,     /**< Momentum */
-      TVector3 Position,        /**< Position */
+      ROOT::Math::XYZVector Momentum,     /**< Momentum */
+      ROOT::Math::XYZVector Position,        /**< Position */
       int flag               /**< flag */
     ): SimHitBase()
     {
@@ -77,15 +77,15 @@ namespace Belle2 {
 
     /*! Set Momentum
      */
-    void setMomentum(TVector3 Momentum) { m_Momentum = Momentum; }
+    void setMomentum(ROOT::Math::XYZVector Momentum) { m_Momentum = Momentum; }
 
     /*! Set Position
      */
-    void setPosIn(TVector3 Position) { m_Position = Position; }
+    void setPosIn(ROOT::Math::XYZVector Position) { m_Position = Position; }
 
     /*! Set Position
      */
-    void setPosition(TVector3 Position) { m_Position = Position; }
+    void setPosition(ROOT::Math::XYZVector Position) { m_Position = Position; }
 
     /*! Set flag
      */
@@ -120,17 +120,17 @@ namespace Belle2 {
     /*! Get Momentum
      * @return Momentum
      */
-    TVector3 getMomentum() const { return m_Momentum; }
+    ROOT::Math::XYZVector getMomentum() const { return m_Momentum; }
 
     /*! Get Position
      * @return Position
      */
-    TVector3 getPosIn() const { return m_Position; }
+    ROOT::Math::XYZVector getPosIn() const { return m_Position; }
 
     /*! Get Position
      * @return Position
      */
-    TVector3 getPosition() const { return m_Position; }
+    ROOT::Math::XYZVector getPosition() const { return m_Position; }
 
     /*! Get flag
      * @return flag
@@ -150,8 +150,8 @@ namespace Belle2 {
     int m_Pdg;               /**< Particle PDG (can be one of secondaries) */
     float m_FlightTime;      /**< Flight time from IP */
     float m_Edep;            /**< Deposit energy */
-    TVector3 m_Momentum;     /**< Momentum */
-    TVector3 m_Position;        /**< Position */
+    ROOT::Math::XYZVector m_Momentum;     /**< Momentum */
+    ROOT::Math::XYZVector m_Position;        /**< Position */
     int m_flag;              /**< flag */
 
     ClassDef(TPCSimHit, 1)

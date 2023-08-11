@@ -14,6 +14,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/geometry/B2Vector3.h>
 
 //c++
 #include <cmath>
@@ -96,8 +97,8 @@ void TpcDigitizerModule::event()
 
   for (const auto& microtpcSimHit : microtpcSimHits) {
     const int detNb = microtpcSimHit.getdetNb();
-    const TVector3 simHitPosition = microtpcSimHit.gettkPos();
-    TVector3 chipPosition(
+    const ROOT::Math::XYZVector simHitPosition = microtpcSimHit.gettkPos();
+    B2Vector3D chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z()
@@ -135,8 +136,8 @@ void TpcDigitizerModule::event()
     const int pdg = microtpcSimHit.gettkPDG();
     const int trkID = microtpcSimHit.gettkID();
 
-    const TVector3 simHitPosition = microtpcSimHit.gettkPos();
-    TVector3 chipPosition(
+    const ROOT::Math::XYZVector simHitPosition = microtpcSimHit.gettkPos();
+    B2Vector3D chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z()
@@ -144,7 +145,7 @@ void TpcDigitizerModule::event()
     chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
     chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
 
-    TVector3 ChipPosition(0, 0, 0);
+    ROOT::Math::XYZVector ChipPosition(0, 0, 0);
     if (m_phase == 1) {
       if (detNb == 0 || detNb == 3) {
         ChipPosition.SetX(-chipPosition.Y());
@@ -219,8 +220,8 @@ void TpcDigitizerModule::event()
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
             //1st GEM geometrical effect
-            //const TVector2 GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
-            const TVector2 GEM1(GEMGeo1(x_DG, y_DG));
+            //const ROOT::Math::XYVector GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
+            const ROOT::Math::XYVector GEM1(GEMGeo1(x_DG, y_DG));
             //drift 1st amplication to 2nd GEM
             double x_TG, y_TG, z_TG, t_TG;
             Drift(GEM1.X(), GEM1.Y(), m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
@@ -229,8 +230,8 @@ void TpcDigitizerModule::event()
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
               //2nd GEN geometrical effect
-              //const TVector2 GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
-              const TVector2 GEM2(GEMGeo2(x_TG, y_TG));
+              //const ROOT::Math::XYVector GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
+              const ROOT::Math::XYVector GEM2(GEMGeo2(x_TG, y_TG));
               //drift 2nd amplification to chip
               double x_CG, y_CG, z_CG, t_CG;
               Drift(GEM2.X(), GEM2.Y(), m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
@@ -310,7 +311,7 @@ void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, doub
     x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
   }
 }
-TVector2 TpcDigitizerModule::GEMGeo1(double x1, double y1)
+ROOT::Math::XYVector TpcDigitizerModule::GEMGeo1(double x1, double y1)
 {
   static const double sqrt3o4 = std::sqrt(3. / 4.);
   double x2 = 0;
@@ -322,10 +323,10 @@ TVector2 TpcDigitizerModule::GEMGeo1(double x1, double y1)
     //everysecond row is shifted with half a pitch
     x2 = (static_cast<int>(x1 / m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
   }
-  return TVector2(x2, y2);
+  return ROOT::Math::XYVector(x2, y2);
 }
 
-TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
+ROOT::Math::XYVector TpcDigitizerModule::GEMGeo2(double x1, double y1)
 {
   static const double sqrt3o4 = std::sqrt(3. / 4.);
   double x2 = (int)(x1 / (sqrt3o4 * m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * sqrt3o4 * m_GEMpitch;
@@ -337,7 +338,7 @@ TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
     //everysecond row is shifted with half a pitch
     y2 = (static_cast<int>(y1 / m_GEMpitch) + (y1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
   }
-  return TVector2(x2, y2);
+  return ROOT::Math::XYVector(x2, y2);
 }
 
 
@@ -663,8 +664,9 @@ void TpcDigitizerModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    m_TPCCenter.push_back(TVector3(activeParams.getLength("SensVol_x"), activeParams.getLength("SensVol_y"),
-                                   activeParams.getLength("SensVol_z")));
+    m_TPCCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("SensVol_x"),
+                                                activeParams.getLength("SensVol_y"),
+                                                activeParams.getLength("SensVol_z")));
     m_TPCAngleX.push_back(activeParams.getLength("AngleX"));
     m_TPCAngleZ.push_back(activeParams.getLength("AngleZ"));
 

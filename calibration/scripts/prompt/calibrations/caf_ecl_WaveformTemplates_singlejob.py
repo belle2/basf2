@@ -69,7 +69,7 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_Wave_C1.pre_collector_path = gamma_gamma_pre_path
 
     LowLimit = 1
-    UpperLimit = 1000
+    UpperLimit = 8736
 
     # ..Algorithm
     algos_C2 = Belle2.ECL.eclWaveformTemplateCalibrationC2Algorithm()
@@ -101,6 +101,8 @@ def get_calibrations(input_data, **kwargs):
 
     # ..Algorithm
     algo_C4 = Belle2.ECL.eclWaveformTemplateCalibrationC4Algorithm()
+    algo_C4.setFirstCellID(LowLimit)
+    algo_C4.setLastCellID(UpperLimit)
 
     # ..The calibration
     cal_ecl_Wave_C4 = Calibration("ecl_Wave_C4",

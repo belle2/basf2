@@ -16,7 +16,6 @@
 #include <vector>
 #include <fstream>
 
-#include <root/TVector2.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -24,13 +23,16 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 
+#include <TMatrix.h>
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
-  typedef std::pair<unsigned short, TVector2> cdcPair;
+  typedef std::pair<unsigned short, ROOT::Math::XYVector> cdcPair;
   /** Map of <counter, cdcPair>, for hits with indices */
   typedef std::map<int, cdcPair> cdcMap;
   /** Hough Tuples */
-  typedef std::pair<TVector2, TVector2> coord2dPair;
+  typedef std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> coord2dPair;
 
   /**
    * Hough Candidates class.

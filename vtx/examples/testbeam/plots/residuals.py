@@ -5,10 +5,10 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-from ROOT import TFile, TH1F, TH2F
-from ROOT import gROOT, Double, TCut, gROOT
+from ROOT import TH1F, TH2F
+from ROOT import gROOT, TCut
 import math
-
+import ROOT
 gROOT.SetBatch()
 
 
@@ -16,8 +16,6 @@ def make_pdf(histofile, pdfName='plots.pdf'):
 
     if histofile is None:
         return
-
-    import ROOT
 
     c1 = ROOT.TCanvas("c1", "", 10, 10, 1100, 700)
     c1.SetRightMargin(0.2)
@@ -69,8 +67,6 @@ def overlay_pdf(histofile1, histofile2, pdfName='plots.pdf'):
         return
     if histofile2 is None:
         return
-
-    import ROOT
 
     c1 = ROOT.TCanvas("c1", "", 10, 10, 1100, 700)
     c1.SetRightMargin(0.2)

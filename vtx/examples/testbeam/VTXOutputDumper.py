@@ -9,20 +9,16 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from ROOT import TrackData
-from ROOT import HitData
-import sys
+
 import math
 import basf2 as b2
 
 # Some ROOT tools
 import ROOT
-from ROOT import Belle2
-
-from ROOT import gROOT, AddressOf
+from ROOT import Belle2, addressof
 
 # Define a ROOT struct to hold output data in the TTree.
-gROOT.ProcessLine('struct HitData {\
+ROOT.gInterpreter.Declare('struct HitData {\
     int cellU_hit;\
     int cellV_hit;\
     int cellU_fit;\
@@ -43,10 +39,9 @@ gROOT.ProcessLine('struct HitData {\
     float theta_u;\
     float theta_v;\
     int hasTrack;\
-};'
-                  )
+};')
 
-gROOT.ProcessLine('struct TrackData {\
+ROOT.gInterpreter.Declare('struct TrackData {\
     int cellU_fit;\
     int cellV_fit;\
     float cellUCenter_fit;\
@@ -54,8 +49,7 @@ gROOT.ProcessLine('struct TrackData {\
     float u_fit;\
     float v_fit;\
     int hasHit;\
-};'
-                  )
+};')
 
 
 conversion_cm_to_mm = 10
@@ -83,22 +77,22 @@ class VTXOutputDumper(b2.Module):
         self.Hit = ROOT.TTree('Hit', 'Hit data of VTX simulation')
         self.Track = ROOT.TTree('Track', 'Track data of VTX simulation')
         #: Instance of HitData class
-        self.dataHit = HitData()
-        self.dataTrack = TrackData()
+        self.dataHit = ROOT.HitData()
+        self.dataTrack = ROOT.TrackData()
         # Declare tree branches
-        for key in HitData.__dict__:
+        for key in ROOT.HitData.__dict__:
             if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.dataHit.__getattribute__(key), int):
                     formstring = '/I'
-                self.Hit.Branch(key, AddressOf(self.dataHit, key), key + formstring)
+                self.Hit.Branch(key, addressof(self.dataHit, key), key + formstring)
 
-        for key in TrackData.__dict__:
+        for key in ROOT.TrackData.__dict__:
             if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.dataTrack.__getattribute__(key), int):
                     formstring = '/I'
-                self.Track.Branch(key, AddressOf(self.dataTrack, key), key + formstring)
+                self.Track.Branch(key, addressof(self.dataTrack, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -126,18 +120,17 @@ class VTXOutputDumper(b2.Module):
                 # Now let's store some data
                 # Get sensor geometry information
                 sensor_info = Belle2.VXD.GeoCache.get(cluster.getSensorID())
-                sensor_info_truehit = Belle2.VXD.GeoCache.get(truehit.getSensorID())
-                assert (sensor_info == sensor_info_truehit), B2ERROR("Different sensor info for TrueHit and Cluster")
+                # sensor_info_truehit = Belle2.VXD.GeoCache.get(truehit.getSensorID())
 
                 thickness = sensor_info.getThickness()
                 mom = truehit.getMomentum()
-                tu = mom[0] / mom[2]
-                tv = mom[1] / mom[2]
+                tu = mom.X() / mom.Z()
+                tv = mom.Y() / mom.Z()
 
                 # TrueHit information
-                pitchU = conversion_cm_to_mm * sensor_info.getUPitch(truehit.getV())
-                pitchV = conversion_cm_to_mm * sensor_info.getVPitch(truehit.getV())
                 # Print the pitch obtained from the sensor info
+                # pitchU = conversion_cm_to_mm * sensor_info.getUPitch(truehit.getV())
+                # pitchV = conversion_cm_to_mm * sensor_info.getVPitch(truehit.getV())
                 # print('PitchU={:.4f}mm and PitchV={:.4f}mm'.format(pitchU,pitchV  ) )
                 self.dataHit.u_fit = conversion_cm_to_mm * truehit.getU()
                 self.dataHit.v_fit = conversion_cm_to_mm * truehit.getV()
@@ -149,6 +142,7 @@ class VTXOutputDumper(b2.Module):
                 self.dataHit.cellVCenter_fit = conversion_cm_to_mm * sensor_info.getVCellPosition(truehit_VcellID)
                 self.dataHit.theta_u = math.atan2(truehit.getExitU() - truehit.getEntryU(), thickness)
                 self.dataHit.theta_v = math.atan2(truehit.getExitV() - truehit.getEntryV(), thickness)
+                self.dataHit.localChi2 = 0
                 # Cluster information
                 offset = PositionEstimator.getClusterOffset(cluster, tu, tv)
                 if offset:

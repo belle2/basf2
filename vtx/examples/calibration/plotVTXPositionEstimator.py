@@ -21,7 +21,6 @@ import pandas as pd
 import seaborn as sns
 
 from ROOT import Belle2
-import ROOT
 import basf2 as b2
 
 
@@ -43,7 +42,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
 
         # We plot the payload whenever it changes
         if self.position_estimator.hasChanged():
-            B2INFO("VTXClusterPositionEstimator payload has changed. Plot the new payload.")
+            print("VTXClusterPositionEstimator payload has changed. Plot the new payload.")
             self.plot()
             self.counter += 1
 
@@ -246,7 +245,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
         # Read corrections data
         offsetMap = shape_classifier.getOffsetMap()
         likelyhoodMap = shape_classifier.getLikelyhoodMap()
-        shapeLikelyhoodMap = shape_classifier.getShapeLikelyhoodMap()
+        # shapeLikelyhoodMap = shape_classifier.getShapeLikelyhoodMap()
 
         # Some counters
         nCorrections = 0
@@ -256,7 +255,7 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
         for item in offsetMap:
             shape_index = item.first
             offsets_array = item.second
-            shape_likelyhood = shapeLikelyhoodMap[shape_index]
+            # shape_likelyhood = shapeLikelyhoodMap[shape_index]
 
             nShapes += 1
 

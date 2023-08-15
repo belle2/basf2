@@ -52,6 +52,15 @@ VTXDigitizerModule::VTXDigitizerModule() :
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name", string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name", string(""));
+  addParam("UseToTCalibration", m_useTotCalibration, "Apply ToT calibration", false);
+  addParam("ToT2DAC", m_tot2Dac, "ToT to DAC conversion factor", float(10.1));
+  addParam("ToTCoefficientA", m_totCalibrationA, "ToT calibration coefficient A in ToT = A*Q + B - C/(Q-T) ", float(0.118));
+  addParam("ToTCoefficientB", m_totCalibrationB, "ToT calibration coefficient B in: ToT = A*Q + B - C/(Q-T) ", float(1.3));
+  addParam("ToTCoefficientC", m_totCalibrationC, "ToT calibration coefficient C in ToT = A*Q + B - C/(Q-T) ", float(1.4e2));
+  addParam("ToTCoefficientT", m_totCalibrationT, "ToT calibration coefficient T in ToT = A*Q + B - C/(Q-T) ", float(4e1));
+  addParam("ChargeCollectionEfficiency", m_cce, "Fraction CE of deposited charge that is collected", float(1.0));
+
+
 
   m_currentSensor = nullptr;
 }
@@ -160,6 +169,7 @@ void VTXDigitizerModule::event()
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
+    if (!m_currentHit->getElectrons()) continue;
     const RelationIndex<MCParticle, VTXSimHit>::Element* mcRel =
       relMCParticleSimHit.getFirstElementTo(m_currentHit);
     if (mcRel) {
@@ -396,8 +406,8 @@ void VTXDigitizerModule::saveDigits()
       const DigitValue& v = digitAndValue.second;
 
       // Check if the readout digit is coming from a masked or dead area
-      // if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
-      //     || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
+      // if (VTX::VTXPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
+      //     || !VTX::VTXPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
       //   continue;
       // }
 
@@ -409,15 +419,22 @@ void VTXDigitizerModule::saveDigits()
         if (charge < info.getBinaryHitThreshold()) continue;
         else charge = 1.0;
       } else {
-        // Remove threshold for value of TOT
-        charge -= m_chargeThreshold * info.getElectronToADU();
+        if (m_useTotCalibration) {
+          // Apply ToT testbeam calibration
+          double chargeDac = m_cce * charge / m_tot2Dac;
+          double y = m_totCalibrationA * chargeDac + m_totCalibrationB - m_totCalibrationC / (chargeDac - m_totCalibrationT);
+          if (y < 0 || charge <= info.getBinaryHitThreshold()) charge = 0;
+          else charge = y;
+        } else {
+          // Remove threshold in electrons
+          charge -= info.getChargeThreshold() * info.getElectronToADU();
 
-        // Check if under threshold
-        if (charge < 0) continue;
+          // Check if under threshold
+          if (charge < 0) continue;
 
-        // Amplifiy and digitize charge
-        charge = round(charge / info.getElectronToADU());
-
+          // Amplifiy and digitize charge
+          charge = round(charge / info.getElectronToADU());
+        }
         // Clipping of ADC codes
         charge = (int) charge % (int) info.getMaxADUCode();
       }

@@ -11,25 +11,30 @@
 
 #############################################################
 # Simple steering file to demonstrate how to run testbeam
-# Before running, you need to set upgrade global tag
-# environment variable (BELLE2_VTX_UPGRADE_GT).
 #
-# Usage: python3 testbeam_example.py (-n 100000 -angle 0)
+# Usage: python3 testbeam_example.py  -forceCoG (-n 100000 -angle 0)
 #############################################################
 
-from vtx import get_upgrade_globaltag
+
 import basf2 as b2
 from VTXOutputDumper import VTXOutputDumper
 
 import argparse
 parser = argparse.ArgumentParser(description="Perform runs of test beam")
-parser.add_argument('-n', default=100000, type=int, help='Number of events to generate')
+parser.add_argument('-n', default=10000, type=int, help='Number of events to generate')
 parser.add_argument('-angle', default=0.0, type=float, help='Angle (deg) for the particleGun (in phi)')
 parser.add_argument('-forceCoG', default=False, action='store_true', help="Use only(!) center of gravity based position finding")
+parser.add_argument('-outputfile', default='', type=str, help='Path of output file')
+parser.add_argument('-eToADU', default=50.0, type=float, help='Conversion from collected charge in e- to ADU code')
+parser.add_argument('-height', default=0.030, type=float, help='Depleted height in mm')
+parser.add_argument('-thr', default=150.0, type=float, help='Hit threshold in e-')
+parser.add_argument('-cloudSize', default=0.000085, type=float, help='Diffusion coefficient')
+parser.add_argument('-cce', default=1.0, type=float, help='Charge collection efficiency, should be 1.0 for non HV')
+parser.add_argument('-tb_a', default=0.118, type=float, help='ToT calibration coefficient a')
+parser.add_argument('-tb_b', default=1.3, type=float, help='ToT calibration coefficient b')
+parser.add_argument('-tb_c', default=1.4e2, type=float, help='ToT calibration coefficient c')
+parser.add_argument('-tb_t', default=4e1, type=float, help='ToT calibration coefficient t')
 args = parser.parse_args()
-
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
 
 # Number of events to generate
@@ -46,6 +51,17 @@ main = b2.create_path()
 
 main.add_module("EventInfoSetter", evtNumList=num_events)
 
+gearbox = main.add_module("Gearbox")
+gearbox.param({
+    "overridePrefix": "//DetectorComponent[@name='VTX-CMOS-testbeam-2022-07-01']/Content/Components/Sensor/Active/",
+    "override": [
+        ("height", str(args.height), "mm"),
+        ("BinaryHitThreshold", str(args.thr), "ENC"),
+        ("ElectronToADU", str(args.eToADU), "ENC"),
+        ("CloudSize", str(args.cloudSize), "mm"),
+    ],
+})
+
 main.add_module('ParticleGun', pdgCodes=[11],
                 momentumGeneration="fixed", momentumParams=[5.2],
                 thetaGeneration="fixed", thetaParams=[90.],
@@ -53,18 +69,46 @@ main.add_module('ParticleGun', pdgCodes=[11],
                 # normal distributed vertex generation
                 vertexGeneration='normal',
                 xVertexParams=[-0.02, 0.0],
-                yVertexParams=[0.28, 0.3],
-                zVertexParams=[0.95, 0.3]
+                yVertexParams=[0.28, 0.6],
+                zVertexParams=[0.95, 0.6]
                 )
 
 main.add_module('Gearbox')
-main.add_module('Geometry')
+
+excluded_parts = [
+    'PXD',
+    'SVD',
+    'CDC',
+    'ECL',
+    'ARICH',
+    'TOP',
+    'KLM',
+    'COIL',
+    'STR',
+    'ServiceGapsMaterial',
+    'BeamPipe',
+    'Cryostat',
+    'FarBeamLine',
+    'HeavyMetalShield',
+    'VXDService',
+    'MagneticField'
+]
+
+main.add_module("Geometry",
+                excludedComponents=excluded_parts,
+                additionalComponents=["VTX-CMOS-testbeam-2022-07-01"],
+                useDB=False)
 
 # G4 simulation
 main.add_module('FullSim')
 
 # Digitizer
-main.add_module('VTXDigitizer')
+main.add_module('VTXDigitizer', UseToTCalibration=True,
+                ToTCoefficientA=args.tb_a,
+                ToTCoefficientB=args.tb_b,
+                ToTCoefficientC=args.tb_c,
+                ToTCoefficientT=args.tb_t,
+                ChargeCollectionEfficiency=args.cce)
 
 # Activate cluster shape correction
 if not args.forceCoG:

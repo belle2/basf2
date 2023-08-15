@@ -5,8 +5,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-from ROOT import TFile, TH1F, TH2F, TGraphAsymmErrors
-from ROOT import gROOT, Double, TCut
+from ROOT import TH1F, TH2F, TGraphAsymmErrors
+from ROOT import TCut
 
 
 def plot_super_inpix(inputfile=None, histofile=None, basecut="", matchcut="hasHit==0", upitch=0.0, vpitch=0.0, ubins=10, vbins=10):

@@ -119,27 +119,22 @@ class VTXPositionEstimation(b2.Module):
                         continue
 
                     mom = truehit.getMomentum()
-                    tu = mom[0] / mom[2]
-                    tv = mom[1] / mom[2]
+                    tu = mom.X() / mom.Z()
+                    tv = mom.Y() / mom.Z()
                     thetaU = math.atan(tu) * 180 / math.pi
                     thetaV = math.atan(tv) * 180 / math.pi
-
-                    # Only look at primary particles
-                    for mcp in truehit.getRelationsFrom("MCParticles"):
-                        if not mcp.hasStatus(1):
-                            reject = True
 
                     # Get instance of position estimator
                     PositionEstimator = Belle2.VTX.VTXClusterPositionEstimator.getInstance()
                     clusterkind = cls.getKind()
 
                     # Only Clusterkind 0 gets corrected.
-                    if clusterkind <= 0 and mom.Mag() > 0.02:
+                    if clusterkind <= 0 and mom.R() > 0.02:
 
                         self.nclusters += 1
 
                         # Fill momentum and angles for clusterkind
-                        self.hist_map_momentum[clusterkind].Fill(mom.Mag())
+                        self.hist_map_momentum[clusterkind].Fill(mom.R())
                         self.hist_map_theta_u[clusterkind].Fill(thetaU)
                         self.hist_map_theta_v[clusterkind].Fill(thetaV)
                         self.hist_map_clustercharge[clusterkind].Fill(cls.getCharge())
@@ -294,7 +289,6 @@ if __name__ == "__main__":
 
     import argparse
     import glob
-    import sys
 
     parser = argparse.ArgumentParser(description="Test cluster shape corrections on generic BBbar events")
     parser.add_argument('--bglocation', dest='bglocation', default='./', type=str, help='Location of bg overlay files')
@@ -327,7 +321,7 @@ if __name__ == "__main__":
     # Background overlay input
     if bkgfiles:
         if args.bkgOverlay:
-            bkginput = register_module('BGOverlayInput')
+            bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
             main.add_module(bkginput)
 

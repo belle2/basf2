@@ -44,22 +44,7 @@ num_events = args.n
 angle = args.angle
 
 # Output file name
-if args.outputfile == '':
-    outputfile = f"testbeam_{angle}deg.root"
-else:
-    outputfile = args.outputfile
-
-# Sanitize inputs: conversion factor
-if args.eToADU <= 5:
-    args.eToADU = 5
-
-# Sanitize inputs: thickness of depleted Si in mm
-if args.height <= 0.015:
-    args.height = 0.015
-
-# Sanitize inputs: threshold in e-
-if args.thr <= 100:
-    args.thr = 100
+outputfile = f"testbeam_{angle}deg.root"
 
 # create path
 main = b2.create_path()
@@ -119,10 +104,10 @@ main.add_module('FullSim')
 
 # Digitizer
 main.add_module('VTXDigitizer', UseToTCalibration=True,
-                ToTCoefficient_a=args.tb_a,
-                ToTCoefficient_b=args.tb_b,
-                ToTCoefficient_c=args.tb_c,
-                ToTCoefficient_t=args.tb_t,
+                ToTCoefficientA=args.tb_a,
+                ToTCoefficientB=args.tb_b,
+                ToTCoefficientC=args.tb_c,
+                ToTCoefficientT=args.tb_t,
                 ChargeCollectionEfficiency=args.cce)
 
 # Activate cluster shape correction

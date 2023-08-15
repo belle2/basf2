@@ -52,12 +52,12 @@ VTXDigitizerModule::VTXDigitizerModule() :
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name", string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name", string(""));
-  addParam("UseToTCalibration", m_use_tot_calibration, "Apply ToT calibration", false);
-  addParam("ToT2DAC", m_tot2dac, "ToT to DAC conversion factor", float(10.1));
-  addParam("ToTCoefficient_a", m_tot_calibration_a, "ToT calibration coefficient a: ToT = a*Q + b - c/(Q-t) ", float(0.118));
-  addParam("ToTCoefficient_b", m_tot_calibration_b, "ToT calibration coefficient b: ToT = a*Q + b - c/(Q-t) ", float(1.3));
-  addParam("ToTCoefficient_c", m_tot_calibration_c, "ToT calibration coefficient c: ToT = a*Q + b - c/(Q-t) ", float(1.4e2));
-  addParam("ToTCoefficient_t", m_tot_calibration_t, "ToT calibration coefficient t: ToT = a*Q + b - c/(Q-t) ", float(4e1));
+  addParam("UseToTCalibration", m_useTotCalibration, "Apply ToT calibration", false);
+  addParam("ToT2DAC", m_tot2Dac, "ToT to DAC conversion factor", float(10.1));
+  addParam("ToTCoefficientA", m_totCalibrationA, "ToT calibration coefficient A in ToT = A*Q + B - C/(Q-T) ", float(0.118));
+  addParam("ToTCoefficientB", m_totCalibrationB, "ToT calibration coefficient B in: ToT = A*Q + B - C/(Q-T) ", float(1.3));
+  addParam("ToTCoefficientC", m_totCalibrationC, "ToT calibration coefficient C in ToT = A*Q + B - C/(Q-T) ", float(1.4e2));
+  addParam("ToTCoefficientT", m_totCalibrationT, "ToT calibration coefficient T in ToT = A*Q + B - C/(Q-T) ", float(4e1));
   addParam("ChargeCollectionEfficiency", m_cce, "Fraction CE of deposited charge that is collected", float(1.0));
 
 
@@ -419,10 +419,10 @@ void VTXDigitizerModule::saveDigits()
         if (charge < info.getBinaryHitThreshold()) continue;
         else charge = 1.0;
       } else {
-        if (m_use_tot_calibration) {
+        if (m_useTotCalibration) {
           // Apply ToT testbeam calibration
-          double charge_dac = m_cce * charge / m_tot2dac;
-          double y = m_tot_calibration_a * charge_dac + m_tot_calibration_b - m_tot_calibration_c / (charge_dac - m_tot_calibration_t);
+          double chargeDac = m_cce * charge / m_tot2Dac;
+          double y = m_totCalibrationA * chargeDac + m_totCalibrationB - m_totCalibrationC / (chargeDac - m_totCalibrationT);
           if (y < 0 || charge <= info.getBinaryHitThreshold()) charge = 0;
           else charge = y;
         } else {

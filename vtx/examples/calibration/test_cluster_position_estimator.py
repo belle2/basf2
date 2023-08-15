@@ -129,12 +129,12 @@ class VTXPositionEstimation(b2.Module):
                     clusterkind = cls.getKind()
 
                     # Only Clusterkind 0 gets corrected.
-                    if clusterkind <= 0 and math.sqrt(mom.Mag2()) > 0.02:
+                    if clusterkind <= 0 and mom.R() > 0.02:
 
                         self.nclusters += 1
 
                         # Fill momentum and angles for clusterkind
-                        self.hist_map_momentum[clusterkind].Fill(math.sqrt(mom.Mag2()))
+                        self.hist_map_momentum[clusterkind].Fill(mom.R())
                         self.hist_map_theta_u[clusterkind].Fill(thetaU)
                         self.hist_map_theta_v[clusterkind].Fill(thetaV)
                         self.hist_map_clustercharge[clusterkind].Fill(cls.getCharge())

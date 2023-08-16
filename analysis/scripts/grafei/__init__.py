@@ -6,4 +6,4 @@ __all__ = ["graFEISaverModule", "FlagBDecayModule"]
 # @endcond
 
 from grafei.scripts.graFEISaverModule import graFEISaverModule
-from grafei.scripts.training_samples_production.FlagBDecayModule import FlagBDecayModule
+from grafei.scripts.FlagBDecayModule import FlagBDecayModule

@@ -13,9 +13,9 @@ from ROOT import Belle2
 import stdPhotons
 from variables import variables as vm
 
-from grafei.scripts.training_samples_production.FlagBDecayModule import FlagBDecayModule
-from grafei.scripts.training_samples_production.isMostLikelyTempVarsModule import isMostLikelyTempVars
-from grafei.scripts.training_samples_production.RootSaverModule import RootSaverModule
+from grafei.scripts.FlagBDecayModule import FlagBDecayModule
+from grafei.scripts.isMostLikelyTempVarsModule import isMostLikelyTempVars
+from grafei.scripts.RootSaverModule import RootSaverModule
 
 
 def get_args():

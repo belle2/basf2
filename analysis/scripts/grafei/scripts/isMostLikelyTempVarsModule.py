@@ -2,7 +2,7 @@ import basf2 as b2
 from variables import variables as vm
 from ROOT import Belle2
 import numpy as np
-from grafei.scripts.training_samples_production.FlagBDecayModule import getObjectList
+from grafei.scripts.FlagBDecayModule import getObjectList
 
 
 class isMostLikelyTempVars(b2.Module):

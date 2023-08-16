@@ -5,7 +5,7 @@ import numpy as np
 import copy
 from itertools import combinations
 from variables import variables as vm
-from grafei.scripts.training_samples_production.FlagBDecayModule import getObjectList
+from grafei.scripts.FlagBDecayModule import getObjectList
 
 # taken from MC PDG code
 FEI_pdg_converter = {

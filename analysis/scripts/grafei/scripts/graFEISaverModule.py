@@ -10,14 +10,14 @@ from ROOT import Belle2
 import ROOT as r
 from variables import variables as vm
 import torch
-from grafei.scripts.training_samples_production.FlagBDecayModule import getObjectList
+from grafei.scripts.FlagBDecayModule import getObjectList
 from grafei.model.geometric_network import GeometricNetwork
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
 from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, n_intermediate_particles
 from grafei.model.tree_utils import masses_to_classes
 from grafei.model.data_utils import pull_down_LCA
-from grafei.scripts.training_samples_production.RootSaverModule import write_hist
+from grafei.scripts.RootSaverModule import write_hist
 
 warnings.filterwarnings(
     action="ignore", category=RuntimeWarning, message="Mean of empty slice.*"

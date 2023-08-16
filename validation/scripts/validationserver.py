@@ -22,6 +22,7 @@ import webbrowser
 import re
 import collections
 import configparser
+import requests
 
 # 3rd
 import cherrypy
@@ -248,6 +249,12 @@ def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
         logging.warning(
             "Issue with authenticating GitLab. "
             "Please ensure access token is correct and valid. "
+            "GitLab Integration will be disabled."
+        )
+    except requests.exceptions.ConnectTimeout:
+        gitlab_object = None
+        logging.warning(
+            "GitLab servers feeling under the weather, DESY outage?"
             "GitLab Integration will be disabled."
         )
 

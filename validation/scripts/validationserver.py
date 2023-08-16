@@ -251,10 +251,11 @@ def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
             "Please ensure access token is correct and valid. "
             "GitLab Integration will be disabled."
         )
-    except requests.exceptions.ConnectTimeout:
+    except (requests.exceptions.ConnectTimeout,
+            requests.exceptions.Timeout) as error:
         gitlab_object = None
         logging.warning(
-            "GitLab servers feeling under the weather, DESY outage?"
+            f"{error}: GitLab servers feeling under the weather, DESY outage? "
             "GitLab Integration will be disabled."
         )
 

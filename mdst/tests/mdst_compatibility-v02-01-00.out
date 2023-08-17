@@ -3,16 +3,7 @@
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v02-01-00.root
 Untested method EventMetaData::addErrorFlag
-Untested method EventMetaData::getErrorFlag
-Untested method EventMetaData::getEvent
-Untested method EventMetaData::getExperiment
-Untested method EventMetaData::getGeneratedWeight
-Untested method EventMetaData::getParentLfn
-Untested method EventMetaData::getProduction
-Untested method EventMetaData::getRun
-Untested method EventMetaData::getSubrun
 Untested method EventMetaData::isEndOfData
-Untested method EventMetaData::isEndOfRun
 Untested method EventMetaData::setEndOfData
 Untested method EventMetaData::setEndOfRun
 Untested method EventMetaData::setErrorFlag
@@ -181,7 +172,16 @@ Untested method EventLevelTriggerTimeInfo::setValid
 [INFO] ------------------------------------------------------------------------
 [INFO] EXP:        0        RUN:        0        EVT:        1
 EventMetaData:
+  getErrorFlag(): 0
+  getEvent(): 1
+  getExperiment(): 0
+  getGeneratedWeight(): 1
+  getParentLfn(): 
+  getProduction(): 0
+  getRun(): 0
+  getSubrun(): 0
   getTime(): 1541276075983871661
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -11159,7 +11159,16 @@ MCParticle#98:
   isVirtual(): False
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
+  getErrorFlag(): 0
+  getEvent(): 2
+  getExperiment(): 0
+  getGeneratedWeight(): 1
+  getParentLfn(): 
+  getProduction(): 0
+  getRun(): 0
+  getSubrun(): 0
   getTime(): 1541276125741332157
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -21048,7 +21057,16 @@ MCParticle#60:
   isVirtual(): False
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
+  getErrorFlag(): 0
+  getEvent(): 3
+  getExperiment(): 0
+  getGeneratedWeight(): 1
+  getParentLfn(): 
+  getProduction(): 0
+  getRun(): 0
+  getSubrun(): 0
   getTime(): 1541276129800913811
+  isEndOfRun(): False
 Track#0:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan

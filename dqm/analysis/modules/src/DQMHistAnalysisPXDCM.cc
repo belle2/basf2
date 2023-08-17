@@ -219,7 +219,7 @@ void DQMHistAnalysisPXDCMModule::event()
           entries_adhoc += v;
           outside_adhoc += v;
         }
-        if (entries_adhoc > 0 && scale < 1e-3) { // ignore 1.3.2 and minimum events
+        if (entries_adhoc > 0 && scale < 1e-3) { // ignore modules with minimum events
           // scale <1e-3 == >1000 events
           mean_adhoc /= entries_adhoc; // calculate mean
           auto warn_tmp_m = fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
@@ -295,10 +295,11 @@ void DQMHistAnalysisPXDCMModule::event()
       m_lineA->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
+    // keep this commented code as we may have excluded modules in phase4
+//     auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
+//     tt->SetTextAngle(90);// Rotated
+//     tt->SetTextAlign(12);// Centered
+//     tt->Draw();
 
     m_cCommonModeDelta->Modified();
     m_cCommonModeDelta->Update();

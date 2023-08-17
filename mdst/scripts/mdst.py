@@ -94,7 +94,7 @@ def add_mdst_dump(path, print_untested=False, print_less_content=False):
         DataStorePrinter("EventMetaData", [
             "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
             "getProduction", "getParentLfn", "getGeneratedWeight", "isEndOfRun"] +
-            [] if print_less_content else ["getTime"],
+            ([] if print_less_content else ["getTime"]),
             array=False
         ),
         DataStorePrinter("Track", [

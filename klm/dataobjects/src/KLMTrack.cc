@@ -81,18 +81,6 @@ TVectorD KLMTrack::getTrackParam()
 }
 
 
-//! Get track parameters in the sector local system, where the first layer of the sector is used as reference.
-TVectorD KLMTrack::getLocalTrackParam()
-{
-  TVectorD trackParam(4);
-  trackParam[0] = m_LocalTrackParam[0];
-  trackParam[1] = m_LocalTrackParam[1];
-  trackParam[2] = m_LocalTrackParam[2];
-  trackParam[3] = m_LocalTrackParam[3];
-
-  return trackParam;
-}
-
 //! Get invariance matrix of track parameters in the global system.
 TMatrixDSym KLMTrack::getTrackParamErr()
 {
@@ -105,17 +93,6 @@ TMatrixDSym KLMTrack::getTrackParamErr()
   return trkParamErr;
 }
 
-//! Get invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
-TMatrixDSym KLMTrack::getLocalTrackParamErr()
-{
-  TMatrixDSym  trkParamErr(4);
-  for (int ii = 0 ; ii < 4; ii ++) {
-    for (int jj = 0 ; jj < 4; jj ++) {
-      trkParamErr[ii][jj] = m_LocalTrackParamErr[ii][jj];
-    }
-  }
-  return trkParamErr;
-}
 
 //! Set track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
 void KLMTrack::setTrackParam(const CLHEP::HepVector& trkPar)
@@ -137,25 +114,6 @@ void KLMTrack::setTrackParamErr(const CLHEP::HepSymMatrix& trkParErr)
   }
 }
 
-//! Set track parameters in the sector local system, where the first layer of the sector is used as reference.
-void KLMTrack::setLocalTrackParam(const CLHEP::HepVector& trkPar)
-{
-  m_LocalTrackParam[0] = trkPar[0];
-  m_LocalTrackParam[1] = trkPar[1];
-  m_LocalTrackParam[2] = trkPar[2];
-  m_LocalTrackParam[3] = trkPar[3];
-
-}
-
-//! Set invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
-void KLMTrack::setLocalTrackParamErr(const CLHEP::HepSymMatrix& trkParErr)
-{
-  for (int ii = 0 ; ii < 4; ii ++) {
-    for (int jj = 0 ; jj < 4; jj ++) {
-      m_LocalTrackParamErr[ii][jj] = trkParErr[ii][jj];
-    }
-  }
-}
 
 //! Get the positon in local coordinate system of track intercept in plane of constant x
 ROOT::Math::XYZVector KLMTrack::getLocalIntercept(double x)

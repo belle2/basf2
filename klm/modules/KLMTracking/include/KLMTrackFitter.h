@@ -36,21 +36,12 @@ namespace Belle2 {
     //! do fit and returns chi square of the fit.
     double fit(std::list<KLMHit2d*>& listTrackPoint);
 
-    //! Distance from track to a hit in the plane of the module
-    double distanceToHit(KLMHit2d* hit,
-                         double& error,
-                         double& sigma);
 
     //! Distance from track to a hit in the global system
     double globalDistanceToHit(KLMHit2d* hit,
                                double& error,
                                double& sigma);
 
-    //! do fit in the y-x plane or z-x plane
-    double fit1dSectorTrack(std::list< KLMHit2d* > hitList,
-                            CLHEP::HepVector&  eta,
-                            CLHEP::HepSymMatrix&  error,
-                            int depDir,    int indDir);
 
     //! do fit in the global system
     double fit1dTrack(std::list< KLMHit2d* > hitList,
@@ -123,7 +114,7 @@ namespace Belle2 {
     CLHEP::HepSymMatrix  m_GlobalErr;
 
     //! pointer to GeometryPar singleton
-    KLM::GeometryPar*   m_GeoPar;
+    KLM::KLMGeometryPar*   m_GeoPar;
 
   };
 } // end of namespace Belle2

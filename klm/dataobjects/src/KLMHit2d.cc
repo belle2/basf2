@@ -23,7 +23,7 @@ KLMHit2d::KLMHit2d(KLMDigit* digit1, KLMDigit* digit2) :
   m_ChiSq(-1)
 {
   if (digit1->getSubdetector() != KLMElementNumbers::c_EKLM)
-    B2FATAL("Trying to construct a KLMHit2d using KLMDigit from BKLM.");
+    B2FATAL("Trying to construct a KLMHit2d using KLMDigit from EKLM.");
   m_Subdetector = KLMElementNumbers::c_EKLM;
   setSection(digit1->getSection());
   setLayer(digit1->getLayer());

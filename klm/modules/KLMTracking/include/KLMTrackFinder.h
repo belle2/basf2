@@ -26,13 +26,13 @@ namespace Belle2 {
     KLMTrackFinder();
 
     //! The track finder requires a track fitter.
-    explicit KLMTrackFinder(BKLMTrackFitter* fitter);
+    explicit KLMTrackFinder(KLMTrackFitter* fitter);
 
     //! Destructor
     ~KLMTrackFinder();
 
     //! Register a fitter if not constructed with one.
-    void registerFitter(BKLMTrackFitter* fitter);
+    void registerFitter(KLMTrackFitter* fitter);
 
     //! find associated hits and do fit.
     bool filter(const std::list<KLMHit2d* >& seed,

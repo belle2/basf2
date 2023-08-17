@@ -55,15 +55,11 @@ namespace Belle2 {
     //! Get invariance matrix of track parameters in the global system.
     TMatrixDSym  getTrackParamErr();
 
-    //! Get track parameters in the sector locan system, where the first layer of the sector is used as reference.
-    TVectorD   getLocalTrackParam();
-
-    //! Get invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
-    TMatrixDSym  getLocalTrackParamErr();
-
+    //TODO: Replace me
     //! Get the position in local coordinate system of track intercept in plane of constant x
     ROOT::Math::XYZVector getLocalIntercept(double x);
 
+    //TODO: Replace me
     //! Get the variance matrix of (y,z) coordinates of the track intercept in plane of constant x in sector local system
     TMatrixD getLocalInterceptVariance(double x);
 

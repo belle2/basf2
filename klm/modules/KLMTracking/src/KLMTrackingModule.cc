@@ -43,9 +43,9 @@ KLMTrackingModule::KLMTrackingModule() : Module(),
     m_effiVsLayer[1][i] = nullptr;
   }
   setDescription("Perform standard-alone straight line standalone tracking for KLM");
-  addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
+  addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match KLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
-           "[degree], match BKLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));
+           "[degree], match KLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));
   addParam("MaxDistance", m_maxDistance,
            "[cm], During efficiency calculation, distance between track and 2dhit must be smaller than (default 10)", double(10.0));
   addParam("MaxSigma", m_maxSigma,
@@ -65,6 +65,9 @@ KLMTrackingModule::~KLMTrackingModule()
 
 void KLMTrackingModule::initialize()
 {
+
+  // initializing geometry:
+  KLMGeometryPar m_GeoPar;
 
   hits2D.isRequired();
   m_storeTracks.registerInDataStore();
@@ -213,6 +216,7 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
           continue;
         if (hits2D[ho]->isOnStaTrack())
           continue;
+        //TODO: consider removing the commented lines below
         //if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi]))
         //  continue;
         // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer())
@@ -230,7 +234,7 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
 
       std::list<KLMHit2d*> m_hits;
       if (m_finder->filter(seed, sectorHitList, m_hits)) {
-        BKLMTrack* m_track = m_storeTracks.appendNew();
+        KLMTrack* m_track = m_storeTracks.appendNew();
         m_track->setTrackParam(m_fitter->getTrackParam());
         m_track->setTrackParamErr(m_fitter->getTrackParamErr());
         m_track->setLocalTrackParam(m_fitter->getTrackParamSector());
@@ -248,7 +252,7 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
         //tracks.push_back(m_track);
         //m_track->getTrackParam().Print();
         //m_track->getTrackParamErr().Print();
-        //match BKLMTrack to RecoTrack
+        //match KLMTrack to RecoTrack
         if (mode == 0) {
           RecoTrack* closestTrack = nullptr;
           if (m_MatchToRecoTrack) {
@@ -280,7 +284,7 @@ void KLMTrackingModule::terminate()
 {
   for (long unsigned int i = 0; i < m_runNumber.size(); i++) {
     float ratio = (float)m_totalEventsWithTracks.at(i) / (float)m_totalEvents.at(i);
-    B2INFO("KLMTrackingModule:: run " << m_runNumber.at(i) << " --> " << ratio * 100 << "% of events has 1+ BKLMTracks");
+    B2INFO("KLMTrackingModule:: run " << m_runNumber.at(i) << " --> " << ratio * 100 << "% of events has 1+ KLMTracks");
   }
 
   m_file->cd();
@@ -439,8 +443,9 @@ void KLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
     if (iLayer != 14 && cnt1 < 1)
       return;
     //TODO: Extend to includ EKLM?
-    m_GeoPar = GeometryPar::instance();
-    const bklm::Module* module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
+    //m_GeoPar = GeometryPar::instance();
+    const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
+    const bklm::Module* module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
     int minPhiStrip = module->getPhiStripMin();
     int maxPhiStrip = module->getPhiStripMax();
     int minZStrip = module->getZStripMin();
@@ -466,6 +471,8 @@ void KLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
     }
 
     TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
+
+    //TODO: how to generalize this...
 
     //first layer is the reference layer
     //if (iSection == 1 && (iSector + 1 ) == 5)
@@ -564,38 +571,88 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
                                         double& sigma)
 {
 
-  double x, y, z, dy, dz;
+  double x, y, z, dx, dy, dz, distance;
 
   error = DBL_MAX;
   sigma = DBL_MAX;
 
-  TVectorD m_SectorPar = track->getLocalTrackParam();
+  TVectorD m_GlobalPar = track->getTrackParam();
 
-  //extend to include EKLM? replace with global mode?
-  m_GeoPar = GeometryPar::instance();
-  const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
-  const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-  CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(),
-                              hit->getPositionZ());
-  CLHEP::Hep3Vector local = refMod->globalToLocal(globalPos);
+  if (hit->getSubdetector() == KLMElementNumbers::c_BKLM) {
 
-  x = local[0] ;
+    const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
 
-  y = m_SectorPar[ 0 ] + x * m_SectorPar[ 1 ];
-  z = m_SectorPar[ 2 ] + x * m_SectorPar[ 3 ];
 
-  dy = y - local[1];
-  dz = z - local[2];
+    const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
+    const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-  double distance = sqrt(dy * dy + dz * dz);
+    CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(),
+                                hit->getPositionZ());
 
-  double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
-  double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
+    x = globalPos[0];
 
-  //error from tracking is ignored here
-  error = sqrt(pow(hit_localPhiErr, 2) +
-               pow(hit_localZErr, 2));
+    y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
+    z = m_GlobalPar[ 2 ] + x * m_GlobalPar[ 3 ];
+
+    dx = 0.;
+    dy = y - m_GlobalPar[1];
+    dz = z - m_GlobalPar[2];
+
+    // we will do a projection to get the shortest distance
+
+    //|(0, dy, dz) x (1, p1, p3)|**2
+    double numerator2 = (dy * m_GlobalPar[3] - dz * m_GlobalPar[1])** 2;
+    numerator2 += dz * dz;
+    numerator2 += dy * dy
+                  //|(1, p1, p3)|**2
+                  double denom2 = 1 + m_GlobalPar[1] * m_GlobalPar[1] +  m_GlobalPar[3] * m_GlobalPar[3];
+    //|| dr x v || / ||v||
+    distance = sqrt(numerator2 / denomator2); //distance of closest approach for BKLM
+
+    double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
+    double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
+
+    //error from tracking is ignored here
+    error = sqrt(pow(hit_localPhiErr, 2) +
+                 pow(hit_localZErr, 2));
+  } //end of BKLM section
+
+  elif(hit->getSubdetector() == KLMElementNumbers::c_EKLM) {
+
+    const EKLM::GeometryData* eklmGeo = m_GeoPar->EndcapInstance();
+
+
+    CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(),
+                                hit->getPositionZ());
+
+    // use z coordinate as main point of interest
+    // should be close enough to distance of closest appraoch
+
+    z = globalPos[2];
+
+    x = (z - m_GlobalPar[ 2 ]) / m_GlobalPar[ 3 ];
+    y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
+
+    dx = x - m_GlobalPar[0];
+    dy = y - m_GlobalPar[1];
+    dz = 0.;
+
+    distance = sqrt(dx * dx + dy * dy + dz * dz);
+
+
+    //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
+    hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin()) / sqrt(
+                 12);
+    hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin()) / sqrt(
+                 12);
+
+
+    //error from tracking is ignored here
+    error = sqrt(pow(hit_xErr, 2) +
+                 pow(hit_yErr, 2));
+  } //end of EKLM section
+
 
   if (error != 0.0) {
     sigma = distance / error;
@@ -606,3 +663,4 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
   return (distance);
 
 }
+

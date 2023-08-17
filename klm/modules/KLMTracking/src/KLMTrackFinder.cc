@@ -59,7 +59,7 @@ bool KLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
   //TODO: REMOVE ME AFTER TESTING B-KLMTrackFitter
   // Will also need to think about how to generalize this
   for (i = hits.begin(); i != hits.end(); ++i) {
-    if ((*i)->getSubdetector() != KLMElementNumbers::c_BKLM)
+    if ((*i)->getSubdetector() != KLMElementNumbers::c_BKLM) //should be removed
       continue;
 
     // Prevent duplicate hits or hits on same layer

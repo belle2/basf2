@@ -32,7 +32,11 @@ settings = CalibrationSettings(
     input_data_filters={
         'hlt_mumu': [INPUT_DATA_FILTERS['Run Type']['physics'],
                      INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
-                     INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
+                     INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
+        'raw_cosmic': [INPUT_DATA_FILTERS['Run Type']['cosmic'],
+                       INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],
+                       INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
+
     },
     depends_on=[])
 

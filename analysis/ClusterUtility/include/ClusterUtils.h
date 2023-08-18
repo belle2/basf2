@@ -115,10 +115,14 @@ namespace Belle2 {
     const TMatrixDSym GetIPPositionCovarianceMatrix();
 
   private:
-    // Beam spot database object
+    /**
+     * Beam spot database object
+     */
     DBObjPtr<BeamSpot> m_beamSpotDB;
 
-    // Photon energy resolution database object
+    /**
+     * Photon energy resolution database object
+     */
     DBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
   };
 

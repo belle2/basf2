@@ -55,16 +55,16 @@ namespace Belle2 {
      * Add energy bin [vector of three pairs] and energy resolution [vector of three values]
      * Energy resolution structure: [value, uncertainty up, uncertainty down]
      * Energy bin structure for bin limit pairs: [energy limits, theta limits, phi limits]
-     * @param Energy resolution
-     * @param Binning
+     * @param energyResolution energy resolution with uncertainties
+     * @param binning binning of energy resolution valid region in bins of [energy, theta phi]
      */
     void addRelativeEnergyResolution(EnergyResolution energyResolution, Binning binning);
 
     /*!
      * Get energy resolution for given energy, theta, phi
-     * @param Energy
-     * @param Theta
-     * @param Phi
+     * @param energy photon energy value
+     * @param theta photon theta value
+     * @param phi photon phi value
      * @return Energy resolution
      */
     double getRelativeEnergyResolution(double energy, double theta, double phi) const;

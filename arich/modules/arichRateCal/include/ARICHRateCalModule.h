@@ -15,22 +15,25 @@
 namespace Belle2 {
 
   /**
-   * Fill ARICHHit collection from ARICHDigits
+   * Fill ARICHHit collection from ARICHDigits.
    */
   class ARICHRateCalModule : public HistoModule {
 
   public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHRateCalModule();
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~ARICHRateCalModule();
 
+    /**
+     * Definition of the histograms.
+     */
     virtual void defineHisto() override;
 
     /**

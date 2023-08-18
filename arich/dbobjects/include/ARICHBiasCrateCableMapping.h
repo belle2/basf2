@@ -13,48 +13,50 @@
 #include <vector>
 
 namespace Belle2 {
-  //! The Class for ARICH bias voltages at gain 40
-  /*!     This class provides ARICH bias voltages at gain 40
-   */
 
+  /**
+   * This class provides ARICH bias voltages at gain 40
+   */
   class ARICHBiasCrateCableMapping : public TObject {
 
   public:
 
-    //! Default constructor
+    /**
+     * Default constructor.
+     */
     ARICHBiasCrateCableMapping();
 
     /**
-    * Get sector ID
-     * @param connectionID connection ID
-     * @return sector sector number ID
-    */
+     * Get sector ID.
+     * @param[in] connectionID Connection ID.
+     * @return Sector number ID.
+     */
     int getSector(int connectionID) const;
 
     /**
-    * Get sector ID
-     * @param connectionID connection ID
-     * @return cable cable number ID
-    */
+     * Get cable ID.
+     * @param[in] connectionID Connection ID.
+     * @return cable Cable number ID.
+     */
     int getCable(int connectionID) const;
 
     /**
-    * Get sector ID
-    * @param sectorCable vector of sector and cable numbers
-    * @return connectionID connection ID
-    */
+     * Get connection ID.
+     * @param[in] sectorCable Vector of sector and cable numbers.
+     * @return Connection ID.
+     */
     int getConnectionID(const std::vector<int>& sectorCable) const;
 
     /**
-     * Add new entry to the mapping table
-     * @param crateSlot numbers of crate and slot
-     * @param sectorCable sector and cable number
+     * Add new entry to the mapping table.
+     * @param[in] connectionID Connection ID.
+     * @param[in] sectorCable  Sector and cable number.
      */
     void addMapping(int connectionID, std::vector<int> sectorCable);
 
     /**
-    * Print mapping parameters
-    */
+     * Print mapping parameters
+     */
     void print() const;
 
   private:

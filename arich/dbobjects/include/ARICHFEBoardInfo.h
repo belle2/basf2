@@ -13,15 +13,16 @@
 #include <arich/dbobjects/ARICHAsicInfo.h>
 
 namespace Belle2 {
-  /**
-  *   Front End Electronics Boards
-  */
 
+  /**
+   * Front End Electronics Boards.
+   */
   class ARICHFEBoardInfo: public TObject {
+
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHFEBoardInfo(): m_serial(0), m_timeStamp(), m_currentLocation("")
     {
@@ -30,7 +31,7 @@ namespace Belle2 {
     };
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHFEBoardInfo(int serial, ARICHAsicInfo** asicInfo, const std::string& asicsFEB, TTimeStamp timeStamp): m_serial(serial),
       m_timeStamp(timeStamp),
@@ -41,57 +42,67 @@ namespace Belle2 {
     };
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHFEBoardInfo() {};
 
-    /** Get Front End Board Identifier
-     * @return Front End Board Identifier
+    /**
+     * Get Front-End Board identifier.
+     * @return Front-End Board identifier.
      */
     int getFEBoardSerial() const {return m_serial; }
 
-    /** Set Front End Board Identifier
-     * @param Front End Board Identifier
+    /**
+     * Set Front-End Board identifier.
+     * @param[in] serial Front-End Board identifier.
      */
     void setFEBoardSerial(int serial) {m_serial = serial; }
 
-    /** Get Asic Info
-     * @return Asic Info
+    /**
+     * Get ASIC info.
+     * @return ASIC info.
      */
     ARICHAsicInfo* getAsicInfo(unsigned int i) const;
 
-    /** Set Asic Info
-     * @param Asic Info
+    /**
+     * Set ASIC info.
+     * @param[in] asic ASIC info.
      */
     void setAsicInfo(unsigned int i, ARICHAsicInfo* asic);
 
-    /** Get Asic position
-     * @return Asic position
+    /**
+     * Get ASIC position.
+     * @return ASIC position.
      */
     std::string getAsicPosition(unsigned int i) const;
 
-    /** Set Asic position
-     * @param Asic position
+    /**
+     * Set ASIC position.
+     * @param[in] asicsFEB Asic position.
      */
     void setAsicPosition(unsigned int i, const std::string& asicsFEB);
 
-    /** Get delivery date
-     * @return delivery date
+    /**
+     * Get delivery date.
+     * @return Delivery date.
      */
     TTimeStamp getTimeStamp() const {return m_timeStamp; }
 
-    /** Set delivery date
-     * @param delivery date
+    /**
+     * Set delivery date.
+     * @param[in] timeStamp Delivery date.
      */
     void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 
-    /** Get current location
-     * @return current location
+    /**
+     * Get current location.
+     * @return Current location.
      */
     std::string getFEBoardLocation();
 
-    /** Set current location
-     * @param current location
+    /**
+     * Set current location.
+     * @param[in] currentLocation Current location.
      */
     void setFEBoardLocation(const std::string& currentLocation) {m_currentLocation = currentLocation; }
 

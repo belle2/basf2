@@ -18,48 +18,48 @@
 namespace Belle2 {
 
   /**
-   * Geometry parameters of ARICH photon detector plane
+   * Geometry parameters of ARICH photon detector plane.
    */
   class ARICHGeoDetectorPlane: public ARICHGeoBase {
 
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHGeoDetectorPlane()
     {};
 
 
     /**
-     * Check if parameters are consistent
-     * @return returns true if true
+     * Check if parameters are consistent.
+     * @return Returns true if true.
      */
     bool isConsistent() const override;
 
     /**
-     * Print the content of the class
-     * @param title title to be printed
+     * Print the content of the class.
+     * @param[in] title Title to be printed.
      */
     void print(const std::string& title = "Detector plane parameters") const override;
 
     /**
-     * Set detector plane positioning within ARICH local volume
-     * @param x x position
-     * @param y y position
-     * @param z z position
-     * @param rx rotation around x-axis
-     * @param ry rotation around y-axis
-     * @param rz rotation around z-axis
+     * Set detector plane positioning within ARICH local volume.
+     * @param[in] x  X position.
+     * @param[in] y  Y position.
+     * @param[in] z  Z position.
+     * @param[in] rx Rotation around x-axis.
+     * @param[in] ry Rotation around y-axis.
+     * @param[in] rz Rotation around z-axis.
      */
     void setPlacement(double x, double y, double z, double rx, double ry, double rz) {m_x = x; m_y = y; m_z = z; m_rx = rx; m_ry = ry; m_rz = rz;}
 
     /**
-     * Set parameters of the support plate
-     * @param inR tube inner radius
-     * @param outR tube outer radius
-     * @param thick tube length
-     * @param material tube material
+     * Set parameters of the support plate.
+     * @param[in] inR      Tube inner radius.
+     * @param[in] outR     Tube outer radius.
+     * @param[in] thick    Tube length.
+     * @param[in] material Tube material.
      */
     void addSupportPlate(double inR, double outR, double thick, const std::string& material)
     {
@@ -70,46 +70,50 @@ namespace Belle2 {
     };
 
     /**
-     * Set size of module hole in support plate
-     * @param hsize hole size
+     * Set size of module hole in support plate.
+     * @param[in] hsize Hole size.
      */
     void setModuleHoleSize(double hsize) {m_moduleHoleSize = hsize;}
 
     /**
      * Set height of the aluminum walls between modules on the electronics side
-     * of aluminum support plate
-     * @param h wall height
+     * of aluminum support plate.
+     * @param[in] h Wall height.
      */
     void setSupportBackWallHeight(double h) {m_supportBackWallHeight = h;}
 
     /**
-     * Set thickness of the aluminum walls between modules on the electronics side
-     * of the aluminum support plate
-     * @param h wall height
+     * Set thickness of the aluminum walls between modules
+     * on the electronics side of the aluminum support plate.
+     * @param[in] h Wall height.
      */
     void setSupportBackWallThickness(double d) {m_supportBackWallThickness = d;}
 
     /**
-     * Set Z position of the aluminum support plate (start Z)
-     * @param zPosition Z position of support plate
+     * Set Z position of the aluminum support plate (start Z).
+     * @param[in] zPosition Z position of support plate.
      */
     void setSupportZPosition(double zPosition) { m_supportZPosition = zPosition; }
 
     /**
-     * Set parameters of module slot rings (r of center of slots in ring, phi (angle) distance between module slots)
-     * @param ringPar vector of module slot ring radiuses and phi (angle) distance between module slots in ring
+     * Set parameters of module slot rings (r of center of slots in ring,
+     * phi (angle) distance between module slots).
+     *
+     * @param[in] ringPar
+     * Vector of module slot ring radiuses and phi (angle) distance between
+     * module slots in ring.
      */
     void setRingPar(const std::vector<std::pair<double, double>>& ringPar);
 
     /**
-     * Get center point
-     * @return center point (TVector3)
+     * Get center point.
+     * @return Center point (TVector3).
      */
     TVector3 getPosition() const {return TVector3(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
 
     /**
-     * Get rotation matrix
-     * @return rotation matrix (TRotation)
+     * Get rotation matrix.
+     * @return Rotation matrix (TRotation).
      */
     TRotation getRotation() const
     {
@@ -119,117 +123,117 @@ namespace Belle2 {
     }
 
     /**
-     * Get angle of rotation around X axis
-     * @return rotation angle arounx X axis
+     * Get angle of rotation around X axis.
+     * @return Rotation angle arounx X axis.
      */
     double getRotationX() const {return m_rx;}
 
     /**
-     * Get angle of rotation around Y axis
-     * @return rotation angle arounx Y axis
+     * Get angle of rotation around Y axis.
+     * @return Rotation angle arounx Y axis.
      */
     double getRotationY() const {return m_ry;}
 
     /**
-     * Get angle of rotation around Z axis
-     * @return rotation angle arounx Z axis
+     * Get angle of rotation around Z axis.
+     * @return Rotation angle arounx Z axis.
      */
     double getRotationZ() const {return m_rz;}
 
     /**
-     * Get support plate inner radius
-     * @return support plate inner radius
+     * Get support plate inner radius.
+     * @return Support-plate inner radius.
      */
     double getSupportInnerR() const {return m_innerR / s_unit;};
 
     /**
-     * Get support plate outer radius
-     * @return support plate outer radius
+     * Get support plate outer radius.
+     * @return Support-plate outer radius.
      */
     double getSupportOuterR() const {return m_outerR / s_unit;};
 
     /**
-     * Get support plate thickness
-     * @return support plate thickness
+     * Get support plate thickness.
+     * @return Support-plate thickness.
      */
     double getSupportThickness() const {return m_thickness / s_unit;};
 
     /**
-     * Get Z position of support plate (start point in Z)
-     * @return support plate Z position (start point in Z)
+     * Get Z position of support plate (start point in Z).
+     * @return Support-plate Z position (start point in Z).
      */
     double getSupportZPosition() const {return m_supportZPosition / s_unit;};
 
     /**
-     * Get size of module hole in support plate
-     * @return module hole size
+     * Get size of module hole in support plate.
+     * @return Module hole size.
      */
     double getModuleHoleSize() const {return m_moduleHoleSize / s_unit;};
 
     /**
      * Get height of the aluminum walls between modules on the electronics side
-     * of aluminum support plate
-     * @return support plate back wall height
+     * of aluminum support plate.
+     * @return Support-plate back wall height.
      */
     double getSupportBackWallHeight() const {return m_supportBackWallHeight / s_unit;};
 
     /**
      * Get thickness of aluminum walls between modules on the electronics side
-     * of aluminum support plate
-     * @return support plate back wall thickness
+     * of aluminum support plate.
+     * @return Support-plate back wall thickness.
      */
     double getSupportBackWallThickness() const {return m_supportBackWallThickness / s_unit;};
 
     /**
-     * Get material of support plate
-     * @return material of support plate
+     * Get material of support plate.
+     * @return material of support plate.
      */
     const std::string& getSupportMaterial() const {return m_supportMaterial;}
 
     /**
-     * Get radius of i-th module slot ring (radius of center point)
-     * @param iRing module slot ring number
-     * @return radius of module slot ring
+     * Get radius of i-th module slot ring (radius of center point).
+     * @param[in] iRing Module slot ring number.
+     * @return Radius of module slot ring.
      */
     double getRingR(unsigned iRing) const { if (iRing == 0 || iRing > m_nRings) B2ERROR("ARICHGeoDetectorPlane: invalid module ring number!"); return m_ringPar[iRing - 1].first / s_unit;}
 
     /**
-     * Get phi (angle) distance between module slots in i-th ring
-     * @param iRing module slot ring number
-     * @return phi (angle) distance between module slots
+     * Get phi (angle) distance between module slots in i-th ring.
+     * @param[in] iRing Module slot ring number.
+     * @return Phi (angle) distance between module slots.
      */
     double getRingDPhi(unsigned iRing) const { if (iRing == 0 || iRing > m_nRings) B2ERROR("ARICHGeoDetectorPlane: invalid module ring number!"); return m_ringPar[iRing - 1].second;}
 
     /**
-     * Get radial position of module with given module ID number
-     * @param modID module ID number
-     * @return radial position of module
+     * Get radial position of module with given module ID number.
+     * @param[in] modID Module ID number.
+     * @return Radial position of module.
      */
     double getSlotR(unsigned modID) const { if (modID == 0 || modID > m_nSlots) B2ERROR("ARICHGeoDetectorPlane: invalid module ID number!"); return m_slotPar[modID - 1].first / s_unit;};
 
     /**
-     * Get phi (angle) position of module with given module ID number
-     * @param modID module ID number
-     * @return phi (angle) position of module
+     * Get phi (angle) position of module with given module ID number.
+     * @param[in] modID Module ID number.
+     * @return Phi (angle) position of module.
      */
     double getSlotPhi(unsigned modID) const { if (modID == 0 || modID > m_nSlots) B2ERROR("ARICHGeoDetectorPlane: invalid module ID number!"); return m_slotPar[modID - 1].second;};
 
     /**
-     * Get total number of module slots
-     * @return total number of module slots
+     * Get total number of module slots.
+     * @return Total number of module slots.
      */
     unsigned getNSlots() const {return m_nSlots;}
 
     /**
      * Get number of module slot rings
-     * @return number of module slot rings
+     * @return Number of module slot rings
      */
     unsigned getNRings() const {return m_nRings;}
 
     /**
-     * Get ring number of slot with slot ID
-     * @param slotID slot ID
-     * @return ring number of slot
+     * Get ring number of slot with slot ID.
+     * @param[in] slotID slot ID.
+     * @return Ring number of slot.
      */
     unsigned getSlotRing(unsigned slotID) const;
 

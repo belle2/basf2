@@ -23,10 +23,18 @@ namespace Belle2 {
     int tessellatedSolidID;
     unsigned int nCells;
     unsigned int nApexPerCell;
-    // Tessellated solid represented by the array (vector) of triangles
-    std::vector<std::vector<double>> posV1; // x, y, z of apex1
-    std::vector<std::vector<double>> posV2; // x, y, z of apex2
-    std::vector<std::vector<double>> posV3; // x, y, z of apex3
+
+    /* Tessellated solid represented by the array (vector) of triangles. */
+
+    /** x, y, z of apex1. */
+    std::vector<std::vector<double>> posV1;
+
+    /** x, y, z of apex2. */
+    std::vector<std::vector<double>> posV2;
+
+    /** x, y, z of apex3. */
+    std::vector<std::vector<double>> posV3;
+
     tessellatedSolidStr()
     {
       tessellatedSolidID = 0;

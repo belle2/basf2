@@ -16,24 +16,21 @@
 
 namespace Belle2 {
 
-
   /**
-   * Geometry parameters of ARICH Master volume (envelope)
+   * Geometry parameters of ARICH Master volume (envelope).
    */
-
-
   class ARICHGlobalAlignment: public ARICHGeoBase {
 
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHGlobalAlignment()
     {}
 
     /**
-     * Copy constructor
+     * Copy constructor.
      */
     ARICHGlobalAlignment(const ARICHGlobalAlignment& align): ARICHGeoBase()
     {
@@ -43,9 +40,8 @@ namespace Belle2 {
       m_translation = 0;
     }
 
-
     /**
-     * Assignment operator
+     * Assignment operator.
      */
     ARICHGlobalAlignment& operator=(const ARICHGlobalAlignment& align)
     {
@@ -63,7 +59,7 @@ namespace Belle2 {
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHGlobalAlignment()
     {
@@ -73,8 +69,8 @@ namespace Belle2 {
     }
 
     /**
-     * Sets alignment parameters (element)
-     * @param align alignment element
+     * Sets alignment parameters (element).
+     * @param[in] align Alignment element.
      */
     void setAlignmentElement(const ARICHPositionElement& align)
     {
@@ -82,8 +78,8 @@ namespace Belle2 {
     }
 
     /**
-     * Returns alignment parameters (element)
-     * @return alignment element
+     * Returns alignment parameters (element).
+     * @return Alignment element
      */
     const ARICHPositionElement& getAlignmentElement() const
     {
@@ -92,21 +88,23 @@ namespace Belle2 {
 
 
     /**
-     * Print the content of the class
-     * @param title title to be printed
+     * Print the content of the class.
+     * @param[in] title Title to be printed.
      */
     void print(const std::string& title = "ARICH global alignment parameters") const;
 
 
     /**
-     * Get position of ARICH master volume center point in global Belle II coordinates
-     * @return center point of ARICH volume
+     * Get position of ARICH master volume center point in global
+     * Belle II coordinates.
+     * @return Center point of ARICH volume.
      */
     const TVector3& getTranslation() const {if (!m_translation) setTransformation(); return *m_translation;}
 
     /**
-     * Get rotation matrix of ARICH master volume in global Belle II coordinates
-     * @return rotation matrix of ARICH master volume
+     * Get rotation matrix of ARICH master volume in global
+     * Belle II coordinates.
+     * @return Rotation matrix of ARICH master volume.
      */
     const TRotation& getRotation() const
     {
@@ -125,7 +123,7 @@ namespace Belle2 {
 
     ARICHPositionElement m_alignPars;
 
-    mutable TRotation* m_rotation = 0 ;
+    mutable TRotation* m_rotation = 0;
     mutable TRotation* m_rotationInverse = 0;
     mutable TVector3*  m_translation = 0;
 

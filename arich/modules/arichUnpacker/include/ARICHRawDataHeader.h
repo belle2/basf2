@@ -13,12 +13,22 @@
 
 namespace Belle2 {
 
-#define ARICHFEB_HEADER_SIZE 10 // FEB header size in bytes
-#define ARICHRAW_HEADER_SIZE 12 // Raw header size in bytes
+  /** FEB header size in bytes. */
+#define ARICHFEB_HEADER_SIZE 10
 
+  /** Raw header size in bytes. */
+#define ARICHRAW_HEADER_SIZE 12
+
+  /**
+   * ARICH raw-data header.
+   */
   struct ARICHRawHeader {
     uint8_t type = 0;
+
+    /** Version. */
     uint8_t version = 0;
+
+    /** Merger-board identifier. */
     uint8_t mergerID = 0;
     uint8_t FEBSlot = 0;
     uint32_t length = 0;

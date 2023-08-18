@@ -20,14 +20,13 @@
 namespace Belle2 {
 
   /**
-   * The Class for ARICH Aerogel Parameters.
+   * ARICH module test data.
    */
-
   class ARICHModuleTest: public TObject {
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHModuleTest(): m_febSN(0), m_hapdSN(""), m_hvbSN(0), m_run(0), m_runposition(0), m_isOK(false), m_deadCh(), m_strangeCh(),
       m_guardBias_th(NULL), m_HV_th(NULL), m_guardBias_2Dx(NULL), m_HV_2Dx(NULL), m_guardBias_2Dy(NULL), m_HV_2Dy(NULL), m_gain(NULL),
@@ -42,321 +41,347 @@ namespace Belle2 {
     };
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHModuleTest() {};
 
-    /** Return FEB serial number
-     * @return FEB serial number
+    /**
+     * Get FEB serial number.
+     * @return FEB serial number.
      */
     int getFebSN() const {return m_febSN; }
 
-    /** Set FEB serial number
-     * @param FEB serial number
+    /**
+     * Set FEB serial number.
+     * @param[in] serial FEB serial number.
      */
     void setFebSN(int serial) {m_febSN = serial; }
 
-    /** Return HAPD serial number
-     * @return HAPD serial number
+    /**
+     * Get HAPD serial number.
+     * @return HAPD serial number.
      */
     std::string getHapdSN() const {return m_hapdSN; }
 
-    /** Set HAPD serial number
-     * @param HAPD serial number
+    /**
+     * Set HAPD serial number.
+     * @param[in] hapd HAPD serial number.
      */
     void setHapdSN(const std::string& hapd) {m_hapdSN = hapd; }
 
-    /** Return HVB serial number
-     * @return HVB serial number
+    /**
+     * Get HVB serial number.
+     * @return HVB serial number.
      */
     int getHvbSN() const {return m_hvbSN; }
 
-    /** Set HVB serial number
-     * @param HVB serial number
+    /**
+     * Set HVB serial number.
+     * @param[in] serial HVB serial number.
      */
     void setHvbSN(int serial) {m_hvbSN = serial; }
 
-    /** Return module test run
-     * @return module test run
+    /**
+     * Get module test run.
+     * @return Nodule test run.
      */
     int getRun() const {return m_run; }
 
-    /** Set module test run
-     * @param module test run
+    /**
+     * Set module test run.
+     * @param[in] run Module test run.
      */
     void setRun(int run) {m_run = run; }
 
-    /** Return module test run position
-     * @return module test run position
+    /**
+     * Get module test-run position.
+     * @return Module test-run position.
      */
     int getRunPosition() const {return m_runposition; }
 
-    /** Set module test run
-     * @param module test run
+    /**
+     * Set module test-run position.
+     * @param[in] runposition Module test-run position.
      */
     void setRunPosition(int runposition) {m_runposition = runposition; }
 
-    /** Return True if module is OK
-     * @return True if module is OK
+    /**
+     * Return true if module is OK.
+     * @return True if module is OK.
      */
     bool getOK() const {return m_isOK; }
 
-    /** Set bool value - module is OK
-     * @param module is OK
+    /**
+     * Set whether module is OK.
+     * @param[in] isOK Module is OK.
      */
     void setOK(bool isOK) {m_isOK = isOK; }
 
     /**
-     * Return a channel number from the list of dead channels
-     * @param i index of the element in the list
-     * @return HAPD channel id
+     * Get a channel number from the list of dead channels.
+     * @param[in] i Index of the element in the list.
+     * @return HAPD channel id.
      */
     int getDeadCh(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of dead channels
-     * @param HAPD channel id
+     * Add a channel number to the list of dead channels.
+     * @param[in] channel HAPD channel id.
      */
     void appendDeadCh(int channel) {m_deadCh.push_back(channel); }
 
     /**
-     * Set vector of dead channel numbers
-     * @param HAPD channel id
+     * Set vector of dead channel numbers.
+     * @param[in] deadChs HAPD channel id.
      */
     void setDeadChs(const std::vector<int>& deadChs) {m_deadCh = deadChs; }
 
     /**
-     * Return size of the list of dead channels
-     * @return size
+     * Get size of the list of dead channels.
+     * @return Size.
      */
     int getDeadChsSize() const {return m_deadCh.size();}
 
     /**
-     * Return a channel number from the list of strange channels
-     * @param i index of the element in the list
-     * @return HAPD channel id
+     * Get a channel number from the list of strange channels.
+     * @param[in] i Index of the element in the list.
+     * @return HAPD channel id.
      */
     int getStrangeCh(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of strange channels
-     * @param HAPD channel id
+     * Add a channel number to the list of strange channels.
+     * @param[in] channel HAPD channel id.
      */
     void appendStrangeCh(int channel) {m_strangeCh.push_back(channel); }
 
     /**
-     * Set vector of strange channel numbers
-     * @param HAPD channel id
+     * Set vector of strange channel numbers.
+     * @param[in] strangeChs HAPD channel id.
      */
     void setStrangeChs(const std::vector<int>& strangeChs) {m_strangeCh = strangeChs; }
 
     /**
-     * Return size of the list of strange channels
-     * @return size
+     * Get size of the list of strange channels.
+     * @return Size.
      */
     int getStrangeChsSize() const {return m_strangeCh.size();}
 
     /**
-     * Return guard bias during treshold scan
-     * @return TGraph guard bias during treshold scan
+     * Get guard bias during treshold scan.
+     * @return TGraph guard bias during treshold scan.
      */
     TGraph* getGuardBiasTH() const {return m_guardBias_th;}
 
     /**
-     * Set guard bias during treshold scan
-     * @param TGraph guard bias during treshold scan
+     * Set guard bias during treshold scan.
+     * @param[in] guardBias_th TGraph guard bias during treshold scan.
      */
     void setGuardBiasTH(TGraph* guardBias_th) { m_guardBias_th = guardBias_th;}
 
-    /** Get Chip Vmon - Vset difference during treshold scan
+    /**
+     * Get Chip Vmon - Vset difference during treshold scan.
      * @return Chip Vmon - Vset difference
      */
     TGraph* getChipVdiffTH(unsigned int i) const;
 
-    /** Set Chip Vmon - Vset difference during treshold scan
-     * @param Chip Vmon - Vset difference
+    /**
+     * Set Chip Vmon - Vset difference during treshold scan.
+     * @param[in] chipVdiff_th Chip Vmon - Vset difference.
      */
     void setChipVdiffTH(unsigned int i, TGraph* chipVdiff_th);
 
-    /** Get leakage current during treshold scan
-     * @return leakage current
+    /**
+     * Get leakage current during treshold scan.
+     * @return Leakage current.
      */
     TGraph* getChipLeakTH(unsigned int i) const;
 
-    /** Set leakage current during treshold scan
-     * @param leakage current
+    /**
+     * Set leakage current during treshold scan.
+     * @param[in] chipLeak_th Leakage current.
      */
     void setChipLeakTH(unsigned int i, TGraph* chipLeak_th);
 
     /**
-     * Return high voltage during treshold scan
-     * @return TGraph high voltage during treshold scan
+     * Get high voltage during treshold scan.
+     * @return TGraph high voltage during treshold scan.
      */
     TGraph* getHighVoltageTH() const {return m_HV_th;}
 
     /**
-     * Set high voltage during treshold scan
-     * @param TGraph high voltage during treshold scan
+     * Set high voltage during treshold scan.
+     * @param[in] HV_th TGraph high voltage during treshold scan.
      */
     void setHighVoltageTH(TGraph* HV_th) { m_HV_th = HV_th;}
 
     /**
-     * Return guard bias during 2Dx scan
-     * @return TGraph guard bias during 2Dx scan
+     * Get guard bias during 2Dx scan.
+     * @return TGraph guard bias during 2Dx scan.
      */
     TGraph* getGuardBias2Dx() const {return m_guardBias_2Dx;}
 
     /**
-     * Set guard bias during 2Dx scan
-     * @param TGraph guard bias during 2Dx scan
+     * Set guard bias during 2Dx scan.
+     * @param[in] guardBias_2Dx TGraph guard bias during 2Dx scan.
      */
     void setGuardBias2Dx(TGraph* guardBias_2Dx) { m_guardBias_2Dx = guardBias_2Dx;}
 
-    /** Get Chip Vmon - Vset difference during 2Dx scan
-     * @return Chip Vmon - Vset difference
+    /**
+     * Get Chip Vmon - Vset difference during 2Dx scan.
+     * @return Chip Vmon - Vset difference.
      */
     TGraph* getChipVdiff2Dx(unsigned int i) const;
 
-    /** Set Chip Vmon - Vset difference during 2Dx scan
-     * @param Chip Vmon - Vset difference
+    /**
+     * Set Chip Vmon - Vset difference during 2Dx scan.
+     * @param[in] chipVdiff_2Dx Chip Vmon - Vset difference.
      */
     void setChipVdiff2Dx(unsigned int i, TGraph* chipVdiff_2Dx);
 
-    /** Get leakage current during 2Dx scan
-     * @return leakage current
+    /**
+     * Get leakage current during 2Dx scan.
+     * @return Leakage current.
      */
     TGraph* getChipLeak2Dx(unsigned int i) const;
 
-    /** Set leakage current during 2Dx scan
-     * @param leakage current
+    /**
+     * Set leakage current during 2Dx scan.
+     * @param[in] chipLeak_2Dx Leakage current.
      */
     void setChipLeak2Dx(unsigned int i, TGraph* chipLeak_2Dx);
 
     /**
-     * Return high voltage during 2Dx scan
-     * @return TGraph high voltage during 2Dx scan
+     * Get high voltage during 2Dx scan.
+     * @return TGraph high voltage during 2Dx scan.
      */
     TGraph* getHighVoltage2Dx() const {return m_HV_2Dx;}
 
     /**
-     * Set high voltage during 2Dx scan
-     * @param TGraph high voltage during 2Dx scan
+     * Set high voltage during 2Dx scan.
+     * @param[in] HV_2Dx TGraph high voltage during 2Dx scan.
      */
     void setHighVoltage2Dx(TGraph* HV_2Dx) { m_HV_2Dx = HV_2Dx;}
 
     /**
-     * Return guard bias during 2Dy scan
-     * @return TGraph guard bias during 2Dy scan
+     * Get guard bias during 2Dy scan.
+     * @return TGraph guard bias during 2Dy scan.
      */
     TGraph* getGuardBias2Dy() const {return m_guardBias_2Dy;}
 
-    /** Get Chip Vmon - Vset difference during 2Dy scan
-     * @return Chip Vmon - Vset difference
+    /**
+     * Set guard bias during 2Dy scan.
+     * @param[in] guardBias_2Dy TGraph guard bias during 2Dy scan.
+     */
+    void setGuardBias2Dy(TGraph* guardBias_2Dy) { m_guardBias_2Dy = guardBias_2Dy;}
+
+    /**
+     * Get Chip Vmon - Vset difference during 2Dy scan.
+     * @return Chip Vmon - Vset difference.
      */
     TGraph* getChipVdiff2Dy(unsigned int i) const;
 
-    /** Set Chip Vmon - Vset difference during 2Dx scan
-     * @param Chip Vmon - Vset difference
+    /**
+     * Set Chip Vmon - Vset difference during 2Dx scan.
+     * @param[in] chipVdiff_2Dy Chip Vmon - Vset difference.
      */
     void setChipVdiff2Dy(unsigned int i, TGraph* chipVdiff_2Dy);
 
     /**
-     * Set guard bias during 2Dy scan
-     * @param TGraph guard bias during 2Dy scan
-     */
-    void setGuardBias2Dy(TGraph* guardBias_2Dy) { m_guardBias_2Dy = guardBias_2Dy;}
-
-    /** Get leakage current during 2Dy scan
-     * @return leakage current
+     * Get leakage current during 2Dy scan.
+     * @return Leakage current.
      */
     TGraph* getChipLeak2Dy(unsigned int i) const;
 
-    /** Set leakage current during 2Dy scan
-     * @param leakage current
+    /**
+     * Set leakage current during 2Dy scan.
+     * @param[in] chipLeak_2Dy Leakage current.
      */
     void setChipLeak2Dy(unsigned int i, TGraph* chipLeak_2Dy);
 
     /**
-     * Return high voltage during 2Dy scan
-     * @return TGraph high voltage 2Dy scan
+     * Get high voltage during 2Dy scan.
+     * @return TGraph high voltage 2Dy scan.
      */
     TGraph* getHighVoltage2Dy() const {return m_HV_2Dy;}
 
     /**
-     * Set high voltage during 2Dy scan
-     * @param TGraph high voltage 2Dy scan
+     * Set high voltage during 2Dy scan.
+     * @param[in] HV_2Dy TGraph high voltage 2Dy scan.
      */
     void setHighVoltage2Dy(TGraph* HV_2Dy) { m_HV_2Dy = HV_2Dy;}
 
     /**
-     * Return gain
-     * @return gain
+     * Get gain.
+     * @return Gain.
      */
     TH1F* getGain() const {return m_gain;}
 
     /**
-     * Set gain
-     * @param gain
+     * Set gain.
+     * @param[in] gain Gain.
      */
     void setGain(TH1F* gain) { m_gain = gain;}
 
     /**
-     * Return charge scan
-     * @return charge scan
+     * Get charge scan.
+     * @return Charge scan.
      */
     TH2D* getChargeScan() const {return m_charge;}
 
     /**
-     * Set charge scan
-     * @param charge scan
+     * Set charge scan.
+     * @param[in] charge Charge scan.
      */
     void setChargeScan(TH2D* charge) { m_charge = charge;}
 
     /**
-     * Return treshold scan
-     * @return treshold scan
+     * Get treshold scan.
+     * @return Treshold scan.
      */
     TH2D* getTresholdScan() const {return m_th;}
 
     /**
-     * Set treshold scan
-     * @param treshold scan
+     * Set treshold scan.
+     * @param[in] th Treshold scan.
      */
     void setTresholdScan(TH2D* th) { m_th = th;}
 
     /**
-     * Return laser scan - X direction
-     * @return laser scan - X direction
+     * Get laser scan - X direction.
+     * @return Laser scan - X direction.
      */
     TH2D* getLaserScanX() const {return m_scanX;}
 
     /**
-     * Set laser scan - X direction
-     * @param laser scan - X direction
+     * Set laser scan - X direction.
+     * @param[in] scanX Laser scan - X direction.
      */
     void setLaserScanX(TH2D* scanX) { m_scanX = scanX;}
 
     /**
-     * Return laser scan - Y direction
-     * @return laser scan - Y direction
+     * Get laser scan - Y direction.
+     * @return Laser scan - Y direction.
      */
     TH2D* getLaserScanY() const {return m_scanY;}
 
     /**
-     * Set laser scan - Y direction
-     * @param laser scan - Y direction
+     * Set laser scan - Y direction.
+     * @param[in] m_scanY Laser scan - Y direction.
      */
     void setLaserScanY(TH2D* scanY) { m_scanY = scanY;}
 
-    /** Set comment
-     * @param comment
-     */
-    void setComment(const std::string& comment) {m_comment = comment; }
-
-    /** Return comment
-     * @return comment
+    /**
+     * Get comment.
+     * @return Comment.
      */
     std::string getComment() const {return m_comment; }
+
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
+     */
+    void setComment(const std::string& comment) {m_comment = comment; }
 
   private:
 

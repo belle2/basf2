@@ -15,21 +15,21 @@
 namespace Belle2 {
 
   /**
-   *   Contains manufacturer data of one of the 4 photo sensors chips
+   * Contains manufacturer data of one of the 4 photo sensors chips.
    */
-
   class ARICHHapdChipInfo: public TObject {
+
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHHapdChipInfo(): m_serial(""), m_chip(""), m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL), m_bombardmentGain(NULL),
       m_bombardmentCurrent(), m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0),
       m_cutChannel(), m_badChannel() {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     explicit ARICHHapdChipInfo(const std::string& serial): m_serial(serial), m_chip(""), m_biasVoltage(0), m_gain(0),
       m_leakCurrent(NULL),
@@ -37,198 +37,203 @@ namespace Belle2 {
       m_biasCurrent2D(NULL), m_channelId(0), m_cutChannel(), m_badChannel() {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHHapdChipInfo() {};
 
-    /** Return Hapd Serial number
-     * @return Hapd Serial number
+    /**
+     * Get HAPD Serial number.
+     * @return HAPD Serial number.
      */
     std::string getHapdSerial() const {return m_serial; };
 
-    /** Set Hapd Serial number
-     * @param Hapd Serial number
+    /**
+     * Set HAPD serial number.
+     * @param[in] serial HAPD serial number.
      */
     void setHapdSerial(const std::string& serial) {m_serial = serial; }
 
-    /** Return Chip label
-     * @return Chip label
+    /**
+     * Get chip label.
+     * @return Chip label.
      */
     std::string getChipLabel() const {return m_chip; };
 
-    /** Set Chip label
-     * @param Chip label
+    /**
+     * Set Chip label.
+     * @param[in] chip Chip label.
      */
     void setChipLabel(const std::string& chip) {m_chip = chip; }
 
     /**
-     * Return Chip Bias Voltage
-     * @return bias voltage
+     * Get chip bias Voltage.
+     * @return Bias voltage.
      */
     int getBiasVoltage() const {return m_biasVoltage;}
 
     /**
-     * set Chip Bias Voltage
-     * @param voltage bias voltage
+     * Set chip bias voltage.
+     * @param[in] voltage Bias voltage.
      */
     void setBiasVoltage(int voltage)  { m_biasVoltage = voltage; }
 
     /**
-     * Return Chip Gain at Operational Voltage
-     * @return chip gain
+     * Get chip gain at operational voltage.
+     * @return Chip gain.
      */
     int getGain() const {return m_gain;}
 
     /**
-     * set Chip Gain at Operational Voltage
-     * @param gain chip gain
+     * Set chip gain at operational voltage.
+     * @param[in] gain Chip gain.
      */
     void setGain(int gain) { m_gain = gain;}
 
     /**
-     * Return Leakeage Current as a function of bias voltage
-     * @return chip gain
+     * Get leakeage current as a function of bias voltage.
+     * @return Leakage current.
      */
     TGraph* getLeakCurrent() const {return m_leakCurrent;}
 
     /**
-     * set Leakeage Current as a function of bias voltage
-     * @param current Leakeage current
+     * Set leakeage current as a function of bias voltage.
+     * @param[in] current Leakeage current.
      */
     void setLeakCurrent(TGraph* current) {m_leakCurrent = current;}
 
     /**
-     * Return Bombardment Gain as a function of high voltage
-     * @return bombardment gain
+     * Get bombardment gain as a function of high voltage.
+     * @return Bombardment gain.
      */
     TGraph* getBombardmentGain() const {return m_bombardmentGain;}
 
     /**
-     * Set Bombardment Gain as a function of high voltage
-     * @param gain bombardment gain
+     * Set bombardment gain as a function of high voltage.
+     * @param[in] gain Bombardment gain.
      */
     void setBombardmentGain(TGraph* gain) {m_bombardmentGain = gain;}
 
     /**
-     * Return Bombardment Current as a function of high voltage
-     * @return current
+     * Get bombardment current as a function of high voltage.
+     * @return Current.
      */
     TGraph* getBombardmentCurrent(unsigned int i) const;
 
     /**
-     * set Bombardment Current as a function of high voltage
-     * @param bombardment current current vs high voltage
+     * Set bombardment current as a function of high voltage.
+     * @param[in] bcurrent Bombardment current current vs high voltage.
      */
     void setBombardmentCurrent(std::vector<TGraph*> bcurrent);
 
     /**
-     * Return Avalanche Gain as a function of bias voltage
-     * @return avalanche gain
+     * Get avalanche Gain as a function of bias voltage.
+     * @return Avalanche gain.
      */
     TGraph* getAvalancheGain() const {return m_avalancheGain;}
 
     /**
-     * set Avalanche Gain as a function of bias voltage
-     * @param gain avalanche gain vs bias
+     * Set avalanche Gain as a function of bias voltage.
+     * @param[in] gain Avalanche gain vs bias.
      */
     void setAvalancheGain(TGraph* gain) {m_avalancheGain = gain;}
 
-
     /**
-     * Return Avalanche Current as a function of bias voltage
-     * @return avalanche current
+     * Get avalanche current as a function of bias voltage.
+     * @return Avalanche current
      */
     TGraph* getAvalancheCurrent(unsigned int i) const;
 
     /**
-     * set Avalanche Current as a function of bias voltage
-     * @param avalanche current current vs bias
+     * Set avalanche current as a function of bias voltage.
+     * @param[in] acurrent Avalanche current current vs bias.
      */
     void setAvalancheCurrent(std::vector<TGraph*> acurrent);
 
     /**
-     * Return Bias Voltage as a function of the channel
-     * @return 2D map of the voltage
+     * Get bias voltage as a function of the channel.
+     * @return 2D map of the voltage.
      */
     TH2F* getBiasVoltage2D() const {return m_biasVoltage2D;}
 
     /**
-     * Set Bias Voltage as a function of the channel
-     * @param h2d 2D map of the voltage
+     * Set bias voltage as a function of the channel.
+     * @param[in] h2d 2D map of the voltage.
      */
     void setBiasVoltage2D(TH2F* h2d) { m_biasVoltage2D = h2d;}
 
     /**
-     * Return Bias Current as a function of the channel
-     * @return 2D map of the current
+     * Get bias current as a function of the channel.
+     * @return 2D map of the current.
      */
     TH2F* getBiasCurrent2D() const {return m_biasCurrent2D;}
 
     /**
-     * set Bias Current as a function of the channel
-     * @param h2d 2D map of the current
+     * Set bias current as a function of the channel.
+     * @param[in] h2d 2D map of the current.
      */
     void setBiasCurrent2D(TH2F* h2d) { m_biasCurrent2D = h2d;}
 
     /**
-     * Return Channel Number for the Bombardment and Avalanche measurements information
-     * @return channel number
+     * Get channel number for the bombardment and avalanche
+     * measurements information.
+     * @return Channel number.
      */
     int getChannelNumber() const {return m_channelId;}
 
     /**
-     * Set Channel Number for the Bombardment and Avalanche measurements information
-     * @param channel channel number
+     * Set channel number for the bombardment and avalanche
+     * measurements information.
+     * @param[in] channel Channel number
      */
     void setChannelNumber(int channel) {m_channelId = channel;}
 
     /**
-     * Return a channel number from the list of cut channels
-     * @param i index of the element in the list
-     * @return channel number
+     * Get a channel number from the list of cut channels.
+     * @param[in] i Index of the element in the list.
+     * @return Channel number.
      */
     int getCutChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of cut channels
-     * @param channel HAPD channel number
+     * Add a channel number to the list of cut channels.
+     * @param[in] channel HAPD channel number.
      */
     void appendCutChannel(int channel) {m_cutChannel.push_back(channel); }
 
     /**
-     * Set the list of cut channels
-     * @param channel HAPD channel numbers
+     * Set the list of cut channels.
+     * @param[in] channels HAPD channel numbers.
      */
     void setCutChannel(const std::vector<int>& channels) {m_cutChannel = channels; }
 
     /**
-     * Return size of the list of cut channels
-     * @return size
+     * Get size of the list of cut channels.
+     * @return Size.
      */
     int getCutChannelsSize() const {return m_cutChannel.size();}
 
     /**
-     * Return a channel number from the list of cut channels
-     * @param i index of the element in the list
-     * @return channel number
+     * Get a channel number from the list of bad channels.
+     * @param[in] i Index of the element in the list.
+     * @return Channel number.
      */
     int getBadChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of cut channels
-     * @param channel HAPD channel number
+     * Add a channel number to the list of bad channels.
+     * @param[in] channel HAPD channel number.
      */
-    void appendBadChannel(int ichannel) { m_badChannel.push_back(ichannel); }
+    void appendBadChannel(int channel) { m_badChannel.push_back(channel); }
 
     /**
-     * Set the list of bad channels
-     * @param channel HAPD channel numbers
+     * Set the list of bad channels.
+     * @param[in] channel HAPD channel numbers.
      */
     void setBadChannel(const std::vector<int>& channels) {m_badChannel = channels; }
 
     /**
-     * Return size of the list of cut channels
-     * @return size
+     * Get size of the list of cut channels.
+     * @return Size.
      */
     int getBadChannelsSize() const {return m_badChannel.size();}
 

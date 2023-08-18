@@ -52,10 +52,17 @@ namespace Belle2 {
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      */
-
     void printBits(const int* buffer, int bufferSize);
-    void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head); /** read Merger header */
-    void readFEHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head); /** read FE header */
+
+    /**
+     * Read Merger header.
+     */
+    void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head);
+
+    /**
+     * Read FE header.
+     */
+    void readFEHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head);
 
 
 

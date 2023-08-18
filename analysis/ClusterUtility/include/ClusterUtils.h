@@ -8,8 +8,9 @@
 
 #pragma once
 
-// BEAMSPOT AND DATABASE
+// DATABASE objects
 #include <mdst/dbobjects/BeamSpot.h>
+#include <analysis/dbobjects/ECLPhotonEnergyResolution.h>
 #include <framework/database/DBObjPtr.h>
 
 // MDST
@@ -31,7 +32,6 @@ namespace Belle2 {
   class ClusterUtils {
 
   public:
-
     /**
      * Constructor
      */
@@ -67,6 +67,12 @@ namespace Belle2 {
      */
     const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
                                                  ECLCluster::EHypothesisBit hypo);
+
+    /**
+     * Returns 3x3 covariance matrix (E, theta, phi)
+     * @return const TMatrixDSym
+     */
+    const TMatrixDSym GetCovarianceMatrix3x3FromCluster(const ECLCluster* cluster);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
@@ -109,8 +115,11 @@ namespace Belle2 {
     const TMatrixDSym GetIPPositionCovarianceMatrix();
 
   private:
+    // Beam spot database object
+    DBObjPtr<BeamSpot> m_beamSpotDB;
 
-    DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */
+    // Photon energy resolution database object
+    DBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
   };
 
 } // Belle2 namespace

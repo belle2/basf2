@@ -55,14 +55,6 @@ namespace Belle2 {
     //! Get invariance matrix of track parameters in the global system.
     TMatrixDSym  getTrackParamErr();
 
-    //TODO: Replace me
-    //! Get the position in local coordinate system of track intercept in plane of constant x
-    ROOT::Math::XYZVector getLocalIntercept(double x);
-
-    //TODO: Replace me
-    //! Get the variance matrix of (y,z) coordinates of the track intercept in plane of constant x in sector local system
-    TMatrixD getLocalInterceptVariance(double x);
-
     //! Get the fitted chi2 of the track
     float getTrackChi2()
     {
@@ -93,12 +85,6 @@ namespace Belle2 {
     //! Set invariance matrix of track parameters in the global system.
     void setTrackParamErr(const CLHEP::HepSymMatrix& trkParErr);
 
-    //! Set track parameters in the sector local system, where the first layer of the sector is used as reference.
-    void setLocalTrackParam(const CLHEP::HepVector& trkPar);
-
-    //! Set invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
-    void setLocalTrackParamErr(const CLHEP::HepSymMatrix& trkParErr);
-
     //! Set the fitted chi2 of the track
     void setTrackChi2(const float chi2)
     {
@@ -118,7 +104,7 @@ namespace Belle2 {
     }
 
     //! setting subdetector flag (barrel or endcap)
-    int getSubdetector(const int subdetector)
+    int setSubdetector(const int subdetector)
     {
       m_Subdetector = subdetector;
     }
@@ -139,7 +125,7 @@ namespace Belle2 {
       return (m_Subdetector == KLMElementNumbers::c_EKLM);
     }
 
-    int getSubdetector()
+    int getSubdetector() const
     {
       return m_Subdetector;
     }
@@ -165,12 +151,6 @@ namespace Belle2 {
 
     //! track parameters variance in the global system.
     float m_TrackParamErr[4][4];
-
-    //! track parameters in the sector local system.
-    float m_LocalTrackParam[4];
-
-    //! track parameters variance in the sector local system.
-    float m_LocalTrackParamErr[4][4];
 
     //! which subdetector does the track hit
     int m_Subdetector;

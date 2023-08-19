@@ -27,7 +27,7 @@
 
 using namespace CLHEP;
 using namespace Belle2;
-using namespace Belle2::KLM; //how much  does this change
+using namespace Belle2::KLM;
 
 //! Hep3Vector indices
 enum { VX = 0, VY = 1, VZ = 2 };
@@ -40,14 +40,14 @@ enum { MY = 0, MZ = 1 };
 
 //! Constructor
 KLMTrackFitter::KLMTrackFitter():
-  setDescription("For the use of standalone KLM tracking, this module is the fitter component.");
-m_Valid(false),
-        m_Good(false),
-        m_Chi2(0.0),
-        m_NumHit(0),
-        m_GlobalPar(4, 0),
-        m_GlobalErr(4, 0),
-        m_GeoPar(nullptr)
+// Description: "For the use of standalone KLM tracking, this module is the fitter component.";
+  m_Valid(false),
+  m_Good(false),
+  m_Chi2(0.0),
+  m_NumHit(0),
+  m_GlobalPar(4, 0),
+  m_GlobalErr(4, 0),
+  m_GeoPar(nullptr)
 {
 }
 
@@ -81,7 +81,8 @@ double KLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
   globalPar.sub(1, eta);
   globalErr.sub(1, error);
 
-  m_Chi2  += fit1dTrack(listHitSector, eta, error, VY, VZ);
+  //m_Chi2  += fit1dTrack(listHitSector, eta, error, VY, VZ);
+  m_Chi2  += fit1dTrack(listHitSector, eta, error, VZ, VX);
   globalPar.sub(3, eta);
   globalErr.sub(3, error);
 
@@ -123,10 +124,11 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   double z_mea = hit->getPositionZ();
 
   //there is some subdetector dependence so let's define this first.
-  double x_pre; double y_pre; double z_pre;
+  double x_pre, y_pre, z_pre, dx, dy, dz;
 
   // Error is composed of four parts: error due to tracking;
-  // and error in hit, y, x  or y, z.
+  // // and error in hit, y, x  or y, z. // TODO: Get rid of me
+  // and error in hit, y(x)  or z(x).
   HepMatrix  errors(2, 2, 0);    // Matrix for errors
   HepMatrix  A(2, 4, 0);         // Matrix for derivatives
 
@@ -134,8 +136,6 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   //defining quanitites for hit errors
   double hit_xErr = 0; double hit_yErr = 0; double hit_zErr = 0;
   HepMatrix globalHitErr(3, 3, 0);
-
-  KLMGeometryPar m_GeoPar;
 
   //HepMatrix  B(2, 2, 0);         // Matrix for derivatives
 
@@ -146,24 +146,29 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   //double errors_b[1] = B[ MZ ][ BY ]*globalHitErr[1][1];
 
   // Derivatives of x (z) = y/b - a/b with respect to a and b.
-  A[ MY ][ AY ] = -1. / m_GlobalPar[BY];
-  A[ MY ][ BY ] = -1 * (y_mea - m_GlobalPar[ AY ]) / (m_GlobalPar[ BY ] * m_GlobalPar[ BY ]);
-  A[ MZ ][ AZ ] = -1. / m_GlobalPar[ BZ ];
-  A[ MZ ][ BZ ] = -1 * (y_mea - m_GlobalPar[ AZ ]) / (m_GlobalPar[ BZ ] * m_GlobalPar[ BZ ]);
+  // TODO: FIX ME
+  //A[ MY ][ AY ] = -1. / m_GlobalPar[BY];
+  //A[ MY ][ BY ] = -1 * (y_mea - m_GlobalPar[ AY ]) / (m_GlobalPar[ BY ] * m_GlobalPar[ BY ]);
+  //A[ MZ ][ AZ ] = -1. / m_GlobalPar[ BZ ];
+  //A[ MZ ][ BZ ] = -1 * (y_mea - m_GlobalPar[ AZ ]) / (m_GlobalPar[ BZ ] * m_GlobalPar[ BZ ]);
+  A[ MY ][ AY ] = 1. ;
+  A[ MY ][ BY ] = x_mea;
+  A[ MZ ][ AZ ] = 1;
+  A[ MZ ][ BZ ] = x_mea;
+
 
   //error from trackPar is inclueded, error from y_mea is not included
   errors = A * m_GlobalErr * A.T();
 
   if (hit->getSubdetector() == KLMElementNumbers::c_BKLM) {
-
     // defining terms relating to distance
-    x_pre = (y_mea - m_GlobalPar[ AY ]) / m_GlobalPar[ BY ]; //y_mea has uncertainties actually
-    //y_pre = y; //by definition
-    z_pre = (y_mea - m_GlobalPar[ AZ ]) / m_GlobalPar[ BZ ];
-
-    dx = x_pre - x_mea;
-    dy = 0.;
-    dz = z_pre - z_mea;
+    // TODO: REMOVE ME
+    //x_pre = (y_mea - m_GlobalPar[ AY ]) / m_GlobalPar[ BY ]; //y_mea has uncertainties actually
+    //y_pre = y_mea; //by definition
+    //z_pre = (y_mea - m_GlobalPar[ AZ ]) / m_GlobalPar[ BZ ];
+    x_pre = x_mea; //by definition
+    y_pre = m_GlobalPar[ AY ] + m_GlobalPar[ BY ] * x_mea;
+    z_pre =  m_GlobalPar[ AZ ] + m_GlobalPar[ BZ ] * x_mea;
 
     const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
     //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
@@ -206,26 +211,27 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
 
   } // end of BKLM portion
 
-  elif(hit->GetSubdetector() == KLMElementNumbers::c_EKLM) {
-
+  else if (hit->getSubdetector() == KLMElementNumbers::c_EKLM) {
     // distance related (choose z variable)
     // z coordinate should correspond to where track passes through EKLM-plane
-    y_pre =  m_GlobalPar[ AZ ] +  m_GlobalPar[ ZZ ] * z_pre;
-    x_pre = (y_pre - m_GlobalPar[ AY ]) / m_GlobalPar[ BY ];
+    //TODO: FIX ME
+    //y_pre =  m_GlobalPar[ AZ ] +  m_GlobalPar[ BZ ] * z_pre;
+    //x_pre = (y_pre - m_GlobalPar[ AY ]) / m_GlobalPar[ BY ];
     //z_pre = z_mea; //by design
-
-    dx = x_pre - x_mea;
-    dy = y_pre - y_mea;
-    dz = 0.;
+    z_pre = z_mea;
+    x_pre = (z_mea - m_GlobalPar[ AZ ]) / m_GlobalPar[ BZ ];
+    y_pre =  m_GlobalPar[ AY ] +  m_GlobalPar[ BY ] * x_pre;
 
     const EKLM::GeometryData* eklmGeo = m_GeoPar->EndcapInstance();
 
     //EKLM GeometryData is needed for strip widths
 
     //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
-    hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin()) / sqrt(
+    hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin() + 1) /
+               sqrt(
                  12);
-    hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin()) / sqrt(
+    hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin() + 1) /
+               sqrt(
                  12);
     hit_zErr = 0.; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
 
@@ -242,11 +248,12 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
 
   } // end of EKLM section
 
-  else {
+  else
     B2FATAL("In KLMTrackFitter globalDistanceToHit, hit is neither from E/B-KLM.");
-  }
 
-
+  dx = x_pre - x_mea;
+  dy = y_pre - y_mea;
+  dz = z_pre - z_mea;
   double distance = sqrt(dx * dx + dy * dy +  dz * dz);
 
   // now that we have globalHitErr, compute error
@@ -268,7 +275,6 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
 }
 
 
-//TODO: Fix me to be E and B KLM - done?
 //! do fit in global system, handle tracks that go thrugh multi-sectors
 double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
                                   HepVector&  eta,
@@ -276,8 +282,8 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
                                   int depDir,    int indDir)
 {
 // Fit d = a + bi, where d is dependent direction and i is independent
-// in global system we assume y = a + b*x and y = c + d*z  different from local fit
-
+// // in global system we assume y = a + b*x and y = c + d*z  different from local fit
+// in global system we assume y = a + b*x and z = c + dx  different from local fit
   HepMatrix globalHitErr(3, 3, 0);
 
   double     indPos = 0;
@@ -300,23 +306,18 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
   HepSymMatrix  V_A, V_A_inverse;
 
 
-  KLMGeometryPar m_GeoPar;
-  const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
-  const EKLM::GeometryData* eklmGeo = m_GeoPar->EndcapInstance();
-
   int n = 0;
   for (std::list< KLMHit2d* >::iterator iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
 
     KLMHit2d* hit = *iHit;
 
-    CLHEP::Hep3Vector globalPos;
-    globalPos[0] = hit->getPositionX();
-    globalPos[1] = hit->getPositionY();
-    globalPos[2] = hit->getPositionZ();
+    CLHEP::Hep3Vector globalPos(hit->getPositionX(),  hit->getPositionY(),  hit->getPositionZ());
+
 
     if (hit->getSubdetector() == KLMElementNumbers::c_BKLM) {
       //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
-      corMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
+      const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
+      const bklm::Module* corMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
       //localHitPos = refMod->globalToLocal(globalPos);
       double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
@@ -339,15 +340,15 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
       double sinphi = globalOrigin[1] / globalOrigin.mag();
       double cosphi = globalOrigin[0] / globalOrigin.mag();
 
-      globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); //x
+      globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); // x
       globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
-      globalHitErr[0][2] = 0;
-      globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2);;
+      globalHitErr[0][2] = 0.;
+      globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2); // y
       globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
-      globalHitErr[1][2] = 0;
-      globalHitErr[2][2] = pow(hit_localZErr, 2);;
-      globalHitErr[2][0] = 0;
-      globalHitErr[2][1] = 0;
+      globalHitErr[1][2] = 0.;
+      globalHitErr[2][2] = pow(hit_localZErr, 2); // z
+      globalHitErr[2][0] = 0.;
+      globalHitErr[2][1] = 0.;
 
       switch (indDir) {
 
@@ -388,14 +389,20 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
       }
     } //end of BKLM section
 
-    elif(hit->GetSubdetector() == KLMElementNumbers::c_EKLM) {
+    else if (hit->getSubdetector() == KLMElementNumbers::c_EKLM) {
+      const EKLM::GeometryData* eklmGeo = m_GeoPar->EndcapInstance();
 
       //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
-      hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin()) / sqrt(
-                   12);
-      hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin()) / sqrt(
-                   12);
-      hit_zErr = 0; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
+      double hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin() +
+                        1) / sqrt(
+                          12);
+      double hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin() +
+                        1) / sqrt(
+                          12);
+      double hit_zErr = 0; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
+
+      B2DEBUG(20, "KLMTrackFitter" << " Width: " << eklmGeo->getStripGeometry()->getWidth() << " Vec_x: " << hit_xErr * sqrt(
+                12) << " Vec_y: " << hit_yErr * sqrt(12));
 
       globalHitErr[0][0] = pow(hit_xErr, 2); //x
       globalHitErr[0][1] = 0.;
@@ -447,7 +454,6 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
 
       }
     } //end of EKLM section
-
 
     A[ n ][ 0 ] = 1;
     A[ n ][ 1 ] = indPos;

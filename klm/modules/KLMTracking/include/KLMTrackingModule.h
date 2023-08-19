@@ -88,7 +88,7 @@ namespace Belle2 {
   private:
 
     //! KLMGeometryPar to call on B/E-KLM
-    KLM::KLMGeometryPar* m_GeoPar;
+    Belle2::KLM::KLMGeometryPar* m_GeoPar;
 
     //! TFile that store efficieny plots
     TFile* m_file = nullptr;
@@ -121,8 +121,8 @@ namespace Belle2 {
 
     //! total event at global position Y vs Z
     TH2F* m_totalYZ;
-    //! BKLMTrack StoreArray
-    StoreArray<BKLMTrack> m_storeTracks;
+    //! KLMTrack StoreArray
+    StoreArray<KLMTrack> m_storeTracks;
 
     //! KLMHit2d StoreArray
     StoreArray<KLMHit2d> hits2D;
@@ -137,7 +137,7 @@ namespace Belle2 {
     void runTracking(int mode, int section, int sector, int layer);
 
     //! calculate efficiency
-    void generateEffi(int section, int sector, int layer);
+    void generateEffi(int iSubdetector, int section, int sector, int layer);
 
     //! my defined sort function using layer number
     static bool sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2);
@@ -145,11 +145,11 @@ namespace Belle2 {
     //! judge whether the current layer is understudy
     bool isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit);
 
-    //! judge whether the hits come from the sctor understudy
+    //! judge whether the hits come from the sctor under study
     bool isSectorUnderStudy(int section, int iSector, KLMHit2d* hit);
 
     //! calculate distance from track to hit
-    double distanceToHit(BKLMTrack* track, KLMHit2d* hit,
+    double distanceToHit(KLMTrack* track, KLMHit2d* hit,
                          double& error,
                          double& sigma);
 

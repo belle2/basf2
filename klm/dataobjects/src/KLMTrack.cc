@@ -22,10 +22,8 @@ KLMTrack::KLMTrack():
 {
   for (int ii = 0 ; ii < 4; ii ++) {
     m_TrackParam[0] = 0.0;
-    m_LocalTrackParam[ii] = 0.0;
     for (int jj = 0 ; jj < 4; jj ++) {
       m_TrackParamErr[ii][jj] =  0.0;
-      m_LocalTrackParamErr[ii][jj] = 0.0;
     }
   }
 }
@@ -41,10 +39,8 @@ KLMTrack::KLMTrack(const KLMTrack& track) :
 
   for (int ii = 0 ; ii < 4; ii ++) {
     m_TrackParam[ii] = track.m_TrackParam[ii];
-    m_LocalTrackParam[ii] = track.m_LocalTrackParam[ii];
     for (int jj = 0 ; jj < 4; jj ++) {
       m_TrackParamErr[ii][jj] = track.m_TrackParamErr[ii][jj];
-      m_LocalTrackParamErr[ii][jj] = track.m_LocalTrackParamErr[ii][jj];
     }
   }
 }
@@ -59,10 +55,8 @@ KLMTrack& KLMTrack::operator=(const KLMTrack& track)
 
   for (int ii = 0 ; ii < 4; ii ++) {
     m_TrackParam[ii] = track.m_TrackParam[ii];
-    m_LocalTrackParam[ii] = track.m_LocalTrackParam[ii];
     for (int jj = 0 ; jj < 4; jj ++) {
       m_TrackParamErr[ii][jj] = track.m_TrackParamErr[ii][jj];
-      m_LocalTrackParamErr[ii][jj] = track.m_LocalTrackParamErr[ii][jj];
     }
   }
   return *this;
@@ -115,32 +109,3 @@ void KLMTrack::setTrackParamErr(const CLHEP::HepSymMatrix& trkParErr)
 }
 
 
-//! Get the positon in local coordinate system of track intercept in plane of constant x
-ROOT::Math::XYZVector KLMTrack::getLocalIntercept(double x)
-{
-
-  ROOT::Math::XYZVector intercept;
-
-  intercept.SetX(x);
-  intercept.SetY(m_LocalTrackParam[ 0 ] + x * m_LocalTrackParam[ 1 ]);
-  intercept.SetZ(m_LocalTrackParam[ 2 ] + x * m_LocalTrackParam[ 3 ]);
-
-  return intercept;
-
-}
-
-//! Get the variance matrix of (y,z) coordinates of the track intercept in plane of constant x in sector local system
-TMatrixD KLMTrack::getLocalInterceptVariance(double x)
-{
-
-  TMatrixD  errors(2, 2, 0);
-  TMatrixD  A(2, 4, 0);
-  A[ 0 ][ 0 ] = 1.0;
-  A[ 0 ][ 1 ] =   x;
-  A[ 1 ][ 2 ] = 1.0;
-  A[ 1 ][ 3 ] =   x;
-  errors = A * getLocalTrackParamErr() * A.T();
-
-  return errors;
-
-}

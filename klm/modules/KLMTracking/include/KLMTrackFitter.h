@@ -49,7 +49,7 @@ namespace Belle2 {
                       CLHEP::HepSymMatrix&  error,
                       int depDir,    int indDir);
 
-    //! Get track parameters in the global system. y = p0 + p1 * x; y = p2 + p3 * z, if in local sector fit mode: y = p0 + p1 * x; z = p2 + p3 * x
+    //! Get track parameters in the global system. y = p0 + p1 * x; y = p2 + p3 * z
     CLHEP::HepVector    getTrackParam()
     {
       return m_GlobalPar;
@@ -114,7 +114,7 @@ namespace Belle2 {
     CLHEP::HepSymMatrix  m_GlobalErr;
 
     //! pointer to GeometryPar singleton
-    KLM::KLMGeometryPar*   m_GeoPar;
+    Belle2::KLM::KLMGeometryPar*   m_GeoPar;
 
   };
 } // end of namespace Belle2

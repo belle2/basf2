@@ -19,7 +19,7 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace Belle2::bklm;
+using namespace Belle2::KLM;
 using namespace CLHEP;
 
 REG_MODULE(KLMTracking);
@@ -65,9 +65,6 @@ KLMTrackingModule::~KLMTrackingModule()
 
 void KLMTrackingModule::initialize()
 {
-
-  // initializing geometry:
-  KLMGeometryPar m_GeoPar;
 
   hits2D.isRequired();
   m_storeTracks.registerInDataStore();
@@ -135,7 +132,7 @@ void KLMTrackingModule::event()
           runTracking(1, iSection, iSector, iLayer);
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
-          generateEffi(iSection, iSector, iLayer);
+          generateEffi(KLMElementNumbers::c_BKLM, iSection, iSector, iLayer);
           //clear tracks so prepare for the next layer efficieny study
           m_storeTracks.clear();
         }
@@ -156,23 +153,23 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
 
   KLMTrackFitter* m_fitter = new KLMTrackFitter();
   KLMTrackFinder*  m_finder = new KLMTrackFinder();
-  m_finder->setGlobalFit(m_globalFit);
-  if (mode == 1)
-    m_finder->setGlobalFit(false);
+  //m_finder->setGlobalFit(m_globalFit);
+  //if (mode == 1)
+  //  m_finder->setGlobalFit(false);
   m_finder->registerFitter(m_fitter);
 
   if (hits2D.getEntries() < 1)
     return;
   if (mode == 1) { //efficieny study
     for (int j = 0; j < hits2D.getEntries(); j++) {
-      if (hits2D[j]->getSubdetector() != KLMElementNumbers::c_BKLM) //TODO: Remove after testing
+      if (hits2D[j]->getSubdetector() != KLMElementNumbers::c_EKLM) //TODO: Remove after testing
         continue;
       hits2D[j]->isOnStaTrack(false);
     }
   }
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
-    if (hits2D[hi]->getSubdetector() != KLMElementNumbers::c_BKLM) //TODO: Remove after testing
+    if (hits2D[hi]->getSubdetector() != KLMElementNumbers::c_EKLM) //TODO: Remove after testing
       continue;
 
     if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi]))
@@ -237,8 +234,6 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
         KLMTrack* m_track = m_storeTracks.appendNew();
         m_track->setTrackParam(m_fitter->getTrackParam());
         m_track->setTrackParamErr(m_fitter->getTrackParamErr());
-        m_track->setLocalTrackParam(m_fitter->getTrackParamSector());
-        m_track->setLocalTrackParamErr(m_fitter->getTrackParamSectorErr());
         m_track->setTrackChi2(m_fitter->getChi2());
         m_track->setNumHitOnTrack(m_fitter->getNumHit());
         m_track->setIsValid(m_fitter->isValid());
@@ -253,6 +248,8 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
         //m_track->getTrackParam().Print();
         //m_track->getTrackParamErr().Print();
         //match KLMTrack to RecoTrack
+
+        // TODO: Example here of geometry split here. (UGHHHH)
         if (mode == 0) {
           RecoTrack* closestTrack = nullptr;
           if (m_MatchToRecoTrack) {
@@ -358,7 +355,7 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
   //klmHits are already sorted by layer
   //possible two hits in one layer?
   //genfit requires TVector3 rather than XYZVector
-  //Tommy: In the case of EKLM, how do MSHs come into play or mltiple hits/layer? especially for cosmics
+  //Tommy: In the case of EKLM, how do MSHs come into play or multiple hits/layer? especially for cosmics
 
   TVector3 firstKLMHitPosition(klmHits[0]->getPosition().X(),
                                klmHits[0]->getPosition().Y(),
@@ -416,9 +413,11 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
   else return true;
 }
 
-void KLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
+//TODO: GENERALIZE ME (HARDEST PART!? :'( )
+void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector, int iLayer)
 {
-
+  //TODO: let's comment out during testing. remove this later
+  /*
   std::set<int> m_pointUsed;
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
@@ -444,104 +443,115 @@ void KLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
       return;
     //TODO: Extend to includ EKLM?
     //m_GeoPar = GeometryPar::instance();
-    const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
-    const bklm::Module* module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
-    int minPhiStrip = module->getPhiStripMin();
-    int maxPhiStrip = module->getPhiStripMax();
-    int minZStrip = module->getZStripMin();
-    int maxZStrip = module->getZStripMax();
 
-    CLHEP::Hep3Vector local = module->getLocalPosition(minPhiStrip, minZStrip);
-    CLHEP::Hep3Vector local2 = module->getLocalPosition(maxPhiStrip, maxZStrip);
-    float minLocalY, maxLocalY;
-    float minLocalZ, maxLocalZ;
-    if (local[1] > local2[1]) {
-      maxLocalY = local[1];
-      minLocalY = local2[1];
-    } else {
-      maxLocalY = local2[1];
-      minLocalY = local[1];
-    }
-    if (local[2] > local2[2]) {
-      maxLocalZ = local[2];
-      minLocalZ = local2[2];
-    } else {
-      maxLocalZ = local2[2];
-      minLocalZ = local[2];
-    }
+    if (iSubdetector == KLMElementNumbers::c_BKLM)
+    {
 
-    TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
+      const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
+      const bklm::Module* module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
+      int minPhiStrip = module->getPhiStripMin();
+      int maxPhiStrip = module->getPhiStripMax();
+      int minZStrip = module->getZStripMin();
+      int maxZStrip = module->getZStripMax();
 
-    //TODO: how to generalize this...
-
-    //first layer is the reference layer
-    //if (iSection == 1 && (iSector + 1 ) == 5)
-    //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
-    float reflocalX = fabs(m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1,
-                                                           iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1));
-    //if (iSection == 1 && (iSector + 1 ) == 5)
-    //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
-
-    float reflocalY = trkPar[0] + trkPar[1] * reflocalX;
-    float reflocalZ = trkPar[2] + trkPar[3] * reflocalX;
-
-    //reference module is the first layer
-    //module = m_GeoPar->findModule(iSection, iSector + 1, 1);
-    reflocalX = 0.0;
-    Hep3Vector reflocal(reflocalX, reflocalY, reflocalZ);
-    //Hep3Vector global(localX, localY, localZ);
-    Hep3Vector global(0, 0, 0);
-    module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
-    global = module->localToGlobal(reflocal);
-    //float localX = module->globalToLocal(global)[0];
-    float localY = module->globalToLocal(global)[1];
-    float localZ = module->globalToLocal(global)[2];
-
-
-    //geometry cut
-    if (localY > minLocalY && localY < maxLocalY && localZ > minLocalZ && localZ < maxLocalZ) {
-
-      bool m_iffound = false;
-      m_total[iSection][iSector]->Fill(iLayer + 1);
-      m_totalYX->Fill(global[0], global[1]);
-      m_totalYZ->Fill(global[2], global[1]);
-
-      for (int he = 0; he < hits2D.getEntries(); ++he) {
-        if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he]))
-          continue;
-        if (hits2D[he]->isOutOfTime())
-          continue;
-        //if alreday used, skip
-        if (m_pointUsed.find(he) != m_pointUsed.end())
-          continue;
-
-        double error, sigma;
-        float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
-
-        if (distance < m_maxDistance && sigma < m_maxSigma)
-          m_iffound = true;
-        if (m_iffound) {
-          m_pointUsed.insert(he);
-          //global[0] = hits2D[he]->getPosition()[0];
-          //global[1] = hits2D[he]->getPosition()[1];
-          //global[2] = hits2D[he]->getPosition()[2];
-          m_pass[iSection][iSector]->Fill(iLayer + 1);
-          m_passYX->Fill(global[0], global[1]);
-          m_passYZ->Fill(global[2], global[1]);
-          break;
-        }
+      CLHEP::Hep3Vector local = module->getLocalPosition(minPhiStrip, minZStrip);
+      CLHEP::Hep3Vector local2 = module->getLocalPosition(maxPhiStrip, maxZStrip);
+      float minLocalY, maxLocalY;
+      float minLocalZ, maxLocalZ;
+      if (local[1] > local2[1]) {
+        maxLocalY = local[1];
+        minLocalY = local2[1];
+      } else {
+        maxLocalY = local2[1];
+        minLocalY = local[1];
+      }
+      if (local[2] > local2[2]) {
+        maxLocalZ = local[2];
+        minLocalZ = local2[2];
+      } else {
+        maxLocalZ = local2[2];
+        minLocalZ = local[2];
       }
 
-      m_effiVsLayer[iSection][iSector]->Fill(m_iffound, iLayer + 1);
-      //cout<<" global "<<global[0]<<", "<< global[1]<<" "<<global[2]<<endl;
-      //m_effiYX->Fill(m_iffound, global[1], global[0]);
-      //m_effiYZ->Fill(m_iffound, global[1], global[2]);
-      //m_effiYX->SetPassedHistogram(*m_passYX);
-      //m_effiYX->SetTotalHistogram(*m_totalYX);
-      //m_effiYZ->SetPassedHistogram(*m_passYZ);
-      //m_effiYZ->SetTotalHistogram(*m_totalYZ);
-    }
+      TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
+
+      //TODO: how to generalize this...
+
+      //first layer is the reference layer
+      //if (iSection == 1 && (iSector + 1 ) == 5)
+      //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
+      float reflocalX = fabs(m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1,
+                                                            iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1));
+      //if (iSection == 1 && (iSector + 1 ) == 5)
+      //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
+
+      float reflocalY = trkPar[0] + trkPar[1] * reflocalX;
+      float reflocalZ = trkPar[2] + trkPar[3] * reflocalX;
+
+      float refglobalX =
+
+      //reference module is the first layer
+      //module = m_GeoPar->findModule(iSection, iSector + 1, 1);
+      reflocalX = 0.0;
+      Hep3Vector reflocal(reflocalX, reflocalY, reflocalZ);
+      //Hep3Vector global(localX, localY, localZ);
+      Hep3Vector global(0, 0, 0);
+      module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
+      global = module->localToGlobal(reflocal);
+      //float localX = module->globalToLocal(global)[0];
+      float localY = module->globalToLocal(global)[1];
+      float localZ = module->globalToLocal(global)[2];
+
+
+      //geometry cut
+      if (localY > minLocalY && localY < maxLocalY && localZ > minLocalZ && localZ < maxLocalZ) {
+
+        bool m_iffound = false;
+        m_total[iSection][iSector]->Fill(iLayer + 1);
+        m_totalYX->Fill(global[0], global[1]);
+        m_totalYZ->Fill(global[2], global[1]);
+
+        for (int he = 0; he < hits2D.getEntries(); ++he) {
+          if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he]))
+            continue;
+          if (hits2D[he]->isOutOfTime())
+            continue;
+          //if alreday used, skip
+          if (m_pointUsed.find(he) != m_pointUsed.end())
+            continue;
+
+          double error, sigma;
+          float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
+
+          if (distance < m_maxDistance && sigma < m_maxSigma)
+            m_iffound = true;
+          if (m_iffound) {
+            m_pointUsed.insert(he);
+            //global[0] = hits2D[he]->getPosition()[0];
+            //global[1] = hits2D[he]->getPosition()[1];
+            //global[2] = hits2D[he]->getPosition()[2];
+            m_pass[iSection][iSector]->Fill(iLayer + 1);
+            m_passYX->Fill(global[0], global[1]);
+            m_passYZ->Fill(global[2], global[1]);
+            break;
+          }
+        }
+
+        m_effiVsLayer[iSection][iSector]->Fill(m_iffound, iLayer + 1);
+        //cout<<" global "<<global[0]<<", "<< global[1]<<" "<<global[2]<<endl;
+        //m_effiYX->Fill(m_iffound, global[1], global[0]);
+        //m_effiYZ->Fill(m_iffound, global[1], global[2]);
+        //m_effiYX->SetPassedHistogram(*m_passYX);
+        //m_effiYX->SetTotalHistogram(*m_totalYX);
+        //m_effiYZ->SetPassedHistogram(*m_passYZ);
+        //m_effiYZ->SetTotalHistogram(*m_totalYZ);
+      } //end of BKLM geometry cut
+
+    } //end of BKLM section
+
+
   }//end of loop tracks
+  */
 
 }
 
@@ -584,29 +594,25 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
     const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
 
 
-    const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
-    const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
+    const Belle2::bklm::Module* refMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), 1);
+    const Belle2::bklm::Module* corMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-    CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(),
-                                hit->getPositionZ());
-
-    x = globalPos[0];
-
+    x = hit->getPositionX();
     y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
     z = m_GlobalPar[ 2 ] + x * m_GlobalPar[ 3 ];
 
     dx = 0.;
-    dy = y - m_GlobalPar[1];
-    dz = z - m_GlobalPar[2];
+    dy = y - hit->getPositionY();
+    dz = z - hit->getPositionZ();
 
     // we will do a projection to get the shortest distance
 
     //|(0, dy, dz) x (1, p1, p3)|**2
-    double numerator2 = (dy * m_GlobalPar[3] - dz * m_GlobalPar[1])** 2;
+    double numerator2 = pow(dy * m_GlobalPar[3] - dz * m_GlobalPar[1], 2);
     numerator2 += dz * dz;
-    numerator2 += dy * dy
-                  //|(1, p1, p3)|**2
-                  double denom2 = 1 + m_GlobalPar[1] * m_GlobalPar[1] +  m_GlobalPar[3] * m_GlobalPar[3];
+    numerator2 += dy * dy;
+    //|(1, p1, p3)|**2
+    double denomator2 = 1 + m_GlobalPar[1] * m_GlobalPar[1] +  m_GlobalPar[3] * m_GlobalPar[3];
     //|| dr x v || / ||v||
     distance = sqrt(numerator2 / denomator2); //distance of closest approach for BKLM
 
@@ -618,34 +624,33 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
                  pow(hit_localZErr, 2));
   } //end of BKLM section
 
-  elif(hit->getSubdetector() == KLMElementNumbers::c_EKLM) {
+  else if (hit->getSubdetector() == KLMElementNumbers::c_EKLM) {
 
     const EKLM::GeometryData* eklmGeo = m_GeoPar->EndcapInstance();
 
 
-    CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(),
-                                hit->getPositionZ());
-
     // use z coordinate as main point of interest
     // should be close enough to distance of closest appraoch
 
-    z = globalPos[2];
+    z = hit->getPositionZ();
 
     x = (z - m_GlobalPar[ 2 ]) / m_GlobalPar[ 3 ];
     y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
 
-    dx = x - m_GlobalPar[0];
-    dy = y - m_GlobalPar[1];
+    dx = x - hit->getPositionX();
+    dy = y - hit->getPositionY();
     dz = 0.;
 
     distance = sqrt(dx * dx + dy * dy + dz * dz);
 
 
     //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
-    hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin()) / sqrt(
-                 12);
-    hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin()) / sqrt(
-                 12);
+    double hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin()) /
+                      sqrt(
+                        12);
+    double hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin()) /
+                      sqrt(
+                        12);
 
 
     //error from tracking is ignored here

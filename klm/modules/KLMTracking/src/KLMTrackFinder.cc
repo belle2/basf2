@@ -24,7 +24,7 @@ KLMTrackFinder::KLMTrackFinder()
 }
 
 KLMTrackFinder::KLMTrackFinder(KLMTrackFitter* fitter) :
-  m_Fitter(fitter),
+  m_Fitter(fitter)
 {
 }
 
@@ -59,7 +59,7 @@ bool KLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
   //TODO: REMOVE ME AFTER TESTING B-KLMTrackFitter
   // Will also need to think about how to generalize this
   for (i = hits.begin(); i != hits.end(); ++i) {
-    if ((*i)->getSubdetector() != KLMElementNumbers::c_BKLM) //should be removed
+    if ((*i)->getSubdetector() != KLMElementNumbers::c_EKLM) //should be removed
       continue;
 
     // Prevent duplicate hits or hits on same layer
@@ -75,14 +75,14 @@ bool KLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
     if ((*i)->isOnStaTrack() == false) {
       double distance, error, sigma;
       distance = m_Fitter->globalDistanceToHit(*i, error, sigma);
-      B2DEBUG("KLMTrackFinder" << " Error: " << error << " Sigma: " << sigma << " Distance: " << distance);
-      if (sigma < 5.0) {
+      if (sigma < 5.0 && distance < 50) {
+        B2DEBUG(20, "KLMTrackFinder" << " Error: " << error << " Sigma: " << sigma << " Distance: " << distance);
         track.push_back(*i);
       }
     }
   }
 
-  if (track.size() < 3)
+  if (track.size() < 5)
     return false;
 
   // Fit with new hits

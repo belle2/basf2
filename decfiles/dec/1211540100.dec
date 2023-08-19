@@ -23,9 +23,9 @@
 #                    | 
 #                      -> mu+mu-.
 #
-Alias Kstpsig   K*+
-Alias Kstmsig   K*-
-Alias K_S0sig   K_S0
+Alias K*+sig   K*+
+Alias K*-sig   K*-
+Alias K_S0sig  K_S0
 #
 #
 Decay Upsilon(4S)
@@ -34,22 +34,22 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B-sig 
-1.000 J/psisig Kstmsig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 1.5507;
+1.000 J/psisig K*-sig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 1.5507;
 Enddecay
 #
 Decay B+sig
-1.000 J/psisig Kstpsig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 1.5507;
+1.000 J/psisig K*+sig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 1.5507;
 Enddecay
 #
 Decay J/psisig
 1.000 e+ e-           PHOTOS VLL;
 Enddecay
 #
-Decay Kstmsig
+Decay K*-sig
 1.000 K_S0sig pi-          PHOTOS VSS;
 Enddecay
 #
-Decay Kstpsig 
+Decay K*+sig 
 1.000 K_S0sig pi+          PHOTOS VSS;
 Enddecay
 #

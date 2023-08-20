@@ -38,6 +38,9 @@ namespace Belle2 {
     /** Define histograms and read payloads from DB */
     void prepare() override;
 
+    /** Load run-dep payloads */
+    void startRun() override;
+
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 

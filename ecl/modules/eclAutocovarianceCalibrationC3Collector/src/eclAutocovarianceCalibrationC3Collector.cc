@@ -42,15 +42,19 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 {
 
   /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclAutocovarianceCalibrationC3Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
-         m_evtMetaData->getRun());
-
-  /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   CovarianceMatrixInfoVsCrysID = new TH2F("CovarianceMatrixInfoVsCrysID", "", ECLElementNumbers::c_NCrystals, 0,
                                           ECLElementNumbers::c_NCrystals, m_nADCWaveformPoints + 1, 0, m_nADCWaveformPoints + 1);
 
   registerObject<TH2F>("CovarianceMatrixInfoVsCrysID", CovarianceMatrixInfoVsCrysID);
+
+}
+
+void eclAutocovarianceCalibrationC3CollectorModule::startRun()
+{
+  /**----------------------------------------------------------------------------------------*/
+  B2INFO("eclAutocovarianceCalibrationC3Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+         m_evtMetaData->getRun());
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
 

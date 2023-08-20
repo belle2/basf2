@@ -40,20 +40,21 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
 {
 
   /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclAutocovarianceCalibrationC1Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
-         m_evtMetaData->getRun());
-
-  /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)",
                         ECLElementNumbers::c_NCrystals, 0,
                         ECLElementNumbers::c_NCrystals, MaxPeaktoPeakValue, 0, MaxPeaktoPeakValue);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);
+}
+
+void eclAutocovarianceCalibrationC1CollectorModule::startRun()
+{
+  /**----------------------------------------------------------------------------------------*/
+  B2INFO("eclAutocovarianceCalibrationC1Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+         m_evtMetaData->getRun());
 
   m_eclDsps.isRequired();
 }
-
-
 
 void eclAutocovarianceCalibrationC1CollectorModule::collect()
 {

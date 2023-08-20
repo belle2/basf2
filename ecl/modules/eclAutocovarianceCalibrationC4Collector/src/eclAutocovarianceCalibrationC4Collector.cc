@@ -46,14 +46,18 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
 {
 
   /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclAutocovarianceCalibrationC4Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
-         m_evtMetaData->getRun());
-
-  /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   Chi2VsCrysID = new TH2F("Chi2VsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals,
                           m_NbinsForChi2Histogram, 0, m_upperThresholdForChi2Histogram);
   registerObject<TH2F>("Chi2VsCrysID", Chi2VsCrysID);
+
+}
+
+void eclAutocovarianceCalibrationC4CollectorModule::startRun()
+{
+  /**----------------------------------------------------------------------------------------*/
+  B2INFO("eclAutocovarianceCalibrationC4Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+         m_evtMetaData->getRun());
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();

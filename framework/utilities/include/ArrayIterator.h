@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <iterator>
+
 class TObject;
 
 namespace Belle2 {

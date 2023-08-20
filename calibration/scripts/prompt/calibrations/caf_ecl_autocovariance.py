@@ -11,6 +11,7 @@
 """ECL Autocovariance."""
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
+from caf import strategies
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -63,12 +64,12 @@ def get_calibrations(input_data, **kwargs):
                                   collector=collector_C1,
                                   algorithms=[algo_C1],
                                   input_files=input_files, max_files_per_collector_job=4)
+    cal_ecl_Auto_C1.strategies = strategies.SequentialRunByRun
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     delayed_Bhabha_pre_path = basf2.create_path()
-    delayed_Bhabha_pre_path.add_module("RootInput", inputFileNames="", branchNames=["EventMetaData", "RawECLs"])
-    eclunpacker = basf2.register_module('ECLUnpacker')
-    delayed_Bhabha_pre_path.add_module(eclunpacker)
+    delayed_Bhabha_pre_path.add_module("RootInput", branchNames=["EventMetaData", "RawECLs"])
+    delayed_Bhabha_pre_path.add_module('ECLUnpacker')
 
     cal_ecl_Auto_C1.pre_collector_path = delayed_Bhabha_pre_path
 
@@ -82,6 +83,7 @@ def get_calibrations(input_data, **kwargs):
                                   collector=collector_C2,
                                   algorithms=[algo_C2],
                                   input_files=input_files, max_files_per_collector_job=4)
+    cal_ecl_Auto_C2.strategies = strategies.SequentialRunByRun
 
     cal_ecl_Auto_C2.pre_collector_path = delayed_Bhabha_pre_path
 
@@ -97,6 +99,7 @@ def get_calibrations(input_data, **kwargs):
                                   collector=collector_C3,
                                   algorithms=[algo_C3],
                                   input_files=input_files, max_files_per_collector_job=4)
+    cal_ecl_Auto_C3.strategies = strategies.SequentialRunByRun
 
     cal_ecl_Auto_C3.pre_collector_path = delayed_Bhabha_pre_path
 
@@ -112,6 +115,7 @@ def get_calibrations(input_data, **kwargs):
                                   collector=collector_C4,
                                   algorithms=[algo_C4],
                                   input_files=input_files, max_files_per_collector_job=4)
+    cal_ecl_Auto_C4.strategies = strategies.SequentialRunByRun
 
     cal_ecl_Auto_C4.pre_collector_path = delayed_Bhabha_pre_path
 

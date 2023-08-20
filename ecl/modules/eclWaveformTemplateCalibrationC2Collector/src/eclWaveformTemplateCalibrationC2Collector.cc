@@ -48,29 +48,12 @@ eclWaveformTemplateCalibrationC2CollectorModule::eclWaveformTemplateCalibrationC
 void eclWaveformTemplateCalibrationC2CollectorModule::prepare()
 {
 
-  /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclWaveformTemplateCalibrationC2Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
-         m_evtMetaData->getRun());
-
-
-  m_eclDsps.registerInDataStore();
-  m_eclDigits.registerInDataStore();
+  m_eclDsps.isRequired();
+  m_eclDigits.isRequired();
 
   // Loading results from C1 stage of the calibration
   m_maxResLimit = m_eclWaveformTemplateCalibrationC1MaxResLimit->getCalibVector();
 
-  // Loading constants to calibrate crystal energy
-  m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);
-  if (m_CrystalElectronics.isValid()) {
-    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_ADCtoEnergy[i] = m_CrystalElectronics->getCalibVector()[i];
-  }
-  if (m_CrystalEnergy.isValid()) {
-    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
-  }
-
-  /**----------------------------------------------------------------------------------------*/
   /** Create the tree and register in the data store */
   auto tree = new TTree("tree", "");
   tree->Branch("CellID", &m_CellID,      "m_CellID/I");
@@ -109,6 +92,23 @@ void eclWaveformTemplateCalibrationC2CollectorModule::prepare()
 
 }
 
+void eclWaveformTemplateCalibrationC2CollectorModule::startRun()
+{
+  /**----------------------------------------------------------------------------------------*/
+  B2INFO("eclWaveformTemplateCalibrationC2Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+         m_evtMetaData->getRun());
+
+  // Loading constants to calibrate crystal energy
+  m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);
+  if (m_CrystalElectronics.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_ADCtoEnergy[i] = m_CrystalElectronics->getCalibVector()[i];
+  }
+  if (m_CrystalEnergy.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
+  }
+}
 
 void eclWaveformTemplateCalibrationC2CollectorModule::collect()
 {

@@ -47,17 +47,21 @@ void eclWaveformTemplateCalibrationC1CollectorModule::prepare()
 {
 
   /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclWaveformTemplateCalibrationC1Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
-         m_evtMetaData->getRun());
-
-  /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   maxResvsCrysID = new TH2F("maxResvsCrysID", "", ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals,
                             m_maxResvsCrysIDHistogramNBins, 0, m_maxResvsCrysIDHistogramLimit);
   registerObject<TH2F>("maxResvsCrysID", maxResvsCrysID);
 
-  m_eclDsps.registerInDataStore();
-  m_eclDigits.registerInDataStore();
+  m_eclDsps.isRequired();
+  m_eclDigits.isRequired();
+
+}
+
+void eclWaveformTemplateCalibrationC1CollectorModule::startRun()
+{
+  /**----------------------------------------------------------------------------------------*/
+  B2INFO("eclWaveformTemplateCalibrationC1Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+         m_evtMetaData->getRun());
 
   // Loading crystal calibration constants from database
   m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);

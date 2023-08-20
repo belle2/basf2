@@ -18,13 +18,14 @@ namespace Belle2 {
    */
   template <class ArrayType, class ValueType> class ObjArrayIterator {
 
+  public:
+
     using iterator_category = std::forward_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = ValueType;
     using pointer = ValueType*;
     using reference = ValueType&;
 
-  public:
     /** default constructor */
     ObjArrayIterator() = default;
     /** real constructor

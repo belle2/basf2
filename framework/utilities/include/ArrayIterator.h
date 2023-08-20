@@ -8,15 +8,20 @@
 
 #pragma once
 
-#include <iterator>
-
 class TObject;
 
 namespace Belle2 {
   /** Optimizes class to iterate over TObjArray and classes inheriting from it.
    *  iterators are invalidated if the size of the TObjArray is changed.
    */
-  template <class ArrayType, class ValueType> class ObjArrayIterator: public std::iterator<std::forward_iterator_tag, ValueType>  {
+  template <class ArrayType, class ValueType> class ObjArrayIterator {
+
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = ValueType;
+    using pointer = ValueType*;
+    using reference = ValueType&;
+
   public:
     /** default constructor */
     ObjArrayIterator() = default;

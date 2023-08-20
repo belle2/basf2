@@ -93,7 +93,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
   }
 
   /** Saving Calibration Results */
-  saveCalibration(Autocovariances, "ECLAutocovarianceCalibrationC3Autocovariances");
+  saveCalibration(Autocovariances, "ECLAutoCovariance");
 
   /** Preparing TGraphs for output file */
   auto ginvertStatusVector = new TGraph(cryIDs.size(), cryIDs.data(), invertStatusVector.data());

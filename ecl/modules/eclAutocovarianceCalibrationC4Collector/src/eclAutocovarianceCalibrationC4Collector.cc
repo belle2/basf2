@@ -35,7 +35,7 @@ REG_MODULE(eclAutocovarianceCalibrationC4Collector);
 eclAutocovarianceCalibrationC4CollectorModule::eclAutocovarianceCalibrationC4CollectorModule() : CalibrationCollectorModule(),
   m_ECLAutocovarianceCalibrationC1Threshold("ECLAutocovarianceCalibrationC1Threshold"),
   m_ECLAutocovarianceCalibrationC2Baseline("ECLAutocovarianceCalibrationC2Baseline"),
-  m_ECLAutocovarianceCalibrationC3Autocovariances("ECLAutocovarianceCalibrationC3Autocovariances")
+  m_ECLAutocovarianceCalibrationC3Autocovariances("ECLAutoCovariance")
 {
   // Set module properties
   setDescription("Module to test covariance matrix calibrations using waveforms from delayed Bhabha events");
@@ -58,7 +58,7 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
 
-  m_eclDsps.registerInDataStore();
+  m_eclDsps.isRequired();
 
   std::vector<double> buf(m_numberofADCPoints);
 

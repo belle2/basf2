@@ -50,7 +50,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
                         ECLElementNumbers::c_NCrystals, MaxPeaktoPeakValue, 0, MaxPeaktoPeakValue);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);
 
-  m_eclDsps.registerInDataStore();
+  m_eclDsps.isRequired();
 }
 
 

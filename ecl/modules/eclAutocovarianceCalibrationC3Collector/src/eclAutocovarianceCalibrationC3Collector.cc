@@ -56,7 +56,7 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
 
-  m_eclDsps.registerInDataStore();
+  m_eclDsps.isRequired();
 
 }
 

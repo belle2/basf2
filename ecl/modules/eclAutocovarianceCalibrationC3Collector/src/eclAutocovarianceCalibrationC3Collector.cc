@@ -48,6 +48,8 @@ void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 
   registerObject<TH2F>("CovarianceMatrixInfoVsCrysID", CovarianceMatrixInfoVsCrysID);
 
+  m_eclDsps.isRequired();
+
 }
 
 void eclAutocovarianceCalibrationC3CollectorModule::startRun()
@@ -59,8 +61,6 @@ void eclAutocovarianceCalibrationC3CollectorModule::startRun()
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
 
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
-
-  m_eclDsps.isRequired();
 
 }
 

@@ -51,6 +51,8 @@ void eclAutocovarianceCalibrationC4CollectorModule::prepare()
                           m_NbinsForChi2Histogram, 0, m_upperThresholdForChi2Histogram);
   registerObject<TH2F>("Chi2VsCrysID", Chi2VsCrysID);
 
+  m_eclDsps.isRequired();
+
 }
 
 void eclAutocovarianceCalibrationC4CollectorModule::startRun()
@@ -61,8 +63,6 @@ void eclAutocovarianceCalibrationC4CollectorModule::startRun()
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
   m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
-
-  m_eclDsps.isRequired();
 
   std::vector<double> buf(m_numberofADCPoints);
 

@@ -45,6 +45,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
                         ECLElementNumbers::c_NCrystals, 0,
                         ECLElementNumbers::c_NCrystals, MaxPeaktoPeakValue, 0, MaxPeaktoPeakValue);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);
+  m_eclDsps.isRequired();
 }
 
 void eclAutocovarianceCalibrationC1CollectorModule::startRun()
@@ -52,8 +53,6 @@ void eclAutocovarianceCalibrationC1CollectorModule::startRun()
   /**----------------------------------------------------------------------------------------*/
   B2INFO("eclAutocovarianceCalibrationC1Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
          m_evtMetaData->getRun());
-
-  m_eclDsps.isRequired();
 }
 
 void eclAutocovarianceCalibrationC1CollectorModule::collect()

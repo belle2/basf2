@@ -48,7 +48,7 @@ void eclAutocovarianceCalibrationC2CollectorModule::prepare()
   m_CounterVsCrysID = new TH1D("m_CounterVsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)",
                                ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1D>("m_CounterVsCrysID", m_CounterVsCrysID);
-
+  m_eclDsps.isRequired();
 
 }
 
@@ -58,7 +58,6 @@ void eclAutocovarianceCalibrationC2CollectorModule::startRun()
   B2INFO("eclAutocovarianceCalibrationC2Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
          m_evtMetaData->getRun());
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
-  m_eclDsps.isRequired();
 }
 
 void eclAutocovarianceCalibrationC2CollectorModule::collect()

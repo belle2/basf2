@@ -134,7 +134,7 @@ namespace Belle2 {
     StoreArray<RecoHitInformation> recoHitInformation;
 
     //! run the track finding and fitting
-    void runTracking(int mode, int section, int sector, int layer);
+    void runTracking(int mode, int iSubdetector, int section, int sector, int layer);
 
     //! calculate efficiency
     void generateEffi(int iSubdetector, int section, int sector, int layer);

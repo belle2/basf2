@@ -97,16 +97,16 @@ namespace Belle2 {
       m_NumHit = NumHit;
     }
 
+    void setInSubdetector(int nBKLM, int nEKLM)
+    {
+      m_inBKLM = (nBKLM > 0) ? true : false;
+      m_inEKLM = (nEKLM > 0) ? true : false;
+    }
+
     //! set the fit valid status
     void setIsValid(const bool valid)
     {
       m_Valid = valid;
-    }
-
-    //! setting subdetector flag (barrel or endcap)
-    int setSubdetector(const int subdetector)
-    {
-      m_Subdetector = subdetector;
     }
 
     //! set the fit good status
@@ -117,18 +117,14 @@ namespace Belle2 {
 
     bool inBKLM() const
     {
-      return (m_Subdetector == KLMElementNumbers::c_BKLM);
+      return (m_inBKLM);
     }
 
     bool inEKLM() const
     {
-      return (m_Subdetector == KLMElementNumbers::c_EKLM);
+      return (m_inEKLM);
     }
 
-    int getSubdetector() const
-    {
-      return m_Subdetector;
-    }
 
 
 
@@ -152,8 +148,11 @@ namespace Belle2 {
     //! track parameters variance in the global system.
     float m_TrackParamErr[4][4];
 
-    //! which subdetector does the track hit
-    int m_Subdetector;
+    //! in BKLM Flag
+    bool m_inBKLM;
+
+    //! in EKLM Flag
+    bool m_inEKLM;
 
     //! Needed to make the ROOT object storable
     ClassDef(KLMTrack, 1)

@@ -16,7 +16,9 @@
 /* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 
 using namespace Belle2;
 using namespace Belle2::KLM;
@@ -74,7 +76,7 @@ void KLMTrackingModule::initialize()
   hits2D.registerRelationTo(recoTracks);
 
   if (m_studyEffi)
-    B2INFO("KLMTrackingModule:: this module is running in efficiency study mode!");
+    B2INFO("KLMTrackingModule::initialize this module is running in efficiency study mode!");
 
   m_file = new TFile(m_outPath.c_str(), "recreate");
   TString hname;
@@ -122,14 +124,15 @@ void KLMTrackingModule::event()
   bool thereIsATrack = false;
 
   if (!m_studyEffi) {
-    runTracking(0, -1, -1, -1);
+    runTracking(0, KLMElementNumbers::c_BKLM, -1, -1, -1);
+    runTracking(0, KLMElementNumbers::c_EKLM, -1, -1, -1);
     if (m_storeTracks.getEntries() > 0)
       thereIsATrack = true;
   } else {
     for (int iSection = 0; iSection < 2; iSection++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         for (int iLayer = 0; iLayer < 15; iLayer++) {
-          runTracking(1, iSection, iSector, iLayer);
+          runTracking(1, KLMElementNumbers::c_BKLM, iSection, iSector, iLayer);
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
           generateEffi(KLMElementNumbers::c_BKLM, iSection, iSector, iLayer);
@@ -145,31 +148,26 @@ void KLMTrackingModule::event()
     m_runTotalEventsWithTracks++;
 }
 
-void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLayer)
+void KLMTrackingModule::runTracking(int mode, int iSubdetector, int iSection, int iSector, int iLayer)
 {
   m_storeTracks.clear();
-  //std::list<BKLMTrack*> tracks;
-  //tracks.clear();
 
   KLMTrackFitter* m_fitter = new KLMTrackFitter();
   KLMTrackFinder*  m_finder = new KLMTrackFinder();
-  //m_finder->setGlobalFit(m_globalFit);
-  //if (mode == 1)
-  //  m_finder->setGlobalFit(false);
   m_finder->registerFitter(m_fitter);
 
   if (hits2D.getEntries() < 1)
     return;
   if (mode == 1) { //efficieny study
     for (int j = 0; j < hits2D.getEntries(); j++) {
-      if (hits2D[j]->getSubdetector() != KLMElementNumbers::c_EKLM) //TODO: Remove after testing
+      if (hits2D[j]->getSubdetector() != iSubdetector) //TODO: Remove after testing
         continue;
       hits2D[j]->isOnStaTrack(false);
     }
   }
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
-    if (hits2D[hi]->getSubdetector() != KLMElementNumbers::c_EKLM) //TODO: Remove after testing
+    if (hits2D[hi]->getSubdetector() != iSubdetector) //TODO: Remove after testing
       continue;
 
     if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi]))
@@ -186,17 +184,12 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
         continue;
       if (hits2D[hj]->isOutOfTime())
         continue;
-      //Tommy: Since I want everything to be in global mode, this line doesn't matter
-      //if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj]))
-      //  continue;
       if (sameSector(hits2D[hi], hits2D[hj]) &&
           std::abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
         continue;
-      //Tommy: do we want a distance cut here naturally for tracks in general?
 
       std::list<KLMHit2d*> sectorHitList;
-      //sectorHitList.push_back(hits2D[hi]);
-      //sectorHitList.push_back(hits2D[hj]);
+
 
       std::list<KLMHit2d*> seed;
       seed.push_back(hits2D[hi]);
@@ -230,7 +223,8 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
         continue;
 
       std::list<KLMHit2d*> m_hits;
-      if (m_finder->filter(seed, sectorHitList, m_hits)) {
+
+      if (m_finder->filter(seed, sectorHitList, m_hits, iSubdetector)) {
         KLMTrack* m_track = m_storeTracks.appendNew();
         m_track->setTrackParam(m_fitter->getTrackParam());
         m_track->setTrackParamErr(m_fitter->getTrackParamErr());
@@ -243,26 +237,31 @@ void KLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iLa
         for (j = m_hits.begin(); j != m_hits.end(); ++j) {
           (*j)->isOnStaTrack(true);
           m_track->addRelationTo((*j));
-        }
-        //tracks.push_back(m_track);
-        //m_track->getTrackParam().Print();
-        //m_track->getTrackParamErr().Print();
-        //match KLMTrack to RecoTrack
+        } //end of klmhit2d loop
 
-        // TODO: Example here of geometry split here. (UGHHHH)
+        //match KLMTrack to RecoTrack
         if (mode == 0) {
           RecoTrack* closestTrack = nullptr;
+          B2DEBUG(28, "KLMTracking::runTracking started matching");
           if (m_MatchToRecoTrack) {
             if (findClosestRecoTrack(m_track, closestTrack)) {
+              B2DEBUG(28, "KLMTracking::runTracking was able to find ClosestRecoTrack");
               m_track->addRelationTo(closestTrack);
               for (j = m_hits.begin(); j != m_hits.end(); ++j) {
                 unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
-                closestTrack->addBKLMHit((*j), sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
-              }
-            }
-          }//end match
-        }
-      }
+                if ((*j)->getSubdetector() == KLMElementNumbers::c_BKLM)
+                  closestTrack->addBKLMHit((*j), sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
+                else if ((*j)->getSubdetector() == KLMElementNumbers::c_EKLM) {
+                  for (const EKLMAlignmentHit& alignmentHit : (*j)->getRelationsFrom<EKLMAlignmentHit>()) {
+                    closestTrack->addEKLMHit(&(alignmentHit), sortingParameter,
+                                             RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
+                  }
+                }
+              } //end of hit loop
+            } //end of closest recotrack
+          }
+        } //end of KLMTrack to RecoTrack
+      } //end of finder loop
     }
   }
 
@@ -281,7 +280,7 @@ void KLMTrackingModule::terminate()
 {
   for (long unsigned int i = 0; i < m_runNumber.size(); i++) {
     float ratio = (float)m_totalEventsWithTracks.at(i) / (float)m_totalEvents.at(i);
-    B2INFO("KLMTrackingModule:: run " << m_runNumber.at(i) << " --> " << ratio * 100 << "% of events has 1+ KLMTracks");
+    B2INFO("KLMTrackingModule::terminate run " << m_runNumber.at(i) << " --> " << ratio * 100 << "% of events has 1+ KLMTracks");
   }
 
   m_file->cd();
@@ -342,11 +341,11 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
   RelationVector<KLMHit2d> klmHits = klmTrk->getRelationsTo<KLMHit2d> ();
 
   if (klmHits.size() < 1) {
-    B2INFO("KLMTrackingModule::something is wrong! there is B/E-KLMTrack but no b/e-klmHits");
+    B2INFO("KLMTrackingModule::findClosestRecoTrack something is wrong! there is B/E-KLMTrack but no b/e-klmHits");
     return false;
   }
   if (recoTracks.getEntries() < 1) {
-    B2INFO("KLMTrackingModule::there is no recoTrack");
+    B2INFO("KLMTrackingModule::findClosestRecoTrack there is no recoTrack");
     return false;
   }
   double oldDistanceSq = INFINITY;
@@ -355,7 +354,6 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
   //klmHits are already sorted by layer
   //possible two hits in one layer?
   //genfit requires TVector3 rather than XYZVector
-  //Tommy: In the case of EKLM, how do MSHs come into play or multiple hits/layer? especially for cosmics
 
   TVector3 firstKLMHitPosition(klmHits[0]->getPosition().X(),
                                klmHits[0]->getPosition().Y(),
@@ -375,33 +373,37 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
   TVector3 mom; // initializes to (0,0,0)
 
   for (RecoTrack& track : recoTracks) {
-    try {
-      genfit::MeasuredStateOnPlane state = track.getMeasuredStateOnPlaneFromLastHit();
-      //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
-      state.getPosMomCov(pos, mom, cov);
-      if (mom.Y() * pos.Y() < 0) {
-        state = track.getMeasuredStateOnPlaneFromFirstHit();
-      }
-      const TVector3& distanceVec = firstKLMHitPosition - pos;
-      state.extrapolateToPoint(firstKLMHitPosition);
-      double newDistanceSq = distanceVec.Mag2();
-      double angle = klmTrkVec.Angle(mom);
-      // choose closest distance or minimum open angle ?
-      // overwrite old distance
-      if (newDistanceSq < oldDistanceSq) {
-        oldDistanceSq = newDistanceSq;
-        closestTrack = &track;
-        oldAngle = angle;
-      }
+    if (track.wasFitSuccessful()) {
+      try {
+        genfit::MeasuredStateOnPlane state = track.getMeasuredStateOnPlaneFromLastHit();
+        B2DEBUG(28, "KLMTracking::findClosestRecoTrack, finished MSOP from last hit");
+        //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
+        state.getPosMomCov(pos, mom, cov);
+        if (mom.Y() * pos.Y() < 0) {
+          state = track.getMeasuredStateOnPlaneFromFirstHit();
+        }
+        const TVector3& distanceVec = firstKLMHitPosition - pos;
+        state.extrapolateToPoint(firstKLMHitPosition);
+        double newDistanceSq = distanceVec.Mag2();
+        double angle = klmTrkVec.Angle(mom);
+        // choose closest distance or minimum open angle ?
+        // overwrite old distance
+        if (newDistanceSq < oldDistanceSq) {
+          oldDistanceSq = newDistanceSq;
+          closestTrack = &track;
+          oldAngle = angle;
+        }
 
-      /* if(angle<oldAngle)
-      {
-      oldAngle=angle;
-      closestTrack = &track;
-      }
-      */
-    } catch (genfit::Exception& e) {
-    }// try
+        /* if(angle<oldAngle)
+        {
+        oldAngle=angle;
+        closestTrack = &track;
+        }
+        */
+        B2DEBUG(28, "KLMTracking::findClosestRecoTrack, step one done");
+      } catch (genfit::Exception& e) {
+      }// try
+    }
   }
 
   // can not find matched RecoTrack
@@ -410,14 +412,18 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
   if (oldAngle > m_maxAngleRequired)
     return false;
   // found matched RecoTrack
-  else return true;
+  else {
+    return true;
+    B2DEBUG(28, "KLMTrackingModule::findClosestRecoTrack RecoTrack found! ");
+  }
+
 }
 
 //TODO: GENERALIZE ME (HARDEST PART!? :'( )
 void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector, int iLayer)
 {
   //TODO: let's comment out during testing. remove this later
-  /*
+
   std::set<int> m_pointUsed;
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
@@ -444,8 +450,7 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
     //TODO: Extend to includ EKLM?
     //m_GeoPar = GeometryPar::instance();
 
-    if (iSubdetector == KLMElementNumbers::c_BKLM)
-    {
+    if (iSubdetector == KLMElementNumbers::c_BKLM) {
 
       const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
       const bklm::Module* module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
@@ -473,22 +478,23 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
         minLocalZ = local[2];
       }
 
-      TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
+      //TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
+      //TODO: Need to rotate this to local coordiantes? m
+      TVectorD trkPar = m_storeTracks[it]->getTrackParam();
+
 
       //TODO: how to generalize this...
 
       //first layer is the reference layer
       //if (iSection == 1 && (iSector + 1 ) == 5)
       //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
-      float reflocalX = fabs(m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1,
-                                                            iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1));
+      float reflocalX = fabs(bklmGeo->getActiveMiddleRadius(iSection, iSector + 1,
+                                                            iLayer + 1) - bklmGeo->getActiveMiddleRadius(iSection, iSector + 1, 1));
       //if (iSection == 1 && (iSector + 1 ) == 5)
       //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
 
       float reflocalY = trkPar[0] + trkPar[1] * reflocalX;
       float reflocalZ = trkPar[2] + trkPar[3] * reflocalX;
-
-      float refglobalX =
 
       //reference module is the first layer
       //module = m_GeoPar->findModule(iSection, iSector + 1, 1);
@@ -496,7 +502,7 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
       Hep3Vector reflocal(reflocalX, reflocalY, reflocalZ);
       //Hep3Vector global(localX, localY, localZ);
       Hep3Vector global(0, 0, 0);
-      module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
+      module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
       global = module->localToGlobal(reflocal);
       //float localX = module->globalToLocal(global)[0];
       float localY = module->globalToLocal(global)[1];
@@ -551,7 +557,7 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
 
 
   }//end of loop tracks
-  */
+
 
 }
 
@@ -592,9 +598,6 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
   if (hit->getSubdetector() == KLMElementNumbers::c_BKLM) {
 
     const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
-
-
-    const Belle2::bklm::Module* refMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), 1);
     const Belle2::bklm::Module* corMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
     x = hit->getPositionX();
@@ -606,12 +609,12 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
     dz = z - hit->getPositionZ();
 
     // we will do a projection to get the shortest distance
-
-    //|(0, dy, dz) x (1, p1, p3)|**2
+    // line = p0 + t * v
+    // || dr x v ||**2 = |(0, dy, dz) x (1, p1, p3)|**2
     double numerator2 = pow(dy * m_GlobalPar[3] - dz * m_GlobalPar[1], 2);
     numerator2 += dz * dz;
     numerator2 += dy * dy;
-    //|(1, p1, p3)|**2
+    // ||v||**2 = |(1, p1, p3)|**2
     double denomator2 = 1 + m_GlobalPar[1] * m_GlobalPar[1] +  m_GlobalPar[3] * m_GlobalPar[3];
     //|| dr x v || / ||v||
     distance = sqrt(numerator2 / denomator2); //distance of closest approach for BKLM
@@ -631,9 +634,7 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
 
     // use z coordinate as main point of interest
     // should be close enough to distance of closest appraoch
-
     z = hit->getPositionZ();
-
     x = (z - m_GlobalPar[ 2 ]) / m_GlobalPar[ 3 ];
     y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
 

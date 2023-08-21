@@ -42,7 +42,8 @@ void KLMTrackFinder::registerFitter(KLMTrackFitter* fitter)
 //! find associated hits and do fit
 bool KLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
                             std::list<KLMHit2d*>& hits,
-                            std::list<KLMHit2d*>& track)
+                            std::list<KLMHit2d*>& track,
+                            int iSubdetector)
 {
 
   std::list<KLMHit2d*>::iterator i;
@@ -59,7 +60,7 @@ bool KLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
   //TODO: REMOVE ME AFTER TESTING B-KLMTrackFitter
   // Will also need to think about how to generalize this
   for (i = hits.begin(); i != hits.end(); ++i) {
-    if ((*i)->getSubdetector() != KLMElementNumbers::c_EKLM) //should be removed
+    if ((*i)->getSubdetector() != iSubdetector) //should be removed
       continue;
 
     // Prevent duplicate hits or hits on same layer

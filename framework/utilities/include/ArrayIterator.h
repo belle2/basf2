@@ -20,10 +20,19 @@ namespace Belle2 {
 
   public:
 
+    /** Iterator category. */
     using iterator_category = std::forward_iterator_tag;
+
+    /** Difference type. */
     using difference_type = std::ptrdiff_t;
+
+    /** Value type. */
     using value_type = ValueType;
+
+    /** Pointer. */
     using pointer = ValueType*;
+
+    /** Reference. */
     using reference = ValueType&;
 
     /** default constructor */

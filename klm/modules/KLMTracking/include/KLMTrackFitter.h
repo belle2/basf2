@@ -49,7 +49,7 @@ namespace Belle2 {
                       CLHEP::HepSymMatrix&  error,
                       int depDir,    int indDir);
 
-    //! Get track parameters in the global system. y = p0 + p1 * x; y = p2 + p3 * z
+    //! Get track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
     CLHEP::HepVector    getTrackParam()
     {
       return m_GlobalPar;

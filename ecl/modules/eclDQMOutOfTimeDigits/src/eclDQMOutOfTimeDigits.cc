@@ -33,7 +33,7 @@ ECLDQMOutOfTimeDigitsModule::ECLDQMOutOfTimeDigitsModule()
   : HistoModule()
 {
   //Set module properties.
-  setDescription("ECL Data Quality Monitor to monitor ECL clusters");
+  setDescription("ECL Data Quality monitoring module. See header file for the detailed description.");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify parallel processing.
 
   addParam("histogramDirectoryName", m_histogramDirectoryName,

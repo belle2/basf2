@@ -14,7 +14,10 @@
 namespace Belle2 {
 
   /**
-   * This module is for analysis of ECL DQM histograms.
+   * This module exports the average value of out-of-time ECLCalDigits
+   * into EPICS and MiraBelle.
+   * See ecl/modules/eclDQMOutOfTimeDigits/include/eclDQMOutOfTimeDigits.h
+   * for the motivations that lead to this module development.
    */
 
   class DQMHistAnalysisECLOutOfTimeDigitsModule final : public

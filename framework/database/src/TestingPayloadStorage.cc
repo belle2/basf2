@@ -170,23 +170,26 @@ namespace Belle2::Conditions {
 
     // create a temporary file if we don't have a source file yet
     fs::path sourcefile{source};
+    int length = m_payloadDir.length();
+    char* temporaryFileName = new char[length + 16];
+    std::strcpy(temporaryFileName, m_payloadDir.c_str());
+    std::strcpy(temporaryFileName + length, "/payload_XXXXXX");
     if (source.empty()) {
       while (true) {
+        int fileDescriptor = mkstemp(temporaryFileName);
         fs::path tmpfilename(std::tmpnam(nullptr));
-        sourcefile = fs::path(m_payloadDir) / tmpfilename.filename();
-        auto fd = open(sourcefile.c_str(), O_CREAT | O_EXCL);
-        if (fd >= 0) {
-          close(fd);
-          break;
-        }
-        if (errno != EEXIST && errno != EINTR) {
+        if ((fileDescriptor == -1) && (errno != EINTR)) {
           B2ERROR("Cannot create payload file:" << strerror(errno));
+          delete temporaryFileName;
           return false;
         }
+        sourcefile = temporaryFileName;
+        close(fileDescriptor);
         B2DEBUG(35, "first try to create tempfile failed, trying again");
       }
       if (!writer(sourcefile.string())) return false;
     }
+    delete temporaryFileName;
     // If we created a temporary file we want to delete it again so we'd like to
     // use a scope guard to do so. However we need it in this scope so we need
     // to create one in any case and release it if we didn't create a temporary

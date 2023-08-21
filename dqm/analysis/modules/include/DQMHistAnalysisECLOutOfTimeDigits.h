@@ -47,6 +47,9 @@ namespace Belle2 {
     /** Prefix to use for PVs registered by this module */
     std::string m_pvPrefix;
 
+    /** If true (default), update EPICS PVs only if there were changes in the histograms */
+    bool m_onlyIfUpdated;
+
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
   };
 } // end namespace Belle2

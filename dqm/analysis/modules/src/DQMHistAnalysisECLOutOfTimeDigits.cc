@@ -22,6 +22,8 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: Constructor done.");
   addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
            std::string("ECL:out_of_time_digits:"));
+  addParam("onlyIfUpdated", m_onlyIfUpdated, "If true (default), update EPICS PVs only if there histograms were updated.",
+           true);
 }
 
 
@@ -51,7 +53,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
       m_out_of_time_digits[pv_name] = 0;
 
       std::string hist_name    = "ECL/out_of_time_" + pv_name;
-      auto prof = (TProfile*)findHist(hist_name);
+      auto prof = (TProfile*)findHist(hist_name, m_onlyIfUpdated);
 
       if (!prof) continue;
 

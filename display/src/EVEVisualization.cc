@@ -1781,7 +1781,7 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
 
 void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
 {
-  /** TOP module ID -> #digits */
+  /* TOP module ID -> #digits */
   std::map<int, int> m_topSummary;
   for (const TOPDigit& hit : digits) {
     int mod = hit.getModuleID();

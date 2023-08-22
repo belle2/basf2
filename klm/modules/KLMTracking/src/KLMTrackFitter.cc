@@ -131,7 +131,7 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
 
 
   //defining quanitites for hit errors
-  double hit_xErr = 0; double hit_yErr = 0; double hit_zErr = 0;
+  double hit_xErr; double hit_yErr; double hit_zErr;
   HepMatrix globalHitErr(3, 3, 0);
 
   // Derivatives of y (z) = a + bx with respect to a and b.
@@ -179,13 +179,13 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
     hit_zErr = hit_localZErr;
 
 
-    globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); //x
-    globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
+    globalHitErr[0][0] = pow(hit_xErr, 2); //x
+    globalHitErr[0][1] = (hit_xErr) * (hit_yErr);
     globalHitErr[0][2] = 0;
-    globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2);;
-    globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
+    globalHitErr[1][1] = pow(hit_yErr, 2);;
+    globalHitErr[1][0] = (hit_xErr) * (hit_yErr);
     globalHitErr[1][2] = 0;
-    globalHitErr[2][2] = pow(hit_localZErr, 2);
+    globalHitErr[2][2] = pow(hit_zErr, 2);
     globalHitErr[2][0] = 0;
     globalHitErr[2][1] = 0;
 
@@ -375,7 +375,7 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
                           12);
       double hit_zErr = 0; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
 
-      B2DEBUG(20, "KLMTrackFitter" << " Width: " << eklmGeo->getStripGeometry()->getWidth() << " Vec_x: " << hit_xErr * sqrt(
+      B2DEBUG(28, "KLMTrackFitter" << " Width: " << eklmGeo->getStripGeometry()->getWidth() << " Vec_x: " << hit_xErr * sqrt(
                 12) << " Vec_y: " << hit_yErr * sqrt(12));
 
       globalHitErr[0][0] = pow(hit_xErr, 2); //x

@@ -97,6 +97,7 @@ namespace Belle2 {
       m_NumHit = NumHit;
     }
 
+    //! setting whether track passes through E/B-KLM
     void setInSubdetector(int nBKLM, int nEKLM)
     {
       m_inBKLM = (nBKLM > 0) ? true : false;
@@ -115,11 +116,13 @@ namespace Belle2 {
       m_Good = good;
     }
 
+    //! does track have hits in BKLM
     bool inBKLM() const
     {
       return (m_inBKLM);
     }
 
+    //! does track have hits in EKLM
     bool inEKLM() const
     {
       return (m_inEKLM);

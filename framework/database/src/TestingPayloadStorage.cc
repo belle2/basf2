@@ -183,8 +183,11 @@ namespace Belle2::Conditions {
           delete temporaryFileName;
           return false;
         }
-        sourcefile = temporaryFileName;
-        close(fileDescriptor);
+        if (fileDescriptor > 0) {
+          sourcefile = temporaryFileName;
+          close(fileDescriptor);
+          break;
+        }
         B2DEBUG(35, "first try to create tempfile failed, trying again");
       }
       if (!writer(sourcefile.string())) return false;

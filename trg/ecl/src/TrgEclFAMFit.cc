@@ -110,10 +110,6 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   //  double EThreshold = _Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
-  /* cppcheck-suppress variableScope */
-  double FitE;
-  /* cppcheck-suppress variableScope */
-  double FitT;
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 
@@ -150,22 +146,22 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
 
       ShiftdTBin = int(deltaT / IntervaldT + dTBin);
 
-      FitE = CoeffAAA;
+      double fitE = CoeffAAA;
 
       //-------
       // Require "expected time" is around middle of table = Nsmalldt.
       //-------
       double condition_t = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
 
-      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && FitE > Threshold[iTCIdm]) {
-        FitT = condition_t + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
+      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && fitE > Threshold[iTCIdm]) {
+        double fitT = condition_t + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
 
 
         pedFlag = 1;
         double rand_sampling_correction = digiTiming[iTCIdm][iShift] + (nbin_pedestal - iShift + 32) * fam_sampling_interval;
 
-        TCFitEnergy[iTCIdm].push_back(FitE / 1000.0); // [GeV/c2]
-        TCFitTiming[iTCIdm].push_back(FitT * 1000 - 4000 + (_DataBase->GetTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
+        TCFitEnergy[iTCIdm].push_back(fitE / 1000.0); // [GeV/c2]
+        TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 + (_DataBase->GetTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
         FitSleepCounter = 0;
         ShiftdTBin = 0;
 

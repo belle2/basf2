@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassPindiodeSimHit - Geant4 simulated hit for the Pindiode crystal in beast..
+  /** ClassPindiodeSimHit - Geant4 simulated hit for the Pindiode crystal in beast.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response information.

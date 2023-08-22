@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassTPCSimHit - Geant4 simulated hit for the TPC crystal in beast..
+  /** ClassTPCSimHit - Geant4 simulated hit for the TPC crystal in beast.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response information.

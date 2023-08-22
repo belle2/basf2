@@ -262,7 +262,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
         geometryStepLength   = currentMinimumStep ;
       }
     } else {
-      geometryStepLength   = lengthAlongCurve = 0.0 ;
+      geometryStepLength   = 0.0 ;
       fGeometryLimitedStep = false ;
     }
 

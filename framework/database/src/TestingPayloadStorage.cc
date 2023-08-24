@@ -177,7 +177,6 @@ namespace Belle2::Conditions {
     if (source.empty()) {
       while (true) {
         int fileDescriptor = mkstemp(temporaryFileName);
-        fs::path tmpfilename(std::tmpnam(nullptr));
         if ((fileDescriptor == -1) && (errno != EINTR)) {
           B2ERROR("Cannot create payload file:" << strerror(errno));
           delete temporaryFileName;

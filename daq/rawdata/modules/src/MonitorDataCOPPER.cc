@@ -61,14 +61,6 @@ void MonitorDataCOPPERModule::defineHisto()
   h_diff = new TH1F("h_diff", "Event inetrval; Event interval[s]; # of Events", 2000, 0, 0.2);
   oldDir->cd();
 
-  /*
-  h_hslb_size[0] = new TH1F("h_hslb_size_0", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_size[1] = new TH1F("h_hslb_size_1", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_size[2] = new TH1F("h_hslb_size_2", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_size[3] = new TH1F("h_hslb_size_3", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);
-  h_hslb_nevt = new TH1F("h_hslb_nevt", "Number of Events / HSLB; HSLB slot; # of Events", 4, 0, 4);
-  h_hslb_rate = new TH1F("h_hslb_rate", "Data rate / HSLB; HSLB slot; Data rate [Bytes/s]", 4, 0, 4);
-  */
 }
 
 

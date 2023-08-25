@@ -248,7 +248,7 @@ int main(int argc, char** argv)
   if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
-  unsigned long long nbyte_out = 0;
+  unsigned long long nbyte_out [[maybe_unused]] = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;

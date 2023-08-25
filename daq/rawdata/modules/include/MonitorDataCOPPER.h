@@ -32,10 +32,7 @@ namespace Belle2 {
     void initialize() override;
 
     //! Module functions to be called from event process
-    void beginRun() override;
     void event() override;
-    void endRun() override;
-    void terminate() override;
 
     //! Histogram definition
     void defineHisto() override;

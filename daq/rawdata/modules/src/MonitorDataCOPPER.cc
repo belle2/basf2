@@ -70,27 +70,6 @@ void MonitorDataCOPPERModule::initialize()
 }
 
 
-void MonitorDataCOPPERModule::beginRun()
-{
-
-}
-
-
-
-
-void MonitorDataCOPPERModule::endRun()
-{
-  //fill Run data
-
-
-}
-
-
-void MonitorDataCOPPERModule::terminate()
-{
-
-}
-
 double MonitorDataCOPPERModule::getTimeSec()
 {
   struct timeval t;

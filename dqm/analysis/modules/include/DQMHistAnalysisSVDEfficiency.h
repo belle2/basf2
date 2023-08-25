@@ -109,6 +109,9 @@ namespace Belle2 {
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 
+    std::string m_pvPrefix; /**< string prefix for EPICS PVs */
+
+
   };
 } // end namespace Belle2
 

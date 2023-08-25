@@ -44,6 +44,11 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:SVD:"));
+
+  // Offline occupancy U-side
+  registerEpicsPV(m_pvPrefix + "EfficiencyUAlarm", "EfficiencyUAlarm");
+  registerEpicsPV(m_pvPrefix + "EfficiencyU3Alarm", "EfficiencyU3Alarm"); // 3 samples
 }
 
 DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
@@ -275,30 +280,34 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   // update summary for U side
   m_cEfficiencyU->cd();
   m_hEfficiency->getHistogram(1)->Draw("text");
-
+  int alarm = -1;
   switch (m_effUstatus) {
     case good: {
       m_cEfficiencyU->SetFillColor(kGreen);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legNormal->Draw("same");
+      alarm = 0;
       break;
     }
     case error: {
       m_cEfficiencyU->SetFillColor(kRed);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legProblem->Draw("same");
+      alarm = 3;
       break;
     }
     case warning: {
       m_cEfficiencyU->SetFillColor(kOrange);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legWarning->Draw("same");
+      alarm = 2;
       break;
     }
     case lowStat: {
       m_cEfficiencyU->SetFillColor(kGray);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legEmpty->Draw("same");
+      alarm = 1;
       break;
     }
     default: {
@@ -306,6 +315,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       break;
     }
   }
+  setEpicsPV("EfficiencyUAlarm", alarm);
 
   m_cEfficiencyU->Draw("text");
   m_cEfficiencyU->Update();
@@ -468,29 +478,35 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_c3EfficiencyU->cd();
   m_h3Efficiency->getHistogram(1)->Draw("text");
 
+  int alarm3 = -1;
+
   switch (m_effUstatus) {
     case good: {
       m_c3EfficiencyU->SetFillColor(kGreen);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legNormal->Draw("same");
+      alarm = 0;
       break;
     }
     case error: {
       m_c3EfficiencyU->SetFillColor(kRed);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legProblem->Draw("same");
+      alarm = 3;
       break;
     }
     case warning: {
       m_c3EfficiencyU->SetFillColor(kOrange);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legWarning->Draw("same");
+      alarm = 2;
       break;
     }
     case lowStat: {
       m_c3EfficiencyU->SetFillColor(kGray);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legEmpty->Draw("same");
+      alarm = 1;
       break;
     }
     default: {
@@ -498,6 +514,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       break;
     }
   }
+
+  setEpicsPV("EfficiencyU3Alarm", alarm3);
 
   m_c3EfficiencyU->Draw("text");
   m_c3EfficiencyU->Update();

@@ -90,19 +90,11 @@ void TPCStudyModule::initialize()
 
 }
 
-void TPCStudyModule::beginRun()
-{
-}
-
 void TPCStudyModule::event()
 {
   //Here comes the actual event processing
 
   StoreArray<MicrotpcSimHit>  SimHits;
-  //StoreArray<MicrotpcHit> Hits;
-  //StoreArray<MicrotpcRecoTrack> Tracks;
-  //StoreArray<TPCG4TrackInfo> mcparts;
-  //StoreArray<SADMetaHit> sadMetaHits;
 
   int old_trkID[4] = { -1, -1, -1, -1};
   int old_trkID_h1[4] = { -1, -1, -1, -1};
@@ -274,11 +266,6 @@ void TPCStudyModule::getXMLData()
 }
 void TPCStudyModule::endRun()
 {
-
-  //B2RESULT("TPCStudyModule: # of p recoils: " << npHits);
-  //B2RESULT("TPCStudyModule: # of He recoils: " << nHeHits);
-  //B2RESULT("TPCStudyModule: # of O recoils: " << nOHits);
-  //B2RESULT("TPCStudyModule: # of C recoils: " << nCHits);
   cout << " Total nb of evts " << ctr << endl;
   for (int i = 0; i < 4; i ++) {
     cout << "n " << n_ctr[i] << " n-recoil-p " << co_ctr[i] << " n-recoil " << ctr_neu[i] << " p-n " << ctr_bak[i] << " p-He4 " <<
@@ -288,8 +275,5 @@ void TPCStudyModule::endRun()
   }
 }
 
-void TPCStudyModule::terminate()
-{
-}
 
 

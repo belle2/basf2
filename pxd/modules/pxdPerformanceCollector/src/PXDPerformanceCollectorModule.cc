@@ -235,7 +235,7 @@ void PXDPerformanceCollectorModule::collect() // Do your event() stuff here
 
   // Beam spot
   DBObjPtr<BeamSpot> beamSpotDB;
-  auto ip = beamSpotDB->getIPPosition();
+  auto ip = ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
 
   // Actually only one event holder / event
   for (auto& pxd2TrackEvent : m_pxd2TrackEvents) {

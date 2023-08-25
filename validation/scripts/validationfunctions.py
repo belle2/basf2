@@ -24,6 +24,8 @@ import time
 from typing import Dict, Optional, List, Union
 import logging
 from pathlib import Path
+import json
+import shutil
 
 # 3rd party
 import ROOT
@@ -111,6 +113,112 @@ def available_revisions(work_folder: str) -> List[str]:
         p.name for p in sorted(subfolders, key=lambda p: p.stat().st_mtime)
     ]
     return revisions
+
+
+def get_popular_revision_combinations(work_folder: str) -> List[str]:
+    """
+    Returns several combinations of available revisions that we might
+    want to pre-build on the server.
+
+    Returns:
+        List[List of revisions (str)]
+    """
+    available = sorted(
+        available_revisions(work_folder),
+        reverse=True
+    )
+    available_releases = [
+        revision for revision in available
+        if revision.startswith("release") or revision.startswith("prerelease")
+    ]
+    available_nightlies = [
+        revision for revision in available
+        if revision.startswith("nightly")
+    ]
+
+    def atindex_or_none(lst, index):
+        """ Returns item at index from lst or None"""
+        try:
+            return lst[index]
+        except IndexError:
+            return None
+
+    def remove_duplicates_lstlst(lstlst):
+        """ Removes duplicate lists in a list of lists """
+        # If we didn't care about the order:
+        # return list(map(list, set(map(tuple, lstlst))))
+        # would do the job. But we do care, or at least it is very
+        # relevant which revision is first (because it gets taken
+        # as reference)
+        ret = []
+        for lst in lstlst:
+            if lst not in ret:
+                ret.append(lst)
+        return ret
+
+    # Return value
+    ret = [
+        # All revisions
+        ["reference"] + sorted(available),
+
+        # Latest X + reference
+        ["reference", atindex_or_none(available_releases, 0)],
+        ["reference", atindex_or_none(available_nightlies, 0)],
+
+        # All latest + reference
+        ["reference"] + sorted(list(filter(
+            None,
+            [
+                atindex_or_none(available_releases, 0),
+                atindex_or_none(available_nightlies, 0)
+            ]
+        ))),
+
+        # All nightlies + reference
+        ["reference"] + sorted(available_nightlies)
+    ]
+
+    # Remove all Nones from the sublists
+    ret = [
+        list(filter(None, comb)) for comb in ret
+    ]
+    # Remove all empty lists
+    ret = list(filter(None, ret))
+
+    # Remove duplicates
+    ret = remove_duplicates_lstlst(ret)
+
+    if not ret:
+        sys.exit("No revisions seem to be available. Exit.")
+
+    return ret
+
+
+def clear_plots(work_folder: str, keep_revisions: List[str]):
+    """
+    This function will clear the plots folder to get rid of all but the
+    skipped revisions' associated plot files.
+    """
+
+    rainbow_file = os.path.join(work_folder, 'rainbow.json')
+    cleaned_rainbow = {}
+
+    keep_revisions = [sorted(revs) for revs in keep_revisions]
+
+    with open(rainbow_file) as rainbow:
+        entries = json.loads(rainbow.read())
+        for hash, revisions in entries.items():
+
+            if sorted(revisions) in keep_revisions:
+                print(f'Retaining {hash}')
+                cleaned_rainbow[hash] = revisions
+                continue
+
+            print(f'Removing {hash}:{revisions}')
+            shutil.rmtree(os.path.join(work_folder, hash))
+
+    with open(rainbow_file, 'w') as rainbow:
+        rainbow.write(json.dumps(cleaned_rainbow, indent=4))
 
 
 def get_start_time() -> float:

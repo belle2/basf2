@@ -22,7 +22,6 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TVector3.h"
 
 
 namespace Belle2 {

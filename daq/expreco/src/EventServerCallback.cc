@@ -80,14 +80,6 @@ void EventServerCallback::load(const DBObject&)
 
 }
 
-void EventServerCallback::start()
-{
-}
-
-void EventServerCallback::stop()
-{
-}
-
 void EventServerCallback::abort()
 {
   // Kill processes
@@ -99,11 +91,6 @@ void EventServerCallback::abort()
   }
 
   pthread_cancel(m_logthread);
-
-}
-
-void EventServerCallback::recover(const DBObject&)
-{
 
 }
 

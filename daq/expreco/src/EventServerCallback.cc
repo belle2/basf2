@@ -44,7 +44,7 @@ EventServerCallback::~EventServerCallback() noexcept
 
 }
 
-void EventServerCallback::load(const DBObject&)
+void EventServerCallback::load(const DBObject&, const std::string&)
 {
 
   // 1. Set execution directory

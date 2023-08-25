@@ -26,7 +26,7 @@ namespace Belle2 {
     virtual ~EventServerCallback() noexcept;
 
   public:
-    virtual void load(const DBObject&);
+    virtual void load(const DBObject&, const std::string&) override;
     void abort() override;
 
     void EventServerLogger();

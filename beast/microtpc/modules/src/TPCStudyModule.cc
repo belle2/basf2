@@ -126,7 +126,8 @@ void TPCStudyModule::event()
     int pdg = MicrotpcSimHit.gettkPDG();
     int trkID = MicrotpcSimHit.gettkID();
     ROOT::Math::XYZVector position = MicrotpcSimHit.gettkPos();
-    ROOT::Math::XYZVector direction = MicrotpcSimHit.gettkMomDir();
+    // direction was used for debugging, but currently all usages are commented -> comment variable declaration as well instead of removing it
+    // ROOT::Math::XYZVector direction = MicrotpcSimHit.gettkMomDir();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG / 2.;

@@ -35,8 +35,6 @@ namespace Belle2 {
     RFConf* m_conf;
     RFProcessManager* m_proc;
     RFLogManager* m_log;
-    char* m_nodename;
-    RFSharedMem* m_shm;
     int m_pid_server;
     pthread_t m_logthread;
 

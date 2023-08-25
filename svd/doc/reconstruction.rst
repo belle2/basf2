@@ -120,7 +120,7 @@ We have two alternative algorithms to compute the cluster time that can be selec
 
 Shifting of SVD-cluster-time based on Cluster-size
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Mean of cluster-times shifts with size of the clusters as strips with lower amplitude delays the time. This is not simulated and only should be seen in Data. To compensate this, a shift is added to the calibrated time. The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
+The mean of the cluster-time distribution shifts with the cluster size, as the strips of the clusters with lower amplitude, which are at the edge, delays in time. This effect is not simulated and it appears only in data. To compensate this, improving cluster time resolution in data and data-simulation agreement, a shift is added to the calibrated time. The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
 
 
 Cluster Position Reconstruction

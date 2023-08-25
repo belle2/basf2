@@ -57,8 +57,9 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            float(6)); // 6 ns
   addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
   addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
-  addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",
-           bool(false));
+  addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:SVD:"));
+
 
 }
 
@@ -138,7 +139,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
       m_cStripOccupancyV[i] = new TCanvas(Form("SVDOccupancy/c_StripOccupancyV_%d_%d_%d", tmp_layer, tmp_ladder, tmp_sensor));
     }
   }
-
 
   //OFFLINE occupancy plots legend
   m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
@@ -248,13 +248,13 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
   // 3 samples occupancy
-  m_h3OccupancyV =  new TH2F("hOccupancyV", "Average OFFLINE Sensor Occupancy (%), V side for 3 samples", 16, 0.5, 16.5, 19, 0, 19);
+  m_h3OccupancyV =  new TH2F("hOccupancy3V", "Average OFFLINE Sensor Occupancy (%), V side for 3 samples", 16, 0.5, 16.5, 19, 0, 19);
   m_h3OccupancyV->SetMarkerSize(1.1);
   m_h3OccupancyV->GetXaxis()->SetTitle("ladder number");
   m_h3OccupancyV->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_h3OccupancyV->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  m_h3OccupancyU =  new TH2F("hOccupancyU", "Average OFFLINE Sensor Occupancy (%), U side for 3 samples", 16, 0.5, 16.5, 19, 0, 19);
+  m_h3OccupancyU =  new TH2F("hOccupancy3U", "Average OFFLINE Sensor Occupancy (%), U side for 3 samples", 16, 0.5, 16.5, 19, 0, 19);
   m_h3OccupancyU->SetMarkerSize(1.1);
   m_h3OccupancyU->GetXaxis()->SetTitle("ladder number");
   m_h3OccupancyU->GetXaxis()->SetLabelSize(0.04);
@@ -262,6 +262,19 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
   rtype = findHist("DQMInfo/rtype");
 // runtype = "physics"; //rtype ? rtype->GetTitle() : "";
+
+  // PV registering
+  // unpack errors
+  registerEpicsPV(m_pvPrefix + "UnpackError", "UnpackError");
+  registerEpicsPV(m_pvPrefix + "UnpackErrorAlarm", "UnpackErrorAlarm");
+
+  // ClusterOnTrackTime
+  registerEpicsPV(m_pvPrefix + "ClsTrkTimeAlarm", "ClsTrkTimeAlarm");
+  registerEpicsPV(m_pvPrefix + "ClsTrk3TimeAlarm", "ClsTrk3TimeAlarm"); // 3 samples
+
+  // Offline occupancy U-side
+  registerEpicsPV(m_pvPrefix + "OccupancyUAlarm", "OccupancyUAlarm");
+  registerEpicsPV(m_pvPrefix + "OccupancyU3Alarm", "OccupancyU3Alarm"); // 3 samples
 
 }
 
@@ -305,11 +318,13 @@ void DQMHistAnalysisSVDGeneralModule::event()
   Float_t nEvents = hnEvnts->GetEntries();
 
   //check DATA FORMAT
-  TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto");
+  TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto", true);
 
   //test ERROR:
   //  h->SetBinContent(100,0.01);
 
+  auto color = kWhite;
+  int status = -1;
   if (h != NULL) {
     h->SetTitle("SVD Data Format Monitor " + runID);
     //check if number of errors is above the allowed limit
@@ -318,17 +333,25 @@ void DQMHistAnalysisSVDGeneralModule::event()
       if (h->GetBinContent(un) / nEvents > m_unpackError)
         hasError = true;
     if (! hasError) {
-      m_cUnpacker->SetFillColor(kGreen);
-      m_cUnpacker->SetFrameFillColor(10);
+      color = kGreen;
+      status = 0;
     } else {
+      color = kRed;
+      status = 3;
       m_legError->Draw("same");
-      m_cUnpacker->SetFillColor(kRed);
-      m_cUnpacker->SetFrameFillColor(10);
     }
+    m_cUnpacker->SetFillColor(color);
+    m_cUnpacker->SetFrameFillColor(10);
+
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
-    m_cUnpacker->SetFillColor(kRed);
+    color = kRed;
+    m_cUnpacker->SetFillColor(color);
   }
+
+  setEpicsPV("UnpackError",  h->GetEntries());
+  setEpicsPV("UnpackErrorAlarm", status);
+
 
   m_cUnpacker->cd();
   h->Draw("colztext");
@@ -361,6 +384,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   // cluster time for clusters of track
   TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  color = kWhite;
+  status = -1;
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
@@ -384,17 +409,20 @@ void DQMHistAnalysisSVDGeneralModule::event()
         B2WARNING("Run type:" << runtype);
       }
     } else {
-      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+      color = kGray;
+      status  = 1;
     }
     if (! hasError) {
-      m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+      color = kGreen;
+      status = 0;
     } else {
       m_legError->Draw("same");
-      m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+      status = 3;
+      color = kRed;
     }
+    m_cClusterOnTrackTime_L456V->SetFillColor(color);
+    m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+
   } else {
     B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
     m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
@@ -409,9 +437,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_printCanvas)
     m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
 
+  setEpicsPV("ClsTrkTimeAlarm", status);
 
   // cluster time for clusters of track
   m_h = findHist("SVDClsTrk/SVDTRK_Cluster3TimeV456");
+  color = kWhite;
+  status = -1;
   if (m_h != NULL) {
     m_hClusterOnTrack3Time_L456V.Clear();
     m_h->Copy(m_hClusterOnTrack3Time_L456V);
@@ -435,17 +466,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
         B2WARNING("Run type:" << runtype);
       }
     } else {
-      m_cClusterOnTrack3Time_L456V->SetFillColor(kGray);
-      m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
+      color = kGray;
+      status  = 1;
     }
     if (! hasError) {
-      m_cClusterOnTrack3Time_L456V->SetFillColor(kGreen);
-      m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
+      color = kGreen;
+      status = 0;
     } else {
       m_legError->Draw("same");
-      m_cClusterOnTrack3Time_L456V->SetFillColor(kRed);
-      m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
+      status = 3;
+      color = kRed;
     }
+    m_cClusterOnTrack3Time_L456V->SetFillColor(color);
+    m_cClusterOnTrack3Time_L456V->SetFrameFillColor(10);
   } else {
     B2INFO("Histogram SVDClsTrk/c_SVDTRK_Cluster3TimeV456 from SVDDQMClustersOnTrack module not found!");
     m_cClusterOnTrack3Time_L456V->SetFillColor(kRed);
@@ -460,57 +493,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_printCanvas)
     m_cClusterOnTrack3Time_L456V->Print("c_SVDClusterOnTrack3Time_L456V.pdf");
 
-
-  // cluster time for clusters of track
-  m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
-  if (m_h != NULL) {
-    m_hClusterOnTrackTime_L456V.Clear();
-    m_h->Copy(m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
-    Float_t mean_PeakInCenter = m_hClusterOnTrackTime_L456V.GetMean(); //
-    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
-    m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
-    bool hasError = false;
-    if (nEvents > m_statThreshold) {
-      if (runtype == "physics") {
-        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
-        if (difference_physics > m_timeThreshold) {
-          hasError = true;
-        }
-      } else if (runtype == "cosmic") {
-        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
-        if (difference_cosmic > m_timeThreshold) {
-          hasError = true;
-        }
-      } else {
-        B2WARNING("Run type:" << runtype);
-      }
-    } else {
-      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
-    }
-    if (! hasError) {
-      m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
-    } else {
-      m_legError->Draw("same");
-      m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
-    }
-  } else {
-    B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
-    m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
-  }
-
-  m_cClusterOnTrackTime_L456V->cd();
-  m_hClusterOnTrackTime_L456V.Draw();
-
-  m_cClusterOnTrackTime_L456V->Modified();
-  m_cClusterOnTrackTime_L456V->Update();
-
-  if (m_printCanvas)
-    m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
-
+  setEpicsPV("ClsTrk3TimeAlarm", status);
 
   //check MODULE OCCUPANCY online & offline
 
@@ -821,6 +804,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cOccupancyU->Modified();
   m_cOccupancyU->Update();
 
+  setEpicsPV("OccupancyUAlarm", m_occUstatus);
+
   //update summary offline occupancy U canvas for 3 samples
   m_c3OccupancyU->cd();
   m_h3OccupancyU->Draw("text");
@@ -851,6 +836,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_c3OccupancyU->Update();
   m_c3OccupancyU->Modified();
   m_c3OccupancyU->Update();
+
+  setEpicsPV("OccupancyU3Alarm", m_occUstatus3);
 
 
   //update summary offline occupancy V canvas

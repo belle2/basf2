@@ -148,6 +148,8 @@ namespace Belle2 {
     TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
     TString runtype = nullptr; /**< string with runtype: physics or cosmic */
 
+    std::string m_pvPrefix; /**< string prefix for EPICS PVs */
+
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 

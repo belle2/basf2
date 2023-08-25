@@ -126,8 +126,6 @@ void TPCStudyModule::event()
     int pdg = MicrotpcSimHit.gettkPDG();
     int trkID = MicrotpcSimHit.gettkID();
     ROOT::Math::XYZVector position = MicrotpcSimHit.gettkPos();
-    // direction was used for debugging, but currently all usages are commented -> comment variable declaration as well instead of removing it
-    // ROOT::Math::XYZVector direction = MicrotpcSimHit.gettkMomDir();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG / 2.;
@@ -146,16 +144,8 @@ void TPCStudyModule::event()
     }
 
     if (pdg == 1000020040) {
-      //cout << "He4 detNb " << detNb << " trID " << trkID << endl;
-      //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-      //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-      //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
       if (old_trkID_he4[detNb] != trkID && MicrotpcSimHit.gettkKEnergy() > 0 && MicrotpcSimHit.getEnergyDep() > 0) {
         old_trkID_he4[detNb] = trkID;
-        //cout << "Output alpha track direction and vertex and momentum"<<endl;
-        //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-        //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-        //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
         atrk[detNb] = true;
         RecoilE.push_back(MicrotpcSimHit.gettkKEnergy());
         h_tpc_kin[0]->Fill(MicrotpcSimHit.gettkKEnergy());
@@ -165,16 +155,8 @@ void TPCStudyModule::event()
     }
 
     if (pdg == 1000060120) {
-      //cout << "C 12 detNb " << detNb << " trID " << trkID << endl;
-      //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-      //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-      //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
       if (old_trkID_c12[detNb] != trkID && MicrotpcSimHit.gettkKEnergy() > 0 && MicrotpcSimHit.getEnergyDep() > 0) {
         old_trkID_c12[detNb] = trkID;
-        //cout << "Output alpha track direction and vertex and momentum"<<endl;
-        //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-        //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-        //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
         RecoilE.push_back(MicrotpcSimHit.gettkKEnergy());
         atrk[detNb] = true;
         h_tpc_kin[1]->Fill(MicrotpcSimHit.gettkKEnergy());
@@ -184,16 +166,8 @@ void TPCStudyModule::event()
     }
 
     if (pdg == 1000080160) {
-      //cout << "O 16 detNb " << detNb << " trID " << trkID << endl;
-      //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-      //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-      //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
       if (old_trkID_o16[detNb] != trkID && MicrotpcSimHit.gettkKEnergy() > 0 && MicrotpcSimHit.getEnergyDep() > 0) {
         old_trkID_o16[detNb] = trkID;
-        //cout << "Output alpha track direction and vertex and momentum"<<endl;
-        //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-        //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-        //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
         RecoilE.push_back(MicrotpcSimHit.gettkKEnergy());
         atrk[detNb] = true;
         h_tpc_kin[2]->Fill(MicrotpcSimHit.gettkKEnergy());
@@ -203,17 +177,8 @@ void TPCStudyModule::event()
     }
 
     if (pdg == Const::proton.getPDGCode()) {
-      //atrk[detNb] = true;
-      //cout << "He4 detNb " << detNb << " trID " << trkID << endl;
-      //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-      //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-      //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
       if (old_trkID_h1[detNb] != trkID && MicrotpcSimHit.gettkKEnergy() > 0 && MicrotpcSimHit.getEnergyDep() > 0) {
         old_trkID_h1[detNb] = trkID;
-        //cout << "Output alpha track direction and vertex and momentum"<<endl;
-        //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
-        //cout << "Vertex x " << position.X() << " y " << position.Y() << " z " << position.Z() << endl;
-        //cout << "Kinetic energy " << MicrotpcSimHit.gettkKEnergy() << endl;
         apro[detNb] = true;
         h_tpc_kin[3]->Fill(MicrotpcSimHit.gettkKEnergy());
         h1_ctr[detNb] ++;

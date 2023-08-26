@@ -23,6 +23,9 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
 #include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
+#include <reconstruction/utility/CDCDedxMeanPred.h>
+#include <reconstruction/utility/CDCDedxSigmaPred.h>
+#include <framework/gearbox/Const.h>
 
 // namespace constants
 namespace numdedx {
@@ -81,6 +84,16 @@ namespace Belle2 {
     }
 
     /**
+    * function to set chi hist parameters
+    */
+    void setChiPars(int value, double min, double max)
+    {
+      m_chiBins = value;
+      m_chiMin = min;
+      m_chiMax = max;
+    }
+
+    /**
     * function to perform gaus fit for input histogram
     */
     void fitGaussianWRange(TH1D*& temphist, fstatus& status);
@@ -119,7 +132,8 @@ namespace Belle2 {
     /**
     * function to store payloads after full calibration
     */
-    void createPayload(std::array<double, numdedx::nrings>& scale);
+    void createPayload(std::array<double, numdedx::nrings>& scale, std::map<int, std::vector<double>>& vmeans,
+                       std::map<int, std::vector<double>> vtime);
 
     /**
     * function to draw event/track statistics plots
@@ -201,6 +215,10 @@ namespace Belle2 {
       }
     }
 
+    double getCorrection(unsigned int ring, unsigned int time, std::map<int, std::vector<double>>&  vmeans);
+    void getMeanReso(std::array<std::vector<TH1D*>, numdedx::nrings> hvar,
+                     std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos);
+
   protected:
 
     /**
@@ -224,6 +242,10 @@ namespace Belle2 {
     double m_dedxMin; /**< min range of dedx */
     double m_dedxMax; /**< max range of dedx */
 
+    int m_chiBins; /**< bins for dedx histogram */
+    double m_chiMin; /**< min range of dedx */
+    double m_chiMax; /**< max range of dedx */
+
     int m_countR; /**< a hack for running functions once */
     int m_thersE; /**< min tracks to start calibration */
 
@@ -235,6 +257,9 @@ namespace Belle2 {
     std::string m_suffix; /**< string suffix for object names */
 
     std::vector<std::vector<double>> m_vinjPayload; /**< vector to store payload values*/
+
+    CDCDedxMeanPred m;
+    CDCDedxSigmaPred s;
 
     DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< Injection time DB object */
   };

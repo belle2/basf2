@@ -37,6 +37,7 @@ eclWaveformTemplateCalibrationC4Algorithm::eclWaveformTemplateCalibrationC4Algor
 
 CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibrate()
 {
+  B2INFO("eclWaveformTemplateCalibrationC4Algorithm m_firstCellID, m_lastCellID " << m_firstCellID << " " << m_lastCellID);
 
   //save to db
   ECLDigitWaveformParameters* PhotonHadronDiodeParameters = new ECLDigitWaveformParameters();
@@ -46,45 +47,54 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
   std::vector<float> hadronNorms;
   std::vector<float> diodeNorms;
 
-  B2INFO("eclWaveformTemplateCalibrationC4Algorithm m_firstCellID, m_lastCellID " << m_firstCellID << " " << m_lastCellID);
+  //int experimentNumber = -999;
 
-  DBObjPtr<ECLDigitWaveformParameters> tempexistingPhotonWaveformParameters(Form("PhotonParameters_CellID%d_CellID%d", m_firstCellID,
-      m_lastCellID));
-  DBObjPtr<ECLDigitWaveformParameters> tempexistingHadronDiodeWaveformParameters(Form("HadronDiodeParameters_CellID%d_CellID%d",
-      m_firstCellID, m_lastCellID));
+  for (int i = 0; i < m_numBatches; i++) {
 
-  //------------------------------------------------------------------------
-  // Get the input run list (should be only 1) for us to use to update the DBObjectPtrs
-  auto runs = getRunList();
-  // Take the first run
-  ExpRun chosenRun = runs.front();
-  B2INFO("merging using the ExpRun (" << chosenRun.second << "," << chosenRun.first << ")");
-  // After here your DBObjPtrs are correct
-  updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
-  int experimentNumber = chosenRun.first;
+    int first = (i * m_batchsize) + 1;
+    int last = ((i + 1) * m_batchsize);
+    if (last > 8736) last = 8736;
 
-  for (int j = m_firstCellID; j <= m_lastCellID; j++) {
-    B2INFO("Check Norm Parms CellID " << j);
-    B2INFO("P " << j << " " << tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
-    B2INFO("H " << j << " " << tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[0]);
-    B2INFO("D " << j << " " << tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[0]);
+    B2INFO("eclWaveformTemplateCalibrationC4Algorithm i " << i << " " << first << " " << last);
 
-    cellIDs.push_back(j);
-    photonNorms.push_back(tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
-    hadronNorms.push_back(tempexistingPhotonWaveformParameters->getHadronParameters(j)[0]);
-    diodeNorms.push_back(tempexistingPhotonWaveformParameters->getDiodeParameters(j)[0]);
+    DBObjPtr<ECLDigitWaveformParameters> tempexistingPhotonWaveformParameters(Form("PhotonParameters_CellID%d_CellID%d", first,
+        last));
+    DBObjPtr<ECLDigitWaveformParameters> tempexistingHadronDiodeWaveformParameters(Form("HadronDiodeParameters_CellID%d_CellID%d",
+        first, last));
 
-    float tempPhotonWaveformParameters[11];
-    float tempHadronWaveformParameters[11];
-    float tempDiodeWaveformParameters[11];
+    //------------------------------------------------------------------------
+    // Get the input run list (should be only 1) for us to use to update the DBObjectPtrs
+    auto runs = getRunList();
+    // Take the first run
+    ExpRun chosenRun = runs.front();
+    B2INFO("merging using the ExpRun (" << chosenRun.second << "," << chosenRun.first << ")");
+    // After here your DBObjPtrs are correct
+    updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
+    //int experimentNumber = chosenRun.first;
 
-    for (int k = 0; k < 11; k++) {
-      tempPhotonWaveformParameters[k] = tempexistingPhotonWaveformParameters->getPhotonParameters(j)[k];
-      tempHadronWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[k];
-      tempDiodeWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[k];
+    for (int j = first; j <= last; j++) {
+      B2INFO("Check Norm Parms CellID " << j);
+      B2INFO("P " << j << " " << tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
+      B2INFO("H " << j << " " << tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[0]);
+      B2INFO("D " << j << " " << tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[0]);
+
+      cellIDs.push_back(j);
+      photonNorms.push_back(tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
+      hadronNorms.push_back(tempexistingPhotonWaveformParameters->getHadronParameters(j)[0]);
+      diodeNorms.push_back(tempexistingPhotonWaveformParameters->getDiodeParameters(j)[0]);
+
+      float tempPhotonWaveformParameters[11];
+      float tempHadronWaveformParameters[11];
+      float tempDiodeWaveformParameters[11];
+
+      for (int k = 0; k < 11; k++) {
+        tempPhotonWaveformParameters[k] = tempexistingPhotonWaveformParameters->getPhotonParameters(j)[k];
+        tempHadronWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[k];
+        tempDiodeWaveformParameters[k] = tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[k];
+      }
+      PhotonHadronDiodeParameters->setTemplateParameters(j, tempPhotonWaveformParameters, tempHadronWaveformParameters,
+                                                         tempDiodeWaveformParameters);
     }
-    PhotonHadronDiodeParameters->setTemplateParameters(j, tempPhotonWaveformParameters, tempHadronWaveformParameters,
-                                                       tempDiodeWaveformParameters);
   }
 
   auto gphotonNorms = new TGraph(cellIDs.size(), cellIDs.data(), photonNorms.data());
@@ -104,9 +114,8 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
   delete histfile;
 
 
-  B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload, chosenRun.second = " << experimentNumber);
-  saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters", IntervalOfValidity(experimentNumber, -1,
-                  experimentNumber, -1));
+//  B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload, chosenRun.second = " << experimentNumber);
+  saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters");
 
   return c_OK;
 }

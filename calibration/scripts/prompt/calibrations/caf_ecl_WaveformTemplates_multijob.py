@@ -11,7 +11,6 @@
 """ECL waveform template calibration"""
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
-from caf import strategies
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -59,7 +58,6 @@ def get_calibrations(input_data, **kwargs):
         algorithms=[algo_C1],
         input_files=input_files,
         max_files_per_collector_job=4)
-    cal_ecl_Wave_C1.strategies = strategies.SequentialRunByRun
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     gamma_gamma_pre_path = basf2.create_path()
@@ -112,10 +110,11 @@ def get_calibrations(input_data, **kwargs):
                                            max_files_per_collector_job=4))
         calibrations_C2[-1].pre_collector_path = gamma_gamma_pre_path
         calibrations_C2[-1].depends_on(cal_ecl_Wave_C1)
-        calibrations_C2[-1].strategies = strategies.SequentialRunByRun
 
     # ..Algorithm
     algo_C4 = Belle2.ECL.eclWaveformTemplateCalibrationC4Algorithm()
+    algo_C4.setFirstCellID(0)
+    algo_C4.setLastCellID(8736)
 
     # ..The calibration
     cal_ecl_Wave_C4 = Calibration("ecl_Wave_C4",
@@ -123,7 +122,6 @@ def get_calibrations(input_data, **kwargs):
                                   algorithms=[algo_C4],
                                   input_files=input_files[:1],
                                   )
-    cal_ecl_Wave_C4.strategies = strategies.SequentialRunByRun
 
     cal_ecl_Wave_C4.depends_on(cal_ecl_Wave_C1)
     for cal in calibrations_C2:

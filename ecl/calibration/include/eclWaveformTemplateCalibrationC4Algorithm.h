@@ -38,8 +38,14 @@ namespace Belle2 {
       /** Setter for m_firstCellID */
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
 
-      /** Getter for m_firstCellID */
+      /** Setter for m_lastCellID */
       void setLastCellID(int lastCellID) {m_lastCellID = lastCellID;}
+
+      /** Setter for m_firstCellID */
+      void setBatchSize(int batchsize) {m_batchsize = batchsize;}
+
+      /** Setter for m_numBatches */
+      void setNumBatches(int numBatches) {m_numBatches = numBatches;}
 
     protected:
 
@@ -52,6 +58,9 @@ namespace Belle2 {
 
       int m_firstCellID; /** First crystal to calibrate */
       int m_lastCellID; /** Last crystal to calibrate */
+
+      int m_batchsize = 100;  /** number of crystals in a batch */
+      int m_numBatches = 88;  /** number of batches */
 
     };
   }

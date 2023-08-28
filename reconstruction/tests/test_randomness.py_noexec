@@ -48,6 +48,6 @@ re.add_reconstruction(main)
 
 main.add_module(PrintRandomNumber())
 
-mdst.add_mdst_dump(main, print_untested=False, print_less_content=True)
+mdst.add_mdst_dump(main, print_untested=False, print_mutable=False)
 
 b2.process(main)

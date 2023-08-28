@@ -63,7 +63,7 @@ def add_mdst_output(
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)
 
 
-def add_mdst_dump(path, print_untested=False, print_less_content=False):
+def add_mdst_dump(path, print_untested=False, print_mutable=True):
     """
     Add a PrintObjectsModule to a path for printing the mDST content.
 
@@ -71,8 +71,8 @@ def add_mdst_dump(path, print_untested=False, print_less_content=False):
         path (basf2.Path): Path to add module to
         print_untested (bool): If True print the names of all methods which are not
             explicitly printed to make sure we don't miss addition of new members
-        print_less_content (bool): If True print less content (content that may differ
-            during the execution of two basf2 jobs, e.g. EventMetaData::getTime)
+        print_mutable (bool): If False do not print mutable content that may differ
+            during the execution of two basf2 jobs, e.g. EventMetaData::getTime
     """
 
     # Always avoid the top-level 'import ROOT'.
@@ -94,7 +94,7 @@ def add_mdst_dump(path, print_untested=False, print_less_content=False):
         DataStorePrinter("EventMetaData", [
             "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
             "getProduction", "getParentLfn", "getGeneratedWeight", "isEndOfRun"] +
-            ([] if print_less_content else ["getTime"]),
+            (["getTime"] if print_mutable else []),
             array=False
         ),
         DataStorePrinter("Track", [

@@ -362,6 +362,12 @@ namespace Belle2 {
      */
     chid getEpicsPVChID(int index);
 
+    bool requestLimitsFromEpicsPVs(chid pv, double& lowAlarm, double& lowWarn, double& highWarn, double& highAlarm);
+
+    bool requestLimitsFromEpicsPVs(std::string name, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    bool requestLimitsFromEpicsPVs(int index, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
     /**
      * Setter for EPICS usage
      * @param flag set in use

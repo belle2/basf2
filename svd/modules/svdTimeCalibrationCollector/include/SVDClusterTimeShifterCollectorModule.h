@@ -17,7 +17,6 @@
 #include "vector"
 #include "TString.h"
 #include "TH1F.h"
-#include "TH2F.h"
 #include "TH3F.h"
 
 #include <svd/dataobjects/SVDCluster.h>
@@ -55,11 +54,10 @@ namespace Belle2 {
 
     int m_maxClusterSize = 6; /**< Maximum size of SVD clusters */
     std::vector<std::string> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
-    std::string m_svdClsOnTrksPrefix = "SVDClustersOnTracks"; /**< SVDClusterOnTracks */
-    std::map<TString, StoreArray<SVDCluster>> m_svdClsOnTrk; /**< SVDClusters store array*/
+    std::string m_svdClustersOnTrackPrefix = "SVDClustersOnTrack"; /**< SVDClustersOnTrack */
+    std::map<TString, StoreArray<SVDCluster>> m_svdClustersOnTrack; /**< SVDClusters store array*/
 
-    StoreObjPtr<EventMetaData> m_emdata; /**< EventMetaData store object pointer*/
-    std::string m_eventTime = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/
+    std::string m_eventT0Name = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/
     StoreObjPtr<EventT0> m_eventT0; /**< EventT0 store object pointer*/
   };
 

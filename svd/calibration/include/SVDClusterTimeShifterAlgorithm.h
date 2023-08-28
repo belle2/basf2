@@ -64,8 +64,14 @@ namespace Belle2 {
     TString m_timeAlgorithmForIoV = "CoG3"; /**< Histogram of one algorithm is used to produce payload boundaries */
   };
 
-  /** return a single gaus*/
-  inline double mySingleGaus(const double* x, const double* par)
+  /** single gaus function.
+   * @param N is a normalization constant
+   * @param a is the mean of the Gaus distribution
+   * @param b is the standard deviation of the Gaus distribution
+   * @param e is a contant
+   * @return value of single gaus distribution
+   */
+  inline double singleGaus(const double* x, const double* par)
   {
     double N = std::fabs(par[0]);
     double a = par[1];
@@ -74,8 +80,17 @@ namespace Belle2 {
     return N * TMath::Gaus(x[0], a, b, true) + e;
   };
 
-  /** return a double gaus*/
-  inline double myDoubleGaus(const double* x, const double* par)
+  /** double gaus function.
+   * @param N is a normalization constant
+   * @param f is the fractional contribution of the first gaus distribution
+   * @param a is the mean of the first gaus distribution
+   * @param b is the standard deviation of the first gaus distribution
+   * @param c is the mean of the second gaus distribution
+   * @param d is the standard deviation of the second gaus distribution
+   * @param e is a contant
+   * @return value of double gaus distribution
+   */
+  inline double doubleGaus(const double* x, const double* par)
   {
     double N = std::fabs(par[0]);
     double f = std::fabs(par[1]);

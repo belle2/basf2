@@ -493,13 +493,13 @@ def get_calibrations(input_data, **kwargs):
     # SVD Cluster Time Shifter                              #
     #########################################################
 
-    SVDClusterOnTracksPrefix = "SVDClustersOnTracks"
+    SVDClustersOnTrackPrefix = "SVDClustersOnTrack"
 
     shift_clusterizers_onTracks = []
     for alg in timeAlgorithms:
         cluster = b2.register_module("SVDClusterizer")
         cluster.set_name(f"ClusterReconstruction_{alg}")
-        cluster.param("Clusters", f"{SVDClusterOnTracksPrefix}_{alg}")
+        cluster.param("Clusters", f"{SVDClustersOnTrackPrefix}_{alg}")
         if NEW_SHAPER_DIGITS_NAME is not None:
             cluster.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
         cluster.param("timeAlgorithm6Samples", alg)
@@ -516,7 +516,7 @@ def get_calibrations(input_data, **kwargs):
     shift_collector.set_name("SVDClusterTimeShifterCollector")
     shift_collector.param("MaxClusterSize", 6)
     shift_collector.param("EventT0Name", "EventT0")
-    shift_collector.param("SVDClusterOnTracksPrefix", f"{SVDClusterOnTracksPrefix}")
+    shift_collector.param("SVDClustersOnTrackPrefix", f"{SVDClustersOnTrackPrefix}")
     shift_collector.param("TimeAlgorithms", timeAlgorithms)
 
     shift_algo = SVDClusterTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"

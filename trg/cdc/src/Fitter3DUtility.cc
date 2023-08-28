@@ -100,7 +100,7 @@ void Fitter3DUtility::rPhiFitter(double* rr, double* phi2, double* invphierror, 
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-  A = 0, B = 0, C = 0, D = 0, E = 0, hcx = 0, hcy = 0;
+  A = 0, B = 0, C = 0, D = 0, E = 0;
   //G=0;
   for (unsigned i = 0; i < 5; i++) {
     A += cos(phi2[i]) * cos(phi2[i]) * (invFiterror[i] * invFiterror[i]);
@@ -191,7 +191,7 @@ void Fitter3DUtility::rPhiFit2(double* rr, double* phi2, double* phierror, doubl
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-  A = 0, B = 0, C = 0, D = 0, E = 0, hcx = 0, hcy = 0;
+  A = 0, B = 0, C = 0, D = 0, E = 0;
   //G=0;
   for (int i = 0; i < nTS; i++) {
     A += cos(phi2[i]) * cos(phi2[i]) / (fiterror[i] * fiterror[i]);

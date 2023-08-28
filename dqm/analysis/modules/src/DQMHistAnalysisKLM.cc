@@ -50,6 +50,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number for delta histogram updates", 500000.);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
+  addParam("PVName", m_pvPrefix, "Prefix for KLM's DQM PVs", std::string("DQM:TEST:"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -82,6 +83,13 @@ void DQMHistAnalysisKLMModule::initialize()
   addDeltaPar(m_histogramDirectoryName, "time_rpc", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
+
+  //register EPICS PVs
+  registerEpicsPV(m_pvPrefix + "KLM:MaskedChannels", "MaskedChannels");
+  registerEpicsPV(m_pvPrefix + "KLM:DeadBarrelModules", "DeadBarrelModules");
+  registerEpicsPV(m_pvPrefix + "KLM:DeadEndcapModules", "DeadEndcapModules");
+  updateEpicsPVs(5.0);
+
 
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
@@ -654,4 +662,9 @@ void DQMHistAnalysisKLMModule::event()
   processTimeHistogram("time_scintillator_bklm");
   processTimeHistogram("time_scintillator_eklm");
 
+  B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
+  setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
+  setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
+  setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
+  updateEpicsPVs(5.0);
 }

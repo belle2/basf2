@@ -27,6 +27,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms.");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
+  addParam("PVName", m_pvPrefix, "Prefix for KLM's DQM PVs", std::string("DQM:TEST:"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
@@ -42,6 +43,11 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 void DQMHistAnalysisKLM2Module::initialize()
 {
   m_monObj = getMonitoringObject("klm");
+
+  //register EPICS PVs
+  registerEpicsPV(m_pvPrefix + "KLM2:nEffBKLMLayers", "nEffBKLMLayers");
+  registerEpicsPV(m_pvPrefix + "KLM2:nEffEKLMLayers", "nEffEKLMLayers");
+  updateEpicsPVs(5.0);
 
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());
@@ -289,6 +295,11 @@ void DQMHistAnalysisKLM2Module::event()
   processPlaneHistogram("eff_bklm_plane", m_eff_bklm);
   processPlaneHistogram("eff_eklm_plane", m_eff_eklm);
 
+  /* Set EPICS PV Values*/
+  B2DEBUG(20, "Updating Epics PVs in DQMHistAnalysisKLM2");
+  setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
+  setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+  updateEpicsPVs(5.0);
 }
 
 

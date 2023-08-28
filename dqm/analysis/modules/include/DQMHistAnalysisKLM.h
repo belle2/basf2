@@ -160,6 +160,9 @@ namespace Belle2 {
     /** Reference Histogram Root file name */
     std::string m_refFileName;
 
+    /** Prefix of PVs*/
+    std::string m_pvPrefix;
+
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
 

@@ -1,0 +1,27 @@
+# EventType: 1290710022
+# Descriptor: [B+ -> Xu0 l+ nu]cc
+# NickName: Bu_Xulnu=non-resonant-DFN
+# Documentation: Non-resonances decays of charged b->ulv (l=e,mu) for hybrid modelling. Higher excited states are included in non-resonance (F. De Fazio (INFN Bari), M. Neubert [hep-ph/9905351])
+# Here, the Pythia parameter probStoUD (commonly referred to as gamma_s) is varied from its default value.
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Tommy Martinov
+# Email: tommy.martinov@desy.de
+# Cuts: None
+# Date: 20231907
+#
+
+PythiaBothParam StringFlav:probStoUD=0.300
+
+Decay Upsilon(4S)
+0.5 B+sig  B-         VSS;
+0.5 B-sig  B+         VSS;
+Enddecay
+#
+Decay B+sig
+0.002206   Xu0    e+    nu_e     PHOTOS VUB 4.658 1.328 0.22 1 0.28 1; #[para. values from arXiv:hep-ph/0507253]
+0.002206   Xu0    mu+   nu_mu    PHOTOS VUB 4.658 1.328 0.22 1 0.28 1; #[para. values from arXiv:hep-ph/0507253]
+Enddecay
+CDecay B-sig
+#
+End

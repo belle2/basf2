@@ -562,8 +562,10 @@ void ECLWaveformFitModule::fitPhotonHadronBackgroundPhoton(
   double sumB0 = 0;
   int jsum = 0;
   for (int j = 0; j < c_NFitPoints; j++) {
-    if ((j < jmax - 3 || jmax + 4 < j) && (j < jmax1 - 3 || jmax1 + 4 < j))
-      sumB0 += fitA[j]; ++jsum;
+    if ((j < jmax - 3 || jmax + 4 < j) && (j < jmax1 - 3 || jmax1 + 4 < j)) {
+      sumB0 += fitA[j];
+      ++jsum;
+    }
   }
   double B0 = sumB0 / jsum;
   amax -= B0;

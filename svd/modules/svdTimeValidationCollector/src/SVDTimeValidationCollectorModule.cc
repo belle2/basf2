@@ -36,24 +36,6 @@ SVDTimeValidationCollectorModule::SVDTimeValidationCollectorModule() : Calibrati
 void SVDTimeValidationCollectorModule::prepare()
 {
 
-  TH1F hClsTimeOnTracks("clsTimeOnTracks__L@layerL@ladderS@sensor@view",
-                        "clsTimeOnTracks in @layer.@ladder.@sensor @view/@side",
-                        300, -150, 150);
-  hClsTimeOnTracks.GetXaxis()->SetTitle("clsTime_onTracks (ns)");
-  auto _hClsTimeOnTracks = new  SVDHistograms<TH1F>(hClsTimeOnTracks);
-
-  TH1F hClsTimeAll("clsTimeAll__L@layerL@ladderS@sensor@view",
-                   "clsTimeAll in @layer.@ladder.@sensor @view/@side",
-                   300, -150, 150);
-  hClsTimeAll.GetXaxis()->SetTitle("clsTime_all (ns)");
-  auto _hClsTimeAll = new SVDHistograms<TH1F>(hClsTimeAll);
-
-  TH1F hClsDiffTimeOnTracks("clsDiffTimeOnTracks__L@layerL@ladderS@sensor@view",
-                            "clsDiffTimeOnTracks in @layer.@ladder.@sensor @view/@side",
-                            300, -150, 150);
-  hClsDiffTimeOnTracks.GetXaxis()->SetTitle("clsDiffTime_onTracks (ns)");
-  auto _hClsDiffTimeOnTracks = new SVDHistograms<TH1F>(hClsDiffTimeOnTracks);
-
   auto hEventT0 = new TH1F("hEventT0", "EventT0", 300, -150, 150);
   registerObject<TH1F>("hEventT0", hEventT0);
 
@@ -64,21 +46,57 @@ void SVDTimeValidationCollectorModule::prepare()
   m_trk.isRequired(m_track);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+  std::vector<Belle2::VxdID> allSensors;
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+    for (auto ladder : geoCache.getLadders(layer))
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+        allSensors.push_back(sensor);
 
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
-          registerObject<TH1F>(_hClsTimeOnTracks->getHistogram(sensor, view)->GetName(), _hClsTimeOnTracks->getHistogram(sensor, view));
-          registerObject<TH1F>(_hClsTimeAll->getHistogram(sensor, view)->GetName(), _hClsTimeAll->getHistogram(sensor, view));
-          registerObject<TH1F>(_hClsDiffTimeOnTracks->getHistogram(sensor, view)->GetName(), _hClsDiffTimeOnTracks->getHistogram(sensor,
-                               view));
-        }
-      }
+  int numberOfSensorBin = 2 * int(allSensors.size());
+  B2INFO("Number of SensorBin: " << numberOfSensorBin);
+
+  TH2F* __hClsTimeOnTracks__     = new TH2F("__hClsTimeOnTracks__", "clsTimeOnTracks",
+                                            300, -150, 150,
+                                            numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH2F* __hClsTimeAll__          = new TH2F("__hClsTimeAll__", "clsTimeAll",
+                                            300, -150, 150,
+                                            numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH2F* __hClsDiffTimeOnTracks__ = new TH2F("__hClsDiffTimeOnTracks__", "clsDiffTimeOnTracks",
+                                            300, -150, 150,
+                                            numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH1F* __hBinToSensorMap__     = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
+                                           numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  __hClsTimeOnTracks__->GetYaxis()->SetTitle("sensor");
+  __hClsTimeOnTracks__->GetXaxis()->SetTitle("clsTime_onTracks (ns)");
+  __hClsTimeAll__->GetYaxis()->SetTitle("sensor");
+  __hClsTimeAll__->GetXaxis()->SetTitle("clsTime_all (ns)");
+  __hClsDiffTimeOnTracks__->GetYaxis()->SetTitle("sensor");
+  __hClsDiffTimeOnTracks__->GetXaxis()->SetTitle("clsDiffTime_onTracks (ns)");
+
+  int tmpBinCnt = 0;
+  for (auto sensor : allSensors) {
+    for (auto view : {'U', 'V'}) {
+      tmpBinCnt++;
+      TString binLabel = TString::Format("L%iL%iS%i%c",
+                                         sensor.getLayerNumber(),
+                                         sensor.getLadderNumber(),
+                                         sensor.getSensorNumber(),
+                                         view);
+      __hBinToSensorMap__->GetXaxis()->SetBinLabel(tmpBinCnt, binLabel);
     }
   }
+  registerObject<TH2F>(__hClsTimeOnTracks__->GetName(), __hClsTimeOnTracks__);
+  registerObject<TH2F>(__hClsTimeAll__->GetName(), __hClsTimeAll__);
+  registerObject<TH2F>(__hClsDiffTimeOnTracks__->GetName(), __hClsDiffTimeOnTracks__);
+  registerObject<TH1F>(__hBinToSensorMap__->GetName(), __hBinToSensorMap__);
 }
 
+void SVDTimeValidationCollectorModule::startRun()
+{
+  getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
+  getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
+  getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
+}
 
 void SVDTimeValidationCollectorModule::collect()
 {
@@ -91,21 +109,16 @@ void SVDTimeValidationCollectorModule::collect()
       // get cluster time
       float clTime = svdCluster.getClsTime();
 
-      //get cluster layer, ladder sensor and side
-      auto theVxdID = svdCluster.getSensorID();
-      auto layer_num = theVxdID.getLayerNumber();
-      auto ladder_num = theVxdID.getLadderNumber();
-      auto sensor_num = theVxdID.getSensorNumber();
-      char side = 'V';
-      if (svdCluster.isUCluster())
-        side = 'U';
+      TString binLabel = TString::Format("L%iL%iS%i%c",
+                                         svdCluster.getSensorID().getLayerNumber(),
+                                         svdCluster.getSensorID().getLadderNumber(),
+                                         svdCluster.getSensorID().getSensorNumber(),
+                                         svdCluster.isUCluster() ? 'U' : 'V');
+      int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
+      double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
 
-      auto hClsTimeOnTracks_name = Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side);
-
-      auto hClsDiffTimeOnTracks_name = Form("clsDiffTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side);
-
-      getObjectPtr<TH1F>(hClsTimeOnTracks_name)->Fill(clTime);
-      getObjectPtr<TH1F>(hClsDiffTimeOnTracks_name)->Fill(clTime - eventT0);
+      getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Fill(clTime, sensorBinCenter);
+      getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Fill(clTime - eventT0, sensorBinCenter);
     };
 
     // Fill histograms with all clusters
@@ -113,18 +126,15 @@ void SVDTimeValidationCollectorModule::collect()
       // get cluster time
       float clTime = svdCluster.getClsTime();
 
-      //get cluster layer, ladder sensor and side
-      auto theVxdID = svdCluster.getSensorID();
-      auto layer_num = theVxdID.getLayerNumber();
-      auto ladder_num = theVxdID.getLadderNumber();
-      auto sensor_num = theVxdID.getSensorNumber();
-      char side = 'V';
-      if (svdCluster.isUCluster())
-        side = 'U';
+      TString binLabel = TString::Format("L%iL%iS%i%c",
+                                         svdCluster.getSensorID().getLayerNumber(),
+                                         svdCluster.getSensorID().getLadderNumber(),
+                                         svdCluster.getSensorID().getSensorNumber(),
+                                         svdCluster.isUCluster() ? 'U' : 'V');
+      int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
+      double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
 
-      auto hClsTimeAll_name = Form("clsTimeAll__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side);
-
-      getObjectPtr<TH1F>(hClsTimeAll_name)->Fill(clTime);
+      getObjectPtr<TH2F>("__hClsTimeAll__")->Fill(clTime, sensorBinCenter);
     };
   }
 }

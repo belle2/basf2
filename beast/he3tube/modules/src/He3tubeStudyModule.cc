@@ -22,7 +22,7 @@
 #include <string>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TMath.h>
@@ -152,8 +152,8 @@ void He3tubeStudyModule::event()
     const double mass = mcpart.getMass();
     double kin = energy - mass;
     const double PDG = mcpart.getPDG();
-    const TVector3 vtx = mcpart.getProductionVertex();
-    const TVector3 mom = mcpart.getMomentum();
+    const ROOT::Math::XYZVector vtx = mcpart.getProductionVertex();
+    const ROOT::Math::XYZVector mom = mcpart.getMomentum();
     double theta = mom.Theta() * TMath::RadToDeg();
     double phi = mom.Phi() * TMath::RadToDeg();
     double z = vtx.Z();

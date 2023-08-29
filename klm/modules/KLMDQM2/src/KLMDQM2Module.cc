@@ -60,7 +60,7 @@ KLMDQM2Module::KLMDQM2Module() :
            std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Maximal distance in the units of strip number from ExtHit to "
-           "matching KLMDigit.", double(8));
+           "matching KLMDigit (not for multi-strip hits).", double(8));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("MinimalMatchingDigitsOuterLayers",
@@ -223,19 +223,23 @@ void KLMDQM2Module::findMatchingDigit(
   struct HitData* hitData)
 {
   for (const KLMDigit& digit : m_Digits) {
-    /*
-     * TODO: multi-strip digits are ignored for now.
-     * It is necessary to take them into account.
-     */
-    if (digit.isMultiStrip())
-      continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
           digit.getPlane() == hitData->plane))
       continue;
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+
+    // Defining quantities for distance cut
+    double stripPosition = digit.getStrip();
+    double allowedDistance1D = m_AllowedDistance1D;
+
+    if (digit.isMultiStrip()) {
+      // Due to a firmware bug, we have to be wary with the allowed distance...
+      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
+      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
+    }
+    if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
       hitData->digit = &digit;
       return;
     }

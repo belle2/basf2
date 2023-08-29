@@ -100,6 +100,12 @@ namespace Belle2 {
      */
     static bool m_epicsReadOnly;
 
+    /**
+     * The Prefix for EPICS PVs
+     */
+    static std::string m_PVPrefix;
+
+
 #ifdef _BELLE2_EPICS
     //! Vector of EPICS PVs
     std::vector <chid>  m_epicsChID;
@@ -297,11 +303,16 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
+     *
+     * If you register large number of PVs at once, consider setting
+     * update_pvs = false and explicitly running updateEpicsPVs()
+     *
      * @param pvname full PV name
      * @param keyname key name for easier access
+     * @param update_pvs if true, update all PVs (flush network) after new PV is registered
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(std::string pvname, std::string keyname = "");
+    int registerEpicsPV(std::string pvname, std::string keyname = "", bool update_pvs = true);
 
     /**
      * Write value to a EPICS PV
@@ -376,9 +387,21 @@ namespace Belle2 {
     bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     /**
-     * Unsubsribe from EPICS PVs on terminate
+     * Unsubscribe from EPICS PVs on terminate
      */
     void cleanupEpicsPVs(void);
+
+    /**
+     * get global Prefix for EPICS PVs
+     * @return prefix in use
+     */
+    std::string& getPVPrefix(void) {return m_PVPrefix;};
+
+    /**
+     * set global Prefix for EPICS PVs
+     * @param prefix Prefix to set
+     */
+    void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
 
     // Public functions
   public:

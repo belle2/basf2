@@ -63,7 +63,7 @@ void DQMHistAnalysisInputSrvModule::event()
   TIter next(file->GetListOfKeys());
   TKey* key = NULL;
   while ((key = (TKey*)next())) {
-    h.push_back((TH1*)key->ReadObj());
+    h.push_back((TH1*)key->ReadObj()); // TODO should check class type before cast
   }
   for (size_t i = 0; i < h.size(); i++) {
     addHist("", h[i]->GetName(), h[i]);

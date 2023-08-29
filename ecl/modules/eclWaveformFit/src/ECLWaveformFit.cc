@@ -454,7 +454,7 @@ void ECLWaveformFitModule::terminate()
 void ECLWaveformFitModule::Fit2h(double& B, double& Ag, double& T, double& Ah, double& amin)
 {
   //minuit parameters
-  double arglist[10];
+  double arglist[10] = {0};
   int ierflg = 0;
 
   // setting inital fit parameters
@@ -496,7 +496,7 @@ void ECLWaveformFitModule::Fit2h(double& B, double& Ag, double& T, double& Ah, d
 //Two component fit background ith extra photon. Fits photon+hadron component + extra photon hypothesis
 void ECLWaveformFitModule::Fit2hExtraPhoton(double& B, double& Ag, double& T, double& Ah, double& A2, double& T2, double& amin)
 {
-  double arglist[10];
+  double arglist[10] = {0};
   int ierflg = 0;
   double dt = 0.5;
   double amax = 0; int jmax = 6;

@@ -22,6 +22,7 @@ import webbrowser
 import re
 import collections
 import configparser
+import requests
 
 # 3rd
 import cherrypy
@@ -248,6 +249,12 @@ def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
         logging.warning(
             "Issue with authenticating GitLab. "
             "Please ensure access token is correct and valid. "
+            "GitLab Integration will be disabled."
+        )
+    except requests.exceptions.Timeout:
+        gitlab_object = None
+        logging.warning(
+            "GitLab servers feeling under the weather, DESY outage? "
             "GitLab Integration will be disabled."
         )
 
@@ -920,7 +927,7 @@ def run_server(
 
     if static_folder is None:
         sys.exit(
-            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
+            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to set "
             "to provide static HTML content. Did you run b2setup ?"
         )
 
@@ -957,6 +964,13 @@ def run_server(
 
     if not os.path.exists("plots"):
         os.mkdir("plots")
+
+    if os.path.exists("plots/rainbow.json"):
+        logging.info("Removing old plots and unpopular combinations")
+        validationfunctions.clear_plots(
+            comparison_folder,
+            validationfunctions.get_popular_revision_combinations(cwd_folder)
+        )
 
     # export js, css and html templates
     cherry_config["/static"] = {

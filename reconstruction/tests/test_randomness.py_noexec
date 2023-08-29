@@ -28,6 +28,33 @@ class PrintRandomNumber(b2.Module):
         b2.B2INFO(f'A random number is {ROOT.gRandom.Uniform()}')
 
 
+class PrintPIDLikelihoods(b2.Module):
+    '''Simple module for printing PID likelihoods.'''
+
+    def initialize(self):
+        '''Initialize method.'''
+        import ROOT.Belle2 as B2  # noqa
+        self.pid_detectors = []
+        it = B2.Const.PIDDetectors.c_set.begin()
+        while True:
+            if it.getDetector() != B2.Const.KLM:
+                self.pid_detectors.append(B2.Const.PIDDetectorSet(it.getDetector()))
+            it.increment()
+            if it == B2.Const.PIDDetectors.c_set.end():
+                break
+        self.pid_hypotheses = [B2.Const.ChargedStable(B2.Const.chargedStableSet.at(index))
+                               for index in range(B2.Const.chargedStableSet.size())]
+        self.pid_likelihoods = B2.PyStoreArray('PIDLikelihoods')
+        self.pid_likelihoods.isRequired()
+
+    def event(self):
+        '''Event method.'''
+        for pl in self.pid_likelihoods:
+            for ph in self.pid_hypotheses:
+                for pd in self.pid_detectors:
+                    b2.B2INFO(f'PID likelihood from {pd} for {ph} hypothesis: {pl.getLogL(ph, pd)}')
+
+
 main = b2.Path()
 
 main.add_module('EventInfoSetter')
@@ -49,5 +76,7 @@ re.add_reconstruction(main)
 main.add_module(PrintRandomNumber())
 
 mdst.add_mdst_dump(main, print_untested=False, print_mutable=False)
+
+main.add_module(PrintPIDLikelihoods())
 
 b2.process(main)

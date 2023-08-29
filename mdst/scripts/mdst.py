@@ -124,11 +124,14 @@ def add_mdst_dump(path, print_untested=False, print_mutable=True):
             "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag", "hasSVDSpacePointCreatorAbortionFlag"], {
             "hasCDCLayer": range(56)
         }, array=False),
-        DataStorePrinter("PIDLikelihood", ["getMostLikely"], {
-            "isAvailable": pid_detectors,
-            "getLogL": charged_stables,
-            "getProbability": charged_stables,
-        }),
+        DataStorePrinter("PIDLikelihood", ["getMostLikely"],
+                         (
+                             {
+                                 "isAvailable": pid_detectors,
+                                 "getLogL": charged_stables,
+                                 "getProbability": charged_stables,
+                             } if print_mutable else {}
+                         )),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
             "getClusterId", "getUniqueClusterId", "getMinTrkDistance", "getDeltaL",

@@ -43,20 +43,20 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
   auto payload = new Belle2::SVDClusterTimeShifter("SVDClusterTimeShifter_" + m_id);
 
   // single gaus fit function
-  TF1* singleGaus = new TF1("singleGaus", mySingleGaus, -50., 50., 4);
+  TF1* fn_singleGaus = new TF1("fn_singleGaus", singleGaus, -50., 50., 4);
 
   // double gaus fit function
-  TF1* doubleGaus = new TF1("doubleGaus", myDoubleGaus, -50., 50., 7);
-  doubleGaus->SetParName(0, "N");
-  doubleGaus->SetParName(1, "f");
-  doubleGaus->SetParName(2, "#mu_{1}");
-  doubleGaus->SetParName(3, "#sigma_{1}");
-  doubleGaus->SetParName(4, "#mu_{2}");
-  doubleGaus->SetParName(5, "#sigma_{2}");
-  doubleGaus->SetParName(6, "C");
-  doubleGaus->SetParLimits(1, 0.01, 0.99);
-  doubleGaus->SetParLimits(3, 0.5, 25.);
-  doubleGaus->SetParLimits(5, 0.5, 25.);
+  TF1* fn_doubleGaus = new TF1("fn_doubleGaus", doubleGaus, -50., 50., 7);
+  fn_doubleGaus->SetParName(0, "N");
+  fn_doubleGaus->SetParName(1, "f");
+  fn_doubleGaus->SetParName(2, "#mu_{1}");
+  fn_doubleGaus->SetParName(3, "#sigma_{1}");
+  fn_doubleGaus->SetParName(4, "#mu_{2}");
+  fn_doubleGaus->SetParName(5, "#sigma_{2}");
+  fn_doubleGaus->SetParName(6, "C");
+  fn_doubleGaus->SetParLimits(1, 0.01, 0.99);
+  fn_doubleGaus->SetParLimits(3, 0.5, 25.);
+  fn_doubleGaus->SetParLimits(5, 0.5, 25.);
 
 
   auto __hBinToSensorMap__ = getObjectPtr<TH1F>("__hBinToSensorMap__");
@@ -149,30 +149,30 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         while (fitCount++ < 5) {
           double histMean = hist->GetMean();
           double histStd  = hist->GetStdDev();
-          singleGaus->SetParameter(0, hist->GetSumOfWeights() * hist->GetBinWidth(1));
-          singleGaus->SetParameter(1, histMean);
-          singleGaus->SetParameter(2, histStd * 0.75);
-          singleGaus->SetParameter(3, 1.);
-          singleGaus->SetParLimits(1, histMean - histStd, histMean + histStd);
-          auto statusSingleFull = hist->Fit("singleGaus", "SNLMEQ", "",
+          fn_singleGaus->SetParameter(0, hist->GetSumOfWeights() * hist->GetBinWidth(1));
+          fn_singleGaus->SetParameter(1, histMean);
+          fn_singleGaus->SetParameter(2, histStd * 0.75);
+          fn_singleGaus->SetParameter(3, 1.);
+          fn_singleGaus->SetParLimits(1, histMean - histStd, histMean + histStd);
+          auto statusSingleFull = hist->Fit("fn_singleGaus", "SNLMEQ", "",
                                             histMean - 2. * histStd, histMean + 2. * histStd);
           singleStatus = statusSingleFull->IsValid();
 
-          doubleGaus->SetParameter(0, hist->GetSumOfWeights() * hist->GetBinWidth(1));
-          doubleGaus->SetParameter(1, 0.95);
-          doubleGaus->SetParameter(2, singleGaus->GetParameter(1));
-          doubleGaus->SetParameter(3, std::fabs(singleGaus->GetParameter(2)));
-          doubleGaus->SetParameter(4, singleGaus->GetParameter(1) - 3.);
-          doubleGaus->SetParameter(5, std::fabs(singleGaus->GetParameter(2)) + 5.);
-          doubleGaus->SetParameter(6, 10.);
-          doubleGaus->SetParLimits(2,
-                                   doubleGaus->GetParameter(2) - m_allowedDeviationMean,
-                                   doubleGaus->GetParameter(2) + m_allowedDeviationMean);
-          doubleGaus->SetParLimits(4,
-                                   doubleGaus->GetParameter(4) - m_allowedDeviationMean,
-                                   doubleGaus->GetParameter(4) + m_allowedDeviationMean);
+          fn_doubleGaus->SetParameter(0, hist->GetSumOfWeights() * hist->GetBinWidth(1));
+          fn_doubleGaus->SetParameter(1, 0.95);
+          fn_doubleGaus->SetParameter(2, fn_singleGaus->GetParameter(1));
+          fn_doubleGaus->SetParameter(3, std::fabs(fn_singleGaus->GetParameter(2)));
+          fn_doubleGaus->SetParameter(4, fn_singleGaus->GetParameter(1) - 3.);
+          fn_doubleGaus->SetParameter(5, std::fabs(fn_singleGaus->GetParameter(2)) + 5.);
+          fn_doubleGaus->SetParameter(6, 10.);
+          fn_doubleGaus->SetParLimits(2,
+                                      fn_doubleGaus->GetParameter(2) - m_allowedDeviationMean,
+                                      fn_doubleGaus->GetParameter(2) + m_allowedDeviationMean);
+          fn_doubleGaus->SetParLimits(4,
+                                      fn_doubleGaus->GetParameter(4) - m_allowedDeviationMean,
+                                      fn_doubleGaus->GetParameter(4) + m_allowedDeviationMean);
 
-          auto statusDoubleFull = hist->Fit("doubleGaus", "SLMEQ");
+          auto statusDoubleFull = hist->Fit("fn_doubleGaus", "SLMEQ");
           doubleStatus = statusDoubleFull->IsValid();
           if (doubleStatus) break;
           int rebinValue = 2;
@@ -186,16 +186,16 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         double fillShiftVal = m_allowedDeviationMean + 1.;
 
         if (doubleStatus)
-          fillShiftVal = (doubleGaus->GetParameter(1) > 0.5 ?
-                          doubleGaus->GetParameter(2) : doubleGaus->GetParameter(4));
+          fillShiftVal = (fn_doubleGaus->GetParameter(1) > 0.5 ?
+                          fn_doubleGaus->GetParameter(2) : fn_doubleGaus->GetParameter(4));
         else if (singleStatus) {
-          fillShiftVal = singleGaus->GetParameter(1);
+          fillShiftVal = fn_singleGaus->GetParameter(1);
           B2WARNING("Fit failed for " << hist->GetName() <<
                     "; using mean from single gaus fit. ");
         }
 
         if (std::fabs(fillShiftVal) > m_allowedDeviationMean) {
-          B2WARNING("Shift valus is more than allowed in " <<
+          B2WARNING("Shift value is more than allowed in " <<
                     hist->GetName() << " : " <<
                     shiftValues[binLabel].back() <<
                     "; using mean of the histogram.");

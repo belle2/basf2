@@ -192,14 +192,21 @@ namespace {
 
 ECLWaveformFitModule::ECLWaveformFitModule()
 {
-  // Set module properties
+  /* Set module properties. */
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.03);
-  addParam("Chi2Threshold25dof", m_Chi2Threshold25dof, "chi2 threshold (25 dof) to classify offline fit as good fit.", 57.1);
-  addParam("Chi2Threshold27dof", m_Chi2Threshold27dof, "chi2 threshold (27 dof) to classify offline fit as good fit.", 60.0);
+  addParam("EnergyThreshold", m_EnergyThreshold,
+           "Energy threshold of online fit result for Fitting Waveforms (GeV).",
+           0.03);
+  addParam("Chi2Threshold25dof", m_Chi2Threshold25dof,
+           "Chi2 threshold (25 dof) to classify offline fit as good fit.",
+           57.1);
+  addParam("Chi2Threshold27dof", m_Chi2Threshold27dof,
+           "Chi2 threshold (27 dof) to classify offline fit as good fit.",
+           60.0);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
-           "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);
+           "Option to use crystal-dependent covariance matrices (false uses identity matrix).",
+           true);
 }
 
 ECLWaveformFitModule::~ECLWaveformFitModule()
@@ -407,8 +414,9 @@ void ECLWaveformFitModule::event()
 
       fitType = ECLDsp::photonHadronBackgroundPhoton;
       chi2 = -1;
-      fitPhotonHadronBackgroundPhoton(pedestal, amplitudePhoton, signalTime, amplitudeHadron,
-                                      amplitudeBackgroundPhoton, timeBackgroundPhoton, chi2);
+      fitPhotonHadronBackgroundPhoton(
+        pedestal, amplitudePhoton, signalTime, amplitudeHadron,
+        amplitudeBackgroundPhoton, timeBackgroundPhoton, chi2);
       aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton,
                                        chi2);
 
@@ -465,24 +473,36 @@ void ECLWaveformFitModule::fitPhotonHadron(
   double arglist[10] = {0};
   int ierflg = 0;
 
-  // setting inital fit parameters
+  /* Setting inital fit parameters. */
   double dt = 0.5;
   double amax = 0;
   int jmax = 6;
-  for (int j = 0; j < c_NFitPoints; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
-  double sumB0 = 0; int jsum = 0;
-  for (int j = 0; j < c_NFitPoints; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += fitA[j]; ++jsum;}
+  for (int j = 0; j < c_NFitPoints; j++) {
+    if (amax < fitA[j]) {
+      amax = fitA[j];
+      jmax = j;
+    }
+  }
+  double sumB0 = 0;
+  int jsum = 0;
+  for (int j = 0; j < c_NFitPoints; j++) {
+    if (j < jmax - 3 || jmax + 4 < j) {
+      sumB0 += fitA[j];
+      ++jsum;
+    }
+  }
   double B0 = sumB0 / jsum;
   amax -= B0;
-  if (amax < 0) amax = 10;
+  if (amax < 0)
+    amax = 10;
   double T0 = dt * (4.5 - jmax);
   double A0 = amax;
 
   //initalize minimizer
-  m_MinuitPhotonHadron->mnparm(0, "B",  B0,    10, B0 / 1.5, B0 * 1.5, ierflg);
-  m_MinuitPhotonHadron->mnparm(1, "Ag", A0, A0 / 20,      0,   2 * A0, ierflg);
-  m_MinuitPhotonHadron->mnparm(2, "T",  T0,   0.5, T0 - 2.5, T0 + 2.5, ierflg);
-  m_MinuitPhotonHadron->mnparm(3, "Ah", 0., A0 / 20,    -A0,   2 * A0, ierflg);
+  m_MinuitPhotonHadron->mnparm(0, "B", B0, 10, B0 / 1.5, B0 * 1.5, ierflg);
+  m_MinuitPhotonHadron->mnparm(1, "Ag", A0, A0 / 20, 0, 2 * A0, ierflg);
+  m_MinuitPhotonHadron->mnparm(2, "T", T0, 0.5, T0 - 2.5, T0 + 2.5, ierflg);
+  m_MinuitPhotonHadron->mnparm(3, "Ah", 0., A0 / 20, -A0, 2 * A0, ierflg);
 
   //perform fit
   arglist[0] = 50000;
@@ -510,35 +530,62 @@ void ECLWaveformFitModule::fitPhotonHadronBackgroundPhoton(
   int ierflg = 0;
   double dt = 0.5;
   double amax = 0; int jmax = 6;
-  for (int j = 0; j < c_NFitPoints; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
+  for (int j = 0; j < c_NFitPoints; j++) {
+    if (amax < fitA[j]) {
+      amax = fitA[j];
+      jmax = j;
+    }
+  }
 
   double amax1 = 0; int jmax1 = 6;
-  for (int j = 0; j < c_NFitPoints; j++)
+  for (int j = 0; j < c_NFitPoints; j++) {
     if (j < jmax - 3 || jmax + 4 < j) {
       if (j == 0) {
-        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j]) {
+          amax1 = fitA[j];
+          jmax1 = j;
+        }
       } else if (j == 30) {
-        if (amax1 < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+        if (amax1 < fitA[j] && fitA[j - 1] < fitA[j]) {
+          amax1 = fitA[j];
+          jmax1 = j;
+        }
       } else {
-        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j] && fitA[j - 1] < fitA[j]) {
+          amax1 = fitA[j];
+          jmax1 = j;
+        }
       }
     }
+  }
 
-  double sumB0 = 0; int jsum = 0;
-  for (int j = 0; j < c_NFitPoints; j++) if ((j < jmax - 3 || jmax + 4 < j) && (j < jmax1 - 3 || jmax1 + 4 < j)) { sumB0 += fitA[j]; ++jsum;}
+  double sumB0 = 0;
+  int jsum = 0;
+  for (int j = 0; j < c_NFitPoints; j++) {
+    if ((j < jmax - 3 || jmax + 4 < j) && (j < jmax1 - 3 || jmax1 + 4 < j))
+      sumB0 += fitA[j]; ++jsum;
+  }
   double B0 = sumB0 / jsum;
-  amax -= B0; amax = std::max(10.0, amax);
-  amax1 -= B0; amax1 = std::max(10.0, amax1);
+  amax -= B0;
+  amax = std::max(10.0, amax);
+  amax1 -= B0;
+  amax1 = std::max(10.0, amax1);
   double T0 = dt * (4.5 - jmax);
   double T01 = dt * (4.5 - jmax1);
 
   double A0 = amax, A01 = amax1;
-  m_MinuitPhotonHadronBackgroundPhoton->mnparm(0, "B",  B0,    10, B0 / 1.5, B0 * 1.5, ierflg);
-  m_MinuitPhotonHadronBackgroundPhoton->mnparm(1, "Ag", A0, A0 / 20,      0,   2 * A0, ierflg);
-  m_MinuitPhotonHadronBackgroundPhoton->mnparm(2, "T",  T0,   0.5, T0 - 2.5, T0 + 2.5, ierflg);
-  m_MinuitPhotonHadronBackgroundPhoton->mnparm(3, "Ah", 0., A0 / 20,    -A0,   2 * A0, ierflg);
-  m_MinuitPhotonHadronBackgroundPhoton->mnparm(4, "A2", A01, A01 / 20,    0,   2 * A01, ierflg);
-  m_MinuitPhotonHadronBackgroundPhoton->mnparm(5, "T2", T01,  0.5,    T01 - 2.5,   T01 + 2.5, ierflg);
+  m_MinuitPhotonHadronBackgroundPhoton->mnparm(
+    0, "B", B0, 10, B0 / 1.5, B0 * 1.5, ierflg);
+  m_MinuitPhotonHadronBackgroundPhoton->mnparm(
+    1, "Ag", A0, A0 / 20, 0, 2 * A0, ierflg);
+  m_MinuitPhotonHadronBackgroundPhoton->mnparm(
+    2, "T", T0, 0.5, T0 - 2.5, T0 + 2.5, ierflg);
+  m_MinuitPhotonHadronBackgroundPhoton->mnparm(
+    3, "Ah", 0., A0 / 20, -A0, 2 * A0, ierflg);
+  m_MinuitPhotonHadronBackgroundPhoton->mnparm(
+    4, "A2", A01, A01 / 20, 0, 2 * A01, ierflg);
+  m_MinuitPhotonHadronBackgroundPhoton->mnparm(
+    5, "T2", T01, 0.5, T01 - 2.5, T01 + 2.5, ierflg);
 
   // Now ready for minimization step
   arglist[0] = 50000;

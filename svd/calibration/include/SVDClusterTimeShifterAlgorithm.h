@@ -53,7 +53,9 @@ namespace Belle2 {
    * N is a normalization constant,
    * a is the mean of the Gaus distribution,
    * b is the standard deviation of the Gaus distribution,
-   * e is a contant.
+   * e is a constant.
+   * @param x indipendent variable of the function
+   * @param par parameters of the function
    * @return value of single gaus distribution
    */
   inline double singleGaus(const double* x, const double* par)
@@ -72,7 +74,9 @@ namespace Belle2 {
    * b is the standard deviation of the first gaus distribution,
    * c is the mean of the second gaus distribution,
    * d is the standard deviation of the second gaus distribution,
-   * e is a contant.
+   * e is a constant.
+   * @param x indipendent variable of the function
+   * @param par parameters of the function
    * @return value of double gaus distribution
    */
   inline double doubleGaus(const double* x, const double* par)

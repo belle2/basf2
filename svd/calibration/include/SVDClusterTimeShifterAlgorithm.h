@@ -49,11 +49,11 @@ namespace Belle2 {
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
   };
 
-  /** single gaus function.
-   * @param N is a normalization constant
-   * @param a is the mean of the Gaus distribution
-   * @param b is the standard deviation of the Gaus distribution
-   * @param e is a contant
+  /** Single gaus function, where
+   * N is a normalization constant,
+   * a is the mean of the Gaus distribution,
+   * b is the standard deviation of the Gaus distribution,
+   * e is a contant.
    * @return value of single gaus distribution
    */
   inline double singleGaus(const double* x, const double* par)
@@ -65,14 +65,14 @@ namespace Belle2 {
     return N * TMath::Gaus(x[0], a, b, true) + e;
   };
 
-  /** double gaus function.
-   * @param N is a normalization constant
-   * @param f is the fractional contribution of the first gaus distribution
-   * @param a is the mean of the first gaus distribution
-   * @param b is the standard deviation of the first gaus distribution
-   * @param c is the mean of the second gaus distribution
-   * @param d is the standard deviation of the second gaus distribution
-   * @param e is a contant
+  /** Double gaus function, where
+   * N is a normalization constant,
+   * f is the fractional contribution of the first gaus distribution,
+   * a is the mean of the first gaus distribution,
+   * b is the standard deviation of the first gaus distribution,
+   * c is the mean of the second gaus distribution,
+   * d is the standard deviation of the second gaus distribution,
+   * e is a contant.
    * @return value of double gaus distribution
    */
   inline double doubleGaus(const double* x, const double* par)

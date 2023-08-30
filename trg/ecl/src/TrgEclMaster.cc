@@ -355,9 +355,6 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       int maxTCId    = aTRGECLCluster->getMaxTCId();
       double clusterenergy  = aTRGECLCluster->getEnergyDep();
       double clustertiming  =  aTRGECLCluster->getTimeAve();
-      TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                               aTRGECLCluster->getPositionY(),
-                               aTRGECLCluster->getPositionZ());
       ClusterTiming.push_back(clustertiming);
       ClusterEnergy.push_back(clusterenergy);
       MaxTCId.push_back(maxTCId);
@@ -740,9 +737,6 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     int maxThetaId = aTRGECLCluster->getMaxThetaId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     MaxTCId.push_back(maxTCId);

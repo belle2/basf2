@@ -27,8 +27,6 @@
 #include <fstream>
 #include <boost/format.hpp>
 
-#include "TVector3.h"
-
 using namespace std;
 using boost::format;
 using namespace Belle2;

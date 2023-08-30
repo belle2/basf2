@@ -42,6 +42,54 @@ namespace Belle2 {
       vector.SetXYZ(x, y, z);
     }
 
+    /**
+     * Set vector magnitude mag
+     * @param[inout] vector Vector
+     * @param[in]    mag    Magnitude
+     */
+    inline void setMag(ROOT::Math::XYZVector& vector, double mag)
+    {
+      setMagThetaPhi(vector, mag, vector.Theta(), vector.Phi());
+    }
+
+    /**
+     * Set vector azimuthal angle theta
+     * @param[inout] vector Vector
+     * @param[in]    theta  Azimuthal angle
+     */
+    inline void setTheta(ROOT::Math::XYZVector& vector, double theta)
+    {
+      setMagThetaPhi(vector, vector.R(), theta, vector.Phi());
+    }
+
+    /**
+     * Set vector polar angle phi
+     * @param[inout] vector Vector
+     * @param[in]    phi    Polar angle
+     */
+    inline void setPhi(ROOT::Math::XYZVector& vector, double phi)
+    {
+      setMagThetaPhi(vector, vector.R(), vector.Theta(), phi);
+    }
+
+    /**
+     * Set vector by polar coordinates.
+     * @param[out] vector Vector.
+     * @param[in]  pt     Magnitude in xy-plane.
+     * @param[in]  theta  Polar angle.
+     * @param[in]  phi    Azimuthal angle.
+     */
+    inline void setPtThetaPhi(ROOT::Math::XYZVector& vector,
+                              double pt, double theta, double phi)
+    {
+      const double aPt = std::abs(pt);
+      const double x = aPt * std::cos(phi);
+      const double y = aPt * std::sin(phi);
+      const double tanTheta = std::tan(theta);
+      const double z = tanTheta ? aPt / tanTheta : 0;
+      vector.SetXYZ(x, y, z);
+    }
+
   }
 
 }

@@ -15,7 +15,7 @@
 
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "TVector3.h"
+#include <Math/Vector3D.h>
 
 #include <framework/core/Module.h>
 #include <trg/ecl/TrgEclMapping.h>
@@ -129,7 +129,7 @@ namespace Belle2 {
     //! TC time
     std::vector<double> TCTiming;
     //! TC position from TRGECLMap (cosmic calibration)
-    std::vector<TVector3> TCPosition;
+    std::vector<ROOT::Math::XYZVector> TCPosition;
 
     //! Matrix
     //! Marix component

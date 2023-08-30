@@ -13,6 +13,9 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/core/RandomNumbers.h>
 
+// ROOT
+#include <TMath.h>
+
 //c++
 #include <string>
 #include <fstream>
@@ -68,8 +71,8 @@ void DosiDigitizerModule::event()
     int m_trackID = aHit->getTrackId();
     int pdgCode = aHit->getPDGCode();
     double m_Time = aHit->getFlightTime();
-    TVector3 m_Mom = aHit->getMomentum();
-    TVector3 m_Pos = aHit->getPosition();
+    ROOT::Math::XYZVector m_Mom = aHit->getMomentum();
+    ROOT::Math::XYZVector m_Pos = aHit->getPosition();
     double m_energyDeposit = aHit->getEnergyDep();
     double erecdep = m_energyDeposit;
     erecdep += gRandom->Gaus(0, GetEnergyResolutionGeV(m_energyDeposit, m_cellID));

@@ -87,11 +87,12 @@ def get_argument_parser():
     parser.add_argument('--confirm', default=False, action='store_true',
                         help='Confirm that the given information is correct and that the payloads should be uploaded')
     parser.add_argument('payloads', help='Name of the testing payload storage file')
-    parser.add_argument("--cdb-auth-token", type=str, default=None,
-                        help="CDB authentication token necessary for write access to the database. "
-                        "Useful only for debugging, since by the default the tool automatically reads the token "
-                        "stored in the file pointed by the environment variable $BELLE2_CDB_AUTH_TOKEN"
-                        )
+    parser.add_argument("--auth-token", type=str, default=None,
+                        help="JSON Web Token necessary for authenticating to the conditions database. "
+                        "Useful only for debugging, since by the default the tool automatically "
+                        "gets a token for you by asking the B2MMS username and password. "
+                        "If the environment variable $BELLE2_CDB_AUTH_TOKEN points to a file with a valid "
+                        "token, such token is used (useful for automatic workflows).")
     return parser
 
 
@@ -263,10 +264,11 @@ Details:""")
 
     # upload to staging global tags and create/update jira issue
     db = ConditionsDB()
-    if args.cdb_auth_token is not None:
-        cdb_auth_token = args.cdb_auth_token
+    if args.auth_token is not None:
+        auth_token = args.auth_token
     else:
-        cdb_auth_token = get_cdb_authentication_token()
-    db.set_authentication_token(cdb_auth_token)
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        auth_token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
+    db.set_authentication_token(auth_token)
     if not db.staging_request(payloadsFile, normalize, data, password):
         sys.exit(1)

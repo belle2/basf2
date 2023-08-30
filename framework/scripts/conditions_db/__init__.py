@@ -55,15 +55,25 @@ def chunks(container, chunk_size):
         yield chunk
 
 
-def get_cdb_authentication_token():
-    """Helper function for correctly retrieving the CDB authentication token."""
-    path_to_token = f'/tmp/b2cdb_{os.getenv("BELLE2_USER", None)}.token'
+def get_cdb_authentication_token(path=None):
+    """
+    Helper function for correctly retrieving the CDB authentication token (either via file either via issuing server).
+
+    :param: path (str): Path to a file containing a CDB authentication token; if ``None``, the function will use
+    a default path (``tmp/b2cdb_${BELLE2_USER}.token``) to look for a token.
+    """
+    # if we pass a path, let's use it for getting the token, otherwise use the default one
+    if path:
+        path_to_token = path
+    else:
+        path_to_token = f'/tmp/b2cdb_{os.getenv("BELLE2_USER", None)}.token'
 
     # check validity of existing token
     if os.path.isfile(path_to_token):
         with open(path_to_token) as token_file:
             response = requests.get('https://token.belle2.org/check', verify=False, params={'token': token_file.read().strip()})
             if response.status_code == 400:
+                B2INFO(f'The file {path_to_token} contains an invalid token, getting a new token...')
                 os.unlink(path_to_token)
 
     # request a token if there is none

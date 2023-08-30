@@ -914,10 +914,11 @@ def get_argument_parser():
     options.add_argument("--base-url", default=None,
                          help="URI for the base of the REST API, if not given a list of default locations is tried")
     options.add_argument("--auth-token", type=str, default=None,
-                         help="CDB authentication token necessary for write access to the database. "
-                         "Useful only for debugging, since by the default the tool automatically reads the token "
-                         "stored in the file pointed by the environment variable $BELLE2_CDB_AUTH_TOKEN"
-                         )
+                         help="JSON Web Token necessary for authenticating to the conditions database. "
+                         "Useful only for debugging, since by the default the tool automatically "
+                         "gets a token for you by asking the B2MMS username and password. "
+                         "If the environment variable $BELLE2_CDB_AUTH_TOKEN points to a file with a valid "
+                         "token, such token is used (useful for automatic workflows).")
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[options])
     parser.set_defaults(func=lambda x, y: parser.print_help())
@@ -1047,8 +1048,8 @@ def main():
     if args.auth_token is not None:
         conditions_db.set_authentication_token(args.auth_token)
     else:
-        # If something goes wrong with the auth. token, the function throws a B2FATAL
-        auth_token = get_cdb_authentication_token()
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        auth_token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
         conditions_db.set_authentication_token(auth_token)
 
     try:

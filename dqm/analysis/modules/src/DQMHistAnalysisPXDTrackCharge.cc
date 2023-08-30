@@ -233,10 +233,11 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
-      tt->Draw();
+      // keep this commented code as we may have excluded modules in phase4
+//       auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
+//       tt->SetTextAngle(90);// Rotated
+//       tt->SetTextAlign(12);// Centered
+//       tt->Draw();
     }
   }
 
@@ -396,12 +397,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetLineWidth(2);
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
-  {
-    auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
-  }
+//   {
+  // keep this commented code as we may have excluded modules in phase4
+//     auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
+//     tt->SetTextAngle(90);// Rotated
+//     tt->SetTextAlign(12);// Centered
+//     tt->Draw();
+//   }
   m_cCharge->cd(0);
   m_cCharge->Modified();
   m_cCharge->Update();

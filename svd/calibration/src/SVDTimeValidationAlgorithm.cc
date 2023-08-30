@@ -41,7 +41,7 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
   gStyle->SetOptFit(1111);
 
   char alg[100] = {};
-  std::sscanf(getPrefix().data(), "SVDTimeValidationCollector_%s", alg);
+  std::sscanf(getPrefix().data(), "SVDTimeValidationCollector_%98s", alg);
 
   FileStat_t info;
   int cal_rev = 1;

@@ -70,5 +70,3 @@ For all three time estimators ``CoG6``, ``CoG3`` and ``ELS3``, we build the 1D p
    #. if double Gaussian fit is successful, mean of the smallest Gaussian
    #. else if sigle Gaussian fit is successful, mean of the sigle Gaussian
    #. else mean of the histogram.
-
-The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.

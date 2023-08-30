@@ -66,7 +66,7 @@ void SVDTimeValidationCollectorModule::prepare()
                                             numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
   TH3F* __hClusterSizeVsTimeResidual__  = new TH3F("__hClusterSizeVsTimeResidual__",
                                                    "ClusterSize vs Time Residual",
-                                                   400, -50., 50., 10, 0.5, + 10.5,
+                                                   100, -25., 25., 10, 0.5, + 10.5,
                                                    numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
   TH1F* __hBinToSensorMap__     = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
                                            numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);

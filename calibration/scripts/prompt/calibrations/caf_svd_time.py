@@ -524,7 +524,6 @@ def get_calibrations(input_data, **kwargs):
     shift_algo.setMinEntries(100)
     shift_algo.setAllowedTimeShift(15.)
     shift_algo.setTimeAlgorithm(timeAlgorithms)
-    shift_algo.setTimeAlgorithmForIoV("CoG3")
 
     shift_calibration = Calibration("SVDClusterTimeShifter",
                                     collector=shift_collector,
@@ -532,7 +531,7 @@ def get_calibrations(input_data, **kwargs):
                                     input_files=good_input_files,
                                     pre_collector_path=shift_pre_collector_path)
 
-    shift_calibration.strategies = strategies.SequentialBoundaries
+    shift_calibration.strategies = strategies.SingleIOV
 
     for algorithm in shift_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}

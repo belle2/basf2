@@ -235,35 +235,3 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
 
   return c_OK;
 }
-
-bool SVDClusterTimeShifterAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
-{
-  float meanTimeL3V = 0;
-  auto TimeL3V = getObjectPtr<TH1F>(("__hTimeL3V__" + m_timeAlgorithmForIoV).Data());
-  if (!TimeL3V) {
-    if (m_previousTimeMeanL3V)
-      meanTimeL3V = m_previousTimeMeanL3V.value();
-  } else {
-    if (TimeL3V->GetEntries() > m_minEntries)
-      meanTimeL3V = TimeL3V->GetMean();
-    else {
-      if (m_previousTimeMeanL3V)
-        meanTimeL3V = m_previousTimeMeanL3V.value();
-    }
-  }
-  if (!m_previousTimeMeanL3V) {
-    B2INFO("Setting start payload boundary to be the first run ("
-           << currentRun.first << "," << currentRun.second << ")");
-    m_previousTimeMeanL3V.emplace(meanTimeL3V);
-
-    return true;
-  } else if (std::fabs(meanTimeL3V - m_previousTimeMeanL3V.value()) > m_allowedDeviationMean) {
-    B2INFO("Histogram mean has shifted from " << m_previousTimeMeanL3V.value()
-           << " to " << meanTimeL3V << ". We are requesting a new payload boundary for ("
-           << currentRun.first << "," << currentRun.second << ")");
-    m_previousTimeMeanL3V.emplace(meanTimeL3V);
-    return true;
-  } else {
-    return false;
-  }
-}

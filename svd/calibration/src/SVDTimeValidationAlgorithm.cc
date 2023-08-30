@@ -41,7 +41,7 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
   gStyle->SetOptFit(1111);
 
   char alg[100] = {};
-  std::sscanf(getPrefix().data(), "SVDTimeValidationCollector_%s", alg);
+  std::sscanf(getPrefix().data(), "SVDTimeValidationCollector_%98s", alg);
 
   FileStat_t info;
   int cal_rev = 1;
@@ -124,8 +124,9 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
 
           __hClusterSizeVsTimeResidual__->GetZaxis()->SetRange(ij + 1, ij + 1);
           TH2D* hClusterSizeVsTimeResidual = (TH2D*)__hClusterSizeVsTimeResidual__->Project3D("yxe");
-          hClusterSizeVsTimeResidual->SetName(Form("clusterSizeVsTimeResidual__L%dS%dS%c", layer_num, sensor_num, side));
-          hClusterSizeVsTimeResidual->SetTitle(Form("ClusterSize vs Time Residual in %d.%d %c/%c", layer_num, sensor_num, side, sidePN));
+          hClusterSizeVsTimeResidual->SetName(Form("clusterSizeVsTimeResidual__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          hClusterSizeVsTimeResidual->SetTitle(Form("Cluster Size vs Time Residual in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num,
+                                                    side, sidePN));
           hClusterSizeVsTimeResidual->SetDirectory(0);
           onePad.Clear();
           onePad.cd();

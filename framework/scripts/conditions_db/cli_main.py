@@ -45,7 +45,7 @@ from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
-from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation
+from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation, get_cdb_authentication_token
 from conditions_db.cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
@@ -307,7 +307,7 @@ def command_tag_modify(args, db=None):
         if typeinfo is None:
             return 1
         # seems so, ok modify the tag info
-        if info['gloalTagType'] != typeinfo:
+        if info['globalTagType'] != typeinfo:
             info["globalTagType"] = typeinfo
             changed = True
 
@@ -913,10 +913,12 @@ def get_argument_parser():
                          help="show help message for all commands and exit")
     options.add_argument("--base-url", default=None,
                          help="URI for the base of the REST API, if not given a list of default locations is tried")
-    options.add_argument("--http-auth", choices=["none", "basic", "digest"], default="basic",
-                         help=argparse.SUPPRESS)
-    options.add_argument("--http-user", default="commonDBUser", help=argparse.SUPPRESS)
-    options.add_argument("--http-password", default="Eil9ohphoo2quot", help=argparse.SUPPRESS)
+    options.add_argument("--auth-token", type=str, default=None,
+                         help="JSON Web Token necessary for authenticating to the conditions database. "
+                         "Useful only for debugging, since by the default the tool automatically "
+                         "gets a token for you by asking the B2MMS username and password. "
+                         "If the environment variable $BELLE2_CDB_AUTH_TOKEN points to a file with a valid "
+                         "token, such token is used (useful for automatic workflows).")
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[options])
     parser.set_defaults(func=lambda x, y: parser.print_help())
@@ -1043,8 +1045,12 @@ def main():
 
     conditions_db = ConditionsDB(args.base_url, nprocess, retries)
 
-    if args.http_auth != "none":
-        conditions_db.set_authentication(args.http_user, args.http_password, args.http_auth == "basic")
+    if args.auth_token is not None:
+        conditions_db.set_authentication_token(args.auth_token)
+    else:
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        auth_token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
+        conditions_db.set_authentication_token(auth_token)
 
     try:
         return args.func(args, conditions_db)

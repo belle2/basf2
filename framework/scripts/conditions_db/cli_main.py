@@ -950,7 +950,7 @@ def get_argument_parser():
                          help="URI for the base of the REST API, if not given a list of default locations is tried")
     options.add_argument("--auth-token", type=str, default=None,
                          help="JSON Web Token necessary for authenticating to the conditions database. "
-                         "Useful only for debugging, since by the default the tool automatically "
+                         "Useful only for debugging, since by default the tool automatically "
                          "gets a token for you by asking the B2MMS username and password. "
                          "If the environment variable ``$BELLE2_CDB_AUTH_TOKEN`` points to a file with a valid "
                          "token, such token is used (useful for automatic workflows).")

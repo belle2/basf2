@@ -57,7 +57,7 @@ def chunks(container, chunk_size):
 
 def get_cdb_authentication_token(path=None):
     """
-    Helper function for correctly retrieving the CDB authentication token (either via file either via issuing server).
+    Helper function for correctly retrieving the CDB authentication token (either via file or via issuing server).
 
     :param path: Path to a file containing a CDB authentication token; if None, the function will use
            a default path (``${HOME}/b2cdb_${BELLE2_USER}.token``) to look for a token.

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassBgoSimHit - Geant4 simulated hit for the Bgo crystal in beast..
+  /** ClassBgoSimHit - Geant4 simulated hit for the Bgo crystal in beast.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response information.

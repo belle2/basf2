@@ -66,7 +66,7 @@ def get_cdb_authentication_token(path=None):
     if path:
         path_to_token = path
     else:
-        path_to_token = f'/tmp/b2cdb_{os.getenv("BELLE2_USER", None)}.token'
+        path_to_token = os.path.join(os.getenv('HOME', '/tmp'), f'b2cdb_{os.getenv("BELLE2_USER", None)}.token')
 
     # check validity of existing token
     if os.path.isfile(path_to_token):

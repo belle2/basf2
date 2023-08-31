@@ -107,6 +107,24 @@ def get_agreament2(histo_eventT0, histo_onTracks, min_entries=100):
         return np.nan
 
 
+def get_shift_agreament(shift_histo, min_entries=100):
+    '''
+    Get the mean of the difference between the mean time of the clusters on tracks and
+    the mean eventT0 divided by the RMS of the event T0
+    '''
+    mean_values = []
+    if isinstance(shift_histo, r.TH2):
+        for ij in range(shift_histo.GetNbinsY()):
+            hist = shift_histo.ProjectionX("tmp", ij + 1, ij + 1, "")
+            if hist.GetSumOfWeights() > min_entries:
+                hmean = hist.GetMean()
+                mean_values.append(hmean * hmean)
+    if not len(mean_values):
+        return np.nan
+    else:
+        return np.sqrt(np.average(mean_values))
+
+
 def make_roc(hist_sgn, hist_bkg, lower_is_better=False, two_sided=True):
     from hist_utils import hist2array
     dist_sgn = hist2array(hist_sgn)
@@ -193,10 +211,12 @@ def get_histos(CollectorHistograms):
     histos_all = {}
     histos['onTracks'] = {}
     histos['diff'] = {}
+    histos['timeShifter'] = {}
 
     __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks'][0]
     __hClsTimeAll__ = CollectorHistograms['hClsTimeAll'][0]
     __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks'][0]
+    __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual'][0]
     __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap'][0]
 
     for name_side in names_sides:
@@ -206,17 +226,24 @@ def get_histos(CollectorHistograms):
         hClsTimeAll = __hClsTimeAll__.ProjectionX("hClsTimeAll_tmp", sensorBin, sensorBin)
         hClsDiffTimeOnTracks = __hClsDiffTimeOnTracks__.ProjectionX("hClsDiffTimeOnTracks_tmp", sensorBin, sensorBin)
 
+        __hClusterSizeVsTimeResidual__.GetZaxis().SetRange(sensorBin, sensorBin)
+        hClusterSizeVsTimeResidual = __hClusterSizeVsTimeResidual__.Project3D("yxe")
+
         hClsTimeOnTracks.SetNameTitle(f"clsTimeOnTracks__{name_side}", f"clsTimeOnTracks__{name_side}")
         hClsTimeAll.SetNameTitle(f"clsTimeAll__{name_side}", f"clsTimeAll__{name_side}")
         hClsDiffTimeOnTracks.SetNameTitle(f"clsDiffTimeOnTracks__{name_side}", f"clsDiffTimeOnTracks__{name_side}")
+        hClusterSizeVsTimeResidual.SetNameTitle(f"clusterSizeVsTimeResidual__{name_side}",
+                                                f"Cluster Size vs Time Residual in {name_side}")
 
         hClsTimeOnTracks.SetDirectory(0)
         hClsTimeAll.SetDirectory(0)
         hClsDiffTimeOnTracks.SetDirectory(0)
+        hClusterSizeVsTimeResidual.SetDirectory(0)
 
         histos['onTracks'][name_side] = hClsTimeOnTracks
         histos_all[name_side] = hClsTimeAll
         histos['diff'][name_side] = hClsDiffTimeOnTracks
+        histos['timeShifter'][name_side] = hClusterSizeVsTimeResidual
 
     histos['offTracks'] = {key: get_histo_offTracks(histos_all[key], histos['onTracks'][key])
                            for key in histos['onTracks']}
@@ -256,6 +283,7 @@ def get_merged_collector_histograms(files):
                                                        "hClsTimeOnTracks": [],
                                                        "hClsTimeAll": [],
                                                        "hClsDiffTimeOnTracks": [],
+                                                       "hClusterSizeVsTimeResidual": [],
                                                        "hBinToSensorMap": []}
 
             __hEventT0__ = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
@@ -265,17 +293,21 @@ def get_merged_collector_histograms(files):
                                                         exp, run, base_dir))
             __hClsDiffTimeOnTracks__ = in_file.Get(get_full_path('__hClsDiffTimeOnTracks__',
                                                                  exp, run, base_dir))
+            __hClusterSizeVsTimeResidual__ = in_file.Get(get_full_path('__hClusterSizeVsTimeResidual__',
+                                                                       exp, run, base_dir))
             __hBinToSensorMap__ = in_file.Get(get_full_path('__hBinToSensorMap__',
                                                             exp, run, base_dir))
             __hEventT0__.SetDirectory(0)
             __hClsTimeOnTracks__.SetDirectory(0)
             __hClsTimeAll__.SetDirectory(0)
             __hClsDiffTimeOnTracks__.SetDirectory(0)
+            __hClusterSizeVsTimeResidual__.SetDirectory(0)
             __hBinToSensorMap__.SetDirectory(0)
             CollectorHistograms[algo][exp][run]["hEventT0"].append(__hEventT0__)
             CollectorHistograms[algo][exp][run]["hClsTimeOnTracks"].append(__hClsTimeOnTracks__)
             CollectorHistograms[algo][exp][run]["hClsTimeAll"].append(__hClsTimeAll__)
             CollectorHistograms[algo][exp][run]["hClsDiffTimeOnTracks"].append(__hClsDiffTimeOnTracks__)
+            CollectorHistograms[algo][exp][run]["hClusterSizeVsTimeResidual"].append(__hClusterSizeVsTimeResidual__)
             CollectorHistograms[algo][exp][run]["hBinToSensorMap"].append(__hBinToSensorMap__)
 
         in_file.Close()

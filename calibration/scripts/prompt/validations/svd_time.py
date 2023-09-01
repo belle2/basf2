@@ -15,6 +15,7 @@ import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import re
 
 from prompt import ValidationSettings
 import svd.validation_utils as vu
@@ -72,9 +73,11 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     vu.progress(0, total_item)
 
     shift_histos = {}
+    shift_histos_merged_over_ladder = {}
 
     for algo in CollectorHistograms:
         shift_histos[algo] = {}
+        shift_histos_merged_over_ladder[algo] = {}
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
                 # print(f"working with : algo {algo} exp {exp} run {run}")
@@ -89,13 +92,13 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 try:
                     entries_eventT0_ = histos['eventT0'].GetEntries()
                     if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
-                        agreements[algo][run] = {key: vu.get_agreament(histos['eventT0'], h_diff)
+                        agreements[algo][run] = {key: vu.get_agreement(histos['eventT0'], h_diff)
                                                  for key, h_diff in histos['diff'].items()}
                         precisions[algo][run] = {key: vu.get_precision(h_diff)
                                                  for key, h_diff in histos['diff'].items()}
                         discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
                                                       for key in histos['onTracks']}
-                        shift_agreements[algo][run] = {key: vu.get_shift_agreament(hShift)
+                        shift_agreements[algo][run] = {key: vu.get_shift_agreement(hShift)
                                                        for key, hShift in histos['timeShifter'].items()}
                         entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
                         entries_eventT0[algo][run] = entries_eventT0_
@@ -105,6 +108,12 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                                 shift_histos[algo][key].Add(hShift)
                             else:
                                 shift_histos[algo][key] = hShift
+                            sensor_id = re.findall(r'\d+', key) + [key[-1]]
+                            keyGroup = f'L{sensor_id[0]}S{sensor_id[2]}{sensor_id[3]}'
+                            if keyGroup in shift_histos_merged_over_ladder[algo]:
+                                shift_histos_merged_over_ladder[algo][keyGroup].Add(hShift)
+                            else:
+                                shift_histos_merged_over_ladder[algo][keyGroup] = hShift
 
                         vu.make_combined_plot('*U', histos,
                                               title=f'exp {exp} run {run} U {algo}')
@@ -129,9 +138,19 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     print()
 
     for algo, KeyHisto in shift_histos.items():
-        c1 = r.TCanvas("c1", "c1", 640, 480)
+        c2 = r.TCanvas("c2", "c2", 640, 480)
         outPDF = f"{output_dir}/shift_histograms_{algo}.pdf"
-        c1.Print(outPDF + "[")
+        c2.Print(outPDF + "[")
+        onePad = r.TPad("onePad", "onePad", 0, 0, 1, 1)
+        onePad.SetMargin(0.1, 0.2, 0.1, 0.1)
+        onePad.SetNumber(1)
+        onePad.Draw()
+        onePad.cd()
+        hShiftHisto = vu.get_shift_plot(shift_histos_merged_over_ladder[algo])
+        hShiftHisto.Draw('COLZ')
+        c2.Print(outPDF, "Title:" + hShiftHisto.GetName())
+
+        c1 = r.TCanvas("c1", "c1", 640, 480)
         topPad = r.TPad("topPad", "topPad", 0, 0.5, 1, 1)
         btmPad = r.TPad("btmPad", "btmPad", 0, 0, 1, 0.5)
         topPad.SetMargin(0.1, 0.1, 0, 0.149)
@@ -150,12 +169,9 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 for xn in range(hShift.GetNbinsX()):
                     hShift.SetBinContent(xn + 1, yn + 1, hShift.GetBinContent(xn + 1, yn + 1) / norm)
             if isOdd:
-                # c1.Clear()
-                # c1.cd(1)
                 topPad.cd()
                 hShift.Draw("colz")
             else:
-                # c1.cd(2)
                 btmPad.cd()
                 hShift.Draw("colz")
                 c1.Print(outPDF, "Title:" + hShift.GetName())

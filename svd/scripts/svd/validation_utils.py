@@ -75,7 +75,7 @@ def get_histo_offTracks(histo_all, histo_onTracks):
         return None
 
 
-def get_agreament(histo_eventT0, histo_diff, min_entries=100):
+def get_agreement(histo_eventT0, histo_diff, min_entries=100):
     '''
     Get the mean of the difference between the mean time of the clusters on tracks and
     the mean eventT0 divided by the RMS of the event T0
@@ -96,7 +96,7 @@ def get_precision(histo_diff, min_entries=100):
         return np.nan
 
 
-def get_agreament2(histo_eventT0, histo_onTracks, min_entries=100):
+def get_agreement2(histo_eventT0, histo_onTracks, min_entries=100):
     '''
     Get the difference between the mean time of the clusters on tracks and the mean eventT0 divided by the RMS of the event T0
     '''
@@ -107,10 +107,39 @@ def get_agreament2(histo_eventT0, histo_onTracks, min_entries=100):
         return np.nan
 
 
-def get_shift_agreament(shift_histo, min_entries=100):
+def get_shift_plot(shift_histos, min_entries=100):
     '''
-    Get the mean of the difference between the mean time of the clusters on tracks and
-    the mean eventT0 divided by the RMS of the event T0
+    The creates a 2D plot to visualize the shift of mean of the
+    cluster time distribution for each cluster sizes for each sensor group.
+    '''
+    hShiftVal = None
+    binNumber = 1
+    for key, hShift in shift_histos.items():
+        if hShiftVal is None:
+            nxbins = len(shift_histos)
+            nybins = hShift.GetNbinsY()
+            hShiftVal = r.TH2F("hShiftVal", "Cluster Size VS Shift Values in Each Sensor Group",
+                               nxbins, 0.5, nxbins + 0.5, nybins, 0.5, nybins + 0.5)
+            hShiftVal.GetZaxis().SetTitle("(Not fitted) Mean of Cluster Time Distribution (in ns)")
+            hShiftVal.GetYaxis().SetTitle("Cluster Size")
+
+        for ij in range(hShift.GetNbinsY()):
+            hist = hShift.ProjectionX("tmp", ij + 1, ij + 1, "")
+            if hist.GetSumOfWeights() > min_entries:
+                hShiftVal.SetBinContent(binNumber, ij + 1, hist.GetMean())
+
+        hShiftVal.GetXaxis().SetBinLabel(binNumber, key)
+        binNumber += 1
+
+    hShiftVal.SetStats(0)
+    hShiftVal.GetXaxis().LabelsOption("V")
+    return hShiftVal
+
+
+def get_shift_agreement(shift_histo, min_entries=100):
+    '''
+    It calculates the mean of cluster-time distribution for each cluster size.
+    Then returns the average of the squared sum of the means.
     '''
     mean_values = []
     if isinstance(shift_histo, r.TH2):
@@ -122,7 +151,7 @@ def get_shift_agreament(shift_histo, min_entries=100):
     if not len(mean_values):
         return np.nan
     else:
-        return np.sqrt(np.average(mean_values))
+        return np.sqrt(np.sum(mean_values)) / len(mean_values)
 
 
 def make_roc(hist_sgn, hist_bkg, lower_is_better=False, two_sided=True):

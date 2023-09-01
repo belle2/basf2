@@ -52,19 +52,24 @@ void DQMHistAnalysisInputModule::initialize()
 {
   if (m_memory != nullptr) delete m_memory;
   if (m_mempath != "") { // TODO: I am not sure that this is working and what the difference to m_memname is
+    B2INFO("Open HistMemoryPath " << m_mempath);
     m_memory = new DqmMemFile(m_mempath.c_str());
-  } else if (m_memname != "") {
-    m_shm_id = -1;
-    m_sem_id = -1;
-    if (!SharedMem::getIdFromTmpFileName(
-          SharedMem::getTmpFileName(m_username, m_memname),
-          m_shm_id, m_sem_id)) {
-      B2FATAL("Could not open shared memory user " << m_username << " Name " << m_memname);
-    }
-  } else if (m_shm_id >= 0 && m_sem_id >= 0) {
-    m_memory = new DqmMemFile(m_shm_id, m_sem_id);
   } else {
-    B2FATAL("Information for shared memory is missing, either name or ID is needed!");
+    if (m_memname != "") {
+      m_shm_id = -1;
+      m_sem_id = -1;
+      auto pathname = SharedMem::getTmpFileName(m_username, m_memname);
+      B2INFO("Open HistMemoryName for user " << m_username << " Name " << m_memname << " Path " << pathname);
+      if (!SharedMem::getIdFromTmpFileName(pathname, m_shm_id, m_sem_id)) {
+        B2FATAL("Could not open shared memory user " << m_username << " Name " << m_memname);
+      }
+    }
+    if (m_shm_id >= 0 && m_sem_id >= 0) {
+      B2INFO("Open Shared Memory ID " << m_shm_id << " Semaphore ID " << m_sem_id);
+      m_memory = new DqmMemFile(m_shm_id, m_sem_id);
+    } else {
+      B2FATAL("Information for shared memory is missing, either name or ID is needed!");
+    }
   }
   if (m_enable_run_info) {
     m_c_info = new TCanvas("DQMInfo/c_info", "");

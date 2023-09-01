@@ -7,18 +7,16 @@
  **************************************************************************/
 
 #include <tracking/modules/svdROIFinder/SVDROIDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <TDirectory.h>
 #include <TH2F.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDROIDQM)
+REG_MODULE(SVDROIDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -48,12 +46,21 @@ SVDROIDQMModule::SVDROIDQMModule()
            "name of the list of SVDShaperDigits", std::string(""));
   addParam("SVDRecoDigitsName", m_SVDRecoDigitsName,
            "name of the list of SVDRecoDigits", std::string(""));
+  addParam("SVDClustersName", m_SVDClustersName,
+           "name of the list of SVDClusters", std::string(""));
 
   addParam("InterceptsName", m_InterceptsName,
            "name of the list of interceptions", std::string(""));
 
   addParam("ROIsName", m_ROIsName,
            "name of the list of ROIs", std::string(""));
+
+  addParam("specificLayer", m_specificLayer,
+           "Layer number, if you want the plots only for a specific SVD layer. If it is not a SVD layer (3, 4, 5, 6) than the plots for all SVD layers are produced. Default is (-1), i.e. plots for all SVD layers are produced.",
+           m_specificLayer);
+
+  addParam("plotRecoDigits", m_plotRecoDigits,
+           "Set true to produce the plots for RecoDigits (false by default)", m_plotRecoDigits);
 
 }
 
@@ -92,6 +99,7 @@ void SVDROIDQMModule::initialize()
 
   m_SVDShaperDigits.isOptional(m_SVDShaperDigitsName);
   m_SVDRecoDigits.isOptional(m_SVDRecoDigitsName);
+  m_SVDClusters.isOptional(m_SVDClustersName);
   m_ROIs.isRequired(m_ROIsName);
   m_Intercepts.isRequired(m_InterceptsName);
 
@@ -161,8 +169,8 @@ void SVDROIDQMModule::createHistosDictionaries()
 
   //  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
-  string name; //name of the histogram
-  string title; //title of the histogram
+  std::string name; //name of the histogram
+  std::string title; //title of the histogram
   TH2F* tmp2D; //temporary 2D histo used to set axis title
   TH1F* tmp1D; //temporary 1D histo used to set axis title
 
@@ -170,6 +178,16 @@ void SVDROIDQMModule::createHistosDictionaries()
 
   std::set<Belle2::VxdID> svdLayers = m_geoCache.getLayers(VXD::SensorInfoBase::SVD);
   std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
+
+  if (m_specificLayer >= 3 && m_specificLayer <= 6) {
+    B2INFO("Producing plots for layer: " << m_specificLayer);
+    svdLayers.clear();
+    svdLayers.insert(Belle2::VxdID(m_specificLayer, 0, 0));
+    itSvdLayers = svdLayers.begin();
+  } else {
+    B2INFO("No specific SVD layer (3,4,5,6) selected (m_specificLayer = " << m_specificLayer <<
+           "). Producing plots for all SVD layers.");
+  }
 
   while (itSvdLayers != svdLayers.end()) {
 
@@ -189,8 +207,9 @@ void SVDROIDQMModule::createHistosDictionaries()
 
         const int nPixelsU = wSensorInfo.getUCells();
         const int nPixelsV = wSensorInfo.getVCells();
-        string sensorid = std::to_string(itSvdSensors->getLayerNumber()) + "_" + std::to_string(itSvdSensors->getLadderNumber()) + "_" +
-                          std::to_string(itSvdSensors->getSensorNumber());
+        std::string sensorid = std::to_string(itSvdSensors->getLayerNumber()) + "_" + std::to_string(
+                                 itSvdSensors->getLadderNumber()) + "_" +
+                               std::to_string(itSvdSensors->getSensorNumber());
 
 
         // ------ HISTOGRAMS WITH AN ACCUMULATE PER ROI AND A FILL PER EVENT -------
@@ -205,7 +224,7 @@ void SVDROIDQMModule::createHistosDictionaries()
           [](TH1 * hPtr, double & val) { hPtr->Fill(val); },
           value
         };
-        hROIDictionaryEvt.insert(pair< Belle2::VxdID, ROIHistoAccumulateAndFill& > ((Belle2::VxdID)*itSvdSensors, *aHAAF));
+        hROIDictionaryEvt.insert(std::pair< Belle2::VxdID, ROIHistoAccumulateAndFill& > ((Belle2::VxdID)*itSvdSensors, *aHAAF));
 
 
 
@@ -216,7 +235,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         // coor U and V
         name = "hCoorU_" + sensorid;
         title = "U coordinate of the extrapolation in U for sensor " + sensorid;
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
@@ -228,7 +247,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
         name = "hCoorV_" + sensorid;
         title = "V coordinate of the extrapolation in V for sensor " + sensorid;
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
@@ -244,7 +263,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         tmp2D = new TH2F(name.c_str(), title.c_str(), 100, -5, 5, 100, -5, 5);
         tmp2D->GetXaxis()->SetTitle("intercept U coor (cm)");
         tmp2D->GetYaxis()->SetTitle("intercept V coor (cm)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
@@ -258,7 +277,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         // sigma U and V
         name = "hStatErrU_" + sensorid;
         title = "stat error of the extrapolation in U for sensor " + sensorid;
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
@@ -269,7 +288,7 @@ void SVDROIDQMModule::createHistosDictionaries()
                                );
         name = "hStatErrV_" + sensorid;
         title = "stat error of the extrapolation in V for sensor " + sensorid;
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
@@ -283,15 +302,14 @@ void SVDROIDQMModule::createHistosDictionaries()
         name = "hResidU_" + sensorid;
         title = "U residuals = intercept - digit,  for sensor " + sensorid;
         tmp1D = new TH1F(name.c_str(), title.c_str(), 1000, -5, 5);
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (it.isUStrip()) {
                 const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
@@ -306,15 +324,14 @@ void SVDROIDQMModule::createHistosDictionaries()
         name = "hResidV_" + sensorid;
         title = "V residuals = intercept - digit,  for sensor " + sensorid;
         tmp1D = new TH1F(name.c_str(), title.c_str(), 1000, -5, 5);
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (!it.isUStrip()) {
                 const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
@@ -326,21 +343,21 @@ void SVDROIDQMModule::createHistosDictionaries()
                                 )
                                );
 
+
         //residual U,V vs coordinate U,V
         name = "hResidU_vs_CoorU_" + sensorid;
         title = "U residual (cm) vs coor U (cm) " + sensorid;
         tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
         tmp2D->GetYaxis()->SetTitle("U resid (cm)");
         tmp2D->GetXaxis()->SetTitle("U coor (cm)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && it.isUStrip()) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
@@ -356,15 +373,14 @@ void SVDROIDQMModule::createHistosDictionaries()
         tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
         tmp2D->GetYaxis()->SetTitle("V resid (cm)");
         tmp2D->GetXaxis()->SetTitle("V coor (cm)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
@@ -376,55 +392,234 @@ void SVDROIDQMModule::createHistosDictionaries()
                                );
 
 
+        // RecoDigits
         //residual vs charge
-        name = "hResidU_vs_charge_" + sensorid;
-        title = "U residual (cm) vs charge " + sensorid;
+        if (m_plotRecoDigits) {
+          name = "hResidU_vs_charge_" + sensorid;
+          title = "U residual (cm) vs charge " + sensorid;
+          tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
+          tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+          tmp2D->GetXaxis()->SetTitle("charge");
+          hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                  (
+                                    (Belle2::VxdID)*itSvdSensors,
+                                    InterHistoAndFill(
+                                      tmp2D,
+          [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+            for (auto& it : this->m_SVDRecoDigits)
+              if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
+                const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
+                double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
+                hPtr->Fill(it.getCharge(), resid);
+              }
+          }
+                                    )
+                                  )
+                                 );
+
+          name = "hResidV_vs_charge_" + sensorid;
+          title = "V residual (cm) vs charge " + sensorid;
+          tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
+          tmp2D->GetYaxis()->SetTitle("V resid (cm)");
+          tmp2D->GetXaxis()->SetTitle("charge");
+          hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                  (
+                                    (Belle2::VxdID)*itSvdSensors,
+                                    InterHistoAndFill(
+                                      tmp2D,
+          [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+            for (auto& it : this->m_SVDRecoDigits)
+              if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
+                const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
+                double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
+                hPtr->Fill(it.getCharge(), resid);
+              }
+          }
+                                    )
+                                  )
+                                 );
+        }
+
+        // 1D residual for clusters
+        name = "hClusterResidU_" + sensorid;
+        title = "Cluster U residuals = intercept - cluster,  for sensor " + sensorid;
+        tmp1D = new TH1F(name.c_str(), title.c_str(), 1000, -5, 5);
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itSvdSensors,
+                                  InterHistoAndFill(
+                                    tmp1D,
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+          for (auto& it : this->m_SVDClusters)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              if (it.isUCluster()) {
+                hPtr->Fill(inter->getCoorU() - it.getPosition(inter->getCoorV()));
+              }
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hClusterResidV_" + sensorid;
+        title = "Cluster V residuals = intercept - cluster,  for sensor " + sensorid;
+        tmp1D = new TH1F(name.c_str(), title.c_str(), 1000, -5, 5);
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itSvdSensors,
+                                  InterHistoAndFill(
+                                    tmp1D,
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+          for (auto& it : this->m_SVDClusters)
+            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
+              if (!it.isUCluster()) {
+                hPtr->Fill(inter->getCoorV() - it.getPosition());
+              }
+            }
+        }
+                                  )
+                                )
+                               );
+
+        //residual U,V vs coordinate U,V for clusters
+        name = "hClusterResidU_vs_CoorU_" + sensorid;
+        title = "Cluster U residual (cm) vs coor U (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("Cluster U resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("U coor (cm)");
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itSvdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+          for (auto& it : this->m_SVDClusters)
+            if (((int)it.getSensorID() == (int)inter->getSensorID()) && it.isUCluster()) {
+              double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
+              hPtr->Fill(inter->getCoorU(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hClusterResidV_vs_CoorV_" + sensorid;
+        title = "Cluster V residual (cm) vs coor V (cm) " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("Cluster V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("V coor (cm)");
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itSvdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+          for (auto& it : this->m_SVDClusters)
+            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
+              double resid = inter->getCoorV() - it.getPosition();
+              hPtr->Fill(inter->getCoorV(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+
+        //residual vs charge for clusters
+        name = "hClusterResidU_vs_charge_" + sensorid;
+        title = "Cluster U residual (cm) vs charge " + sensorid;
         tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
         tmp2D->GetYaxis()->SetTitle("U resid (cm)");
-        tmp2D->GetXaxis()->SetTitle("charge");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        tmp2D->GetXaxis()->SetTitle("charge (ke-)");
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDRecoDigit> SVDRecoDigits(this->m_SVDRecoDigitsName);
 
-          for (auto& it : SVDRecoDigits)
-            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
-              double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
-              hPtr->Fill(it.getCharge(), resid);
+          for (auto& it : this->m_SVDClusters)
+            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUCluster())) {
+              double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
+              hPtr->Fill(it.getCharge() / 1000., resid);
             }
         }
                                   )
                                 )
                                );
 
-        name = "hResidV_vs_charge_" + sensorid;
-        title = "V residual (cm) vs charge " + sensorid;
+        name = "hClusterResidV_vs_charge_" + sensorid;
+        title = "Cluster V residual (cm) vs charge " + sensorid;
         tmp2D = new TH2F(name.c_str(), title.c_str(), 250, 0, 250, 100, -5, 5);
-        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
-        tmp2D->GetXaxis()->SetTitle("charge");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        tmp2D->GetYaxis()->SetTitle("Cluster V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("charge (ke-)");
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDRecoDigit> SVDRecoDigits(this->m_SVDRecoDigitsName);
 
-          for (auto& it : SVDRecoDigits)
-            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
-              double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
-              hPtr->Fill(it.getCharge(), resid);
+          for (auto& it : this->m_SVDClusters)
+            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
+              double resid = inter->getCoorV() - it.getPosition();
+              hPtr->Fill(it.getCharge() / 1000., resid);
             }
         }
                                   )
                                 )
                                );
 
+        // residual vs time for clusters
+        name = "hClusterResidU_vs_time_" + sensorid;
+        title = "Cluster U residual (cm) vs time " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 400, -200, 200, 100, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("time (ns)");
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itSvdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+          for (auto& it : this->m_SVDClusters)
+            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUCluster())) {
+              double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
+              hPtr->Fill(it.getClsTime(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
+
+        name = "hClusterResidV_vs_time_" + sensorid;
+        title = "Cluster V residual (cm) vs time " + sensorid;
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 400, -200, 200, 100, -5, 5);
+        tmp2D->GetYaxis()->SetTitle("Cluster V resid (cm)");
+        tmp2D->GetXaxis()->SetTitle("time (ns)");
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
+                                (
+                                  (Belle2::VxdID)*itSvdSensors,
+                                  InterHistoAndFill(
+                                    tmp2D,
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
+
+          for (auto& it : this->m_SVDClusters)
+            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
+              double resid = inter->getCoorV() - it.getPosition();
+              hPtr->Fill(it.getClsTime(), resid);
+            }
+        }
+                                  )
+                                )
+                               );
 
         // scatter plot: U,V intercept in cm VS U,V cell position
         name = "hCoorU_vs_UDigit_" + sensorid;
@@ -432,15 +627,14 @@ void SVDROIDQMModule::createHistosDictionaries()
         tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
         tmp2D->GetXaxis()->SetTitle("intercept U coor (cm)");
         tmp2D->GetYaxis()->SetTitle("digit U coor (cm)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits)
+          for (auto& it : this->m_SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorU(), aSensorInfo.getUCellPosition(it.getCellID()));
@@ -456,15 +650,14 @@ void SVDROIDQMModule::createHistosDictionaries()
         tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
         tmp2D->GetXaxis()->SetTitle("intercept V coor (cm)");
         tmp2D->GetYaxis()->SetTitle("digi V coor (cm)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
+        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
                                 (
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const SVDIntercept * inter) {
-          StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
-          for (auto& it : SVDShaperDigits) {
+          for (auto& it : this->m_SVDShaperDigits) {
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
               const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorV(), aSensorInfo.getVCellPosition(it.getCellID()));
@@ -487,7 +680,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         // MIN in U and V
         name = "hminU_" + sensorid;
         title = "ROI min in U for sensor " + sensorid;
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(
@@ -498,7 +691,7 @@ void SVDROIDQMModule::createHistosDictionaries()
                              );
         name = "hminV_" + sensorid;
         title = "ROI min in V for sensor " + sensorid;
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(
@@ -511,7 +704,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         // MAX in U and V
         name = "hmaxU_" + sensorid;
         title = "ROI max in U for sensor " + sensorid;
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(
@@ -522,7 +715,7 @@ void SVDROIDQMModule::createHistosDictionaries()
                              );
         name = "hmaxV_" + sensorid;
         title = "ROI max in V for sensor " + sensorid;
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(
@@ -536,7 +729,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         // WIDTH in U and V
         name = "hwidthU_" + sensorid;
         title = "ROI width in U for sensor " + sensorid;
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(
@@ -547,7 +740,7 @@ void SVDROIDQMModule::createHistosDictionaries()
                              );
         name = "hwidthV_" + sensorid;
         title = "ROI width in V for sensor " + sensorid;
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(
@@ -563,7 +756,7 @@ void SVDROIDQMModule::createHistosDictionaries()
         tmp2D = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
         tmp2D->GetXaxis()->SetTitle(" U (ID)");
         tmp2D->GetYaxis()->SetTitle(" V (ID)");
-        hROIDictionary.insert(pair< Belle2::VxdID, ROIHistoAndFill >
+        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
                               (
                                 (Belle2::VxdID)*itSvdSensors,
                                 ROIHistoAndFill(

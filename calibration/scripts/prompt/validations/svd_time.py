@@ -107,13 +107,15 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                             if key in shift_histos[algo]:
                                 shift_histos[algo][key].Add(hShift)
                             else:
-                                shift_histos[algo][key] = hShift
+                                shift_histos[algo][key] = hShift.Clone()
+                                shift_histos[algo][key].SetDirectory(0)
                             sensor_id = re.findall(r'\d+', key) + [key[-1]]
                             keyGroup = f'L{sensor_id[0]}S{sensor_id[2]}{sensor_id[3]}'
                             if keyGroup in shift_histos_merged_over_ladder[algo]:
                                 shift_histos_merged_over_ladder[algo][keyGroup].Add(hShift)
                             else:
-                                shift_histos_merged_over_ladder[algo][keyGroup] = hShift
+                                shift_histos_merged_over_ladder[algo][keyGroup] = hShift.Clone()
+                                shift_histos_merged_over_ladder[algo][keyGroup].SetDirectory(0)
 
                         vu.make_combined_plot('*U', histos,
                                               title=f'exp {exp} run {run} U {algo}')

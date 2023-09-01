@@ -3283,6 +3283,8 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     path.add_module('LowEnergyPi0IdentificationExpert',
                     identifier=payload_name, Pi0ListName=pi0List,
                     Belle1=b2bii.isB2BII())
+    # Clean photon list to be able to call lowEnergyPi0Identification() again.
+    applyCuts('gamma:pi0veto', 'E < 0.0', path=path)
 
 
 def getNeutralHadronGeomMatches(

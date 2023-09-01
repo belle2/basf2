@@ -34,10 +34,11 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
 {
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
-  addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
+//  addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
   addParam("HistMemoryName", m_memname, "Name of Input Hist memory", std::string(""));
-  addParam("ShmId", m_shm_id, "ID of shared memory", 0);
-  addParam("SemId", m_sem_id, "ID of semaphore", 0);
+  addParam("HistMemoryUser", m_username, "Name of Input Hist memory owner", std::string("dqmdaq"));
+  addParam("ShmId", m_shm_id, "ID of shared memory", -1);
+  addParam("SemId", m_sem_id, "ID of semaphore", -1);
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
@@ -50,10 +51,21 @@ DQMHistAnalysisInputModule::~DQMHistAnalysisInputModule() { }
 void DQMHistAnalysisInputModule::initialize()
 {
   if (m_memory != nullptr) delete m_memory;
-  if (m_mempath != "")
+  if (m_mempath != "") { // TODO: I am not sure that this is working and what the difference to m_memname is
     m_memory = new DqmMemFile(m_mempath.c_str());
-  else
+  } else if (m_memname != "") {
+    m_shm_id = -1;
+    m_sem_id = -1;
+    if (!SharedMem::getIdFromTmpFileName(
+          SharedMem::getTmpFileName(m_username, m_memname),
+          m_shm_id, m_sem_id)) {
+      B2FATAL("Could not open shared memory user " << m_username << " Name " << m_memname);
+    }
+  } else if (m_shm_id >= 0 && m_sem_id >= 0) {
     m_memory = new DqmMemFile(m_shm_id, m_sem_id);
+  } else {
+    B2FATAL("Information for shared memory is missing, either name or ID is needed!");
+  }
   if (m_enable_run_info) {
     m_c_info = new TCanvas("DQMInfo/c_info", "");
     m_c_info->SetTitle("");

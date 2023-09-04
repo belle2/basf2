@@ -83,11 +83,26 @@ namespace Belle2 {
     MonitoringObject* m_monObj {};
 
     /** alarm limits from PV */
-    double m_meanLowerAlarm{NAN}, m_meanLowerWarn{NAN}, m_meanUpperWarn{NAN}, m_meanUpperAlarm{NAN}, m_widthUpperWarn{NAN},
-           m_widthUpperAlarm{NAN};
+    double m_meanLowerAlarm{NAN};
+    /** alarm limits from PV */
+    double m_meanLowerWarn{NAN};
+    /** alarm limits from PV */
+    double m_meanUpperWarn{NAN};
+    /** alarm limits from PV */
+    double m_meanUpperAlarm{NAN};
+    /** alarm limits from PV */
+    double m_widthUpperWarn{NAN};
+    /** alarm limits from PV */
+    double m_widthUpperAlarm{NAN};
 
-    /** TLines for alarm limits */
-    TLine* m_meanLowerAlarmLine{nullptr}, *m_meanLowerWarnLine{nullptr}, *m_meanUpperWarnLine{nullptr}, *m_meanUpperAlarmLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanLowerAlarmLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanLowerWarnLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanUpperWarnLine{nullptr};
+    /** TLine for alarm limits */
+    TLine* m_meanUpperAlarmLine{nullptr};
 
   };
 } // end namespace Belle2

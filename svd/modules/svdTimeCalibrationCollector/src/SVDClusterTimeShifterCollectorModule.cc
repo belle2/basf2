@@ -22,7 +22,8 @@ SVDClusterTimeShifterCollectorModule::SVDClusterTimeShifterCollectorModule() : C
 {
   //Set module properties
 
-  setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration");
+  setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration. "
+                 "This is for the cluster-size dependent correction of the calibrated time.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDClustersOnTrackPrefix", m_svdClustersOnTrackPrefix, "set prefix of the list of clusters on track",

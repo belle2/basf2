@@ -365,19 +365,19 @@ namespace Belle2 {
     /**
      * Get Alarm Limits from EPICS PV
      * @param id Channel ID
-     * @param lowAlarm return low Alarm limit (lolo) if set, not changed otherwise
-     * @param lowWarn return low Warning limit (low) if set, not changed otherwise
+     * @param lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param lowerWarn return low Warning limit (low) if set, not changed otherwise
      * @param highWarn return high Warning limit (high) if set, not changed otherwise
      * @param highAlarm return high Alarm limit (hihi) if set, not changed otherwise
      * @return true if limits could be read (even if there are none set)
      */
-    bool requestLimitsFromEpicsPVs(chid id, double& lowAlarm, double& lowWarn, double& highWarn, double& highAlarm);
+    bool requestLimitsFromEpicsPVs(chid id, double& lowerAlarm, double& lowerWarn, double& highWarn, double& highAlarm);
 
     /**
      * Get Alarm Limits from EPICS PV
      * @param keyname key name (or full PV name) of PV
-     * @param lowAlarm return low Alarm limit (lolo) if set, not changed otherwise
-     * @param lowWarn return low Warning limit (low) if set, not changed otherwise
+     * @param lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param lowerWarn return low Warning limit (low) if set, not changed otherwise
      * @param highWarn return high Warning limit (high) if set, not changed otherwise
      * @param highAlarm return high Alarm limit (hihi) if set, not changed otherwise
      * @return true if limits could be read (even if there are none set)
@@ -387,8 +387,8 @@ namespace Belle2 {
     /**
      * Get Alarm Limits from EPICS PV
      * @param index index of PV
-     * @param lowAlarm return low Alarm limit (lolo) if set, not changed otherwise
-     * @param lowWarn return low Warning limit (low) if set, not changed otherwise
+     * @param lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param lowerWarn return low Warning limit (low) if set, not changed otherwise
      * @param highWarn return high Warning limit (high) if set, not changed otherwise
      * @param highAlarm return high Alarm limit (hihi) if set, not changed otherwise
      * @return true if limits could be read (even if there are none set)

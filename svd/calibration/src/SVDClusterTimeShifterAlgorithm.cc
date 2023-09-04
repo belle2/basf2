@@ -16,6 +16,7 @@
 #include "TH3F.h"
 #include "TCanvas.h"
 #include "TStyle.h"
+#include "TPaveStats.h"
 #include <framework/logging/Logger.h>
 #include <iostream>
 #include <TString.h>
@@ -37,16 +38,22 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
 
   gStyle->SetFillColor(0);
   gStyle->SetFillStyle(0);
-  gStyle->SetOptStat(1111);
-  gStyle->SetOptFit(1111);
+  gStyle->SetOptStat(0);
+  gStyle->SetOptFit(0);
 
   auto payload = new Belle2::SVDClusterTimeShifter("SVDClusterTimeShifter_" + m_id);
 
   // single gaus fit function
   TF1* fn_singleGaus = new TF1("fn_singleGaus", singleGaus, -50., 50., 4);
+  fn_singleGaus->SetLineColor(kGreen + 2);
+  fn_singleGaus->SetParName(0, "N");
+  fn_singleGaus->SetParName(1, "#mu");
+  fn_singleGaus->SetParName(2, "#sigma");
+  fn_singleGaus->SetParName(3, "C");
 
   // double gaus fit function
   TF1* fn_doubleGaus = new TF1("fn_doubleGaus", doubleGaus, -50., 50., 7);
+  fn_doubleGaus->SetLineColor(kRed + 2);
   fn_doubleGaus->SetParName(0, "N");
   fn_doubleGaus->SetParName(1, "f");
   fn_doubleGaus->SetParName(2, "#mu_{1}");
@@ -114,14 +121,14 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
       TH2D* hClusterSizeVsTimeResidual = (TH2D*)__hClusterSizeVsTimeResidual__->Project3D("yxe");
       hClusterSizeVsTimeResidual->SetName(Form("clusterSizeVsTimeResidual__L%dS%dS%c", layer_num, sensor_num, side));
       char sidePN = (side == 'U' ? 'P' : 'N');
-      hClusterSizeVsTimeResidual->SetTitle(Form("ClusterSize vs Time Residual in %d.%d %c/%c", layer_num, sensor_num, side, sidePN));
+      hClusterSizeVsTimeResidual->SetTitle(Form("ClusterSize vs Time Residual in L%d.S%d %c/%c", layer_num, sensor_num, side, sidePN));
       hClusterSizeVsTimeResidual->SetDirectory(0);
 
       for (int clSize = 1; clSize <= maxClsSize; clSize++) {
 
         TH1D* hist = (TH1D*)hClusterSizeVsTimeResidual->ProjectionX("tmp", clSize, clSize, "");
         hist->SetName(Form("clusterTimeResidual__L%dS%dS%c_Sz%d", layer_num, sensor_num, side, clSize));
-        hist->SetTitle(Form("Cluster Time Residual for Size %d in %d.%d %c/%c", clSize, layer_num, sensor_num, side, sidePN));
+        hist->SetTitle(Form("Cluster Time Residual for Size %d in L%d.S%d %c/%c", clSize, layer_num, sensor_num, side, sidePN));
         hist->SetDirectory(0);
 
         B2INFO("Histogram: " << hist->GetName() <<
@@ -145,7 +152,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
         }
 
         int fitCount = 0;
-        bool singleStatus, doubleStatus;
+        bool isSingleGausFitValid, isDoubleGausFitValid;
         while (fitCount++ < 5) {
           double histMean = hist->GetMean();
           double histStd  = hist->GetStdDev();
@@ -154,9 +161,9 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
           fn_singleGaus->SetParameter(2, histStd * 0.75);
           fn_singleGaus->SetParameter(3, 1.);
           fn_singleGaus->SetParLimits(1, histMean - histStd, histMean + histStd);
-          auto statusSingleFull = hist->Fit("fn_singleGaus", "SNLMEQ", "",
-                                            histMean - 2. * histStd, histMean + 2. * histStd);
-          singleStatus = statusSingleFull->IsValid();
+          auto singleGausFitStatus = hist->Fit("fn_singleGaus", "SLMEQ", "",
+                                               histMean - 2. * histStd, histMean + 2. * histStd);
+          isSingleGausFitValid = singleGausFitStatus->IsValid();
 
           fn_doubleGaus->SetParameter(0, hist->GetSumOfWeights() * hist->GetBinWidth(1));
           fn_doubleGaus->SetParameter(1, 0.95);
@@ -166,45 +173,94 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
           fn_doubleGaus->SetParameter(5, std::fabs(fn_singleGaus->GetParameter(2)) + 5.);
           fn_doubleGaus->SetParameter(6, 10.);
           fn_doubleGaus->SetParLimits(2,
-                                      fn_doubleGaus->GetParameter(2) - m_allowedDeviationMean,
-                                      fn_doubleGaus->GetParameter(2) + m_allowedDeviationMean);
+                                      fn_doubleGaus->GetParameter(2) - m_maximumAllowedShift,
+                                      fn_doubleGaus->GetParameter(2) + m_maximumAllowedShift);
           fn_doubleGaus->SetParLimits(4,
-                                      fn_doubleGaus->GetParameter(4) - m_allowedDeviationMean,
-                                      fn_doubleGaus->GetParameter(4) + m_allowedDeviationMean);
+                                      fn_doubleGaus->GetParameter(4) - m_maximumAllowedShift,
+                                      fn_doubleGaus->GetParameter(4) + m_maximumAllowedShift);
 
-          auto statusDoubleFull = hist->Fit("fn_doubleGaus", "SLMEQ");
-          doubleStatus = statusDoubleFull->IsValid();
-          if (doubleStatus) break;
+          auto doubleGausFitStatus = hist->Fit("fn_doubleGaus", "SLMEQ+");
+          isDoubleGausFitValid = doubleGausFitStatus->IsValid();
+          if (isDoubleGausFitValid) break;
           int rebinValue = 2;
           while ((hist->GetNbinsX()) % rebinValue != 0) rebinValue++;
           hist->Rebin(rebinValue);
         }
-        c1.Print(outPDF, TString("Title:") + hist->GetName());
-        f->cd();
-        hist->Write();
 
-        double fillShiftVal = m_allowedDeviationMean + 1.;
+        TPaveStats* ptstats = new TPaveStats(0.55, 0.73, 0.85, 0.88, "brNDC");
+        ptstats->SetName("stats1");
+        ptstats->SetBorderSize(1);
+        ptstats->SetFillColor(0);
+        ptstats->SetTextAlign(12);
+        ptstats->SetTextFont(42);
+        ptstats->SetTextColor(kGreen + 2);
+        ptstats->SetOptStat(11);
+        ptstats->SetParent(hist);
+        ptstats->Draw();
+        ptstats->AddText("Single Gaus");
+        for (int npar = 0; npar < (fn_singleGaus->GetNpar()); npar++)
+          ptstats->AddText(TString::Format("%s = %.3f #pm %.4f",
+                                           fn_singleGaus->GetParName(npar),
+                                           fn_singleGaus->GetParameter(npar),
+                                           fn_singleGaus->GetParError(npar)));
+        ptstats = new TPaveStats(0.55, 0.49, 0.85, 0.73, "brNDC");
+        ptstats->SetName("stats2");
+        ptstats->SetBorderSize(1);
+        ptstats->SetFillColor(0);
+        ptstats->SetTextAlign(12);
+        ptstats->SetTextFont(42);
+        ptstats->SetTextColor(kRed + 2);
+        ptstats->SetOptStat(11);
+        ptstats->SetParent(hist);
+        ptstats->Draw();
+        ptstats->AddText("Double Gaus");
+        for (int npar = 0; npar < (fn_doubleGaus->GetNpar()); npar++)
+          ptstats->AddText(TString::Format("%s = %.3f #pm %.4f",
+                                           fn_doubleGaus->GetParName(npar),
+                                           fn_doubleGaus->GetParameter(npar),
+                                           fn_singleGaus->GetParError(npar)));
+        ptstats = new TPaveStats(0.55, 0.43, 0.85, 0.49, "brNDC");
+        ptstats->SetName("stats3");
+        ptstats->SetBorderSize(1);
+        ptstats->SetFillColor(0);
+        ptstats->SetTextAlign(12);
+        ptstats->SetTextFont(42);
+        ptstats->SetTextColor(kBlue + 2);
+        ptstats->SetOptStat(11);
+        ptstats->SetParent(hist);
+        ptstats->Draw();
 
-        if (doubleStatus)
+        // setting `fillShiftVal` a higher than `m_maximumAllowedShift`. If both fit statuses are invalid,
+        // then this condition will set shift value to the histogram mean.
+        double fillShiftVal = m_maximumAllowedShift + 1.;
+
+        if (isDoubleGausFitValid) {
           fillShiftVal = (fn_doubleGaus->GetParameter(1) > 0.5 ?
                           fn_doubleGaus->GetParameter(2) : fn_doubleGaus->GetParameter(4));
-        else if (singleStatus) {
+          ptstats->AddText(TString::Format("#splitline{Shift Value from Double Gaus}{%.3f}", fillShiftVal));
+        } else if (isSingleGausFitValid) {
           fillShiftVal = fn_singleGaus->GetParameter(1);
           B2WARNING("Fit failed for " << hist->GetName() <<
                     "; using mean from single gaus fit. ");
+          ptstats->AddText(TString::Format("#splitline{Shift Value from Single Gaus}{%.3f}", fillShiftVal));
         }
 
-        if (std::fabs(fillShiftVal) > m_allowedDeviationMean) {
-          B2WARNING("Shift value is more than allowed in " <<
+        if (std::fabs(fillShiftVal) > m_maximumAllowedShift) {
+          B2WARNING("Shift value is more than allowed or fit failed in " <<
                     hist->GetName() << " : " <<
                     shiftValues[binLabel].back() <<
                     "; using mean of the histogram.");
           fillShiftVal = hist->GetMean();
+          ptstats->AddText(TString::Format("#splitline{Shift Value from Histogram Mean}{%.3f}", fillShiftVal));
         }
 
         shiftValues[binLabel].push_back(1. * int(1000. * fillShiftVal) / 1000.);
         hDrawShift->SetBinContent(ij + 1, clSize, shiftValues[binLabel].back());
         hDrawShift->GetXaxis()->SetBinLabel(ij + 1, binLabel);
+
+        c1.Print(outPDF, TString("Title:") + hist->GetName());
+        f->cd();
+        hist->Write();
 
         delete hist;
       } // loop over cluster size

@@ -28,7 +28,7 @@ namespace Belle2 {
     virtual ~SVDClusterTimeShifterAlgorithm() {}
 
     /** Setter for m_allowedT0Shift*/
-    void setAllowedTimeShift(const float& value) {m_allowedDeviationMean = value;}
+    void setMaximumAllowedShift(const float& value) {m_maximumAllowedShift = value;}
 
     /** set list of time algorithm */
     void setTimeAlgorithm(const std::vector<TString>& lst) {m_timeAlgorithms = lst;}
@@ -44,7 +44,7 @@ namespace Belle2 {
   private:
 
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
-    float m_allowedDeviationMean = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
+    float m_maximumAllowedShift = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
     int m_minEntries = 1000; /**< Set the minimun number of entries required in the histograms*/
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
   };

@@ -522,7 +522,7 @@ def get_calibrations(input_data, **kwargs):
     shift_algo = SVDClusterTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
                                                 f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
     shift_algo.setMinEntries(100)
-    shift_algo.setAllowedTimeShift(15.)
+    shift_algo.setMaximumAllowedShift(15.)
     shift_algo.setTimeAlgorithm(timeAlgorithms)
 
     shift_calibration = Calibration("SVDClusterTimeShifter",

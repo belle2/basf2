@@ -133,13 +133,13 @@ Let's test what you learned so far!
 .. admonition:: Hint
    :class: xhint stacked toggle
 
-   The project lives `here <https://stash.desy.de/projects/B2T>`__.
+   The project lives `here <https://gitlab.desy.de/belle2/software/training>`__.
 
 .. admonition:: Hint
    :class: xhint stacked toggle
 
-   The repositories live `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space/browse>`__
-   and `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/browse>`__.
+   The repositories live `here <https://gitlab.desy.de/belle2/software/training/b2-git-training-space>`__
+   and `here <https://gitlab.desy.de/belle2/software/training/b2-git-training-space-2>`__.
    You can find the URL to clone by clicking a button in the sidebar on your left.
 
 .. admonition:: Solution
@@ -147,8 +147,8 @@ Let's test what you learned so far!
 
    .. code-block:: bash
 
-      git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space.git
-      git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space-2.git
+      git clone git@gitlab.desy.de:belle2/software/training/b2-git-training-space.git
+      git clone git@gitlab.desy.de:belle2/software/training/b2-git-training-space-2.git
 
 Now you should have both repositories on your local machine.
 
@@ -270,7 +270,7 @@ The output of the last command tells you to go to
 
 .. code-block::
 
-   https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/<your new branch>
+   https://gitlab.desy.de/belle2/software/training/b2-git-training-space-2/-/merge_requests/new?merge_request%5Bsource_branch%5D=<your new branch>
 
 to open a PR. That's exactly what we want to do!
 

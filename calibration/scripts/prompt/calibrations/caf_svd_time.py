@@ -52,7 +52,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[],
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfCalibrations": ["rawTimeCalibration", "timeShiftCalibration"],
+                                   "listOfCalibrations": ["rawTimeCalibration", "timeShiftCalibration", "timeValidation"],
                                    "max_events_per_run":  60000,
                                    "max_events_per_file": 30000,
                                    "isMC": False,
@@ -360,6 +360,8 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
+    return_list_of_calibrations = []
+
     ####
     # Build the clusterizers with the different options.
     ####
@@ -494,6 +496,9 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
+    if "rawTimeCalibration" in listOfCalibrations:
+        return_list_of_calibrations.append(calibration)
+
     #########################################################
     # SVD Cluster Time Shifter                              #
     #########################################################
@@ -539,8 +544,8 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in shift_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    if "rawTimeCalibration" in listOfCalibrations:
-        shift_calibration.depends_on(calibration)
+    if "timeShiftCalibration" in listOfCalibrations:
+        return_list_of_calibrations.append(shift_calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #
@@ -660,16 +665,10 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in val_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    if "timeShiftCalibration" in listOfCalibrations:
-        val_calibration.depends_on(shift_calibration)
-    elif "rawTimeCalibration" in listOfCalibrations:
-        val_calibration.depends_on(calibration)
+    if "timeValidation" in listOfCalibrations:
+        return_list_of_calibrations.append(val_calibration)
 
-    return_list_of_calibrations = []
-    if "rawTimeCalibration" in listOfCalibrations:
-        return_list_of_calibrations.append(calibration)
-    if "timeShiftCalibration" in listOfCalibrations:
-        return_list_of_calibrations.append(shift_calibration)
-    return_list_of_calibrations.append(val_calibration)
+    for item in range(len(return_list_of_calibrations) - 1):
+        return_list_of_calibrations[item + 1].depends_on(return_list_of_calibrations[item])
 
     return return_list_of_calibrations

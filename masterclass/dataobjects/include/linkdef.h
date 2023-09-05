@@ -5,8 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class BParticle+; // checksum=0xf8a8893, global, version=1
-#pragma link C++ class BEvent+; // checksum=0xfd7bbbfc, global, version=1
+#pragma link C++ class BParticle+; // checksum=0xcca2a44c, global, version=2
+#pragma link C++ class BEvent+; // checksum=0xfd7bbbfc, global, version=2
 
 #endif
 

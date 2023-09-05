@@ -52,7 +52,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[],
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfCalibrations": ["rawTimeCalibration", "timeShiftCalibration", "timeValidation"],
+                                   "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
                                    "max_events_per_run":  60000,
                                    "max_events_per_file": 30000,
                                    "isMC": False,
@@ -307,7 +307,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
     timeAlgorithms = expert_config["timeAlgorithms"]
-    listOfCalibrations = expert_config["listOfCalibrations"]
+    listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     max_events_per_file = expert_config["max_events_per_file"]  # Maximum number of events selected per each file
     isMC = expert_config["isMC"]
@@ -360,7 +360,11 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    return_list_of_calibrations = []
+    ####
+    # List of calibrations to be returned by `get_calibrations` function.
+    # The calibrations must be appended as per the order of dependency.
+    ####
+    list_of_calibrations = []
 
     ####
     # Build the clusterizers with the different options.
@@ -496,8 +500,8 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    if "rawTimeCalibration" in listOfCalibrations:
-        return_list_of_calibrations.append(calibration)
+    if "rawTimeCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(calibration)
 
     #########################################################
     # SVD Cluster Time Shifter                              #
@@ -544,8 +548,8 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in shift_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    if "timeShiftCalibration" in listOfCalibrations:
-        return_list_of_calibrations.append(shift_calibration)
+    if "timeShiftCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(shift_calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #
@@ -665,10 +669,10 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in val_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    if "timeValidation" in listOfCalibrations:
-        return_list_of_calibrations.append(val_calibration)
+    if "timeValidation" not in listOfMutedCalibrations:
+        list_of_calibrations.append(val_calibration)
 
-    for item in range(len(return_list_of_calibrations) - 1):
-        return_list_of_calibrations[item + 1].depends_on(return_list_of_calibrations[item])
+    for item in range(len(list_of_calibrations) - 1):
+        list_of_calibrations[item + 1].depends_on(list_of_calibrations[item])
 
-    return return_list_of_calibrations
+    return list_of_calibrations

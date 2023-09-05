@@ -49,10 +49,12 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
   for (auto& event_type : {"rand", "dphy", "physics"}) {
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = event_type + std::string(":") + ecl_part;
+      std::string var_name = pv_name;
+      std::replace(var_name.begin(), var_name.end(), ':', '_');
 
       m_out_of_time_digits[pv_name] = 0;
 
-      std::string hist_name    = "ECL/out_of_time_" + pv_name;
+      std::string hist_name    = "ECL/out_of_time_" + var_name;
       auto prof = (TProfile*)findHist(hist_name, m_onlyIfUpdated);
 
       if (!prof) continue;

@@ -86,8 +86,8 @@ be aware of.
 Belle II Specifics
 ==================
 
-In Belle II we use Bitbucket Server by Atlassian for our git repositories. While
-this is rather similar to github in some regards. It is strongly advised to use
+In Belle II we use GitLab by GitLab Inc. for our git repositories, with our instance hosted at DESY.
+While this is rather similar to github in some regards. It is strongly advised to use
 ``ssh`` as access protocol and for that you need to upload your public key to
 https://gitlab.desy.de.
 

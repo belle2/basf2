@@ -52,6 +52,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[],
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
+                                   "listOfCalibrations": ["rawTimeCalibration", "timeShiftCalibration"],
                                    "max_events_per_run":  60000,
                                    "max_events_per_file": 30000,
                                    "isMC": False,
@@ -306,6 +307,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
     timeAlgorithms = expert_config["timeAlgorithms"]
+    listOfCalibrations = expert_config["listOfCalibrations"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     max_events_per_file = expert_config["max_events_per_file"]  # Maximum number of events selected per each file
     isMC = expert_config["isMC"]
@@ -537,7 +539,8 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in shift_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    shift_calibration.depends_on(calibration)
+    if "rawTimeCalibration" in listOfCalibrations:
+        shift_calibration.depends_on(calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #
@@ -657,6 +660,16 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in val_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    val_calibration.depends_on(shift_calibration)
+    if "timeShiftCalibration" in listOfCalibrations:
+        val_calibration.depends_on(shift_calibration)
+    elif "rawTimeCalibration" in listOfCalibrations:
+        val_calibration.depends_on(calibration)
 
-    return [calibration, shift_calibration, val_calibration]
+    return_list_of_calibrations = []
+    if "rawTimeCalibration" in listOfCalibrations:
+        return_list_of_calibrations.append(calibration)
+    if "timeShiftCalibration" in listOfCalibrations:
+        return_list_of_calibrations.append(shift_calibration)
+    return_list_of_calibrations.append(val_calibration)
+
+    return return_list_of_calibrations

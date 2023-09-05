@@ -187,7 +187,8 @@ def create_svd_clusterizer(name="ClusterReconstruction",
                            reco_digits=None,
                            shaper_digits=None,
                            time_algorithm="CoG6",
-                           get_3sample_raw_time=False):
+                           get_3sample_raw_time=False,
+                           shiftSVDClusterTime=None):
     """
     Simply creates a SVDClusterizer module with some options.
 
@@ -201,6 +202,8 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     if shaper_digits is not None:
         cluster.param("ShaperDigits", shaper_digits)
     cluster.param("timeAlgorithm6Samples", time_algorithm)
+    if shiftSVDClusterTime is not None:
+        cluster.param("shiftSVDClusterTime", shiftSVDClusterTime)
     cluster.param("useDB", False)
     if get_3sample_raw_time:
         cluster.param("returnClusterRawTime", True)
@@ -497,14 +500,12 @@ def get_calibrations(input_data, **kwargs):
 
     shift_clusterizers_onTracks = []
     for alg in timeAlgorithms:
-        cluster = b2.register_module("SVDClusterizer")
-        cluster.set_name(f"ClusterReconstruction_{alg}")
-        cluster.param("Clusters", f"{SVDClustersOnTrackPrefix}_{alg}")
-        if NEW_SHAPER_DIGITS_NAME is not None:
-            cluster.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
-        cluster.param("timeAlgorithm6Samples", alg)
-        cluster.param("shiftSVDClusterTime", False)
-        cluster.param("useDB", False)
+        cluster = create_svd_clusterizer(
+            name=f"ClusterReconstruction_{alg}",
+            clusters=f"{SVDClustersOnTrackPrefix}_{alg}",
+            shaper_digits=NEW_SHAPER_DIGITS_NAME,
+            time_algorithm=alg,
+            shiftSVDClusterTime=False)
         shift_clusterizers_onTracks.append(cluster)
 
     shift_pre_collector_path = create_pre_collector_path(

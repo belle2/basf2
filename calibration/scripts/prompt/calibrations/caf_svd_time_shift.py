@@ -36,7 +36,7 @@ random.seed(42)
 
 now = datetime.datetime.now()
 
-settings = CalibrationSettings(name="caf_svd_time",
+settings = CalibrationSettings(name="caf_svd_time_shift",
                                expert_username="gdujany",
                                description=__doc__,
                                input_data_formats=["raw"],
@@ -182,7 +182,6 @@ def create_pre_collector_path(
             # if we would like using the grouping (True by default), we should use the calibrated cluster time
             # if we would like to use the raw time, than the cluster grouping parameters are OK only for CoG3
             # in the reconstruction (default in reconstruction)
-            b2.set_module_parameters(path, 'SVDClusterizer')
             if useSVDGrouping:
                 b2.set_module_parameters(path, 'SVDTimeGrouping',
                                          forceGroupingFromDB=False,

@@ -181,7 +181,7 @@ Now you should have both repositories on your local machine.
      committed yet) and ``git reset`` ("undo" ``git commit``)
 
 Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you
-cannot just push changes there directly. Instead, you have to open a pull request (PR).
+cannot just push changes there directly. Instead, you have to open a merge request (MR).
 For this concept you need to complete the next section.
 
 Branches (intermediate)
@@ -272,12 +272,12 @@ The output of the last command tells you to go to
 
    https://gitlab.desy.de/belle2/software/training/b2-git-training-space-2/-/merge_requests/new?merge_request%5Bsource_branch%5D=<your new branch>
 
-to open a PR. That's exactly what we want to do!
+to open a MR. That's exactly what we want to do!
 
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Create a PR and add the StarterKit organizer as a reviewer.
+   Create a MR and add the StarterKit organizer as a reviewer.
 
 .. admonition:: Solution
    :class: solution toggle

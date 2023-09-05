@@ -139,8 +139,7 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix3x3FromCluster(const ECLClust
   /**
    * Replace fixed energy resolution value by derived value from the DB if present
    */
-  if (cluster->getDetectorRegion() == 2 and m_photonEnergyResolutionDB.isValid()
-      and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+  if (m_photonEnergyResolutionDB.isValid() and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
     double pEnergy = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
     double pTheta = cluster->getTheta();
     double pPhi = cluster->getPhi();

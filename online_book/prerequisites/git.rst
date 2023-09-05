@@ -257,9 +257,9 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
       git add my_story.txt
       git commit -m "Adding a story"
 
-Remember that you weren't allowed to push to the master branch in this
+Remember that you weren't allowed to push to the main branch in this
 repository. To still get your changes in, you need to first push your
-new branch to the remote (just like there is a local and a remote ``master``
+new branch to the remote (just like there is a local and a remote ``main``
 branch you will then have a local and a remote ``<your new branch>`` branch).
 
 .. code-block:: bash

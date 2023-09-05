@@ -218,7 +218,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
           ptstats->AddText(TString::Format("%s = %.3f #pm %.4f",
                                            fn_doubleGaus->GetParName(npar),
                                            fn_doubleGaus->GetParameter(npar),
-                                           fn_singleGaus->GetParError(npar)));
+                                           fn_doubleGaus->GetParError(npar)));
         ptstats = new TPaveStats(0.55, 0.43, 0.85, 0.49, "brNDC");
         ptstats->SetName("stats3");
         ptstats->SetBorderSize(1);

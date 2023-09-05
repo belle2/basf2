@@ -46,7 +46,7 @@ sometimes we might get an email like this
 
     -- Poor Student
 
-Now one way to achieve this is would maybe be to keep all old versions manually,
+Now one way to achieve this would maybe be to keep all old versions manually,
 either in the same file but commented out like this:
 
 .. code-block:: python
@@ -87,7 +87,7 @@ Belle II Specifics
 ==================
 
 In Belle II we use GitLab by GitLab Inc. for our git repositories, with our instance hosted at DESY.
-While this is rather similar to github in some regards. It is strongly advised to use
+This is quite similar to github in some regards. It is strongly advised to use
 ``ssh`` as access protocol and for that you need to upload your public key to
 https://gitlab.desy.de.
 
@@ -287,20 +287,20 @@ to open a PR. That's exactly what we want to do!
 
 Now you have to wait for someone to approve your PR. Once they do,
 you can click on the ``Merge`` button. Then your changes are finally
-in the repository (verify this by checkout out the ``master`` branch and
+in the repository (verify this by checkout out the ``main`` branch and
 updating it with ``git pull``).
 
 .. admonition:: Exercise
    :class: Exercise
 
-   Check if there are any other open PRs. If there are, leave some comments!
+   Check if there are any other open MRs. If there are, leave some comments!
    You can also add yourself as the reviewer and approve them.
 
 Further reading
 ---------------
 
 Git is complex and it might take you months (or years, depending on your effort)
-to really feel its full power and to be able to use it effortless.
+to really feel its full power and to be able to use it effortlessly.
 
 At this point `the xkcd comic <https://xkcd.com/1597/>`_ from above might still
 show you (we certainly haven't taught you enough to change it). Therefore it's important

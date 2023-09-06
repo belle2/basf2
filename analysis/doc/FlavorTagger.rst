@@ -302,10 +302,10 @@ An example tutorial for normal use can be found under:
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
 Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_
-at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
+at `GitLab <https://gitlab.desy.de/belle2/software/training/handsonexercises>`_.
 
-Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
-(Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
+Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://gitlab.desy.de/belle2/software/training/b2-starterkit/-/blob/main/B2T_Advanced_3_FlavorTagger.ipynb>`_
+(Jupyter notebook) under the latest `b2-starter-kit <https://gitlab.desy.de/belle2/software/training/b2-starterkit>`_ tutorials.
 
 As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.
 You find them under:

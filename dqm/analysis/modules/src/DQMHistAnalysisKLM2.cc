@@ -45,8 +45,8 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_monObj = getMonitoringObject("klm");
 
   //register EPICS PVs
-  registerEpicsPV(m_pvPrefix + "KLM2:nEffBKLMLayers", "nEffBKLMLayers");
-  registerEpicsPV(m_pvPrefix + "KLM2:nEffEKLMLayers", "nEffEKLMLayers");
+  registerEpicsPV(m_pvPrefix + "KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
+  registerEpicsPV(m_pvPrefix + "KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
   updateEpicsPVs(5.0);
 
   gROOT->cd();

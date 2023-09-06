@@ -329,7 +329,7 @@ The convention is BGx0 for no machine background and BGx1 for MC with machine ba
   flavorTaggerVertexingValidation.py
 
 
-If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://stash.desy.de/projects/B2A/repos/flavortaggingvalidation>`_ repository.
+If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://gitlab.desy.de/belle2/data-production/validation/flavortaggingvalidation>`_ repository.
 
 
 Functions

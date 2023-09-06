@@ -205,8 +205,8 @@ Please follow the steps below to install the software.
 
 2. ``cd yourDirectoryForTopoAna``
 
-3. Clone the ``TopoAna`` repository from Stash with
-   ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``
+3. Clone the ``TopoAna`` repository from GitLab with
+   ``git clone git@gitlab.desy.de:belle2/software/topoana.git``
 
 4. ``cd topoana``
 

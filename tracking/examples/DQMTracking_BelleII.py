@@ -10,7 +10,7 @@
 
 #############################################################
 # Simple steering file to demonstrate how to run Track DQM on BelleII geometry
-# Valid for Phase 2, Phase 3 Early and Phase 3 regular as well as for testbeams
+# Valid for early phase 3 and nominal phase 3
 #############################################################
 
 import basf2 as b2
@@ -19,64 +19,49 @@ from reconstruction import add_reconstruction
 
 import argparse
 parser = argparse.ArgumentParser(
-    description="Tracking DQM Belle II for Phase 2 (Exp=1), Phase 3 Early (Exp=2) and Phase 3 regular (Exp=3)")
+    description="Tracking DQM Belle II for early phase 3 (Exp=1) and nominal phase 3 (Exp=2)")
 parser.add_argument('--experiment-type', dest='ExperimentType', action='store',
                     default=2, type=int,
-                    help='Set which experiment you want: 1 (Phase 2), 2 (Phase 3 Early) or 3 (Phase 3 regular), default = 2')
+                    help='Set which experiment you want: 1 (Phase 3 Early) or 2 (Phase 3 regular), default = 2')
 
 args = parser.parse_args()
 
-print("Final setting of arguments: ")
-print("                 ExperimentType: ", args.ExperimentType)
-
-# background (collision) files
-# bg = glob.glob('./BG/*.root')
-bg = None
+if args.ExperimentType not in [1, 2]:
+    import sys
+    sys.exit(1)
 
 # number of events to generate, can be overriden with -n
 num_events = 100
-# output filename, can be overriden with -o
-output_filename = "RootOutput.root"
-if (args.ExperimentType == 1):
-    output_filename = "RootOutput_Phase2.root"
-if (args.ExperimentType == 2):
-    output_filename = "RootOutput_Phase3Early.root"
-if (args.ExperimentType == 3):
-    output_filename = "RootOutput_Phase3.root"
+
 
 # create path
 main = b2.create_path()
 
 if (args.ExperimentType == 1):
-    # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
-    main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_events)
-if (args.ExperimentType == 2):
     # the experiment number for early phase3 MC has to be 1003, otherwise the wrong payloads for this faze are loaded
     main.add_module("EventInfoSetter", expList=1003, runList=1, evtNumList=num_events)
-if (args.ExperimentType == 3):
+elif (args.ExperimentType == 2):
     # the experiment number for regular phase3 MC has no need to set, it is default
     main.add_module("EventInfoSetter", evtNumList=num_events)
 
 # in case you need to fix seed of random numbers
-# set_random_seed('d33fa68eab781f3dcb069fb23425885fcd92d3432e6433a14894e5d7bba34272')
+# set_random_seed('some_seed')
 
 # generate BBbar events
 main.add_module('EvtGenInput')
 
 # detector and L1 trigger simulation
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=None)
 
 # reconstruction
 add_reconstruction(main)
 
 # histomanager: use DqmHistoManager for in-line monitoring, or HistoManager for offline training
 # main.add_module('DqmHistoManager', Port=7777)
-Histos_filename = "Histos_DQMTracks.root"
+Histos_filename = ""
 if (args.ExperimentType == 1):
-    Histos_filename = "Histos_DQMTracks_Phase2.root"
-if (args.ExperimentType == 2):
     Histos_filename = "Histos_DQMTracks_Phase3Early.root"
-if (args.ExperimentType == 3):
+elif (args.ExperimentType == 2):
     Histos_filename = "Histos_DQMTracks_Phase3.root"
 main.add_module('HistoManager', histoFileName=Histos_filename)
 
@@ -86,6 +71,12 @@ trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # trackDQM.logging.log_level = LogLevel.DEBUG
 
 # Finally add output, if you need
+# output filename, can be overriden with -o
+# output_filename = ""
+# if (args.ExperimentType == 1):
+#     output_filename = "RootOutput_Phase3Early.root"
+# elif (args.ExperimentType == 2):
+#     output_filename = "RootOutput_Phase3.root"
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics

@@ -155,8 +155,8 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
 
   TIter nextkey(keylist);
   TKey* key = 0;
-  int nkeys = 0;
-  int nobjs = 0;
+  int nkeys [[maybe_unused]] = 0;
+  int nobjs [[maybe_unused]] = 0;
   while ((key = (TKey*)nextkey())) {
     nkeys++;
     TObject* obj = curdir->FindObjectAny(key->GetName());

@@ -123,7 +123,7 @@ namespace Belle2 {
     /**
      * Photon energy resolution database object
      */
-    DBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
+    OptionalDBObjPtr<ECLPhotonEnergyResolution> m_photonEnergyResolutionDB;
   };
 
 } // Belle2 namespace

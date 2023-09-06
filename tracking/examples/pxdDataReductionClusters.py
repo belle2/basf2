@@ -12,57 +12,31 @@ import basf2 as b2
 from tracking import add_tracking_reconstruction
 from simulation import add_simulation
 
-numEvents = 100
-
-# first register the modules
-
 b2.set_random_seed(1)
-
-eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('expList', [0])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [numEvents])
-
-eventinfoprinter = b2.register_module('EventInfoPrinter')
-
-evtgeninput = b2.register_module('EvtGenInput')
-evtgeninput.logging.log_level = b2.LogLevel.INFO
-
-pxdROIFinder = b2.register_module('PXDROIFinder')
-pxdROIFinder.logging.log_level = b2.LogLevel.DEBUG
-# pxdROIFinder.logging.debug_level = 2
-param_pxdROIFinder = {
-    'recoTrackListName': 'RecoTracks',
-    'PXDInterceptListName': 'PXDIntercepts',
-    'ROIListName': 'ROIs',
-}
-pxdROIFinder.param(param_pxdROIFinder)
-
-# PXD digitization module
-PXDDIGI = b2.register_module('PXDDigitizer')
-# PXD clusterizer
-PXDCLUST = b2.register_module('PXDClusterizer')
-
-pxdClusterFilter = b2.register_module('PXDclusterFilter')
-pxdClusterFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True, 'overrideDB': True, 'enableFiltering': True})
 
 # Create paths
 main = b2.create_path()
 
 # Add modules to paths
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
-main.add_module(evtgeninput)
+main.add_module('EventInfoSetter', expList=[0], runList=[1], evtNumList=[100])
+main.add_module('EvtGenInput', logLevel=b2.LogLevel.INFO)
+
 add_simulation(main, components=['PXD', 'SVD', 'CDC'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
 add_tracking_reconstruction(main, ['SVD', 'CDC'])
-main.add_module(pxdROIFinder)
-main.add_module(PXDDIGI)
-main.add_module(PXDCLUST)
-main.add_module(pxdClusterFilter)
-# display = register_module("Display")
-# main.add_module(display)
 
-main.add_module('RootOutput')
+main.add_module('PXDROIFinder',
+                recoTrackListName='RecoTracks',
+                PXDInterceptListName='PXDIntercepts',
+                ROIListName='ROIs',
+                logLevel=b2.LogLevel.DEBUG)
+# PXD digitization module
+main.add_module('PXDDigitizer')
+# PXD clusterizer
+main.add_module('PXDClusterizer')
+# filter PXDClusters that are in ROIs
+main.add_module('PXDclusterFilter', ROIidsName='ROIs', CreateOutside=True, overrideDB=True, enableFiltering=True)
+
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

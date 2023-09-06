@@ -561,8 +561,10 @@ void OverlapResidualsModule::event()
           h_V_DeltaRes_PXD->Fill(over_V_PXD);
           //Fill sensor hit-maps and 2D histograms with PXD clusters
           if (pxd_Layer_1 == 1 && pxd_Layer_2 == 1) {
-            h_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
-            h_Lyr1[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            if (m_ExpertLevel) {
+              h_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
+              h_Lyr1[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            }
             h_U_DeltaRes_PXD_Lyr1->Fill(over_U_PXD);
             h_V_DeltaRes_PXD_Lyr1->Fill(over_V_PXD);
             h_DeltaResUPhi_Lyr1->Fill(pxdPhi_1, over_U_PXD);
@@ -575,8 +577,10 @@ void OverlapResidualsModule::event()
             h_DeltaResUz_Lyr1->Fill(pxdZ_2, over_U_PXD);
           }
           if (pxd_Layer_1 == 2 && pxd_Layer_2 == 2) {
-            h_Lyr2[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
-            h_Lyr2[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            if (m_ExpertLevel) {
+              h_Lyr2[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
+              h_Lyr2[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            }
             h_U_DeltaRes_PXD_Lyr2->Fill(over_U_PXD);
             h_V_DeltaRes_PXD_Lyr2->Fill(over_V_PXD);
             h_DeltaResUPhi_Lyr2->Fill(pxdPhi_1, over_U_PXD);
@@ -813,8 +817,10 @@ void OverlapResidualsModule::event()
             }
             //Fill sensor hit-maps and 2D histograms with SVD u clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
-              h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr3->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr3->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr3->Fill(svdPhi_2, over_U_SVD);
@@ -822,8 +828,10 @@ void OverlapResidualsModule::event()
               h_DeltaResUz_Lyr3->Fill(svdZ_2, over_U_SVD);
             }
             if (svd_Layer_1 == 4 && svd_Layer_2 == 4) {
-              h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr4->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr4->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr4->Fill(svdPhi_2, over_U_SVD);
@@ -831,8 +839,10 @@ void OverlapResidualsModule::event()
               h_DeltaResUz_Lyr4->Fill(svdZ_2, over_U_SVD);
             }
             if (svd_Layer_1 == 5 && svd_Layer_2 == 5) {
-              h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr5[svd_Ladder_2][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr5[svd_Ladder_2][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr5->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr5->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr5->Fill(svdPhi_2, over_U_SVD);
@@ -840,8 +850,10 @@ void OverlapResidualsModule::event()
               h_DeltaResUz_Lyr5->Fill(svdZ_2, over_U_SVD);
             }
             if (svd_Layer_1 == 6 && svd_Layer_2 == 6) {
-              h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr6->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr6->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr6->Fill(svdPhi_2, over_U_SVD);
@@ -995,8 +1007,10 @@ void OverlapResidualsModule::event()
             }
             //Fill sensor hit-maps and 2D histograms with SVD v clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
-              h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr3->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr3->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr3->Fill(svdPhi_2, over_V_SVD);
@@ -1004,8 +1018,10 @@ void OverlapResidualsModule::event()
               h_DeltaResVz_Lyr3->Fill(svdZ_2, over_V_SVD);
             }
             if (svd_Layer_1 == 4 && svd_Layer_2 == 4) {
-              h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr4->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr4->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr4->Fill(svdPhi_2, over_V_SVD);
@@ -1013,8 +1029,10 @@ void OverlapResidualsModule::event()
               h_DeltaResVz_Lyr4->Fill(svdZ_2, over_V_SVD);
             }
             if (svd_Layer_1 == 5 && svd_Layer_2 == 5) {
-              h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr5[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr5->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr5->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr5->Fill(svdPhi_2, over_V_SVD);
@@ -1022,8 +1040,10 @@ void OverlapResidualsModule::event()
               h_DeltaResVz_Lyr5->Fill(svdZ_2, over_V_SVD);
             }
             if (svd_Layer_1 == 6 && svd_Layer_2 == 6) {
-              h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr6->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr6->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr6->Fill(svdPhi_2, over_V_SVD);

@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ZMQTxWorker);
+REG_MODULE(ZMQTxWorker)
 
 ZMQTxWorkerModule::ZMQTxWorkerModule() : Module()
 {
@@ -38,11 +38,21 @@ void ZMQTxWorkerModule::event()
     const auto& evtMessage = m_streamer.stream();
     auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_eventMessage, evtMessage);
     m_zmqClient.send(std::move(message));
+    //    B2INFO ( "ZMQTxWorker : an event sent" );
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Tx worker event: " << ex.what());
     }
   }
+}
+
+void ZMQTxWorkerModule::endRun()
+{
+  if (m_eventMetaData->isEndOfRun() != 1) return;
+
+  const auto& evtMessage = m_streamer.stream();
+  auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_eventMessage, evtMessage);
+  m_zmqClient.send(std::move(message));
 }
 
 void ZMQTxWorkerModule::terminate()

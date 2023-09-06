@@ -1,5 +1,7 @@
 # Path building
 from basf2 import create_path, register_module, LogLevel, process, statistics
+from simulation import add_simulation
+from tracking import add_prefilter_tracking_reconstruction
 
 # analysis
 from stdCharged import stdK, stdPi
@@ -7,16 +9,20 @@ import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
 
-
-NtupleFilePath = "/nfs/dust/belle2/user/floschw/Data/example_Ntuple_1000.root"
-ROOTFilePath = "/nfs/dust/belle2/user/floschw/Data/simulation/sim_1000.root"
+NtupleFilePath = "example_Ntuple.root"
 
 path = create_path()
-# Load a MDST Root file where relations from hit matching
-# are excluded.
-path.add_module("RootInput",
-                inputFileName=ROOTFilePath,
-                excludeBranchNames=["TracksToMCParticles"])
+
+path.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=10)
+
+# generate BBbar events
+path.add_module('EvtGenInput')
+
+# detector simulation, don't perfrom PXD data reduction
+add_simulation(path, bkgOverlay=False, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
+
+# add tracking and track fitting, without MC matching
+add_prefilter_tracking_reconstruction(path)
 
 # Add the Chi2-matcher to path
 chi2Matcher = register_module("Chi2MCTrackMatcher")

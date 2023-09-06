@@ -25,7 +25,7 @@ ECLPhotonEnergyResolution::ECLPhotonEnergyResolution()
   m_resolutionBinningTable.defineOutOfRangeWeight(energyResolutionInfo);
 }
 
-void ECLPhotonEnergyResolution::addRelativeEnergyResolution(EnergyResolution energyResolution, Binning binning)
+void ECLPhotonEnergyResolution::addRelativeEnergyResolution(std::vector<double> energyResolution, Binning binning)
 {
   /**
    * Build energy resolution with uncertainties as info map

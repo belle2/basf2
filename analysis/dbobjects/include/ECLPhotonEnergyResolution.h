@@ -20,11 +20,6 @@
 namespace Belle2 {
 
   /**
-   * Energy resolution holder as vector: [value, uncertainty up, uncertainty down]
-   */
-  typedef std::vector<double> EnergyResolution;
-
-  /**
    * Bin holder as vector for bin limit pairs: [energy limits, theta limits, phi limits]
    */
   typedef std::vector<std::pair<double, double>> Binning;
@@ -58,7 +53,7 @@ namespace Belle2 {
      * @param energyResolution energy resolution with uncertainties
      * @param binning binning of energy resolution valid region in bins of [energy, theta phi]
      */
-    void addRelativeEnergyResolution(EnergyResolution energyResolution, Binning binning);
+    void addRelativeEnergyResolution(std::vector<double> energyResolution, Binning binning);
 
     /*!
      * Get energy resolution for given energy, theta, phi

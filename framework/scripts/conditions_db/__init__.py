@@ -60,7 +60,7 @@ def get_cdb_authentication_token(path=None):
     Helper function for correctly retrieving the CDB authentication token (either via file either via issuing server).
 
     :param path: Path to a file containing a CDB authentication token; if None, the function will use
-           a default path (``tmp/b2cdb_${BELLE2_USER}.token``) to look for a token.
+           a default path (``${HOME}/b2cdb_${BELLE2_USER}.token``) to look for a token.
     """
     # if we pass a path, let's use it for getting the token, otherwise use the default one
     if path:

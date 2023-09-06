@@ -10,7 +10,7 @@
 
 import os
 
-com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich_database.git HEAD cosmicTest_payloads | tar -x"
+com = "git archive --remote=git@gitlab.desy.de:belle2/detector/arich/arich_database.git HEAD cosmicTest_payloads | tar -x"
 os.system(com)
 
 com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich_datafiles.git HEAD cosmicTest | tar -x"

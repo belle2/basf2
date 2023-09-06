@@ -24,7 +24,10 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 
   int stage = 0; //0: in, 1: event/main, 2: out
   for (const ModulePtr& module : path->getModules()) {
-    bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
+    bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified) and
+                           !module->hasProperties(Module::c_Input) and
+                           !module->hasProperties(Module::c_Output) and
+                           !module->hasProperties(Module::c_HistogramManager) ;
     //entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
       for (const auto& conditionPath : module->getAllConditionPaths()) {
@@ -57,6 +60,13 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 
     if (stage == 0) {
       inputPath->addModule(module);
+      if (module->hasProperties(Module::c_HistogramManager)) {
+        // Initialize histogram manager if found in the path
+
+        //add histoman to other paths
+        mainPath->addModule(module);
+        outputPath->addModule(module);
+      }
     } else if (stage == 1) {
       mainPath->addModule(module);
     } else if (stage == 2) {
@@ -94,8 +104,8 @@ ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, 
       histoManagerModule = module;
 
       //add histoman to other paths
-      mainPath->addModule(histoManagerModule);
-      outputPath->addModule(histoManagerModule);
+      //      mainPath->addModule(histoManagerModule);
+      //      outputPath->addModule(histoManagerModule);
     }
   }
 
@@ -140,6 +150,7 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqRxWorkerModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
     zmqRxWorkerModule->getParam<unsigned int>("eventBufferSize").setValue(eventBufferSize);
     prependModule(mainPath, zmqRxWorkerModule);
+
   }
 
   if (outputPath) {
@@ -157,6 +168,7 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
     zmqRxOutputModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
     prependModule(outputPath, zmqRxOutputModule);
+
   }
 
   if (inputPath) {
@@ -177,6 +189,9 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
   if (outputPath) {
     mergedPath.addPath(outputPath);
   }
+
+  B2INFO("ModuleList " << mergedPath.getPathString());
+
   return mergedPath.buildModulePathList();
 }
 

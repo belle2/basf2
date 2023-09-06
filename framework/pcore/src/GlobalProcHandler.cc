@@ -11,6 +11,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
 
+#include <framework/pcore/ProcHandler.h>
+
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>
@@ -202,6 +204,8 @@ bool GlobalProcHandler::startProc(ProcType procType, int id)
       s_processID = getpid();
     else
       s_processID = id;
+
+    ProcHandler::setProcessID(s_processID);    // Interface to existing ProcHandler
 
     // Reset some python state: signals, threads, gil in the child
     PyOS_AfterFork_Child();

@@ -15,8 +15,6 @@
 #include <vector>
 #include <memory>
 
-#include <TObject.h>
-
 namespace Belle2 {
   class Path;
 
@@ -421,8 +419,6 @@ namespace Belle2 {
      * The Environment destructor.
      */
     ~Environment();
-
-    ClassDef(Environment, 1);
 
   };
 

@@ -23,7 +23,7 @@ BinningType = List[Tuple[float, float]]
 
 # Add custom parser for config script
 parser = argparse.ArgumentParser(allow_abbrev=True)
-parser.add_argument("-f", "--filename", help="")
+parser.add_argument("-f", "--filename", help="PERC summary output file")
 args, _ = parser.parse_known_args()
 filename = args.filename
 
@@ -112,13 +112,14 @@ def process_resolution(filename: PathType) -> Tuple[ECLPhotonEnergyResolution, D
 
 
 if __name__ == "__main__":
-    photonEnergyResolution, information_dict = process_resolution(filename)
+    if filename:
+        photonEnergyResolution, information_dict = process_resolution(filename)
 
-    database = Database.Instance()
-    iov = IntervalOfValidity(
-        information_dict["experimentLow"],
-        information_dict["runLow"],
-        information_dict["experimentHigh"],
-        information_dict["runHigh"],
-    )
-    database.storeData("ECLPhotonEnergyResolution", photonEnergyResolution, iov)
+        database = Database.Instance()
+        iov = IntervalOfValidity(
+            information_dict["experimentLow"],
+            information_dict["runLow"],
+            information_dict["experimentHigh"],
+            information_dict["runHigh"],
+        )
+        database.storeData("ECLPhotonEnergyResolution", photonEnergyResolution, iov)

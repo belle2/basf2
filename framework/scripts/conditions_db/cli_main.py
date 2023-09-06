@@ -24,7 +24,7 @@ is stored in a file. More informations about what a JWT is can be found on
 `Wikipedia <https://en.wikipedia.org/wiki/JSON_Web_Token>`_.
 
 The tool automatically queries the JWT issuing server
-(https://token.belle2.org) and get a valid token by asking the B2MMS username
+(https://token.belle2.org) and gets a valid token by asking the B2MMS username
 and password. The issued "default" JWT has a validity of 1 hour; after it
 expires, a new JWT needs to be obtained for authenticating the conditions
 database. When retrieved by this tool, the JWT is stored locally in the file
@@ -34,10 +34,13 @@ Some selected users (e.g. the calibration managers) are granted a JWT with an
 extended validity (30 days) to allow smooth operations with some automated
 workflows. Such "extended" JWTs are issued by a different server
 (https://token.belle2.org/extended). B2MMS username and password are necessary
-for getting the extended JWT. If a user is granted an extended JWT, the browser
-will download a file containing it. The extended JWT differs from the default
-JWT only by its validity and can be obtained only by manually querying the
-alternative server.
+for getting the extended JWT. The extended JWT differs from the default JWT
+only by its validity and can be obtained only by manually querying the
+alternative server. If queried via web browser, a file containing the extended
+JWT will be downloaded in case the user is granted it. The server can also be
+queried via command line using
+``wget --user USERNAME --ask-password --no-check-certificate https://token.belle2.org/extended``
+or ``curl -u USERNAME -k https://token.belle2.org/extended``.
 
 If the environment variable ``${BELLE2_CDB_AUTH_TOKEN}`` is defined and points
 to a file containing a valid JWT, the ``b2conditionsdb`` tools use this token

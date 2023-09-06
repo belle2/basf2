@@ -801,8 +801,6 @@ void PXDROIFinderAnalysisModule::event()
 
   m_h1okROIs->Fill(nROIs);
   m_h1okROIfrac->Fill(1.*nROIs / m_ROIs.getEntries());
-  std::cout << "" << std::endl;
-
 
 }
 

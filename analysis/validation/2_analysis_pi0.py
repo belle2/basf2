@@ -44,7 +44,7 @@ create_validation_histograms(
         (
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
-            "Taichiro Koga <taichiro.koga@outlook.jp>",
+            "Eldar Ganiev <eldar.ganiev@desy.de>",
             r"The $\pi^0$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -62,7 +62,7 @@ create_validation_histograms(
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
-            "Taichiro Koga <taichiro.koga@outlook.jp>",
+            "Eldar Ganiev <eldar.ganiev@desy.de>",
             r"The $\pi^0$ invariant mass distribution for truth matched candidates",
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"

@@ -13,7 +13,7 @@ from sys import argv
 
 main = Path()
 
-inputMod = main.add_module('RootInput')
+main.add_module('RootInput')
 # basf2 -n100 -i "/group/belle/users/kspenko/data/masterclass/exp26/sub00/*.root" masterclass.py
 
 # Use this only with data (hadron collections) ---------------------------------

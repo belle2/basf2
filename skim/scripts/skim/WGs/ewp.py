@@ -63,6 +63,12 @@ class BtoXgamma(BaseSkim):
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
 
+        # Remove events with insuffcient number of good tracks and clusters, this
+        # mitigates "The 0th-order FoxWolfram moment is zero" error
+        ma.applyEventCuts(
+            'nParticlesInList(pi+:BtoXgamma_eventshape) > 0 and nParticlesInList(gamma:BtoXgamma_eventshape) > 0',
+            path=path)
+
         ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
@@ -167,6 +173,11 @@ class BtoXll(BaseSkim):
         # event level cuts: R2 and require a minimum number of tracks
         ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
+
+        # Remove events with insuffcient number of good tracks and clusters, this
+        # mitigates "The 0th-order FoxWolfram moment is zero" error
+        ma.applyEventCuts('nParticlesInList(pi+:BtoXll_eventshape) > 0 and nParticlesInList(gamma:BtoXll_eventshape) > 0',
+                          path=path)
 
         ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
                            allMoments=False,
@@ -278,6 +289,12 @@ class BtoXll_LFV(BaseSkim):
         # Create lists for buildEventShape (basically all tracks and clusters)
         ma.cutAndCopyList('pi+:BtoXllLFV_eventshape', 'pi+:all', 'pt> 0.1', path=path)
         ma.cutAndCopyList('gamma:BtoXllLFV_eventshape', 'gamma:all', 'E > 0.1', path=path)
+
+        # Remove events with insuffcient number of good tracks and clusters, this
+        # mitigates "The 0th-order FoxWolfram moment is zero" error
+        ma.applyEventCuts(
+            'nParticlesInList(pi+:BtoXllLFV_eventshape) > 0 and nParticlesInList(gamma:BtoXllLFV_eventshape) > 0',
+            path=path)
 
         # buildEventShape to access R2
         ma.buildEventShape(inputListNames=['pi+:BtoXllLFV_eventshape', 'gamma:BtoXllLFV_eventshape'],

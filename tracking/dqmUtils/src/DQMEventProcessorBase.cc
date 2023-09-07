@@ -136,7 +136,10 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
   if (!isPXD && !isSVD)
     return;
 
-  auto fitterInfo = m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo();
+  auto trackpoint = m_recoTrack->getCreatedTrackPoint(recoHitInfo);
+  if (!trackpoint)
+    return;
+  auto fitterInfo = trackpoint->getFitterInfo();
   if (!fitterInfo)
     return;
 

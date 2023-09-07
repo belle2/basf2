@@ -40,7 +40,7 @@ from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
 from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdK, stdPi
-from stdPi0s import loadStdSkimPi0, stdPi0s
+from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 
@@ -94,7 +94,6 @@ class BtoD0h_Kspi0(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
-        loadStdSkimPi0(path=path)
         stdPi0s(listtype='eff50_May2020Fit', path=path)
 
         ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_May2020Fit', '1.84 < M < 1.89', path=path)
@@ -163,12 +162,6 @@ class BtoD0h_Kspipipi0(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
-        stdPi('all', path=path)
-        stdK('all', path=path)
-        loadStdSkimPi0(path=path)
-        stdKshorts(path=path)
-        stdPi0s(listtype='eff40_May2020Fit', path=path)
-
         ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
@@ -792,9 +785,6 @@ class BtoD0h_hh(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
-        stdPi('all', path=path)
-        stdK('all', path=path)
-
         ma.reconstructDecay('D0 -> K-:all pi+:all', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
@@ -976,9 +966,6 @@ class BtoD0h_Kshh(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
-        stdPi('all', path=path)
-        stdK('all', path=path)
-
         ma.reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 

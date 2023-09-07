@@ -25,12 +25,8 @@ REG_MODULE(SVDROIDQM);
 SVDROIDQMModule::SVDROIDQMModule()
   : HistoModule()
   , m_InterDir(nullptr)
-  , m_ROIDir(nullptr)
   , hInterDictionary(172, [](const Belle2::VxdID & vxdid) {return (size_t)vxdid.getID(); })
-, hROIDictionary(172, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
-, hROIDictionaryEvt(172, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
 , m_numModules(0)
-, hnROIs(nullptr)
 , hnInter(nullptr)
 , harea(nullptr)
 , hredFactor(nullptr)
@@ -52,9 +48,6 @@ SVDROIDQMModule::SVDROIDQMModule()
   addParam("InterceptsName", m_InterceptsName,
            "name of the list of interceptions", std::string(""));
 
-  addParam("ROIsName", m_ROIsName,
-           "name of the list of ROIs", std::string(""));
-
   addParam("specificLayer", m_specificLayer,
            "Layer number, if you want the plots only for a specific SVD layer. If it is not a SVD layer (3, 4, 5, 6) than the plots for all SVD layers are produced. Default is (-1), i.e. plots for all SVD layers are produced.",
            m_specificLayer);
@@ -71,7 +64,6 @@ void SVDROIDQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   TDirectory* roiDir = oldDir->mkdir("SVDROIs");
   m_InterDir = roiDir->mkdir("intercept");
-  m_ROIDir = roiDir->mkdir("roi");
 
   hCellU  = new TH1F("hCellU", "CellID U", 769, -0.5, 768.5);
   hCellU->GetXaxis()->SetTitle("U cell ID");
@@ -80,12 +72,6 @@ void SVDROIDQMModule::defineHisto()
 
   m_InterDir->cd();
   hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
-
-  m_ROIDir->cd();
-  hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
-  harea = new TH1F("harea", "ROIs area", 100, 0, 100000);
-  hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
-
 
   createHistosDictionaries();
 
@@ -100,7 +86,6 @@ void SVDROIDQMModule::initialize()
   m_SVDShaperDigits.isOptional(m_SVDShaperDigitsName);
   m_SVDRecoDigits.isOptional(m_SVDRecoDigitsName);
   m_SVDClusters.isOptional(m_SVDClustersName);
-  m_ROIs.isRequired(m_ROIsName);
   m_Intercepts.isRequired(m_InterceptsName);
 
   n_events = 0;
@@ -123,44 +108,6 @@ void SVDROIDQMModule::event()
 
   for (auto& it : m_Intercepts)
     fillSensorInterHistos(&it);
-
-
-  for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it)
-    (it->second).value = 0;
-
-  int ROIarea = 0;
-  double redFactor = 0;
-
-  for (auto& it : m_ROIs) {
-
-    fillSensorROIHistos(&it);
-
-    const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
-    const int nPixelsU = aSensorInfo.getUCells();
-    const int nPixelsV = aSensorInfo.getVCells();
-
-    int minU = it.getMinUid();
-    int minV = it.getMinVid();
-    int maxU = it.getMaxUid();
-    int maxV = it.getMaxVid();
-
-    int tmpROIarea = (maxU - minU) * (maxV - minV);
-    ROIarea += tmpROIarea;
-    redFactor += (double)tmpROIarea / (nPixelsU * nPixelsV * m_numModules);
-
-  }
-
-  hnROIs->Fill(m_ROIs.getEntries());
-
-  harea->Fill((double)ROIarea);
-
-  hredFactor->Fill((double)redFactor);
-
-
-  for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it) {
-    ROIHistoAccumulateAndFill aROIHistoAccumulateAndFill = it->second;
-    aROIHistoAccumulateAndFill.fill(aROIHistoAccumulateAndFill.hPtr, aROIHistoAccumulateAndFill.value);
-  }
 
 }
 
@@ -203,30 +150,9 @@ void SVDROIDQMModule::createHistosDictionaries()
 
         m_numModules++; //counting the total number of modules
 
-        const VXD::SensorInfoBase& wSensorInfo = m_geoCache.getSensorInfo(*itSvdSensors);
-
-        const int nPixelsU = wSensorInfo.getUCells();
-        const int nPixelsV = wSensorInfo.getVCells();
         std::string sensorid = std::to_string(itSvdSensors->getLayerNumber()) + "_" + std::to_string(
                                  itSvdSensors->getLadderNumber()) + "_" +
                                std::to_string(itSvdSensors->getSensorNumber());
-
-
-        // ------ HISTOGRAMS WITH AN ACCUMULATE PER ROI AND A FILL PER EVENT -------
-        m_ROIDir->cd();
-
-        name = "hNROIs_" + sensorid;
-        title = "number of ROIs for sensor " + sensorid;
-        double value = 0;
-        ROIHistoAccumulateAndFill* aHAAF = new ROIHistoAccumulateAndFill {
-          new TH1F(name.c_str(), title.c_str(), 25, 0, 25),
-          [](const ROIid*, double & val) {val++;},
-          [](TH1 * hPtr, double & val) { hPtr->Fill(val); },
-          value
-        };
-        hROIDictionaryEvt.insert(std::pair< Belle2::VxdID, ROIHistoAccumulateAndFill& > ((Belle2::VxdID)*itSvdSensors, *aHAAF));
-
-
 
 
         // ------ HISTOGRAMS WITH A FILL PER INTERCEPT -------
@@ -576,50 +502,6 @@ void SVDROIDQMModule::createHistosDictionaries()
                                 )
                                );
 
-        // residual vs time for clusters
-        name = "hClusterResidU_vs_time_" + sensorid;
-        title = "Cluster U residual (cm) vs time " + sensorid;
-        tmp2D = new TH2F(name.c_str(), title.c_str(), 400, -200, 200, 100, -5, 5);
-        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
-        tmp2D->GetXaxis()->SetTitle("time (ns)");
-        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
-                                (
-                                  (Belle2::VxdID)*itSvdSensors,
-                                  InterHistoAndFill(
-                                    tmp2D,
-        [this](TH1 * hPtr, const SVDIntercept * inter) {
-
-          for (auto& it : this->m_SVDClusters)
-            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUCluster())) {
-              double resid = inter->getCoorU() - it.getPosition(inter->getCoorV());
-              hPtr->Fill(it.getClsTime(), resid);
-            }
-        }
-                                  )
-                                )
-                               );
-
-        name = "hClusterResidV_vs_time_" + sensorid;
-        title = "Cluster V residual (cm) vs time " + sensorid;
-        tmp2D = new TH2F(name.c_str(), title.c_str(), 400, -200, 200, 100, -5, 5);
-        tmp2D->GetYaxis()->SetTitle("Cluster V resid (cm)");
-        tmp2D->GetXaxis()->SetTitle("time (ns)");
-        hInterDictionary.insert(std::pair< Belle2::VxdID, InterHistoAndFill >
-                                (
-                                  (Belle2::VxdID)*itSvdSensors,
-                                  InterHistoAndFill(
-                                    tmp2D,
-        [this](TH1 * hPtr, const SVDIntercept * inter) {
-
-          for (auto& it : this->m_SVDClusters)
-            if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUCluster())) {
-              double resid = inter->getCoorV() - it.getPosition();
-              hPtr->Fill(it.getClsTime(), resid);
-            }
-        }
-                                  )
-                                )
-                               );
 
         // scatter plot: U,V intercept in cm VS U,V cell position
         name = "hCoorU_vs_UDigit_" + sensorid;
@@ -670,102 +552,6 @@ void SVDROIDQMModule::createHistosDictionaries()
                                );
 
 
-
-
-
-
-        // ------ HISTOGRAMS WITH A FILL PER ROI -------
-        m_ROIDir->cd();
-
-        // MIN in U and V
-        name = "hminU_" + sensorid;
-        title = "ROI min in U for sensor " + sensorid;
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  new TH1F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU),
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill(roi->getMinUid()); }
-                                )
-                              )
-                             );
-        name = "hminV_" + sensorid;
-        title = "ROI min in V for sensor " + sensorid;
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  new TH1F(name.c_str(), title.c_str(), nPixelsV, 0, nPixelsV),
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill(roi->getMinVid()); }
-                                )
-                              )
-                             );
-        //--------------------------
-        // MAX in U and V
-        name = "hmaxU_" + sensorid;
-        title = "ROI max in U for sensor " + sensorid;
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  new TH1F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU),
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill(roi->getMaxUid()); }
-                                )
-                              )
-                             );
-        name = "hmaxV_" + sensorid;
-        title = "ROI max in V for sensor " + sensorid;
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  new TH1F(name.c_str(), title.c_str(), nPixelsV, 0, nPixelsV),
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill(roi->getMaxVid()); }
-                                )
-                              )
-                             );
-        //--------------------------
-
-        // WIDTH in U and V
-        name = "hwidthU_" + sensorid;
-        title = "ROI width in U for sensor " + sensorid;
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  new TH1F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU),
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill(roi->getMaxUid() - roi->getMinUid()); }
-                                )
-                              )
-                             );
-        name = "hwidthV_" + sensorid;
-        title = "ROI width in V for sensor " + sensorid;
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  new TH1F(name.c_str(), title.c_str(), nPixelsV, 0, nPixelsV),
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill(roi->getMaxVid() - roi->getMinVid()); }
-                                )
-                              )
-                             );
-
-        // ROI center
-        name = "hROIcenter_" + sensorid;
-        title = "ROI center " + sensorid;
-        tmp2D = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
-        tmp2D->GetXaxis()->SetTitle(" U (ID)");
-        tmp2D->GetYaxis()->SetTitle(" V (ID)");
-        hROIDictionary.insert(std::pair< Belle2::VxdID, ROIHistoAndFill >
-                              (
-                                (Belle2::VxdID)*itSvdSensors,
-                                ROIHistoAndFill(
-                                  tmp2D,
-        [](TH1 * hPtr, const ROIid * roi) { hPtr->Fill((roi->getMaxUid() + roi->getMinUid()) / 2, (roi->getMaxVid() + roi->getMinVid()) / 2); }
-                                )
-                              )
-                             );
-
         //--------------------------
 
         ++itSvdSensors;
@@ -789,27 +575,10 @@ void SVDROIDQMModule::fillSensorInterHistos(const SVDIntercept* inter)
 
 }
 
-void SVDROIDQMModule::fillSensorROIHistos(const ROIid* roi)
-{
-
-  auto its = hROIDictionary.equal_range(roi->getSensorID());
-
-  for (auto it = its.first; it != its.second; ++it) {
-    ROIHistoAndFill aROIHistoAndFill = it->second;
-    aROIHistoAndFill.second(aROIHistoAndFill.first, roi);
-  }
-
-  auto itsEvt = hROIDictionaryEvt.equal_range(roi->getSensorID());
-  for (auto it = itsEvt.first; it != itsEvt.second; ++it)
-    (it->second).accumulate(roi, (it->second).value);
-}
 
 void SVDROIDQMModule::endRun()
 {
 
   hCellU->Scale((double)1 / n_events);
   hCellV->Scale((double)1 / n_events);
-
-  for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it)
-    delete &(it->second);
 }

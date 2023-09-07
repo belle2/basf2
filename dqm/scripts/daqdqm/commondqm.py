@@ -92,6 +92,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('SVDDQMClustersOnTrack')
             # SVD DOSE
             add_svd_dqm_dose(path, 'SVDShaperDigitsZS5')
+            # SVD ROI
+            path.add_module('SVDROIDQM', plotRecoDigits=False)
 
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:

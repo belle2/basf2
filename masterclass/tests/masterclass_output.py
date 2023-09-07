@@ -16,9 +16,8 @@ from reconstruction import add_reconstruction
 main = b2.Path()
 
 b2.set_random_seed(12345)
-eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10]})
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter', evtNumList=[10])
+
 particlegun = b2.register_module('ParticleGun')
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [0.5, 4.0])
@@ -27,6 +26,7 @@ particlegun.param('nTracks', 10)
 particlegun.param('thetaGeneration', 'uniformCos')
 particlegun.param('thetaParams', [0.0, 180.0])
 main.add_module(particlegun)
+
 add_simulation(main)
 add_reconstruction(main)
 

@@ -34,8 +34,6 @@ int BEvent::EventNo()
 void BEvent::AddTrack(float px, float py, float pz, float e,
                       float charge, SIMPLEPID pid)
 {
-  // const TClonesArray& particles = *m_particles;
-  // new (particles[m_nprt++]) BParticle(px, py, pz, e, charge, pid);
   new ((*m_particles)[m_nprt++]) BParticle(px, py, pz, e, charge, pid);
 }
 
@@ -43,8 +41,6 @@ void BEvent::AddTrack(float px, float py, float pz, float e,
                       float charge, SIMPLEPID pid,
                       float logL_e, float logL_mu, float logL_pi, float logL_k, float logL_p, float logL_d)
 {
-  // const TClonesArray& particles = *m_particles;
-  // new (particles[m_nprt++]) BParticle(px, py, pz, e, charge, pid);
   new ((*m_particles)[m_nprt++]) BParticle(px, py, pz, e, charge, pid, logL_e, logL_mu, logL_pi, logL_k, logL_p, logL_d);
 }
 

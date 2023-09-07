@@ -95,6 +95,7 @@ void MasterClassModule::event()
 
 void MasterClassModule::terminate()
 {
+  m_file->cd();
   m_tree->Write();
   m_file->Close();
   delete m_file;

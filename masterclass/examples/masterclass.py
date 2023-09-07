@@ -12,10 +12,11 @@ from modularAnalysis import applyEventCuts
 from sys import argv
 
 main = Path()
-print(main.__dir__())
 
-main.add_module('RootInput')
+inputMod = main.add_module('RootInput')
+# basf2 -n100 -i "/group/belle/users/kspenko/data/masterclass/exp26/sub00/*.root" masterclass.py
 
+# Use this only with data (hadron collections) ---------------------------------
 event_cuts = "[SoftwareTriggerResult(software_trigger_cut&skim&accept_b_neutral)]"
 event_cuts += " or [SoftwareTriggerResult(software_trigger_cut&skim&accept_b_charged)]"
 event_cuts += " or [SoftwareTriggerResult(software_trigger_cut&skim&accept_dstar_1)]"
@@ -40,6 +41,8 @@ trigger_skim.param("expectedResult", 1)
 trigger_skim.param("logicMode", "or")
 trigger_skim.if_value("==0", Path(), AfterConditionPath.END)
 
+
+# (Running on grid with custom compiled libraries) In theory this should work---------------------------
 # mc_module = register_module(
 #     'MasterClass',
 #     shared_lib_path='/home/belle2/kspenko/basf2/modules/Linux_x86_64/opt/libmasterclass_modules.so')

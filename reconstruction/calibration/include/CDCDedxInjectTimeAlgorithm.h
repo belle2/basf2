@@ -136,7 +136,7 @@ namespace Belle2 {
                        std::map<int, std::vector<double>>& varscal, std::string svar);
 
     /**
-    * function to get mean and reso
+    * function to get mean and reso of histogram
     */
     void getMeanReso(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar,
                      std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos);
@@ -226,7 +226,7 @@ namespace Belle2 {
     }
 
     /**
-    * function to get the correction factor
+    * function to get the correction factor of mean
     */
     double getCorrection(unsigned int ring, unsigned int time, std::map<int, std::vector<double>>&  vmeans);
 

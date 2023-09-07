@@ -1171,7 +1171,7 @@ def printToScreen(allSkimStats, samples):
     print(
         "\nNote: If you are producing these stats for a skim pull request, please\n"
         "    consider using the `--markdown` option to produce a Markdown table\n"
-        "    which BitBucket will display nicely."
+        "    which GitLab will display nicely."
     )
 
 
@@ -1247,7 +1247,7 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
 
 def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
     """Format the skim performance statistics as a markdown table, which will be
-    formatted nicely if pasted into a pull request on BitBucket.
+    formatted nicely if pasted into a merge request on GitLab.
 
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by

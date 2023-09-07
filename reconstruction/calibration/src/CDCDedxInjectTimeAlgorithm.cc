@@ -113,6 +113,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
   if (m_isminStat) {
     deleteHisto(htime);
     deleteHisto(hdedx);
+    deleteHisto(hdedx_corr);
     deleteHisto(hchi);
     deleteTimeHisto(hztime);
     delete htimes;
@@ -215,7 +216,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     //1 plot injection time
     plotInjectionTime(hztime);
 
-    //2. Draw dedxfits and chifits
+    //2. Draw dedxfits
     plotBinLevelDist(hdedx, "dedxfits");
 
     //3. Draw chifits
@@ -230,13 +231,13 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     //6. plot relative const., bias-bias corrected for chi
     plotRelConstants(vmeans_chi, vresos_chi, vresoscorr, "chi");
 
-    //6. plot mean and resolution of corrected dedx to check for consistency
+    //7. plot mean and resolution of corrected dedx to check for consistency
     plotRelConstants(vmeans_corr, vresos_corr, vresoscorr, "dedx_corr");
 
-    //7. plot time statistics dist
+    //8. plot time statistics dist
     plotTimeStat(htime);
 
-    //8. plot final merged const. and comparison to old
+    //9. plot final merged const. and comparison to old
     plotFinalConstants(vmeanscal, vresoscal, scale, scale_reso);
   }
 

@@ -13,7 +13,7 @@ using namespace Belle2;
 double CDCDedxSigmaPred::sigmaCurve(double* x, const double* par, int version) const
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
-  // this is done with a different function depending dE/dx, nhit, and sin(theta)
+  // this is done with a different function depending dE/dx, nhit, and cos(theta)
   double f = 0;
 
   if (version == 0) {
@@ -51,7 +51,7 @@ double CDCDedxSigmaPred::nhitPrediction(double nhit)
     nhitpar[i + 1] = m_sigmapars[i + 2];
   }
 
-  // determine sigma from the parameterization
+  // determine sigma from the nhit parameterization
   x[0] = nhit;
 
   double corNHit;
@@ -95,8 +95,6 @@ double CDCDedxSigmaPred::cosPrediction(double cos)
   m_sigmapars = getSigmaVector();
   double x[1];
   double corCos;
-
-  // determine sigma from the parameterization
 
   if (m_sigmapars.size() == 17) {
     double cospar[11];

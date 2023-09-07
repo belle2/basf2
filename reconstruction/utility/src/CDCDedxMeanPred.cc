@@ -31,7 +31,6 @@ double CDCDedxMeanPred::meanCurve(double* x, double* par, int version) const
 
 double CDCDedxMeanPred::getMean(double bg)
 {
-  // CDCDedxMeanPred M;
   m_meanpars = getMeanVector();
 
   // define the section of the mean to use

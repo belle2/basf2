@@ -16,14 +16,16 @@
 namespace Belle2 {
 
   /**
-  * A calibration algorithm for CDC dE/dx electron: 1D enta cleanup correction
-  *
+  * Class to hold the prediction of mean as a function of beta-gamma (bg)
   */
 
   class CDCDedxMeanPred {
 
   public:
 
+    /**
+     * Return the mean vector from payload
+     */
     std::vector<double> getMeanVector() const
     {
       if (!m_DBMeanPars || m_DBMeanPars->getSize() == 0) {
@@ -36,17 +38,22 @@ namespace Belle2 {
         return m_DBMeanPars->getMeanPars();
     }
 
+    /**
+    * Return the predicted mean value as a function of beta-gamma (bg)
+    */
     double getMean(double bg);
+
+    /**
+      * beta-gamma (bg) curve function
+      */
     double meanCurve(double* x, double* par, int version) const;
 
 
   private:
 
-    // parameters to determine the predicted resolutions
     std::vector<double> m_meanpars; /**< dE/dx mean parameters */
 
-    // parameters to determine the predicted resolutions
-    const DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< dE/dx mean parameters */
+    const DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< db object for dE/dx mean parameters */
 
   };
 } // Belle2 namespace

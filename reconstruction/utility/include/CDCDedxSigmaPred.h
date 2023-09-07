@@ -17,21 +17,20 @@
 
 #include <memory>
 #include <cmath>
-// #include <algorithm>
 
 namespace Belle2 {
 
   /**
-  * A calibration algorithm for CDC dE/dx electron: 1D enta cleanup correction
-  *
+  * Class to hold the prediction of resolution depending dE/dx, nhit, and cos(theta)
   */
 
   class CDCDedxSigmaPred {
 
   public:
 
-    /** Initialize the module */
-    //virtual void initialize();
+    /**
+    * Return the resolution vector from payload
+    */
     std::vector<double> getSigmaVector() const
     {
 
@@ -45,22 +44,36 @@ namespace Belle2 {
       } else return m_DBSigmaPars->getSigmaPars();
     }
 
+    /**
+      * resolution functions depending on dE/dx, nhit, and cos(theta)
+      */
     double sigmaCurve(double* x, const double* par, int version) const;
 
-
+    /**
+      * Return the predicted resolution depending on dE/dx, nhit, and cos(theta)
+      */
     double getSigma(double dedx, double nhit, double cos, double timereso);
 
+    /**
+      * Return sigma from the nhit parameterization
+      */
     double nhitPrediction(double nhit);
+
+    /**
+    *  Return sigma from the ionization parameterization
+    */
     double ionzPrediction(double dedx);
+
+    /**
+    *  Return sigma from the cos parameterization
+    */
     double cosPrediction(double cos);
 
   private:
 
-    // parameters to determine the predicted resolutions
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
-    // parameters to determine the predicted resolutions
-    const DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< dE/dx resolution parameters */
+    const DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< db object for dE/dx resolution parameters */
 
   };
 } // Belle2 namespace

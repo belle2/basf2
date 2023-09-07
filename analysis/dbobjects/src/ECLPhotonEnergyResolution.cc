@@ -63,7 +63,7 @@ double ECLPhotonEnergyResolution::getRelativeEnergyResolution(double energy, dou
    */
   WeightInfo energyResolutionInfo = m_resolutionBinningTable.getInfo(binning);
 
-  if (energyResolutionInfo.at("RelativeEnergyResolution")) {
+  if (energyResolutionInfo.at("RelativeEnergyResolution") == -1.) {
     B2DEBUG(20, "Energy resolution was returned as -1 since provided energy was not within energy resolution binning.");
   }
 

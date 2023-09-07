@@ -15,6 +15,7 @@ import json
 import argparse
 
 from ROOT.Belle2 import ECLPhotonEnergyResolution, Database, IntervalOfValidity
+from b2test_utils import require_file
 
 PathType = Union[str, AnyStr, os.PathLike]
 OutputType = Dict[str, Any]
@@ -23,7 +24,7 @@ BinningType = List[Tuple[float, float]]
 
 # Add custom parser for config script
 parser = argparse.ArgumentParser(allow_abbrev=True)
-parser.add_argument("-f", "--filename", help="PERC summary output file")
+parser.add_argument("-f", "--filename", help="PERC summary output file", default="ExamplePhotonEnergyResolution.json")
 args, _ = parser.parse_known_args()
 filename = args.filename
 
@@ -112,14 +113,14 @@ def process_resolution(filename: PathType) -> Tuple[ECLPhotonEnergyResolution, D
 
 
 if __name__ == "__main__":
-    if filename:
-        photonEnergyResolution, information_dict = process_resolution(filename)
+    filepath = require_file(filename, "examples")
+    photonEnergyResolution, information_dict = process_resolution(filepath)
 
-        database = Database.Instance()
-        iov = IntervalOfValidity(
-            information_dict["experimentLow"],
-            information_dict["runLow"],
-            information_dict["experimentHigh"],
-            information_dict["runHigh"],
-        )
-        database.storeData("ECLPhotonEnergyResolution", photonEnergyResolution, iov)
+    database = Database.Instance()
+    iov = IntervalOfValidity(
+        information_dict["experimentLow"],
+        information_dict["runLow"],
+        information_dict["experimentHigh"],
+        information_dict["runHigh"],
+    )
+    database.storeData("ECLPhotonEnergyResolution", photonEnergyResolution, iov)

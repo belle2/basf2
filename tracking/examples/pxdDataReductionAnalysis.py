@@ -21,7 +21,7 @@ main = b2.create_path()
 main.add_module('EventInfoSetter', expList=[0], runList=[1], evtNumList=[100])
 main.add_module('EvtGenInput', logLevel=b2.LogLevel.INFO)
 
-add_simulation(main, components=['PXD', 'SVD', 'CDC'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
+add_simulation(main, forceSetPXDDataReduction=True, usePXDDataReduction=False)
 
 add_tracking_reconstruction(main, ['SVD', 'CDC'], mcTrackFinding=True)
 

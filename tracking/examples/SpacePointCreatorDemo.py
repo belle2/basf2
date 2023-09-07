@@ -27,7 +27,7 @@ main.add_module('Gearbox')
 main.add_module('Geometry')
 main.add_module('EvtGenInput', logLevel=b2.LogLevel.WARNING)
 # For this example we only need PXD and SVD in simulation, and we only need to clusterize their data, too
-add_simulation(main, components=['PXD', 'SVD'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
+add_simulation(main, forceSetPXDDataReduction=True, usePXDDataReduction=False)
 main.add_module('PXDClusterizer')
 main.add_module('SVDClusterizer')
 main.add_module('SVDSpacePointCreator', OnlySingleClusterSpacePoints=True, NameOfInstance='singlesOnly',

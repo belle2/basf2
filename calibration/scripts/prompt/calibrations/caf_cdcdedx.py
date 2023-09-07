@@ -124,20 +124,20 @@ def get_calibrations(input_data, **kwargs):
         calibration_procedure = {
             "rgtrail0": 0,
             "tg0": 0,
+            "rgpre0": 0,
             "cc0": 0,
             "ce0": 0,
             "bd0": 0,
             "wg0": 0,
-            "rgpre0": 0,
             "rg0": 0
         }
     elif calib_mode == "quick":
         calibration_procedure = {
             "rgtrail0": 0,
             "tg0": 0,
+            "rgpre0": 0,
             "cc0": 0,
             "wg0": 0,
-            "rgpre0": 0,
             "rg0": 0
         }
     elif calib_mode == "manual":
@@ -161,7 +161,7 @@ def get_calibrations(input_data, **kwargs):
             alg = [cos_algo()]
         elif cal_name == "ce":
             alg = [cosedge_algo()]
-        elif cal_name == "tg" or cal_name == "tg_f":
+        elif cal_name == "tg":
             alg = [time_algo()]
         elif cal_name == "bd":
             alg = [badwire_algo()]
@@ -181,7 +181,7 @@ def get_calibrations(input_data, **kwargs):
                                      )
         if payload_boundaries:
             basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
-            if cal_name == "rg" or cal_name == "rgtrail" or cal_name == "rgpre" or cal_name == "tg" or cal_name == "tg_f":
+            if cal_name == "rg" or cal_name == "rgtrail" or cal_name == "rgpre" or cal_name == "tg":
                 cals[i].strategies = SequentialRunByRun
                 for algorithm in cals[i].algorithms:
                     algorithm.params = {"iov_coverage": output_iov}
@@ -212,7 +212,7 @@ def pre_collector(name='rg'):
 
     reco_path = basf2.create_path()
     recon.prepare_cdst_analysis(path=reco_path)
-    if(name == "tg" or name == "tg_f"):
+    if(name == "tg"):
         trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
         # ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
@@ -257,7 +257,7 @@ def collector(granularity='all', name=''):
 
     from basf2 import register_module
     col = register_module('CDCDedxElectronCollector', cleanupCuts=True)
-    if name == "tg" or name == "tg_f":
+    if name == "tg":
         CollParam = {'isRun': True, 'isInjTime': True, 'granularity': 'run'}
 
     elif name == "cc" or name == "ce":

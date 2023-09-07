@@ -2,11 +2,11 @@
 
 # 1 BUGFIX
 
-In **/basf2/masterclass/dataobjects/src/BEvent.cc** there was a ROOT based bugg in **BEvent::AddTrack** function
+In **/basf2/masterclass/dataobjects/src/BEvent.cc** there was a ROOT based bug in **BEvent::AddTrack** function
 
 # 2 Additional test
 
-Created new test **/basf2/masterclass/tests/masterclass_output.py** in order to realize if new ROOT based buggs arise in future releases.
+Created new test **/basf2/masterclass/tests/masterclass_output.py** in order to realize if new ROOT based bugs arise in future releases.
 
 # 3 Updating steering file & New Dataset
 

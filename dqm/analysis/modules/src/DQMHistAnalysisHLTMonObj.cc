@@ -14,6 +14,7 @@
 
 // C++ headers
 #include <regex>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -46,13 +47,14 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   m_c_skim = new TCanvas("Skim", "skim", 400, 400);
   m_c_hardware = new TCanvas("Hardware", "hardware", 1000, 1000);
   m_c_l1 = new TCanvas("L1", "l1", 750, 400);
+  m_c_ana_eff_shifter = new TCanvas("ana_eff_shifter", "ana_eff_shifter", 1000, 1000);
 
   // add canvases to MonitoringObject
   m_monObj->addCanvas(m_c_filter);
   m_monObj->addCanvas(m_c_skim);
   m_monObj->addCanvas(m_c_hardware);
   m_monObj->addCanvas(m_c_l1);
-
+  m_monObj->addCanvas(m_c_ana_eff_shifter);
 }
 
 
@@ -76,6 +78,13 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_l1_cat_w_overlap = findHist("TRGGDL/hGDL_psn_raw_rate_all");
   TH1* h_l1_cat_wo_overlap = findHist("TRGGDL/hGDL_psn_effect_to_l1_all");
   TH1* h_full_mem = findHist("timing_statistics/fullMemoryHistogram");
+  TCanvas* c_GDL_ana_eff_shifter = findCanvas("TRGGDL/hGDL_ana_eff_shifter");
+  TH1* h_GDL_ana_eff_shifter = nullptr;
+
+  if (c_GDL_ana_eff_shifter) {
+    c_GDL_ana_eff_shifter->cd();
+    h_GDL_ana_eff_shifter = dynamic_cast<TH1*>(gPad->GetPrimitive("hGDL_ana_eff_shifter"));
+  }
 
   // set the content of filter canvas
   m_c_filter->Clear(); // clear existing content
@@ -123,6 +132,11 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   if (h_l1_cat_w_overlap) h_l1_cat_w_overlap->Draw();
   m_c_l1->cd(4);
   if (h_l1_cat_wo_overlap) h_l1_cat_wo_overlap->Draw();
+
+// set the content of ana_eff_shifter canvas
+  m_c_ana_eff_shifter->Clear();
+  m_c_ana_eff_shifter->cd();
+  if (h_GDL_ana_eff_shifter) h_GDL_ana_eff_shifter->Draw();
 
   double n_hlt = 0.;
   if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));
@@ -207,6 +221,15 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
       double nentr = (double)h_l1_cat_wo_overlap->GetBinContent(ibin);
       std::string bin_name(h_l1_cat_wo_overlap->GetXaxis()->GetBinLabel(ibin));
       m_monObj->setVariable(bin_name.insert(0, "l1_noOv_"), nentr);
+    }
+  }
+
+  if (h_GDL_ana_eff_shifter) {
+    // loop bins, add variable to monObj named as "GDLanaEffShifter_" + bin label
+    for (int ibin = 1; ibin < h_GDL_ana_eff_shifter->GetXaxis()->GetNbins() + 1; ibin++) {
+      double nentr = (double)h_GDL_ana_eff_shifter->GetBinContent(ibin);
+      std::string bin_name(h_GDL_ana_eff_shifter->GetXaxis()->GetBinLabel(ibin));
+      m_monObj->setVariable(bin_name.insert(0, "GDLanaEffShifter_"), nentr);
     }
   }
 

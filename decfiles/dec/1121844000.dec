@@ -22,9 +22,6 @@
 #                    | 
 #                      -> e+e- or mu+mu-.
 #
-Alias B0sig      B0
-Alias anti-B0sig anti-B0
-ChargeConj B0sig anti-B0sig
 Alias J/psisig   J/psi
 Alias K0sig   K*0
 Alias anti-K0sig anti-K*0

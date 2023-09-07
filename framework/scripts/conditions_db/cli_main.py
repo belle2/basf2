@@ -577,7 +577,7 @@ def command_diff(args, db):
 
         # print the table but make sure the first column is empty except for
         # added/removed lines so that it can be copy-pasted into a diff syntax
-        # highlighting area (say pull request description)
+        # highlighting area (say merge request description)
         print(f" Differences between {args.tagA} and {args.tagB}")
         pretty_print_table(table, columns, transform=color_row,
                            hline_formatter=lambda w: " " + (w - 1) * '-')

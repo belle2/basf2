@@ -144,7 +144,7 @@ def getArgumentParser():
         metavar="OutputFilename",
         help=(
             "Save a markdown table in a format that can be copied into "
-            "pull request comments."
+            "merge request comments."
         ),
     )
     OutputGroup.add_argument(
@@ -1169,7 +1169,7 @@ def printToScreen(allSkimStats, samples):
         print(table)
 
     print(
-        "\nNote: If you are producing these stats for a skim pull request, please\n"
+        "\nNote: If you are producing these stats for a skim merge request, please\n"
         "    consider using the `--markdown` option to produce a Markdown table\n"
         "    which GitLab will display nicely."
     )
@@ -1291,7 +1291,7 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
 
     print(
         f"Wrote tables to {OutputFilename}. This format is suitable for including "
-        "in pull request comments."
+        "in merge request comments."
     )
 
 

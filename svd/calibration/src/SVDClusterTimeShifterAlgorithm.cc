@@ -41,7 +41,13 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(0);
 
-  auto payload = new Belle2::SVDClusterTimeShifter("SVDClusterTimeShifter_" + m_id);
+  FileStat_t info;
+  int cal_rev = 1;
+  while (gSystem->GetPathInfo(Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.root", m_timeAlgorithms[0].Data(), cal_rev),
+                              info) == 0)
+    cal_rev++;
+
+  auto payload = new Belle2::SVDClusterTimeShifter(Form("SVDClusterTimeShifter_%s_rev_%d", m_id.data(), cal_rev));
 
   // single gaus fit function
   TF1* fn_singleGaus = new TF1("fn_singleGaus", singleGaus, -50., 50., 4);
@@ -88,10 +94,6 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
     hDrawShift->GetYaxis()->SetTitle("Cluster Size");
     hDrawShift->GetXaxis()->SetTitle("Sensor");
 
-    FileStat_t info;
-    int cal_rev = 1;
-    while (gSystem->GetPathInfo(Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.root", alg.Data(), cal_rev), info) == 0)
-      cal_rev++;
     std::unique_ptr<TFile> f(new TFile(Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.root", alg.Data(), cal_rev), "RECREATE"));
 
     TString outPDF = Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.pdf", alg.Data(), cal_rev);
@@ -138,6 +140,10 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
                  " Entries (n. clusters): " << hist->GetEntries() <<
                  " Entries required: " << m_minEntries);
           B2WARNING("Not enough data, adding one run to the collector");
+          delete hDrawShift;
+          c1.Print(outPDF + "]");
+          f->Close();
+          gSystem->Unlink(Form("algorithm_svdClusterTimeShifter_%s_output_rev_%d.root", m_timeAlgorithms[0].Data(), cal_rev));
           return c_NotEnoughData;
         }
 
@@ -161,7 +167,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
           fn_singleGaus->SetParameter(2, histStd * 0.75);
           fn_singleGaus->SetParameter(3, 1.);
           fn_singleGaus->SetParLimits(1, histMean - histStd, histMean + histStd);
-          auto singleGausFitStatus = hist->Fit("fn_singleGaus", "SLMEQ", "",
+          auto singleGausFitStatus = hist->Fit("fn_singleGaus", "SQ", "",
                                                histMean - 2. * histStd, histMean + 2. * histStd);
           isSingleGausFitValid = singleGausFitStatus->IsValid();
 
@@ -179,7 +185,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
                                       fn_doubleGaus->GetParameter(4) - m_maximumAllowedShift,
                                       fn_doubleGaus->GetParameter(4) + m_maximumAllowedShift);
 
-          auto doubleGausFitStatus = hist->Fit("fn_doubleGaus", "SLMEQ+");
+          auto doubleGausFitStatus = hist->Fit("fn_doubleGaus", "SQ+");
           isDoubleGausFitValid = doubleGausFitStatus->IsValid();
           if (isDoubleGausFitValid) break;
           int rebinValue = 2;

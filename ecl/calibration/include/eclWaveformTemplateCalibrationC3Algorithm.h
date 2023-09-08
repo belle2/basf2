@@ -52,8 +52,7 @@ namespace Belle2 {
       int m_firstCellID;  /**< first cell id to fit */
       int m_lastCellID;  /**< last cell id to fit */
 
-      /** Waveform parameters. */
-      DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;
+      DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;  /**< Waveform parameters. */
     };
   }
 } // namespace Belle2

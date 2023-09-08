@@ -56,11 +56,11 @@ namespace Belle2 {
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC4Algorithm.root"; /**< file name for histogram output */
 
-      int m_firstCellID; /** First crystal to calibrate */
-      int m_lastCellID; /** Last crystal to calibrate */
+      int m_firstCellID; /**< First crystal to calibrate */
+      int m_lastCellID; /**< Last crystal to calibrate */
 
-      int m_batchsize = 100;  /** number of crystals in a batch */
-      int m_numBatches = 88;  /** number of batches */
+      int m_batchsize = 100;  /**< number of crystals in a batch */
+      int m_numBatches = 88;  /**< number of batches */
 
     };
   }

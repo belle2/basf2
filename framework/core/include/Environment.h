@@ -316,39 +316,44 @@ namespace Belle2 {
       m_zmqFailOnFailedWorkers = zmqFailOnFailedWorkers;
     }
 
-    /// DAQ environment
+    // DAQ environment
+    /// obtain current environment (DAQ or not)
     bool getZMQDAQEnvironment() const
     {
       return m_zmqDAQEnvironment;
     }
 
+    /// Set DAQ environment
     void setZMQDAQEnvironment(bool zmqDAQ)
     {
       m_zmqDAQEnvironment = zmqDAQ;
     }
 
-    /// DAQ FirstEvent Exp
+    /// get the exp number for DAQ first event
     int getZMQDAQFirstEventExp() const
     {
       return m_zmqDAQFirstEventExp;
     }
 
+    /// set the exp number for DAQ first event
     void setZMQDAQFirstEventExp(int exp)
     {
       m_zmqDAQFirstEventExp = exp;
     }
 
-    /// DAQ FirstEvent Run
+    /// get run number for DAQ first event
     int getZMQDAQFirstEventRun() const
     {
       return m_zmqDAQFirstEventRun;
     }
 
+    /// set run number for DAQ first event
     void setZMQDAQFirstEventRun(int run)
     {
       m_zmqDAQFirstEventRun = run;
     }
 
+    /// checks the exp/run is DAQ first event
     bool isZMQDAQFirstEvent(int exp, int run)
     {
       if (exp == m_zmqDAQFirstEventExp && run == m_zmqDAQFirstEventRun)

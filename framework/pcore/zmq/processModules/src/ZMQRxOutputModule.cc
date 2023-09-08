@@ -50,10 +50,8 @@ void ZMQRxOutputModule::event()
       m_zmqClient.subscribe(EMessageTypes::c_terminateMessage);
       m_firstEvent = false;
 
-      //      m_bgnrun = Environment::Instance().getNumberProcesses() * Environment::Instance().getZMQEventBufferSize();
-      //      m_endrun = Environment::Instance().getNumberProcesses() * Environment::Instance().getZMQEventBufferSize();
-      m_bgnrun = Environment::Instance().getNumberProcesses();
-      m_endrun = Environment::Instance().getNumberProcesses();
+      m_beginRun = Environment::Instance().getNumberProcesses();
+      m_endRun = Environment::Instance().getNumberProcesses();
     }
 
     const auto multicastAnswer = [this](const auto & socket) {
@@ -87,9 +85,9 @@ void ZMQRxOutputModule::event()
         m_zmqClient.publish(std::move(confirmMessage));
         // Check EventMetaData and repeat poll until all end run records received
         if (m_eventMetaData->isEndOfRun()) {
-          m_endrun--;
-          if (m_endrun == 0) {
-            m_endrun = Environment::Instance().getNumberProcesses();
+          m_endRun--;
+          if (m_endRun == 0) {
+            m_endRun = Environment::Instance().getNumberProcesses();
             B2INFO("ZMQOutputModule : sending out EndRun record.");
             return false;
           } else {
@@ -97,9 +95,9 @@ void ZMQRxOutputModule::event()
           }
         } else if (Environment::Instance().isZMQDAQFirstEvent(m_eventMetaData->getExperiment(),
                                                               m_eventMetaData->getRun())) {    // Special first event
-          m_bgnrun--;
-          if (m_bgnrun == 0) {
-            m_bgnrun = Environment::Instance().getNumberProcesses();
+          m_beginRun--;
+          if (m_beginRun == 0) {
+            m_beginRun = Environment::Instance().getNumberProcesses();
             B2INFO("ZMQOutputModule : sending out HLTZMQ first event.");
             return false;
           } else {

@@ -102,10 +102,6 @@ ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, 
     if (module->hasProperties(Module::c_HistogramManager)) {
       // Initialize histogram manager if found in the path
       histoManagerModule = module;
-
-      //add histoman to other paths
-      //      mainPath->addModule(histoManagerModule);
-      //      outputPath->addModule(histoManagerModule);
     }
   }
 
@@ -190,7 +186,7 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     mergedPath.addPath(outputPath);
   }
 
-  B2INFO("ModuleList " << mergedPath.getPathString());
+  B2DEBUG(10, "ModuleList " << mergedPath.getPathString());
 
   return mergedPath.buildModulePathList();
 }

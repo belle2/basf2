@@ -165,8 +165,6 @@ void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
   // Run the initialization of the modules and the histogram manager
   initialize(moduleList, histogramManager);
 
-  //  pause();
-
   B2DEBUG(10, "Main phase");
   // The main part: fork into the different processes and run!
   const ModulePtrList& terminateGlobally = PathUtils::getTerminateGloballyModules(moduleList);
@@ -306,7 +304,6 @@ void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inpu
 
   if (not GlobalProcHandler::startWorkerProcesses(numProcesses)) {
     // Make sure the worker process is running until we go on
-    //    m_processMonitor.waitForRunningWorker(60);
     m_processMonitor.waitForRunningWorker(7200);
     return;
   }
@@ -332,7 +329,6 @@ void ZMQEventProcessor::processPath(const PathPtr& localPath, const ModulePtrLis
   ModulePtrList localModules = localPath->buildModulePathList();
   maxEvent = getMaximumEventNumber(maxEvent);
   // we are not using the default signal handler, so the processCore can not throw any exception because if sigint...
-  //  processCore(localPath, localModules, maxEvent, GlobalProcHandler::isProcess(ProcType::c_Input));
   processCore(localPath, localModules, maxEvent, GlobalProcHandler::isProcess(ProcType::c_Input),
               GlobalProcHandler::isProcess(ProcType::c_Worker),
               GlobalProcHandler::isProcess(ProcType::c_Output));
@@ -444,8 +440,6 @@ void ZMQEventProcessor::cleanup()
 void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrList& modulePathList, long maxEvent,
                                     bool isInputProcess, bool isWorkerProcess, bool isOutputProcess)
 {
-  //  bool firstRound = true;
-
   DataStore::Instance().setInitializeActive(false);
   m_moduleList = modulePathList;
 
@@ -461,8 +455,6 @@ void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrLis
     if (collectStats)
       m_processStatisticsPtr->startGlobal();
 
-    //    B2INFO ( "processCore:: currEvent = " << currEvent );
-
     PathIterator moduleIter(startPath);
 
     if (isInputProcess) {
@@ -472,12 +464,9 @@ void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrLis
     } else if (isOutputProcess) {
       endProcess = ZMQEventProcessor::processEvent(moduleIter, false, false, isOutputProcess && currEvent == 0 && g_daq_environment);
     } else {
-      B2INFO("processCore : should not come here. Specified path is invalid");
+      B2ERROR("processCore : should not come here. Specified path is invalid");
       return;
     }
-
-    // Original code
-    //    endProcess = ZMQEventProcessor::processEvent(moduleIter, isInputProcess && currEvent == 0);
 
     //Delete event related data in DataStore
     DataStore::Instance().invalidateData(DataStore::c_Event);
@@ -546,7 +535,7 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
 
       // Worker Path
       if (WorkerPath) {
-        B2ERROR("Worker Path and First Event!");
+        B2INFO("Worker Path and First Event!");
         if (Environment::Instance().isZMQDAQFirstEvent(m_eventMetaDataPtr->getExperiment(), m_eventMetaDataPtr->getRun())) {
           //  if ( m_eventMetaDataPtr->getExperiment() == Environment::Instance().getZMQDAQFirstEventExp() &&
           //       m_eventMetaDataPtr->getRun() == Environment::Instance().getZMQDAQFirstEventRun() ) {

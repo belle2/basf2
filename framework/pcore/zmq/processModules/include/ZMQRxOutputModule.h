@@ -59,8 +59,9 @@ namespace Belle2 {
     /// The random generator in the data store
     StoreObjPtr<RandomGenerator> m_randomgenerator;
 
-    /// Begin/End Run counter
-    int m_bgnrun;
-    int m_endrun;
+    /// Begin Run counter
+    int m_beginRun;
+    /// End Run counter
+    int m_endRun;
   };
 }

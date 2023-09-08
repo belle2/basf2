@@ -1,3 +1,6 @@
+B65;6800;1c.. _event_generators:
+
+================
 Event Generators
 ================
 
@@ -44,3 +47,12 @@ built with PyTorch is stored in ``generators/smartBKG/model/gatgap.py`` while
 framework.
 
 .. autoclass:: smartBKG.NN_filter_module.NNFilterModule
+
+
+Validation
+----------
+
+.. toctree::
+   :glob:
+
+   validation

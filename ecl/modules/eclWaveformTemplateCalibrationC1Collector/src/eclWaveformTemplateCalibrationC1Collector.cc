@@ -40,6 +40,7 @@ eclWaveformTemplateCalibrationC1CollectorModule::eclWaveformTemplateCalibrationC
   addParam("baselineLimit", m_baselineLimit, "Number of ADC points used to define baseline.", 12);
   addParam("maxResvsCrysIDHistogramLimit", m_maxResvsCrysIDHistogramLimit, "upper limit of histogram.", 100);
   addParam("maxResvsCrysIDHistogramNBins", m_maxResvsCrysIDHistogramNBins, "histogram number of bins.", 1000);
+  addParam("ADCFloorThreshold", m_ADCFloorThreshold, "Used to determine if waveform hit ADC floor", 10);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -97,6 +98,13 @@ void eclWaveformTemplateCalibrationC1CollectorModule::collect()
     if (energy < m_MinEnergyThreshold)  continue;
     // avoid very high energy crystals due to potential photodiode interactions
     if (energy > m_MaxEnergyThreshold)  continue;
+
+    // check if waveform has point below m_ADCFloorThreshold (indicates waveform hit ADC floor)
+    bool skipWaveform = false;
+    for (int i = 0; i < m_numberofADCPoints; i++) {
+      if (aECLDsp.getDspA()[i] < m_ADCFloorThreshold) skipWaveform = true;
+    }
+    if (skipWaveform) continue;
 
     //compute mean of baseline
     float baseline = 0.0;

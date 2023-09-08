@@ -52,6 +52,7 @@ namespace Belle2 {
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
+    int m_ADCFloorThreshold; /**< Used to determine if waveform hit ADC floor */
     int m_baselineLimit; /**< Number of ADC points used to define baseline. */
 
     TH2F* maxResvsCrysID; /**< Histogram to store collector output. */

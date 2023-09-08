@@ -313,7 +313,7 @@ for VXDReq in VXDReqs:
     if resolutionErr < 0.01:
         resolutionErr = 0.01
 
-    Numbr = '{:d}'.format(int((f1 + f2) * fitDataDT.numEntries()))
+    Numbr = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
 
     c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
     c1.cd()
@@ -328,12 +328,12 @@ for VXDReq in VXDReqs:
     legend.AddEntry(
         0,
         '#splitline{#mu_{#Delta t} =' +
-        '{: 4.2f}'.format(shift) +
+        f'{shift: 4.2f}' +
         '}{    #pm ' +
-        '{:4.2f}'.format(shiftErr) +
+        f'{shiftErr:4.2f}' +
         ' ps}')
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(resolution) + '}{    #pm ' +
-                    '{:4.2f}'.format(resolutionErr) + ' ps}')
+    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + f'{resolution: 4.2f}' + '}{    #pm ' +
+                    f'{resolutionErr:4.2f}' + ' ps}')
     legend.SetTextSize(0.054)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
@@ -342,8 +342,8 @@ for VXDReq in VXDReqs:
     c1.SaveAs(nPlot)
     c1.Clear()
 
-    iResult.append(['mu = ' + '{: 4.3f}'.format(shift) + ' +- ' + '{:4.3f}'.format(shiftErr) + ' ps',
-                    'sigma =' + '{: 4.3f}'.format(resolution) + ' +- ' + '{:4.3f}'.format(resolutionErr) + ' ps'])
+    iResult.append(['mu = ' + f'{shift: 4.3f}' + ' +- ' + f'{shiftErr:4.3f}' + ' ps',
+                    'sigma =' + f'{resolution: 4.3f}' + ' +- ' + f'{resolutionErr:4.3f}' + ' ps'])
 
     resFrameDtErr.SetTitle("")
     sXtitleLandau = "#sigma_{#Deltat} / ps"
@@ -364,10 +364,10 @@ for VXDReq in VXDReqs:
     resFrameDtErr.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(meanCBS.getVal()) + '}{    #pm ' +
-                    '{:4.2f}'.format(meanCBS.getError()) + ' ps}')  # '{:>6}'.format(Shift)
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(sigmaCBS.getVal()) +
-                    '}{    #pm ' + '{:4.2f}'.format(sigmaCBS.getError()) + ' ps}')  # '{:>4}'.format(Resol)
+    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + f'{meanCBS.getVal(): 4.2f}' + '}{    #pm ' +
+                    f'{meanCBS.getError():4.2f}' + ' ps}')  # '{:>6}'.format(Shift)
+    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + f'{sigmaCBS.getVal(): 4.2f}' +
+                    '}{    #pm ' + f'{sigmaCBS.getError():4.2f}' + ' ps}')  # '{:>4}'.format(Resol)
     legend.SetTextSize(0.054)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     # legend.Draw()
@@ -471,16 +471,16 @@ for VXDReq in VXDReqs:
     legend.AddEntry(
         0,
         '#splitline{#mu_{#Delta z} =' +
-        '{: 1.1f}'.format(shiftSigZ) +
+        f'{shiftSigZ: 1.1f}' +
         '}{    #pm ' +
-        '{:1.1f}'.format(shiftErrSigZ) +
+        f'{shiftErrSigZ:1.1f}' +
         ' #mum}')
     legend.AddEntry(
         0,
         '#splitline{#sigma_{#Delta z} =' +
-        '{: 1.1f}'.format(resolutionSigZ) +
+        f'{resolutionSigZ: 1.1f}' +
         '}{    #pm ' +
-        '{:1.1f}'.format(resolutionErrSigZ) +
+        f'{resolutionErrSigZ:1.1f}' +
         ' #mum}')
 
     legend.SetTextSize(0.05)
@@ -494,8 +494,8 @@ for VXDReq in VXDReqs:
     fitResSigZ.Clear()
     modelSigZ.Clear()
 
-    iResult.append(['mu = ' + '{:^5.3f}'.format(shiftSigZ) + ' +- ' + '{:^4.3f}'.format(shiftErrSigZ) + ' mum',
-                    'sigma = ' + '{:^4.3f}'.format(resolutionSigZ) + ' +- ' + '{:^4.3f}'.format(resolutionErrSigZ) + ' mum'])
+    iResult.append(['mu = ' + f'{shiftSigZ:^5.3f}' + ' +- ' + f'{shiftErrSigZ:^4.3f}' + ' mum',
+                    'sigma = ' + f'{resolutionSigZ:^4.3f}' + ' +- ' + f'{resolutionErrSigZ:^4.3f}' + ' mum'])
 
     # Fit of Delta z for B0_Tag
 
@@ -590,10 +590,10 @@ for VXDReq in VXDReqs:
     # NumbrTagZ = '{:d}'.format(int((f1+f2)*fitDataTagZ.numEntries()))
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrTagZ))
 
-    legend.AddEntry(0, '#splitline{#mu_{#Delta z} =' + '{: 1.1f}'.format(shiftTagZ) +
-                    '}{  #pm ' + '{: 1.1f}'.format(shiftErrTagZ) + ' #mum}')
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta z} =' + '{: 1.1f}'.format(resolutionTagZ) +
-                    '}{  #pm ' + '{: 1.1f}'.format(resolutionErrTagZ) + ' #mum}')
+    legend.AddEntry(0, '#splitline{#mu_{#Delta z} =' + f'{shiftTagZ: 1.1f}' +
+                    '}{  #pm ' + f'{shiftErrTagZ: 1.1f}' + ' #mum}')
+    legend.AddEntry(0, '#splitline{#sigma_{#Delta z} =' + f'{resolutionTagZ: 1.1f}' +
+                    '}{  #pm ' + f'{resolutionErrTagZ: 1.1f}' + ' #mum}')
     legend.SetTextSize(0.05)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
@@ -602,8 +602,8 @@ for VXDReq in VXDReqs:
     cTag.SaveAs(nPlot)
     cTag.Clear()
 
-    iResult.append(['mu = ' + '{:^5.3f}'.format(shiftTagZ) + ' +- ' + '{:^4.3f}'.format(shiftErrTagZ) + ' mum',
-                    'sigma = ' + '{:^4.3f}'.format(resolutionTagZ) + ' +- ' + '{:^4.3f}'.format(resolutionErrTagZ) + ' mum'])
+    iResult.append(['mu = ' + f'{shiftTagZ:^5.3f}' + ' +- ' + f'{shiftErrTagZ:^4.3f}' + ' mum',
+                    'sigma = ' + f'{resolutionTagZ:^4.3f}' + ' +- ' + f'{resolutionErrTagZ:^4.3f}' + ' mum'])
 
     fitResults.append(iResult)
 
@@ -632,7 +632,7 @@ print('*                                                             *')
 print('* Efficiency                                                  *')
 print('*                                                             *')
 print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
-      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%  *')
+      f'{float(numberOfEntries[1] / numberOfEntries[0] * 100):^3.2f}' + '%  *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

@@ -2451,7 +2451,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
-        inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
+        inputParticlelists = [f'{ptype}:mostlikely_roe' for ptype in ['K+', 'p+', 'e+', 'mu+']]
     import b2bii
     if not b2bii.isB2BII():
         fillParticleList('gamma:all', '', path=path)
@@ -2503,9 +2503,9 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC(f"{t}:roe_default_gen", 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
-            inputParticlelists += ["%s:roe_default_gen" % t]
+            inputParticlelists += [f"{t}:roe_default_gen"]
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('MCROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
@@ -3396,7 +3396,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
-        inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        inputListNames = [f'{ptype}:mostlikely_evtkin' for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         if b2bii.isB2BII():
             copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
@@ -3453,11 +3453,11 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC(f"{t}:evtkin_default_gen", 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
-                applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
-            inputListNames += ["%s:evtkin_default_gen" % t]
+                applyCuts(f"{t}:evtkin_default_gen", selectionCut, path=path)
+            inputListNames += [f"{t}:evtkin_default_gen"]
 
     eventKinematicsModule = register_module('EventKinematics')
     eventKinematicsModule.set_name('EventKinematics_gen')

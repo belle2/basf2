@@ -41,8 +41,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path,
-                    b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(
@@ -67,8 +66,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path,
-                    b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(
@@ -114,8 +112,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path,
-                    b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(
@@ -155,8 +152,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path,
-                    b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(
@@ -204,8 +200,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path,
-                    b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(

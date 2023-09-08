@@ -14,7 +14,6 @@
 
 // C++ headers
 #include <regex>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

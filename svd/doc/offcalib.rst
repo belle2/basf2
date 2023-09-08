@@ -72,3 +72,5 @@ The steps are in the following:
    #. if the double Gaussian fit is successful, the shift considered is the mean of the Gaussian with :math:`f>0.5`;
    #. else if single Gaussian fit is successful, the shift is the mean of the single Gaussian;
    #. else shift is the mean of the histogram.
+
+The shift-values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.

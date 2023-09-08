@@ -99,11 +99,35 @@ public:
    */
 
   SIMPLEPID pid() const { return m_pid; };
+  /**
+   * Get the log likelihood for electron hypothesis
+   * @return the log likelihood for electron hypothesis
+   */
   float logL_e() const { return m_logL_e; };
+  /**
+   * Get the log likelihood for muon hypothesis
+   * @return the log likelihood for muon hypothesis
+   */
   float logL_mu() const { return m_logL_mu; };
+  /**
+   * Get the log likelihood for pion hypothesis
+   * @return the log likelihood for pion hypothesis
+   */
   float logL_pi() const { return m_logL_pi; };
+  /**
+   * Get the log likelihood for kaon hypothesis
+   * @return the log likelihood for kaon hypothesis
+   */
   float logL_k() const { return m_logL_k; };
+  /**
+   * Get the log likelihood for proton hypothesis
+   * @return the log likelihood for proton hypothesis
+   */
   float logL_p() const { return m_logL_p; };
+  /**
+   * Get the log likelihood for deuteron hypothesis
+   * @return the log likelihood for deuteron hypothesis
+   */
   float logL_d() const { return m_logL_d; };
   /**
    * Get the log likelihood for a particle hypothesis

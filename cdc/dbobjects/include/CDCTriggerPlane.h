@@ -8,7 +8,7 @@
 #pragma once
 
 #include <TObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -26,14 +26,14 @@ namespace Belle2 {
     /**
      * Getter for the center posotion of the trigger plane.
      */
-    const TVector3& getTriggerPosition() const
+    const ROOT::Math::XYZVector& getTriggerPosition() const
     {
       return m_position;
     }
     /**
      * Getter for the normal vector to the trigger plane.
      */
-    const TVector3& getTriggerDirection() const
+    const ROOT::Math::XYZVector& getTriggerDirection() const
     {
       return m_direction;
     }
@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Getter for the pmt position.
      */
-    const TVector3& getPmtPosition() const
+    const ROOT::Math::XYZVector& getPmtPosition() const
     {
       return m_pmtPosition;
     }
@@ -55,11 +55,11 @@ namespace Belle2 {
     }
 
   private:
-    TVector3 m_position;    /**< center position of the trigger plane. */
-    TVector3 m_direction;   /**< normal direction to the trigger plane. */
-    TVector3 m_pmtPosition; /**< edge position of the pmt. */
+    ROOT::Math::XYZVector m_position;    /**< center position of the trigger plane. */
+    ROOT::Math::XYZVector m_direction;   /**< normal direction to the trigger plane. */
+    ROOT::Math::XYZVector m_pmtPosition; /**< edge position of the pmt. */
     double m_lightPropSpeed = 12.9925; /**< light of speed in the trigger counter. */
-    ClassDef(CDCTriggerPlane, 1); /**< ClassDef */
+    ClassDef(CDCTriggerPlane, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

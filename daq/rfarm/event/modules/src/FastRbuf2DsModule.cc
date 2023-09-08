@@ -123,7 +123,7 @@ void FastRbuf2DsModule::initialize()
 void FastRbuf2DsModule::ReadRbufInThread()
 {
   printf("ReadFileInThread started!!\n");
-  int rf_nevt = 0;
+  int rf_nevt [[maybe_unused]] = 0;
   for (;;) {
     char* evtbuf = new char[EvtMessage::c_MaxEventSize];
     int size;

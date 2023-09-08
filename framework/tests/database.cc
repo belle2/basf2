@@ -25,7 +25,7 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <list>
 #include <cstdio>
 
@@ -115,7 +115,7 @@ namespace {
     /** clear datastore */
     void TearDown() override
     {
-      if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
+      if (m_dbType != c_central) std::filesystem::remove_all("testPayloads");
       Database::reset();
       DataStore::Instance().reset();
     }
@@ -645,7 +645,7 @@ namespace {
     /** Just reset the Database, hopefully no DataStore needs resetting */
     void TearDown() override
     {
-      if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
+      if (m_dbType != c_central) std::filesystem::remove_all("testPayloads");
       Database::reset();
     }
 

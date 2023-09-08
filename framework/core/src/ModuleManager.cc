@@ -11,9 +11,7 @@
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/filesystem.hpp>
 #include <regex>
-
 #include <fstream>
 
 using namespace Belle2;
@@ -48,15 +46,15 @@ void ModuleManager::addModuleSearchPath(const string& path)
     m_moduleSearchPathList.push_back(path);
 
     //Search the path for map files and add the contained module names to the known module names
-    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(path));
-    boost::filesystem::directory_iterator endIter;
+    auto fullPath = std::filesystem::absolute(std::filesystem::path(path));
+    std::filesystem::directory_iterator endIter;
 
 
     map<string, string> moduleNameLibMap;
-    for (boost::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
+    for (std::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
       //Only files in the given folder are taken, subfolders are not used.
-      if (boost::filesystem::is_regular_file(dirItr->status())) {
-        if (boost::filesystem::extension(dirItr->path()) == MAP_FILE_EXTENSION) {
+      if (std::filesystem::is_regular_file(dirItr->status())) {
+        if (std::filesystem::path(dirItr->path()).extension() == MAP_FILE_EXTENSION) {
           fillModuleNameLibMap(moduleNameLibMap, *dirItr);
         }
       }
@@ -154,10 +152,10 @@ bool ModuleManager::allModulesHaveFlag(const ModulePtrList& list, unsigned int f
 //============================================================================
 
 void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap,
-                                         const boost::filesystem::directory_entry& mapPath)
+                                         const std::filesystem::directory_entry& mapPath)
 {
   //Check if the associated shared library file exists
-  string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
+  string sharedLibPath = std::filesystem::path(mapPath).replace_extension(LIB_FILE_EXTENSION).string();
   if (!FileSystem::fileExists(sharedLibPath)) {
     B2WARNING("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string());
     return;

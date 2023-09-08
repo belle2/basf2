@@ -48,9 +48,10 @@ namespace Belle2 {
       /// Destructor
       virtual ~IGlobalParamInterface() {}
       /// Implement this to be called after Millepede finishes and all global parameters are filled
-      /// in DB objects (which allow this) in GlobalParam
-      /// @param std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& tuple with result <unique id, element, param, value>
-      /// @param GlobalParamVector& the GlobalVector which you have to update, extend or just read jsu after it is filled
+      /// in DB objects (which allow this) in GlobalParam. The function takes two parameters, both of which are unused
+      /// thus no name is given
+      /// First parameter: Vector with a tuple representing <unique id, element, param, value> per result
+      /// Second parameter: The GlobalParamVector which you have to update, extend or just read jsu after it is filled
       /// automatically (for DB objects which support it) and before its DBObjects are stored back into DB.
       virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&,
                                   GlobalParamVector&) {};

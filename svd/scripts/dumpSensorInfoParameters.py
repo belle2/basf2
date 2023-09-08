@@ -46,9 +46,9 @@ class printVelocity(b2.Module):
             z = - thickness / 2 + step * s
             print('Z = ' + str(z * 1e4) + ' um')
             print('   electrons')
-            sensorInfo.getVelocity(-1, r.TVector3(0, 0, z)).Print()
+            sensorInfo.getVelocity(-1, r.Math.XYZVector(0, 0, z)).Print()
             print('   holes')
-            sensorInfo.getVelocity(+1, r.TVector3(0, 0, z)).Print()
+            sensorInfo.getVelocity(+1, r.Math.XYZVector(0, 0, z)).Print()
 
 
 class printMobility(b2.Module):
@@ -72,12 +72,13 @@ class printMobility(b2.Module):
             z = - thickness / 2 + step * s
             print('Z = ' + str(z * 1e4) + ' um')
             print('   E-field')
-            sensorInfo.getEField(r.TVector3(0, 0, z)).Print()
+            sensorInfo.getEField(r.Math.XYZVector(0, 0, z)).Print()
             print('   B-field')
-            sensorInfo.getBField(r.TVector3(0, 0, z)).Print()
+            sensorInfo.getBField(r.Math.XYZVector(0, 0, z)).Print()
             print('electorn hall factor = ' + str(sensorInfo.getHallFactor(-1)))
-            print('   electron mobility = ' + str(sensorInfo.getElectronMobility(sensorInfo.getEField(r.TVector3(0, 0, z)).Mag())))
-            print('   hole mobility = ' + str(sensorInfo.getHoleMobility(sensorInfo.getEField(r.TVector3(0, 0, z)).Mag())))
+            print('   electron mobility = ' +
+                  str(sensorInfo.getElectronMobility(sensorInfo.getEField(r.Math.XYZVector(0, 0, z)).Mag())))
+            print('   hole mobility = ' + str(sensorInfo.getHoleMobility(sensorInfo.getEField(r.Math.XYZVector(0, 0, z)).Mag())))
             print('hole hall factor = ' + str(sensorInfo.getHallFactor(+1)))
 
         print('TEMPERATURE = ' + str(sensorInfo.getTemperature))

@@ -64,7 +64,6 @@ eventinfosetter.param('evtNumList', [500])
 # create geometry
 gearbox = b2.register_module('Gearbox')
 geometry = b2.register_module('Geometry')
-geometry.param('components', ['CDC', 'MagneticField'])
 
 particlegun = b2.register_module('ParticleGun')
 particlegun.param('nTracks', 4)

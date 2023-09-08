@@ -11,53 +11,55 @@
 using namespace Belle2;
 
 CDCTriggerMLP::CDCTriggerMLP():
-  nNodes{27, 27, 2}, trained(false), targetVars(3), outputScale{ -1., 1., -1., 1.},
-  phiRange{0., 2. * M_PI}, invptRange{ -5., 5.}, thetaRange{0., M_PI},
-  maxHitsPerSL(1), SLpattern(0), SLpatternMask(0), tMax(256),
-  relevantID{ -1., 1.,
-              -10., 1.,
-              -1., 1.,
-              -1., 10.,
-              -1., 1.,
-              -10.5, 1.,
-              -1., 1.,
-              -1., 11.,
-              -1., 1.},
-    et_option("etf_or_fastestpriority"),
-    T0fromHits(false)
+  m_nNodes{27, 27, 2}, m_trained(false), m_targetVars(3), m_outputScale{ -1., 1., -1., 1.},
+  m_phiRangeUse{0., 2. * M_PI}, m_invptRangeUse{ -5., 5.}, m_thetaRangeUse{0., M_PI},
+  m_phiRangeTrain{0., 2. * M_PI}, m_invptRangeTrain{ -5., 5.}, m_thetaRangeTrain{0., M_PI},
+  m_maxHitsPerSL(1), m_SLpattern(0), m_SLpatternMask(0), m_tMax(256),
+  m_relevantID{ -1., 1.,
+                -10., 1.,
+                -1., 1.,
+                -1., 10.,
+                -1., 1.,
+                -10.5, 1.,
+                -1., 1.,
+                -1., 11.,
+                -1., 1.},
+    m_et_option("etf_or_fastestpriority")
 {
-  weights.assign(nWeightsCal(), 0.);
+  m_weights.assign(nWeightsCal(), 0.);
 }
 
 CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
                              unsigned short targets,
                              std::vector<float>& outputscale,
-                             std::vector<float>& phirange,
-                             std::vector<float>& invptrange,
-                             std::vector<float>& thetarange,
+                             std::vector<float>& phirangeUse,
+                             std::vector<float>& invptrangeUse,
+                             std::vector<float>& thetarangeUse,
+                             std::vector<float>& phirangeTrain,
+                             std::vector<float>& invptrangeTrain,
+                             std::vector<float>& thetarangeTrain,
                              unsigned short maxHits,
                              unsigned long pattern,
                              unsigned long patternMask,
                              unsigned short tmax,
-                             bool calcT0,
                              const std::string&  etoption):
-  nNodes(nodes), trained(false), targetVars(targets), outputScale(outputscale),
-  phiRange(phirange), invptRange(invptrange), thetaRange(thetarange),
-  maxHitsPerSL(maxHits), SLpattern(pattern), SLpatternMask(patternMask),
-  tMax(tmax),
-  relevantID{ -1., 1.,
-              -10., 1.,
-              -1., 1.,
-              -1., 10.,
-              -1., 1.,
-              -10.5, 1.,
-              -1., 1.,
-              -1., 11.,
-              -1., 1.},
-    et_option(etoption),
-    T0fromHits(calcT0)
+  m_nNodes(nodes), m_trained(false), m_targetVars(targets), m_outputScale(outputscale),
+  m_phiRangeUse(phirangeUse), m_invptRangeUse(invptrangeUse), m_thetaRangeUse(thetarangeUse),
+  m_phiRangeTrain(phirangeTrain), m_invptRangeTrain(invptrangeTrain), m_thetaRangeTrain(thetarangeTrain),
+  m_maxHitsPerSL(maxHits), m_SLpattern(pattern), m_SLpatternMask(patternMask),
+  m_tMax(tmax),
+  m_relevantID{ -1., 1.,
+                -10., 1.,
+                -1., 1.,
+                -1., 10.,
+                -1., 1.,
+                -10.5, 1.,
+                -1., 1.,
+                -1., 11.,
+                -1., 1.},
+    m_et_option(etoption)
 {
-  weights.assign(nWeightsCal(), 0.);
+  m_weights.assign(nWeightsCal(), 0.);
 }
 
 unsigned
@@ -65,53 +67,79 @@ CDCTriggerMLP::nWeightsCal() const
 {
   unsigned nWeights = 0;
   if (nLayers() > 1) {
-    nWeights = (nNodes[0] + 1) * nNodes[1];
+    nWeights = (m_nNodes[0] + 1) * m_nNodes[1];
     for (unsigned il = 1; il < nLayers() - 1; ++il) {
-      nWeights += (nNodes[il] + 1) * nNodes[il + 1];
+      nWeights += (m_nNodes[il] + 1) * m_nNodes[il + 1];
     }
   }
   return nWeights;
 }
 
 bool
-CDCTriggerMLP::inPhiRange(float phi) const
+CDCTriggerMLP::inPhiRangeUse(float phi) const
 {
-  return ((phiRange[0] <= (phi - 2. * M_PI) && (phi - 2. * M_PI) <= phiRange[1]) ||
-          (phiRange[0] <= phi && phi <= phiRange[1]) ||
-          (phiRange[0] <= (phi + 2. * M_PI) && (phi + 2. * M_PI) <= phiRange[1]));
+  return ((m_phiRangeUse[0] <= (phi - 2. * M_PI) && (phi - 2. * M_PI) <= m_phiRangeUse[1]) ||
+          (m_phiRangeUse[0] <= phi && phi <= m_phiRangeUse[1]) ||
+          (m_phiRangeUse[0] <= (phi + 2. * M_PI) && (phi + 2. * M_PI) <= m_phiRangeUse[1]));
 }
 
 bool
-CDCTriggerMLP::inPtRange(float pt) const
+CDCTriggerMLP::inPtRangeUse(float pt) const
 {
-  return (invptRange[0] <= 1. / pt && 1. / pt <= invptRange[1]);
+  return (m_invptRangeUse[0] <= 1. / pt && 1. / pt <= m_invptRangeUse[1]);
 }
 
 bool
-CDCTriggerMLP::inInvptRange(float invpt) const
+CDCTriggerMLP::inInvptRangeUse(float invpt) const
 {
-  return (invptRange[0] <= invpt && invpt <= invptRange[1]);
+  return (m_invptRangeUse[0] <= invpt && invpt <= m_invptRangeUse[1]);
 }
 
 bool
-CDCTriggerMLP::inThetaRange(float theta) const
+CDCTriggerMLP::inThetaRangeUse(float theta) const
 {
-  return (thetaRange[0] <= theta && theta <= thetaRange[1]);
+  return (m_thetaRangeUse[0] <= theta && theta <= m_thetaRangeUse[1]);
+}
+
+bool
+CDCTriggerMLP::inPhiRangeTrain(float phi) const
+{
+  return ((m_phiRangeTrain[0] <= (phi - 2. * M_PI) && (phi - 2. * M_PI) <= m_phiRangeTrain[1]) ||
+          (m_phiRangeTrain[0] <= phi && phi <= m_phiRangeTrain[1]) ||
+          (m_phiRangeTrain[0] <= (phi + 2. * M_PI) && (phi + 2. * M_PI) <= m_phiRangeTrain[1]));
+}
+
+bool
+CDCTriggerMLP::inPtRangeTrain(float pt) const
+{
+  return (m_invptRangeTrain[0] <= 1. / pt && 1. / pt <= m_invptRangeTrain[1]);
+}
+
+bool
+CDCTriggerMLP::inInvptRangeTrain(float invpt) const
+{
+  return (m_invptRangeTrain[0] <= invpt && invpt <= m_invptRangeTrain[1]);
+}
+
+bool
+CDCTriggerMLP::inThetaRangeTrain(float theta) const
+{
+  return (m_thetaRangeTrain[0] <= theta && theta <= m_thetaRangeTrain[1]);
 }
 
 bool
 CDCTriggerMLP::isRelevant(float relId, unsigned iSL) const
 {
-  return (relevantID[2 * iSL] <= relId && relId <= relevantID[2 * iSL + 1]);
+  return (m_relevantID[2 * iSL] <= relId && relId <= m_relevantID[2 * iSL + 1]);
 }
 
 float
 CDCTriggerMLP::scaleId(double relId, unsigned iSL) const
 {
-  float scale = 2. / (relevantID[2 * iSL + 1] - relevantID[2 * iSL]);
+  float scale = 2. / (m_relevantID[2 * iSL + 1] - m_relevantID[2 * iSL]);
   // round down to nearest power of 2
   scale = pow(2, floor(log2(scale)));
-  float offset = (relevantID[2 * iSL] + relevantID[2 * iSL + 1]) / 2.;
+  float offset = (m_relevantID[2 * iSL] + m_relevantID[2 * iSL + 1]) / 2.;
   return scale * (relId - offset);
 }
 
@@ -121,7 +149,7 @@ CDCTriggerMLP::scaleTarget(std::vector<float> target) const
   std::vector<float> scaled;
   scaled.assign(target.size(), 0.);
   for (unsigned i = 0; i < target.size(); ++i) {
-    scaled[i] = 2. * (target[i] - outputScale[2 * i]) / (outputScale[2 * i + 1] - outputScale[2 * i]) - 1.;
+    scaled[i] = 2. * (target[i] - m_outputScale[2 * i]) / (m_outputScale[2 * i + 1] - m_outputScale[2 * i]) - 1.;
   }
   return scaled;
 }
@@ -132,7 +160,7 @@ CDCTriggerMLP::unscaleTarget(std::vector<float> target) const
   std::vector<float> unscaled;
   unscaled.assign(target.size(), 0.);
   for (unsigned i = 0; i < target.size(); ++i) {
-    unscaled[i] = (target[i] + 1.) * (outputScale[2 * i + 1] - outputScale[2 * i]) / 2. + outputScale[2 * i];
+    unscaled[i] = (target[i] + 1.) * (m_outputScale[2 * i + 1] - m_outputScale[2 * i]) / 2. + m_outputScale[2 * i];
   }
   return unscaled;
 }
@@ -140,11 +168,11 @@ CDCTriggerMLP::unscaleTarget(std::vector<float> target) const
 int
 CDCTriggerMLP::zIndex() const
 {
-  return (targetVars & 1) ? 0 : -1;
+  return (m_targetVars & 1) ? 0 : -1;
 }
 
 int
 CDCTriggerMLP::thetaIndex() const
 {
-  return (targetVars & 2) ? (targetVars & 1) : -1;
+  return (m_targetVars & 2) ? (m_targetVars & 1) : -1;
 }

@@ -147,10 +147,10 @@ namespace Belle2 {
       }
     }
     void GlobalParamVector::postReadFromResult(
-      std::vector< std::tuple< short unsigned int, short unsigned int, short unsigned int, double > >& result)
+      std::vector< std::tuple< short unsigned int, short unsigned int, short unsigned int, double > >& results)
     {
       for (auto interface : m_subDetectorInterfacesVector) {
-        interface->readFromResult(result, *this);
+        interface->readFromResult(results, *this);
       }
     }
 

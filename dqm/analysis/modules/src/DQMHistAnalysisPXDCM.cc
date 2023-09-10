@@ -231,7 +231,7 @@ void DQMHistAnalysisPXDCMModule::event()
           }
           m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
 
-          SetEpicsPV((std::string)m_PXDModules[i], mean_adhoc)
+          setEpicsPV((std::string)m_PXDModules[i], mean_adhoc)
         }
       }
     }
@@ -264,9 +264,9 @@ void DQMHistAnalysisPXDCMModule::event()
     if (anyupdate) {
       double dataoutside = all > 0 ? (all_outside / all) : 0;
       double datacm = all > 0 ? (all_cm / all) : 0;
-      SetEpicsPV("Status", status_adhoc);
-      SetEpicsPV("Outside", dataoutside);
-      SetEpicsPV("CM63", datacm);
+      setEpicsPV("Status", status_adhoc);
+      setEpicsPV("Outside", dataoutside);
+      setEpicsPV("CM63", datacm);
     }
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");

@@ -116,8 +116,8 @@ void DQMHistAnalysisPXDCMModule::initialize()
   //registerEpicsPV("PXD:CommonMode:CM62", "CM62");
 
   for (VxdID& aPXDModule : m_PXDModules) {
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:CommonMode:Mean:" + buff, (std::string)aPXDModule);
   }
   B2DEBUG(99, "DQMHistAnalysisPXDCM: initialized.");
@@ -231,7 +231,7 @@ void DQMHistAnalysisPXDCMModule::event()
           }
           m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
 
-          setEpicsPV((std::string)m_PXDModules[i], mean_adhoc)
+          setEpicsPV((std::string)m_PXDModules[i], mean_adhoc);
         }
       }
     }

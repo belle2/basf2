@@ -41,7 +41,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
@@ -53,11 +52,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 
 DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDEffModule::initialize()
@@ -97,20 +91,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
     nv = cellGetInfo.getVCells();
   }
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  }
-#endif
-
   for (VxdID& aPXDModule : m_PXDModules) {
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
-#ifdef _BELLE2_EPICS
-    if (getUseEpics()) {
-      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &mychid_eff[aPXDModule]), "ca_create_channel failure");
-    }
-#endif
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
+    registerEpicsPV("PXD:Eff:" + buff, (std::string)aPXDModule);
+
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
     m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
@@ -182,16 +167,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    // values per module, see above
-    mychid_status.resize(2);
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Overall").data(), NULL, NULL, 10, &mychid_status[1]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:Eff:Status", "Status");
+  registerEpicsPV("PXD:Eff:Overall", "Overall");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -214,29 +191,15 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
     m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
 
-#ifdef _BELLE2_EPICS
-    if (getUseEpics()) {
-      // get warn and error limit
-      // as the same array as above, we assume chid exists
-      struct dbr_ctrl_double tPvData;
-      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
-      if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData.lower_alarm_limit)
-            && tPvData.lower_alarm_limit > 0.0) {
-          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
-        }
-        if (!std::isnan(tPvData.lower_warning_limit)
-            && tPvData.lower_warning_limit > 0.0) {
-          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
-          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
-        }
-      } else {
-        SEVCHK(r, "ca_get or ca_pend_io failure");
-      }
+    // get warn and error limit
+    // as the same array as above, we assume chid exists
+    doube dummy, loerr = 0, lowarn = 0;
+    if (requestLimitsFromEpicsPVs(m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
+      m_hErrorLine->SetBinContent(i + 1, loerr);
+      if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
+      m_hWarnLine->SetBinContent(i + 1, lowarn);
+      if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
     }
-#endif
 
   }
   // Thus histo will contain old content until first update
@@ -521,19 +484,15 @@ void DQMHistAnalysisPXDEffModule::event()
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
-#ifdef _BELLE2_EPICS
-      if (getUseEpics() && !getUseEpicsReadOnly()) {
-        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          if (updated[m_PXDModules[i]]) {
-            Double_t x, y;// we assume that double and Double_t are same!
-            gr->GetPoint(i, x, y);
-            auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
-            // we should only write if it was updated!
-            SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
-          }
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        if (updated[m_PXDModules[i]]) {
+          // we should only write if it was updated!
+          Double_t x, y;// we assume that double and Double_t are same!
+          gr->GetPoint(i, x, y);
+          setEpicsPV(m_PXDModules[i], y);
         }
       }
-#endif
+
       gr->SetLineColor(kBlack);
       gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
@@ -579,25 +538,13 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("efficiency", var_efficiency);
   m_monObj->setVariable("nmodules", ieff);
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics() && !getUseEpicsReadOnly()) {
-    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
-    // only update if statistics is reasonable, we dont want "0" drops between runs!
-    if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  setEpicsPC("Status", stat_data);
+  // only update if statistics is reasonable, we dont want "0" drops between runs!
+  if (stat_data != 0) setEpisPV("Overall", var_efficiency);
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

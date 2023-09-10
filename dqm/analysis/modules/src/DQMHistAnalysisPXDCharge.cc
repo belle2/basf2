@@ -106,9 +106,9 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   m_fMean->SetNpx(m_PXDModules.size());
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
-  registerEpicsPV(m_pvPrefix + "PXD:Charge:Mean", "Mean");
-  registerEpicsPV(m_pvPrefix + "PXD:Charge:Diff", "Diff");
-  registerEpicsPV(m_pvPrefix + "PXD:Charge:Status", "Status");
+  registerEpicsPV("PXD:Charge:Mean", "Mean");
+  registerEpicsPV("PXD:Charge:Diff", "Diff");
+  registerEpicsPV("PXD:Charge:Status", "Status");
 }
 
 

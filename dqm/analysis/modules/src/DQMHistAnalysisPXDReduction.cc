@@ -94,8 +94,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 //   m_line3->SetLineColor(1);
 //   m_line3->SetLineWidth(3);
 
-  registerEpicsPV(m_pvPrefix + "PXD:Red:Status", "Status");
-  registerEpicsPV(m_pvPrefix + "PXD:Red:Value", "Value");
+  registerEpicsPV("PXD:Red:Status", "Status");
+  registerEpicsPV("PXD:Red:Value", "Value");
 }
 
 

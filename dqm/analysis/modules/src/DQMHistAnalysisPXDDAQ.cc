@@ -68,26 +68,26 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_hMissingDHC = new TH2F("hPXDMissingDHC", "PXD Missing DHC", 16, 0, 16, 2, 0, 2);
   m_hMissingDHE = new TH2F("hPXDMissingDHE", "PXD Missing DHE", 64, 0, 64, 2, 0, 2);
 
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HLTRej", "HLTReject");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:Trunc", "Trunc");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HER_Trunc", "HER_Trunc");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LER_Trunc", "LER_Trunc");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:CM63", "CM63");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HER_CM63", "HER_CM63");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LER_CM63", "LER_CM63");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HER_CM63_1ms", "HER_CM63_1ms");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LER_CM63_1ms", "LER_CM63_1ms");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HER_Trunc_1ms", "HER_Trunc_1ms");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LER_Trunc_1ms", "LER_Trunc_1ms");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:MissFrame", "MissFrame");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:Timeout", "Timeout");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LinkDown", "LinkDown");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:Mismatch", "Mismatch");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HER_Miss", "HER_Miss");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LER_Miss", "LER_Miss");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:HER_Miss_1ms", "HER_Miss_1ms");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:LER_Miss_1ms", "LER_Miss_1ms");
-  registerEpicsPV(m_pvPrefix + "PXD:DAQ:unused", "unused");
+  registerEpicsPV("PXD:DAQ:HLTRej", "HLTReject");
+  registerEpicsPV("PXD:DAQ:Trunc", "Trunc");
+  registerEpicsPV("PXD:DAQ:HER_Trunc", "HER_Trunc");
+  registerEpicsPV("PXD:DAQ:LER_Trunc", "LER_Trunc");
+  registerEpicsPV("PXD:DAQ:CM63", "CM63");
+  registerEpicsPV("PXD:DAQ:HER_CM63", "HER_CM63");
+  registerEpicsPV("PXD:DAQ:LER_CM63", "LER_CM63");
+  registerEpicsPV("PXD:DAQ:HER_CM63_1ms", "HER_CM63_1ms");
+  registerEpicsPV("PXD:DAQ:LER_CM63_1ms", "LER_CM63_1ms");
+  registerEpicsPV("PXD:DAQ:HER_Trunc_1ms", "HER_Trunc_1ms");
+  registerEpicsPV("PXD:DAQ:LER_Trunc_1ms", "LER_Trunc_1ms");
+  registerEpicsPV("PXD:DAQ:MissFrame", "MissFrame");
+  registerEpicsPV("PXD:DAQ:Timeout", "Timeout");
+  registerEpicsPV("PXD:DAQ:LinkDown", "LinkDown");
+  registerEpicsPV("PXD:DAQ:Mismatch", "Mismatch");
+  registerEpicsPV("PXD:DAQ:HER_Miss", "HER_Miss");
+  registerEpicsPV("PXD:DAQ:LER_Miss", "LER_Miss");
+  registerEpicsPV("PXD:DAQ:HER_Miss_1ms", "HER_Miss_1ms");
+  registerEpicsPV("PXD:DAQ:LER_Miss_1ms", "LER_Miss_1ms");
+  registerEpicsPV("PXD:DAQ:unused", "unused");
 }
 
 void DQMHistAnalysisPXDDAQModule::beginRun()

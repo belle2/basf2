@@ -106,7 +106,7 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
   m_cReduction->Clear();
   m_hReduction->Reset(); // dont sum up!!!
 
-  requestLimitsFromEpicsPVs("Value", m_lowarnlimit, m_loerrorlimit, m_hiwarnlimit, m_hierrorlimit);
+  requestLimitsFromEpicsPVs("Value", m_loerrorlimit, m_lowarnlimit, m_hiwarnlimit, m_hierrorlimit);
 }
 
 void DQMHistAnalysisPXDReductionModule::event()

@@ -97,8 +97,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
     registerEpicsPV("PXD:Eff:" + buff, (std::string)aPXDModule);
 
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
-    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-    m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
+    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_" + buff).c_str());
+    m_hEffModules[aPXDModule] = new TEfficiency(("ePXDHitEff_" + buff).c_str(), histTitle,
                                                 m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
@@ -193,8 +193,8 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 
     // get warn and error limit
     // as the same array as above, we assume chid exists
-    doube dummy, loerr = 0, lowarn = 0;
-    if (requestLimitsFromEpicsPVs(m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
+    double dummy, loerr = 0, lowarn = 0;
+    if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(i + 1, loerr);
       if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
       m_hWarnLine->SetBinContent(i + 1, lowarn);
@@ -489,7 +489,7 @@ void DQMHistAnalysisPXDEffModule::event()
           // we should only write if it was updated!
           Double_t x, y;// we assume that double and Double_t are same!
           gr->GetPoint(i, x, y);
-          setEpicsPV(m_PXDModules[i], y);
+          setEpicsPV((std::string)m_PXDModules[i], y);
         }
       }
 
@@ -538,9 +538,9 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("efficiency", var_efficiency);
   m_monObj->setVariable("nmodules", ieff);
 
-  setEpicsPC("Status", stat_data);
+  setEpicsPV("Status", stat_data);
   // only update if statistics is reasonable, we dont want "0" drops between runs!
-  if (stat_data != 0) setEpisPV("Overall", var_efficiency);
+  if (stat_data != 0) setEpicsPV("Overall", var_efficiency);
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()

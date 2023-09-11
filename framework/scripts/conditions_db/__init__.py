@@ -71,13 +71,12 @@ def get_cdb_authentication_token(path=None):
     # check validity of existing token
     if os.path.isfile(path_to_token):
         with open(path_to_token) as token_file:
-            try:
-                response = requests.get('https://token.belle2.org/check', verify=False, params={'token': token_file.read().strip()})
-                response.raise_for_status()
-            except requests.RequestException as e:
-                B2WARNING(f"{e}")
+            response = requests.get('https://token.belle2.org/check', verify=False, params={'token': token_file.read().strip()})
+            if response.status_code == 400:
                 B2INFO(f'The file {path_to_token} contains an invalid token, getting a new token...')
                 os.unlink(path_to_token)
+            elif response.status_code > 400:
+                B2WARNING("The validity of the existing token could not be checked. Trying to connect to CDB anyway.")
 
     # request a token if there is none
     if not os.path.isfile(path_to_token):

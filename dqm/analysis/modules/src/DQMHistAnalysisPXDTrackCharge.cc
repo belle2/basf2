@@ -38,8 +38,9 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Track-Cluster Charge");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower border for fit", 20.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);

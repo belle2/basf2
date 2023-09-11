@@ -32,11 +32,12 @@ REG_MODULE(DQMHistAnalysisPXDEff);
 DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Efficiency");
 
-  //Parameter definition
+  // Parameter definition
 
-  //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
-  //Or get one and clone it
+  // Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
+  // Or get one and clone it
   addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(16));
   addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",

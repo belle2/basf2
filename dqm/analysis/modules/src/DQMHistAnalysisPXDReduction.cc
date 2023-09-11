@@ -31,8 +31,9 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("PXD DQM analysis module for ONSEN Data Reduction Monitoring");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("lowarnlimit", m_lowarnlimit, "Mean Reduction Low Warn limit for alarms", 0.99);
   addParam("LowErrorlimit", m_loerrorlimit, "Mean Reduction Low limit for alarms", 0.90);

@@ -30,8 +30,9 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD DAQ Statistics and Issues");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: Constructor done.");

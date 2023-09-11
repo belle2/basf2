@@ -34,8 +34,9 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Common Mode");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
 

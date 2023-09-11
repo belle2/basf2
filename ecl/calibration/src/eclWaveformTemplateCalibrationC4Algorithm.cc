@@ -53,7 +53,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
 
     int first = (i * m_batchsize) + 1;
     int last = ((i + 1) * m_batchsize);
-    if (last > 8736) last = 8736;
+    if (last > ECLElementNumbers::c_NCrystals) last = ECLElementNumbers::c_NCrystals;
 
     B2INFO("eclWaveformTemplateCalibrationC4Algorithm i " << i << " " << first << " " << last);
 
@@ -61,16 +61,6 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
         last));
     DBObjPtr<ECLDigitWaveformParameters> tempexistingHadronDiodeWaveformParameters(Form("HadronDiodeParameters_CellID%d_CellID%d",
         first, last));
-
-    //------------------------------------------------------------------------
-    // Get the input run list (should be only 1) for us to use to update the DBObjectPtrs
-    auto runs = getRunList();
-    // Take the first run
-    ExpRun chosenRun = runs.front();
-    B2INFO("merging using the ExpRun (" << chosenRun.second << "," << chosenRun.first << ")");
-    // After here your DBObjPtrs are correct
-    updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
-    //int experimentNumber = chosenRun.first;
 
     for (int j = first; j <= last; j++) {
       B2INFO("Check Norm Parms CellID " << j);
@@ -114,7 +104,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
   delete histfile;
 
 
-//  B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload, chosenRun.second = " << experimentNumber);
+  B2INFO("eclWaveformTemplateCalibrationC4Algorithm: Successful, now writing DB PAyload");
   saveCalibration(PhotonHadronDiodeParameters, "ECLDigitWaveformParameters");
 
   return c_OK;

@@ -44,6 +44,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
   std::vector<float> cellIDs;
   std::vector<float> maxResiduals;
   std::vector<float> Counts;
+  std::vector<float> maxResidualsError(ECLElementNumbers::c_NCrystals);
 
   for (int id = 0; id < ECLElementNumbers::c_NCrystals; id++) {
 
@@ -76,7 +77,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
     }
 
     cellIDs.push_back(id + 1);
-    maxResiduals.push_back(hMaxResx->GetBinCenter(counter + 1));
+    maxResiduals.push_back(hMaxResx->GetBinLowEdge(counter + 1));
     Counts.push_back(Total);
 
     B2INFO("eclWaveformTemplateCalibrationC1Algorithm: id counter fraction Total maxResiduals[id]" << id << " " << counter << " " <<
@@ -88,7 +89,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
 
   /** Saving thresholds to database */
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(maxResiduals, cellIDs);
+  PPThreshold->setCalibVector(maxResiduals, maxResidualsError);
   saveCalibration(PPThreshold, "eclWaveformTemplateCalibrationC1MaxResLimit");
   B2INFO("eclWaveformTemplateCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 

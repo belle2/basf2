@@ -64,6 +64,7 @@ namespace Belle2 {
 
     int m_maxResvsCrysIDHistogramLimit; /**< upper limit of histogram */
     int m_maxResvsCrysIDHistogramNBins; /**< histogram number of bins */
+    const int m_numberofADCPoints = 31; /**< Number of ADC points in waveform */
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};

@@ -22,9 +22,11 @@ OutputType = Dict[str, Any]
 EnergyResolutionType = List[float]
 BinningType = List[Tuple[float, float]]
 
-# Add custom parser for config script
+# Add custom parser for input file
 parser = argparse.ArgumentParser(allow_abbrev=True)
-parser.add_argument("-f", "--filename", help="PERC summary output file", default="ExamplePhotonEnergyResolution.json")
+parser.add_argument(
+    "-f", "--filename", help="PERC summary output file in json  format", default="ExamplePhotonEnergyResolution.json"
+)
 args, _ = parser.parse_known_args()
 filename = args.filename
 

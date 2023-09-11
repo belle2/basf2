@@ -103,9 +103,9 @@ def mod_train(
             loss.backward()
             optimizer.step()
             if i != l_train - 1:
-                print("The loss is: %0.3f" % loss.item(), end="\r")
+                print(f"The loss is: {loss.item():0.3f}", end="\r")
             else:
-                print("The loss is: %0.3f" % loss.item(), end="\n")
+                print(f"The loss is: {loss.item():0.3f}", end="\n")
         model = model.eval()
 
         with torch.no_grad():
@@ -119,8 +119,8 @@ def mod_train(
                 acc += accuracy_score(y_max, targets.detach().numpy())
                 if i != l_test - 1:
                     testloss += tcce(y_out, targets) / (l_test - 1)
-            print("Avg. test loss is %0.3f" % (testloss))
-            print("Test accuracy is %0.3f%%" % ((acc / (l_test)) * 100))
+            print(f"Avg. test loss is {testloss:0.3f}")
+            print(f"Test accuracy is {acc / l_test * 100:0.3f}%")
         if acc <= chacc and t != 0:
             t -= 1
 

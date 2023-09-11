@@ -233,7 +233,11 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
   int layer;
   int extHitLayer[nExtrapolationLayers] = {0};
   int digitLayer[nExtrapolationLayers] = {0};
+  // initialize hitDataPrevious components
   hitDataPrevious.subdetector = -1;
+  hitDataPrevious.section = -1;
+  hitDataPrevious.sector = -1;
+  hitDataPrevious.layer = -1;
   for (const ExtHit& hit : extHits) {
     /*
      * Choose hits that exit the sensitive volume.

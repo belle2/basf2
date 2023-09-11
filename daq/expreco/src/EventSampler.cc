@@ -15,7 +15,7 @@ using namespace std;
 
 // constructor/destructor
 
-EventSampler::EventSampler(vector<string> nodes, int port, string rbufname, int interval) : m_port(port), m_interval(interval)
+EventSampler::EventSampler(vector<string> nodes, int port, string rbufname, int interval) : m_interval(interval)
 {
   // Attach to output RingBuffer
   m_rbuf = new RingBuffer(rbufname.c_str());

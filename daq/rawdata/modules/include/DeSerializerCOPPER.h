@@ -87,13 +87,6 @@ namespace Belle2 {
     //! Event # from data
     unsigned int m_prev_ftsweve32;
 
-    //! exp #
-    int m_exp;
-
-    //! run #
-    int m_run;
-
-
   };
 
 } // end namespace Belle2

@@ -58,7 +58,7 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
   addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:SVD:"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 
 
 }
@@ -103,9 +103,10 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
     B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
 
   B2INFO(" SVD occupancy thresholds:");
-  B2INFO("ONLINE OCCUPANCY: empty < " << m_onlineOccEmpty << " normal < " << m_onlineOccWarning << "warning < " << m_onlineOccError <<
+  B2INFO("ONLINE OCCUPANCY: empty < " << m_onlineOccEmpty << " normal < " << m_onlineOccWarning << " warning < " << m_onlineOccError
+         <<
          " < error");
-  B2INFO("OFFLINE OCCUPANCY: empty < " << m_occEmpty << " normal < " << m_occWarning << "warning < " << m_occError << " < error");
+  B2INFO("OFFLINE OCCUPANCY: empty < " << m_occEmpty << " normal < " << m_occWarning << " warning < " << m_occError << " < error");
 
   m_legError = new TPaveText(-1, 54, 3, 57.5);
   m_legError->AddText("ERROR!!");
@@ -140,53 +141,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
     }
   }
 
-  //OFFLINE occupancy plots legend
-  m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
-  m_legProblem->AddText("ERROR!");
-  m_legProblem->AddText("at least one sensor with:");
-  m_legProblem->AddText(Form("occupancy > %1.1f%%", m_occError));
-  m_legProblem->SetFillColor(kRed);
-  m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
-  m_legWarning->AddText("WARNING!");
-  m_legWarning->AddText("at least one sensor with:");
-  m_legWarning->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occWarning, m_occError));
-  m_legWarning->SetFillColor(kOrange);
-  m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
-  m_legNormal->AddText("OCCUPANCY WITHIN LIMITS");
-  m_legNormal->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occEmpty, m_occWarning));
-  m_legNormal->SetFillColor(kGreen);
-  m_legNormal->SetBorderSize(0.);
-  m_legNormal->SetLineColor(kBlack);
-  m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
-  m_legEmpty->AddText("NO DATA RECEIVED");
-  m_legEmpty->AddText("from at least one sensor");
-  m_legEmpty->SetFillColor(kBlack);
-  m_legEmpty->SetTextColor(kWhite);
-  m_legEmpty->SetBorderSize(0.);
-  m_legEmpty->SetLineColor(kBlack);
 
-  //ONLINE occupancy plots legend
-  m_legOnProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
-  m_legOnProblem->AddText("ERROR!");
-  m_legOnProblem->AddText("at least one sensor with:");
-  m_legOnProblem->AddText(Form("online occupancy > %1.1f%%", m_onlineOccError));
-  m_legOnProblem->SetFillColor(kRed);
-  m_legOnWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
-  m_legOnWarning->AddText("WARNING!");
-  m_legOnWarning->AddText("at least one sensor with:");
-  m_legOnWarning->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccWarning, m_onlineOccError));
-  m_legOnWarning->SetFillColor(kOrange);
-  m_legOnNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
-  m_legOnNormal->AddText("OCCUPANCY WITHIN LIMITS");
-  m_legOnNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
-  m_legOnNormal->SetFillColor(kGreen);
-  m_legOnNormal->SetBorderSize(0.);
-  m_legOnNormal->SetLineColor(kBlack);
-  m_legOnEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
-  m_legOnEmpty->AddText("NO DATA RECEIVED");
-  m_legOnEmpty->AddText("from at least one sensor");
-  m_legOnEmpty->SetFillColor(kBlack);
-  m_legOnEmpty->SetTextColor(kWhite);
 
 
   //occupancy plot Y axis title
@@ -276,6 +231,9 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   registerEpicsPV(m_pvPrefix + "OccupancyUAlarm", "OccupancyUAlarm");
   registerEpicsPV(m_pvPrefix + "OccupancyU3Alarm", "OccupancyU3Alarm"); // 3 samples
 
+  //register limits for EPICS
+  registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");
+  registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
 }
 
 
@@ -298,6 +256,60 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   }
   m_cClusterOnTrackTime_L456V->Clear();
   m_cClusterOnTrack3Time_L456V->Clear();
+
+  //Retrieve limits from EPICS
+  requestLimitsFromEpicsPVs("occLimits", m_occError, m_occEmpty, m_occWarning,  m_occError);
+  requestLimitsFromEpicsPVs("occOnlineLimits", m_onlineOccError, m_onlineOccEmpty, m_onlineOccWarning,  m_onlineOccError);
+
+  // Create text panel
+  //OFFLINE occupancy plots legend
+  m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legProblem->AddText("ERROR!");
+  m_legProblem->AddText("at least one sensor with:");
+  m_legProblem->AddText(Form("occupancy > %1.1f%%", m_occError));
+  m_legProblem->SetFillColor(kRed);
+  m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legWarning->AddText("WARNING!");
+  m_legWarning->AddText("at least one sensor with:");
+  m_legWarning->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occWarning, m_occError));
+  m_legWarning->SetFillColor(kOrange);
+  m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legNormal->AddText("OCCUPANCY WITHIN LIMITS");
+  m_legNormal->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occEmpty, m_occWarning));
+  m_legNormal->SetFillColor(kGreen);
+  m_legNormal->SetBorderSize(0.);
+  m_legNormal->SetLineColor(kBlack);
+  m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
+  m_legEmpty->AddText("NO DATA RECEIVED");
+  m_legEmpty->AddText("from at least one sensor");
+  m_legEmpty->SetFillColor(kBlack);
+  m_legEmpty->SetTextColor(kWhite);
+  m_legEmpty->SetBorderSize(0.);
+  m_legEmpty->SetLineColor(kBlack);
+
+  //ONLINE occupancy plots legend
+  m_legOnProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legOnProblem->AddText("ERROR!");
+  m_legOnProblem->AddText("at least one sensor with:");
+  m_legOnProblem->AddText(Form("online occupancy > %1.1f%%", m_onlineOccError));
+  m_legOnProblem->SetFillColor(kRed);
+  m_legOnWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legOnWarning->AddText("WARNING!");
+  m_legOnWarning->AddText("at least one sensor with:");
+  m_legOnWarning->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccWarning, m_onlineOccError));
+  m_legOnWarning->SetFillColor(kOrange);
+  m_legOnNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
+  m_legOnNormal->AddText("OCCUPANCY WITHIN LIMITS");
+  m_legOnNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
+  m_legOnNormal->SetFillColor(kGreen);
+  m_legOnNormal->SetBorderSize(0.);
+  m_legOnNormal->SetLineColor(kBlack);
+  m_legOnEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
+  m_legOnEmpty->AddText("NO DATA RECEIVED");
+  m_legOnEmpty->AddText("from at least one sensor");
+  m_legOnEmpty->SetFillColor(kBlack);
+  m_legOnEmpty->SetTextColor(kWhite);
+
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()

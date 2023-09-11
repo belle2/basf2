@@ -241,7 +241,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyEnergy();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[0][0]));
       }
       return Const::doubleNaN;
     }
@@ -385,7 +387,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster  = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyTheta();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[2][2]));
       }
       return Const::doubleNaN;
     }
@@ -395,7 +399,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyPhi();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[1][1]));
       }
       return Const::doubleNaN;
     }

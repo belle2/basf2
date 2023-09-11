@@ -31,6 +31,7 @@ DQMHistAnalysisRunNrModule::DQMHistAnalysisRunNrModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for RunNr/Mixing Check");
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("DAQ"));

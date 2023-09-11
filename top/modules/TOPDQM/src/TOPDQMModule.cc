@@ -95,6 +95,11 @@ namespace Belle2 {
     m_time->SetYTitle("hits per bin");
     m_time->SetMinimum(0);
 
+    m_timeBG = new TH1F("goodHitTimesBG", "Time distribution of good hits (background)", 1000, -20, 80);
+    m_timeBG->SetXTitle("time [ns]");
+    m_timeBG->SetYTitle("hits per bin");
+    m_timeBG->SetMinimum(0);
+
     m_signalHits = new TProfile("signalHits", "Number of good hits per track in [0, 50] ns", 16, 0.5, 16.5, 0, 1000);
     m_signalHits->SetXTitle("slot number");
     m_signalHits->SetYTitle("hits per track");
@@ -206,6 +211,14 @@ namespace Belle2 {
       h1->SetMinimum(0);
       m_goodTiming.push_back(h1);
 
+      name = str(format("good_timing_%1%BG") % (module));
+      title = str(format("Timing distribution of good hits (background) for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), 200, -20, 80);
+      h1->GetXaxis()->SetTitle("time [ns]");
+      h1->GetYaxis()->SetTitle("hits per time bin");
+      h1->SetMinimum(0);
+      m_goodTimingBG.push_back(h1);
+
       name = str(format("good_channel_hits_%1%") % (module));
       title = str(format("Distribution of good hits for slot #%1%") % (module));
       int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
@@ -223,6 +236,14 @@ namespace Belle2 {
       h1->SetMinimum(0);
       m_badChannelHits.push_back(h1);
 
+      name = str(format("pulseHeights_%1%") % (module));
+      title = str(format("Average pulse heights for slot #%1%") % (module));
+      auto* prof = new TProfile(name.c_str(), title.c_str(), 32, 0.5, 32.5, 0, 2000);
+      prof->GetXaxis()->SetTitle("PMT number");
+      prof->GetYaxis()->SetTitle("pulse height [ADC counts]");
+      prof->SetMarkerStyle(20);
+      prof->SetMinimum(0);
+      m_pulseHeights.push_back(prof);
     }
 
     // cd back to root directory
@@ -252,6 +273,7 @@ namespace Belle2 {
     m_eventT0->Reset();
     m_bunchOffset->Reset();
     m_time->Reset();
+    m_timeBG->Reset();
     m_signalHits->Reset();
     m_backgroundHits->Reset();
     m_goodTDCAll->Reset();
@@ -272,8 +294,10 @@ namespace Belle2 {
       m_goodTDC[i]->Reset();
       m_badTDC[i]->Reset();
       m_goodTiming[i]->Reset();
+      m_goodTimingBG[i]->Reset();
       m_goodChannelHits[i]->Reset();
       m_badChannelHits[i]->Reset();
+      m_pulseHeights[i]->Reset();
     }
   }
 
@@ -355,6 +379,7 @@ namespace Belle2 {
         m_goodTDC[slot - 1]->Fill(digit.getRawTime());
         m_goodTDCAll->Fill(digit.getRawTime());
         m_goodChannelHits[slot - 1]->Fill(digit.getChannel());
+        m_pulseHeights[slot - 1]->Fill(digit.getPMTNumber(), digit.getPulseHeight());
         nHits_good++;
         if (digit.hasStatus(TOPDigit::c_EventT0Subtracted)) {
           double time = digit.getTime();
@@ -362,6 +387,9 @@ namespace Belle2 {
           if (numTracks[slot - 1] > 0) {
             m_goodTiming[slot - 1]->Fill(time);
             m_time->Fill(time);
+          } else {
+            m_goodTimingBG[slot - 1]->Fill(time);
+            m_timeBG->Fill(time);
           }
           if (selectedSlots[slot - 1] and abs(time) < 50) {
             if (time > 0) numSignalHits[slot - 1]++;

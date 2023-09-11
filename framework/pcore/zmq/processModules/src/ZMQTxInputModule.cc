@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ZMQTxInput)
+REG_MODULE(ZMQTxInput);
 
 ZMQTxInputModule::ZMQTxInputModule() : Module()
 {
@@ -149,7 +149,7 @@ void ZMQTxInputModule::event()
         workerID = *it;
         m_nextWorker.pop_front();
         std::string workerIDString = std::to_string(workerID);
-        B2INFO("ZMQTxInput :: sending first event to worker : " << workerIDString);
+        B2INFO("ZMQTxInput :: sending first event to worker : " << LogVar("worker", workerIDString));
         auto message = ZMQMessageFactory::createMessage(workerIDString, EMessageTypes::c_eventMessage, eventMessage);
         m_zmqClient.send(std::move(message));
         // Check the same ID in the forward

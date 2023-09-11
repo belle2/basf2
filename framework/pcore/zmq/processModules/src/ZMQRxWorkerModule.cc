@@ -15,7 +15,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ZMQRxWorker)
+REG_MODULE(ZMQRxWorker);
 
 static int s_event_number = 0;
 
@@ -124,7 +124,7 @@ void ZMQRxWorkerModule::event()
 
     //    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
     //    B2INFO ( "ZMQRxWorker : polliing started" );
-    const int pollReply = m_zmqClient.poll(72000 * 1000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(7200 * 1000, multicastAnswer, socketAnswer);
     B2ASSERT("The input process did not send any event in some time!", pollReply);
 
     //    B2INFO ( "ZMQRxWorker : event received and moved to data store" );

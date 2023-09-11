@@ -637,6 +637,10 @@ class Job:
             self.setup_cmds.append("""if [ -z "${{BELLE2_EXTERNALS_TOPDIR}}" ]; then""")
             self.setup_cmds.append(f"  export BELLE2_EXTERNALS_TOPDIR={os.environ['BELLE2_EXTERNALS_TOPDIR']}")
             self.setup_cmds.append("fi")
+        if "BELLE2_CONDB_PROXY" in os.environ:
+            self.setup_cmds.append("""if [ -z "${{BELLE2_CONDB_PROXY}}" ]; then""")
+            self.setup_cmds.append(f"  export BELLE2_CONDB_PROXY={os.environ['BELLE2_CONDB_PROXY']}")
+            self.setup_cmds.append("fi")
         if "BELLE2_CONDB_METADATA" in os.environ:
             self.setup_cmds.append("""if [ -z "${{BELLE2_CONDB_METADATA}}" ]; then""")
             self.setup_cmds.append(f"  export BELLE2_CONDB_METADATA={os.environ['BELLE2_CONDB_METADATA']}")

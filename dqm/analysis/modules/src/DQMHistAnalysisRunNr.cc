@@ -34,7 +34,7 @@ DQMHistAnalysisRunNrModule::DQMHistAnalysisRunNrModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("DAQ"));
-  addParam("Prefix", m_Prefix, "Prefix HLT or ERECO", std::string(""));
+  addParam("Prefix", m_prefix, "Prefix HLT or ERECO");
 
   B2DEBUG(99, "DQMHistAnalysisRunNr: Constructor done.");
 }
@@ -53,8 +53,8 @@ void DQMHistAnalysisRunNrModule::initialize()
 
   // m_monObj->addCanvas(m_cRunNr);// useful?
 
-  registerEpicsPV("DAQ:" + Prefix + ":RunNr:RunNr", "RunNr");
-  registerEpicsPV("DAQ:" + Prefix + ":RunNr:Alarm", "Alarm");
+  registerEpicsPV("DAQ:" + m_refix + ":RunNr:RunNr", "RunNr");
+  registerEpicsPV("DAQ:" + m_refix + ":RunNr:Alarm", "Alarm");
 
   B2DEBUG(99, "DQMHistAnalysisRunNr: initialized.");
 }

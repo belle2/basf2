@@ -54,8 +54,8 @@ void DQMHistAnalysisRunNrModule::initialize()
 
   // m_monObj->addCanvas(m_cRunNr);// useful?
 
-  registerEpicsPV("DAQ:" + m_refix + ":RunNr:RunNr", "RunNr");
-  registerEpicsPV("DAQ:" + m_refix + ":RunNr:Alarm", "Alarm");
+  registerEpicsPV("DAQ:" + m_prefix + ":RunNr:RunNr", "RunNr");
+  registerEpicsPV("DAQ:" + m_prefix + ":RunNr:Alarm", "Alarm");
 
   B2DEBUG(99, "DQMHistAnalysisRunNr: initialized.");
 }

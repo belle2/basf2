@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
     description="Tracking DQM Belle II for early phase 3 (Exp=1) and nominal phase 3 (Exp=2)")
 parser.add_argument('--experiment-type', dest='ExperimentType', action='store',
                     default=2, type=int,
-                    help='Set which experiment you want: 1 (early phase 3 Early) or 2 (nominal phase 3), default = 2')
+                    help='Set which experiment you want: 1 (early phase 3) or 2 (nominal phase 3), default = 2')
 
 args = parser.parse_args()
 

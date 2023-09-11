@@ -75,6 +75,8 @@ def get_cdb_authentication_token(path=None):
             if response.status_code == 400:
                 B2INFO(f'The file {path_to_token} contains an invalid token, getting a new token...')
                 os.unlink(path_to_token)
+            elif response.status_code > 400:
+                B2WARNING("The validity of the existing token could not be checked. Trying to connect to CDB anyway.")
 
     # request a token if there is none
     if not os.path.isfile(path_to_token):

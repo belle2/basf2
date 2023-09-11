@@ -107,11 +107,14 @@ void DQMHistAnalysisRunNrModule::event()
           leg->AddText(tmp);
         }
       }
+      // Check number of bins filled
       if (nfilled > 1) {
+        // problem
         status = 4;
       } else if (nfilled == 1) {
+        // ok
         status = 2;
-      }// else nfilled=0, status stays 0
+      }// else nfilled=0, status stays 0 (no data)
     }
   }
 
@@ -131,7 +134,6 @@ void DQMHistAnalysisRunNrModule::event()
 
   m_cRunNr->Modified();
   m_cRunNr->Update();
-
 
   setEpicsPV("Alarm", status);
   setEpicsPV("RunNr", mean);

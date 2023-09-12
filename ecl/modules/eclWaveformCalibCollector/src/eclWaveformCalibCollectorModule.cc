@@ -45,7 +45,7 @@ eclWaveformCalibCollectorModule::eclWaveformCalibCollectorModule() : Module()
   addParam("LowEnergyThresholdGeV", m_LowEnergyThresholdGeV, "Low Energy Threshold in GeV.", 1.0);
   addParam("HighEnergyThresholdGeV", m_HighEnergyThresholdGeV, "High Energy Threshold in GeV.", 5.5);
   addParam("IncludeWaveforms", m_includeWaveforms, "Flag to save ADC information.", true);
-  addParam("selectCellID", m_selectCellID, "High Energy Threshold in GeV.", -1);
+  addParam("selectCellID", m_selectCellID, "If greater than zero only save that CellID.", -1);
 }
 
 

@@ -41,7 +41,7 @@ namespace Belle2 {
 
   private:
 
-    int m_selectCellID;
+    int m_selectCellID; /**< Root used to select specific CellID to save */
 
     std::string m_dataOutFileName;  /**< Root file name for saving the output */
     TTree* tree{nullptr};  /**< Root tree for saving the output */
@@ -51,9 +51,9 @@ namespace Belle2 {
 
     StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
-    std::vector<float> m_ADCtoEnergy;  /**< calibration vector from adc to energy*/
+    std::vector<float> m_ADCtoEnergy;  /**< calibration vector from adc to energy */
 
-    StoreObjPtr<EventMetaData> m_EventMetaData;
+    StoreObjPtr<EventMetaData> m_EventMetaData; /**< Event metadata info */
 
     double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
 

@@ -12,7 +12,6 @@ import modularAnalysis
 import stdV0s
 import vertex
 from geometry import check_components
-import reconstruction
 from softwaretrigger.reconstruction_utils import bToCharmHLTSkim
 
 
@@ -188,6 +187,8 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
     Please note that this function adds the HLT decision, but does not branch
     according to it.
     """
+    import reconstruction  # noqa
+
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
@@ -221,6 +222,8 @@ def add_post_filter_reconstruction(path, run_type, components):
     This includes reconstruction modules not essential
     to calculate filter decision and then the skim calculation.
     """
+    import reconstruction  # noqa
+
     check_components(components)
 
     if run_type == constants.RunTypes.beam:

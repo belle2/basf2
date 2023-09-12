@@ -22,6 +22,7 @@ import webbrowser
 import re
 import collections
 import configparser
+import requests
 
 # 3rd
 import cherrypy
@@ -250,6 +251,12 @@ def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
             "Please ensure access token is correct and valid. "
             "GitLab Integration will be disabled."
         )
+    except requests.exceptions.Timeout:
+        gitlab_object = None
+        logging.warning(
+            "GitLab servers feeling under the weather, DESY outage? "
+            "GitLab Integration will be disabled."
+        )
 
     return gitlab_object
 
@@ -357,19 +364,21 @@ def create_gitlab_issue(
     title: str,
     description: str,
     uploaded_file: Dict[str, str],
+    plot_package: str,
     project: 'gitlab.project'
 ) -> str:
     """
-    Create a new project issue with the passed title and description, using
-    Gitlab API.
+    Create a new project issue with the passed title, description and package,
+    using Gitlab API.
 
     Returns:
         created isssue id
     """
 
-    issue = project.issues.create({"title": title, "description": description})
+    issue = project.issues.create({"title": title,
+                                   "description": description,
+                                   "labels": [plot_package, 'validation']})
 
-    issue.labels = ["validation_issue"]
     issue.notes.create(
         {"body": "See the [error plot]({})".format(uploaded_file["url"])}
     )
@@ -688,6 +697,7 @@ class ValidationRoot:
         project = get_project_object(self.gitlab_object, project_id)
         uploaded_file = upload_file_gitlab(self.plot_path, project)
         plot_title = self.plot_path.split("/")[-1].split(".")[0]
+        plot_package = self.plot_path.split("/")[-2]
         description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
             Relevant plot: {0}\n\n\
             Revision label: {1}\n\n---".format(
@@ -695,7 +705,7 @@ class ValidationRoot:
             self.revision_label
         )
         issue_id = create_gitlab_issue(
-            title, description, uploaded_file, project
+            title, description, uploaded_file, plot_package, project
         )
         project.save()
 

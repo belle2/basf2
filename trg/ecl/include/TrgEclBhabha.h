@@ -13,7 +13,8 @@
 #include "trg/ecl/TrgEclMapping.h"
 #include "trg/ecl/TrgEclDataBase.h"
 
-#include "TVector3.h"
+#include <Math/Vector3D.h>
+
 //
 //
 //
@@ -255,7 +256,7 @@ namespace Belle2 {
     /** Cluster Timing*/
     std::vector<double> ClusterTiming;
     /** Cluster Timing*/
-    std::vector<TVector3> ClusterPosition;
+    std::vector<ROOT::Math::XYZVector> ClusterPosition;
     //! 2D Bhabha Energy Threshold
     std::vector<double> _2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold

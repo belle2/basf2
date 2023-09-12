@@ -15,6 +15,7 @@ import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import re
 
 from prompt import ValidationSettings
 import svd.validation_utils as vu
@@ -48,6 +49,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     agreements = {algo: {} for algo in vu.time_algorithms}
     precisions = {algo: {} for algo in vu.time_algorithms}
     discriminations = {algo: {} for algo in vu.time_algorithms}
+    shift_agreements = {algo: {} for algo in vu.time_algorithms}
     entries_onTracks = {algo: {} for algo in vu.time_algorithms}
     entries_eventT0 = {algo: {} for algo in vu.time_algorithms}
 
@@ -70,7 +72,12 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     count = 0
     vu.progress(0, total_item)
 
+    shift_histos = {}
+    shift_histos_merged_over_ladder = {}
+
     for algo in CollectorHistograms:
+        shift_histos[algo] = {}
+        shift_histos_merged_over_ladder[algo] = {}
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
                 # print(f"working with : algo {algo} exp {exp} run {run}")
@@ -85,14 +92,30 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 try:
                     entries_eventT0_ = histos['eventT0'].GetEntries()
                     if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
-                        agreements[algo][run] = {key: vu.get_agreament(histos['eventT0'], h_diff)
+                        agreements[algo][run] = {key: vu.get_agreement(histos['eventT0'], h_diff)
                                                  for key, h_diff in histos['diff'].items()}
                         precisions[algo][run] = {key: vu.get_precision(h_diff)
                                                  for key, h_diff in histos['diff'].items()}
                         discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
                                                       for key in histos['onTracks']}
+                        shift_agreements[algo][run] = {key: vu.get_shift_agreement(hShift)
+                                                       for key, hShift in histos['timeShifter'].items()}
                         entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
                         entries_eventT0[algo][run] = entries_eventT0_
+
+                        for key, hShift in histos['timeShifter'].items():
+                            if key in shift_histos[algo]:
+                                shift_histos[algo][key].Add(hShift)
+                            else:
+                                shift_histos[algo][key] = hShift.Clone()
+                                shift_histos[algo][key].SetDirectory(0)
+                            sensor_id = re.findall(r'\d+', key) + [key[-1]]
+                            keyGroup = f'L{sensor_id[0]}S{sensor_id[2]}{sensor_id[3]}'
+                            if keyGroup in shift_histos_merged_over_ladder[algo]:
+                                shift_histos_merged_over_ladder[algo][keyGroup].Add(hShift)
+                            else:
+                                shift_histos_merged_over_ladder[algo][keyGroup] = hShift.Clone()
+                                shift_histos_merged_over_ladder[algo][keyGroup].SetDirectory(0)
 
                         vu.make_combined_plot('*U', histos,
                                               title=f'exp {exp} run {run} U {algo}')
@@ -116,6 +139,47 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     print()
 
+    for algo, KeyHisto in shift_histos.items():
+        c2 = r.TCanvas("c2", "c2", 640, 480)
+        outPDF = f"{output_dir}/shift_histograms_{algo}.pdf"
+        c2.Print(outPDF + "[")
+        onePad = r.TPad("onePad", "onePad", 0, 0, 1, 1)
+        onePad.SetMargin(0.1, 0.2, 0.1, 0.1)
+        onePad.SetNumber(1)
+        onePad.Draw()
+        onePad.cd()
+        hShiftHisto = vu.get_shift_plot(shift_histos_merged_over_ladder[algo])
+        hShiftHisto.Draw('COLZ')
+        c2.Print(outPDF, "Title:" + hShiftHisto.GetName())
+
+        c1 = r.TCanvas("c1", "c1", 640, 480)
+        topPad = r.TPad("topPad", "topPad", 0, 0.5, 1, 1)
+        btmPad = r.TPad("btmPad", "btmPad", 0, 0, 1, 0.5)
+        topPad.SetMargin(0.1, 0.1, 0, 0.149)
+        btmPad.SetMargin(0.1, 0.1, 0.303, 0)
+        topPad.SetNumber(1)
+        btmPad.SetNumber(2)
+        topPad.Draw()
+        btmPad.Draw()
+        isOdd = True
+        for key, hShift in KeyHisto.items():
+            hShift.SetStats(0)
+            for yn in range(hShift.GetNbinsY()):
+                norm = (hShift.ProjectionX("tmp", yn + 1, yn + 1, "")).GetMaximum()
+                if norm <= 0:
+                    continue
+                for xn in range(hShift.GetNbinsX()):
+                    hShift.SetBinContent(xn + 1, yn + 1, hShift.GetBinContent(xn + 1, yn + 1) / norm)
+            if isOdd:
+                topPad.cd()
+                hShift.Draw("colz")
+            else:
+                btmPad.cd()
+                hShift.Draw("colz")
+                c1.Print(outPDF, "Title:" + hShift.GetName())
+            isOdd = not isOdd
+        c1.Print(outPDF + "]")
+
     dd = {}
     runs = sorted(agreements[vu.time_algorithms[0]])
     dd['run'] = sum([[i]*len(vu.names_sides) for i in runs], [])
@@ -126,6 +190,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         dd[f'agreement_{algo}'] = [agreements[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'precision_{algo}'] = [precisions[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'discrimination_{algo}'] = [discriminations[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
+        dd[f'shift_agreement_{algo}'] = [shift_agreements[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'entries_onTracks_{algo}'] = [entries_onTracks[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'entries_eventT0_{algo}'] = [entries_eventT0[algo][run] for run, side in zip(dd['run'], dd['name'])]
 
@@ -188,6 +253,19 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.setp(ax.get_xticklabels(), rotation=90)
         plt.tight_layout()
         plt.savefig(output_dir / f'discrimination_{algo}.pdf')
+        plt.close()
+
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
+        ax = sns.violinplot(x='run', y=f'shift_agreement_{algo}', hue='side', data=df, split=True, cut=0)
+        ax.xaxis.set_minor_locator(ticker.NullLocator())
+        ax.set_ylim([0.0, 3.5])
+        plt.axhline(0, color='black', linestyle='--')
+        plt.axhline(0.5, color='black', linestyle=':')
+        plt.axhline(1.0, color='black', linestyle=':')
+        plt.axhline(2.0, color='black', linestyle=':')
+        plt.setp(ax.get_xticklabels(), rotation=90)
+        plt.tight_layout()
+        plt.savefig(output_dir / f'shift_agreement_{algo}.pdf')
         plt.close()
 
         plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))

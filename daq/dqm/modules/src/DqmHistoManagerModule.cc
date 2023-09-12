@@ -144,7 +144,7 @@ void DqmHistoManagerModule::event()
     if (m_nobjs > 0) {
       m_sock->send(msg);
     }
-    delete(msg);
+    delete (msg);
     m_ptime = ctime;
   }
   // Dump histograms to file
@@ -178,7 +178,7 @@ void DqmHistoManagerModule::terminate()
 
     //m_sock->send(msg);
 
-    delete(msg);
+    delete (msg);
 
     // Dump hitograms to file  -> Turned Off (
     //    RbTupleManager::Instance().dump();
@@ -196,8 +196,8 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
 
   TIter nextkey(keylist);
   TKey* key = 0;
-  int nkeys = 0;
-  int nobjs = 0;
+  int nkeys [[maybe_unused]] = 0;
+  int nobjs [[maybe_unused]] = 0;
   while ((key = (TKey*)nextkey())) {
     nkeys++;
     TObject* obj = curdir->FindObject(key->GetName());
@@ -218,7 +218,7 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
       nobjs++;
       m_nobjs++;
       tdir->cd();
-      StreamHistograms(tdir , msg);
+      StreamHistograms(tdir, msg);
       TText command(0, 0, "COMMAND:EXIT");
       m_msg->add(&command, "SUBDIR:EXIT");
       nobjs++;

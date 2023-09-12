@@ -96,11 +96,11 @@ namespace Belle2 {
 
     /*! Set pile-up photon energy
      */
-    void setbackgroundPhotonEnergy(double input) {  m_backgroundPhotonEnergy = input; }
+    void setBackgroundPhotonEnergy(double input) {  m_backgroundPhotonEnergy = input; }
 
     /*! Set pile-up photon time
      */
-    void setbackgroundPhotonTime(double input) {  m_backgroundPhotonTime = input; }
+    void setBackgroundPhotonTime(double input) {  m_backgroundPhotonTime = input; }
 
     /*! Set fit type
      */
@@ -169,12 +169,12 @@ namespace Belle2 {
     /*! get pile up photon energy
      * @return pile up photon energy
      */
-    double getbackgroundPhotonEnergy() const { return m_backgroundPhotonEnergy; }
+    double getBackgroundPhotonEnergy() const { return m_backgroundPhotonEnergy; }
 
     /*! get pile up photon time
      * @return pile up photon time
      */
-    double getbackgroundPhotonTime() const { return m_backgroundPhotonTime; }
+    double getBackgroundPhotonTime() const { return m_backgroundPhotonTime; }
 
     /*! Get Dsp Array
      * @return Dsp Array of variable length
@@ -182,6 +182,15 @@ namespace Belle2 {
     std::vector <int> getDspA() const
     {
       return m_DspAVector;
+    }
+
+    /*! Compute maximum peak to peak value
+     * @return maximum peak to peak value
+     */
+    int computePeaktoPeakAmp() const
+    {
+      const auto [min, max] = std::minmax_element(m_DspAVector.begin(), m_DspAVector.end());
+      return *max - *min;
     }
 
     /*! Get number of ADC points

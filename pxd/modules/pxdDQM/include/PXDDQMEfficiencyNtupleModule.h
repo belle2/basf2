@@ -23,7 +23,7 @@
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 
 //root stuff
-#include "TVector3.h"
+#include <Math/Vector3D.h>
 
 #include "TFile.h"
 #include "TNtuple.h"
@@ -66,7 +66,7 @@ namespace Belle2 {
   private:
     /* helper functions to do some of the calculations*/
     /** find the closest cluster*/
-    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(const VxdID& vxdid, ROOT::Math::XYZVector intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/

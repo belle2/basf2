@@ -233,6 +233,7 @@
   version="[1]"                                                                                               \
   targetClass="Belle2::EventShapeContainer"                                                                   \
   target="m_forwardHemisphere4Momentum"                                                                       \
+  include="TLorentzVector.h"                                                                                  \
   code="{m_forwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_forwardHemisphere4Momentum.Px(),   \
                                                                   onfile.m_forwardHemisphere4Momentum.Py(),   \
                                                                   onfile.m_forwardHemisphere4Momentum.Pz(),   \
@@ -246,6 +247,7 @@
   version="[1]"                                                                                                 \
   targetClass="Belle2::EventShapeContainer"                                                                     \
   target="m_backwardHemisphere4Momentum"                                                                        \
+  include="TLorentzVector.h"                                                                                  \
   code="{m_backwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_backwardHemisphere4Momentum.Px(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Py(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Pz(),   \

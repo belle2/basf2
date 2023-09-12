@@ -102,7 +102,7 @@ isSignalSomething_vars += ["isSignalAcceptMissingGammaAndDecayInFlight"]
 
 # this line show how create_isSignal_alias() work, and is equivalent to the lines above
 vm.addAlias("isSignalAcceptMissingNeutrinoAndWrongFSP", "passesCut(unmask(mcErrors," +
-            "%d) == %d)" % (c_MissGamma | c_MissMassiveParticle | c_MissKlong | c_MissKlong, c_Correct))
+            f"{int(c_MissGamma | c_MissMassiveParticle | c_MissKlong | c_MissKlong)}) == {int(c_Correct)})")
 isSignalSomething_vars += ["isSignalAcceptMissingNeutrinoAndWrongFSP"]
 
 basic_vars += isSignalSomething_vars

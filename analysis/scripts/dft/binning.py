@@ -28,7 +28,7 @@ def get_bins(arr, bin_count=1024):
     arr_len = len(_arr)
     if bin_count is not None:
         if arr_len <= bin_count:
-            raise ValueError('%d entries are not enough for equal statistics binning.' % len(_arr))
+            raise ValueError(f'{len(_arr)} entries are not enough for equal statistics binning.')
 
     _arr = np.sort(_arr)
 
@@ -183,7 +183,7 @@ def get_signal_background_pdf(df, bins=100):
     :param bins:
     :return: tuple of signal pdf and back ground
     """
-    print("WARNING: this function (%s) is not tested yet" % get_signal_background_pdf.__name__)
+    print(f"WARNING: this function ({get_signal_background_pdf.__name__}) is not tested yet")
 
     a_bins = np.linspace(0, 1, bins + 1)
     a_bins[-1] = 1 + np.nextafter(1, 1.1)

@@ -54,7 +54,6 @@ _RegisteredSkims = [
     ("12160100", "ewp", "BtoXgamma"),
     ("12160200", "ewp", "BtoXll"),
     ("12160300", "ewp", "BtoXll_LFV"),
-    ("12160400", "ewp", "inclusiveBplusToKplusNuNu"),
 
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),

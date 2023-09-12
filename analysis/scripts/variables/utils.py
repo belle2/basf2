@@ -248,7 +248,7 @@ class DecayParticleNode:
             prefix = current_prefix + c.name
             # is this particle name ambiguous or are all indices requested? add index
             if always_include_indices or names[c.name] > 1:
-                prefix += "_{}".format(relative_indices[c.name] if use_relative_indices else index)
+                prefix += f"_{relative_indices[c.name] if use_relative_indices else index}"
                 # always increase the relative indices
                 relative_indices[c.name] += 1
 
@@ -573,4 +573,4 @@ def create_isSignal_alias(aliasName, flags):
             informationString += "Now one of the input flags is " + str(int) + " ."
             raise ValueError(informationString)
 
-    variables.variables.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))
+    variables.variables.addAlias(aliasName, f"passesCut(unmask(mcErrors, {int(mask)}) == {int(0)})")

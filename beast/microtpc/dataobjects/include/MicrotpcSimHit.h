@@ -12,7 +12,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -70,11 +70,11 @@ namespace Belle2 {
     /** Return the global time */
     float getGlTime()  const { return m_GlTime; }
     /** Return the track position */
-    TVector3 gettkPos()       const { return TVector3(m_tkPos[0], m_tkPos[1], m_tkPos[2]); }
+    ROOT::Math::XYZVector gettkPos()       const { return ROOT::Math::XYZVector(m_tkPos[0], m_tkPos[1], m_tkPos[2]); }
     /** Return the track momentum */
-    TVector3 gettkMom()       const { return TVector3(m_tkMom[0], m_tkMom[1], m_tkMom[2]); }
+    ROOT::Math::XYZVector gettkMom()       const { return ROOT::Math::XYZVector(m_tkMom[0], m_tkMom[1], m_tkMom[2]); }
     /** Return the track momentum direction */
-    TVector3 gettkMomDir()    const { return TVector3(m_tkMomDir[0], m_tkMomDir[1], m_tkMomDir[2]); }
+    ROOT::Math::XYZVector gettkMomDir()    const { return ROOT::Math::XYZVector(m_tkMomDir[0], m_tkMomDir[1], m_tkMomDir[2]); }
     /** Return track position as float array */
     const float* gettkPosArray() const { return m_tkPos; }
     /** Return track momentum as float array */

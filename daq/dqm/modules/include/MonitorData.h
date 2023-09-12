@@ -44,7 +44,6 @@ namespace Belle2 {
 
     //! No. of sent events
     int m_nevt;
-    int* m_buffer;
 
     //! Histograms
     TH1F* h_ncpr;

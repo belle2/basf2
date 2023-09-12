@@ -29,7 +29,7 @@ settings = CalibrationSettings(name="ecl_leakage",
                                               "barrel_energies": [0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500],
                                               "backward_energies": [0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200],
                                               "lowEnergyThreshold": 0.,
-                                              "showerArrayName": "ECLShowers"
+                                              "showerArrayName": "ECLTrimmedShowers"
                                               }
                                )
 

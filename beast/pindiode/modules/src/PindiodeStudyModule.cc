@@ -194,8 +194,9 @@ void PindiodeStudyModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    PINCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
-                                 activeParams.getLength("Phi")));
+    PINCenter.push_back(ROOT::Math::XYZVector(activeParams.getLength("z_pindiode"),
+                                              activeParams.getLength("r_pindiode"),
+                                              activeParams.getLength("Phi")));
     nPIN++;
   }
   */

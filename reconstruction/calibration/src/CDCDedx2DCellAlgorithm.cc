@@ -160,10 +160,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       if (abs(idocaHit) > 1.50)  continue;
 
       //Bin corresponds to enta and doca value
-      ibinEA = 0;
       ibinEA = (ieaHit - feaLE) / feaBS ; //from 0
 
-      ibinDOCA = 0;
       ibinDOCA = (idocaHit - fdocaLE) / fdocaBS;
 
       if (ibinEA >= fnEntaBinG || ibinDOCA >= fnDocaBinG) continue; //bin stats from 0
@@ -340,7 +338,6 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
 
     //conversion from local to global
-    ibinEA = 0, ibinDOCA = 0;
     for (int iea = 0; iea < fnEntaBinG; iea++) {
       ibinEA = iea;
       if (IsLocalBin)ibinEA = fEntaBinNums.at(iea);

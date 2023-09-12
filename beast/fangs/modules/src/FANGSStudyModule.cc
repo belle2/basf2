@@ -19,7 +19,7 @@
 #include <string>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TH1.h>
 #include <TH2.h>
 
@@ -228,7 +228,7 @@ void FANGSStudyModule::event()
     double timeBin = aHit->getTime();
     int  pdg = aHit->getPDG();
 
-    TVector3 position = aHit->getPosEntry();
+    ROOT::Math::XYZVector position = aHit->getPosEntry();
     double r = sqrt(position.X() * position.X() + position.Y() * position.Y());
     int detNB = (lad - 1) * 5 + sen - 1;
     //cout <<" lad " << lad << " sen " << sen << " detNB " << detNB << " time " << timeBin << " edep " << adep*1e3 << endl;

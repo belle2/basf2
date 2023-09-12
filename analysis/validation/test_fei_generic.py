@@ -46,7 +46,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', cache=-1, training=True, monitor=False)
@@ -69,7 +69,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', cache=feistate.stage, training=True, monitor=False)
@@ -112,7 +112,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', cache=feistate.stage, training=True, monitor=False)
@@ -149,7 +149,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', cache=feistate.stage, training=True, monitor=False)
@@ -193,7 +193,7 @@ maxTracks = 12
 empty_path = b2.create_path()
 skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
+skimfilter.if_value(f'>{maxTracks}', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', cache=0, monitor=True)

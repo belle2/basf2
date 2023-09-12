@@ -88,17 +88,17 @@ std::string StringUtil::tolower(const std::string& str)
 
 int StringUtil::atoi(const std::string& str)
 {
-  return atoi(str.c_str());
+  return std::atoi(str.c_str());
 }
 
 double StringUtil::atof(const std::string& str)
 {
-  return atof(str.c_str());
+  return std::atof(str.c_str());
 }
 
 long long StringUtil::atoll(const std::string& str)
 {
-  return atoll(str.c_str());
+  return std::atoll(str.c_str());
 }
 
 bool StringUtil::find(const std::string& s, const std::string& str)

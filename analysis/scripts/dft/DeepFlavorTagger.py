@@ -106,7 +106,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         particle_lists = [particle_lists]
 
     if mode not in ['expert', 'teacher', 'sampler']:
-        B2FATAL('Invalid mode  %s' % mode)
+        B2FATAL(f'Invalid mode  {mode}')
 
     if variable_list is None and mode in ['sampler', 'teacher']:
         variable_list = [
@@ -177,7 +177,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
     if mode == 'sampler':
         if os.path.isfile(output_file_name) and not overwrite:
-            B2FATAL('Outputfile %s already exists. Aborting writeout.' % output_file_name)
+            B2FATAL(f'Outputfile {output_file_name} already exists. Aborting writeout.')
 
         # and add target
         all_variables = features + [target]
@@ -186,16 +186,13 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         ma.variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
 
         # write the command line output for the extern teacher to a file
-        extern_command = 'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' \
-                         ' --identifier {identifier} --variables "{variables_string}"  --target_variable {target}' \
-                         ' --method Python --training_fraction {fraction}' \
-                         " --config '{classifier_args}' --framework tensorflow" \
-                         ' --steering_file {steering_file}'\
-                         ''.format(output_file_name=output_file_name, tree_name=tree_name,
-                                   identifier=uniqueIdentifier,
-                                   variables_string='" "'.join(features), target=target,
-                                   classifier_args=json.dumps(classifier_args), fraction=train_valid_fraction,
-                                   steering_file=mva_steering_file)
+        extern_command = f'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' + \
+                         f' --identifier {uniqueIdentifier} ' + \
+                         '--variables "{}"  '.format('" "'.join(features)) + \
+                         f'--target_variable {target}' + \
+                         f' --method Python --training_fraction {train_valid_fraction}' + \
+                         f" --config '{json.dumps(classifier_args)}' --framework tensorflow" + \
+                         f' --steering_file {mva_steering_file}'
 
         with open(os.path.join(working_dir, uniqueIdentifier + '_teacher_command'), 'w') as f:
             f.write(extern_command)

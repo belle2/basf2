@@ -95,7 +95,12 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
                                                  '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
                                                  '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
                                                  '__ROIsvdRecoTracksToRecoHitInformations',
-                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI'])
+                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI',
+                                                 # not only prune the pxd_unfiltered_digits, but also their relations to
+                                                 # MCParticles, PXDDigits (the filtered ones), and PXDTrueHits
+                                                 f'{pxd_unfiltered_digits}ToMCParticles',
+                                                 f'{pxd_unfiltered_digits}ToPXDDigits',
+                                                 f'{pxd_unfiltered_digits}ToPXDTrueHits'])
         path.add_module(datastore_cleaner)
 
 

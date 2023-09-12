@@ -17,11 +17,6 @@ Variables
 * Added new variables `nECLTriggerCellsFWDEndcap`, `nECLTriggerCellsBarrel`, `nECLTriggerCellsBWDEndcap`, 
   and `nECLTriggerCells` for numbers of ECL trigger cells above 100 MeV in the event. 0 prior to mc16/proc16.
 * Added new variable `isTrackFound` for particles created from MCParticles.
-* Added the variables `PxHER`, `PyHER`, `PzHER` and  `PxLER`, `PyLER`, `PzLER`  which are the nominal beam momenta
-  derived from the ``CollisionInvariantMass``, ``CollisionBoostVector`` and ``CollisionAxisCMS`` payloads
-* Added the variables `mcPxHER`, `mcPyHER`, `mcPzHER` and  `mcPxLER`, `mcPyLER`, `mcPzLER`  which are the truth
-  momenta of colliding electron/positron for the event. These are available only for MC.
-  For ``EvtGen`` and ``BabaYaga`` generators these variables have dummy value for MC15 or older.
 
 
 Changes in the analysis package in light-2305-korat

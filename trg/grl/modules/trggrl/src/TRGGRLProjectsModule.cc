@@ -147,11 +147,11 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = eclMapping->getTCPosition(tc);
+    ROOT::Math::XYZVector CellPosition = eclMapping->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
-    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
-    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
+    CellLab.SetPx(CellPosition.X() / CellPosition.R());
+    CellLab.SetPy(CellPosition.Y() / CellPosition.R());
+    CellLab.SetPz(CellPosition.Z() / CellPosition.R());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab

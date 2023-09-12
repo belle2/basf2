@@ -64,14 +64,21 @@ void SVDTimeValidationCollectorModule::prepare()
   TH2F* __hClsDiffTimeOnTracks__ = new TH2F("__hClsDiffTimeOnTracks__", "clsDiffTimeOnTracks",
                                             300, -150, 150,
                                             numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
-  TH1F* __hBinToSensorMap__      = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
-                                            numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH3F* __hClusterSizeVsTimeResidual__  = new TH3F("__hClusterSizeVsTimeResidual__",
+                                                   "ClusterSize vs Time Residual",
+                                                   100, -25., 25., 10, 0.5, + 10.5,
+                                                   numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
+  TH1F* __hBinToSensorMap__     = new TH1F("__hBinToSensorMap__", "__BinToSensorMap__",
+                                           numberOfSensorBin, + 0.5, numberOfSensorBin + 0.5);
   __hClsTimeOnTracks__->GetYaxis()->SetTitle("sensor");
   __hClsTimeOnTracks__->GetXaxis()->SetTitle("clsTime_onTracks (ns)");
   __hClsTimeAll__->GetYaxis()->SetTitle("sensor");
   __hClsTimeAll__->GetXaxis()->SetTitle("clsTime_all (ns)");
   __hClsDiffTimeOnTracks__->GetYaxis()->SetTitle("sensor");
   __hClsDiffTimeOnTracks__->GetXaxis()->SetTitle("clsDiffTime_onTracks (ns)");
+  __hClusterSizeVsTimeResidual__->GetZaxis()->SetTitle("Sensor");
+  __hClusterSizeVsTimeResidual__->GetYaxis()->SetTitle("Cluster Size");
+  __hClusterSizeVsTimeResidual__->GetXaxis()->SetTitle("Cluster Time - EventT0 (ns)");
 
   int tmpBinCnt = 0;
   for (auto sensor : allSensors) {
@@ -89,6 +96,7 @@ void SVDTimeValidationCollectorModule::prepare()
   registerObject<TH2F>(__hClsTimeAll__->GetName(), __hClsTimeAll__);
   registerObject<TH2F>(__hClsDiffTimeOnTracks__->GetName(), __hClsDiffTimeOnTracks__);
   registerObject<TH1F>(__hBinToSensorMap__->GetName(), __hBinToSensorMap__);
+  registerObject<TH3F>(__hClusterSizeVsTimeResidual__->GetName(), __hClusterSizeVsTimeResidual__);
 }
 
 void SVDTimeValidationCollectorModule::startRun()
@@ -97,6 +105,7 @@ void SVDTimeValidationCollectorModule::startRun()
   getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
   getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
   getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
+  getObjectPtr<TH3F>("__hClusterSizeVsTimeResidual__")->Reset();
   getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
 }
 
@@ -109,7 +118,8 @@ void SVDTimeValidationCollectorModule::collect()
     // Fill histograms clusters on tracks
     for (const auto& svdCluster : m_svdClsOnTrk) {
       // get cluster time
-      float clTime = svdCluster.getClsTime();
+      float clusterTime = svdCluster.getClsTime();
+      int clusterSize = svdCluster.getSize();
 
       TString binLabel = TString::Format("L%iL%iS%i%c",
                                          svdCluster.getSensorID().getLayerNumber(),
@@ -119,14 +129,15 @@ void SVDTimeValidationCollectorModule::collect()
       int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
       double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
 
-      getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Fill(clTime, sensorBinCenter);
-      getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Fill(clTime - eventT0, sensorBinCenter);
+      getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Fill(clusterTime, sensorBinCenter);
+      getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Fill(clusterTime - eventT0, sensorBinCenter);
+      getObjectPtr<TH3F>("__hClusterSizeVsTimeResidual__")->Fill(clusterTime - eventT0, clusterSize, sensorBinCenter);
     };
 
     // Fill histograms with all clusters
     for (const auto& svdCluster : m_svdCls) {
       // get cluster time
-      float clTime = svdCluster.getClsTime();
+      float clusterTime = svdCluster.getClsTime();
 
       TString binLabel = TString::Format("L%iL%iS%i%c",
                                          svdCluster.getSensorID().getLayerNumber(),
@@ -136,7 +147,7 @@ void SVDTimeValidationCollectorModule::collect()
       int sensorBin = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->FindBin(binLabel.Data());
       double sensorBinCenter = getObjectPtr<TH1F>("__hBinToSensorMap__")->GetXaxis()->GetBinCenter(sensorBin);
 
-      getObjectPtr<TH2F>("__hClsTimeAll__")->Fill(clTime, sensorBinCenter);
+      getObjectPtr<TH2F>("__hClsTimeAll__")->Fill(clusterTime, sensorBinCenter);
     };
   }
 }

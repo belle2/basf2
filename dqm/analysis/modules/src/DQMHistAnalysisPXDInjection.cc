@@ -29,6 +29,7 @@ REG_MODULE(DQMHistAnalysisPXDInjection);
 DQMHistAnalysisPXDInjectionModule::DQMHistAnalysisPXDInjectionModule() : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Hits after Injection");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDINJ"));

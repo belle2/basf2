@@ -14,8 +14,6 @@ from softwaretrigger import constants
 from softwaretrigger.processing import finalize_zmq_path, setup_basf2_and_db, start_zmq_path
 
 
-basf2.logging.add_udp('hltctl', 6900)
-
 args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt)

@@ -12,7 +12,6 @@
 #include <framework/gearbox/Const.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasuredStateOnPlane.h>
-#include <TVector3.h>
 //#include <limits>
 #include <math.h>
 

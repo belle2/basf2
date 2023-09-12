@@ -34,7 +34,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
     while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
     while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-    if (fabs(phiDiff) < m_param_PhiRecoTrackToHitCut) {
+    if (fabs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)) {
       return 1.0;
     }
     // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
@@ -56,7 +56,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-  if (fabs(phiDiff) < m_param_PhiHitHitCut) {
+  if (fabs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut)) {
     return 1.0;
   }
 

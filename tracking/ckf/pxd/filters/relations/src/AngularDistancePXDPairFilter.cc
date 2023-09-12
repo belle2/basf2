@@ -31,7 +31,7 @@ AngularDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, c
 
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD / CDC-SVD track, so we can use its position to only look for matching ladders
-    if (abs(phiDiff) < m_param_PhiRecoTrackToHitCut) {
+    if (abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)) {
       return 1.0;
     }
     return NAN;
@@ -46,7 +46,7 @@ AngularDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, c
     return 1.0;
   }
 
-  if (abs(phiDiff) < m_param_PhiHitHitCut) {
+  if (abs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut)) {
     return 1.0;
   }
 

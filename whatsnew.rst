@@ -58,6 +58,14 @@ Changes since release-07
         -
         - 0.15.0
 
+.. rubric:: Authentication for Conditions Database using JWT
+
+The authentication method that allows to upload payloads to the Conditions
+Database and to modify existing global tags has been updated. It now uses
+JSON web tokens that are created and verified based on the B2MMS username and
+the associated password. More information can be found in the section
+:ref:`b2conditionsdb`.
+
 .. include:: analysis/doc/whatsnew-since/release-07-00.txt
 
 .. List of changes for the b2bii package

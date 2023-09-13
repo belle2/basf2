@@ -626,23 +626,23 @@ class Job:
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
         if "BELLE2_CONFIG_DIR" in os.environ:
-            self.setup_cmds.append("""if [ -z "${{BELLE2_CONFIG_DIR}}" ]; then""")
+            self.setup_cmds.append("""if [ -z "${BELLE2_CONFIG_DIR}" ]; then""")
             self.setup_cmds.append(f"  export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}")
             self.setup_cmds.append("fi")
         if "VO_BELLE2_SW_DIR" in os.environ:
-            self.setup_cmds.append("""if [ -z "${{VO_BELLE2_SW_DIR}}" ]; then""")
+            self.setup_cmds.append("""if [ -z "${VO_BELLE2_SW_DIR}" ]; then""")
             self.setup_cmds.append(f"  export VO_BELLE2_SW_DIR={os.environ['VO_BELLE2_SW_DIR']}")
             self.setup_cmds.append("fi")
         if "BELLE2_EXTERNALS_TOPDIR" in os.environ:
-            self.setup_cmds.append("""if [ -z "${{BELLE2_EXTERNALS_TOPDIR}}" ]; then""")
+            self.setup_cmds.append("""if [ -z "${BELLE2_EXTERNALS_TOPDIR}" ]; then""")
             self.setup_cmds.append(f"  export BELLE2_EXTERNALS_TOPDIR={os.environ['BELLE2_EXTERNALS_TOPDIR']}")
             self.setup_cmds.append("fi")
         if "BELLE2_CONDB_PROXY" in os.environ:
-            self.setup_cmds.append("""if [ -z "${{BELLE2_CONDB_PROXY}}" ]; then""")
+            self.setup_cmds.append("""if [ -z "${BELLE2_CONDB_PROXY}" ]; then""")
             self.setup_cmds.append(f"  export BELLE2_CONDB_PROXY={os.environ['BELLE2_CONDB_PROXY']}")
             self.setup_cmds.append("fi")
         if "BELLE2_CONDB_METADATA" in os.environ:
-            self.setup_cmds.append("""if [ -z "${{BELLE2_CONDB_METADATA}}" ]; then""")
+            self.setup_cmds.append("""if [ -z "${BELLE2_CONDB_METADATA}" ]; then""")
             self.setup_cmds.append(f"  export BELLE2_CONDB_METADATA={os.environ['BELLE2_CONDB_METADATA']}")
             self.setup_cmds.append("fi")
         if "BELLE2_RELEASE" in os.environ:

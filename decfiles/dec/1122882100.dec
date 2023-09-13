@@ -1,0 +1,54 @@
+# EventType: 1122882100
+# Descriptor: [B0 -> psi(2S) [ -> Jpsi [ -> l+ l-] pi+ pi-] K*0 ]cc
+# NickName: Bd_Psi2SK*0_Jpsipi+pi-_l+l-
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Sourabh Chutia
+# Email: ph21070@iisermohali.ac.in
+# Cuts: None
+# Date: 20230911
+# Comments:
+
+
+Define PKHplus  0.3469687
+Define PKHzero  0.480
+Define PKHminus 0.1342112
+Define PKphHplus  -0.054642
+Define PKphHzero  0.0
+Define PKphHminus -1.162401
+
+Alias J/psisig J/psi
+Alias psi(2S)sig psi(2S)
+Alias pi0sig pi0
+Alias K*0sig K*0
+
+Decay Upsilon(4S)
+1.0000 B0 anti-B0 B0sig anti-B0sig       VSS_BMIX dm;
+Enddecay
+
+
+Decay B0sig
+1.00000  psi(2S)sig K*0sig  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus ;
+Enddecay
+CDecay anti-B0sig
+
+Decay psi(2S)sig
+1.000 J/psisig pi+ pi-  VVPIPI ;
+Enddecay
+
+Decay J/psisig
+0.5000 e+ e-  PHOTOS VLL ;
+0.5000 mu+ mu- PHOTOS VLL ;
+Enddecay
+
+Decay K*0sig
+0.3326 K_S0 pi0sig   PHOTOS VSS;
+0.6651 K+  pi-   PHOTOS VSS;
+Enddecay
+
+Decay pi0sig
+1.000 gamma gamma  PHSP;
+Enddecay
+
+End

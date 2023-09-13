@@ -68,13 +68,13 @@ namespace Belle2 {
 
     // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
-    float m_occError; /**<error level of the occupancy */
-    float m_occWarning; /**< warning level of the occupancy */
-    float m_occEmpty; /**<empty level of the occupancy */
+    double m_occError; /**<error level of the occupancy */
+    double m_occWarning; /**< warning level of the occupancy */
+    double m_occEmpty; /**<empty level of the occupancy */
 
-    float m_onlineOccError; /**<error level of the onlineOccupancy */
-    float m_onlineOccWarning; /**< warning level of the onlineOccupancy */
-    float m_onlineOccEmpty; /**<empty level of the occupancy */
+    double m_onlineOccError; /**<error level of the onlineOccupancy */
+    double m_onlineOccWarning; /**< warning level of the onlineOccupancy */
+    double m_onlineOccEmpty; /**<empty level of the occupancy */
 
     int m_statThreshold; /**< minimal number of events to compare histograms */
     float m_timeThreshold; /**< difference between mean of cluster time for present and reference run */

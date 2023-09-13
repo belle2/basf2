@@ -41,10 +41,10 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   setDescription("DQM Analysis Module that computes the average SVD sensor efficiency.");
 
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
-  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
-  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
-  addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:SVD:"));
+  addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", double(0.9));
+  addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", double(0.94));
+  addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", double(100));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 
   // Offline occupancy U-side
   registerEpicsPV(m_pvPrefix + "EfficiencyUAlarm", "EfficiencyUAlarm");
@@ -58,31 +58,28 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialized.");
   B2DEBUG(10, " black = " << kBlack);
   B2DEBUG(10, " green = " << kGreen);
-  B2DEBUG(10, " orange = " << kOrange);
+  B2DEBUG(10, " yellow = " << kYellow);
   B2DEBUG(10, " Red = " << kRed);
 
-  m_refFile = NULL;
-  if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data(), "READ");
-  }
-
-  //search for reference
-  if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
-
-    TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
-    if (!ref_eff)
-      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
-    else {
-      m_effWarning = ref_eff->GetBinContent(2);
-      m_effError = ref_eff->GetBinContent(3);
-    }
-
-  } else
-    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
-
-  B2INFO(" SVD efficiency thresholds:");
-  B2INFO(" EFFICIENCY: normal < " << m_effWarning << " < warning < " << m_effError << " < error");
+//  m_refFile = NULL;
+//  if (m_refFileName != "") {
+//    m_refFile = new TFile(m_refFileName.data(), "READ");
+//  }
+//
+//  //search for reference
+//  if (m_refFile && m_refFile->IsOpen()) {
+//    B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
+//
+//    TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
+//    if (!ref_eff)
+//      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
+//    else {
+//      m_effWarning = ref_eff->GetBinContent(2);
+//      m_effError = ref_eff->GetBinContent(3);
+//    }
+//
+//  } else
+//    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
 
 
   //build the legend
@@ -95,7 +92,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
   m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
-  m_legWarning->SetFillColor(kOrange);
+  m_legWarning->SetFillColor(kYellow);
   m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
   m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
@@ -152,6 +149,10 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
                                        Form("Summary of SVD efficiencies (%%), @view/@side Side for 3 samples %s", runID.Data()));
   m_h3EfficiencyErr = new SVDSummaryPlots("SVD3EfficiencyErr@view",
                                           Form("Summary of SVD efficiencies errors (%%), @view/@side Side for 3 samples %s", runID.Data()));
+
+
+  //register limits for EPICS
+  registerEpicsPV(m_pvPrefix + "efficiencyLimits", "effLimits");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -166,6 +167,12 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
   m_c3EfficiencyV->Clear();
   m_c3EfficiencyErrU->Clear();
   m_c3EfficiencyErrV->Clear();
+
+  //Retrieve limits from EPICS
+  requestLimitsFromEpicsPVs("effLimits", m_effError, m_statThreshold, m_effWarning,  m_effError);
+
+  B2INFO(" SVD efficiency thresholds taken from EPICS configuration file:");
+  B2INFO("  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
@@ -178,7 +185,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   //set dedicate gStyle
   //  const Int_t colNum = 4;
-  //  Int_t palette[colNum] {kBlack,  kGreen, kOrange, kRed};
+  //  Int_t palette[colNum] {kBlack,  kGreen, kYellow, kRed};
   //  gStyle->SetPalette(colNum, palette);
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
@@ -280,34 +287,30 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   // update summary for U side
   m_cEfficiencyU->cd();
   m_hEfficiency->getHistogram(1)->Draw("text");
-  int alarm = -1;
+
   switch (m_effUstatus) {
     case good: {
       m_cEfficiencyU->SetFillColor(kGreen);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legNormal->Draw("same");
-      alarm = 0;
       break;
     }
     case error: {
       m_cEfficiencyU->SetFillColor(kRed);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legProblem->Draw("same");
-      alarm = 3;
       break;
     }
     case warning: {
-      m_cEfficiencyU->SetFillColor(kOrange);
+      m_cEfficiencyU->SetFillColor(kYellow);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legWarning->Draw("same");
-      alarm = 2;
       break;
     }
     case lowStat: {
       m_cEfficiencyU->SetFillColor(kGray);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legEmpty->Draw("same");
-      alarm = 1;
       break;
     }
     default: {
@@ -315,7 +318,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       break;
     }
   }
-  setEpicsPV("EfficiencyUAlarm", alarm);
+//   setEpicsPV("EfficiencyUAlarm", alarm);
 
   m_cEfficiencyU->Draw("text");
   m_cEfficiencyU->Update();
@@ -340,7 +343,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       break;
     }
     case warning: {
-      m_cEfficiencyV->SetFillColor(kOrange);
+      m_cEfficiencyV->SetFillColor(kYellow);
       m_cEfficiencyV->SetFrameFillColor(10);
       m_legWarning->Draw("same");
       break;
@@ -478,35 +481,29 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_c3EfficiencyU->cd();
   m_h3Efficiency->getHistogram(1)->Draw("text");
 
-  int alarm3 = -1;
-
   switch (m_effUstatus) {
     case good: {
       m_c3EfficiencyU->SetFillColor(kGreen);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legNormal->Draw("same");
-      alarm = 0;
       break;
     }
     case error: {
       m_c3EfficiencyU->SetFillColor(kRed);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legProblem->Draw("same");
-      alarm = 3;
       break;
     }
     case warning: {
-      m_c3EfficiencyU->SetFillColor(kOrange);
+      m_c3EfficiencyU->SetFillColor(kYellow);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legWarning->Draw("same");
-      alarm = 2;
       break;
     }
     case lowStat: {
       m_c3EfficiencyU->SetFillColor(kGray);
       m_c3EfficiencyU->SetFrameFillColor(10);
       m_legEmpty->Draw("same");
-      alarm = 1;
       break;
     }
     default: {
@@ -514,8 +511,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       break;
     }
   }
-
-  setEpicsPV("EfficiencyU3Alarm", alarm3);
 
   m_c3EfficiencyU->Draw("text");
   m_c3EfficiencyU->Update();
@@ -540,7 +535,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       break;
     }
     case warning: {
-      m_c3EfficiencyV->SetFillColor(kOrange);
+      m_c3EfficiencyV->SetFillColor(kYellow);
       m_c3EfficiencyV->SetFrameFillColor(10);
       m_legWarning->Draw("same");
       break;

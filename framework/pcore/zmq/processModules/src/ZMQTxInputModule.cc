@@ -144,9 +144,9 @@ void ZMQTxInputModule::event()
         }
       }
 
-      unsigned int workerID = -1;
+      //      unsigned int workerID = -1;
       for (deque<unsigned int>::iterator it = m_nextWorker.begin(); it != m_nextWorker.end(); ++it) {
-        workerID = *it;
+        unsigned int workerID = *it;
         m_nextWorker.pop_front();
         std::string workerIDString = std::to_string(workerID);
         B2INFO("ZMQTxInput :: sending first event to worker : " << LogVar("worker", workerIDString));

@@ -5,7 +5,7 @@ Photon Energy Resolution
 ++++++++++++++++++++++++
 * Added ``ECLPhotonEnergyResolution`` to analysis database objects. This module reads the relative energy resolution calculation
   results from the `Photon Energy Resolution Calibration workflow <https://gitlab.desy.de/alexander.heidelbach/photonenergyresolutioncalibration>`_
-  and creates a corresponding database object. The new method `GetCovarianceMatrix3x3FromCluster` in ``ClusterUtils`` replaces the former
+  and creates a corresponding database object. The new method ``GetCovarianceMatrix3x3FromCluster`` in ``ClusterUtils`` replaces the former
   calculated values if the cluster properties (:math:`E`, :math:`\phi`, :math:`\theta`) are within valid binning and leaves them unchanged otherwise.
   ``ClusterUtils`` triggers the replacement if a globaltag with a valid ``ECLPhotonEnergyResolution`` payload is present and
   without further user input.

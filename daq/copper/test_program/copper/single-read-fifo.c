@@ -38,27 +38,25 @@ int maxevent = 0;
 void do_reset(void *start)
 {
     unsigned long *lp = (unsigned long *) (start + COPPER_FF_RST);
-    *lp = 0x1F;
+    //*lp = 0x1F;
     *lp = 0;
 }
 
 void
 do_display_word(char * title, unsigned long offset, unsigned long value, int may_be_eof)
 {
-    int j;
-
     if (ninterest == 0) {
         if (may_be_eof) {
-            printf("%s %4d %08x (%ddup, may be end of the FIFO)\n",
+            printf("%s %4lu %08lx (%ddup, may be end of the FIFO)\n",
                 title, offset, value, may_be_eof);
         } else {
-            printf("%s %4d %08x\n",
+            printf("%s %4lu %08lx\n",
                 title, offset, value);
         }
     } else {
-        for (j = 0; j < ninterest; j++) {
+        for (int j = 0; j < ninterest; j++) {
             if (interest[j] == offset) {
-                printf("%s %4d %08x\n", title, offset, value);
+                printf("%s %4lu %08lx\n", title, offset, value);
             }
         }
     }
@@ -69,10 +67,10 @@ int do_read_fifo(char *title, unsigned char *fifop)
     int ret = 0;
     int ndup = 0;
     int offset = 0;
-    unsigned long word, lastword = 0;
+    unsigned long lastword = 0;
 
     while (1) {
-        word = *(unsigned long *) fifop;
+        unsigned long word = *(unsigned long *) fifop;
         if (word == lastword) {
             ndup++;
             if (ndup > duplimit)
@@ -82,11 +80,11 @@ int do_read_fifo(char *title, unsigned char *fifop)
             lastword = word;
         }
 
-	if (ndup == offset && (word >> 16) == 0xFF55) {
-	} else {
-		do_display_word(title, offset, word, ndup);
-		ret = 1;
-	}
+        if (ndup == offset && (word >> 16) == 0xFF55) {
+        } else {
+            do_display_word(title, offset, word, ndup);
+            ret = 1;
+        }
         offset++;
     }
     return ret;
@@ -122,7 +120,7 @@ void do_scan(void *start)
     int i;
 
     for (i = 0; i * 4 < 0x100; i++) {
-        printf("COPPER REG %3d %08x\n", i, lp[i]);
+        printf("COPPER REG %3d %08lx\n", i, lp[i]);
     }
 
 }
@@ -157,7 +155,6 @@ unsigned char *do_mmap()
 
 void doit()
 {
-    int ret;
     int event = 0;
     unsigned char *copperreg = do_mmap();
     if (copperreg == MAP_FAILED)
@@ -167,14 +164,14 @@ void doit()
     do_reset(copperreg);
     enable_single_read(copperreg);
     while (1) {
-        ret = do_read_all_fifo(copperreg);
-	if (ret > 0) {
-	    printf("==========================\n", ret);
-	    event++;
-	}
+        int ret = do_read_all_fifo(copperreg);
+        if (ret > 0) {
+            printf("==========================\n", ret);
+            event++;
+        }
         usleep(10 * 1000);
         if (maxevent && event > maxevent)
-	    break;
+            break;
     }
     return;
 }

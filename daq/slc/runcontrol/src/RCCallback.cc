@@ -245,8 +245,8 @@ void RCCallback::dump(bool isstart)
   obj.print();
   std::string table = m_table + "record";
   if (getDB()) {
-    DBInterface& db(*getDB());
     try {
+      DBInterface& db(*getDB());
       DBObjectLoader::createDB(db, table, obj);
     } catch (const IOException& e) {
       throw (DBHandlerException("Failed to connect to database error : %s ", e.what()));

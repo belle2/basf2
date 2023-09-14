@@ -27,7 +27,7 @@ void show_event(unsigned long *head, int len)
     }
     printf("%08d", i);
     for (j = 0; j < (len / 4) - i; j += 4) {
-	printf(" %08x", buffer[i + j]);
+	printf(" %08lx", buffer[i + j]);
     }
     printf("\n");
 }

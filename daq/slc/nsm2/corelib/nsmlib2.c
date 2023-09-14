@@ -1501,7 +1501,7 @@ nsmlib_initcli(NSMcontext *nsmc, const char *nodename)
 /* -- nsmlib_sendreqid ----------------------------------------------- */
 int
 nsmlib_sendreqid(NSMcontext *nsmc,
-		 const char *node, uint16_t req, uint npar, int *pars,
+		 const char *node, uint16_t req, uint npar, const int *pars,
 		 int len, const char *datap)
 {
   NSMmsg msg;

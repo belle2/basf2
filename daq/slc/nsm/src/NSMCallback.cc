@@ -310,8 +310,8 @@ void NSMCallback::alloc_open(NSMCommunicator& com)
   }
   for (NSMDataMap::iterator it = m_datas.begin();
        it != m_datas.end(); ++it) {
-    NSMData& data(it->second);
     try {
+      NSMData& data(it->second);
       if (!data.isAvailable() && data.getName().size() > 0 &&
           data.getFormat().size() > 0) {
         data.open(com);

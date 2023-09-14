@@ -177,7 +177,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     buf[ offset +  1 ] = 0x7f7f820c;
 #endif
     buf[ offset +  2 ] = exp_run;
-    printf("run_no %d\n", exp_run); fflush(stdout);
+    printf("run_no %u\n", exp_run); fflush(stdout);
     buf[ offset +  4 ] = ctime;
     buf[ offset +  5 ] = utime;
     buf[ offset +  6 ] = node_id + k;
@@ -601,7 +601,7 @@ int main(int argc, char** argv)
     if (cnt % 10000 == 1) {
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
-        printf("run %d evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+        printf("run %d evt %llu time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
                run_no,
                cnt,
                cur_time - init_time,

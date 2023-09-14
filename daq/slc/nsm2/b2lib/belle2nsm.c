@@ -384,7 +384,6 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
 int
 b2nsm_error(NSMmsg *msg, const char *fmt, ...)
 {
-  va_list ap;
   const char *node = nsmlib_nodename(nsm, msg->node);
   char buf[256];
   char *ptr = buf;
@@ -395,6 +394,7 @@ b2nsm_error(NSMmsg *msg, const char *fmt, ...)
   if (! msg || ! fmt) return -1;
 
   if (fmt) {
+    va_list ap;
     va_start(ap, fmt);
     vsnprintf(buf, 256, fmt, ap);
     va_end(ap);
@@ -533,9 +533,9 @@ NSMcontext *
 b2nsm_init2(const char *nodename, int usesig,
 	    const char *hostname, int port, int shmkey)
 {
-  char nodename_uprcase[NSMSYS_NAME_SIZ+1];
   b2nsm_errc = 0;
   if (nodename) {
+    char nodename_uprcase[NSMSYS_NAME_SIZ+1];
     xuprcpy(nodename_uprcase, nodename, NSMSYS_NAME_SIZ+1);
     nsm = nsmlib_init(nodename_uprcase, hostname, port, shmkey);
   } else {

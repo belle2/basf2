@@ -829,7 +829,7 @@ main(int argc, char **argv)
   char fmtstr[256];
   int revision;
   int newrevision = -1;
-  NSMparse *parsep;
+  NSMparse *parsep = nullptr;
   char indent[256];
 
   memset(fmtstr, 0, sizeof(fmtstr));

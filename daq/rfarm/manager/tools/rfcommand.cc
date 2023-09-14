@@ -35,7 +35,7 @@ void error_handler(NSMmsg* /*msg*/, NSMcontext*)
   printf("ERROR received\n");
 }
 
-int main(int argc, char** argv)
+int main(int argc, const char** argv)
 {
   // Usage : getconf conffile node
 
@@ -44,9 +44,9 @@ int main(int argc, char** argv)
     exit(-1);
   }
 
-  char* conffile = argv[1];
-  char* nodename = argv[2];
-  char* command = argv[3];
+  const char* conffile = argv[1];
+  const char* nodename = argv[2];
+  const char* command = argv[3];
 
   char* confdir = getenv("RFARM_CONFDIR");
   string confpath = string(confdir) + "/" + string(conffile) + ".conf";

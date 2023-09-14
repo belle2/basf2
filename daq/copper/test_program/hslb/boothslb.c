@@ -58,7 +58,6 @@ int xslot = 0;
 static int
 open_mgt(int ch, int mode)
 {
-  char *DEVICE = 0;
   int o_mode = (mode & 1) ? O_RDWR                 : O_RDONLY;
   int m_mode = (mode & 1) ? (PROT_READ|PROT_WRITE) : PROT_READ;
 
@@ -109,16 +108,17 @@ open_mgt(int ch, int mode)
       return mgt;
     }
   } else {
+    char *DEVICE = 0;
     switch (ch) {
-    case  0:
-    case 'a': DEVICE = "/dev/copper/fngeneric:a"; break;
-    case  1:
-    case 'b': DEVICE = "/dev/copper/fngeneric:b"; break;
-    case  2:
-    case 'c': DEVICE = "/dev/copper/fngeneric:c"; break;
-    case  3:
-    case 'd': DEVICE = "/dev/copper/fngeneric:d"; break;
-    default: errno = ENODEV; return -1;
+        case  0:
+        case 'a': DEVICE = "/dev/copper/fngeneric:a"; break;
+        case  1:
+        case 'b': DEVICE = "/dev/copper/fngeneric:b"; break;
+        case  2:
+        case 'c': DEVICE = "/dev/copper/fngeneric:c"; break;
+        case  3:
+        case 'd': DEVICE = "/dev/copper/fngeneric:d"; break;
+        default: errno = ENODEV; return -1;
     }
     int mgt = open(DEVICE, o_mode);
     if (mgt < 0) {

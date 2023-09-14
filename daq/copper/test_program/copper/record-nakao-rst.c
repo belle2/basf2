@@ -34,7 +34,7 @@ void
 show_event(unsigned long * head, int len)
 {
   for (int i=0; i<(len/4); i+= 8) {
-    printf("%08d %08x %08x %08x %08x %08x %08x %08x %08x\n", i,
+    printf("%08d %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
 	   buffer[i], buffer[i+1], buffer[i+2], buffer[i+3],
 	   buffer[i+4], buffer[i+5], buffer[i+6], buffer[i+7]);
   }
@@ -235,18 +235,18 @@ main(int argc, char **argv)
 	istop = istart + buffer[9 + iii] ; 
 
 #ifdef FILE_OUT
-      if(card_test[0]==1 & iii==0) fprintf(fpw,"Board A: %08x /*** Data length=%08x, Trigger#=%08x ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[0]==1 & iii==0) fprintf(fpw,"Board A: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 
-      if(card_test[2]==1 & iii==2) fprintf(fpw,"Board C: %08x /*** Data length=%08x, Trigger#=%08x ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
-      if(card_test[3]==1 & iii==3) fprintf(fpw,"Board D: %08x /*** Data length=%08x, Trigger#=%08x ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[2]==1 & iii==2) fprintf(fpw,"Board C: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[3]==1 & iii==3) fprintf(fpw,"Board D: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 #endif
       if(card_test[1]==1 & iii==1){ 
 #ifdef FILE_OUT
-	fprintf(fpw,"Board B: %08x /*** Data length=%08x, Trigger#=%08x ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+	fprintf(fpw,"Board B: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 #endif
-	printf("Board B: %08x /*** Data length=%08x, Trigger#=%08x ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);}
+	printf("Board B: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);}
 
-      printf("istart= %d ,istop = %d : 0x%x\n",istart, istop, buffer[9+iii]);
+      printf("istart= %d ,istop = %d : 0x%lx\n",istart, istop, buffer[9+iii]);
       for (t= istart + 4; t<istop-1; t= t + 1)
 	{
  
@@ -272,7 +272,7 @@ main(int argc, char **argv)
       istart = istop; 
     }
 
-    printf("ret10 = %d size %d\n", ret, sizeof(unsigned long));
+    printf("ret10 = %d size %zu\n", ret, sizeof(unsigned long));
     /*
       for (t=17; t<(ret/4 - sizeof(struct copper_footer)/4 - 2); t= t + 1)
       {
@@ -310,7 +310,7 @@ main(int argc, char **argv)
     }
 
     if (footer->magic != COPPER_DRIVER_FOOTER_MAGIC)  {
-      printf(" Event : %i  received, Footer: %x,  xor = %08x\n", event, footer->magic, xor((unsigned long *)buffer, ret/4));
+      printf(" Event : %i  received, Footer: %x,  xor = %08lx\n", event, footer->magic, xor((unsigned long *)buffer, ret/4));
       printf("ret11= %x\n",ret);
       printf("bad fotter %x\n", footer->magic);
       show_event(buffer, ret);
@@ -318,14 +318,14 @@ main(int argc, char **argv)
     }
 
     if (header->event_number != event) { 
-      printf("bad copper evn = %x should be %x\n", buffer[1], event);
+      printf("bad copper evn = %lx should be %x\n", buffer[1], event);
     }
 
-    printf("ret11.5 = %d size %d\n", ret, sizeof(unsigned long));
+    printf("ret11.5 = %d size %zu\n", ret, sizeof(unsigned long));
     event++;
         
     //    if (event <= 100)  {/*   modified by sun */
-      printf(" Event : %i  received, xor = %08x\n", event,  xor((unsigned long *)buffer, ret/4));
+      printf(" Event : %i  received, xor = %08lx\n", event,  xor((unsigned long *)buffer, ret/4));
       printf("ret12= 0x%x %d\n",ret,ret);
       show_event(buffer, ret);
       //    }     /*  modified by sun */

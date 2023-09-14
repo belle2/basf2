@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
 {
   unsigned int port;
   std::string sourceHost;
-  bool raw;
-  bool repeat;
+  bool raw = false;
+  bool repeat = false;
   std::string file_name;
 
   po::options_description desc("b2hlt_file2socket FILE-NAME PORT SHM-NAME SHM-ID");

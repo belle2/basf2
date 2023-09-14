@@ -33,7 +33,7 @@ do_scan(void * start)
         int i;
 
         for (i=0; i*4<0x100; i++) {
-                printf("COPPER REG %3d %08x\n", i, lp[i]);
+                printf("COPPER REG %3d %08lx\n", i, lp[i]);
         }
 
 }

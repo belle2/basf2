@@ -76,8 +76,8 @@ namespace Belle2 {
     double m_onlineOccWarning; /**< warning level of the onlineOccupancy */
     double m_onlineOccEmpty; /**<empty level of the occupancy */
 
-    int m_statThreshold; /**< minimal number of events to compare histograms */
-    float m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
+    double m_statThreshold; /**< minimal number of events to compare histograms */
+    double m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
     float m_refMeanP; /**< mean of the signal time peak from Physics reference run */
     float m_refMeanC; /**< mean of the signal time peak from Cosmic reference run */
 

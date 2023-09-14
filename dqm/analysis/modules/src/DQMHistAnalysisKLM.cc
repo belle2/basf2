@@ -50,7 +50,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number for delta histogram updates", 500000.);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
-  addParam("PVName", m_pvPrefix, "Prefix for KLM's DQM PVs", std::string("DQM:TEST:"));
+  addParam("PVName", m_pvPrefix, "Prefix for KLM's DQM PVs", std::string(""));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);

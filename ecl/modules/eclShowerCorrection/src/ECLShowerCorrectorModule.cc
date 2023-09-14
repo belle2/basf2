@@ -146,7 +146,7 @@ void ECLShowerCorrectorModule::event()
   for (auto& eclShower : m_eclShowers) {
 
     //..Only want to correct EM showers
-    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {break;}
+    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {continue;}
 
     //..Will correct both raw cluster energy and energy of the center crystal
     const double energyRaw = eclShower.getEnergy();
@@ -274,7 +274,7 @@ void ECLShowerCorrectorModule::event()
   //..Count number of showers in each region for EventLevelClusteringInfo
   uint16_t nShowersPerRegion[nLeakReg] = {};
   for (auto& eclShower : m_eclShowers) {
-    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {break;}
+    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {continue;}
     const int iCellId = eclShower.getCentralCellId();
     if (ECLElementNumbers::isForward(iCellId)) {nShowersPerRegion[0]++;}
     if (ECLElementNumbers::isBarrel(iCellId)) {nShowersPerRegion[1]++;}

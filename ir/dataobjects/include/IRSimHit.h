@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <string>
 #include <simulation/dataobjects/SimHitBase.h>
 
@@ -30,10 +30,10 @@ namespace Belle2 {
 
     /** Full Constructor. */
     IRSimHit(
-      TVector3 posIn,
-      TVector3 momIn,
-      TVector3 posOut,
-      TVector3 momOut,
+      ROOT::Math::XYZVector posIn,
+      ROOT::Math::XYZVector momIn,
+      ROOT::Math::XYZVector posOut,
+      ROOT::Math::XYZVector momOut,
       int PDGcode,
       float depEnergy,
       const std::string& Volname
@@ -49,19 +49,19 @@ namespace Belle2 {
     ~IRSimHit();
 
     /** The method to set.*/
-    void setposIn(TVector3 posIn); /** Set position at start point*/
-    void setmomIn(TVector3 momIn); /** Set momentum at start point */
-    void setposOut(TVector3 posOut); /** Set position at end point */
-    void setmomOut(TVector3 momOut); /** Set momentum at end point */
+    void setposIn(ROOT::Math::XYZVector posIn); /** Set position at start point*/
+    void setmomIn(ROOT::Math::XYZVector momIn); /** Set momentum at start point */
+    void setposOut(ROOT::Math::XYZVector posOut); /** Set position at end point */
+    void setmomOut(ROOT::Math::XYZVector momOut); /** Set momentum at end point */
     void setPDGcode(int PDGcode);    /** Set PDF code */
     void setdepEnergy(float depEnergy); /** Set deposited energy */
     void setVolname(const std::string& Volname); /** Set volume name */
 
     /** The method to get.*/
-    TVector3 getposIn();  /** return position at start point*/
-    TVector3 getmomIn();  /** return momentum at start point*/
-    TVector3 getposOut(); /** return position at end point*/
-    TVector3 getmomOut(); /** return momentum at end point*/
+    ROOT::Math::XYZVector getposIn();  /** return position at start point*/
+    ROOT::Math::XYZVector getmomIn();  /** return momentum at start point*/
+    ROOT::Math::XYZVector getposOut(); /** return position at end point*/
+    ROOT::Math::XYZVector getmomOut(); /** return momentum at end point*/
     int getPDGcode();     /** return PDG code */
     float getdepEnergy(); /** return deposited energy */
     std::string getVolname(); /** return volume name */
@@ -70,16 +70,16 @@ namespace Belle2 {
 
   private:
 
-    TVector3 m_posIn;  /**< Start point of energy deposition in local coordinates. */
-    TVector3 m_momIn;  /**< Momentum of particle at start of energy deposition. */
-    TVector3 m_posOut; /**< End point of energy deposition in local coordinates. */
-    TVector3 m_momOut; /**< Momentum of particle at end of energy deposition. */
+    ROOT::Math::XYZVector m_posIn;  /**< Start point of energy deposition in local coordinates. */
+    ROOT::Math::XYZVector m_momIn;  /**< Momentum of particle at start of energy deposition. */
+    ROOT::Math::XYZVector m_posOut; /**< End point of energy deposition in local coordinates. */
+    ROOT::Math::XYZVector m_momOut; /**< Momentum of particle at end of energy deposition. */
     int m_PDGcode;     /**< PDG code of the particle producing hit. */
     float m_depEnergy; /**< Deposited energy */
     std::string m_Volname; /**< Volume name */
 
     /** ROOT Macro.*/
-    ClassDef(IRSimHit, 1);
+    ClassDef(IRSimHit, 2);
 
   };
 

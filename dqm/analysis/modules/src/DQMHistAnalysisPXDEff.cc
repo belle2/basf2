@@ -32,16 +32,16 @@ REG_MODULE(DQMHistAnalysisPXDEff);
 DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Efficiency");
 
-  //Parameter definition
+  // Parameter definition
 
-  //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
-  //Or get one and clone it
+  // Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
+  // Or get one and clone it
   addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(16));
   addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
@@ -53,11 +53,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 
 DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDEffModule::initialize()
@@ -97,23 +92,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
     nv = cellGetInfo.getVCells();
   }
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  }
-#endif
-
   for (VxdID& aPXDModule : m_PXDModules) {
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
-#ifdef _BELLE2_EPICS
-    if (getUseEpics()) {
-      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &mychid_eff[aPXDModule]), "ca_create_channel failure");
-    }
-#endif
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
+    registerEpicsPV("PXD:Eff:" + buff, (std::string)aPXDModule);
+
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
-    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-    m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
+    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_" + buff).c_str());
+    m_hEffModules[aPXDModule] = new TEfficiency(("ePXDHitEff_" + buff).c_str(), histTitle,
                                                 m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
@@ -182,16 +168,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    // values per module, see above
-    mychid_status.resize(2);
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Overall").data(), NULL, NULL, 10, &mychid_status[1]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:Eff:Status", "Status");
+  registerEpicsPV("PXD:Eff:Overall", "Overall");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -214,29 +192,15 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
     m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
 
-#ifdef _BELLE2_EPICS
-    if (getUseEpics()) {
-      // get warn and error limit
-      // as the same array as above, we assume chid exists
-      struct dbr_ctrl_double tPvData;
-      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
-      if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData.lower_alarm_limit)
-            && tPvData.lower_alarm_limit > 0.0) {
-          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
-        }
-        if (!std::isnan(tPvData.lower_warning_limit)
-            && tPvData.lower_warning_limit > 0.0) {
-          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
-          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
-        }
-      } else {
-        SEVCHK(r, "ca_get or ca_pend_io failure");
-      }
+    // get warn and error limit
+    // as the same array as above, we assume chid exists
+    double dummy, loerr = 0, lowarn = 0;
+    if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
+      m_hErrorLine->SetBinContent(i + 1, loerr);
+      if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
+      m_hWarnLine->SetBinContent(i + 1, lowarn);
+      if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
     }
-#endif
 
   }
   // Thus histo will contain old content until first update
@@ -354,7 +318,8 @@ void DQMHistAnalysisPXDEffModule::event()
         ihit +=  nhit;
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        if (j == 6) continue; // workaround for 1.3.2 module
+        // keep workaround code for re-use
+//         if (j == 6) continue; // workaround for 1.3.2 module
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
       }
@@ -382,7 +347,8 @@ void DQMHistAnalysisPXDEffModule::event()
         updated[aModule] = true;
       }
 
-      if (j == 6) continue; // workaround for 1.3.2 module
+      // keep workaround code for re-use
+//       if (j == 6) continue; // workaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
 
@@ -419,10 +385,9 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (i != 5) { // exclude 1.3.2
-          /// check for val > 0.0) { would exclude all zero efficient modules!!!
-          if (scale_min > val) scale_min = val;
-        }
+        // keep workaround code for re-use
+//         if (i != 5) // exclude 1.3.2
+        if (scale_min > val) scale_min = val;
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -445,10 +410,11 @@ void DQMHistAnalysisPXDEffModule::event()
 
       gr->Draw("AP");
 
-      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
-      tt->Draw();
+      // keep workaround code for re-use
+//       auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
+//       tt->SetTextAngle(90);// Rotated
+//       tt->SetTextAlign(12);// Centered
+//       tt->Draw();
 
       if (all < 100.) {
         m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
@@ -501,10 +467,9 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (i != 5) { // exclude 1.3.2
-          /// check for val > 0.0) { would exclude all zero efficient modules!!!
-          if (scale_min > val) scale_min = val;
-        }
+        // keep workaround code for re-use
+//         if (i != 5) { // exclude 1.3.2
+        if (scale_min > val) scale_min = val;
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -520,30 +485,27 @@ void DQMHistAnalysisPXDEffModule::event()
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
-#ifdef _BELLE2_EPICS
-      if (getUseEpics() && !getUseEpicsReadOnly()) {
-        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          if (updated[m_PXDModules[i]]) {
-            Double_t x, y;// we assume that double and Double_t are same!
-            gr->GetPoint(i, x, y);
-            auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
-            // we should only write if it was updated!
-            SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
-          }
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        if (updated[m_PXDModules[i]]) {
+          // we should only write if it was updated!
+          Double_t x, y;// we assume that double and Double_t are same!
+          gr->GetPoint(i, x, y);
+          setEpicsPV((std::string)m_PXDModules[i], y);
         }
       }
-#endif
+
       gr->SetLineColor(kBlack);
       gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
     } else scale_min = 0.0;
     if (gr) gr->Draw("AP");
     if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-    tt->SetTextSize(0.035);
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
+    // keep workaround code for re-use
+//     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
+//     tt->SetTextSize(0.035);
+//     tt->SetTextAngle(90);// Rotated
+//     tt->SetTextAlign(12);// Centered
+//     tt->Draw();
 
     if (all < 100.) {
       m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
@@ -577,25 +539,13 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("efficiency", var_efficiency);
   m_monObj->setVariable("nmodules", ieff);
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics() && !getUseEpicsReadOnly()) {
-    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
-    // only update if statistics is reasonable, we dont want "0" drops between runs!
-    if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  setEpicsPV("Status", stat_data);
+  // only update if statistics is reasonable, we dont want "0" drops between runs!
+  if (stat_data != 0) setEpicsPV("Overall", var_efficiency);
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

@@ -124,7 +124,12 @@ function triggerPopup(itemId) {
  * This function call is triggered by the button under the revisions list
  * "Load custom selection" and sets up the page with the new set of revisions.
  */
-function loadSelectedRevisions() {
+function loadSelectedRevisions(button=false) {
+
+    if (button === true){
+        // Change the dropdown option to Custom
+        $("#prebuilt-select").val('c');
+    }
 
     let revList = getSelectedRevsList();
 
@@ -176,7 +181,7 @@ function setDefaultPrebuildOption(){
 
     let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
     console.debug(`RECOVERED ${mode}`);
-    if (mode == null){
+    if (mode == null || mode == 'c'){
         mode = "rbn";
     }
     // todo: check if this is an allowed mode (since it might since have vanished), else discard!

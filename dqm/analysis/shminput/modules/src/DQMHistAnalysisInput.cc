@@ -104,7 +104,7 @@ void DQMHistAnalysisInputModule::event()
   while ((key = (TKey*)next())) {
     auto obj = key->ReadObj();
     if (obj == nullptr) continue; // would be strange, but better check
-    if (!key->IsA()->InheritsFrom("TH1")) continue; //
+    if (!obj->IsA()->InheritsFrom("TH1")) continue; // other non supported (yet?)
     TH1* h = (TH1*)obj; // we are sure its a TH1
 
     if (m_remove_empty && h->GetEntries() == 0) continue;

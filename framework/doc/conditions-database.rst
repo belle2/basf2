@@ -85,6 +85,12 @@ If multiple globaltags are selected the software will look for all necessary
 payloads in each of them in turn and always take each payload from the first
 globaltag it can be found in.
 
+.. tip::
+   A set of tools is provided with basf2 for interacting with the conditions
+   database via command line and operating actions such as creating globaltags,
+   uploading payloads, etc. Such tools, called ``b2conditionsdb`` tools, are
+   properly documented in :ref:`b2conditionsdb <b2conditionsdb>`.
+
 .. _configuring_cdb:
 
 Configuring the Conditions Database

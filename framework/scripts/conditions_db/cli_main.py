@@ -9,13 +9,48 @@
 ##########################################################################
 
 """
-This script provides a command line interface to all the tasks related to the
-:ref:`Conditions database <conditionsdb_overview>`: manage globaltags and iovs as well as upload new payloads
-or download of existing payloads.
+This tool provides a command line interface to all the tasks related to the
+:ref:`Conditions database <conditionsdb_overview>`: manage globaltags and iovs
+as well as upload new payloads or download of existing payloads.
 
-The usage of this program is similar to git: there are sub commands like for
-example ``tag`` which groups all actions related to the management of global
-tags. All the available commands are listed below.
+The usage of this tool is similar to git: there are sub commands like for
+example ``tag`` which groups all actions related to the management of
+globaltags. All the available commands are listed below.
+
+Users need a valid JSON Web Token (JWT) to authenticate to the conditions
+database when using this tool. For practical purposes, it is only necessary
+to know that a JWT is a string containing crypted information, and that string
+is stored in a file. More informations about what a JWT is can be found on
+`Wikipedia <https://en.wikipedia.org/wiki/JSON_Web_Token>`_.
+
+The tool automatically queries the JWT issuing server
+(https://token.belle2.org) and gets a valid token by asking the B2MMS username
+and password. The issued "default" JWT has a validity of 1 hour; after it
+expires, a new JWT needs to be obtained for authenticating the conditions
+database. When retrieved by this tool, the JWT is stored locally in the file
+``${HOME}/b2cdb_${BELLE2_USER}.token``.
+
+Some selected users (e.g. the calibration managers) are granted a JWT with an
+extended validity (30 days) to allow smooth operations with some automated
+workflows. Such "extended" JWTs are issued by a different server
+(https://token.belle2.org/extended). B2MMS username and password are necessary
+for getting the extended JWT. The extended JWT differs from the default JWT
+only by its validity and can be obtained only by manually querying the
+alternative server. If queried via web browser, a file containing the extended
+JWT will be downloaded in case the user is granted it. The server can also be
+queried via command line using
+``wget --user USERNAME --ask-password --no-check-certificate https://token.belle2.org/extended``
+or ``curl -u USERNAME -k https://token.belle2.org/extended``.
+
+If the environment variable ``${BELLE2_CDB_AUTH_TOKEN}`` is defined and points
+to a file containing a valid JWT, the ``b2conditionsdb`` tools use this token
+to authenticate with the CDB instead of querying the issuing server. This is
+useful when using an extended token. Please note that, in case the JWT to which
+``${BELLE2_CDB_AUTH_TOKEN}`` points is not valid anymore, the
+``b2conditionsdb`` tools will attempt to get a new one and store it into
+``${BELLE2_CDB_AUTH_TOKEN}``. If a new extended token is needed, it has to be
+manually obtained via https://token.belle2.org/extended and stored into
+``${BELLE2_CDB_AUTH_TOKEN}``.
 """
 
 # Creation of command line parser is done semi-automatically: it looks for
@@ -915,9 +950,9 @@ def get_argument_parser():
                          help="URI for the base of the REST API, if not given a list of default locations is tried")
     options.add_argument("--auth-token", type=str, default=None,
                          help="JSON Web Token necessary for authenticating to the conditions database. "
-                         "Useful only for debugging, since by the default the tool automatically "
+                         "Useful only for debugging, since by default the tool automatically "
                          "gets a token for you by asking the B2MMS username and password. "
-                         "If the environment variable $BELLE2_CDB_AUTH_TOKEN points to a file with a valid "
+                         "If the environment variable ``$BELLE2_CDB_AUTH_TOKEN`` points to a file with a valid "
                          "token, such token is used (useful for automatic workflows).")
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[options])

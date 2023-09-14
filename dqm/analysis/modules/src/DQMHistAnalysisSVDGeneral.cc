@@ -52,9 +52,9 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("onlineOccLevel_Empty", m_onlineOccEmpty, "Maximum OnlineOccupancy (%) for which the sensor is considered empty",
            double(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
-  addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
+  addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", double(10000.));
   addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
-           float(6)); // 6 ns
+           double(6)); // 6 ns
   addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
   addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
@@ -209,22 +209,11 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   rtype = findHist("DQMInfo/rtype");
 // runtype = "physics"; //rtype ? rtype->GetTitle() : "";
 
-  // PV registering
-  // unpack errors
-  registerEpicsPV(m_pvPrefix + "UnpackError", "UnpackError");
-  // registerEpicsPV(m_pvPrefix + "UnpackErrorAlarm", "UnpackErrorAlarm");
-
-//   // ClusterOnTrackTime
-//   registerEpicsPV(m_pvPrefix + "ClsTrkTimeAlarm", "ClsTrkTimeAlarm");
-//   registerEpicsPV(m_pvPrefix + "ClsTrk3TimeAlarm", "ClsTrk3TimeAlarm"); // 3 samples
-//
-//   // Offline occupancy U-side
-//   registerEpicsPV(m_pvPrefix + "OccupancyUAlarm", "OccupancyUAlarm");
-//   registerEpicsPV(m_pvPrefix + "OccupancyU3Alarm", "OccupancyU3Alarm"); // 3 samples
-//
   //register limits for EPICS
+  registerEpicsPV(m_pvPrefix + "UnpackErrorLimits", "UnpackErrorLimits");
   registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");
   registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
+  registerEpicsPV(m_pvPrefix + "clusterTimeOnTrackLimits", "clusTimeOnTrkLimits");
 }
 
 
@@ -257,6 +246,17 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
          <<
          " < error");
   B2INFO("  OFFLINE OCCUPANCY: empty < " << m_occEmpty << " normal < " << m_occWarning << " warning < " << m_occError << " < error");
+
+  double timeWarnUp = 0.;
+  requestLimitsFromEpicsPVs("clusTimeOnTrkLimits", m_timeThreshold, m_statThreshold, timeWarnUp,  m_timeThreshold);
+  B2INFO(" SVD cluster time on track threshold taken from EPICS configuration file:");
+  B2INFO("  CLUSTER TIME ON TRACK: error > " << m_timeThreshold << " ns with minimum statistics of " << m_statThreshold);
+
+  double unpackWarnLo = 0.;
+  double unpackWarnUp = 0.;
+  requestLimitsFromEpicsPVs("UnpackErrorLimits", m_unpackError, unpackWarnLo, unpackWarnUp,  m_unpackError);
+  B2INFO(" SVD unpack error threshold taken from EPICS configuration file:");
+  B2INFO("  DATA UNPACK: error > " << m_unpackError);
 
   // Create text panel
   //OFFLINE occupancy plots legend
@@ -352,8 +352,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cUnpacker->SetFillColor(kRed);
   }
 
-  setEpicsPV("UnpackError",  h->GetEntries());
-
   m_cUnpacker->cd();
   h->Draw("colztext");
   h->SetStats(0);
@@ -393,7 +391,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
-    if (nEvents > m_statThreshold) {
+    if (nEvents > (int)m_statThreshold) {
       if (runtype == "physics") {
         Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
         if (difference_physics > m_timeThreshold) {
@@ -444,7 +442,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hClusterOnTrack3Time_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
     m_hClusterOnTrack3Time_L456V.SetTitle("ClusterOnTrack Time L456V 3 samples " + runID);
     bool hasError = false;
-    if (nEvents > m_statThreshold) {
+    if (nEvents > (int)m_statThreshold) {
       if (runtype == "physics") {
         Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
         if (difference_physics > m_timeThreshold) {

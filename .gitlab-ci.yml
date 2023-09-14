@@ -138,12 +138,12 @@ release-validation:
   needs: [run-tests]
   artifacts:
     when: on_success
-    expose_as: 'automated release validation'
     paths:
-      - automated_validation
+      - automated_validation_*
+    expire_in: 60 days
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH == 'release/06-02') && $CI_COMMIT_TITLE =~ /Merge branch.*/
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'release/06-02' && $CI_COMMIT_TITLE =~ /Merge branch.*/
     - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
@@ -152,5 +152,5 @@ release-validation:
     - b2code-option opt
     - b2setup
     - basf2 --info
-    - hlt/tests/release_validation/run.sh automatic automated_validation
+    - hlt/tests/release_validation/run.sh automatic automated_validation_${CI_COMMIT_BRANCH//\//-}_$(date +%Y-%m-%d_%H-%M-%S)
     - echo "stage stop time -> $(date +%H:%M:%S)"

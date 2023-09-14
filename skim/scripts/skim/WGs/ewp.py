@@ -65,7 +65,9 @@ class BtoXgamma(BaseSkim):
 
         # Remove events with insuffcient number of good tracks and clusters, this
         # mitigates "The 0th-order FoxWolfram moment is zero" error
-        bugfix_cleanup = 'nParticlesInList(pi+:BtoXgamma_eventshape) > 0 and nParticlesInList(gamma:BtoXgamma_eventshape) > 0'
+        R2_cleanup = 'nParticlesInList(pi+:BtoXgamma_eventshape) > 0 and nParticlesInList(gamma:BtoXgamma_eventshape) > 0'
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
                            allMoments=False,
@@ -79,8 +81,8 @@ class BtoXgamma(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts(bugfix_cleanup + ' and ' + 'foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(R2_cleanup + ' and ' + Event_cleanup + ' and foxWolframR2 < 0.7', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
         ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
@@ -174,7 +176,9 @@ class BtoXll(BaseSkim):
 
         # Remove events with insuffcient number of good tracks and clusters, this
         # mitigates "The 0th-order FoxWolfram moment is zero" error
-        bugfix_cleanup = 'nParticlesInList(pi+:BtoXll_eventshape) > 0 and nParticlesInList(gamma:BtoXll_eventshape) > 0'
+        R2_cleanup = 'nParticlesInList(pi+:BtoXll_eventshape) > 0 and nParticlesInList(gamma:BtoXll_eventshape) > 0'
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
                            allMoments=False,
@@ -188,8 +192,8 @@ class BtoXll(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts(bugfix_cleanup + ' and ' + 'foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(R2_cleanup + ' and ' + Event_cleanup + ' and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
@@ -289,7 +293,9 @@ class BtoXll_LFV(BaseSkim):
 
         # Remove events with insuffcient number of good tracks and clusters, this
         # mitigates "The 0th-order FoxWolfram moment is zero" error
-        bugfix_cleanup = 'nParticlesInList(pi+:BtoXllLFV_eventshape) > 0 and nParticlesInList(gamma:BtoXllLFV_eventshape) > 0'
+        R2_cleanup = 'nParticlesInList(pi+:BtoXllLFV_eventshape) > 0 and nParticlesInList(gamma:BtoXllLFV_eventshape) > 0'
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         # buildEventShape to access R2
         ma.buildEventShape(inputListNames=['pi+:BtoXllLFV_eventshape', 'gamma:BtoXllLFV_eventshape'],
@@ -304,8 +310,8 @@ class BtoXll_LFV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts(bugfix_cleanup + ' and ' + 'foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(R2_cleanup + ' and ' + Event_cleanup + ' and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack

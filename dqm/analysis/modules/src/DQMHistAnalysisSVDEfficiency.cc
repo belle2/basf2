@@ -59,27 +59,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   B2DEBUG(10, " yellow = " << kYellow);
   B2DEBUG(10, " Red = " << kRed);
 
-//  m_refFile = NULL;
-//  if (m_refFileName != "") {
-//    m_refFile = new TFile(m_refFileName.data(), "READ");
-//  }
-//
-//  //search for reference
-//  if (m_refFile && m_refFile->IsOpen()) {
-//    B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
-//
-//    TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
-//    if (!ref_eff)
-//      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
-//    else {
-//      m_effWarning = ref_eff->GetBinContent(2);
-//      m_effError = ref_eff->GetBinContent(3);
-//    }
-//
-//  } else
-//    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
-
-
   //build the legend
   m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legProblem->AddText("ERROR!");

@@ -5,6 +5,7 @@ import os
 import shlex
 import config
 import subprocess
+import socket
 
 from SCons.Script import AddOption, Command, Dir, Environment, Exit, GetOption, Help, SetOption, Tool, VariantDir
 
@@ -77,6 +78,10 @@ if GetOption("check_externals"):
             print(f"externals version ({os.environ['BELLE2_EXTERNALS_VERSION']}) differs from the one defined in .externals ({ext_version})")
             print("Please run b2setup again.")
             Exit(1)
+
+# don't use /tmp on KEKCC because of limited quota
+if socket.gethostname().endswith('.cc.kek.jp'):
+    os.environ['TMPDIR'] = os.path.abspath(os.path.join('build', subdir))
 
 # create construction environment
 global_env = Environment(

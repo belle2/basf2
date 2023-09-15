@@ -6,9 +6,9 @@ Validation
 Reconstruction Scripts
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The validation of the MC generators is performed to check that new updates to the framework does not break the generator level particle multiplicities and event shapes. These validations are run automatically when new updates are added to the framework and can also be run manually. The output histograms are compared to reference histograms to make sure that nothing has changed.
+The validation of the MC generators is performed to ensure that updates to the framework do not break the generator level particle multiplicities and event shapes. These validations are run automatically when updates are added to the framework and can also be run manually. The output histograms are compared to reference histograms to make sure that nothing has changed.
 
-.. warning:: In the case of updating to new releases or if changes to the DECAY.dec are implemented it is very likely that the histograms will not agree with the reference. This validation is only a good metric when comparing updates to the same release as the reference histograms.
+.. warning:: In the case of updating to new releases or if changes to the DECAY_BELLE2.dec are implemented it is very likely that the histograms will not agree with the reference. This validation is only a good metric when comparing updates to the same release as the reference histograms.
 
 The different python scripts used for the validation are located at ``generators/validation/decayfile/``.
 

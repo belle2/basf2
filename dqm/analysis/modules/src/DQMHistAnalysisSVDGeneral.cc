@@ -59,8 +59,6 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
-
-
 }
 
 DQMHistAnalysisSVDGeneralModule::~DQMHistAnalysisSVDGeneralModule() { }
@@ -207,7 +205,11 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   for (unsigned short i = 0; i < nY; i++) m_h3OccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
   rtype = findHist("DQMInfo/rtype");
-// runtype = "physics"; //rtype ? rtype->GetTitle() : "";
+  if (rtype)
+    B2INFO("DQMInfo/rtype found");
+
+  runtype = rtype ? rtype->GetTitle() : "";
+  // runtype = "physics";
 
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "UnpackErrorLimits", "UnpackErrorLimits");
@@ -306,22 +308,26 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   m_legOnEmpty->AddText("from at least one sensor");
   m_legOnEmpty->SetFillColor(kBlack);
   m_legOnEmpty->SetTextColor(kWhite);
-
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
 {
+
+  B2INFO("DQMHistAnalysisSVDGeneral: event called.");
 
   //SETUP gSTYLE - all plots
   //  gStyle->SetOptStat(0);
   //  gStyle->SetTitleY(.97);
 
   //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
+  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
     return;
+  } else {
+    B2INFO("SVDExpReco/SVDDQM_nEvents found");
   }
+
   TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
   B2INFO("runID = " << runID);
   Float_t nEvents = hnEvnts->GetEntries();

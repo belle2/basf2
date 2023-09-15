@@ -46,16 +46,14 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", double(100));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 
-  // Offline occupancy U-side
-  registerEpicsPV(m_pvPrefix + "EfficiencyUAlarm", "EfficiencyUAlarm");
-  registerEpicsPV(m_pvPrefix + "EfficiencyU3Alarm", "EfficiencyU3Alarm"); // 3 samples
 }
 
 DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
 
 void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
-  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialized.");
+  B2INFO("DQMHistAnalysisSVDEfficiency: initialize");
+
   B2DEBUG(10, " black = " << kBlack);
   B2DEBUG(10, " green = " << kGreen);
   B2DEBUG(10, " yellow = " << kYellow);
@@ -120,7 +118,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   }
   std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
 
-  //find nEvents
+  //find nEvents testing if histograms are present
   TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
@@ -157,7 +155,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 {
-  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: beginRun called.");
+  B2INFO("DQMHistAnalysisSVDEfficiency: beginRun called.");
   m_cEfficiencyU->Clear();
   m_cEfficiencyV->Clear();
   m_cEfficiencyErrU->Clear();
@@ -177,16 +175,17 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
 {
-  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: event called.");
+  B2INFO("DQMHistAnalysisSVDEfficiency: event called.");
 
-  //SETUP gSTYLE - all plots
-  //  gStyle->SetOptStat(0);
-  //  gStyle->SetTitleY(.97);
+  //find nEvents
+  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
+  if (hnEvnts == NULL) {
+    B2INFO("no events, nothing to do here");
+    return;
+  } else {
+    B2INFO("SVDExpReco/SVDDQM_nEvents found");
+  }
 
-  //set dedicate gStyle
-  //  const Int_t colNum = 4;
-  //  Int_t palette[colNum] {kBlack,  kGreen, kYellow, kRed};
-  //  gStyle->SetPalette(colNum, palette);
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
 
@@ -208,7 +207,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyU->SetFillColor(kRed);
   } else {
-    B2INFO("U-side Before loop on sensors, size :" << m_SVDModules.size());
+    B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effUstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
@@ -249,7 +248,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyV->SetFillColor(kRed);
   } else {
-    B2INFO("V-side Before loop on sensors, size :" << m_SVDModules.size());
+    B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effVstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
@@ -400,7 +399,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_c3EfficiencyU->SetFillColor(kRed);
   } else {
-    B2INFO("U-side Before loop on sensors, size :" << m_SVDModules.size());
+    B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effUstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
@@ -442,7 +441,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_c3EfficiencyV->SetFillColor(kRed);
   } else {
-    B2INFO("V-side Before loop on sensors, size :" << m_SVDModules.size());
+    B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effVstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
@@ -574,12 +573,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
 {
-  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
+  B2INFO("DQMHistAnalysisSVDEfficiency:  endRun called");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()
 {
-  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: terminate called");
+  B2INFO("DQMHistAnalysisSVDEfficiency: terminate called");
 
   delete m_refFile;
   delete m_legProblem;

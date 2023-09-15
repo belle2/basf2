@@ -773,33 +773,10 @@ void SVDDQMExpressRecoModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  //reset histograms
-  TObject* obj;
-  TIter nextH(m_histoList);
-  while ((obj = nextH()))
-    if (obj->InheritsFrom("TH1")) {
-      ((TH1F*)obj)->Reset();
-    }
-}
-
-void SVDDQMExpressRecoModule::event()
-{
-
-  //check HLT decision and increase number of events only if the event has been accepted
-
-  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
-    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
-    if (!eventAccepted) return;
-  }
-  m_nEvents->Fill(0);
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_expNumber = evtMetaData->getExperiment();
   m_runNumber = evtMetaData->getRun();
-  int nSamples = m_svdEventInfo->getNSamples();
-
-  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
-  if (gTools->getNumberOfSVDLayers() == 0) return;
 
   // Add experiment and run number to the title of selected histograms (CR shifter plots)
   TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
@@ -809,8 +786,29 @@ void SVDDQMExpressRecoModule::event()
     if (obj->InheritsFrom("TH1")) {
       if (((TString)obj->GetTitle()).Contains(runID) == false) {
         ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
+        ((TH1F*)obj)->Reset();
       }
     }
+}
+
+void SVDDQMExpressRecoModule::event()
+{
+
+
+  //check HLT decision and increase number of events only if the event has been accepted
+
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
+  m_nEvents->Fill(0);
+
+  int nSamples = m_svdEventInfo->getNSamples();
+
+
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfSVDLayers() == 0) return;
+
 
   const StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);

@@ -22,7 +22,6 @@
 #                    | 
 #                      -> e+e- or mu+mu-.
 #
-Alias J/psisig   J/psi
 Alias K0sig   K*0
 Alias anti-K0sig anti-K*0
 ChargeConj K0sig anti-K0sig

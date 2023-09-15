@@ -230,10 +230,11 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
-  tt->SetTextAngle(90);// Rotated
-  tt->SetTextAlign(12);// Centered
-  tt->Draw();
+  // keep this commented code as we may have excluded modules in phase4
+//   auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
+//   tt->SetTextAngle(90);// Rotated
+//   tt->SetTextAlign(12);// Centered
+//   tt->Draw();
 
   m_cCharge->Modified();
   m_cCharge->Update();

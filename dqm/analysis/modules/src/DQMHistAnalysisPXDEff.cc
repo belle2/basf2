@@ -368,7 +368,8 @@ void DQMHistAnalysisPXDEffModule::event()
         ihit +=  nhit;
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        if (j == 6) continue; // workaround for 1.3.2 module
+        // keep workaround code for re-use
+//         if (j == 6) continue; // workaround for 1.3.2 module
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
       }
@@ -396,7 +397,8 @@ void DQMHistAnalysisPXDEffModule::event()
         updated[aModule] = true;
       }
 
-      if (j == 6) continue; // workaround for 1.3.2 module
+      // keep workaround code for re-use
+//       if (j == 6) continue; // workaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
 
@@ -433,10 +435,9 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (i != 5) { // exclude 1.3.2
-          /// check for val > 0.0) { would exclude all zero efficient modules!!!
-          if (scale_min > val) scale_min = val;
-        }
+        // keep workaround code for re-use
+//         if (i != 5) // exclude 1.3.2
+        if (scale_min > val) scale_min = val;
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -459,10 +460,11 @@ void DQMHistAnalysisPXDEffModule::event()
 
       gr->Draw("AP");
 
-      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
-      tt->Draw();
+      // keep workaround code for re-use
+//       auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
+//       tt->SetTextAngle(90);// Rotated
+//       tt->SetTextAlign(12);// Centered
+//       tt->Draw();
 
       if (all < 100.) {
         m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
@@ -515,10 +517,9 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (i != 5) { // exclude 1.3.2
-          /// check for val > 0.0) { would exclude all zero efficient modules!!!
-          if (scale_min > val) scale_min = val;
-        }
+        // keep workaround code for re-use
+//         if (i != 5) { // exclude 1.3.2
+        if (scale_min > val) scale_min = val;
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -528,7 +529,7 @@ void DQMHistAnalysisPXDEffModule::event()
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();
       if (ax) {
-        ax->Set(m_PXDModules.size() , 0, m_PXDModules.size());
+        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);
@@ -553,11 +554,12 @@ void DQMHistAnalysisPXDEffModule::event()
     } else scale_min = 0.0;
     if (gr) gr->Draw("AP");
     if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-    tt->SetTextSize(0.035);
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
+    // keep workaround code for re-use
+//     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
+//     tt->SetTextSize(0.035);
+//     tt->SetTextAngle(90);// Rotated
+//     tt->SetTextAlign(12);// Centered
+//     tt->Draw();
 
     if (all < 100.) {
       m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray

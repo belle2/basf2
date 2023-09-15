@@ -50,7 +50,6 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number for delta histogram updates", 500000.);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
-  addParam("PVName", m_pvPrefix, "Prefix for KLM's DQM PVs", std::string(""));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -85,11 +84,12 @@ void DQMHistAnalysisKLMModule::initialize()
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
 
   //register EPICS PVs
-  registerEpicsPV(m_pvPrefix + "KLM:MaskedChannels", "MaskedChannels");
-  registerEpicsPV(m_pvPrefix + "KLM:DeadBarrelModules", "DeadBarrelModules");
-  registerEpicsPV(m_pvPrefix + "KLM:DeadEndcapModules", "DeadEndcapModules");
+  registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
+  registerEpicsPV("KLM:DeadBarrelModules", "DeadBarrelModules");
+  registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
   updateEpicsPVs(5.0);
 
+  gROOT->cd();
 
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
@@ -205,6 +205,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->Clear();
   canvas->cd();
   histogram->SetStats(false);
+  canvas->SetLogy(0); //initialize to start without logscale
   histogram->Draw();
   deltaDrawer(delta, histogram, canvas); //draw normalized delta on top
   n = histogram->GetXaxis()->GetNbins();
@@ -322,6 +323,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
           delta->SetBinContent(i, 0);
       }
       str = channelStatus + " channel: ";
+      // lane, axis, channel
       str += ("L" + std::to_string(electronicsChannel->getLane()) +
               " A" + std::to_string(electronicsChannel->getAxis()) +
               " Ch" + std::to_string(electronicsChannel->getChannel()));
@@ -331,18 +333,17 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   }
 
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
+    histogram->SetMinimum(1);
     canvas->SetLogy();
   } else if (ref_histogram != nullptr) {
     if (ref_histogram->GetMaximum()*n > ref_histogram->Integral()*m_ThresholdForLog
         && ref_average * activeModuleChannels > m_MinHitsForFlagging) {
+      histogram->SetMinimum(1);
       canvas->SetLogy();
-    } else {
+    } else
       canvas->SetLogy(0);
-    }
-
-  } else {
+  } else
     canvas->SetLogy(0);
-  }
 
   canvas->Modified();
   canvas->Update();
@@ -666,5 +667,8 @@ void DQMHistAnalysisKLMModule::event()
   setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
   setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
   setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
+  B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
+  B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
+  B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
   updateEpicsPVs(5.0);
 }

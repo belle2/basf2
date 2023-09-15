@@ -27,7 +27,6 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms.");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
-  addParam("PVName", m_pvPrefix, "Prefix for KLM's DQM PVs", std::string("DQM:TEST:"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
@@ -45,8 +44,8 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_monObj = getMonitoringObject("klm");
 
   //register EPICS PVs
-  registerEpicsPV(m_pvPrefix + "KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
-  registerEpicsPV(m_pvPrefix + "KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
+  registerEpicsPV("KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
+  registerEpicsPV("KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
   updateEpicsPVs(5.0);
 
   gROOT->cd();

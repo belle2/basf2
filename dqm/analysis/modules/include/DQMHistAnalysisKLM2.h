@@ -130,9 +130,6 @@ namespace Belle2 {
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;
 
-    /** Prefix of PVs*/
-    std::string m_pvPrefix;
-
     /** Minimal number of entries for delta histogram update. */
     double m_minEvents;
 

@@ -71,35 +71,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   B2DEBUG(10, " yellow = " << kYellow);
   B2DEBUG(10, " Red = " << kRed);
 
-  m_refFile = NULL;
-  if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data(), "READ");
-  }
-
-//  //search for reference
-//  if (m_refFile && m_refFile->IsOpen()) {
-//    B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
-//
-//    TH1F* ref_occ = (TH1F*)m_refFile->Get("refOccupancy");
-//    if (!ref_occ)
-//      B2WARNING("SVD DQMHistAnalysis: Occupancy Level Reference not found! using module parameters");
-//    else {
-//      m_occEmpty = ref_occ->GetBinContent(1);
-//      m_occWarning = ref_occ->GetBinContent(2);
-//      m_occError = ref_occ->GetBinContent(3);
-//    }
-//
-//    TH1F* ref_onlineOcc = (TH1F*)m_refFile->Get("refOnlineOccupancy");
-//    if (!ref_onlineOcc)
-//      B2WARNING("SVD DQMHistAnalysis: OnlineOccupancy Level Reference not found! using module parameters");
-//    else {
-//      m_onlineOccEmpty = ref_onlineOcc->GetBinContent(1);
-//      m_onlineOccWarning = ref_onlineOcc->GetBinContent(2);
-//      m_onlineOccError = ref_onlineOcc->GetBinContent(3);
-//    }
-//  } else
-//    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
-
   m_legError = new TPaveText(-1, 54, 3, 57.5);
   m_legError->AddText("ERROR!!");
   m_legError->SetFillColor(kRed);
@@ -212,7 +183,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   // runtype = "physics";
 
   //register limits for EPICS
-  registerEpicsPV(m_pvPrefix + "UnpackErrorLimits", "UnpackErrorLimits");
+  registerEpicsPV(m_pvPrefix + "UnpackError", "UnpackError");
   registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");
   registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
   registerEpicsPV(m_pvPrefix + "clusterTimeOnTrackLimits", "clusTimeOnTrkLimits");
@@ -256,7 +227,7 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
 
   double unpackWarnLo = 0.;
   double unpackWarnUp = 0.;
-  requestLimitsFromEpicsPVs("UnpackErrorLimits", m_unpackError, unpackWarnLo, unpackWarnUp,  m_unpackError);
+  requestLimitsFromEpicsPVs("UnpackError", m_unpackError, unpackWarnLo, unpackWarnUp,  m_unpackError);
   B2INFO(" SVD unpack error threshold taken from EPICS configuration file:");
   B2INFO("  DATA UNPACK: error > " << m_unpackError);
 
@@ -312,12 +283,7 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
 
 void DQMHistAnalysisSVDGeneralModule::event()
 {
-
   B2INFO("DQMHistAnalysisSVDGeneral: event called.");
-
-  //SETUP gSTYLE - all plots
-  //  gStyle->SetOptStat(0);
-  //  gStyle->SetTitleY(.97);
 
   //find nEvents
   TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
@@ -333,7 +299,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   Float_t nEvents = hnEvnts->GetEntries();
 
   //check DATA FORMAT
-  TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto", true);
+  TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto");
 
   //test ERROR:
   //  h->SetBinContent(100,0.01);
@@ -357,6 +323,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->SetFillColor(kRed);
   }
+
+  setEpicsPV("UnpackError", h->GetEntries() / nEvents);
 
   m_cUnpacker->cd();
   h->Draw("colztext");

@@ -4,6 +4,7 @@ stages:
   - run-tests
   - build-clang
   - build-doc
+  - release-validation
 
 variables:
   # GitLab specific variables
@@ -11,6 +12,7 @@ variables:
   GITLAB_BELLE2_EXTERNALS_TOPDIR: "/belle2/externals"
   GITLAB_IS_FIRST_STAGE: "no"
   GITLAB_FORCE_RUNNING_PIPELINE: "no"
+  GITLAB_STAGING_GLOBALTAG: "none"
   # The BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
 
 default:
@@ -125,9 +127,38 @@ build-doc:
     expose_as: 'sphinx documentation'
     paths:
       - build/html/
+    expire_in: 7 days
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - b2code-option opt
     - b2setup
     - scons --no-debuginfo --sphinx html
+    - echo "stage stop time -> $(date +%H:%M:%S)"
+
+release-validation:
+  stage: release-validation
+  needs: [run-tests]
+  artifacts:
+    when: on_success
+    paths:
+      - automated_validation_*
+    expire_in: 60 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'release/06-02' && $CI_COMMIT_TITLE =~ /Merge branch.*/
+    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
+  script:
+    - echo "stage start time -> $(date +%H:%M:%S)"
+    # Set release to branch name but replace / with -
+    - export BELLE2_RELEASE=${CI_COMMIT_BRANCH//\//-}
+    # In case this pipeline is manually triggered, let's check if the user passed a staging globaltag
+    - |
+      if [ "${GITLAB_FORCE_RUNNING_PIPELINE}" == "yes" ]; then
+        if [ "${GITLAB_STAGING_GLOBALTAG}" != "none" ]; then
+          export VALIDATION_GLOBALTAG=${GITLAB_STAGING_GLOBALTAG}
+        fi
+      fi
+    - b2code-option opt
+    - b2setup
+    - basf2 --info
+    - hlt/tests/release_validation/run.sh automatic automated_validation_${CI_COMMIT_BRANCH//\//-}_$(date +%Y-%m-%d_%H-%M-%S)
     - echo "stage stop time -> $(date +%H:%M:%S)"

@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SVDB4CommissioningPlots)
+REG_MODULE(SVDB4CommissioningPlots);
 
 SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
   , m_nTracks(0), m_Pvalue(), m_mom(0), m_nSVDhits(0)
@@ -30,11 +30,8 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
   addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string("SVDClusters"));
   addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string("Tracks"));
   addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string("TrackFitResults"));
-}
-
-SVDB4CommissioningPlotsModule::~SVDB4CommissioningPlotsModule()
-{
-
+  addParam("plotRecoDigits", m_plotRecoDigits,
+           "Set true to produce the plots for RecoDigits (false by default)", m_plotRecoDigits);
 }
 
 void SVDB4CommissioningPlotsModule::initialize()
@@ -45,7 +42,6 @@ void SVDB4CommissioningPlotsModule::initialize()
   m_Tracks.isOptional(m_TrackName);
   m_recoTracks.isOptional();
   m_tfr.isOptional(m_TrackFitResultName);
-
 
   B2INFO("      RecoDigits: " << m_RecoDigitName);
   B2INFO("        Clusters: " << m_ClusterName);
@@ -66,93 +62,93 @@ void SVDB4CommissioningPlotsModule::beginRun()
   //RECO DIGITS
   TH1F hRecoCharge("reco_charge_L@layerL@ladderS@sensor@view",
                    "Charge of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                   100, 0 , 1000);
+                   100, 0, 1000);
   hRecoCharge.GetXaxis()->SetTitle("charge (ke-)");
   h_recoCharge = new SVDHistograms<TH1F>(hRecoCharge);
 
   TH1F hRecoEnergy("reco_energy_L@layerL@ladderS@sensor@view",
                    "Energy of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                   100, 0 , 360);
+                   100, 0, 360);
   hRecoEnergy.GetXaxis()->SetTitle("energy (keV)");
   h_recoEnergy = new SVDHistograms<TH1F>(hRecoEnergy);
 
   TH1F hRecoTime("reco_time_L@layerL@ladderS@sensor@view",
                  "Time of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                 200, -100 , 100);
+                 200, -100, 100);
   hRecoTime.GetXaxis()->SetTitle("time (ns)");
   h_recoTime = new SVDHistograms<TH1F>(hRecoTime);
 
   TH1F hRecoNoise("reco_noise_L@layerL@ladderS@sensor@view",
                   "Noise of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                  200, 300 , 1800);
+                  200, 300, 1800);
   hRecoNoise.GetXaxis()->SetTitle("strip noise (e-)");
   h_recoNoise = new SVDHistograms<TH1F>(hRecoNoise);
 
   //CLUSTER NOT RELATED TO TRACKS
   TH1F hClusterCharge("cluster_charge_L@layerL@ladderS@sensor@view",
                       "Charge of Clusters in @layer.@ladder.@sensor @view/@side side",
-                      100, 0 , 100);
+                      100, 0, 100);
   hClusterCharge.GetXaxis()->SetTitle("charge (ke-)");
   h_clusterCharge = new SVDHistograms<TH1F>(hClusterCharge);
 
   TH1F hClusterSize("cluster_size_L@layerL@ladderS@sensor@view",
                     "Clusters Size for @layer.@ladder.@sensor @view/@side side",
-                    20, 0 , 20);
+                    20, 0, 20);
   hClusterSize.GetXaxis()->SetTitle("cluster size");
   h_clusterSize = new SVDHistograms<TH1F>(hClusterSize);
 
   TH1F hClusterSNR("cluster_SNR_L@layerL@ladderS@sensor@view",
                    "SNR of Clusters in @layer.@ladder.@sensor @view/@side side",
-                   100, 0 , 140);
+                   100, 0, 140);
   hClusterSNR.GetXaxis()->SetTitle("SNR");
   h_clusterSNR = new SVDHistograms<TH1F>(hClusterSNR);
 
   TH1F hClusterEnergy("cluster_energy_L@layerL@ladderS@sensor@view",
                       "Energy of Clusters in @layer.@ladder.@sensor @view/@side side",
-                      100, 0 , 360);
+                      100, 0, 360);
   hClusterEnergy.GetXaxis()->SetTitle("energy (keV)");
   h_clusterEnergy = new SVDHistograms<TH1F>(hClusterEnergy);
 
   TH1F hClusterTime("cluster_time_L@layerL@ladderS@sensor@view",
                     "Time of Clusters in @layer.@ladder.@sensor @view/@side side",
-                    200, -100 , 100);
+                    200, -100, 100);
   hClusterTime.GetXaxis()->SetTitle("time (ns)");
   h_clusterTime = new SVDHistograms<TH1F>(hClusterTime);
 
   //CLUSTER RELATED TO TRACKS
   TH1F hClusterTrkCharge("clusterTrk_charge_L@layerL@ladderS@sensor@view",
                          "Charge of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                         100, 0 , 100);
+                         100, 0, 100);
   hClusterTrkCharge.GetXaxis()->SetTitle("charge (ke-)");
   h_clusterTrkCharge = new SVDHistograms<TH1F>(hClusterTrkCharge);
 
   TH1F hClusterTrkSize("clusterTrk_size_L@layerL@ladderS@sensor@view",
                        "Cluster Size for @layer.@ladder.@sensor @view/@side side",
-                       20, 0 , 20);
+                       20, 0, 20);
   hClusterTrkSize.GetXaxis()->SetTitle("cluster size");
   h_clusterTrkSize = new SVDHistograms<TH1F>(hClusterTrkSize);
 
   TH1F hClusterTrkSNR("clusterTrk_SNR_L@layerL@ladderS@sensor@view",
                       "SNR of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                      100, 0 , 140);
+                      100, 0, 140);
   hClusterTrkSNR.GetXaxis()->SetTitle("SNR");
   h_clusterTrkSNR = new SVDHistograms<TH1F>(hClusterTrkSNR);
 
   TH1F hClusterTrkEnergy("clusterTrk_energy_L@layerL@ladderS@sensor@view",
                          "Energy of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                         100, 0 , 360);
+                         100, 0, 360);
   hClusterTrkEnergy.GetXaxis()->SetTitle("energy (keV)");
   h_clusterTrkEnergy = new SVDHistograms<TH1F>(hClusterTrkEnergy);
 
   TH1F hClusterTrkTime("clusterTrk_time_L@layerL@ladderS@sensor@view",
                        "Time of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                       200, -100 , 100);
+                       200, -100, 100);
   hClusterTrkTime.GetXaxis()->SetTitle("time (ns)");
   h_clusterTrkTime = new SVDHistograms<TH1F>(hClusterTrkTime);
 
   TH1F hClusterTrkInterstripPos("clusterTrk_interstripPos_L@layerL@ladderS@sensor@view",
                                 "Interstrip Position of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                                400, 0 , 1);
+                                400, 0, 1);
   hClusterTrkInterstripPos.GetXaxis()->SetTitle("interstrip position");
   h_clusterTrkInterstripPos = new SVDHistograms<TH1F>(hClusterTrkInterstripPos);
 
@@ -225,25 +221,27 @@ void SVDB4CommissioningPlotsModule::event()
   }
 
   if (m_Tracks)
-    B2DEBUG(1, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
-
+    B2DEBUG(29, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
 
   //reco digits
-  if (m_svdRecos.isValid()) {
-    for (int digi = 0 ; digi < m_svdRecos.getEntries(); digi++) {
+  if (m_plotRecoDigits) {
+    if (m_svdRecos.isValid()) {
+      for (int digi = 0 ; digi < m_svdRecos.getEntries(); digi++) {
 
-      VxdID::baseType theVxdID = (VxdID::baseType)m_svdRecos[digi]->getSensorID();
-      int side = m_svdRecos[digi]->isUStrip();
-      int cellID = m_svdRecos[digi]->getCellID();
+        VxdID::baseType theVxdID = (VxdID::baseType)m_svdRecos[digi]->getSensorID();
+        int side = m_svdRecos[digi]->isUStrip();
+        int cellID = m_svdRecos[digi]->getCellID();
 
-      float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
+        float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
 
-      h_recoNoise->fill(theVxdID, side, thisNoise);
-      h_recoCharge->fill(theVxdID, side, m_svdRecos[digi]->getCharge() / 1000.);
-      h_recoEnergy->fill(theVxdID, side, m_svdRecos[digi]->getCharge()*c_eTOkeV);
-      h_recoTime->fill(theVxdID, side, m_svdRecos[digi]->getTime());
+        h_recoNoise->fill(theVxdID, side, thisNoise);
+        h_recoCharge->fill(theVxdID, side, m_svdRecos[digi]->getCharge() / 1000.);
+        h_recoEnergy->fill(theVxdID, side, m_svdRecos[digi]->getCharge()*c_eTOkeV);
+        h_recoTime->fill(theVxdID, side, m_svdRecos[digi]->getTime());
+      }
     }
   }
+
 
   //clusters  NOT related to tracks
   for (int cl = 0 ; cl < m_svdClusters.getEntries(); cl++) {
@@ -311,11 +309,13 @@ void SVDB4CommissioningPlotsModule::endRun()
         for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
 
-            dir_reco_layer->cd();
-            (h_recoCharge->getHistogram(sensor, view))->Write();
-            (h_recoEnergy->getHistogram(sensor, view))->Write();
-            (h_recoTime->getHistogram(sensor, view))->Write();
-            (h_recoNoise->getHistogram(sensor, view))->Write();
+            if (m_plotRecoDigits) {
+              dir_reco_layer->cd();
+              (h_recoCharge->getHistogram(sensor, view))->Write();
+              (h_recoEnergy->getHistogram(sensor, view))->Write();
+              (h_recoTime->getHistogram(sensor, view))->Write();
+              (h_recoNoise->getHistogram(sensor, view))->Write();
+            }
             dir_clusterAssigned_layer->cd();
             (h_clusterTrkCharge->getHistogram(sensor, view))->Write();
             (h_clusterTrkSNR->getHistogram(sensor, view))->Write();
@@ -336,10 +336,4 @@ void SVDB4CommissioningPlotsModule::endRun()
 
   }
 
-}
-
-
-
-void SVDB4CommissioningPlotsModule::terminate()
-{
 }

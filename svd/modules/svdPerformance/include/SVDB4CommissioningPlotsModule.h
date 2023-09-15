@@ -13,8 +13,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -41,14 +41,16 @@ namespace Belle2 {
 
   public:
 
+    /** constructor */
     SVDB4CommissioningPlotsModule();
 
-    virtual ~SVDB4CommissioningPlotsModule();
-    virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /** destructor */
+    virtual ~SVDB4CommissioningPlotsModule() {};
+
+    virtual void initialize() override; /**< check StoreArrays & create rootfile */
+    virtual void beginRun() override; /**< create histograms */
+    virtual void event() override; /**< fill histograms */
+    virtual void endRun() override; /**< write histogrmas */
 
     std::string m_ShaperDigitName; /**< SVDSHaperDigit StoreArray name*/
     std::string m_RecoDigitName; /**< SVDRecoDigit StoreArray name*/
@@ -76,6 +78,7 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_tfr; /**<TrackFitResult StoreArray*/
 
     int m_ntracks = 0; /**< number of tracks*/
+    bool m_plotRecoDigits = false; /**< Produce plots for SVDRecoDigits when True */
 
     //TRACKS
     TH1F* m_nTracks = nullptr; /**< number of tracks*/

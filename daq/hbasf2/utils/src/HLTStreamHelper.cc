@@ -215,8 +215,6 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
     RawDataBlock tempdblk;
     tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
-    unsigned int utime = 0;
-    unsigned int ctime = 0;
     unsigned long long int mtime = 0;
 
     int store_time_flag = 0;
@@ -235,8 +233,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
         ftsw->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
 
         // Tentative for DESY TB 2017
-        utime = (unsigned int)(ftsw->GetTTUtime(0));
-        ctime = (unsigned int)(ftsw->GetTTCtime(0));
+        unsigned int utime = (unsigned int)(ftsw->GetTTUtime(0));
+        unsigned int ctime = (unsigned int)(ftsw->GetTTCtime(0));
         mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
         store_time_flag = 1;
         continue;
@@ -245,8 +243,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
         // Not store RawCOPPER here. 2018.11.23
         RawCOPPER tempcpr_time;
         tempcpr_time.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
-        utime = (unsigned int)(tempcpr_time.GetTTUtime(0));
-        ctime = (unsigned int)(tempcpr_time.GetTTCtime(0));
+        unsigned int utime = (unsigned int)(tempcpr_time.GetTTUtime(0));
+        unsigned int ctime = (unsigned int)(tempcpr_time.GetTTCtime(0));
         mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
         store_time_flag = 1;
       }

@@ -2693,7 +2693,6 @@ int main(int argc, char** argv)
   //  auto t1 = std::chrono::high_resolution_clock::now();
   double m_start_time = getTimeSec();
   double m_prev_time = 0.;
-  unsigned int event_words = 0;
   double total_size_bytes = 0.;
   double prev_total_size_bytes = 0.;
   double total_eve_cnt = 0.;
@@ -2722,7 +2721,7 @@ int main(int argc, char** argv)
       //printf( "Number of super page received: %d\n" , rv ) ;
       //    #pragma omp parallel for
       for (int j = 0 ; j < rv * S_PAGE_SLOT_NMB ; ++j) {
-        event_words = 0;
+        unsigned int event_words = 0;
         data = pcie40_getSuperPageCopy(0, (get_sp_cnt / S_PAGE_SLOT_NMB) % S_PAGES, get_sp_cnt % S_PAGE_SLOT_NMB) ;
         if (! isData) {
           checkEventGenerator(data, get_sp_cnt, size);
@@ -2806,7 +2805,7 @@ int main(int argc, char** argv)
           //
           // End of an event
           //
-          if (ret < 1) {
+          {
             if (combined_data != NULL) {
               //              if (k < 10)printFullData(combined_data + dma_hdr_offset);
               event_words = combined_data[ dma_hdr_offset + EVENT_LEN_POS ];

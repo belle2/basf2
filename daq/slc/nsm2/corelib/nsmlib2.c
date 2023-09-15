@@ -867,7 +867,7 @@ nsmlib_selectc(int usesig, unsigned int msec)
     ASSERT("nsmlib_selectc should not reach here - no fd");
     return 0;
   }
-  if (usesig > 0 && msec > 0 && ret <= 0) {
+  if (usesig > 0 && msec > 0) {
     LOG("nsmlib_selectc should not reach here - ret=%d msec=%d usesig=%d",
         ret, msec, nsmc->usesig);
   }
@@ -1177,6 +1177,8 @@ int
 nsmlib_callbackid(NSMcontext *nsmc, int req, const char *name,
 		  NSMcallback_t callback, NSMfunctype functype)
 {
+  if (! nsmc)                         return NSMENOINIT;
+
   NSMrequest *reqp = nsmc->req;
   NSMrequest *reqlast = reqp + nsmc->nreq;
   NSMrequest *reqfound = 0;
@@ -1184,7 +1186,7 @@ nsmlib_callbackid(NSMcontext *nsmc, int req, const char *name,
   int sigfound = 0;
   
   /* basic checks */
-  if (! nsmc || ! nsmc->memp)         return NSMENOINIT;
+  if (nsmc->memp)                     return NSMENOINIT;
   if (nsmc->nodeid == NSMSYS_MAX_NOD) return NSMEPERM; /* anonymous */
 
   /* search for existing and free-space */
@@ -1618,7 +1620,6 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
     return nsmc->errc = NSMEPARSE;
   }
   nsmlib_parsefree(parsep);
-  parsep = 0;
   
   if (revision == -1) {
     revision = newrevision;
@@ -1851,6 +1852,8 @@ void *
 nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
 		int revision, float cycle)
 {
+  if (! nsmc) { nsmlib_errc = NSMENOINIT; return 0; }
+
   NSMmsg msg;
   int ret;
   char fmtstr[256];
@@ -1862,7 +1865,6 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   DBG("allocmem 1");
   
   if (! fmtname) fmtname = datname;
-  if (! nsmc) { nsmlib_errc = NSMENOINIT; return 0; }
   if (! datname) { nsmc->errc = NSMEINVPAR; return 0; }
   if (revision <= 0) { nsmc->errc = NSMEINVPAR; return 0; }
   if (strlen(datname) > NSMSYS_DNAM_SIZ) { nsmc->errc = NSMEINVPAR; return 0; }
@@ -1938,7 +1940,6 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
   nsmlib_errc = ret;
   nsmlib_port = port;
   nsmlib_free(nsmc);
-  nsmc = 0;
   sleep(1); /* one second penalty */
   return 0; // TODO is the return value OK?
 }

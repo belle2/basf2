@@ -348,14 +348,14 @@ b2nsm_sendreq(const char *node, const char *req, int npar, int32_t *pars)
    newstate may be 0 to keep the same state
 \* ---------------------------------------------------------------------- */
 int
-b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
+b2nsm_ok(const NSMmsg *msg, const char *newstate, const char *fmt, ...)
 {
+  if (! nsm || ! msg) return -1;
   const char *node = nsmlib_nodename(nsm, msg->node);
   char buf[32+256];
   int  len;
   int  pars[2];
   
-  if (! nsm || ! msg) return -1;
 
   if (newstate) {
     if ((len = strlen(newstate) + 1) > 32) return -1;
@@ -384,6 +384,7 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
 int
 b2nsm_error(NSMmsg *msg, const char *fmt, ...)
 {
+  if (! msg || ! fmt) return -1;
   const char *node = nsmlib_nodename(nsm, msg->node);
   char buf[256];
   char *ptr = buf;
@@ -391,18 +392,13 @@ b2nsm_error(NSMmsg *msg, const char *fmt, ...)
   int  pars[2];
   
   if (! nsm) return -1;
-  if (! msg || ! fmt) return -1;
 
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, 256, fmt, ap);
-    va_end(ap);
-    len = strlen(buf) + 1;
-  } else {
-    ptr = 0;
-    len = 0;
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, 256, fmt, ap);
+  va_end(ap);
+  len = strlen(buf) + 1;
+
 
   pars[0] = msg->req;
   pars[1] = msg->seq;

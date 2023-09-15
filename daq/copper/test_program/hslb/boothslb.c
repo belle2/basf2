@@ -64,49 +64,51 @@ open_mgt(int ch, int mode)
   printf("mode = %x\n", mode);
   
   if (mode & MGT_MMAP) {
-    unsigned long base = 0;
-    int fd;
-    struct pcichip {
-      unsigned long word[4];
-      unsigned long bar[4];
-    } chip;
+      unsigned long base = 0;
+      int fd;
+      struct pcichip {
+          // unsigned long word[4]; // unused
+          unsigned long bar[4];
+      } chip;
 
 
-    char *plx9054_path = get_copper_plx9054_path();
-    
-    if ((fd = open(plx9054_path, O_RDONLY)) < 0) {
-      fprintf(stderr, "%s: cannot open %s: %s\n",
-	      PROGRAM, plx9054_path, strerror(errno));
-      return -1;
-    }
-    if (read(fd, &chip, sizeof(chip)) != sizeof(chip)) {
-      fprintf(stderr, "%s: cannot read %s: %s\n",
-	      PROGRAM, plx9054_path, strerror(errno));
+      char *plx9054_path = get_copper_plx9054_path();
+
+      if ((fd = open(plx9054_path, O_RDONLY)) < 0) {
+          fprintf(stderr, "%s: cannot open %s: %s\n",
+                  PROGRAM, plx9054_path, strerror(errno));
+          return -1;
+      }
+      if (read(fd, &chip, sizeof(chip)) != sizeof(chip)) {
+          fprintf(stderr, "%s: cannot read %s: %s\n",
+                  PROGRAM, plx9054_path, strerror(errno));
+          close(fd);
+          return -1;
+      }
       close(fd);
-      return -1;
-    }
-    close(fd);
-    base = chip.bar[2];
-    
-    if (ch >= 'a' && ch <= 'd') ch -= 'a';
-    if (ch < 0 || ch > 4) {
-      int mgt = open("/dev/mem", o_mode);
-      if (mgt == -1) {
-	fprintf(stderr, "%s: cannot open /dev/mem: %s\n",
-		PROGRAM, strerror(errno));
-	return -1;
-      }
+      base = chip.bar[2];
 
-      xslot = ch;
-      xmemp = mmap(0, 0x1000000, m_mode, MAP_SHARED, mgt, base);
-      if (xmemp == (unsigned long *)0xffffffff) {
-	fprintf(stderr, "%s: cannot mmap /dev/mem: %s\n",
-		PROGRAM, strerror(errno));
-	return -1;
+      if (ch >= 'a' && ch <= 'd') ch -= 'a';
+      if (ch < 0 || ch > 4) {
+          int mgt = open("/dev/mem", o_mode);
+          if (mgt == -1) {
+              fprintf(stderr, "%s: cannot open /dev/mem: %s\n",
+                      PROGRAM, strerror(errno));
+              return -1;
+          }
+
+          xslot = ch;
+          xmemp = mmap(0, 0x1000000, m_mode, MAP_SHARED, mgt, base);
+          if (xmemp == (unsigned long *)0xffffffff) {
+              fprintf(stderr, "%s: cannot mmap /dev/mem: %s\n",
+                      PROGRAM, strerror(errno));
+              return -1;
+          }
+
+          return mgt;
       }
-      
-      return mgt;
-    }
+      fprintf(stderr, "%s: Forbidden part of open_mgt reached\n", PROGRAM);
+      return -1;
   } else {
     char *DEVICE = 0;
     switch (ch) {
@@ -143,24 +145,24 @@ close_mgt(int mgt)
 static int
 read_mgt(int mgt, int reg)
 {
-  if (xmemp) {
-    unsigned long csr[4] = { 0x00100000, 0x00100200,
-			     0x00100400, 0x00100600 };
-    volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
+    if (xmemp) {
+        const unsigned long csr[4] = { 0x00100000, 0x00100200,
+                                       0x00100400, 0x00100600 };
+        volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
 
-    static int first = 1;
-    if (first) {
-      first = 0;
-      printf("read_mgt %02x %p\n", reg, regp);
+        static int first = 1;
+        if (first) {
+            first = 0;
+            printf("read_mgt %02x %p\n", reg, regp);
+        }
+
+        return (*regp >> 24) & 0xff;
+    } else {
+        int val;
+        int ret = ioctl(mgt, FNGENERICIO_GET(reg), &val);
+        if (ret < 0) return ret;
+        return val;
     }
-    
-    return (*regp >> 24) & 0xff;
-  } else {
-    int val;
-    int ret = ioctl(mgt, FNGENERICIO_GET(reg), &val);
-    if (ret < 0) return ret;
-    return val;
-  }
 }
 /* ---------------------------------------------------------------------- *\
    write_mgt
@@ -168,21 +170,21 @@ read_mgt(int mgt, int reg)
 static int
 write_mgt(int mgt, int reg, int val)
 {
-  if (xmemp) {
-    unsigned long csr[4] = { 0x00100000, 0x00100200,
-			     0x00100400, 0x00100600 };
-    volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
-    
-    *regp = (val & 0xff) << 24;
-    static int first = 1;
-    if (first) {
-      first = 0;
-      printf("write_mgt %02x %p %d\n", reg, regp, val);
+    if (xmemp) {
+        const unsigned long csr[4] = { 0x00100000, 0x00100200,
+                                       0x00100400, 0x00100600 };
+        volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
+
+        *regp = (val & 0xff) << 24;
+        static int first = 1;
+        if (first) {
+            first = 0;
+            printf("write_mgt %02x %p %d\n", reg, regp, val);
+        }
+        return 0;
+    } else {
+        return ioctl(mgt, FNGENERICIO_SET(reg), val);
     }
-    return 0;
-  } else {
-    return ioctl(mgt, FNGENERICIO_SET(reg), val);
-  }
 }
 /* ---------------------------------------------------------------------- *\
    write_fpga

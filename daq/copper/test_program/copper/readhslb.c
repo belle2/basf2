@@ -145,8 +145,8 @@ main()
 
         i++;
 
-        if(i % 1==0){
-            for( k = 0 ; k < 4 ; k ++ ){
+        if(i % 1==0) {
+            for( k = 0 ; k < 4 ; k ++ ) {
                if ( !use_slot[k] ) continue;
                err_check = rdmgt(fd[k], ERROR);
                if ( !use_slot[k] ) continue;

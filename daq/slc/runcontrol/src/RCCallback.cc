@@ -140,7 +140,7 @@ bool RCCallback::perform(NSMCommunicator& com)
         std::string runtype = (msg.getLength() > 0 ? msg.getData() : "");
         if (runtype.size() == 0) {
           get("runtype", runtype);
-        } else if (runtype.size() > 0) {
+        } else {
           set("runtype", runtype);
         }
         get(m_obj);

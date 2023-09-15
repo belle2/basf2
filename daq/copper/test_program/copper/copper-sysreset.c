@@ -22,7 +22,7 @@ main(int argc, char *argv[])
 	int devfd, memfd;
 	int ret;
 	struct {
-		unsigned long m_word[4];
+		// unsigned long m_word[4]; // unused
 		unsigned long m_bar[4];
 	} pcichip;
 	int pagesize;

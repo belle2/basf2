@@ -155,7 +155,6 @@ int SocketIO::get_pxd(int sock, char* data, int len)
     exit(0);
   }
   int bcount = read_data(sock, data + headerlen + tablelen, datalen);
-  if (br <= 0) return br;
   return (headerlen + tablelen + bcount);
 }
 

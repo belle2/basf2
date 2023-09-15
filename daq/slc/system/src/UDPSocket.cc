@@ -70,7 +70,7 @@ UDPSocket::UDPSocket(unsigned int port,
       unsigned long addr = inet_addr(hostname.c_str());
       if ((signed long) addr < 0) {
         throw (std::exception());
-        throw (IOException("Wrong host name or ip"));
+        // throw (IOException("Wrong host name or ip")); // TODO which throw is the right one?
       } else {
         host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
       }
@@ -126,7 +126,7 @@ int UDPSocket::bind(unsigned int port,
       unsigned long addr = inet_addr(hostname.c_str());
       if ((signed long) addr < 0) {
         throw (std::exception());
-        throw (IOException("Wrong host name or ip"));
+        // throw (IOException("Wrong host name or ip")); TODO which throw is the right one?
       } else {
         host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
       }

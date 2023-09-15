@@ -52,6 +52,11 @@ public:
     m_filesize = 0;
     m_fileid = 0;
     m_diskid = 1;
+    m_id    = -1;
+    m_expno = -1;
+    m_runno = -1;
+    m_nevents = 0;
+    m_chksum  = 0;
   }
   ~FileHandler() throw()
   {
@@ -219,7 +224,7 @@ int main(int argc, char** argv)
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
-  const char* obufname = (argc > 7) ? argv[8] : "";
+  const char* obufname = argv[8];
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
   const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
@@ -258,7 +263,7 @@ int main(int argc, char** argv)
   bool newrun = false;
   unsigned int fileid = 0;
   struct dataheader {
-    int nword;
+    // int nword; // unused
     int type;
     unsigned int expno;
     unsigned int runno;

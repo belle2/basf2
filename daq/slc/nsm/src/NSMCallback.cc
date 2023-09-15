@@ -267,7 +267,7 @@ void NSMCallback::vlistget(NSMCommunicator& com)
 
 struct vlistentry_t {
   std::string name;
-  int id;
+  int id; // unused
   std::string type;
   bool useGet;
   bool useSet;

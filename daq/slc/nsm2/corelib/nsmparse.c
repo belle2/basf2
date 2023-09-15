@@ -66,11 +66,12 @@ static int nsmparse_alloccnt2 = 0;
 static void
 nsmparse_free(void *ptr)
 {
-  int32_t siz = *(int32_t *)((char *)ptr - 4);
   if (! ptr) {
     printf("nsmparse_free: freeing null pointer\n");
     exit(1);
   }
+
+  int32_t siz = *(int32_t *)((char *)ptr - 4);
   if (siz == 0) {
     printf("nsmparse_free: possible double free attempt\n");
     exit(1);
@@ -337,12 +338,10 @@ nsmparse_struct(char *filebuf, const char *datname)
 {
   int datlen = strlen(datname);
   char *p = filebuf;
-  char *structp = 0;
-  char *definep = 0;
 
   while (p) {
-    structp = strstr(p, "struct");
-    definep = strstr(p, "\n#define");
+    char *structp = strstr(p, "struct");
+    char *definep = strstr(p, "\n#define");
     
     if (definep && definep < structp) {
       int val;

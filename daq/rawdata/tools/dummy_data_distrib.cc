@@ -343,7 +343,6 @@ int main(int argc, char** argv)
   }
 
   int maxi = 0;
-  int id = 0;
   int nconn = 0;
 
   while (1) {
@@ -351,6 +350,7 @@ int main(int argc, char** argv)
     if (client[0].revents & POLLRDNORM) {
       printf("Accepting..."); fflush(stdout);
       int connfd = accept(listenfd, (struct sockaddr*) NULL, NULL);
+      int id;
       for (id = 1; id <= NUM_CLIENTS; id++) {
         if (client[id].fd < 0) {
           client[id].fd = connfd;

@@ -59,7 +59,7 @@ main(int argc, char **argv)
   FILE *fpr;  // for file read modified by Jingzhou Zhao
   char SaveFile[100];// SaveFile
   char timebuf[100];
-  time_t t;//             
+  time_t timeObj;//             
 
   int event=0;
   int ret, i = 0;
@@ -111,8 +111,8 @@ main(int argc, char **argv)
   //
   // Open an output file
   //
-  time(&t);
-  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&t));
+  time(&timeObj);
+  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&timeObj));
   strcpy(SaveFile,timebuf);
   strcat(SaveFile,".dat");
   printf("File Name: %s\n",SaveFile);
@@ -213,11 +213,11 @@ main(int argc, char **argv)
       else
 	istop = istart + buffer[9 + iii] ; 
 
-      if(card_test[0]==1 & iii==0) fprintf(fpw,"Board A: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
-      if(card_test[1]==1 & iii==1){ fprintf(fpw,"Board B: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[0]==1 && iii==0) fprintf(fpw,"Board A: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[1]==1 && iii==1){ fprintf(fpw,"Board B: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 	printf("Board B: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);}
-      if(card_test[2]==1 & iii==2) fprintf(fpw,"Board C: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
-      if(card_test[3]==1 & iii==3) fprintf(fpw,"Board D: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[2]==1 && iii==2) fprintf(fpw,"Board C: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[3]==1 && iii==3) fprintf(fpw,"Board D: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
       printf("istart= %d ,istop = %d : 0x%lx\n",istart, istop, buffer[9+iii]);
       for (t= istart + 4; t<istop-1; t= t + 1)
 	{

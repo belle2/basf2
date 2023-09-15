@@ -435,9 +435,8 @@ int sender(int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb)
     //  }
 
 
-    int ret = 0;
-    if ((ret = write(fd_accept, buff, total_words * sizeof(int))) <= 0) {
-      printf("[FATAL] Return value %d\n", ret);
+    if ((int r = write(fd_accept, buff, total_words * sizeof(int))) <= 0) {
+      printf("[FATAL] Return value %d\n", r);
       fflush(stdout);
       exit(1);
     }

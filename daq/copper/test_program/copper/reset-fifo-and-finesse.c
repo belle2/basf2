@@ -48,6 +48,7 @@ find_offset()
                 return 0;
 
         n = fread(word, sizeof(unsigned long), 0x100, fp);
+        fclose(fp);
         if (n < 0x10)
                 return 0;
         assert(word[0] == 0x905410b5);

@@ -243,12 +243,12 @@ main(int argc, char **argv)
 	istop = istart + buffer[9 + iii] ; 
 
 #ifdef FILE_OUT
-      if(card_test[0]==1 & iii==0) fprintf(fpw,"Board A: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[0]==1 && iii==0) fprintf(fpw,"Board A: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 
-      if(card_test[2]==1 & iii==2) fprintf(fpw,"Board C: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
-      if(card_test[3]==1 & iii==3) fprintf(fpw,"Board D: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[2]==1 && iii==2) fprintf(fpw,"Board C: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
+      if(card_test[3]==1 && iii==3) fprintf(fpw,"Board D: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 #endif
-      if(card_test[1]==1 & iii==1){ 
+      if(card_test[1]==1 && iii==1){ 
 #ifdef FILE_OUT
 	fprintf(fpw,"Board B: %08lx /*** Data length=%08lx, Trigger#=%08lx ***/\n", buffer[istart + 1], buffer[istart + 2], buffer[istart + 3]);
 #endif

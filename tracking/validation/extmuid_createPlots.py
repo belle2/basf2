@@ -19,7 +19,7 @@
 <header>
     <input>muon-ExtMuidValidation.root,
            pion-ExtMuidValidation.root</input>
-    <contact>giacomo.pietro@kit.edu</contact>
+    <contact>piilonen@vt.edu</contact>
     <description>Create validation plots for Ext and Muid</description>
 </header>
 """
@@ -37,8 +37,8 @@ from optparse import OptionParser
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Giacomo De Pietro',
-                  'Email': 'giacomo.pietro@kit.edu'}
+CONTACT_PERSON = {'Name': 'Leo Piilonen',
+                  'Email': 'piilonen@vt.edu'}
 
 
 def main():

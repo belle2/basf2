@@ -18,6 +18,7 @@ import random
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVDClusterTimeShifterAlgorithm
 from ROOT.Belle2 import SVDTimeValidationAlgorithm
 
 import basf2 as b2
@@ -50,8 +51,10 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "timeAlgorithms": ["CoG3", "ELS3"],
-                                   "max_events_per_run": 30000,
+                                   "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
+                                   "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
+                                   "max_events_per_run":  60000,
+                                   "max_events_per_file": 30000,
                                    "isMC": False,
                                    "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],
@@ -185,7 +188,8 @@ def create_svd_clusterizer(name="ClusterReconstruction",
                            reco_digits=None,
                            shaper_digits=None,
                            time_algorithm="CoG6",
-                           get_3sample_raw_time=False):
+                           get_3sample_raw_time=False,
+                           shiftSVDClusterTime=None):
     """
     Simply creates a SVDClusterizer module with some options.
 
@@ -199,6 +203,8 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     if shaper_digits is not None:
         cluster.param("ShaperDigits", shaper_digits)
     cluster.param("timeAlgorithm6Samples", time_algorithm)
+    if shiftSVDClusterTime is not None:
+        cluster.param("shiftSVDClusterTime", shiftSVDClusterTime)
     cluster.param("useDB", False)
     if get_3sample_raw_time:
         cluster.param("returnClusterRawTime", True)
@@ -209,6 +215,7 @@ def create_pre_collector_path(
         clusterizers,
         isMC=False,
         max_events_per_run=10000,
+        max_events_per_file=10000,
         useSVDGrouping=True,
         useRawtimeForTracking=False,
         is_validation=False):
@@ -230,7 +237,7 @@ def create_pre_collector_path(
 
     # Read from file only what is needed
     if not isMC:
-        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS, entrySequences=[f'0:{max_events_per_run}'])
+        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS, entrySequences=[f'0:{max_events_per_file - 1}'])
     else:
         path.add_module("RootInput")
 
@@ -300,7 +307,9 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
     timeAlgorithms = expert_config["timeAlgorithms"]
+    listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
+    max_events_per_file = expert_config["max_events_per_file"]  # Maximum number of events selected per each file
     isMC = expert_config["isMC"]
     linearCutsOnCoG3 = expert_config["linearCutsOnCoG3"]
     upperLineParameters = expert_config["upperLineParameters"]
@@ -312,7 +321,8 @@ def get_calibrations(input_data, **kwargs):
     useRawtimeForTracking = expert_config["useRawtimeForTracking"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
-                                                               max_events_per_run, random_select=True)
+                                                               max_events_per_run, random_select=True,
+                                                               max_events_per_file=max_events_per_file)
     good_input_files = list(reduced_file_to_iov_physics.keys())
 
     b2.B2INFO(f"Total number of files used as input = {len(good_input_files)}")
@@ -349,6 +359,12 @@ def get_calibrations(input_data, **kwargs):
 
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+
+    ####
+    # List of calibrations to be returned by `get_calibrations` function.
+    # The calibrations must be appended as per the order of dependency.
+    ####
+    list_of_calibrations = []
 
     ####
     # Build the clusterizers with the different options.
@@ -452,6 +468,7 @@ def get_calibrations(input_data, **kwargs):
     pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_clusterizers,
         isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
         useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking)
 
     # Decide what collector will be "managed" by the CAF
@@ -482,6 +499,58 @@ def get_calibrations(input_data, **kwargs):
 
     for algorithm in calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
+
+    if "rawTimeCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(calibration)
+
+    #########################################################
+    # SVD Cluster Time Shifter                              #
+    #########################################################
+
+    SVDClustersOnTrackPrefix = "SVDClustersOnTrack"
+
+    shift_clusterizers_onTracks = []
+    for alg in timeAlgorithms:
+        cluster = create_svd_clusterizer(
+            name=f"ClusterReconstruction_{alg}",
+            clusters=f"{SVDClustersOnTrackPrefix}_{alg}",
+            shaper_digits=NEW_SHAPER_DIGITS_NAME,
+            time_algorithm=alg,
+            shiftSVDClusterTime=False)
+        shift_clusterizers_onTracks.append(cluster)
+
+    shift_pre_collector_path = create_pre_collector_path(
+        clusterizers=shift_clusterizers_onTracks,
+        isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
+        useSVDGrouping=useSVDGrouping)
+
+    shift_collector = b2.register_module("SVDClusterTimeShifterCollector")
+    shift_collector.set_name("SVDClusterTimeShifterCollector")
+    shift_collector.param("MaxClusterSize", 6)
+    shift_collector.param("EventT0Name", "EventT0")
+    shift_collector.param("SVDClustersOnTrackPrefix", f"{SVDClustersOnTrackPrefix}")
+    shift_collector.param("TimeAlgorithms", timeAlgorithms)
+
+    shift_algo = SVDClusterTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
+                                                f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
+    shift_algo.setMinEntries(100)
+    shift_algo.setMaximumAllowedShift(15.)
+    shift_algo.setTimeAlgorithm(timeAlgorithms)
+
+    shift_calibration = Calibration("SVDClusterTimeShifter",
+                                    collector=shift_collector,
+                                    algorithms=shift_algo,
+                                    input_files=good_input_files,
+                                    pre_collector_path=shift_pre_collector_path)
+
+    shift_calibration.strategies = strategies.SingleIOV
+
+    for algorithm in shift_calibration.algorithms:
+        algorithm.params = {"iov_coverage": output_iov}
+
+    if "timeShiftCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(shift_calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #
@@ -572,6 +641,7 @@ def get_calibrations(input_data, **kwargs):
     val_pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_val_clusterizers,
         isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
         useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking,
         is_validation=True)
 
@@ -600,6 +670,10 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in val_calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    val_calibration.depends_on(calibration)
+    if "timeValidation" not in listOfMutedCalibrations:
+        list_of_calibrations.append(val_calibration)
 
-    return [calibration, val_calibration]
+    for item in range(len(list_of_calibrations) - 1):
+        list_of_calibrations[item + 1].depends_on(list_of_calibrations[item])
+
+    return list_of_calibrations

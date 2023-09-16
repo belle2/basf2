@@ -88,8 +88,6 @@ namespace Belle2 {
 
     /**
      * Returns the types of sensor grouping.
-     * A total of 7 types of sensors are grouped;
-     * L3, L4/5/6-Forward, L4/5/6-Barrel.
      * @param layer : layer number
      * @param sensor : sensor number
      * @param isU : is U side?
@@ -97,21 +95,7 @@ namespace Belle2 {
      **/
     TString getSensorType(const int& layer, const int& sensor, const bool& isU) const
     {
-      TString sensorType = TString::Format("L%i", layer);
-
-      if (layer >= 4) {
-        if (sensor == 1)
-          sensorType += "-Forward";
-        else
-          sensorType += "-Barrel";
-      }
-
-      if (isU)
-        sensorType += "-U";
-      else
-        sensorType += "-V";
-
-      return sensorType;
+      return TString::Format("L%iS%iS%c", layer, sensor, (isU ? 'U' : 'V'));
     };
 
   private:

@@ -427,7 +427,7 @@ bool HLTEventProcessor::forkOut()
   } else {
     // Child process
     // Reset some python state: signals, threads, gil in the child
-    PyOS_AfterFork();
+    PyOS_AfterFork_Child();
     // InputController becomes useless in child process
     InputController::resetForChildProcess();
     // die when parent dies

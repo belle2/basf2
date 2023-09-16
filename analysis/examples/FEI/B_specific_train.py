@@ -80,7 +80,7 @@ ma.copyLists('B+:FEIMC', ['B+:FEIMC_e', 'B+:FEIMC_mu'], writeOut=True, path=path
 # We want the FEI to be only trained on a correctly reconstruced signal side and on wrongly reconstructed background.
 isSignal = 'isSignalAcceptMissingNeutrino'
 signalMC = 'eventCached(countInList(B+:FEIMC))'
-cut = '[[{mc} > 0 and {sig} == 1] or [{mc} == 0 and {sig} != 1]]'.format(mc=signalMC, sig=isSignal)
+cut = f'[[{signalMC} > 0 and {isSignal} == 1] or [{signalMC} == 0 and {isSignal} != 1]]'
 ma.applyCuts('B+:sig', cut, path=path)
 
 # Set up FEI configuration specifying the FEI prefix

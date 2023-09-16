@@ -9,10 +9,9 @@
 #include <mva/interface/Dataset.h>
 #include <framework/utilities/TestHelpers.h>
 
-#include <boost/filesystem/operations.hpp>
-
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <fstream>
 #include <numeric>
 
@@ -580,12 +579,12 @@ namespace {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 5);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile2.root");
+    std::filesystem::copy_file("datafile.root", "datafile2.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile3.root");
+    std::filesystem::copy_file("datafile.root", "datafile3.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
@@ -646,7 +645,7 @@ namespace {
     {
       std::ofstream(general_options.m_datafiles[0]);
     }
-    EXPECT_TRUE(boost::filesystem::exists(general_options.m_datafiles[0]));
+    EXPECT_TRUE(std::filesystem::exists(general_options.m_datafiles[0]));
 
     try {
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
@@ -865,12 +864,12 @@ namespace {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 5);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile2.root");
+    std::filesystem::copy_file("datafile.root", "datafile2.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile3.root");
+    std::filesystem::copy_file("datafile.root", "datafile3.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
@@ -931,7 +930,7 @@ namespace {
     {
       std::ofstream(general_options.m_datafiles[0]);
     }
-    EXPECT_TRUE(boost::filesystem::exists(general_options.m_datafiles[0]));
+    EXPECT_TRUE(std::filesystem::exists(general_options.m_datafiles[0]));
 
     try {
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
@@ -1286,12 +1285,12 @@ namespace {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile3.root");
+    std::filesystem::copy_file("datafile.root", "datafile3.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile4.root");
+    std::filesystem::copy_file("datafile.root", "datafile4.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 20);
@@ -1306,7 +1305,7 @@ namespace {
 
     // If a file exists with the specified expansion
     // the file takes precedence over the expansion
-    boost::filesystem::copy_file("datafile.root", "datafile*.root");
+    std::filesystem::copy_file("datafile.root", "datafile*.root");
     {
       general_options.m_max_events = 0;
       MVA::ROOTDataset chain_test(general_options);
@@ -1658,12 +1657,12 @@ namespace {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile3.root");
+    std::filesystem::copy_file("datafile.root", "datafile3.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
     }
-    boost::filesystem::copy_file("datafile.root", "datafile4.root");
+    std::filesystem::copy_file("datafile.root", "datafile4.root");
     {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 20);
@@ -1678,7 +1677,7 @@ namespace {
 
     // If a file exists with the specified expansion
     // the file takes precedence over the expansion
-    boost::filesystem::copy_file("datafile.root", "datafile*.root");
+    std::filesystem::copy_file("datafile.root", "datafile*.root");
     {
       general_options.m_max_events = 0;
       MVA::ROOTDataset chain_test(general_options);

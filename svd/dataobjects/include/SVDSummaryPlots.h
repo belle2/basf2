@@ -49,7 +49,7 @@ namespace Belle2 {
     isU methods defined by Peter Kv.*/
     enum E_side { VIndex = 0, UIndex = 1 };
 
-    /** get a reference to the histogram for @param vxdID side @param view
+    /** get a reference to the histogram for @param view
      * please, use the enumeration SVDSummaryPlots::Vindex and
      * SVDSummaryPlots::UIndex */
     TH2F* getHistogram(int view)

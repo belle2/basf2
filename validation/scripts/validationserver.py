@@ -696,12 +696,8 @@ class ValidationRoot:
         uploaded_file = upload_file_gitlab(self.plot_path, project)
         plot_title = self.plot_path.split("/")[-1].split(".")[0]
         plot_package = self.plot_path.split("/")[-2]
-        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant plot: {}\n\n\
-            Revision label: {}\n\n---".format(
-            plot_title,
-            self.revision_label
-        )
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n" + \
+            f"Relevant plot: {plot_title}\n\nRevision label: {self.revision_label}\n\n---"
         issue_id = create_gitlab_issue(
             title, description, uploaded_file, plot_package, project
         )

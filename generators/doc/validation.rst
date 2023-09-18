@@ -3,9 +3,6 @@
 Validation
 ----------
 
-Reconstruction Scripts
-^^^^^^^^^^^^^^^^^^^^^^
-
 The validation of the MC generators is performed to ensure that updates to the framework do not break the generator
 level particle multiplicities and event shapes. These validations are run automatically when updates are added to the
 framework and can also be run manually. The output histograms are compared to reference histograms to make sure that
@@ -16,6 +13,9 @@ nothing has changed.
    updates to the same release as the reference histograms.
 
 The different python scripts used for the validation are located at ``generators/validation/decayfile/``.
+
+Reconstruction Scripts
+^^^^^^^^^^^^^^^^^^^^^^
 
 There are two reconstruction scripts divided between charged and mixed MC:
 

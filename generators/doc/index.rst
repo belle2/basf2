@@ -1,4 +1,4 @@
-B65;6800;1c.. _event_generators:
+.. _event_generators:
 
 ================
 Event Generators

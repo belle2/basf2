@@ -17,7 +17,6 @@ Define PKphHplus  -0.054642
 Define PKphHzero  0.0
 Define PKphHminus -1.162401
 
-Alias psi(2S)sig psi(2S)
 Alias pi0sig pi0
 Alias K*0sig K*0
 

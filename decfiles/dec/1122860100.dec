@@ -10,9 +10,6 @@
 # Date: 20230911
 # Comments:
 
-Alias J/psisig J/psi
-Alias psi(2S)sig psi(2S)
-
 Decay Upsilon(4S)
 1.0000 B0 anti-B0 B0sig  anti-B0sig     VSS_BMIX dm;
 Enddecay

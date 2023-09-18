@@ -10,7 +10,6 @@
 # Date: 20230911
 # Comments:
 
-Alias psi(2S)sig psi(2S)
 
 Decay Upsilon(4S)
 0.50000 B+sig  B-        VSS;

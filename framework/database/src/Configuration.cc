@@ -22,7 +22,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "prerelease-08-00-00b"
+#define CURRENT_DEFAULT_TAG "prerelease-08-00-00d"
 
 namespace py = boost::python;
 

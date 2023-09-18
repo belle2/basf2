@@ -18,9 +18,7 @@ Define PKphHzero  0.0
 Define PKphHminus -1.162401
 
 # Define aliases
-Alias J/psisig J/psi
 Alias K*+sig K*+
-Alias psi(2S)sig psi(2S)
 Alias pi0sig pi0
 
 

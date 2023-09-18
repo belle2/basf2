@@ -106,9 +106,13 @@ namespace Belle2 {
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 
     TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
+    TH2F* m_h3OnlineOccupancyU = nullptr; /**< online occupancy U histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
+    TCanvas* m_c3OnlineOccupancyU = nullptr; /**< online occupancy U histo canvas for 3 samples*/
     TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
+    TH2F* m_h3OnlineOccupancyV = nullptr; /**< online Occupancy V histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
+    TCanvas* m_c3OnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
 
     const int nSensors = 172; /**< total number of sensors */
     TH1F m_hStripOccupancyU[172]; /**< u-side strip chart occupancy histos*/
@@ -144,6 +148,9 @@ namespace Belle2 {
 
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+
+    Int_t m_onlineOccUstatus3 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
+    Int_t m_onlineOccVstatus3 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
 
     TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
     TString runtype = nullptr; /**< string with runtype: physics or cosmic */

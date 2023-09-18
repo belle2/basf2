@@ -127,6 +127,12 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   //  m_cOnlineOccupancyU->SetGrid(1);
   m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
   //  m_cOnlineOccupancyV->SetGrid(1);
+
+  m_c3OnlineOccupancyU = new TCanvas("SVDAnalysis/c_3SVDOnlineOccupancyU");
+  //  m_cOnlineOccupancyU->SetGrid(1);
+  m_c3OnlineOccupancyV = new TCanvas("SVDAnalysis/c_3SVDOnlineOccupancyV");
+  //  m_cOnlineOccupancyV->SetGrid(1);
+
   m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
   m_cClusterOnTrack3Time_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrack3Time_L456V");
 
@@ -175,11 +181,25 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_h3OccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_h3OccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
+  m_h3OnlineOccupancyV =  new TH2F("hOnlineOccupancy3V", "Average ONLINE Sensor Occupancy (%), V side for 3 samples", 16, 0.5, 16.5,
+                                   19, 0, 19);
+  m_h3OnlineOccupancyV->SetMarkerSize(1.1);
+  m_h3OnlineOccupancyV->GetXaxis()->SetTitle("ladder number");
+  m_h3OnlineOccupancyV->GetXaxis()->SetLabelSize(0.04);
+  for (unsigned short i = 0; i < nY; i++) m_h3OnlineOccupancyV->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
+
+  m_h3OnlineOccupancyU =  new TH2F("hOnlineOccupancy3U", "Average ONLINE Sensor Occupancy (%), U side for 3 samples", 16, 0.5, 16.5,
+                                   19, 0, 19);
+  m_h3OnlineOccupancyU->SetMarkerSize(1.1);
+  m_h3OnlineOccupancyU->GetXaxis()->SetTitle("ladder number");
+  m_h3OnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
+  for (unsigned short i = 0; i < nY; i++) m_h3OnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
+
   rtype = findHist("DQMInfo/rtype");
   if (rtype)
     B2INFO("DQMInfo/rtype found");
 
-  runtype = rtype ? rtype->GetTitle() : "";
+  runtype = rtype ? rtype->GetTitle() : "physics"; // per default
   // runtype = "physics";
 
   //register limits for EPICS
@@ -458,12 +478,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
 
   //check MODULE OCCUPANCY online & offline
-
   //reset canvas color
   m_occUstatus = 0;
   m_occVstatus = 0;
   m_onlineOccUstatus = 0;
   m_onlineOccVstatus = 0;
+
+  m_onlineOccUstatus3 = 0;
+  m_onlineOccVstatus3 = 0;
 
   m_occUstatus3 = 0;
   m_occVstatus3 = 0;
@@ -484,6 +506,11 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_h3OccupancyU->SetStats(0);
   m_h3OccupancyV->SetTitle("Average OFFLINE Sensor Occupancy (%), V side for 3 samples" + runID);
   m_h3OccupancyV->SetStats(0);
+
+  m_h3OnlineOccupancyU->SetTitle("Average ONLINE Sensor Occupancy (%), U side for 3 samples" + runID);
+  m_h3OnlineOccupancyU->SetStats(0);
+  m_h3OnlineOccupancyV->SetTitle("Average ONLINE Sensor Occupancy (%), V side for 3 samples" + runID);
+  m_h3OnlineOccupancyV->SetStats(0);
 
 
   //set dedicate gStyle
@@ -517,14 +544,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t occU = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOccupancyU->SetBinContent(bin, occU);
 
-      //test ERRORS
-      /*
-      if(bin == m_hOccupancyU->FindBin(2, findBinY(3, 1))){
-      occU = 0; //0,1,1.5,1.8,2,3
-      m_hOccupancyU->SetBinContent(bin, occU);
-      }
-      */
-
       if (occU <= m_occEmpty) {
         if (m_occUstatus < 1) m_occUstatus = 1;
       } else if (occU > m_occWarning) {
@@ -534,8 +553,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
           if (m_occUstatus < 3) m_occUstatus = 3;
         }
       }
-
-      //      B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " status = " << m_occUstatus);
 
       //produce the occupancy plot
       if (m_additionalPlots) {
@@ -574,8 +591,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
       }
     }
 
-
-
     //look for V histogram - OFFLINE ZS
     tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountV", tmp_layer, tmp_ladder, tmp_sensor);
 
@@ -591,14 +606,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
       Float_t occV = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOccupancyV->SetBinContent(bin, occV);
-
-      //test ERRORS
-      /*
-      if(bin == m_hOccupancyV->FindBin(3, findBinY(3, 1))){
-      occV = 1.8; //0,1,1.5,1.8,2,3
-      m_hOccupancyV->SetBinContent(bin, occV);
-      }
-      */
 
       if (occV <= m_occEmpty) {
         if (m_occVstatus < 1) m_occVstatus = 1;
@@ -667,13 +674,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
       htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-      //test ERRORS
-      /*
-        if(bin == m_hOnlineOccupancyV->FindBin(3, findBinY(3, 1))){
-        onlineOccV = 1.8; //0,1,1.5,1.8,2,3
-        m_hOnlineOccupancyV->SetBinContent(bin, onlineOccV);
-        }
-      */
 
       if (onlineOccV <= m_onlineOccEmpty) {
         if (m_onlineOccVstatus < 1) m_onlineOccVstatus = 1;
@@ -684,9 +684,40 @@ void DQMHistAnalysisSVDGeneralModule::event()
           if (m_onlineOccVstatus < 3) m_onlineOccVstatus = 3;
         }
       }
-
-
     }
+
+    //look for V histogram - ONLINE ZS for 3 samples
+    tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_OnlineZSStrip3CountV", tmp_layer, tmp_ladder, tmp_sensor);
+
+    htmp = (TH1F*)findHist(tmpname.Data());
+    if (htmp == NULL) {
+      B2INFO("OnlineOccupancy3 V histogram not found");
+      m_c3OnlineOccupancyV->SetFillColor(kRed);
+    } else {
+
+      Int_t nStrips = 768;
+      if (tmp_layer != 3)
+        nStrips = 512;
+
+      Float_t onlineOccV = htmp->GetEntries() / nStrips / nEvents * 100;
+      m_h3OnlineOccupancyV->SetBinContent(bin, onlineOccV);
+
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
+        htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
+      }
+      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
+
+      if (onlineOccV <= m_onlineOccEmpty) {
+        if (m_onlineOccVstatus3 < 1) m_onlineOccVstatus3 = 1;
+      } else if (onlineOccV > m_onlineOccWarning) {
+        if (onlineOccV < m_onlineOccError) {
+          if (m_onlineOccVstatus3 < 2) m_onlineOccVstatus3 = 2;
+        } else {
+          if (m_onlineOccVstatus3 < 3) m_onlineOccVstatus3 = 3;
+        }
+      }
+    }
+
     //look for U histogram - ONLINE ZS
     tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_OnlineZSStripCountU", tmp_layer, tmp_ladder, tmp_sensor);
 
@@ -705,13 +736,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
       htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-      //test ERRORS
-      /*
-        if(bin == m_hOnlineOccupancyU->FindBin(3, findBinY(3, 1))){
-        onlineOccU = 1.8; //0,1,1.5,1.8,2,3
-        m_hOnlineOccupancyU->SetBinContent(bin, onlineOccU);
-        }
-      */
 
       if (onlineOccU <= m_onlineOccEmpty) {
         if (m_onlineOccUstatus < 1) m_onlineOccUstatus = 1;
@@ -722,8 +746,36 @@ void DQMHistAnalysisSVDGeneralModule::event()
           if (m_onlineOccUstatus < 3) m_onlineOccUstatus = 3;
         }
       }
+    }
 
-      //B2INFO(" x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " V occ = " << occV << " status = " << m_occVstatus);
+    //look for U histogram - ONLINE ZS for 3 samples
+    tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_OnlineZSStrip3CountU", tmp_layer, tmp_ladder, tmp_sensor);
+
+    htmp = (TH1F*)findHist(tmpname.Data());
+    if (htmp == NULL) {
+      B2INFO("OnlineOccupancy3 U histogram not found");
+      m_c3OnlineOccupancyU->SetFillColor(kRed);
+    } else {
+
+      Int_t nStrips = 768;
+
+      Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
+      m_h3OnlineOccupancyU->SetBinContent(bin, onlineOccU);
+
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
+        htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
+      }
+      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
+
+      if (onlineOccU <= m_onlineOccEmpty) {
+        if (m_onlineOccUstatus3 < 1) m_onlineOccUstatus3 = 1;
+      } else if (onlineOccU > m_onlineOccWarning) {
+        if (onlineOccU < m_onlineOccError) {
+          if (m_onlineOccUstatus3 < 2) m_onlineOccUstatus3 = 2;
+        } else {
+          if (m_onlineOccUstatus3 < 3) m_onlineOccUstatus3 = 3;
+        }
+      }
     }
 
     //update sensor occupancy canvas U and V
@@ -766,8 +818,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cOccupancyU->Modified();
   m_cOccupancyU->Update();
 
-//   setEpicsPV("OccupancyUAlarm", m_occUstatus);
-
   //update summary offline occupancy U canvas for 3 samples
   m_c3OccupancyU->cd();
   m_h3OccupancyU->Draw("text");
@@ -798,8 +848,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_c3OccupancyU->Update();
   m_c3OccupancyU->Modified();
   m_c3OccupancyU->Update();
-
-//   setEpicsPV("OccupancyU3Alarm", m_occUstatus3);
 
 
   //update summary offline occupancy V canvas
@@ -938,6 +986,69 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOnlineOccupancyV->Print("c_SVDOnlineOccupancyV.pdf");
   }
 
+  //update summary online occupancy U canvas for 3 samples
+  m_c3OnlineOccupancyU->cd();
+  m_h3OnlineOccupancyU->Draw("text");
+  m_yTitle->Draw("same");
+
+  if (m_onlineOccUstatus3 == 0) {
+    m_c3OnlineOccupancyU->SetFillColor(kGreen);
+    m_c3OnlineOccupancyU->SetFrameFillColor(10);
+    m_legOnNormal->Draw("same");
+  } else {
+    if (m_onlineOccUstatus3 == 3) {
+      m_c3OnlineOccupancyU->SetFillColor(kRed);
+      m_c3OnlineOccupancyU->SetFrameFillColor(10);
+      m_legOnProblem->Draw("same");
+    }
+    if (m_onlineOccUstatus3 == 2) {
+      m_c3OnlineOccupancyU->SetFillColor(kYellow);
+      m_c3OnlineOccupancyU->SetFrameFillColor(10);
+      m_legOnWarning->Draw("same");
+    }
+    if (m_onlineOccUstatus3 == 1) {
+      m_c3OnlineOccupancyU->SetFillColor(kGray);
+      m_c3OnlineOccupancyU->SetFrameFillColor(10);
+      m_legOnEmpty->Draw("same");
+    }
+  }
+
+  m_c3OnlineOccupancyU->Draw();
+  m_c3OnlineOccupancyU->Update();
+  m_c3OnlineOccupancyU->Modified();
+  m_c3OnlineOccupancyU->Update();
+
+  //update summary online occupancy V canvas for 3 samples
+  m_c3OnlineOccupancyV->cd();
+  m_h3OnlineOccupancyV->Draw("text");
+  m_yTitle->Draw("same");
+
+  if (m_onlineOccVstatus3 == 0) {
+    m_c3OnlineOccupancyV->SetFillColor(kGreen);
+    m_c3OnlineOccupancyV->SetFrameFillColor(10);
+    m_legOnNormal->Draw("same");
+  } else {
+    if (m_onlineOccVstatus3 == 3) {
+      m_c3OnlineOccupancyV->SetFillColor(kRed);
+      m_c3OnlineOccupancyV->SetFrameFillColor(10);
+      m_legOnProblem->Draw("same");
+    }
+    if (m_onlineOccVstatus3 == 2) {
+      m_c3OnlineOccupancyV->SetFillColor(kYellow);
+      m_c3OnlineOccupancyV->SetFrameFillColor(10);
+      m_legOnWarning->Draw("same");
+    }
+    if (m_onlineOccVstatus3 == 1) {
+      m_c3OnlineOccupancyV->SetFillColor(kGray);
+      m_c3OnlineOccupancyV->SetFrameFillColor(10);
+      m_legOnEmpty->Draw("same");
+    }
+  }
+
+  m_c3OnlineOccupancyV->Draw();
+  m_c3OnlineOccupancyV->Update();
+  m_c3OnlineOccupancyV->Modified();
+  m_c3OnlineOccupancyV->Update();
 }
 
 void DQMHistAnalysisSVDGeneralModule::endRun()

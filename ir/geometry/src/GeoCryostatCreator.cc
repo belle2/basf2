@@ -26,11 +26,13 @@
 #include <G4Box.hh>
 #include <G4Trd.hh>
 #include <G4Tubs.hh>
+#include <G4Cons.hh>
 #include <G4Polycone.hh>
 #include <G4EllipticalTube.hh>
 #include <G4UnionSolid.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4ExtrudedSolid.hh>
 #include <G4UserLimits.hh>
 
 using namespace std;
@@ -904,6 +906,232 @@ namespace Belle2 {
       G4LogicalVolume* logi_elp_QC1RP = new G4LogicalVolume(geo_elp_QC1RP, Materials::get("Vacuum"), "logi_elp_QC1RP_name");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1RP, "phys_elp_QC1RP_name", elements["B2wal1"].logi, false, 0);
 
+
+
+
+      //--------------------------------------------------------------------------------------------
+      //-   2023 QCS shielding
+
+      std::vector<std::string> polyBlocks;
+      boost::split(polyBlocks, m_config.getParameterStr("PolyBlock"), boost::is_any_of(" "));
+      for (const auto& name : polyBlocks) {
+        prep = name + ".";
+        //string type = m_config.getParameterStr(prep + "type");
+
+        int block_En = int(m_config.getParameter(prep + "Enable"));
+        double block_L = m_config.getParameter(prep + "L") * unitFactor;
+        double block_R = m_config.getParameter(prep + "R") * unitFactor;
+        double block_r = m_config.getParameter(prep + "r") * unitFactor;
+        double block_W = m_config.getParameter(prep + "W") * unitFactor;
+        double block_w = m_config.getParameter(prep + "w") * unitFactor;
+        double block_t = m_config.getParameter(prep + "t") * unitFactor;
+        double block_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+        double block_dr = m_config.getParameter(prep + "dr", 0.0) * unitFactor;
+        // Number of instances
+        int block_N = int(m_config.getParameter(prep + "N"));
+
+        std::vector<double> block_PHIs(block_N);
+        for (int i = 0; i < block_N; ++i) {
+          ostringstream oss_block_num;
+          oss_block_num << i;
+          block_PHIs[i] = m_config.getParameter(prep + "PHI" + oss_block_num.str());
+        }
+
+        // Box shaped cuts, if any
+        double block_cut_L0 = m_config.getParameter(prep + "cutL0", 0.0) * unitFactor;
+        double block_cut_L1 = m_config.getParameter(prep + "cutL1", 0.0) * unitFactor;
+        int block_cut_N = 0;
+        if (block_cut_L0 != 0.0 && block_cut_L1 != 0.0) {
+          block_cut_N = 2;
+        } else if (block_cut_L0 != 0.0 || block_cut_L1 != 0.0) {
+          block_cut_N = 1;
+        } else {
+          block_cut_N = 0;
+        }
+
+        //define geometry
+        string geo_block_name;
+        if (block_cut_N == 0) {
+          geo_block_name = "geo_" + name + "_name";
+        } else {
+          geo_block_name = "geo_" + name + "_x_name";
+        }
+
+        double block_T = sqrt((block_R - block_r) * (block_R - block_r) + (block_W - block_w) * (block_W - block_w) / 4.0);
+
+        int nSect = 5;
+        std::vector<G4TwoVector> xy(nSect);
+        xy[0].set(0.0, 0.0);
+        xy[1].set(-block_T, (block_W - block_w) / 2.0);
+        xy[2].set(-block_t, block_W / 2.0);
+        xy[3].set(-block_T, (block_w + block_W) / 2.0);
+        xy[4].set(0.0, block_W);
+
+        G4TwoVector offset1(block_dr, 0.0), offset2(0.0, 0.0);
+        G4double scale1 = 1.0, scale2 = 1.0;
+
+        G4VSolid* geo_block = new G4ExtrudedSolid(geo_block_name, xy, block_L / 2.0, offset1, scale1, offset2, scale2);
+
+        for (int i = 0; i < block_cut_N; ++i) {
+          ostringstream oss_block_num;
+          oss_block_num << i;
+
+          string geo_blockx_name;
+          if (i == block_cut_N) {
+            geo_blockx_name = "geo_" + name + "_name";
+          } else {
+            geo_block_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
+          }
+          string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
+
+          double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
+          double cut_W = m_config.getParameter(prep + "cutW" + oss_block_num.str()) * unitFactor;
+          double cut_H = m_config.getParameter(prep + "cutH" + oss_block_num.str()) * unitFactor;
+
+          G4VSolid* geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
+
+          double cut_X0 = m_config.getParameter(prep + "cutX0" + oss_block_num.str()) * unitFactor;
+          double cut_Y0 = m_config.getParameter(prep + "cutY0" + oss_block_num.str()) * unitFactor;
+          double cut_Z0 = m_config.getParameter(prep + "cutZ0" + oss_block_num.str()) * unitFactor;
+          double cut_PHI = m_config.getParameter(prep + "cutPHI" + oss_block_num.str());
+
+          G4Transform3D cut_transform = G4Translate3D(cut_X0, cut_Y0, cut_Z0);
+          cut_transform = cut_transform * G4RotateY3D(cut_PHI / Unit::rad);
+
+          geo_block = new G4SubtractionSolid(geo_block_name, geo_block, geo_cut,  cut_transform);
+          //geo_block = new G4UnionSolid(geo_block_name, geo_block, geo_cut,  cut_transform);
+        }
+
+        // logical volume
+        string strMat_block = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_block = Materials::get(strMat_block);
+
+        string logi_block_name = "logi_" + name + "_name";
+        G4LogicalVolume* logi_block = new G4LogicalVolume(geo_block, mat_block, logi_block_name);
+
+        //put volume
+        setColor(*logi_block, "#0000CC");
+        //setVisibility(*logi_block, false);
+
+        for (int i = 0; i < block_N; ++i) {
+          // storable element
+          CryostatElement block;
+          block.geo = geo_block;
+          block.logi = logi_block;
+
+          double block_PHI = block_PHIs[i];
+          double block_X0 = block_R * cos(block_PHI);
+          double block_Y0 = block_R * sin(block_PHI);
+          double block_dPHI = asin(block_W / block_R / 2.0);
+
+          block.transform = G4Translate3D(block_X0, block_Y0, block_Z0);
+          block.transform = block.transform * G4RotateZ3D((block_PHI + block_dPHI) / Unit::rad);
+
+          ostringstream oss_block_num;
+          oss_block_num << i;
+          string phys_block_name = "phys_" + name + "-" + oss_block_num.str() + "_name";
+          if (block_En == 1)
+            new G4PVPlacement(block.transform, block.logi, phys_block_name, &topVolume, false, 0);
+
+          elements[name] = block;
+        }
+      }
+
+      std::vector<std::string> SWXLayers;
+      boost::split(SWXLayers, m_config.getParameterStr("SWXLayer"), boost::is_any_of(" "));
+      for (const auto& name : SWXLayers) {
+        prep = name + ".";
+        //string type = m_config.getParameterStr(prep + "type");
+
+        // storable element
+        CryostatElement layer;
+
+        int layer_En = int(m_config.getParameter(prep + "Enable"));
+        double layer_L = m_config.getParameter(prep + "L") * unitFactor;
+        double layer_r1 = m_config.getParameter(prep + "r1") * unitFactor;
+        double layer_r2 = m_config.getParameter(prep + "r2") * unitFactor;
+        double layer_t = m_config.getParameter(prep + "t") * unitFactor;
+        double layer_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+        int layer_cut_N = int(m_config.getParameter(prep + "N", 0));
+
+        layer.transform = G4Translate3D(0.0, 0.0, layer_Z0);
+
+        //define geometry
+        string geo_layer_name;
+        if (layer_cut_N == 0) {
+          geo_layer_name = "geo_" + name + "_name";
+        } else {
+          geo_layer_name = "geo_" + name + "_x_name";
+        }
+
+        G4VSolid* geo_layer = new G4Cons(geo_layer_name, layer_r1, layer_r1 + layer_t, layer_r2, layer_r2 + layer_t, layer_L / 2.0, 0.0,
+                                         2.0 * M_PI);
+
+        for (int i = 0; i < layer_cut_N; ++i) {
+          ostringstream oss_block_num;
+          oss_block_num << i;
+
+          //string cut_type = m_config.getParameterStr(prep + "cutType" + oss_block_num.str());
+          double cut_type = m_config.getParameter(prep + "cutType" + oss_block_num.str());
+          string geo_layerx_name;
+          if (i == layer_cut_N) {
+            geo_layerx_name = "geo_" + name + "_name";
+          } else {
+            geo_layer_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
+          }
+          string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
+
+          G4VSolid* geo_cut;
+          //if(cut_type == "Box") {
+          if (cut_type == 0.0) {
+            double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
+            double cut_W = m_config.getParameter(prep + "cutW" + oss_block_num.str()) * unitFactor;
+            double cut_H = m_config.getParameter(prep + "cutH" + oss_block_num.str()) * unitFactor;
+
+            geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
+            //} else if(cut_type == "Tubs") {
+          } else if (cut_type != 0.0) {
+            double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
+            double cut_R = m_config.getParameter(prep + "cutR" + oss_block_num.str()) * unitFactor;
+
+            geo_cut = new G4Tubs(geo_cut_name, 0.0, cut_R, cut_L / 2.0, 0.0, 2.0 * M_PI);
+          } else
+            continue;
+
+          double cut_X0 = m_config.getParameter(prep + "cutX0" + oss_block_num.str()) * unitFactor;
+          double cut_Y0 = m_config.getParameter(prep + "cutY0" + oss_block_num.str()) * unitFactor;
+          double cut_Z0 = m_config.getParameter(prep + "cutZ0" + oss_block_num.str()) * unitFactor;
+          double cut_PHI = m_config.getParameter(prep + "cutPHI" + oss_block_num.str());
+          double cut_TH = m_config.getParameter(prep + "cutTH" + oss_block_num.str());
+
+          G4Transform3D cut_transform = G4Translate3D(cut_X0, cut_Y0, cut_Z0);
+          cut_transform = cut_transform * G4RotateY3D(cut_PHI / Unit::rad);
+          cut_transform = cut_transform * G4RotateX3D(cut_TH / Unit::rad);
+
+          geo_layer = new G4SubtractionSolid(geo_layer_name, geo_layer, geo_cut,  layer.transform.inverse()*cut_transform);
+          //geo_layer = new G4UnionSolid(geo_layer_name, geo_layer, geo_cut,  layer.transform.inverse()*cut_transform);
+        }
+
+        layer.geo = geo_layer;
+
+        // logical volume
+        string strMat_layer = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_layer = Materials::get(strMat_layer);
+
+        string logi_layer_name = "logi_" + name + "_name";
+        G4LogicalVolume* logi_layer = new G4LogicalVolume(layer.geo, mat_layer, logi_layer_name);
+        layer.logi = logi_layer;
+
+        //put volume
+        setColor(*logi_layer, "#0000CC");
+        //setVisibility(*logi_layer, false);
+
+        string phys_layer_name = "phys_" + name + "_name";
+        if (layer_En == 1)
+          new G4PVPlacement(layer.transform, layer.logi, phys_layer_name, &topVolume, false, 0);
+
+        elements[name] = layer;
+      }
 
       //---------------------------
       // for dose simulation

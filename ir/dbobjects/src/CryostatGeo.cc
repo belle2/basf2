@@ -53,4 +53,24 @@ void CryostatGeo::initialize(const GearDir& content)
     supports += name;
   }
   addParameter("Support", supports);
+
+  std::string polyBlocks;
+  for (const GearDir& polyBlock : content.getNodes("PolyBlock")) {
+    std::string name = polyBlock.getString("@name");
+    addParameters(polyBlock, name);
+    if (!polyBlocks.empty()) polyBlocks += " ";
+    polyBlocks += name;
+  }
+  addParameter("PolyBlock", polyBlocks);
+
+  std::string SWXLayers;
+  for (const GearDir& SWXLayer : content.getNodes("SWXLayer")) {
+    std::string name = SWXLayer.getString("@name");
+    addParameters(SWXLayer, name);
+    if (!SWXLayers.empty()) SWXLayers += " ";
+    SWXLayers += name;
+  }
+  addParameter("SWXLayer", SWXLayers);
+
 }
+

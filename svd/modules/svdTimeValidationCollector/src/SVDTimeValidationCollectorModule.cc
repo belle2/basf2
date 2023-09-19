@@ -101,9 +101,11 @@ void SVDTimeValidationCollectorModule::prepare()
 
 void SVDTimeValidationCollectorModule::startRun()
 {
+  getObjectPtr<TH1F>("hEventT0")->Reset();
   getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
   getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
   getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
+  getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
   getObjectPtr<TH3F>("__hClusterSizeVsTimeResidual__")->Reset();
 }
 

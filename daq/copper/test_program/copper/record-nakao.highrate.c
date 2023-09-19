@@ -286,7 +286,9 @@ main(int argc, char **argv)
       time(&timer);
       t_st = localtime(&timer);
 
-      printf(" Event : %i  received, xor = %08lx total received %.2lf[MB] %s", event,  xor((unsigned long *)buffer, ret/4), tot_recvd_byte/1.e6, asctime(t_st));
+      char timeStr[100];
+      std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
+      printf(" Event : %i  received, xor = %08lx total received %.2lf[MB] %s", event,  xor((unsigned long *)buffer, ret/4), tot_recvd_byte/1.e6, timeStr);
     }
     if (event <= 10)  {/*   modified by sun */
 #ifdef PRINT

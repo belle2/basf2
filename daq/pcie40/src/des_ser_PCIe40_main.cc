@@ -1116,6 +1116,9 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
         struct tm* t_st;
         time(&timer);
         t_st = localtime(&timer);
+        char timeStr[100];
+        std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
+
         if (first_b2lctime_flag == 0) {
           first_b2lctime = data[ cur_pos +
                                          Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
@@ -1135,7 +1138,7 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
-               asctime(t_st));
+               timeStr);
         pthread_mutex_unlock(&(mtx_sender_log));
       }
     }
@@ -2980,6 +2983,9 @@ int main(int argc, char** argv)
           struct tm* t_st;
           time(&timer);
           t_st = localtime(&timer);
+          char timeStr[100];
+          std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
+
           pthread_mutex_lock(&(mtx_sender_log));
 
           printf("[DEBUG] Event %12u Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] evenum %12u exprun 0x%.8x eve_size %6.2lf[kB] numch %d nonred %u crcok %u crcng %u evejump %u bad_7f7f %u bad_runnum %u bad_linknum %u bad_evenum %u bad_ffaa %u bad_ff55 %u bad_linksize %u no_data %u bad_header %u bad_size %u bad_size_dmatrl %u bad_dmatrl %u bad_word_size %u %s",
@@ -2993,7 +2999,7 @@ int main(int argc, char** argv)
                  sum_err_bad_7f7f,
                  sum_err_bad_runnum, sum_err_bad_linknum, sum_err_bad_evenum, sum_err_bad_ffaa, sum_err_bad_ff55, sum_err_bad_linksize,
                  dmaerr_no_data, dmaerr_bad_header, dmaerr_bad_size, dmaerr_bad_size_dmatrl, dmaerr_bad_dmatrl, dmaerr_bad_word_size,
-                 asctime(t_st));
+                 timeStr);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           prev_total_size_bytes = total_size_bytes;

@@ -2048,6 +2048,7 @@ namespace Belle2 {
           }
 
           MCParticle* mcUpsilon4S = mcParticles[0];
+          if (mcUpsilon4S->isInitial()) mcUpsilon4S = mcParticles[2];
           if (mcUpsilon4S->getPDG() != 300553)
           {
             return Const::doubleNaN;

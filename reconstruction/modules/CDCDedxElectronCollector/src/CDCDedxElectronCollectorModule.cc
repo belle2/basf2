@@ -8,6 +8,7 @@
 
 #include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
+
 #include <TTree.h>
 #include <TH1D.h>
 #include <TH1I.h>
@@ -86,6 +87,9 @@ void CDCDedxElectronCollectorModule::prepare()
   if (m_isInjTime) {
     ttree->Branch<double>("injtime", &m_injTime);
     ttree->Branch<double>("injring", &m_injRing);
+    ttree->Branch<double>("costh", &m_costh);
+    ttree->Branch<int>("nhits", &m_nhits);
+    ttree->Branch<double>("p", &m_p);
   }
 
   ttree->Branch<double>("dedx", &m_dedx);
@@ -203,6 +207,8 @@ void CDCDedxElectronCollectorModule::collect()
     m_charge = fitResult->getChargeSign();
     m_injTime = dedxTrack->getInjectionTime();
     m_injRing = dedxTrack->getInjectionRing();
+    m_nhits = dedxTrack->size();
+
     htstats->Fill(0);
 
     if (m_cuts) {
@@ -216,7 +222,6 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
       htstats->Fill(2);
 
-      m_nhits = dedxTrack->size();
       if (m_nhits > m_maxHits) continue;
 
       //making some cuts based on acceptance

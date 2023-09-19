@@ -1010,7 +1010,7 @@ namespace Belle2 {
         G4LogicalVolume* logi_block = new G4LogicalVolume(geo_block, mat_block, logi_block_name);
 
         //put volume
-        setColor(*logi_block, "#0000CC");
+        setColor(*logi_block, "#00CC00");
         //setVisibility(*logi_block, false);
 
         for (int i = 0; i < block_N; ++i) {
@@ -1123,7 +1123,7 @@ namespace Belle2 {
         layer.logi = logi_layer;
 
         //put volume
-        setColor(*logi_layer, "#0000CC");
+        setColor(*logi_layer, "#B100CC");
         //setVisibility(*logi_layer, false);
 
         string phys_layer_name = "phys_" + name + "_name";
@@ -1566,22 +1566,22 @@ namespace Belle2 {
 
       APSR12.transform = G4Translate3D(0, 0, 0);
 
-      /*
-            G4Polycone* geo_apsr12x1 = new G4Polycone("geo_apsr12x1", 0.0, 2.0 * M_PI, apsr12_N, &(apsr12_Z[0]), &(apsr12_r[0]),
-                                                      &(apsr12_R[0]));
-            G4Tubs* geo_apsr12xx1 = new G4Tubs("geo_apsr12xx1", 0, 41.0, 1000.0 / 2, 0, 2.0 * M_PI);
-            G4SubtractionSolid* geo_apsr12x2 = new G4SubtractionSolid("geo_apsr12x2", geo_apsr12x1, geo_apsr12xx1, Rotation1, G4ThreeVector(0,
-                                                                      0, 1049.99 + 283.50));
-            G4SubtractionSolid* geo_apsr12x3 = new G4SubtractionSolid("geo_apsr12x3", geo_apsr12x2, geo_apsr12xx1, Rotation2, G4ThreeVector(0,
-                                                                      0, 1049.99 + 283.50));
-            G4Box* geo_apsr12xx2 = new G4Box("geo_apsr12xx2", 41., (285.0 - 278.15), 283.50);
-            G4SubtractionSolid* geo_apsr12x4 = new G4SubtractionSolid("geo_apsr12x4", geo_apsr12x3, geo_apsr12xx2, Transform1);
-            G4SubtractionSolid* geo_apsr12x5 = new G4SubtractionSolid("geo_apsr12x5", geo_apsr12x4, geo_apsr12xx2, Transform2);
-            G4SubtractionSolid* geo_apsr12x6 = new G4SubtractionSolid("geo_apsr12x6", geo_apsr12x5, geo_apsr12xx2, Transform3);
-            G4VSolid* geo_apsr12 = new G4SubtractionSolid("geo_apsr12", geo_apsr12x6, geo_apsr12xx2, Transform4);
-      */
-      G4VSolid* geo_apsr12 = new G4Polycone("geo_apsr12", 0.0, 2.0 * M_PI, apsr12_N, &(apsr12_Z[0]), &(apsr12_r[0]),
-                                            &(apsr12_R[0]));
+
+      G4Polycone* geo_apsr12x1 = new G4Polycone("geo_apsr12x1", 0.0, 2.0 * M_PI, apsr12_N, &(apsr12_Z[0]), &(apsr12_r[0]),
+                                                &(apsr12_R[0]));
+      G4Tubs* geo_apsr12xx1 = new G4Tubs("geo_apsr12xx1", 0, 41.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr12x2 = new G4SubtractionSolid("geo_apsr12x2", geo_apsr12x1, geo_apsr12xx1, Rotation1, G4ThreeVector(0,
+                                                                0, 1049.99 + 283.50));
+      G4SubtractionSolid* geo_apsr12x3 = new G4SubtractionSolid("geo_apsr12x3", geo_apsr12x2, geo_apsr12xx1, Rotation2, G4ThreeVector(0,
+                                                                0, 1049.99 + 283.50));
+      G4Box* geo_apsr12xx2 = new G4Box("geo_apsr12xx2", 41., (285.0 - 278.15), 283.50);
+      G4SubtractionSolid* geo_apsr12x4 = new G4SubtractionSolid("geo_apsr12x4", geo_apsr12x3, geo_apsr12xx2, Transform1);
+      G4SubtractionSolid* geo_apsr12x5 = new G4SubtractionSolid("geo_apsr12x5", geo_apsr12x4, geo_apsr12xx2, Transform2);
+      G4SubtractionSolid* geo_apsr12x6 = new G4SubtractionSolid("geo_apsr12x6", geo_apsr12x5, geo_apsr12xx2, Transform3);
+      G4VSolid* geo_apsr12 = new G4SubtractionSolid("geo_apsr12", geo_apsr12x6, geo_apsr12xx2, Transform4);
+
+      // G4VSolid* geo_apsr12 = new G4Polycone("geo_apsr12", 0.0, 2.0 * M_PI, apsr12_N, &(apsr12_Z[0]), &(apsr12_r[0]),
+      //                                      &(apsr12_R[0]));
 
       APSR12.geo = geo_apsr12;
 
@@ -1669,22 +1669,22 @@ namespace Belle2 {
       G4Transform3D Transform8 = G4RotateZ3D((M_PI_2 * 3 + M_PI_4) / Unit::rad) * G4Translate3D(0, 250.0 + 3.2, -(628.01 + 100));
 
       APSL12.transform = G4Translate3D(0, 0, 0);
-      /*
-            G4Polycone* geo_apsl12x1 = new G4Polycone("geo_apsl12x1", 0.0, 2.0 * M_PI, apsl12_N, &(apsl12_Z[0]), &(apsl12_r[0]),
-                                                      &(apsl12_R[0]));
-            G4Tubs* geo_apsl12xx1 = new G4Tubs("geo_apsl12xx1", 0, 40.0, 1000.0 / 2, 0, 2.0 * M_PI);
-            G4SubtractionSolid* geo_apsl12x2 = new G4SubtractionSolid("geo_apsl12x2", geo_apsl12x1, geo_apsl12xx1, Rotation1, G4ThreeVector(0,
-                                                                      0, -(628.01 + 363.8) + 12.0 + 40.0));
-            G4SubtractionSolid* geo_apsl12x3 = new G4SubtractionSolid("geo_apsl12x3", geo_apsl12x2, geo_apsl12xx1, Rotation2, G4ThreeVector(0,
-                                                                      0, -(628.01 + 363.8) + 12.0 + 40.0));
-            G4Box* geo_apsl12xx2 = new G4Box("geo_apsl12xx2", 40.0, 10.0, 363.8 - 100.0 - 12.0 - 40.0);
-            G4SubtractionSolid* geo_apsl12x4 = new G4SubtractionSolid("geo_apsl12x4", geo_apsl12x3, geo_apsl12xx2, Transform5);
-            G4SubtractionSolid* geo_apsl12x5 = new G4SubtractionSolid("geo_apsl12x5", geo_apsl12x4, geo_apsl12xx2, Transform6);
-            G4SubtractionSolid* geo_apsl12x6 = new G4SubtractionSolid("geo_apsl12x6", geo_apsl12x5, geo_apsl12xx2, Transform7);
-            G4VSolid* geo_apsl12 = new G4SubtractionSolid("geo_apsl12", geo_apsl12x6, geo_apsl12xx2, Transform8);
-      */
-      G4VSolid* geo_apsl12 = new G4Polycone("geo_apsl12", 0.0, 2.0 * M_PI, apsl12_N, &(apsl12_Z[0]), &(apsl12_r[0]),
-                                            &(apsl12_R[0]));
+
+      G4Polycone* geo_apsl12x1 = new G4Polycone("geo_apsl12x1", 0.0, 2.0 * M_PI, apsl12_N, &(apsl12_Z[0]), &(apsl12_r[0]),
+                                                &(apsl12_R[0]));
+      G4Tubs* geo_apsl12xx1 = new G4Tubs("geo_apsl12xx1", 0, 40.0, 1000.0 / 2, 0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl12x2 = new G4SubtractionSolid("geo_apsl12x2", geo_apsl12x1, geo_apsl12xx1, Rotation1, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0));
+      G4SubtractionSolid* geo_apsl12x3 = new G4SubtractionSolid("geo_apsl12x3", geo_apsl12x2, geo_apsl12xx1, Rotation2, G4ThreeVector(0,
+                                                                0, -(628.01 + 363.8) + 12.0 + 40.0));
+      G4Box* geo_apsl12xx2 = new G4Box("geo_apsl12xx2", 40.0, 10.0, 363.8 - 100.0 - 12.0 - 40.0);
+      G4SubtractionSolid* geo_apsl12x4 = new G4SubtractionSolid("geo_apsl12x4", geo_apsl12x3, geo_apsl12xx2, Transform5);
+      G4SubtractionSolid* geo_apsl12x5 = new G4SubtractionSolid("geo_apsl12x5", geo_apsl12x4, geo_apsl12xx2, Transform6);
+      G4SubtractionSolid* geo_apsl12x6 = new G4SubtractionSolid("geo_apsl12x6", geo_apsl12x5, geo_apsl12xx2, Transform7);
+      G4VSolid* geo_apsl12 = new G4SubtractionSolid("geo_apsl12", geo_apsl12x6, geo_apsl12xx2, Transform8);
+
+      //G4VSolid* geo_apsl12 = new G4Polycone("geo_apsl12", 0.0, 2.0 * M_PI, apsl12_N, &(apsl12_Z[0]), &(apsl12_r[0]),
+      //                                      &(apsl12_R[0]));
 
       APSL12.geo = geo_apsl12;
 

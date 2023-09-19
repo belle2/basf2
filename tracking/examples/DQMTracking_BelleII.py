@@ -28,13 +28,12 @@ args = parser.parse_args()
 
 if args.ExperimentType not in [1, 2]:
     import sys
+    print("Parameter experiment-type must be either 1 (early phase 3) "
+          f"or 2 (nominal phase 3, default), but you set {args.ExperimentType}. Exiting.")
     sys.exit(1)
 
 # number of events to generate, can be overriden with -n
 num_events = 100
-
-# b2.set_log_level(b2.LogLevel.DEBUG)
-# b2.set_debug_level(20)
 
 # create path
 main = b2.create_path()
@@ -46,8 +45,8 @@ elif (args.ExperimentType == 2):
     # the experiment number for nominal phase3 MC has no need to set, it is default
     main.add_module("EventInfoSetter", evtNumList=num_events)
 
-# in case you need to fix seed of random numbers
-# set_random_seed('some_seed')
+# Set a random seed to ensure reproducibility
+b2.set_random_seed('some_seed')
 
 # generate BBbar events
 main.add_module('EvtGenInput')
@@ -72,14 +71,13 @@ trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # In case to see more details:
 # trackDQM.logging.log_level = LogLevel.DEBUG
 
-# Finally add output, if you need
 # output filename, can be overriden with -o
-# output_filename = ""
-# if (args.ExperimentType == 1):
-#     output_filename = "RootOutput_Phase3Early.root"
-# elif (args.ExperimentType == 2):
-#     output_filename = "RootOutput_Phase3.root"
-# main.add_module("RootOutput", outputFileName=output_filename)
+output_filename = ""
+if (args.ExperimentType == 1):
+    output_filename = "RootOutput_Phase3Early.root"
+elif (args.ExperimentType == 2):
+    output_filename = "RootOutput_Phase3.root"
+main.add_module("RootOutput", outputFileName=output_filename)
 
 main.add_module('Progress')
 

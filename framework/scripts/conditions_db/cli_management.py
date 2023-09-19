@@ -12,6 +12,7 @@ from collections import defaultdict
 from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface  # noqa
 from basf2.utils import pretty_print_table
 from terminal_utils import Pager
+from conditions_db import set_cdb_authentication_token
 from conditions_db.iov import IoVSet, IntervalOfValidity
 from conditions_db.runningupdate import RunningTagUpdater, RunningTagUpdaterError, RunningTagUpdateMode
 
@@ -147,6 +148,9 @@ def command_tag_merge(args, db=None):
                           "creating payloads into the output globaltag.")
         return
 
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+
     # prepare some colors for easy distinction of source tag
     support_color = LogPythonInterface.terminal_supports_colors()
     if support_color:
@@ -217,6 +221,7 @@ def command_tag_merge(args, db=None):
 
     # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
+
         B2INFO(f'Now copying the {len(final)} payloads into {args.output} to create {len(table)-1} iovs ...')
         create_iov = functools.partial(create_iov_wrapper, db, output_id)
         try:
@@ -367,6 +372,9 @@ def command_tag_runningupdate(args, db=None):
         args.add_argument("--dry-run", default=False, action="store_true",
                           help="Only show the changes, don't try to apply them")
         return
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
 
     try:
         updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode, args.dry_run)

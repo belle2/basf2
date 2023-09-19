@@ -329,6 +329,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     codes in the event, for example ::
 
         [INFO] Content of MCParticle list
+        ├── e- (11)
+        ├── e+ (-11)
         ╰── Upsilon(4S) (300553)
             ├── B+ (521)
             │   ├── anti-D_0*0 (-10421)
@@ -408,6 +410,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     the pion don't have additional daughters. ::
 
         [INFO] Content of MCParticle list
+        ├── e- (11)
+        ├── e+ (-11)
         ╰── Upsilon(4S) (300553)
             ├── B+ (521)
             │   ├── anti-D*0 (-423) → …

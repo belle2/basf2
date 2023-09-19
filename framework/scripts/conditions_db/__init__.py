@@ -57,10 +57,10 @@ def chunks(container, chunk_size):
 
 def get_cdb_authentication_token(path=None):
     """
-    Helper function for correctly retrieving the CDB authentication token (either via file either via issuing server).
+    Helper function for correctly retrieving the CDB authentication token (either via file or via issuing server).
 
     :param path: Path to a file containing a CDB authentication token; if None, the function will use
-           a default path (``tmp/b2cdb_${BELLE2_USER}.token``) to look for a token.
+           a default path (``${HOME}/b2cdb_${BELLE2_USER}.token`` or ``/tmp/b2cdb_${BELLE2_USER}.token``) to look for a token.
     """
     # if we pass a path, let's use it for getting the token, otherwise use the default one
     if path:
@@ -75,6 +75,8 @@ def get_cdb_authentication_token(path=None):
             if response.status_code == 400:
                 B2INFO(f'The file {path_to_token} contains an invalid token, getting a new token...')
                 os.unlink(path_to_token)
+            elif response.status_code > 400:
+                B2WARNING("The validity of the existing token could not be checked. Trying to connect to CDB anyway.")
 
     # request a token if there is none
     if not os.path.isfile(path_to_token):

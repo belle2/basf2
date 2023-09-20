@@ -92,7 +92,7 @@ void DqmMasterCallback::start(int expno, int runno)
 
   m_sock_hlt->send(msg);
   m_sock_reco->send(msg);
-  delete(msg);
+  delete (msg);
 
   printf("expno = %d, runno = %d\n", m_expno, m_runno);
   m_running = 1;
@@ -127,6 +127,7 @@ void DqmMasterCallback::stop()
     while ((key = (TKey*)next())) {
       TH1* hist = (TH1*)key->ReadObj();
       printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
+      TH1* cpyhst = (TH1*)hist->Clone();
     }
 
     // Close TFile
@@ -154,6 +155,7 @@ void DqmMasterCallback::stop()
     while ((erkey = (TKey*)ernext())) {
       TH1* hist = (TH1*)erkey->ReadObj();
       printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
+      TH1* cpyhst = (TH1*)hist->Clone();
     }
 
     // Close TFile

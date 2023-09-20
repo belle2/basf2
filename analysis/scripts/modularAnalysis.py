@@ -1200,7 +1200,8 @@ def fillParticleListFromMC(decayString,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
                            path=None,
-                           skipNonPrimary=False):
+                           skipNonPrimary=False,
+                           skipInitial=True):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1215,6 +1216,7 @@ def fillParticleListFromMC(decayString,
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     @param skipNonPrimary          if true, skip non primary particle
+    @param skipInitial             if true, skip initial particles
     """
 
     pload = register_module('ParticleLoader')
@@ -1225,6 +1227,7 @@ def fillParticleListFromMC(decayString,
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     pload.param('skipNonPrimary', skipNonPrimary)
+    pload.param('skipInitial', skipInitial)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1242,7 +1245,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
                             path=None,
-                            skipNonPrimary=False):
+                            skipNonPrimary=False,
+                            skipInitial=True):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1271,6 +1275,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     @param skipNonPrimary          if true, skip non primary particle
+    @param skipInitial             if true, skip initial particles
     """
 
     pload = register_module('ParticleLoader')
@@ -1281,6 +1286,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     pload.param('skipNonPrimary', skipNonPrimary)
+    pload.param('skipInitial', skipInitial)
     path.add_module(pload)
 
     from ROOT import Belle2

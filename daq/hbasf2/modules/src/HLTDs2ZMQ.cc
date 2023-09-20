@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(HLTDs2ZMQ)
+REG_MODULE(HLTDs2ZMQ);
 
 HLTDs2ZMQModule::HLTDs2ZMQModule() : Module()
 {

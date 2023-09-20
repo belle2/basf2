@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DeSerializerPrePC)
+REG_MODULE(DeSerializerPrePC);
 
 //-----------------------------------------------------------------
 //                 Implementation

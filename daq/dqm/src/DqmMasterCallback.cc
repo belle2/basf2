@@ -127,7 +127,7 @@ void DqmMasterCallback::stop()
     while ((key = (TKey*)next())) {
       TH1* hist = (TH1*)key->ReadObj();
       printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-      TH1* cpyhst = (TH1*)hist->Clone();
+      hist->Write();
     }
 
     // Close TFile
@@ -155,7 +155,7 @@ void DqmMasterCallback::stop()
     while ((erkey = (TKey*)ernext())) {
       TH1* hist = (TH1*)erkey->ReadObj();
       printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-      TH1* cpyhst = (TH1*)hist->Clone();
+      hist->Write();
     }
 
     // Close TFile

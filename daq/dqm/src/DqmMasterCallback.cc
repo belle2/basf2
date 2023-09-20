@@ -76,6 +76,7 @@ void DqmMasterCallback::filedump(TMemFile* memfile, const char* outfile)
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
+  printf("LOAD: runtype %s\n", m_runtype.c_str());
 }
 
 void DqmMasterCallback::start(int expno, int runno)
@@ -116,12 +117,13 @@ void DqmMasterCallback::start(int expno, int runno)
   m_sock_reco->send(msg);
   delete (msg);
 
-  printf("expno = %d, runno = %d\n", m_expno, m_runno);
+  printf("START: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
   m_running = 1;
 }
 
-void DqmMasterCallback::stop()
+void DqmMasterCallback::stop(void)
 {
+  printf("STOP: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
 
   if (m_running == 0) return;
 
@@ -163,7 +165,7 @@ void DqmMasterCallback::stop()
   waitpid(proc2, &status2, 0);
 }
 
-void DqmMasterCallback::abort()
+void DqmMasterCallback::abort(void)
 {
   stop();
 }

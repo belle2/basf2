@@ -51,6 +51,28 @@ DqmMasterCallback::~DqmMasterCallback()
 
 }
 
+void DqmMasterCallback::filedump(TMemFile* memfile, const char* outfile)
+{
+  printf("dump to dqm file = %s\n", outfile);
+
+  TFile* dqmtfile = new TFile(outfile, "RECREATE");
+
+  // Copy all histograms in TFile
+  TIter next(memfile->GetListOfKeys());
+  TKey* key = NULL;
+  while ((key = (TKey*)next())) {
+    TH1* hist = (TH1*)key->ReadObj();
+    printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
+    hist->Write();
+  }
+
+  // Close TFile
+  dqmtfile->Write();
+  dqmtfile->Close();
+
+  delete dqmtfile;
+}
+
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
@@ -114,24 +136,9 @@ void DqmMasterCallback::stop()
   if (proc1 == 0) {
     // Copy ShM and create TMemFile
     TMemFile* hlttmem = m_hltdqm->LoadMemFile();
-    sprintf(outfile, "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
-    TFile* dqmtfile = new TFile(outfile, "RECREATE");
-    printf("HLT dqm file = %s\n", outfile);
-
-    // Copy all histograms in TFile
-    TIter next(hlttmem->GetListOfKeys());
-    TKey* key = NULL;
-    while ((key = (TKey*)next())) {
-      TH1* hist = (TH1*)key->ReadObj();
-      printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-      hist->Write();
-    }
-
-    // Close TFile
-    dqmtfile->Write();
-    dqmtfile->Close();
-    delete dqmtfile;
-    //    delete hlttmem;
+    snprintf(outfile, sizeof(outfile), "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
+    dump(hlttmem, outfile);
+    //    delete hlttmem; // we die anyway
     exit(0);
   } else if (proc1 < 0) {
     perror("DQMMASTER : fork HLTDQM writing");
@@ -142,24 +149,9 @@ void DqmMasterCallback::stop()
   if (proc2 == 0) {
     // Copy ShM and create TMemFile
     TMemFile* erecotmem = m_erecodqm->LoadMemFile();
-    sprintf(outfile, "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-    TFile* erdqmtfile = new TFile(outfile, "RECREATE");
-    printf("ERECO dqm file = %s\n", outfile);
-
-    // Copy all histograms in TFile
-    TIter ernext(erecotmem->GetListOfKeys());
-    TKey* erkey = NULL;
-    while ((erkey = (TKey*)ernext())) {
-      TH1* hist = (TH1*)erkey->ReadObj();
-      printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-      hist->Write();
-    }
-
-    // Close TFile
-    erdqmtfile->Write();
-    erdqmtfile->Close();
-    delete erdqmtfile;
-    //    delete erecotmem;
+    snprintf(outfile, sizeof(outfile), "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
+    dump(erecotmem, outfile);
+    //    delete erecotmem; // we die anyway
     exit(0);
   } else if (proc2 < 0) {
     perror("DQMMASTER : fork ERECODQM writing");

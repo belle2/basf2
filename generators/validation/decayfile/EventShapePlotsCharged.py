@@ -113,8 +113,6 @@ if __name__ == '__main__':
 
     outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
-    ROOT.gROOT.SetStyle("BELLE2")
-    ROOT.gROOT.ForceStyle()
 
     # plot the histograms
     for var in all_list:

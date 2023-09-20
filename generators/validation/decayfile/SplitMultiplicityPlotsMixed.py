@@ -79,8 +79,6 @@ if __name__ == '__main__':
 
     outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
-    ROOT.gROOT.SetStyle("BELLE2")
-    ROOT.gROOT.ForceStyle()
 
     PlottingHistos("Kpm", "gen_Kp", "gen_Kn")
     PlottingHistos("K0", "gen_K0", "gen_K0bar")

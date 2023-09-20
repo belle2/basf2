@@ -33,7 +33,7 @@ def get_argument_parser():
         # usage="%(prog)s [optional arguments] [--] program [program arguments]"
     )
 
-    parser.add_argument('--input', type=str, default='MCvalidatioMixed.root', help='The name of the input root file')
+    parser.add_argument('--input', type=str, default='MCvalidationMixed.root', help='The name of the input root file')
     parser.add_argument('--output', type=str, default='SplitMultiplicityPlotsMixed.root', help='The name of the output root file')
 
     return parser

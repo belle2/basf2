@@ -7,16 +7,20 @@
     <link rel="stylesheet" href="css/main.css">
   </head>
   <body>
-    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td width="36%" align="left"><img id="menu_main_logo" src="images/belle2-logo.png"></td>
-      </tr>
-    </table>
     <form method="get" action="../create_issue">
-      <legend id="menu_main_text">Validation Plot Issue</legend>
-      <input type="text" name="title" placeholder="Issue title"/><br>
-      <textarea name="description" placeholder="Issue description"></textarea><br>
-      <button type="submit">Create</button>
+      <div class = 'form-header-row'>
+        <div class = 'form-header'>
+          <img id="belle2_logo" src="images/belle2-logo.png" alt="Belle II" style="width:45%">
+        </div>
+        <div class = 'form-header'>
+          <img id="gitlab_logo" src="images/gitlab-logo-100.png" alt="GitLab" style="width:75%;margin: 10%;">
+        </div>
+      </div>
+      <br>
+      <legend id="menu_main_text"><h2>Validation Plot Issue</h2></legend>
+      <input class="issue_input" type="text" name="title" placeholder="Issue title"/><br>
+      <textarea class="issue_input" name="description" placeholder="Issue description"></textarea><br>
+      <button type="submit" class="btn btn-primary btn-block btn-large">Create</button>
     </form>
   </body>
 </html>

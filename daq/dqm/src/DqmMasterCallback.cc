@@ -139,7 +139,7 @@ void DqmMasterCallback::stop(void)
     // Copy ShM and create TMemFile
     TMemFile* hlttmem = m_hltdqm->LoadMemFile();
     snprintf(outfile, sizeof(outfile), "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
-    dump(hlttmem, outfile);
+    filedump(hlttmem, outfile);
     //    delete hlttmem; // we die anyway
     exit(0);
   } else if (proc1 < 0) {
@@ -152,7 +152,7 @@ void DqmMasterCallback::stop(void)
     // Copy ShM and create TMemFile
     TMemFile* erecotmem = m_erecodqm->LoadMemFile();
     snprintf(outfile, sizeof(outfile), "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-    dump(erecotmem, outfile);
+    filedump(erecotmem, outfile);
     //    delete erecotmem; // we die anyway
     exit(0);
   } else if (proc2 < 0) {

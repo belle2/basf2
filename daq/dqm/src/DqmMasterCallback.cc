@@ -109,14 +109,11 @@ void DqmMasterCallback::stop()
   //  m_expno = getExpNumber();
   //  m_runno = getRunNumber();
 
-  // Connect TMemFile
-  TMemFile* hlttmem = m_hltdqm->LoadMemFile();
-  TMemFile* erecotmem = m_erecodqm->LoadMemFile();
-
   // Dump HLT DQM
   int proc1 = fork();
   if (proc1 == 0) {
-    //  TMemFile* tmem = m_hltdqm->LoadMemFile();
+    // Copy ShM and create TMemFile
+    TMemFile* hlttmem = m_hltdqm->LoadMemFile();
     sprintf(outfile, "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
     TFile* dqmtfile = new TFile(outfile, "RECREATE");
     printf("HLT dqm file = %s\n", outfile);
@@ -143,9 +140,9 @@ void DqmMasterCallback::stop()
   // Dump ERECO DQM
   int proc2 = fork();
   if (proc2 == 0) {
-    //    TMemFile* tmem = m_erecodqm->LoadMemFile();
+    // Copy ShM and create TMemFile
+    TMemFile* erecotmem = m_erecodqm->LoadMemFile();
     sprintf(outfile, "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-    //  sprintf(outfile, "hltdqm_e%4.4dr%6.6d.root", m_expno, m_runno);
     TFile* erdqmtfile = new TFile(outfile, "RECREATE");
     printf("ERECO dqm file = %s\n", outfile);
 
@@ -172,9 +169,6 @@ void DqmMasterCallback::stop()
   int status1, status2;
   waitpid(proc1, &status1, 0);
   waitpid(proc2, &status2, 0);
-
-  //  delete hlttmem;
-  //  delete erecotmem;
 }
 
 void DqmMasterCallback::abort()

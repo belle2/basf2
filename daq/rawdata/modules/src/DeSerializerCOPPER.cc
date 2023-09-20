@@ -372,7 +372,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
         string err_str;
         try {
           callCheckRunPause(err_str);
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           if (delete_flag) {
             // Delete allocated buffer
             B2WARNING("Delete buffer before going to Run-pause state");
@@ -510,7 +510,7 @@ void DeSerializerCOPPERModule::event()
     try {
       temp_buf = readOneEventFromCOPPERFIFO(j, &delete_flag, &m_size_word);
       g_status.copyEventHeader(temp_buf);
-    } catch (string err_str) {
+    } catch (const string& err_str) {
 
 #ifdef NONSTOP
       if (err_str == "RUN_PAUSE" || err_str == "RUN_ERROR") {
@@ -542,7 +542,7 @@ void DeSerializerCOPPERModule::event()
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_prev_ftsweve32, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
       m_prev_exprunsubrun_no = m_exprunsubrun_no;
       //    fillNewRawCOPPERHeader( &temp_rawcopper );
-    } catch (string err_str) {
+    } catch (const string& err_str) {
       print_err.PrintError(m_shmflag, &g_status, err_str);
       exit(1);
     }

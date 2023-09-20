@@ -300,13 +300,16 @@ void DeSerializerModule::RateMonitor(unsigned int nevt, int subrun, int run)
   struct tm* t_st;
   time(&timer);
   t_st = localtime(&timer);
+  char timeStr[100];
+  std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
+
   printf("[INFO] run %d sub %d Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
          run, subrun,
          nevt, (nevt  - m_prev_nevt) / interval / 1.e3,
          (m_totbytes - m_prev_totbytes) / interval / 1.e6,
          total_time,
          interval,
-         asctime(t_st));
+         timeStr);
 
   fflush(stdout);
   m_prev_time = current_time;

@@ -294,7 +294,7 @@ void DeSerializerFILEModule::event()
                                    m_dummy_evenum - 2, &temp_cur_copper_ctr,
                                    m_prev_exprunsubrun_no, &m_exprunsubrun_no);
 
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -384,7 +384,7 @@ void DeSerializerFILEModule::event()
   }
 
   if (n_basf2evt % 100 == 0) {
-    printf("[DEBUG] Processing Evt # %d...\n", prev_eve_num);
+    printf("[DEBUG] Processing Evt # %u...\n", prev_eve_num);
   }
 
   n_basf2evt++;

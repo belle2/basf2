@@ -640,7 +640,7 @@ void SerializerModule::event()
     try {
       m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
       //    } catch (string err_str) {
-    } catch (string err_str) {
+    } catch (const string& err_str) {
 
 #ifdef NONSTOP
       if (err_str == "RUN_PAUSE" || err_str == "RUN_ERROR") {

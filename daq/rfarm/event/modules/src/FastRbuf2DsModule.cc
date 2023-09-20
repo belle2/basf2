@@ -128,7 +128,7 @@ void FastRbuf2DsModule::ReadRbufInThread()
     char* evtbuf = new char[EvtMessage::c_MaxEventSize];
     int size;
     while ((size = m_rbuf->remq((int*)evtbuf)) == 0) usleep(20);
-    if (size == 0) {
+    if (size == 0) { // TODO this condition is always false
       printf("ReadRbufInThread : ERROR! record with size=0 detected!!!!!\n");
       m_streamer->queueEvtMessage(NULL);
       delete[] evtbuf;

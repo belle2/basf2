@@ -359,7 +359,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
     try {
       total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
                                  each_buf_nwords[ i ] * sizeof(int), flag);
-    } catch (string err_str) {
+    } catch (const string& err_str) {
       if (*delete_flag) {
         B2WARNING("Delete buffer before going to Run-pause state");
         delete temp_buf;
@@ -404,7 +404,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
   for (int i = 0; i < (int)(m_socket.size()); i++) {
     try {
       recvFD(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
-    } catch (string err_str) {
+    } catch (const string& err_str) {
       if (*delete_flag) {
         B2WARNING("Delete buffer before going to Run-pause state");
         delete temp_buf;
@@ -515,7 +515,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         try {
           temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -542,7 +542,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         try {
           temp_rawtlu->CheckData(0, m_prev_evenum, &cur_evenum);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -573,7 +573,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
                                     m_prev_copper_ctr, &cur_copper_ctr,
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           temp_rawcopper->PrintData(temp_rawcopper->GetWholeBuffer(), temp_rawcopper->TotalBufNwords());
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
@@ -611,7 +611,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 //           ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
         char err_buf[500];
         for (int m = 0; m < num_nodes_in_sendblock; m++) {
-          printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
+          printf("[DEBUG] node %d eve # %u utime %x ctime %x\n",
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
         sprintf(err_buf, "[FATAL] CORRUPTED DATA: Event or Time record mismatch. Exiting...");
@@ -742,7 +742,7 @@ void DeSerializerPCModule::event()
     try {
       setRecvdBuffer(&temp_rawdatablk, &delete_flag);
       checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
-    } catch (string err_str) {
+    } catch (const string& err_str) {
 #ifdef NONSTOP
       // Update EventMetaData otherwise basf2 stops.
       if (err_str == "RUN_PAUSE" || err_str == "RUN_ERROR") {
@@ -775,7 +775,7 @@ void DeSerializerPCModule::event()
   setErrorFlag(error_bit_flag, m_eventMetaDataPtr);
   if (error_bit_flag != 0) {
     m_eventMetaDataPtr->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
-    printf("[ERROR] error bit was detected. exp %d run %d eve %d count = %d\n",
+    printf("[ERROR] error bit was detected. exp %u run %u eve %u count = %u\n",
            exp_copper_0, run_copper_0, eve_copper_0, error_bit_flag);
   }
 

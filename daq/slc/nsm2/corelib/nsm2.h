@@ -11,9 +11,6 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
-}
-#endif
 
 /* -- version info */
 
@@ -234,9 +231,6 @@ typedef struct {
 typedef void (*NSMcallback_t)(NSMmsg* msg, NSMcontext* nsmc);
 typedef void (*NSMfunc_t)(NSMmsg* msg, NSMcontext* nsmc);
 
-#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
-__dummy_open_bracket_to_cheat_emacs_auto_indent {
-#endif
 #if defined(__cplusplus)
 }
 #endif

@@ -132,7 +132,7 @@ path.add_module(SplitMultiplicities(-311))  # anti_K0
 pions = ("pi+:MC", '')
 kaons = ("K+:MC", '')
 muons = ("mu+:MC", '')
-electrons = ("e+:MC", 'mcInitial != 1')
+electrons = ("e+:MC", '')
 protons = ("p+:MC", '')
 photons = ("gamma:MC", '')
 klongs = ("K_L0:MC", '')

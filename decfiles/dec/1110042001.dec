@@ -1,23 +1,18 @@
 # EventType: 1110042001
 # Descriptor: [B0 -> [eta -> pi+ pi- pi0] [eta -> pi+ pi- pi0]]
 ##
-Alias eta0sig eta
-Alias eta1sig eta
+Alias etasig eta
 ##
 Decay Upsilon(4S)
 1.0	B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
 Enddecay
 ##
 Decay B0sig
-1.0	eta0sig eta1sig	PHSP;
+1.0	etasig etasig	PHSP;
 Enddecay
 CDecay anti-B0sig
 ##====
-Decay eta0sig
-1.0	pi+ pi-	pi0	ETA_FULLDALITZ -1.128 0.153 0.0 0.085 0.0 0.173; # New decay model
-Enddecay
-##
-Decay eta1sig
+Decay etasig
 1.0	pi+ pi-	pi0	ETA_FULLDALITZ -1.128 0.153 0.0 0.085 0.0 0.173; # New decay model
 Enddecay
 ##===

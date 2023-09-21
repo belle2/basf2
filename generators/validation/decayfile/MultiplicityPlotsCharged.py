@@ -18,6 +18,25 @@
 """
 
 import ROOT
+import argparse
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        # epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        # usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('--input', type=str, default='MCvalidationCharged.root', help='The name of the input root file')
+    parser.add_argument('--output', type=str, default='MultiplicityPlotsCharged.root', help='The name of the output root file')
+
+    return parser
 
 
 def PlottingHistos(particle):
@@ -36,8 +55,11 @@ def PlottingHistos(particle):
 
 if __name__ == '__main__':
 
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
     # load the root file into RDataFrame
-    rdf = ROOT.RDataFrame("Multiplicities", "MCvalidationCharged.root")
+    rdf = ROOT.RDataFrame("Multiplicities", args.input)
 
     # define the variables to plot
     colnames = rdf.GetColumnNames()
@@ -93,7 +115,7 @@ if __name__ == '__main__':
                 'nTNEUTRINO': '#nu_{#tau}^{#minus}',
                 'nPHOTON': '#gamma'}
 
-    outputFile = ROOT.TFile("MultiplicityPlotsCharged.root", "RECREATE")
+    outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.SetStyle("BELLE2")
     ROOT.gROOT.ForceStyle()

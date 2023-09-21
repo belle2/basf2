@@ -56,8 +56,8 @@ namespace Belle2 {
      * @param maxMass maximum mass for the beam particle to be accepted
      * @return lorentzvector of the compound beam particle
      */
-    ROOT::Math::PxPyPzEVector createBeamParticle(double minMass = 0.0,
-                                                 double maxMass = std::numeric_limits<double>::infinity());
+    MCInitialParticles  createBeamParticle(double minMass = 0.0,
+                                           double maxMass = std::numeric_limits<double>::infinity());
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */
@@ -69,7 +69,6 @@ namespace Belle2 {
     std::string m_inclusiveParticle; /**< inclusive Particle */
     int m_maxTries; /**< Maximum number of tries for generating the parent particle */
     EvtId m_parentId; /**< EvtGen Id of the parent particle we want to generate */
-    ROOT::Math::XYZVector m_PrimaryVertex; /**< primary vertex incl. spread */
 
   private:
 

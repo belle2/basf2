@@ -403,7 +403,7 @@ def create_gitlab_issue(
 
     issue = project.issues.create({"title": title,
                                    "description": description,
-                                   "labels": [package, 'validation']})
+                                   "labels": [package, 'validation_issue']})
 
     issue.notes.create(
         {"body": "View the [error plot/log file]({}).".format(

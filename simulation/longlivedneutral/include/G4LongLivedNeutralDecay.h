@@ -65,9 +65,11 @@ namespace Belle2 {
     ) override;
 
     /**
-     * G4VProess::AtRestDoIt() implemention for decay at rest
-     * @param aTrack
-     * @param aStep
+     * G4VProcess::AtRestDoIt() implementation for decay at rest.
+     * Proposes particle change by DecayIt method at rest
+     *
+     * @param aTrack Propagating particle track reference
+     * @param aStep Current step reference
      */
     virtual G4VParticleChange* AtRestDoIt(
       const G4Track& aTrack,
@@ -175,13 +177,6 @@ namespace Belle2 {
 
   };
 
-  /**
-   * G4VProcess::AtRestDoIt() implementation,
-   * Proposes particle change by DecayIt method at rest
-   *
-   * @param aTrack Propagating particle track reference
-   * @param aStep Current step reference
-   */
   inline
   G4VParticleChange* G4LongLivedNeutralDecay::AtRestDoIt(
     const G4Track& aTrack,

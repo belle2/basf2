@@ -16,6 +16,7 @@
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLLeakagePosition.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -53,6 +54,7 @@ void ECLShowerCorrectorModule::initialize()
 
   //..Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eventLevelClusteringInfo.registerInDataStore();
 
   //..Class to find cellID and position within crystal from theta and phi
   m_leakagePosition = new ECLLeakagePosition();
@@ -89,6 +91,30 @@ void ECLShowerCorrectorModule::beginRun()
     //..Relevant parameters
     nPositionBins = thetaCorrection.GetNbinsY();
     nXBins = nThetaID * nEnergies;
+  } else if (!m_eclLeakageCorrections.isValid()) {
+    B2FATAL("ECLShowerCorrectorModule: missing eclLeakageCorrections payload");
+  }
+
+  //-----------------------------------------------------------------
+  //..Get correction histograms related to the nOptimal number of crystals.
+  //  All three have energy bin as y, crystals group number as x.
+  //  Energy bin and group number for the shower are found in
+  //  eclSplitterN1 and are stored in the ECLShower dataobject.
+
+  if (m_eclNOptimal.hasChanged()) {
+
+    //..Bias is the difference between the peak energy in nOptimal crystals
+    //  before bias correction and the mc true deposited energy.
+    m_bias = m_eclNOptimal->getBias();
+
+    //..Log of the peak energy contained in nOptimal crystals after bias correction
+    m_logPeakEnergy = m_eclNOptimal->getLogPeakEnergy();
+
+    //..peakFracEnergy is the peak energy after subtracting the beam bias
+    //  divided by the generated photon energy.
+    m_peakFracEnergy = m_eclNOptimal->getPeakFracEnergy();
+  } else if (!m_eclNOptimal.isValid()) {
+    B2FATAL("ECLShowerCorrectorModule: missing eclNOptimal payload");
   }
 
   //-----------------------------------------------------------------
@@ -120,7 +146,7 @@ void ECLShowerCorrectorModule::event()
   for (auto& eclShower : m_eclShowers) {
 
     //..Only want to correct EM showers
-    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {break;}
+    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {continue;}
 
     //..Will correct both raw cluster energy and energy of the center crystal
     const double energyRaw = eclShower.getEnergy();
@@ -243,6 +269,22 @@ void ECLShowerCorrectorModule::event()
             overallCorrection);
 
   } // end loop over showers
+
+  //-----------------------------------------------------------------
+  //..Count number of showers in each region for EventLevelClusteringInfo
+  uint16_t nShowersPerRegion[nLeakReg] = {};
+  for (auto& eclShower : m_eclShowers) {
+    if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) {continue;}
+    const int iCellId = eclShower.getCentralCellId();
+    if (ECLElementNumbers::isForward(iCellId)) {nShowersPerRegion[0]++;}
+    if (ECLElementNumbers::isBarrel(iCellId)) {nShowersPerRegion[1]++;}
+    if (ECLElementNumbers::isBackward(iCellId)) {nShowersPerRegion[2]++;}
+  }
+
+  //..Store
+  m_eventLevelClusteringInfo->setNECLShowersFWD(nShowersPerRegion[0]);
+  m_eventLevelClusteringInfo->setNECLShowersBarrel(nShowersPerRegion[1]);
+  m_eventLevelClusteringInfo->setNECLShowersBWD(nShowersPerRegion[2]);
 
 }
 

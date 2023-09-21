@@ -126,5 +126,5 @@ running check_25_legacy_ip_only: Check that we can merge if the Legacy_IP_Inform
 check_25_legacy_ip_only passed
 running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
-    affect merge_basf2_files and adapt the correct version number here.
+    affect b2file-merge and adapt the correct version number here.
 check_XX_filemetaversion passed

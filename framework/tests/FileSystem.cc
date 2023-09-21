@@ -7,17 +7,17 @@
  **************************************************************************/
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/ScopeGuard.h>
-#include <boost/filesystem.hpp>
 
 #include <gtest/gtest.h>
 
 #include <sys/wait.h>
 
 #include <unistd.h>
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace {
   TEST(Utilities, TemporaryFile)

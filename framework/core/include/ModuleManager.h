@@ -15,12 +15,7 @@
 #include <string>
 #include <map>
 #include <list>
-
-namespace boost {
-  namespace filesystem {
-    class directory_entry;
-  }
-}
+#include <filesystem>
 
 namespace Belle2 {
 
@@ -168,7 +163,7 @@ namespace Belle2 {
      * @param mapPath The filename (path+name) of the map file which should be parsed for module names.
      */
     static void fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap,
-                                     const boost::filesystem::directory_entry& mapPath);
+                                     const std::filesystem::directory_entry& mapPath);
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

@@ -18,6 +18,25 @@
 """
 
 import ROOT
+import argparse
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        # epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        # usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('--input', type=str, default='MCvalidationMixed.root', help='The name of the input root file')
+    parser.add_argument('--output', type=str, default='EventShapePlotsMixed.root', help='The name of the output root file')
+
+    return parser
 
 
 def PlottingHistos(var):
@@ -34,8 +53,10 @@ def PlottingHistos(var):
 
 if __name__ == '__main__':
 
+    parser = get_argument_parser()
+    args = parser.parse_args()
     # load the root file into RDataFrame
-    rdf = ROOT.RDataFrame("EventShape", "MCvalidationMixed.root")
+    rdf = ROOT.RDataFrame("EventShape", args.input)
 
     # define the variables to plot
     colnames = rdf.GetColumnNames()
@@ -90,7 +111,7 @@ if __name__ == '__main__':
                 'harmonicMomentThrust4': "harmonicMomentThrust4"
                 }
 
-    outputFile = ROOT.TFile("EventShapePlotsMixed.root", "RECREATE")
+    outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.SetStyle("BELLE2")
     ROOT.gROOT.ForceStyle()

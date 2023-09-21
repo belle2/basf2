@@ -248,6 +248,9 @@ namespace Belle2 {
     /** Return cluster id */
     int getClusterId() const {return m_clusterId;}
 
+    /** Return unique cluster id = 1000 * regionId + clusterId */
+    int getUniqueClusterId() const {return 1000 * m_connectedRegionId + m_clusterId;}
+
     /** Get distance between cluster COG and track extrapolation to ECL. */
     double getMinTrkDistance() const { return m_minTrkDistance; }
 

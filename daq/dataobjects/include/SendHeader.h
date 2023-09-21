@@ -64,8 +64,6 @@ namespace Belle2 {
       SENDHDR_NWORDS = 6
     };
 
-  private:
-
     /* Data Format : Fixed length part*/
     enum {
       POS_NWORDS = 0,
@@ -85,6 +83,7 @@ namespace Belle2 {
       SUBRUNNO_MASK = 0x000000FF
     };
 
+  private:
     int m_buffer[ SENDHDR_NWORDS ];
 
     //    ClassDef(SendHeader, 1);

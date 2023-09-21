@@ -208,8 +208,8 @@ void PXDDQMEfficiencySelftrackModule::event()
           double v_clus = m_pxdclusters[bestcluster]->getV();
 
           //is the closest cluster close enough to the track to count as measured?
-          TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
-          if (dist_clus.Mag() <= m_distcut)  {
+          ROOT::Math::XYZVector dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
+          if (dist_clus.R() <= m_distcut)  {
             m_h_matched_cluster[aVxdID]->Fill(ucell_fit, vcell_fit);
             if (m_verboseHistos) {
               if (m_h_p2[aVxdID]) m_h_p2[aVxdID]->Fill(trackstate.getMom().Mag());

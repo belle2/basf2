@@ -147,11 +147,11 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = eclMapping->getTCPosition(tc);
+    ROOT::Math::XYZVector CellPosition = eclMapping->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
-    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
-    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
+    CellLab.SetPx(CellPosition.X() / CellPosition.R());
+    CellLab.SetPy(CellPosition.Y() / CellPosition.R());
+    CellLab.SetPz(CellPosition.Z() / CellPosition.R());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -743,6 +743,8 @@ void TRGGRLProjectsModule::event()
   int n_secl = trgInfo->getNsecl();
   int n_iecl = trgInfo->getNiecl();
 
+  bool ecltaunn = trgInfo->getTauNN();
+
   //std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
   //std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;
   //std::cout << "2dklm  " << nTrk2D << " " << cdcklm_0 << " " << cdcklm_1 << std::endl;
@@ -969,6 +971,9 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "inp157") {bit = false;}
     else if (bitname == "inp158") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
+
+    //new tau bit
+    else if (bitname == "ecl_taunn") {bit = ecltaunn;}
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.

@@ -56,7 +56,7 @@ eclLeakageCollectorModule::eclLeakageCollectorModule() : CalibrationCollectorMod
   addParam("energies_forward", m_energies_forward, "generated photon energies, forward", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.483, 1.166, 2.816, 6.800});
   addParam("energies_barrel", m_energies_barrel, "generated photon energies, barrel", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500});
   addParam("energies_backward", m_energies_backward, "generated photon energies, backward", std::vector<double> {0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200});
-  addParam("showerArrayName", m_showerArrayName, "name of ECLShower data object", std::string("ECLShowers"));
+  addParam("showerArrayName", m_showerArrayName, "name of ECLShower data object", std::string("ECLTrimmedShowers"));
 }
 
 

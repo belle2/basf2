@@ -31,7 +31,6 @@ namespace Belle2 {
        * Constructor.
        * @param mcCollectionName The name of the MCParticle collection.
        * @param mcParticleGraph Reference to the MCParticle graph.
-       * @param createRelation If set to true the relation collection Hit -> MCParticle is created.
        */
       EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
 

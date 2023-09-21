@@ -355,9 +355,7 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
   if (m_particleSource == c_ECLCluster) {
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
-      const int crid     = cluster->getConnectedRegionId();
-      const int clusterid = cluster->getClusterId();
-      m_identifier = 1000 * crid + clusterid;
+      m_identifier = cluster->getUniqueClusterId();
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -379,9 +377,7 @@ int Particle::getMdstSource() const
   if (m_particleSource == c_ECLCluster) {
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
-      const int crid     = cluster->getConnectedRegionId();
-      const int clusterid = cluster->getClusterId();
-      identifier = 1000 * crid + clusterid;
+      identifier = cluster->getUniqueClusterId();
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");

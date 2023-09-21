@@ -89,16 +89,18 @@ def group_files_by_iov(files_to_iov):
     return iov_to_files
 
 
-def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select=False):
+def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select=False, max_events_per_file=0):
     """
     This function creates a new files_to_iov dictionary by appending files
     in order until the maximum number of events are reached per run.
+    Each file contributes a maximum of events specified by "max_events_per_file".
 
     Parameters:
         files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
             for lookup values.
         max_events_per_run (int): The threshold we want to reach but stop adding files if we reach it.
         random_select (bool): true will select random nfile and false will take first nfile.
+        max_events_per_file (int): true will limit the contribution from each file to max events specified.
 
     Returns:
         dict: The same style of dict as the input files_to_iov, but filtered down.
@@ -125,7 +127,7 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select
             if not events:
                 B2INFO(f"No events in {file_path}, skipping...")
                 continue
-            total += events
+            total += events if max_events_per_file <= 0 or events <= max_events_per_file else max_events_per_file
             chosen_files.append(file_path)
             B2INFO(f"Choosing input file for {run}: {file_path} and total events so far {total}")
 

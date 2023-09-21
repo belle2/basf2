@@ -58,7 +58,6 @@ namespace Belle2 {
 
     /** Some other useful quantities */
     const int nLeakReg = 3; /**< 3 ECL regions: 0 = forward, 1 = barrel, 2 = backward */
-    const int nCrysMax = 21; /**< max number of crystals used to calculate energy */
     bool storeCalib = true; /**< store parameters first event */
     std::vector< std::vector<int> > i_energies;/**< Generated energies in MeV in each region */
 

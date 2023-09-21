@@ -6,6 +6,17 @@ Modules
 * Added support of decay string functionality to ``MVAExpert`` module, so it can be used for daughter particles. 
   The first MVA to support this feature is `getNbarIDMVA`.
 
+Variables
++++++++++
+* Added new variables `nKLMMultistripHitsFWDEndcap`, `nKLMMultistripHitsBarrel`, `nKLMMultistripHitsBWDEndcap`, 
+  and `nKLMMultistripHits` for numbers of KLM multistrip hits in the event. 0 prior to mc16/proc16. 
+* Added new variables `nECLShowersFWDEndcap`, `nECLShowersBarrel`, `nECLShowersBWDEndcap`, 
+  and `nECLShowers` for numbers of ECLShowers in the event. 0 prior to mc16/proc16.
+* Added new variables `nECLLocalMaximumsFWDEndcap`, `nECLLocalMaximumsBarrel`, `nECLLocalMaximumsBWDEndcap`, 
+  and `nECLLocalMaximums` for numbers of ECLShowers in the event. 0 prior to mc16/proc16.
+* Added new variables `nECLTriggerCellsFWDEndcap`, `nECLTriggerCellsBarrel`, `nECLTriggerCellsBWDEndcap`, 
+  and `nECLTriggerCells` for numbers of ECL trigger cells above 100 MeV in the event. 0 prior to mc16/proc16.
+* Added new variable `isTrackFound` for particles created from MCParticles.
 
 
 Changes in the analysis package in light-2305-korat

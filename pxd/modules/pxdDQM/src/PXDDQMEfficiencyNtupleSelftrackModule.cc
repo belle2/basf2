@@ -15,6 +15,8 @@
 #include <framework/geometry/VectorUtil.h>
 
 #include "TMatrixDSym.h"
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -190,10 +192,10 @@ void PXDDQMEfficiencyNtupleSelftrackModule::event()
           double v_clus = m_pxdclusters[bestcluster]->getV();
 
           //is the closest cluster close enough to the track to count as measured?
-          TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
+          ROOT::Math::XYZVector dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
           du_clus = u_fit - u_clus;
           dv_clus = v_fit - v_clus;
-          d_clus = dist_clus.Mag();
+          d_clus = dist_clus.R();
           charge = m_pxdclusters[bestcluster]->getCharge();
           matched = true;
         }

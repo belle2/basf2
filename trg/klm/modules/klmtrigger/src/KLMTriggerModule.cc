@@ -317,15 +317,19 @@ void KLMTriggerModule::event()
     StoreObjPtr<KLMTrgSummary> KLMTrgSummary;
 
     auto hits = fill_vector(klmDigits.getEntries(),
-                            [&](auto) -> event_nr      { return event_nr(m_event_nr); },
-                            [&](auto Index) -> Subdetector   { return Subdetector(klmDigits[Index]->getSubdetector()); },
-                            [&](auto Index) -> section       { return section(klmDigits[Index]->getSection());     },
-                            [&](auto Index) -> isectors_t    { return to_i_sector(klmDigits[Index]->getSubdetector(), klmDigits[Index]->getSection()); },
-                            [&](auto Index) -> sector        { return sector(klmDigits[Index]->getSector() - 1);  },
-                            [&](auto Index) -> plane         { return plane(klmDigits[Index]->getPlane()  - (klmDigits[Index]->getSubdetector() == 2));  },
-                            [&](auto Index) -> layer         { return layer(klmDigits[Index]->getLayer()  - 1);  },
-                            [&](auto Index) -> strip         { return strip(klmDigits[Index]->getStrip());}
-                           );
+    [&](auto Index) {
+      letref digit = klmDigits[Index];
+      return std::tuple(
+               event_nr(m_event_nr),
+               Subdetector(digit->getSubdetector()),
+               section(digit->getSection()),
+               to_i_sector(digit->getSubdetector(), digit->getSection()),
+               sector(digit->getSector() - 1),
+               plane(digit->getPlane()  - (digit->getSubdetector() == 2)),
+               layer(digit->getLayer()  - 1),
+               strip(digit->getStrip())
+             );
+    });
 
 
     sort(hits);

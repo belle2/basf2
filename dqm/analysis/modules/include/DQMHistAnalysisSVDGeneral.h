@@ -68,6 +68,7 @@ namespace Belle2 {
 
     // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
+    bool m_3samples; /**< if true enable 3 samples histograms analysis */
     double m_occError; /**<error level of the occupancy */
     double m_occWarning; /**< warning level of the occupancy */
     double m_occEmpty; /**<empty level of the occupancy */

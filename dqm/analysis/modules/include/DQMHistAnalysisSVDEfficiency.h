@@ -68,6 +68,8 @@ namespace Belle2 {
     double m_effError; /**<error level of the efficiency */
     double m_effWarning; /**< warning level of the efficiency */
     double m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
+    bool m_3samples; /**< if true enable 3 samples histograms analysis */
+
     //! Data members
 
     /** Reference Histogram Root file name */

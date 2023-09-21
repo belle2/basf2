@@ -221,7 +221,6 @@ def command_tag_merge(args, db=None):
 
     # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
-
         B2INFO(f'Now copying the {len(final)} payloads into {args.output} to create {len(table)-1} iovs ...')
         create_iov = functools.partial(create_iov_wrapper, db, output_id)
         try:

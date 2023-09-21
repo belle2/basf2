@@ -14,6 +14,11 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-08
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-08-00.txt
+
 Changes since release-07
 ========================
 
@@ -57,6 +62,14 @@ Changes since release-07
       * - sphinx-codeautolink
         -
         - 0.15.0
+
+.. rubric:: Authentication for Conditions Database using JWT
+
+The authentication method that allows to upload payloads to the Conditions
+Database and to modify existing global tags has been updated. It now uses
+JSON web tokens that are created and verified based on the B2MMS username and
+the associated password. More information can be found in the section
+:ref:`b2conditionsdb`.
 
 .. include:: analysis/doc/whatsnew-since/release-07-00.txt
 

@@ -45,7 +45,6 @@ namespace Belle2 {
     int m_expno;
     int m_runno;
     int m_subno;
-    DBInterface* m_db;
 
   };
 

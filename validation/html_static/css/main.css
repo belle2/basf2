@@ -82,6 +82,21 @@
     color: red;
 }
 
+.releases-tag {
+    display: inline;
+}
+
+.button {
+    display: inline;
+    border-radius: 20px;
+    border: 0.5px solid black;
+    transition-duration: 0.3s;
+}
+
+.button:hover {
+    background-color: #a09ec2; /* Green */
+}
+
 .package_root_file {
     white-space: nowrap;
     overflow: hidden;

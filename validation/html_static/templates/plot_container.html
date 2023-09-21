@@ -40,7 +40,34 @@
   <h1>Package: {{ name }}</h1>
 
   <h2>Script Files</h2>
-  {{>scriptfiles_accordion}}
+  <!-- Choose any(first here) package to fetch the list of selected revisions 
+  to build the script files table-->
+
+  {{#plotfiles:i}}
+  {{#if i == 0}}
+    {{#compared_revision:j}}
+    <div class="releases-tag">
+    {{#if j > 0}}
+    <button class="button" id="bt_{{compared_revision[j]}}" onclick="showScriptFiles('{{compared_revision[j]}}')">{{compared_revision[j]}}</button>
+    {{/if}}
+    </div>
+    {{/compared_revision}}
+    {{#compared_revision:j}}
+    <!-- iterate through revisions selected, skipping reference as there are no logs for that. 
+      Display the first non-reference release by default, hiding the others. -->
+    {{#if j == 1 || (compared_revision[j] != "reference" && compared_revision.length==1)}}
+      <div id="{{compared_revision[j]}}" class="script_logs">
+          {{>scriptfiles_accordion compared_revision[j]}}
+          <script>$('#bt_{{compared_revision[j]}}').click();</script>
+      </div>
+    {{elseif j>1}}
+      <div id="{{compared_revision[j]}}" class="script_logs" style="display:none">
+        {{>scriptfiles_accordion compared_revision[j]}}
+      </div>
+    {{/if}}
+    {{/compared_revision}}
+  {{/if}}
+  {{/plotfiles}}
   <br>
 
   <!-- Looping over all plotfiles -->
@@ -132,41 +159,44 @@
 <!---------------------------------------------------------------------------->
 
 {{#partial scriptfiles_accordion}}
-<div id="accordion_script_files">
-  <h3>Failed Scripts</h3>
-  <div >
-    <div id="no_failed_scripts">No failed scripts</div>
-    {{#scriptfiles}}
-    {{#if status == "failed" }}
-    <div class="failed_script">
-      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
-      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+  <div class="accordion_script_files">
+    <h3>Failed Scripts</h3>
+    <div>
+      <div id="no_failed_scripts_{{compared_revision[j]}}">No failed scripts</div>
+      {{#scriptfiles_dict[compared_revision[j]]}}
+      {{#if status == "failed" }}
+      <script>$("#no_failed_scripts_{{compared_revision[j]}}").hide()</script>
+      <div class="failed_script">
+        <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+        <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log</a>
+      </div>
+      {{/if}}
+      {{/scriptfiles_dict[compared_revision[j]]}}
     </div>
-    {{/if}}
-    {{/scriptfiles}}
-  </div>
-  <h3>Finished Scripts</h3>
-  <div>
-    <div id="no_finished_scripts">No finished scripts</div>
-    {{#scriptfiles}}
-    {{#if status == "finished" }}
-    <div class="finished_script">
-      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
-      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    <h3>Finished Scripts</h3>
+    <div>
+      <div id="no_finished_scripts_{{compared_revision[j]}}">No finished scripts</div>
+      {{#scriptfiles_dict[compared_revision[j]]}}
+      {{#if status == "finished" }}
+      <script>$("#no_finished_scripts_{{compared_revision[j]}}").hide()</script>
+      <div class="finished_script">
+        <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+        <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log</a>
+      </div>
+      {{/if}}
+      {{/scriptfiles_dict[compared_revision[j]]}}
     </div>
-    {{/if}}
-    {{/scriptfiles}}
+    <h3>Skipped Scripts</h3>
+    <div>
+      <div id="no_skipped_scripts_{{compared_revision[j]}}">No skipped scripts</div>
+      {{#scriptfiles_dict[compared_revision[j]]}}
+      {{#if status == "skipped" }}
+      <script>$("#no_skipped_scripts_{{compared_revision[j]}}").hide()</script>
+      <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
+      {{/if}}
+      {{/scriptfiles_dict[compared_revision[j]]}}
+    </div>
   </div>
-  <h3>Skipped Scripts</h3>
-  <div>
-    <div id="no_skipped_scripts">No skipped scripts</div>
-    {{#scriptfiles}}
-    {{#if status == "skipped" }}
-    <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
-    {{/if}}
-    {{/scriptfiles}}
-  </div>
-</div>
 {{/partial}}
 
 <!---------------------------------------------------------------------------->

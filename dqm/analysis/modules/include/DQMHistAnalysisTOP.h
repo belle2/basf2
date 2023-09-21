@@ -12,6 +12,7 @@
 
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TLine.h>
 #include <TPaveText.h>
 #include <THStack.h>
@@ -155,6 +156,18 @@ namespace Belle2 {
     void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
                        bool bigRed = true);
 
+    /**
+     * Returns histogram mean by excluding bins with zero content
+     * @param h 2D histogram
+     * @return mean
+     */
+    double getMean(const TH2* h);
+
+    /**
+     * Calculates and sets epics variables
+     */
+    void setEpicsVariables();
+
     // module parameters
 
     std::vector<int> m_rawTimingBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
@@ -165,6 +178,7 @@ namespace Belle2 {
     std::vector<double> m_backgroundAlarmLevels = {5.0, 10.0}; /**< alarm levels for background rates [MHz/PMT] */
     std::vector<double> m_photonYieldsAlarmLevels = {15.0, 25.0}; /**< alarm levels for the number of photons per track */
     std::vector<std::string> m_excludedBoardstacks; /**< list of boarstacks to be excluded from alarming */
+    std::string  m_pvPrefix;  /**< Epics PV prefix */
 
     // other
 

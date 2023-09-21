@@ -10,7 +10,6 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <TClass.h>
-#include <TH2.h>
 #include <TF1.h>
 #include <TROOT.h>
 #include <TStyle.h>
@@ -53,6 +52,7 @@ DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule(): DQMHistAnalysisModule()
            "alarm levels for the number of photons per track (red, yellow)", m_photonYieldsAlarmLevels);
   addParam("excludedBoardstacks", m_excludedBoardstacks,
            "boarstacks to be excluded from alarming. Names are given like '5c', '13d' etc.", m_excludedBoardstacks);
+  addParam("pvPrefix", m_pvPrefix, "Epics PV prefix", std::string("DQM:TOP:"));
 
   B2DEBUG(20, "DQMHistAnalysisTOP: Constructor done.");
 }
@@ -91,6 +91,11 @@ void DQMHistAnalysisTOPModule::initialize()
   }
 
   m_monObj = getMonitoringObject("top");
+  registerEpicsPV(m_pvPrefix + "badBoardstacks", "badBoardstacks");
+  registerEpicsPV(m_pvPrefix + "badCarriers", "badCarriers");
+  registerEpicsPV(m_pvPrefix + "badAsics", "badAsics");
+  registerEpicsPV(m_pvPrefix + "badPMTs", "badPMTs");
+  updateEpicsPVs(5.0);
 
   gROOT->cd();
 
@@ -185,6 +190,9 @@ void DQMHistAnalysisTOPModule::event()
   if (canvas) canvas->SetLogy();
   canvas = findCanvas("TOP/c_badHitsPerEventAll");
   if (canvas) canvas->SetLogy();
+
+  // Set Epics variables
+  setEpicsVariables();
 
   gStyle->SetHistMinimumZero(zeroSupp);
 }
@@ -497,7 +505,7 @@ void DQMHistAnalysisTOPModule::setZAxisRange(const std::string& name, double sca
   if (histos.empty()) return;
   double average = totalHits / 512 / histos.size();  // per pixel or asic channel
 
-  for (auto* h : histos) h->GetZaxis()->SetRangeUser(0, average * scale);
+  for (auto* h : histos) h->GetZaxis()->SetRangeUser(0, std::max(average * scale, 1.0));
 }
 
 
@@ -578,4 +586,91 @@ void DQMHistAnalysisTOPModule::setAlarmLines(const std::vector<double>& alarmLev
       alarmLines.push_back(line);
     }
   }
+}
+
+
+double DQMHistAnalysisTOPModule::getMean(const TH2* h)
+{
+  double mean = 0;
+  int n = 0;
+  for (int col = 1; col <= h->GetNbinsX(); col++) {
+    for (int row = 1; row <= h->GetNbinsY(); row++) {
+      double y = h->GetBinContent(col, row);
+      if (y > 0) {
+        mean += y;
+        n++;
+      }
+    }
+  }
+  if (n > 0) mean /= n;
+  return mean;
+}
+
+
+void DQMHistAnalysisTOPModule::setEpicsVariables()
+{
+  int badBoardstacks = 0;
+  int badCarriers = 0;
+  int badAsics = 0;
+  for (int slot = 1; slot <= 16; slot++) {
+    std::string hname = "TOP/good_hits_asics_" + to_string(slot);
+    auto* h = (TH2F*) findHist(hname);
+    if (not h) continue;
+
+    double mean = getMean(h);
+    double deadCut = mean / 10;
+    double hotCut = mean * 10;
+    std::vector<int> asics(64, 0);
+    std::vector<int> carriers(16, 0);
+    std::vector<int> boardstacks(4, 0);
+    for (int asic = 0; asic < 64; asic++) {
+      int carrier = asic / 4;
+      int boardstack = carrier / 4;
+      for (int chan = 0; chan < 8; chan++) {
+        double y = h->GetBinContent(asic + 1, chan + 1);
+        if (y > deadCut and y < hotCut) {
+          asics[asic]++;
+          carriers[carrier]++;
+          boardstacks[boardstack]++;
+        }
+      }
+    }
+    for (int n : asics) if (n == 0) badAsics++;
+    for (int n : carriers) if (n == 0) badCarriers++;
+    for (int n : boardstacks) if (n == 0) badBoardstacks++;
+  }
+  badAsics -= badCarriers * 4;
+  badCarriers -= badBoardstacks * 4;
+
+  int badPMTs = 0;
+  for (int slot = 1; slot <= 16; slot++) {
+    std::string hname = "TOP/good_hits_xy_" + to_string(slot);
+    auto* h = (TH2F*) findHist(hname);
+    if (not h) continue;
+
+    double mean = getMean(h);
+    double deadCut = mean / 10;
+    double hotCut = mean * 10;
+    std::vector<int> pmts(32, 0);
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 64; col++) {
+        int pmt = col / 4 + (row / 4) * 16;
+        double y = h->GetBinContent(col + 1, row + 1);
+        if (y > deadCut and y < hotCut) pmts[pmt]++;
+      }
+    }
+    for (int n : pmts) if (n == 0) badPMTs++;
+  }
+  badPMTs -= badBoardstacks * 8;
+
+  setEpicsPV("badBoardstacks", badBoardstacks);
+  setEpicsPV("badCarriers", badCarriers);
+  setEpicsPV("badAsics", badAsics);
+  setEpicsPV("badPMTs", badPMTs);
+  updateEpicsPVs(5.0);
+
+  B2DEBUG(20, "badBoardstacks: " << badBoardstacks);
+  B2DEBUG(20, "badCarriers: " << badCarriers);
+  B2DEBUG(20, "badAsics: " << badAsics);
+  B2DEBUG(20, "badPMTs: " << badPMTs);
 }

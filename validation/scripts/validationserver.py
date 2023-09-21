@@ -377,7 +377,7 @@ def create_gitlab_issue(
 
     issue = project.issues.create({"title": title,
                                    "description": description,
-                                   "labels": [plot_package, 'validation']})
+                                   "labels": [plot_package, 'validation_issue']})
 
     issue.notes.create(
         {"body": "See the [error plot]({})".format(uploaded_file["url"])}

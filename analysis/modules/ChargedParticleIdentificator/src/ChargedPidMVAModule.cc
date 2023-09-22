@@ -172,6 +172,14 @@ void ChargedPidMVAModule::event()
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
+      if (std::isnan(theta) or std::isnan(p) or std::isnan(charge)) {
+        if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
+          B2WARNING("\nParticle [" << ipart << "] has invalid input variable, skip MVA application..." <<
+                    " polar angle: " << theta << ", p: " << p << ", charge: " << charge);
+        }
+        continue;
+      }
+
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 

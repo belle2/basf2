@@ -2,7 +2,7 @@
 arich/utility/scripts/ARICHImportChannelMaskToDB.py  -f DQMhistograms.root --hname ARICHDQM/chHit --firstexp=3 --firstrun=2300 --lastexp=4 --lastrun=10
 ####  Installation Data for Database (ARICHDatabaseImporter.py)
 
-All data can be found at: https://stash.desy.de/projects/B2G/repos/arich_database
+All data can be found at: https://gitlab.desy.de/belle2/detector/arich/arich_database
 Data for classes: ARICHAerogelInfo, ARICHAsicInfo, ARICHFebTest, ARICHHapdQA, ARICHHapdQE, ARICHHapdInfo
 
 #### Importing and exporting data to/from DB

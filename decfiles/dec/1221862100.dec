@@ -18,6 +18,7 @@ Define PKphHzero  0.0
 Define PKphHminus -1.162401
 
 Alias K*+sig K*+
+Alias K*-sig K*-
 Alias pi0sig pi0
 
 Decay Upsilon(4S)

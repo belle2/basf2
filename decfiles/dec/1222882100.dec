@@ -19,6 +19,7 @@ Define PKphHminus -1.162401
 
 # Define aliases
 Alias K*+sig K*+
+Alias K*-sig K*-
 Alias pi0sig pi0
 
 

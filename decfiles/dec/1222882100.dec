@@ -29,7 +29,7 @@ Enddecay
 
 
 Decay B+sig
-1.0000   psi(2S)sig myK*+sig  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+1.0000   psi(2S)sig K*+sig  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 Enddecay
 CDecay B-sig
 

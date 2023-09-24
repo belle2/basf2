@@ -21,6 +21,7 @@ Define PKphHminus -1.162401
 Alias pi0sig pi0
 Alias K*0sig K*0
 Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
 
 Decay Upsilon(4S)
 1.0000 B0 anti-B0 B0sig anti-B0sig       VSS_BMIX dm;

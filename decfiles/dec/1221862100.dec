@@ -36,6 +36,7 @@ Decay K*+sig
 0.3330 K+ pi0sig   PHOTOS VSS;
 0.6660 K_S0  pi+   PHOTOS VSS;
 Enddecay
+CDecay K*-sig
 
 Decay pi0sig
 1.000 gamma gamma  PHSP;

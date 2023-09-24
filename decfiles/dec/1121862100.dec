@@ -19,6 +19,7 @@ Define PKphHminus -1.162401
 
 Alias pi0sig pi0
 Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
 
 Decay Upsilon(4S)
 1.0000 B0 anti-B0 B0sig anti-B0sig       VSS_BMIX dm;
@@ -40,6 +41,7 @@ Decay K*0sig
 0.3326 K_S0 pi0sig   PHOTOS VSS;
 0.6651 K+  pi-   PHOTOS VSS;
 Enddecay
+CDecay anti-K*0sig
 
 Decay pi0sig
 1.000 gamma gamma  PHSP;

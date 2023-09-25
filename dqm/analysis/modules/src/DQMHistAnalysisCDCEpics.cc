@@ -45,7 +45,7 @@ DQMHistAnalysisCDCEpicsModule::~DQMHistAnalysisCDCEpicsModule()
 void DQMHistAnalysisCDCEpicsModule::initialize()
 {
   hist_adc = new TH1F("hist_adc", "hist_adc", 300, 0, 300);
-  hist_adc->SetTitle("ADC Medians of CDC boards; CDC board index; TDC medians");
+  hist_adc->SetTitle("ADC Medians of CDC boards; CDC board index; ADC medians");
 
   hist_tdc = new TH1F("hist_tdc", "hist_tdc", 300, 0, 300);
   hist_tdc->SetTitle("TDC Medians of CDC boards; CDC board index; TDC medians");
@@ -59,8 +59,8 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   if (!hasDeltaPar(m_histoDir, m_histoTDC))
     addDeltaPar(m_histoDir, m_histoTDC, HistDelta::c_Entries, m_minevt, 1);
 
-  registerEpicsPV(m_pvPrefix + "m_fracadcmedian", "m_fracadcmedian");
-  registerEpicsPV(m_pvPrefix + "m_fractdcmedian", "m_fractdcmedian");
+  registerEpicsPV(m_pvPrefix + "cdcboards_wadc", "adcboards");
+  registerEpicsPV(m_pvPrefix + "cdcboards_wtdc", "tdcboards");
 
   //creating box for normal adc and tdc windows
   m_boxadc = new TBox(0, m_minadc, 300, m_maxadc);
@@ -110,11 +110,11 @@ void DQMHistAnalysisCDCEpicsModule::event()
     }
   }
 
-  auto adcfrac = cadcgood / 3; // (100.0/300) in %
-  setEpicsPV("m_fracadcmedian", adcfrac);
+  double adcfrac = cadcgood / 3.0; // (100.0/300) in %
+  setEpicsPV("adcboards", adcfrac);
 
-  auto tdcfrac = ctdcgood / 3;
-  setEpicsPV("m_fractdcmedian", tdcfrac);
+  double tdcfrac = ctdcgood / 3.0;
+  setEpicsPV("tdcboards", tdcfrac);
 
   updateEpicsPVs(5.0); // 5 is time in seconds
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");

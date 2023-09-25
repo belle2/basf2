@@ -204,7 +204,7 @@ void ChargedPidMVAModule::event()
       // Don't even bother if particle does not fulfil the category selection.
       if (m_cuts.at(index)) {
         if (!m_cuts.at(index)->check(particle)) {
-          B2WARNING("\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
+          B2DEBUG(11, "\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
           continue;
         }
       }

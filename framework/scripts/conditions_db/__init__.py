@@ -100,6 +100,22 @@ def get_cdb_authentication_token(path=None):
         return token_file.read().strip()
 
 
+def set_cdb_authentication_token(cdb_instance, auth_token=None):
+    """
+    Helper function for setting the CDB authentication token.
+
+    :param cdb_instance: An instance of the ``ConditionsDB`` class.
+    :param auth_token: A CDB authentication token: if ``None``, it is automatically retrieved from the issuing server
+           and then set
+    """
+    if auth_token is not None:
+        cdb_instance.set_authentication_token(auth_token)
+    else:
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
+        cdb_instance.set_authentication_token(token)
+
+
 class BearerAuth(requests.auth.AuthBase):
     """Simple class to present bearer token instead of username/password"""
 

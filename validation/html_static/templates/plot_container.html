@@ -168,7 +168,27 @@
       <script>$("#no_failed_scripts_{{compared_revision[j]}}").hide()</script>
       <div class="failed_script">
         <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
-        <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log</a>
+        <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log </a>
+        {{#if issues.length==0}}
+        <span>
+          <button class="btn-create" onclick="window.open('../issue?file_path=../results/{{compared_revision[j]}}/{{log_url}}&rev_label={{compared_revision[j]}}','_blank');" type="button">
+            <img src="images/gitlab-logo-600.png" style="width: 24px;">
+              Create issue
+          </button>
+        </span>
+        {{else}}
+        <span>
+          <strong>Linked issues &darr</strong>
+          <ul style="margin:auto">
+            {{#issues:i}}
+            <li>
+              <a target="_blank" href="../issue_redirect?iid={{ issues[i] }}">{{issues[i]}}</a> || 
+              <a target="_blank" href="../update_issue?file_path=../results/{{compared_revision[j]}}/{{log_url}}&id={{issues[i]}}&rev_label={{compared_revision[j]}}" target="_blank">Update with this log</a>
+            </li>
+            {{/issues}}
+          </ul>
+        </span>
+        {{/if}}
       </div>
       {{/if}}
       {{/scriptfiles_dict[compared_revision[j]]}}
@@ -263,10 +283,16 @@
   {{! if the warning has not been set, no pvalue is available either }}
   <span><strong>Contact: </strong>{{ contact }}</span><br>
   <span><strong>Check for: </strong>{{ check }}</span><br>
+  {{#scriptfiles}}
+  {{#if name == rootfile+".py" }}
+  <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>
+  {{/if}}
+  {{/scriptfiles}}
   {{#if issue.length==0 }}
-  <span>
-    <a href="../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}" target="_blank">Create issue</a>
-  </span>
+  <button class="btn-create" onclick="window.open('../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}','_blank');" type="button">
+    <img src="images/gitlab-logo-600.png" style="width: 24px;">
+      Create issue
+  </button>
   {{else}}
   <span>
     <strong>Linked issues &darr</strong>
@@ -281,11 +307,6 @@
   </span>
   {{/if}}
   <br>
-  {{#scriptfiles}}
-  {{#if name == rootfile+".py" }}
-  <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>
-  {{/if}}
-  {{/scriptfiles}}
   <!-- todo: share this plot -->
 </div>
 {{/partial}}

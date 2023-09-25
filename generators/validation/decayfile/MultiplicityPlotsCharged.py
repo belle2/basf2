@@ -97,8 +97,8 @@ if __name__ == '__main__':
                 'nETA': '#eta',
                 'nETAprim': "#eta'",
                 'nPHI': '#phi',
-                'nRHOp': '#rho^{0}',
-                'nRHO0': '#rho^{+}',
+                'nRHOp': '#rho^{+}',
+                'nRHO0': '#rho^{0}',
                 'nKp': 'K^{+}',
                 'nKL0': 'K_{L}^{0}',
                 'nKS0': 'K_{S}^{0}',
@@ -117,8 +117,6 @@ if __name__ == '__main__':
 
     outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
-    ROOT.gROOT.SetStyle("BELLE2")
-    ROOT.gROOT.ForceStyle()
 
     # plot the histograms
     for var in all_list:

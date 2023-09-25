@@ -210,6 +210,7 @@ namespace Belle2 {
 
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
+    bool m_skipInitial; /**< toggle skip of initial MC particles */
     bool m_skipNonPrimary; /**< toggle skip of secondary MC particle */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
     bool m_skipNonPrimaryDaughters; /**< toggle skip of secondary MC daughters */

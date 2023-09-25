@@ -10,7 +10,7 @@
 
 """
 <header>
-  <input>"../PartGunChargedStableGenSim.root"</input>
+  <input>PartGunChargedStableGenSim.root</input>
   <output>ChargedPID_Validation.root</output>
   <contact>Sviatoslav Bilokin (sviatoslav.bilokin@desy.de)</contact>
   <description>

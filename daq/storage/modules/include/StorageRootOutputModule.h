@@ -164,6 +164,9 @@ namespace Belle2 {
     /** Keep track of the file index: if we split files than we add '.f{fileIndex:05d}' in front of the ROOT extension */
     int m_fileIndex{0};
 
+    /** Number of full events (aka number of events without an error flag) */
+    unsigned int m_nFullEvents{0};
+
     /** TFile for output. */
     TFile* m_file;
 

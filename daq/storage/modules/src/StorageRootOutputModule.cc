@@ -426,6 +426,10 @@ void StorageRootOutputModule::event()
     }
   }
 
+  // check if the event is a full event or not: if yes, increase the counter
+  if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
+    m_nFullEvents++;
+
   // check if we need to split the file
   if (m_outputSplitSize and (uint64_t)m_file->GetEND() > *m_outputSplitSize) {
     // close file and open new one
@@ -451,7 +455,7 @@ void StorageRootOutputModule::fillFileMetaData()
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
-    m_fileMetaData->setNFullEvents(tree->GetEntries("EventMetaData.m_errorFlag == 0"));
+    m_fileMetaData->setNFullEvents(m_nFullEvents);
     if (m_buildIndex && numEntries > 0) {
       if (numEntries > 10000000) {
         //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(

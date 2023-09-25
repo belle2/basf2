@@ -522,6 +522,7 @@ def get_calibrations(input_data, **kwargs):
     shift_pre_collector_path = create_pre_collector_path(
         clusterizers=shift_clusterizers_onTracks,
         isMC=isMC, max_events_per_run=max_events_per_run,
+        max_events_per_file=max_events_per_file,
         useSVDGrouping=useSVDGrouping)
 
     shift_collector = b2.register_module("SVDClusterTimeShifterCollector")

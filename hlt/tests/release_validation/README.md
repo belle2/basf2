@@ -7,7 +7,7 @@ system](https://bamboo.desy.de/browse/B2-HLTVALID/branches). There are two
 separate stages:
 
 1. an automatic stage which is supposed to be executed automatically by the CI
-   on the release branch whenever a PR is merged.
+   on the release branch whenever a MR is merged.
 2. a manual stage which can be triggered to run on the CI once the automatic
    stage is done to perform additional, potential long running validation before
    tagging a release.
@@ -65,7 +65,7 @@ build.
 When to Run
 -----------
 
-These tests are not intended to run on each individual PR to the main (master)
+These tests are not intended to run on each individual MR to the main (master)
 branch, but only for release version which are intended to run on the HLT.
 This should prevent release tags which are not usable on the HLT system.
 
@@ -125,7 +125,7 @@ This should keep the payloads as close as possible to the conditions when taking
 data while still allowing some validation. For this to work the validation run
 should be updated frequently just to keep the differences minimal.
 
-The results will contain a log of which payloads where choosen in which revision
+The results will contain a log of which payloads where chosen in which revision
 and where they were taken from. If too many payloads are taken from the run
 number there are many changes between the current payloads and the conditions
 back then and the validation run should probably be updated.

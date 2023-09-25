@@ -322,7 +322,7 @@ Contributions
 -------------
 
 The `MVA/ML subgroup <https://confluence.desy.de/pages/viewpage.action?pageId=104035532>`_ is the place to go for getting involved in MVA-related projects.
-If you want to contribute your are welcome to do so by creating a pull request or initiating your own project.
+If you want to contribute your are welcome to do so by creating a merge request or initiating your own project.
 
 You can add examples if you have interesting applications of MVA, or you can add plots to the ``basf2_mva_evaluation.py`` script.
 

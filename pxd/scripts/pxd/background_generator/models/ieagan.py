@@ -518,7 +518,7 @@ class ccbn(nn.Module):
     Class-conditional bn
     output size is the number of channels, input size is for the linear layers
     Andy's Note: this class feels messy but I'm not really sure how to clean it up  # noqa
-    Suggestions welcome! (By which I mean, refactor this and make a pull request
+    Suggestions welcome! (By which I mean, refactor this and make a merge request
     if you want to make this more readable/usable).
     """
 

@@ -358,17 +358,20 @@ namespace Belle2 {
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
     {
-      int elementI = int(std::lround(element[0]));
-      int elementJ = int(std::lround(element[1]));
+      int elementI = std::lround(element[0]);
+      int elementJ = std::lround(element[1]);
 
-      if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
-        return Const::doubleNaN;
+      bool isOutOfRange = false;
+      if (elementI < 0 || elementI > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("i", elementI));
+        isOutOfRange = true;
       }
-      if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
-        return Const::doubleNaN;
+      if (elementJ < 0 || elementJ > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("j", elementJ));
+        isOutOfRange = true;
       }
+
+      if (isOutOfRange) return Const::doubleNaN;
 
       static DBObjPtr<BeamSpot> beamSpotDB;
       return beamSpotDB->getCovVertex()(elementI, elementJ);

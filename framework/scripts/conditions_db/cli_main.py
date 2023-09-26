@@ -80,7 +80,7 @@ from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
-from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation, get_cdb_authentication_token
+from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation, set_cdb_authentication_token
 from conditions_db.cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
@@ -287,6 +287,8 @@ def command_tag_create(args, db=None):
                           "If not given we will try to supply a useful default")
         return
 
+    set_cdb_authentication_token(db, args.auth_token)
+
     # create tag info needed for creation
     info = {"name": args.tag, "description": args.description, "modifiedBy": args.user, "isDefault": False}
     # add user information if not given by command line
@@ -319,6 +321,8 @@ def command_tag_modify(args, db=None):
                           "If not given we will try to supply a useful default")
         args.add_argument("-s", "--state", help="new globaltag state, see the command ``tag state`` for details")
         return
+
+    set_cdb_authentication_token(db, args.auth_token)
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
@@ -369,6 +373,8 @@ def command_tag_clone(args, db=None):
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be cloned")
         args.add_argument("name", metavar="NEWNAME", help="name of the cloned globaltag")
         return
+
+    set_cdb_authentication_token(db, args.auth_token)
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
@@ -435,6 +441,8 @@ def command_tag_state(args, db):
         args.add_argument("state", metavar="STATE", help="new state for the globaltag")
         args.add_argument("--force", default=False, action="store_true", help=argparse.SUPPRESS)
         return
+
+    set_cdb_authentication_token(db, args.auth_token)
 
     return change_state(db, args.tag, args.state, args.force)
 
@@ -1079,13 +1087,6 @@ def main():
         args.nprocess = nprocess = 1
 
     conditions_db = ConditionsDB(args.base_url, nprocess, retries)
-
-    if args.auth_token is not None:
-        conditions_db.set_authentication_token(args.auth_token)
-    else:
-        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
-        auth_token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
-        conditions_db.set_authentication_token(auth_token)
 
     try:
         return args.func(args, conditions_db)

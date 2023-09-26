@@ -24,6 +24,7 @@ namespace Belle2 {
     bool IsCreated(void);
 
     static std::string getTmpFileName(std::string user, std::string name);
+    static bool getIdFromTmpFileName(std::string filename, int& shmid, int& semid);
 
     void lock(void);
     void unlock(void);

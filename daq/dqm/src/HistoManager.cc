@@ -24,7 +24,7 @@ HistoManager::~HistoManager()
 {
 }
 
-bool HistoManager::add(string& subdir, const string& name, int pid, TH1* histo)
+bool HistoManager::add(const string& subdir, const string& name, int pid, TH1* histo)
 {
   //  printf ( "HistoManager: adding %s to subdir %s from id %d\n",
   //  name.c_str(), subdir.c_str(), pid );

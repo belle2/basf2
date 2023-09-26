@@ -19,8 +19,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/EnvironmentVariables.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -30,6 +28,7 @@
 
 #include <memory>
 #include <regex>
+#include <filesystem>
 
 // For online storage
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -197,8 +196,11 @@ void StorageRootOutputModule::initialize()
 
 void StorageRootOutputModule::openFile()
 {
+  // Since we open a new file, we also have to reset the number of full events
+  m_nFullEvents = 0;
+  // Continue with opening the file
   TDirectory* dir = gDirectory;
-  boost::filesystem::path out{m_outputFileName};
+  std::filesystem::path out{m_outputFileName};
   if (m_outputSplitSize) {
     // Mangle the filename to add the fNNNNN part. However we need to be
     // careful since the file name could be non-local and have some options or
@@ -206,7 +208,7 @@ void StorageRootOutputModule::openFile()
     // http://mydomain.org/filename.root?foo=bar#baz). So use "TUrl" *sigh* to
     // do the parsing and only replace the extension of the file part.
     TUrl fileUrl(m_outputFileName.c_str(), m_regularFile);
-    boost::filesystem::path file{fileUrl.GetFile()};
+    std::filesystem::path file{fileUrl.GetFile()};
     file.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
     fileUrl.SetFile(file.c_str());
     // In case of regular files we don't want the protocol or anything, just the file
@@ -214,15 +216,15 @@ void StorageRootOutputModule::openFile()
   }
 
   // For online storage buffer disks
-  boost::filesystem::path out_notmp = out;
-  out = boost::filesystem::path{std::string("/buffer") + out.generic_string()};
+  std::filesystem::path out_notmp = out;
+  out = std::filesystem::path{std::string("/buffer") + out.generic_string()};
 
   m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
   if ((!m_file || m_file->IsZombie()) && m_regularFile) {
     //try creating necessary directories since this is a local file
     auto dirpath = out.parent_path();
 
-    if (boost::filesystem::create_directories(dirpath)) {
+    if (std::filesystem::create_directories(dirpath)) {
       B2INFO("Created missing directory " << dirpath << ".");
       //try again
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
@@ -497,7 +499,7 @@ void StorageRootOutputModule::fillFileMetaData()
   // Set the LFN to the filename: if it's a URL to directly, otherwise make sure it's absolute
   std::string lfn = m_file->GetName();
   if(m_regularFile) {
-    lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+    lfn = std::filesystem::absolute(lfn).string();
   }
   // Format LFN if BELLE2_LFN_FORMATSTRING is set
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
@@ -556,10 +558,10 @@ void StorageRootOutputModule::closeFile()
   }
 
   // Before deleting m_file, store file list in online storage file list DB table
-  const boost::filesystem::path filename_path{filename};
+  const std::filesystem::path filename_path{filename};
   std::string filename_notmp = m_file->GetName();
   filename_notmp.erase(0, 7); // remove "/buffer" in front of full path
-  const boost::filesystem::path filename_notmp_path{filename_notmp};
+  const std::filesystem::path filename_notmp_path{filename_notmp};
   try {
     m_db->connect();
     m_db->execute("UPDATE datafiles_root SET "

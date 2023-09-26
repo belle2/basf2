@@ -230,5 +230,6 @@ namespace Belle2 {
     int m_nDisk;
     int m_processNumber;
     bool m_firstEvent{false};
+    bool m_ramdiskBuffer{false};
   };
 } // end namespace Belle2

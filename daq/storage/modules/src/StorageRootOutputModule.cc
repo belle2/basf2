@@ -142,6 +142,8 @@ Warning:
   addParam("nDisk", m_nDisk, "The number of paratitions", 3);
   addParam("skipFirstEvent", m_firstEvent, "Boolean to skip the first event or not. "
            "If the module is used inside the hbasf2, like HLT storage, the first event need to be skipped.", m_firstEvent);
+  addParam("ramdiskBuffer", m_ramdiskBuffer, "Boolean to make small ramdisk buffer setup. "
+           "If this is false, assuming the buffer disks are large SSD.", m_ramdiskBuffer);
 }
 
 
@@ -211,9 +213,9 @@ void StorageRootOutputModule::openFile()
     out = m_regularFile? fileUrl.GetFileAndOptions() : fileUrl.GetUrl();
   }
 
-  // For online storage ramdisk buffer
+  // For online storage buffer disks
   boost::filesystem::path out_notmp = out;
-  out = boost::filesystem::path{std::string("/tmp") + out.generic_string()};
+  out = boost::filesystem::path{std::string("/buffer") + out.generic_string()};
 
   m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
   if ((!m_file || m_file->IsZombie()) && m_regularFile) {
@@ -556,7 +558,7 @@ void StorageRootOutputModule::closeFile()
   // Before deleting m_file, store file list in online storage file list DB table
   const boost::filesystem::path filename_path{filename};
   std::string filename_notmp = m_file->GetName();
-  filename_notmp.erase(0, 4); // remove "/tmp" in front of full path
+  filename_notmp.erase(0, 7); // remove "/buffer" in front of full path
   const boost::filesystem::path filename_notmp_path{filename_notmp};
   try {
     m_db->connect();
@@ -568,8 +570,7 @@ void StorageRootOutputModule::closeFile()
                   "size = %lu, "
                   "time_close = '%s' "
                   "WHERE name = '%s' AND host = '%s';",
-                  //(boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize ? "true" : "false",
-                  "TRUE", // temporary with small ramdisk
+                  ((boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize || m_ramdiskBuffer) ? "true" : "false",
                   m_fileMetaData->getNEvents(), m_fileMetaData->getNFullEvents(), m_file->GetSize(),
                   (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str(),
                   filename_path.filename().c_str(), m_HLTName.c_str());
@@ -599,9 +600,11 @@ void StorageRootOutputModule::closeFile()
   ++m_fileIndex;
 
   // Call system(/usr/bin/rsync) for online storage ramdisk buffer cleanup
-  const std::string rsync_cmd = std::string("/usr/bin/rsync -a --remove-source-files --recursive ") + filename + std::string(" ") + filename_notmp_path.parent_path().generic_string() + std::string("/ &");
-  B2INFO(getName() << ": system(" << rsync_cmd << ")");
-  system(rsync_cmd.c_str());
+  if (m_ramdiskBuffer) {
+    const std::string rsync_cmd = std::string("/usr/bin/rsync -a --remove-source-files --recursive ") + filename + std::string(" ") + filename_notmp_path.parent_path().generic_string() + std::string("/ &");
+    B2INFO(getName() << ": system(" << rsync_cmd << ")");
+    system(rsync_cmd.c_str());
+  }
 }
 
 

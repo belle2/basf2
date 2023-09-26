@@ -435,8 +435,8 @@ Track#9:
   isFlippedAndRefitted(): False
   wasRefined(): False
 TrackFitResult#0:
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltags (highest priority first) are release-05-00-00, Legacy_CollisionAxisCMS
   get4Momentum(): (0.0520715,-0.213788,0.0390396,0.263478)
   getChargeSign(): -1

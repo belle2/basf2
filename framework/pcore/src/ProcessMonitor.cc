@@ -42,7 +42,7 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     // ATTENTION: this is switched on intention!
     try {
       pubSocket.bind(subSocketAddress);
-    } catch (zmq::error_t err) {
+    } catch (zmq::error_t& err) {
       B2DEBUG(30, "ZMQ bind error!! " + std::string(err.what()));
     }
 

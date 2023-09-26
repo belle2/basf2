@@ -29,7 +29,6 @@ namespace Belle2 {
 
   private:
     bool m_new{false}; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    bool m_file;
     std::string m_pathname;
     int  m_pathfd; /** Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */

@@ -35,14 +35,13 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
-from stdCharged import stdK, stdPi
+from stdCharged import stdK
 
 # create path
 my_path = b2.create_path()
 
 # writePi0EtaVeto uses a payload in analysis global tag.
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-b2.conditions.prepend_globaltag("pi0veto_systematics_preliminary")
 
 # load input ROOT file
 ma.inputMdst(filename=b2.find_file('B2rhogamma_rho2pipi.root', 'examples', False),
@@ -103,17 +102,16 @@ ma.addPi0VetoEfficiencySystematics(particleList='B0',
                                    suffix=suffix,
                                    path=my_path)
 
-# Then one can obtain the pi0/eta probability by the variables, `pi0Prob(arg)` and `etaProb`.
-# The argument corresponds to the mode which you set in writPieEtaVeto function.
-# In above case, one can call `pi0Probe(standard)` and `etaProb(standard)`.
+# Then one can obtain the pi0/eta probability by the variables pi0Prob(arg) and etaProb(arg).
+# The argument corresponds to the mode which you set in writePi0EtaVeto function.
+# In above case, one can call pi0Probe(standard) and etaProb(standard).
 # For the B0 candidates whose gamma daughter could not be combined with
-# any of the remaining photons to form pi0/eta because of soft photon selection.
-# In these cases NaN will be written to the `pi0Probe(standard)` branch and `etaProb(standard)` branch.
+# any of the remaining photons to form pi0/eta because of soft photon selection
+# NaN will be written to the pi0Probe(standard) branch and etaProb(standard) branch.
 
 # For the validation purpose, one may want to calculate the pi0/eta probability using a particle other than a photon.
-# Example : B+ -> anti-D0 pi+. This is one of the mode to validate the pi0/eta veto tool.
+# Example : B+ -> anti-D0 pi+. This is one of the modes to validate the pi0/eta veto tool.
 stdK('loose', path=my_path)
-stdPi('loose', path=my_path)
 ma.reconstructDecay("D0:Kpi -> K-:loose pi+:loose", "", path=my_path)
 ma.reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E))>1.4", path=my_path)
 ma.matchMCTruth("B+:Dpi", path=my_path)

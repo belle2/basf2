@@ -392,7 +392,8 @@ namespace Belle2 {
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */
     std::string m_zmqSocketAddress = ""; /**< Socket address to use in ZMQ. If not set, uses a random IPC connection. */
-    unsigned int m_zmqMaximalWaitingTime = 100 * 1000; /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    unsigned int m_zmqMaximalWaitingTime = (3600 * 24) *
+                                           1000; /**< Maximal waiting time of any ZMQ module for any communication in ms */
     unsigned int m_zmqEventBufferSize = 1; /**< Number of events to keep in flight for every worker */
     unsigned int m_zmqWorkerTimeout =
       0; /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */

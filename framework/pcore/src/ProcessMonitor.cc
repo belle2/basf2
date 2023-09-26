@@ -15,12 +15,17 @@
 #include <thread>
 #include <csignal>
 
+#include <string>
+
+#include <unistd.h>
+
 using namespace Belle2;
 
 void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                                const std::string& controlSocketAddress)
 {
   if (GlobalProcHandler::startProxyProcess()) {
+    B2DEBUG(10, "ProcessMonitor starting.....");
     m_client.reset();
 
     // The default will be to not do anything on signals...
@@ -29,9 +34,18 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     // We open a new context here in the new process
     zmq::context_t context(1);
 
+    // current directory
+    char currentdir[256];
+    getcwd(currentdir, 256);
+
     zmq::socket_t pubSocket(context, ZMQ_XPUB);
     // ATTENTION: this is switched on intention!
-    pubSocket.bind(subSocketAddress);
+    try {
+      pubSocket.bind(subSocketAddress);
+    } catch (zmq::error_t err) {
+      B2DEBUG(30, "ZMQ bind error!! " + std::string(err.what()));
+    }
+
     pubSocket.set(zmq::sockopt::linger, 0);
 
     zmq::socket_t subSocket(context, ZMQ_XSUB);
@@ -44,7 +58,7 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     controlSocket.set(zmq::sockopt::linger, 0);
     controlSocket.set(zmq::sockopt::subscribe, "");
 
-    B2DEBUG(10, "Will now start the proxy..");
+    B2DEBUG(30, "Will now start the proxy..");
     bool running = true;
     while (running) {
       try {
@@ -62,7 +76,7 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     pubSocket.close();
     subSocket.close();
     context.close();
-    B2DEBUG(10, "Proxy has finished");
+    B2DEBUG(30, "Proxy has finished");
     exit(0);
   }
 
@@ -76,7 +90,7 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
   m_client.subscribe(EMessageTypes::c_killWorkerMessage);
   m_client.subscribe(EMessageTypes::c_goodbyeMessage);
 
-  B2DEBUG(10, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
+  B2DEBUG(30, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
 }
 
 void ProcessMonitor::terminate()
@@ -95,7 +109,7 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
            or GlobalProcHandler::isProcess(ProcType::c_Init));
 
   if (not m_processList.empty() and m_client.isOnline()) {
-    B2DEBUG(10, "Try to kill the processes gently...");
+    B2DEBUG(30, "Try to kill the processes gently...");
     // Try to kill them gently...
     auto pcbMulticastMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_terminateMessage);
     m_client.publish(std::move(pcbMulticastMessage));
@@ -106,7 +120,7 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
       processMulticast(socket);
       for (const auto& pair : m_processList) {
         if (pair.second != ProcType::c_Stopped) {
-          B2DEBUG(10, "Process pid " << pair.first << " of type " << static_cast<char>(pair.second) << " is still alive");
+          B2DEBUG(30, "Process pid " << pair.first << " of type " << static_cast<char>(pair.second) << " is still alive");
           return true;
         }
       }
@@ -122,14 +136,14 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
     }
 
     if (not allProcessesStopped) {
-      B2DEBUG(10, "Start waiting for processes to go down.");
-      m_client.pollMulticast(timeout * 1000, multicastAnswer);
-      B2DEBUG(10, "Finished waiting for processes to go down.");
+      B2DEBUG(30, "Start waiting for processes to go down.");
+      m_client.pollMulticast(timeout, multicastAnswer);
+      B2DEBUG(30, "Finished waiting for processes to go down.");
     }
   }
 
   if (m_client.isOnline()) {
-    B2DEBUG(10, "Will kill the proxy now.");
+    B2DEBUG(30, "Will kill the proxy now.");
     // Kill the proxy and give it some time to terminate
     auto message = ZMQMessageHelper::createZMQMessage("TERMINATE");
     m_client.send(message);
@@ -148,7 +162,7 @@ void ProcessMonitor::waitForRunningInput(const int timeout)
       return processesWithType(ProcType::c_Input) < 1;
     };
 
-    const auto pullResult = m_client.pollMulticast(timeout * 1000, multicastAnswer);
+    const auto pullResult = m_client.pollMulticast(timeout, multicastAnswer);
     if (not pullResult) {
       B2ERROR("Input process did not start properly!");
       m_hasEnded = true;
@@ -164,7 +178,7 @@ void ProcessMonitor::waitForRunningWorker(const int timeout)
       return processesWithType(ProcType::c_Worker) < m_requestedNumberOfWorkers;
     };
 
-    const auto pullResult = m_client.pollMulticast(timeout * 1000, multicastAnswer);
+    const auto pullResult = m_client.pollMulticast(timeout, multicastAnswer);
     if (not pullResult) {
       B2ERROR("Worker process did not start properly!");
       m_hasEnded = true;
@@ -180,7 +194,7 @@ void ProcessMonitor::waitForRunningOutput(const int timeout)
       return processesWithType(ProcType::c_Output) < 1;
     };
 
-    const auto pullResult = m_client.pollMulticast(timeout * 1000, multicastAnswer);
+    const auto pullResult = m_client.pollMulticast(timeout, multicastAnswer);
     if (not pullResult) {
       B2ERROR("Output process did not start properly!");
       m_hasEnded = true;
@@ -214,9 +228,9 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
     const int pid = std::stoi(pcbMulticastMessage->getData());
     const ProcType procType = GlobalProcHandler::getProcType(pid);
     m_processList[pid] = procType;
-    B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
-    B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
-    B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
+    B2DEBUG(30, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
+    B2DEBUG(30, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
+    B2DEBUG(30, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
   } else if (pcbMulticastMessage->isMessage(EMessageTypes::c_goodbyeMessage)) {
     const int pid = std::stoi(pcbMulticastMessage->getData());
     const auto& processIt = m_processList.find(pid);
@@ -227,15 +241,15 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
     const ProcType procType = processIt->second;
     if (procType == ProcType::c_Worker) {
       m_requestedNumberOfWorkers--;
-      B2DEBUG(10, "Now we will only need " << m_requestedNumberOfWorkers << " of workers anymore");
+      B2DEBUG(30, "Now we will only need " << m_requestedNumberOfWorkers << " of workers anymore");
     }
     processIt->second = ProcType::c_Stopped;
-    B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
-    B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
-    B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
+    B2DEBUG(30, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
+    B2DEBUG(30, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
+    B2DEBUG(30, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
   } else if (pcbMulticastMessage->isMessage(EMessageTypes::c_killWorkerMessage)) {
     const int workerPID = atoi(pcbMulticastMessage->getData().c_str());
-    B2DEBUG(10, "Got message to kill worker " << workerPID);
+    B2DEBUG(30, "Got message to kill worker " << workerPID);
     if (kill(workerPID, SIGKILL) == 0) {
       B2WARNING("Needed to kill worker  " << workerPID << " as it was requested.");
     } else {
@@ -244,7 +258,7 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
     // TODO: Do we want to decrease the number of workers here or later in the check of the processes?
   } else if (pcbMulticastMessage->isMessage(EMessageTypes::c_statisticMessage)) {
     m_streamer.read(std::move(pcbMulticastMessage));
-    B2DEBUG(10, "Having received the process statistics");
+    B2DEBUG(30, "Having received the process statistics");
     m_receivedStatistics = true;
   }
 }
@@ -287,7 +301,7 @@ void ProcessMonitor::checkChildProcesses()
       auto pcbMulticastMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_deleteWorkerMessage, pair.first);
       m_client.publish(std::move(pcbMulticastMessage));
     } else if (pair.second == ProcType::c_Stopped) {
-      B2DEBUG(10, "An children process has died expectedly.");
+      B2DEBUG(30, "An children process has died expectedly.");
     }
 
     iter = m_processList.erase(iter);
@@ -313,14 +327,14 @@ void ProcessMonitor::checkChildProcesses()
   }
 
   if (m_hasEnded) {
-    B2DEBUG(10, "No input and no output process around. Will go home now!");
+    B2DEBUG(30, "No input and no output process around. Will go home now!");
   }
 }
 
 void ProcessMonitor::checkSignals(int g_signalReceived)
 {
   if (g_signalReceived > 0) {
-    B2DEBUG(10, "Received signal " << g_signalReceived);
+    B2DEBUG(30, "Received signal " << g_signalReceived);
     m_hasEnded = true;
   }
 }
@@ -342,7 +356,7 @@ unsigned int ProcessMonitor::needMoreWorkers() const
     B2FATAL("Something went completely wrong here! I have more workers as requested...");
   }
   if (neededWorkers > 0) {
-    B2DEBUG(10, "I need to restart " << neededWorkers << " workers");
+    B2DEBUG(30, "I need to restart " << neededWorkers << " workers");
   }
   return static_cast<unsigned int>(neededWorkers);
 }

@@ -115,11 +115,12 @@ void ZMQRxOutputModule::event()
 
     B2DEBUG(100, "Start polling");
     //    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
-    const int pollReply = m_zmqClient.poll((unsigned int)7200 * 1000, multicastAnswer, socketAnswer);
+    //    const int pollReply = m_zmqClient.poll((unsigned int)7200 * 1000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(Environment::Instance().getZMQMaximalWaitingTime(), multicastAnswer, socketAnswer);
     B2ASSERT("Output process did not receive any message in some time. Aborting.", pollReply);
     //    B2INFO ( "ZMQRxOutput : event received" );
 
-    B2DEBUG(100, "finished reading in an event.");
+    B2DEBUG(30, "finished reading in an event.");
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Rx output event: " << ex.what());

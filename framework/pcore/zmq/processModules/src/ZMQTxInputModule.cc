@@ -70,7 +70,8 @@ void ZMQTxInputModule::event()
     }
 
     //    int timeout = m_param_maximalWaitingTime;
-    int timeout = 7200 * 1000;
+    //    int timeout = 7200 * 1000;
+    int timeout = (int)Environment::Instance().getZMQMaximalWaitingTime();
     if (not m_nextWorker.empty()) {
       // if next worker are available do not waste time
       timeout = 0;

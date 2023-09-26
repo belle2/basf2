@@ -122,9 +122,14 @@ function triggerPopup(itemId) {
 
 /**
  * This function call is triggered by the button under the revisions list
- * "Load selected" and sets up the page with the new set of revisions.
+ * "Load custom selection" and sets up the page with the new set of revisions.
  */
-function loadSelectedRevisions() {
+function loadSelectedRevisions(button=false) {
+
+    if (button === true){
+        // Change the dropdown option to Custom
+        $("#prebuilt-select").val('c');
+    }
 
     let revList = getSelectedRevsList();
 
@@ -176,7 +181,7 @@ function setDefaultPrebuildOption(){
 
     let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
     console.debug(`RECOVERED ${mode}`);
-    if (mode == null){
+    if (mode == null || mode == 'c'){
         mode = "rbn";
     }
     // todo: check if this is an allowed mode (since it might since have vanished), else discard!
@@ -301,8 +306,8 @@ function onReferenceSelectionChanged(){
 /**
  * Sets the state of the revision checkboxes
  * @parm mode: "all" (all revisions), "r" (last revision only), "n" (last
- *  nightly only), "b" (last build only), "nnn" (all nightlies), "rbn"
- *  (default, last build, nightly and revision).
+ *  nightly only), "nnn" (all nightlies), "rbn"
+ *  (default, nightly and revision).
  */
 function getDefaultRevisions(mode="rbn") {
 
@@ -310,16 +315,12 @@ function getDefaultRevisions(mode="rbn") {
 
     let referenceRevision = "reference";
     let releaseRevisions = [];
-    let buildRevisions = [];
     let nightlyRevisions = [];
 
     for (let rev of allRevisions){
         // fixme: This will have problems with sorting. Probably we rather want to have prerelease as a new category!
         if (rev.startsWith("release") || rev.startsWith("prerelease")) {
             releaseRevisions.push(rev);
-        }
-        if (rev.startsWith("build")) {
-            buildRevisions.push(rev);
         }
         if (rev.startsWith("nightly")) {
             nightlyRevisions.push(rev);
@@ -333,7 +334,7 @@ function getDefaultRevisions(mode="rbn") {
     // First, we cache the case of running locally: There all of the above
     // revision lists are empty and our only guess is to return allRevisions, which
     // in particular will include 'reference' and 'current' etc.
-    if (!nightlyRevisions.length && !buildRevisions.length && !releaseRevisions.length){
+    if (!nightlyRevisions.length && !releaseRevisions.length){
         return allRevisions;
     }
 
@@ -342,9 +343,6 @@ function getDefaultRevisions(mode="rbn") {
     }
     else if (mode === "r"){
         return [referenceRevision].concat(releaseRevisions.slice(0, 1));
-    }
-    else if (mode === "b"){
-        return [referenceRevision].concat(buildRevisions.slice(0,1));
     }
     else if (mode === "n"){
         return [referenceRevision].concat(nightlyRevisions.slice(0, 1));
@@ -362,9 +360,6 @@ function getDefaultRevisions(mode="rbn") {
     let rbnRevisions = [referenceRevision];
     if (releaseRevisions.length >= 1){
         rbnRevisions.push(releaseRevisions[0])
-    }
-    if (buildRevisions.length >= 1){
-        rbnRevisions.push(buildRevisions[0])
     }
     if (nightlyRevisions.length >= 1){
         rbnRevisions.push(nightlyRevisions[0])
@@ -400,6 +395,27 @@ function loadCustomSelectionRequired(required){
     }
 }
 
+/**
+ * Display the scriptfiles accordion of the selected revision,
+ * hiding the rest. Also highlight the selected reference button. 
+ */
+function showScriptFiles(revision) {
+    var i;
+    var revisions = document.getElementsByClassName("script_logs");
+    for (i = 0; i < revisions.length; i++) {
+      revisions[i].style.display = "none";
+    }
+    document.getElementById(revision).style.display = "block";
+
+    var buttons = document.getElementsByClassName("button");
+    for (i = 0; i < buttons.length; i++) {
+      buttons[i].style.backgroundColor = '';
+    }
+    document.getElementById('bt_'+revision).style.backgroundColor = '#a09ec2';
+    
+}
+
+
 // ============================================================================
 // Loading
 // ============================================================================
@@ -416,6 +432,7 @@ function updateComparisonData(_comparisonData) {
     // to get information about failed scripts and the
     // log files
     let newestRev = getObjectWithKey(revisionsData["revisions"], "label", getNewestRevision());
+    let revs = getSelectedRevsList();
 
     console.debug(`Newest revision is '${newestRev["label"]}'`);
 
@@ -435,6 +452,7 @@ function updateComparisonData(_comparisonData) {
         for (let index in comparisonData["packages"]) {
             let name = comparisonData["packages"][index]["name"];
             comparisonDataPkg2Index[name] = index;
+            comparisonData["packages"][index]['scriptfiles_dict'] = {};
         }
 
         for (let irev in newestRev["packages"]) {
@@ -452,6 +470,17 @@ function updateComparisonData(_comparisonData) {
 
                 comparisonData["packages"][ipkg]["fail_count"] = failCount;
                 comparisonData["packages"][ipkg]["scriptfiles"] = scriptfiles;
+                // Store all the selected revs' scriptfiles as well,
+                // along with the newestRev's
+                for (let rev of revs) {
+                    if (rev == 'reference') {
+                        continue;
+                    }
+                    let selectedRev = getObjectWithKey(revisionsData["revisions"], "label", rev);
+                    comparisonData["packages"][ipkg]["scriptfiles_dict"][rev] = selectedRev["packages"][irev]["scriptfiles"];
+                }
+                
+
                 // Also store the label of the newest revision as this
                 // is needed to stich together the loading path of
                 // log files
@@ -658,27 +687,13 @@ function loadValidationPlots(packageLoadName="") {
             ractive.observe('show_expert_plots', function () {
                 ractiveValuePreserveSession(ractive, "show_expert_plots");
             });
-
-            // check if an "empty" entry needs to be added to the script accordion
-            if ( $('.failed_script').length > 0) {
-                $("#no_failed_scripts").hide();
-            }
-
-            if ( $('.finished_script').length > 0) {
-                $("#no_finished_scripts").hide();
-            }
-
-            if ( $('.skipped_script').length > 0) {
-                $("#no_skipped_scripts").hide();
-            }
-
         },
         // on teardown
         function (ractive) {
         },
         // on render
         function () {
-            $("#accordion_script_files").accordion({
+            $(".accordion_script_files").accordion({
                 heightStyle: "content"
             });
         },
@@ -850,11 +865,22 @@ function getNewestRevision(index=0) {
         return "reference";
     }
 
+    // If at least one nightly revision is selected, pick the newest nightly instead of the newest overall
+    let nightlySelected = false;
+    for (let revision of revisionsData["revisions"]){
+        let label = revision["label"];
+        if ( ! selectedRevs.includes(label)) continue;
+	if (label.startsWith("nightly")) {
+            nightlySelected = true;
+        }
+    }
+
     let date2rev = {};
     for (let revision of revisionsData["revisions"]){
         let label = revision["label"];
         if ( ! selectedRevs.includes(label)) continue;
         if ( label === "reference" ) continue;
+        if ( nightlySelected && ! label.startsWith("nightly")) continue;
         let date = revision["creation_date"];
         date2rev[date] = label;
     }

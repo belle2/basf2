@@ -147,7 +147,7 @@ namespace Belle2 {
       but it still creates the streamers for the base classes.
       Just for reference: the previous class version was 10.
     */
-    ClassDef(DirectedNodeNetworkContainer, 0)
+    ClassDef(DirectedNodeNetworkContainer, 0);
 
   protected:
 

@@ -40,7 +40,34 @@
   <h1>Package: {{ name }}</h1>
 
   <h2>Script Files</h2>
-  {{>scriptfiles_accordion}}
+  <!-- Choose any(first here) package to fetch the list of selected revisions 
+  to build the script files table-->
+
+  {{#plotfiles:i}}
+  {{#if i == 0}}
+    {{#compared_revision:j}}
+    <div class="releases-tag">
+    {{#if j > 0}}
+    <button class="button" id="bt_{{compared_revision[j]}}" onclick="showScriptFiles('{{compared_revision[j]}}')">{{compared_revision[j]}}</button>
+    {{/if}}
+    </div>
+    {{/compared_revision}}
+    {{#compared_revision:j}}
+    <!-- iterate through revisions selected, skipping reference as there are no logs for that. 
+      Display the first non-reference release by default, hiding the others. -->
+    {{#if j == 1 || (compared_revision[j] != "reference" && compared_revision.length==1)}}
+      <div id="{{compared_revision[j]}}" class="script_logs">
+          {{>scriptfiles_accordion compared_revision[j]}}
+          <script>$('#bt_{{compared_revision[j]}}').click();</script>
+      </div>
+    {{elseif j>1}}
+      <div id="{{compared_revision[j]}}" class="script_logs" style="display:none">
+        {{>scriptfiles_accordion compared_revision[j]}}
+      </div>
+    {{/if}}
+    {{/compared_revision}}
+  {{/if}}
+  {{/plotfiles}}
   <br>
 
   <!-- Looping over all plotfiles -->
@@ -132,41 +159,64 @@
 <!---------------------------------------------------------------------------->
 
 {{#partial scriptfiles_accordion}}
-<div id="accordion_script_files">
-  <h3>Failed Scripts</h3>
-  <div >
-    <div id="no_failed_scripts">No failed scripts</div>
-    {{#scriptfiles}}
-    {{#if status == "failed" }}
-    <div class="failed_script">
-      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
-      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+  <div class="accordion_script_files">
+    <h3>Failed Scripts</h3>
+    <div>
+      <div id="no_failed_scripts_{{compared_revision[j]}}">No failed scripts</div>
+      {{#scriptfiles_dict[compared_revision[j]]}}
+      {{#if status == "failed" }}
+      <script>$("#no_failed_scripts_{{compared_revision[j]}}").hide()</script>
+      <div class="failed_script">
+        <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+        <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log </a>
+        {{#if issues.length==0}}
+        <span>
+          <button class="btn-create" onclick="window.open('../issue?file_path=../results/{{compared_revision[j]}}/{{log_url}}&rev_label={{compared_revision[j]}}','_blank');" type="button">
+            <img src="images/gitlab-logo-600.png" style="width: 24px;">
+              Create issue
+          </button>
+        </span>
+        {{else}}
+        <span>
+          <strong>Linked issues &darr</strong>
+          <ul style="margin:auto">
+            {{#issues:i}}
+            <li>
+              <a target="_blank" href="../issue_redirect?iid={{ issues[i] }}">{{issues[i]}}</a> || 
+              <a target="_blank" href="../update_issue?file_path=../results/{{compared_revision[j]}}/{{log_url}}&id={{issues[i]}}&rev_label={{compared_revision[j]}}" target="_blank">Update with this log</a>
+            </li>
+            {{/issues}}
+          </ul>
+        </span>
+        {{/if}}
+      </div>
+      {{/if}}
+      {{/scriptfiles_dict[compared_revision[j]]}}
     </div>
-    {{/if}}
-    {{/scriptfiles}}
-  </div>
-  <h3>Finished Scripts</h3>
-  <div>
-    <div id="no_finished_scripts">No finished scripts</div>
-    {{#scriptfiles}}
-    {{#if status == "finished" }}
-    <div class="finished_script">
-      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
-      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    <h3>Finished Scripts</h3>
+    <div>
+      <div id="no_finished_scripts_{{compared_revision[j]}}">No finished scripts</div>
+      {{#scriptfiles_dict[compared_revision[j]]}}
+      {{#if status == "finished" }}
+      <script>$("#no_finished_scripts_{{compared_revision[j]}}").hide()</script>
+      <div class="finished_script">
+        <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+        <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log</a>
+      </div>
+      {{/if}}
+      {{/scriptfiles_dict[compared_revision[j]]}}
     </div>
-    {{/if}}
-    {{/scriptfiles}}
+    <h3>Skipped Scripts</h3>
+    <div>
+      <div id="no_skipped_scripts_{{compared_revision[j]}}">No skipped scripts</div>
+      {{#scriptfiles_dict[compared_revision[j]]}}
+      {{#if status == "skipped" }}
+      <script>$("#no_skipped_scripts_{{compared_revision[j]}}").hide()</script>
+      <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
+      {{/if}}
+      {{/scriptfiles_dict[compared_revision[j]]}}
+    </div>
   </div>
-  <h3>Skipped Scripts</h3>
-  <div>
-    <div id="no_skipped_scripts">No skipped scripts</div>
-    {{#scriptfiles}}
-    {{#if status == "skipped" }}
-    <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
-    {{/if}}
-    {{/scriptfiles}}
-  </div>
-</div>
 {{/partial}}
 
 <!---------------------------------------------------------------------------->
@@ -233,10 +283,16 @@
   {{! if the warning has not been set, no pvalue is available either }}
   <span><strong>Contact: </strong>{{ contact }}</span><br>
   <span><strong>Check for: </strong>{{ check }}</span><br>
+  {{#scriptfiles}}
+  {{#if name == rootfile+".py" }}
+  <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>
+  {{/if}}
+  {{/scriptfiles}}
   {{#if issue.length==0 }}
-  <span>
-    <a href="../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}" target="_blank">Create issue</a>
-  </span>
+  <button class="btn-create" onclick="window.open('../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}','_blank');" type="button">
+    <img src="images/gitlab-logo-600.png" style="width: 24px;">
+      Create issue
+  </button>
   {{else}}
   <span>
     <strong>Linked issues &darr</strong>
@@ -251,11 +307,6 @@
   </span>
   {{/if}}
   <br>
-  {{#scriptfiles}}
-  {{#if name == rootfile+".py" }}
-  <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>
-  {{/if}}
-  {{/scriptfiles}}
   <!-- todo: share this plot -->
 </div>
 {{/partial}}

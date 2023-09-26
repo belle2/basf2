@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 <header>
   <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>Pi0_Validation.root</output>
-  <contact>Mario Merola (mario.merola@na.infn.it), Andrea Selce (selce@infn.it)</contact>
+  <contact>Mario Merola (mario.merola@na.infn.it)</contact>
   <description>
   Check the calibration of the ECL in the MC by determining the measured pi0 invariant mass.
   </description>
@@ -45,7 +44,7 @@ create_validation_histograms(
         (
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
-            "Andrea Selce <selce@infn.it>",
+            "Eldar Ganiev <eldar.ganiev@desy.de>",
             r"The $\pi^0$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -63,7 +62,7 @@ create_validation_histograms(
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
-            "Andrea Selce <selce@infn.it>",
+            "Eldar Ganiev <eldar.ganiev@desy.de>",
             r"The $\pi^0$ invariant mass distribution for truth matched candidates",
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"

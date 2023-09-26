@@ -7,14 +7,13 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
 #include <TRandom.h>
 #include <cmath>
 

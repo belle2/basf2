@@ -6,11 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+
 #include <svd/modules/svdSpacePointCreator/SVDSpacePointCreatorModule.h>
 #include <svd/modules/svdSpacePointCreator/SpacePointHelperFunctions.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,6 +36,8 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "SpacePoints collection name", string("SVDSpacePoints"));
   addParam("EventLevelTrackingInfoName", m_eventLevelTrackingInfoName,
            "EventLevelTrackingInfo collection name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName,
+           "SVDEventInfo collection name.", string("SVDEventInfo"));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -55,12 +60,96 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created",
            unsigned(m_numMaxSpacePoints));
 
-  addParam("useSVDGroupInfo", m_useSVDGroupInfo,
-           "Use SVD group info to reject combinations from clusters belonging to different groups",
+  addParam("useSVDGroupInfoIn6Sample", m_useSVDGroupInfoIn6Sample,
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 6-sample DAQ mode", bool(false));
+  addParam("useSVDGroupInfoIn3Sample", m_useSVDGroupInfoIn3Sample,
+           "Use SVD group info to reject combinations from clusters belonging to different groups in 3-sample DAQ mode", bool(false));
+  addParam("numberOfSignalGroups", m_usedParsIn6Samples.numberOfSignalGroups,
+           "Number of groups expected to contain the signal clusters.",
+           int(1));
+  addParam("formSingleSignalGroup", m_usedParsIn6Samples.formSingleSignalGroup,
+           "Form a single super-group.",
            bool(false));
 
+  addParam("forceGroupingFromDB", m_forceGroupingFromDB, "use SVDRecoConfiguration from DB", bool(true));
+  addParam("useParamFromDB", m_useParamFromDB, "use SVDTimeGroupingConfiguration from DB", bool(true));
+
+  addParam("useSVDSpacePointSNRFractionFor6Samples", m_useSVDSpacePointSNRFractionFor6Samples,
+           "Use SVDSpacePointSNRFractionSelector to apply a selection on combinations of clusters in 6-sample DAQ mode", bool(false));
+  addParam("useSVDSpacePointSNRFractionFor3Samples", m_useSVDSpacePointSNRFractionFor3Samples,
+           "Use SVDSpacePointSNRFractionSelector to apply a selection on combinations of clusters in 3-sample DAQ mode", bool(false));
+
+  addParam("useDBForSNRFraction", m_useDBForSNRFraction,
+           "if False, use configuration module parameters for SVDSPacePointSNRFractionSelector",
+           bool(true));
+
+
+  m_usedParsIn3Samples.numberOfSignalGroups  = m_usedParsIn6Samples.numberOfSignalGroups;
+  m_usedParsIn3Samples.formSingleSignalGroup = m_usedParsIn6Samples.formSingleSignalGroup;
 }
 
+
+
+void SVDSpacePointCreatorModule::beginRun()
+{
+  if (m_forceGroupingFromDB || m_useDBForSNRFraction) {
+    if (!m_recoConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+
+    if (m_forceGroupingFromDB) {
+      m_useSVDGroupInfoIn6Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(6);
+      m_useSVDGroupInfoIn3Sample = m_recoConfig->isSVDGroupInfoUsedInSPCreator(3);
+    }
+
+    if (m_useDBForSNRFraction) {
+      m_useSVDSpacePointSNRFractionFor6Samples = m_recoConfig->useSVDSpacePointSNRFraction(6);
+      m_useSVDSpacePointSNRFractionFor3Samples = m_recoConfig->useSVDSpacePointSNRFraction(3);
+    }
+  }
+
+  if (m_useSVDGroupInfoIn6Sample)
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 6-sample DAQ mode.");
+  else
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 6-sample DAQ mode.");
+
+  if (m_useSVDGroupInfoIn3Sample)
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is used for 3-sample DAQ mode.");
+  else
+    B2INFO("SVDSpacePointCreator : SVDCluster groupId is not used for 3-sample DAQ mode.");
+
+  if (m_useSVDSpacePointSNRFractionFor6Samples)
+    B2INFO("SVDSpacePointCreator : cut on sample SNR fraction  is used for 6-sample DAQ mode.");
+
+  if (m_useSVDSpacePointSNRFractionFor3Samples)
+    B2INFO("SVDSpacePointCreator : cut on sample SNR fraction  is used for 3-sample DAQ mode.");
+
+  if (m_useSVDSpacePointSNRFractionFor6Samples || m_useSVDSpacePointSNRFractionFor3Samples) {
+    if (!m_svdSpacePointSNRFractionSelector.isValid())
+      B2FATAL("No valid SVDSpacePointSNRFractionSelector");
+  }
+
+  if (m_useParamFromDB &&
+      (m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample)) {
+
+    if (!m_recoConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+
+    TString timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+    TString timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
+
+    if (!m_groupingConfig.isValid())
+      B2FATAL("no valid configuration found for SVDTimeGrouping");
+    else
+      B2DEBUG(20, "SVDTimeGroupingConfiguration: from now on we are using " << m_groupingConfig->get_uniqueID());
+
+    m_usedParsIn6Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith6SamplesAlgorithm, 6);
+    m_usedParsIn3Samples = m_groupingConfig->getTimeGroupingParameters(timeRecoWith3SamplesAlgorithm, 3);
+  }
+}
 
 
 void SVDSpacePointCreatorModule::initialize()
@@ -73,8 +162,7 @@ void SVDSpacePointCreatorModule::initialize()
   //Relations to cluster objects only if the ancestor relations exist:
   m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
-
-  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
+  B2DEBUG(20, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
           "\nsvdClusters: " << m_svdClusters.getName() <<
           "\nspacePoints: " << m_spacePoints.getName());
 
@@ -103,18 +191,44 @@ void SVDSpacePointCreatorModule::initialize()
 void SVDSpacePointCreatorModule::event()
 {
 
-
+  bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
+  bool useSVDSpacePointSNRFraction = m_useSVDSpacePointSNRFractionFor6Samples
+                                     || m_useSVDSpacePointSNRFractionFor3Samples;
+  int  numberOfSignalGroups;
+  bool formSingleSignalGroup;
+  if (useSVDGroupInfo || useSVDSpacePointSNRFraction) {
+    // first take Event Informations:
+    StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
+    if (!temp_eventinfo.isValid())
+      m_svdEventInfoName = "SVDEventInfoSim";
+    StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+    if (!eventinfo) B2ERROR("No SVDEventInfo!");
+    int numberOfAcquiredSamples = eventinfo->getNSamples();
+    // then use the respective parameters
+    if (numberOfAcquiredSamples == 6) {
+      useSVDGroupInfo = m_useSVDGroupInfoIn6Sample;
+      numberOfSignalGroups  = m_usedParsIn6Samples.numberOfSignalGroups;
+      formSingleSignalGroup = m_usedParsIn6Samples.formSingleSignalGroup;
+      useSVDSpacePointSNRFraction = m_useSVDSpacePointSNRFractionFor6Samples;
+    } else if (numberOfAcquiredSamples == 3) {
+      useSVDGroupInfo = m_useSVDGroupInfoIn3Sample;
+      numberOfSignalGroups  = m_usedParsIn3Samples.numberOfSignalGroups;
+      formSingleSignalGroup = m_usedParsIn3Samples.formSingleSignalGroup;
+      useSVDSpacePointSNRFraction = m_useSVDSpacePointSNRFractionFor3Samples;
+    }
+  }
 
   if (m_onlySingleClusterSpacePoints == true) {
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, m_useSVDGroupInfo);
+                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, useSVDGroupInfo, numberOfSignalGroups, formSingleSignalGroup,
+                                  m_NoiseCal, m_svdSpacePointSNRFractionSelector, useSVDSpacePointSNRFraction);
   }
 
 
-  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance <<
+  B2DEBUG(21, "SVDSpacePointCreatorModule(" << m_nameOfInstance <<
           ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           ", svdClusters: " << m_svdClusters.getEntries() <<
           ", spacePoints: " << m_spacePoints.getEntries());
@@ -124,7 +238,7 @@ void SVDSpacePointCreatorModule::event()
     for (int index = 0; index < m_spacePoints.getEntries(); index++) {
       const SpacePoint* sp = m_spacePoints[index];
 
-      B2DEBUG(10, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
+      B2DEBUG(29, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<
               " and VxdID " << VxdID(sp->getVxdID()) <<
               " is tied to a cluster in: " << sp->getArrayName());
@@ -140,7 +254,7 @@ void SVDSpacePointCreatorModule::event()
 
 void SVDSpacePointCreatorModule::terminate()
 {
-  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2DEBUG(20, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
           ", svdClusters: " << m_TESTERSVDClusterCtr <<
           ", spacePoints: " << m_TESTERSpacePointCtr);
   if (m_useQualityEstimator == true) {

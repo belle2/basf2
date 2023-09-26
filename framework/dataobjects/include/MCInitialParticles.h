@@ -10,7 +10,8 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <TLorentzVector.h>
+#include <TMath.h>
+#include <TVector3.h>
 #include <Math/AxisAngle.h>
 #include <Math/Boost.h>
 #include <Math/LorentzRotation.h>

@@ -28,6 +28,8 @@
 #include <svd/calibration/SVDMCClusterPositionFudgeFactor.h>
 #include <svd/calibration/SVDMCClusterTimeFudgeFactor.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
+#include <svd/dbobjects/SVDClusterTimeShifter.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <TMath.h>
 
@@ -136,12 +138,15 @@ namespace Belle2 {
 
       // 4. Calibration Objects
       bool m_returnRawClusterTime = false; /**< if true cluster time is not calibrated, to be used for time calibration */
+      bool m_shiftSVDClusterTime = true; /**< if true applies SVDCluster time shift based on cluster-size*/
 
+      DBObjPtr<HardwareClockSettings> m_hwClock;  /**< systems clock*/
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/
       SVDMCClusterPositionFudgeFactor m_mcPositionFudgeFactor; /**<SVDMCClusterPositionFudgeFactor db object*/
       SVDMCClusterTimeFudgeFactor m_mcTimeFudgeFactor; /**<SVDMCClusterTimeFudgeFactor db object*/
+      DBObjPtr<SVDClusterTimeShifter> m_svdClusterTimeShifter; /**< SVDCluster time shift*/
 
       /**
        * returns the position of the cluster after
@@ -169,6 +174,11 @@ namespace Belle2 {
        * alter the cluster time (applied on MC to match resolution measured on data)
        */
       void alterClusterTime();
+
+      /**
+       * Apply cluster time shift depending on cluster size
+       */
+      void shiftSVDClusterTime();
 
     };// end class declarations
 

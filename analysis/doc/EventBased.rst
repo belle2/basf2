@@ -13,7 +13,7 @@ Event based analysis
 In some situations, it is useful to make cuts on, and write out event-wise information.
 
 .. warning::
-        Please note that this use model and the documentation are under development. 
+        Please note that this use model and the documentation are under development.
 
 Please ask questions at `Belle II questions <https://questions.belle2.org/>`_ and report bugs using `GitLab <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
 Be sure to tag your questions and bug reports as "analysis" and "event based" to help us find them.
@@ -58,7 +58,7 @@ Here is a simple example:
     buildEventShape(path=mypath)
     applyEventCuts('foxWolframR2 < 0.3', path=mypath)
 
-This builds the list of all pions but only processes events where the event-level R2 passes the cut. 
+This builds the list of all pions but only processes events where the event-level R2 passes the cut.
 
 .. seealso:: :download:`B2A307 </analysis/examples/tutorials/B2A307-BasicEventWiseNtupleSelection.py>` shows a full example.
 
@@ -73,4 +73,3 @@ Here is a list of event based variables on which you can make a cut using the ab
 .. b2-variables::
    :description-regex-filter: ^\[Eventbased\].*
    :noindex:
-

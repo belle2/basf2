@@ -11,7 +11,7 @@
 #pragma link C++ class Belle2::TOPDigit+; // checksum=0x43b82094, version=15
 #pragma link C++ class Belle2::TOPBarHit+; // checksum=0x88bd7661, version=3
 #pragma link C++ class Belle2::TOPLikelihood+; // checksum=0xd7c618b7, version=2
-#pragma link C++ class Belle2::TOPRecBunch+; // checksum=0xdb990202, version=5
+#pragma link C++ class Belle2::TOPRecBunch+; // checksum=0x28cd770d, version=7
 #pragma link C++ class Belle2::TOPRawWaveform+; // checksum=0x581d60d9, version=9
 #pragma link C++ class Belle2::TOPProductionEventDebug+; // checksum=0xfbeb4b5d, version=1
 #pragma link C++ class Belle2::TOPProductionHitDebug+; // checksum=0x32688835, version=1
@@ -34,10 +34,12 @@
 #pragma read sourceClass="Belle2::TOPPDFCollection" version="[3]" \
   source="TVector3 m_localHitPosition" \
   targetClass="Belle2::TOPPDFCollection" target="m_localHitPosition" \
+  include="TVector3.h" \
   code="{m_localHitPosition = ROOT::Math::XYZPoint(onfile.m_localHitPosition);}"
 #pragma read sourceClass="Belle2::TOPPDFCollection" version="[3]" \
   source = "TVector3 m_localHitMomentum" \
   targetClass = "Belle2::TOPPDFCollection" target = "m_localHitMomentum" \
+  include="TVector3.h" \
   code = "{m_localHitMomentum = ROOT::Math::XYZVector(onfile.m_localHitMomentum);}"
 
 #pragma read sourceClass="Belle2::TOPSimHit" version="[-2]" \

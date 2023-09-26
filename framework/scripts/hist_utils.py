@@ -28,7 +28,8 @@ def hist2array(hist, return_edges=False):
     if return_edges:
         edges = []
         edges.append(np.empty(nbins + 1))
-        hist.GetLowEdge(edges[-1])
+        hist.GetXaxis().GetLowEdge(edges[-1])
+        edges[-1][nbins] = hist.GetXaxis().GetBinUpEdge(nbins)
         return arr, edges
     return arr
 

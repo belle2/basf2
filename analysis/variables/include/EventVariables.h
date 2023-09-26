@@ -126,6 +126,46 @@ namespace Belle2 {
      */
     double getBeamE(const Particle*);
 
+
+    /** px component of truth value of HER momentum */
+    double getMcPxHER(const Particle*);
+
+    /** py component of truth value of HER momentum */
+    double getMcPyHER(const Particle*);
+
+    /** pz component of truth value of HER momentum */
+    double getMcPzHER(const Particle*);
+
+    /** px component of truth value of LER momentum */
+    double getMcPxLER(const Particle*);
+
+    /** py component of truth value of LER momentum */
+    double getMcPyLER(const Particle*);
+
+    /** pz component of truth value of LER momentum */
+    double getMcPzLER(const Particle*);
+
+
+    /** px component of HER momentum */
+    double getPxHER(const Particle*);
+
+    /** py component of HER momentum */
+    double getPyHER(const Particle*);
+
+    /** pz component of HER momentum */
+    double getPzHER(const Particle*);
+
+    /** px component of LER momentum */
+    double getPxLER(const Particle*);
+
+    /** py component of LER momentum */
+    double getPyLER(const Particle*);
+
+    /** pz component of LER momentum */
+    double getPzLER(const Particle*);
+
+
+
     /**
      * return true sqrt(s) value
      */

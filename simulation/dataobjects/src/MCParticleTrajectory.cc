@@ -7,25 +7,25 @@
  **************************************************************************/
 
 #include <simulation/dataobjects/MCParticleTrajectory.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <stack>
 #include <tuple>
 
 using namespace Belle2;
 
 namespace {
-  /** Utility function to set an TVector3 from two points.
+  /** Utility function to set an ROOT::Math::XYZVector from two points.
    * v = a - b
-   * @param v TVector3 to modify
+   * @param v ROOT::Math::XYZVector to modify
    * @param a first point
    * @param b second point
    * @param unit if true, return the unit vector in a-b direction
    */
-  void setVector(TVector3& v, const MCTrajectoryPoint& a, const MCTrajectoryPoint& b, bool unit = false)
+  void setVector(ROOT::Math::XYZVector& v, const MCTrajectoryPoint& a, const MCTrajectoryPoint& b, bool unit = false)
   {
     v.SetXYZ(a.x - b.x, a.y - b.y, a.z - b.z);
     if (unit) {
-      v *= 1. / v.Mag();
+      v *= 1. / v.R();
     }
   }
 }
@@ -44,7 +44,7 @@ void MCParticleTrajectory::simplify(float distance_tolerance)
   // iterators used for the segment inspection
   iterator firstPoint, splitPoint, finalPoint;
   // segment direction and vector between segment start and mid point
-  TVector3 n, pa;
+  ROOT::Math::XYZVector n, pa;
   // investigate all segments until all fulfill the distance requirement
   while (!stack.empty()) {
     //Get first and last point
@@ -59,7 +59,7 @@ void MCParticleTrajectory::simplify(float distance_tolerance)
       //vector from segment start (p) to point (a)
       setVector(pa, *firstPoint, *nextPoint);
       //3D distance between point a and line p + x*n
-      const double dist = (pa - (pa * n) * n).Mag();
+      const double dist = (pa - (pa.Dot(n)) * n).R();
       //check if this is the maximum distance so far
       if (dist > maxDistance) {
         splitPoint = nextPoint;

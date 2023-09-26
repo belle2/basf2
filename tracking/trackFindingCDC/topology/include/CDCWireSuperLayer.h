@@ -227,7 +227,7 @@ namespace Belle2 {
       /**@}*/
 
       /**
-       *  @getSecondaryNeighbor Secondary neighborhood
+       *  getSecondaryNeighbor Secondary neighborhood
        *  The secondary neighbors are numbered like positions on the normal twelve hour clock.
        *
        *  Due to the hexogonal arrangement of the wires, the secondary neighbors are positioned

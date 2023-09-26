@@ -19,6 +19,7 @@
 /* ROOT headers. */
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TString.h>
 #include <TText.h>
 #include <TLine.h>
@@ -39,11 +40,6 @@ namespace Belle2 {
      * Constructor.
      */
     DQMHistAnalysisKLM2Module();
-
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLM2Module();
 
     /**
      * Initializer.
@@ -68,6 +64,15 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Process histogram containing the efficiencies.
+     * @param[in]  effHist  Histogram itself.
+     * @param[in]  denominator Denominator for efficiency hist.
+     * @param[in]  numerator Numerator for efficiency hist.
+     * @param[in]  canvas Canvas of interest.
+     */
+    void processEfficiencyHistogram(TH1* effHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
+
 
     /**
      * Process histogram containing the number of hits in plane.
@@ -76,6 +81,19 @@ namespace Belle2 {
      */
     void processPlaneHistogram(const std::string& histName, TH1* histogram);
 
+    /**
+     * Process 2D efficiency histograms.
+     * @param[in]  mainHist Live efficiency histogram.
+     * @param[in]  refHist Reference efficiency histogram
+     * @param[in]  planeHist Live ratio histogram
+     * @param[in]  errHist Error histogram
+     * @param[in]  layers Number of layers
+     * @param[in]  sectors Number of sectors
+     * @param[in]  ratioPlot True if ratio plot, False if difference plot
+     * @param[in]  eff2dCanv Canvas
+     */
+    void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
+                               TCanvas* eff2dCanv);
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
@@ -119,10 +137,58 @@ namespace Belle2 {
     /** Monitoring object. */
     MonitoringObject* m_monObj {};
 
-
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_EklmElementNumbers;
 
+    /** 2D layer-sector efficiency differences */
+
+    /** reference histogram file path **/
+    std::string m_refFileName;
+
+    /** reference histogram file **/
+    TFile* m_refFile = nullptr;
+
+    /** efficiency ratio alarm threshold **/
+    float m_alarmThr = 0;
+
+    /** efficiency ratio min z scale **/
+    float m_min = 0;
+
+    /** efficiency ratio max z scale **/
+    float m_max = 2;
+
+    /** show efficiency ratio or difference **/
+    bool m_ratio = true;
+
+    /** BKLM efficiencies reference histogram **/
+    TH1* m_ref_efficiencies_bklm = NULL;
+
+    /** BKLM efficiencies 2dim histogram **/
+    TH2* m_eff2d_bklm = NULL;
+
+    /** BKLM efficiencies error histogram **/
+    TH2* m_err_bklm = NULL;
+
+    /** BKLM efficiencies ratio canvas **/
+    TCanvas* m_c_eff2d_bklm = NULL;
+
+    /** ELM efficiencies reference histogram **/
+    TH1* m_ref_efficiencies_eklm = NULL;
+
+    /** EKLM efficiencies 2dim histogram **/
+    TH2* m_eff2d_eklm = NULL;
+
+    /** EKLM efficiencies error histogram **/
+    TH2* m_err_eklm = NULL;
+
+    /** EKLM efficiencies ratio canvas **/
+    TCanvas* m_c_eff2d_eklm = NULL;
+
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
+
+    /** Minimal number of entries for delta histogram update. */
+    double m_minEvents;
 
   };
 

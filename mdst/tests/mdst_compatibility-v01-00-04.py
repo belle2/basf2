@@ -14,6 +14,12 @@ Test backwards compatibility for an mdst file produced with release-01-00-04.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-01-00-04:
+
+- EventLevelClusteringInfo
+  + nKLMDigitsMultiStrip
+  + nECLShowers
+  + nECLLocalMaximums
+  + nECLTriggerCells
 - EventMetaData:
   + isEndOfRun
 - EventLevelTrackingInfo:
@@ -76,4 +82,4 @@ if __name__ == "__main__":
     main.add_module("RootInput", inputFileName=find_file("mdst/tests/mdst-v01-00-04.root"))
     main.add_module("EventInfoPrinter")
     add_mdst_dump(main, True)
-    process(main, 5)
+    process(main, 4)

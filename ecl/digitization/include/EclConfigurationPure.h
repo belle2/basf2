@@ -79,7 +79,7 @@ namespace Belle2 {
        * the same set of fit parameters).
        *
        * For detailed description of the fit algorithm, see ECL-TN-2013-02
-       * (latest version at https://stash.desy.de/users/remnev/repos/ecl-tn-2013-02/browse/digi.pdf)
+       * (latest version at https://gitlab.desy.de/belle2/documents/ecl-tn-2013-02/-/blob/master/digi.pdf)
        */
       struct fitparamspure_t {
         /** Matrix used in shape fit algorithm.

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -196,12 +195,12 @@ def efficiencyCalculator(mc, data, method):
         mc_uncertainty_eff_effB0bar = mc_uncertainty_eff_effB0bar + mc_iEffEfficiencyB0barUncertainty[i]**2
 
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
-        print('* ' + '{:.3f}'.format(r_subsample[i]) + ' - ' + '{:.3f}'.format(r_subsample[i + 1]) + '   ' +
-              '{:.3f}'.format(mc_rvalueB0Average[i]) + ' +- ' + '{:.4f}'.format(mc_rvalueStdB0Average[i]) + '    ' +
-              '{:.4f}'.format(mc_event_fractionTotal[i]) + '      ' +
-              '{: .4f}'.format(mc_event_fractionDiff[i]) + '     ' +
-              '{:.4f}'.format(mc_wvalue[i]) + ' +- ' + '{:.4f}'.format(mc_wvalueUncertainty[i]) + '   ' +
-              '{: .4f}'.format(mc_wvalueDiff[i]) + ' +- ' + '{:.4f}'.format(mc_wvalueDiffUncertainty[i]) + '  *')
+        print('* ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '   ' +
+              f'{mc_rvalueB0Average[i]:.3f}' + ' +- ' + f'{mc_rvalueStdB0Average[i]:.4f}' + '    ' +
+              f'{mc_event_fractionTotal[i]:.4f}' + '      ' +
+              f'{mc_event_fractionDiff[i]: .4f}' + '     ' +
+              f'{mc_wvalue[i]:.4f}' + ' +- ' + f'{mc_wvalueUncertainty[i]:.4f}' + '   ' +
+              f'{mc_wvalueDiff[i]: .4f}' + ' +- ' + f'{mc_wvalueDiffUncertainty[i]:.4f}' + '  *')
 
     mc_average_eff_eff = (mc_tot_eff_effB0 + mc_tot_eff_effB0bar) / 2
     mc_uncertainty_eff_effAverage = math.sqrt(mc_uncertainty_eff_effAverage)
@@ -215,51 +214,39 @@ def efficiencyCalculator(mc, data, method):
     print('*    __________________________________________________________________________________________    *')
     print('*   |                                                                                          |   *')
     print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
-          '{:<24}'.format("%.0f" % mc_total_tagged) + '{:>36}'.format('|   *'))
+          f"{f'{mc_total_tagged:.0f}':<24}" + f"{'|   *':>36}")
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' +
-        '{:.2f}'.format(
-            mc_tagging_eff *
-            100) +
+        f'{mc_tagging_eff * 100:.2f}' +
         " +- " +
-        '{:.2f}'.format(
-            mc_DeltaTagging_eff *
-            100) +
+        f'{mc_DeltaTagging_eff * 100:.2f}' +
         ' %                                      |   *')
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' +
-        '{:.6f}'.format(
-            mc_average_eff_eff *
-            100) +
+        f'{mc_average_eff_eff * 100:.6f}' +
         " +- " +
-        '{:.6f}'.format(
-            mc_uncertainty_eff_effAverage *
-            100) +
+        f'{mc_uncertainty_eff_effAverage * 100:.6f}' +
         ' %                    |   *')
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY ASYMMETRY (q=+-1)=  ' +
-        '{:^9.6f}'.format(
-            mc_diff_eff *
-            100) +
+        f'{mc_diff_eff * 100:^9.6f}' +
         " +- " +
-        '{:.6f}'.format(
-            mc_diff_eff_Uncertainty *
-            100) +
+        f'{mc_diff_eff_Uncertainty * 100:.6f}' +
         ' %           |   *')
     print('*   |                                                                                          |   *')
     print('*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' +
-          '{:.2f}'.format(mc_tot_eff_effB0 * 100) + " +-" + '{: 4.2f}'.format(mc_uncertainty_eff_effB0 * 100) +
+          f'{mc_tot_eff_effB0 * 100:.2f}' + " +-" + f'{mc_uncertainty_eff_effB0 * 100: 4.2f}' +
           ' % (q=+1)  ' +
-          '{:.2f}'.format(mc_tot_eff_effB0bar * 100) + " +-" + '{: 4.2f}'.format(mc_uncertainty_eff_effB0bar * 100) +
+          f'{mc_tot_eff_effB0bar * 100:.2f}' + " +-" + f'{mc_uncertainty_eff_effB0bar * 100: 4.2f}' +
           ' % (q=-1) ' + ' |   *')
     print('*   |                                                                                          |   *')
     print('*   | FLAVOR PERCENTAGE (MC):                  ' +
-          '{:.2f}'.format(mc_total_tagged_B0 / mc_total_tagged * 100) + ' % (q=+1)  ' +
-          '{:.2f}'.format(mc_total_tagged_B0bar / mc_total_tagged * 100) + ' % (q=-1)  Diff=' +
-          '{:^5.2f}'.format((mc_total_tagged_B0 - mc_total_tagged_B0bar) / mc_total_tagged * 100) + ' %    |   *')
+          f'{mc_total_tagged_B0 / mc_total_tagged * 100:.2f}' + ' % (q=+1)  ' +
+          f'{mc_total_tagged_B0bar / mc_total_tagged * 100:.2f}' + ' % (q=-1)  Diff=' +
+          f'{(mc_total_tagged_B0 - mc_total_tagged_B0bar) / mc_total_tagged * 100:^5.2f}' + ' %    |   *')
     print('*   |__________________________________________________________________________________________|   *')
     print('*                                                                                                  *')
     print('****************************************************************************************************')
@@ -270,30 +257,26 @@ def efficiencyCalculator(mc, data, method):
           r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip$ ' +
           r' & & & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i} $\\ \hline\hline')
     for i in range(0, r_size - 1):
-        print('$ ' + '{:.3f}'.format(r_subsample[i]) + ' - ' + '{:.3f}'.format(r_subsample[i + 1]) + '$ & $'
-              '{: 6.1f}'.format(mc_event_fractionTotal[i] * 100) + '$ & $' +
-              '{: 7.3f}'.format(mc_wvalue[i] * 100) + r" \pm " + '{:2.3f}'.format(mc_wvalueUncertainty[i] * 100) + r' $ & $' +
-              '{: 6.1f}'.format(mc_wvalueDiff[i] * 100) + r" \pm " +
-              '{:2.3f}'.format(mc_wvalueDiffUncertainty[i] * 100) + r'\, $ & $' +
-              '{: 8.4f}'.format(mc_iEffEfficiency[i] * 100) +  # + '$ & $' +
-              r" \pm " + '{:2.4f}'.format(mc_iEffEfficiencyUncertainty[i] * 100) + r'\, $ & & & $' +
-              '{: 6.4f}'.format(mc_iDeltaEffEfficiency[i] * 100) +  # +
-              r" \pm " + '{:2.4f}'.format(mc_iDeltaEffEfficiencyUncertainty[i] * 100) +
+        print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $' +
+              f'{mc_event_fractionTotal[i] * 100: 6.1f}' + '$ & $' +
+              f'{mc_wvalue[i] * 100: 7.3f}' + r" \pm " + f'{mc_wvalueUncertainty[i] * 100:2.3f}' + r' $ & $' +
+              f'{mc_wvalueDiff[i] * 100: 6.1f}' + r" \pm " +
+              f'{mc_wvalueDiffUncertainty[i] * 100:2.3f}' + r'\, $ & $' +
+              f'{mc_iEffEfficiency[i] * 100: 8.4f}' +  # + '$ & $' +
+              r" \pm " + f'{mc_iEffEfficiencyUncertainty[i] * 100:2.4f}' + r'\, $ & & & $' +
+              f'{mc_iDeltaEffEfficiency[i] * 100: 6.4f}' +  # +
+              r" \pm " + f'{mc_iDeltaEffEfficiencyUncertainty[i] * 100:2.4f}' +
               r'\enskip $ \\ ')
     print(r'\hline\hline')
     print(
         r'\multicolumn{1}{r}{Total} &  & \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
         r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-        '{: 6.2f}'.format(
-            mc_average_eff_eff *
-            100) +
+        f'{mc_average_eff_eff * 100: 6.2f}' +
         r" \pm " +
-        '{: 6.2f}'.format(
-            mc_uncertainty_eff_effAverage *
-            100) +
+        f'{mc_uncertainty_eff_effAverage * 100: 6.2f}' +
         r'\quad\,$ }')
     print(r'& & \multicolumn{2}{r}{ $\Delta \varepsilon_\text{eff} = ' +
-          '{: 6.2f}'.format(mc_diff_eff * 100) + r" \pm " + '{: 6.2f}'.format(mc_diff_eff_Uncertainty * 100) + r'\ \quad\,  $ }' +
+          f'{mc_diff_eff * 100: 6.2f}' + r" \pm " + f'{mc_diff_eff_Uncertainty * 100: 6.2f}' + r'\ \quad\,  $ }' +
           r' \\')
     print(r'\hline')
     print(r'\end{tabular}')
@@ -362,10 +345,10 @@ def efficiencyCalculator(mc, data, method):
         data_uncertainty_eff_effAverage = data_uncertainty_eff_effAverage + data_iEffEfficiencyUncertainty[i]**2
 
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
-        print('* ' + '{:.3f}'.format(r_subsample[i]) + ' - ' + '{:.3f}'.format(r_subsample[i + 1]) + '       ' +
-              '{:.3f}'.format(data_rvalueB0Average[i]) + ' +- ' + '{:.4f}'.format(data_rvalueStdB0Average[i]) + '          ' +
-              '{:.4f}'.format(data_event_fractionTotal[i]) + '               ' +
-              '{:.4f}'.format(data_wvalue[i]) + ' +- ' + '{:.4f}'.format(data_wvalueUncertainty[i]) + '             ' + '  *')
+        print('* ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '       ' +
+              f'{data_rvalueB0Average[i]:.3f}' + ' +- ' + f'{data_rvalueStdB0Average[i]:.4f}' + '          ' +
+              f'{data_event_fractionTotal[i]:.4f}' + '               ' +
+              f'{data_wvalue[i]:.4f}' + ' +- ' + f'{data_wvalueUncertainty[i]:.4f}' + '             ' + '  *')
 
     data_uncertainty_eff_effAverage = math.sqrt(data_uncertainty_eff_effAverage)
 
@@ -374,28 +357,20 @@ def efficiencyCalculator(mc, data, method):
     print('*    __________________________________________________________________________________________    *')
     print('*   |                                                                                          |   *')
     print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
-          '{:<24}'.format("%.0f" % data_total_tagged) + '{:>36}'.format('|   *'))
+          f"{f'{data_total_tagged:.0f}':<24}" + f"{'|   *':>36}")
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' +
-        '{:.2f}'.format(
-            data_tagging_eff *
-            100) +
+        f'{data_tagging_eff * 100:.2f}' +
         " +- " +
-        '{:.2f}'.format(
-            data_DeltaTagging_eff *
-            100) +
+        f'{data_DeltaTagging_eff * 100:.2f}' +
         ' %                                      |   *')
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' +
-        '{:.6f}'.format(
-            data_average_eff_eff *
-            100) +
+        f'{data_average_eff_eff * 100:.6f}' +
         " +- " +
-        '{:.6f}'.format(
-            data_uncertainty_eff_effAverage *
-            100) +
+        f'{data_uncertainty_eff_effAverage * 100:.6f}' +
         ' %                    |   *')
     print('*   |__________________________________________________________________________________________|   *')
     print('*                                                                                                  *')
@@ -407,22 +382,18 @@ def efficiencyCalculator(mc, data, method):
           r' & $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}$ ' +
           r'\\ \hline\hline')
     for i in range(0, len(rbins) - 1):
-        print('$ ' + '{:.3f}'.format(r_subsample[i]) + ' - ' + '{:.3f}'.format(r_subsample[i + 1]) + '$ & $'
-              '{: 6.2f}'.format(data_event_fractionTotal[i] * 100) + '$ & $' +
-              '{: 6.2f}'.format(data_wvalue[i] * 100) + r" \pm " + '{:2.2f}'.format(data_wvalueUncertainty[i] * 100) + r'\, $ & $' +
-              '{: 7.3f}'.format(data_iEffEfficiency[i] * 100) +  # + '$ & $' +
-              r" \pm " + '{:4.3f}'.format(data_iEffEfficiencyUncertainty[i] * 100) + r'\, $ \\ ')
+        print('$ ' + f'{r_subsample[i]:.3f}' + ' - ' + f'{r_subsample[i + 1]:.3f}' + '$ & $' +
+              f'{data_event_fractionTotal[i] * 100: 6.2f}' + '$ & $' +
+              f'{data_wvalue[i] * 100: 6.2f}' + r" \pm " + f'{data_wvalueUncertainty[i] * 100:2.2f}' + r'\, $ & $' +
+              f'{data_iEffEfficiency[i] * 100: 7.3f}' +  # + '$ & $' +
+              r" \pm " + f'{data_iEffEfficiencyUncertainty[i] * 100:4.3f}' + r'\, $ \\ ')
     print(r'\hline\hline')
     print(
         r'\multicolumn{1}{r}{Total} &  \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
         r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-        '{: 6.1f}'.format(
-            data_average_eff_eff *
-            100) +
+        f'{data_average_eff_eff * 100: 6.1f}' +
         r" \pm " +
-        '{: 6.1f}'.format(
-            data_uncertainty_eff_effAverage *
-            100) +
+        f'{data_uncertainty_eff_effAverage * 100: 6.1f}' +
         r'\quad\,$ }' +
         r' \\')
     print(r'\hline')
@@ -511,7 +482,7 @@ def efficiencyCalculator(mc, data, method):
 
     print('****************************************************************************************************')
     print('*   TOTAL NUMBER OF TAGGED CONTINUUM EVENTS  =  ' +
-          '{:<24}'.format("%.0f" % data_total_tagged_Continuum) + '{:>28}'.format(' *'))
+          f"{f'{data_total_tagged_Continuum:.0f}':<24}" + f"{' *':>28}")
 
     # Chi-squared between MC and Data
 

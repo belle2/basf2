@@ -38,7 +38,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    .. math::
 
-      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)} 
+      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)}
 
    is computed with a simple system of equations:
 
@@ -54,7 +54,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    All three algorithms are implemented in the ``svd/reconstruction/SVDClusterCharge`` class.
 
-.. _MaxSum: 
+.. _MaxSum:
 
 **The MaxSum Algorithm**:
 
@@ -80,7 +80,7 @@ where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV rea
 
 The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject, see :ref:`svdtimecalib` for more details on the calibration.
 
-We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. 
+We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``.
 
 #. ``CoG6``: the cluster time is the average of the strips time weighted with the strip charge. The raw strip time is computed as the average of the sample time weighted with the sample amplitude:
 
@@ -117,7 +117,11 @@ We have two alternative algorithms to compute the cluster time that can be selec
       t_{\rm hit} = f(t_{\rm raw}) + r_{\rm shift} + \frac{\Delta t}{4} \cdot (3 - TB + 4\ FF)
    
    where :math:`f(t_{\rm raw})` is the calibrated time, :math:`r_{\rm shift}` is the relative shift among 3-sample and 6-sample event (= 0 in 6-sample events), :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`TB` is the :ref:`TriggerBin<svdtb>` and :math:`FF` is the :ref:`FirstFrame<svdff>`.
-   
+
+Shifting of SVD-cluster-time based on Cluster-size
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The mean of the cluster-time distribution shifts with the cluster size, as the strips of the clusters with lower amplitude, which are at the edge, delays in time. This effect is not simulated and it appears only in data. To compensate this, improving cluster time resolution in data and data-simulation agreement, a shift is added to the calibrated time. The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
+
 
 Cluster Position Reconstruction
 -------------------------------
@@ -183,9 +187,9 @@ Method in :b2:mod:`SVDTimeGrouping` module:
 +--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Finding Peaks                  | Once all the Gaussian entries are filled, the correlated-clusters form a big Gaussian (which will be called **group** hereafter). The group-finding is performed in the following method.                                                                                                                                                                                       |
 |                                |                                                                                                                                                                                                                                                                                                                                                                                 |
-|                                | * Maximum bin is found and a Gaussian is fitted in the range of **[-5, 5]** ns keeping the bin as center. (default **fitRangeHalfWidth=5**)                                                                                                                                                                                                                                     |
+|                                | * Maximum bin is found and a Gaussian is fitted in the range of **[-5, 5]** ns keeping the bin as center. (default **fitRangeHalfWidth=7**)                                                                                                                                                                                                                                     |
 |                                | * The group info (integral, center, width) is stored.                                                                                                                                                                                                                                                                                                                           |
-|                                | * The fitted Gaussian is then subtracted from the histogram to find the next significant peak/group. To save time, value of the Gaussian for the bins only within 5 sigma are calculated and subtracted from those bins. (default **removeSigmaN=5**)                                                                                                                           |
+|                                | * The fitted Gaussian is then subtracted from the histogram to find the next significant peak/group. To save time, value of the Gaussian for the bins only within 5 sigma are calculated and subtracted from those bins. (default **removeSigmaN=7**)                                                                                                                           |
 |                                | * Maximum bin is found again and checked whether this peak is above threshold ( > 0.05 x firstGroup). (default **fracThreshold=0.05**)                                                                                                                                                                                                                                          |
 |                                | * If above threshold, then the process is repeated again.                                                                                                                                                                                                                                                                                                                       |
 |                                | * Search is stopped if 20 groups are found. (default **maxGroups=20**)                                                                                                                                                                                                                                                                                                          |
@@ -208,8 +212,14 @@ Method in :b2:mod:`SVDTimeGrouping` module:
 +--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **formSingleSignalGroup**      | If this flag is enabled, all the groups are given same groupId = 0.                                                                                                                                                                                                                                                                                                             |
 +--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Assign GroupId to SVD-Clusters | All the clusters are now compared against the surviving groups. The clusters within 5 sigma of a group center are then assigned the groupId and groupInfo. Hence, one cluster shared between two groups can have two groupId. (default **acceptSigmaN=5**)                                                                                                                      |
+| Assign GroupId to SVD-Clusters | All the clusters are now compared against the surviving groups. The clusters within 5 sigma of a group center are then assigned the groupId and groupInfo. Hence, one cluster shared between two groups can have two groupId. (default **acceptSigmaN=7**)                                                                                                                      |
 +--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Payloads related to SVDTimeGrouping:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. :ref:`SVDRecoConfiguration<svdrecoconfiguration>` : The switiching ON/OFF of SVDTimeGrouping is controlled by this DBObject.
+#. :ref:`SVDTimeGroupingConfiguration<svdtimegroupingconfiguration>` : All the parameters used by this module is stored in this DBObject.
+
 
 :ref:`SpacePoint<svdsps>` Creation
 ----------------------------------
@@ -257,7 +267,7 @@ The charge and time algorithm available for clusters are also available for stri
 Reconstruction Modules
 ----------------------
 
-This is a list of the ``svd`` modules used for reconstruction. 
+This is a list of the ``svd`` modules used for reconstruction.
 
 .. b2-modules::
    :package: svd

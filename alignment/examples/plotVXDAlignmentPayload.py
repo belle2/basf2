@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -41,7 +40,7 @@ for entry in vxd.getMap():
     ladder = vxdid.getLadderNumber()
     sensor = vxdid.getSensorNumber()
     if sensor != 0:
-        text_file.write("{0} {1} {2} {3} {4}\n".format(layer, ladder, sensor, param, value))
+        text_file.write("{} {} {} {} {}\n".format(layer, ladder, sensor, param, value))
 text_file.close()
 
 # set to True, if automatic scaling is to be used, otherwise the values in the unit_scale dict will be used.
@@ -54,7 +53,7 @@ parameters = {'du', 'dv', 'dw', 'alpha', 'beta', 'gamma', 'P_20', 'P_11', 'P_02'
 param_map = {1: 'du', 2: 'dv', 3: 'dw', 4: 'alpha', 5: 'beta', 6: 'gamma',
              31: 'P_20', 32: 'P_11', 33: 'P_02',
              41: 'P_30', 42: 'P_21', 43: 'P_12', 44: 'P_03'}
-param_nums = dict([(u, v) for (v, u) in param_map.items()])
+param_nums = {u: v for (v, u) in param_map.items()}
 layers = {1, 2, 3, 4, 5, 6}
 
 n_data = 10  # number of independent samples

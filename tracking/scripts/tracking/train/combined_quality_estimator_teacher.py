@@ -2528,7 +2528,7 @@ class MasterTask(b2luigi.WrapperTask):
     num_processes = b2luigi.get_setting(
         #: \cond
         "basf2_processes_per_worker", default=0
-        #: \cond
+        #: \endcond
     )
     #: list of raw-datafiles to be used in the case of processing data.
     datafiles = b2luigi.get_setting("datafiles")

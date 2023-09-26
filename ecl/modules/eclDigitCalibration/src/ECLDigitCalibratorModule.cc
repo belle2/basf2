@@ -130,7 +130,10 @@ void ECLDigitCalibratorModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& ca
 void ECLDigitCalibratorModule::initialize()
 {
   //mdst dataobjects
-  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
+  // This object is registered by both ECL and KLM packages. Let's be agnostic about the
+  // execution order of ecl and klm modules: the first package run registers the module
+  m_eventLevelClusteringInfo.isOptional(eventLevelClusteringInfoName()) ? m_eventLevelClusteringInfo.isRequired(
+    eventLevelClusteringInfoName()) : m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register Digits, CalDigits and their relation in datastore
   m_eclDigits.registerInDataStore(eclDigitArrayName());
@@ -459,7 +462,4 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
           outOfTimeCount.at(ECL::DetectorRegion::BWD) << " out of time digits in FWD, BRL, BWD");
 
   return m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
-
 }
-
-

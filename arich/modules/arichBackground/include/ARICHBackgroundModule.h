@@ -15,6 +15,7 @@
 
 #include <string>
 
+#include <Math/Vector3D.h>
 #include <TFile.h>
 #include <TTree.h>
 
@@ -79,16 +80,16 @@ namespace Belle2 {
       std::string m_filename;          /**< Output file name.   */
       int m_bkgTag;           /**< background source.  */
 
-      TVector3 m_phpos;                  /**< hit position */
-      TVector3 m_phmom;                  /**< hit momentum */
-      TVector3 m_phVtx;                  /**< hit particle vertex position */
-      TVector3 m_phMmom;                 /**< hit particle mother momentum */
-      TVector3 m_phMvtx;                 /**< hit particle mother vertex */
-      TVector3 m_phPvtx;                 /**< primary particle vertex */
-      TVector3 m_phPmom;                 /**< primary particle momentum */
-      TVector3 m_phGMvtx;                /**< hit particle grand mother vertex */
-      TVector3 m_phGMmom;                /**< hit particle grand mother momentum */
-      TVector3 m_modOrig;                /**< HAPD module position */
+      ROOT::Math::XYZVector m_phpos;                  /**< hit position */
+      ROOT::Math::XYZVector m_phmom;                  /**< hit momentum */
+      ROOT::Math::XYZVector m_phVtx;                  /**< hit particle vertex position */
+      ROOT::Math::XYZVector m_phMmom;                 /**< hit particle mother momentum */
+      ROOT::Math::XYZVector m_phMvtx;                 /**< hit particle mother vertex */
+      ROOT::Math::XYZVector m_phPvtx;                 /**< primary particle vertex */
+      ROOT::Math::XYZVector m_phPmom;                 /**< primary particle momentum */
+      ROOT::Math::XYZVector m_phGMvtx;                /**< hit particle grand mother vertex */
+      ROOT::Math::XYZVector m_phGMmom;                /**< hit particle grand mother momentum */
+      ROOT::Math::XYZVector m_modOrig;                /**< HAPD module position */
       int m_source;                      /**< hit source (RBB_HER, ...) */
       int m_phPDG;                       /**< hit particle PDG code */
       int m_phMPDG;                      /**< hit particle mother PDG code */

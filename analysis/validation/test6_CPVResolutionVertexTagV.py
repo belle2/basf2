@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,7 +36,7 @@ limDeltaTErr = 3.0
 limZSig = 0.03
 limZTag = 0.03
 
-treename = str("B0tree")
+treename = "B0tree"
 
 # Output Validation file
 outputFile = ROOT.TFile("test6_CPVResolutionVertexTagV.root", "RECREATE")
@@ -411,7 +410,7 @@ for VXDReq in VXDReqs:
     if resolutionErr < 0.01:
         resolutionErr = 0.01
 
-    Numbr = '{:d}'.format(int((f1 + f2) * fitDataDT.numEntries()))
+    Numbr = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
 
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)

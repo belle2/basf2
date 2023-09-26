@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -30,11 +28,15 @@ settings = CalibrationSettings(
     expert_username='nbrenny',
     description=__doc__,
     input_data_formats=['cdst'],
-    input_data_names=['hlt_mumu'],
+    input_data_names=['hlt_mumu', 'raw_cosmic'],
     input_data_filters={
         'hlt_mumu': [INPUT_DATA_FILTERS['Run Type']['physics'],
                      INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
-                     INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
+                     INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
+        'raw_cosmic': [INPUT_DATA_FILTERS['Run Type']['cosmic'],
+                       INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],
+                       INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
+
     },
     depends_on=[])
 
@@ -71,8 +73,9 @@ def get_calibrations(input_data, **kwargs):
     # Set up config options
 
     # In this script we want to use one sources of input data.
-    # Get the input files  from the input_data variable
+    # Get the input files from the input_data variable
     file_to_iov_cdst = input_data['hlt_mumu']
+    file_to_iov_raw_cosmic = input_data['raw_cosmic']
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -91,10 +94,20 @@ def get_calibrations(input_data, **kwargs):
     # reduced_file_to_iov_cdst = filter_by_max_files_per_run(file_to_iov_cdst, max_files_per_run, min_events_per_file)
     # input_files_cdst = sorted(list(reduced_file_to_iov_cdst.keys()))
     input_files_cdst = sorted(list(file_to_iov_cdst.keys()))
-    basf2.B2INFO(f'Total number of \'hlt_mumu\' files actually used as input = {len(input_files_cdst)}')
+    input_files_raw_cosmic = sorted(list(file_to_iov_raw_cosmic.keys()))
 
-    if not input_files_cdst:
-        raise Exception('No valid input files found!')
+    # If we provide some raw cosmic data, let's skip the cdst files and switch completely to cosmic
+    running_on_cdst = True
+    if len(input_files_raw_cosmic) > 0:
+        running_on_cdst = False
+        basf2.B2INFO('Running on \'raw_cosmic\' data set.')
+        basf2.B2INFO(f'Total number of \'raw_cosmic\' files actually used as input = {len(input_files_raw_cosmic)}')
+
+    if running_on_cdst:
+        if not input_files_cdst:
+            raise Exception('No valid input files found!')
+        else:
+            basf2.B2INFO(f'Total number of \'hlt_mumu\' files actually used as input = {len(input_files_cdst)}')
 
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
@@ -111,6 +124,10 @@ def get_calibrations(input_data, **kwargs):
 
     alg = KLMStripEfficiencyAlgorithm()
 
+    if not running_on_cdst:
+        alg.setCalibrationStage(KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement)
+        alg.setForcedCalibration(True)
+
     ###################################################
     # Calibration setup
 
@@ -121,13 +138,13 @@ def get_calibrations(input_data, **kwargs):
     ########
     # Collect on multiple input data types for one calibration
 
-    from klm_calibration_utils import get_strip_efficiency_pre_collector_path
+    from klm_calibration_utils import get_strip_efficiency_pre_collector_path_cdst, get_strip_efficiency_pre_collector_path_cosmic
 
-    if input_files_cdst:
+    if running_on_cdst:
         muon_list_name = 'klmStripEfficiency'
         coll_cdst = get_collector(input_data_name='hlt_mumu',
                                   muon_list_name=muon_list_name)
-        rec_path_cdst = get_strip_efficiency_pre_collector_path(muon_list_name=muon_list_name)
+        rec_path_cdst = get_strip_efficiency_pre_collector_path_cdst(muon_list_name=muon_list_name)
 
         collection_cdst = Collection(collector=coll_cdst,
                                      input_files=input_files_cdst,
@@ -135,16 +152,33 @@ def get_calibrations(input_data, **kwargs):
 
         cal_klm.add_collection(name='cdst', collection=collection_cdst)
 
+    else:
+        coll_cosmic = get_collector('raw_cosmic')
+        rec_path_cosmic = get_strip_efficiency_pre_collector_path_cosmic()
+
+        collection_cosmic = Collection(collector=coll_cosmic,
+                                       input_files=input_files_raw_cosmic,
+                                       pre_collector_path=rec_path_cosmic)
+
+        cal_klm.add_collection(name='cdst', collection=collection_cosmic)
+
     #####
     # Algorithm step config
 
     cal_klm.algorithms = [alg]
 
     from klm_strip_efficiency import KLMStripEfficiency
+    from caf.strategies import SimpleRunByRun
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMStripEfficiency
         algorithm.params = {'iov_coverage': output_iov}
+
+        if running_on_cdst:
+            algorithm.strategy = KLMStripEfficiency
+        else:
+            algorithm.strategy = SimpleRunByRun
+        algorithm.params = {'apply_iov': output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]
@@ -158,7 +192,7 @@ def get_collector(input_data_name, muon_list_name):
     Placed here so it can be different for prompt compared to standard.
     """
 
-    if input_data_name == 'hlt_mumu':
+    if (input_data_name == 'hlt_mumu' or input_data_name == 'raw_cosmic'):
         return basf2.register_module('KLMStripEfficiencyCollector',
                                      MuonListName=f'mu+:{muon_list_name}',
                                      MinimalMatchingDigits=14,

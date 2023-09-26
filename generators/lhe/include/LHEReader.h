@@ -123,9 +123,8 @@ namespace Belle2 {
     /**
      * Reads the event header from the hepevt file.
      * @return The number of particles for the current event.
-     * @params: References to the eventID and the eventWeight which can both be read from the file.
+     * @param eventWeight reference to the eventWeight which can both be read from the file.
      */
-//     int readEventHeader(int& eventID, double& eventWeight);
     int readEventHeader(double& eventWeight);
 
     /**

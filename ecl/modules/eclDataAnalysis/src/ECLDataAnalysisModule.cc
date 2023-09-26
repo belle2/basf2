@@ -6,33 +6,33 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
 
-#include <TTree.h>
-#include <TFile.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLPidLikelihood.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// MDST
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
 
-// ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TMath.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -2054,11 +2054,9 @@ void ECLDataAnalysisModule::event()
       y++;
     }
 
-    int no_rel = 0;
     int no_Primary = 1;
 
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
-      no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
       if (mcParticle->getSecondaryPhysicsProcess() == 0 && mcParticle->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getDecayVertex().X();
@@ -2084,7 +2082,6 @@ void ECLDataAnalysisModule::event()
     double no_fFMatch = 0;
 
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
-      no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
       if (mcParticle->getSecondaryPhysicsProcess() == 0) {
         double vtxx = mcParticle->getDecayVertex().X();

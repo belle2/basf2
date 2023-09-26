@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -442,9 +441,9 @@ if __name__ == '__main__':
         p = plotting.RejectionOverEfficiency()
         for identifier in identifier_abbreviations.values():
             auc = p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == bkgrOutput)
-            o += b2latex.String("This is the Area under the ROC " + " ({:.2f})".format(auc) + ".")
+            o += b2latex.String("This is the Area under the ROC " + f" ({auc:.2f})" + ".")
             f = open("AUCROCTest.txt", "w")
-            f.write("{:.6f}".format(auc))
+            f.write(f"{auc:.6f}")
             f.close()
         p.finish()
         # p.axis.set_title("ROC Rejection Plot on independent data")
@@ -459,13 +458,13 @@ if __name__ == '__main__':
                 identifier_abbr = identifier_abbreviations[identifier]
                 aucTrain = p.add(train_probability, identifier_abbr, train_target[identifier_abbr] == 1,
                                  train_target[identifier_abbr] == bkgrOutput, label=r'{\rm Train}')
-                o += b2latex.String("This is the Area under the train ROC  " + " ({:.2f})".format(aucTrain) + ". ")
+                o += b2latex.String("This is the Area under the train ROC  " + f" ({aucTrain:.2f})" + ". ")
                 f = open("AUCROCTrain.txt", "w")
-                f.write("{:.6f}".format(auc))
+                f.write(f"{auc:.6f}")
                 f.close()
                 aucTest = p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
                                 test_target[identifier_abbr] == bkgrOutput, label=r'{\rm Test}')
-                o += b2latex.String("This is the Area under the test ROC  " + " ({:.2f})".format(aucTest) + ".")
+                o += b2latex.String("This is the Area under the test ROC  " + f" ({aucTest:.2f})" + ".")
                 p.finish()
                 # p.axis.set_title(identifier)
                 p.save('roc_test.pdf')
@@ -541,8 +540,8 @@ if __name__ == '__main__':
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == bkgrOutput, label="Background")
             p.finish()
-            p.save('spectator_{}.pdf'.format(hash(spectator)))
-            graphics.add('spectator_{}.pdf'.format(hash(spectator)), width=1.0)
+            p.save(f'spectator_{hash(spectator)}.pdf')
+            graphics.add(f'spectator_{hash(spectator)}.pdf', width=1.0)
             o += graphics.finish()
 
             for identifier in identifiers:
@@ -555,8 +554,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] == bkgrOutput)
                 p.finish()
-                p.save('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)))
-                graphics.add('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)), width=1.0)
+                p.save(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf')
+                graphics.add(f'correlation_plot_{hash(spectator)}_{hash(identifier)}.pdf', width=1.0)
                 o += graphics.finish()
 
         o.save('latex.tex', compile=True)

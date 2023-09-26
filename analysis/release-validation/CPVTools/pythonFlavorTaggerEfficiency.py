@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -183,51 +182,27 @@ def efficiencyCalculator(data, total_notTagged, SimpleOutput=False, v='notVerbos
         if v == 'verbose':
             print(
                 "r = ",
-                "{: 6.3f}".format(rval),
+                f"{rval: 6.3f}",
                 "Eff1 = ",
-                "{: 6.3f}".format(eff),
+                f"{eff: 6.3f}",
                 "Eff2 = ",
-                "{: 6.3f}".format(eff2),
+                f"{eff2: 6.3f}",
                 "w = ",
-                "{: 8.3f}".format(
-                    float(
-                        wvalue[i] *
-                        100)),
+                f"{float(wvalue[i] * 100): 8.3f}",
                 "Delta w = ",
-                "{: 6.3f}".format(
-                    float(
-                        wvalueDiff[i] *
-                        100)) +
+                f"{float(wvalueDiff[i] * 100): 6.3f}" +
                 " +-" +
-                "{: 1.3f}".format(
-                    float(
-                        wvalueDiffUncertainty[i] *
-                        100)),
+                f"{float(wvalueDiffUncertainty[i] * 100): 1.3f}",
                 "epsilon = ",
-                "{: 1.3f}".format(
-                    float(
-                        event_fractionTotal[i] *
-                        100)),
+                f"{float(event_fractionTotal[i] * 100): 1.3f}",
                 "Delta epsilon = ",
-                "{: 1.3f}".format(
-                    float(
-                        event_fractionDiff[i] *
-                        100)) +
+                f"{float(event_fractionDiff[i] * 100): 1.3f}" +
                 " +-" +
-                "{: 1.3f}".format(
-                    float(
-                        event_fractionDiffUncertainty[i] *
-                        100)),
+                f"{float(event_fractionDiffUncertainty[i] * 100): 1.3f}",
                 "mu = ",
-                "{: 1.3f}".format(
-                    float(
-                        muParam[i] *
-                        100)) +
+                f"{float(muParam[i] * 100): 1.3f}" +
                 " +-" +
-                "{: 1.3f}".format(
-                    float(
-                        muParamUncertainty[i] *
-                        100)))
+                f"{float(muParamUncertainty[i] * 100): 1.3f}")
 
     tot_eff_eff = (tot_eff_eff_B0 + tot_eff_eff_B0bar) / 2
     tot_eff_diff = tot_eff_eff_B0 - tot_eff_eff_B0bar
@@ -237,8 +212,8 @@ def efficiencyCalculator(data, total_notTagged, SimpleOutput=False, v='notVerbos
     efficiencyB0bar = 100 * tot_eff_eff_B0bar
 
     if v == 'verbose':
-        print("Total Efficiency from Avr. rB0 and rB0bar  ", "{: 6.3f}".format(float(100 * tot_eff_eff)))
-        print("Total Efficiency from Avr. wB0 and wB0bar  ", "{: 6.3f}".format(float(100 * tot_eff_eff_Avg)))
+        print("Total Efficiency from Avr. rB0 and rB0bar  ", f"{float(100 * tot_eff_eff): 6.3f}")
+        print("Total Efficiency from Avr. wB0 and wB0bar  ", f"{float(100 * tot_eff_eff_Avg): 6.3f}")
 
     if SimpleOutput:
 
@@ -416,14 +391,13 @@ for method in methods:
         for category in usedCategories:
 
             exec(
-                "%s = %s" %
-                ("hasTrueTarget" +
-                 category,
-                 "ROOT.RooRealVar('hasTrueTarget' + category, 'hasTrueTarget' + category, 0, -2.1, 1.1)"))
+                f"hasTrueTarget + {category} = " +
+                "ROOT.RooRealVar('hasTrueTarget' + category, 'hasTrueTarget' + category, 0, -2.1, 1.1)"
+            )
             # exec("%s = %s" % ("isTrueCategory" + category,
             # "ROOT.RooRealVar('isRightCategory' + category, 'isRightCategory' +
             # category, 0, -1.0, 1.1)"))
-            exec("%s" % "argSet.add(hasTrueTarget" + category + ")")
+            exec(f"argSet.add(hasTrueTarget{category})")
 
         rooDataSet = ROOT.RooDataSet("data", "data", tree, argSet, "")
 
@@ -485,18 +459,18 @@ for method in methods:
         event_fractionB0, event_fractionB0bar, event_fractionDiffUncertainty, event_fractionTotalUncertainty, muParam, \
         muParamUncertainty = efficiencyCalculator(data, total_notTagged, False, 'verbose')
 
-    efficiency = '% .2f' % efficiency
-    efficiencyDiff = '%.2f' % efficiencyDiff
-    efficiencyB0 = '% .2f' % efficiencyB0
-    efficiencyB0bar = '% .2f' % efficiencyB0bar
+    efficiency = f'{efficiency:.2f}'
+    efficiencyDiff = f'{efficiencyDiff:.2f}'
+    efficiencyB0 = f'{efficiencyB0:.2f}'
+    efficiencyB0bar = f'{efficiencyB0bar:.2f}'
 
     N = data.shape[0]
     NB0 = dataB0.shape[0] / N
     NB0 = 100 * NB0
-    NB0 = '% .2f' % NB0
+    NB0 = f'{NB0:.2f}'
     NB0bar = dataB0bar.shape[0] / N
     NB0bar = 100 * NB0bar
-    NB0bar = '% .2f' % NB0bar
+    NB0bar = f'{NB0bar:.2f}'
     NnoTrueCat = dataNoTrueCategory.shape[0]
     FracNoFTInfo = NnoTrueCat / N
 
@@ -511,7 +485,7 @@ for method in methods:
 
     print("   ")
     print("N without trueCats = ", NnoTrueCat)
-    print("Fraction Of Events without trueCats Info = ", '{: 4.2f}'.format(float(FracNoFTInfo * 100)), "% ")
+    print("Fraction Of Events without trueCats Info = ", f'{float(FracNoFTInfo * 100): 4.2f}', "% ")
 
     # ----------------Delta T Plots -------------------------------------------------------------------------------
 
@@ -1358,20 +1332,17 @@ for iCategory in usedCategories:
     #
     with Quiet(ROOT.kError):
         exec(
-            "%s = %s" %
-            ("hasTrueTarget" +
-             iCategory,
-             "ROOT.RooRealVar('hasTrueTarget' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"))
+            f"hasTrueTarget + {iCategory} = " +
+            "ROOT.RooRealVar('hasTrueTarget' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
+        )
         exec(
-            "%s = %s" %
-            ("qp" +
-             iCategory,
-             "ROOT.RooRealVar('qp' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"))
+            f"qp + {iCategory} = ROOT.RooRealVar('qp' + iCategory, 'hasTrueTarget' + iCategory, 0, -2.1, 1.1)"
+        )
         # exec("%s = %s" % ("isTrueCategory" + iCategory,
         # "ROOT.RooRealVar('isRightCategory' + iCategory, 'isRightCategory'
         # + iCategory, 0, -2.0, 1.1)"))
-        exec("%s" % "argSet.add(hasTrueTarget" + iCategory + ")")
-        exec("%s" % "argSet.add(qp" + iCategory + ")")
+        exec(f"argSet.add(hasTrueTarget{iCategory})")
+        exec(f"argSet.add(qp{iCategory})")
 rooDataSet = ROOT.RooDataSet("data", "data", tree, argSet, "")
 
 for category in usedCategories:
@@ -1431,21 +1402,21 @@ for category in usedCategories:
     # print(dataNoTarget)
 
     noTargetEfficiency, noTargetEfficiencyDiff, noTargetEfficiencyB0, noTargetEfficiencyB0bar = categoriesEfficiencyCalculator(data)
-    print("Efficiencies for B0, B0bar = ", '{: 6.2f}'.format(noTargetEfficiencyB0),
-          " %, ", '{: 6.2f}'.format(noTargetEfficiencyB0bar), " %")
+    print("Efficiencies for B0, B0bar = ", f'{noTargetEfficiencyB0: 6.2f}',
+          " %, ", f'{noTargetEfficiencyB0bar: 6.2f}', " %")
 
     noTargetEfficiency, noTargetEfficiencyDiff, noTargetEfficiencyB0, noTargetEfficiencyB0bar = categoriesEfficiencyCalculator(
         dataNoTarget)
-    print("Efficiencies for B0, B0bar If Not Target = ", '{: 6.2f}'.format(
-        noTargetEfficiencyB0), " %, ", '{: 6.2f}'.format(noTargetEfficiencyB0bar), " %")
+    print("Efficiencies for B0, B0bar If Not Target = ", f'{noTargetEfficiencyB0: 6.2f}', " %, ",
+          f'{noTargetEfficiencyB0bar: 6.2f}', " %")
 
     NoTargetEfficiencies.append([noTargetEfficiencyB0, noTargetEfficiencyB0bar])
     categoryLabel.append(categoryLabelsDict[category])
 
     trueTargetEfficiency, trueTargetEfficiencyDiff, trueTargetEfficiencyB0, \
         trueTargetEfficiencyB0bar = categoriesEfficiencyCalculator(dataTruth)
-    print("Efficiencies for B0, B0bar If True Target= ", '{: 6.2f}'.format(
-        trueTargetEfficiencyB0), " %, ", '{: 6.2f}'.format(trueTargetEfficiencyB0bar), " %")
+    print("Efficiencies for B0, B0bar If True Target= ", f'{trueTargetEfficiencyB0: 6.2f}', " %, ",
+          f'{trueTargetEfficiencyB0bar: 6.2f}', " %")
 
     # catLabel = r"${\rm " + category + "}$"
     # categoryLabel.append(catLabel)
@@ -1456,7 +1427,7 @@ for category in usedCategories:
         bins[i] = float(bins[i]) / 50
     # ------
 
-    title = str()
+    title = ''
     location = 1
     if category != 'Lambda' and category != 'MaximumPstar' and category != 'Kaon':
         title = r'$q_{\rm cand}\cdot y_{\rm ' + category + '}$'
@@ -1568,7 +1539,7 @@ for category in usedCategories:
     fig2c.clear()
 
     percentageCategory = dataTruth.shape[0] / data.shape[0] * 100
-    percentageCategory = '% .2f' % percentageCategory
+    percentageCategory = f'{percentageCategory:.2f}'
 
     print("Percentage of Category " + category + " is = " + percentageCategory + " %")
 

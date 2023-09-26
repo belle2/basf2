@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   TCPServerSocket server_socket;
   const std::string host = argv[2];
   server_socket.open(host, atoi(argv[3]));
-  const int ninterval = atoi(argv[4]);
+  // const int ninterval = atoi(argv[4]);
   printf("file2socket::accepting\n");
   TCPSocket socket = server_socket.accept();
   printf("file2socket::accepted\n");

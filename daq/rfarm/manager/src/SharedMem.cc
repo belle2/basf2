@@ -24,11 +24,11 @@ using namespace std;
 
 SharedMem::SharedMem(const char* name, int size)
 {
+  std::string tmpPathName;
   // 0. Determine shared memory type
   if (strcmp(name, "private") != 0) {      // Global
-    m_pathname = string("/tmp/") + string(getenv("USER"))
-                 + string("_SHM_") + string(name);
-    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
+    tmpPathName = getTmpFileName(getenv("USER"), name);
+    m_pathfd = open(tmpPathName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
     if (m_pathfd > 0) {   // a new shared memory file created
       printf("SharedMem: Creating a shared memory with key %s\n", name);
       m_new = true;
@@ -39,8 +39,8 @@ SharedMem::SharedMem(const char* name, int size)
       printf("SharedMem: error to open shm file\n");
       return;
     }
-    m_shmkey = ftok(m_pathname.c_str(), 1);
-    m_semkey = ftok(m_pathname.c_str(), 2);
+    m_shmkey = ftok(tmpPathName.c_str(), 1);
+    m_semkey = ftok(tmpPathName.c_str(), 2);
   } else { // Private
     m_new = true;
     m_shmkey = IPC_PRIVATE;
@@ -147,6 +147,11 @@ int SharedMem::shmid(void)
 bool SharedMem::IsCreated(void)
 {
   return m_new;
+}
+
+std::string SharedMem::getTmpFileName(std::string user, std::string name)
+{
+  return string("/tmp/") + user + string("_SHM_") + name;
 }
 
 void SharedMem::lock()

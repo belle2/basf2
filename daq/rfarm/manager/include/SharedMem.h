@@ -23,13 +23,14 @@ namespace Belle2 {
 
     bool IsCreated(void);
 
+    static std::string getTmpFileName(std::string user, std::string name);
+
     void lock(void);
     void unlock(void);
     bool isLocked(void);
 
   private:
     bool m_new{false}; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    std::string m_pathname;
     int  m_pathfd; /** Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key */
@@ -37,7 +38,6 @@ namespace Belle2 {
     int m_shmid{-1}; /**< shared memory id */
     int m_semid{-1}; /**< semaphore id */
     void* m_shmadr{nullptr};
-    char* m_strbuf;
   };
 }
 

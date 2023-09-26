@@ -113,16 +113,6 @@ SharedMem::SharedMem(const char* name, int size)
 
 }
 
-SharedMem::SharedMem(int shm_id)
-{
-  m_shmid = shm_id;
-  m_shmadr = (int*) shmat(m_shmid, 0, 0);
-  if (m_shmadr == (int*) - 1) {
-    perror("SharedMem::shmat");
-    return;
-  }
-}
-
 SharedMem::SharedMem(int shm_id, int sem_id, int size)
 {
   m_shmid = shm_id;
@@ -200,9 +190,7 @@ void SharedMem::unlock()
 bool SharedMem::isLocked()
 {
   int ignored = 0;
-  int val = semctl(m_semid, 0, GETVAL, ignored);
-  return (val == 0); //0: locked, 1: unlocked
-
+  return (semctl(m_semid, 0, GETVAL, ignored) == 0); //0: locked, 1: unlocked
 }
 
 

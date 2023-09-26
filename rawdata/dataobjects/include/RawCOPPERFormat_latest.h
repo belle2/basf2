@@ -245,6 +245,13 @@ namespace Belle2 {
       SIZE_COPPER_TRAILER = 0
     };
 
+    // Format of the last 16bits in FF55**** trailer : 2023.9.26
+    // the least significant bit = 0
+    // the most significant bit = 15
+    enum {
+      ONLINE_REMOVED_DATA = 15
+    };
+
     //! header ( not recorded )
     RawHeader_latest tmp_header;
 

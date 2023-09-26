@@ -159,6 +159,11 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int* GetDetectorBuffer(int n, int finesse_num) OVERRIDE_CPP17;
 
+    //! check if this channel's data has been removed on a readout PC for CDC online "masking"
+    //! True : data contents was removed on a readout PC
+    /* cppcheck-suppress missingOverride */
+    bool CheckOnlineRemovedDataBit(int n, int finesse_num);
+
     // Data Format : "B2Link PCIe40 ch Header"
     enum {
       POS_B2LHSLB_MAGIC = 0,
@@ -296,7 +301,15 @@ namespace Belle2 {
     return nwords;
   }
 
+  inline bool PostRawCOPPERFormat_latest::CheckOnlineRemovedDataBit(int n, int finesse_num)
+  {
+    unsigned int* buf = (unsigned int*)GetFINESSEBuffer(n, finesse_num)
+                        + (GetFINESSENwords(n, finesse_num) - SIZE_B2LHSLB_TRAILER + POS_B2LHSLB_MAGIC);
+    if (*buf & (1 << ONLINE_REMOVED_DATA)) { return true; }
+    return false;
+  }
 
 }
+
 
 #endif

@@ -67,7 +67,7 @@ SharedMem::SharedMem(const char* name, int size)
   }
 
   // 2. Open semaphore
-  s
+
   // Behavior:
   // - IPC_CREATE will open existing or create new one
   // - IPC_CREATE|IPC_EXCL will create new one and fail is existing

@@ -38,7 +38,6 @@ namespace Belle2 {
     int m_shmid{-1}; /**< shared memory id */
     int m_semid{-1}; /**< semaphore id */
     void* m_shmadr{nullptr};
-    int m_shmsize;
     char* m_strbuf;
   };
 }

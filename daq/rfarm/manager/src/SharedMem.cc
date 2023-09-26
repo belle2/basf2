@@ -67,7 +67,6 @@ SharedMem::SharedMem(const char* name, int size)
     perror("SharedMem::shmat");
     return;
   }
-  m_shmsize = size;
 
   // 2. Open semaphore
   s
@@ -121,7 +120,6 @@ SharedMem::SharedMem(int shm_id, int sem_id, int size)
     perror("SharedMem::shmat");
     return;
   }
-  m_shmsize = size;
   m_semid = sem_id;
   printf("SharedMem: open shmid = %d, semid = %d\n", m_shmid, m_semid);
 }

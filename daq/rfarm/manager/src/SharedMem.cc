@@ -26,7 +26,6 @@ SharedMem::SharedMem(const char* name, int size)
 {
   // 0. Determine shared memory type
   if (strcmp(name, "private") != 0) {      // Global
-    m_file = true;
     m_pathname = string("/tmp/") + string(getenv("USER"))
                  + string("_SHM_") + string(name);
     m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
@@ -43,7 +42,6 @@ SharedMem::SharedMem(const char* name, int size)
     m_shmkey = ftok(m_pathname.c_str(), 1);
     m_semkey = ftok(m_pathname.c_str(), 2);
   } else { // Private
-    m_file = false;
     m_new = true;
     m_shmkey = IPC_PRIVATE;
     m_semkey = IPC_PRIVATE;

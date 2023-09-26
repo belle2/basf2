@@ -154,6 +154,23 @@ std::string SharedMem::getTmpFileName(std::string user, std::string name)
   return string("/tmp/") + user + string("_SHM_") + name;
 }
 
+bool SharedMem::getIdFromTmpFileName(std::string filename, int& shmid, int& semid)
+{
+  char shminfo[256];
+  int fd = open(filename.c_str(), O_RDONLY);
+  if (fd < 0) {
+    printf("SharedMem: error to reopen tmp file %s\n", filename.c_str());
+    return false;
+  }
+  shmid = -1;
+  semid = -1;
+  memset(shminfo, 0, sizeof(shminfo));
+  int n = read(fd, shminfo, sizeof(shminfo));
+  close(fd);
+  sscanf(shminfo, "%d %d", &shmid, &semid);
+  return (n >= 3 && shmid >= 0 && semid >= 0);
+}
+
 void SharedMem::lock()
 {
   struct sembuf sb;

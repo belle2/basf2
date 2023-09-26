@@ -86,7 +86,7 @@ namespace Belle2 {
         return particle->getExtraInfo("beamBackgroundSuppression");
       } else {
         B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
-                  "This variable is only available for photons, and you have to use the standard particle lists (stdPhotons or stdPi0s).");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getBeamBackgroundProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -97,7 +97,7 @@ namespace Belle2 {
         return particle->getExtraInfo("fakePhotonSuppression");
       } else {
         B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
-                  "This variable is only available for photons, and you have to use the standard particle lists (stdPhotons or stdPi0s).");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getFakePhotonProbability on a photon list.");
         return Const::doubleNaN;
       }
     }

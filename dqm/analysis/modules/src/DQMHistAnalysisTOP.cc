@@ -64,6 +64,8 @@ DQMHistAnalysisTOPModule::~DQMHistAnalysisTOPModule() { }
 void DQMHistAnalysisTOPModule::initialize()
 {
 
+  // check module parameters
+
   if (m_rawTimingBand.size() != 2) B2ERROR("Parameter list 'rawTimingBand' must contain two numbers");
   if (m_rawTimingAlarmLevels.size() != 2) B2ERROR("Parameter list 'rawTimingAlarmLevels' must contain two numbers");
   if (m_eventMonitorAlarmLevels.size() != 2) B2ERROR("Parameter list 'eventMonitorAlarmLevels' must contain two numbers");
@@ -72,6 +74,9 @@ void DQMHistAnalysisTOPModule::initialize()
   if (m_backgroundAlarmLevels.size() != 2) B2ERROR("Parameter list 'backgroundAlarmLevels' must contain two numbers");
   if (m_photonYieldsAlarmLevels.size() != 2) B2ERROR("Parameter list 'photonYieldsAlarmLevels' must contain two numbers");
 
+  // parse excluded boardstacks
+
+  m_includedBoardstacks.resize(64, true);
   if (not m_excludedBoardstacks.empty()) {
     std::map<std::string, int> bsmap;
     int id = 1;
@@ -82,20 +87,41 @@ void DQMHistAnalysisTOPModule::initialize()
         id++;
       }
     }
-    m_excludedBS.resize(64, false);
     for (const auto& bsname : m_excludedBoardstacks) {
       id = bsmap[bsname];
-      if (id > 0) m_excludedBS[id - 1] = true;
+      if (id > 0) m_includedBoardstacks[id - 1] = false;
       else B2ERROR("Invalid boardstack name: " << bsname);
     }
   }
 
+  // MiraBelle monitoring
+
   m_monObj = getMonitoringObject("top");
+
+  // Epics used to pass values to shifter's page (output only)
+
   registerEpicsPV(m_pvPrefix + "badBoardstacks", "badBoardstacks");
   registerEpicsPV(m_pvPrefix + "badCarriers", "badCarriers");
   registerEpicsPV(m_pvPrefix + "badAsics", "badAsics");
   registerEpicsPV(m_pvPrefix + "badPMTs", "badPMTs");
+
+  // Epics used to get limits from configuration file - override module parameters (input only)
+
+  registerEpicsPV(m_pvPrefix + "rawTimingBand", "rawTimingBand");
+  registerEpicsPV(m_pvPrefix + "rawTimingAlarmLevels", "rawTimingAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "eventMonitorAlarmLevels", "eventMonitorAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "badHitsAlarmLevels", "badHitsAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "deadChannelsAlarmLevels", "deadChannelsAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "backgroundAlarmLevels", "backgroundAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "photonYieldsAlarmLevels", "photonYieldsAlarmLevels");
+  for (int slot = 1; slot <= 16; slot++) {
+    std::string varName = "slot" + to_string(slot);
+    registerEpicsPV(m_pvPrefix + varName, varName); // excludedBoardstacks (lolo = BS0, low = BS1, high = BS2, hihi = BS3)
+  }
+
   updateEpicsPVs(5.0);
+
+  // new canvases, histograms and graphic primitives
 
   gROOT->cd();
 
@@ -109,13 +135,6 @@ void DQMHistAnalysisTOPModule::initialize()
 
   m_junkFraction = new TH1F("TOP/junkFraction", "Fraction of bad hits per boardstack; slot number; fraction", 64, 0.5, 16.5);
   m_c_junkFraction = new TCanvas("TOP/c_junkFraction", "c_junkFraction");
-
-  for (auto y : m_rawTimingBand) {
-    auto* line = new TLine(0.5, y, 16.5, y);
-    line->SetLineWidth(2);
-    line->SetLineColor(kRed);
-    m_rawTimingBandLines.push_back(line);
-  }
 
   m_text1 = new TPaveText(1, 435, 12, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
@@ -134,10 +153,7 @@ void DQMHistAnalysisTOPModule::initialize()
     m_verticalLines.push_back(line);
   }
 
-  setAlarmLines(m_badHitsAlarmLevels, 0.5, 16.5, m_badHitsAlarmLines);
-  setAlarmLines(m_deadChannelsAlarmLevels, 0.5, 16.5, m_deadChannelsAlarmLines);
-  setAlarmLines(m_backgroundAlarmLevels, 0.5, 16.5, m_backgroundAlarmLines);
-  setAlarmLines(m_photonYieldsAlarmLevels, 0.5, 16.5, m_photonYieldsAlarmLines, false);
+  setAlarmLines();
 
   B2DEBUG(20, "DQMHistAnalysisTOP: initialized.");
 }
@@ -148,6 +164,8 @@ void DQMHistAnalysisTOPModule::beginRun()
   auto* h = findHist("DQMInfo/rtype");
   std::string title = h ? h->GetTitle() : "";
   m_IsNullRun = (title == "null");
+
+  updateLimits();
 
   B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
@@ -307,7 +325,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     for (int chan = 0; chan < h->GetNbinsX(); chan++) {
       double y = h->GetBinContent(chan + 1);
       int bs = chan / 128 + (slot - 1) * 4;
-      bool included = m_excludedBS.empty() or not m_excludedBS[bs];
+      bool included = m_includedBoardstacks[bs];
       if (y <= deadCut) {
         deadFract += 1;
         if (included) deadFractIncl += 1;
@@ -467,10 +485,10 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
   int alarmState = c_Gray;
   if (allHits->Integral() > 0) {
     alarmState = getAlarmState(m_junkFraction->GetMaximum(), m_badHitsAlarmLevels);
-    if (not m_excludedBS.empty() and alarmState == 3) {
+    if (alarmState == 3) {
       double hmax = 0;
-      for (size_t i = 0; i < m_excludedBS.size(); i++) {
-        if (not m_excludedBS[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
+      for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
+        if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
       }
       alarmState = std::max(getAlarmState(hmax, m_badHitsAlarmLevels), 2);
     }
@@ -589,6 +607,22 @@ void DQMHistAnalysisTOPModule::setAlarmLines(const std::vector<double>& alarmLev
 }
 
 
+void DQMHistAnalysisTOPModule::setAlarmLines()
+{
+  for (auto y : m_rawTimingBand) {
+    auto* line = new TLine(0.5, y, 16.5, y);
+    line->SetLineWidth(2);
+    line->SetLineColor(kRed);
+    m_rawTimingBandLines.push_back(line);
+  }
+
+  setAlarmLines(m_badHitsAlarmLevels, 0.5, 16.5, m_badHitsAlarmLines);
+  setAlarmLines(m_deadChannelsAlarmLevels, 0.5, 16.5, m_deadChannelsAlarmLines);
+  setAlarmLines(m_backgroundAlarmLevels, 0.5, 16.5, m_backgroundAlarmLines);
+  setAlarmLines(m_photonYieldsAlarmLevels, 0.5, 16.5, m_photonYieldsAlarmLines, false);
+}
+
+
 double DQMHistAnalysisTOPModule::getMean(const TH2* h)
 {
   double mean = 0;
@@ -674,3 +708,50 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   B2DEBUG(20, "badAsics: " << badAsics);
   B2DEBUG(20, "badPMTs: " << badPMTs);
 }
+
+void DQMHistAnalysisTOPModule::updateLimits()
+{
+  double unused = 0;
+
+  double yLo = m_rawTimingBand[0];
+  double yHi = m_rawTimingBand[1];
+  requestLimitsFromEpicsPVs("rawTimingBand", yLo, unused, unused, yHi);
+  m_rawTimingBand[0] = yLo;
+  m_rawTimingBand[1] = yHi;
+
+  requestLimitsFromEpicsPVs("rawTimingAlarmLevels", unused, unused, m_rawTimingAlarmLevels[0], m_rawTimingAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("eventMonitorAlarmLevels", unused, unused, m_eventMonitorAlarmLevels[0], m_eventMonitorAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("badHitsAlarmLevels", unused, unused, m_badHitsAlarmLevels[0], m_badHitsAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("deadChannelsAlarmLevels", unused, unused, m_deadChannelsAlarmLevels[0], m_deadChannelsAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("backgroundAlarmLevels", unused, unused, m_backgroundAlarmLevels[0], m_backgroundAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("photonYieldsAlarmLevels", m_photonYieldsAlarmLevels[0], m_photonYieldsAlarmLevels[1], unused, unused);
+
+  setAlarmLines();
+
+  m_excludedBoardstacks.clear();
+  std::vector<std::string> bsLabels = {"a", "b", "c", "d"};
+  for (int slot = 1; slot <= 16; slot++) {
+    std::vector<double> includedBS(4);
+    for (int bs = 0; bs < 4; bs++) includedBS[bs] = m_includedBoardstacks[(slot - 1) * 4 + bs];
+    std::string varName = "slot" + to_string(slot);
+    requestLimitsFromEpicsPVs(varName, includedBS[0], includedBS[1], includedBS[2], includedBS[3]);
+    for (int bs = 0; bs < 4; bs++) {
+      int index = (slot - 1) * 4 + bs;
+      m_includedBoardstacks[index] = (includedBS[bs] != 0);
+      if (not m_includedBoardstacks[index]) m_excludedBoardstacks.push_back(to_string(slot) + bsLabels[bs]);
+    }
+  }
+
+  B2DEBUG(20, "rawTimingBand:           [" << m_rawTimingBand[0] << ", " << m_rawTimingBand[1] << "]");
+  B2DEBUG(20, "rawTimingAlarmLevels:    [" << m_rawTimingAlarmLevels[0] << ", " << m_rawTimingAlarmLevels[1] << "]");
+  B2DEBUG(20, "eventMonitorAlarmLevels: [" << m_eventMonitorAlarmLevels[0] << ", " << m_eventMonitorAlarmLevels[1] << "]");
+  B2DEBUG(20, "badHitsAlarmLevels:      [" << m_badHitsAlarmLevels[0] << ", " << m_badHitsAlarmLevels[1] << "]");
+  B2DEBUG(20, "deadChannelsAlarmLevels: [" << m_deadChannelsAlarmLevels[0] << ", " << m_deadChannelsAlarmLevels[1] << "]");
+  B2DEBUG(20, "backgroundAlarmLevels:   [" << m_backgroundAlarmLevels[0] << ", " << m_backgroundAlarmLevels[1] << "]");
+  B2DEBUG(20, "photonYieldsAlarmLevels: [" << m_photonYieldsAlarmLevels[0] << ", " << m_photonYieldsAlarmLevels[1] << "]");
+  std::string ss;
+  for (const auto& s : m_excludedBoardstacks) ss += "'" + s + "', ";
+  ss.pop_back(); ss.pop_back();
+  B2DEBUG(20, "excludedBoardstacks:     [" << ss << "]");
+}
+

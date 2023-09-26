@@ -73,8 +73,8 @@ namespace Belle2 {
     enum EAlarmStates {
       c_Gray = 0,    // undefined
       c_Green = 1,   // good
-      c_Yellow = 2,  // caution
-      c_Red = 3      // bad
+      c_Yellow = 2,  // warning
+      c_Red = 3      // alarm
     };
 
     /**
@@ -157,6 +157,11 @@ namespace Belle2 {
                        bool bigRed = true);
 
     /**
+     * Sets all alarm lines.
+     */
+    void setAlarmLines();
+
+    /**
      * Returns histogram mean by excluding bins with zero content
      * @param h 2D histogram
      * @return mean
@@ -167,6 +172,12 @@ namespace Belle2 {
      * Calculates and sets epics variables
      */
     void setEpicsVariables();
+
+    /**
+     * Updates limits defined by module parameters using EpicsPVs.
+     * This includes rawTimingBand, alarmLevels and excluded boardstacks.
+     */
+    void updateLimits();
 
     // module parameters
 
@@ -183,7 +194,7 @@ namespace Belle2 {
     // other
 
     std::vector<int> m_alarmColors = {kGray, kGreen, kYellow, kRed}; /**< alarm colors */
-    std::vector<bool> m_excludedBS; /**< boardstacks excluded from alarming */
+    std::vector<bool> m_includedBoardstacks; /**< boardstacks included in alarming */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
 

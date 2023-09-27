@@ -52,7 +52,7 @@ DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule(): DQMHistAnalysisModule()
            "alarm levels for the number of photons per track (red, yellow)", m_photonYieldsAlarmLevels);
   addParam("excludedBoardstacks", m_excludedBoardstacks,
            "boarstacks to be excluded from alarming. Names are given like '5c', '13d' etc.", m_excludedBoardstacks);
-  addParam("pvPrefix", m_pvPrefix, "Epics PV prefix", std::string("DQM:TOP:"));
+  addParam("pvPrefix", m_pvPrefix, "Epics PV prefix", std::string("TOP:"));
 
   B2DEBUG(20, "DQMHistAnalysisTOP: Constructor done.");
 }
@@ -751,7 +751,7 @@ void DQMHistAnalysisTOPModule::updateLimits()
   B2DEBUG(20, "photonYieldsAlarmLevels: [" << m_photonYieldsAlarmLevels[0] << ", " << m_photonYieldsAlarmLevels[1] << "]");
   std::string ss;
   for (const auto& s : m_excludedBoardstacks) ss += "'" + s + "', ";
-  ss.pop_back(); ss.pop_back();
+  if (ss.size() > 2)  {ss.pop_back(); ss.pop_back();}
   B2DEBUG(20, "excludedBoardstacks:     [" << ss << "]");
 }
 

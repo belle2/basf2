@@ -208,6 +208,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   // runtype = "physics";
 
   //register limits for EPICS
+  registerEpicsPV(m_pvPrefix + "ratio3_6", "ratio3_6");
   registerEpicsPV(m_pvPrefix + "UnpackError", "UnpackError");
   registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");
   registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
@@ -387,6 +388,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
 
   // cluster time for clusters of track
+  double ratio3_6 = 0.;
   TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
@@ -487,7 +489,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
     if (m_printCanvas)
       m_cClusterOnTrack3Time_L456V->Print("c_SVDClusterOnTrack3Time_L456V.pdf");
+
+    ratio3_6 = m_hClusterOnTrack3Time_L456V.GetEntries() / m_hClusterOnTrackTime_L456V.GetEntries();
   }
+
+  setEpicsPV("ratio3_6", ratio3_6);
+
+  printf("Ration %.2f\n", ratio3_6);
+
 
   //check MODULE OCCUPANCY online & offline
   //reset canvas color

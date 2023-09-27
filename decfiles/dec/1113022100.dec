@@ -1,0 +1,27 @@
+# EventType: 1113022100
+# Descriptor: [B0 -> [D- -> K_S0 pi- pi0] pi+]
+# NickName: Bu_Dpi_DtoKspi-pi0
+# Documentation: BToHadronic for [B+ -> KS pi+ pi0] Dalitz studies.
+# Tested: Yes
+# PhysicsWG: BHADRONIC
+# Responsible: Oskar Tittel
+# Email: otittel@mpp.mpg.de
+# Cuts: None
+# Date: 31/08/2023
+
+Decay Upsilon(4S)
+1.0  B0 anti-B0 B0sig anti-B0sig  VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 D-sig pi+ PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay D-sig
+1.000 K_S0 pi- pi0 PHOTOS D_DALITZ;
+Enddecay
+CDecay D+sig
+
+End
+

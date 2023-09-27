@@ -278,7 +278,15 @@ void eclLeakageCollectorModule::collect()
   //  Note that payload may have been updated since events were generated, so
   //  we need to redo the sum of energies of the nOptimal crystals.
   const int ig = m_groupNumber[maxECellId - 1];
-  const double e3x3 = m_eclShowerArray[minShower]->getNOptimalEnergy();
+  const double e3x3Orig = m_eclShowerArray[minShower]->getNOptimalEnergy();
+  double e3x3 = e3x3Orig;
+
+  //..Alternate e3x3, for samples produced before nOptimal was introduced
+  const double eHighestCorr = m_eclShowerArray[minShower]->getEnergyHighestCrystal();
+  const double correction = m_eclShowerArray[minShower]->getEnergy() / m_eclShowerArray[minShower]->getEnergyRaw();
+  const double eHighestRaw = eHighestCorr / correction;
+  const double e3x3Alt = eHighestRaw / m_eclShowerArray[minShower]->getE1oE9();
+  if (e3x3 < 0.001) {e3x3 = e3x3Alt;}
 
   //..Need the detector region to get the energy bin boundaries
   int iRegion = 1; // barrel
@@ -380,12 +388,13 @@ void eclLeakageCollectorModule::collect()
   //..Debug: dump some events
   if (m_nDump < 100) {
     m_nDump++;
-    B2DEBUG(170, " ");
-    B2DEBUG(170, "cellID " << t_cellID << " ig " << ig << " Eraw " << eRaw * mcLabE << " ESum " << eSumOfN << " ie " << t_energyBin <<
-            " nOpt " << t_nCrys << " eFrac " << t_energyFrac);
-    B2DEBUG(170, " 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
-    B2DEBUG(170, "  3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
-    B2DEBUG(170, "  3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
+    B2INFO(" ");
+    B2INFO("cellID " << t_cellID << " ig " << ig << " iEnergy " << iEnergy << " ie " << t_energyBin << " nOpt " << t_nCrys);
+    B2INFO(" e3x3Orig " << e3x3Orig << " e3x3Alt " << e3x3Alt << " Eraw " << eRaw << " ESum " << eSumOfN << " eFrac " <<
+           t_energyFrac);
+    B2INFO(" 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
+    B2INFO(" 3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
+    B2INFO(" 3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
   }
 
   //-----------------------------------------------------------------

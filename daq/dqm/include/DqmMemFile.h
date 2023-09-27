@@ -5,8 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef DQM_MEMFILE
-#define DQM_MEMFILE
+#pragma once
 
 #include <string>
 
@@ -47,8 +46,7 @@ namespace Belle2 {
     char* m_buf;
     std::string m_name;
     int m_size;
-    int m_mode;
+    bool m_writeMode;
   };
 }
-#endif
 

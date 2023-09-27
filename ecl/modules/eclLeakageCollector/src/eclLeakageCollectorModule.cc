@@ -388,13 +388,13 @@ void eclLeakageCollectorModule::collect()
   //..Debug: dump some events
   if (m_nDump < 100) {
     m_nDump++;
-    B2DEBUG(29, " ");
-    B2DEBUG(29, "cellID " << t_cellID << " ig " << ig << " iEnergy " << iEnergy << " ie " << t_energyBin << " nOpt " << t_nCrys);
-    B2DEBUG(29, " e3x3Orig " << e3x3Orig << " e3x3Alt " << e3x3Alt << " Eraw " << eRaw << " ESum " << eSumOfN << " eFrac " <<
-            t_energyFrac);
-    B2DEBUG(29, " 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
-    B2DEBUG(29, " 3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
-    B2DEBUG(29, " 3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
+    B2INFO(" ");
+    B2INFO("cellID " << t_cellID << " ig " << ig << " iEnergy " << iEnergy << " ie " << t_energyBin << " nOpt " << t_nCrys);
+    B2INFO(" e3x3Orig " << e3x3Orig << " e3x3Alt " << e3x3Alt << " Eraw " << eRaw << " ESum " << eSumOfN << " eFrac " <<
+           t_energyFrac);
+    B2INFO(" 3 log E " << logELower << " " << logENom << " " << logEHigher << " log E " << logESumN);
+    B2INFO(" 3 biases " << biasLower << " " << biasNom << " " << biasHigher << " bias " << bias);
+    B2INFO(" 3 peaks " << peakLower << " " << peakNom << " " << peakHigher << " peak " << peak);
   }
 
   //-----------------------------------------------------------------

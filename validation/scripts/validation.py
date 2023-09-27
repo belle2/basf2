@@ -1378,6 +1378,40 @@ class Validation:
 
         validationplots.create_plots(force=True, work_folder=self.work_folder)
 
+    def save_metadata(self):
+        """!
+        This method fetches the metadata of all the data files produced
+        during the validation run and saves them in idvidual text files of the
+        same name (with .txt appended at the end) inside the results folder.
+        @return: None
+        """
+
+        result_folder = self.get_log_folder()
+
+        if not os.path.exists(result_folder):
+            self.log.error(
+                f"Folder {result_folder} not found in "
+                f"the work directory {self.work_folder}, please run "
+                f"b2validation first"
+            )
+
+        # Loop through all the *.root files in the current result
+        for file in os.listdir(result_folder):
+            if file.endswith(".root"):
+                metadata = validationfunctions.get_file_metadata(
+                    os.path.join(result_folder, file))
+                if metadata:
+                    metadata_file = os.path.join(result_folder, f'{file}.txt')
+                    # Remove old metadata file if it exists
+                    try:
+                        os.remove(metadata_file)
+                    except FileNotFoundError:
+                        pass
+                    with open(metadata_file, 'a') as out:
+                        out.write(f'{metadata}\n')
+                else:
+                    self.log.debug(f"b2file-metadata-show failed for {file}.")
+
 
 def execute(tag=None, is_test=None):
     """!
@@ -1575,6 +1609,8 @@ def execute(tag=None, is_test=None):
             )
 
         validation.report_on_scripts()
+
+        validation.save_metadata()
 
         # Log that everything is finished
         validation.log.note(

@@ -1084,8 +1084,8 @@ def run_server(
     cherry_config["/results"] = {
         "tools.staticdir.on": True,
         "tools.staticdir.dir": results_folder,
-        # only serve root files
-        "tools.staticdir.match": r"^.*\.(log|root)$",
+        # only serve root, log and txt files
+        "tools.staticdir.match": r"^.*\.(log|root|txt)$",
         # server the log files as plain text files, and make sure to use
         # utf-8 encoding. Firefox might decide different, if the files
         # are located on a .jp domain and use Shift_JIS

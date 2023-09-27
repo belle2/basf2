@@ -726,10 +726,16 @@ def get_file_metadata(filename: str) -> str:
     if not Path(filename).exists():
         raise FileNotFoundError(f"Could not find file {filename}")
 
-    proc = subprocess.run(
-        ["b2file-metadata-show", "-a", str(filename)],
-        stdout=subprocess.PIPE,
-        check=True,
-    )
-    metadata = proc.stdout.decode("utf-8")
+    metadata = None
+
+    try:
+        proc = subprocess.run(
+            ["b2file-metadata-show", "-a", str(filename)],
+            stdout=subprocess.PIPE,
+            check=True,
+        )
+        metadata = proc.stdout.decode("utf-8")
+    except subprocess.CalledProcessError as e:
+        print(e.stderr)
+
     return metadata

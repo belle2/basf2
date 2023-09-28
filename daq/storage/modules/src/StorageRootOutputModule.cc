@@ -573,7 +573,7 @@ void StorageRootOutputModule::closeFile()
                   "time_close = '%s' "
                   "WHERE name = '%s' AND host = '%s';",
                   ((boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize || m_ramdiskBuffer) ? "true" : "false",
-                  m_fileMetaData->getNEvents(), m_fileMetaData->getNFullEvents(), m_file->GetSize(),
+                  m_outputFileMetaData.getNEvents(), m_outputFileMetaData.getNFullEvents(), m_file->GetSize(),
                   (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str(),
                   filename_path.filename().c_str(), m_HLTName.c_str());
   } catch (const DBHandlerException &e) {

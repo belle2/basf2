@@ -83,7 +83,6 @@ void DQMHistAnalysisPXDCMModule::initialize()
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
     for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
-    // set some default size to nu, nv?
   }
   m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 

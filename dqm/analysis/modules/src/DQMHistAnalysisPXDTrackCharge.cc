@@ -54,11 +54,6 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 
 DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDTrackChargeModule::initialize()

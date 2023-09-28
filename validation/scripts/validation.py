@@ -1381,7 +1381,7 @@ class Validation:
     def save_metadata(self):
         """!
         This method fetches the metadata of all the data files produced
-        during the validation run and saves them in idvidual text files of the
+        during the validation run and saves them in individual text files of the
         same name (with .txt appended at the end) inside the results folder.
         @return: None
         """

@@ -65,6 +65,19 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
+  if (m_PXDModules.size() == 0) {
+    // Backup if no geometry is present (testing...)
+    B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
+    std::vector <string> mod = {
+      "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
+      "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
+      "2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.3.1", "2.3.2", "2.4.1", "2.4.2",
+      "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
+      "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
+    };
+    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+  }
+
   m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
   m_hReduction = new TH1F("hPXDReduction", "PXD Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hReduction->SetDirectory(0);// dont mess with it, this is MY histogram
@@ -121,7 +134,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = getDelta(name);
+    TH1* hh1 = getDelta(m_histogramDirectoryName, name);
     // no inital sampling, we should get lenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();

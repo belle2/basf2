@@ -45,12 +45,6 @@ namespace Belle2 {
       virtual void initialize() override;
 
       /**
-       * Called when entering a new run.
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun() override;
-
-      /**
        * Event processor.
        */
       virtual void event() override;
@@ -60,12 +54,6 @@ namespace Belle2 {
        * Save run-related stuff, such as statistics.
        */
       virtual void endRun() override;
-
-      /**
-       * Termination action.
-       * Clean-up, close files, summarize statistics, etc.
-       */
-      virtual void terminate() override;
 
       /** Defines the histograms*/
       virtual void defineHisto() override;

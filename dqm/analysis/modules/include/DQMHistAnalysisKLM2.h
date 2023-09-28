@@ -134,40 +134,46 @@ namespace Belle2 {
 
     /** 2D layer-sector efficiency differences */
 
-    /** reference file name*/
+    /** reference histogram file path **/
     std::string m_refFileName;
 
-    /** reference file*/
+    /** reference histogram file **/
     TFile* m_refFile = nullptr;
 
-    // configurable plotting parameters
-    /** alarm threshold*/
+    /** efficiency ratio alarm threshold **/
     float m_alarmThr = 0;
-    /** min value of 2d shifter histogram*/
+
+    /** efficiency ratio min z scale **/
     float m_min = 0;
-    /** max value of 2d shifer histogram*/
+
+    /** efficiency ratio max z scale **/
     float m_max = 2;
-    /** enable ratio mode (true) or difference mode (false)*/
+
+    /** show efficiency ratio or difference **/
     bool m_ratio = true;
 
-    // bklm
-    /** reference bklm eff histogram*/
+    /** BKLM efficiencies reference histogram **/
     TH1* m_ref_efficiencies_bklm = NULL;
-    /** 2d bklm shifter histogram*/
+
+    /** BKLM efficiencies 2dim histogram **/
     TH2* m_eff2d_bklm = NULL;
-    /** 2d bklm shifter text*/
+
+    /** BKLM efficiencies error histogram **/
     TH2* m_err_bklm = NULL;
-    /** 2d bklm shifter canvas*/
+
+    /** BKLM efficiencies ratio canvas **/
     TCanvas* m_c_eff2d_bklm = NULL;
 
-    // eklm
-    /** reference eklm eff histogram histogram*/
+    /** ELM efficiencies reference histogram **/
     TH1* m_ref_efficiencies_eklm = NULL;
-    /** 2d eklm shifter histogram*/
+
+    /** EKLM efficiencies 2dim histogram **/
     TH2* m_eff2d_eklm = NULL;
-    /** 2d eklm shifter text*/
+
+    /** EKLM efficiencies error histogram **/
     TH2* m_err_eklm = NULL;
-    /** 2d eklm shifter canvas*/
+
+    /** EKLM efficiencies ratio canvas **/
     TCanvas* m_c_eff2d_eklm = NULL;
 
     /** Name of histogram directory */

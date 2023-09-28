@@ -74,6 +74,29 @@ void DQMHistAnalysisKLM2Module::initialize()
 
   } else {
     B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
+
+    // Switch to absolute 2D efficiencies if reference histogram is not found
+    m_alarmThr = 0;
+    m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
+                                       0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
+    for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
+      if (m_ratio) {
+        m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 1);
+      } else {
+        m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 0);
+      }
+    }
+
+    m_ref_efficiencies_eklm = new TH1F("eff_eklm_plane", "Plane Efficiency in EKLM", EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
+                                       0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
+    for (int lay_id = 0; lay_id < EKLMElementNumbers::getMaximalPlaneGlobalNumber(); lay_id++) {
+      if (m_ratio) {
+        m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 1);
+      } else {
+        m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 0);
+      }
+    }
+
   }
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());

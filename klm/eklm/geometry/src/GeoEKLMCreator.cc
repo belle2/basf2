@@ -1424,9 +1424,7 @@ void EKLM::GeoEKLMCreator::createSolids()
   /* Section, layer, sector. */
   createSectionSolid();
   createLayerSolid();
-  m_LogVol.shieldLayer = createLayerLogicalVolume("ShieldLayer");
   createSectorSolid();
-  m_LogVol.shieldLayerSector = createSectorLogicalVolume("ShieldLayerSector");
   createSectorCoverLogicalVolume();
   createSectorSupportLogicalVolume();
   /**
@@ -1495,16 +1493,13 @@ EKLM::GeoEKLMCreator::createSection(G4LogicalVolume* topVolume) const
 }
 
 G4LogicalVolume* EKLM::GeoEKLMCreator::
-createLayer(G4LogicalVolume* section, G4LogicalVolume* layer) const
+createLayer(G4LogicalVolume* section) const
 {
   G4LogicalVolume* logicLayer;
   const HepGeom::Transform3D* t;
-  if (layer == nullptr) {
-    std::string layerName = "Layer_" + std::to_string(m_CurVol.layer) +
-                            "_" + section->GetName();
-    logicLayer = createLayerLogicalVolume(layerName.c_str());
-  } else
-    logicLayer = layer;
+  std::string layerName = "Layer_" + std::to_string(m_CurVol.layer) +
+                          "_" + section->GetName();
+  logicLayer = createLayerLogicalVolume(layerName.c_str());
   t = m_TransformData->getLayerTransform(m_CurVol.section, m_CurVol.layer);
   try {
     new G4PVPlacement(*t, logicLayer, logicLayer->GetName(), section, false,
@@ -1516,16 +1511,13 @@ createLayer(G4LogicalVolume* section, G4LogicalVolume* layer) const
 }
 
 G4LogicalVolume* EKLM::GeoEKLMCreator::
-createSector(G4LogicalVolume* layer, G4LogicalVolume* sector) const
+createSector(G4LogicalVolume* layer) const
 {
   G4LogicalVolume* logicSector;
   const HepGeom::Transform3D* t;
-  if (sector == nullptr) {
-    std::string sectorName = "Sector_" + std::to_string(m_CurVol.sector) +
-                             "_" + layer->GetName();
-    logicSector = createSectorLogicalVolume(sectorName.c_str());
-  } else
-    logicSector = sector;
+  std::string sectorName = "Sector_" + std::to_string(m_CurVol.sector) +
+                           "_" + layer->GetName();
+  logicSector = createSectorLogicalVolume(sectorName.c_str());
   t = m_TransformData->getSectorTransform(m_CurVol.section, m_CurVol.layer,
                                           m_CurVol.sector);
   try {
@@ -1867,10 +1859,6 @@ bool EKLM::GeoEKLMCreator::detectorLayer(int section, int layer) const
 
 void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
 {
-// The clang analyzer reports correctly that this function has a memory leak
-// but that is by the design of user volumes in GEANT4 (create once, persist
-// to end of job).
-#ifndef __clang_analyzer__
   /* cppcheck-suppress variableScope */
   int i, j, imin, imax;
   /* cppcheck-suppress variableScope */
@@ -1904,19 +1892,19 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
     aRegion->AddRootLogicalVolume(section);
     for (m_CurVol.layer = 1; m_CurVol.layer <= m_GeoDat->getNLayers();
          m_CurVol.layer++) {
-      if (detectorLayer(m_CurVol.section, m_CurVol.layer)) {
-        /* Detector layer. */
-        layer = createLayer(section, nullptr);
-        for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
-             m_CurVol.sector++) {
-          sector = createSector(layer, nullptr);
-          createSectorSupport(sector);
-          createSectorSupportCorner1(sector);
-          createSectorSupportCorner2(sector);
-          createSectorSupportCorner3(sector);
-          createSectorSupportCorner4(sector);
-          for (i = 1; i <= 2; i++)
-            createSectorCover(i, sector);
+      layer = createLayer(section);
+      for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
+           m_CurVol.sector++) {
+        sector = createSector(layer);
+        createSectorSupport(sector);
+        createSectorSupportCorner1(sector);
+        createSectorSupportCorner2(sector);
+        createSectorSupportCorner3(sector);
+        createSectorSupportCorner4(sector);
+        for (i = 1; i <= 2; i++)
+          createSectorCover(i, sector);
+        if (detectorLayer(m_CurVol.section, m_CurVol.layer)) {
+          /* Detector layer. */
           for (m_CurVol.plane = 1; m_CurVol.plane <= m_GeoDat->getNPlanes();
                m_CurVol.plane++) {
             plane = createPlane(sector);
@@ -1927,25 +1915,13 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
                  m_CurVol.segment++)
               createSegment(plane);
           }
+        } else {
+          /* Shield layer. */
+          createShield(sector);
         }
-      } else {
-        /* Shield layer. */
-        layer = createLayer(section, m_LogVol.shieldLayer);
-        for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
-             m_CurVol.sector++)
-          createSector(layer, m_LogVol.shieldLayerSector);
-        createSectorSupport(m_LogVol.shieldLayerSector);
-        createSectorSupportCorner1(m_LogVol.shieldLayerSector);
-        createSectorSupportCorner2(m_LogVol.shieldLayerSector);
-        createSectorSupportCorner3(m_LogVol.shieldLayerSector);
-        createSectorSupportCorner4(m_LogVol.shieldLayerSector);
-        for (i = 1; i <= 2; i++)
-          createSectorCover(i, m_LogVol.shieldLayerSector);
-        createShield(m_LogVol.shieldLayerSector);
       }
     }
   }
-#endif
 }
 
 void EKLM::GeoEKLMCreator::create(const GearDir& content,

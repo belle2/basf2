@@ -21,7 +21,7 @@ have to be executed in a specific order.
 The below scripts execute the various calibrations and validations using the airflow framework,
 which executes both the collector and the algorithms.  To be used they have to be put in the 
    calibration/scripts/prompt/calibrations/
-diretory; however, we don't want to keep them there permanently as the automated calibration system
+directory; however, we don't want to keep them there permanently as the automated calibration system
 will execute all scripts in that directory, which we don't want to do.  These scripts are used with
 the "b2caf-prompt-run" command (or whatever the latest version is).  They have to be copied into
 the calibration/scripts/prompt/calibrations/ and basf2 recompiled for them to be recognized
@@ -56,7 +56,7 @@ the calibration yourself.  Sometimes a collector job fails for unknown reasons b
 instructions on how to hack CAF in this way, speak with the person in charge of CAF.
 
 
-If being run locally on kekcc with the LSF batch system, this is an excample of how to execute the caf scripts:
+If being run locally on kekcc with the LSF batch system, this is an example of how to execute the caf scripts:
  nohup b2caf-prompt-run   LSF    caf_eclBhabhaT_config.json  input_data_bucket_16.json   > bucket16.out 2> bucket16.err < /dev/null   &
 
    where
@@ -84,7 +84,7 @@ A single full calibration performs:
 The crystal and crate calibrations have to iterate to converge towards the correct calibrations.  More iterations may be required
 if the crystals calibrations are expected to changed by a larger amount.  To perform a crystal calibration, a set of crate calibration 
 constants are required and to perform a crate calibration a set of crystal calibration constants are required.  So the better the 
-starting crytal and crate calibration constants are, the fewer the iterations that will be required to converge towards the final values.
+starting crystal and crate calibration constants are, the fewer the iterations that will be required to converge towards the final values.
 
 
 Note that the crystal calibration, crate calibration, crystal calibration constant merger, bhabha validation, hadron validation, and crate time
@@ -104,10 +104,10 @@ Here is a description of how to use calibration/scripts/prompt/calibrations/caf_
 
 The input parameters of the script have default values and can be changed via the calibrations website when submitting the jobs.
 * input_data_formats=["cdst"] : require cdst files.
-* input_data_names=["bhabha_all_calib", "hadron_calib"] : require bhabha and hadron skimmed runs defined by input_data_filters 
+* input_data_names=["bhabha_all_calib", "hadron_calib"] : require bhabha and hadron skimmed runs defined by input_data_filters
 * input_data_filters=... : parameters for picking out bhabha events and hadronic events
    * Access the "bhabha_all_calib" and "hadron_calib" skims.
-   * The data quality currently requires "good" runs as the default but the user can test to see if "recoverable" runs could also be used.  
+   * The data quality currently requires "good" runs as the default but the user can test to see if "recoverable" runs could also be used. 
      This can be changed by the user via the website interface through these input parameters
    * Require any energies for the beams (4S, Continuum, Scan)
    * The magnets should be on
@@ -121,9 +121,9 @@ The input parameters of the script have default values and can be changed via th
         to have changed after things have been turned off/on and physical interventions made.  If 2 iterations is not enough, you can 
         either just resubmit with a larger number (and waste CPU time by repeating the first 2 iterations) or maybe the Calibrations convenors 
         will let you upload the crystal and crate payloads to the GT as a new starting point for more iterations.  The policies haven't yet 
-        been established.  You can set the numebr of iterations through this paramter, an integer.  The user can look at the convergence 
+        been established. You can set the number of iterations through this parameter, an integer. The user can look at the convergence 
         histograms to determine if the calibrations have converged properly.  There are several different convergence histograms produced 
-        by the different calibration and valiadtion algorithms.
+        by the different calibration and validation algorithms.
 
         Note that a second mode exists for if numCrysCrateIterations <= 0.  In this case the code does a crate calibration, then a
         crystal calibration, and finally a second crate calibration before doing the validations.  Perhaps this is not needed in the
@@ -150,8 +150,8 @@ Example configuration file:
      {"caf_script": "caf_ecl_time_crystalCrate.py", "database_chain": ["Reco_master_patch_rel5", "ECL_testingNewPayload_RefCrystalPerCrate", "AIRFLOW_online_snapshot_20201207-094707", "data_reprocessing_prompt", "AIRFLOW_TEST_data_staging_calibration_prompt", "ECL_pre_bucket9", "ECL_testing_timingCalibs_forIteratingTowardsConvergence", "ECL_crystalTimeMergingTests"] , "requested_iov": [14, 694, 14, 7000], "backend_args": {"queue": "s"}, "expert_config": {"numCrysCrateIterations": 2, "payload_boundaries": [[14, 694], [14, 7000]]}}
 
 * You will have to modify the list of global tags
-* You will have to modify the requested_iov to the experiment and run range you care about.  
-  This is generally done automatically through the website.  
+* You will have to modify the requested_iov to the experiment and run range you care about. 
+  This is generally done automatically through the website.
 * You will have to modify the expert_config variable payload_boundaries.  The example here produces a single crystal calibration 
   constant covering exp 14 run 694 through to experiment 14 run 7000, which is the same as the requested_iov.  If you changed this to 
     "payload_boundaries": [[14, 694], [14, 786], [14, 791], [14, 795], [14, 7000]]
@@ -184,7 +184,7 @@ be modified, thus changing the number of input events.
                                          may need changing if the number of event in a hadron skim cdst file decreases.
                                          The bhabha validation uses max_files_per_run_calibration.
     max_events_per_run_plotting = 1    : The maximum number of files per run to use for plotting the crate time shifts.
-                                         This won't blikely need changing.
+                                         This won't likely need changing.
 
 
 
@@ -284,9 +284,9 @@ be modified, thus changing the number of input events.
 
 Validations
 
-To look at the valiation plots, you'll have to get access to the outputs of the "algorithm" codes.  During routine operation, 
+To look at the validation plots, you'll have to get access to the outputs of the "algorithm" codes.  During routine operation, 
      the calibration will be run remotely, maybe on a server to which you don't have access, so you may have to use your grid 
-     certificate to download the files.  Currently, the jira tickets automatically have a post saying how to download 
+     certificate to download the files.  Currently, the GitLab tickets automatically have a post saying how to download 
      those files using the grid.
 
 
@@ -294,15 +294,15 @@ To check that the calibrations worked, look at the output root files from the va
    * crate calibrations (at least the last iteration) : eclBhabhaTAlgorithm_cratesAllRuns.root
       * root files also exist for individual runs if you find problems you want to further investigate
    * crystal calibrations (at least the last iteration) : eclBhabhaTAlgorithm_*.root
-      * There will be one root file for each run range encumpassing a single crystal calibration, set by expert_config payload_boundaries
+      * There will be one root file for each run range encompassing a single crystal calibration, set by expert_config payload_boundaries
    * crystal merger (at least the last iteration) : eclTimeShiftsAlgorithm_*.root
-      * There will be one root file for each run range encumpassing a single crystal calibration, set by expert_config payload_boundaries
+      * There will be one root file for each run range encompassing a single crystal calibration, set by expert_config payload_boundaries
    * bhabha validations : eclBhabhaTValidationAlgorithm_*.root
-      * There will be one root file for each run range encumpassing a single crystal calibration, set by expert_config payload_boundaries
+      * There will be one root file for each run range encompassing a single crystal calibration, set by expert_config payload_boundaries
    * hadronic validations : eclHadronTValidationAlgorithm_*.root
-      * There will be one root file for each run range encumpassing a single crystal calibration, set by expert_config payload_boundaries
+      * There will be one root file for each run range encompassing a single crystal calibration, set by expert_config payload_boundaries
    * crate time shifts : eclTimeShiftsAlgorithm_*.root
-      * There will be one root file for each run range encumpassing a single crystal calibration, set by expert_config payload_boundaries
+      * There will be one root file for each run range encompassing a single crystal calibration, set by expert_config payload_boundaries
 
 
 The plots here will help the user to regularly (just simple ideas, not rigorous):
@@ -333,7 +333,7 @@ Other plots also exist for deeper analysis of problems:
    * histogram of hits to each crystal : The user can see which crystals rarely get hits.
    * histogram of good fits to the crates to know which runs had good statistics for the fits.
    * cutflow, to diagnose problems
-   * values of the crystal calibration constants from the different calibraitons before and after merger : to understand the merger
+   * values of the crystal calibration constants from the different calibrations before and after merger : to understand the merger
    * differences in the times of the two highest energy electrons/photons, which cancels out the event t0: understand how 
      self-consistent the ECL times are.
 
@@ -372,7 +372,7 @@ These plot names apply to the crystal calibration:
 
 
 
-These plots names apply ot the crate calibration root files for individual runs, e.g.   eclBhabhaTAlgorithm_14_948-14_948.root
+These plots names apply to the crate calibration root files for individual runs, e.g.   eclBhabhaTAlgorithm_14_948-14_948.root
 (The names are similar to those in the crate calibration because the same algorithm is run)
 
    TH2F TimevsCrysPrevCrateCalibNoCrystCalib       --- important !  used by the algorithm as the input.  
@@ -433,12 +433,12 @@ These plot names apply to both the bhabha validations and the hadron validations
                                         A similar plot exists for each crystal
 
 
-   TH1F peakClusterTime_cid               --- plots the mean value from the Guassians fitted to the time histograms above vs cell id.  
+   TH1F peakClusterTime_cid               --- plots the mean value from the Gaussians fitted to the time histograms above vs cell id.  
                                               Includes all crystals.
-   TH1F peakClusterTimes                  --- histogram of the above Guassian means
-   TH1F peakClusterTimesGoodFit__cid      --- plots the mean value from the Guassians fitted to the time histograms above vs cell id.  
+   TH1F peakClusterTimes                  --- histogram of the above Gaussian means
+   TH1F peakClusterTimesGoodFit__cid      --- plots the mean value from the Gaussians fitted to the time histograms above vs cell id.  
                                               Only crystals with decent fits. 
-   TH1F peakClusterTimesGoodFit           --- histogram of the above Guassian means 
+   TH1F peakClusterTimesGoodFit           --- histogram of the above Gaussian means 
 
    TGraphAsymmErrors  g_clusterTimeFractionInWindow__cid                 --- plot the fraction of cluster times within the window, for all crystals
    TH1F clusterTimeFractionInWindow                                      --- histogram of the above fractions
@@ -452,9 +452,9 @@ These plot names apply to both the bhabha validations and the hadron validations
                                                the tails and doing a fit.  A similar plot exists for each energy bin
 
     
-   TH1F clusterTimePeak_ClusterEnergy_varBin              --- plot of the above Guassian fit means to the energy binned time 
+   TH1F clusterTimePeak_ClusterEnergy_varBin              --- plot of the above Gaussian fit means to the energy binned time 
                                                               histograms, plotted vs energy
-   TH1F clusterTimePeakWidth_ClusterEnergy_varBin         --- plot of the above Guassian fit sigmas to the energy binned time
+   TH1F clusterTimePeakWidth_ClusterEnergy_varBin         --- plot of the above Gaussian fit sigmas to the energy binned time
                                                                histograms, plotted vs energy
    TH1F tsNew_MINUS_tsCustomPrev__cid                     --- a crystal convergence plot: new minus pre-calibration values.  
                                                               the ts values are from after the ts merger for both

@@ -22,9 +22,9 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   // Record parameters
   m_size = size;
   if (mode != "write" && mode != "WRITE")
-    m_mode = 0;
+    m_writeMode = false;
   else
-    m_mode = 1;
+    m_writeMode = true;
   m_name = name;
   m_memfile = NULL;
 
@@ -35,7 +35,7 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   m_shm = new SharedMem((char*)name.c_str(), size);
 
   // Open TMemFile if write mode selected
-  if (m_mode == 1) {
+  if (m_writeMode) {
     m_memfile = new TMemFile(name.c_str(), m_buf, size * sizeof(int), "RECREATE");
     m_shm->lock();
     m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
@@ -50,9 +50,9 @@ DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
   // Record parameters
   m_size = size;
   if (mode != "write" && mode != "WRITE")
-    m_mode = 0;
+    m_writeMode = false;
   else
-    m_mode = 1;
+    m_writeMode = true;
   m_name = "dqm_mem_file";
   m_memfile = NULL;
 
@@ -63,7 +63,7 @@ DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
   m_shm = new SharedMem(shm_id, sem_id, size);
 
   // Open TMemFile if write mode selected
-  if (m_mode == 1) {
+  if (m_writeMode) {
     m_memfile = new TMemFile(m_name.c_str(), m_buf, size * sizeof(int), "RECREATE");
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
   } else
@@ -88,7 +88,7 @@ TMemFile* DqmMemFile::GetMemFile()
 // Copy TMemFile contents to Shared Memory
 int DqmMemFile::UpdateSharedMem()
 {
-  if (m_mode == 0) return -1;
+  if (!m_writeMode) return -1;
   m_memfile->Write(0, TObject::kOverwrite);
   m_shm->lock();
   m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
@@ -98,7 +98,7 @@ int DqmMemFile::UpdateSharedMem()
 
 int DqmMemFile::ClearSharedMem()
 {
-  if (m_mode == 0) return -1;
+  if (!m_writeMode) return -1;
 
   if (m_memfile != NULL) delete m_memfile;
   m_memfile = new TMemFile(m_name.c_str(), m_buf, m_size * sizeof(int), "RECREATE");
@@ -112,7 +112,7 @@ int DqmMemFile::ClearSharedMem()
 
 TMemFile* DqmMemFile::LoadMemFile()
 {
-  if (m_mode == 1) return NULL;
+  if (m_writeMode) return NULL;
 
   if (m_memfile != NULL) {
     delete m_memfile;
@@ -155,8 +155,8 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
 
   TIter nextkey(keylist);
   TKey* key = 0;
-  int nkeys = 0;
-  int nobjs = 0;
+  int nkeys [[maybe_unused]] = 0;
+  int nobjs [[maybe_unused]] = 0;
   while ((key = (TKey*)nextkey())) {
     nkeys++;
     TObject* obj = curdir->FindObjectAny(key->GetName());

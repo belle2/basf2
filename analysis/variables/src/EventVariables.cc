@@ -38,6 +38,7 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
+
 namespace Belle2 {
   namespace Variable {
 
@@ -229,7 +230,8 @@ namespace Belle2 {
       return (T.getBeamFourMomentum()).E();
     }
 
-    ROOT::Math::PxPyPzEVector getCMSEnergyMCVector()
+    // get total 4-momentum of all final-state particles in MC
+    static ROOT::Math::PxPyPzEVector getTotalMcFinalStateMomentum()
     {
       StoreArray<MCParticle> mcps;
       ROOT::Math::PxPyPzEVector sum;
@@ -245,12 +247,58 @@ namespace Belle2 {
       return sum;
     }
 
+
+    // get 4-momentum of the incoming electron/positron in MC event
+    static ROOT::Math::PxPyPzEVector getMcBeamMomentum(int charge)
+    {
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps) {
+        if (mcp.isInitial() && mcp.getPDG() == -charge * 11) {
+          return mcp.get4Vector();
+        }
+      }
+
+      // if no initial electron/positron found
+      return  ROOT::Math::PxPyPzEVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+    }
+
+    // get HER/LER 4-momentum based on the calibration payloads
+    static ROOT::Math::PxPyPzEVector getBeamMomentum(int charge)
+    {
+      PCmsLabTransform T;
+      double EbeamCM = T.getCMSEnergy() / 2;
+      double pBeamCM = sqrt(pow(EbeamCM, 2) - pow(Const::electronMass, 2));
+
+      ROOT::Math::PxPyPzEVector pCM(0, 0, -charge * pBeamCM, EbeamCM);
+
+      return T.cmsToLab(pCM);
+    }
+
+
+    double getMcPxHER(const Particle*) {return getMcBeamMomentum(-1).Px();}
+    double getMcPyHER(const Particle*) {return getMcBeamMomentum(-1).Py();}
+    double getMcPzHER(const Particle*) {return getMcBeamMomentum(-1).Pz();}
+
+    double getMcPxLER(const Particle*) {return getMcBeamMomentum(+1).Px();}
+    double getMcPyLER(const Particle*) {return getMcBeamMomentum(+1).Py();}
+    double getMcPzLER(const Particle*) {return getMcBeamMomentum(+1).Pz();}
+
+
+    double getPxHER(const Particle*) {return getBeamMomentum(-1).Px();}
+    double getPyHER(const Particle*) {return getBeamMomentum(-1).Py();}
+    double getPzHER(const Particle*) {return getBeamMomentum(-1).Pz();}
+
+    double getPxLER(const Particle*) {return getBeamMomentum(+1).Px();}
+    double getPyLER(const Particle*) {return getBeamMomentum(+1).Py();}
+    double getPzLER(const Particle*) {return getBeamMomentum(+1).Pz();}
+
+
     double getCMSEnergyMC(const Particle*)
     {
       StoreArray<MCParticle> mcps;
       if (!mcps)  {
         return Const::doubleNaN;
-      } else return getCMSEnergyMCVector().M();
+      } else return getTotalMcFinalStateMomentum().M();
     }
 
     double getTotalEnergyMC(const Particle*)
@@ -258,7 +306,7 @@ namespace Belle2 {
       StoreArray<MCParticle> mcps;
       if (!mcps)  {
         return Const::doubleNaN;
-      } else return getCMSEnergyMCVector().E();
+      } else return getTotalMcFinalStateMomentum().E();
     }
 
     double getGenIPX(const Particle*)
@@ -310,17 +358,20 @@ namespace Belle2 {
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
     {
-      int elementI = int(std::lround(element[0]));
-      int elementJ = int(std::lround(element[1]));
+      int elementI = std::lround(element[0]);
+      int elementJ = std::lround(element[1]);
 
-      if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
-        return Const::doubleNaN;
+      bool isOutOfRange = false;
+      if (elementI < 0 || elementI > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("i", elementI));
+        isOutOfRange = true;
       }
-      if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
-        return Const::doubleNaN;
+      if (elementJ < 0 || elementJ > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("j", elementJ));
+        isOutOfRange = true;
       }
+
+      if (isOutOfRange) return Const::doubleNaN;
 
       static DBObjPtr<BeamSpot> beamSpotDB;
       return beamSpotDB->getCovVertex()(elementI, elementJ);
@@ -884,6 +935,23 @@ In such cases the event numbers are sequential *only within a production*, so ex
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.\n\n","GeV/c");
     REGISTER_VARIABLE("EcmsMC", getCMSEnergyMC, "[Eventbased] Truth value of sqrt(s)\n\n", "GeV");
     REGISTER_VARIABLE("totalEnergyMC", getTotalEnergyMC, "[Eventbased] Truth value of sum of energies of all the generated particles\n\n", "GeV");
+
+
+    REGISTER_VARIABLE("PxHER", getPxHER, "[Eventbased] Returns truth value of the x component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyHER", getPyHER, "[Eventbased] Returns truth value of the y component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzHER", getPzHER, "[Eventbased] Returns truth value of the z component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PxLER", getPxLER, "[Eventbased] Returns truth value of the x component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyLER", getPyLER, "[Eventbased] Returns truth value of the y component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzLER", getPzLER, "[Eventbased] Returns truth value of the z component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+
+    REGISTER_VARIABLE("mcPxHER", getMcPxHER, "[Eventbased] Returns x component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyHER", getMcPyHER, "[Eventbased] Returns y component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzHER", getMcPzHER, "[Eventbased] Returns z component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPxLER", getMcPxLER, "[Eventbased] Returns x component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyLER", getMcPyLER, "[Eventbased] Returns y component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzLER", getMcPzLER, "[Eventbased] Returns z component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+
+
 
     REGISTER_VARIABLE("IPX", getIPX, R"DOC(
 [Eventbased] Returns x coordinate of the measured interaction point.

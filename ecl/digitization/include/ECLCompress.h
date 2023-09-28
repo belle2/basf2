@@ -84,8 +84,7 @@ namespace Belle2 {
       /** Constructor for DCT based compression algorithm
        *  @param scale scale factor for quantization.
        *  @param c0 average waveform amplitude.
-       *  @param w
-       *  @w DCT coefficient probability density based bit widths for quantized coefficients
+       *  @param w DCT coefficient probability density based bit widths for quantized coefficients
        */
       ECLDCTCompress(double scale, double c0, width_t* w);
       /**

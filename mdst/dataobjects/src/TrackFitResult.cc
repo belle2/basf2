@@ -64,7 +64,7 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
                                const Const::ParticleType& particleType, const float pValue,
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
-                               const float_t NDF) :
+                               const float NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),

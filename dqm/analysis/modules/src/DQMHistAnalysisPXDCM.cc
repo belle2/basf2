@@ -294,6 +294,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     tt->SetTextAlign(12);// Centered
 //     tt->Draw();
 
+    UpdateCanvas(m_cCommonModeDelta);
     m_cCommonModeDelta->Modified();
     m_cCommonModeDelta->Update();
   }

@@ -8,9 +8,6 @@
 
 #pragma once
 
-/* ECL headers. */
-#include <ecl/calibration/eclAutocovarianceCalibrationC1Algorithm.h>
-
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
@@ -53,8 +50,6 @@ namespace Belle2 {
     private:
 
       std::string m_outputName = "eclAutocovarianceCalibrationC1Algorithm.root"; /**< file name for histogram output */
-
-      const int m_numberofADCPoints = 31; /**< length of ECLDsp waveform */
 
       float m_lowestEnergyFraction = 0.75;  /**< Fraction of noise waveforms to use */
 

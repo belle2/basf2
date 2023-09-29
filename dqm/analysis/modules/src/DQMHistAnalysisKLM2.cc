@@ -49,6 +49,11 @@ void DQMHistAnalysisKLM2Module::initialize()
 {
   m_monObj = getMonitoringObject("klm");
 
+  //register EPICS PVs
+  registerEpicsPV("KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
+  registerEpicsPV("KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
+  updateEpicsPVs(5.0);
+
   if (m_refFileName != "") {
     m_refFile = TFile::Open(m_refFileName.data(), "READ");
   }
@@ -367,7 +372,8 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
 }
 
 void DQMHistAnalysisKLM2Module::process2DEffHistogram(
-  TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot, TCanvas* eff2dCanv)
+  TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot, int* pvcount,
+  TCanvas* eff2dCanv)
 {
 
   int i = 0;
@@ -379,15 +385,21 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float minVal = m_min;
   float eff2dVal;
   bool setAlarm = false;
+  *pvcount = 0; //initialize to zero
 
   for (int binx = 0; binx < sectors; binx++) {
 
     for (int biny = 0; biny < layers; biny++) {
 
       mainEff = mainHist->GetBinContent(i + 1);
-      refEff = refHist->GetBinContent(i + 1);
       mainErr = mainHist->GetBinError(i + 1);
-      refErr = refHist->GetBinError(i + 1);
+      if (refHist) {
+        refEff = refHist->GetBinContent(i + 1);
+        refErr = refHist->GetBinError(i + 1);
+      } else {
+        refEff = 0.;
+        refErr = 0.;
+      }
 
       if ((mainEff == 0) and (refEff == 0)) {
         // empty histograms, draw blank bin
@@ -422,15 +434,16 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
         // set alarm
         if (eff2dVal < m_alarmThr) {
+          *pvcount += 1;
           setAlarm = true;
         }
 
       }
 
       i++;
-    }
+    }//end of layer loop
 
-  }
+  }//end of sector loop
 
   eff2dHist->SetMinimum(m_min);
   eff2dHist->SetMaximum(m_max);
@@ -442,7 +455,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
     eff2dCanv->Pad()->SetFillColor(kRed);
   }
   eff2dCanv->Modified();
-
+  eff2dCanv->Update();
 }
 
 void DQMHistAnalysisKLM2Module::event()
@@ -498,13 +511,18 @@ void DQMHistAnalysisKLM2Module::event()
 
   /* Make Diff 2D plots */
   process2DEffHistogram(m_eff_bklm, m_ref_efficiencies_bklm, m_eff2d_bklm, m_err_bklm,
-                        BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(), m_ratio, m_c_eff2d_bklm);
+                        BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(),
+                        m_ratio, &m_nEffBKLMLayers, m_c_eff2d_bklm);
 
   process2DEffHistogram(m_eff_eklm, m_ref_efficiencies_eklm, m_eff2d_eklm, m_err_eklm,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
-                        EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(), m_ratio,
-                        m_c_eff2d_eklm);
-
+                        EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
+                        m_ratio, &m_nEffEKLMLayers, m_c_eff2d_eklm);
+  /* Set EPICS PV Values*/
+  B2DEBUG(20, "Updating EPICS PVs in DQMHistAnalysisKLM2");
+  setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
+  setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+  updateEpicsPVs(5.0);
 }
 
 

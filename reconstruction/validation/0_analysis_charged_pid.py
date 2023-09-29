@@ -33,11 +33,41 @@ GLOBAL_ID_NAMES = ['electronID', 'muonID', 'pionID', 'kaonID', 'protonID']
 PARTICLE_TYPES = ['e', 'mu', 'pi', 'K', 'p']
 PARTICLE_PDGS = [11, 13, 211, 321, 2212]
 DETECTORS = ['SVD', 'CDC', 'TOP', 'ARICH', 'ECL', 'KLM']
+DETECTOR_EXPERTS = ["sviatoslav.bilokin@desy.de",  # SVD
+                    "sviatoslav.bilokin@desy.de",  # CDC
+                    "sviatoslav.bilokin@desy.de",  # TOP
+                    "sviatoslav.bilokin@desy.de",  # ARICH
+                    "sviatoslav.bilokin@desy.de",  # ECL
+                    "sviatoslav.bilokin@desy.de"  # KLM
+                    ]
 
+PID_EXPERTS = ["sviatoslav.bilokin@desy.de",  # e
+               "sviatoslav.bilokin@desy.de",  # mu
+               "sviatoslav.bilokin@desy.de",  # pi
+               "sviatoslav.bilokin@desy.de",  # K
+               "sviatoslav.bilokin@desy.de"  # p
+               ]
 
 THRESHOLDS = [0.2, 0.8]
 KIN_VAR_NAMES = ['p', 'cosTheta']
 KIN_VAR_BINS = [(25, 0.2, 5), (10, -1, 1)]
+DEFAULT_OPTIONS = "pvalue-warn=0.5"
+
+
+def get_expert(pid: str, for_detector: bool = False):
+    """
+    Returns the email of expert for detector or PID.
+    """
+    tup = (PARTICLE_TYPES, PID_EXPERTS)
+    if for_detector:
+        tup = (DETECTORS, DETECTOR_EXPERTS)
+    for det_or_part, exp in zip(*tup):
+        if for_detector:
+            if f'_{det_or_part}' in pid:
+                return exp
+        elif pid.startswith(det_or_part.lower()):
+            return exp
+    return "sviatoslav.bilokin@desy.de"
 
 
 def add_aliases():
@@ -62,7 +92,7 @@ def run_b2analysis():
     Function to produce the validation ntuples via basf2.
     """
     main = basf2.Path()
-    inputMdst(INPUT_FILENAME, path=main)
+    inputMdst('default', INPUT_FILENAME, path=main)
     add_reconstruction(path=main)
     track_quality_cuts = 'isSignal > 0'
 
@@ -134,7 +164,6 @@ def add_global_plots():
             print(f'total_{particle}_{var}')
             total_obs_th1 = root_file.Get(f'total_{particle}_{var}').Get(var)
             for cut_val in THRESHOLDS:
-                # print(f'cut0{int(cut_val*10)}_{particle}_{var}')
                 eff_cut_obs_th1 = root_file.Get(f'cut0{int(cut_val*10)}_{particle}_{pid}_{var}').Get(var)
                 eff_cut_obs_th1.Print()
                 teff = ROOT.TEfficiency(eff_cut_obs_th1, total_obs_th1)
@@ -144,10 +173,10 @@ def add_global_plots():
                     ROOT.TNamed("Description", f"Efficiency plot of {pid} for {particle}")
                 )
                 teff.GetListOfFunctions().Add(ROOT.TNamed("Check", "Efficiency should not decrease"))
-                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", "sviatoslav.bilokin@desy.de"))
-                options = ""
+                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(pid)))
+                options = DEFAULT_OPTIONS
                 if cut_val == THRESHOLDS[-1]:
-                    options = "shifter"
+                    options += " ,shifter"
                 teff.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", options))
                 teff.Write()
                 for fake_pid in GLOBAL_ID_NAMES:
@@ -163,13 +192,18 @@ def add_global_plots():
                         ROOT.TNamed("Description", f"Fake rate plot of {fake_pid} for {particle}")
                     )
                     tfake.GetListOfFunctions().Add(ROOT.TNamed("Check", "Fake rates should not increase"))
-                    tfake.GetListOfFunctions().Add(ROOT.TNamed("Contact", "sviatoslav.bilokin@desy.de"))
-                    tfake.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", ""))
+                    tfake.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(pid)))
+                    tfake.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", DEFAULT_OPTIONS))
                     tfake.Write()
     ROOT.TNamed(
         "Description",
-        "Global Charged PID validation."
-    ).Write()
+        "Global Charged PID validation plots. Shifter plots are the log-likelihood PID efficiency plots \
+        for e, μ, π, K and p particles in bins of momentum and cosTheta. If any degradation of efficiency \
+        is spotted here, please take a look at the expert plots. A decrease of efficiency might indicate: \
+        a) a work to improve the data/MC agreement; b) possible decrease of fake rate levels, \
+        see the expert plots in this section; \
+        c) a problem with a sub-detector likelihood, please take a look at \
+        the expert section of detector-only PID section. ").Write()
     root_file.Write()
     root_file.Close()
 
@@ -193,9 +227,9 @@ def add_detector_plots():
                     ROOT.TNamed("Description", f"Efficiency plot of {det_pid_var} for {particle}")
                 )
                 teff.GetListOfFunctions().Add(ROOT.TNamed("Check", "Efficiency should not decrease"))
-                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", "sviatoslav.bilokin@desy.de"))
+                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(det_pid_var, for_detector=True)))
                 # Only for experts:
-                teff.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", ""))
+                teff.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", DEFAULT_OPTIONS))
                 teff.Write()
     ROOT.TNamed(
         "Description",
@@ -206,6 +240,6 @@ def add_detector_plots():
     root_file.Close()
 
 
-# run_b2analysis()
+run_b2analysis()
 add_global_plots()
 add_detector_plots()

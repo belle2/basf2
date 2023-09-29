@@ -128,7 +128,7 @@ namespace Belle2 {
     std::map<std::string, std::shared_ptr<TNamed>> m_templateObjects;
 
     /// We rename objects based on the Exp,Run that they contain so we need to generate a nice naming convention
-    std::string getSuffix(const Belle2::Calibration::ExpRun& key) const;
+    std::string getSuffix(const Calibration::ExpRun& key) const;
 
     /// Sometimes it's nice to just pass in the EventMetaData instead of converting manually
     std::string getSuffix(const EventMetaData& emd) const;

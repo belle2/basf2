@@ -111,7 +111,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(PyObject* runs, int 
   return execute(vecRuns, iteration, iov);
 }
 
-CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<ExpRun> runs, int iteration, IntervalOfValidity iov)
+CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<Calibration::ExpRun> runs, int iteration, IntervalOfValidity iov)
 {
   // Check if we are calling this function directly and need to reset, or through Python where it was already done.
   if (m_data.getResult() != c_Undefined) {

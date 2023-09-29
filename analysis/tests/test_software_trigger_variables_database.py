@@ -32,12 +32,12 @@ def check_file(input_file_name, trigger_variables):
 
 def swtr(name):
     """Make the string form variable name"""
-    return "SoftwareTriggerResult(%s)" % name
+    return f"SoftwareTriggerResult({name})"
 
 
 def swtp(name):
     """Make the string form prescale variable name"""
-    return "SoftwareTriggerPrescaling(%s)" % name
+    return f"SoftwareTriggerPrescaling({name})"
 
 
 if __name__ == "__main__":

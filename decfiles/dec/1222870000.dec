@@ -1,0 +1,34 @@
+# EventType: 1222870000
+# Descriptor: [B+ -> psi(2S) [ ->Jpsi [ -> l+ l-] pi+ pi-] K+ ]cc
+# NickName: Bu_Psi2SK+_Jpsipi+pi-_l+l-
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Sourabh Chutia
+# Email: ph21070@iisermohali.ac.in
+# Cuts: None
+# Date: 20230911
+# Comments:
+
+Decay Upsilon(4S)
+0.50000 B+sig  B-        VSS;
+0.50000 B+  B-sig        VSS;
+Enddecay
+
+
+Decay B+sig
+1.0000  psi(2S)sig K+   SVS ;
+Enddecay
+CDecay B-sig
+
+Decay psi(2S)sig
+1.000 J/psisig pi+ pi-   VVPIPI ;
+Enddecay
+
+
+Decay J/psisig
+0.5000 e+ e-  PHOTOS VLL ;
+0.5000 mu+ mu- PHOTOS VLL ;
+Enddecay
+
+End

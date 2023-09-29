@@ -34,10 +34,10 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Common Mode");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
 
   addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 2.0);
@@ -54,11 +54,6 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
 DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDCMModule::initialize()
@@ -116,23 +111,16 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_lineA->SetLineWidth(3);
 
 
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    mychid.resize(3);
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status_Adhoc").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Outside").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "CM63").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+  registerEpicsPV("PXD:CommonMode:Status_Adhoc", "Status");
+  registerEpicsPV("PXD:CommonMode:Outside", "Outside");
+  registerEpicsPV("PXD:CommonMode:CM63", "CM63");
+  //registerEpicsPV("PXD:CommonMode:CM62", "CM62");
 
-    for (VxdID& aPXDModule : m_PXDModules) {
-      TString buff = (std::string)aPXDModule;
-      buff.ReplaceAll(".", "_");
-      auto& my = mychid_mean[aPXDModule];
-      SEVCHK(ca_create_channel((m_pvPrefix + "Mean:" + buff).Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
-    }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  for (VxdID& aPXDModule : m_PXDModules) {
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
+    registerEpicsPV("PXD:CommonMode:Mean:" + buff, (std::string)aPXDModule);
   }
-#endif
   B2DEBUG(99, "DQMHistAnalysisPXDCM: initialized.");
 }
 
@@ -243,12 +231,8 @@ void DQMHistAnalysisPXDCMModule::event()
                    << err_tmp_os);
           }
           m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
-#ifdef _BELLE2_EPICS
-          if (getUseEpics()) {
-            auto my = mychid_mean[m_PXDModules[i]];
-            if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
-          }
-#endif
+
+          setEpicsPV((std::string)m_PXDModules[i], mean_adhoc);
         }
       }
     }
@@ -278,16 +262,13 @@ void DQMHistAnalysisPXDCMModule::event()
                 status_adhoc = 1;*/
       }
     }
-#ifdef _BELLE2_EPICS
-    if (getUseEpics() && anyupdate) {
+    if (anyupdate) {
       double dataoutside = all > 0 ? (all_outside / all) : 0;
       double datacm = all > 0 ? (all_cm / all) : 0;
-      SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status_adhoc), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&dataoutside), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&datacm), "ca_set failure");
-      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+      setEpicsPV("Status", status_adhoc);
+      setEpicsPV("Outside", dataoutside);
+      setEpicsPV("CM63", datacm);
     }
-#endif
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");
       leg->Draw();
@@ -310,13 +291,5 @@ void DQMHistAnalysisPXDCMModule::event()
 void DQMHistAnalysisPXDCMModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
-  // should delete canvas here, maybe hist, too? Who owns it?
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    for (auto& m : mychid_mean) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

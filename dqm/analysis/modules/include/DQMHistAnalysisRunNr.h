@@ -12,11 +12,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
 #include <TCanvas.h>
 
@@ -63,8 +58,8 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
+    //! HLT/ERECO prefix for EPICS PVs
+    std::string m_prefix;
 
     //! Final Canvas
     TCanvas* m_cRunNr = nullptr;
@@ -72,10 +67,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-#ifdef _BELLE2_EPICS
-    //! epics PVs
-    std::vector <chid> mychid;
-#endif
   };
 } // end namespace Belle2
 

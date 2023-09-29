@@ -402,7 +402,7 @@ def temporary_set_environment(**environ):
 
 def is_ci() -> bool:
     """
-    Returns true if we are running a test on our CI system (currently bamboo).
+    Returns true if we are running a test on our CI system (currently GitLab pipeline).
     The 'BELLE2_IS_CI' environment variable is set on CI only when the unit
     tests are run.
     """

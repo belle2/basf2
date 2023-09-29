@@ -52,7 +52,7 @@ if __name__ == "__main__":
     udst.add_udst_dump(main, True)
 
     # also dump some variables just in case the DataStorePrinter hides some
-    # problems (like has happened once: PR #7525 / BII-7148).
+    # problems (like has happened once: GitLab issue #7023).
     sanity_check_variables = [
         "mcPDG",
         "daughter(0, mcPDG)",  # check the MCParticle <--> Particle relation (or array index lookup)

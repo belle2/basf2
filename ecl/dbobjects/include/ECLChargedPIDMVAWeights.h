@@ -157,7 +157,6 @@ namespace Belle2 {
     * Useful constructor.
     * @param weightfilePath path to the MVA weightfile for this phasespace category.
     * @param mvaResponeTransformMode mva response transform mode booked for this phasespace.
-    * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each mva response.
     * @param mvaIndexForHypothesis unordered_map mapping hypothesis to index of mva response. Useful if we exclude a class from the MVA training
     *        but want to use the likelihood of a different particle. For example using the proton pdf for a deuteron.
     */
@@ -206,7 +205,7 @@ namespace Belle2 {
     /**
      * Getter for pdfs.
      * @param iMVAResponse index of MVA response.
-     * @param hypoPDG, hypothesis pdg.
+     * @param hypoPDG hypothesis pdg.
      */
     const TF1* getPDF(const unsigned int iMVAResponse, const unsigned int hypoPDG) const
     {
@@ -216,7 +215,7 @@ namespace Belle2 {
     /**
      * Gets the cdf for the hypothesis pdg for a given response value.
      * @param iMVAResponse index of MVA response.
-     * @param hypoPDG, hypothesis pdg.
+     * @param hypoPDG hypothesis pdg.
      */
     const TH1F* getCDF(const unsigned int iMVAResponse, const int hypoPDG) const
     {
@@ -225,7 +224,7 @@ namespace Belle2 {
 
     /**
      * Gets the decorrelation matrix for a given particle hypothesis.
-     * @param hypoPDG, hypothesis pdg.
+     * @param hypoPDG hypothesis pdg.
      */
     const std::vector<float>* getDecorrelationMatrix(const int hypoPDG) const
     {
@@ -396,7 +395,7 @@ namespace Belle2 {
 
     /**
      * Returns the ith ECLChargedPIDPhasespaceCategory.
-     * @param idx, index of ECLChargedPIDPhasespaceCategory.
+     * @param idx index of ECLChargedPIDPhasespaceCategory.
      */
     const ECLChargedPIDPhasespaceCategory* getPhasespaceCategory(const unsigned int idx)  const {return &m_phasespaceCategories.at(idx);}
 

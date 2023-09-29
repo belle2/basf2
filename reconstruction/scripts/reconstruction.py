@@ -474,7 +474,7 @@ def add_postfilter_posttracking_reconstruction(path,
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param cosmics: if True, steer TOP for cosmic reconstruction.
-    :param for_cdst_analysis: if True, dEdx and OnlineEventT0Creator modules are not added to the path.
+    :param for_cdst_analysis: if True, the OnlineEventT0Creator module is not added to the path.
            This is only needed by prepare_cdst_analysis().
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
@@ -518,10 +518,11 @@ def add_posttracking_reconstruction(path,
         execution time.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param cosmics: if True, steer TOP for cosmic reconstruction.
-    :param for_cdst_analysis: if True, dEdx, EventT0 and PruneTracks modules are not added to the path.
+    :param for_cdst_analysis: if True, the dEdx and PruneTracks modules are not added to the path, as well
+           as all EventT0 related modules.
            This is only needed by prepare_cdst_analysis().
     :param add_eventt0_combiner_for_cdst: if True, the EventT0Combiner module is added to the path even if
-           for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
+           for_cdst_analysis is True. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
     :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors

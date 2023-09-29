@@ -188,7 +188,7 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   m_monObj->setVariable("reduction", value);
 
-  UpdateCanvas(m_cReduction);
+  UpdateCanvas(m_cReduction->GetName());
   m_cReduction->Modified();
   m_cReduction->Update();
 

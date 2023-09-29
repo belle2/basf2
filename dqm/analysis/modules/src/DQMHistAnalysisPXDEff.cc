@@ -286,8 +286,8 @@ void DQMHistAnalysisPXDEffModule::event()
   m_hOuterMap->Draw("colz");
   m_cOuterMap->Modified();
   m_cOuterMap->Update();
-  UpdateCanvas(m_cInnerMap);
-  UpdateCanvas(m_cOuterMap);
+  UpdateCanvas(m_cInnerMap->GetName());
+  UpdateCanvas(m_cOuterMap->GetName());
 
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
@@ -441,7 +441,7 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hErrorLine->Draw("same,hist");
     }
 
-    UpdateCanvas(m_cEffAll);
+    UpdateCanvas(m_cEffAll->GetName());
     m_cEffAll->Modified();
     m_cEffAll->Update();
   }
@@ -536,7 +536,7 @@ void DQMHistAnalysisPXDEffModule::event()
     m_hWarnLine->Draw("same,hist");
     m_hErrorLine->Draw("same,hist");
   }
-  UpdateCanvas(m_cEffAllUpdate);
+  UpdateCanvas(m_cEffAllUpdate->GetName());
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();
 

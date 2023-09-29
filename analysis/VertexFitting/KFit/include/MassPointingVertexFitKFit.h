@@ -76,7 +76,6 @@ namespace Belle2 {
       double                      getCHIsq(void) const override;
       /** Get a vertex error matrix of the track
        * @param id track id
-       * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
       const CLHEP::HepMatrix      getTrackVertexError(const int id) const;

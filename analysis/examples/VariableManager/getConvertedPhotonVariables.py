@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 This script loads a specified input ROOT file, reconstructs photon conversions and
 saves converted-photon variables and some of their generator-level counterparts for comparison.
@@ -18,6 +15,9 @@ saves converted-photon variables and some of their generator-level counterparts 
 Execute script with:
   $> basf2 getConvertedPhotonVariables.py -i [input_ROOT_file]
 """
+
+# Doxygen should skip this script
+# @cond
 
 import basf2 as b2
 import modularAnalysis as ma

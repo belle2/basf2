@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 This steering file fills an NTuple with the ChargedPidMVA score
 for charged particle identification. By default, global PID info is stored,
@@ -25,6 +22,9 @@ Input: *_mdst_*.root
 Output: *_ntup_*.root
 
 """
+
+# Doxygen should skip this script
+# @cond
 
 import argparse
 import re

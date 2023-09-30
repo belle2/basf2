@@ -22,6 +22,11 @@
 #include <string>
 #include <map>
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 namespace Belle2 {
 
   /**
@@ -83,12 +88,37 @@ namespace Belle2 {
      */
     inline static std::string s_runType = "";
 
+    /**
+     * Flag if to use EPICS
+     * do not set by yourself, use EpicsEnable module to set.
+     */
+    static bool m_useEpics;
+
+    /**
+     * Flag if to use EPICS in ReadOnly mode (for reading limits)
+     * do not set by yourself, use EpicsEnable module to set.
+     */
+    static bool m_epicsReadOnly;
+
+    /**
+     * The Prefix for EPICS PVs
+     */
+    static std::string m_PVPrefix;
+
+
+#ifdef _BELLE2_EPICS
+    //! Vector of EPICS PVs
+    std::vector <chid>  m_epicsChID;
+    //! Map of (key)names to EPICS PVs
+    std::map <std::string, chid> m_epicsNameToChID;
+#endif
+
   public:
     /**
      * Get the list of the histograms.
      * @return The list of the histograms.
      */
-    static const HistList& getHistList() { return s_histList;};
+    static /*const*/ HistList& getHistList() { return s_histList;};
 
     /**
      * Get the list of MonitoringObjects.
@@ -193,8 +223,9 @@ namespace Belle2 {
      * @param dirname The name of the directory.
      * @param histname The name of the histogram.
      * @param h The TH1 pointer for the histogram.
+     * @return histogram was updated flag
      */
-    static void addHist(const std::string& dirname,
+    static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
     /**
@@ -241,7 +272,7 @@ namespace Belle2 {
      * @param p numerical parameter depnding on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
-    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a);
+    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a = 1);
 
     /**
      * Check if Delta histogram parameters exist for histogram.
@@ -267,6 +298,143 @@ namespace Belle2 {
      * Extract event processed from daq histogram, called from input module
      */
     void ExtractEvent(std::vector <TH1*>& hs);
+
+    /// EPICS related Functions
+
+    /**
+     * Register a PV with its name and a key name
+     *
+     * If you register large number of PVs at once, consider setting
+     * update_pvs = false and explicitly running updateEpicsPVs()
+     *
+     * @param pvname full PV name
+     * @param keyname key name for easier access
+     * @param update_pvs if true, update all PVs (flush network) after new PV is registered
+     * @return an index which can be used to access the PV instead of key name, -1 if failure
+     */
+    int registerEpicsPV(std::string pvname, std::string keyname = "", bool update_pvs = true);
+
+    /**
+     * Write value to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value value to write
+     */
+    void setEpicsPV(std::string keyname, double value);
+
+    /**
+     * Write value to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value value to write
+     */
+    void setEpicsPV(std::string keyname, int value);
+
+    /**
+     * Write value to a EPICS PV
+     * @param index index of PV
+     * @param value value to write
+     */
+    void setEpicsPV(int index, double value);
+
+    /**
+     * Write value to a EPICS PV
+     * @param index index of PV
+     * @param value value to write
+     */
+    void setEpicsPV(int index, int value);
+
+    /**
+     * Update all EPICS PV (flush to network)
+     * @param timeout maximum time until timeout in s
+     * */
+    void updateEpicsPVs(float timeout);
+
+    /**
+     * Get EPICS PV Channel Id
+     * @param keyname key name (or full PV name) of PV
+     * @return Channel ID is written on success, otherwise nullptr
+     */
+    chid getEpicsPVChID(std::string keyname);
+
+    /**
+     * Get EPICS PV Channel Id
+     * @param index index of PV
+     * @return Channel ID is written on success, otherwise nullptr
+     */
+    chid getEpicsPVChID(int index);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param id Channel ID
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(chid id, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(std::string keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param index index of PV
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(int index, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Setter for EPICS usage
+     * @param flag set in use
+     */
+    void setUseEpics(bool flag) {m_useEpics = flag;};
+
+    /**
+     * Setter EPICS flag in read only mode
+     * @param flag set read only
+     */
+    void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
+
+    /**
+     * Getter for EPICS usage
+     * @return flag is in use
+     */
+    bool getUseEpics(void) {return m_useEpics;};
+
+    /**
+     * Getter EPICS flag in read only mode
+     * @return flag if read only
+     */
+    bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
+
+    /**
+     * Unsubscribe from EPICS PVs on terminate
+     */
+    void cleanupEpicsPVs(void);
+
+    /**
+     * get global Prefix for EPICS PVs
+     * @return prefix in use
+     */
+    std::string& getPVPrefix(void) {return m_PVPrefix;};
+
+    /**
+     * set global Prefix for EPICS PVs
+     * @param prefix Prefix to set
+     */
+    void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
 
     // Public functions
   public:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,7 +14,8 @@ import subprocess
 import unittest
 import glob
 from basf2 import find_file
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, configure_logging_for_tests, skip_test
+from b2test_utils_analysis import scanTTree
 
 
 class TutorialsTest(unittest.TestCase):
@@ -32,12 +32,15 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
+        configure_logging_for_tests()
         all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "/B2A3*.py"))
         for tutorial in all_tutorials:
             filename = os.path.basename(tutorial)
             if filename not in self.broken_tutorials:
                 with self.subTest(msg=filename):
-                    result = subprocess.run(['basf2', '-n1', tutorial], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    outputfilename = filename.replace('.py', '.root')
+                    result = subprocess.run(['basf2', '-n100', tutorial, '-o', outputfilename],
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     if result.returncode != 0:
                         # failure running tutorial so let's print the output
                         # on stderr so it's not split from output of unittest
@@ -45,7 +48,11 @@ class TutorialsTest(unittest.TestCase):
                         sys.stdout.buffer.write(result.stdout)
                     self.assertEqual(result.returncode, 0)
 
+                    if os.path.exists(outputfilename):
+                        scanTTree(outputfilename)
+
 
 if __name__ == '__main__':
+    skip_test("Temporarily skip test of B2A3XX tutorials to update input file.")
     with clean_working_directory():
         unittest.main()

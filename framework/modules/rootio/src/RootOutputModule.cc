@@ -19,8 +19,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/EnvironmentVariables.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -30,7 +28,7 @@
 
 #include <memory>
 #include <regex>
-
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
@@ -171,8 +169,11 @@ void RootOutputModule::initialize()
 
 void RootOutputModule::openFile()
 {
+  // Since we open a new file, we also have to reset the number of full events
+  m_nFullEvents = 0;
+  // Continue with opening the file
   TDirectory* dir = gDirectory;
-  boost::filesystem::path out{m_outputFileName};
+  std::filesystem::path out{m_outputFileName};
   if (m_outputSplitSize) {
     // Mangle the filename to add the fNNNNN part. However we need to be
     // careful since the file name could be non-local and have some options or
@@ -180,7 +181,7 @@ void RootOutputModule::openFile()
     // http://mydomain.org/filename.root?foo=bar#baz). So use "TUrl" *sigh* to
     // do the parsing and only replace the extension of the file part.
     TUrl fileUrl(m_outputFileName.c_str(), m_regularFile);
-    boost::filesystem::path file{fileUrl.GetFile()};
+    std::filesystem::path file{fileUrl.GetFile()};
     file.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
     fileUrl.SetFile(file.c_str());
     // In case of regular files we don't want the protocol or anything, just the file
@@ -191,7 +192,7 @@ void RootOutputModule::openFile()
     //try creating necessary directories since this is a local file
     auto dirpath = out.parent_path();
 
-    if (boost::filesystem::create_directories(dirpath)) {
+    if (std::filesystem::create_directories(dirpath)) {
       B2INFO("Created missing directory " << dirpath << ".");
       //try again
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
@@ -292,7 +293,8 @@ void RootOutputModule::openFile()
 void RootOutputModule::event()
 {
   // if we closed after last event ... make a new one
-  if (!m_file) openFile();
+  if (!m_file)
+    openFile();
 
   if (!m_keepParents) {
     if (m_fileMetaData) {
@@ -342,6 +344,10 @@ void RootOutputModule::event()
     }
   }
 
+  // check if the event is a full event or not: if yes, increase the counter
+  if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
+    m_nFullEvents++;
+
   // check if we need to split the file
   if (m_outputSplitSize and (uint64_t)m_file->GetEND() > *m_outputSplitSize) {
     // close file and open new one
@@ -360,6 +366,7 @@ void RootOutputModule::fillFileMetaData()
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
+    m_fileMetaData->setNFullEvents(m_nFullEvents);
     if (m_buildIndex && numEntries > 0) {
       if (numEntries > 10000000) {
         //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
@@ -399,7 +406,7 @@ void RootOutputModule::fillFileMetaData()
   // Set the LFN to the filename: if it's a URL to directly, otherwise make sure it's absolute
   std::string lfn = m_file->GetName();
   if(m_regularFile) {
-    lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+    lfn = std::filesystem::absolute(lfn).string();
   }
   // Format LFN if BELLE2_LFN_FORMATSTRING is set
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");

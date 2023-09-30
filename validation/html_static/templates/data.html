@@ -50,7 +50,7 @@
   <!-- Page overview -->
   <!-------------------------------------------------------------------------->
 
-  <h2>Data files produced by steering files</h2>
+  <h2>Data files produced by steering scripts</h2>
 
   <!-- Looping over all packages -->
   <!-------------------------------------------------------------------------->
@@ -62,15 +62,16 @@
       <!-------------------------------------------------------------------------->
       {{#scriptfiles}}
       {{ #if output }}
-        <li>{{ name }}
+        <li id="{{name}}"><a target="_blank"><code>{{ name }}</code></a><script>buildLink('{{path}}');</script>
           <ul>
             {{ #output:i }}
             <li>
-              <a href="../results/current/{{output[i]}}" target="_blank" download>{{ output[i] }}</a> || 
-              <a href="../retrieve_file_metadata?filename=../results/current/{{output[i]}}" target="_blank">metadata</a>
+              <span>{{ output[i] }}</span> || 
+              <a href="../results/{{newest_revision}}/{{output[i]}}.txt" target="_blank">metadata</a>
             </li>
             {{/output}}
           </ul>
+        </li>
       {{/if}}
       {{/scriptfiles}}
       </ul>
@@ -83,8 +84,8 @@
   {{/packages}}
   <a href="#" onclick="toggleDataFilesView();return false;">Back</a>
 </div>
-<!-- Script to handle hide empty package lists -->
-<!-------------------------------------------------------------------------->
+<!-- Script functions to handle hide empty package lists and dynamically build script links-->
+<!------------------------------------------------------------------------------------------->
 <script type="text/javascript">
   function hideEmpty(package) {
     var li = document.getElementById(package);
@@ -92,5 +93,14 @@
     if(count===1){
       li.style.display = 'none';
     }
+  }
+  function buildLink(path) {
+    // the name of the id is script file, so we need to extraxt the last field of the full path
+    var fields = path.split('/');
+    var li = document.getElementById(fields[fields.length-1]);
+    var package = li.parentElement.parentElement.id;
+    // the path of the validation script under the package subdirectory is needed for the repo link
+    var paths = path.split(package);
+    li.childNodes[0].href = "https://gitlab.desy.de/belle2/software/basf2/-/tree/main/"+package+paths[1];
   }
 </script>

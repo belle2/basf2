@@ -17,6 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
@@ -126,26 +127,20 @@ void TreeFitterModule::initialize()
 
 void TreeFitterModule::beginRun()
 {
-  if (!m_beamparams.isValid())
-    B2FATAL("BeamParameters are not available!");
-
-  const ROOT::Math::PxPyPzEVector& her = m_beamparams->getHER();
-  const ROOT::Math::PxPyPzEVector& ler = m_beamparams->getLER();
-  const ROOT::Math::PxPyPzEVector& cms = her + ler;
+  PCmsLabTransform T;
+  const ROOT::Math::PxPyPzEVector cms = T.getBeamFourMomentum();
 
   m_beamMomE(0) = cms.X();
   m_beamMomE(1) = cms.Y();
   m_beamMomE(2) = cms.Z();
   m_beamMomE(3) = cms.E();
 
-  const TMatrixDSym& HERcoma = m_beamparams->getCovHER();
-  const TMatrixDSym& LERcoma = m_beamparams->getCovLER();
-
   m_beamCovariance = Eigen::Matrix4d::Zero();
-  const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
+  const double covE = 3.19575e-05; // TODO Avoid using the hard coded value.
+  // It is taked from the BeamParameter which was used previously. The uncertainty from the CollisionInvariantMass is a possibility.
+
   for (size_t i = 0; i < 4; ++i) {
-    m_beamCovariance(i, i) =
-      covE;
+    m_beamCovariance(i, i) = covE;
     // TODO Currently, we do not get a full covariance matrix from beamparams, and the py value is zero, which means there is no constraint on py. Therefore, we approximate it by a diagonal matrix using the energy value for all components. This is based on the assumption that the components of the beam four-momentum are independent and of comparable size.
   }
 }

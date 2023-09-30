@@ -6,13 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/modules/eclMatchingPerformance/ECLMatchingPerformanceExpertModule.h>
 
+/* ECL headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
+
+/* Basf2 headers. */
 #include <framework/datastore/RelationVector.h>
 
-#include <root/TFile.h>
-#include <root/TTree.h>
+/* ROOT headers. */
+#include <Math/Vector3D.h>
+#include <TFile.h>
+#include <TTree.h>
+
+/* C++ headers. */
+#include <algorithm>
 
 using namespace Belle2;
 
@@ -118,7 +127,7 @@ void ECLMatchingPerformanceExpertModule::event()
         if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
         ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
         if (eclClusterNear) {
-          distance = (eclClusterNear->getClusterPosition() - extHit.getPositionTVector3()).Mag();
+          distance = (eclClusterNear->getClusterPosition() - extHit.getPosition()).R();
           if (m_distance < 0 || distance < m_distance) {
             m_distance = distance;
           }
@@ -221,7 +230,7 @@ void ECLMatchingPerformanceExpertModule::event()
       for (const auto& eclCalDigit : m_eclCalDigits) {
         if (eclCalDigit.getEnergy() < m_innerDistanceEnergy) continue;
         int cellid = eclCalDigit.getCellId();
-        TVector3 cvec = geometry->GetCrystalPos(cellid - 1);
+        ROOT::Math::XYZVector cvec = geometry->GetCrystalPos(cellid - 1);
         ROOT::Math::XYZVector crystalPosition(cvec.X(), cvec.Y(), cvec.Z());
         distance = (crystalPosition - 0.5 * (pos_enter + pos_exit)).R();
         if (m_innerdistance < 0 || distance < m_innerdistance) {
@@ -391,9 +400,9 @@ void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(
 {
   const auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
   for (const auto& neighbouringcell : vec_of_neighbouring_cells) {
-    const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+    const auto idigit = std::find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
     [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > m_minCalDigitEnergy); }
-                               );
+                                    );
     //Found ECLCalDigit close to ExtHit
     if (idigit != m_eclCalDigits.end()) {
       matchedToNeighbours = 1;
@@ -404,9 +413,9 @@ void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(
 
 void ECLMatchingPerformanceExpertModule::findECLCalDigitMatch(const int& cell, int& matched)
 {
-  const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+  const auto idigit = std::find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
   [&](const ECLCalDigit & d) { return (d.getCellId() == cell && d.getEnergy() > m_minCalDigitEnergy); }
-                             );
+                                  );
   //Found ECLCalDigit close to ExtHit
   if (idigit != m_eclCalDigits.end()) {
     matched = 1;

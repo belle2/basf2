@@ -261,7 +261,6 @@ namespace Belle2 {
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *
      *  @param accessor   Encapsulates name, durability, and type
-     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */

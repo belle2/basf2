@@ -111,18 +111,18 @@ void MCDecayFinderModule::event()
             newParticle->appendDaughter(partDaughter, /* updateType = */ false); // particleSource remain c_MCParticle
           }
         }
-        m_outputList->addParticle(newParticle);
+        addUniqueParticleToList(newParticle);
 
       } else if (arrayIndex == -1) {
         // Particle is not created when no daughter is described in decayString
         Particle* newParticle = m_particles.appendNew(mcp);
         newParticle->addRelationTo(mcp);
 
-        m_outputList->addParticle(newParticle);
-
+        addUniqueParticleToList(newParticle);
       } else {
         // Particle is already created
-        m_outputList->addParticle(m_particles[arrayIndex]);
+        addUniqueParticleToList(m_particles[arrayIndex]);
+
       }
 
     }
@@ -201,6 +201,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
       DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC, tmp);
       if (!daughter->getObj()) {
         ++itDP;
+        delete daughter;
         continue;
       }
       // Matching daughter found, remove it from list of unmatched particle daughters
@@ -385,4 +386,15 @@ Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, 
   }
 
   return newParticle;
+}
+
+void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
+{
+
+  for (auto existingParticle : *m_outputList) {
+    if (existingParticle.isCopyOf(newParticle))
+      return;
+  }
+
+  m_outputList->addParticle(newParticle);
 }

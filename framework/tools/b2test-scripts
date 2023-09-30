@@ -176,15 +176,15 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = "A CellExecutionError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A CellExecutionError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
         extra = str(ce)
     except TimeoutError as te:
         result = False
-        message = "A TimeoutError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A TimeoutError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
         extra = str(te)
     except RuntimeError as re:
         result = False
-        message = "A RuntimeError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A RuntimeError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
         extra = str(re)
 
     time = timeit.default_timer() - time_start

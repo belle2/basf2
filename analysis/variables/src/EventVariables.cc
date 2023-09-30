@@ -38,6 +38,7 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
+
 namespace Belle2 {
   namespace Variable {
 
@@ -79,7 +80,7 @@ namespace Belle2 {
       if (bPDGs.size() == 2) {
         return bPDGs[0] * bPDGs[1] < 0;
       }
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     bool isNotContinuumEvent(const Particle*)
@@ -229,7 +230,8 @@ namespace Belle2 {
       return (T.getBeamFourMomentum()).E();
     }
 
-    ROOT::Math::PxPyPzEVector getCMSEnergyMCVector()
+    // get total 4-momentum of all final-state particles in MC
+    static ROOT::Math::PxPyPzEVector getTotalMcFinalStateMomentum()
     {
       StoreArray<MCParticle> mcps;
       ROOT::Math::PxPyPzEVector sum;
@@ -245,20 +247,66 @@ namespace Belle2 {
       return sum;
     }
 
+
+    // get 4-momentum of the incoming electron/positron in MC event
+    static ROOT::Math::PxPyPzEVector getMcBeamMomentum(int charge)
+    {
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps) {
+        if (mcp.isInitial() && mcp.getPDG() == -charge * 11) {
+          return mcp.get4Vector();
+        }
+      }
+
+      // if no initial electron/positron found
+      return  ROOT::Math::PxPyPzEVector(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+    }
+
+    // get HER/LER 4-momentum based on the calibration payloads
+    static ROOT::Math::PxPyPzEVector getBeamMomentum(int charge)
+    {
+      PCmsLabTransform T;
+      double EbeamCM = T.getCMSEnergy() / 2;
+      double pBeamCM = sqrt(pow(EbeamCM, 2) - pow(Const::electronMass, 2));
+
+      ROOT::Math::PxPyPzEVector pCM(0, 0, -charge * pBeamCM, EbeamCM);
+
+      return T.cmsToLab(pCM);
+    }
+
+
+    double getMcPxHER(const Particle*) {return getMcBeamMomentum(-1).Px();}
+    double getMcPyHER(const Particle*) {return getMcBeamMomentum(-1).Py();}
+    double getMcPzHER(const Particle*) {return getMcBeamMomentum(-1).Pz();}
+
+    double getMcPxLER(const Particle*) {return getMcBeamMomentum(+1).Px();}
+    double getMcPyLER(const Particle*) {return getMcBeamMomentum(+1).Py();}
+    double getMcPzLER(const Particle*) {return getMcBeamMomentum(+1).Pz();}
+
+
+    double getPxHER(const Particle*) {return getBeamMomentum(-1).Px();}
+    double getPyHER(const Particle*) {return getBeamMomentum(-1).Py();}
+    double getPzHER(const Particle*) {return getBeamMomentum(-1).Pz();}
+
+    double getPxLER(const Particle*) {return getBeamMomentum(+1).Px();}
+    double getPyLER(const Particle*) {return getBeamMomentum(+1).Py();}
+    double getPzLER(const Particle*) {return getBeamMomentum(+1).Pz();}
+
+
     double getCMSEnergyMC(const Particle*)
     {
       StoreArray<MCParticle> mcps;
       if (!mcps)  {
-        return std::numeric_limits<double>::quiet_NaN();
-      } else return getCMSEnergyMCVector().M();
+        return Const::doubleNaN;
+      } else return getTotalMcFinalStateMomentum().M();
     }
 
     double getTotalEnergyMC(const Particle*)
     {
       StoreArray<MCParticle> mcps;
       if (!mcps)  {
-        return std::numeric_limits<double>::quiet_NaN();
-      } else return getCMSEnergyMCVector().E();
+        return Const::doubleNaN;
+      } else return getTotalMcFinalStateMomentum().E();
     }
 
     double getGenIPX(const Particle*)
@@ -269,7 +317,7 @@ namespace Belle2 {
       for (const auto& mcp : mcps)
         if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
           return mcp.getVertex().X();
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double getGenIPY(const Particle*)
@@ -278,7 +326,7 @@ namespace Belle2 {
       for (const auto& mcp : mcps)
         if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
           return mcp.getVertex().Y();
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double getGenIPZ(const Particle*)
@@ -287,7 +335,7 @@ namespace Belle2 {
       for (const auto& mcp : mcps)
         if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
           return mcp.getVertex().Z();
-      return std::numeric_limits<double>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     double getIPX(const Particle*)
@@ -310,17 +358,20 @@ namespace Belle2 {
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
     {
-      int elementI = int(std::lround(element[0]));
-      int elementJ = int(std::lround(element[1]));
+      int elementI = std::lround(element[0]);
+      int elementJ = std::lround(element[1]);
 
-      if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
-        return std::numeric_limits<float>::quiet_NaN();
+      bool isOutOfRange = false;
+      if (elementI < 0 || elementI > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("i", elementI));
+        isOutOfRange = true;
       }
-      if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
-        return std::numeric_limits<float>::quiet_NaN();
+      if (elementJ < 0 || elementJ > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("j", elementJ));
+        isOutOfRange = true;
       }
+
+      if (isOutOfRange) return Const::doubleNaN;
 
       static DBObjPtr<BeamSpot> beamSpotDB;
       return beamSpotDB->getCovVertex()(elementI, elementJ);
@@ -332,7 +383,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentum().R();
       return missing;
@@ -343,7 +394,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentum().X();
       return missing;
@@ -354,7 +405,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentum().Y();
       return missing;
@@ -365,7 +416,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentum().Z();
       return missing;
@@ -376,7 +427,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentum().Theta();
       return missing;
@@ -387,7 +438,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
@@ -398,7 +449,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
@@ -409,7 +460,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentumCMS().X();
       return missing;
@@ -420,7 +471,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentumCMS().Y();
       return missing;
@@ -431,7 +482,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMomentumCMS().Z();
       return missing;
@@ -442,7 +493,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double theta = evtShape->getMissingMomentumCMS().Theta();
       return theta;
@@ -453,7 +504,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingEnergyCMS();
       return missing;
@@ -464,7 +515,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingEnergyCMS();
       return missing;
@@ -476,7 +527,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMass2();
       return missing;
@@ -487,7 +538,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double missing = evtShape->getMissingMass2();
       return missing;
@@ -498,7 +549,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double visible = evtShape->getVisibleEnergyCMS();
       return visible;
@@ -509,7 +560,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double visible = evtShape->getVisibleEnergyCMS();
       return visible;
@@ -521,7 +572,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
@@ -532,7 +583,7 @@ namespace Belle2 {
       StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
@@ -542,7 +593,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       if (!evtMetaData) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       std::time_t rawtime = trunc(evtMetaData->getTime() / 1e9);
       auto tt = std::gmtime(&rawtime);  // GMT
@@ -556,7 +607,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       if (!evtMetaData) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       std::time_t rawtime = trunc(evtMetaData->getTime() / 1e9);
       auto tt = std::gmtime(&rawtime);
@@ -568,7 +619,7 @@ namespace Belle2 {
       StoreObjPtr<EventMetaData> evtMetaData;
 
       if (!evtMetaData) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double evtTime = trunc(evtMetaData->getTime() / 1e9);
 
@@ -580,7 +631,7 @@ namespace Belle2 {
       StoreObjPtr<EventMetaData> evtMetaData;
 
       if (!evtMetaData) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       double evtTime = trunc(evtMetaData->getTime() / 1e9);
 
@@ -595,13 +646,13 @@ namespace Belle2 {
 
       if (!evtT0) {
         B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       if (evtT0->hasEventT0()) {
         return evtT0->getEventT0();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -612,14 +663,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->getTimeSincePrevTrigger();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -630,14 +681,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->getTimeSincePrevTriggerInMicroSeconds();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -648,14 +699,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->getBunchNumber();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -666,14 +717,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->getTriggeredBunchNumberGlobal();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -684,14 +735,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->hasInjection();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -702,14 +753,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceLastInjection();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -720,14 +771,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -738,14 +789,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceInjectedBunch();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -756,14 +807,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceInjectedBunchInMicroSeconds();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -774,14 +825,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->isHER();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -792,14 +843,14 @@ namespace Belle2 {
       // Check if the pointer is valid
       if (!TTDInfo.isValid()) {
         B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->isRevo2();
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -884,6 +935,23 @@ In such cases the event numbers are sequential *only within a production*, so ex
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.\n\n","GeV/c");
     REGISTER_VARIABLE("EcmsMC", getCMSEnergyMC, "[Eventbased] Truth value of sqrt(s)\n\n", "GeV");
     REGISTER_VARIABLE("totalEnergyMC", getTotalEnergyMC, "[Eventbased] Truth value of sum of energies of all the generated particles\n\n", "GeV");
+
+
+    REGISTER_VARIABLE("PxHER", getPxHER, "[Eventbased] Returns truth value of the x component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyHER", getPyHER, "[Eventbased] Returns truth value of the y component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzHER", getPzHER, "[Eventbased] Returns truth value of the z component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PxLER", getPxLER, "[Eventbased] Returns truth value of the x component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyLER", getPyLER, "[Eventbased] Returns truth value of the y component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzLER", getPzLER, "[Eventbased] Returns truth value of the z component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+
+    REGISTER_VARIABLE("mcPxHER", getMcPxHER, "[Eventbased] Returns x component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyHER", getMcPyHER, "[Eventbased] Returns y component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzHER", getMcPzHER, "[Eventbased] Returns z component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPxLER", getMcPxLER, "[Eventbased] Returns x component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyLER", getMcPyLER, "[Eventbased] Returns y component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzLER", getMcPzLER, "[Eventbased] Returns z component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+
+
 
     REGISTER_VARIABLE("IPX", getIPX, R"DOC(
 [Eventbased] Returns x coordinate of the measured interaction point.

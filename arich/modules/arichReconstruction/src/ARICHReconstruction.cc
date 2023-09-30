@@ -569,7 +569,10 @@ namespace Belle2 {
             double   path              = meanr.Mag();
             meanr                      = meanr.Unit();
 
-            double   detector_sigma    = thcResolution * path / meanr.Z();
+            double meanpath = (m_recPars->getParameters())[2];
+            if (iAerogel == 1) meanpath = meanpath - m_thickness[iAerogel];
+
+            double detector_sigma    = thcResolution * meanpath / meanr.Z();
             double wide_sigma = wideGaussSigma * path / meanr.Z();
             // calculate pad orientation and distance relative to that photon
             double modphi =  m_arichgp->getDetectorPlane().getSlotPhi(modID);
@@ -579,7 +582,7 @@ namespace Belle2 {
             double  dr = (track_at_detector - detector_position).Mag();
 
             if (dr > 0.01) {
-              double normalizacija = nSig_wo_acc[iHyp][iAerogel][ifi] * padSize / (0.1 * M_PI * dr);
+              double normalizacija = nSig_wo_acc[iHyp][iAerogel][ifi] * padSize / (0.1 * M_PI * dr * meanr.Z());
               weight[iHyp][iAerogel] = normalizacija;
               weight_sum[iHyp] += weight[iHyp][iAerogel];
               double integralMain = SquareInt(padSize, pad_fi, dx, detector_sigma) / sqrt(2.);

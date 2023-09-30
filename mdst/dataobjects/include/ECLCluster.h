@@ -10,7 +10,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
@@ -248,6 +248,9 @@ namespace Belle2 {
     /** Return cluster id */
     int getClusterId() const {return m_clusterId;}
 
+    /** Return unique cluster id = 1000 * regionId + clusterId */
+    int getUniqueClusterId() const {return 1000 * m_connectedRegionId + m_clusterId;}
+
     /** Get distance between cluster COG and track extrapolation to ECL. */
     double getMinTrkDistance() const { return m_minTrkDistance; }
 
@@ -320,8 +323,8 @@ namespace Belle2 {
     /** Return Uncertainty on Phi of Shower */
     double getUncertaintyPhi() const { return (m_sqrtcovmat_11);}
 
-    /** Return TVector3 on cluster position (x,y,z) */
-    TVector3 getClusterPosition() const;
+    /** Return ROOT::Math::XYZVector on cluster position (x,y,z) */
+    ROOT::Math::XYZVector getClusterPosition() const;
 
     /** Return TMatrixDsym 3x3 covariance matrix for E, Phi and Theta */
     TMatrixDSym getCovarianceMatrix3x3() const;

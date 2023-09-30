@@ -8,10 +8,15 @@
 
 #pragma once
 
-#include <vector>
-#include <map>
+/* Geant4 headers. */
 #include <G4ThreeVector.hh>
-#include <TVector3.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
+
+/* C++ headers. */
+#include <map>
+#include <vector>
 
 typedef int EclIdentifier;
 typedef double EclGeV;
@@ -89,19 +94,19 @@ namespace Belle2 {
       }
 
       /** The Position of crystal*/
-      TVector3 GetCrystalPos(int cid)
+      ROOT::Math::XYZVector GetCrystalPos(int cid)
       {
         if (cid != m_ini_cid) InitCrystal(cid);
         const G4ThreeVector& t = m_current_crystal.pos;
-        return TVector3(t.x(), t.y(), t.z());
+        return ROOT::Math::XYZVector(t.x(), t.y(), t.z());
       }
 
       /** The direction of crystal*/
-      TVector3 GetCrystalVec(int cid)
+      ROOT::Math::XYZVector GetCrystalVec(int cid)
       {
         if (cid != m_ini_cid) InitCrystal(cid);
         const G4ThreeVector& t = m_current_crystal.dir;
-        return TVector3(t.x(), t.y(), t.z());
+        return ROOT::Math::XYZVector(t.x(), t.y(), t.z());
       }
 
       /** function to calculate flight time to diode sensor */
@@ -130,7 +135,7 @@ namespace Belle2 {
       int mPar_thetaID;
       /** The Phi ID information*/
       int mPar_phiID;
-      /** . */
+      /** initial crystal ID */
       int m_ini_cid;
       /** Pointer that saves the instance of this class. */
       static ECLGeometryPar* m_B4ECLGeometryParDB;

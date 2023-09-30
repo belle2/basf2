@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -153,3 +152,5 @@ class CAFDB(SQLiteDB):
         border = line_len * "="
         header = "\n".join((border, title, border))
         return "\n".join((header, table_string, border))
+
+# @endcond

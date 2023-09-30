@@ -21,8 +21,6 @@
 #include <utility>
 #include <iostream>
 #include <fstream>
-#include "TVector3.h"
-#include "TVector2.h"
 
 using std::cout;
 using std::endl;
@@ -41,14 +39,13 @@ using std::make_tuple;
 
 int Fitter3DUtility::findSign(double* phi2)
 {
-  double Trg_PI = 3.141592653589793;
   int mysign;
   double sign_phi[2];
 
-  if ((phi2[0] - phi2[4]) > Trg_PI || (phi2[0] - phi2[4]) < -Trg_PI) {
-    if (phi2[0] > Trg_PI) {sign_phi[0] = phi2[0] - 2 * Trg_PI;}
+  if ((phi2[0] - phi2[4]) > M_PI || (phi2[0] - phi2[4]) < -M_PI) {
+    if (phi2[0] > M_PI) {sign_phi[0] = phi2[0] - 2 * M_PI;}
     else {sign_phi[0] = phi2[0];}
-    if (phi2[4] > Trg_PI) {sign_phi[1] = phi2[4] - 2 * Trg_PI;}
+    if (phi2[4] > M_PI) {sign_phi[1] = phi2[4] - 2 * M_PI;}
     else {sign_phi[1] = phi2[4];}
   } else {
     sign_phi[0] = phi2[0];
@@ -88,7 +85,6 @@ void Fitter3DUtility::rPhiFitter(double* rr, double* phi2, double* invphierror, 
   //  cout<<"SL["<<iSL<<"] rr: "<<rr[iSL]<<" phi: "<<phi2[iSL]<<" phiError: "<<phierror[iSL]<<endl;
   //}
 
-  double Trg_PI = 3.141592653589793;
   double A, B, C, D, E, hcx, hcy;
   double invFiterror[5];
   //double G;
@@ -102,7 +98,7 @@ void Fitter3DUtility::rPhiFitter(double* rr, double* phi2, double* invphierror, 
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-  A = 0, B = 0, C = 0, D = 0, E = 0, hcx = 0, hcy = 0;
+  A = 0, B = 0, C = 0, D = 0, E = 0;
   //G=0;
   for (unsigned i = 0; i < 5; i++) {
     A += cos(phi2[i]) * cos(phi2[i]) * (invFiterror[i] * invFiterror[i]);
@@ -118,11 +114,11 @@ void Fitter3DUtility::rPhiFitter(double* rr, double* phi2, double* invphierror, 
   hcy /= 2 * (A * B - C * C);
   rho = sqrt(hcx * hcx + hcy * hcy); //radius of helix
   myphi0 = atan2(hcy, hcx);
-  if (myphi0 < 0) myphi0 += 2 * Trg_PI;
+  if (myphi0 < 0) myphi0 += 2 * M_PI;
   //myphi0=atan(hcy/hcx);
-  //if(hcx<0 && hcy>0) myphi0 += Trg_PI;
-  //if(hcx<0 && hcy<0) myphi0 += Trg_PI;
-  //if(hcx>0 && hcy<0) myphi0 += Trg_PI*2.0;
+  //if(hcx<0 && hcy>0) myphi0 += M_PI;
+  //if(hcx<0 && hcy<0) myphi0 += M_PI;
+  //if(hcx>0 && hcy<0) myphi0 += M_PI*2.0;
 
   //// For chi2
   // double pchi2 = -2*hcx*D-2*hcy*E+G;
@@ -146,7 +142,6 @@ void Fitter3DUtility::rPhiFitter(double* rr, double* phi2, double* invphierror, 
 void Fitter3DUtility::chargeFinder(double* nTSs, double* tsIds, double* tsHitmap, double phi0, double inCharge,
                                    double& foundCharge)
 {
-  double Trg_PI = 3.141592653589793;
   vector<double> tsPhi(5);
   vector<double> dPhi(5);
   vector<double> dPhi_c(5);
@@ -154,12 +149,12 @@ void Fitter3DUtility::chargeFinder(double* nTSs, double* tsIds, double* tsHitmap
   for (unsigned iAx = 0; iAx < 5; iAx++) {
     //cout<<"iAx:"<<iAx<<" nTSs:"<<nTSs[iAx]<<" tsId:"<<tsIds[iAx]<<" hitmap:"<<tsHitmap[iAx]<<" phi0:"<<phi0<<" inCharge:"<<inCharge<<endl;
     // Change tsId to rad unit.
-    tsPhi[iAx] = tsIds[iAx] * 2 * Trg_PI / nTSs[iAx];
+    tsPhi[iAx] = tsIds[iAx] * 2 * M_PI / nTSs[iAx];
     dPhi[iAx] = tsPhi[iAx] - phi0;
     //cout<<"iAx:"<<iAx<<" dPhi:"<<dPhi[iAx]<<endl;
     // Constrain dPhi to [-pi, pi]
-    if (dPhi[iAx] < -Trg_PI) dPhi_c[iAx] = dPhi[iAx] + 2 * Trg_PI;
-    else if (dPhi[iAx] > Trg_PI) dPhi_c[iAx] = dPhi[iAx] - 2 * Trg_PI;
+    if (dPhi[iAx] < -M_PI) dPhi_c[iAx] = dPhi[iAx] + 2 * M_PI;
+    else if (dPhi[iAx] > M_PI) dPhi_c[iAx] = dPhi[iAx] - 2 * M_PI;
     else dPhi_c[iAx] = dPhi[iAx];
     //cout<<"iAx:"<<iAx<<" dPhi_c:"<<dPhi_c[iAx]<<endl;
     // Calculate charge
@@ -184,7 +179,6 @@ void Fitter3DUtility::chargeFinder(double* nTSs, double* tsIds, double* tsHitmap
 void Fitter3DUtility::rPhiFit2(double* rr, double* phi2, double* phierror, double& rho, double& myphi0, int nTS)
 {
 
-  double Trg_PI = 3.141592653589793;
   double A, B, C, D, E, hcx, hcy;
   //double G;
   double fiterror[5];
@@ -195,7 +189,7 @@ void Fitter3DUtility::rPhiFit2(double* rr, double* phi2, double* phierror, doubl
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-  A = 0, B = 0, C = 0, D = 0, E = 0, hcx = 0, hcy = 0;
+  A = 0, B = 0, C = 0, D = 0, E = 0;
   //G=0;
   for (int i = 0; i < nTS; i++) {
     A += cos(phi2[i]) * cos(phi2[i]) / (fiterror[i] * fiterror[i]);
@@ -211,11 +205,11 @@ void Fitter3DUtility::rPhiFit2(double* rr, double* phi2, double* phierror, doubl
   hcy /= 2 * (A * B - C * C);
   rho = sqrt(hcx * hcx + hcy * hcy); //radius of helix
   myphi0 = atan2(hcy, hcx);
-  if (myphi0 < 0) myphi0 += 2 * Trg_PI;
+  if (myphi0 < 0) myphi0 += 2 * M_PI;
   //myphi0=atan(hcy/hcx);
-  //if(hcx<0 && hcy>0) myphi0 += Trg_PI;
-  //if(hcx<0 && hcy<0) myphi0 += Trg_PI;
-  //if(hcx>0 && hcy<0) myphi0 += Trg_PI*2.0;
+  //if(hcx<0 && hcy>0) myphi0 += M_PI;
+  //if(hcx<0 && hcy<0) myphi0 += M_PI;
+  //if(hcx>0 && hcy<0) myphi0 += M_PI*2.0;
 
   //// For chi2
   // double pchi2 = -2*hcx*D-2*hcy*E+G;
@@ -285,11 +279,11 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
   // Make phiFactor constants
   if (mSignalStorage.find("phiFactor_0") == mSignalStorage.end()) {
     for (unsigned iSt = 0; iSt < 4; iSt++) {
-      int nShiftBits = int(log(pow(2, 24) / 2 / mConstD.at("Trg_PI") * mConstV.at("nTSs")[2 * iSt + 1] *
+      int nShiftBits = int(log(pow(2, 24) / 2 / mConstD.at("M_PI") * mConstV.at("nTSs")[2 * iSt + 1] *
                                mSignalStorage["phi0"].getToReal()) / log(2));
       string t_name;
       t_name = "phiFactor_" + to_string(iSt);
-      mSignalStorage[t_name] = Belle2::TRGCDCJSignal(2 * mConstD.at("Trg_PI") / mConstV.at("nTSs")[2 * iSt + 1],
+      mSignalStorage[t_name] = Belle2::TRGCDCJSignal(2 * mConstD.at("M_PI") / mConstV.at("nTSs")[2 * iSt + 1],
                                                      mSignalStorage["phi0"].getToReal() / pow(2, nShiftBits), commonData);
     }
   }
@@ -502,9 +496,9 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
       string t_maxName = "phiMax_" + to_string(iSt);
       string t_minName = "phiMin_" + to_string(iSt);
       string t_2PiName = "phi2Pi_" + to_string(iSt);
-      mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
-      mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(-mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
-      mSignalStorage[t_2PiName] = Belle2::TRGCDCJSignal(2 * mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+      mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(mConstD.at("M_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+      mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(-mConstD.at("M_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+      mSignalStorage[t_2PiName] = Belle2::TRGCDCJSignal(2 * mConstD.at("M_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
     }
   }
   for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -614,14 +608,13 @@ void Fitter3DUtility::calPhiFast(map<string, vector<double> >& stGeometry, vecto
 
 double Fitter3DUtility::rotatePhi(double value, double refPhi)
 {
-  double Trg_PI = 3.141592653589793;
-  double phiMin = -Trg_PI;
-  double phiMax = Trg_PI;
+  double phiMin = -M_PI;
+  double phiMax = M_PI;
   double result = value - refPhi;
   bool rangeOK = 0;
   while (rangeOK == 0) {
-    if (result > phiMax) result -= 2 * Trg_PI;
-    else if (result < phiMin) result += 2 * Trg_PI;
+    if (result > phiMax) result -= 2 * M_PI;
+    else if (result < phiMin) result += 2 * M_PI;
     else rangeOK = 1;
   }
   return result;
@@ -648,21 +641,20 @@ int Fitter3DUtility::rotateTsId(int value, int refId, int nTSs)
 int Fitter3DUtility::findQuadrant(double value)
 {
   // Rotate to [-pi,pi] range.
-  double Trg_PI = 3.141592653589793;
-  double phiMin = -Trg_PI;
-  double phiMax = Trg_PI;
+  double phiMin = -M_PI;
+  double phiMax = M_PI;
   bool rangeOK = 0;
   while (rangeOK == 0) {
-    if (value > phiMax) value -= 2 * Trg_PI;
-    else if (value < phiMin) value += 2 * Trg_PI;
+    if (value > phiMax) value -= 2 * M_PI;
+    else if (value < phiMin) value += 2 * M_PI;
     else rangeOK = 1;
   }
   // Find quadrant.
   int result = -1;
-  if (value > Trg_PI / 2) result = 2;
+  if (value > M_PI_2) result = 2;
   else if (value > 0) result = 1;
-  else if (value > -Trg_PI / 2) result = 4;
-  else if (value > -Trg_PI) result = 3;
+  else if (value > -M_PI_2) result = 4;
+  else if (value > -M_PI) result = 3;
   return result;
 }
 
@@ -795,7 +787,6 @@ double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, 
   if (false) cout << anglest << ztostraw << endl; // Removes warnings when compileing
 
   double myphiz, acos_real;
-  double Trg_PI = 3.141592653589793;
   //Find phifit-phist
   double t_rho = rho;
   if (rr > (2 * rho)) t_rho = rr / 2;
@@ -805,8 +796,8 @@ double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, 
   } else {
     myphiz = -acos_real + myphi0;
   }
-  if (myphiz > Trg_PI) myphiz -= 2 * Trg_PI;
-  if (myphiz < -Trg_PI) myphiz += 2 * Trg_PI;
+  if (myphiz > M_PI) myphiz -= 2 * M_PI;
+  if (myphiz < -M_PI) myphiz += 2 * M_PI;
 
   return myphiz;
 }
@@ -816,7 +807,6 @@ double Fitter3DUtility::calDeltaPhi(int mysign, double anglest, double ztostraw,
   if (false) cout << anglest << ztostraw << endl; // Removes warnings when compileing
 
   double myphiz, acos_real;
-  double Trg_PI = 3.141592653589793;
   //Find phifit-phist
   double t_rho = rho;
   if (rr > (2 * rho)) t_rho = rr / 2;
@@ -826,8 +816,8 @@ double Fitter3DUtility::calDeltaPhi(int mysign, double anglest, double ztostraw,
   } else {
     myphiz = +acos_real - myphi0 + phi2;
   }
-  if (myphiz > Trg_PI) myphiz -= 2 * Trg_PI;
-  if (myphiz < -Trg_PI) myphiz += 2 * Trg_PI;
+  if (myphiz > M_PI) myphiz -= 2 * M_PI;
+  if (myphiz < -M_PI) myphiz += 2 * M_PI;
 
   return myphiz;
 }
@@ -902,7 +892,6 @@ void Fitter3DUtility::constrainRPerStSl(std::map<std::string, std::vector<double
 double Fitter3DUtility::calZ(int mysign, double anglest, double ztostraw, double rr, double phi2, double rho, double myphi0)
 {
   double myphiz = 0, acos_real = 0, dPhiAx = 0;
-  double Trg_PI = 3.141592653589793;
   //Find phifit-phist
   double t_rho = rho;
   if (rr > (2 * rho)) t_rho = rr / 2;
@@ -913,8 +902,8 @@ double Fitter3DUtility::calZ(int mysign, double anglest, double ztostraw, double
     dPhiAx = acos_real - myphi0;
   }
   myphiz = dPhiAx + phi2;
-  if (myphiz > Trg_PI) myphiz -= 2 * Trg_PI;
-  if (myphiz < -Trg_PI) myphiz += 2 * Trg_PI;
+  if (myphiz > M_PI) myphiz -= 2 * M_PI;
+  if (myphiz < -M_PI) myphiz += 2 * M_PI;
 
   return (ztostraw - rr * 2 * sin(myphiz / 2) / anglest);
 }
@@ -1031,9 +1020,9 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const& mConstD, std::ma
       string t_maxName = "dPhiPiMax_" + to_string(iSt);
       string t_minName = "dPhiPiMin_" + to_string(iSt);
       string t_2PiName = "dPhiPi2Pi_" + to_string(iSt);
-      mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
-      mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(-mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
-      mSignalStorage[t_2PiName] = Belle2::TRGCDCJSignal(2 * mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+      mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(mConstD.at("M_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+      mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(-mConstD.at("M_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+      mSignalStorage[t_2PiName] = Belle2::TRGCDCJSignal(2 * mConstD.at("M_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
     }
   }
   for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -1079,7 +1068,7 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const& mConstD, std::ma
       string t_maxName = "dPhiMax_" + to_string(iSt);
       string t_minName = "dPhiMin_" + to_string(iSt);
       string t_valueName = "dPhi_" + to_string(iSt);
-      double t_value = 2 * mConstD.at("Trg_PI") * fabs(mConstV.at("nShift")[iSt]) / (mConstV.at("nWires")[2 * iSt + 1]);
+      double t_value = 2 * mConstD.at("M_PI") * fabs(mConstV.at("nShift")[iSt]) / (mConstV.at("nWires")[2 * iSt + 1]);
       mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(t_value, mSignalStorage[t_valueName].getToReal(), commonData);
       mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(0, mSignalStorage[t_valueName].getToReal(), commonData);
     }
@@ -1506,7 +1495,7 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
     mSignalStorage["denMin"] = Belle2::TRGCDCJSignal(t_denMin, mSignalStorage["den"].getToReal(), commonData);
     double t_arcSMax[4], t_driftZError[4];
     for (unsigned iSt = 0; iSt < 4; iSt++) {
-      t_arcSMax[iSt] = mConstD.at("Trg_PI") * mConstV.at("rr3D")[iSt] / 2;
+      t_arcSMax[iSt] = mConstD.at("M_PI") * mConstV.at("rr3D")[iSt] / 2;
       t_driftZError[iSt] = 1 / mConstV.at("driftZError")[iSt];
     }
     double t_denMax = Fitter3DUtility::calDenWithIZError(t_arcSMax, t_driftZError);
@@ -1654,8 +1643,8 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   //cout<<"<<<z0Max>>>"<<endl; mSignalStorage["z0Max"].dump();
   //cout<<"<<<z0_c>>>"<<endl; mSignalStorage["z0_c"].dump();
   // Constraint cot to [-0.753, 1.428]
-  double cotMin = cos(127 * mConstD.at("Trg_PI") / 180) / sin(127 * mConstD.at("Trg_PI") / 180);
-  double cotMax = cos(35 * mConstD.at("Trg_PI") / 180) / sin(35 * mConstD.at("Trg_PI") / 180);
+  double cotMin = cos(127 * mConstD.at("M_PI") / 180) / sin(127 * mConstD.at("M_PI") / 180);
+  double cotMax = cos(35 * mConstD.at("M_PI") / 180) / sin(35 * mConstD.at("M_PI") / 180);
   if (!mSignalStorage.count("cotMin")) {
     mSignalStorage["cotMin"] = Belle2::TRGCDCJSignal(cotMin, mSignalStorage["cot"].getToReal(), commonData);
     mSignalStorage["cotMax"] = Belle2::TRGCDCJSignal(cotMax, mSignalStorage["cot"].getToReal(), commonData);
@@ -1930,9 +1919,9 @@ void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD,
   }
 }
 
-void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
-                                         TVector2& helixCenter,
-                                         TVector3& impactPosition)
+void Fitter3DUtility::findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
+                                         ROOT::Math::XYVector& helixCenter,
+                                         ROOT::Math::XYZVector& impactPosition)
 {
 
   // Finds the impact position. Everything is in cm, and GeV.
@@ -1942,12 +1931,12 @@ void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyP
   // Output:  helix center's coordiante (hcx, hcy)
   //          impact position (impactX, impactY, impactZ)
 
-  double rho = sqrt(pow(mcMomentum->Px(), 2) + pow(mcMomentum->Py(), 2)) / 0.3 / 1.5 * 100;
-  double hcx = mcPosition->X() + rho * cos(atan2(mcMomentum->Py(), mcMomentum->Px()) - charge * TMath::Pi() / 2);
-  double hcy = mcPosition->Y() + rho * sin(atan2(mcMomentum->Py(), mcMomentum->Px()) - charge * TMath::Pi() / 2);
-  helixCenter.Set(hcx, hcy);
-  double impactX = (helixCenter.Mod() - rho) / helixCenter.Mod() * helixCenter.X();
-  double impactY = (helixCenter.Mod() - rho) / helixCenter.Mod() * helixCenter.Y();
+  double rho = sqrt(pow(mcMomentum->X(), 2) + pow(mcMomentum->Y(), 2)) / 0.3 / 1.5 * 100;
+  double hcx = mcPosition->X() + rho * cos(atan2(mcMomentum->Y(), mcMomentum->X()) - charge * M_PI_2);
+  double hcy = mcPosition->Y() + rho * sin(atan2(mcMomentum->Y(), mcMomentum->X()) - charge * M_PI_2);
+  helixCenter.SetXY(hcx, hcy);
+  double impactX = (helixCenter.R() - rho) / helixCenter.R() * helixCenter.X();
+  double impactY = (helixCenter.R() - rho) / helixCenter.R() * helixCenter.Y();
   int signdS;
   if (atan2(impactY, impactX) < atan2(mcPosition->Y(), mcPosition->X())) signdS = -1;
   else signdS = 1;
@@ -1957,12 +1946,12 @@ void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyP
 
 }
 
-void Fitter3DUtility::calHelixParameters(TVector3 position, TVector3 momentum, int charge, TVectorD& helixParameters)
+void Fitter3DUtility::calHelixParameters(ROOT::Math::XYZVector position, ROOT::Math::XYZVector momentum, int charge,
+                                         TVectorD& helixParameters)
 {
-  double Trg_PI = 3.141592653589793;
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
   double t_alpha = 1 / 0.3 / 1.5 * 100;
-  double t_pT = momentum.Perp();
+  double t_pT = momentum.Rho();
   double t_R = t_pT * t_alpha;
   helixParameters.Clear();
   helixParameters.ResizeTo(5);
@@ -1970,13 +1959,13 @@ void Fitter3DUtility::calHelixParameters(TVector3 position, TVector3 momentum, i
   helixParameters[1] = atan2(position.Y() - t_R * momentum.X() / t_pT * charge, position.X() + t_R * momentum.Y() / t_pT * charge);
   helixParameters[0] = (position.X() + t_R * momentum.Y() / t_pT * charge) / cos(helixParameters[1]) - t_R;
   double t_phi = atan2(-momentum.X() * charge, momentum.Y() * charge) - helixParameters[1];
-  if (t_phi > Trg_PI) t_phi -= 2 * Trg_PI;
-  if (t_phi < -Trg_PI) t_phi += 2 * Trg_PI;
+  if (t_phi > M_PI) t_phi -= 2 * M_PI;
+  if (t_phi < -M_PI) t_phi += 2 * M_PI;
   helixParameters[4] = momentum.Z() / t_pT * charge;
   helixParameters[3] = position.Z() + helixParameters[4] * t_R * t_phi;
 }
-void Fitter3DUtility::calVectorsAtR(const TVectorD& helixParameters, int charge, double cdcRadius, TVector3& position,
-                                    TVector3& momentum)
+void Fitter3DUtility::calVectorsAtR(const TVectorD& helixParameters, int charge, double cdcRadius, ROOT::Math::XYZVector& position,
+                                    ROOT::Math::XYZVector& momentum)
 {
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
   double t_alpha = 1 / 0.3 / 1.5 * 100;

@@ -9,8 +9,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <sstream>
 
-using namespace std;
-
 namespace Belle2 {
 
   namespace {
@@ -19,7 +17,7 @@ namespace Belle2 {
      *
      * This function takes an input stream and will return the next component of the VxdID
      * */
-    int getPart(istream& in)
+    int getPart(std::istream& in)
     {
       if (!in.eof()) {
         //Get next char, if it is a dot, ignore it and get the next one
@@ -39,7 +37,7 @@ namespace Belle2 {
         int value(0);
         in >> value;
         if (in.fail() && !in.eof()) {
-          throw runtime_error("Failed to parse Number");
+          throw std::runtime_error("Failed to parse Number");
         }
         return value;
       }
@@ -52,7 +50,7 @@ namespace Belle2 {
     //We parse the Id from string, so set it to 0 first
     m_id.id = 0;
     //create a stream from the string
-    istringstream in(sensor);
+    std::istringstream in(sensor);
     try {
       //Get all the parts
       m_id.parts.layer  = getPart(in);
@@ -63,25 +61,25 @@ namespace Belle2 {
         in.get();
         m_id.parts.segment = getPart(in);
       }
-    } catch (runtime_error&) {
+    } catch (std::runtime_error&) {
       //Something went wrong parsing the parts
       m_id.id = 0;
-      throw invalid_argument("Could not parse VxdID: '" + sensor + "'");
+      throw std::invalid_argument("Could not parse VxdID: '" + sensor + "'");
     }
     //There is stuff left we also throw an exception as we cannot warn the user
     //without the logging system
     if (!in.eof()) {
-      string rest;
+      std::string rest;
       //Get the remainder: get everything in the stream until the next NULL
       //character which should only occur at the end of the string.
       getline(in, rest, '\0');
-      throw invalid_argument("Trailing characters after VxdID " + (string)*this + ": '" + rest + "'");
+      throw std::invalid_argument("Trailing characters after VxdID " + std::string(*this) + ": '" + rest + "'");
     }
   }
 
-  VxdID::operator string() const
+  VxdID::operator std::string() const
   {
-    stringstream out;
+    std::stringstream out;
     if (m_id.parts.layer) {
       out << m_id.parts.layer;
     } else {
@@ -106,7 +104,7 @@ namespace Belle2 {
 
   std::ostream& operator<<(std::ostream& out, const VxdID& id)
   {
-    out << ((string)id);
+    out << ((std::string)id);
     return out;
   }
 

@@ -46,9 +46,9 @@ Particle#0:
 	# of daughters = 0
   getAcoplanarity(): nan
   getCharge(): 1
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_release-04, release-05-00-00
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
+[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_release-04, release-05-00-00, Legacy_CollisionAxisCMS
   getCosHelicity(): nan
 [ERROR] No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle
 	name = pi+

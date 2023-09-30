@@ -81,7 +81,7 @@ Other functions available
 
 .. warning::
         These other functions are not recommended for normal use without some study of the selection, or if you are working on skimming.
-        If you use and improve these lists, please report in a performance meeting and make a pull request.
+        If you use and improve these lists, please report in a performance meeting and make a merge request.
 
 .. automodule:: stdCharged
    :members:

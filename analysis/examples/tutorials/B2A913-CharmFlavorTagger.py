@@ -68,7 +68,7 @@ cft.charmFlavorTagger(
     path=cft_path)
 
 # Select variables that will be stored to ntuple
-d_vars = vc.kinematics+vc.mc_truth+["CFT_qr","CFT_prob"]
+d_vars = vc.kinematics+vc.mc_truth+["CFT_qr", "CFT_prob"]
 d_vars += vu.create_aliases_for_selected(
     list_of_variables=vc.kinematics
     + vc.mc_truth,
@@ -88,4 +88,3 @@ b2.process(cft_path)
 
 # print out the summary
 print(b2.statistics)
-

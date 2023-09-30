@@ -9,7 +9,6 @@ Processing steps in a snakemake workflow are called *rules*, written in a simple
 
 .. literalinclude:: snakefile
    :language: python
-   :linenos:
    :caption:
    
 In a snakefile the topmost rule is the target rule, in our case :code:`OfflineAnalysis` which produces the histogram plots. Rules can have :code:`log:` and :code:`params:` directives for log file paths and additional parameters respectively. 
@@ -21,18 +20,15 @@ To merge basf2 output files, we can simply employ :code:`hadd` or :code:`b2file_
 To submit jobs to the grid using gbasf2, we provide a public wrapper via :code:`git clone https://github.com/casschmitt/gbasf2_wrapper_for_snakemake.git`. Specify :code:`wrapper: "file:/path/to/gbasf2_wrapper_for_snakemake"` as a directive in the rules that you want to submit using gbasf2. It takes care of proxy setup, job submission, reschedules failed jobs and downloads finished job outputs. To make sure the proxy is only initialized once, please include a rule with :code:`setProxy = True` and require its output :code:`proxy_text_file` in the skim rules. After checking for download completeness, it returns a text file with the paths to all output files, which can be used in subsequent processing steps. Please note that gbasf2 does not support absolute paths for the sandbox files. Global gbasf2-specific parameters can be given in a :code:`configfile:`
 
 .. literalinclude:: config.yaml
-   :language: python
-   :linenos:
+   :language: yaml
    :caption:
 
 To map gbasf2 input file paths to output directories, we here use a dictionary :code:`PathDictionary`, which is filled with paths from the provided text files:
 
 .. literalinclude:: ../qqcontinuumskims.dat
-   :language: python
-   :linenos:
+   :language: none
    :caption:
    
 .. literalinclude:: ../bmesonsskims.dat
-   :language: python
-   :linenos:
+   :language: none
    :caption:

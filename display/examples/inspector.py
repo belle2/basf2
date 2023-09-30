@@ -37,7 +37,7 @@ class InspectorModule(b2.Module):
     def event(self):
         """reimplementation of Module::event()."""
 
-        self.info.newEvent()
+        self.info.update()
 
         print("Press Ctrl+D to exit.")
         import interactive

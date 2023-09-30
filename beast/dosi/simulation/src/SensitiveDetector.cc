@@ -93,8 +93,9 @@ namespace Belle2 {
 
       m_startPos =  preStep.GetPosition();
       m_endPos = postStep.GetPosition();
-      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm, (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm,
-                        (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
+      ROOT::Math::XYZVector position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm,
+                                     (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm,
+                                     (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
       m_WightedPos += position * (step->GetTotalEnergyDeposit());
 
       //Save Hit if track leaves volume or is killed
@@ -185,7 +186,7 @@ namespace Belle2 {
       const G4double tof,
       const G4double edep,
       G4ThreeVector mom,
-      TVector3 posAve)
+      ROOT::Math::XYZVector posAve)
     {
 
       //Get the datastore arraus
@@ -193,7 +194,7 @@ namespace Belle2 {
       StoreArray<DosiSimHit>  simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
-      TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
+      ROOT::Math::XYZVector momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       simHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
       int simhitNumber = simHits.getEntries() - 1;
       B2DEBUG(150, "HitNumber: " << simhitNumber);

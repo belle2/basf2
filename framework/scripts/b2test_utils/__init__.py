@@ -123,6 +123,7 @@ def configure_logging_for_tests(user_replacements=None):
             - :envvar:`BELLE2_VALIDATION_DATA_DIR`
             - :envvar:`BELLE2_EXAMPLES_DATA_DIR`
             - :envvar:`BELLE2_BACKGROUND_DIR`
+            - :envvar:`BELLE2_CONDB_METADATA`
 
     Parameters:
         user_replacements (dict(str, str)): Additional strings and their replacements to replace in the output
@@ -147,6 +148,8 @@ def configure_logging_for_tests(user_replacements=None):
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    # add a special replacement for the CDB metadata provider URL, since it's not set via env. variable
+    replacements[basf2.conditions.default_metadata_provider_url] = "${BELLE2_CONDB_METADATA}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
         if not replacement:
@@ -155,6 +158,7 @@ def configure_logging_for_tests(user_replacements=None):
             # replace path from the environment with the name of the variable. But remove a trailing slash or whitespace so that
             # the output doesn't depend on whether there is a tailing slash in the environment variable
             replacements[os.environ[env_name].rstrip('/ ')] = f"${{{replacement}}}"
+
     if user_replacements is not None:
         replacements.update(user_replacements)
     # add cwd only if it doesn't overwrite anything ...
@@ -200,15 +204,14 @@ def clean_working_directory():
 @contextmanager
 def local_software_directory():
     """Context manager to make sure we are executed in the top software
-    directory by switching to $BELLE2_LOCAL_DIR.
+    directory by switching to $BELLE2_LOCAL_DIR or $BELLE2_RELEASE_DIR.
 
     >>> with local_software_directory():
     >>>    assert(os.listdir().contains("analysis"))
     """
-    try:
-        directory = os.environ["BELLE2_LOCAL_DIR"]
-    except KeyError:
-        raise RuntimeError("Cannot find local Belle II software directory, "
+    directory = os.environ.get("BELLE2_LOCAL_DIR", os.environ.get("BELLE2_RELEASE_DIR", None))
+    if directory is None:
+        raise RuntimeError("Cannot find Belle II software directory, "
                            "have you setup the software correctly?")
 
     with working_directory(directory):
@@ -251,10 +254,6 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
     In case there is some output left, then prints the error message and exits
     (failing the test).
 
-    The test is only executed for a full local checkout: If the ``BELLE2_RELEASE_DIR``
-    environment variable is set or if ``BELLE2_LOCAL_DIR`` is unset the test is
-    skipped: The program exits with an appropriate message.
-
     Warnings:
         If the test is skipped or the test contains errors this function does
         not return but will directly end the program.
@@ -268,10 +267,8 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
         toolopts(list(str)): extra options to pass to the tool.
     """
 
-    if "BELLE2_RELEASE_DIR" in os.environ:
-        skip_test("Central release is setup")
-    if "BELLE2_LOCAL_DIR" not in os.environ:
-        skip_test("No local release is setup")
+    if "BELLE2_LOCAL_DIR" not in os.environ and "BELLE2_RELEASE_DIR" not in os.environ:
+        skip_test("No release is setup")
 
     args = [tool]
     if toolopts:
@@ -405,7 +402,7 @@ def temporary_set_environment(**environ):
 
 def is_ci() -> bool:
     """
-    Returns true if we are running a test on our CI system (currently bamboo).
+    Returns true if we are running a test on our CI system (currently GitLab pipeline).
     The 'BELLE2_IS_CI' environment variable is set on CI only when the unit
     tests are run.
     """

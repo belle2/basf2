@@ -18,10 +18,11 @@
 #include <boost/algorithm/string.hpp>
 
 #include <set>
+#include <regex>
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2022-07-05"
+#define CURRENT_DEFAULT_TAG "main_2023-09-18"
 
 namespace py = boost::python;
 
@@ -102,7 +103,7 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
+    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultMetadataProviderUrl);
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
@@ -162,29 +163,47 @@ namespace Belle2::Conditions {
 
     // HACK: So, we successfully set the input globaltags from the input file,
     // however we also decided that we want to add new payloads for
-    // boost/invariant mass/beam spot. So if any of the files was created
-    // before the first of October 2019 we assume their globaltag might be
-    // missing these new payloads and we append an extra globaltag containing
-    // just this information with lowest priority. If the files actually had
-    // all payloads these legacy payloads will never be used as they have
-    // lowest priority. Otherwise this should enable running over old files.
+    // boost, invariant mass, beam spot, collision axis in CMS.
+    // So if the release is older than when these features were introduced
+    // or if files were produced before specific date, extra GTs are appended.
+    // The appended GTs contain only the possible missing info and are added
+    // with lowest priority.
+    // If the files actually had all payloads these legacy payloads will never
+    // be used as they have lowest priority.
+    // Otherwise this should enable running over old files.
     //
     // TODO: Once we're sure all files being used contain all payloads remove this.
-    std::optional<std::string> youngest;
+
+    std::optional<std::string> relMin, dateMin;
+
     for (const auto& metadata : inputMetadata) {
-      // Skip release 4 or later files.
-      const std::string& release = metadata.getRelease();
-      if (release.substr(0, 8) == "release-" and
-          release.compare(8, 2, "04", 2) >= 0)
-        continue;
-      // Otherwise, get the date of the youngest file.
-      if (!youngest or * youngest > metadata.getDate()) {
-        youngest = metadata.getDate();
+      // get oldest release
+      std::string rel = metadata.getRelease().substr(0, 10);
+      if (std::regex_match(rel, std::regex("release-[0-9][0-9]"))) {
+        if (!relMin) relMin = rel;
+        relMin = min(*relMin, rel);
+      }
+
+      // get oldest production date
+      std::string date = metadata.getDate().substr(0, 10);
+      if (std::regex_match(date, std::regex("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"))) {
+        if (!dateMin) dateMin = date;
+        dateMin = min(*dateMin, date);
       }
     }
-    if (youngest and youngest->compare("2019-12-31") < 0) {
+
+    // add IP GT if rel older than rel04 or for old files
+    if ((relMin && relMin < "release-04") ||
+        (!relMin && (!dateMin || dateMin < "2019-12-31"))) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
+    }
+
+    // add CollisionAxisCMS GT if rel older than rel08 or for old files
+    if ((relMin && relMin < "release-08") ||
+        (!relMin && (!dateMin || dateMin < "2023-08-31"))) {
+      B2DEBUG(30, "Enabling legacy CollsionAxisCMS globaltag in tag replay");
+      m_inputGlobaltags->emplace_back("Legacy_CollisionAxisCMS");
     }
     // END TODO/HACK
   }
@@ -492,6 +511,10 @@ This list should rarely need to be changed. The only exception is for users who
 want to be able to use the software without internet connection after they
 downloaded a snapshot of the necessary globaltags with ``b2conditionsdb download``
 to point to this location.
+)DOC")
+    .add_property("default_metadata_provider_url", &Configuration::getDefaultMetadataProviderUrl, R"DOC(
+URL of the default central metadata provider to look for payloads in the
+conditions database.
 )DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
 List of payload locations to search for payloads which have been found by any of

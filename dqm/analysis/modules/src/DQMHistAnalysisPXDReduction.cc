@@ -31,12 +31,10 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("PXD DQM analysis module for ONSEN Data Reduction Monitoring");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
-  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("lowarnlimit", m_lowarnlimit, "Mean Reduction Low Warn limit for alarms", 0.99);
   addParam("LowErrorlimit", m_loerrorlimit, "Mean Reduction Low limit for alarms", 0.90);
   addParam("HighWarnlimit", m_hiwarnlimit, "Mean Reduction High Warn limit for alarms", 1.01);
@@ -47,11 +45,6 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
 
 DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
 {
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDReductionModule::initialize()
@@ -102,16 +95,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 //   m_line3->SetLineColor(1);
 //   m_line3->SetLineWidth(3);
 
-#ifdef _BELLE2_EPICS
-  m_useEpics |= m_useEpicsRO; // implicit
-  if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    mychid.resize(2);
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Value").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:Red:Status", "Status");
+  registerEpicsPV("PXD:Red:Value", "Value");
 }
 
 
@@ -122,40 +107,7 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
   m_cReduction->Clear();
   m_hReduction->Reset(); // dont sum up!!!
 
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    // get warn and error limit
-    // as the same array as above, we assume chid exists
-    struct dbr_ctrl_double tPvData;
-    auto r = ca_get(DBR_CTRL_DOUBLE, mychid[1], &tPvData);
-    if (r == ECA_NORMAL) r = ca_pend_io(5.0);
-    if (r == ECA_NORMAL) {
-      if (!std::isnan(tPvData.lower_alarm_limit)
-          && tPvData.lower_alarm_limit > 0.0) {
-        //m_hLoErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-        m_loerrorlimit = tPvData.lower_alarm_limit;
-      }
-      if (!std::isnan(tPvData.lower_warning_limit)
-          && tPvData.lower_warning_limit > 0.0) {
-        //m_hLoWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
-        m_lowarnlimit = tPvData.lower_warning_limit;
-      }
-      if (!std::isnan(tPvData.upper_alarm_limit)
-          && tPvData.upper_alarm_limit > 0.0) {
-        //m_hHiErrorLine->SetBinContent(i + 1, tPvData.upper_alarm_limit);
-        m_hierrorlimit = tPvData.upper_alarm_limit;
-      }
-      if (!std::isnan(tPvData.upper_warning_limit)
-          && tPvData.upper_warning_limit > 0.0) {
-        //m_hHiWarnLine->SetBinContent(i + 1, tPvData.upper_warning_limit);
-        m_hiwarnlimit = tPvData.upper_warning_limit;
-      }
-    } else {
-      SEVCHK(r, "ca_get or ca_pend_io failure");
-    }
-  }
-#endif
-
+  requestLimitsFromEpicsPVs("Value", m_loerrorlimit, m_lowarnlimit, m_hiwarnlimit, m_hierrorlimit);
 }
 
 void DQMHistAnalysisPXDReductionModule::event()
@@ -225,25 +177,14 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   m_cReduction->Modified();
   m_cReduction->Update();
-#ifdef _BELLE2_EPICS
-  if (m_useEpics && !m_useEpicsRO) {
-/// doch besser DBR_DOUBLE wg alarms?
-    SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
-    // only update if statistics is reasonable, we dont want "0" drops between runs!
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&value), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+
+  // better only update if statistics is reasonable, we dont want "0" drops between runs!
+  setEpicsPV("Status", status);
+  setEpicsPV("Value", value);
 }
 
 void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

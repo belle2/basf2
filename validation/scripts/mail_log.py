@@ -300,7 +300,7 @@ class Mails:
         """
 
         # link to validation page
-        url = "https://b2-master.belle2.org/validation/static/validation.html"
+        url = "https://validation.belle2.org/static/validation.html"
         # url = "http://localhost:8000/static/validation.html"
 
         if incremental:

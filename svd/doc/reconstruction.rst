@@ -38,7 +38,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    .. math::
 
-      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)} 
+      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)}
 
    is computed with a simple system of equations:
 
@@ -54,7 +54,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    All three algorithms are implemented in the ``svd/reconstruction/SVDClusterCharge`` class.
 
-.. _MaxSum: 
+.. _MaxSum:
 
 **The MaxSum Algorithm**:
 
@@ -80,7 +80,7 @@ where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV rea
 
 The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject, see :ref:`svdtimecalib` for more details on the calibration.
 
-We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. 
+We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``.
 
 #. ``CoG6``: the cluster time is the average of the strips time weighted with the strip charge. The raw strip time is computed as the average of the sample time weighted with the sample amplitude:
 
@@ -117,7 +117,11 @@ We have two alternative algorithms to compute the cluster time that can be selec
       t_{\rm hit} = f(t_{\rm raw}) + r_{\rm shift} + \frac{\Delta t}{4} \cdot (3 - TB + 4\ FF)
    
    where :math:`f(t_{\rm raw})` is the calibrated time, :math:`r_{\rm shift}` is the relative shift among 3-sample and 6-sample event (= 0 in 6-sample events), :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`TB` is the :ref:`TriggerBin<svdtb>` and :math:`FF` is the :ref:`FirstFrame<svdff>`.
-   
+
+Shifting of SVD-cluster-time based on Cluster-size
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The mean of the cluster-time distribution shifts with the cluster size, as the strips of the clusters with lower amplitude, which are at the edge, delays in time. This effect is not simulated and it appears only in data. To compensate this, improving cluster time resolution in data and data-simulation agreement, a shift is added to the calibrated time. The values are stored in :ref:`SVDClusterTimeShifter<svdclustertimeshifter>` DBObject.
+
 
 Cluster Position Reconstruction
 -------------------------------
@@ -167,6 +171,56 @@ Creation of Clusters in disabled-APV regions
 
 In case one or more APV readout chips are disabled during data taking, a *fake* cluster is created in the middle of the region in order not to loose the information of the hit on the other side of the sensor. For more details see :b2:mod:`SVDMissingAPVsClusterCreator`.
 
+SVD Cluster Grouping
+--------------------
+Clusters are grouped event-by event based on their time distribution. Clusters created by charged particles coming to the same e+e- collision are near in time, and will be grouped together.
+
+Method in :b2:mod:`SVDTimeGrouping` module:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Steps                          | Description                                                                                                                                                                                                                                                                                                                                                                     |
++================================+=================================================================================================================================================================================================================================================================================================================================================================================+
+| Preparing Histogram            | Creating a 1D histogram of given range **[-160, 160]** ns and bin-width of **1/2** ns. (default **tRangeLow=-160, tRangeHigh=160, rebinningFactor=2**)                                                                                                                                                                                                                          |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Filling Cluster Time           | For each cluster, a normalized Gaussian is filled in the above histogram, centered at the cluster-time. The width of the Gaussian is parsed from the hard-coded values in the header depending on the side of the sensor and the number of strips in the cluster. To save time, only the bins within 3 sigma of the center is calculated and filled. (default **fillSigmaN=3**) |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Finding Peaks                  | Once all the Gaussian entries are filled, the correlated-clusters form a big Gaussian (which will be called **group** hereafter). The group-finding is performed in the following method.                                                                                                                                                                                       |
+|                                |                                                                                                                                                                                                                                                                                                                                                                                 |
+|                                | * Maximum bin is found and a Gaussian is fitted in the range of **[-5, 5]** ns keeping the bin as center. (default **fitRangeHalfWidth=7**)                                                                                                                                                                                                                                     |
+|                                | * The group info (integral, center, width) is stored.                                                                                                                                                                                                                                                                                                                           |
+|                                | * The fitted Gaussian is then subtracted from the histogram to find the next significant peak/group. To save time, value of the Gaussian for the bins only within 5 sigma are calculated and subtracted from those bins. (default **removeSigmaN=7**)                                                                                                                           |
+|                                | * Maximum bin is found again and checked whether this peak is above threshold ( > 0.05 x firstGroup). (default **fracThreshold=0.05**)                                                                                                                                                                                                                                          |
+|                                | * If above threshold, then the process is repeated again.                                                                                                                                                                                                                                                                                                                       |
+|                                | * Search is stopped if 20 groups are found. (default **maxGroups=20**)                                                                                                                                                                                                                                                                                                          |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Creating Dummy Groups          | If the number of groups found is less than **maxGroups** then, dummy groups are inserted to increase the total groups to **maxGroups**. This helps in the sorting process described in the following.                                                                                                                                                                           |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Sorting the Groups             | Naturally, the groups are sorted by their prominence. But in an event, background might be higher than signal, causing the background peak occupying the first position. So there is a need for sorting the groups. It is done in two stages:                                                                                                                                   |
+|                                |                                                                                                                                                                                                                                                                                                                                                                                 |
+|                                | * Background:                                                                                                                                                                                                                                                                                                                                                                   |
+|                                |                                                                                                                                                                                                                                                                                                                                                                                 |
+|                                |     * All the groups with centers outside the signal range **[-50,50]**, are moved towards the end of the queue. (default **expectedSignalTimeMin=-50, expectedSignalTimeMax=50**)                                                                                                                                                                                              |
+|                                |     * These groups are then sorted in reverse, that means, the probability of being background is max at groupID = 19(or max) and decreases with group number decreasing.                                                                                                                                                                                                       |
+|                                |                                                                                                                                                                                                                                                                                                                                                                                 |
+|                                | * Signal:                                                                                                                                                                                                                                                                                                                                                                       |
+|                                |                                                                                                                                                                                                                                                                                                                                                                                 |
+|                                |     * Signal groups are naturally sorted based on integral at this point. But sometimes a background group, near signal may be higher than the signal group. Now the probability of finding a signal group near 0 is greater. So the signal groups are sorted with an exponential weight with width 30 ns. (default **expectedSignalTimeCenter=0, signalLifetime=30**)          |
+|                                |     * So, the probability of being signal is max at groupID = 0 and decreases with group number increasing.                                                                                                                                                                                                                                                                     |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Signal Group Selection         | Depending on the type of study, we may choose the first group to be accepted for space-point-creation. (default **numberOfSignalGroups=1**)                                                                                                                                                                                                                                     |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **formSingleSignalGroup**      | If this flag is enabled, all the groups are given same groupId = 0.                                                                                                                                                                                                                                                                                                             |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Assign GroupId to SVD-Clusters | All the clusters are now compared against the surviving groups. The clusters within 5 sigma of a group center are then assigned the groupId and groupInfo. Hence, one cluster shared between two groups can have two groupId. (default **acceptSigmaN=7**)                                                                                                                      |
++--------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Payloads related to SVDTimeGrouping:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. :ref:`SVDRecoConfiguration<svdrecoconfiguration>` : The switiching ON/OFF of SVDTimeGrouping is controlled by this DBObject.
+#. :ref:`SVDTimeGroupingConfiguration<svdtimegroupingconfiguration>` : All the parameters used by this module is stored in this DBObject.
+
+
 :ref:`SpacePoint<svdsps>` Creation
 ----------------------------------
 
@@ -184,14 +238,15 @@ All clusters on one side of each sensor are combined with all clusters on the ot
 
       |t_{u/v}| < t_{\rm max}
 
-
 #. exclude ``SpacePoints`` in which the time difference of the two clusters exceeds a certain threshold:
 
    .. math::
 
       |t_u - t_v| < \Delta t_{\rm max}
 
-The choice of the cut and of the threshold is stored in the :ref:`SVDHitTimeSelection<svdhittimeselection>`.
+#. exclude ``SpacePoints`` formed by clusters belonging to different SVD groups.
+
+The choice of the cut and of the threshold is stored in the :ref:`SVDHitTimeSelection<svdhittimeselection>` for what concerns 1,2,3; while to enable the selection based on grouping, the module parameter ``useSVDGroupInfo`` should be used.
 
 SpacePoints are not created if they exceed a certain threshold defined in the ``numMaxSpacePoints`` parameter of the :b2:mod:`SVDSpacePointCreator`
 
@@ -212,10 +267,10 @@ The charge and time algorithm available for clusters are also available for stri
 Reconstruction Modules
 ----------------------
 
-This is a list of the ``svd`` modules used for reconstruction. 
+This is a list of the ``svd`` modules used for reconstruction.
 
 .. b2-modules::
    :package: svd
-   :modules: SVDUnpacker, SVDClusterizer, SVDMissingAPVsClusterCreator, SVDSpacePointCreator, SVDRecoDigitCreator
+   :modules: SVDUnpacker, SVDClusterizer, SVDTimeGrouping, SVDMissingAPVsClusterCreator, SVDSpacePointCreator, SVDRecoDigitCreator
    :io-plots:
 

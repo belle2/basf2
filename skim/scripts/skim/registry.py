@@ -54,7 +54,7 @@ _RegisteredSkims = [
     ("12160100", "ewp", "BtoXgamma"),
     ("12160200", "ewp", "BtoXll"),
     ("12160300", "ewp", "BtoXll_LFV"),
-    ("12160400", "ewp", "inclusiveBplusToKplusNuNu"),
+    # ("12160400", "ewp", "inclusiveBplusToKplusNuNu"), # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
@@ -141,6 +141,7 @@ _RegisteredSkims = [
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
     ("18020500", "dark", "InelasticDarkMatterWithDarkHiggs"),
+    ("18370100", "dark", "AA2uuuu"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

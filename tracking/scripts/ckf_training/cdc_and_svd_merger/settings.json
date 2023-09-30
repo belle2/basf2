@@ -1,0 +1,14 @@
+{
+    "result_dir": "output/",
+    "log_dir": "logs/",
+    "n_events_training": 1000,
+    "n_events_testing": 500,
+    "n_events_per_task": 100,
+    "workers": 1000,
+    "basf2_processes_per_worker": 0,
+    "globaltags": [],
+    "experiment_numbers": [0],
+    "bkgfiles_by_exp": {
+        "0": "/use/the/default/path/for/experiment/0/"
+    }
+}

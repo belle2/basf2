@@ -1248,7 +1248,7 @@ namespace Belle2 {
       }
 
       /**
-       * Get nonscintillating layer thickness..
+       * Get nonscintillating layer thickness.
        */
       double getNoScintillationThickness() const
       {
@@ -1256,7 +1256,7 @@ namespace Belle2 {
       }
 
       /**
-       * Set nonscintillating layer thickness..
+       * Set nonscintillating layer thickness.
        * @param[in] thickness Nonscintillating layer thickness.
        */
       void setNoScintillationThickness(double thickness)
@@ -1274,7 +1274,7 @@ namespace Belle2 {
 
       /**
        * Set "SiPM" size.
-       * @param[in]
+       * @param[in] rssSize SiPM size.
        */
       void setRSSSize(double rssSize)
       {

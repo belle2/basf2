@@ -12,7 +12,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/core/HistoModule.h>
@@ -49,7 +49,7 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
       std::string m_ECLDigitsName;  /**< The name of the StoreArray of ECLRawHits to be generated */
-      double m_revolutionTime;  /**< The beam revolution cycle time in #mus */
+      double m_revolutionTime;  /**< The beam revolution cycle time in \f$\mu s\f$ */
       double m_ECLThresholdforVetoTuning; /**< ECL threshold for injection veto tuning, ADC channels */
 
 

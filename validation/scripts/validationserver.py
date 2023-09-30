@@ -22,6 +22,7 @@ import webbrowser
 import re
 import collections
 import configparser
+import requests
 
 # 3rd
 import cherrypy
@@ -250,6 +251,12 @@ def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
             "Please ensure access token is correct and valid. "
             "GitLab Integration will be disabled."
         )
+    except requests.exceptions.Timeout:
+        gitlab_object = None
+        logging.warning(
+            "GitLab servers feeling under the weather, DESY outage? "
+            "GitLab Integration will be disabled."
+        )
 
     return gitlab_object
 
@@ -303,15 +310,19 @@ def update_linked_issues(
     search_key = "Automated code, please do not delete"
     issues = search_project_issues(gitlab_object, search_key)
 
-    # find out the plots linked to the issues
+    # find out the plots/scripts linked to the issues
     plot_issues = collections.defaultdict(list)
-    pattern = r"Relevant plot: (\w+)"
+    script_issues = collections.defaultdict(list)
+    pattern = r"Relevant ([a-z]+): (\w+.*\w*)"
     for issue in issues:
         match = re.search(pattern, issue.description)
         if match:
-            plot_issues[match.groups()[0]].append(issue.iid)
+            if match.groups()[0] == 'plot':
+                plot_issues[match.groups()[1]].append(issue.iid)
+            else:
+                script_issues[match.groups()[1]].append(issue.iid)
 
-    # get list of available revision
+    # get list of available revision hashes
     rev_list = get_json_object_list(
         validationpath.get_html_plots_folder(cwd_folder),
         validationpath.file_name_comparison_json,
@@ -327,13 +338,35 @@ def update_linked_issues(
         for package in comparison_json["packages"]:
             for plotfile in package.get("plotfiles"):
                 for plot in plotfile.get("plots"):
-                    if plot["title"] in plot_issues.keys():
-                        plot["issue"] = plot_issues[plot["title"]]
+                    if plot["png_filename"] in plot_issues.keys():
+                        plot["issue"] = plot_issues[plot["png_filename"]]
                     else:
                         plot["issue"] = []
 
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
+
+    # get list of available revision lables
+    rev_list = get_json_object_list(
+            validationpath.get_results_folder(cwd_folder),
+            validationpath.file_name_results_json,
+        )
+    for r in rev_list:
+        revision_json_path = os.path.join(
+                validationpath.get_results_folder(cwd_folder),
+                r,
+                validationpath.file_name_results_json,
+            )
+        revision_json = deliver_json(revision_json_path)
+        for package in revision_json["packages"]:
+            for scriptfile in package.get("scriptfiles"):
+                if scriptfile["name"] in script_issues.keys():
+                    scriptfile["issues"] = script_issues[scriptfile['name']]
+                else:
+                    scriptfile["issues"] = []
+
+        with open(revision_json_path, "w") as jsonFile:
+            json.dump(revision_json, jsonFile, indent=4)
 
 
 def upload_file_gitlab(
@@ -357,21 +390,24 @@ def create_gitlab_issue(
     title: str,
     description: str,
     uploaded_file: Dict[str, str],
+    package: str,
     project: 'gitlab.project'
 ) -> str:
     """
-    Create a new project issue with the passed title and description, using
-    Gitlab API.
+    Create a new project issue with the passed title, description and package,
+    using Gitlab API.
 
     Returns:
         created isssue id
     """
 
-    issue = project.issues.create({"title": title, "description": description})
+    issue = project.issues.create({"title": title,
+                                   "description": description,
+                                   "labels": [package, 'validation_issue']})
 
-    issue.labels = ["validation_issue"]
     issue.notes.create(
-        {"body": "See the [error plot]({})".format(uploaded_file["url"])}
+        {"body": "View the [error plot/log file]({}).".format(
+            uploaded_file["url"])}
     )
 
     issue.save()
@@ -396,13 +432,17 @@ def update_gitlab_issue(
     """
 
     issue = project.issues.get(issue_iid)
-    plot_name = file_path.split("/")[-1].split(".")[0]
-    plot_package = file_path.split("/")[-2]
+    name = file_path.split("/")[-1].split(".")[0]
+    package = file_path.split("/")[-2]
+    # check if this is a plot/script based on file format
+    issue_type = 'plot'
+    if 'log' == file_path.split("/")[-1].split(".")[-1]:
+        issue_type = 'script'
     issue.notes.create(
         {
             "body": "Related observation in validation of `{0}` package, `{1}`\
-             plot in `{2}` build. See the [error plot]({3})".format(
-                plot_package, plot_name, rev_label, uploaded_file["url"]
+             {4} in `{2}` build. View the [error plot/log file]({3}).".format(
+                package, name, rev_label, uploaded_file["url"], issue_type
             )
         }
     )
@@ -410,6 +450,59 @@ def update_gitlab_issue(
     issue.save()
 
     logging.info(f"Updated existing Gitlab issue {issue.iid}")
+
+
+def update_scriptfile_issues_json(
+        revision_json_path: str,
+        scritptfile_name: str,
+        scritptfile_package: str,
+        issue_id: str
+) -> None:
+    """
+    Update the scriptfile's linked issues key in the relevant revision's
+    json file.
+
+    Returns:
+        None
+    """
+
+    revision_json = deliver_json(revision_json_path)
+    for package in revision_json["packages"]:
+        if package["name"] == scritptfile_package:
+            for scriptfile in package.get("scriptfiles"):
+                if (scriptfile["name"] == scritptfile_name):
+                    scriptfile["issues"].append(issue_id)
+                    break
+
+    with open(revision_json_path, "w") as jsonFile:
+        json.dump(revision_json, jsonFile, indent=4)
+
+
+def update_plot_issues_json(
+        comparison_json_path: str,
+        plot_name: str,
+        plot_package: str,
+        issue_id: str
+) -> None:
+    """
+    Update the plotfile's linked issues key in the relevant comparison
+    json file.
+
+    Returns:
+        None
+    """
+
+    comparison_json = deliver_json(comparison_json_path)
+    for package in comparison_json["packages"]:
+        if package["name"] == plot_package:
+            for plotfile in package.get("plotfiles"):
+                for plot in plotfile.get("plots"):
+                    if (plot["png_filename"] == plot_name):
+                        plot["issue"].append(issue_id)
+                        break
+
+    with open(comparison_json_path, "w") as jsonFile:
+        json.dump(comparison_json, jsonFile, indent=4)
 
 
 class ValidationRoot:
@@ -447,7 +540,7 @@ class ValidationRoot:
         self.gitlab_config = gitlab_config
 
         #: placeholder variable for path
-        self.plot_path = None
+        self.file_path = None
         #: placeholder variable for revision label
         self.revision_label = None
 
@@ -545,7 +638,7 @@ class ValidationRoot:
 
         # Sorting
 
-        # Order by categories (nightly, build, etc.) first, then by date
+        # Order by categories (nightly, release, etc.) first, then by date
         # A pure chronological order doesn't make sense, because we do not
         # have a linear history ((pre)releases branch off) and for the builds
         # the date corresponds to the build date, not to the date of the
@@ -562,7 +655,7 @@ class ValidationRoot:
             # Will later reverse order to bring items in the same category
             # in reverse chronological order, so the following list will have
             # the items in reverse order as well:
-            order = ["release", "prerelease", "build", "nightly"]
+            order = ["release", "prerelease", "nightly"]
             try:
                 index = order.index(category)
             except ValueError:
@@ -682,44 +775,48 @@ class ValidationRoot:
         to the created Gitlab issue page.
         """
 
+        # check if this is a plot/script based on file format
+        issue_type = 'plot'
+        if 'log' == self.file_path.split("/")[-1].split(".")[-1]:
+            issue_type = 'script'
         default_section = self.gitlab_config['global']['default']
         project_id = self.gitlab_config[default_section]['project_id']
         # Create issue in the Gitlab project and save it
         project = get_project_object(self.gitlab_object, project_id)
-        uploaded_file = upload_file_gitlab(self.plot_path, project)
-        plot_title = self.plot_path.split("/")[-1].split(".")[0]
+        uploaded_file = upload_file_gitlab(self.file_path, project)
+        file_name = self.file_path.split("/")[-1].split(".log")[0]
+        file_package = self.file_path.split("/")[-2]
         description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant plot: {0}\n\n\
+            Relevant {2}: {0}\n\n\
             Revision label: {1}\n\n---".format(
-            plot_title,
-            self.revision_label
+            file_name,
+            self.revision_label,
+            issue_type
         )
         issue_id = create_gitlab_issue(
-            title, description, uploaded_file, project
+            title, description, uploaded_file, file_package, project
         )
         project.save()
 
-        # Update JSON with created issue id
-        comparison_json_path = os.path.join(
-            validationpath.get_html_plots_folder(self.working_folder),
-            self.plot_path.split("/")[-3],
-            "comparison.json",
-        )
-
-        comparison_json = deliver_json(comparison_json_path)
-        for package in comparison_json["packages"]:
-            if package["name"] == self.plot_path.split("/")[-2]:
-                for plotfile in package.get("plotfiles"):
-                    for plot in plotfile.get("plots"):
-                        if (
-                            plot["png_filename"]
-                            == self.plot_path.split("/")[-1]
-                        ):
-                            plot["issue"].append(issue_id)
-                            break
-
-        with open(comparison_json_path, "w") as jsonFile:
-            json.dump(comparison_json, jsonFile, indent=4)
+        # Update JSON with created issue id - script and plot info reside
+        # in different locations and also have different structures.
+        # todo - maybe this can be combined?
+        if issue_type == 'script':
+            revision_json_path = os.path.join(
+                validationpath.get_results_folder(self.working_folder),
+                self.revision_label,
+                validationpath.file_name_results_json,
+            )
+            update_scriptfile_issues_json(
+                revision_json_path, file_name, file_package, issue_id)
+        else:
+            comparison_json_path = os.path.join(
+                validationpath.get_html_plots_folder(self.working_folder),
+                self.file_path.split("/")[-3],
+                "comparison.json",
+            )
+            update_plot_issues_json(
+                comparison_json_path, file_name, file_package, issue_id)
 
         issue_url = self.gitlab_config[default_section]['project_url'] \
             + "/-/issues/" \
@@ -734,7 +831,7 @@ class ValidationRoot:
         Return a template issue creation interface
         for the user to add title and description.
         """
-        self.plot_path = os.path.join(
+        self.file_path = os.path.join(
             validationpath.get_html_folder(self.working_folder), file_path
         )
 
@@ -920,7 +1017,7 @@ def run_server(
 
     if static_folder is None:
         sys.exit(
-            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
+            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to set "
             "to provide static HTML content. Did you run b2setup ?"
         )
 
@@ -958,6 +1055,13 @@ def run_server(
     if not os.path.exists("plots"):
         os.mkdir("plots")
 
+    if os.path.exists("plots/rainbow.json"):
+        logging.info("Removing old plots and unpopular combinations")
+        validationfunctions.clear_plots(
+            comparison_folder,
+            validationfunctions.get_popular_revision_combinations(cwd_folder)
+        )
+
     # export js, css and html templates
     cherry_config["/static"] = {
         "tools.staticdir.on": True,
@@ -980,8 +1084,8 @@ def run_server(
     cherry_config["/results"] = {
         "tools.staticdir.on": True,
         "tools.staticdir.dir": results_folder,
-        # only serve root files
-        "tools.staticdir.match": r"^.*\.(log|root)$",
+        # only serve root, log and txt files
+        "tools.staticdir.match": r"^.*\.(log|root|txt)$",
         # server the log files as plain text files, and make sure to use
         # utf-8 encoding. Firefox might decide different, if the files
         # are located on a .jp domain and use Shift_JIS

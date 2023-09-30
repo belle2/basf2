@@ -30,13 +30,6 @@ namespace Belle2 {
       /** Getter for m_lowEnergyThreshold */
       double getLowEnergyThreshold() {return m_lowEnergyThreshold;}
 
-      /** Setter for m_noNCrysThreshold */
-      void setNoNCrysThreshold(double noNCrysThreshold) {m_noNCrysThreshold = noNCrysThreshold;}
-
-      /** Getter for m_noNCrysThreshold */
-      double getNoNCrysThreshold() {return m_noNCrysThreshold;}
-
-
     protected:
 
       /** Run algorithm */
@@ -46,7 +39,6 @@ namespace Belle2 {
 
       /** Parameters to control fit procedure */
       double m_lowEnergyThreshold = 0.0; /**< only minimal fits below this value */
-      double m_noNCrysThreshold = 0.0; /**< no nCrys fits below this value */
 
       /** For TTree */
       int t_cellID = 0; /**< cellID of photon */
@@ -57,8 +49,8 @@ namespace Belle2 {
       int t_phiMech = -1; /**< mechanical structure next to lower phi (0), upper phi (1), or neither (2) */
       int t_energyBin = -1; /**< generated energy point */
       int t_nCrys = -1; /**< number of crystals used to calculate energy */
-      float t_energyFrac = 0.; /**< measured energy (without leakage correction) divided by generated */
-      float t_origEnergyFrac = 0.; /**< measured energy with leakage correction divided by generated */
+      float t_energyFrac = 0.; /**< measured energy after nOptimal bias and peak corrections, divided by generated */
+      float t_origEnergyFrac = 0.; /**< corrected energy at time of generation, divided by generated */
       float t_locationError = 999.; /**< reconstructed minus generated position (cm) */
 
 

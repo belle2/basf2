@@ -205,11 +205,11 @@ GRLNeuroTrainerModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
+    ROOT::Math::XYZVector CellPosition = trgecl_obj->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Unit().Px());
-    CellLab.SetPy(CellPosition.Unit().Py());
-    CellLab.SetPz(CellPosition.Unit().Pz());
+    CellLab.SetPx(CellPosition.Unit().X());
+    CellLab.SetPy(CellPosition.Unit().Y());
+    CellLab.SetPz(CellPosition.Unit().Z());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -506,7 +506,7 @@ GRLNeuroTrainerModule::terminate()
     train(isector);
     m_GRLNeuro[isector].Trained(true);
     // save all networks (including the newly trained)
-    m_GRLNeuro.save(m_filename, m_arrayname);
+    //m_GRLNeuro.save(m_filename, m_arrayname);
   }
 
   // save the training data
@@ -634,12 +634,12 @@ GRLNeuroTrainerModule::train(unsigned isector)
   }
   if (m_saveDebug) {
     for (unsigned i = nTrain + m_nValid; i < m_trainSets[isector].getNumberOfSamples(); ++i) {
-      vector<float> output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
+      float output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
       vector<float> target = m_trainSets[isector].getTarget(i);
-      for (unsigned iout = 0; iout < output.size(); ++iout) {
-        if (((int)target[0]) == 1)h_result_sig[isector]->Fill(output[iout]);
-        else                    h_result_bg[isector]->Fill(output[iout]);
-      }
+      //for (unsigned iout = 0; iout < output.size(); ++iout) {
+      if (((int)target[0]) == 1)h_result_sig[isector]->Fill(output);
+      else                    h_result_bg[isector]->Fill(output);
+      //}
     }
   }
   // free memory

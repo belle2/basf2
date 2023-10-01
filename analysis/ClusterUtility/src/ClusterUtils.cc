@@ -29,7 +29,7 @@ const PxPyPzEVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clus
   return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
 }
 
-const PxPyPzEVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const XYZVector& vertex,
+const PxPyPzEVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
                                                           ECLCluster::EHypothesisBit hypo)
 {
 
@@ -57,7 +57,7 @@ const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* clu
   return GetJacobiMatrix4x6FromCluster(cluster, GetIPPosition(), hypo);
 }
 
-const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const XYZVector& vertex,
+const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
                                                            ECLCluster::EHypothesisBit hypo)
 {
 

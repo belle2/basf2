@@ -98,7 +98,7 @@ with open("first_var_classifier.pickle", "wb") as first_var_classifier_file:
   }
 
 
-  TEST(DISABLED_TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
+  TEST(TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
   {
     Py_Initialize();
     try {
@@ -118,16 +118,17 @@ from sklearn import datasets
 from sklearn.utils import shuffle
 import numpy as np
 
-boston = datasets.load_boston()
-x, y = shuffle(boston.data, boston.target, random_state=13)
+housing = datasets.fetch_california_housing()
+x, y = shuffle(housing.data, housing.target, random_state=13)
 x = x.astype(np.float64)
 
-offset = int(x.shape[0] * 0.9)
-trainX, trainY = x[:offset], y[:offset]
-testX, testY = x[offset:], y[offset:]
+max_samples = 1000
+train_fraction = 900
+trainX, trainY = x[:train_fraction], y[:train_fraction]
+testX, testY = x[train_fraction:max_samples], y[train_fraction:max_samples]
 
-params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
-          'learning_rate': 0.01, 'loss': 'ls'}
+params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 0.1,
+          'learning_rate': 0.01, 'loss': 'squared_error'}
 
 clf = ensemble.GradientBoostingRegressor(**params)
 clf.fit(trainX, trainY)
@@ -193,7 +194,7 @@ with open("bdt_regressor.pickle", "wb") as bdt_regressor_file:
       }
 
       double mean_square_error = squareSum / nRowsTestX;
-      EXPECT_GT(7, mean_square_error);
+      EXPECT_GT(1, mean_square_error);
 
     } catch (...) {
       PyErr_Print();

@@ -32,19 +32,23 @@ SharedMem::SharedMem(const char* name, int size)
     hasFile = true;
     tmpPathName = getTmpFileName(getenv("USER"), name);
     tmpFilefd = open(tmpPathName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
+    // existance of file does not really imply shared mem is existing.
+    // -> better we do not rely and update the content anyway!
     if (tmpFilefd > 0) {   // a new shared memory file created
-      printf("SharedMem: Creating a shared memory with key %s\n", name);
+      printf("SharedMem: Creating a new tmp file %s\n", name);
       m_new = true;
+      close(tmpFilefd); // will open again later
     } else if (tmpFilefd == -1 && errno == EEXIST) { // shm already there
-      printf("SharedMem: Attaching the ring buffer with key %s\n", name);
+      printf("SharedMem: Found existing tmp file %s\n", name);
       m_new = false;
     } else {
-      printf("SharedMem: error to open shm file\n");
+      printf("SharedMem: error to open tmp file %s\n", tmpPathName.c_str());
       return;
     }
     m_shmkey = ftok(tmpPathName.c_str(), 1);
     m_semkey = ftok(tmpPathName.c_str(), 2);
   } else { // Private
+    hasFile = false;
     m_new = true;
     m_shmkey = IPC_PRIVATE;
     m_semkey = IPC_PRIVATE;
@@ -75,15 +79,18 @@ SharedMem::SharedMem(const char* name, int size)
   // - IPC_CREATE will open existing or create new one
   // - IPC_CREATE|IPC_EXCL will create new one and fail is existing
   // - 0 will open existing one and fails if not existing
-  m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
+  m_semid = semget(m_semkey, 1, IPC_CREAT | IPC_EXCL | 0666);
   if (m_semid >= 0) {
     // POSIX doesn't guarantee any particular state of our fresh semaphore
     int semval = 1; //unlocked state
+    printf("Semaphore ID %d created for key $%X\n", m_semid, m_semkey);
     if (semctl(m_semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
-      printf("Initializing semaphore with semctl() failed.\n");
+      perror("Initializing semaphore with semctl() failed.");
+      return;
     }
   } else if (errno == EEXIST) {
-    m_semid = semget(m_semkey, 1, 0600);
+    m_semid = semget(m_semkey, 1, 0); // obtain existing one
+    printf("Found existing Semaphore ID %d for key $%X\n", m_semid, m_semkey);
   }
   if (m_semid < 0) {
     perror("SharedMem::shmget");

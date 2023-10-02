@@ -40,7 +40,6 @@ namespace Belle2 {
      * Constructor to access an object in the DBStore which is not a ROOT Object.
      * @param type       should be one of c_RootFile or c_RawFile.
      * @param name       Name under which the object is stored in the database (and DBStore).
-     * @param isArray    Flag that indicates whether this is a single object or a TClonesArray.
      * @param isRequired If true emit errors if the object cannot be found in the Database
      */
     DBAccessorBase(DBStoreEntry::EPayloadType type, const std::string& name, bool isRequired):

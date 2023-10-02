@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # this file is used to create the mdst.root file located in this test folder
 # and used for unit testing.

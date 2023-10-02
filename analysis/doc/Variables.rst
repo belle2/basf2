@@ -601,7 +601,7 @@ Miscellaneous helpers for using variables
 Writing your own variable
 -------------------------
 
-The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a pull request. Then your variables will be made available in a central release to many people.
+The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a merge request. Then your variables will be made available in a central release to many people.
 
 In case you have something really analysis-specific that no one else will need. You can still use the VariableManager.
 

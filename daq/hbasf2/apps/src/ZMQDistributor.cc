@@ -63,7 +63,7 @@ void ZMQDistributor::handleInput()
 {
   auto messages = m_input->handleIncomingData();
 
-  for (auto && message : messages) {
+  for (auto&& message : messages) {
     // So there has been a message, make sure to reset the timer for waiting (if no timer is set this will just return)
     resetTimer();
 
@@ -140,7 +140,7 @@ void ZMQInputAdapter::handleInput()
 {
   auto messages = m_input->handleIncomingData();
 
-  for (auto && message : messages) {
+  for (auto&& message : messages) {
     // So there has been a message, make sure to reset the timer for waiting (if no timer is set this will just return)
     resetTimer();
 

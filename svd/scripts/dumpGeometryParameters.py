@@ -203,7 +203,7 @@ class printSVDLadders(b2.Module):
                     # sensor ID string
                     sensorID = str(layerNumber) + "." + str(ladderNumber)
                     # get global coordinates:
-                    local = r.TVector3(0, 0, 0)
+                    local = r.Math.XYZVector(0, 0, 0)
                     glob = geoCache.getSensorInfo(sensor).pointToGlobal(local)
 
                     angleRad = m.atan2(glob.Y(), glob.X())

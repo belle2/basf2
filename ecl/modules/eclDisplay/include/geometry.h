@@ -8,8 +8,8 @@
 
 #pragma once
 
-/** @file ecl/modules/eclDisplay/geometry.h
- * This file was meant to contain several (relatively) short auxillary functions
+/** @file
+ * This file was meant to contain several (relatively) short auxiliary functions
  * that depend on geometric properties of the calorimeter and specific
  * parameters of COPPER.
  *

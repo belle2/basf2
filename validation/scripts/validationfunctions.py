@@ -215,7 +215,9 @@ def clear_plots(work_folder: str, keep_revisions: List[str]):
                 continue
 
             print(f'Removing {hash}:{revisions}')
-            shutil.rmtree(os.path.join(work_folder, hash))
+            work_folder_path = Path(os.path.join(work_folder, hash))
+            if work_folder_path.exists() and work_folder_path.is_dir():
+                shutil.rmtree(work_folder_path)
 
     with open(rainbow_file, 'w') as rainbow:
         rainbow.write(json.dumps(cleaned_rainbow, indent=4))
@@ -726,10 +728,16 @@ def get_file_metadata(filename: str) -> str:
     if not Path(filename).exists():
         raise FileNotFoundError(f"Could not find file {filename}")
 
-    proc = subprocess.run(
-        ["b2file-metadata-show", "-a", str(filename)],
-        stdout=subprocess.PIPE,
-        check=True,
-    )
-    metadata = proc.stdout.decode("utf-8")
+    metadata = None
+
+    try:
+        proc = subprocess.run(
+            ["b2file-metadata-show", "-a", str(filename)],
+            stdout=subprocess.PIPE,
+            check=True,
+        )
+        metadata = proc.stdout.decode("utf-8")
+    except subprocess.CalledProcessError as e:
+        print(e.stderr)
+
     return metadata

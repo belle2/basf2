@@ -61,11 +61,11 @@ Repositories
 ~~~~~~~~~~~~
 
 The following three remote repositories of ``TopoAna`` are provided at present.
-The one at Stash is most convenient to Belle II users.
+The one at DESY's GitLab is most convenient to Belle II users.
 Nonetheless, the two at GitHub and at GitLab of IHEP are also provided as helpful
 alternatives for possible convenience.
 
-* `Repository at Stash <https://stash.desy.de/users/zhouxy/repos/topoana/browse>`_
+* `Repository at DESY GitLab <https://gitlab.desy.de/belle2/software/topoana>`_
 * `Repository at GitHub <https://github.com/buaazhouxingyu/topoana>`_
 * `Repository at GitLab of IHEP <http://code.ihep.ac.cn/xyzhou/topoana>`_
 
@@ -132,4 +132,4 @@ one for semitauonic analyses and the other for charm analyses.
 You can refer to them if you work in the related analysis groups.
 
 * `Using TopoAna with the semitauonic framework <https://confluence.desy.de/display/BI/Using+topoAna+with+the+semitauonic+framework>`_ by Hannah Marie Wakeling
-* `TopoAna Wrapper for Charm Analysis <https://stash.desy.de/projects/B2CHARM/repos/charm_topoanawrapper/browse>`_ by Guanda Gong
+* `TopoAna Wrapper for Charm Analysis <https://gitlab.desy.de/belle2/physics/charm/software/charm_topoanawrapper>`_ by Guanda Gong

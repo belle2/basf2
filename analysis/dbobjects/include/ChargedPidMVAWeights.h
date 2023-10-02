@@ -309,7 +309,6 @@ namespace Belle2 {
      * Given a particle mass hypothesis' pdgId,
      * get the list of selection cuts stored in the payload, one for each category.
      * @param pdg the particle mass hypothesis' pdgId.
-     * @param pdg the particle mass hypothesis' pdgId.
      */
     const std::vector<std::string>* getCuts(const int pdg) const
     {

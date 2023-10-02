@@ -126,7 +126,7 @@ offset = int(x.shape[0] * 0.9)
 trainX, trainY = x[:offset], y[:offset]
 testX, testY = x[offset:], y[offset:]
 
-params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
+params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 0.1,
           'learning_rate': 0.01, 'loss': 'squared_error'}
 
 clf = ensemble.GradientBoostingRegressor(**params)

@@ -122,9 +122,10 @@ housing = datasets.fetch_california_housing()
 x, y = shuffle(housing.data, housing.target, random_state=13)
 x = x.astype(np.float64)
 
-offset = int(x.shape[0] * 0.9)
-trainX, trainY = x[:offset], y[:offset]
-testX, testY = x[offset:], y[offset:]
+max_samples = 1000
+train_fraction = 900
+trainX, trainY = x[:train_fraction], y[:train_fraction]
+testX, testY = x[train_fraction:max_samples], y[train_fraction:max_samples]
 
 params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 0.1,
           'learning_rate': 0.01, 'loss': 'squared_error'}

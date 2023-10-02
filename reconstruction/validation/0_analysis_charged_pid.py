@@ -40,12 +40,20 @@ DETECTOR_EXPERTS = ["luigi.corona@pi.infn.it",  # SVD
                     "torben.ferber@kit.edu",  # ECL
                     "piilonen@vt.edu"  # KLM
                     ]
+DETECTOR_ACCEPTANCE_CUTS = [
+    "inCDCAcceptance",  # SVD
+    "inCDCAcceptance",  # CDC
+    "inTOPAcceptance",  # TOP
+    "inARICHAcceptance",  # ARICH
+    "inECLAcceptance",  # ECL
+    "inKLMAcceptance"  # KLM
+]
 
 PID_EXPERT = "kenta.uno@kek.jp and alessandro.gaz@pd.infn.it"
 
 THRESHOLDS = [0.2, 0.8]
 KIN_VAR_NAMES = ['p', 'cosTheta']
-KIN_VAR_BINS = [(25, 0.2, 5), (10, -1, 1)]
+KIN_VAR_BINS = [(20, 0., 5), (10, -1, 1)]
 DEFAULT_OPTIONS = "pvalue-warn=0.5"
 
 
@@ -80,12 +88,17 @@ def run_b2analysis():
     Function to produce the validation ntuples via basf2.
     """
     main = basf2.Path()
-    inputMdst('default', INPUT_FILENAME, path=main)
+    inputMdst(INPUT_FILENAME, path=main)
     add_reconstruction(path=main)
     track_quality_cuts = 'isSignal > 0'
 
     for pid, particle in zip(GLOBAL_ID_NAMES, PARTICLE_TYPES):
+        # Total rates:
         fillParticleList(f'{particle}+:total', track_quality_cuts, path=main)
+        # Total rates for subdetector:
+        for det, cut in zip(DETECTORS, DETECTOR_ACCEPTANCE_CUTS):
+            fillParticleList(f'{particle}+:total_{det}', f'{track_quality_cuts} and {cut}', path=main)
+
         # Efficiency cuts:
         for cut_val in THRESHOLDS:
             cutAndCopyList(f'{particle}+:cut0{int(cut_val*10)}', f'{particle}+:total',
@@ -113,8 +126,9 @@ def run_b2analysis():
         det_cut_value = THRESHOLDS[0]
         for det_pid_var in DETECTOR_PIDS:
             # Efficiency only
+            det = [d for d in DETECTORS if d in det_pid_var][0]
             if f'_{particle}_' in det_pid_var:
-                cutAndCopyList(f'{particle}+:eff_{det_pid_var}_cut0{int(det_cut_value*10)}', f'{particle}+:total',
+                cutAndCopyList(f'{particle}+:eff_{det_pid_var}_cut0{int(det_cut_value*10)}', f'{particle}+:total_{det}',
                                f'{det_pid_var} > {det_cut_value}', path=main)
                 variablesToHistogram(f'{particle}+:eff_{det_pid_var}_cut0{int(det_cut_value*10)}',
                                      (KIN_VAR_NAMES[0], *KIN_VAR_BINS[0]),
@@ -128,11 +142,12 @@ def run_b2analysis():
                                  filename=GLOBALID_OUTPUT_FILENAME,
                                  path=main,
                                  directory=f'total_{particle}_{var}')
-        variablesToHistogram(f'{particle}+:total',
-                             (KIN_VAR_NAMES[0], *KIN_VAR_BINS[0]),
-                             filename=DET_PID_OUTPUT_FILENAME,
-                             path=main,
-                             directory=f'total_{particle}_{KIN_VAR_NAMES[0]}')
+        for det in DETECTORS:
+            variablesToHistogram(f'{particle}+:total_{det}',
+                                 (KIN_VAR_NAMES[0], *KIN_VAR_BINS[0]),
+                                 filename=DET_PID_OUTPUT_FILENAME,
+                                 path=main,
+                                 directory=f'total_{det}_{particle}_{KIN_VAR_NAMES[0]}')
 
     main.add_module('Progress')
     basf2.process(main)
@@ -198,7 +213,8 @@ def add_detector_plots():
     cut_val = THRESHOLDS[0]
     for det_pid_var in DETECTOR_PIDS:
         for particle in PARTICLE_TYPES:
-            total_obs_th1 = root_file.Get(f'total_{particle}_{var}').Get(var)
+            det = [d for d in DETECTORS if d in det_pid_var][0]
+            total_obs_th1 = root_file.Get(f'total_{det}_{particle}_{var}').Get(var)
             if f'_{particle}_' in det_pid_var:
                 eff_cut_obs_th1 = root_file.Get(f'eff_cut0{int(cut_val*10)}_{particle}_{det_pid_var}_{var}').Get(var)
                 teff = ROOT.TEfficiency(eff_cut_obs_th1, total_obs_th1)

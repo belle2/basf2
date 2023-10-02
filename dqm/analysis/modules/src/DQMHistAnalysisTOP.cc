@@ -36,14 +36,14 @@ DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule(): DQMHistAnalysisModule()
   setDescription("Histogram analysis module for TOP DQM.");
 
   // Add parameters
-  addParam("rawTimingBand", m_rawTimingBand,
-           "lower and upper bin of a band denoting good windows", m_rawTimingBand);
-  addParam("rawTimingAlarmLevels", m_rawTimingAlarmLevels,
-           "alarm levels for the fraction of windows outside the band (yellow, red)", m_rawTimingAlarmLevels);
+  addParam("asicWindowsBand", m_asicWindowsBand,
+           "lower and upper bin of a band denoting good windows", m_asicWindowsBand);
+  addParam("asicWindowsAlarmLevels", m_asicWindowsAlarmLevels,
+           "alarm levels for the fraction of windows outside the band (yellow, red)", m_asicWindowsAlarmLevels);
   addParam("eventMonitorAlarmLevels", m_eventMonitorAlarmLevels,
            "alarm levels for the fraction of desynchronized digits (yellow, red)", m_eventMonitorAlarmLevels);
-  addParam("badHitsAlarmLevels", m_badHitsAlarmLevels,
-           "alarm levels for the fraction of junk hits (yellow, red)", m_badHitsAlarmLevels);
+  addParam("junkHitsAlarmLevels", m_junkHitsAlarmLevels,
+           "alarm levels for the fraction of junk hits (yellow, red)", m_junkHitsAlarmLevels);
   addParam("deadChannelsAlarmLevels", m_deadChannelsAlarmLevels,
            "alarm levels for the fraction of dead + hot channels (yellow, red)", m_deadChannelsAlarmLevels);
   addParam("backgroundAlarmLevels", m_backgroundAlarmLevels,
@@ -66,10 +66,10 @@ void DQMHistAnalysisTOPModule::initialize()
 
   // check module parameters
 
-  if (m_rawTimingBand.size() != 2) B2ERROR("Parameter list 'rawTimingBand' must contain two numbers");
-  if (m_rawTimingAlarmLevels.size() != 2) B2ERROR("Parameter list 'rawTimingAlarmLevels' must contain two numbers");
+  if (m_asicWindowsBand.size() != 2) B2ERROR("Parameter list 'asicWindowsBand' must contain two numbers");
+  if (m_asicWindowsAlarmLevels.size() != 2) B2ERROR("Parameter list 'asicWindowsAlarmLevels' must contain two numbers");
   if (m_eventMonitorAlarmLevels.size() != 2) B2ERROR("Parameter list 'eventMonitorAlarmLevels' must contain two numbers");
-  if (m_badHitsAlarmLevels.size() != 2) B2ERROR("Parameter list 'badHitsAlarmLevels' must contain two numbers");
+  if (m_junkHitsAlarmLevels.size() != 2) B2ERROR("Parameter list 'junkHitsAlarmLevels' must contain two numbers");
   if (m_deadChannelsAlarmLevels.size() != 2) B2ERROR("Parameter list 'deadChannelsAlarmLevels' must contain two numbers");
   if (m_backgroundAlarmLevels.size() != 2) B2ERROR("Parameter list 'backgroundAlarmLevels' must contain two numbers");
   if (m_photonYieldsAlarmLevels.size() != 2) B2ERROR("Parameter list 'photonYieldsAlarmLevels' must contain two numbers");
@@ -107,10 +107,10 @@ void DQMHistAnalysisTOPModule::initialize()
 
   // Epics used to get limits from configuration file - override module parameters (input only)
 
-  registerEpicsPV(m_pvPrefix + "rawTimingBand", "rawTimingBand");
-  registerEpicsPV(m_pvPrefix + "rawTimingAlarmLevels", "rawTimingAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "asicWindowsBand", "asicWindowsBand");
+  registerEpicsPV(m_pvPrefix + "asicWindowsAlarmLevels", "asicWindowsAlarmLevels");
   registerEpicsPV(m_pvPrefix + "eventMonitorAlarmLevels", "eventMonitorAlarmLevels");
-  registerEpicsPV(m_pvPrefix + "badHitsAlarmLevels", "badHitsAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "junkHitsAlarmLevels", "junkHitsAlarmLevels");
   registerEpicsPV(m_pvPrefix + "deadChannelsAlarmLevels", "deadChannelsAlarmLevels");
   registerEpicsPV(m_pvPrefix + "backgroundAlarmLevels", "backgroundAlarmLevels");
   registerEpicsPV(m_pvPrefix + "photonYieldsAlarmLevels", "photonYieldsAlarmLevels");
@@ -128,12 +128,20 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_photonYields = new TCanvas("TOP/c_photonYields", "c_photonYields");
   m_c_backgroundRates = new TCanvas("TOP/c_backgroundRates", "c_backgroundRates");
 
-  m_deadFraction = new TH1F("TOP/deadFraction", "Fraction of dead channels; slot number; fraction", 16, 0.5, 16.5);
-  m_hotFraction = new TH1F("TOP/hotFraction", "Fraction of hot channels; slot number; fraction", 16, 0.5, 16.5);
-  m_activeFraction = new TH1F("TOP/activeFraction", "Fraction of active channels; slot number; fraction", 16, 0.5, 16.5);
+  m_deadFraction = new TH1F("TOP/deadFraction", "Fraction of dead channels", 16, 0.5, 16.5);
+  m_deadFraction->SetXTitle("slot number");
+  m_deadFraction->SetYTitle("fraction");
+  m_hotFraction = new TH1F("TOP/hotFraction", "Fraction of hot channels", 16, 0.5, 16.5);
+  m_hotFraction->SetXTitle("slot number");
+  m_hotFraction->SetYTitle("fraction");
+  m_activeFraction = new TH1F("TOP/activeFraction", "Fraction of active channels", 16, 0.5, 16.5);
+  m_activeFraction->SetXTitle("slot number");
+  m_activeFraction->SetYTitle("fraction");
   m_c_deadAndHot = new TCanvas("TOP/c_deadAndHotChannels", "c_deadAndHotChannels");
 
-  m_junkFraction = new TH1F("TOP/junkFraction", "Fraction of bad hits per boardstack; slot number; fraction", 64, 0.5, 16.5);
+  m_junkFraction = new TH1F("TOP/junkFraction", "Fraction of junk hits per boardstack", 64, 0.5, 16.5);
+  m_junkFraction->SetXTitle("slot number");
+  m_junkFraction->SetYTitle("fraction");
   m_c_junkFraction = new TCanvas("TOP/c_junkFraction", "c_junkFraction");
 
   m_text1 = new TPaveText(1, 435, 12, 500, "NB");
@@ -191,7 +199,7 @@ void DQMHistAnalysisTOPModule::event()
   // Fractions of junk hits
   makeJunkFractionPlot();
 
-  // Set z-axis range to 3 times the average for good hits, 30 times the average for bad hits
+  // Set z-axis range to 3 times the average for good hits, 30 times the average for junk hits
   setZAxisRange("TOP/good_hits_xy_", 3);
   setZAxisRange("TOP/bad_hits_xy_", 30);
   setZAxisRange("TOP/good_hits_asics_", 3);
@@ -202,12 +210,6 @@ void DQMHistAnalysisTOPModule::event()
   for (int slot = 1; slot <= 16; slot++) {
     makeBGSubtractedTimimgPlot("good_timing_" + to_string(slot));
   }
-
-  // Set logy
-  auto* canvas = findCanvas("TOP/c_goodHitsPerEventAll");
-  if (canvas) canvas->SetLogy();
-  canvas = findCanvas("TOP/c_badHitsPerEventAll");
-  if (canvas) canvas->SetLogy();
 
   // Set Epics variables
   setEpicsVariables();
@@ -246,14 +248,14 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
   auto* hraw = (TH2F*) findHist("TOP/window_vs_slot");
   if (hraw) {
     auto* px = hraw->ProjectionX("tmp_px");
-    auto* band = hraw->ProjectionX("TOP/windowFractions", m_rawTimingBand[0], m_rawTimingBand[1]);
+    auto* band = hraw->ProjectionX("TOP/windowFractions", m_asicWindowsBand[0], m_asicWindowsBand[1]);
     band->Add(px, band, 1, -1);
     double total = px->Integral();
     m_totalWindowFraction = (total != 0) ? band->Integral() / total : 0;
     band->Divide(band, px);
     m_windowFractions = band;
     if (total > 0) {
-      alarmState = getAlarmState(m_totalWindowFraction, m_rawTimingAlarmLevels);
+      alarmState = getAlarmState(m_totalWindowFraction, m_asicWindowsAlarmLevels);
       m_text1->AddText(Form("Fraction outside red lines: %.2f %%", m_totalWindowFraction * 100.0));
     }
     delete px;
@@ -263,7 +265,7 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
   if (canvas) {
     canvas->cd();
     m_text1->Draw();
-    for (auto* line : m_rawTimingBandLines) line->Draw();
+    for (auto* line : m_asicWindowsBandLines) line->Draw();
     canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
     canvas->Modified();
   }
@@ -362,7 +364,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   canvas->cd();
   canvas->Pad()->SetFrameFillColor(10);
   if (not m_stack) {
-    m_stack = new THStack("TOP/stack", "Fraction of dead and hot channels; slot number; fraction");
+    m_stack = new THStack("TOP/stack", "Fraction of dead and hot channels");
     m_stack->Add(m_deadFraction);
     m_stack->Add(m_hotFraction);
     m_stack->Add(m_activeFraction);
@@ -424,6 +426,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
 
   auto* canvas = m_c_photonYields;
   canvas->cd();
+  m_photonYields->SetMinimum(0);
   m_photonYields->Draw();
   for (auto* line : m_photonYieldsAlarmLines) line->Draw("same");
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
@@ -454,6 +457,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
 
   canvas = m_c_backgroundRates;
   canvas->cd();
+  m_backgroundRates->SetMinimum(0);
   m_backgroundRates->Draw();
   for (auto* line : m_backgroundAlarmLines) line->Draw("same");
   m_text3->Draw();
@@ -484,13 +488,13 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
 
   int alarmState = c_Gray;
   if (allHits->Integral() > 0) {
-    alarmState = getAlarmState(m_junkFraction->GetMaximum(), m_badHitsAlarmLevels);
+    alarmState = getAlarmState(m_junkFraction->GetMaximum(), m_junkHitsAlarmLevels);
     if (alarmState == 3) {
       double hmax = 0;
       for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
         if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
       }
-      alarmState = std::max(getAlarmState(hmax, m_badHitsAlarmLevels), 2);
+      alarmState = std::max(getAlarmState(hmax, m_junkHitsAlarmLevels), 2);
     }
   }
   delete allHits;
@@ -505,7 +509,7 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
   m_junkFraction->GetYaxis()->SetRangeUser(0, 1); // Note: m_junkFraction->GetMaximum() will now give 1 and not the histogram maximum!
   m_junkFraction->Draw();
   for (auto* line : m_verticalLines) line->Draw("same");
-  for (auto* line : m_badHitsAlarmLines) line->Draw("same");
+  for (auto* line : m_junkHitsAlarmLines) line->Draw("same");
   canvas->Modified();
 }
 
@@ -609,14 +613,14 @@ void DQMHistAnalysisTOPModule::setAlarmLines(const std::vector<double>& alarmLev
 
 void DQMHistAnalysisTOPModule::setAlarmLines()
 {
-  for (auto y : m_rawTimingBand) {
+  for (auto y : m_asicWindowsBand) {
     auto* line = new TLine(0.5, y, 16.5, y);
     line->SetLineWidth(2);
     line->SetLineColor(kRed);
-    m_rawTimingBandLines.push_back(line);
+    m_asicWindowsBandLines.push_back(line);
   }
 
-  setAlarmLines(m_badHitsAlarmLevels, 0.5, 16.5, m_badHitsAlarmLines);
+  setAlarmLines(m_junkHitsAlarmLevels, 0.5, 16.5, m_junkHitsAlarmLines);
   setAlarmLines(m_deadChannelsAlarmLevels, 0.5, 16.5, m_deadChannelsAlarmLines);
   setAlarmLines(m_backgroundAlarmLevels, 0.5, 16.5, m_backgroundAlarmLines);
   setAlarmLines(m_photonYieldsAlarmLevels, 0.5, 16.5, m_photonYieldsAlarmLines, false);
@@ -713,15 +717,15 @@ void DQMHistAnalysisTOPModule::updateLimits()
 {
   double unused = 0;
 
-  double yLo = m_rawTimingBand[0];
-  double yHi = m_rawTimingBand[1];
-  requestLimitsFromEpicsPVs("rawTimingBand", yLo, unused, unused, yHi);
-  m_rawTimingBand[0] = yLo;
-  m_rawTimingBand[1] = yHi;
+  double yLo = m_asicWindowsBand[0];
+  double yHi = m_asicWindowsBand[1];
+  requestLimitsFromEpicsPVs("asicWindowsBand", yLo, unused, unused, yHi);
+  m_asicWindowsBand[0] = yLo;
+  m_asicWindowsBand[1] = yHi;
 
-  requestLimitsFromEpicsPVs("rawTimingAlarmLevels", unused, unused, m_rawTimingAlarmLevels[0], m_rawTimingAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("asicWindowsAlarmLevels", unused, unused, m_asicWindowsAlarmLevels[0], m_asicWindowsAlarmLevels[1]);
   requestLimitsFromEpicsPVs("eventMonitorAlarmLevels", unused, unused, m_eventMonitorAlarmLevels[0], m_eventMonitorAlarmLevels[1]);
-  requestLimitsFromEpicsPVs("badHitsAlarmLevels", unused, unused, m_badHitsAlarmLevels[0], m_badHitsAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("junkHitsAlarmLevels", unused, unused, m_junkHitsAlarmLevels[0], m_junkHitsAlarmLevels[1]);
   requestLimitsFromEpicsPVs("deadChannelsAlarmLevels", unused, unused, m_deadChannelsAlarmLevels[0], m_deadChannelsAlarmLevels[1]);
   requestLimitsFromEpicsPVs("backgroundAlarmLevels", unused, unused, m_backgroundAlarmLevels[0], m_backgroundAlarmLevels[1]);
   requestLimitsFromEpicsPVs("photonYieldsAlarmLevels", m_photonYieldsAlarmLevels[0], m_photonYieldsAlarmLevels[1], unused, unused);
@@ -742,10 +746,10 @@ void DQMHistAnalysisTOPModule::updateLimits()
     }
   }
 
-  B2DEBUG(20, "rawTimingBand:           [" << m_rawTimingBand[0] << ", " << m_rawTimingBand[1] << "]");
-  B2DEBUG(20, "rawTimingAlarmLevels:    [" << m_rawTimingAlarmLevels[0] << ", " << m_rawTimingAlarmLevels[1] << "]");
+  B2DEBUG(20, "asicWindowsBand:           [" << m_asicWindowsBand[0] << ", " << m_asicWindowsBand[1] << "]");
+  B2DEBUG(20, "asicWindowsAlarmLevels:    [" << m_asicWindowsAlarmLevels[0] << ", " << m_asicWindowsAlarmLevels[1] << "]");
   B2DEBUG(20, "eventMonitorAlarmLevels: [" << m_eventMonitorAlarmLevels[0] << ", " << m_eventMonitorAlarmLevels[1] << "]");
-  B2DEBUG(20, "badHitsAlarmLevels:      [" << m_badHitsAlarmLevels[0] << ", " << m_badHitsAlarmLevels[1] << "]");
+  B2DEBUG(20, "junkHitsAlarmLevels:      [" << m_junkHitsAlarmLevels[0] << ", " << m_junkHitsAlarmLevels[1] << "]");
   B2DEBUG(20, "deadChannelsAlarmLevels: [" << m_deadChannelsAlarmLevels[0] << ", " << m_deadChannelsAlarmLevels[1] << "]");
   B2DEBUG(20, "backgroundAlarmLevels:   [" << m_backgroundAlarmLevels[0] << ", " << m_backgroundAlarmLevels[1] << "]");
   B2DEBUG(20, "photonYieldsAlarmLevels: [" << m_photonYieldsAlarmLevels[0] << ", " << m_photonYieldsAlarmLevels[1] << "]");

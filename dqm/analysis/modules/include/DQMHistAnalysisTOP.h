@@ -101,7 +101,7 @@ namespace Belle2 {
     void makePhotonYieldsAndBGRatePlots(const TH1F* activeFraction);
 
     /**
-     * Makes a plot of fractions of bad hits per boardstack
+     * Makes a plot of fractions of junk hits per boardstack
      */
     void makeJunkFractionPlot();
 
@@ -175,16 +175,16 @@ namespace Belle2 {
 
     /**
      * Updates limits defined by module parameters using EpicsPVs.
-     * This includes rawTimingBand, alarmLevels and excluded boardstacks.
+     * This includes asicWindowsBand, alarmLevels and excluded boardstacks.
      */
     void updateLimits();
 
     // module parameters
 
-    std::vector<int> m_rawTimingBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
-    std::vector<double> m_rawTimingAlarmLevels = {0.002, 0.02}; /**< alarm levels for fraction of windows outside the band */
+    std::vector<int> m_asicWindowsBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
+    std::vector<double> m_asicWindowsAlarmLevels = {0.002, 0.02}; /**< alarm levels for fraction of windows outside the band */
     std::vector<double> m_eventMonitorAlarmLevels = {1e-4, 2e-3}; /**< alarm levels for fraction of desynchronized digits */
-    std::vector<double> m_badHitsAlarmLevels = {0.05, 0.25}; /**< alarm levels for the fraction of junk hits */
+    std::vector<double> m_junkHitsAlarmLevels = {0.05, 0.25}; /**< alarm levels for the fraction of junk hits */
     std::vector<double> m_deadChannelsAlarmLevels = {0.1, 0.35}; /**< alarm levels for the fraction of dead + hot channels */
     std::vector<double> m_backgroundAlarmLevels = {5.0, 10.0}; /**< alarm levels for background rates [MHz/PMT] */
     std::vector<double> m_photonYieldsAlarmLevels = {15.0, 25.0}; /**< alarm levels for the number of photons per track */
@@ -214,12 +214,12 @@ namespace Belle2 {
     TLegend* m_legend = nullptr; /**< legend for dead and hot channels */
     TCanvas* m_c_deadAndHot = nullptr; /**< Canvas: fractin of dead and hot channels */
 
-    TH1F* m_junkFraction = nullptr; /**< fraction of bad hits per boardstack */
-    TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of bad hits per boardstack */
+    TH1F* m_junkFraction = nullptr; /**< fraction of junk hits per boardstack */
+    TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of junk hits per boardstack */
 
-    std::vector<TLine*> m_rawTimingBandLines; /**< lines denoting a band of good windows */
+    std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
-    std::vector<TLine*> m_badHitsAlarmLines; /**< lines representing alarm levels */
+    std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_deadChannelsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_backgroundAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_photonYieldsAlarmLines; /**< lines representing alarm levels */

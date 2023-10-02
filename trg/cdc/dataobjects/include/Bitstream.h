@@ -36,7 +36,7 @@ namespace Belle2 {
    *
    * To add a signal bus with a new type (or dimension), declare the type in linkdef.h, e.g.
    *
-   * #pragma link C++ class Belle2::Bitstream<array<array<array<char, 429>, 4>, 5> >+
+   * \#pragma link C++ class Belle2::Bitstream<array<array<array<char, 429>, 4>, 5> >+
    *
    * and then it can be used in a module.
    *

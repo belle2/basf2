@@ -210,16 +210,16 @@ namespace Belle2 {
     std::vector<NNTParam<unsigned short>> maxHitsPerSL;
     /** Super layer pattern for which MLP is trained for all networks.
        *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
-       *  0 in bit <i>: hits from super layer <i> are not used.
-       *  1 in bit <i>: hits from super layer <i> are used.
+       *  0 in bit \<i>: hits from super layer \<i> are not used.
+       *  1 in bit \<i>: hits from super layer \<i> are used.
        *  SLpattern = 0: use any hits present, don't check the pattern. */
     std::vector<NNTParam<unsigned long>> SLpattern;
     /** Super layer pattern mask for which MLP is trained for all networks.
        *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
-       *  0 in bit <i>: super layer <i> may or may not have a hit.
-       *  1 in bit <i>: super layer <i>
-       *                - must have a hit if SLpattern bit <i> = 1
-       *                - must not have a hit if SLpattenr bit <i> = 0 */
+       *  0 in bit \<i>: super layer \<i> may or may not have a hit.
+       *  1 in bit \<i>: super layer \<i>
+       *                - must have a hit if SLpattern bit \<i> = 1
+       *                - must not have a hit if SLpattenr bit \<i> = 0 */
     std::vector<NNTParam<unsigned long>> SLpatternMask;
     /** precision used for the hardware simulation */
     std::vector<NNTParam<unsigned>> precision;

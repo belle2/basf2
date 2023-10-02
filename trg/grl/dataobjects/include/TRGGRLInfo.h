@@ -450,13 +450,13 @@ namespace Belle2 {
     int m_n_3dfitter_track_Z25;
     /**#3D fitter tracks*/
     int m_n_3dfitter_track_Z35;
-    /**#NN tracks*/
+    /** \#NN tracks*/
     int m_n_NN_track;
-    /**#NN tracks Z0<20cm*/
+    /** \#NN tracks Z0<20cm*/
     int m_n_NN_track_Z20;
-    /**#NN tracks Z0<40cm*/
+    /** \#NN tracks Z0<40cm*/
     int m_n_NN_track_Z40;
-    /**#NN tracks Z0<15cm,P>0.7GeV*/
+    /** \#NN tracks Z0<15cm,P>0.7GeV*/
     int m_n_NN_track_STT;
     /**#2D matched finder tracks*/
     int m_n_2dmatch_track;

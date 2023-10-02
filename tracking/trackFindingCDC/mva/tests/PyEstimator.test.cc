@@ -98,7 +98,7 @@ with open("first_var_classifier.pickle", "wb") as first_var_classifier_file:
   }
 
 
-  TEST(DISABLED_TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
+  TEST(TrackFindingCDCTest, PyEstimator_predict_sklearn_regressor)
   {
     Py_Initialize();
     try {

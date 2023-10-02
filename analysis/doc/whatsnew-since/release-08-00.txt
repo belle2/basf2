@@ -1,6 +1,13 @@
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------
 
+FEI
++++
+* Applied the mass constraint to pi0 candidates in FEI.
+  Please note that the FEI calibration on MC15ri is performed without applying pi0 mass constraint and without loosening the gamma
+  energy threshold, which has been implemented since light-2305-korat.
+  So, either use FEI skims (recommended), or run FEI with an older release until new FEI calibration with MC16 will be available.
+
 Photon Energy Resolution
 ++++++++++++++++++++++++
 * Added ``ECLPhotonEnergyResolution`` to analysis database objects. This module reads the relative energy resolution calculation

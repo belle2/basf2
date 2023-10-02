@@ -24,6 +24,10 @@ namespace Belle2 {
      *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].
      *  @param omega     The signed curvature of the track where the sign is given by the charge of the particle.
      *  @param chi2      Chi2 value of the 2D fit.
+     *  @param foundoldtrack vector with boolean information whether an old 2dtrack was found
+     *  @param driftthreshold vector with boolean information whether drift time was within the timing window
+     *  @param valstereobit switch whether at least 3 valid stereo ts found in the NNInput
+     *  @param expert    whether to use expert network
      *  @param time      found time for firmware tracks.
      *  @param quadrant  iTracker of the unpacked quadrant.
      *
@@ -61,14 +65,20 @@ namespace Belle2 {
       m_qualityvector(0) { }
 
     /** 3D constructor
-     *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].
-     *  @param omega     The signed curvature of the track where the sign is given by the charge of the particle.
-     *  @param chi2D     Chi2 value of the 2D fit.
-     *  @param z0        The z coordinate of the perigee.
-     *  @param cotTheta  The slope of the track in the sz plane (dz/ds).
-     *  @param chi3D     Chi2 value of the 3D fit.
-     *  @param time      found time for firmware tracks.
-     *  @param quadrant  iTracker of the unpacked quadrant.
+     *  @param phi0           The angle between the transverse momentum and the x axis and in [-pi, pi].
+     *  @param omega          The signed curvature of the track where the sign is given by the charge of the particle.
+     *  @param chi2D          Chi2 value of the 2D fit.
+     *  @param z0             The z coordinate of the perigee.
+     *  @param cotTheta       The slope of the track in the sz plane (dz/ds).
+     *  @param chi3D          Chi2 value of the 3D fit.
+     *  @param foundoldtrack  vector with boolean information whether an old 2dtrack was found
+     *  @param driftthreshold vector with boolean information whether drift time was within the timing window
+     *  @param valstereobit   switch whether at least 3 valid stereo ts found in the NNInput
+     *  @param expert         whether to use expert network
+     *  @param tsvector       vector of which track segments were used
+     *  @param time           found time for firmware tracks.
+     *  @param quadrant       iTracker of the unpacked quadrant.
+     *  @param qualityvector  quality flag bit
      */
     CDCTriggerTrack(double phi0, double omega, double chi2D,
                     double z0, double cotTheta, double chi3D,
@@ -177,7 +187,7 @@ namespace Belle2 {
     short m_time;
     /** iTracker of the unpacked quadrant*/
     short m_quadrant;
-    /** array to store wether an old 2dtrack was found */
+    /** array to store whether an old 2dtrack was found */
     std::vector<bool> m_foundoldtrack;
     /** store if drift time was within the timing window */
     std::vector<bool> m_driftthreshold;

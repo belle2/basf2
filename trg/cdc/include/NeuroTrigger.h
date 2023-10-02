@@ -237,6 +237,7 @@ namespace Belle2 {
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
      * @param track   axial hit relations are taken from given track
+     * @param neurotrackinputmode input mode
      * @return super layer pattern of hits in the current track
      */
     unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
@@ -255,8 +256,6 @@ namespace Belle2 {
     /** Select hits for each super layer from the ones related to input track
      * @param isector              index of the MLP that will use the input
      * @param track                all hit relations are taken from given track
-     * @param returnAllRelevant    if true, return all relevant hits instead of
-     *                             selecting the best (for making relations)
      * @return list of selected hit indices */
     std::vector<unsigned> selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track);
 

@@ -97,21 +97,11 @@ namespace Belle2 {
     /**
      *  Calculate the number of clocks in the data,
      *  reserve that much of clocks in the Bitstream(s)
-     *
-     *  @param subDetectorId   COPPER id of the current data
-     *
-     *  @param nWords          Number of words of each FINESSE in the COPPER
      */
     virtual void reserve(int, std::array<int, nFinesse>, bool) {};
 
     /**
      *  Unpack the Belle2Link data and fill the Bitstream
-     *
-     *  @param subDetectorId   COPPER id of the current data
-     *
-     *  @param data32tab       list of pointers to the Belle2Link data buffers
-     *
-     *  @param nWords          Number of words of each FINESSE in the COPPER
      */
     virtual void unpack(int,
                         std::array<int*, nFinesse>,
@@ -126,6 +116,8 @@ namespace Belle2 {
      *  @param data32tab       list of pointers to the Belle2Link data buffers
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
+     *
+     *  @param pciedata        Switch between PCIe 40 and COPPER
      *
      *  @return                1 if there are data other than the header
      */

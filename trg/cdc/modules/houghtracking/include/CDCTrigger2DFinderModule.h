@@ -101,12 +101,12 @@ namespace Belle2 {
                             unsigned ix_s, unsigned iy_s);
 
     /** count the number of super layers with hits
-     *  @param array of hit/no hit for all super layers */
-    unsigned short countSL(bool*);
+     *  @param superLayers array of hit/no hit for all super layers */
+    unsigned short countSL(bool* superLayers);
     /** check the short track condition
      *  (= hits in the inner super layers rather than any super layers)
-     *  @param array of hit/no hit for all super layers */
-    bool shortTrack(bool*);
+     *  @param superLayers array of hit/no hit for all super layers */
+    bool shortTrack(bool* superLayers);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */

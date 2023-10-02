@@ -355,7 +355,7 @@ namespace Belle2 {
     /**
      *  Get the list of associated track segments with a hit
      *
-     *  @param index      index of the CDC hit in question
+     *  @param iHit       index of the CDC hit in question
      *
      *  @return           list of TS ID (0-15) containing the hit
      */
@@ -393,9 +393,8 @@ namespace Belle2 {
     /**
      *  Pack the merger output data structure to TSF input vector
      *
-     *  @param field   type of output to be packed
-     *
-     *  @param width   bit width of a single output unit
+     *  template with field as the type of output to be packed and
+     *  width as the bit width of a single output unit
      *
      *  @param rInput  iterator of the TSF input vector
      *

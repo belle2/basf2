@@ -15,7 +15,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <genfit/MeasuredStateOnPlane.h>
-#include <TVector3.h>
 //#include <limits>
 #include <vector>
 #include <math.h>

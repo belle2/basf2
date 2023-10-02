@@ -188,7 +188,7 @@ if __name__ == "__main__":
     b2.B2INFO(f"{len(rundata)} runs in total")
 
     if args.exp is not None:
-        rundata = set(e for e in rundata if e[0] == args.exp)
+        rundata = {e for e in rundata if e[0] == args.exp}
         b2.B2INFO(f"{len(rundata)} runs for experiment {args.exp}")
 
     # and subtract all excluded runs from that

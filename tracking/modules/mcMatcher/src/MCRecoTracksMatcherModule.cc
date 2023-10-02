@@ -641,7 +641,6 @@ void MCRecoTracksMatcherModule::event()
     // regardless whether the charge is correctly reconstructed or not
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
     prRecoTrack->addRelationTo(mcParticle, -purity);
-    ++nClones;
 
     // Add the mc matching relation to the mc particle
     B2DEBUG(23, "Stored PRTrack " << prId << " as clone.");
@@ -654,7 +653,7 @@ void MCRecoTracksMatcherModule::event()
   B2DEBUG(23, "Number of matches " << nMatched);
   B2DEBUG(23, "Number of wrongCharge " << nWrongCharge);
   B2DEBUG(23, "Number of clones " << nClones);
-  B2DEBUG(23, "Number of clones wrongCharge" << nClonesWrongCharge);
+  B2DEBUG(23, "Number of clones wrongCharge " << nClonesWrongCharge);
   B2DEBUG(23, "Number of bkg " << nBackground);
   B2DEBUG(23, "Number of ghost " << nGhost);
 
@@ -712,10 +711,10 @@ void MCRecoTracksMatcherModule::event()
     // No related pattern recognition track
     // Do not create a relation.
     B2DEBUG(23, "mcId " << mcId << " is missing. No relation created.");
-    B2DEBUG(23, "is Primary" << m_MCRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
+    B2DEBUG(23, "is Primary " << m_MCRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
     B2DEBUG(23, "best prId " << prId << " with purity " << mostPureMCId_for_prId.purity << " -> " << mostPureMCId);
     B2DEBUG(23, "MC Total ndf " << totalNDF_by_mcId[mcId]);
-    B2DEBUG(23, "MC Total weight" << totalWeight_by_mcId[mcId]);
+    B2DEBUG(23, "MC Total weight " << totalWeight_by_mcId[mcId]);
     B2DEBUG(23, "MC Overlap ndf\n " << confusionMatrix.col(mcId).transpose());
     B2DEBUG(23, "MC Overlap weight\n " << weightedConfusionMatrix.col(mcId).transpose());
     B2DEBUG(23, "MC Efficiencies for the track\n" << efficiencyMatrix.col(mcId).transpose());

@@ -144,7 +144,7 @@ def getArgumentParser():
         metavar="OutputFilename",
         help=(
             "Save a markdown table in a format that can be copied into "
-            "pull request comments."
+            "merge request comments."
         ),
     )
     OutputGroup.add_argument(
@@ -1169,9 +1169,9 @@ def printToScreen(allSkimStats, samples):
         print(table)
 
     print(
-        "\nNote: If you are producing these stats for a skim pull request, please\n"
+        "\nNote: If you are producing these stats for a skim merge request, please\n"
         "    consider using the `--markdown` option to produce a Markdown table\n"
-        "    which BitBucket will display nicely."
+        "    which GitLab will display nicely."
     )
 
 
@@ -1247,7 +1247,7 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
 
 def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
     """Format the skim performance statistics as a markdown table, which will be
-    formatted nicely if pasted into a pull request on BitBucket.
+    formatted nicely if pasted into a merge request on GitLab.
 
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
@@ -1291,7 +1291,7 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
 
     print(
         f"Wrote tables to {OutputFilename}. This format is suitable for including "
-        "in pull request comments."
+        "in merge request comments."
     )
 
 

@@ -12,7 +12,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -51,9 +51,9 @@ namespace Belle2 {
     /** Return energy */
     float getEnergy()      const { return m_Energy; }
     /** Return production vertex */
-    TVector3 getProductionVertex()  const { return TVector3(m_vtx[0], m_vtx[1], m_vtx[2]); }
+    ROOT::Math::XYZVector getProductionVertex()  const { return ROOT::Math::XYZVector(m_vtx[0], m_vtx[1], m_vtx[2]); }
     /** Return momentum */
-    TVector3 getMomentum() const { return TVector3(m_mom[0], m_mom[1], m_mom[2]); }
+    ROOT::Math::XYZVector getMomentum() const { return ROOT::Math::XYZVector(m_mom[0], m_mom[1], m_mom[2]); }
     /** Return production array as float array */
     const float* getProductionVertexArray() const { return m_vtx; }
     /** Return momentum as float array */

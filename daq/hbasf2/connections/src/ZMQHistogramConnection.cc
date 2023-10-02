@@ -13,6 +13,7 @@
 
 #include <TH1.h>
 #include <TBufferJSON.h>
+#include <TMemFile.h>
 
 #include <lz4.h>
 

@@ -261,6 +261,11 @@ void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
   s_canvasUpdatedList[name] = updated;
 }
 
+void DQMHistAnalysisModule::UpdateCanvas(TCanvas* c, bool updated)
+{
+  if (c) UpdateCanvas(c->GetName(), updated);
+}
+
 void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
 {
   s_runType = "";
@@ -411,4 +416,48 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
     m_epicsNameToChID.clear();
   }
 #endif
+}
+
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(std::string name, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                                      double& upperAlarm)
+{
+  return requestLimitsFromEpicsPVs(getEpicsPVChID(name), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
+}
+
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(int index, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                                      double& upperAlarm)
+{
+  return requestLimitsFromEpicsPVs(getEpicsPVChID(index), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
+}
+
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                                      double& upperAlarm)
+{
+  // get warn and error limit only if pv exists
+  // overwrite only if limit is defined (not NaN)
+  // user should initilize with NaN before calling, unless
+  // some "default" values should be set otherwise
+  if (pv != nullptr) {
+    struct dbr_ctrl_double tPvData;
+    auto r = ca_get(DBR_CTRL_DOUBLE, pv, &tPvData);
+    if (r == ECA_NORMAL) r = ca_pend_io(5.0); // TODO << why is this needed?
+    if (r == ECA_NORMAL) {
+      if (!std::isnan(tPvData.lower_alarm_limit)) {
+        lowerAlarm = tPvData.lower_alarm_limit;
+      }
+      if (!std::isnan(tPvData.lower_warning_limit)) {
+        lowerWarn = tPvData.lower_warning_limit;
+      }
+      if (!std::isnan(tPvData.upper_warning_limit)) {
+        upperWarn = tPvData.upper_warning_limit;
+      }
+      if (!std::isnan(tPvData.upper_alarm_limit)) {
+        upperAlarm = tPvData.upper_alarm_limit;
+      }
+      return true;
+    } else {
+      SEVCHK(r, "ca_get or ca_pend_io failure");
+    }
+  }
+  return false;
 }

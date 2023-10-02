@@ -46,7 +46,8 @@ MakeMotherKFit::addTrack(const KFitTrack& p) {
 
 
 enum KFitError::ECode
-MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag) {
+MakeMotherKFit::addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q,
+                         const int flag) {
   if (e.num_row() != (int)KFitConst::kNumber7)
   {
     m_ErrorCode = KFitError::kBadMatrixSize;

@@ -20,6 +20,7 @@
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <TMD5.h>
 #include <zlib.h>
@@ -218,12 +219,18 @@ bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
 
 FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fstream()
 {
-  fs::path filename = std::tmpnam(nullptr);
-  m_filename = filename.native();
-  open(m_filename.c_str(), mode);
-  if (!is_open()) {
+  char temporaryFileName[] = "/tmp/basf2_XXXXXX";
+  int fileDescriptor = mkstemp(temporaryFileName);
+  if (fileDescriptor == -1) {
     B2ERROR("Cannot create temporary file: " << strerror(errno));
+    return;
   }
+  m_filename = temporaryFileName;
+  open(temporaryFileName, mode);
+  if (!is_open()) {
+    B2ERROR("Cannot open temporary file: " << strerror(errno));
+  }
+  ::close(fileDescriptor);
 }
 
 FileSystem::TemporaryFile::~TemporaryFile()

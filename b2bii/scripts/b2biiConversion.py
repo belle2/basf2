@@ -217,7 +217,7 @@ def parse_process_url(url):
             return [url]
         else:
             b2.B2ERROR(
-                "Could not parse url '{}': no such file or directory".format(url))
+                f"Could not parse url '{url}': no such file or directory")
             return []
 
     # regular expression to find process_event lines in html response
@@ -230,7 +230,6 @@ def parse_process_url(url):
                 for e in process_event.findall(request.content)]
     except (requests.ConnectionError, requests.HTTPError) as e:
         b2.B2ERROR(
-            "Failed to connect to '{url}': {message}".format(
-                url=url, message=str(e)))
+            f"Failed to connect to '{url}': {str(e)}")
 
     return []

@@ -27,7 +27,6 @@ namespace Belle2 {
   private:
     std::vector<EvtSocketSend*> m_socklist;
     RingBuffer* m_rbuf;
-    int m_port;
     //int m_force_exit;
     int m_interval;
   };

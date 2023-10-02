@@ -1,0 +1,30 @@
+# EventType: 1210012002
+# Descriptor: [B+ -> rho+ pi0 pi0]cc
+# NickName: B+_rho+pi0pi0
+# Documentation: 3 Body charmless process 
+# Reponsible: Yu Nakazawa
+# Email: nakancyo@post.kek.jp
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 22/08/2023
+#
+#
+#
+Decay Upsilon(4S)
+0.5   B+sig   B-      VSS;
+0.5   B+      B-sig   VSS;
+Enddecay
+###
+###
+Decay B+sig
+1.0  rho+ pi0 pi0        PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+###
+###
+###
+###
+###
+End
+

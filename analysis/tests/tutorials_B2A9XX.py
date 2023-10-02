@@ -14,7 +14,7 @@ import subprocess
 import unittest
 import glob
 from basf2 import find_file
-from b2test_utils import clean_working_directory, configure_logging_for_tests
+from b2test_utils import clean_working_directory, configure_logging_for_tests, skip_test
 from b2test_utils_analysis import scanTTree
 
 
@@ -60,5 +60,6 @@ class TutorialsTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    skip_test("Temporarily skip test of B2A9XX tutorials to update input file.")
     with clean_working_directory():
         unittest.main()

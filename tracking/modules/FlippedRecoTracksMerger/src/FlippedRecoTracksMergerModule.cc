@@ -58,10 +58,12 @@ void FlippedRecoTracksMergerModule::event()
   // loop all the recoTracks
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
 
-    // check if the recoTracks was fitted successfully
+    // check if the recoTracks was fitted successfully (WARNING: only the latest fit is checked)
     if (not recoTrack.wasFitSuccessful()) {
       continue;
     }
+
+
     // get the related Belle2::Tracks
     Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
 
@@ -79,6 +81,15 @@ void FlippedRecoTracksMergerModule::event()
     RecoTrack* flippedRecoTrack =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
     if (!flippedRecoTrack) continue;
+
+    // The algorithm needs to copy the genfit::Track at the end. This can only be done if it passes
+    // the consistency check. So discard those tracks in the first place.
+    try {
+      flippedRecoTrack->getGenfitTrack().checkConsistency();
+    } catch (...) {
+      B2WARNING("Consistency check of genfit track failed. Will skip this track candidate.");
+      continue;
+    }
 
     // get the tracksflipped
     Track* trackFlipped = flippedRecoTrack->getRelatedFrom<Belle2::Track>("Tracks_flipped");

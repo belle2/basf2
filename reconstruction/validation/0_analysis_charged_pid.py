@@ -21,7 +21,7 @@
 
 import basf2
 import ROOT
-from modularAnalysis import cutAndCopyList, inputMdst, fillParticleList, variablesToHistogram, printList
+from modularAnalysis import cutAndCopyList, inputMdst, fillParticleList, variablesToHistogram
 from reconstruction import add_reconstruction
 from variables import variables
 
@@ -33,20 +33,15 @@ GLOBAL_ID_NAMES = ['electronID', 'muonID', 'pionID', 'kaonID', 'protonID']
 PARTICLE_TYPES = ['e', 'mu', 'pi', 'K', 'p']
 PARTICLE_PDGS = [11, 13, 211, 321, 2212]
 DETECTORS = ['SVD', 'CDC', 'TOP', 'ARICH', 'ECL', 'KLM']
-DETECTOR_EXPERTS = ["sviatoslav.bilokin@desy.de",  # SVD
-                    "sviatoslav.bilokin@desy.de",  # CDC
-                    "sviatoslav.bilokin@desy.de",  # TOP
-                    "sviatoslav.bilokin@desy.de",  # ARICH
-                    "sviatoslav.bilokin@desy.de",  # ECL
-                    "sviatoslav.bilokin@desy.de"  # KLM
+DETECTOR_EXPERTS = ["luigi.corona@pi.infn.it",  # SVD
+                    "alexander.glazov@desy.de",  # CDC
+                    "marko.staric@ijs.si",  # TOP
+                    "luka.santelj@ijs.si",  # ARICH
+                    "torben.ferber@kit.edu",  # ECL
+                    "piilonen@vt.edu"  # KLM
                     ]
 
-PID_EXPERTS = ["sviatoslav.bilokin@desy.de",  # e
-               "sviatoslav.bilokin@desy.de",  # mu
-               "sviatoslav.bilokin@desy.de",  # pi
-               "sviatoslav.bilokin@desy.de",  # K
-               "sviatoslav.bilokin@desy.de"  # p
-               ]
+PID_EXPERT = "kenta.uno@kek.jp and alessandro.gaz@pd.infn.it"
 
 THRESHOLDS = [0.2, 0.8]
 KIN_VAR_NAMES = ['p', 'cosTheta']
@@ -58,14 +53,8 @@ def get_expert(pid: str, for_detector: bool = False):
     """
     Returns the email of expert for detector or PID.
     """
-    tup = (PARTICLE_TYPES, PID_EXPERTS)
-    if for_detector:
-        tup = (DETECTORS, DETECTOR_EXPERTS)
-    for det_or_part, exp in zip(*tup):
-        if for_detector:
-            if f'_{det_or_part}' in pid:
-                return exp
-        elif pid.startswith(det_or_part.lower()):
+    for det, exp in zip(DETECTORS, DETECTOR_EXPERTS):
+        if f'_{det}' in pid:
             return exp
     return "sviatoslav.bilokin@desy.de"
 
@@ -84,7 +73,6 @@ def add_aliases():
 
 
 DETECTOR_PIDS = add_aliases()
-print(DETECTOR_PIDS)
 
 
 def run_b2analysis():
@@ -98,12 +86,10 @@ def run_b2analysis():
 
     for pid, particle in zip(GLOBAL_ID_NAMES, PARTICLE_TYPES):
         fillParticleList(f'{particle}+:total', track_quality_cuts, path=main)
-        printList(f'{particle}+:total', False, path=main)
         # Efficiency cuts:
         for cut_val in THRESHOLDS:
             cutAndCopyList(f'{particle}+:cut0{int(cut_val*10)}', f'{particle}+:total',
                            f'{pid} > {cut_val}', path=main)
-            printList(f'{particle}+:cut0{int(cut_val*10)}', False, path=main)
             for var, bin_tuple in zip(KIN_VAR_NAMES, KIN_VAR_BINS):
                 variablesToHistogram(f'{particle}+:cut0{int(cut_val*10)}',
                                      (var, *bin_tuple),
@@ -116,7 +102,6 @@ def run_b2analysis():
                     continue
                 cutAndCopyList(f'{particle}+:fake_{fake_pid}_cut0{int(cut_val*10)}', f'{particle}+:total',
                                f'{fake_pid} > {cut_val}', path=main)
-                printList(f'{particle}+:fake_{fake_pid}_cut0{int(cut_val*10)}', False, path=main)
                 for var, bin_tuple in zip(KIN_VAR_NAMES, KIN_VAR_BINS):
                     variablesToHistogram(f'{particle}+:fake_{fake_pid}_cut0{int(cut_val*10)}',
                                          (var, *bin_tuple),
@@ -161,11 +146,9 @@ def add_global_plots():
     root_file = ROOT.TFile(GLOBALID_OUTPUT_FILENAME, "UPDATE")
     for pid, particle in zip(GLOBAL_ID_NAMES, PARTICLE_TYPES):
         for var in KIN_VAR_NAMES:
-            print(f'total_{particle}_{var}')
             total_obs_th1 = root_file.Get(f'total_{particle}_{var}').Get(var)
             for cut_val in THRESHOLDS:
                 eff_cut_obs_th1 = root_file.Get(f'cut0{int(cut_val*10)}_{particle}_{pid}_{var}').Get(var)
-                eff_cut_obs_th1.Print()
                 teff = ROOT.TEfficiency(eff_cut_obs_th1, total_obs_th1)
                 teff.SetName(f'cut0{int(cut_val*10)}_{particle}_{pid}_{var}_eff')
                 teff.SetTitle(f'Efficiency for {pid} > {cut_val} for {particle}; {var}; Efficiency')
@@ -173,7 +156,7 @@ def add_global_plots():
                     ROOT.TNamed("Description", f"Efficiency plot of {pid} for {particle}")
                 )
                 teff.GetListOfFunctions().Add(ROOT.TNamed("Check", "Efficiency should not decrease"))
-                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(pid)))
+                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", PID_EXPERT))
                 options = DEFAULT_OPTIONS
                 if cut_val == THRESHOLDS[-1]:
                     options += " ,shifter"
@@ -182,9 +165,7 @@ def add_global_plots():
                 for fake_pid in GLOBAL_ID_NAMES:
                     if fake_pid == pid:
                         continue
-                    print(f'fake_cut0{int(cut_val*10)}_{particle}_{fake_pid}_{var}')
                     fake_cut_obs_th1 = root_file.Get(f'fake_cut0{int(cut_val*10)}_{particle}_{fake_pid}_{var}').Get(var)
-                    fake_cut_obs_th1.Print()
                     tfake = ROOT.TEfficiency(fake_cut_obs_th1, total_obs_th1)
                     tfake.SetName(f'cut0{int(cut_val*10)}_{particle}_{fake_pid}_{var}_fake')
                     tfake.SetTitle(f'Fake rate for {fake_pid} > {cut_val} for {particle}; {var}; Fake rate')
@@ -192,7 +173,7 @@ def add_global_plots():
                         ROOT.TNamed("Description", f"Fake rate plot of {fake_pid} for {particle}")
                     )
                     tfake.GetListOfFunctions().Add(ROOT.TNamed("Check", "Fake rates should not increase"))
-                    tfake.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(pid)))
+                    tfake.GetListOfFunctions().Add(ROOT.TNamed("Contact", PID_EXPERT))
                     tfake.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", DEFAULT_OPTIONS))
                     tfake.Write()
     ROOT.TNamed(
@@ -227,7 +208,7 @@ def add_detector_plots():
                     ROOT.TNamed("Description", f"Efficiency plot of {det_pid_var} for {particle}")
                 )
                 teff.GetListOfFunctions().Add(ROOT.TNamed("Check", "Efficiency should not decrease"))
-                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(det_pid_var, for_detector=True)))
+                teff.GetListOfFunctions().Add(ROOT.TNamed("Contact", get_expert(det_pid_var)))
                 # Only for experts:
                 teff.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", DEFAULT_OPTIONS))
                 teff.Write()

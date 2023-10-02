@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <daq/rfarm/manager/SharedMem.h>
+#include <daq/dqm/DqmSharedMem.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"
@@ -41,7 +41,7 @@ namespace Belle2 {
     int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& nobjs);
 
   private:
-    SharedMem* m_shm;
+    DqmSharedMem* m_shm;
     TMemFile* m_memfile;
     char* m_buf;
     std::string m_name;

@@ -118,8 +118,8 @@ from sklearn import datasets
 from sklearn.utils import shuffle
 import numpy as np
 
-boston = datasets.load_boston()
-x, y = shuffle(boston.data, boston.target, random_state=13)
+housing = datasets.fetch_california_housing()
+x, y = shuffle(housing.data, housing.target, random_state=13)
 x = x.astype(np.float64)
 
 offset = int(x.shape[0] * 0.9)

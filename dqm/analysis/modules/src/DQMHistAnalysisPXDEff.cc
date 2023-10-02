@@ -75,18 +75,20 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   int nu = 1;//If this does not get overwritten, the histograms will anyway never contain anything useful
   int nv = 1;
-  //Have been promised that all modules have the same number of pixels, so just take from the first one
   if (m_PXDModules.size() == 0) {
-    //This could as well be a B2FATAL, the module won't do anything useful if this happens
+    // This could as well be a B2FATAL, the module won't do anything useful if this happens
     B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
     std::vector <string> mod = {
       "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
       "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
-      "2.4.1", "2.4.2", "2.5.1", "2.5.2"
+      "2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.3.1", "2.3.2", "2.4.1", "2.4.2",
+      "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
+      "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
     for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
     // set some default size to nu, nv?
   } else {
+    // Have been promised that all modules have the same number of pixels, so just take from the first one
     VXD::SensorInfoBase cellGetInfo = geo.getSensorInfo(m_PXDModules[0]);
     nu = cellGetInfo.getUCells();
     nv = cellGetInfo.getVCells();
@@ -284,6 +286,8 @@ void DQMHistAnalysisPXDEffModule::event()
   m_hOuterMap->Draw("colz");
   m_cOuterMap->Modified();
   m_cOuterMap->Update();
+  UpdateCanvas(m_cInnerMap->GetName());
+  UpdateCanvas(m_cOuterMap->GetName());
 
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
@@ -437,6 +441,7 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hErrorLine->Draw("same,hist");
     }
 
+    UpdateCanvas(m_cEffAll->GetName());
     m_cEffAll->Modified();
     m_cEffAll->Update();
   }
@@ -531,6 +536,7 @@ void DQMHistAnalysisPXDEffModule::event()
     m_hWarnLine->Draw("same,hist");
     m_hErrorLine->Draw("same,hist");
   }
+  UpdateCanvas(m_cEffAllUpdate->GetName());
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();
 

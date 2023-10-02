@@ -66,7 +66,7 @@ namespace Belle2 {
 
     // Histograms
 
-    m_BoolEvtMonitor = new TH1D("BoolEvtMonitor", "Event desynchronization monitoring", 2, -0.5, 1.5);
+    m_BoolEvtMonitor = new TH1D("BoolEvtMonitor", "Event synchronization", 2, -0.5, 1.5);
     m_BoolEvtMonitor->GetYaxis()->SetTitle("number of digits");
     m_BoolEvtMonitor->GetXaxis()->SetBinLabel(1, "synchronized");
     m_BoolEvtMonitor->GetXaxis()->SetBinLabel(2, "de-synchronized");
@@ -74,7 +74,7 @@ namespace Belle2 {
     m_BoolEvtMonitor->GetXaxis()->SetAlphanumeric();
     m_BoolEvtMonitor->SetMinimum(0);
 
-    m_window_vs_slot = new TH2F("window_vs_slot", "Distribution of hits: raw timing", 16, 0.5, 16.5, 512, 0, 512);
+    m_window_vs_slot = new TH2F("window_vs_slot", "Asic windows", 16, 0.5, 16.5, 512, 0, 512);
     m_window_vs_slot->SetXTitle("slot number");
     m_window_vs_slot->SetYTitle("window number w.r.t reference window");
     m_window_vs_slot->SetStats(kFALSE);
@@ -83,9 +83,9 @@ namespace Belle2 {
 
     int nbinsT0 = 75;
     double rangeT0 = nbinsT0 * bunchTimeSep;
-    m_eventT0 = new TH1F("eventT0", "reconstructed event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
+    m_eventT0 = new TH1F("eventT0", "Event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
 
-    m_bunchOffset = new TH1F("bunchOffset", "Reconstructed bunch: current offset", 100, -bunchTimeSep / 2, bunchTimeSep / 2);
+    m_bunchOffset = new TH1F("bunchOffset", "Bunch offset", 100, -bunchTimeSep / 2, bunchTimeSep / 2);
     m_bunchOffset->SetXTitle("offset [ns]");
     m_bunchOffset->SetYTitle("events per bin");
     m_bunchOffset->SetMinimum(0);
@@ -93,12 +93,10 @@ namespace Belle2 {
     m_time = new TH1F("goodHitTimes", "Time distribution of good hits", 1000, -20, 80);
     m_time->SetXTitle("time [ns]");
     m_time->SetYTitle("hits per bin");
-    m_time->SetMinimum(0);
 
     m_timeBG = new TH1F("goodHitTimesBG", "Time distribution of good hits (background)", 1000, -20, 80);
     m_timeBG->SetXTitle("time [ns]");
     m_timeBG->SetYTitle("hits per bin");
-    m_timeBG->SetMinimum(0);
 
     m_signalHits = new TProfile("signalHits", "Number of good hits per track in [0, 50] ns", 16, 0.5, 16.5, 0, 1000);
     m_signalHits->SetXTitle("slot number");
@@ -118,7 +116,7 @@ namespace Belle2 {
     m_goodHitsPerEventAll->GetXaxis()->SetTitle("hits per event");
     m_goodHitsPerEventAll->GetYaxis()->SetTitle("entries per bin");
 
-    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of bad hits per event", nbinsHits, 0, xmaxHits);
+    m_badHitsPerEventAll = new TH1F("badHitsPerEventAll", "Number of junk hits per event", nbinsHits, 0, xmaxHits);
     m_badHitsPerEventAll->GetXaxis()->SetTitle("hits per event");
     m_badHitsPerEventAll->GetYaxis()->SetTitle("entries per bin");
 
@@ -129,7 +127,7 @@ namespace Belle2 {
     m_goodTDCAll->SetXTitle("raw time [samples]");
     m_goodTDCAll->SetYTitle("hits per sample");
 
-    m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of bad hits", nbinsTDC, xminTDC, xmaxTDC);
+    m_badTDCAll = new TH1F("badTDCAll", "Raw time distribution of junk hits", nbinsTDC, xminTDC, xmaxTDC);
     m_badTDCAll->SetXTitle("raw time [samples]");
     m_badTDCAll->SetYTitle("hits per sample");
 
@@ -145,7 +143,7 @@ namespace Belle2 {
       TH2F* h2 = 0;
 
       name = str(format("window_vs_asic_%1%") % (module));
-      title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
+      title = str(format("Asic windows for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 512, 0, 512);
       h2->SetStats(kFALSE);
       h2->SetXTitle("ASIC number");
@@ -163,7 +161,7 @@ namespace Belle2 {
       m_goodHitsXY.push_back(h2);
 
       name = str(format("bad_hits_xy_%1%") % (module));
-      title = str(format("Distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Distribution of junk hits for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("pixel column");
@@ -181,7 +179,7 @@ namespace Belle2 {
       m_goodHitsAsics.push_back(h2);
 
       name = str(format("bad_hits_asics_%1%") % (module));
-      title = str(format("Distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Distribution of junk hits for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
       h2->SetStats(kFALSE);
       h2->GetXaxis()->SetTitle("ASIC number");
@@ -197,26 +195,24 @@ namespace Belle2 {
       m_goodTDC.push_back(h1);
 
       name = str(format("bad_TDC_%1%") % (module));
-      title = str(format("Raw time distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Raw time distribution of junk hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), nbinsTDC, xminTDC, xmaxTDC);
       h1->GetXaxis()->SetTitle("raw time [samples]");
       h1->GetYaxis()->SetTitle("hits per sample");
       m_badTDC.push_back(h1);
 
       name = str(format("good_timing_%1%") % (module));
-      title = str(format("Timing distribution of good hits for slot #%1%") % (module));
+      title = str(format("Time distribution of good hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 200, -20, 80);
       h1->GetXaxis()->SetTitle("time [ns]");
       h1->GetYaxis()->SetTitle("hits per time bin");
-      h1->SetMinimum(0);
       m_goodTiming.push_back(h1);
 
       name = str(format("good_timing_%1%BG") % (module));
-      title = str(format("Timing distribution of good hits (background) for slot #%1%") % (module));
+      title = str(format("Time distribution of good hits (background) for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 200, -20, 80);
       h1->GetXaxis()->SetTitle("time [ns]");
       h1->GetYaxis()->SetTitle("hits per time bin");
-      h1->SetMinimum(0);
       m_goodTimingBG.push_back(h1);
 
       name = str(format("good_channel_hits_%1%") % (module));
@@ -229,7 +225,7 @@ namespace Belle2 {
       m_goodChannelHits.push_back(h1);
 
       name = str(format("bad_channel_hits_%1%") % (module));
-      title = str(format("Distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Distribution of junk hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->GetXaxis()->SetTitle("channel number");
       h1->GetYaxis()->SetTitle("hits per channel");

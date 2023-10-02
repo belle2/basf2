@@ -194,7 +194,7 @@ with open("bdt_regressor.pickle", "wb") as bdt_regressor_file:
       }
 
       double mean_square_error = squareSum / nRowsTestX;
-      EXPECT_GT(7, mean_square_error);
+      EXPECT_GT(1, mean_square_error);
 
     } catch (...) {
       PyErr_Print();

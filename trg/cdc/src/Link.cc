@@ -37,8 +37,8 @@ namespace Belle2 {
   unsigned* TRGCDCLink::_nHitsSL = 0;
   vector<TCLink*> TRGCDCLink::_all;
 
-  TRGCDCLink::TRGCDCLink(TCTrack* t,
-                         const Belle2::TCCHit* h,
+  TRGCDCLink::TRGCDCLink(TRGCDCTrack* t,
+                         const TRGCDCCellHit* h,
                          const HepGeom::Point3D<double>& p)
     : _track(t),
       _hit(h),

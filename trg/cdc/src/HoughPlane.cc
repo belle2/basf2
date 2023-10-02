@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   TRGCDCHoughPlane::TRGCDCHoughPlane(const std::string& name,
-                                     const TCHTransformation& trans,
+                                     const TRGCDCHoughTransformation& trans,
                                      unsigned nX,
                                      float xMin,
                                      float xMax,

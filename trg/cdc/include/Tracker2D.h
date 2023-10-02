@@ -108,14 +108,14 @@ namespace Belle2 {
 
   inline
   unsigned
-  TCTracker2D::nTSF(void)
+  TRGCDCTracker2D::nTSF(void)
   {
     return 160 + 192 + 256 + 320 + 384;
   }
 
   inline
   unsigned
-  TCTracker2D::nTSF(unsigned i)
+  TRGCDCTracker2D::nTSF(unsigned i)
   {
     if (i == 0)
       return 160;

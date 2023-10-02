@@ -21,7 +21,7 @@ using namespace std;
 namespace Belle2 {
 
   TRGCDCHoughPlaneBoolean::TRGCDCHoughPlaneBoolean(const std::string& name,
-                                                   const TCHTransformation& trans,
+                                                   const TRGCDCHoughTransformation& trans,
                                                    unsigned nX,
                                                    float xMin,
                                                    float xMax,

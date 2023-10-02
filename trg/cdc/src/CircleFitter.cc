@@ -23,17 +23,17 @@ using namespace std;
 
 namespace Belle2 {
 
-  TCCFitter::TCCFitter(const std::string& name)
+  TRGCDCCircleFitter::TRGCDCCircleFitter(const std::string& name)
     : TCFitter(name), _charge(0.), _radius(0.), _center(Point3D(0., 0., 0.))
   {
   }
 
-  TCCFitter::~TCCFitter()
+  TRGCDCCircleFitter::~TRGCDCCircleFitter()
   {
   }
 
   int
-  TCCFitter::fit(TCTBase& t) const
+  TRGCDCCircleFitter::fit(TRGCDCTrackBase& t) const
   {
 
     TRGDebug::enterStage("TCCFitter::fit");

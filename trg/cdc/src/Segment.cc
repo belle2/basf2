@@ -147,8 +147,8 @@ namespace Belle2 {
   }
 
   void
-  TCSegment::simulate(bool clockSimulation, bool logicLUTFlag,
-                      const string& cdcCollectionName, const string& tsCollectionName)
+  TRGCDCSegment::simulate(bool clockSimulation, bool logicLUTFlag,
+                          const std::string& cdcCollectionName, const std::string& tsCollectionName)
   {
     //...Get wire informtion for speed-up...
     unsigned nHits = 0;
@@ -169,7 +169,7 @@ namespace Belle2 {
   }
 
   void
-  TCSegment::simulateWithoutClock(bool logicLUTFlag)
+  TRGCDCSegment::simulateWithoutClock(bool logicLUTFlag)
   {
     TRGDebug::enterStage("TS sim");
 
@@ -284,7 +284,7 @@ namespace Belle2 {
   }
 
   void
-  TCSegment::simulateWithClock(string cdcCollectionName, string tsCollectionName)
+  TRGCDCSegment::simulateWithClock(string cdcCollectionName, string tsCollectionName)
   {
     // check LUT pattern without clock -> if there is no hit, skip clock simulation
     if (m_TSLUT->getValue(lutPattern()) == 0) return;
@@ -380,7 +380,7 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::fastestTime() const
+  TRGCDCSegment::fastestTime() const
   {
     if ((LUT()->getValue(lutPattern()))) {
       float tmpFastTime = 9999;
@@ -398,7 +398,7 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::fastestTime(int clk0) const
+  TRGCDCSegment::fastestTime(int clk0) const
   {
     int fastest = 9999;
     for (unsigned iw = 0; iw < _wires.size(); ++iw) {
@@ -416,7 +416,7 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::foundTime() const
+  TRGCDCSegment::foundTime() const
   {
     if ((LUT()->getValue(lutPattern()))) {
       float tmpFoundTime[5] = {9999, 9999, 9999, 9999, 9999};
@@ -456,7 +456,7 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::priorityTime() const
+  TRGCDCSegment::priorityTime() const
   {
     const TRGSignal& prioritySignal = priority().signal();
     if (prioritySignal.active()) {
@@ -466,7 +466,7 @@ namespace Belle2 {
   }
 
   int
-  TCSegment::priorityPosition() const
+  TRGCDCSegment::priorityPosition() const
   {
     if (center().signal().active()) {
       return 3;
@@ -492,7 +492,7 @@ namespace Belle2 {
   }
 
   int
-  TCSegment::priorityPosition(int clk0, int clk1) const
+  TRGCDCSegment::priorityPosition(int clk0, int clk1) const
   {
     if (center().signal().active(clk0, clk1)) {
       return 3;
@@ -518,7 +518,7 @@ namespace Belle2 {
   }
 
   const TRGCDCWire&
-  TCSegment::priority() const
+  TRGCDCSegment::priority() const
   {
     int priority = priorityPosition();
     int offset = (_wires.size() == 15) ? 0 : 5;

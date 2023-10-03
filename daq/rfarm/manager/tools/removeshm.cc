@@ -15,7 +15,6 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-using namespace Belle2;
 using namespace std;
 
 int main(int argc, char** argv)

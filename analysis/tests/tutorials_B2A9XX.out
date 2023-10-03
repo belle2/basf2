@@ -61,13 +61,13 @@ TBranch: p, 2.86
 TBranch: E, 2.86
 TBranch: theta, 0.4971
 TBranch: phi, 3.042
-TBranch: Weight, nan
-TBranch: TotalErrUp, nan
-TBranch: TotalErrDown, nan
-TBranch: StatErrUp, nan
-TBranch: StatErrDown, nan
-TBranch: SystErrUp, nan
-TBranch: SystErrDown, nan
+TBranch: Weight, 1.002
+TBranch: TotalErrUp, 0.008917
+TBranch: TotalErrDown, 0.01316
+TBranch: StatErrUp, 0.007632
+TBranch: StatErrDown, 0.007585
+TBranch: SystErrUp, 0.004612
+TBranch: SystErrDown, 0.01075
 TFile: B2A908-ApplyLIDWeights.root
 TTree: jpsimumu
 TBranch: __experiment__, 0

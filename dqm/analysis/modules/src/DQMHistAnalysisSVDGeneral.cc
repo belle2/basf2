@@ -245,23 +245,28 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   }
 
   //Retrieve limits from EPICS
-  requestLimitsFromEpicsPVs("occLimits", m_occError, m_occEmpty, m_occWarning,  m_occError);
-  requestLimitsFromEpicsPVs("occOnlineLimits", m_onlineOccError, m_onlineOccEmpty, m_onlineOccWarning,  m_onlineOccError);
+  double oocErrorLoOff = 0.;
+  double oocErrorLoOn = 0.;
+  requestLimitsFromEpicsPVs("occLimits", oocErrorLoOff, m_occEmpty, m_occWarning,  m_occError);
+  requestLimitsFromEpicsPVs("occOnlineLimits", oocErrorLoOn, m_onlineOccEmpty, m_onlineOccWarning,  m_onlineOccError);
 
   B2INFO(" SVD occupancy thresholds taken from EPICS configuration file:");
   B2INFO("  ONLINE OCCUPANCY: empty < " << m_onlineOccEmpty << " normal < " << m_onlineOccWarning << " warning < " << m_onlineOccError
          <<
          " < error");
-  B2INFO("  OFFLINE OCCUPANCY: empty < " << m_occEmpty << " normal < " << m_occWarning << " warning < " << m_occError << " < error");
+  B2INFO("  OFFLINE OCCUPANCY: empty < " << m_occEmpty << " normal < " << m_occWarning << " warning < " << m_occError <<
+         " < error with minimum statistics of " << m_occEmpty);
 
   double timeWarnUp = 0.;
-  requestLimitsFromEpicsPVs("clusTimeOnTrkLimits", m_timeThreshold, m_statThreshold, timeWarnUp,  m_timeThreshold);
+  double timeErrorLo = 0.;
+  requestLimitsFromEpicsPVs("clusTimeOnTrkLimits", timeErrorLo, m_statThreshold, timeWarnUp,  m_timeThreshold);
   B2INFO(" SVD cluster time on track threshold taken from EPICS configuration file:");
   B2INFO("  CLUSTER TIME ON TRACK: error > " << m_timeThreshold << " ns with minimum statistics of " << m_statThreshold);
 
   double unpackWarnLo = 0.;
   double unpackWarnUp = 0.;
-  requestLimitsFromEpicsPVs("UnpackError", m_unpackError, unpackWarnLo, unpackWarnUp,  m_unpackError);
+  double unpackErrorLo = 0.;
+  requestLimitsFromEpicsPVs("UnpackError", unpackErrorLo, unpackWarnLo, unpackWarnUp,  m_unpackError);
   B2INFO(" SVD unpack error threshold taken from EPICS configuration file:");
   B2INFO("  DATA UNPACK: error > " << m_unpackError);
 

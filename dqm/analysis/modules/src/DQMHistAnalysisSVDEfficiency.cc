@@ -150,10 +150,12 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
   }
 
   //Retrieve limits from EPICS
-  requestLimitsFromEpicsPVs("effLimits", m_effError, m_statThreshold, m_effWarning,  m_effError);
+  double effErrorLo = 0.;
+  requestLimitsFromEpicsPVs("effLimits", effErrorLo, m_statThreshold, m_effWarning,  m_effError);
 
   B2INFO(" SVD efficiency thresholds taken from EPICS configuration file:");
-  B2INFO("  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error");
+  B2INFO("  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
+         m_statThreshold);
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()

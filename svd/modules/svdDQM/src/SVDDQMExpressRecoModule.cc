@@ -786,8 +786,8 @@ void SVDDQMExpressRecoModule::beginRun()
     if (obj->InheritsFrom("TH1")) {
       if (((TString)obj->GetTitle()).Contains(runID) == false) {
         ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-        ((TH1F*)obj)->Reset();
       }
+      ((TH1F*)obj)->Reset();
     }
 }
 

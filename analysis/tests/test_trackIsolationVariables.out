@@ -3560,7 +3560,7 @@
 [INFO]      o) pi_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.993889
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_S0:merged (0+9)
+[INFO]  ParticleList : K_S0:merged (0+10)
 [INFO]  - 160 = 310[0]
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 0.0646942
@@ -3764,7 +3764,41 @@
 [INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 22.2751
 [INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
 [INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.986105
-[INFO]  - 187 = 310[6]
+[INFO]  - 186 = 310[6]
+[INFO]      o) daughter indices = 41 43
+[INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
+[INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 0.0646942
+[INFO]      o) pi_0_minET2ETDist_CDC_1_pi_all_1 = 1.92551
+[INFO]      o) pi_0_minET2ETDist_CDC_2_pi_all_1 = 2.88398
+[INFO]      o) pi_0_minET2ETDist_CDC_3_pi_all_1 = 9.52478
+[INFO]      o) pi_0_minET2ETDist_CDC_4_pi_all_1 = 14.6898
+[INFO]      o) pi_0_minET2ETDist_CDC_5_pi_all_1 = 21.1402
+[INFO]      o) pi_0_minET2ETDist_CDC_6_pi_all_1 = 0.313164
+[INFO]      o) pi_0_minET2ETDist_CDC_7_pi_all_1 = 7.65649
+[INFO]      o) pi_0_minET2ETDist_CDC_8_pi_all_1 = 16.7182
+[INFO]      o) pi_0_minET2ETDist_ECL_0_pi_all_1 = 67.6136
+[INFO]      o) pi_0_minET2ETDist_ECL_1_pi_all_1 = 80.9955
+[INFO]      o) pi_0_minET2ETDist_KLM_0_pi_all_1 = 286.618
+[INFO]      o) pi_0_minET2ETDist_TOP_0_pi_all_1 = 58.5948
+[INFO]      o) pi_0_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
+[INFO]      o) pi_0_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.797881
+[INFO]      o) pi_1_minET2ETDist_ARICH_0_pi_all_1 = nan
+[INFO]      o) pi_1_minET2ETDist_CDC_0_pi_all_1 = 7.90381
+[INFO]      o) pi_1_minET2ETDist_CDC_1_pi_all_1 = 15.0135
+[INFO]      o) pi_1_minET2ETDist_CDC_2_pi_all_1 = 21.5983
+[INFO]      o) pi_1_minET2ETDist_CDC_3_pi_all_1 = 23.1585
+[INFO]      o) pi_1_minET2ETDist_CDC_4_pi_all_1 = 22.5238
+[INFO]      o) pi_1_minET2ETDist_CDC_5_pi_all_1 = 19.5847
+[INFO]      o) pi_1_minET2ETDist_CDC_6_pi_all_1 = 11.0272
+[INFO]      o) pi_1_minET2ETDist_CDC_7_pi_all_1 = 3.67913
+[INFO]      o) pi_1_minET2ETDist_CDC_8_pi_all_1 = 3.18384
+[INFO]      o) pi_1_minET2ETDist_ECL_0_pi_all_1 = 110.894
+[INFO]      o) pi_1_minET2ETDist_ECL_1_pi_all_1 = 134.826
+[INFO]      o) pi_1_minET2ETDist_KLM_0_pi_all_1 = 211.053
+[INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 22.2751
+[INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
+[INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.986105
+[INFO]  - 187 = 310[7]
 [INFO]      o) daughter indices = 42 43
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 3.7651
@@ -3798,7 +3832,7 @@
 [INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 22.2751
 [INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
 [INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.986105
-[INFO]  - 201 = 310[7]
+[INFO]  - 201 = 310[8]
 [INFO]      o) daughter indices = 44 46
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 4.77403
@@ -3832,7 +3866,7 @@
 [INFO]      o) pi_1_minET2ETDist_TOP_0_pi_all_1 = 62.4687
 [INFO]      o) pi_1_minET2ETIsoScore_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 1
 [INFO]      o) pi_1_minET2ETIsoScoreAsWeightedAvg_pi_all_1_CDC_TOP_ARICH_ECL_KLM = 0.964691
-[INFO]  - 207 = 310[8]
+[INFO]  - 207 = 310[9]
 [INFO]      o) daughter indices = 44 47
 [INFO]      o) pi_0_minET2ETDist_ARICH_0_pi_all_1 = nan
 [INFO]      o) pi_0_minET2ETDist_CDC_0_pi_all_1 = 4.77403

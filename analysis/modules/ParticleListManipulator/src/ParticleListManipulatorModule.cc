@@ -231,6 +231,8 @@ void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std:
   if (ignoreMotherFlavor) idSequence.push_back(abs(p->getPDGCode()));
   else idSequence.push_back(p->getPDGCode());
 
+  idSequence.push_back(p->getParticleSource());
+
   if (p->getNDaughters() == 0) {
     idSequence.push_back(p->getMdstArrayIndex());
   } else {

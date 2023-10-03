@@ -274,6 +274,8 @@ class graFEISaverModule(b2.Module):
         graFEI_nKaons_preFit = sum(kaons)
         graFEI_nProtons_preFit = sum(protons)
         graFEI_nLeptons_preFit = graFEI_nElectrons_preFit + graFEI_nMuons_preFit
+        graFEI_nOthers_preFit = graFEI_nCharged_preFit - \
+            (graFEI_nLeptons_preFit + graFEI_nPions_preFit + graFEI_nKaons_preFit + graFEI_nProtons_preFit)
 
         # Done once and for all for each event
         if self.storeTrueInfo and self.storeDecayTrees:
@@ -314,6 +316,7 @@ class graFEISaverModule(b2.Module):
             Ups_cand.addExtraInfo("graFEI_nKaons_preFit", graFEI_nKaons_preFit)
             Ups_cand.addExtraInfo("graFEI_nProtons_preFit", graFEI_nProtons_preFit)
             Ups_cand.addExtraInfo("graFEI_nLeptons_preFit", graFEI_nLeptons_preFit)
+            Ups_cand.addExtraInfo("graFEI_nOthers_preFit", graFEI_nOthers_preFit)
             Ups_cand.addExtraInfo("graFEI_nPhotons_postFit", np.nan)
             Ups_cand.addExtraInfo("graFEI_nCharged_postFit", np.nan)
             Ups_cand.addExtraInfo("graFEI_nElectrons_postFit", np.nan)
@@ -696,13 +699,13 @@ class graFEISaverModule(b2.Module):
             graFEI_truth_perfectMasses = int(
                 (predicted_masses.numpy() == p_masses).all()
             )  # Check if all the masses are predicted correctly
-            graFEI_truth_nPhotons = p_masses[p_masses == 6].sum()
-            graFEI_truth_nElectrons = p_masses[p_masses == 1].sum()
-            graFEI_truth_nMuons = p_masses[p_masses == 2].sum()
-            graFEI_truth_nPions = p_masses[p_masses == 3].sum()
-            graFEI_truth_nKaons = p_masses[p_masses == 4].sum()
-            graFEI_truth_nProtons = p_masses[p_masses == 5].sum()
-            graFEI_truth_nOthers = p_masses[p_masses == 0].sum()
+            graFEI_truth_nPhotons = (p_masses == 6).sum()
+            graFEI_truth_nElectrons = (p_masses == 1).sum()
+            graFEI_truth_nMuons = (p_masses == 2).sum()
+            graFEI_truth_nPions = (p_masses == 3).sum()
+            graFEI_truth_nKaons = (p_masses == 4).sum()
+            graFEI_truth_nProtons = (p_masses == 5).sum()
+            graFEI_truth_nOthers = (p_masses == 0).sum()
 
             # Get the generated B's
             genUps_list = Belle2.PyStoreObj("Upsilon(4S):MC")

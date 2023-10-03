@@ -44,14 +44,14 @@ dataset:
 output:
   # Top directory to save model, run_name as subdir and timestamp suffix
   # will be added automatically
-  path: null #/home/jcerasol/Code/baumbauen/models
-  tensorboard: null #/home/jcerasol/Code/baumbauen/models/tensorboard
+  path: null 
+  tensorboard: null
   # Give a name to this config file's series of training
   # Tensorboard logs will be saved in a subdir with that name to help 
   # organise them
   run_name: test
 train:
-  epochs: 4
+  epochs: 3
   batch_size: 128
   num_workers: 0
   # Whether to calculate class weights from dataset

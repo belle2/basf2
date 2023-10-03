@@ -67,7 +67,7 @@ struct crystalInfo {
 int main(int argc, char* argv[])
 {
   //
-  TString OutputDirectory = "";
+  TString OutputDirectory = ".";
   if (OutputDirectory == "") {
     std::cout << "Error set ouput directory" << std::endl;
     return -1;

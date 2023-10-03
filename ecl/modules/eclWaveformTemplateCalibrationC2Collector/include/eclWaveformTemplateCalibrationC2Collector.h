@@ -8,73 +8,68 @@
 
 #pragma once
 
-/* ECL headers. */
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
+//Calibration
+#include <calibration/CalibrationCollectorModule.h>
 
-/* Basf2 headers. */
-#include <framework/core/Module.h>
+//Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TFile.h>
-#include <TTree.h>
+//ECL
+#include <ecl/dbobjects/ECLCrystalCalib.h>
 
 namespace Belle2 {
 
-  /** Store information needed to calculate ECL waveform template shapes */
-  class eclWaveformCalibCollectorModule : public Module {
+  class ECLDigit;
+  class ECLDsp;
+
+  /** Calibration collector module that uses delayed Bhabha to compute coveriance matrix */
+  class eclWaveformTemplateCalibrationC2CollectorModule : public CalibrationCollectorModule {
 
   public:
 
-    /** Constructor: Sets the description, the properties and the parameters of the module */
-    eclWaveformCalibCollectorModule();
+    /** Constructor.
+     */
+    eclWaveformTemplateCalibrationC2CollectorModule();
 
-    /** Initializes the module. */
-    virtual void initialize() override;
+    /** Define histograms and read payloads from DB */
+    void prepare() override;
 
-    /** terminate */
-    virtual void terminate() override;
+    /** Load run-dep payloads */
+    void startRun() override;
 
-    /** Method is called for each event. */
-    virtual void event() override;
+    /** Select events and crystals and accumulate histograms */
+    void collect() override;
 
   private:
+    StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
+    StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    int m_selectCellID; /**< Root used to select specific CellID to save */
+    std::vector<float> m_ADCtoEnergy; /**< Crystal energy calibration constants */
 
-    std::string m_dataOutFileName;  /**< Root file name for saving the output */
-    TTree* tree{nullptr};  /**< Root tree for saving the output */
-    TFile* m_rootFile{nullptr};  /**< Root file for saving the output */
+    double m_MinEnergyThreshold; /**< Minimum energy threshold  */
+    double m_MaxEnergyThreshold; /**< Maximum energy threshold  */
+    int m_MinCellID; /**< Minimum Cell ID  */
+    int m_MaxCellID; /**< Maximum Cell ID  */
 
-    StoreArray<ECLDsp> m_eclDSPs;  /**< StoreArray ECLDsp */
+    int m_ADCFloorThreshold; /**< Used to determine if waveform hit ADC floor */
+    int m_baselineLimit; /**< Number of points to compute baseline */
+    const int m_numberofADCPoints = 31; /**< Number of ADC points in waveform */
 
-    StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
+    /** Crystal electronics. */
+    DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
 
-    std::vector<float> m_ADCtoEnergy;  /**< calibration vector from adc to energy */
+    /** Crystal energy. */
+    DBObjPtr<ECLCrystalCalib> m_CrystalEnergy{"ECLCrystalEnergy"};
 
-    StoreObjPtr<EventMetaData> m_EventMetaData; /**< Event metadata info */
+    /** Baseline noise thresholds compute in stage C1. */
+    DBObjPtr<ECLCrystalCalib> m_eclWaveformTemplateCalibrationC1MaxResLimit;
 
-    double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
-
-    double m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
-
-    bool m_includeWaveforms; /**< Flag to save ADC information. >*/
+    /** Vector to store baseline noise thresholds compute in stage C1. */
+    std::vector<float> m_maxResLimit;
 
     int m_CellID; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    int m_runNum; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    int m_expNum; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    float m_OnlineE; /**< To read ntuple branch, waveform energy measured online by FPGA > */
-    float m_OfflineE;  /**< To read ntuple branch, waveform energy measure offline with multi-template fit > */
-    float m_OfflineHadE; /**< To read ntuple branch, waveform hadron energy measure offline with multi-template fit > */
-    float m_Baseline; /**< To read ntuple branch, baseline of waveform > */
-    float m_BaselineRMS; /**< To read ntuple branch, RMS squared of waveform baseline > */
-    float m_calibConst; /**< To read ntuple branch, calibration from ADC to GeV > */
-    float m_Chi2; /**< To read ntuple branch, offline fit chi2 > */
-    float m_Chi2Save0; /**< To read ntuple branch, offline fit chi2 for fit type 0 > */
-    float m_Chi2Save1; /**< To read ntuple branch, offline fit chi2 for fit type 1 > */
-    float m_Chi2Save2; /**< To read ntuple branch, offline fit chi2 for fit type 2 > */
-    int m_FitType; /**< To read ntuple branch, offline fit type with best chi2 > */
     int m_ADC0; /**< To read ntuple branch, ith ADC value of waveform > */
     int m_ADC1; /**< To read ntuple branch, ith ADC value of waveform > */
     int m_ADC2; /**< To read ntuple branch, ith ADC value of waveform > */
@@ -108,4 +103,4 @@ namespace Belle2 {
     int m_ADC30; /**< To read ntuple branch, ith ADC value of waveform > */
 
   };
-}
+} // end Belle2 namespace

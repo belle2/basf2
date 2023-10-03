@@ -44,11 +44,12 @@ DQMHistAnalysisCDCEpicsModule::~DQMHistAnalysisCDCEpicsModule()
 
 void DQMHistAnalysisCDCEpicsModule::initialize()
 {
-  hist_adc = new TH1F("hist_adc", "hist_adc", 300, 0, 300);
-  hist_adc->SetTitle("ADC Medians of CDC boards; CDC board index; ADC medians");
+  gROOT->cd();
+  m_hist_adc = new TH1F("hist_adc", "m_hist_adc", 300, 0, 300);
+  m_hist_adc->SetTitle("ADC Medians of CDC boards; CDC board index; ADC medians");
 
-  hist_tdc = new TH1F("hist_tdc", "hist_tdc", 300, 0, 300);
-  hist_tdc->SetTitle("TDC Medians of CDC boards; CDC board index; TDC medians");
+  m_hist_tdc = new TH1F("hist_tdc", "m_hist_tdc", 300, 0, 300);
+  m_hist_tdc->SetTitle("TDC Medians of CDC boards; CDC board index; TDC medians");
 
   m_cBoards = new TCanvas("cdc_boardstatus", "cdc_boardstatus", 1000, 400);
   m_cBoards->Divide(1, 2);
@@ -82,18 +83,18 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
 void DQMHistAnalysisCDCEpicsModule::event()
 {
   //get intra-run histogram from CDC DQM module
-  delta_adc = (TH2F*)getDelta(m_histoDir, m_histoADC, 0, true); //true=only if updated
-  delta_tdc = (TH2F*)getDelta(m_histoDir, m_histoTDC, 0, true);
-  if (delta_adc == nullptr || delta_tdc == nullptr) {
-    if (delta_adc == nullptr)B2INFO("Histogram of hADCs not found (intra-run). Exiting");
-    if (delta_tdc == nullptr)B2INFO("Histogram of hTDCs not found (intra-run). Exiting");
+  m_delta_adc = (TH2F*)getDelta(m_histoDir, m_histoADC, 0, true); //true=only if updated
+  m_delta_tdc = (TH2F*)getDelta(m_histoDir, m_histoTDC, 0, true);
+  if (m_delta_adc == nullptr || m_delta_tdc == nullptr) {
+    if (m_delta_adc == nullptr)B2INFO("Histogram of hADCs not found (intra-run). Exiting");
+    if (m_delta_tdc == nullptr)B2INFO("Histogram of hTDCs not found (intra-run). Exiting");
     return;
   }
 
   int cadcgood = 0, ctdcgood = 0;
   double sumadcgood = 0, sumtdcgood = 0;
   for (int ic = 0; ic < 300; ++ic) {
-    m_hADCs[ic] = delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
+    m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
     m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
     float md_adc = getHistMedian(m_hADCs[ic]);
     if (md_adc >= m_minadc && md_adc <= m_maxadc) {
@@ -101,7 +102,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
       cadcgood++;
     }
 
-    m_hTDCs[ic] = delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
+    m_hTDCs[ic] = m_delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
     m_hTDCs[ic]->SetTitle(Form("hTDC%d", ic));
     float md_tdc = getHistMedian(m_hTDCs[ic]);
     if (md_tdc >= m_mintdc && md_tdc <= m_maxtdc) {
@@ -131,29 +132,29 @@ void DQMHistAnalysisCDCEpicsModule::endRun()
     return;
   }
 
-  hist_adc->Reset();
-  hist_tdc->Reset();
+  m_hist_adc->Reset();
+  m_hist_tdc->Reset();
   for (int ic = 0; ic < 300; ++ic) {
     auto hadc_proj = (TH1D*)hrun_adc->ProjectionY(Form("hrunADC%d", ic + 1), ic + 1, ic + 1, "");
     float md_adc_run = getHistMedian(hadc_proj);
-    hist_adc->SetBinContent(ic + 1, md_adc_run);
+    m_hist_adc->SetBinContent(ic + 1, md_adc_run);
 
     auto htdc_proj = hrun_tdc->ProjectionY(Form("hrunADC%d", ic + 1), ic + 1, ic + 1, "");
     float md_tdc_run = getHistMedian(htdc_proj);
-    hist_tdc->SetBinContent(ic + 1, md_tdc_run);
+    m_hist_tdc->SetBinContent(ic + 1, md_tdc_run);
   }
 
   // Draw canvas
   m_cBoards->Clear();
   m_cBoards->Divide(2, 1);
   m_cBoards->cd(1);// necessary!
-  getHistStyle(hist_adc, 2, 20);
+  getHistStyle(m_hist_adc, 2, 20);
   m_boxadc->Draw();
-  hist_adc->Draw();
+  m_hist_adc->Draw();
   m_cBoards->cd(2);// necessary!
-  getHistStyle(hist_tdc, 4, 21);
+  getHistStyle(m_hist_tdc, 4, 21);
   m_boxtdc->Draw();
-  hist_tdc->Draw();
+  m_hist_tdc->Draw();
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end run");
 }

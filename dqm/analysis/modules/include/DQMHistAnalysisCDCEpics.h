@@ -101,11 +101,11 @@ namespace Belle2 {
     double m_mintdc;/**< min tdc median thershold accepted */
     double m_maxtdc;/**< max tdc median thershold accepted */
 
-    TH2F* delta_adc = nullptr; /**< 2D histograms (Card vs ADC) from track associated hits (Intra run)*/
-    TH1F* hist_adc = nullptr; /**< same as above but for Integrated run*/
+    TH2F* m_delta_adc = nullptr; /**< 2D histograms (Card vs ADC) from track associated hits (Intra run)*/
+    TH1F* m_hist_adc = nullptr; /**< same as above but for Integrated run*/
 
-    TH2F* delta_tdc = nullptr; /**< 2D histograms (Card vs ADC) from track associated hits (Intra run)*/
-    TH1F* hist_tdc = nullptr; /**< same as above but for Integrated run*/
+    TH2F* m_delta_tdc = nullptr; /**< 2D histograms (Card vs ADC) from track associated hits (Intra run)*/
+    TH1F* m_hist_tdc = nullptr; /**< same as above but for Integrated run*/
 
     TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits for each board (0-299) */
     TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits for each board (0-299) */

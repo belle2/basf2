@@ -380,13 +380,13 @@ double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value))
+  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return value;
   } else {
     SEVCHK(r, "ca_get or ca_pend_io failure");
-    }
+  }
 #endif
   return NAN;
 }
@@ -403,13 +403,13 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value));
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return value;
   } else {
     SEVCHK(r, "ca_get or ca_pend_io failure");
-    }
+  }
 #endif
   return value;
 }

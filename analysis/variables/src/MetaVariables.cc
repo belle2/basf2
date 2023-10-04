@@ -3167,7 +3167,7 @@ namespace Belle2 {
         } catch (std::exception& e) {}
       }
 
-      auto func = [absPdg](const Particle*) -> double {
+      auto func = [absPdg](const Particle*) -> int {
 
         Const::ChargedStable type(absPdg);
         StoreArray<Track> tracks;
@@ -3663,11 +3663,11 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
-Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double)
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",
-			  Manager::VariableDataType::c_double)
+			  Manager::VariableDataType::c_int);
 
   }
 }

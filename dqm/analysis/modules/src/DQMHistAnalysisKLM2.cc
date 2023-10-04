@@ -17,6 +17,9 @@
 #include <TStyle.h>
 #include <TColor.h>
 
+/* Standard Library*/
+#include <algorithm>
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisKLM2);
@@ -29,7 +32,8 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
-  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0));
+  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
+  addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
   addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
@@ -52,6 +56,7 @@ void DQMHistAnalysisKLM2Module::initialize()
   //register EPICS PVs
   registerEpicsPV("KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
   registerEpicsPV("KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
+  registerEpicsPV("KLMEff:2DEffSettings", "2DEffSettings");
   updateEpicsPVs(5.0);
 
   if (m_refFileName != "") {
@@ -73,10 +78,11 @@ void DQMHistAnalysisKLM2Module::initialize()
     m_ref_efficiencies_eklm->SetStats(false);
 
   } else {
-    B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
+    B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
     m_alarmThr = 0;
+    m_warnThr = 0;
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
                                        0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
     for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
@@ -232,6 +238,27 @@ void DQMHistAnalysisKLM2Module::beginRun()
   m_RunType = findHist("DQMInfo/rtype");
   m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
   m_IsPhysicsRun = (m_RunTypeString == "physics");
+
+  double unused = NAN;
+  //ratio/diff mode should only be possible if references exist
+  if (m_refFile && m_refFile->IsOpen()) {
+    // values for LOLO and LOW error are used for alarmThr and warnThr settings
+    // default values should be initially defined in input parameters?
+    double tempAlarm = (double) m_alarmThr;
+    double tempWarn = (double) m_warnThr;
+    requestLimitsFromEpicsPVs("2DEffSettings", tempAlarm, tempWarn, unused, unused);
+    m_alarmThr = (float) std::min(tempAlarm, tempWarn);
+    m_warnThr = (float) std::max(tempAlarm, tempWarn);
+    // EPICS should catch if this happens but just in case
+    if (m_alarmThr > m_warnThr) {
+      B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr is greater than warnThr...");
+    }
+  }
+  m_BKLMLayerWarn = 5;
+  m_EKLMLayerWarn = 5;
+  requestLimitsFromEpicsPVs("nEffBKLMLayers", unused, unused, unused, m_BKLMLayerWarn);
+  requestLimitsFromEpicsPVs("nEffEKLMLayers", unused, unused, unused, m_EKLMLayerWarn);
+
 }
 
 void DQMHistAnalysisKLM2Module::endRun()
@@ -372,8 +399,8 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
 }
 
 void DQMHistAnalysisKLM2Module::process2DEffHistogram(
-  TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot, int* pvcount,
-  TCanvas* eff2dCanv)
+  TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
+  int* pvcount, double layerLimit, TCanvas* eff2dCanv)
 {
 
   int i = 0;
@@ -385,6 +412,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float minVal = m_min;
   float eff2dVal;
   bool setAlarm = false;
+  bool setWarn = false;
   *pvcount = 0; //initialize to zero
 
   for (int binx = 0; binx < sectors; binx++) {
@@ -433,8 +461,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         }
 
         // set alarm
-        if (eff2dVal < m_alarmThr) {
+        if (eff2dVal < m_warnThr) {
           *pvcount += 1;
+        }
+        if (eff2dVal < m_alarmThr) {
           setAlarm = true;
         }
 
@@ -445,6 +475,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
   }//end of sector loop
 
+  if (*pvcount > (int) layerLimit) {
+    setWarn = true;
+  }
+
   eff2dHist->SetMinimum(m_min);
   eff2dHist->SetMaximum(m_max);
 
@@ -453,6 +487,8 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   errHist->Draw("TEXT SAME");
   if (setAlarm) {
     eff2dCanv->Pad()->SetFillColor(kRed);
+  } else if (setWarn) {
+    eff2dCanv->Pad()->SetFillColor(kYellow);
   }
   eff2dCanv->Modified();
   eff2dCanv->Update();
@@ -512,17 +548,15 @@ void DQMHistAnalysisKLM2Module::event()
   /* Make Diff 2D plots */
   process2DEffHistogram(m_eff_bklm, m_ref_efficiencies_bklm, m_eff2d_bklm, m_err_bklm,
                         BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(),
-                        m_ratio, &m_nEffBKLMLayers, m_c_eff2d_bklm);
+                        m_ratio, &m_nEffBKLMLayers, m_BKLMLayerWarn, m_c_eff2d_bklm);
 
   process2DEffHistogram(m_eff_eklm, m_ref_efficiencies_eklm, m_eff2d_eklm, m_err_eklm,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
-                        m_ratio, &m_nEffEKLMLayers, m_c_eff2d_eklm);
+                        m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "Updating EPICS PVs in DQMHistAnalysisKLM2");
   setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
   setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
   updateEpicsPVs(5.0);
 }
-
-

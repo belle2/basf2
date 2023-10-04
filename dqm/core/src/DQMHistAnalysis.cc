@@ -368,6 +368,35 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
 #endif
 }
 
+double DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
+{
+  double value{NAN};
+  if (!m_useEpics) return value;
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return value;
+  }
+  SEVCHK(ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+#endif
+  return value;
+}
+
+double DQMHistAnalysisModule::getEpicsPV(int index)
+{
+  double value{NAN};
+  if (!m_useEpics) return value;
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return value;
+  }
+  SEVCHK(ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure");
+#endif
+  return value;
+}
+
+
 chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
 {
 #ifdef _BELLE2_EPICS

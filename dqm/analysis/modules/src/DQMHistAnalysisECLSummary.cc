@@ -40,6 +40,11 @@ DQMHistAnalysisECLSummaryModule::DQMHistAnalysisECLSummaryModule()
   addParam("useChannelMask", m_useChannelMask,
            "Mask Cell IDs based on information from ECL PVs",
            true);
+  addParam("maxDeviationForOccupancy", m_maxDeviationForOccupancy,
+           "The higher this parameter, the larger differences in occupancy are allowed for adjacent channels", 0.28);
+  addParam("maxDeviationForChi2", m_maxDeviationForChi2,
+           "The higher this parameter, the larger differences in the number of hits with bad chi2 are allowed for adjacent channels",
+           2.5);
 }
 
 
@@ -90,6 +95,7 @@ void DQMHistAnalysisECLSummaryModule::initialize()
                                 ECL::ECL_CRATES, 1, ECL::ECL_CRATES + 1,
                                 m_ecl_alarms.size(), 0, m_ecl_alarms.size());
 
+  // Do not show statistics box.
   h_channels_summary->SetStats(0);
   h_channels_summary->SetMinimum(0);
   h_channels_summary->SetMaximum(1);
@@ -370,7 +376,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
     if (h_fail_crateid) {
       errors_count = h_fail_crateid->GetBinContent(crate_id);
     } else {
-      errors_count = 999999;
+      errors_count = 9999;
     }
 
     alarm_counts[fit_alarm_index][crate_id - 1] += errors_count;
@@ -521,8 +527,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithOccupancyProb
   }
 
   TH1* h_occupancy = findHist("ECL/cid_Thr5MeV");
-  // TODO: Maybe set this as a module parameter
-  const double max_deviation = 0.28;
+  const double max_deviation = m_maxDeviationForOccupancy;
   return getSuspiciousChannels(h_occupancy, m_total_events, neighbours,
                                max_deviation, true);
 }
@@ -554,8 +559,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithChi2Problems(
   }
 
   TH1* h_bad_chi2 = findHist("ECL/bad_quality");
-  // TODO: Maybe set this as a module parameter
-  const double max_deviation = 2.5;
+  const double max_deviation = m_maxDeviationForChi2;
   return getSuspiciousChannels(h_bad_chi2, m_total_events, neighbours,
                                max_deviation, false);
 }
@@ -604,10 +608,13 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
   // == Search for dead channels
 
   if (occupancy_histogram) {
+    // This indicates that DQMHistAnalysisECL module is not included in the path
+    bool not_normalized = (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr);
     if (total_events >= dead_alarm.required_statistics) {
-      // There should be registered signals in at least 1% of all events.
+      // Number of hits with E > threshold should be higher than 0.01%
+      // (for physics runs, as opposed to cosmics, this can actually be set to higher value)
       double min_occupancy = 0.0001;
-      if (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr) {
+      if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count
         min_occupancy *= total_events;
       }

@@ -648,6 +648,18 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
         retval[cid] |= dead_bit;
       }
     }
+    if (total_events >= hot_alarm.required_statistics) {
+      // Number of hits with E > threshold should be less than 70%
+      double max_occupancy = 0.7;
+      if (not_normalized) {
+        // The histogram is not normalized, multiply the threshold by evt count
+        max_occupancy *= total_events;
+      }
+      for (int cid = 1; cid <= ECL::ECL_TOTAL_CHANNELS; cid++) {
+        if (hist->GetBinContent(cid) < max_occupancy) continue;
+        retval[cid] |= hot_bit;
+      }
+    }
   }
 
   // == Search for cold and hot channels (or channels with bad chi2)

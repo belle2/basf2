@@ -8,11 +8,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 

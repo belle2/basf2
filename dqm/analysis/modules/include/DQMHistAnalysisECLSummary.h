@@ -114,6 +114,10 @@ namespace Belle2 {
     std::string m_pvPrefix;
     /** If true, mask Cell IDs based on DQM:ECL:channels_info:{alarm_type} PV info */
     bool m_useChannelMask;
+    /** The higher this parameter, the larger differences in occupancy are allowed for adjacent channels */
+    double m_maxDeviationForOccupancy;
+    /** The higher this parameter, the larger differences in the number of hits with bad chi2 are allowed for adjacent channels */
+    double m_maxDeviationForChi2;
 
     /** Different alarms monitored in h_channels_summary */
     std::vector<ECLAlarmType> m_ecl_alarms;

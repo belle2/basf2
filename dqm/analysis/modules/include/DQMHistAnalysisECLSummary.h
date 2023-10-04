@@ -8,11 +8,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
@@ -83,11 +78,27 @@ namespace Belle2 {
       double required_statistics; /**< Minimum number of events for this alarm to be active */
     };
 
+    // Size of an array with masked channels
+    static const int c_max_masked_channels = 200;
+    /* structure to get an array of long values from EPICS */
+    struct dbr_sts_long_array {
+      dbr_short_t     status;                       /* status of value */
+      dbr_short_t     severity;                     /* severity of alarm */
+      dbr_long_t      value[c_max_masked_channels]; /* current value */
+    };
+
     /** Returns index of the specific alarm type and detailed information */
     std::pair<int, ECLAlarmType> getAlarmByName(std::string name);
 
     /** Set alarm limits in DQM based on EPICS PV limits */
     void updateAlarmConfig();
+
+    /**
+     * Get the array of masked channels for each type of alarm case
+     * monitored by this module
+     */
+    bool getMaskedChannels(std::map<std::string, dbr_sts_long_array>& mask_info);
+
 
     /** Calculate and return number of problems per crate for all alarm categories
      * @return     vector: [alarm_type][crate_id - 1] -> number of times the specific issue occurred for that crate

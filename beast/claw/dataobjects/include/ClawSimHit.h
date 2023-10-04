@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** ClassClawSimHit - Geant4 simulated hit for the Claw crystal in beast..
+  /** ClassClawSimHit - Geant4 simulated hit for the Claw crystal in beast.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response information.

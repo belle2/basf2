@@ -22,7 +22,7 @@ import requests
 import getpass
 import readline  # wraps `input()` to have gnu readline functionality
 from terminal_utils import InputEditor, ANSIColors
-from conditions_db import ConditionsDB
+from conditions_db import ConditionsDB, get_cdb_authentication_token
 
 
 def ask_new(data):
@@ -87,6 +87,12 @@ def get_argument_parser():
     parser.add_argument('--confirm', default=False, action='store_true',
                         help='Confirm that the given information is correct and that the payloads should be uploaded')
     parser.add_argument('payloads', help='Name of the testing payload storage file')
+    parser.add_argument("--auth-token", type=str, default=None,
+                        help="JSON Web Token necessary for authenticating to the conditions database. "
+                        "Useful only for debugging, since by the default the tool automatically "
+                        "gets a token for you by asking the B2MMS username and password. "
+                        "If the environment variable $BELLE2_CDB_AUTH_TOKEN points to a file with a valid "
+                        "token, such token is used (useful for automatic workflows).")
     return parser
 
 
@@ -132,14 +138,23 @@ if __name__ == "__main__":
     else:
         if input('\nDoes the request contain new or modified payloads classes (y/n) [n]? ').lower() in ['n', '']:
             data['request'] = 'Update'
-            print('\nFor which type of global tags is the request, ma[i]n, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
+            print(
+                '\nFor which type of global tags is the request, ma[i]n, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
             while True:
                 task = input('i/o/p/d/m/a: ').lower()
                 if task in ['i', 'v', 'o', 'p', 'd', 'm', 'a']:
                     break
-            data['task'] = {'i': 'main', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
+            data['task'] = {
+                'i': 'main',
+                'v': 'validation',
+                'o': 'online',
+                'p': 'prompt',
+                'd': 'data',
+                'm': 'mc',
+                'a': 'analysis'}[task]
         else:
-            if input('\nDo payloads of the given names already exist, but the class definition has changed (y/n) [n]? ').lower() in ['n', '']:
+            if input(
+                    '\nDo payloads of the given names already exist, but the class definition has changed (y/n) [n]? ').lower() in ['n', '']:
                 ask_new(data)
             else:
                 ask_modify(data)
@@ -157,7 +172,8 @@ if __name__ == "__main__":
         data['details'] = open(args.details_file).read()
     else:
         # For this multiline input, offer option to use temporary editor
-        if input(f"\nUse editor (e) or command line (c) for entering detailed instructions for the global tag manager? [e] ").lower() != "c":
+        if input(
+                "\nUse editor (e) or command line (c) for entering detailed instructions for the global tag manager? [e] ").lower() != "c":
             input_editor = InputEditor(commentlines_start_with="#")
             # define initial comment for the temporary input file to guide the user
             editor_help_comment = (
@@ -177,7 +193,8 @@ if __name__ == "__main__":
     # if this is an online globaltag update request, provide additional details
     if data['task'] == 'online':
         # For this multiline input, offer option to use temporary editor
-        if input(f"\nUse editor (e) or command line (c) for entering detailed information about the impact of this online globaltag update request on the data taking conditions or the relevant changes to monitor on DQM histograms? [e] ").lower() != "c":
+        if input(
+                "\nUse editor (e) or command line (c) for entering detailed information about the impact of this online globaltag update request on the data taking conditions or the relevant changes to monitor on DQM histograms? [e] ").lower() != "c":
             input_editor = InputEditor(commentlines_start_with="#")
             # define initial comment for the temporary input file to guide the user
             editor_help_comment = (
@@ -247,6 +264,11 @@ Details:""")
 
     # upload to staging global tags and create/update jira issue
     db = ConditionsDB()
-    db.set_authentication("commonDBUser", "Eil9ohphoo2quot")
+    if args.auth_token is not None:
+        auth_token = args.auth_token
+    else:
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        auth_token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
+    db.set_authentication_token(auth_token)
     if not db.staging_request(payloadsFile, normalize, data, password):
         sys.exit(1)

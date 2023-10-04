@@ -290,6 +290,13 @@ namespace Belle2 {
     void UpdateCanvas(std::string name, bool updated = true);
 
     /**
+     * Mark canvas as updated (or not)
+     * @param canvas Canvas from which to take the name for update
+     * @param updated was updated
+     */
+    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+
+    /**
      * Extract Run Type from histogram title, called from input module
      */
     void ExtractRunType(std::vector <TH1*>& hs);
@@ -361,6 +368,39 @@ namespace Belle2 {
      * @return Channel ID is written on success, otherwise nullptr
      */
     chid getEpicsPVChID(int index);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param id Channel ID
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(chid id, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(std::string keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param index index of PV
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(int index, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
 
     /**
      * Setter for EPICS usage

@@ -124,20 +124,20 @@ def get_calibrations(input_data, **kwargs):
         calibration_procedure = {
             "rgtrail0": 0,
             "tg0": 0,
+            "rgpre0": 0,
             "cc0": 0,
             "ce0": 0,
             "bd0": 0,
             "wg0": 0,
-            "rgpre0": 0,
             "rg0": 0
         }
     elif calib_mode == "quick":
         calibration_procedure = {
             "rgtrail0": 0,
             "tg0": 0,
+            "rgpre0": 0,
             "cc0": 0,
             "wg0": 0,
-            "rgpre0": 0,
             "rg0": 0
         }
     elif calib_mode == "manual":

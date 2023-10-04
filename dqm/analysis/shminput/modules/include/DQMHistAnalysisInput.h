@@ -78,12 +78,14 @@ namespace Belle2 {
     std::string m_mempath;
     /** The name of the memory file (HLT or ExpressReco). */
     std::string m_memname;
+    /** The owner of the memory file (HLT or ExpressReco). */
+    std::string m_username;
     /** The shmid for the shared memory. */
-    int m_shm_id;
+    int m_shm_id{-1};
     /** The semid for the shared memory. */
-    int m_sem_id;
+    int m_sem_id{-1};
     /** The size of the shared memory. */
-    int m_memsize;
+//    int m_memsize; // this is not used in code!!! it is hard coded in DqmMemFile to 4*128MB
     /** The refresh interval. */
     int m_interval;
     /** Whether to remove empty histograms. */

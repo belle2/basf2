@@ -293,7 +293,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
   }//end of for tp
 }//end of func
 
-const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const TVector3& xyz, const CDCWireLayer& layer,
+const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
   Vector3D crosspoint;
@@ -303,7 +303,7 @@ const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const TVector3
     const CDCWire& oneWire = layer.getWire(1);
     double newR = oneWire.getWirePos2DAtZ(xyz.Z()).norm();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
-    TVector3 xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
+    ROOT::Math::XYZVector xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     crosspoint = Vector3D(xyzOnWire);
   }
 
@@ -319,7 +319,7 @@ void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit
     const double arcLength = helixFit.getArcLength2DAtCylindricalR(radiusofLayer);
-    const TVector3 xyz = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
+    const ROOT::Math::XYZVector xyz = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     if (!xyz.X()) continue;
     const CDCWire& wireIntersected = getIntersectingWire(xyz, wireLayer, helixFit);
     unsigned short crossedWire = wireIntersected.getEWire();

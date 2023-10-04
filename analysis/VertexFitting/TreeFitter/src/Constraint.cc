@@ -83,7 +83,7 @@ namespace TreeFitter {
   ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
   {
     /**
-     * We now linearise around the last iteration \alpha (const FitParams& oldState)
+     * We now linearise around the last iteration \f$\alpha\f$ (const FitParams& oldState)
      * In this implementation we can no longer linearize non-linear constraints
      * but we ensured by the linearisation around the last state that the step size is small enough
      * so we just use them as if they were linear

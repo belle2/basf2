@@ -43,6 +43,8 @@ namespace Belle2 {
     //!
     int m_file;
     std::string m_filename;
+    int m_expno;
+    int m_runno;
 
   };
 

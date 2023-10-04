@@ -7,7 +7,15 @@
 
 #pragma link C++ class Belle2::ECL::eclMuMuEAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclCosmicEAlgorithm-;
+#pragma link C++ class Belle2::ECL::eclWaveformTemplateCalibrationC1Algorithm-;
+#pragma link C++ class Belle2::ECL::eclWaveformTemplateCalibrationC2Algorithm-;
+#pragma link C++ class Belle2::ECL::eclWaveformTemplateCalibrationC3Algorithm-;
+#pragma link C++ class Belle2::ECL::eclWaveformTemplateCalibrationC4Algorithm-;
 #pragma link C++ class Belle2::ECL::eclGammaGammaEAlgorithm-;
+#pragma link C++ class Belle2::ECL::eclAutocovarianceCalibrationC1Algorithm-;
+#pragma link C++ class Belle2::ECL::eclAutocovarianceCalibrationC2Algorithm-;
+#pragma link C++ class Belle2::ECL::eclAutocovarianceCalibrationC3Algorithm-;
+#pragma link C++ class Belle2::ECL::eclAutocovarianceCalibrationC4Algorithm-;
 #pragma link C++ class Belle2::ECL::eclee5x5Algorithm-;
 #pragma link C++ class Belle2::ECL::eclBhabhaTAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclTValidationAlgorithm-;

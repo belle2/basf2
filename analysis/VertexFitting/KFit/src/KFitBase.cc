@@ -44,7 +44,7 @@ KFitBase::addTrack(const KFitTrack& p) {
 
 
 enum KFitError::ECode
-KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q) {
+KFitBase::addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q) {
   if (e.num_row() != KFitConst::kNumber7)
   {
     m_ErrorCode = KFitError::kBadMatrixSize;
@@ -218,7 +218,7 @@ KFitBase::getCorrelation(const int id1, const int id2, const int flag) const
 
 
 const HepSymMatrix
-KFitBase::makeError1(const HepLorentzVector& p, const HepMatrix& e) const
+KFitBase::makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const
 {
   // self track
   // Error(6x6,e) ==> Error(7x7,output(hsm)) using Momentum(p).
@@ -252,7 +252,7 @@ KFitBase::makeError1(const HepLorentzVector& p, const HepMatrix& e) const
 
 
 const HepMatrix
-KFitBase::makeError1(const HepLorentzVector& p1, const HepLorentzVector& p2, const HepMatrix& e) const
+KFitBase::makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e) const
 {
   // track and track
   // Error(6x6,e) ==> Error(7x7,output(hm)) using Momentum(p1&p2).
@@ -317,7 +317,7 @@ KFitBase::makeError2(const HepLorentzVector& p, const HepMatrix& e) const
 
 
 const HepSymMatrix
-KFitBase::makeError3(const HepLorentzVector& p, const HepMatrix& e, const bool is_fix_mass) const
+KFitBase::makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e, const bool is_fix_mass) const
 {
   // self track
   // Error(7x7,e) ==> Error(7x7,output(hsm)) using Momentum(p).
@@ -358,7 +358,8 @@ KFitBase::makeError3(const HepLorentzVector& p, const HepMatrix& e, const bool i
 
 
 const HepMatrix
-KFitBase::makeError3(const HepLorentzVector& p1, const HepLorentzVector& p2, const HepMatrix& e, const bool is_fix_mass1,
+KFitBase::makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e,
+                     const bool is_fix_mass1,
                      const bool is_fix_mass2) const
 {
   // track and track

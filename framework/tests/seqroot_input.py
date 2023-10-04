@@ -11,7 +11,6 @@
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
 # (both files)
 
-import os
 import basf2
 from ROOT import Belle2
 import gzip

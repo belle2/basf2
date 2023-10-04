@@ -329,61 +329,46 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
 
   //===== Get masked channels
 
-  // Size of an array with masked channels
-  static const int MASK_SIZE = 200;
-  /* structure to get an array of long values from EPICS */
-  struct dbr_sts_long_array {
-    dbr_short_t     status;                 /* status of value */
-    dbr_short_t     severity;               /* severity of alarm */
-    dbr_long_t      value[MASK_SIZE];       /* current value */
-  };
-
+  // alarm_type -> array_of_masked_channels
   static std::map<std::string, dbr_sts_long_array> mask_info;
-
-  for (auto& alarm : m_ecl_alarms) {
-    std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
-    chid mask_chid = getEpicsPVChID(mask_pv_name);
-
-    if (mask_chid == nullptr) return;
-    // ca_array_get data is only valid after ca_pend_io
-    auto r = ca_array_get(DBR_STS_LONG, MASK_SIZE, mask_chid, &mask_info[alarm.name]);
-    if (r != ECA_NORMAL) return;
-  }
-
-  // mask_info is available after this ca_pend_io call
-  auto r = ca_pend_io(5.0);
-  if (r != ECA_NORMAL) {
-    B2WARNING("Could not get alarm config");
+  if (!getMaskedChannels(mask_info)) {
+    B2WARNING("Failed to get arrays of masked channels");
     return;
   }
 
   for (auto& alarm : m_ecl_alarms) {
-    // In the current version, use only first crate PV to get alarm limits
-    int crate_id = 1;
-
-    std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
-    double unused              = 0;
-    double upper_warning_limit = 0;
-    double upper_alarm_limit   = 0;
-    bool accessed = requestLimitsFromEpicsPVs(pv_name, unused, unused, upper_warning_limit, upper_alarm_limit);
-
-    if (!accessed || upper_alarm_limit <= 0 || upper_warning_limit <= 0) {
-      B2WARNING("Failed to get alarm limits");
-      return;
-    }
-
-    alarm.alarm_limit   = upper_alarm_limit;
-    alarm.warning_limit = upper_warning_limit;
-
+    // Update the list of masked channels
     m_mask[alarm.name].clear();
-    for (int i = 0; i < MASK_SIZE; i++) {
+    for (int i = 0; i < c_max_masked_channels; i++) {
       int cell_id = mask_info[alarm.name].value[i];
       // The array of masked channels goes like this: [15, 22, 716, 0, 0, 0, 0, 0]
-      // So if 0 is encountered, stop reading further.
+      // So if 0 (invalid channel ID) is encountered, stop reading further.
       if (cell_id == 0) break;
       m_mask[alarm.name].insert(cell_id);
     }
   }
+}
+
+bool DQMHistAnalysisECLSummaryModule::getMaskedChannels(std::map<std::string, dbr_sts_long_array>& mask_info)
+{
+  for (auto& alarm : m_ecl_alarms) {
+    std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
+    chid mask_chid = getEpicsPVChID(mask_pv_name);
+
+    if (mask_chid == nullptr) return false;
+    // ca_array_get data is NOT VALID here.
+    // It will only be valid after ca_pend_io returns ECA_NORMAL
+    auto r = ca_array_get(DBR_STS_LONG, c_max_masked_channels, mask_chid, &mask_info[alarm.name]);
+    if (r != ECA_NORMAL) return false;
+  }
+
+  // ca_pend_io has to be called here,
+  // see https://epics.anl.gov/base/R3-14/12-docs/CAref.html#ca_get
+
+  auto r = ca_pend_io(5.0);
+  if (r != ECA_NORMAL) return false;
+
+  return true;
 }
 
 std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCounts(bool update_mirabelle)

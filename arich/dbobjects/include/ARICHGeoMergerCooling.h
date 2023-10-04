@@ -93,7 +93,7 @@ namespace Belle2 {
     //Merger cooling bodies.
     std::string m_mergerCoolingBodiesMaterialName; /**< Name of the merger cooling bodies material */
     std::vector<double> m_mergerCoolingPositionID; /**< Merger cooling body shape id (positionID) for each merger PCB */
-    /**< Vector of structures which holds apexes of the tessellation volumes for (merger cooling bodyes). */
+    /** Vector of structures which holds apexes of the tessellation volumes for (merger cooling bodyes). */
     std::vector<tessellatedSolidStr> m_mergerCoolingBodiesInfo;
 
     ClassDef(ARICHGeoMergerCooling, 1); /**< ClassDef */

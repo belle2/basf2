@@ -303,28 +303,28 @@ namespace Belle2 {
     double m_sizeL = 0.0;                /**< Size of merger PCB : length */
     double m_sizeW = 0.0;                /**< Size of merger PCB : width */
     double m_thickness = 0.0;            /**< Thickenss of merger PCB */
-    double m_singlemergerenvelopeSizeL = 0.0;     /** Size of single merger PCB and merger cooling envelop : length */
-    double m_singlemergerenvelopeSizeW = 0.0;     /** Size of single merger PCB and merger cooling envelop : width */
-    double m_singlemergerenvelopeThickness = 0.0; /** Thickenss of single merger PCB and merger cooling envelop */
+    double m_singlemergerenvelopeSizeL = 0.0;     /**< Size of single merger PCB and merger cooling envelop : length */
+    double m_singlemergerenvelopeSizeW = 0.0;     /**< Size of single merger PCB and merger cooling envelop : width */
+    double m_singlemergerenvelopeThickness = 0.0; /**< Thickenss of single merger PCB and merger cooling envelop */
     /** Z position of the single merger and merger cooling body envelope inside global merger envelope in mm */
     std::vector<double> m_singlemergerenvelopeDeltaZ;
-    double m_mergerPCBscrewholeR = 0.0;      /** Merger PCB screw hole radius */
-    double m_mergerPCBscrewholePosdY = 0.0;  /** Merger PCB screw hole position from the left and right sides */
-    double m_mergerPCBscrewholePosdX1 = 0.0; /** Merger PCB screw hole position from the bottom edge */
-    double m_mergerPCBscrewholePosdX2 = 0.0; /** Merger PCB screw hole position from the top edge */
-    double m_envelopeOuterRadius = 0.0;  /** Outer radius of merger PCB assembly envelope */
-    double m_envelopeInnerRadius = 0.0;  /** Inner radius of merger PCB assembly envelope */
-    double m_envelopeThickness = 0.0;    /** Thickness of merger PCB assembly envelope */
-    double m_envelopeX0 = 0.0;           /** X0 merger PCB assembly envelope */
-    double m_envelopeY0 = 0.0;           /** Y0 merger PCB assembly envelope */
-    double m_envelopeZ0 = 0.0;           /** Z0 merger PCB assembly envelope */
-    double m_envelopePosX0 = 0.0; /** Position of the merger inside the envelope */
-    double m_envelopePosY0 = 0.0; /** Position of the merger inside the envelope */
-    double m_envelopePosZ0 = 0.0; /** Position of the merger inside the envelope */
-    std::vector<double> m_mergerSlotID;  /** Merger slot number */
-    std::vector<double> m_mergerPosR;    /** Distance from the center in mm */
-    std::vector<double> m_mergerAngle;   /** Azimuthal angle of the merger PCB center in polar coordinate system in deg */
-    std::vector<double> m_mergerOrientation; /** Orientation of the merger board in deg */
+    double m_mergerPCBscrewholeR = 0.0;      /**< Merger PCB screw hole radius */
+    double m_mergerPCBscrewholePosdY = 0.0;  /**< Merger PCB screw hole position from the left and right sides */
+    double m_mergerPCBscrewholePosdX1 = 0.0; /**< Merger PCB screw hole position from the bottom edge */
+    double m_mergerPCBscrewholePosdX2 = 0.0; /**< Merger PCB screw hole position from the top edge */
+    double m_envelopeOuterRadius = 0.0;  /**< Outer radius of merger PCB assembly envelope */
+    double m_envelopeInnerRadius = 0.0;  /**< Inner radius of merger PCB assembly envelope */
+    double m_envelopeThickness = 0.0;    /**< Thickness of merger PCB assembly envelope */
+    double m_envelopeX0 = 0.0;           /**< X0 merger PCB assembly envelope */
+    double m_envelopeY0 = 0.0;           /**< Y0 merger PCB assembly envelope */
+    double m_envelopeZ0 = 0.0;           /**< Z0 merger PCB assembly envelope */
+    double m_envelopePosX0 = 0.0; /**< Position of the merger inside the envelope */
+    double m_envelopePosY0 = 0.0; /**< Position of the merger inside the envelope */
+    double m_envelopePosZ0 = 0.0; /**< Position of the merger inside the envelope */
+    std::vector<double> m_mergerSlotID;  /**< Merger slot number */
+    std::vector<double> m_mergerPosR;    /**< Distance from the center in mm */
+    std::vector<double> m_mergerAngle;   /**< Azimuthal angle of the merger PCB center in polar coordinate system in deg */
+    std::vector<double> m_mergerOrientation; /**< Orientation of the merger board in deg */
 
     ClassDef(ARICHGeoMerger, 2);         /**< ClassDef */
 

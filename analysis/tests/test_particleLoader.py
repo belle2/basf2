@@ -17,9 +17,10 @@ import modularAnalysis as ma
 
 
 class TestParticleLoader(unittest.TestCase):
-    """Test case of ParticleLoader. Compare the number of mdst objects and particles."""
+    """Test case of ParticleLoader"""
 
     def testNumberOfParticles(self):
+        """Compare the number of mdst objects and particles."""
         from ROOT import TFile
 
         testFile = tempfile.NamedTemporaryFile()

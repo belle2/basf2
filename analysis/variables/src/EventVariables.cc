@@ -153,15 +153,15 @@ namespace Belle2 {
     {
       StoreArray<V0> v0s;
 
-      int nV0s = 0;
+      int n = 0;
       for (int i = 0; i < v0s.getEntries(); i++) {
         const V0* v0 = v0s[i];
         if (v0->getTrackFitResults().first->getChargeSign() == v0->getTrackFitResults().second->getChargeSign())
           continue;
-        nV0s++;
+        n++;
       }
 
-      return nV0s;
+      return n;
     }
 
 

@@ -1,6 +1,16 @@
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------
 
+Bugfix of ParticleListManipulator for particleLists loaded from KLMClusters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Fixed a major bug in the `ParticleListManipulator` used in functions such as `copyList`, `fillParticleList` and other
+  modularAnalysis functions. The bug occurred when creating a particleList from two or more types of mdst objects, for example,
+  ``K_L0`` loaded from ECLClusters and KLMClusters. When a new particleList was created from original lists, mdst objects with the
+  same mdst index as other mdst objects were skipped and mot added to the new particleList, even if the mdst types were different.
+* This mainly impacted the ``K_L0`` or ``neutron`` particleLists, resulting in a significant drop in particles loaded from
+  KLMClusters. No such impact has been observed for other types of particleLists.
+
+
 FEI
 +++
 * Applied the mass constraint to pi0 candidates in FEI.

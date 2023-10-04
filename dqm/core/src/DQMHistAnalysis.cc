@@ -368,7 +368,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
 #endif
 }
 
-double DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
+double DQMHistAnalysisModule::setEpicsPV(std::string keyname)
 {
   double value{NAN};
   if (!m_useEpics) return value;

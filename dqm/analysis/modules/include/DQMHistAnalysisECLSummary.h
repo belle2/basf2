@@ -78,13 +78,13 @@ namespace Belle2 {
       double required_statistics; /**< Minimum number of events for this alarm to be active */
     };
 
-    // Size of an array with masked channels
+    /** Size of an array with masked channels */
     static const int c_max_masked_channels = 200;
-    /* structure to get an array of long values from EPICS */
+    /** structure to get an array of long values from EPICS */
     struct dbr_sts_long_array {
-      dbr_short_t     status;                       /* status of value */
-      dbr_short_t     severity;                     /* severity of alarm */
-      dbr_long_t      value[c_max_masked_channels]; /* current value */
+      dbr_short_t     status;                       /**< status of value */
+      dbr_short_t     severity;                     /**< severity of alarm */
+      dbr_long_t      value[c_max_masked_channels]; /**< current value */
     };
 
     /** Returns index of the specific alarm type and detailed information */

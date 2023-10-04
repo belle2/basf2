@@ -59,8 +59,8 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   //=== Set up ECL alarms and corresponding PVs
 
   m_ecl_alarms = {
-    {"dead",     "#splitline{dead}{channels}",         0,  0,  1e5},
-    {"cold",     "#splitline{cold}{channels}",         0,  1,  1e5},
+    {"dead",     "#splitline{dead}{channels}",         1,  1,  1e5},
+    {"cold",     "#splitline{cold}{channels}",         1,  2,  1e5},
     {"hot",      "#splitline{hot}{channels}",          25, 50, 1e5},
     {"bad_chi2", "#splitline{bad #chi^{2}}{channels}", 5,  10, 1e6},
     {"bad_fit",  "#splitline{fit incon-}{sistencies}", 5,  10, 0  },
@@ -168,7 +168,7 @@ void DQMHistAnalysisECLSummaryModule::beginRun()
 
   for (size_t i = 0; i < m_ecl_alarms.size(); i++) {
     TString label = m_ecl_alarms[i].title;
-    label += " > ";
+    label += " #geq ";
     label += m_ecl_alarms[i].alarm_limit;
     h_channels_summary->GetYaxis()->SetBinLabel(i + 1, label);
   }
@@ -203,10 +203,10 @@ void DQMHistAnalysisECLSummaryModule::event()
       if (m_total_events < m_ecl_alarms[alarm_idx].required_statistics) {
         color = HISTCOLOR_BLUE;
         label_text[0] = 'L';
-      } else if (alarm_counts[alarm_idx][crate] > alarm_limit) {
+      } else if (alarm_counts[alarm_idx][crate] >= alarm_limit) {
         color = HISTCOLOR_RED;
         label_text[0] = 'E';
-      } else if (alarm_counts[alarm_idx][crate] > warning_limit) {
+      } else if (alarm_counts[alarm_idx][crate] >= warning_limit) {
         color = HISTCOLOR_ORANGE;
         label_text[0] = 'W';
       } else {
@@ -220,6 +220,7 @@ void DQMHistAnalysisECLSummaryModule::event()
       if (label_text[0] != 0) {
         auto text = new TText((crate + 1.5), (alarm_idx + 0.5), label_text);
         text->SetTextColor(kWhite);
+        text->SetTextSize(0.03);
         text->SetTextAlign(22); // centered
         labels.push_back(text);
       }

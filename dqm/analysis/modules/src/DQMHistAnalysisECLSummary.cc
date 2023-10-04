@@ -306,6 +306,30 @@ std::pair<int, DQMHistAnalysisECLSummaryModule::ECLAlarmType> DQMHistAnalysisECL
 
 void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
 {
+  //===== Get alarm limits
+
+  for (auto& alarm : m_ecl_alarms) {
+    // In the current version, use only first crate PV to get alarm limits
+    int crate_id = 1;
+
+    std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
+    double unused              = 0;
+    double upper_warning_limit = 0;
+    double upper_alarm_limit   = 0;
+    bool accessed = requestLimitsFromEpicsPVs(pv_name, unused, unused, upper_warning_limit, upper_alarm_limit);
+
+    if (!accessed || upper_alarm_limit <= 0 || upper_warning_limit <= 0) {
+      B2WARNING("Failed to get alarm limits");
+      return;
+    }
+
+    alarm.alarm_limit   = upper_alarm_limit;
+    alarm.warning_limit = upper_warning_limit;
+  }
+
+  //===== Get masked channels
+
+  // Size of an array with masked channels
   static const int MASK_SIZE = 200;
   /* structure to get an array of long values from EPICS */
   struct dbr_sts_long_array {
@@ -314,29 +338,19 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
     dbr_long_t      value[MASK_SIZE];       /* current value */
   };
 
-  static std::map<std::string, dbr_ctrl_long> limits_info;
   static std::map<std::string, dbr_sts_long_array> mask_info;
 
   for (auto& alarm : m_ecl_alarms) {
-    // In the current version, use only first crate PV to get alarm limits
-    int crate_id = 1;
-    std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
-    chid limits_chid = getEpicsPVChID(pv_name);
-
-    if (limits_chid == nullptr) return;
-    // ca_get data is only valid after ca_pend_io
-    auto r = ca_get(DBR_CTRL_LONG, limits_chid, &limits_info[pv_name]);
-    if (r != ECA_NORMAL) return;
-
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
     chid mask_chid = getEpicsPVChID(mask_pv_name);
 
     if (mask_chid == nullptr) return;
     // ca_array_get data is only valid after ca_pend_io
-    r = ca_array_get(DBR_STS_LONG, MASK_SIZE, mask_chid, &mask_info[alarm.name]);
+    auto r = ca_array_get(DBR_STS_LONG, MASK_SIZE, mask_chid, &mask_info[alarm.name]);
     if (r != ECA_NORMAL) return;
   }
 
+  // mask_info is available after this ca_pend_io call
   auto r = ca_pend_io(5.0);
   if (r != ECA_NORMAL) {
     B2WARNING("Could not get alarm config");
@@ -346,16 +360,26 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
   for (auto& alarm : m_ecl_alarms) {
     // In the current version, use only first crate PV to get alarm limits
     int crate_id = 1;
+
     std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
-    if (std::isnan(limits_info[pv_name].upper_alarm_limit)) return;
-    if (std::isnan(limits_info[pv_name].upper_warning_limit)) return;
-    // Looks like for integer PVs, alarms are set at value >= upper_limit
-    alarm.alarm_limit   = limits_info[pv_name].upper_alarm_limit   - 1;
-    alarm.warning_limit = limits_info[pv_name].upper_warning_limit - 1;
+    double unused              = 0;
+    double upper_warning_limit = 0;
+    double upper_alarm_limit   = 0;
+    bool accessed = requestLimitsFromEpicsPVs(pv_name, unused, unused, upper_warning_limit, upper_alarm_limit);
+
+    if (!accessed || upper_alarm_limit <= 0 || upper_warning_limit <= 0) {
+      B2WARNING("Failed to get alarm limits");
+      return;
+    }
+
+    alarm.alarm_limit   = upper_alarm_limit;
+    alarm.warning_limit = upper_warning_limit;
 
     m_mask[alarm.name].clear();
     for (int i = 0; i < MASK_SIZE; i++) {
       int cell_id = mask_info[alarm.name].value[i];
+      // The array of masked channels goes like this: [15, 22, 716, 0, 0, 0, 0, 0]
+      // So if 0 is encountered, stop reading further.
       if (cell_id == 0) break;
       m_mask[alarm.name].insert(cell_id);
     }

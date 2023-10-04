@@ -3150,6 +3150,47 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1) {
+        B2FATAL("Number of arguments for nTrackFitResults must be 1, particleType or PDGcode");
+      }
+
+      std::string arg = arguments[0];
+      TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
+      int absPdg;
+      if (part != nullptr) {
+        absPdg = std::abs(part->PdgCode());
+      } else {
+        try {
+          absPdg = Belle2::convertString<int>(arg);
+        } catch (std::exception& e) {}
+      }
+
+      auto func = [absPdg](const Particle*) -> double {
+
+        Const::ChargedStable type(absPdg);
+        StoreArray<Track> tracks;
+
+        int nTrackFitResults = 0;
+
+        for (int i = 0; i < tracks.getEntries(); i++)
+        {
+          const Track* track = tracks[i];
+          const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
+
+          if (!trackFit) continue;
+          if (trackFit->getChargeSign() == 0) continue;
+
+          nTrackFitResults++;
+        }
+
+        return nTrackFitResults;
+
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_METAVARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                           "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -3623,6 +3664,10 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
 Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double)
+
+    REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
+			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",
+			  Manager::VariableDataType::c_double)
 
   }
 }

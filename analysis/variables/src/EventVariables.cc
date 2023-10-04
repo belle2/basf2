@@ -164,21 +164,14 @@ namespace Belle2 {
       return n;
     }
 
-
-    int nECLClusters(const Particle*)
-    {
-      StoreArray<ECLCluster> eclClusters;
-      return eclClusters.getEntries();
-    }
-
     int nNeutralECLClusters(const Particle*, const std::vector<double>& hypothesis)
     {
       if (hypothesis.size() != 1)
         B2FATAL("Number of arguments of nNeutralECLClusters must be 1.");
 
       int hypothesis_int = std::lround(hypothesis[0]);
-      if (hypothesis_int < 0 or hypothesis_int > 2) {
-        B2WARNING("nNeutralECLClusters:: Hypothesis must be 0 (any hypothesis), 1 (nPhotons), or 2 (NeutralHadron)");
+      if (hypothesis_int < 1 or hypothesis_int > 2) {
+        B2WARNING("nNeutralECLClusters:: Hypothesis must be 1 (nPhotons) or 2 (NeutralHadron)");
         return 0;
       }
 
@@ -189,15 +182,9 @@ namespace Belle2 {
         if (!cluster->isNeutral())
           continue;
 
-        if (hypothesis_int == 0) {
+        if ((hypothesis_int == 1 and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) or
+            (hypothesis_int == 2 and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)))
           nClusters++;
-        } else if (hypothesis_int == 1) {
-          if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-            nClusters++;
-        } else if (hypothesis_int == 2) {
-          if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-            nClusters++;
-        }
       }
       return nClusters;
     }
@@ -965,10 +952,8 @@ namespace Belle2 {
 )DOC","GeV");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] Returns number of KLM clusters in the event.");
-    REGISTER_VARIABLE("nECLClusters", nECLClusters,
-                      "[Eventbased] Returns number of ECL clusters in the event.");
     REGISTER_VARIABLE("nNeutralECLClusters(hypothesis)", nNeutralECLClusters,
-                      "[Eventbased] Returns number of neutral ECL clusters with a given hypothesis, 0:Any hypotheses, 1:nPhotons, 2:NeutralHadron.");
+                      "[Eventbased] Returns number of neutral ECL clusters with a given hypothesis, 1:nPhotons, 2:NeutralHadron.");
     REGISTER_VARIABLE("nV0s", nV0s,
                       "[Eventbased] Returns number of V0s in the event.");
     REGISTER_VARIABLE("nValidV0s", nValidV0s,

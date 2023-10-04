@@ -82,11 +82,6 @@ namespace Belle2 {
     int nVirtualPrimaryMCParticles(const Particle*);
 
     /**
-     * return number of ECL clusters in event
-     */
-    int nECLClusters(const Particle*);
-
-    /**
      * return number of neutral ECL clusters with a given hypothesis
      */
     int nNeutralECLClusters(const Particle*, const std::vector<double>& hypothesis);

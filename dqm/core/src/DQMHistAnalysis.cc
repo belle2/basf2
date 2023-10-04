@@ -377,9 +377,18 @@ double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return value;
   }
-  SEVCHK(ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value))
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    return value;
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+    }
 #endif
-  return value;
+  return NAN;
 }
 
 double DQMHistAnalysisModule::getEpicsPV(int index)
@@ -391,7 +400,16 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
     B2ERROR("Epics PV with " << index << " not registered!");
     return value;
   }
-  SEVCHK(ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure");
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value));
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    return value;
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+    }
 #endif
   return value;
 }
@@ -468,8 +486,11 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
   // some "default" values should be set otherwise
   if (pv != nullptr) {
     struct dbr_ctrl_double tPvData;
+    // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+    // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+    // outstanding get requests are not automatically reissued following reconnect.
     auto r = ca_get(DBR_CTRL_DOUBLE, pv, &tPvData);
-    if (r == ECA_NORMAL) r = ca_pend_io(5.0); // TODO << why is this needed?
+    if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
     if (r == ECA_NORMAL) {
       if (!std::isnan(tPvData.lower_alarm_limit)) {
         lowerAlarm = tPvData.lower_alarm_limit;

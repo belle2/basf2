@@ -411,7 +411,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
     SEVCHK(r, "ca_get or ca_pend_io failure");
   }
 #endif
-  return value;
+  return NAN;
 }
 
 

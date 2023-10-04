@@ -29,6 +29,7 @@ namespace Belle2 {
       /*! does nothing */
     }
 
+    //! Constructor
     ARICHThParam(int index, double dth, double th0, int nth)
     {
       m_index = index;

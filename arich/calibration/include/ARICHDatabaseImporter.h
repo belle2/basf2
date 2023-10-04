@@ -557,9 +557,13 @@ namespace Belle2 {
     void importSensorModuleMap();
 
     /**
-     * Export module sensor map and info classes from database
+     * Export module sensor map classes from database
      */
     void exportSensorModuleMap();
+
+    /**
+     * Export module sensor map info classes from database
+     */
     void exportSensorModuleMapInfo(int number);
 
     /**
@@ -586,7 +590,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesHapdQE;        /**< Input root files for HAPD quantum efficiency */
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
-    IntervalOfValidity m_iov;
+    IntervalOfValidity m_iov; /**< interval of validity */
 
     /**
      * @brief printContainer used for debugging purposes...

@@ -63,6 +63,7 @@ namespace Belle2 {
       m_pciechid = 0;
     }
 
+    //! Constructor
     ARICHRawDigit(int type, int ver, int boardid, int febno, unsigned int length, unsigned int trgno = 0)
     {
       set(type, ver, boardid, febno, length, trgno);

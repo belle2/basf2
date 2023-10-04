@@ -22,7 +22,7 @@ from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
-                               expert_username="qyliu",
+                               expert_username="takaham",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["physics"],

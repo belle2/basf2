@@ -34,6 +34,8 @@ namespace Belle2 {
     //! Useful Constructor
     /*!
       \param position vector of track position on aerogel plane
+      \param mod module ID
+      \param ch channel ID
     */
     ARICHHit(TVector3 position, int mod, int ch)
     {

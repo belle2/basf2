@@ -57,7 +57,7 @@ namespace Belle2 {
 
     /**
      * Constructor from ARICHAeroHit
-     * @param ARICHAeroHit   ARICHAeroHit
+     * @param aeroHit ARICHAeroHit
      */
     explicit ARICHTrack(const ARICHAeroHit* aeroHit)
     {
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     /**
      * Constructor from ExtHit
-     * @param ExtHit  ExtHit
+     * @param extHit ExtHit
      */
     explicit ARICHTrack(const ExtHit* extHit)
     {

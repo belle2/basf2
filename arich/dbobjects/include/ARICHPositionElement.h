@@ -86,14 +86,14 @@ namespace Belle2 {
 
     /**
      * Sets rotation around y
-     * @param alpha rotation angle around y
+     * @param beta rotation angle around y
      */
     void setBeta(double beta) {m_beta = beta;}
 
 
     /**
      * Sets rotation around z
-     * @param alpha rotation angle around z
+     * @param gamma rotation angle around z
      */
     void setGamma(double gamma) {m_gamma = gamma;}
 

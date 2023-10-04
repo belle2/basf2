@@ -53,7 +53,7 @@ namespace Belle2 {
     std::string getAerogelSN() const {return m_id; }
 
     /** Set Aerogel serial number
-     * @param Aerogel serial number
+     * @param agelid Aerogel serial number
      */
     void setAerogelSN(const std::string& agelid) {m_id = agelid; }
 
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     /**
      * Set Aerogel Ring Identifier
-     * @param Ring Identifier
+     * @param ring Ring Identifier
      */
     void setAerogelRingID(int ring) {m_ring = ring;}
 
@@ -77,7 +77,7 @@ namespace Belle2 {
 
     /**
      * Set Aerogel Column Identifier
-     * @param Column Identifier
+     * @param column Column Identifier
      */
     void setAerogelColumnID(int column) {m_column = column;}
 
@@ -90,6 +90,7 @@ namespace Belle2 {
     /**
      * Set aerogel info of layer i
      * @param i aerogel layer
+     * @param layer aerogel layer info
      */
     void setAerogelLayer(unsigned int i, unsigned int layer);
 
@@ -100,7 +101,7 @@ namespace Belle2 {
     TTimeStamp getAerogelTimeStamp() const {return m_timeStamp; }
 
     /** Set Aerogel installation date
-     * @param Aerogel installation date
+     * @param timeStamp Aerogel installation date
      */
     void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 

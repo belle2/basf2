@@ -78,25 +78,25 @@ namespace Belle2 {
 
     /**
      * Set window material
-     * @param window material name
+     * @param material window material name
      */
     void setWinMaterial(const std::string& material) {m_winMaterial = material;}
 
     /**
      * Sets APD material
-     * @param APD material name
+     * @param material APD material name
      */
     void setAPDMaterial(const std::string& material) {m_apdMaterial = material;}
 
     /**
      * Sets FEB material
-     * @param FEB material name
+     * @param material FEB material name
      */
     void setFEBMaterial(const std::string& material) {m_febMaterial = material;}
 
     /**
      * Sets material inside of HAPD (vacuum with set ref. index)
-     * @param fill material name
+     * @param material fill material name
      */
     void setFillMaterial(const std::string& material) {m_fillMaterial = material;}
 
@@ -105,7 +105,7 @@ namespace Belle2 {
      * @param sizeX size in x
      * @param sizeY size in y
      * @param sizeZ size in z
-     * @param FEB material
+     * @param material FEB material
      */
     void setFEBVolume(double sizeX, double sizeY, double sizeZ,
                       const std::string& material)
@@ -121,8 +121,8 @@ namespace Belle2 {
      * @param sizeX size in x
      * @param sizeY size in y
      * @param sizeZ size in z
-     * @param APD material name
-     * @param APD optical surface properties
+     * @param material APD material name
+     * @param surf APD optical surface properties
      */
     void setAPDVolume(double sizeX, double sizeY, double sizeZ,
                       const std::string& material, const GeoOpticalSurface& surf)
@@ -139,7 +139,7 @@ namespace Belle2 {
      * @param sizeX size in x
      * @param sizeY size in y
      * @param sizeZ size in z
-     * @param fill material
+     * @param material fill material
      */
     void setHAPDVolume(double sizeX, double sizeY, double sizeZ,
                        const std::string& material)

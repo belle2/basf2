@@ -42,7 +42,7 @@ namespace Belle2 {
 
     /**
      * Set vector of structures which holds apexes of the tessellation volumes for (merger cooling bodyes).
-     * @param mergerCoolingBodiesInfo vector of structures which holds apexes of the tessellation volumes for (merger cooling bodyes).
+     * @param mergerCoolingBodiesStr vector of structures which holds apexes of the tessellation volumes for (merger cooling bodyes).
      */
     void addMergerCoolingBodiesInfo(tessellatedSolidStr mergerCoolingBodiesStr) {m_mergerCoolingBodiesInfo.push_back(mergerCoolingBodiesStr);}
 

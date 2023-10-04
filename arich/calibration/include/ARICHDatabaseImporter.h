@@ -205,7 +205,7 @@ namespace Belle2 {
     /**
      * Dumps aerogel tile properties (aerogel optical properties - AOP) into root file with
      * arich/utility/ARICHAerogelHist histos
-     * @param string with output name
+     * @param outRootFileName string with output name
      */
     void dumpAerogelOpticalProperties(std::string outRootFileName = "ARICH_AerogelOpticalProperties.root");
 
@@ -474,7 +474,7 @@ namespace Belle2 {
 
     /**
      * Get graphs for bombardment and avalanche gain and current.
-     * @param bomb_val - bombardment or avalanche
+     * @param bomb_aval - bombardment or avalanche
      * @param g_i - gain or current
      * @param chip_label - chip label
      * @param i - number of entries
@@ -510,19 +510,19 @@ namespace Belle2 {
 
     /**
      * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
-     * @param HAPD serial number
+     * @param serialNumber HAPD serial number
      */
     void printBiasVoltagesForHapdChip(const std::string& serialNumber);
 
     /**
      * Example that shows how to use data from the database
-     * @param aerogel serial number
+     * @param aeroSerialNumber aerogel serial number
      */
     void printMyParams(const std::string& aeroSerialNumber);
 
     /**
      * Function that returns refractive index, thickness and transmission length of aerogel
-     * @param aerogel serial number
+     * @param aeroSerialNumber aerogel serial number
      */
     std::map<std::string, float> getAerogelParams(const std::string& aeroSerialNumber);
 

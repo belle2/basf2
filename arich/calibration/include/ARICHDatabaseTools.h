@@ -39,7 +39,7 @@ namespace Belle2 {
 
       /**
        * @brief isValidChannel defines the range of valid channels.
-       * @param channel
+       * @param channel channel
        * @return true if channel id/number is in the valid range otherwise false.
        */
       static constexpr auto isValidChannel(const int channel) noexcept -> bool

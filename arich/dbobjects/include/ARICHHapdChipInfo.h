@@ -227,7 +227,7 @@ namespace Belle2 {
 
     /**
      * Set the list of bad channels.
-     * @param[in] channel HAPD channel numbers.
+     * @param[in] channels HAPD channel numbers.
      */
     void setBadChannel(const std::vector<int>& channels) {m_badChannel = channels; }
 

@@ -66,6 +66,7 @@ namespace Belle2 {
 
     /**
      * Set ASIC info.
+     * @param[in] i ASIC number
      * @param[in] asic ASIC info.
      */
     void setAsicInfo(unsigned int i, ARICHAsicInfo* asic);
@@ -78,6 +79,7 @@ namespace Belle2 {
 
     /**
      * Set ASIC position.
+     * @param[in] i ASIC number
      * @param[in] asicsFEB Asic position.
      */
     void setAsicPosition(unsigned int i, const std::string& asicsFEB);

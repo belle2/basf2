@@ -187,6 +187,7 @@ namespace Belle2 {
 
     /**
      * Set Chip Vmon - Vset difference during treshold scan.
+     * @param[in] i chip id
      * @param[in] chipVdiff_th Chip Vmon - Vset difference.
      */
     void setChipVdiffTH(unsigned int i, TGraph* chipVdiff_th);
@@ -199,6 +200,7 @@ namespace Belle2 {
 
     /**
      * Set leakage current during treshold scan.
+     * @param[in] i chip id
      * @param[in] chipLeak_th Leakage current.
      */
     void setChipLeakTH(unsigned int i, TGraph* chipLeak_th);
@@ -235,6 +237,7 @@ namespace Belle2 {
 
     /**
      * Set Chip Vmon - Vset difference during 2Dx scan.
+     * @param[in] i chip id
      * @param[in] chipVdiff_2Dx Chip Vmon - Vset difference.
      */
     void setChipVdiff2Dx(unsigned int i, TGraph* chipVdiff_2Dx);
@@ -247,6 +250,7 @@ namespace Belle2 {
 
     /**
      * Set leakage current during 2Dx scan.
+     * @param[in] i chip id
      * @param[in] chipLeak_2Dx Leakage current.
      */
     void setChipLeak2Dx(unsigned int i, TGraph* chipLeak_2Dx);
@@ -283,6 +287,7 @@ namespace Belle2 {
 
     /**
      * Set Chip Vmon - Vset difference during 2Dx scan.
+     * @param[in] i chip id
      * @param[in] chipVdiff_2Dy Chip Vmon - Vset difference.
      */
     void setChipVdiff2Dy(unsigned int i, TGraph* chipVdiff_2Dy);
@@ -295,6 +300,7 @@ namespace Belle2 {
 
     /**
      * Set leakage current during 2Dy scan.
+     * @param[in] i chip id
      * @param[in] chipLeak_2Dy Leakage current.
      */
     void setChipLeak2Dy(unsigned int i, TGraph* chipLeak_2Dy);
@@ -367,7 +373,7 @@ namespace Belle2 {
 
     /**
      * Set laser scan - Y direction.
-     * @param[in] m_scanY Laser scan - Y direction.
+     * @param[in] scanY Laser scan - Y direction.
      */
     void setLaserScanY(TH2D* scanY) { m_scanY = scanY;}
 

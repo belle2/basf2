@@ -106,6 +106,8 @@ namespace Belle2 {
      * @param outR outer radius
      * @param length length
      * @param zPosition Z position of start of tube (in ARICH frame)
+     * @param material material
+     * @param name name
      */
     void addTube(double inR, double outR, double length, double zPosition, const std::string& material, const std::string& name)
     {

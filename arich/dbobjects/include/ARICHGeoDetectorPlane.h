@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Set thickness of the aluminum walls between modules
      * on the electronics side of the aluminum support plate.
-     * @param[in] h Wall height.
+     * @param[in] d Wall thickness.
      */
     void setSupportBackWallThickness(double d) {m_supportBackWallThickness = d;}
 

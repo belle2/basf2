@@ -152,6 +152,7 @@ namespace Belle2 {
      * @param[in] refind Array of layers refractive indices.
      * @param[in] z      Array of z coordinates of borders between layers.
      * @param[in] n      Number of aerogel layers through which photon passes.
+     * @param[in] opt    Parameter can be set to 1 to return empty TVector3 in case of errors
      */
     TVector3 FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n, int opt);
 

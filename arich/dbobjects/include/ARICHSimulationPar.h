@@ -67,7 +67,7 @@ namespace Belle2 {
 
     /**
      * Set number of flat background hits/hapd/event to be added in digitizer
-     * @param number of background hits/hapd/event
+     * @param nbkg number of background hits/hapd/event
      */
     void setNBkgHits(float nbkg) { m_nBkgHits = nbkg;}
 

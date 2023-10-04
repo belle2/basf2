@@ -34,6 +34,7 @@ namespace Belle2 {
      * @param name name
      * @param title title
      * @param type type
+     * @param moduleIDs vector of module IDs
      */
     ARICHChannelHist(const char* name, const char* title, int type = 0,
                      const std::vector<unsigned>& moduleIDs = std::vector<unsigned>());
@@ -42,6 +43,7 @@ namespace Belle2 {
      * Add entry to bin corresponding to hapd hapdID and channel chID
      * @param hapdID ID number of HAPD module
      * @param chID channel ID (asic channel) or APD ID
+     * @param weight value to be added to bin
      */
     void fillBin(unsigned hapdID, unsigned chID, double weight = 1.);
 
@@ -56,6 +58,7 @@ namespace Belle2 {
     /**
      * Add entry to bin corresponding to hapd hapdID
      * @param hapdID ID number of HAPD module
+     * @param weight value to be added to bin
      */
     void fillBin(unsigned hapdID, double weight = 1.);
 

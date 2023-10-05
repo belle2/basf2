@@ -129,6 +129,8 @@ namespace Belle2 {
     double m_maxDeviationForOccupancy;
     /** The higher this parameter, the larger differences in the number of hits with bad chi2 are allowed for adjacent channels */
     double m_maxDeviationForChi2;
+    /** If true (default), update EPICS PVs only if there were changes in the histograms */
+    bool m_onlyIfUpdated;
 
     /** Different alarms monitored in h_channels_summary */
     std::vector<ECLAlarmType> m_ecl_alarms;

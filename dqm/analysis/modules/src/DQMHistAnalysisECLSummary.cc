@@ -378,7 +378,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   //=== Get number of fit inconsistencies
 
-  TH1* h_fail_crateid = findHist("ECL/fail_crateid");
+  TH1* h_fail_crateid = findHist("ECL/fail_crateid", m_onlyIfUpdated);
 
   const int fit_alarm_index = getAlarmByName("bad_fit").first;
   for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
@@ -446,12 +446,12 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       TH1F* overlay_hist;
       TH1F* overlay_hist_green;
       if (index_name == "hot") {
-        main_hist          = findHist("ECL/cid_Thr5MeV");
+        main_hist          = findHist("ECL/cid_Thr5MeV", m_onlyIfUpdated);
         overlay_hist       = h_bad_occ_overlay;
         overlay_hist_green = h_bad_occ_overlay_green;
         current_canvas     = c_occupancy;
       } else {
-        main_hist          = findHist("ECL/bad_quality");
+        main_hist          = findHist("ECL/bad_quality", m_onlyIfUpdated);
         overlay_hist       = h_bad_chi2_overlay;
         overlay_hist_green = h_bad_chi2_overlay_green;
         current_canvas     = c_bad_chi2;
@@ -536,7 +536,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithOccupancyProb
     }
   }
 
-  TH1* h_occupancy = findHist("ECL/cid_Thr5MeV");
+  TH1* h_occupancy = findHist("ECL/cid_Thr5MeV", m_onlyIfUpdated);
   const double max_deviation = m_maxDeviationForOccupancy;
   return getSuspiciousChannels(h_occupancy, m_total_events, neighbours,
                                max_deviation, true);
@@ -568,7 +568,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getChannelsWithChi2Problems(
     }
   }
 
-  TH1* h_bad_chi2 = findHist("ECL/bad_quality");
+  TH1* h_bad_chi2 = findHist("ECL/bad_quality", m_onlyIfUpdated);
   const double max_deviation = m_maxDeviationForChi2;
   return getSuspiciousChannels(h_bad_chi2, m_total_events, neighbours,
                                max_deviation, false);

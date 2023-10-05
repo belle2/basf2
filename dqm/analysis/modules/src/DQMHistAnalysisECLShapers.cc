@@ -20,6 +20,7 @@ DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLShapers: Constructor done.");
+  setDescription("Processes information involving ECL pedistals (widths and rms).");
 }
 
 

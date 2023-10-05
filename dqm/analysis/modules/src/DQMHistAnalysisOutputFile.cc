@@ -32,6 +32,8 @@ REG_MODULE(DQMHistAnalysisOutputFile);
 DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("Module to save histograms from DQMHistAnalysisModules");
+
   //Parameter definition
   addParam("HistoFile", m_filename, "Output Histogram Filename", std::string("histo.root"));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",

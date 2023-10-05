@@ -26,7 +26,7 @@ DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
   B2DEBUG(20, "DQMHistAnalysisECL: Constructor done.");
 
   m_WaveformOption = {"psd", "logic", "rand", "dphy", "other"};
-
+  setDescription("Modify and analyze the data quality histograms of ECL");
   addParam("HitMapThresholds", m_HitMapThresholds, "Thresholds to display hit map, MeV", std::vector<double> {0, 5, 10, 50});
   addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy) to display waveform flow",
            m_WaveformOption);

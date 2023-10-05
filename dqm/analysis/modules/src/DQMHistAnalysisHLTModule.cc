@@ -38,6 +38,7 @@ REG_MODULE(DQMHistAnalysisHLT);
 
 DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
 {
+  setDescription("Modify and analyze the data quality histograms of HLT");
   addParam("pvPrefix", m_pvPrefix, "EPICS PV Name for the inst. luminosity", m_pvPrefix);
   addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);

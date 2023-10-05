@@ -30,6 +30,7 @@ DQMHistAnalysisDeltaTestModule::DQMHistAnalysisDeltaTestModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("Testing module for using delta histogramming functinality.");
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));

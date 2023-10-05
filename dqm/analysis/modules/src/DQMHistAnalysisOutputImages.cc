@@ -33,6 +33,7 @@ REG_MODULE(DQMHistAnalysisOutputImages);
 DQMHistAnalysisOutputImagesModule::DQMHistAnalysisOutputImagesModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("Module to produce output images during 'events' for dqm steering scripts.");
   //Parameter definition
   addParam("CanvasSaveDefault", m_canvasSaveDefault, "Save untagged canvases", false);
   addParam("OutputPath", m_outputPath, "Set output path", std::string(""));

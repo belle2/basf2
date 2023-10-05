@@ -20,6 +20,7 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: Constructor done.");
+  setDescription("Module to collect and process 'out of time' ECL hits");
   addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
            std::string("ECL:out_of_time_digits:"));
   addParam("onlyIfUpdated", m_onlyIfUpdated, "If true (default), update EPICS PVs only if there histograms were updated.",

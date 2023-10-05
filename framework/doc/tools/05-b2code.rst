@@ -118,8 +118,8 @@ Options for the compiler are:
 
 .. rubric:: Optional Arguments
 
--h, --help  show this help message and exit
---csh   To be used with csh shells.
+-h, --help      Show this help message and exit
+--csh           To be used with csh shells.
 
 
 ``b2code-parallel_processing-benchmark``: Measure multi-core performance

@@ -26,7 +26,9 @@
 namespace Belle2 {
 
   /**
-   * This module is for analysis of ECL DQM histograms.
+   * This module provides a high-level display to show which
+   * ECLCollectors have channels with various type of issues
+   * See https://indico.belle2.org/event/10116/contributions/66837/attachments/23993/35443/2023.09.06_ecl.dqm.status_mikhail.remnev.pdf
    */
 
   class DQMHistAnalysisECLSummaryModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */

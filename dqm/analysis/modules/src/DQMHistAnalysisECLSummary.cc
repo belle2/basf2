@@ -457,23 +457,25 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
         current_canvas     = c_bad_chi2;
       }
 
-      for (auto& overlay : {overlay_hist, overlay_hist_green}) {
-        for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
-          if (overlay->GetBinContent(bin_id) == 0) continue;
-          // Do not adjust bin height for dead channels
-          if (main_hist->GetBinContent(bin_id) == 0) continue;
-          overlay->SetBinContent(bin_id, main_hist->GetBinContent(bin_id));
+      if (!main_hist) {
+        for (auto& overlay : {overlay_hist, overlay_hist_green}) {
+          for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
+            if (overlay->GetBinContent(bin_id) == 0) continue;
+            // Do not adjust bin height for dead channels
+            if (main_hist->GetBinContent(bin_id) == 0) continue;
+            overlay->SetBinContent(bin_id, main_hist->GetBinContent(bin_id));
+          }
         }
-      }
 
-      current_canvas->Clear();
-      current_canvas->cd();
-      main_hist->Draw("hist");
-      overlay_hist->Draw("hist;same");
-      overlay_hist_green->Draw("hist;same");
-      current_canvas->Modified();
-      current_canvas->Update();
-      current_canvas->Draw();
+        current_canvas->Clear();
+        current_canvas->cd();
+        main_hist->Draw("hist");
+        overlay_hist->Draw("hist;same");
+        overlay_hist_green->Draw("hist;same");
+        current_canvas->Modified();
+        current_canvas->Update();
+        current_canvas->Draw();
+      }
     }
   }
 

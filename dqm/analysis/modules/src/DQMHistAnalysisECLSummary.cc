@@ -13,14 +13,9 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 
 //ROOT
-#include <TProfile.h>
 #include <TStyle.h>
 #include <TLine.h>
 #include <TText.h>
-
-//std
-#include <iostream>
-#include <fstream>
 
 //boost
 #include "boost/format.hpp"

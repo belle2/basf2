@@ -350,6 +350,20 @@ namespace Belle2 {
     void setEpicsPV(int index, int value);
 
     /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(std::string keyname);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(int index);
+
+    /**
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
      * */

@@ -230,6 +230,8 @@ namespace Belle2::Conditions {
     std::vector<std::string> getMetadataProviders() { return m_metadataProviders.ensureCpp(); }
     /** Get the list of metadata providers in python */
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
+    /** Get the default URL where to look for the metadata provider */
+    std::string getDefaultMetadataProviderUrl() { return m_defaultMetadataProviderUrl; }
     ///@}
 
     /** @name Payload Location Configuration
@@ -329,6 +331,8 @@ namespace Belle2::Conditions {
     CppOrPyList m_metadataProviders;
     /** the list with all the payload locations */
     CppOrPyList m_payloadLocations;
+    /** default URL where to look for the metadata provider */
+    std::string m_defaultMetadataProviderUrl{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
     /** the file to put the newly created payload information */
     std::string m_newPayloadFile{"localdb/database.txt"};
     /** the directory to put newly downloaded payloads */

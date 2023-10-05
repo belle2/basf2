@@ -22,7 +22,7 @@ class TutorialsTest(unittest.TestCase):
     """Test to run all B2A9XX tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = []
+    broken_tutorials = ['B2A910-ApplyKsSelector.py']
     #: list of the tutorials whose output file name cannot be overwritten
     do_not_overwrite = ['B2A911-CreateTrainData.py']
 

@@ -110,7 +110,7 @@ This tool sets up compiler options coding environment.
 
 To run this tool:: 
 
-    usage: b2code-option [-h] [--csh] OPTION
+    b2code-option [-h] [--csh] OPTION
 
 Options for the compiler are: 
     debug : use gcc compiler, include debug symbols, no optimization

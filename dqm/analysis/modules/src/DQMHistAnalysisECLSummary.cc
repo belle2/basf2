@@ -45,6 +45,8 @@ DQMHistAnalysisECLSummaryModule::DQMHistAnalysisECLSummaryModule()
   addParam("maxDeviationForChi2", m_maxDeviationForChi2,
            "The higher this parameter, the larger differences in the number of hits with bad chi2 are allowed for adjacent channels",
            2.5);
+  addParam("onlyIfUpdated", m_onlyIfUpdated, "If true (default), update EPICS PVs only if there histograms were updated.",
+           true);
 }
 
 
@@ -178,7 +180,7 @@ void DQMHistAnalysisECLSummaryModule::event()
 {
   h_channels_summary->Reset();
 
-  TH1* h_total_events = findHist("ECL/event");
+  TH1* h_total_events = findHist("ECL/event", m_onlyIfUpdated);
   if (!h_total_events) return;
   m_total_events = h_total_events->GetEntries();
 
@@ -440,6 +442,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
     if (update_mirabelle) continue;
 
+    //=== Prepare the histogram to display the list of all bad channels
     if (index_name == "hot" || index_name == "bad_chi2") {
       TCanvas* current_canvas;
       TH1* main_hist;
@@ -457,7 +460,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
         current_canvas     = c_bad_chi2;
       }
 
-      if (!main_hist) {
+      if (main_hist) {
         for (auto& overlay : {overlay_hist, overlay_hist_green}) {
           for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
             if (overlay->GetBinContent(bin_id) == 0) continue;

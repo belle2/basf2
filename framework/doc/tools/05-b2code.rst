@@ -103,6 +103,25 @@ cppcheck in parallel::
 However in this case a directory to check has to be provided
 
 
+``b2code-option``: Set up the environment for selected compiler options
+-------------------------------------------------
+
+This tool sets up compiler options coding environment. 
+
+    usage: b2code-option [-h] [--csh] OPTION
+
+Options for the compiler are: 
+    debug : use gcc compiler, include debug symbols, no optimization
+    opt   : use gcc compiler, no debug symbols, turn on -O3 optimization
+    intel : use intel compiler, no debug symbols
+    clang : use clang compiler (LLVM), no debug symbols, turn on -O3 optimization
+
+.. rubric:: Optional Arguments
+
+-h, --help  show this help message and exit
+--csh   To be used with csh shells.
+
+
 ``b2code-parallel_processing-benchmark``: Measure multi-core performance
 ------------------------------------------------------------------------
 

@@ -108,6 +108,8 @@ However in this case a directory to check has to be provided
 
 This tool sets up compiler options coding environment. 
 
+To run this tool:: 
+
     usage: b2code-option [-h] [--csh] OPTION
 
 Options for the compiler are: 

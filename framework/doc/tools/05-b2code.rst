@@ -110,7 +110,7 @@ This tool sets up compiler options coding environment.
 
 To run this tool:: 
 
-    b2code-option [-h] [--csh] OPTION
+    b2code-option [-h] OPTION
 
 Possible inputs for OPTION: 
 
@@ -122,7 +122,6 @@ Possible inputs for OPTION:
 .. rubric:: Optional Arguments
 
 -h, --help      Show this help message and exit
---csh           To be used with csh shells.
 
 
 ``b2code-parallel_processing-benchmark``: Measure multi-core performance

@@ -491,7 +491,7 @@ TBranch: mcErrors, 8
 TBranch: mcPDG, 3.006e+05
 TBranch: nROE_Charged__bo__bc, 0
 TBranch: nROE_Photons__bo__bc, 0
-TBranch: nROE_NeutralHadrons__bo__bc, 1
+TBranch: nROE_NeutralHadrons__bo__bc, 2
 TBranch: pRecoil, 2.542
 TBranch: eRecoil, 2.573
 TBranch: mRecoil, 0.3977

@@ -16,18 +16,18 @@ import argparse
 def get_argument_parser() -> argparse.ArgumentParser:
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-id', '--identifiers', dest='identifiers', type=str, required=True, action='append', nargs='+',
+    parser.add_argument('-id', '--identifier', dest='identifier', type=str, required=True,
                         help='Identifier produced by basf2_mva_teacher')
-    parser.add_argument('-did', '--db_identifiers', dest='db_identifiers', type=str, required=True, action='append', nargs='+',
+    parser.add_argument('-did', '--db_identifier', dest='db_identifier', type=str, required=True,
                         help='New database identifier for the method')
-    parser.add_argument('-be', '--begin_experiment', dest='begin_experiment', type=str, required=False, action='append', nargs='+',
-                        help='First experiment for which the weightfile is valid')
-    parser.add_argument('-ee', '--end_experiment', dest='end_experiment', type=str, required=False, action='append', nargs='+',
-                        help='Last experiment for which the weightfile is valid')
-    parser.add_argument('-br', '--begin_run', dest='begin_run', type=str, required=False, action='append', nargs='+',
-                        help='First run for which the weightfile is valid')
-    parser.add_argument('-er', '--end_run', dest='end_run', type=str, required=False, action='append', nargs='+',
-                        help='Last run for which the weightfile is valid')
+    parser.add_argument('-be', '--begin_experiment', dest='begin_experiment', type=int, required=False,
+                        help='First experiment for which the weightfile is valid', default=0)
+    parser.add_argument('-ee', '--end_experiment', dest='end_experiment', type=int, required=False,
+                        help='Last experiment for which the weightfile is valid', default=0)
+    parser.add_argument('-br', '--begin_run', dest='begin_run', type=int, required=False,
+                        help='First run for which the weightfile is valid', default=-1)
+    parser.add_argument('-er', '--end_run', dest='end_run', type=int, required=False,
+                        help='Last run for which the weightfile is valid', default=-1)
     return parser
 
 

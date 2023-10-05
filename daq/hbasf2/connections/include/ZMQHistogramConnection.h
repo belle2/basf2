@@ -17,7 +17,7 @@
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 
 #include <framework/pcore/EvtMessage.h>
-#include <daq/rfarm/manager/SharedMem.h>
+#include <daq/dqm/DqmSharedMem.h>
 
 #include <string>
 #include <memory>
@@ -66,7 +66,7 @@ namespace Belle2 {
     std::string getEndPoint() const { return "file://" + m_rootFileName; }
   private:
     /// The SHM file. Please note that we do not call its destructor on purpose.
-    SharedMem* m_sharedMemory = nullptr;
+    DqmSharedMem* m_sharedMemory = nullptr;
     /// Name of the shared memory
     std::string m_dqmMemFileName;
     /// Output file name (possible with placeholders)

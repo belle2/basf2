@@ -22,7 +22,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2023-07-09"
+#define CURRENT_DEFAULT_TAG "main_2023-09-18"
 
 namespace py = boost::python;
 
@@ -103,7 +103,7 @@ namespace Belle2::Conditions {
       fillFromEnv(m_globalTags, "BELLE2_CONDB_GLOBALTAG", "");
       overrideGlobalTags();
     }
-    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
+    std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", m_defaultMetadataProviderUrl);
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
   }
@@ -511,6 +511,10 @@ This list should rarely need to be changed. The only exception is for users who
 want to be able to use the software without internet connection after they
 downloaded a snapshot of the necessary globaltags with ``b2conditionsdb download``
 to point to this location.
+)DOC")
+    .add_property("default_metadata_provider_url", &Configuration::getDefaultMetadataProviderUrl, R"DOC(
+URL of the default central metadata provider to look for payloads in the
+conditions database.
 )DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
 List of payload locations to search for payloads which have been found by any of

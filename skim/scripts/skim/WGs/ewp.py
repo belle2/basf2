@@ -16,12 +16,10 @@ B->Xgamma, B->Xll, B->Xll (LFV modes)
 
 """
 
-import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
-from variables import variables as vm
 
 __liaison__ = "Rahul Tiwary <rahul.tiwary@tifr.res.in>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -315,135 +313,3 @@ class BtoXll_LFV(BaseSkim):
         ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
         return ['B+:lfv']
-
-
-class inclusiveBplusToKplusNuNu(BaseSkim):
-    """
-      Reconstructed decay modes:
-
-    * :math:`B^+ \\to K\\nu\\nu` inclusive
-
-    Track cleanup:
-    * :math:`p_t > 0.1`
-    * :math:`thetaInCDCAcceptance`
-    * :math:`dr<0.5 and abs(dz)<3.0`
-
-    Event cleanup:
-    * :math:`3 < nCleanedTracks < 11`
-
-    Kaon cuts:
-    * :math:`track cleanup + event cleanup + nPXDHits > 0`
-    * :math:`p_t rank=1`
-    * :math:`kaonID>0.01`
-
-    MVA info and cuts:
-    * mva_identifier: MVAFastBDT_InclusiveBplusToKplusNuNu_Skim
-    * Global Tag: mva_inclusiveBplusToKplusNuNu
-    * :math:`mva\\_identifier > 0.5`
-    """
-
-    __authors__ = ["Cyrille Praz"]
-    __description__ = "Inclusive skim for :math:`B\\to K\\nu\\nu` analysis"
-    __contact__ = __liaison__
-    __category__ = "physics, electroweak penguins, radiative decays"
-
-    NoisyModules = ["ParticleCombiner"]
-    validation_sample = _VALIDATION_SAMPLE
-
-    def build_lists(self, path):
-
-        # Default cleanup also used in and ma.buildEventShape
-        track_cleanup = 'pt > 0.1'
-        track_cleanup += ' and thetaInCDCAcceptance'
-        track_cleanup += ' and abs(dz) < 3.0'
-        track_cleanup += ' and dr < 0.5'
-
-        # Min 4 tracks and Max 10 tracks per event.
-        event_cleanup = 'nCleanedTracks({}) > 3'.format(track_cleanup)
-        event_cleanup += ' and nCleanedTracks({}) < 11'.format(track_cleanup)
-
-        # Define the signal
-        total_cleanup = track_cleanup + ' and ' + event_cleanup + ' and ' + 'nPXDHits>0'
-        ma.fillParticleList('K+:inclusiveBplusToKplusNuNu', cut=total_cleanup, path=path)
-        ma.rankByHighest('K+:inclusiveBplusToKplusNuNu', 'pt', path=path)
-        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'extraInfo(pt_rank)==1', path=path)
-        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'kaonID>1e-2', path=path)
-        ma.reconstructDecay(decayString='B+:inclusiveBplusToKplusNuNu -> K+:inclusiveBplusToKplusNuNu', cut='', path=path)
-
-        # Build the event-based variables that we need
-        ma.buildEventShape(inputListNames=[],
-                           default_cleanup=True,
-                           allMoments=False,
-                           cleoCones=True,
-                           collisionAxis=False,
-                           foxWolfram=True,
-                           harmonicMoments=True,
-                           jets=False,
-                           sphericity=True,
-                           thrust=True,
-                           checkForDuplicates=False,
-                           path=path)
-
-        # Apply a MVA by reading from the DB
-        mva_identifier = 'MVAFastBDT_InclusiveBplusToKplusNuNu_Skim'
-        b2.conditions.append_globaltag('mva_inclusiveBplusToKplusNuNu')
-        path.add_module('MVAExpert', listNames=['B+:inclusiveBplusToKplusNuNu'],
-                        extraInfoName=mva_identifier, identifier=mva_identifier)
-        vm.addAlias(mva_identifier, f'extraInfo({mva_identifier})')
-        ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier + '>0.5', path=path)
-
-        return ['B+:inclusiveBplusToKplusNuNu']
-
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        histogram_filename = f'{self}_Validation.root'
-        # Default cleanup also used in and ma.buildEventShape
-        track_cleanup = 'pt > 0.1'
-        track_cleanup += ' and thetaInCDCAcceptance'
-        track_cleanup += ' and abs(dz) < 3.0'
-        track_cleanup += ' and abs(dr) < 0.5'
-
-        # Define a couple of aliases
-        vm.addAlias('kaon_pt', 'daughter(0,pt)')
-        vm.addAlias('nCleanedTracks_simple_cleanup', 'nCleanedTracks({})'.format(track_cleanup))
-
-        # Output validation histograms
-        create_validation_histograms(
-            rootfile=histogram_filename,
-            particlelist='B+:inclusiveBplusToKplusNuNu',
-            variables_1d=[
-                ('kaon_pt',
-                 10,
-                 0,
-                 5,
-                 'Kaon pt',
-                 __liaison__,
-                 'Transverse momentum of the kaon candidate',
-                 'Maximum between 1.5 and 2 GeV/c',
-                 'Kaon pt [GeV/c]',
-                 'Candidates'),
-                ('nCleanedTracks_simple_cleanup',
-                 12,
-                 0,
-                 12,
-                 'Number of cleaned tracks',
-                 __liaison__,
-                 'Number of cleaned tracks in the event',
-                 'Should be between 4 and 10, with two local maxima at 4 and 6',
-                 'Number of cleaned tracks',
-                 'Events'),
-                ('sphericity',
-                 10,
-                 0,
-                 1,
-                 'Event Sphericity',
-                 __liaison__,
-                 'Sphericity computed by ma.buildEventShape',
-                 'Maximum around 0.3',
-                 'Event Sphericity',
-                 'Events')],
-            variables_2d=[],
-            path=path)

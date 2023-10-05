@@ -24,8 +24,13 @@ namespace Belle2 {
 
     class ISRPhotonFitObject : public ParticleFitObject {
     public:
-      ISRPhotonFitObject(double px, double py, double pz,                   /// initial values for photon (p_x,p_y fix)
-                         double b_, double PzMaxB_, double PzMinB_ = 0.);  /// photon spectrum parametrization (see above)
+      ISRPhotonFitObject(double px,           ///< initial px value for photon (fixed)
+                         double py,           ///< initial py value for photon (fixed)
+                         double pz,           ///< initial pz value for photon
+                         double b_,           ///< photon spectrum parametrization
+                         double PzMaxB_,      ///< photon spectrum parametrization
+                         double PzMinB_ = 0.  ///< photon spectrum parametrization
+                        );
 
       /// Copy constructor
       ISRPhotonFitObject(const ISRPhotonFitObject& rhs               ///< right hand side

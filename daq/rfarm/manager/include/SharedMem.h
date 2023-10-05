@@ -5,8 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef SHAREDMEM_H
-#define SHAREDMEM_H
+#pragma once
 
 #include <sys/types.h>
 
@@ -16,7 +15,6 @@ namespace Belle2 {
   class SharedMem {
   public:
     SharedMem(const char* name, int size);
-    SharedMem(int shm_id);
     SharedMem(int shm_id, int sem_id, int size);
     ~SharedMem(void);
 
@@ -25,25 +23,22 @@ namespace Belle2 {
 
     bool IsCreated(void);
 
-    void lock();
-    void unlock();
-    bool isLocked();
+    static std::string getTmpFileName(std::string user, std::string name);
+    static bool getIdFromTmpFileName(std::string filename, int& shmid, int& semid);
+
+    void lock(void);
+    void unlock(void);
+    bool isLocked(void);
 
   private:
-    bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    bool m_file;
-    std::string m_pathname;
-    int  m_pathfd; /** Associated file descriptor. */
+    bool m_new{false}; /**< True if we created the ring buffer ourselves (and need to clean it). */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key */
 
-    int m_shmid;
-    int m_semid;
-    void* m_shmadr;
-    int m_shmsize;
-    char* m_strbuf;
+    int m_shmid{-1}; /**< shared memory id */
+    int m_semid{-1}; /**< semaphore id */
+    void* m_shmadr{nullptr};
   };
 }
 
-#endif
 

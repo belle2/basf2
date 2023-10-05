@@ -18,6 +18,25 @@
 """
 
 import ROOT
+import argparse
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        # epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        # usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('--input', type=str, default='MCvalidationMixed.root', help='The name of the input root file')
+    parser.add_argument('--output', type=str, default='MultiplicityPlotsMixed.root', help='The name of the output root file')
+
+    return parser
 
 
 def PlottingHistos(particle):
@@ -36,8 +55,11 @@ def PlottingHistos(particle):
 
 if __name__ == '__main__':
 
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
     # load the root file into RDataFrame
-    rdf = ROOT.RDataFrame("Multiplicities", "MCvalidationMixed.root")
+    rdf = ROOT.RDataFrame("Multiplicities", args.input)
 
     # define the variables to plot
     colnames = rdf.GetColumnNames()
@@ -75,8 +97,8 @@ if __name__ == '__main__':
                 'nETA': '#eta',
                 'nETAprim': "#eta'",
                 'nPHI': '#phi',
-                'nRHOp': '#rho^{0}',
-                'nRHO0': '#rho^{+}',
+                'nRHOp': '#rho^{+}',
+                'nRHO0': '#rho^{0}',
                 'nKp': 'K^{+}',
                 'nKL0': 'K_{L}^{0}',
                 'nKS0': 'K_{S}^{0}',
@@ -93,10 +115,8 @@ if __name__ == '__main__':
                 'nTNEUTRINO': '#nu_{#tau}^{#minus}',
                 'nPHOTON': '#gamma'}
 
-    outputFile = ROOT.TFile("MultiplicityPlotsMixed.root", "RECREATE")
+    outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
-    ROOT.gROOT.SetStyle("BELLE2")
-    ROOT.gROOT.ForceStyle()
 
     # plot the histograms
     for var in all_list:

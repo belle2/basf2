@@ -329,6 +329,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     codes in the event, for example ::
 
         [INFO] Content of MCParticle list
+        ├── e- (11)
+        ├── e+ (-11)
         ╰── Upsilon(4S) (300553)
             ├── B+ (521)
             │   ├── anti-D_0*0 (-10421)
@@ -408,6 +410,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     the pion don't have additional daughters. ::
 
         [INFO] Content of MCParticle list
+        ├── e- (11)
+        ├── e+ (-11)
         ╰── Upsilon(4S) (300553)
             ├── B+ (521)
             │   ├── anti-D*0 (-423) → …
@@ -1196,7 +1200,8 @@ def fillParticleListFromMC(decayString,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
                            path=None,
-                           skipNonPrimary=False):
+                           skipNonPrimary=False,
+                           skipInitial=True):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1211,6 +1216,7 @@ def fillParticleListFromMC(decayString,
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     @param skipNonPrimary          if true, skip non primary particle
+    @param skipInitial             if true, skip initial particles
     """
 
     pload = register_module('ParticleLoader')
@@ -1221,6 +1227,7 @@ def fillParticleListFromMC(decayString,
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     pload.param('skipNonPrimary', skipNonPrimary)
+    pload.param('skipInitial', skipInitial)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1238,7 +1245,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
                             path=None,
-                            skipNonPrimary=False):
+                            skipNonPrimary=False,
+                            skipInitial=True):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1267,6 +1275,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     @param skipNonPrimary          if true, skip non primary particle
+    @param skipInitial             if true, skip initial particles
     """
 
     pload = register_module('ParticleLoader')
@@ -1277,6 +1286,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     pload.param('skipNonPrimary', skipNonPrimary)
+    pload.param('skipInitial', skipInitial)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -3273,11 +3283,12 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     """
 
     # Select photons with higher energy for formation of veto combinations.
-    cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
+    gammaListVeto = f'{gammaList}_pi0veto'
+    cutAndCopyList(gammaListVeto, gammaList, 'E > 0.2', path=path)
     import b2bii
     payload_name = 'LowEnergyPi0Veto' + payloadNameSuffix
     path.add_module('LowEnergyPi0VetoExpert', identifier=payload_name,
-                    VetoPi0Daughters=True, GammaListName='gamma:pi0veto',
+                    VetoPi0Daughters=True, GammaListName=gammaListVeto,
                     Pi0ListName=pi0List, Belle1=b2bii.isB2BII())
     payload_name = 'LowEnergyPi0Identification' + payloadNameSuffix
     path.add_module('LowEnergyPi0IdentificationExpert',

@@ -40,11 +40,11 @@ TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 17
+TBranch: __ncandidates__, 12
 TBranch: __weight__, 1
 TBranch: M, 0
-TBranch: p, 0.04153
-TBranch: E, 0.04153
+TBranch: p, 2.86
+TBranch: E, 2.86
 TBranch: Weight, nan
 TBranch: StatErr, nan
 TBranch: binID, nan
@@ -55,19 +55,19 @@ TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 17
+TBranch: __ncandidates__, 12
 TBranch: __weight__, 1
-TBranch: p, 0.04153
-TBranch: E, 0.04153
-TBranch: theta, 0.309
-TBranch: phi, 1.36
-TBranch: Weight, nan
-TBranch: TotalErrUp, nan
-TBranch: TotalErrDown, nan
-TBranch: StatErrUp, nan
-TBranch: StatErrDown, nan
-TBranch: SystErrUp, nan
-TBranch: SystErrDown, nan
+TBranch: p, 2.86
+TBranch: E, 2.86
+TBranch: theta, 0.4971
+TBranch: phi, 3.042
+TBranch: Weight, 1.002
+TBranch: TotalErrUp, 0.008917
+TBranch: TotalErrDown, 0.01316
+TBranch: StatErrUp, 0.007632
+TBranch: StatErrDown, 0.007585
+TBranch: SystErrUp, 0.004612
+TBranch: SystErrDown, 0.01075
 TFile: B2A908-ApplyLIDWeights.root
 TTree: jpsimumu
 TBranch: __experiment__, 0
@@ -259,33 +259,6 @@ TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_s
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_stat_dn, 0.9742
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_up, 1.093
 TBranch: e_1_weight_binaryElectronID_noSVD_noTOP_pi_misid_pi_FixedThresh09_rel_sys_dn, 0.6004
-TFile: B2A910-ApplyKsSelector.root
-TTree: tree
-TBranch: __experiment__, 0
-TBranch: __run__, 0
-TBranch: __event__, 1
-TBranch: __production__, 0
-TBranch: __candidate__, 0
-TBranch: __ncandidates__, 1
-TBranch: __weight__, 1
-TBranch: px, -1.547
-TBranch: py, -0.6457
-TBranch: pz, 0.9127
-TBranch: pt, 1.676
-TBranch: p, 1.909
-TBranch: E, 1.973
-TBranch: mcE, 1.968
-TBranch: mcP, 1.904
-TBranch: mcPT, 1.674
-TBranch: mcPX, -1.544
-TBranch: mcPY, -0.6454
-TBranch: mcPZ, 0.9073
-TBranch: mcPhi, -2.746
-TBranch: isSignal, 1
-TBranch: mcErrors, 0
-TBranch: mcPDG, 310
-TBranch: extraInfo__boV0_mva__bc, 0.9998
-TBranch: extraInfo__boLam_mva__bc, 0.9981
 TFile: B2A913-CharmFlavorTagger.root
 TTree: D0tree
 TBranch: __experiment__, 0

@@ -112,11 +112,12 @@ To run this tool::
 
     b2code-option [-h] [--csh] OPTION
 
-Options for the compiler are: 
-    debug : use gcc compiler, include debug symbols, no optimization
-    opt   : use gcc compiler, no debug symbols, turn on -O3 optimization
-    intel : use intel compiler, no debug symbols
-    clang : use clang compiler (LLVM), no debug symbols, turn on -O3 optimization
+Possible inputs for OPTION: 
+
+* debug : use gcc compiler, include debug symbols, no optimization
+* opt   : use gcc compiler, no debug symbols, turn on -O3 optimization
+* intel : use intel compiler, no debug symbols
+* clang : use clang compiler (LLVM), no debug symbols, turn on -O3 optimization
 
 .. rubric:: Optional Arguments
 

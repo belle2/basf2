@@ -50,7 +50,7 @@ int HistoServer::server()
   MsgHandler msghdl(0);
   char mbstr[100];
   time_t now;
-  char* buffer = new char[MAXBUFSIZE];
+  char* buffer = new char[c_maxBufSize];
   //  vector<int> recvsock;
   int loop_counter = 0;
   bool updated = false;
@@ -65,7 +65,7 @@ int HistoServer::server()
            it != recvsock.end(); ++it) {
         int fd = *it;
         if (m_man->connected(fd)) {
-          int is = sio.get(fd, buffer, MAXBUFSIZE);
+          int is = sio.get(fd, buffer, c_maxBufSize);
           if (is <= 0) {
             now = time(0);
             strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
@@ -121,7 +121,7 @@ int HistoServer::server()
     }
     usleep(1000);
     loop_counter++;
-    if (loop_counter % MERGE_INTERVAL == 0 && updated) {
+    if (loop_counter % c_mergeIntervall == 0 && updated) {
       now = time(0);
       strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
       printf("[%s] HistoServer: merging histograms\n", mbstr);

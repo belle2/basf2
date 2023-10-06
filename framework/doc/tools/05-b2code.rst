@@ -104,7 +104,7 @@ However in this case a directory to check has to be provided
 
 
 ``b2code-option``: Set up the environment for selected compiler options
--------------------------------------------------
+-----------------------------------------------------------------------
 
 This tool sets up compiler options coding environment. 
 

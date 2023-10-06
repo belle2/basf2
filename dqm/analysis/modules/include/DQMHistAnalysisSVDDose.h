@@ -37,7 +37,7 @@ namespace Belle2 {
    * Sends the occupancies averaged over the run to MiraBelle (via the
    * `svd` MonitoringObject).
    *
-   * @sa https://agira.desy.de/browse/BII-7853
+   * @sa [BII-7853]: https://gitlab.desy.de/belle2/software/basf2/-/issues/7721
    */
   class DQMHistAnalysisSVDDoseModule final : public DQMHistAnalysisModule {
   public:

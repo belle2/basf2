@@ -34,12 +34,9 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   // Allocate shared memory
   m_shm = new DqmSharedMem((char*)name.c_str(), size);
 
-  // Open TMemFile if write mode selected
-  if (m_writeMode) {
-    m_memfile = new TMemFile(name.c_str(), m_buf, size * sizeof(int), "RECREATE");
-    m_shm->lock();
-    m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
-    m_shm->unlock();
+  // Clear/Open TMemFile if write mode selected
+  // it will check write mode by itself!
+  if (ClearSharedMem() == 0) {
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
   } else {
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");
@@ -62,10 +59,9 @@ DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
 
   // Allocate shared memory
   m_shm = new DqmSharedMem(shm_id, sem_id, size);// size is not used in here
-
-  // Open TMemFile if write mode selected
-  if (m_writeMode) {
-    m_memfile = new TMemFile(m_name.c_str(), m_buf, size * sizeof(int), "RECREATE");
+  // Clear/Open TMemFile if write mode selected
+  // it will check write mode by itself!
+  if (ClearSharedMem() == 0) {
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
   } else {
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");

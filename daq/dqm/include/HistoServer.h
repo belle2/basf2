@@ -19,8 +19,6 @@
 
 #define MAXBUFSIZE 160000000
 
-#define MAPFILESIZE 512000000
-
 // interval to invoke histogram merge (in msec*2)
 #define MERGE_INTERVAL 5000
 

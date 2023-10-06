@@ -20,7 +20,7 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
   : DQMHistAnalysisModule()
 {
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: Constructor done.");
-  setDescription("Module to draw and compute values related to dEdX for CDC. ");
+  setDescription("Module to draw and compute values related to dEdx for CDC. ");
 
   //Parameter definition here
   addParam("mmode", mmode, "default monitoring mode is basic", std::string("basic"));

@@ -32,7 +32,7 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   m_buf = (char*) new int[size];
 
   // Allocate shared memory
-  m_shm = new DqmSharedMem((char*)name.c_str(), size);
+  m_shm = new DqmSharedMem((char*)name.c_str(), size, m_writeMode);
 
   // Clear/Open TMemFile if write mode selected
   // it will check write mode by itself!

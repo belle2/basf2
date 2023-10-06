@@ -66,12 +66,24 @@ DqmSharedMem::DqmSharedMem(const char* name, int size, bool writeable, const cha
   // - 0 will open existing one and fails if not existing
 
   // 1. Open shared memory
-  m_shmid = shmget(m_shmkey, size * 4, IPC_CREAT | 0644);
+  m_shmid = shmget(m_shmkey, size * 4, IPC_CREAT | IPC_EXCL | 0644);
+  if (m_shmid >= 0) {
+    printf("Created new shm %d for key $%X\n", m_shmid, m_shmkey);
+  } else if (errno == EEXIST) {
+    m_shmid = shmget(m_shmkey, 0, 0);
+    printf("Found existing shm %d for key $%X\n", m_shmid, m_shmkey);
+  }
   if (m_shmid < 0) {
-    perror("DqmSharedMem::shmget");
+    perror("SharedMem::shmget");
     return;
   }
-  m_shmadr = (int*) shmat(m_shmid, 0, 0);
+  if (!writeable) {
+    printf("ShM ID %d opened Readonly\n", m_shmid);
+    m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);
+  } else {
+    printf("ShM ID %d opened Writeable\n", m_shmid);
+    m_shmadr = (int*) shmat(m_shmid, 0, 0);
+  }
   if (m_shmadr == (int*) - 1) {
     perror("DqmSharedMem::shmat");
     return;

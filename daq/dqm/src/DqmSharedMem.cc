@@ -140,10 +140,9 @@ DqmSharedMem::DqmSharedMem(const char* name, int size, bool writeable, const cha
       if (is < 0) perror("write");
       close(tmpFilefd);
       printf("tmp file %s has been updated with shminfo \"%s\"\n", tmpPathName.c_str(), shminfo);
-      //    printf("SharedMem: leaving shmid and semid in the path file %d %d fd=%d\n", m_shmid, m_semid, m_pathfd);
     }
   }
-  printf("DqmSharedMem: created. shmid = %d, semid = %d\n", m_shmid, m_semid);
+  printf("DqmSharedMem: opened. shmid = %d, semid = %d\n", m_shmid, m_semid);
 }
 
 DqmSharedMem::DqmSharedMem(int shm_id, int sem_id)

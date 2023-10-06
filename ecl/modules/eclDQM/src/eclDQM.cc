@@ -52,7 +52,9 @@ ECLDQMModule::ECLDQMModule()
     m_calibrationThrApsd("ECL_FPGA_StoreWaveform")
 {
   //Set module properties.
-  setDescription("ECL Data Quality Monitor");
+  setDescription(
+    "Primary module for ECL Data Quality Monitor.\n"
+    "This module provides a large set of low-level histograms: occupancy, time distribution, number of saved waveforms, etc.");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify parallel processing.
 
   m_WaveformOption = {"psd", "logic", "rand", "dphy", "other"};

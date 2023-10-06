@@ -97,6 +97,7 @@ int DqmMemFile::UpdateSharedMem()
 int DqmMemFile::ClearSharedMem()
 {
   if (!m_writeMode) return -1;
+  // Open TMemFile only if write mode selected
 
   if (m_memfile != NULL) delete m_memfile;
   m_memfile = new TMemFile(m_name.c_str(), m_buf, m_size * sizeof(int), "RECREATE");

@@ -83,15 +83,18 @@ DqmSharedMem::DqmSharedMem(const char* name, int size, bool writeable, const cha
   // - IPC_CREATE will open existing or create new one
   // - IPC_CREATE|IPC_EXCL will create new one and fail is existing
   // - 0 will open existing one and fails if not existing
-  m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
+  m_semid = semget(m_semkey, 1, IPC_CREAT | IPC_EXCL | 0666);
   if (m_semid >= 0) {
     // POSIX doesn't guarantee any particular state of our fresh semaphore
     int semval = 1; //unlocked state
+    printf("Semaphore ID %d created for key $%X\n", m_semid, m_semkey);
     if (semctl(m_semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
-      printf("Initializing semaphore with semctl() failed.\n");
+      perror("Initializing semaphore with semctl() failed.");
+      return;
     }
   } else if (errno == EEXIST) {
-    m_semid = semget(m_semkey, 1, 0600);
+    m_semid = semget(m_semkey, 1, 0); // obtain existing one
+    printf("Found existing Semaphore ID %d for key $%X\n", m_semid, m_semkey);
   }
   if (m_semid < 0) {
     perror("DqmSharedMem::shmget");

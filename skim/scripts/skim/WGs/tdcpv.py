@@ -233,13 +233,14 @@ class TDCPV_ccs(BaseSkim):
     * ``psi(2S):mumu``
     * ``K*0:SkimHighEff``
     * ``K+:SkimHighEff``
-    * ``K_L0:all``
+    * ``K_L0:allklm``
+    * ``K_L0:allecl``
 
     **Cuts used**:
 
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29 for Ks/K*``
-    * ``5.05 < Mbc < 5.29 for KL``
+    * ``abs(deltaE) < 0.3 for KL``
     * ``abs(deltaE) < 0.5``
     * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
@@ -278,7 +279,7 @@ class TDCPV_ccs(BaseSkim):
 
     def additional_setup(self, path):
         ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
-        ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:allecl'], writeOut=True, path=path)
+        ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
@@ -286,7 +287,7 @@ class TDCPV_ccs(BaseSkim):
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
-        btotcpvcuts_KL = 'abs(deltaE) < 0.5'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.3'
 
         bd_ccs_Channels = ['J/psi:ee K_S0:merged',
                            'J/psi:mumu K_S0:merged',
@@ -359,3 +360,9 @@ class TDCPV_ccs(BaseSkim):
             filename=filename,
             path=path,
             directory="jpsimumu")
+
+        ma.reconstructMissingKlongDecayExpert('B0:KL_jpsimumu -> J/psi:mumu K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
+        ma.reconstructMissingKlongDecayExpert('B0:KL_jpsimuee -> J/psi:ee   K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
+        variableshisto = [('deltaE', 100, -0.020, 0.180)]
+        ma.variablesToHistogram('B0:KL_jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
+        ma.variablesToHistogram('B0:KL_jpsiee',   variableshisto, filename=filename, path=path, directory="jpsiee")

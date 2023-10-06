@@ -33,7 +33,7 @@ int HistoServer:: init()
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
   //  m_mapfile = TMapFile::Create(m_filename.c_str(), "RECREATE", MAPFILESIZE);
-  m_memfile = new DqmMemFile(m_filename, "write", MEMFILESIZE);
+  m_memfile = new DqmMemFile(m_filename, "write", DqmMemFile::c_memFileSize);
   m_hman = new HistoManager(m_memfile);
 
   // Semaphore to ensure exclusive access to shm

@@ -114,7 +114,7 @@ TMemFile* DqmMemFile::LoadMemFile()
   memcpy(m_buf, m_shm->ptr(), m_size * sizeof(int));
   m_shm->unlock();
   //  m_memfile = new TMemFile ( m_name.c_str(), m_buf, m_size*sizeof(int), "RECREATE" );
-  m_memfile = new TMemFile(m_name.c_str(), m_buf, MEMFILESIZE);
+  m_memfile = new TMemFile(m_name.c_str(), m_buf, c_memFileSize);
   return m_memfile;
 }
 

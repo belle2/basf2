@@ -146,8 +146,9 @@ DqmSharedMem::DqmSharedMem(const char* name, int size, bool writeable, const cha
   printf("DqmSharedMem: created. shmid = %d, semid = %d\n", m_shmid, m_semid);
 }
 
-DqmSharedMem::DqmSharedMem(int shm_id, int sem_id, int size)
+DqmSharedMem::DqmSharedMem(int shm_id, int sem_id)
 {
+  // Open DqmSharedMemory with given IDs, this is only possible for read-only access
   m_shmid = shm_id;
   m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);
   if (m_shmadr == (int*) - 1) {

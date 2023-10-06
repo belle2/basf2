@@ -15,7 +15,7 @@ namespace Belle2 {
   class DqmSharedMem {
   public:
     DqmSharedMem(const char* name, int size, bool writeable = true, const char* user = nullptr);
-    DqmSharedMem(int shm_id, int sem_id, int size);
+    DqmSharedMem(int shm_id, int sem_id);
     ~DqmSharedMem(void);
 
     void* ptr(void);

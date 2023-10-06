@@ -43,14 +43,13 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   }
 }
 
-DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
+
+DqmMemFile::DqmMemFile(int shm_id, int sem_id, int size)
 {
+  // This defaults to read only access
   // Record parameters
   m_size = size;
-  if (mode != "write" && mode != "WRITE")
-    m_writeMode = false;
-  else
-    m_writeMode = true;
+  m_writeMode = false;
   m_name = "dqm_mem_file";
   m_memfile = NULL;
 
@@ -58,14 +57,8 @@ DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
   m_buf = (char*) new int[size];
 
   // Allocate shared memory
-  m_shm = new DqmSharedMem(shm_id, sem_id, size);// size is not used in here
-  // Clear/Open TMemFile if write mode selected
-  // it will check write mode by itself!
-  if (ClearSharedMem() == 0) {
-    printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
-  } else {
-    printf("DqmMemFile : TMemFile is opend in READ mode.\n");
-  }
+  m_shm = new DqmSharedMem(shm_id, sem_id);
+  printf("DqmMemFile : TMemFile is opend in READ mode.\n");
 }
 
 // Destructor

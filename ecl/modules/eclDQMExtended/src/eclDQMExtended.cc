@@ -391,7 +391,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int k_16 = map_coef.at("k_16");
   int chi_thres = map_coef.at("chi_thres");
 
-  int A0 = (int)v_totalthrA0[cellID - 1];
+  int A0    = (int)v_totalthrA0[cellID - 1];
   int Ahard = (int)v_totalthrAhard[cellID - 1];
   int Askip = (int)v_totalthrAskip[cellID - 1];
 
@@ -470,12 +470,6 @@ void ECLDQMEXTENDEDModule::event()
 
     emulator(m_CellId, m_TrigTime, DspArray);
     ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
-
-    if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit)
-      B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"
-              << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
-              << LogVar("A_emulator", m_AmpFit)
-              << LogVar("Quality_emulator", m_QualityFit));
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
 

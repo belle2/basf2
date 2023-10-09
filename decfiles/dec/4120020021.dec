@@ -14,8 +14,8 @@ Decay vpho
 Enddecay
 
 Decay Upsilonsig
-0.023800000 e+ e- PHOTOS VLL; #[Reconstructed PDG2011]
-0.024800000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2011]
+0.023800000 e+ e- VLL; #[Reconstructed PDG2011]
+0.024800000 mu+ mu- VLL; #[Reconstructed PDG2011]
 0.026000000 tau+ tau- VLL; #[Reconstructed PDG2011]
 0.008700000 d anti-d PYTHIA 91; #[Reconstructed PDG2011], all qqbar have been corrected to 1/4 ratio
 0.034900000 u anti-u PYTHIA 91; #[Reconstructed PDG2011]

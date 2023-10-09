@@ -28,7 +28,7 @@ class Once(argparse.Action):
 
 
 def get_argument_parser() -> argparse.ArgumentParser:
-    """ Parses the command line options of the fei and returns the corresponding arguments. """
+    """ Parses the command line options of this tool """
     parser = argparse.ArgumentParser()
     parser.add_argument('--identifier', dest='identifier', type=str, required=True,
                         help='Identifier produced by basf2_mva_teacher')

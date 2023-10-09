@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2_mva_util
+import basf2_mva
 
 import argparse
 
@@ -28,4 +28,4 @@ if __name__ == '__main__':
     parser = get_argument_parser()
     args = parser.parse_args()
     for filename in args.identifiers:
-        basf2_mva_util.extract(filename, args.directory)
+        basf2_mva.extract(filename, args.directory)

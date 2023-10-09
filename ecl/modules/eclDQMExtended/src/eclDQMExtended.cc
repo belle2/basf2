@@ -150,14 +150,16 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_quality->SetFillColor(kPink - 4);
   h_timefail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
 
-  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", ECLElementNumbers::c_NCrystals, 1, 8737);
+  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies",
+                              ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_ampfail_cellid->GetXaxis()->SetTitle("Cell ID");
 
-  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies", ECLElementNumbers::c_NCrystals, 1, 8737);
+  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies",
+                               ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_timefail_cellid->GetXaxis()->SetTitle("Cell ID");
 
-  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies", ECLElementNumbers::c_NCrystals, 1,
-                                  8737);
+  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies",
+                                  ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_amptimefail_cellid->GetXaxis()->SetTitle("Cell ID");
 
   h_ampfail_shaperid = new TH1F("ampfail_shaperid", "Shaper IDs w/ amp inconsistencies", 624, 1, 625);
@@ -178,8 +180,8 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ time and amp inconsistencies", 52, 1, 53);
   h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
 
-  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies", ECLElementNumbers::c_NCrystals, 1,
-                                  8737);
+  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies",
+                                  ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_qualityfail_cellid->GetXaxis()->SetTitle("Cell ID");
 
   h_qualityfail_shaperid = new TH1F("qualityfail_shaperid", "Shaper IDs w/ fit qual inconsistencies", 624, 1, 625);
@@ -199,12 +201,12 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   if (m_SaveDetailedFitData) {
     h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp inconsistencies",
-                                ECLElementNumbers::c_NCrystals, 1, 8737, 239, -262143, 262143);
+                                ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, 239, -262143, 262143);
     h_ampdiff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_ampdiff_cellid->GetYaxis()->SetTitle("Amplitude difference");
 
     h_timediff_cellid = new TH2F("timediff_cellid", "Time diff. (Emulator-Data) for time inconsistencies",
-                                 ECLElementNumbers::c_NCrystals, 1, 8737, 239, -4095, 4095);
+                                 ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, 239, -4095, 4095);
     h_timediff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_timediff_cellid->GetYaxis()->SetTitle("Time difference");
 
@@ -244,6 +246,10 @@ void ECLDQMEXTENDEDModule::defineHisto()
                                     -1, 3);
   h_timeflag_qualityfail->GetXaxis()->SetTitle("FPGA fit quality. 0-good,1-int overflow,2-low amp,3-bad chi2");
   h_timeflag_qualityfail->GetYaxis()->SetTitle("Time flag (0-time consistent)");
+
+  h_missing_ecldigits = new TH1F("missing_ecldigits", "", 4, 0, 4);
+  h_missing_ecldigits->SetTitle("Fit quality flag for missing ECLDigits (missing fit results)");
+  h_missing_ecldigits->GetXaxis()->SetTitle("Quality flag. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
 
   oldDir->cd();
 }
@@ -445,6 +451,7 @@ void ECLDQMEXTENDEDModule::beginRun()
   h_quality_fit_data->Reset();
   h_ampflag_qualityfail->Reset();
   h_timeflag_qualityfail->Reset();
+  h_missing_ecldigits->Reset();
 }
 
 void ECLDQMEXTENDEDModule::event()
@@ -470,6 +477,10 @@ void ECLDQMEXTENDEDModule::event()
 
     emulator(m_CellId, m_TrigTime, DspArray);
     ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
+
+    if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit) {
+      h_missing_ecldigits->Fill(m_QualityFit);
+    }
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
 

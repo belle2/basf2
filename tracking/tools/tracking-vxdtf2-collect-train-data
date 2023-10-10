@@ -19,7 +19,7 @@
 #    one of the two options above ("BBbar" or "BhaBha")
 #
 # The number of events which will be simulated can be set via the
-# basf2 commandline option -n.
+# basf2 commandline option "--nEvents".
 #
 # There are tow types of outputs:
 #    1) The full root output which can be used to study the trainings data
@@ -44,27 +44,33 @@
 # The settings for the particle gun(s) and EvtGen simulation have to be
 # adapted in the convenience functions defined in SectorMapTrainingUtils.py
 #
-# By default the user should specify the random seed, the output directory, and the
-# event type to be generated. An example call generating 1000 BBbar events is given below:
-# basf2  -n 1000 CollectTrainingsData.py -- --rndSeed 12345 --outputDir "./outdir/" --eventType "BBbar"
+# For a complete list of available parameters run the following command: 
+# tracking-vxdtf2-collect-train-data --help 
+# An example generating 10 BBbar events is given below (adapt to your needs). The output will 
+# be written to your current directory: 
+# tracking-vxdtf2-collect-train-data  --rndSeed 12345 --outputDir "./" --eventType "BBbar" --nEvents 10
 #####################################################################
 
 # default basf2 stuff
 import basf2 as b2
 # convenience functions to set up the SectorMap training
-from tracking.secMapTraining.SectorMapTrainingUtils import add_event_generation, add_simulation_and_reconstruction_modules
-from tracking.secMapTraining.SectorMapTrainingUtils import add_rootoutput, add_training_data_collector
+from tracking.secMapTraining.SectorMapTrainingUtils import (
+  add_event_generation, 
+  add_simulation_and_reconstruction_modules, 
+  add_rootoutput, 
+  add_training_data_collector
+)
 import argparse
 
 
 
 if __name__ == "__main__":
     # Argument parser to enable training sample selection via comandline option.
-    parser = argparse.ArgumentParser(description='Script that produces a data sample\
-                                     which can be used to train a SectorMap for the VXDTF2 track finder. The output\
-                                     are root files for each trainings setup implemented, which can be used to\
+    parser = argparse.ArgumentParser(description='Script that produces a data sample \
+                                     which can be used to train a SectorMap for the VXDTF2 track finder. The output \
+                                     are root files for each trainings setup implemented, which can be used to \
                                      train a SectorMap. Optionally \
-                                     one can also activate the full root output for the generated events\
+                                     one can also activate the full root output for the generated events \
                                      (not needed for the training)')
 
     parser.add_argument(

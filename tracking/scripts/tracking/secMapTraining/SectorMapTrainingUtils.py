@@ -153,9 +153,8 @@ def add_rootoutput(path, outputFileName):
     rootOutput.param('excludeBranchNames', ["ARICHAeroHits",
                                             "ARICHDigits",
                                             "ARICHSimHits",
-                                            "BKLMDigits",
-                                            "BKLMSimHitPositions",
-                                            "BKLMSimHits",
+                                            "KLMDigits",
+                                            "KLMSimHits",
                                             "CDCHits",
                                             "CDCHits4Trg",
                                             "CDCSimHits",
@@ -180,9 +179,9 @@ def setup_RTCtoSPTCConverters(
         path=0,
         SVDSPscollection='SVDSpacePoints',
         PXDSPscollection='PXDSpacePoints',
-        RTCinput='mcTracks',
+        RTCinput='mcRecoTracks',
         sptcOutput='checkedSPTCs',
-        usePXD=True,
+        usePXD=False,
         logLevel=b2.LogLevel.INFO,
         debugVal=1,
         useNoKick=False,
@@ -313,8 +312,8 @@ def add_training_data_collector(path, usePXD=False, nameTag='', outputDir='./', 
         geometry = b2.register_module('Geometry')
         path.add_module(geometry)
 
-    # Converts GenFit track candidates and checks them, with respect to the SecMap settings
-    # Produces SpacePoint TrackCand which is used in VXDTFTrainingDataCollector.
+    # Converts RecoTrack candidates and checks them, with respect to the SecMap settings
+    # Produces SpacePoint track candidates which are used in the VXDTFTrainingDataCollector.
     setup_RTCtoSPTCConverters(path=path,
                               SVDSPscollection='SVDSpacePoints',
                               PXDSPscollection='PXDSpacePoints',
@@ -346,3 +345,33 @@ def add_training_data_collector(path, usePXD=False, nameTag='', outputDir='./', 
     SecMapTrainerBase.param('NameTag', nameTag)
     SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')
     path.add_module(SecMapTrainerBase)
+
+
+def create_unique_random_numbers(n=500, random_seed=12345, n_min=9999, n_max=9999999):
+    ''' Creates randomly a unique set of random numbers of size n. WARNING: if n is close or equal to the
+      specified range this will take very long!
+      @param n number of random numbers
+      @param random_seed random seed to initialize the random generator which generates the random numbers
+      @patam n_min minimum value for the generated random numbers
+      @param n_max maximum value for the generated random numbers
+    '''
+
+    # you cannot create more random numbers than numbers in range.
+    if (n_max - n_min + 1) < n or n_min > n_max:
+        b2.B2ERROR(
+            "Range (" +
+            str(n_min) +
+            "," +
+            str(n_max) +
+            ") not well defined or not great enough for that many random numbers (n=" +
+            str(n) +
+            ")")
+        return []
+
+    random.seed(random_seed)
+
+    # as there is no "do while" in python
+    while True:
+        my_list = [random.randint(n_min, n_max) for i in range(0, n)]
+        if (len(my_list) == len(set(my_list))):
+            return my_list

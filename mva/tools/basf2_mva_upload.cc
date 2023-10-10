@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   po::options_description description("Options");
   description.add_options()
   ("help", "print this message")
-  ("identifier", po::value<std::string>(&identifier)->required(), "Identifier produced by basf2_mva_teacher")
+  ("weight_file_name", po::value<std::string>(&identifier)->required(), "Weightfile produced by basf2_mva_teacher")
   ("db_identifier", po::value<std::string>(&db_identifier)->required(), "New database identifier for the method")
   ("begin_experiment", po::value<int>(&exp1), "First experiment for which the weightfile is valid")
   ("end_experiment", po::value<int>(&exp2), "Last experiment for which the weightfile is valid")

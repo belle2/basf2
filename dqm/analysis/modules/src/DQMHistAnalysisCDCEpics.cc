@@ -24,16 +24,10 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   addParam("HistTDC", m_histoTDC, "TDC Histogram Name", std::string("hTDC"));
   addParam("PvPrefix", m_pvPrefix, "PV Prefix and Name", std::string("CDC:"));
   addParam("MinEvt", m_minevt, "Min events for intra-run point", 10000);
-  addParam("MinADC", m_minadc, "Min ADC median acceptable", 70.0);
-  addParam("MaxADC", m_maxadc, "max ADC median acceptable", 130.0);
-  addParam("MinTDC", m_mintdc, "min TDC median acceptable", 4600.0);
-  addParam("MaxTDC", m_maxtdc, "max TDC median acceptable", 4900.0);
-
   for (int i = 0; i < 300; i++) {
     m_hADCs[i] = nullptr;
     m_hTDCs[i] = nullptr;
   }
-
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: Constructor done.");
 }
 
@@ -63,6 +57,9 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   registerEpicsPV(m_pvPrefix + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_pvPrefix + "cdcboards_wtdc", "tdcboards");
 
+  registerEpicsPV(m_pvPrefix + "adc_median_window", "adcmedianwindow");
+  registerEpicsPV(m_pvPrefix + "tdc_median_window", "tdcmedianwindow");
+
   //creating box for normal adc and tdc windows
   m_boxadc = new TBox(0, m_minadc, 300, m_maxadc);
   m_boxadc->SetFillColorAlpha(kYellow, 0.40);
@@ -78,6 +75,16 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
 void DQMHistAnalysisCDCEpicsModule::beginRun()
 {
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: beginRun run called");
+
+  double unused = 0;
+  requestLimitsFromEpicsPVs("adcmedianwindow", unused, m_minadc, m_maxadc, unused);
+  requestLimitsFromEpicsPVs("tdcmedianwindow", unused, m_mintdc, m_maxtdc, unused);
+
+  //in case if something is wrong in config file
+  if (!std::isnan(m_minadc)) m_minadc = 70.0;
+  if (!std::isnan(m_maxadc)) m_maxadc = 130.0;
+  if (!std::isnan(m_mintdc)) m_mintdc = 4600.0;
+  if (!std::isnan(m_maxtdc)) m_maxtdc = 4900.0;
 }
 
 void DQMHistAnalysisCDCEpicsModule::event()

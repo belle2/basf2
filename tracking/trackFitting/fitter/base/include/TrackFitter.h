@@ -10,6 +10,8 @@
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 #include <framework/gearbox/Const.h>
 
+#include <tracking/dbobjects/DAFparameters.h>
+
 #include <TError.h>
 
 #include <string>
@@ -280,6 +282,9 @@ namespace Belle2 {
 
     /// Control the output level of the ROOT functions used by the GenFit fitter. Default is increased from kError to kFatal;
     Int_t m_gErrorIgnoreLevel = kFatal;
+
+    /// DAF parameters Database OjbPtr
+    DBObjPtr<DAFparameters> m_DAFparameters;
 
     /**
      * Helper function to do the fit.

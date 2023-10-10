@@ -118,7 +118,6 @@ namespace Belle2 {
 
     // Steerable data members (parameters)
     std::string m_pvPrefix; /**< Prefix for EPICS PVs */
-    bool m_useEpics; /**< Whether to update EPICS PVs */
     double m_epicsUpdateSeconds; /**< Minimum interval between successive PV updates */
     std::string m_pvSuffix; /**< Suffix for EPICS PVs */
     std::string m_deltaTPVSuffix; /**< Suffix of the update-time monitoring PV */

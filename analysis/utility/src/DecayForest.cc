@@ -9,6 +9,7 @@
 #include <analysis/utility/DecayForest.h>
 
 #include <cassert>
+#include <cstdint>
 
 using namespace Belle2;
 

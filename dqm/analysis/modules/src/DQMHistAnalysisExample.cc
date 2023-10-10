@@ -24,52 +24,60 @@ DQMHistAnalysisExampleModule::DQMHistAnalysisExampleModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
-  addParam("Function", m_function, "Fit function definition", std::string("gaus"));
+  //Parameter definition
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
+  addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST"));
   B2DEBUG(20, "DQMHistAnalysisExample: Constructor done.");
 }
 
 
-DQMHistAnalysisExampleModule::~DQMHistAnalysisExampleModule() { }
+DQMHistAnalysisExampleModule::~DQMHistAnalysisExampleModule()
+{
+  // if this function is not needed, please remove
+}
 
 void DQMHistAnalysisExampleModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisExample: initialized.");
-  TString a = m_histoname;
+  TString a = m_histogramName;
   a.ReplaceAll("/", "_");
-  m_c = new TCanvas("c_" + a);
-  m_f = new TF1("f_" + a, TString(m_function), -100, 100);
+  m_canvas = new TCanvas("c_" + a);
+  m_function = new TF1("f_" + a, TString("gaus"), -100, 100);
 }
 
 void DQMHistAnalysisExampleModule::beginRun()
 {
+  // if this function is not needed, please remove
   B2DEBUG(20, "DQMHistAnalysisExample : beginRun called");
 }
 
 void DQMHistAnalysisExampleModule::event()
 {
-  TH1* h = findHist(m_histoname);
+  TH1* h = findHist(m_histogramName);
   if (h != NULL) {
-    m_c->Clear();
-    m_c->cd();
-    h->Fit(m_f, "R");
+    m_canvas->Clear();
+    m_canvas->cd();
+    h->Fit(m_function, "R");
     h->Draw();
-    m_c->Modified();
-    B2DEBUG(20, "mean " << m_f->GetParameter(1));
-    B2DEBUG(20, "sigma" << m_f->GetParameter(2));
+    m_canvas->Modified();
+    B2DEBUG(20, "mean " << m_function->GetParameter(1));
+    B2DEBUG(20, "sigma" << m_function->GetParameter(2));
   } else {
-    B2DEBUG(20, "Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histogramName << " not found");
   }
 }
 
 void DQMHistAnalysisExampleModule::endRun()
 {
+  // if this function is not needed, please remove
   B2DEBUG(20, "DQMHistAnalysisExample : endRun called");
 }
 
 
 void DQMHistAnalysisExampleModule::terminate()
 {
+  // if this function is not needed, please remove
   B2DEBUG(20, "terminate called");
 }
 

@@ -12,13 +12,14 @@
 
 #include <TF1.h>
 #include <TProfile.h>
-#include <TH2F.h>
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TH3F.h"
 #include <framework/logging/Logger.h>
 #include <iostream>
 #include <TString.h>
 #include <TFitResult.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVDTimeValidationAlgorithm::SVDTimeValidationAlgorithm() :
@@ -45,32 +46,43 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           " Entries (n. clusters): " << hEventT0->GetEntries() <<
           " Mean: " << eventT0_mean);
 
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
-          char side = 'U';
-          if (view == 0)
-            side = 'V';
-          auto layer_num = sensor.getLayerNumber();
-          auto ladder_num = sensor.getLadderNumber();
-          auto sensor_num = sensor.getSensorNumber();
-          auto hClsTimeOnTracks = getObjectPtr<TH1F>(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          float clsTimeOnTracks_mean = 0.;
-          if (hClsTimeOnTracks)
-            clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
-          else
+  auto __hClsTimeOnTracks__     = getObjectPtr<TH2F>("__hClsTimeOnTracks__");
+  // auto __hClsTimeAll__          = getObjectPtr<TH2F>("__hClsTimeAll__");
+  // auto __hClsDiffTimeOnTracks__ = getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__");
+  auto __hBinToSensorMap__      = getObjectPtr<TH1F>("__hBinToSensorMap__");
+
+  for (int ij = 0; ij < (__hBinToSensorMap__->GetNbinsX()); ij++) {
+    {
+      {
+        {
+
+          auto binLabel = __hBinToSensorMap__->GetXaxis()->GetBinLabel(ij + 1);
+          char side;
+          int layer_num, ladder_num, sensor_num;
+          std::sscanf(binLabel, "L%dL%dS%d%c", &layer_num, &ladder_num, &sensor_num, &side);
+
+          B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
+
+          auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", ij + 1, ij + 1);
+          if (!hClsTimeOnTracks)
             B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
+
+          hClsTimeOnTracks->SetName(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          char sidePN = (side == 'U' ? 'P' : 'N');
+          hClsTimeOnTracks->SetTitle(Form("clsTimeOnTracks in %d.%d.%d %c/%c", layer_num, ladder_num, sensor_num, side, sidePN));
+          hClsTimeOnTracks->SetDirectory(0);
+
+          float clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
           auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
 
           B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<
                   " Entries (n. clusters): " << hClsTimeOnTracks->GetEntries() <<
                   " Mean: " << clsTimeOnTracks_mean <<
                   " Deviation: " << deviation << " EventT0 RMS");
-          if (abs(deviation) > m_allowedDeviationMean)
+          if (std::fabs(deviation) > m_allowedDeviationMean)
             B2ERROR("Histogram: " << hClsTimeOnTracks->GetName() << " deviates from EventT0 by" << deviation << " times the EventT0 RMS");
 
+          delete hClsTimeOnTracks;
         }
       }
     }

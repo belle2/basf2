@@ -9,6 +9,7 @@
 #include <pxd/utilities/PXDPerformanceStructs.h>
 #include <framework/logging/Logger.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
+#include <pxd/utilities/PXDUtilities.h>
 
 namespace Belle2 {
   namespace PXD {

@@ -45,6 +45,8 @@ void TRGECLUnpackerModule::initialize()
   m_TRGECLTCArray.registerInDataStore();
   m_TRGECLEvtArray.registerInDataStore();
   m_TRGECLClusterArray.registerInDataStore();
+  m_eventLevelClusteringInfo.registerInDataStore();
+
 }
 
 void TRGECLUnpackerModule::beginRun() {}
@@ -76,6 +78,28 @@ void TRGECLUnpackerModule::event()
       }
     }
   }
+
+  // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
+  uint16_t nTCsPerRegion[3] = {};
+  const int firstBarrelId = 81; // First TCId in the barrel
+  const int lastBarrelId = 512; // Last TCId in the barrel
+  for (auto& trgeclhit : m_TRGECLTCArray) {
+    const int tcId = trgeclhit.getTCId();
+    if (tcId < firstBarrelId) {
+      nTCsPerRegion[0]++;
+    } else if (tcId > lastBarrelId) {
+      nTCsPerRegion[2]++;
+    } else {
+      nTCsPerRegion[1]++;
+    }
+  }
+
+  // Store
+  if (!m_eventLevelClusteringInfo) { m_eventLevelClusteringInfo.create();}
+  m_eventLevelClusteringInfo->setNECLTriggerCellsFWD(nTCsPerRegion[0]);
+  m_eventLevelClusteringInfo->setNECLTriggerCellsBarrel(nTCsPerRegion[1]);
+  m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
+
 }
 
 void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn, int ch)

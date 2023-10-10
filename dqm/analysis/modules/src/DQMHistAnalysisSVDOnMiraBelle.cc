@@ -44,6 +44,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_c_MPVSNRClusterOnTrack = new TCanvas("svd_MPVSNRClusterOnTrack", "SNR from Clusters on Track Charge", 0, 0, 400, 400);
   m_c_MPVTimeClusterOnTrack = new TCanvas("svd_MPVTimeClusterOnTrack", "time from Clusters on Track Charge", 0, 0, 400, 400);
   m_c_avgMaxBinClusterOnTrack = new TCanvas("svd_avgMaxBin", "average MaxBin", 0, 0, 800, 600);
+  m_c_MeanSVDEventT0 = new TCanvas("svd_MeanSVDEventT0", "Mean Event T0 from SVD for all samples", 0, 0, 400, 400);
 
   // add canvases used to create monitoring variables to MonitoringObject
   m_monObj->addCanvas(m_c_avgEfficiency);
@@ -52,6 +53,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_monObj->addCanvas(m_c_MPVSNRClusterOnTrack);
   m_monObj->addCanvas(m_c_MPVTimeClusterOnTrack);
   m_monObj->addCanvas(m_c_avgMaxBinClusterOnTrack);
+  m_monObj->addCanvas(m_c_MeanSVDEventT0);
 
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: initialized.");
 }
@@ -597,6 +599,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   TH1F* h_clusterTime_L3V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV3");
   TH1F* h_clusterTime_L456U = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeU456");
   TH1F* h_clusterTime_L456V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  TH1F* h_MeanSVD3EventT0   = (TH1F*)findHist("SVDHitTime/SVD3EventT0");
+  TH1F* h_MeanSVD6EventT0   = (TH1F*)findHist("SVDHitTime/SVD6EventT0");
+  TH1F* h_MeanSVDEventT0    = 0x0;
+
+  if (h_MeanSVD3EventT0)
+    h_MeanSVDEventT0 = (TH1F*)h_MeanSVD3EventT0->Clone();
 
   m_c_MPVTimeClusterOnTrack->Clear();
   m_c_MPVTimeClusterOnTrack->Divide(2, 2);
@@ -608,6 +616,19 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_clusterTime_L456U) h_clusterTime_L456U->Draw();
   m_c_MPVTimeClusterOnTrack->cd(4);
   if (h_clusterTime_L456V) h_clusterTime_L456V->Draw();
+
+  m_c_MeanSVDEventT0->Clear();
+  m_c_MeanSVDEventT0->Divide(2, 2);
+  m_c_MeanSVDEventT0->cd(1);
+  if (h_MeanSVD3EventT0) h_MeanSVD3EventT0->Draw();
+  m_c_MeanSVDEventT0->cd(2);
+  if (h_MeanSVD6EventT0) h_MeanSVD6EventT0->Draw();
+  m_c_MeanSVDEventT0->cd(3);
+  if (h_MeanSVDEventT0) {
+    if (h_MeanSVD6EventT0)
+      h_MeanSVDEventT0->Add(h_MeanSVD6EventT0);
+    h_MeanSVDEventT0->Draw();
+  }
 
   float MPVClusterTimeL3U = -1;
   if (h_clusterTime_L3U) MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);
@@ -625,6 +646,15 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_clusterTime_L456U) FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
   float FWHMClusterTimeL456V = -1;
   if (h_clusterTime_L456V) FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
+
+  float MeanSVD3EventT0 = -1;
+  if (h_MeanSVD3EventT0) MeanSVD3EventT0 = xForMaxY(h_MeanSVD3EventT0);
+
+  float MeanSVD6EventT0 = -1;
+  if (h_MeanSVD6EventT0) MeanSVD6EventT0 = xForMaxY(h_MeanSVD6EventT0);
+
+  float MeanSVDEventT0 = -1;
+  if (h_MeanSVDEventT0) MeanSVDEventT0 = xForMaxY(h_MeanSVDEventT0);
 
   if (h_clusterTime_L3U == NULL || h_clusterTime_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster time on U side are not found");
@@ -652,6 +682,26 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("FWHMClusterTimeL456V", FWHMClusterTimeL456V);
   }
 
+  if (h_MeanSVD3EventT0 == NULL) {
+    B2INFO("Histograms needed for SVD Event T0 (3 samples) not found");
+    m_monObj->setVariable("MeanSVD3EventT0", -1);
+  } else {
+    m_monObj->setVariable("MeanSVD3EventT0", MeanSVD3EventT0);
+  }
+
+  if (h_MeanSVD6EventT0 == NULL) {
+    B2INFO("Histograms needed for SVD Event T0 (6 samples) not found");
+    m_monObj->setVariable("MeanSVD6EventT0", -1);
+  } else {
+    m_monObj->setVariable("MeanSVD6EventT0", MeanSVD6EventT0);
+  }
+
+  if (h_MeanSVDEventT0 == NULL) {
+    B2INFO("Histograms needed for SVD Event T0 (all samples) not found");
+    m_monObj->setVariable("MeanSVDEventT0", -1);
+  } else {
+    m_monObj->setVariable("MeanSVDEventT0", MeanSVDEventT0);
+  }
 
   // average maxBin for clusters on track
   TH1F* h_maxBinU = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinUAll");
@@ -678,6 +728,77 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   } else {
     float avgMaxBinV = h_maxBinV->GetMean();
     m_monObj->setVariable("avgMaxBinV", avgMaxBinV);
+  }
+
+  std::map<std::pair<int, int>, int> ladderMap =  {
+    {{3, 1}, 0}, {{3, 2}, 1},
+    {{4, 1}, 2}, {{4, 2}, 3}, {{4, 3}, 4},
+    {{5, 1}, 5}, {{5, 2}, 6}, {{5, 3}, 7}, {{5, 4}, 8},
+    {{6, 1}, 9}, {{6, 2}, 10}, {{6, 3}, 11}, {{6, 4}, 12}, {{6, 5}, 13}
+  };
+
+
+  for (const auto& it : ladderMap) {
+    std::pair<int, int> p = it.first;
+    int layer = p.first;
+    int sensor = p.second;
+
+    TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L%d.x.%d", layer, sensor);
+    TString title = Form("MPVClusterCharge_L%d.x.%d", layer, sensor);
+    TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
+    float MPVClusterCharge = -1;
+    if (h_clusterCharge) MPVClusterCharge = xForMaxY(h_clusterCharge);
+
+    if (h_clusterCharge == NULL) {
+      B2INFO("Histograms needed for cluster charge not found");
+      m_monObj->setVariable(title.Data(), -1);
+    } else {
+      m_monObj->setVariable(title.Data(), MPVClusterCharge);
+    }
+
+    name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L%d.x.%d", layer, sensor);
+    title = Form("MPVClusterSNR_L%d.x.%d", layer, sensor);
+    TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
+    float MPVClusterSNR = -1;
+    if (h_clusterSNR) MPVClusterSNR = xForMaxY(h_clusterSNR);
+
+    if (h_clusterSNR == NULL) {
+      B2INFO("Histograms needed for cluster SNR not found");
+      m_monObj->setVariable(title.Data(), -1);
+    } else {
+      m_monObj->setVariable(title.Data(), MPVClusterSNR);
+    }
+  }
+
+  for (int ladder = 1; ladder <= 2; ++ladder) {
+    for (int sensor = 1; sensor <= 2; ++sensor) {
+
+      TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L3.%d.%d", ladder, sensor);
+      TString  title =  Form("MPVClusterCharge_L3.%d.%d", ladder, sensor);
+      float MPVClusterCharge = -1;
+      TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
+      if (h_clusterCharge) MPVClusterCharge = xForMaxY(h_clusterCharge);
+
+      if (h_clusterCharge == NULL) {
+        B2INFO("Histograms needed for cluster charge not found");
+        m_monObj->setVariable(title.Data(), -1);
+      } else {
+        m_monObj->setVariable(title.Data(), MPVClusterCharge);
+      }
+
+      name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L3.%d.%d", ladder, sensor);
+      title = Form("MPVClusterSNR_L3.%d.%d", ladder, sensor);
+      TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
+      float MPVClusterSNR = -1;
+      if (h_clusterSNR) MPVClusterSNR = xForMaxY(h_clusterSNR);
+
+      if (h_clusterSNR == NULL) {
+        B2INFO("Histograms needed for cluster SNR not found");
+        m_monObj->setVariable(title.Data(), -1);
+      } else {
+        m_monObj->setVariable(title.Data(), MPVClusterSNR);
+      }
+    }
   }
 
   B2INFO("DQMHistAnalysisSVDGeneral: endRun called");

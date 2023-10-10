@@ -63,6 +63,8 @@ class SVDHoughTrackingValidationBkg(TrackingValidationRun):
     fit_tracks = True
     #: plot pull distributions
     pulls = True
+    #: do not create expert-level output histograms in dedicated folder but in the main folder
+    use_expert_folder = False
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
     #: define empty list of non expert parameters so that no shifter plots are created (to revert just remove following line)

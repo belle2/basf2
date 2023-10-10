@@ -10,6 +10,8 @@
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
 #include <genfit/DAF.h>
 
+#include <tracking/dbobjects/DAFparameters.h>
+
 namespace Belle2 {
 
   /** DAF fitter. */
@@ -26,10 +28,7 @@ namespace Belle2 {
     /** Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001. */
     double m_param_probabilityCut;
 
-    /** If the delta PValue between two DAF iterations is small than this value, the iterative procedure will be terminated early.*/
-    double m_param_deltaPValue;
-
-    /** Maximum number of failed hits before aborting the fit. */
-    int m_param_maxNumberOfFailedHits = -1;
+    /// DAF parameters Database OjbPtr
+    DBObjPtr<DAFparameters> m_DAFparameters;
   };
 }

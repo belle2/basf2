@@ -993,10 +993,9 @@ namespace Belle2 {
                     + (pbuf * pbuf * pbuf * error[3]) * (pbuf * pbuf * pbuf * error[3]);
     eresol = sqrt(eresol) / 1000.;
 
-    //     dout(Debugout::INFO,"B2BIIFixMdst_ecl") <<" theta="<<theta<<" p="<<pbuf
-    //     <<" para="<< para[0]<<", "<< para[1]<<", "
-    //     << para[2]<<", "<<para[3]
-    //     <<" resol="<<resol<<" er="<<eresol<<std::endl;
+    B2DEBUG(19, "B2BIIFixMdst_ecl" << LogVar("theta", theta) << LogVar("p", pbuf)
+            << LogVar("para0", para[0]) << LogVar("para1", para[1]) << LogVar("para2", para[2]) << LogVar("para3", para[3])
+            << LogVar("resol", resol) << LogVar("er", eresol));
     return resol;
   }
 // Following lines were commented out, because asymmetric line shape is
@@ -1617,7 +1616,7 @@ namespace Belle2 {
         if (0.0 < low_limit || up_limit < 0.0) {
           B2ERROR("option=2 was selected. ");
           B2ERROR("Invalid mass window! " << low_limit);
-          B2ERROR(" sould be negative, or " << up_limit);
+          B2ERROR(" should be negative, and " << up_limit);
           B2ERROR(" should be positive.");
           return;
         }
@@ -2106,8 +2105,8 @@ namespace Belle2 {
         double det = err_i[2][2] * err_j[2][2] - dth_i_x_dth_j * dth_i_x_dth_j;
 
 
-        double e_i = e_i0, phi_i = phi_i0, theta_i = theta_i0, sin_th_i = sin_th_i0, cos_th_i = cos_th_i0;
-        double e_j = e_j0, phi_j = phi_j0, theta_j = theta_j0, sin_th_j = sin_th_j0, cos_th_j = cos_th_j0;
+        double e_i = e_i0, phi_i = phi_i0, sin_th_i = sin_th_i0, cos_th_i = cos_th_i0;
+        double e_j = e_j0, phi_j = phi_j0, sin_th_j = sin_th_j0, cos_th_j = cos_th_j0;
 
 
         double dphi     = phi_i - phi_j;
@@ -2180,7 +2179,6 @@ namespace Belle2 {
           //const double pull     = residual / dmass;
           if (it >= iter_max ||
               mass < low_default || mass > up_default) {
-            it = -it;
             //sdev = (dmass > 0.0) ? pull : -100;
             break;
           }
@@ -2218,8 +2216,8 @@ namespace Belle2 {
           e_j     = e_j0     + de_j;
           phi_i   = phi_i0   + dphi_i;
           phi_j   = phi_j0   + dphi_j;
-          theta_i = theta_i0 + dtheta_i;
-          theta_j = theta_j0 + dtheta_j;
+          double theta_i = theta_i0 + dtheta_i;
+          double theta_j = theta_j0 + dtheta_j;
 
           sin_th_i = std::sin(theta_i);
           cos_th_i = std::cos(theta_i);

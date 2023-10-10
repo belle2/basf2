@@ -7,10 +7,8 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPCalTimebase.h>
-
 #include <framework/logging/Logger.h>
-
-#include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -23,6 +21,17 @@ namespace Belle2 {
                               const vector<double>& sampleTimes,
                               bool replace)
   {
+    // sanitary checks for NaN's
+    for (double t : sampleTimes) {
+      if (isnan(t)) {
+        B2ERROR("TOPCalTimebase::append: sampleTimes contain NaN's - constants rejected."
+                << LogVar("scrodID", scrodID)
+                << LogVar("channel", channel));
+        return;
+      }
+    }
+
+    // append
     unsigned key = (scrodID << 16) + (channel % 128);
     Iterator it = m_map.find(key);
     if (it == m_map.end()) { // constants not appended yet
@@ -32,11 +41,11 @@ namespace Belle2 {
     } else { // constants already there
       if (replace) {
         const_cast<TOPSampleTimes*>(it->second)->setTimeAxis(sampleTimes, m_syncTimeBase);
-        B2WARNING("TOPCalTimebase: constants replaced."
+        B2WARNING("TOPCalTimebase::append: constants replaced."
                   << LogVar("scrodID", scrodID)
                   << LogVar("channel", channel));
       } else {
-        B2WARNING("TOPCalTimebase: old constants kept."
+        B2WARNING("TOPCalTimebase::append old constants kept."
                   << LogVar("scrodID", scrodID)
                   << LogVar("channel", channel));
       }

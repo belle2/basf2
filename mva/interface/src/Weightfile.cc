@@ -17,7 +17,6 @@
 #include <boost/archive/iterators/transform_width.hpp>
 
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -26,7 +25,7 @@
 #include <TFile.h>
 
 #include <sstream>
-
+#include <filesystem>
 
 namespace Belle2 {
   namespace MVA {
@@ -47,9 +46,9 @@ namespace Belle2 {
     Weightfile::~Weightfile()
     {
       for (auto& filename : m_filenames) {
-        if (boost::filesystem::exists(filename)) {
+        if (std::filesystem::exists(filename)) {
           if (m_remove_temporary_directories)
-            boost::filesystem::remove_all(filename);
+            std::filesystem::remove_all(filename);
         }
       }
     }
@@ -212,7 +211,7 @@ namespace Belle2 {
     Weightfile Weightfile::loadFromROOTFile(const std::string& filename)
     {
 
-      if (not boost::filesystem::exists(filename)) {
+      if (not std::filesystem::exists(filename)) {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 
@@ -234,7 +233,7 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromXMLFile(const std::string& filename)
     {
-      if (not boost::filesystem::exists(filename)) {
+      if (not std::filesystem::exists(filename)) {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 

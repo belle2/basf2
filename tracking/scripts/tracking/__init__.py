@@ -270,13 +270,13 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    # V0 finding
-    if v0_finding:
-        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
+
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')
@@ -550,8 +550,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
 
     if is_pxd_used(components):
         add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                 output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                 filter_cut=0.01)
+                                 output_reco_tracks=full_reco_tracks, add_both_directions=True)
 
     if merge_tracks:
         # merge the tracks together
@@ -625,14 +624,6 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
         'recoTrackListName': reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': roiName,
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)

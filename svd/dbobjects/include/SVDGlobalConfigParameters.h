@@ -36,7 +36,6 @@ namespace Belle2 {
      * Returns the zero suppression threshold for global data taking in
      * ZS acquisition mode
      *
-     * @param none
      * @return float corresponding to zero suppression cut applied during
      * data taking
      */
@@ -44,22 +43,18 @@ namespace Belle2 {
 
     /**
      * Returns the latency set for global data taking
-     *
-     * @param none
      * @return int corresponding to the latency set for global data taking
      */
     int getLatency(void) const { return m_latency; };
 
     /**
      * Returns the masking bitmap used to mask the strips at FADC level (only for CM-section)
-     * @param none
      * @return int corresponding to the mask filter applied at FADC level
      */
     int getMaskFilter(void) const { return m_maskFilter; };
 
     /**
      * Returns the APV clock
-     * @param none
      * @return float corresponding to the APV clock units in [ns]
      */
     float getAPVClockInRFCUnits(void) const
@@ -77,14 +72,12 @@ namespace Belle2 {
 
     /**
      * Returns the HV = Vbias/2
-     * @param none
      * @return float corresponding to the HV = Vbias/2
      */
     float getHV(void) const  { return m_hv; };
 
     /**
      * Returns the relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
-     * @param none
      * @return int [0,15] corresponding to relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
      */
     int getRelativeTimeShift(void) const  { return m_relativeTimeShift; };

@@ -58,7 +58,7 @@ void TrackingEfficiencyModule::event()
       B2ERROR("The provided particlelist " << iList << " does not contain track-based particles.");
     }
 
-    std::vector<int> toRemove;
+    std::vector<unsigned int> toRemove;
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);

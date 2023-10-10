@@ -636,7 +636,7 @@ class Distribution(Plotter):
             self.axis.set_yscale('log', nonposy='clip')
         else:
             self.axis.set_ylim((self.ymin, self.ymax))
-        self.binWidth = '{:8.2f}'.format(self.binWidth)
+        self.binWidth = f'{self.binWidth:8.2f}'
 
         # self.axis.set_title("Distribution Plot")
         self.axis.get_xaxis().set_label_text(self.x_axis_label)
@@ -1372,7 +1372,7 @@ class Importance(Plotter):
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
-        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        f'trunc({cmap.name},{minval:.2f},{maxval:.2f})',
         cmap(np.linspace(minval, maxval, n)))
     return new_cmap
 
@@ -1442,13 +1442,13 @@ class CorrelationMatrix(Plotter):
 
         for y in range(mirrored_signal_corr.shape[0]):
             for x in range(mirrored_signal_corr.shape[1]):
-                outputWithRedundantMinus = '%.0f' % mirrored_signal_corr[y, x]
+                outputWithRedundantMinus = f'{mirrored_signal_corr[y, x]:.0f}'
                 if outputWithRedundantMinus == '-0':
                     mirrored_signal_corr[y, x] = 0
 
         for y in range(mirrored_bckgrd_corr.shape[0]):
             for x in range(mirrored_bckgrd_corr.shape[1]):
-                outputWithRedundantMinus = '%.0f' % mirrored_bckgrd_corr[y, x]
+                outputWithRedundantMinus = f'{mirrored_bckgrd_corr[y, x]:.0f}'
                 if outputWithRedundantMinus == '-0':
                     mirrored_bckgrd_corr[y, x] = 0
 

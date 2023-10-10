@@ -38,7 +38,7 @@ KFitTrack::KFitTrack(const KFitTrack& a)  = default;
 
 KFitTrack::KFitTrack
 (
-  const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double charge,
+  const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double charge,
   const int flag
 )
 {

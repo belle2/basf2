@@ -82,4 +82,4 @@ if __name__ == "__main__":
     main.add_module("RootInput", inputFileName=find_file("mdst/tests/mdst-v01-00-04.root"))
     main.add_module("EventInfoPrinter")
     add_mdst_dump(main, True)
-    process(main, 5)
+    process(main, 4)

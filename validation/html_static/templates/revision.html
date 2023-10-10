@@ -9,6 +9,7 @@
     <option value="n" title="Reference and the latest nightly">R+latest nightly</option>
     <option value="nnn" title="Reference and all nightly revisions">R+all nightlies</option>
     <option value="all" title="Reference and all revisions">R+all revisions</option>
+    <option value="c" title="Custom selection(s)">Custom</option>
   </select>
 </span>
 {{#revisions}}
@@ -49,7 +50,7 @@ CSS properties -->
 <span id="button-revision-load-container">
 	<button
       id="button-revision-load"
-      onclick='loadSelectedRevisions()'
+      onclick='loadSelectedRevisions(true)'
       title="Load a combination of revisions selected above. This button turns red when you change a setting that requires a reload.">
     Load custom selection
   </button>

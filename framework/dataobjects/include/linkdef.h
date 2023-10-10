@@ -54,6 +54,7 @@
   version="[-3]"                                                                                                          \
   targetClass="Belle2::MCInitialParticles"                                                                                \
   target="m_her"                                                                                                          \
+  include="TLorentzVector.h"                                                                                              \
   code="{m_her = ROOT::Math::PxPyPzEVector(onfile.m_her.Px(), onfile.m_her.Py(), onfile.m_her.Pz(), onfile.m_her.E());}"  \
 
 #pragma read                                                                                                              \
@@ -62,6 +63,7 @@
   version="[-3]"                                                                                                          \
   targetClass="Belle2::MCInitialParticles"                                                                                \
   target="m_ler"                                                                                                          \
+  include="TLorentzVector.h"                                                                                              \
   code="{m_ler = ROOT::Math::PxPyPzEVector(onfile.m_ler.Px(), onfile.m_ler.Py(), onfile.m_ler.Pz(), onfile.m_ler.E());}"  \
 
 #pragma read                                \

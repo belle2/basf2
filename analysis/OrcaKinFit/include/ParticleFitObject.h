@@ -50,7 +50,7 @@
  * but using measured[i] which is the bool giving the measured/unmeasured
  * status and NOT a bool containing the START VALUES!!!!!
  * From its stored initial parameters and the current fit parameters
- * the FitObject calculates its contribution to the $\chi^2$ of the fit.
+ * the FitObject calculates its contribution to the \f$\chi^2\f$ of the fit.
  *
  * In its current state, a ParticleFitObject has a set of parameters, some
  * of them measured (i.e., they contribute to the \f$\chi^2\f$).

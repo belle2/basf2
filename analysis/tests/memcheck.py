@@ -119,7 +119,7 @@ TagV('B0:jpsiks', 'breco', path=main)
 fs_vars = ['kaonID', 'muonID', 'dr', 'dz', 'pValue', 'isSignal', 'mcErrors', 'genMotherID']
 b_vars = ['nTracks', 'Mbc', 'deltaE', 'p', 'E', 'useCMSFrame(p)', 'useCMSFrame(E)',
           'isSignal', 'mcErrors', 'nROE_KLMClusters', 'qrOutput(FBDT)', 'TagVLBoost', 'TagVz', 'TagVzErr', 'mcDeltaT'] + \
-    ['daughter(0,daughter(0,%s))' % var for var in fs_vars]
+    [f'daughter(0,daughter(0,{var}))' for var in fs_vars]
 
 # save variables to ntuple
 variablesToNtuple('B0:jpsiks', variables=b_vars, filename='ntuple.root', treename='B0tree', path=main)

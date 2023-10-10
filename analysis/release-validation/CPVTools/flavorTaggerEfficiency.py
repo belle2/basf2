@@ -424,13 +424,13 @@ for method in methods:
         muParamUncertainty[i] = event_fractionDiffUncertainty[i] / (2 * event_fractionTotal[i]) * math.sqrt(muParam[i]**2 + 1)
 
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
-        print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '   ' +
-              '{:.3f}'.format(rvalueB0Average[i]) + ' +- ' + '{:.4f}'.format(rvalueStdB0Average[i]) + '    ' +
-              '{:.4f}'.format(event_fractionTotal[i]) + ' ' +
-              '{: .4f}'.format(event_fractionDiff[i]) + ' +- ' + '{:.4f}'.format(event_fractionDiffUncertainty[i]) + ' ' +
-              '{: .4f}'.format(muParam[i]) + ' +- ' + '{:.4f}'.format(muParamUncertainty[i]) + '   ' +
-              '{:.4f}'.format(wvalue[i]) + ' +- ' + '{:.4f}'.format(wvalueUncertainty[i]) + '  ' +
-              '{: .4f}'.format(wvalueDiff[i]) + ' +- ' + '{:.4f}'.format(wvalueDiffUncertainty[i]) + '  *')
+        print('* ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '   ' +
+              f'{rvalueB0Average[i]:.3f}' + ' +- ' + f'{rvalueStdB0Average[i]:.4f}' + '    ' +
+              f'{event_fractionTotal[i]:.4f}' + ' ' +
+              f'{event_fractionDiff[i]: .4f}' + ' +- ' + f'{event_fractionDiffUncertainty[i]:.4f}' + ' ' +
+              f'{muParam[i]: .4f}' + ' +- ' + f'{muParamUncertainty[i]:.4f}' + '   ' +
+              f'{wvalue[i]:.4f}' + ' +- ' + f'{wvalueUncertainty[i]:.4f}' + '  ' +
+              f'{wvalueDiff[i]: .4f}' + ' +- ' + f'{wvalueDiffUncertainty[i]:.4f}' + '  *')
 
     # average_eff_eff = (tot_eff_effB0 + tot_eff_effB0bar) / 2
     uncertainty_eff_effAverage = math.sqrt(uncertainty_eff_effAverage)
@@ -444,51 +444,39 @@ for method in methods:
     print('*    __________________________________________________________________________________________    *')
     print('*   |                                                                                          |   *')
     print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
-          '{:<24}'.format("%.0f" % total_tagged) + '{:>36}'.format('|   *'))
+          f"{f'{total_tagged:.0f}':<24}" + f"{'|   *':>36}")
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' +
-        '{:.2f}'.format(
-            tagging_eff *
-            100) +
+        f'{tagging_eff * 100:.2f}' +
         " +- " +
-        '{:.2f}'.format(
-            DeltaTagging_eff *
-            100) +
+        f'{DeltaTagging_eff * 100:.2f}' +
         ' %                                      |   *')
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' +
-        '{:.6f}'.format(
-            average_eff_eff *
-            100) +
+        f'{average_eff_eff * 100:.6f}' +
         " +- " +
-        '{:.6f}'.format(
-            uncertainty_eff_effAverage *
-            100) +
+        f'{uncertainty_eff_effAverage * 100:.6f}' +
         ' %                    |   *')
     print('*   |                                                                                          |   *')
     print(
         '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY ASYMMETRY (q=+-1)=  ' +
-        '{:^9.6f}'.format(
-            diff_eff *
-            100) +
+        f'{diff_eff * 100:^9.6f}' +
         " +- " +
-        '{:.6f}'.format(
-            diff_eff_Uncertainty *
-            100) +
+        f'{diff_eff_Uncertainty * 100:.6f}' +
         ' %           |   *')
     print('*   |                                                                                          |   *')
     print('*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' +
-          '{:.2f}'.format(tot_eff_effB0 * 100) + " +-" + '{: 4.2f}'.format(uncertainty_eff_effB0 * 100) +
+          f'{tot_eff_effB0 * 100:.2f}' + " +-" + f'{uncertainty_eff_effB0 * 100: 4.2f}' +
           ' % (q=+1)  ' +
-          '{:.2f}'.format(tot_eff_effB0bar * 100) + " +-" + '{: 4.2f}'.format(uncertainty_eff_effB0bar * 100) +
+          f'{tot_eff_effB0bar * 100:.2f}' + " +-" + f'{uncertainty_eff_effB0bar * 100: 4.2f}' +
           ' % (q=-1) ' + ' |   *')
     print('*   |                                                                                          |   *')
     print('*   | FLAVOR PERCENTAGE (MC):                  ' +
-          '{:.2f}'.format(total_tagged_B0 / total_tagged * 100) + ' % (q=+1)  ' +
-          '{:.2f}'.format(total_tagged_B0bar / total_tagged * 100) + ' % (q=-1)  Diff=' +
-          '{:^5.2f}'.format((total_tagged_B0 - total_tagged_B0bar) / total_tagged * 100) + ' %    |   *')
+          f'{total_tagged_B0 / total_tagged * 100:.2f}' + ' % (q=+1)  ' +
+          f'{total_tagged_B0bar / total_tagged * 100:.2f}' + ' % (q=-1)  Diff=' +
+          f'{(total_tagged_B0 - total_tagged_B0bar) / total_tagged * 100:^5.2f}' + ' %    |   *')
     print('*   |__________________________________________________________________________________________|   *')
     print('*                                                                                                  *')
     print('****************************************************************************************************')
@@ -516,12 +504,12 @@ for method in methods:
     wrong_eff = right_tag_fraction * right_tag_fraction
 
     print('*     wrong_tag_fraction for all:   ' +
-          '{:.3f}'.format(wrong_tag_fraction * 100) +
+          f'{wrong_tag_fraction * 100:.3f}' +
           ' %                                                       *')
     print('*     right_tag_fraction for all:   ' +
-          '{:.3f}'.format(right_tag_fraction * 100) +
+          f'{right_tag_fraction * 100:.3f}' +
           ' %                                                       *')
-    print('*     wrong calculated eff all:     ' + '{:.3f}'.format(wrong_eff * 100) +
+    print('*     wrong calculated eff all:     ' + f'{wrong_eff * 100:.3f}' +
           ' %                                                       *')
     print('*                                                                                                  *')
     print('****************************************************************************************************')
@@ -627,23 +615,23 @@ for method in methods:
           r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip\, $ ' +
           r' & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i}\enskip\, $\\ \hline\hline')
     for i in range(1, r_size):
-        print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
-              '{: 6.1f}'.format(event_fractionTotal[i] * 100) + r'$ & $' +
-              '{: 7.2f}'.format(event_fractionDiff[i] * 100) + r'\;$ & $' +
-              '{: 7.2f}'.format(wvalue[i] * 100) + r" \pm " + '{:2.2f}'.format(wvalueUncertainty[i] * 100) + r'\enskip $ & $' +
-              '{: 7.2f}'.format(wvalueDiff[i] * 100) + r" \pm " +
-              '{:2.2f}'.format(wvalueDiffUncertainty[i] * 100) + r'\enskip $ & $' +
-              '{: 8.4f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
-              r" \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\, $ & $' +
-              '{: 6.4f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
-              r" \pm " + '{:2.4f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
+        print('$ ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '$ & $' +
+              f'{event_fractionTotal[i] * 100: 6.1f}' + r'$ & $' +
+              f'{event_fractionDiff[i] * 100: 7.2f}' + r'\;$ & $' +
+              f'{wvalue[i] * 100: 7.2f}' + r" \pm " + f'{wvalueUncertainty[i] * 100:2.2f}' + r'\enskip $ & $' +
+              f'{wvalueDiff[i] * 100: 7.2f}' + r" \pm " +
+              f'{wvalueDiffUncertainty[i] * 100:2.2f}' + r'\enskip $ & $' +
+              f'{iEffEfficiency[i] * 100: 8.4f}' +  # + '$ & $' +
+              r" \pm " + f'{iEffEfficiencyUncertainty[i] * 100:2.4f}' + r'\, $ & $' +
+              f'{iDeltaEffEfficiency[i] * 100: 6.4f}' +  # +
+              r" \pm " + f'{iDeltaEffEfficiencyUncertainty[i] * 100:2.4f}' +
               r'\enskip\enskip $ \\ ')
     print(r'\hline\hline')
     print(r'\multicolumn{1}{r}{Total} &  & \multicolumn{5}{r}{ $\varepsilon_\text{eff} = ' +
           r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-          '{: 6.2f}'.format(average_eff_eff * 100) + r" \pm " + '{: 6.2f}'.format(uncertainty_eff_effAverage * 100) + r'\enskip\, ')
+          f'{average_eff_eff * 100: 6.2f}' + r" \pm " + f'{uncertainty_eff_effAverage * 100: 6.2f}' + r'\enskip\, ')
     print(r'\Delta \varepsilon_\text{eff} = ' +
-          '{: 6.2f}'.format(diff_eff * 100) + r" \pm " + '{: 6.2f}'.format(diff_eff_Uncertainty * 100) + r'\quad\  $ }' +
+          f'{diff_eff * 100: 6.2f}' + r" \pm " + f'{diff_eff_Uncertainty * 100: 6.2f}' + r'\quad\  $ }' +
           r' \\ ')
     print(r'\hline')
     print(r'\end{tabular}')
@@ -654,8 +642,8 @@ for method in methods:
     print('')
 
     for i in range(1, r_size):
-        print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
-              '{: 7.2f}'.format(muParam[i] * 100) + r" \pm " + '{:2.2f}'.format(muParamUncertainty[i] * 100) + r' $ & ')
+        print('$ ' + f'{r_subsample[i - 1]:.3f}' + ' - ' + f'{r_subsample[i]:.3f}' + '$ & $' +
+              f'{muParam[i] * 100: 7.2f}' + r" \pm " + f'{muParamUncertainty[i] * 100:2.2f}' + r' $ & ')
 # ************************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
 # ************************************************
@@ -953,16 +941,16 @@ for category in usedCategories:
     diff_eff_Uncertainty = math.sqrt(diff_eff_Uncertainty)
     uncertainty_eff_effAverage = diff_eff_Uncertainty / 2
     print(
-        '{:<25}'.format("* " + category) + ' B0-Eff=' +
-        '{: 8.2f}'.format(tot_eff_effB0 * 100) + " +-" + '{: 4.2f}'.format(uncertainty_eff_effB0 * 100) +
+        f"{'* ' + category:<25}" + ' B0-Eff=' +
+        f'{tot_eff_effB0 * 100: 8.2f}' + " +-" + f'{uncertainty_eff_effB0 * 100: 4.2f}' +
         ' %' +
         '   B0bar-Eff=' +
-        '{: 8.2f}'.format(tot_eff_effB0bar * 100) + " +-" + '{: 4.2f}'.format(uncertainty_eff_effB0bar * 100) +
+        f'{tot_eff_effB0bar * 100: 8.2f}' + " +-" + f'{uncertainty_eff_effB0bar * 100: 4.2f}' +
         ' %' +
         '   EffAverage=' +
-        '{: 8.2f}'.format(effAverage * 100) + " +- " + '{:4.2f}'.format(uncertainty_eff_effAverage * 100) + ' %' +
+        f'{effAverage * 100: 8.2f}' + " +- " + f'{uncertainty_eff_effAverage * 100:4.2f}' + ' %' +
         '   EffDiff=' +
-        '{: 8.2f}'.format(effDiff * 100) + " +- " + '{:4.2f}'.format(diff_eff_Uncertainty * 100) + ' %  *')
+        f'{effDiff * 100: 8.2f}' + " +- " + f'{diff_eff_Uncertainty * 100:4.2f}' + ' %  *')
 
     # hist_signal.Write('', ROOT.TObject.kOverwrite)
     # hist_background.Write('', ROOT.TObject.kOverwrite)
@@ -997,11 +985,11 @@ print(r'Categories & $\varepsilon_\text{eff} \pm \delta\varepsilon_\text{eff} $&
       r'$\Delta\varepsilon_\text{eff} \pm \delta\Delta\varepsilon_\text{eff}$\\ \hline\hline')
 for (category, effAverage, uncertainty_eff_effAverage, effDiff, diff_eff_Uncertainty) in categoriesPerformance:
     print(
-        '{:<23}'.format(category) +
+        f'{category:<23}' +
         ' & $' +
-        '{: 6.2f}'.format(effAverage * 100) + r" \pm " + '{:4.2f}'.format(uncertainty_eff_effAverage * 100) +
+        f'{effAverage * 100: 6.2f}' + r" \pm " + f'{uncertainty_eff_effAverage * 100:4.2f}' +
         ' $ & $' +
-        '{: 6.2f}'.format(effDiff * 100) + r" \pm " + '{:4.2f}'.format(diff_eff_Uncertainty * 100) +
+        f'{effDiff * 100: 6.2f}' + r" \pm " + f'{diff_eff_Uncertainty * 100:4.2f}' +
         r'\ \enskip  $ \\')
 print(r'\hline')
 print(r'\end{tabular}')

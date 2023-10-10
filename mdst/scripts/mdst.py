@@ -129,7 +129,7 @@ def add_mdst_dump(path, print_untested=False):
         }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
-            "getClusterId", "getMinTrkDistance", "getDeltaL",
+            "getClusterId", "getUniqueClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getNumberOfHadronDigits", "getR", "getHypotheses",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",

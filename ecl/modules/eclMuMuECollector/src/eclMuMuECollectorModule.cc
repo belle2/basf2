@@ -25,6 +25,7 @@
 
 /* ROOT headers. */
 #include <TH2F.h>
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -133,7 +134,7 @@ void eclMuMuECollectorModule::prepare()
   } else if (m_thetaLabMinDeg > 179.) {
     cotThetaLabMax = -9999.;
   } else {
-    double thetaLabMin = m_thetaLabMinDeg * TMath::Pi() / 180.;
+    double thetaLabMin = m_thetaLabMinDeg * TMath::DegToRad();
     cotThetaLabMax = 1. / tan(thetaLabMin);
   }
   if (m_thetaLabMaxDeg < 1.) {
@@ -141,7 +142,7 @@ void eclMuMuECollectorModule::prepare()
   } else if (m_thetaLabMaxDeg > 179.) {
     cotThetaLabMin = -9999.;
   } else {
-    double thetaLabMax = m_thetaLabMaxDeg * TMath::Pi() / 180.;
+    double thetaLabMax = m_thetaLabMaxDeg * TMath::DegToRad();
     cotThetaLabMin = 1. / tan(thetaLabMax);
   }
   B2INFO("cotThetaLabMin: " << cotThetaLabMin);

@@ -132,7 +132,7 @@ int SocketIO::get_pxd(int sock, char* data, int len)
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(sock, data, headerlen);
   if (br <= 0) return br;
-  if (pxdheader[0] != htonl(0xCAFEBABE)) {
+  if (static_cast<uint>(pxdheader[0]) != htonl(0xCAFEBABE)) {
     printf("pxdheader wrong : Magic %X , Frames %X \n", pxdheader[0], ntohl(pxdheader[1]));
     exit(0);
   }

@@ -358,7 +358,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string va
   }
   char text[40];
   strcpy(text, value.c_str());
-  SEVCHK(ca_put(DBR_STRING, m_epicsNameToChID[keyname], (void*)&text), "ca_set failure");
+  SEVCHK(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure");
 #endif
 }
 
@@ -396,7 +396,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
   }
   char text[40];
   strcpy(text, value.c_str());
-  SEVCHK(ca_put(DBR_STRING, m_epicsChID[index], (void*)&text), "ca_set failure");
+  SEVCHK(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure");
 #endif
 }
 
@@ -458,7 +458,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_STRING, m_epicsNameToChID[keyname], (void*)&value);
+  auto r = ca_get(DBR_STRING, m_epicsNameToChID[keyname], value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return std::string(value);
@@ -481,7 +481,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return std::string(value);

@@ -249,7 +249,7 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   h_missing_ecldigits = new TH1F("missing_ecldigits", "", 4, 0, 4);
   h_missing_ecldigits->SetTitle("Fit quality flag for missing ECLDigits (missing fit results)");
-  h_missing_ecldigits->GetXaxis()->SetTitle("Quality flag. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
+  h_missing_ecldigits->GetXaxis()->SetTitle("C++ fit quality. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
 
   oldDir->cd();
 }
@@ -479,6 +479,12 @@ void ECLDQMEXTENDEDModule::event()
     ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit) {
+      if (h_missing_ecldigits->GetEntries() == 0) {
+        B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"
+                << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
+                << LogVar("A_emulator", m_AmpFit)
+                << LogVar("Quality_emulator", m_QualityFit));
+      }
       h_missing_ecldigits->Fill(m_QualityFit);
     }
 

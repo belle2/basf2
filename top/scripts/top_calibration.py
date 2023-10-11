@@ -16,6 +16,7 @@
 import basf2
 from rawdata import add_unpackers
 from reconstruction import add_cosmics_reconstruction
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 from caf.framework import Calibration, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
 from ROOT.Belle2 import TOP
@@ -262,24 +263,30 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
 
 
 def moduleT0_calibration_cosmics(inputFiles, globalTags=None, localDBs=None,
-                                 data_format="raw"):
+                                 data_format="raw", full_reco=True):
     '''
     Returns calibration object for module T0 calibration with cosmic data using DeltaT method.
-    Note: cdst must be processed without merging incoming and outcoming track segments.
+    Note: by default cdst is processed with merging incoming and outcoming track segments of a cosmic particle,
+    but we need here separate track segments in order to get ExtHits in incoming and outcoming module.
     :param inputFiles: A list of input files in cdst data format
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
     :param data_format: "raw" for raw data or "cdst" for the new cdst format
+    :param full_reco: on True, run full cosmics reconstruction also if data_format=="cdst"
     '''
 
     #   create path
     main = basf2.create_path()
 
     #   add basic modules
-    main.add_module('RootInput')
+    if data_format == "cdst" and full_reco:
+        main.add_module('RootInput', branchNames=ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
+    else:
+        main.add_module('RootInput')
+
     main.add_module('Gearbox')
     main.add_module('Geometry')
-    if data_format == "raw":
+    if data_format == "raw" or full_reco:
         add_unpackers(main)
         add_cosmics_reconstruction(main, merge_tracks=False, reconstruct_cdst=True)
     else:

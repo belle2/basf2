@@ -55,7 +55,7 @@ namespace Belle2 {
         }
         if (evtShapeCont->getFWMoment(0) == 0)
         {
-          B2ERROR("The 0th-order FoxWolfram moment is zero");
+          B2INFO("The 0th-order FoxWolfram moment is zero");
           return std::numeric_limits<float>::quiet_NaN();
         }
         return evtShapeCont->getFWMoment(order) / evtShapeCont->getFWMoment(0);
@@ -606,7 +606,8 @@ namespace Belle2 {
           TVector3 newY(0, 0, 0);
           if (newZ(2) == 0 and newZ(1) == 0)
             newY(0) = 1;
-          else{
+          else
+          {
             newY(1) = newZ(2);
             newY(2) = -newZ(1);
           }

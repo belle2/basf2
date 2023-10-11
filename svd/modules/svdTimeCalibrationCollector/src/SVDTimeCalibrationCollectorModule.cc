@@ -101,9 +101,14 @@ void SVDTimeCalibrationCollectorModule::prepare()
 
 void SVDTimeCalibrationCollectorModule::startRun()
 {
+  getObjectPtr<TH1F>("hEventT0FromCDC")->Reset();
+  getObjectPtr<TH1F>("hEventT0FromCDCSync")->Reset();
+  getObjectPtr<TH1F>("hRawTimeL3V")->Reset();
+  getObjectPtr<TH1F>("hRawTimeL3VFullRange")->Reset();
   getObjectPtr<TH3F>("__hEventT0vsCoG__")->Reset();
   getObjectPtr<TH2F>("__hEventT0__")->Reset();
   getObjectPtr<TH2F>("__hEventT0NoSync__")->Reset();
+  getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
 }
 
 void SVDTimeCalibrationCollectorModule::collect()

@@ -25,7 +25,7 @@
 # March 2018, R. Godang (godang@southalabama.edu)
 #   Updated the BRs of the semitauonic decays: B0, anti-B0, B-, B+ decays including pi+ tau- anti-nu_tau
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/1769/overview
-#   https://stash.desy.de/projects/B2/repos/software/commits/eb4481dfe852e60cde1fe9a79ea05828c8e87eac#generators/evtgen/decayfiles/DECAY_BELLE2.DEC
+#   https://github.com/belle2/basf2/blob/629dc58140ef04e18106dc7a7df9fff27974c98c/generators/evtgen/decayfiles/DECAY_BELLE2.DEC
 #
 # March 2018, T. Lueck (lueck@pi.infn.it)
 #   Updated B -> X_c l nu BR to PDG2018 values

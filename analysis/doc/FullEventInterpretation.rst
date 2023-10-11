@@ -402,12 +402,12 @@ should be replaced with:
             else:
                 experiment_min, experiment_max, run_min, run_max = -1, -1, -1, -1
 
-After installing all prerequisites, you would need to get the example `feiongridworkflow <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse>`_:
+After installing all prerequisites, you would need to get the example `feiongridworkflow <https://gitlab.desy.de/belle2/performance/fei/grid-workflow>`_:
 
 .. code-block:: bash
 
     cd </path/to/your/work/directory>
-    git clone ssh://git@stash.desy.de:7999/~aakhmets/feiongridworkflow.git
+    git clone git@gitlab.desy.de:belle2/performance/fei/grid-workflow.git feiongridworkflow
     cd feiongridworkflow
 
 General Workflow Concept
@@ -699,7 +699,7 @@ Tips and Tricks
 In this concluding section of running FEI training on the grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
 especially when running on the grid.
 
-* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
+* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
 * To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilities to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR -n 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
 * To run instances of ``FEIAnalysisTask`` efficiently on the grid, you should prepare yourself well for that.
 
@@ -832,6 +832,6 @@ Resources, Publications etc.
 .. _luigi: https://luigi.readthedocs.io/en/latest/
 .. _b2luigi: https://b2luigi.readthedocs.io/en/latest/
 .. _gbasf2: https://confluence.desy.de/display/BI/Computing+GBasf2
-.. _settings.json: https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/settings.json
-.. _fei_grid_workflow.py: https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/fei_grid_workflow.py
+.. _settings.json: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/settings.json
+.. _fei_grid_workflow.py: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/fei_grid_workflow.py
 .. _Belle II DIRAC: https://dirac.cc.kek.jp:8443/DIRAC/

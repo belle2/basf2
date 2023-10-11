@@ -290,6 +290,13 @@ namespace Belle2 {
     void UpdateCanvas(std::string name, bool updated = true);
 
     /**
+     * Mark canvas as updated (or not)
+     * @param canvas Canvas from which to take the name for update
+     * @param updated was updated
+     */
+    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+
+    /**
      * Extract Run Type from histogram title, called from input module
      */
     void ExtractRunType(std::vector <TH1*>& hs);
@@ -341,6 +348,20 @@ namespace Belle2 {
      * @param value value to write
      */
     void setEpicsPV(int index, int value);
+
+    /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(std::string keyname);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(int index);
 
     /**
      * Update all EPICS PV (flush to network)

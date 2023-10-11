@@ -60,7 +60,7 @@ class TestStdCharged(unittest.TestCase):
             f(path=testpath)
             self.assertEqual(
                 len(testpath.modules()), 3,
-                "Function %s doesn't work" % f.__name__)
+                f"Function {f.__name__} doesn't work")
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
             loader = testpath.modules()[0]
             self._check_list_name(expectedlist, f.__name__, loader)
@@ -121,7 +121,7 @@ class TestStdCharged(unittest.TestCase):
         stdCharged.stdMostLikely(path=testpath)
         self.assertEqual(
             len(testpath.modules()), 3 * nLists,
-            "There should be %i fillParticleList calls" % nLists)
+            f"There should be {int(nLists)} fillParticleList calls")
         self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
         for module in testpath.modules():
             self._check_list_name('mostlikely', 'stdMostLikely', module)

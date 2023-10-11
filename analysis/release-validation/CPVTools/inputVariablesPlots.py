@@ -340,7 +340,7 @@ def plotInputVariablesOfFlavorTagger():
             if category == "Lambda" and inputVariable == 'distance':
                 variablesPlotParamsDict[inputVariable][5] = r"{\rm cm}\, "
 
-            binWidth = '{:8.2f}'.format(binWidth)
+            binWidth = f'{binWidth:8.2f}'
 
             xLabel = variablesPlotParamsDict[inputVariable][4]
             legendLocation = 1

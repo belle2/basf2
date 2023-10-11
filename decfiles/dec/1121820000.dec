@@ -21,7 +21,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.000    J/psisig  K*0    SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+1.000    J/psisig  K*0    SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 1.5507;
 Enddecay
 CDecay anti-B0sig
 

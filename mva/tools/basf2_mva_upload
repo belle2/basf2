@@ -13,7 +13,7 @@ import subprocess
 import os
 
 OLD = "basf2_mva_upload"
-NEW = "./basf2_mva_add_to_local_database"
+NEW = "basf2_mva_add_to_local_database"
 
 output_string = f"\n\033[0;31mAttention:\033[0m {OLD} has been deprecated in favor of {NEW} as the name {OLD} was confusing."
 output_string += " The old name has been kept for compatibility but will be removed in release-09.\n"
@@ -21,4 +21,4 @@ output_string += f"From now on please use \033[0;32m{NEW}\033[0m.\n"
 
 print(output_string)
 
-os.system(f"{NEW} {subprocess.list2cmdline(sys.argv[1:])}")
+os.system(f"{NEW} {subprocess.list2cmdline(sys.argv[1:]).replace('--identifier', '--weight_file_name')}")

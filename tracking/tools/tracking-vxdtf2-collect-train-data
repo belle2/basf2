@@ -125,11 +125,22 @@ if __name__ == "__main__":
         type=int,
         default=10,
         help="Number of events generated from which the information is collected")
+    
+    parser.add_argument(
+        '--prependGT', 
+        dest='prependGT',
+        default='',
+        help='Optional Global tag that will be prepend to the list of GT. Useful for e.g. training \
+          SectorMaps on an altered Geometry.')
 
     # the arguments for this scripts
     args = parser.parse_args()
     b2.B2INFO("Using random Seed: " + str(args.rndSeed))
-    
+
+    if not (args.prependGT == ''):
+        b2.B2INFO("Prepending GT: " + args.prependGT)
+        b2.conditions.prepend_globaltag(args.prependGT)
+
     main_path = b2.create_path()
     
     # Adds either BB or ee event generation (no detector simulation)

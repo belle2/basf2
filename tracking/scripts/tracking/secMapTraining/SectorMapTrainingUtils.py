@@ -375,3 +375,60 @@ def create_unique_random_numbers(n=500, random_seed=12345, n_min=9999, n_max=999
         my_list = [random.randint(n_min, n_max) for i in range(0, n)]
         if (len(my_list) == len(set(my_list))):
             return my_list
+
+
+def remove_timing_cuts_from_SectorMap(sectorMapFile, setupToRead="SVDOnlyDefault"):
+    '''
+    Simple function to remove the timing cuts from a given SectorMap and stores the
+    new SectorMap to a file
+    @param sectorMapFile Name (including path) of the SectorMap to be altered.
+    @param setupToRead SectorMap files can store different setups. This parameter specifies the name
+        of the setup which should be read.
+        Currently in use should only be the name given as default.
+     NOTE: This script should only be used by experts!
+    '''
+
+    import basf2 as b2
+
+    # Using the SectorMapBootstrap module to read the sectormap from file
+    SMBSM1 = b2.register_module("SectorMapBootstrap")
+    SMBSM1.param("ReadSecMapFromDB", False)
+    SMBSM1.param("ReadSectorMap", True)
+    SMBSM1.param("SectorMapsInputFile", sectorMapFile)
+    SMBSM1.param("SetupToRead", setupToRead)
+
+    # assumes it is a root file so replace the last 5 letters
+    outputMapFile = sectorMapFile[:-5] + '_timingRemoved.root'
+    # the following setting will make the module write the altered sectormap to a root file
+    SMBSM1.param("SectorMapsOutputFile", outputMapFile)
+    SMBSM1.param("WriteSectorMap", True)
+
+    ##################################################################
+    # now the actual alteration of the cut values
+    ###############################################################
+
+    # NOTE: the indizes in the example below may have changed if the code changed! So you have to cross check!
+
+    # three hit filter
+    # (#19 <= DistanceInTime <= #20)
+    SMBSM1.param('threeHitFilterAdjustFunctions', [(19, "-TMath::Infinity()"), (20, "TMath::Infinity()")])
+    # two hit filters:
+    # (#12 <= DistanceInTimeUside <= #13)
+    # (#10 <= DistanceInTimeVside <= #11)
+    SMBSM1.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "TMath::Infinity()"),
+                                                 (10, "-TMath::Infinity()"), (11, "TMath::Infinity()")])
+
+    # this will, in addition to other debbugging output, print the original filter ("BEFORE")
+    # and the altered filter ("AFTER") to the screen.
+    # NOTE: there are order of 10th of thousends of filters both for 2-hits and 3-hits. So expect lots of output.
+    # SMBSM1.logging.log_level = LogLevel.DEBUG
+
+    # create path
+    main = b2.create_path()
+    # EventInfoSetter needed else basf2 complains as it is afraid of having no EventMetaData
+    main.add_module('EventInfoSetter')
+    main.add_module(SMBSM1)
+    b2.print_path(main)
+    # run path
+    b2.process(main)
+    print(b2.statistics)

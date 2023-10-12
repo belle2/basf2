@@ -179,6 +179,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   bootstrapSectorMap(config1);
 
 
+  // 11th Oct. 2023: removed to prevent that corresponding training samples are generated. Still want to keep it to not forget how it is done.
+  /*
   // same as config1 but allows the PXD layers
   // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
@@ -198,7 +200,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.rarenessThreshold = 0.; //0.001;
   config1point1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   bootstrapSectorMap(config1point1);
-
+  */
 }
 
 void

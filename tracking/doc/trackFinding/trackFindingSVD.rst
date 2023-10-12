@@ -6,22 +6,25 @@ SVD Track Finding
 .. warning::
   This documentation is under construction!
 
-The VXDTF2 is the SVD standalone pattern recognition algorithm. In this page there is a brief description of the logic behind this pattern recognition algorithm.
+The VXDTF2 is the standalone pattern recognition algorithm for the both of the silicon detectors. It is capable of 
+doing full 6 layer tracking (SVD+PXD). Though in the current tracking chain PXD hits are treated separately thus the 
+VXDTF2 is used for SVD track finding only. In this page there is a brief description of the logic behind this pattern recognition algorithm.
 
 Reduction of the combinatorial burden with the SectorMaps
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-The goal extract track patterns from a huge number of possible combinations of space points (3D hits) in the 4 SVD layers.
+The goal is to extract track patterns from a huge number of possible combinations of space points (3D hits) in the 4 SVD layers.
 The logic behind the reduction of the number of combinations is the following:
-divide the sensors into sectors (NxM)
-combine SpacePoints belonging to friend-sectors only, two sectors are friend if they are directly connected by a track
-reject background SpacePoints using dedicated filters
+divide the sensors into sectors (NxM). Only combine SpacePoints belonging to friend-sectors, where two sectors are defined as friend if they are directly connected by a track. 
+Background SpacePoints are rejected using dedicated filters which use simple geometric relations between sectors and hit time information.  
 
 .. figure:: figures/friends.png
    :align: center
    :width: 80%
 
 The connections defining friend sectors are learned from simulation. In order to avoid attaching background hits to patterns, filters based on 2- or 3-hit combinations are also learned from simulation.
-The SectorMap stores the information about the friendship relations between sectors and a set of selection requirements (filters = {variable, range}) used to reject background hits.
+The SectorMap stores the information about the friendship relations between sectors and a set of selection requirements (filters = {variable, range}) used to reject background hits. The filters 
+are defined (and stored in the SectorMap) individually for each occurring combination of friend sector relations, meaning that different combination of friend sectors usually have 
+different ranges for the filters defined.
 
 .. container:: twocol
 
@@ -40,25 +43,59 @@ The SectorMap stores the information about the friendship relations between sect
     
       Two-hit filter example
 
-Variables used in the filters are geometric (distances, slopes) or properties of the SVD clusters, like the cluster time, listed in the following tables:
+Variables used in the filters are geometric (distances, slopes) or properties of the SVD clusters, like the cluster time. There are two types of filters defined within 
+the framework. There are 2-hit filters, defined for the selection of 2-hit combination, and 3-hit filters, defined for the selection of 3-hit combinations, defined. 
+Variables used in the current implementation of filters are listed in the following tables:
 
-+----------------------------+------------------------------------------------------------------------------------+
-| variables for 2-hit filter | description                                                                        |
-+----------------------------+------------------------------------------------------------------------------------+
-|distance 3D                 | squared distance of the two SpacePoints                                            |
-+----------------------------+------------------------------------------------------------------------------------+
-|distance 2D                 | xy squared distance of the two SpacePoints in the x-y plane                        |
-+----------------------------+------------------------------------------------------------------------------------+
-|distance 1D                 | z distance of the two SpacePoints in the z direction                               |
-+----------------------------+------------------------------------------------------------------------------------+
-|slope rz                    | angle between the z direction and the direction defined by the two Space Points    |
-+----------------------------+------------------------------------------------------------------------------------+
-|cos xy                      | angle between of the vector defined by the two Space Points on the transverse plane|
-+----------------------------+------------------------------------------------------------------------------------+
-|time difference U-U         | time difference of the two u-side clusters of the SpacePoints                      |
-+----------------------------+------------------------------------------------------------------------------------+
-|time difference V-V         | time difference of the two v-side clusters of the SpacePoints                      |
-+----------------------------+------------------------------------------------------------------------------------+
+# defined in tracking/trackFindingVXD/filterMap/
+
++----------------------------+-------------------------------------------------------------------------------------------+
+| variables for 2-hit filter | description                                                                               |
++----------------------------+-------------------------------------------------------------------------------------------+
+|Distance3DSquared.h         | squared distance of the two SpacePoints                                                   |
++----------------------------+-------------------------------------------------------------------------------------------+
+|Distance3DNormed.h          | squared distance in the x-y plane divied by the 3D distance sqared of the two SpacePoints |
++----------------------------+-------------------------------------------------------------------------------------------+
+|Distance2DXYSquared.h       | xy squared distance of the two SpacePoints in the x-y plane                               |
++----------------------------+-------------------------------------------------------------------------------------------+
+|Distance1DZ.h               | distance of the two SpacePoints in the z direction                                        |
++----------------------------+-------------------------------------------------------------------------------------------+
+|SlopeRZ.h                   | angle between the z direction and the direction defined by the two Space Points           |
++----------------------------+-------------------------------------------------------------------------------------------+
+|DistanceInTimeUside.h       | time difference of the two u-side clusters of the SpacePoints                             |
++----------------------------+-------------------------------------------------------------------------------------------+         
+|DistanceInTimeVside.h       | time difference of the two v-side clusters of the SpacePoints                             |
++----------------------------+-------------------------------------------------------------------------------------------+
+
+
++-----------------------------+-----------------------------------------------------------------------------------------------------
+| variables for 3-hit filters | description 
++-----------------------------+-----------------------------------------------------------------------------------------------------
+| DistanceInTime              | time difference between u- and v- cluster of the center hit (of the 3-hit combination) 
++-----------------------------+-----------------------------------------------------------------------------------------------------
+Angle3DSimple
++-----------------------------+-----------------------------------------------------------------------------------------------------
+CosAngleXY
++-----------------------------+-----------------------------------------------------------------------------------------------------
+AngleRZSimple
++-----------------------------+-----------------------------------------------------------------------------------------------------
+CircleDist2IP
++-----------------------------+-----------------------------------------------------------------------------------------------------
+DeltaSlopeRZ
++-----------------------------+-----------------------------------------------------------------------------------------------------
+DeltaSlopeZoverS
++-----------------------------+-----------------------------------------------------------------------------------------------------
+DeltaSoverZ
++-----------------------------+-----------------------------------------------------------------------------------------------------
+HelixParameterFit
++-----------------------------+-----------------------------------------------------------------------------------------------------
+Pt
++-----------------------------+-----------------------------------------------------------------------------------------------------
+CircleRadius
++-----------------------------+-----------------------------------------------------------------------------------------------------
+
+
+
 
 The allowed range for each filter is learned from simulation, filling the distribution of the variable during the training and defining threshold as max and min of the distribution (or 0.1% and 99.9% quantile?).
 Using the friendship relations and the filters, segments connecting two, three or four SpacePoints are built. At this stage a single SpacePoint can be shared by more than one segment and we are ready to build track candidates that are identified and collected by a Cellular Automaton.

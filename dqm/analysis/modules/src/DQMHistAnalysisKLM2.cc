@@ -203,7 +203,7 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_eff2d_eklm->GetYaxis()->SetTitle("Layer");
   m_eff2d_eklm->SetStats(false);
 
-  m_err_eklm = new TH2F((m_histogramDirectoryName + "/err_bklm_sector").data(), eff2d_hist_eklm_title,
+  m_err_eklm = new TH2F((m_histogramDirectoryName + "/err_eklm_sector").data(), eff2d_hist_eklm_title,
                         n_sectors_eklm, 0.5, n_sectors_eklm + 0.5,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),  0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
   m_err_eklm->GetXaxis()->SetTitle("Sector");

@@ -176,8 +176,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   m_hEfficiency->getHistogram(0)->Reset();
   m_hEfficiency->getHistogram(1)->Reset();
+  m_hEfficiency->getHistogram(0)->SetStats(0);
+  m_hEfficiency->getHistogram(1)->SetStats(0);
   m_hEfficiencyErr->getHistogram(0)->Reset();
   m_hEfficiencyErr->getHistogram(1)->Reset();
+  m_hEfficiencyErr->getHistogram(0)->SetStats(0);
+  m_hEfficiencyErr->getHistogram(1)->SetStats(0);
 
   Float_t effU = -1;
   Float_t effV = -1;

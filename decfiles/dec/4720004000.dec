@@ -7,16 +7,15 @@
 # Tested: Yes
 # Responsible: Alessandro Boschetti 
 # Email: boschett@to.infn.it
-# Date: 2023/09/08
+# Date: 10/12/2023
 
-Alias myEta eta
+Alias etaSig eta
 
 Decay vpho
-1.000 myEta  h_b  PARTWAVE 1. 0. 0. 0. 0. 0.;
+1.000 etaSig  h_b  PARTWAVE 1. 0. 0. 0. 0. 0.;
 Enddecay
 
-Decay myEta
+Decay etaSig
 1.000 pi0  pi0  pi0  ETA_PI0DALITZ  -0.0135;  #New decay model
 Enddecay
 End
-

@@ -44,7 +44,7 @@ of the physics program.
 .. admonition:: Question
     :class: exercise stacked
 
-    At LHC, every bunch collision generates dozens of individual particle
+    At the LHC, every bunch collision generates dozens of individual particle
     interactions that overlay each other in the detectors (pile-up),
     considerably complicating the data analysis.
     This doesn't seem to be a problem at SuperKEKB and Belle II. Why?

@@ -42,7 +42,7 @@ os.system(training_string)
 
 # "upload" to localdb
 os.system(
-    ('basf2_mva_upload --identifier {identifier} --db_identifier {identifier_db} ' +
+    ('basf2_mva_add_to_local_database --weight_file_name {identifier} --db_identifier {identifier_db} ' +
      '--begin_experiment {ex_b} --end_experiment {ex_e} --begin_run {run_b} --end_run {run_e}').format(
         identifier=identifier,
         identifier_db=identifier.split(".xml")[0],

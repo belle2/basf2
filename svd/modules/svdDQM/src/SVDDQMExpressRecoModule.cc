@@ -803,8 +803,11 @@ void SVDDQMExpressRecoModule::event()
   }
   m_nEvents->Fill(0);
 
-  int nSamples = m_svdEventInfo->getNSamples();
-
+  int nSamples = 0;
+  if (m_svdEventInfo.isValid())
+    nSamples = m_svdEventInfo->getNSamples();
+  else
+    return;
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;

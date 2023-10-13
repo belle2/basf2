@@ -13,7 +13,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-
+#include <analysis/dataobjects/ParticleList.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
@@ -63,7 +63,10 @@ namespace Belle2 {
       StoreObjPtr<EventT0> m_eventTimeStoreObject;  /**< Event t0 object */
       StoreArray<Track> m_Tracks;                   /**< Tracks. */
       StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
+      StoreObjPtr<ParticleList> m_DiMuonList;       /**< List of the reconstructed dimion */
 
+      std::string m_DiMuonListName;                  /**< List name for the reconstruted dimuon */
+      std::string m_GammaListName;                  /**< List name for the reconstruted dimuon */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_treeName = "tree";                 /**< Name of tree for the output file. */
@@ -76,6 +79,8 @@ namespace Belle2 {
       Float_t ndf_neg;               /**< NDF of the negative track. */
       Float_t Pval_pos;              /**< P-value of the positive track. */
       Float_t Pval_neg;              /**< P-value of the negative track. */
+      Float_t nCDC_pos;              /**< Number of CDC hit of the positive track. */
+      Float_t nCDC_neg;              /**< Number of CDC hit of the negative track. */
 
       Float_t D0_pos;                /**< d0 of the positive track  */
       Float_t D0_neg;                /**< d0 of the negative track  */

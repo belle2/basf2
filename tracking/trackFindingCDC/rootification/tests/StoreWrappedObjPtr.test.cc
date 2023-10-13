@@ -41,7 +41,7 @@ TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 }
 
 template <class T>
-class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {
+class TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {
 };
 
 using RootifiedTypes =
@@ -50,9 +50,9 @@ using RootifiedTypes =
   std::vector<CDCTrack>,
   std::vector<WeightedRelation<const CDCTrack> > >;
 
-TYPED_TEST_SUITE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
+TYPED_TEST_SUITE(TrackFindingCDCTestRootification, RootifiedTypes);
 
-TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
+TYPED_TEST(TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
 {
   DataStore& datastore = DataStore::Instance();
   StoreWrappedObjPtr< TypeParam > storeObj;

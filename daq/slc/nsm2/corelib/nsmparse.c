@@ -306,7 +306,7 @@ nsmparse_revision(const char *file, char *filebuf, const char *datname)
   char *p = filebuf;
   int num;
 
-  while (p = strstr(p, datname)) {
+  while ( (p = strstr(p, datname)) ) {
     if ((p == filebuf || ! isa_num(*(p-1))) &&
 	strncmp(p+len, "_revision", 9) == 0) {
       p += len + 9;
@@ -453,7 +453,6 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	      char *fmtout, int *fmtsiz)
 {
   char *ptr = start;
-  char *q = 0; /* temporary pointer */
   struct types_t { char *name; int siz; char sym; char type; };
   struct types_t *typep;
   static struct types_t types[] = {
@@ -476,11 +475,11 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
     { "uint8_t",  1, 'a', 'C' },
     { "double", 8, 'd', 'd' },
     { "float",  4, 'i', 'f' },
-    { 0, 0, 0 }};
+    { 0, 0, 0, 0 }};
   char sym_prev = 0;
   int n_same = 0;
-  char fmtstr[256];
-  int fmtlen = 63;
+  char fmtstr[512];
+  const unsigned int fmtlen = 63;
   int offset = 0;
   NSMparse *parsetop = 0;
   NSMparse *parsep = 0;
@@ -519,7 +518,6 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 
       if (*ptr == '{') {
 	static char fmtout2[256];
-	NSMparse *parse2 = 0;
 	char *nestp = 0;
 	int num = -1;
 	int siz2 = 0;

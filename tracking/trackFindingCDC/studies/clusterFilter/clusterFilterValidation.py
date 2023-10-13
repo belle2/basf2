@@ -127,7 +127,7 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
     save_tree = refiners.save_tree(
         #: \cond
         folder_name="tree"
-        #: \cond
+        #: \endcond
     )
     #: Save histograms in a sub folder
     save_histograms = refiners.save_histograms(
@@ -135,7 +135,7 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         allow_discrete=True,
         folder_name="histograms"
-        #: \cond
+        #: \endcond
     )
 
 

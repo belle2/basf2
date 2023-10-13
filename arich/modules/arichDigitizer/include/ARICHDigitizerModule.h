@@ -89,7 +89,8 @@ namespace Belle2 {
 
     /* Other members.*/
     double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
-    double m_timeWindow;             /**< Readout time window width */
+    double m_timeWindow;             /**< Readout time window width in ns */
+    double m_timeWindowStart;        /**< Readout time window shift w.r.t. the global time zero in ns */
     double m_bkgLevel;               /**< Number of background hits ped hapd per readout (electronics noise) */
     int m_bdistort;                  /**< apply distorsion due to magnetic field */
 

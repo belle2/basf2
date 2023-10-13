@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <vector>
 
 using namespace std;
 
@@ -30,9 +31,9 @@ enum {
 
 
 
-int main(int argc, char** argv)
+int main()
 {
-  unsigned int buf[400000];
+  vector<unsigned int> buf(400000);
   int infn = fileno(stdin);
   printf("infn = %u\n", infn);
 

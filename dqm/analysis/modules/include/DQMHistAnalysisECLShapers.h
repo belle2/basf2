@@ -51,9 +51,6 @@ namespace Belle2 {
 
   private:
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
     /** Number of ECLCollector modules (normally 52) */
     const static int c_collector_count = ECL::ECL_CRATES;
 

@@ -10,7 +10,6 @@
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 

@@ -7,12 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <string>
-
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+/* C++ headers. */
+#include <string>
 
 class TFile;
 class TTree;

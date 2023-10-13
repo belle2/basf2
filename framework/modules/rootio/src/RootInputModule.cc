@@ -583,6 +583,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
 bool RootInputModule::createParentStoreEntries()
 {
   // get the experiment/run/event number and parentLfn of the first entry
+  assert(m_tree);
   TBranch* branch = m_tree->GetBranch("EventMetaData");
   char* address = branch->GetAddress();
   EventMetaData* eventMetaData = nullptr;

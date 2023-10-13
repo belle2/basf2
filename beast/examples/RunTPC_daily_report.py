@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@ import datetime
 import basf2 as b2
 
 d = datetime.datetime.today()
-print((d.strftime('job start: %Y-%m-%d %H:%M:%S\n')))
+print(d.strftime('job start: %Y-%m-%d %H:%M:%S\n'))
 
 # 1/ mkdir output_directory
 # 2/ basf2 ./RunTPC_daily_report.py yyyy mm dd TPCposition output_directory

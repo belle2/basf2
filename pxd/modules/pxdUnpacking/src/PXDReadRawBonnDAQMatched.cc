@@ -242,7 +242,7 @@ void PXDReadRawBonnDAQMatchedModule::event()
   if (offset == 0) offset = m_last_offset;
   fseek(fh, offset, SEEK_SET);
   // Get a record from file
-  auto tnr = triggernr;
+  unsigned int tnr = 0;
   do {
     // Search for triggernr
     tnr = triggernr; // set again as it is the return value

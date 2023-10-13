@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
       // However we have to make sure to pad the buffer correctly, as sizeInWords could be a larger buffer
       unsigned int sizeRoundedUp = sizeInWords * sizeof(int);
       auto charBuffer = reinterpret_cast<char*>(buffer);
-      for (int pos = size; pos < sizeRoundedUp; pos++) {
+      for (unsigned int pos = size; pos < sizeRoundedUp; ++pos) {
         charBuffer[pos] = 0;
       }
       size = sizeInWords;

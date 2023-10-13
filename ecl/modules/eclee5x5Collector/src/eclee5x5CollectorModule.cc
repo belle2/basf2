@@ -19,6 +19,7 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
@@ -295,16 +296,14 @@ void eclee5x5CollectorModule::collect()
   const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
 
   double phi0 = m_eclClusterArray[icMax[0]]->getPhi();
-  TVector3 p30(0., 0., maxClustE[0]);
-  p30.SetTheta(theta0);
-  p30.SetPhi(phi0);
+  ROOT::Math::XYZVector p30;
+  VectorUtil::setMagThetaPhi(p30, maxClustE[0], theta0, phi0);
   const ROOT::Math::PxPyPzEVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex,
                                         ECLCluster::EHypothesisBit::c_nPhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
-  TVector3 p31(0., 0., maxClustE[1]);
-  p31.SetTheta(theta1);
-  p31.SetPhi(phi1);
+  ROOT::Math::XYZVector p31;
+  VectorUtil::setMagThetaPhi(p31, maxClustE[1], theta1, phi1);
   const ROOT::Math::PxPyPzEVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex,
                                         ECLCluster::EHypothesisBit::c_nPhotons);
 

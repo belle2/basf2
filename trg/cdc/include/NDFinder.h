@@ -270,8 +270,6 @@ namespace Belle2 {
       return pt * 1e11 / (3e8 * 1.5); // div (c * B)
     }
 
-    float m_pi_deg = 3.141592653589793 / 180.;
-
     /** Calculate physical units */
     float transformVar(float estVal, int idx);
     std::vector<double> transform(std::vector<double> estimate);

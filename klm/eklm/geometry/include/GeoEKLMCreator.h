@@ -162,8 +162,6 @@ namespace Belle2 {
      * Shield.
      */
     struct LogicalVolumes {
-      G4LogicalVolume* shieldLayer;
-      G4LogicalVolume* shieldLayerSector;
       G4LogicalVolume* cover;
       G4LogicalVolume** segment;
       G4LogicalVolume** stripSegment;
@@ -498,8 +496,7 @@ namespace Belle2 {
        * (for detector layers). If layer != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
-      G4LogicalVolume* createLayer(G4LogicalVolume* section,
-                                   G4LogicalVolume* layer) const;
+      G4LogicalVolume* createLayer(G4LogicalVolume* section) const;
 
       /**
        * Create sector.
@@ -511,8 +508,7 @@ namespace Belle2 {
        * (for detector layers). If sector != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
-      G4LogicalVolume* createSector(G4LogicalVolume* layer,
-                                    G4LogicalVolume* sector) const;
+      G4LogicalVolume* createSector(G4LogicalVolume* layer) const;
 
       /**
        * Create sector cover.

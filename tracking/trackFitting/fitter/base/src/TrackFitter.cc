@@ -93,7 +93,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
       } else {
         std::vector<double> weights = kalmanFitterInfo->getWeights();
         for (const double weight : weights) {
-          if (weight == 0) {
+          if (weight < 1.e-9) {
             recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
           }
         }
@@ -136,9 +136,17 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
 void TrackFitter::resetFitterToDefaultSettings()
 {
-  genfit::DAF* dafFitter = new genfit::DAF(true, s_defaultDeltaPValue);
-  dafFitter->setProbCut(s_defaultProbCut);
-  dafFitter->setMaxFailedHits(s_defaultMaxFailedHits);
+  if (!m_DAFparameters.isValid())
+    B2FATAL("DAF parameters are not available.");
+  genfit::DAF* dafFitter = new genfit::DAF(m_DAFparameters->getAnnealingScheme(),
+                                           m_DAFparameters->getMinimumIterations(),
+                                           m_DAFparameters->getMaximumIterations(),
+                                           m_DAFparameters->getMinimumIterationsForPVal(),
+                                           true,
+                                           m_DAFparameters->getDeltaPValue(),
+                                           m_DAFparameters->getDeltaWeight(),
+                                           m_DAFparameters->getProbabilityCut());
+  dafFitter->setMaxFailedHits(m_DAFparameters->getMaximumFailedHits());
 
   m_fitter.reset(dafFitter);
 

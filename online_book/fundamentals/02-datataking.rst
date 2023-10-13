@@ -344,7 +344,7 @@ ECL
     :width: 900px
     :alt: Picture of ECL electronics
 
-    Small part of the ECL electronics in the endcap. oards do the mapping from
+    Small part of the ECL electronics in the endcap. Boards do the mapping from
     the preamps (which you can’t see) to the cables that go to the ShaperDSPs.
     You can also see the cooling lines under the boards.
 

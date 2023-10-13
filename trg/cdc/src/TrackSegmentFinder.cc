@@ -54,8 +54,6 @@ namespace Belle2 {
     _type(), _tosbE(), _tosbT() // 2019/07/31 by ytlai
   {
 
-    m_Trg_PI = 3.141592653589793;
-
     m_hitPatternInformation = new TClonesArray("TVectorD");
     m_particleEfficiency = new TClonesArray("TVectorD");
     m_tsInformation = new TClonesArray("TVectorD");
@@ -92,7 +90,6 @@ namespace Belle2 {
                                                      const std::vector<TCSegment*>& tsSL)
     : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
       _cdc(TRGCDC),
-      m_Trg_PI(), // 2019/07/31 by ytlai
       m_logicLUTFlag(),
       m_rootTSFFilename(),
       m_fileTSF(),
@@ -454,7 +451,7 @@ namespace Belle2 {
         priorityLRs[0] = SimHits[iSimHit]->getPosFlag();
         posOnTrack = SimHits[iSimHit]->getPosTrack();
         posOnWire = SimHits[iSimHit]->getPosWire();
-        priorityPhis[0] = (posOnTrack - posOnWire).Phi() + m_Trg_PI / 2 -
+        priorityPhis[0] = (posOnTrack - posOnWire).Phi() + M_PI_2 -
                           posOnWire.Phi();
         //cout<<ts.name()<<endl;
         //cout<<"Track: "<<posOnTrack.x()<<" "<<posOnTrack.y()<<" "<<posOnTrack.z()<<endl;
@@ -470,7 +467,7 @@ namespace Belle2 {
         priorityLRs[1] = SimHits[iSimHit]->getPosFlag();
         posOnTrack = SimHits[iSimHit]->getPosTrack();
         posOnWire = SimHits[iSimHit]->getPosWire();
-        priorityPhis[1] = (posOnTrack - posOnWire).Phi() + m_Trg_PI / 2 -
+        priorityPhis[1] = (posOnTrack - posOnWire).Phi() + M_PI_2 -
                           posOnWire.Phi();
       } else {
         priorityLRs[1] = -1;
@@ -481,7 +478,7 @@ namespace Belle2 {
         priorityLRs[2] = SimHits[iSimHit]->getPosFlag();
         posOnTrack = SimHits[iSimHit]->getPosTrack();
         posOnWire = SimHits[iSimHit]->getPosWire();
-        priorityPhis[2] = (posOnTrack - posOnWire).Phi() + m_Trg_PI / 2 -
+        priorityPhis[2] = (posOnTrack - posOnWire).Phi() + M_PI_2 -
                           posOnWire.Phi();
       } else {
         priorityLRs[2] = -1;

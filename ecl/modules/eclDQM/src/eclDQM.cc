@@ -16,7 +16,7 @@
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/core/HistoModule.h>
@@ -52,7 +52,9 @@ ECLDQMModule::ECLDQMModule()
     m_calibrationThrApsd("ECL_FPGA_StoreWaveform")
 {
   //Set module properties.
-  setDescription("ECL Data Quality Monitor");
+  setDescription(
+    "Primary module for ECL Data Quality Monitor.\n"
+    "This module provides a large set of low-level histograms: occupancy, time distribution, number of saved waveforms, etc.");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify parallel processing.
 
   m_WaveformOption = {"psd", "logic", "rand", "dphy", "other"};
@@ -90,21 +92,21 @@ void ECLDQMModule::defineHisto()
   h_evtot = new TH1F("event", "Total event bank", 1, 0, 1);
 
   h_quality = new TH1F("quality", "Fit quality flag. 0-good, 1-integer overflow, 2-low amplitude, 3-bad chi2", 4, 0, 4);
-  h_quality->GetXaxis()->SetTitle("Flag number");
+  h_quality->GetXaxis()->SetTitle("Quality flag");
   h_quality->GetYaxis()->SetTitle("ECL hits count");
   h_quality->SetFillColor(kPink - 4);
 
   h_quality_other = new TH1F("quality_other", "Fit quality flag for unexpectedly saved waveforms", 4, 0, 4);
-  h_quality_other->GetXaxis()->SetTitle("Flag number. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
+  h_quality_other->GetXaxis()->SetTitle("Quality flag. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
   h_quality_other->SetFillColor(kPink - 4);
 
   h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID",
-                           ECLElementNumbers::c_NCrystals, 1, 8737);
+                           ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_bad_quality->GetXaxis()->SetTitle("Cell ID");
   h_bad_quality->GetYaxis()->SetTitle("ECL hits count");
 
   h_trigtag1 = new TH1F("trigtag1", "Consistency b/w global event number and trigger tag. 0-good, 1-DQM error", 2, 0, 2);
-  h_trigtag1->GetXaxis()->SetTitle("Flag number");
+  h_trigtag1->GetXaxis()->SetTitle("Flag value");
   h_trigtag1->GetYaxis()->SetTitle("Events count");
   h_trigtag1->SetDrawOption("hist");
   h_trigtag1->SetFillColor(kPink - 4);
@@ -123,7 +125,8 @@ void ECLDQMModule::defineHisto()
     std::string h_name, h_title;
     h_name = str(boost::format("cid_Thr%1%MeV") % id);
     h_title = str(boost::format("Occupancy per Cell ID (E > %1% MeV)") % id);
-    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), ECLElementNumbers::c_NCrystals, 1, 8737);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(),
+                       ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
     h->GetXaxis()->SetTitle("Cell ID");
     h->GetYaxis()->SetTitle("Occupancy (hits / events_count)");
     h_cids.push_back(h);
@@ -186,10 +189,12 @@ void ECLDQMModule::defineHisto()
     if (id == "dphy") h_title = "#frac{Saved}{Expected} waveforms for delayed bhabha (DPHY) events";
     if (id == "all") h_title = "#frac{Saved}{Expected} waveforms for all events";
     h_cell_name = str(boost::format("wf_cid_%1%") % (id));
-    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), ECLElementNumbers::c_NCrystals, 1, 8737);
+    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(),
+                            ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
     h_cell->GetXaxis()->SetTitle("Cell ID");
     if (id == "psd") {
-      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid", ECLElementNumbers::c_NCrystals, 1, 8737);
+      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid",
+                                 ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
     }
     if (id == "logic") {
       h_evtot_logic = new TH1F("event_logic", "Event bank for logic", 1, 0, 1);
@@ -210,12 +215,13 @@ void ECLDQMModule::defineHisto()
   h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Data consistency flag");
 
-  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", ECLElementNumbers::c_NCrystals, 1, 8737);
+  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID",
+                                  ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC units, #approx 0.05 MeV)");
 
   h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal stddev vs Cell ID",
-                                 ECLElementNumbers::c_NCrystals, 1, 8737);
+                                 ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
 

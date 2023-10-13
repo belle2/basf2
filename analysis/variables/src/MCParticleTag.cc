@@ -44,7 +44,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeB = -99;
 
@@ -68,7 +68,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeB = -99;
 
@@ -92,7 +92,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeB1 = -99, modeB2 = -99, modeB = -99, nb1 = 0, nb2 = 0;
 
@@ -133,7 +133,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeB1 = -99, modeB2 = -99, modeB = -99, nb1 = 0, nb2 = 0;
 
@@ -174,7 +174,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeB1 = -99, modeB2 = -99, modeB = -99, nb1 = 0, nb2 = 0;
 
@@ -215,7 +215,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeB1 = -99, modeB2 = -99, modeB = -99, nb1 = 0, nb2 = 0;
 
@@ -256,7 +256,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -280,7 +280,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -304,7 +304,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -328,7 +328,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -352,7 +352,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -376,7 +376,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -400,7 +400,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -424,7 +424,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeD = -99;
 
@@ -448,7 +448,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeTau = -1;
 
@@ -476,7 +476,7 @@ namespace Belle2 {
       StoreArray<MCParticle> MC_Particle_list;
       if (!MC_Particle_list) {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int modeTau = -1;
 

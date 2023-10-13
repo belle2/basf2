@@ -385,8 +385,10 @@ void KeccakP1600_ExtractAndAddBytesInLane(const void *state, unsigned int lanePo
         unsigned int i;
         UINT64 lane1[1];
         lane1[0] = lane;
+#ifndef __clang_analyzer__
         for(i=0; i<length; i++)
             output[i] = input[i] ^ ((UINT8*)lane1)[offset+i];
+#endif
     }
 #else
     unsigned int i;

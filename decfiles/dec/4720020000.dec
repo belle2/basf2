@@ -1,0 +1,17 @@
+# EventType: 4720020000
+# Descriptor: [vpho_pipih_b]
+# NickName: vpho_pipih_b
+# Cuts: None
+# Documentation: pipih_b process
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Alessandro Boschetti 
+# Email: boschett@to.infn.it
+# Date: 20230405
+
+Decay vpho
+1.000 pi+ pi- h_b  PHSP;
+Enddecay
+
+End
+

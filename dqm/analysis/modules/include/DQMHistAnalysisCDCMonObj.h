@@ -91,9 +91,9 @@ namespace Belle2 {
   protected:
     //TObjects for DQM analysis
     TCanvas* m_cMain = nullptr; /**< main panel */
-    TCanvas* m_cADC = nullptr; /**< main panel */
-    TCanvas* m_cTDC = nullptr; /**< bad wire panel */
-    TCanvas* m_cHit = nullptr; /**< main panel */
+    TCanvas* m_cADC = nullptr; /**< ADC panel */
+    TCanvas* m_cTDC = nullptr; /**< TDC panel */
+    TCanvas* m_cHit = nullptr; /**< Hit panel */
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 

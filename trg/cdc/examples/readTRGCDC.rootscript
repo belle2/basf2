@@ -6,6 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <algorithm>
+#include <TMath.h>
+
 readTRGCDC(){
 
   // Control readTRGCDC
@@ -83,8 +85,6 @@ readTRGCDC(){
   double* mcTheta = new double[nEvents];
   double* fitTheta = new double[nEvents];
 
-  double Trg_PI = 3.141592653589793;
-
   //[0]=pt, [1]=phi0, [2]=z0(cm), [3]=cot
   TVectorD tempPar(4);
   TVectorD tempMCPar(4);
@@ -127,12 +127,12 @@ readTRGCDC(){
         hMCZ0pT4->Fill(tempMCPar[2]*100);
       }
 
-      if(tempPar[1]<0) tempPar[1] += 2*Trg_PI;
-      tempPar[1] = tempPar[1]*180/Trg_PI;
+      if(tempPar[1]<0) tempPar[1] += 2*M_PI;
+      tempPar[1] = tempPar[1]*TMath::RadToDeg();
       hphi0->Fill(tempPar[1]);
       fitPhi0[event] = tempPar[1];
-      if(tempMCPar[1]<0) tempMCPar[1] += 2*Trg_PI;
-      tempMCPar[1] = tempMCPar[1]*180/Trg_PI;
+      if(tempMCPar[1]<0) tempMCPar[1] += 2*M_PI;
+      tempMCPar[1] = tempMCPar[1]*TMath::RadToDeg();
       hMCphi0->Fill(tempMCPar[1]);
       mcPhi0[event] = tempMCPar[1];
 
@@ -141,12 +141,12 @@ readTRGCDC(){
       hMCz0->Fill(tempMCPar[2]*100);
       mcZ0[event] = tempMCPar[2]*100;
 
-      theta = Trg_PI/2.-atan(tempPar[3]);
-      theta*=180./Trg_PI;
+      theta = M_PI_2-atan(tempPar[3]);
+      theta*=TMath::RadToDeg();
       htheta->Fill(theta);
       fitTheta[event]=theta;
-      mctheta=Trg_PI/2.-atan(tempMCPar[3]);
-      mctheta*=180./Trg_PI;
+      mctheta=M_PI_2-atan(tempMCPar[3]);
+      mctheta*=TMath::RadToDeg();
       hMCtheta->Fill(mctheta);
       mcTheta[event]=mctheta;
     } // End of track loop

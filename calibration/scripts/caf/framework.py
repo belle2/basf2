@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -393,8 +392,8 @@ class CalibrationBase(ABC, Thread):
             if self not in calibration.dependencies:
                 calibration.future_dependencies.append(self)
         else:
-            B2WARNING((f"Tried to add {calibration} as a dependency for {self} but they have the same name."
-                       "Dependency was not added."))
+            B2WARNING(f"Tried to add {calibration} as a dependency for {self} but they have the same name."
+                      "Dependency was not added.")
 
     def dependencies_met(self):
         """
@@ -907,8 +906,8 @@ class Calibration(CalibrationBase):
                 if isinstance(alg, CalibrationAlgorithm):
                     self._algorithms.append(Algorithm(alg))
                 else:
-                    B2ERROR((f"Something other than CalibrationAlgorithm instance passed in {type(value)}."
-                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm"))
+                    B2ERROR(f"Something other than CalibrationAlgorithm instance passed in {type(value)}."
+                            "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
 
     @property
     def pre_algorithms(self):
@@ -1225,8 +1224,8 @@ class CAF():
             else:
                 B2WARNING(f"Tried to add a calibration with the name {calibration.name} twice.")
         else:
-            B2WARNING((f"Tried to add incomplete/invalid calibration ({calibration.name}) to the framwork."
-                       "It was not added and will not be part of the final process."))
+            B2WARNING(f"Tried to add incomplete/invalid calibration ({calibration.name}) to the framwork."
+                      "It was not added and will not be part of the final process.")
 
     def _remove_missing_dependencies(self):
         """
@@ -1474,3 +1473,5 @@ class CAF():
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
         with CAFDB(self._db_path):
             pass
+
+# @endcond

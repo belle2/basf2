@@ -5,6 +5,8 @@
     <!-- normally, parameters should be defined with a unit attribute. This
          enables automatic conversion to the default framework unit --> 
     <stepSize unit="um">200</stepSize>
+    <!-- set '1' to make the sensor sensitive, dose rate measurements; otherwise only materials are built -->
+    <BeamBackgroundStudy>0</BeamBackgroundStudy>
     <!--if we don't supply a unit there can be no conversion but is still valid -->
     <divisions>32</divisions>
     <!-- valid values for false are: "", "0", "off", "false" (case

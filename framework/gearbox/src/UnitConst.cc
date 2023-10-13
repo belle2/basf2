@@ -438,3 +438,5 @@ const double Const::fineStrConst   = 1.0 / 137.036;
 const double Const::permSi         = 11.9 * 8.8542 * 1e-18 * Unit::C / Unit::V / Unit::um;
 const double Const::uTherm         = 0.026 * Unit::V;
 const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
+
+const double Const::doubleNaN = std::numeric_limits<double>::quiet_NaN();

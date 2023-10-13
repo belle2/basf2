@@ -58,20 +58,28 @@ namespace Belle2 {
    * This construction should give a NaN if the argument is 0 (but hopefully cppcheck can be fooled to not raise a division by zero error)
    * NOTE: it is tested if this actually is the case!
    */
+  // Silence Doxygen which is complaining that "no uniquely matching class member found for"
+  // But there should be a better way that I just don't know of / find
+  //! @cond Doxygen_Suppress
   struct {
     double operator()(int i)
     {
       return std::tan(i) / std::sin(i);
     }
   } secans;
+  //! @endcond
 
   /** function object that implements sin(i/2). This does give positive and negative weights, but no NaNs */
+  // Silence Doxygen which is complaining that "no uniquely matching class member found for".
+  // But there should be a better way that I just don't know of / find
+  //! @cond Doxygen_Suppress
   struct {
     double operator()(int i)
     {
       return std::sin(i * .5);
     }
   } sinHalf;
+  //! @endcond
 
   /**
    * class for testing the helper functions from MapHelperFunctions.h

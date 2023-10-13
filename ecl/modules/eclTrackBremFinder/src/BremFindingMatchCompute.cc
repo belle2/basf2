@@ -6,17 +6,19 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
-//Framework
+/* Basf2 headers. */
+#include <framework/geometry/VectorUtil.h>
 #include <framework/utilities/Angle.h>
-
-//MDST
 #include <mdst/dataobjects/ECLCluster.h>
 
-//genfit
+/* Genfit headers. */
 #include <genfit/MeasuredStateOnPlane.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -27,8 +29,10 @@ bool BremFindingMatchCompute::isMatch()
 
   auto clusterPosition = m_eclCluster.getClusterPosition();
 
-  auto fitted_pos = fitted_state.getPos();
-  auto fitted_mom = fitted_state.getMom();
+  TVector3 position = fitted_state.getPos();
+  ROOT::Math::XYZVector fitted_pos(position.X(), position.Y(), position.Z());
+  TVector3 momentum = fitted_state.getMom();
+  ROOT::Math::XYZVector fitted_mom(momentum.X(), momentum.Y(), momentum.Z());
 
   auto cov = fitted_state.get6DCov();
   const double err_px = cov[3][3];
@@ -71,14 +75,16 @@ bool BremFindingMatchCompute::isMatch()
   if (clusterPhi.containsIn(hitPhi, m_clusterAcceptanceFactor) &&
       clusterTheta.containsIn(hitTheta, m_clusterAcceptanceFactor)) {
 
-    TVector3 hitV;
-    hitV.SetMagThetaPhi(1.0f, hitTheta.getAngle(), hitPhi.getAngle());
-    TVector3 clusterV;
-    clusterV.SetMagThetaPhi(1.0f, clusterTheta.getAngle(), clusterPhi.getAngle());
+    ROOT::Math::XYZVector hitV;
+    VectorUtil::setMagThetaPhi(
+      hitV, 1.0, hitTheta.getAngle(), hitPhi.getAngle());
+    ROOT::Math::XYZVector clusterV;
+    VectorUtil::setMagThetaPhi(
+      clusterV, 1.0, clusterTheta.getAngle(), clusterPhi.getAngle());
 
-    auto distV = hitV - clusterV;
+    ROOT::Math::XYZVector distV = hitV - clusterV;
 
-    m_distanceHitCluster = distV.Mag();
+    m_distanceHitCluster = distV.R();
 
     // set the effective acceptance factor
     double deltaTheta = abs(hitV.Y() - clusterV.Y());

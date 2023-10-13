@@ -37,7 +37,7 @@ Cuts and signal selection
 The most basic way to select a signal is to apply what, in jargon, are called
 "cuts".
 A cut is nothing but selection, usually binary, over one quantity that has some
-separation power between signal and background. Of course multiples cuts can be
+separation power between signal and background. Of course multiple cuts can be
 applied in sequence, leading to quite effective background reductions.
 Before deciding on the selection criteria however, one must define the variable
 that will be used to count of many signal events are left. A good variable has a

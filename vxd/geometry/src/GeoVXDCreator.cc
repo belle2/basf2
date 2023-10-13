@@ -167,7 +167,7 @@ namespace Belle2 {
 
     G4Transform3D GeoVXDCreator::getAlignment(const VXDAlignmentPar& params)
     {
-      G4RotationMatrix rotation(params.getAlpha(), params.getBeta(), params.getBeta());
+      G4RotationMatrix rotation(params.getAlpha(), params.getBeta(), params.getGamma());
       G4ThreeVector translation(params.getDU() / Unit::mm, params.getDV() / Unit::mm, params.getDW() / Unit::mm);
       return G4Transform3D(rotation, translation);
     }

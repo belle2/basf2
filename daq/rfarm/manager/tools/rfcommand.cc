@@ -23,13 +23,13 @@ using namespace Belle2;
 
 static int done_flag;
 
-void ok_handler(NSMmsg* msg, NSMcontext*)
+void ok_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   done_flag = 1;
   //  printf ( "OK received\n" );
 }
 
-void error_handler(NSMmsg* msg, NSMcontext*)
+void error_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   done_flag = -1;
   printf("ERROR received\n");
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 
 
   // Send NSM request
-  int* pars;
+  int* pars = nullptr;
   done_flag = 0;
   b2nsm_sendreq(nodename, command, 0, pars);
   while (done_flag == 0) usleep(1000);

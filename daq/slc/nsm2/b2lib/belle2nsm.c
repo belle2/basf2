@@ -371,7 +371,7 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
     va_start(ap, fmt);
     vsnprintf(buf + len, 256, fmt, ap);
     va_end(ap);
-    char *str = buf + len;
+    //char *str = buf + len;
     len += strlen(buf + len) + 1;
   }
 
@@ -563,7 +563,7 @@ b2nsm_init(const char *nodename)
 }
 /* -- b2nsm_term -------------------------------------------------------- */
 int
-b2nsm_term(const char *nodename)
+b2nsm_term(const char * /*nodename*/)
 {
   return nsmlib_term(nsm);
 }

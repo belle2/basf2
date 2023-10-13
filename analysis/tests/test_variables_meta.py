@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -91,7 +90,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         """
 
         # Read file contents
-        with open(filepath, "r") as fp:
+        with open(filepath) as fp:
             filecontent = fp.read()
 
         # List for all found registering statements
@@ -231,9 +230,9 @@ class MetavariableDataTypeTest(unittest.TestCase):
         for filepath in files:
             num_metavariables += self.process_file(filepath)
 
-        # We should get at least 229 registering statements
+        # We should get at least 231 registering statements
         print(f"Number of meta-variables is {num_metavariables}")
-        self.assertGreaterEqual(num_metavariables, 229)
+        self.assertGreaterEqual(num_metavariables, 231)
 
 
 if __name__ == "__main__":

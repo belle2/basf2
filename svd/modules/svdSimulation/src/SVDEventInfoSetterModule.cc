@@ -106,6 +106,7 @@ void SVDEventInfoSetterModule::event()
   B2DEBUG(25, " triggerBin = " << m_triggerBin);
 
   m_svdEventInfoPtr.create();
+  m_svdEventInfoPtr->setAPVClock(m_hwClock);
   m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
   m_svdEventInfoPtr->setMatchModeByte(m_ModeByteMatch);
   m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);

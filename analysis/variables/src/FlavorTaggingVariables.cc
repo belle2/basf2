@@ -50,7 +50,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     //   ############################################## FlavorTagger Variables   ###############################################
 
     // Track Level Variables ---------------------------------------------------------------------------------------------------
@@ -780,14 +779,14 @@ namespace Belle2 {
         B2ERROR("MCFlavorOfOtherB: this variable works only for B mesons.\n"
                 "The given particle with PDG code " << particle->getPDGCode() <<
                 " is not a B-meson candidate (PDG code 511 or 521). ");
-        return realNaN;
+        return Const::doubleNaN;
       }
 
       const MCParticle* mcParticle = particle->getMCParticle();
-      if (!mcParticle) return realNaN;
+      if (!mcParticle) return Const::doubleNaN;
 
       const MCParticle* mcMother = mcParticle->getMother();
-      if (!mcMother) return realNaN;
+      if (!mcMother) return Const::doubleNaN;
 
       if (Variable::isSignal(particle) < 1.0) return 0;
 
@@ -2004,7 +2003,7 @@ namespace Belle2 {
       const Variable::Manager::Var* var = Manager::Instance().getVariable(inputVariable);
       auto func = [particleListName, var, indexRanking](const Particle*) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-        if (!ListOfParticles.isValid()) return realNaN;
+        if (!ListOfParticles.isValid()) return Const::doubleNaN;
 
         Particle* target = nullptr; //Particle selected as target
 
@@ -2032,7 +2031,7 @@ namespace Belle2 {
         }
 
         // no target found
-        if (!target) return realNaN;
+        if (!target) return Const::doubleNaN;
 
         if (std::holds_alternative<double>(var->function(target)))
         {
@@ -2043,7 +2042,7 @@ namespace Belle2 {
         } else if (std::holds_alternative<bool>(var->function(target)))
         {
           return std::get<bool>(var->function(target));
-        } else return realNaN;
+        } else return Const::doubleNaN;
       };
       return func;
     }
@@ -2089,7 +2088,7 @@ namespace Belle2 {
         if (categoryName == "FSC") trackTargetName = "SlowPion";
 
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-        if (!ListOfParticles.isValid()) return realNaN;
+        if (!ListOfParticles.isValid()) return Const::doubleNaN;
 
         Variable::Manager& manager = Variable::Manager::Instance();
 
@@ -2115,7 +2114,7 @@ namespace Belle2 {
           }
         }
 
-        if (!particlesHaveMCAssociated) return realNaN;
+        if (!particlesHaveMCAssociated) return Const::doubleNaN;
         return (nTargets > 0);
       };
       return func;
@@ -2161,7 +2160,7 @@ namespace Belle2 {
         if (categoryName == "FSC") trackTargetName = "SlowPion";
 
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-        if (!ListOfParticles.isValid()) return realNaN;
+        if (!ListOfParticles.isValid()) return Const::doubleNaN;
 
         std::vector<Particle*> targetParticles;
         std::vector<Particle*> targetParticlesCategory;
@@ -2192,7 +2191,7 @@ namespace Belle2 {
             output = 1;
             targetParticlesCategory.push_back(targetParticle);
           } else if (isTargetOfRightCategory == -2 && output != 1)
-            output = realNaN;
+            output = Const::doubleNaN;
         }
 
         return output;
@@ -2208,7 +2207,7 @@ namespace Belle2 {
       std::string combinerMethod = arguments[0];
       auto func = [combinerMethod](const Particle * particle) -> double {
 
-        double output = realNaN;
+        double output = Const::doubleNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
 
         if (flavorTaggerInfo && flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
@@ -2227,7 +2226,7 @@ namespace Belle2 {
       std::string combinerMethod = arguments[0];
       auto func = [combinerMethod](const Particle * particle) -> double {
 
-        double output = realNaN;
+        double output = Const::doubleNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
 
         if (flavorTaggerInfo && flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
@@ -2275,7 +2274,7 @@ namespace Belle2 {
       std::string categoryName = arguments[0];
       auto func = [categoryName](const Particle * particle) -> double {
 
-        double output = realNaN;
+        double output = Const::doubleNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
 
         if (flavorTaggerInfo && flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
@@ -2298,7 +2297,7 @@ namespace Belle2 {
       std::string categoryName = arguments[0];
       auto func = [categoryName](const Particle * particle) -> double {
 
-        double output = realNaN;
+        double output = Const::doubleNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
 
         if (flavorTaggerInfo && flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
@@ -2322,7 +2321,7 @@ namespace Belle2 {
       std::string categoryName = arguments[0];
       auto func = [categoryName](const Particle * particle) -> double {
 
-        double output = realNaN;
+        double output = Const::doubleNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
 
         if (flavorTaggerInfo &&  flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")

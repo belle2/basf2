@@ -1,4 +1,4 @@
-.. _tracking_ckf: 
+.. _tracking_ckf:
 
 Inter-Detector Hit Finding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6,7 +6,7 @@ Inter-Detector Hit Finding
 .. warning::
   This documentation is under construction!
 
-The inter-detector hit finding is done through a Combinatorial Kalman Filter (CKF). 
+The inter-detector hit finding is done through a Combinatorial Kalman Filter (CKF).
 
 
 We have several implementations of the CKF, depending on the detector we are extrapolating to.

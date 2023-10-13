@@ -35,6 +35,7 @@ inroot.param('Experiment', exp_nr)
 inroot.param('RunList', [run_nr])
 inroot.param('EventsList', [nevt])
 mypath.add_module(inroot)
+# mypath.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 dqmEff = b2.register_module('DQMHistAnalysisEventT0')
 dqmEff.set_log_level(b2.LogLevel.INFO)

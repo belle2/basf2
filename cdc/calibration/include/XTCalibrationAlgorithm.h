@@ -127,7 +127,7 @@ namespace Belle2 {
 
       int m_fitStatus[56][2][20][10];       /**< Fit flag */
       bool m_useSliceFit = false; /**< Use slice fit or profile */
-      int m_minEntriesRequired = 1000; /**< minimum number of hit per hitosgram. */
+      int m_minEntriesRequired = 5000; /**< minimum number of hit per hitosgram. */
       int m_nAlphaBins; /**<number of alpha bins*/
       int m_nThetaBins; /**<number of  theta bins*/
       int m_xtMode = c_Chebyshev;  /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/

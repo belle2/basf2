@@ -13,7 +13,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <framework/database/DBObjPtr.h>
-#include <simulation/dbobjects/ROIParameters.h>
+#include <simulation/dbobjects/ROISimulationParameters.h>
 
 namespace Belle2 {
 
@@ -66,7 +66,7 @@ namespace Belle2 {
     std::string m_PXDClustersInsideROIName;  /**< The name of the StoreArray of Filtered PXDClusters */
     std::string m_PXDClustersOutsideROIName;  /**< The name of the StoreArray of Filtered PXDClusters */
     std::string m_ROIidsName;  /**< The name of the StoreArray of ROIs */
-    DBObjPtr<ROIParameters> m_roiParameters;  /**< Configuration parameters for ROIs */
+    DBObjPtr<ROISimulationParameters> m_ROISimulationParameters;  /**< Configuration parameters for ROIs */
     bool m_CreateOutside = false; /**< if set, create list of outside pixels, too */
     bool m_overrideDB = false; /**< if set, overwrites ROI-finding settings in DB */
     bool m_enableFiltering = false; /**< enables/disables ROI-finding if overwriteDB=True */

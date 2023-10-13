@@ -21,6 +21,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/VectorUtil.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -35,6 +36,7 @@
 #include <Math/RotationY.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/Point3D.h>
 
 #include <limits>
 #include <algorithm>
@@ -336,14 +338,14 @@ void B2BIIConvertMdstModule::event()
   // 1. Convert MC information
   convertGenHepEvtTable();
 
-  // 2. Convert ECL information
+  // 2. Convert Tracking information
+  convertMdstChargedTable();
+
+  // 3. Convert ECL information
   convertMdstECLTable();
 
-  // 3. Convert KLM information
+  // 4. Convert KLM information
   convertMdstKLMTable();
-
-  // 4. Convert Tracking information
-  convertMdstChargedTable();
 
   // 5. Set Track -> ECLCluster relations
   setTracksToECLClustersRelations();
@@ -716,7 +718,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TrackFitResult* trackFitP = m_trackFitResults[trackFitPIndex];
     TrackFitResult* trackFitM = m_trackFitResults[trackFitMIndex];
 
-    m_v0s.appendNew(std::make_pair(trackP, trackFitP), std::make_pair(trackM, trackFitM));
+    m_v0s.appendNew(std::make_pair(trackP, trackFitP), std::make_pair(trackM, trackFitM), belleV0.vx(), belleV0.vy(), belleV0.vz());
 
     // create Ks Particle and add it to the 'K_S0:mdst' ParticleList
     const PIDLikelihood* pidP = trackP->getRelated<PIDLikelihood>();
@@ -838,7 +840,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     }
     // append extra info: nisKsFinder quality indicators
     if (m_nisEnable) {
-      if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+      if (belleV0.kind() > 0 and belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
         Belle::nisKsFinder ksnb;
         double protIDP = atcPID(pidP, 2, 4);
         double protIDM = atcPID(pidM, 2, 4);
@@ -942,6 +944,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
   m_particleGraph.generateList();
 }
 
+
 void B2BIIConvertMdstModule::convertMdstECLTable()
 {
   // Relations
@@ -1027,6 +1030,7 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
 
   }
 }
+
 
 void B2BIIConvertMdstModule::convertMdstGammaTable()
 {
@@ -1904,6 +1908,64 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   tdccount  = property2     & 0xffff;
   eclCluster->setTime(tdccount);
   eclCluster->setNumberOfCrystals(eclAux.nhits());
+  double dist = computeTrkMinDistanceBelle(eclCluster);
+  eclCluster->setMinTrkDistance(dist);
+}
+
+double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster)
+{
+  const double m_extRadius(125.0);
+  const double m_extZFWD(196.0);
+  const double m_extZBWD(-102.2);
+  double minDist(10000);
+
+  // get cluster info
+  const int reg = eclCluster->getDetectorRegion();
+  double eclClusterR_surface = m_extRadius / sin(eclCluster->getTheta());
+  if (reg == 1) {eclClusterR_surface = m_extZFWD / cos(eclCluster->getTheta());}
+  else if (reg == 3) {eclClusterR_surface = m_extZBWD / cos(eclCluster->getTheta());}
+
+  ROOT::Math::XYZVector eclCluster_surface_position(0, 0, 0);
+  VectorUtil::setMagThetaPhi(eclCluster_surface_position, eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
+
+  for (const auto& track : m_tracks) {
+    const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::ChargedStable(Const::pion));
+
+    if (trackFit == NULL) {continue;}
+    // get the track parameters
+    const double z0        = trackFit->getZ0();
+    const double tanlambda = trackFit->getTanLambda();
+
+    // use the helix class
+    Helix h = trackFit->getHelix();
+
+    // extrapolate to radius
+    const double lHelixRadius = h.getArcLength2DAtCylindricalR(m_extRadius) > 0 ? h.getArcLength2DAtCylindricalR(m_extRadius) : 999999.;
+
+    // extrapolate to FWD z
+    const double lFWD = (m_extZFWD - z0) / tanlambda > 0 ? (m_extZFWD - z0) / tanlambda : 999999.;
+
+    // extrapolate to backward z
+    const double lBWD = (m_extZBWD - z0) / tanlambda > 0 ? (m_extZBWD - z0) / tanlambda : 999999.;
+
+    // pick smallest arclength
+    const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
+
+    B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
+
+    ROOT::Math::XYZVector ext_helix = h.getPositionAtArcLength2D(l);
+    double helixExtR_surface = m_extRadius / sin(ext_helix.Theta());
+    if (l == lFWD) { helixExtR_surface = m_extZFWD / cos(ext_helix.Theta());}
+    else if (l == lBWD) { helixExtR_surface = m_extZBWD / cos(ext_helix.Theta());}
+
+    ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
+    VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+
+    double distance = (eclCluster_surface_position - helixExt_surface_position).R();
+    if (distance < minDist) {minDist = distance;}
+  }
+  if (minDist > 9999) minDist = -1;
+  return minDist;
 }
 
 void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster& klm_cluster, KLMCluster* klmCluster)
@@ -2266,4 +2328,3 @@ void B2BIIConvertMdstModule::terminate()
 {
   B2DEBUG(99, "B2BIIConvertMdst: terminate called");
 }
-

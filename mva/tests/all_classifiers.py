@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,12 +9,9 @@
 ##########################################################################
 
 import basf2_mva
-
-import os
-import tempfile
-import subprocess
-import shutil
-from b2test_utils import skip_test
+import basf2
+from subprocess import PIPE, run
+import b2test_utils
 
 variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
              'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
@@ -24,38 +20,45 @@ variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', '
 if __name__ == "__main__":
 
     # Skip test if files are not available
-    if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
-        skip_test('Necessary files "train.root" and "test.root" not available.')
+    try:
+        train_file = basf2.find_file('mva/train_D0toKpipi.root', 'examples', False)
+        test_file = basf2.find_file('mva/test_D0toKpipi.root', 'examples', False)
+    except BaseException:
+        b2test_utils.skip_test('Necessary files "train.root" and "test.root" not available.')
 
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = basf2_mva.vector(train_file)
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
+    general_options.m_max_events = 200
 
     methods = [
-        ('Trivial.xml', basf2_mva.TrivialOptions()),
-        ('Python.xml', basf2_mva.PythonOptions()),
-        ('FastBDT.xml', basf2_mva.FastBDTOptions()),
-        ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
-        ('FANN.xml', basf2_mva.FANNOptions()),
+        ('Trivial.xml', basf2_mva.TrivialOptions(), None),
+        ('FastBDT.xml', basf2_mva.FastBDTOptions(), None),
+        ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification(), None),
+        ('FANN.xml', basf2_mva.FANNOptions(), None),
+        ('Python_sklearn.xml', basf2_mva.PythonOptions(), 'sklearn'),
+        ('Python_xgb.xml', basf2_mva.PythonOptions(), 'xgboost'),
+        ('Python_tensorflow.xml', basf2_mva.PythonOptions(), 'tensorflow'),
     ]
 
-    olddir = os.getcwd()
-    with tempfile.TemporaryDirectory() as tempdir:
-        os.symlink(os.path.abspath('train.root'), tempdir + '/' + os.path.basename('train.root'))
-        os.symlink(os.path.abspath('test.root'), tempdir + '/' + os.path.basename('test.root'))
-        os.chdir(tempdir)
-
-        for identifier, specific_options in methods:
+    # we create payloads so let's switch to an empty, temporary directory
+    with b2test_utils.clean_working_directory():
+        for identifier, specific_options, framework in methods:
             general_options.m_identifier = identifier
+            if framework is not None:
+                specific_options.m_framework = framework
             basf2_mva.teacher(general_options, specific_options)
 
-        basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
-                         basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        basf2_mva.expert(basf2_mva.vector(*[i for i, _, _ in methods]),
+                         basf2_mva.vector(train_file), 'tree', 'expert.root')
 
-        subprocess.call('basf2_mva_evaluate.py -c -o latex.pdf -train train.root -data test.root -i ' +
-                        ' '.join([i for i, _ in methods]), shell=True)
+        # don't compile the evaluation as this fails on the build bot due to missing latex files
+        command = f'basf2_mva_evaluate.py -o latex.pdf -train {train_file}'\
+            f' -data {test_file} -i {" ".join([i for i, _, _ in methods])}'
 
-        os.chdir(olddir)
-        shutil.copyfile(tempdir + '/latex.pdf', 'latex.pdf')
+        result = run(command,
+                     stdout=PIPE, stderr=PIPE,
+                     text=True, shell=True)
+        assert result.returncode == 0, 'basf2_mva_evaluate.py failed!'

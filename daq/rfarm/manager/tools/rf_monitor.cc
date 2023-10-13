@@ -20,7 +20,7 @@
 using namespace std;
 using namespace Belle2;
 
-int main(int argc, char** argv)
+int main()
 {
   // 0. Conf file
   char* conffile = getenv("RFARM_CONFFILE");

@@ -23,6 +23,8 @@
 
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
 
+#include <pxd/utilities/PXDUtilities.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -63,6 +65,11 @@ PXDClusterizerModule::PXDClusterizerModule() : Module()
            string(""));
   addParam("MCParticles", m_storeMCParticlesName, "MCParticles collection name",
            string(""));
+  addParam("ErrorFromDB", m_errorFromDB, "Assign cluster position error from DB", true);
+  addParam("PositionErrorUPayloadName", m_positionErrorUName, "Payload name for cluster position error in U",
+           string("PXDClusterPositionErrorUPar"));
+  addParam("PositionErrorVPayloadName", m_positionErrorVName, "Payload name for cluster position error in V",
+           string("PXDClusterPositionErrorVPar"));
 
 }
 
@@ -134,6 +141,30 @@ void PXDClusterizerModule::initialize()
     m_cache = std::unique_ptr<ClusterCache>(new ClusterCache(m_clusterCacheSize));
   else
     m_cache = std::unique_ptr<ClusterCache>(new ClusterCache());
+
+  // Cluster position error from DB
+  if (m_errorFromDB) {
+    if (!m_positionErrorUName.size() || !m_positionErrorVName.size()) {
+      B2WARNING("You chose to use cluster position erros from DB but did not provide PositionErrorUPayloadName ("
+                << m_positionErrorUName << ") and/or PositionErrorVPayloadName (" << m_positionErrorVName
+                << "). Disabling DB option.");
+      m_errorFromDB = false;
+    }
+    m_clusterPositionErrorUPar = std::make_unique<DBObjPtr<PXDClusterPositionErrorPar>>(m_positionErrorUName);
+    m_clusterPositionErrorVPar = std::make_unique<DBObjPtr<PXDClusterPositionErrorPar>>(m_positionErrorVName);
+    if (m_clusterPositionErrorUPar == nullptr || m_clusterPositionErrorVPar == nullptr) {
+      B2FATAL("DB objects for ClusterPositionError not valid");
+    }
+  }
+
+}
+
+void PXDClusterizerModule::beginRun()
+{
+  // Need to check if payload should be re-loaded at run change (currently just one revision for the entire period)
+  if (m_errorFromDB && (!m_clusterPositionErrorUPar->isValid() || !m_clusterPositionErrorVPar.get()->isValid())) {
+    B2FATAL("DB objects for ClusterPositionError not valid for this run");
+  }
 }
 
 void PXDClusterizerModule::event()
@@ -328,6 +359,16 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     //Calculate position and error with v as primary axis, possibly different pitch sizes
     calculatePositionError(cls, projV, projU, info.getVPitch(projV.getMinPos()), pitchV, info.getVPitch(projV.getMaxPos()));
 
+    if (m_errorFromDB) { // Overwrite cluster position error with value from DB (keep the above calculation untouched for now)
+      unsigned int uID = info.getUCellID(projU.getPos());
+      unsigned int vID = info.getVCellID(projV.getPos());
+      bool isUedge = PXD::isClusterAtUEdge(sensorID, projU.getMinCell(), projU.getMaxCell());
+      bool isVedge = (PXD::isClusterAtVEdge(sensorID, projV.getMinCell(), projV.getMaxCell())
+                      || PXD::isClusterAtLadderJoint(sensorID, projV.getMinCell(), projV.getMaxCell()));
+      assignPositionErrorFromDB(projU, **m_clusterPositionErrorUPar, sensorID, uID, vID, pitchU, isUedge, isVedge);
+      assignPositionErrorFromDB(projV, **m_clusterPositionErrorVPar, sensorID, uID, vID, pitchV, isUedge, isVedge);
+    }
+
     ROOT::Math::XYZVector lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
     projU.setPos(projU.getPos() - lorentzShift.X());
     projV.setPos(projV.getPos() - lorentzShift.Y());
@@ -401,4 +442,23 @@ void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, C
     const double sn = cls.getSeedCharge() / m_elNoise;
     primary.setError(2.0 * centerPitch / sn);
   }
+}
+
+void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
+                                                     VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
+                                                     bool isAtUEdge, bool isAtVEdge, bool isAdjacentDead)
+{
+  // Get bins from cell ID
+  unsigned short uBin = PXD::getBinU(sensorID, uCell, vCell, errorPar.getBinsU());
+  unsigned short vBin = PXD::getBinV(sensorID, vCell, errorPar.getBinsV());
+  // Get error from DB [in units of pix]
+  double error = errorPar.getContent(sensorID.getID(), uBin, vBin, primary.getSize());
+  double sf = 1.;
+  // Apply additional factor if at sensor edges or adjacent to daed rows/colums
+  if (isAtUEdge)      sf *= errorPar.getSensorUEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
+  if (isAtVEdge)      sf *= errorPar.getSensorVEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
+  if (isAdjacentDead) sf *= errorPar.getDeadNeighbourFactor(sensorID.getID(), uBin, vBin, primary.getSize());
+  // Set error (convert to [um])
+  if (error) primary.setError(sf * error * centerPitch); // zero means default values to use analytic error
+
 }

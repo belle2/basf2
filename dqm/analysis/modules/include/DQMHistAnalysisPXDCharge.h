@@ -14,11 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <vxd/dataobjects/VxdID.h>
 
 #include <TF1.h>
@@ -70,8 +65,6 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     //! fit range lo edge for landau
     double m_rangeLow;
     //! fit range hi edge for landau
@@ -91,14 +84,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! Place for EPICS PVs, Mean and maximum deviation
-    std::vector <chid> mychid;
-#endif
   };
 } // end namespace Belle2
 

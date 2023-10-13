@@ -13,12 +13,6 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
-
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <TLine.h>
 
 namespace Belle2 {
@@ -34,10 +28,7 @@ namespace Belle2 {
      */
     DQMHistAnalysisIPModule();
 
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisIPModule();
+  private:
 
     /**
      * Initializer.
@@ -53,11 +44,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override final;
 
     // Data members
   private:
@@ -81,14 +67,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if exporting to EPICS */
-    bool m_useEpics;
-    /** number of EPICS PVs */
-    static const int m_parameters = 3;
-#ifdef _BELLE2_EPICS
-    chid mychid[m_parameters];// hard limit max parameters
-#endif
   };
 } // end namespace Belle2
 

@@ -63,7 +63,8 @@ namespace Belle2 {
                              It is assumed, that the B-field is parallel to the z-Axis.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
-     *  @param NDF  number of degrees of freedom for the fit
+     *  @param NDF           number of degrees of freedom for the fit
+     *                       (float since DAF provides decimal weights which can be less than 1)
      */
     TrackFitResult(const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum,
                    const TMatrixDSym& covariance, const short int charge,
@@ -71,7 +72,7 @@ namespace Belle2 {
                    const float bField,
                    const uint64_t hitPatternCDCInitializer,
                    const uint32_t hitPatternVXDInitializer,
-                   const uint16_t NDF);
+                   const float NDF);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -82,13 +83,14 @@ namespace Belle2 {
      *  @param pValue        p-value of the corresponding track fit.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
-     *  @param NDF  number of degrees of freedom for the fit
+     *  @param NDF           number of degrees of freedom for the fit
+     *                       (float since DAF provides decimal weights which can be less than 1)
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,
                    const uint64_t hitPatternCDCInitializer,
                    const uint32_t hitPatternVXDInitializer,
-                   const uint16_t NDF
+                   const float NDF
                   );
     /** update the TrackFitResults
     * @param input the TrackFitResult that will be
@@ -158,7 +160,7 @@ namespace Belle2 {
     double getPValue() const { return m_pValue; }
 
     /** Getter for number of degrees of freedom of the track fit. */
-    int getNDF() const;
+    float getNDF() const;
 
     /** Get chi2 given NDF and p-value */
     double getChi2() const;
@@ -297,11 +299,14 @@ namespace Belle2 {
     /** backward compatibility initialisation for NDF */
     static const uint16_t c_NDFFlag = 0xFFFF;
 
-    /** Memeber for number of degrees of freedom*/
-    uint16_t m_NDF;
+    /** Member for number of degrees of freedom multiplied by 100
+     *  in order to store inside an int a float with two significant digits
+     **/
+    uint16_t m_NDF100;
 
-    ClassDefOverride(TrackFitResult, 9); /**< Values of the result of a track fit with a given particle hypothesis. */
+    ClassDefOverride(TrackFitResult, 10); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
+       ver 10: m_NDF -> m_NDF100, we store NDFx100, to have a 2-digit number inside an integer
        ver 9: change m_pValue, m_pdg, m_hitPatternVXDInitializer to a non-const value
        ver 8: add NDF
        ver 7: fixed sign errors in the translation of position and momentum covariances.

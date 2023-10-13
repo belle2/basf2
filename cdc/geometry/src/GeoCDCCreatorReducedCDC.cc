@@ -189,9 +189,8 @@ namespace Belle2 {
         const double length = (wallZfwd - wallZbwd) / 2.0;
 
 
-        G4Material* medWall = medAir;
+        G4Material* medWall;
         if (strstr((wallName).c_str(), "MiddleWall") != nullptr) {
-          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else {
           medWall = medAluminum;
@@ -216,9 +215,8 @@ namespace Belle2 {
         const double length = (wallZfwd - wallZbwd) / 2.0;
         const int iInnerWall = wall.getId();
 
-        G4Material* medWall = medAir;
+        G4Material* medWall;
         if (strstr(wallName.c_str(), "MiddleWall") != nullptr) {
-          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else if (strstr(wallName.c_str(), "MiddleGlue") != nullptr) { // Glue layer 0.005 mmt
           medWall = medGlue;
@@ -541,11 +539,11 @@ namespace Belle2 {
         if (gcp.getMaterialDefinitionMode() == 2) {
           G4String sName = "sWire";
           const G4int jc = 0;
-          TVector3 wb0 = cdcgp.wireBackwardPosition(iSLayer, jc);
+          B2Vector3D wb0 = cdcgp.wireBackwardPosition(iSLayer, jc);
           //    G4double rsense0 = wb0.Perp();
-          TVector3 wf0 = cdcgp.wireForwardPosition(iSLayer, jc);
+          B2Vector3D wf0 = cdcgp.wireForwardPosition(iSLayer, jc);
           G4double tAtZ0 = -wb0.Z() / (wf0.Z() - wb0.Z()); //t: param. along the wire
-          TVector3 wAtZ0 = wb0 + tAtZ0 * (wf0 - wb0);
+          B2Vector3D wAtZ0 = wb0 + tAtZ0 * (wf0 - wb0);
           //additional chop of wire; must be larger than 126um*(1/10), where 126um is the field wire diameter; 1/10: approx. stereo angle
           const G4double epsl = 25.e-4; // (in cm);
           G4double reductionBwd = (zback_sensitive_middle + epsl) / wb0.Z();
@@ -574,14 +572,14 @@ namespace Belle2 {
 
           const G4int nCells = cdcgp.nWiresInLayer(iSLayer);
           const G4double dphi = M_PI / nCells;
-          const TVector3 unitZ(0., 0., 1.);
+          const B2Vector3D unitZ(0., 0., 1.);
 
           for (int ic = 0; ic < nCells; ++ic) {
             //define sense wire
-            TVector3 wb = cdcgp.wireBackwardPosition(iSLayer, ic);
-            TVector3 wf = cdcgp.wireForwardPosition(iSLayer, ic);
+            B2Vector3D wb = cdcgp.wireBackwardPosition(iSLayer, ic);
+            B2Vector3D wf = cdcgp.wireForwardPosition(iSLayer, ic);
             G4double tAtZ02 = -wb.Z() / (wf.Z() - wb.Z());
-            TVector3 wAtZ02 = wb + tAtZ02 * (wf - wb);
+            B2Vector3D wAtZ02 = wb + tAtZ02 * (wf - wb);
             G4double reductionBwd2 = (zback_sensitive_middle + epsl) / wb.Z();
             wb = reductionBwd2 * (wb - wAtZ02) + wAtZ02;
             G4double reductionFwd2 = (zfor_sensitive_middle - epsl) / wf.Z();
@@ -589,7 +587,7 @@ namespace Belle2 {
 
             G4double thetaYZ = -asin((wf - wb).Y() / (wf - wb).Mag());
 
-            TVector3 fMinusBInZX((wf - wb).X(), 0., (wf - wb).Z());
+            B2Vector3D fMinusBInZX((wf - wb).X(), 0., (wf - wb).Z());
             G4double thetaZX = asin((unitZ.Cross(fMinusBInZX)).Y() / fMinusBInZX.Mag());
             G4RotationMatrix rotM;
             //      std::cout <<"deg,rad= " << CLHEP::deg <<" "<< CLHEP::rad << std::endl;
@@ -604,14 +602,14 @@ namespace Belle2 {
             new G4PVPlacement(G4Transform3D(rotM, xyz), middleSensitiveSwire, sName, middleSensitiveTube, false, ic);
 
             //define field wire #1 (placed at the same phi but at the outer r boundary)
-            TVector3 wbF = wb;
+            B2Vector3D wbF = wb;
             G4double rF = rmax_sensitive_middle - 0.5 * diameter;
             //      std::cout <<"iSLayer,rF= " << iSLayer <<" "<< rF <<" "<< std::endl;
             G4double phi = atan2(wbF.Y(), wbF.X());
             wbF.SetX(rF * cos(phi));
             wbF.SetY(rF * sin(phi));
 
-            TVector3 wfF = wf;
+            B2Vector3D wfF = wf;
             rF = rmax_sensitive_middle - 0.5 * diameter;
             phi = atan2(wfF.Y(), wfF.X());
             wfF.SetX(rF * cos(phi));

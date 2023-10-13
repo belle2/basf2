@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -59,7 +58,7 @@ class PXDHitErrorsTTree(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(PXDHitErrorsTTree, self).__init__()
+        super().__init__()
         #: Output ROOT file.
         self.file = ROOT.TFile('PXDHitErrorOutput.root', 'recreate')
         #: TTree for output data

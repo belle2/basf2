@@ -53,6 +53,13 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name.", std::string(""));
 
   m_histoList = new TList();
+
+  m_ladderMap =  {
+    {{3, 1}, 0}, {{3, 2}, 1},
+    {{4, 1}, 2}, {{4, 2}, 3}, {{4, 3}, 4},
+    {{5, 1}, 5}, {{5, 2}, 6}, {{5, 3}, 7}, {{5, 4}, 8},
+    {{6, 1}, 9}, {{6, 2}, 10}, {{6, 3}, 11}, {{6, 4}, 12}, {{6, 5}, 13}
+  };
 }
 
 
@@ -128,6 +135,54 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_clsTrkChargeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkChargeV456);
 
+  m_clsTrkChargeL3 = new TH1F*[4];
+  m_clsTrkSNRL3    = new TH1F*[4];
+
+  int ind = 0;
+  for (int ladder = 1; ladder <= 2; ++ladder) {
+    for (int sensor = 1; sensor <= 2; ++sensor) {
+
+      name = Form("SVDTRK_ClusterCharge_L3.%d.%d", ladder, sensor);
+      title = Form("SVD Cluster-on-Track Charge for L3.%d.%d", ladder, sensor);
+      m_clsTrkChargeL3[ind] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
+      m_clsTrkChargeL3[ind]->GetXaxis()->SetTitle("cluster charge [ke-]");
+      m_clsTrkChargeL3[ind]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clsTrkChargeL3[ind]);
+
+      name = Form("SVDTRK_ClusterSNR_L3.%d.%d", ladder, sensor);
+      title = Form("SVD Cluster-on-Track SNR for L3.%d.%d", ladder, sensor);
+      m_clsTrkSNRL3[ind] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
+      m_clsTrkSNRL3[ind]->GetXaxis()->SetTitle("cluster SNR");
+      m_clsTrkSNRL3[ind]->GetYaxis()->SetTitle("count");
+      m_histoList->Add(m_clsTrkSNRL3[ind]);
+      ind++;
+    }
+  }
+
+  m_clsTrkCharge = new TH1F*[m_ladderMap.size()];
+  m_clsTrkSNR    = new TH1F*[m_ladderMap.size()];
+
+  for (const auto& it : m_ladderMap) {
+    std::pair<int, int> p = it.first;
+    int layer = p.first;
+    int sensor = p.second;
+    int idx = it.second;
+    name = Form("SVDTRK_ClusterCharge_L%d.x.%d", layer, sensor);
+    title = Form("SVD Cluster-on-Track Charge for L%d.x.%d", layer, sensor);
+    m_clsTrkCharge[idx] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
+    m_clsTrkCharge[idx]->GetXaxis()->SetTitle("cluster charge [ke-]");
+    m_clsTrkCharge[idx]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clsTrkCharge[idx]);
+
+    //printf("name %s layer %d sensor %d index %d\n", name.Data(), layer, sensor, idx);
+    name = Form("SVDTRK_ClusterSNR_L%d.x.%d", layer, sensor);
+    title = Form("SVD Cluster-on-Track SNR for L%d.x.%d", layer, sensor);
+    m_clsTrkSNR[idx] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
+    m_clsTrkSNR[idx]->GetXaxis()->SetTitle("cluster SNR");
+    m_clsTrkSNR[idx]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clsTrkSNR[idx]);
+  }
+
   //----------------------------------------------------------------
   // SNR of clusters for L3/L456 sensors
   //----------------------------------------------------------------
@@ -173,6 +228,33 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_clsTrkTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV3);
 
+  name = "SVDTRK_Cluster3TimeU3";
+  title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors for 3 samples", refFrame.Data());
+  m_cls3TrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls3TrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls3TrkTimeU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls3TrkTimeU3);
+  name = "SVDTRK_Cluster3TimeV3";
+  title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors for 3 samples", refFrame.Data());
+  m_cls3TrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls3TrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls3TrkTimeV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls3TrkTimeV3);
+
+  name = "SVDTRK_Cluster6TimeU3";
+  title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors for 6 samples", refFrame.Data());
+  m_cls6TrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls6TrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls6TrkTimeU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls6TrkTimeU3);
+  name = "SVDTRK_Cluster6TimeV3";
+  title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors for 6 samples", refFrame.Data());
+  m_cls6TrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls6TrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls6TrkTimeV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls6TrkTimeV3);
+
+
   name = "SVDTRK_ClusterTimeU456";
   title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors", refFrame.Data());
   m_clsTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
@@ -185,6 +267,32 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_clsTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV456);
+
+  name = "SVDTRK_Cluster3TimeU456";
+  title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
+  m_cls3TrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls3TrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls3TrkTimeU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls3TrkTimeU456);
+  name = "SVDTRK_Cluster3TimeV456";
+  title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
+  m_cls3TrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls3TrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls3TrkTimeV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls3TrkTimeV456);
+
+  name = "SVDTRK_Cluster6TimeU456";
+  title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
+  m_cls6TrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls6TrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls6TrkTimeU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls6TrkTimeU456);
+  name = "SVDTRK_Cluster6TimeV456";
+  title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
+  m_cls6TrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+  m_cls6TrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_cls6TrkTimeV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_cls6TrkTimeV456);
 
   //----------------------------------------------------------------
   // EventT0 vs Time of clusters for U and V sides
@@ -273,6 +381,8 @@ void SVDDQMClustersOnTrackModule::event()
   m_expNumber = evtMetaData->getExperiment();
   m_runNumber = evtMetaData->getRun();
 
+  int nSamples = m_svdEventInfo->getNSamples();
+
   // get EventT0 if present and valid
   double eventT0 = -1000;
   if (m_eventT0.isOptional())
@@ -316,6 +426,33 @@ void SVDDQMClustersOnTrackModule::event()
     for (const SVDCluster& svdCluster : recoTrack->getRelationsWith<SVDCluster>(m_svdClustersName)) {
 
       int iLayer = svdCluster.getSensorID().getLayerNumber();
+      int iLadder = svdCluster.getSensorID().getLadderNumber();
+      int iSensor = svdCluster.getSensorID().getSensorNumber();
+
+      if (iLayer == 3) {
+        int ind = -1;
+        if (iLadder == 1 && iSensor == 1) {
+          ind = 0;
+        } else if (iLadder == 1 && iSensor == 2) {
+          ind = 1;
+        } else if (iLadder == 2 && iSensor == 1) {
+          ind = 2;
+        } else if (iLadder == 2 && iSensor == 2) {
+          ind = 3;
+        }
+
+        if (ind != -1) {
+          if (m_clsTrkChargeL3[ind] != nullptr) m_clsTrkChargeL3[ind]->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRL3[ind] != nullptr) m_clsTrkSNRL3[ind]->Fill(svdCluster.getSNR());
+        }
+
+      }
+
+      std::pair<int, int> p(iLayer, iSensor);
+      int idx = m_ladderMap[p];
+
+      if (m_clsTrkCharge[idx] != nullptr) m_clsTrkCharge[idx]->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clsTrkSNR[idx] != nullptr) m_clsTrkSNR[idx]->Fill(svdCluster.getSNR());
 
       float time = svdCluster.getClsTime();
       if (m_desynchSVDTime && m_svdEventInfo.isValid())
@@ -329,10 +466,22 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkChargeU3 != nullptr) m_clsTrkChargeU3->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRU3 != nullptr) m_clsTrkSNRU3->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeU3 != nullptr) m_clsTrkTimeU3->Fill(time);
+
+          if (nSamples == 3) {
+            if (m_cls3TrkTimeU3 != nullptr) m_cls3TrkTimeU3->Fill(time);
+          } else {
+            if (m_cls6TrkTimeU3 != nullptr) m_cls6TrkTimeU3->Fill(time);
+          }
         } else {
           if (m_clsTrkChargeU456 != nullptr) m_clsTrkChargeU456->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRU456 != nullptr) m_clsTrkSNRU456->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeU456 != nullptr) m_clsTrkTimeU456->Fill(time);
+
+          if (nSamples == 3) {
+            if (m_cls3TrkTimeU456 != nullptr) m_cls3TrkTimeU456->Fill(time);
+          } else {
+            if (m_cls6TrkTimeU456 != nullptr) m_cls6TrkTimeU456->Fill(time);
+          }
         }
 
         for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
@@ -350,10 +499,20 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkChargeV3 != nullptr) m_clsTrkChargeV3->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRV3 != nullptr) m_clsTrkSNRV3->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeV3 != nullptr) m_clsTrkTimeV3->Fill(time);
+          if (nSamples == 3) {
+            if (m_cls3TrkTimeV3 != nullptr) m_cls3TrkTimeV3->Fill(time);
+          } else {
+            if (m_cls6TrkTimeV3 != nullptr) m_cls6TrkTimeV3->Fill(time);
+          }
         } else {
           if (m_clsTrkChargeV456 != nullptr) m_clsTrkChargeV456->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRV456 != nullptr) m_clsTrkSNRV456->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
+          if (nSamples == 3) {
+            if (m_cls3TrkTimeV456 != nullptr) m_cls3TrkTimeV456->Fill(time);
+          } else {
+            if (m_cls6TrkTimeV456 != nullptr) m_cls6TrkTimeV456->Fill(time);
+          }
         }
 
         for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {

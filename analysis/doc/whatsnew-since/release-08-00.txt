@@ -1,0 +1,36 @@
+Changes in the analysis package in light-2309-munchkin
+------------------------------------------------------
+
+Bugfix of ParticleListManipulator for particleLists loaded from KLMClusters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Fixed a major bug in the `ParticleListManipulator` used in functions such as `copyList`, `fillParticleList` and other
+  modularAnalysis functions. The bug occurred when creating a particle list from two or more types of mdst objects, for example,
+  ``K_L0`` loaded from ECL clusters and KLM clusters. When a new particle list was created from original lists, mdst objects with the
+  same mdst index as other mdst objects were skipped and not added to the new particle list, even if the mdst types were different.
+  This mainly impacted the ``K_L0`` or ``neutron`` particle lists, resulting in a significant drop in particles loaded from
+  KLM clusters. No such impact has been observed for other types of particle lists.
+
+
+FEI
++++
+* Applied the mass constraint to pi0 candidates in FEI.
+  Please note that the FEI calibration on MC15ri is performed without applying pi0 mass constraint and without loosening the gamma
+  energy threshold, which has been implemented since light-2305-korat.
+  So, either use FEI skims (recommended), or run FEI with an older release until new FEI calibration with MC16 will be available.
+
+Photon Energy Resolution
+++++++++++++++++++++++++
+* Added ``ECLPhotonEnergyResolution`` to analysis database objects. This module reads the relative energy resolution calculation
+  results from the `Photon Energy Resolution Calibration workflow <https://gitlab.desy.de/alexander.heidelbach/photonenergyresolutioncalibration>`_
+  and creates a corresponding database object. The new method ``GetCovarianceMatrix3x3FromCluster`` in ``ClusterUtils`` replaces the former
+  calculated values if the cluster properties (:math:`E`, :math:`\phi`, :math:`\theta`) are within valid binning and leaves them unchanged otherwise.
+  ``ClusterUtils`` triggers the replacement if a globaltag with a valid ``ECLPhotonEnergyResolution`` payload is present and
+  without further user input.
+
+Variables
++++++++++
+* Added the variables `PxHER`, `PyHER`, `PzHER` and  `PxLER`, `PyLER`, `PzLER`  which are the nominal beam momenta
+  derived from the ``CollisionInvariantMass``, ``CollisionBoostVector`` and ``CollisionAxisCMS`` payloads
+* Added the variables `mcPxHER`, `mcPyHER`, `mcPzHER` and  `mcPxLER`, `mcPyLER`, `mcPzLER`  which are the truth
+  momenta of colliding electron/positron for the event. These are available only for MC.
+  For ``EvtGen`` and ``BabaYaga`` generators these variables have dummy value for MC15 or older.

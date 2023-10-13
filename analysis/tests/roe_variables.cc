@@ -244,7 +244,7 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 5.2959199);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 5.2986979);
 
     DataStore::StoreEntry& roeobjptr = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at("RestOfEvent");
     roeobjptr.object = myROEs[0];
@@ -252,7 +252,7 @@ namespace {
 
     var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(partNotROE)), 2.8002837);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(partNotROE)), 2.801749);
 
     // Clear ptr at the end
     roeobjptr.object = nullptr;
@@ -383,21 +383,21 @@ namespace {
 
     auto* var = Manager::Instance().getVariable("weCosThetaEll()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -0.99858648);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -0.99899036);
 
     var = Manager::Instance().getVariable("weXiZ()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.31121328);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), 0.31122509);
 
     var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -2.1316282e-14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -1.7763568e-14);
 
     // FIXME: This value is the same as for weQ2lnuSimple
     // More complicated test setup is required to pass abs(cos_angle_nu) < 1
     var = Manager::Instance().getVariable("weQ2lnu(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -2.1316282e-14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -1.7763568e-14);
   }
   /*
    * Test isInROE variables

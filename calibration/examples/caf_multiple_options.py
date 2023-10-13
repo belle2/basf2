@@ -45,8 +45,8 @@ def main(argv):
         Just to show that the function is correctly applied
         """
         b2.set_log_level(b2.LogLevel.DEBUG)
-        b2.B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
-        b2.B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
+        b2.B2INFO("Running Test Algorithm Setup For Iteration {}".format(iteration))
+        b2.B2INFO("Can access the {} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
 
     # Make a bunch of test calibrations
     calibrations = []

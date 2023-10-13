@@ -59,7 +59,7 @@ eventinfoprinter = main.add_module('EventInfoPrinter')
 
 evtgeninput = main.add_module('EvtGenInput')
 
-components = ['CDC', 'KLM', 'MagneticField']
+components = ['CDC', 'KLM']
 add_simulation(main, components)
 
 ########################################

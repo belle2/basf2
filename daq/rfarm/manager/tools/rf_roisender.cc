@@ -15,7 +15,7 @@ using namespace Belle2;
 
 static RFRoiSender* roi = NULL;
 
-extern "C" void sighandler(int sig)
+extern "C" void sighandler(int /*sig*/)
 {
   printf("SIGTERM handler here\n");
   roi->cleanup();

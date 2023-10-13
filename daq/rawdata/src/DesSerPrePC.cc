@@ -8,6 +8,7 @@
 #include <daq/rawdata/DesSerPrePC.h>
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
+#include <utility>
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -279,7 +280,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
         printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
         delete temp_buf;
       }
-      throw (err_str);
+      throw (std::move(err_str));
     }
     //
     // Data length check
@@ -324,7 +325,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
         printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
         delete temp_buf;
       }
-      throw (err_str);
+      throw (std::move(err_str));
     }
   }
 

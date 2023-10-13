@@ -31,8 +31,27 @@ import modularAnalysis as ma
 from variables import variables as v
 from variables import collections as vc
 from SplitMultiplicities import SplitMultiplicities
+import argparse
 
 path = b2.create_path()
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        # epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        # usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('--input', type=str, default='../charged.cdst.root', help='The name of the input root file')
+    parser.add_argument('--output', type=str, default='MCvalidationCharged.root', help='The name of the output root file')
+
+    return parser
 
 
 def define_ups_aliases():
@@ -98,8 +117,11 @@ def add_aliases(alias_dict={}):
         v.addAlias(key, value)
 
 
+parser = get_argument_parser()
+args = parser.parse_args()
+
 # read input file
-ma.inputMdstList('../charged.cdst.root', path)
+ma.inputMdstList(args.input, path)
 
 path.add_module(SplitMultiplicities(321))  # K+
 path.add_module(SplitMultiplicities(-321))  # K-
@@ -137,14 +159,14 @@ ma.variablesToNtuple(
     '',
     treename="Multiplicities",
     variables=multi_variables,
-    filename='MCvalidationCharged.root',
+    filename=args.output,
     path=path)
-ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidationCharged.root', path=path)
+ma.variablesToNtuple('', treename="Split", variables=split_variables, filename=args.output, path=path)
 ma.variablesToNtuple(
     '',
     treename="EventShape",
     variables=eventshape_variables,
-    filename='MCvalidationCharged.root',
+    filename=args.output,
     path=path)
 
 progress = ma.register_module('Progress')

@@ -53,21 +53,27 @@
 // First version
 //
 //
-#ifndef __FIX_MDST_H__
-#define __FIX_MDST_H__
+
+#pragma once
 
 #define HEP_SHORT_NAMES
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventExtraInfo.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
-#include "belle_legacy/belle.h"
-#include "belle_legacy/tables/run_info.h"
+/* Belle headers. */
+#include <belle_legacy/belle.h>
+#include <belle_legacy/tables/run_info.h>
 
+/* CLHEP headers. */
+#include <CLHEP/Matrix/SymMatrix.h>
+#include <CLHEP/Geometry/Point3D.h>
+
+/* C++ headers. */
 #include <string>
-
-#include "CLHEP/Matrix/SymMatrix.h"
-#include "CLHEP/Geometry/Point3D.h"
 
 typedef HepGeom::Point3D<double> HepPoint3D;
 
@@ -185,6 +191,9 @@ namespace Belle2 {
     int m_expno;
     //@}
 
+    /** Whether to save result as EventExtraInfo. */
+    bool m_saveResultExtraInfo;
+
   protected:
 
   private:
@@ -195,6 +204,9 @@ namespace Belle2 {
     MuidProb* m_muonprob{nullptr};      /**< Pointer to muons' prob-density object */
     MuidProb* m_pionprob{nullptr};      /**< Pointer to pions' prob-density object */
     MuidProb* m_kaonprob{nullptr};      /**< Pointer to kaons' prob-density object */
+
+    /** Event ExtraInfo. */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
 
     bool good_event(); /**< Check if event correspondes to the period when Belle detector not in good condition */
 
@@ -319,6 +331,4 @@ namespace Belle2 {
 
   };
 
-} // namespace Belle
-#endif /* __FIX_MDST_H__ */
-
+}

@@ -8,10 +8,10 @@
 
 #pragma once
 
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 

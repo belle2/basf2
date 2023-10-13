@@ -225,7 +225,7 @@ def pretty_print_description_list(rows):
             subheading = row[0]
             print('')
             print(bold(subheading).center(term_width))
-        else:
+        elif len(row) == 2:
             name, description = row
             for i, line in enumerate(description.splitlines()):
                 if i == 0:
@@ -237,6 +237,15 @@ def pretty_print_description_list(rows):
                 else:
                     # not first line anymore, no module name in front so initial
                     # indent is equal to subsequent indent
+                    wrapper.initial_indent = wrapper.subsequent_indent
+                    print(wrapper.fill(line))
+        else:
+            name, description, vartype = row
+            for i, line in enumerate(description.splitlines()):
+                if i == 0:
+                    wrapper.initial_indent = max(module_width, len(name + vartype) + 4) * " "
+                    print(bold((name+' ['+vartype+']').ljust(module_width - 1)), wrapper.fill(line).lstrip())
+                else:
                     wrapper.initial_indent = wrapper.subsequent_indent
                     print(wrapper.fill(line))
 

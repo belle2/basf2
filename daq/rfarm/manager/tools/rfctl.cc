@@ -42,7 +42,7 @@ void
 xreopenlog()
 {
   static char logprefix[1024];
-  char logfile[1024];
+  char logfile[2048];
   time_t now = time(0);
   tm* cur = localtime(&now);
   struct stat statbuf;
@@ -189,8 +189,6 @@ main(int argc, char** argv)
   const char myname[] = "rfctl";
 
   char* buf = 0;
-  char* input = 0;
-  char* prev = 0;
   char* av[128];
   char* prompt;
 
@@ -229,6 +227,12 @@ main(int argc, char** argv)
   prompt = (char*)malloc(strlen(nodename) + 2);
   strcpy(prompt, nodename);
   strcat(prompt, ">");
+
+
+#ifdef USE_READLINE
+  char* input = 0;
+  char* prev = 0;
+#endif
 
   // infinite loop
   while (1) {

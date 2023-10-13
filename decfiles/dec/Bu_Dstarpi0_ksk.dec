@@ -1,0 +1,40 @@
+# EventType: 1213032105
+# Descriptor: [B+ -> [Ds*+ -> [Ds+ -> [KS0 ->  pi+ pi-] K+] gamma] [pi0 -> gamma  gamma]]
+# NickName: Bu_Dsst+pi0_Dsst+toDsgamma_DstoKSK+_KStopi+pi-
+# Documentation: B to Charm studies
+# PhysicsWG: B2Hadronic
+# Responsible: Manish Kumar
+# Email: manishkumar@iisermohali.ac.in
+# Cuts: None
+# Date: 20230202
+
+Alias D_s*+sig D_s*+
+Alias D_s*-sig D_s*-
+ChargeConj D_s*+sig D_s*-sig
+
+Decay Upsilon(4S)
+0.5 B+sig B-  VSS;
+0.5 B+ B-sig  VSS;
+Enddecay
+
+
+Decay B+sig
+1.0 D_s*+sig pi0 PHOTOS SVS;
+Enddecay
+
+CDecay B-sig
+
+Decay D_s*+sig
+1.0 D_s+sig gamma PHOTOS VSP_PWAVE;
+Enddecay
+
+CDecay D_s*-sig
+
+
+Decay D_s+sig
+1.0 K_S0 K+  PHOTOS PHSP;
+Enddecay
+
+CDecay D_s-sig
+
+End

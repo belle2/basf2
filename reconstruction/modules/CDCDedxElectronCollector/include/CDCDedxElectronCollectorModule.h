@@ -11,13 +11,19 @@
 #include <vector>
 
 #include <calibration/CalibrationCollectorModule.h>
+
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
+
 
 namespace Belle2 {
   /**
@@ -46,8 +52,7 @@ namespace Belle2 {
     /**
     * Set range for EoP cut
     */
-    void setEoverPCutValue(double value) {m_setEoverP = value;}
-
+    void setEoverPCutValue(double value) {m_setEoP = value;}
 
   private:
     /**
@@ -56,23 +61,27 @@ namespace Belle2 {
     bool m_cuts; /**< Boolean to apply cuts during collection */
 
     /// required input
-    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
+    StoreObjPtr<SoftwareTriggerResult> m_trgResult; /**< Store array for Trigger selection */
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array for Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
 
     /// module params
-    int m_maxNumHits; /**< maximum number of hits allowed */
-    double m_setEoverP; /**< Cut of E over P value */
+    int m_maxHits; /**< maximum number of hits allowed */
+    double m_setEoP; /**< Cut of E over P value */
+
+    /// event level information
+    double m_injRing{ -1}; /**< her or ler  */
+    double m_injTime{ -1}; /**< time since last injection */
 
     /// track level information
-    double m_dedx = -1;  /**< dE/dx truncated mean */
-    double m_costh = -1; /**< track cos(theta) */
-    double m_p = -1; /**< track momentum */
-    int m_charge = 0; /**< track momentum */
-    int m_run = 1;  /**<run number */
-    int m_nhits = -1;    /**< number of dE/dx hits on the track */
+    double m_dedx{ -1}; /**< dE/dx truncated mean */
+    double m_costh{ -1}; /**< track cos(theta) */
+    double m_p{ -1}; /**< track momentum */
+    int m_charge{0}; /**< track momentum */
+    int m_run{ -1}; /**<run number */
+    int m_nhits{ -1}; /**< number of dE/dx hits on the track */
 
     /// hit level information
     std::vector<int> m_wire;       /**< wire number for the hit */
@@ -96,8 +105,9 @@ namespace Belle2 {
     bool m_isEntaRS;        /**< flag to write rescaled enta in tree */
     bool m_isDedxhit;       /**< flag to write dedxhits in tree */
     bool m_isADCcorr;       /**< flag to write adc corrected in tree */
-    bool m_isBhabhaEvt;     /**< flag to select bhabha event */
-    bool m_isRadBhabhaEvt;  /**< flag to select radee event */
-    bool m_enableTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */
+    bool m_isBhabha;     /**< flag to select bhabha event */
+    bool m_isRadee;  /**< flag to select radee event */
+    bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */
+    bool m_isInjTime; /**< flag to enable trigger skim (off deafult) */
   };
 }

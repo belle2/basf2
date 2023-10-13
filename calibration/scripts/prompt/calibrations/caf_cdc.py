@@ -524,3 +524,5 @@ class CDCCalibration(Calibration):
         if dependencies is not None:
             for dep in dependencies:
                 self.depends_on(dep)
+
+# @endcond

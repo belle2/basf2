@@ -1,4 +1,4 @@
-.. _tracking_svdROIFinder: 
+.. _tracking_svdROIFinder:
 
 SVD Region of Interest Finder
 =============================

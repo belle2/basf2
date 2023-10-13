@@ -52,7 +52,7 @@ DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
 
 void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: initialize");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialize");
 
   B2DEBUG(10, " black = " << kBlack);
   B2DEBUG(10, " green = " << kGreen);
@@ -136,7 +136,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: beginRun called.");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: beginRun called.");
   m_cEfficiencyU->Clear();
   m_cEfficiencyV->Clear();
   m_cEfficiencyErrU->Clear();
@@ -153,14 +153,14 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
   double effErrorLo = 0.;
   requestLimitsFromEpicsPVs("effLimits", effErrorLo, m_statThreshold, m_effWarning,  m_effError);
 
-  B2INFO(" SVD efficiency thresholds taken from EPICS configuration file:");
-  B2INFO("  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
-         m_statThreshold);
+  B2DEBUG(10, " SVD efficiency thresholds taken from EPICS configuration file:");
+  B2DEBUG(10, "  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
+          m_statThreshold);
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: event called.");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: event called.");
 
   //find nEvents
   TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
@@ -168,7 +168,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("no events, nothing to do here");
     return;
   } else {
-    B2INFO("SVDExpReco/SVDDQM_nEvents found");
+    B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
   gStyle->SetOptStat(0);
@@ -182,6 +182,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(1)->Reset();
   m_hEfficiencyErr->getHistogram(0)->SetStats(0);
   m_hEfficiencyErr->getHistogram(1)->SetStats(0);
+
 
   Float_t effU = -1;
   Float_t effV = -1;
@@ -563,12 +564,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency:  endRun called");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()
 {
-  B2INFO("DQMHistAnalysisSVDEfficiency: terminate called");
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: terminate called");
 
   delete m_refFile;
   delete m_legProblem;

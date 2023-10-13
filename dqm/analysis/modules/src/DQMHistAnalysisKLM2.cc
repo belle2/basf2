@@ -25,7 +25,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),
     m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
-  setDescription("Module used to analyze KLM Efficiency DQM histograms.");
+  setDescription("Module used to analyze KLM Efficiency DQM histograms (depends on tracking variables).");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));

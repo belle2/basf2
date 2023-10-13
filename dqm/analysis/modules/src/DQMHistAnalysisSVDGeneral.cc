@@ -401,7 +401,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
-    if (nEvents > (int)m_statThreshold) {
+    bool lowStat = false;
+
+    if (nEvents > m_statThreshold) {
       if (runtype == "physics") {
         Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
         if (difference_physics > m_timeThreshold) {
@@ -416,9 +418,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
         B2WARNING("Run type:" << runtype);
       }
     } else {
-      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
-      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+      lowStat = true;
     }
+
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
       m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
@@ -427,6 +429,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
       m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
     }
+
+    if (lowStat) {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    }
+
   } else {
     B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
     m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
@@ -453,7 +461,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_hClusterOnTrackTimeL456V3Samples.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
       m_hClusterOnTrackTimeL456V3Samples.SetTitle("ClusterOnTrack Time L456V 3 samples " + runID);
       bool hasError = false;
-      if (nEvents > (int)m_statThreshold) {
+      bool lowStat = false;
+
+      if (nEvents > m_statThreshold) {
         if (runtype == "physics") {
           Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
           if (difference_physics > m_timeThreshold) {
@@ -468,8 +478,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
           B2WARNING("Run type:" << runtype);
         }
       } else {
-        m_cClusterOnTrackTimeL456V3Samples->SetFillColor(kGray);
-        m_cClusterOnTrackTimeL456V3Samples->SetFrameFillColor(10);
+        lowStat = true;
       }
       if (! hasError) {
         m_cClusterOnTrackTimeL456V3Samples->SetFillColor(kGreen);
@@ -479,6 +488,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
         m_cClusterOnTrackTimeL456V3Samples->SetFillColor(kRed);
         m_cClusterOnTrackTimeL456V3Samples->SetFrameFillColor(10);
       }
+
+      if (lowStat) {
+        m_cClusterOnTrackTimeL456V3Samples->SetFillColor(kGray);
+        m_cClusterOnTrackTimeL456V3Samples->SetFrameFillColor(10);
+      }
+
     } else {
       B2INFO("Histogram SVDClsTrk/c_SVDTRK_Cluster3TimeV456 from SVDDQMClustersOnTrack module not found!");
       m_cClusterOnTrackTimeL456V3Samples->SetFillColor(kRed);

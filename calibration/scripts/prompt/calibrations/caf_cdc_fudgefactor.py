@@ -28,6 +28,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
+                                   "fileFormat": "RAW",
                                    "min_events_per_file": 500,
                                    "max_events_per_file": 30000,
                                    "components": ["CDC", "ECL", "KLM"],
@@ -50,6 +51,7 @@ def get_calibrations(input_data, **kwargs):
 #    file_format = expert_config["file_format"]
     components = expert_config["components"]
     vertex_fit = expert_config["vertex_fit"]
+    fileFormat = expert_config["fileFormat"]
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
@@ -90,6 +92,7 @@ def get_calibrations(input_data, **kwargs):
                               input_files=input_files_mumu,
                               pre_collector_path=pre_collector(max_events_per_file,
                                                                components=components,
+                                                               fileFormat=fileFormat,
                                                                vertex_fit=vertex_fit))
 #                              backend_args=expert_config["backend_args"])
     #                           collector_granularity=collector_granularity)
@@ -108,7 +111,7 @@ def get_calibrations(input_data, **kwargs):
 
 
 #################################################
-def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], vertex_fit=0):
+def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], fileFormat="RAW", vertex_fit=0):
     """
     Define pre collection (reconstruction in our purpose).
     Probably, we need only CDC and ECL data.
@@ -121,22 +124,26 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], vertex_fit=
     from basf2 import create_path, register_module
     from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
-    if max_events is None:
-        root_input = register_module('RootInput', branchNames=HLT_INPUT_OBJECTS)
-    else:
-        root_input = register_module('RootInput', branchNames=HLT_INPUT_OBJECTS,
-                                     entrySequences=['0:{}'.format(max_events)])
-    reco_path.add_module(root_input)
-    reco_path.add_module('Progress')
-    # unpack
-    from rawdata import add_unpackers
-    from reconstruction import add_reconstruction
-    add_unpackers(reco_path, components=components)
-    # reconstruction
-    add_reconstruction(reco_path,
-                       components=components,
-                       append_full_grid_cdc_eventt0=True)
+    if fileFormat == "RAW":
+        if max_events is None:
+            root_input = register_module('RootInput', branchNames=HLT_INPUT_OBJECTS)
+        else:
+            root_input = register_module('RootInput', branchNames=HLT_INPUT_OBJECTS,
+                                         entrySequences=['0:{}'.format(max_events)])
+        reco_path.add_module(root_input)
+        # unpack
+        from rawdata import add_unpackers
+        from reconstruction import add_reconstruction
+        add_unpackers(reco_path, components=components)
+        # reconstruction
+        add_reconstruction(reco_path,
+                           components=components,
+                           append_full_grid_cdc_eventt0=True)
+    if fileFormat == "mdst":
+        from modularAnalysis import inputMdst
+        inputMdst(filename="", path=reco_path, environmentType='default', skipNEvents=0, entrySequence=['0:{}'.format(max_events)])
 
+    reco_path.add_module('Progress')
     fillParticleList('gamma:HLT', 'E>0.1', path=reco_path)
     goodTrack = 'abs(d0) < 2.0 and abs(z0) < 4.0 and pt > 2.0 and useCMSFrame(p) > 0.5'
     fillParticleList('mu+:HLT', goodTrack, path=reco_path)

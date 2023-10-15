@@ -34,4 +34,225 @@
 #pragma link C++ class Belle2::Bitstream<array<array<char, NN_OUT_WIDTH>, NUM_2D> >+; // checksum=0x689d6f35, version=4
 #pragma link C++ class Belle2::Bitstream<array<array<char, NN_WIDTH>, NUM_2D> >+; // checksum=0x9e8c810d, version=4
 
+
+
+
+
+
+
+
+
+
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<unsigned short> nNodes"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_nNodes"                                                            \
+  code="{for (const auto& w : onfile.nNodes)                              \
+           m_nNodes.emplace_back(w);}"
+
+
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> weights"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_weights"                                                            \
+  code="{for (const auto& w : onfile.weights)                              \
+           m_weights.emplace_back(w);    \
+        }"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="bool trained"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_trained"                                                            \
+  code="{m_trained = onfile.trained;}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="unsigned short targetVars"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_targetVars"                                                            \
+  code="{m_targetVars = onfile.targetVars;}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> outputScale"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_outputScale"                                                            \
+  code="{for (const auto& w : onfile.outputScale)                              \
+           m_outputScale.emplace_back(w);}"
+//####################################################################################
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> phiRange"                                      \
+  version="[-7]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_phiRangeUse"                                                            \
+  code="{for (const auto& w : onfile.phiRange)                              \
+           m_phiRangeUse.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> invptRange"                                      \
+  version="[-7]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_invptRangeUse"                                                            \
+  code="{for (const auto& w : onfile.invptRange)                              \
+           m_invptRangeUse.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> thetaRange"                                      \
+  version="[-7]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_thetaRangeUse"                                                            \
+  code="{for (const auto& w : onfile.thetaRange)                              \
+           m_thetaRangeUse.emplace_back(w);}"
+
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> thetaRange"                                      \
+  version="[-7]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_thetaRangeTrain"                                                            \
+  code="{for (const auto& w : onfile.thetaRange)                              \
+           m_thetaRangeTrain.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> phiRange"                                      \
+  version="[-7]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_phiRangeTrain"                                                            \
+  code="{for (const auto& w : onfile.phiRange)                              \
+           m_phiRangeTrain.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> invptRange"                                      \
+  version="[-7]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_invptRangeTrain"                                                            \
+  code="{for (const auto& w : onfile.invptRange)                              \
+           m_invptRangeTrain.emplace_back(w);}"
+
+//##################################################################
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> phiRangeUse"                                      \
+  version="[8-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_phiRangeUse"                                                            \
+  code="{for (const auto& w : onfile.phiRangeUse)                              \
+           m_phiRangeUse.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> invptRangeUse"                                      \
+  version="[8-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_invptRangeUse"                                                            \
+  code="{for (const auto& w : onfile.invptRangeUse)                              \
+           m_invptRangeUse.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> thetaRangeUse"                                      \
+  version="[8-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_thetaRangeUse"                                                            \
+  code="{for (const auto& w : onfile.thetaRangeUse)                              \
+           m_thetaRangeUse.emplace_back(w);}"
+
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> thetaRangeTrain"                                      \
+  version="[8-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_thetaRangeTrain"                                                            \
+  code="{for (const auto& w : onfile.thetaRangeTrain)                              \
+           m_thetaRangeTrain.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> phiRangeTrain"                                      \
+  version="[8-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_phiRangeTrain"                                                            \
+  code="{for (const auto& w : onfile.phiRangeTrain)                              \
+           m_phiRangeTrain.emplace_back(w);}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> invptRangeTrain"                                      \
+  version="[8-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_invptRangeTrain"                                                            \
+  code="{for (const auto& w : onfile.invptRangeTrain)                              \
+           m_invptRangeTrain.emplace_back(w);}"
+
+
+//#######################################################################
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="unsigned short maxHitsPerSL"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_maxHitsPerSL"                                                            \
+  code="{m_maxHitsPerSL = onfile.maxHitsPerSL;}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="unsigned long SLpattern"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_SLpattern"                                                            \
+  code="{m_SLpattern = onfile.SLpattern;}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="unsigned long SLpatternMask"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_SLpatternMask"                                                            \
+  code="{m_SLpatternMask = onfile.SLpatternMask;}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="unsigned short tMax"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_tMax"                                                            \
+  code="{m_tMax = onfile.tMax;}"
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::vector<float> relevantID"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_relevantID"                                                            \
+  code="{for (const auto& w : onfile.relevantID) m_relevantID.emplace_back(w);}"
+
+
+#pragma read                                                                \
+  sourceClass="Belle2::CDCTriggerMLP"                              \
+  source="std::string et_option"                                      \
+  version="[-10]"                                                             \
+  targetClass="Belle2::CDCTriggerMLP"                              \
+  target="m_et_option"                                                            \
+  code="{m_et_option = onfile.et_option;}"
+
+
+
+
 #endif

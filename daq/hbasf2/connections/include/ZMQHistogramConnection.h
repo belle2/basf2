@@ -17,7 +17,6 @@
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 
 #include <framework/pcore/EvtMessage.h>
-#include <daq/dqm/DqmMemFile.h>
 #include <daq/rfarm/manager/SharedMem.h>
 
 #include <string>

@@ -103,6 +103,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad1ECLTRG->SetFillColor(0);
     m_pad1ECLTRG->Modified();
     m_pad1ECLTRG->Update();
+  } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
     m_pad1ECLTRG->SetFillColor(kGray);
@@ -217,6 +218,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad1ECLTRG->SetFillColor(0);
     m_svdPad1ECLTRG->Modified();
     m_svdPad1ECLTRG->Update();
+  } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
     m_svdPad1ECLTRG->SetFillColor(kGray);

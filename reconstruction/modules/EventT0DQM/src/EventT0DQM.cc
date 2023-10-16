@@ -115,6 +115,46 @@ void EventT0DQMModule::defineHisto()
                                                 nBins, minT0, maxT0);
 
 
+  m_histEventT0_ECL_bhabha_L1_TOPTRG = new TH1F("m_histEventT0_ECL_bhabha_L1_TOPTRG",
+                                                "ECL EventT0, L1TRG from TOP, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_bhabha_L1_TOPTRG = new TH1F("m_histEventT0_CDC_bhabha_L1_TOPTRG",
+                                                "CDC EventT0, L1TRG from TOP, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_bhabha_L1_TOPTRG = new TH1F("m_histEventT0_TOP_bhabha_L1_TOPTRG",
+                                                "TOP EventT0, L1TRG from TOP, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_SVD_bhabha_L1_TOPTRG = new TH1F("m_histEventT0_SVD_bhabha_L1_TOPTRG",
+                                                "SVD EventT0, L1TRG from TOP, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+
+  m_histEventT0_ECL_hadron_L1_TOPTRG = new TH1F("m_histEventT0_ECL_hadron_L1_TOPTRG",
+                                                "ECL EventT0, L1TRG from TOP, HLT Hadron;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_hadron_L1_TOPTRG = new TH1F("m_histEventT0_CDC_hadron_L1_TOPTRG",
+                                                "CDC EventT0, L1TRG from TOP, HLT Hadron;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_hadron_L1_TOPTRG = new TH1F("m_histEventT0_TOP_hadron_L1_TOPTRG",
+                                                "TOP EventT0, L1TRG from TOP, HLT Hadron;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_SVD_hadron_L1_TOPTRG = new TH1F("m_histEventT0_SVD_hadron_L1_TOPTRG",
+                                                "SVD EventT0, L1TRG from TOP, HLT Hadron;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+
+  m_histEventT0_ECL_mumu_L1_TOPTRG   = new TH1F("m_histEventT0_ECL_mumu_L1_TOPTRG",
+                                                "ECL EventT0, L1TRG from TOP, HLT mumu;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_CDC_mumu_L1_TOPTRG   = new TH1F("m_histEventT0_CDC_mumu_L1_TOPTRG",
+                                                "CDC EventT0, L1TRG from TOP, HLT mumu;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_TOP_mumu_L1_TOPTRG   = new TH1F("m_histEventT0_TOP_mumu_L1_TOPTRG",
+                                                "TOP EventT0, L1TRG from TOP, HLT mumu;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+  m_histEventT0_SVD_mumu_L1_TOPTRG   = new TH1F("m_histEventT0_SVD_mumu_L1_TOPTRG",
+                                                "SVD EventT0, L1TRG from TOP, HLT mumu;EventT0 [ns];events / 0.5 ns",
+                                                nBins, minT0, maxT0);
+
+
   oldDir->cd();
 
 }
@@ -175,6 +215,21 @@ void EventT0DQMModule::beginRun()
   m_histEventT0_CDC_mumu_L1_CDCTRG->Reset();
   m_histEventT0_TOP_mumu_L1_CDCTRG->Reset();
   m_histEventT0_SVD_mumu_L1_CDCTRG->Reset();
+
+  m_histEventT0_ECL_bhabha_L1_TOPTRG->Reset();
+  m_histEventT0_CDC_bhabha_L1_TOPTRG->Reset();
+  m_histEventT0_TOP_bhabha_L1_TOPTRG->Reset();
+  m_histEventT0_SVD_bhabha_L1_TOPTRG->Reset();
+
+  m_histEventT0_ECL_hadron_L1_TOPTRG->Reset();
+  m_histEventT0_CDC_hadron_L1_TOPTRG->Reset();
+  m_histEventT0_TOP_hadron_L1_TOPTRG->Reset();
+  m_histEventT0_SVD_hadron_L1_TOPTRG->Reset();
+
+  m_histEventT0_ECL_mumu_L1_TOPTRG->Reset();
+  m_histEventT0_CDC_mumu_L1_TOPTRG->Reset();
+  m_histEventT0_TOP_mumu_L1_TOPTRG->Reset();
+  m_histEventT0_SVD_mumu_L1_TOPTRG->Reset();
 
 }
 

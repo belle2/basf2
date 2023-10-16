@@ -242,17 +242,16 @@ void EventT0DQMModule::event()
     return;
   }
 
-  // for L1 timing source is "ecl trigger" -> TRGSummary::ETimingType is 0
-  const bool IsECLL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_ECL);
-  // for L1 timing source is "top trigger" -> TRGSummary::ETimingType is 1
-  const bool IsTOPL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_TOP);
-  // for L1 timing source is "cdc trigger" -> TRGSummary::ETimingType is 3
-  const bool IsCDCL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_CDC);
+  // Skip this event if there is no event t0, to avoid crashing other DQM
+  if (!m_eventT0.isOptional()) {
+    B2WARNING("Missing event t0, EventT0DQM is skipped.");
+    return;
+  }
 
-  B2DEBUG(20, "IsECLL1TriggerSource = " << IsECLL1TriggerSource);
-  B2DEBUG(20, "IsTOPL1TriggerSource = " << IsTOPL1TriggerSource);
-  B2DEBUG(20, "IsCDCL1TriggerSource = " << IsCDCL1TriggerSource);
-
+  // Determine if there is a valid event t0 to use and then extract the information about it
+  if (!m_eventT0.isValid()) {
+    return ;
+  }
 
   if (!m_TrgResult.isValid()) {
     B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events for this module");
@@ -267,18 +266,16 @@ void EventT0DQMModule::event()
     return;
   }
 
+  // for L1 timing source is "ecl trigger" -> TRGSummary::ETimingType is 0
+  const bool IsECLL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_ECL);
+  // for L1 timing source is "top trigger" -> TRGSummary::ETimingType is 1
+  const bool IsTOPL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_TOP);
+  // for L1 timing source is "cdc trigger" -> TRGSummary::ETimingType is 3
+  const bool IsCDCL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_CDC);
 
-
-  // Skip this event if there is no event t0, to avoid crashing other DQM
-  if (!m_eventT0.isOptional()) {
-    B2WARNING("Missing event t0, EventT0DQM is skipped.");
-    return;
-  }
-
-  // Determine if there is a valid event t0 to use and then extract the information about it
-  if (!m_eventT0.isValid()) {
-    return ;
-  }
+  B2DEBUG(20, "IsECLL1TriggerSource = " << IsECLL1TriggerSource);
+  B2DEBUG(20, "IsTOPL1TriggerSource = " << IsTOPL1TriggerSource);
+  B2DEBUG(20, "IsCDCL1TriggerSource = " << IsCDCL1TriggerSource);
 
   // determine if the event was part of the hadron skim or bhabha skim or mumu skim
   const bool IsEvtAcceptedBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==

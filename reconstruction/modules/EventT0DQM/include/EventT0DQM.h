@@ -48,14 +48,6 @@ namespace Belle2 {
      * takes place in this method. */
     virtual void event() override;
 
-    /** This method is called at the end of each run */
-    virtual void endRun() override;
-
-    /** End of the event processing. */
-    virtual void terminate() override;
-
-
-
   private:
 
 

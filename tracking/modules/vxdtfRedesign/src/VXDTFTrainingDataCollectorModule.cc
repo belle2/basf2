@@ -42,7 +42,7 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
            "random number will be attached!", std::string(""));
 
   addParam("outputDir", m_PARAMoutputDir,
-           "Name of the output directory. The output file created by this module will be written into that directoy.", m_PARAMoutputDir);
+           "Name of the output directory. The output file created by this module will be written into that directory.", m_PARAMoutputDir);
 }
 
 /**

@@ -17,7 +17,7 @@ REG_MODULE(EventT0DQM);
 EventT0DQMModule::EventT0DQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
-  setDescription("Make data quality monitoring plots for event t0 for bhabha, mu mu, and hadron samples seeded by different trigger times.");
+  setDescription("Make data quality monitoring plots for EventT0 for bhabha, mu mu, and hadron samples for different trigger (time) sources.");
 }
 
 //---------------------------------
@@ -177,7 +177,7 @@ void EventT0DQMModule::initialize()
 void EventT0DQMModule::beginRun()
 {
   if (!m_eventT0.isValid()) {
-    B2WARNING("Missing event t0, EventT0DQM is skipped.");
+    B2WARNING("Missing EventT0, EventT0DQM is skipped.");
     return;
   }
 
@@ -244,7 +244,7 @@ void EventT0DQMModule::event()
 
   // Skip this event if there is no event t0, to avoid crashing other DQM
   if (!m_eventT0.isOptional()) {
-    B2WARNING("Missing event t0, EventT0DQM is skipped.");
+    B2WARNING("Missing EventT0, EventT0DQM is skipped.");
     return;
   }
 

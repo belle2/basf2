@@ -14,7 +14,7 @@ using namespace Belle2;
 REG_MODULE(EventT0DQM);
 
 //---------------------------------
-EventT0DQMModule::EventT0DQMModule(): HistoModule(), m_L1TimingSrc(0)
+EventT0DQMModule::EventT0DQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for event t0 for bhabha, mu mu, and hadron samples seeded by different trigger times.");
@@ -240,18 +240,11 @@ void EventT0DQMModule::event()
   if (!m_objTrgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but required to indicate which detector provided the L1 trigger time");
     return;
-  } else {
-    m_L1TimingSrc = m_objTrgSummary->getTimType();
   }
 
-  bool Is_ECL_L1TriggerSource = false ;
-  bool Is_CDC_L1TriggerSource = false ;
-  if (m_L1TimingSrc == 0) {            // for L1 timing source is "ecl trigger"
-    Is_ECL_L1TriggerSource = true ;
-  } else if (m_L1TimingSrc == 3) {     // for L1 timing source is "cdc trigger"
-    Is_CDC_L1TriggerSource = true ;
-  }
-  // else if(m_L1TimingSrc==5){  // for L1 timing source is "delayed Bhabha" }
+  bool Is_ECL_L1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_ECL);
+  bool Is_CDC_L1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_CDC);
+
   B2DEBUG(20, "Is_ECL_L1TriggerSource = " << Is_ECL_L1TriggerSource) ;
   B2DEBUG(20, "Is_CDC_L1TriggerSource= " << Is_CDC_L1TriggerSource) ;
 

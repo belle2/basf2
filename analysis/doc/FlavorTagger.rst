@@ -15,7 +15,7 @@ with a charged :math:`B` meson pair.
 .. seealso:: For a more detailed introduction, take a look at
 
   * The paper: `B-flavor tagging at Belle II <https://link.springer.com/article/10.1140/epjc/s10052-022-10180-9>`_
-  * The internal note on calibration using the 2019 and 2020 data: `BELLE2-NOTE-PH-2021-001 <https://docs.belle2.org/record/1905>`_
+  * The note on calibration using data: `BELLE2-NOTE-PH-2021-001 <https://docs.belle2.org/record/1905>`_
 
 Flavor Tagging Principle
 ------------------------

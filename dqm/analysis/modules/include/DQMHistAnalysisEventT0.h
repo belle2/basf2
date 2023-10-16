@@ -44,7 +44,7 @@ namespace Belle2 {
 
   private:
 
-    int m_nEntriesMin = 100; /**< minimum number of entries to process the histogram*/
+    uint m_nEntriesMin = 100; /**< minimum number of entries to process the histogram*/
     /** process the EventT0 distribution
      * fitting with two gaussians
      * filling the MonitoringObject

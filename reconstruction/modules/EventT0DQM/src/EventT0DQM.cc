@@ -359,17 +359,3 @@ void EventT0DQMModule::event()
   B2DEBUG(20, "eventT0_TOP = " << eventT0_TOP << " ns") ;
   B2DEBUG(20, "eventT0_SVD = " << eventT0_SVD << " ns") ;
 }
-
-
-//---------------------------------
-void EventT0DQMModule::endRun()
-{
-
-}
-
-
-//---------------------------------
-void EventT0DQMModule::terminate()
-{
-
-}

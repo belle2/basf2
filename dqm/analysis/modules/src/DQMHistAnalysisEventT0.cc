@@ -354,16 +354,19 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
     return  false;
   }
 
-  int nToFit = h->GetEntries();// - h->GetBinContent(0) - h->GetBinContent(h->GetNbinsX()+1);
-  if (nToFit < m_nEntriesMin) {
+  // The default value for the EventT0 value is -1000, but bins start at -100, so we might mostly fill the underflow bin if
+  // EventT0 for a detector is not present. And also the nominal EventT0 might be too big or too small. Only use the content
+  // of the actually useful bins to decide whether or not to fit the histogram.
+  auto nValidEntries = h->GetEntries() - h->GetBinContent(0) - h->GetBinContent(h->GetNbinsX() + 1);
+  if (static_cast<uint>(nValidEntries) < m_nEntriesMin) {
     B2DEBUG(20, "not enough entries");
     m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
     return false;
   }
 
 
-  //scale the histogram
-  h->Scale(1. / h->GetEntries());
+  //scale the histogram only with content of valid bins, ignore over and underflow bins
+  h->Scale(1. / nValidEntries);
   h->GetXaxis()->SetRangeUser(-50, 50);
 
   //define the fitting function
@@ -400,7 +403,7 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
   gauss2.SetParameters(par[0] * (1 - par[1]), par[4], par[5]);
 
   m_monObj->setVariable(Form("fit_%s", tag.Data()), 1);
-  m_monObj->setVariable(Form("N_%s", tag.Data()), h->GetEntries(), TMath::Sqrt(h->GetEntries()));
+  m_monObj->setVariable(Form("N_%s", tag.Data()), nValidEntries, TMath::Sqrt(nValidEntries));
   m_monObj->setVariable(Form("f_%s", tag.Data()), par[1], parErr[1]);
   m_monObj->setVariable(Form("mean1_%s", tag.Data()), par[2], parErr[2]);
   m_monObj->setVariable(Form("sigma1_%s", tag.Data()), par[3], parErr[3]);

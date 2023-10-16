@@ -95,6 +95,22 @@ namespace Belle2 {
     TH1F* m_histEventT0_TOP_mumu_L1_CDCTRG{nullptr};   /**< event t0 histogram for TOP, HLT mu mu events, L1 time by CDC trigger */
     TH1F* m_histEventT0_SVD_mumu_L1_CDCTRG{nullptr};   /**< event t0 histogram for SVD, HLT mu mu events, L1 time by CDC trigger */
 
+    // TOP trigger based EventT0 histograms
+    TH1F* m_histEventT0_ECL_bhabha_L1_TOPTRG{nullptr}; /**< event t0 histogram for ECL, HLT bha bha events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_CDC_bhabha_L1_TOPTRG{nullptr}; /**< event t0 histogram for CDC, HLT bha bha events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_TOP_bhabha_L1_TOPTRG{nullptr}; /**< event t0 histogram for TOP, HLT bha bha events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_SVD_bhabha_L1_TOPTRG{nullptr}; /**< event t0 histogram for SVD, HLT bha bha events, L1 time by TOP trigger */
+
+    TH1F* m_histEventT0_ECL_hadron_L1_TOPTRG{nullptr}; /**< event t0 histogram for ECL, HLT hadronic events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_CDC_hadron_L1_TOPTRG{nullptr}; /**< event t0 histogram for CDC, HLT hadronic events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_TOP_hadron_L1_TOPTRG{nullptr}; /**< event t0 histogram for TOP, HLT hadronic events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_SVD_hadron_L1_TOPTRG{nullptr}; /**< event t0 histogram for SVD, HLT hadronic events, L1 time by TOP trigger */
+
+    TH1F* m_histEventT0_ECL_mumu_L1_TOPTRG{nullptr};   /**< event t0 histogram for ECL, HLT mu mu events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_CDC_mumu_L1_TOPTRG{nullptr};   /**< event t0 histogram for CDC, HLT mu mu events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_TOP_mumu_L1_TOPTRG{nullptr};   /**< event t0 histogram for TOP, HLT mu mu events, L1 time by TOP trigger */
+    TH1F* m_histEventT0_SVD_mumu_L1_TOPTRG{nullptr};   /**< event t0 histogram for SVD, HLT mu mu events, L1 time by TOP trigger */
+
 
   };
 

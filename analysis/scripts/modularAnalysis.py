@@ -4166,6 +4166,23 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
+def phiGammaPhotonCorrector(particleList=None, path=None):
+    """
+    Sets photon kinematics to corrected values in phi gamma events.
+
+    @param particleList  new ParticleList filled with copied Particles
+    @param path          modules are added to this path
+    """
+
+    if particleList is None:
+        particleList = ""
+
+    mod = register_module('PhiGammaPhotonCorrector')
+    mod.set_name('PhiGammaPhotonCorrector' + particleList)
+    mod.param('particleList', particleList)
+    path.add_module(mod)
+
+
 def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     """
     Add photon Data/MC detection efficiency ratio weights to the specified particle list

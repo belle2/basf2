@@ -22,21 +22,25 @@ from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
 from ROOT.Belle2 import TOP
 
 
-def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None):
+def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None, sroot=False):
     '''
     Returns calibration object for carrier shift calibration of BS13d with local runs
     (laser, single-pulse or double-pulse).
-    :param inputFiles: A list of input files in sroot format
+    :param inputFiles: A list of input files
     :param look_back: look-back window setting (set it to 0 to use the one from DB)
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param sroot: True if input files are in sroot format, False if in root format
     '''
 
     #   create path
     main = basf2.create_path()
 
     #   add basic modules
-    main.add_module('SeqRootInput')
+    if sroot:
+        main.add_module('SeqRootInput')
+    else:
+        main.add_module('RootInput')
     main.add_module('TOPGeometryParInitializer')
     main.add_module('TOPUnpacker')
     main.add_module('TOPRawDigitConverter', lookBackWindows=look_back,
@@ -425,23 +429,27 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
 
 
 def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=28,
-                                  globalTags=None, localDBs=None):
+                                  globalTags=None, localDBs=None, sroot=False):
     '''
     Returns calibration object for calibration of pulse-height distributions and
     threshold efficiencies with local laser runs.
-    :param inputFiles: A list of input files in sroot format
+    :param inputFiles: A list of input files
     :param t_min: lower edge of time window to select laser signal [ns]
     :param t_max: upper edge of time window to select laser signal [ns]
     :param look_back: look-back window setting (set it to 0 to use the one from DB)
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param sroot: True if input files are in sroot format, False if in root format
     '''
 
     #   create path
     main = basf2.create_path()
 
     #   add basic modules
-    main.add_module('SeqRootInput')
+    if sroot:
+        main.add_module('SeqRootInput')
+    else:
+        main.add_module('RootInput')
     main.add_module('TOPGeometryParInitializer')
     main.add_module('TOPUnpacker')
     main.add_module('TOPRawDigitConverter', lookBackWindows=look_back)

@@ -41,6 +41,7 @@ b2.set_log_level(b2.LogLevel.ERROR)
 main = b2.create_path()
 
 # input
+# roinput = b2.register_module('SeqRootInput')  # sroot files
 roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 

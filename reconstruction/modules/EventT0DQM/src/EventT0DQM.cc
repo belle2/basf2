@@ -242,11 +242,13 @@ void EventT0DQMModule::event()
     return;
   }
 
-  bool Is_ECL_L1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_ECL);
-  bool Is_CDC_L1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_CDC);
+  // for L1 timing source is "ecl trigger" -> TRGSummary::ETimingType is 0
+  const bool IsECLL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_ECL);
+  // for L1 timing source is "cdc trigger" -> TRGSummary::ETimingType is 3
+  const bool IsCDCL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_CDC);
 
-  B2DEBUG(20, "Is_ECL_L1TriggerSource = " << Is_ECL_L1TriggerSource) ;
-  B2DEBUG(20, "Is_CDC_L1TriggerSource= " << Is_CDC_L1TriggerSource) ;
+  B2DEBUG(20, "IsECLL1TriggerSource = " << IsECLL1TriggerSource) ;
+  B2DEBUG(20, "IsCDCL1TriggerSource = " << IsCDCL1TriggerSource) ;
 
 
   if (!m_TrgResult.isValid()) {
@@ -345,7 +347,7 @@ void EventT0DQMModule::event()
   }
 
   // Fill the plots that used the ECL trigger as the L1 timing source
-  if (Is_ECL_L1TriggerSource) {
+  if (IsECLL1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
       m_histEventT0_ECL_bhabha_L1_ECLTRG->Fill(eventT0_ECL);
@@ -369,7 +371,7 @@ void EventT0DQMModule::event()
     }
   }
   // Fill the plots that used the CDC trigger as the L1 timing source
-  else if (Is_CDC_L1TriggerSource) {
+  else if (IsCDCL1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
       m_histEventT0_ECL_bhabha_L1_CDCTRG->Fill(eventT0_ECL);

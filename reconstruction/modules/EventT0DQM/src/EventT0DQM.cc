@@ -36,91 +36,82 @@ void EventT0DQMModule::defineHisto()
   double maxT0 =  100 ;
 
   m_histEventT0_ECL_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_ECL_bhabha_L1_ECLTRG",
-                                                "ECL event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "ECL EventT0, L1TRG from ECL, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_CDC_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_CDC_bhabha_L1_ECLTRG",
-                                                "CDC event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "CDC EventT0, L1TRG from ECL, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_TOP_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_TOP_bhabha_L1_ECLTRG",
-                                                "TOP event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "TOP EventT0, L1TRG from ECL, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
   m_histEventT0_SVD_bhabha_L1_ECLTRG = new TH1F("m_histEventT0_SVD_bhabha_L1_ECLTRG",
-                                                "SVD event t0 - bhabhas - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "SVD EventT0, L1TRG from ECL, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
 
   m_histEventT0_ECL_hadron_L1_ECLTRG = new TH1F("m_histEventT0_ECL_hadron_L1_ECLTRG",
-                                                "ECL event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "ECL EventT0, L1TRG from ECL, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_CDC_hadron_L1_ECLTRG = new TH1F("m_histEventT0_CDC_hadron_L1_ECLTRG",
-                                                "CDC event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "CDC EventT0, L1TRG from ECL, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_TOP_hadron_L1_ECLTRG = new TH1F("m_histEventT0_TOP_hadron_L1_ECLTRG",
-                                                "TOP event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "TOP EventT0, L1TRG from ECL, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
   m_histEventT0_SVD_hadron_L1_ECLTRG = new TH1F("m_histEventT0_SVD_hadron_L1_ECLTRG",
-                                                "SVD event t0 - hadrons - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "SVD EventT0, L1TRG from ECL, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
 
   m_histEventT0_ECL_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_ECL_mumu_L1_ECLTRG",
-                                                "ECL event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "ECL EventT0, L1TRG from ECL, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_CDC_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_CDC_mumu_L1_ECLTRG",
-                                                "CDC event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "CDC EventT0, L1TRG from ECL, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_TOP_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_TOP_mumu_L1_ECLTRG",
-                                                "TOP event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "TOP EventT0, L1TRG from ECL, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_SVD_mumu_L1_ECLTRG   = new TH1F("m_histEventT0_SVD_mumu_L1_ECLTRG",
-                                                "SVD event t0 - mu mu - ECLTRG time;event t0 [ns];events / 0.5 ns",
+                                                "SVD EventT0, L1TRG from ECL, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
-
-
 
 
   m_histEventT0_ECL_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_ECL_bhabha_L1_CDCTRG",
-                                                "ECL event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "ECL EventT0, L1TRG from CDC, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_CDC_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_CDC_bhabha_L1_CDCTRG",
-                                                "CDC event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "CDC EventT0, L1TRG from CDC, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_TOP_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_TOP_bhabha_L1_CDCTRG",
-                                                "TOP event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "TOP EventT0, L1TRG from CDC, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
   m_histEventT0_SVD_bhabha_L1_CDCTRG = new TH1F("m_histEventT0_SVD_bhabha_L1_CDCTRG",
-                                                "SVD event t0 - bhabhas - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "SVD EventT0, L1TRG from CDC, HLT Bhabha;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
 
   m_histEventT0_ECL_hadron_L1_CDCTRG = new TH1F("m_histEventT0_ECL_hadron_L1_CDCTRG",
-                                                "ECL event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "ECL EventT0, L1TRG from CDC, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_CDC_hadron_L1_CDCTRG = new TH1F("m_histEventT0_CDC_hadron_L1_CDCTRG",
-                                                "CDC event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "CDC EventT0, L1TRG from CDC, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_TOP_hadron_L1_CDCTRG = new TH1F("m_histEventT0_TOP_hadron_L1_CDCTRG",
-                                                "TOP event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "TOP EventT0, L1TRG from CDC, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
   m_histEventT0_SVD_hadron_L1_CDCTRG = new TH1F("m_histEventT0_SVD_hadron_L1_CDCTRG",
-                                                "SVD event t0 - hadrons - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "SVD EventT0, L1TRG from CDC, HLT Hadron;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
 
   m_histEventT0_ECL_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_ECL_mumu_L1_CDCTRG",
-                                                "ECL event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "ECL EventT0, L1TRG from CDC, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_CDC_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_CDC_mumu_L1_CDCTRG",
-                                                "CDC event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "CDC EventT0, L1TRG from CDC, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
   m_histEventT0_TOP_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_TOP_mumu_L1_CDCTRG",
-                                                "TOP event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "TOP EventT0, L1TRG from CDC, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
-
   m_histEventT0_SVD_mumu_L1_CDCTRG   = new TH1F("m_histEventT0_SVD_mumu_L1_CDCTRG",
-                                                "SVD event t0 - mu mu - CDCTRG time;event t0 [ns];events / 0.5 ns",
+                                                "SVD EventT0, L1TRG from CDC, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
 
 

@@ -244,11 +244,14 @@ void EventT0DQMModule::event()
 
   // for L1 timing source is "ecl trigger" -> TRGSummary::ETimingType is 0
   const bool IsECLL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_ECL);
+  // for L1 timing source is "top trigger" -> TRGSummary::ETimingType is 1
+  const bool IsTOPL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_TOP);
   // for L1 timing source is "cdc trigger" -> TRGSummary::ETimingType is 3
   const bool IsCDCL1TriggerSource = (m_objTrgSummary->getTimType() == TRGSummary::ETimingType::TTYP_CDC);
 
-  B2DEBUG(20, "IsECLL1TriggerSource = " << IsECLL1TriggerSource) ;
-  B2DEBUG(20, "IsCDCL1TriggerSource = " << IsCDCL1TriggerSource) ;
+  B2DEBUG(20, "IsECLL1TriggerSource = " << IsECLL1TriggerSource);
+  B2DEBUG(20, "IsTOPL1TriggerSource = " << IsTOPL1TriggerSource);
+  B2DEBUG(20, "IsCDCL1TriggerSource = " << IsCDCL1TriggerSource);
 
 
   if (!m_TrgResult.isValid()) {
@@ -368,6 +371,30 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_mumu_L1_ECLTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_mumu_L1_ECLTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_mumu_L1_ECLTRG->Fill(eventT0_SVD);
+    }
+  }
+  // Fill the plots that used the TOP trigger as the L1 timing source
+  else if (IsTOPL1TriggerSource) {
+    // Fill the histograms with the event t0 values
+    if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
+      m_histEventT0_ECL_bhabha_L1_TOPTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_bhabha_L1_TOPTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_bhabha_L1_TOPTRG->Fill(eventT0_TOP);
+      m_histEventT0_SVD_bhabha_L1_TOPTRG->Fill(eventT0_SVD);
+    }
+
+    if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
+      m_histEventT0_ECL_hadron_L1_TOPTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_hadron_L1_TOPTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_hadron_L1_TOPTRG->Fill(eventT0_TOP);
+      m_histEventT0_SVD_hadron_L1_TOPTRG->Fill(eventT0_SVD);
+    }
+
+    if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
+      m_histEventT0_ECL_mumu_L1_TOPTRG->Fill(eventT0_ECL);
+      m_histEventT0_CDC_mumu_L1_TOPTRG->Fill(eventT0_CDC);
+      m_histEventT0_TOP_mumu_L1_TOPTRG->Fill(eventT0_TOP);
+      m_histEventT0_SVD_mumu_L1_TOPTRG->Fill(eventT0_SVD);
     }
   }
   // Fill the plots that used the CDC trigger as the L1 timing source

@@ -692,7 +692,7 @@ an MC sample with only four decay channels.
         cut_df = df.query('(Btag_SigProb > 0.01) & (nCharged == 0.0)')
 
         n, bins, patches = ax.hist(cut_df['m2RecoilSignalSide'], bins=30, range=(-2, 5))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/$c^2$')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
         fig.savefig('m2RSS_FEIcut_0_01_nCharged_0.pdf')

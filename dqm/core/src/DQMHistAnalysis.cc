@@ -261,6 +261,11 @@ void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
   s_canvasUpdatedList[name] = updated;
 }
 
+void DQMHistAnalysisModule::UpdateCanvas(TCanvas* c, bool updated)
+{
+  if (c) UpdateCanvas(c->GetName(), updated);
+}
+
 void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
 {
   s_runType = "";

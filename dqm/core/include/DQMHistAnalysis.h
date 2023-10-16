@@ -290,6 +290,13 @@ namespace Belle2 {
     void UpdateCanvas(std::string name, bool updated = true);
 
     /**
+     * Mark canvas as updated (or not)
+     * @param canvas Canvas from which to take the name for update
+     * @param updated was updated
+     */
+    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+
+    /**
      * Extract Run Type from histogram title, called from input module
      */
     void ExtractRunType(std::vector <TH1*>& hs);

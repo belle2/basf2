@@ -317,18 +317,12 @@ void EventT0DQMModule::event()
     // Get the list of ECL event t0 values.  There are several event t0 values, not just one.
     auto evtT0List_ECL = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
 
-    // Select the event t0 value from the ECL as the one with the smallest chi squared value (defined as ".quality")
-    double smallest_ECL_t0_minChi2 = evtT0List_ECL[0].quality ;
-    int smallest_ECL_t0_minChi2_idx = 0 ;
-    for (long unsigned int ECLi = 0; ECLi < evtT0List_ECL.size(); ECLi++) {
-      if (evtT0List_ECL[ECLi].quality < smallest_ECL_t0_minChi2) {
-        smallest_ECL_t0_minChi2 = evtT0List_ECL[ECLi].quality ;
-        smallest_ECL_t0_minChi2_idx = ECLi ;
-      }
-    }
+    auto eclBestT0 = std::min_element(evtT0List_ECL.begin(), evtT0List_ECL.end(), [](EventT0::EventT0Component c1,
+    EventT0::EventT0Component c2) {return c1.quality < c2.quality;});
+
     // set the ECL event t0 value for filling into the histogram
     //    It is the value found to have the small chi square
-    eventT0_ECL = evtT0List_ECL[smallest_ECL_t0_minChi2_idx].eventT0 ;
+    eventT0_ECL = eclBestT0->eventT0 ;
   }
 
   // Set the TOP event t0 value if it exists

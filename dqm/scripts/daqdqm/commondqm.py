@@ -231,6 +231,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(ecldqm)
         ecldqmext = b2.register_module('ECLDQMEXTENDED')
         path.add_module(ecldqmext)
+        path.add_module('ECLDQMOutOfTimeDigits')
         # we dont want to create large histograms on HLT, thus ERECO only
         if dqm_environment == "expressreco":
             path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')

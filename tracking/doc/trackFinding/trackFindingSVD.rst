@@ -108,9 +108,9 @@ SectorMap Training
 The training of the SectorMap is a critical step for the performance of the pattern recognition. Important aspects of the training are:
 
 * division of the sensor in sectors: we use a 4x4 division
-* sample used for the training (size, types of simulated events): we use :math:`10\times10^6\ B\bar{B}` + :math:`2\times 10^6` Bhabha events, both samples have additional muon tracks mixed in using the `particlegun`
+* sample used for the training (size, types of simulated events): we use :math:`10\times10^6\ B\bar{B}` + :math:`2\times 10^6` Bhabha events, both samples have additional muon tracks mixed in using the `ParticleGun`
 * pruning: removal of friendship relations that are less used: the threshold is set at 70%
-* difference in misalignment between simulation and real detector: we train on perfectly aligned MC, for data we now use a `geometry` using alignment data.
+* difference in misalignment between simulation and real detector: we train on perfectly aligned MC, for data we now use a *geometry* using alignment data.
 
 Further details on the SectorMap training and a detailed description of steps to be taken to train a SectorMap can be found under: 
 
@@ -136,9 +136,9 @@ Best Candidate Selection
 
 We do not allow that track candidates found by the VXDTF2 share common hits. To achieve that a best candidate selection is performed. At the moment two algorithms are implemented to perform the best candidate selection which can be chosen by a Module parameter. 
 
-One is the so called `Hopfield` which builds a Hopfield network out of all track candidates and performs an optimization on that network. The resulting set of output track candidates do not share any hits among each other. 
+One is the so called *Hopfield* which builds a Hopfield network out of all track candidates and performs an optimization on that network. The resulting set of output track candidates do not share any hits among each other. 
 
-The second algorithm is a so called `greedy` algorithm. It selects from the initial set of track candidates the one with the highest quality based on the output of a quality estimator. This track candidate is removed from the initial set of track candidates and put into the final set of track candidates. In addition all track candidates which share at least one hit with this track candidate are removed from the initial set of track candidates. This procedure is repeated until the initial set of track candidates is empty. The output is the final set of track candidates. Currently a simple Triplet fit is used as quality estimator:
+The second algorithm is a so called *greedy* algorithm. It selects from the initial set of track candidates the one with the highest quality based on the output of a quality estimator. This track candidate is removed from the initial set of track candidates and put into the final set of track candidates. In addition all track candidates which share at least one hit with this track candidate are removed from the initial set of track candidates. This procedure is repeated until the initial set of track candidates is empty. The output is the final set of track candidates. Currently a simple Triplet fit is used as quality estimator:
 
 
 * a Triplet Fit is applied to each path and sub paths obtained by excluding one or more space points
@@ -146,4 +146,4 @@ The second algorithm is a so called `greedy` algorithm. It selects from the init
 * the p-value of each track candidate is used to select the track candidates competing for one or more space points
 
 
-During operation it was observed that the `Hopfield` algorithm is significantly slower compared to the `greedy` algorithm. For that reason the `greedy` algorithm is applied which is much faster than the `Hopfield` while shows similar performance in terms of efficiency and fake rate.
+During operation it was observed that the *Hopfield* algorithm is significantly slower compared to the *greedy* algorithm. For that reason the *greedy* algorithm is applied which is much faster than the *Hopfield* while shows similar performance in terms of efficiency and fake rate.

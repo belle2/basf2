@@ -17,16 +17,15 @@
 # this script does not run over any actual events.
 #
 # The training sample must be provided via the extra commandline
-# argument '-- --train_sample <f1> <f2> ...' or '-- -i <f1> <f2> ...'
+# argument '--train_sample <f1> <f2> ...' 
 # where f1, f2 and so on are different prepared training samples.
-# The -- is requiered to escape from basf2 options and add additional
-# commandline arguments specifically for this script.
+# Note also wild cards can be use e.g.  '--train_sample *.root'.  
 # The file name under which the trained SecMap will be stored can be
 # specified via the argument --secmap
 # The pruning of the X least used relations can be specified via
 # the argument --threshold X
 #
-# Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root --threshold 70
+# Usage:  tracking-vxdtf2-train-SectorMap --train_sample traindata.root --secmap trainedSecMap.root --threshold 70
 #####################################################################
 
 import basf2 as b2
@@ -60,6 +59,13 @@ if __name__ == "__main__":
             default='',
             help='Optional Global tag that will be prepend to the list of GT. Useful for e.g. training \
               SectorMaps on an altered Geometry.')
+    
+    arg_parser.add_argument(
+            '--expNumber',
+            dest='expNumber',
+            default=0,
+            help='Experiment number to be used. This will influence which geometry is read from the DB. Default value is 0. \
+               At that stage the only information needed from the geometry is the sensor numbering (no position).')
 
 
     arguments = arg_parser.parse_args()
@@ -87,12 +93,7 @@ if __name__ == "__main__":
     # Phase. Thus, this script does not run over any events at all, but over the data available
     # in the prepared training sample root file.
     eventinfosetter = b2.register_module('EventInfoSetter')
-    # default phase3 geometry:
-    exp_number = 0
-    # if environment variable is set then phase2 (aka Beast2) geometry will be taken
-    if os.environ.get('USE_BEAST2_GEOMETRY'):
-        exp_number = 1002
-    eventinfosetter.param("expList", [exp_number])
+    eventinfosetter.param("expList", [arguments.expNumber])
     path.add_module(eventinfosetter)
 
     # puts the geometry and gearbox in the path
@@ -111,8 +112,6 @@ if __name__ == "__main__":
     secMapBootStrap.param('WriteSectorMap', True)
     if secmap_name:
         secMapBootStrap.param('SectorMapsOutputFile', secmap_name)
-    elif os.environ.get('USE_BEAST2_GEOMETRY'):
-        secMapBootStrap.param('SectorMapsOutputFile', 'SectorMaps_Beast2.root')
     path.add_module(secMapBootStrap)
 
     # Perform SecMap Training on provided data sample

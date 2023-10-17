@@ -20,7 +20,6 @@ from beamparameters import add_beamparameters
 import basf2 as b2
 import random
 from ROOT import Belle2
-import os
 from generators import add_babayaganlo_generator
 
 
@@ -31,9 +30,12 @@ def add_event_generation(path, randomSeed, eventType, expNumber):
       @param eventType: the allowed event types are
           "BBbar" which will generate BBbar events plus extra ParticleGun tracks.
           "BhaBha" which will generate radiative BhaBha events
-      @param expNumber: the experiment number 0 for full geometry, 1003 for partial PXD geometry (early phase 3).
-          For training SVD only SectorMaps this setting does not matter, as SVD does not change between exp 0 and 1003.
+      @param expNumber: the experiment number 0 or 1004 for full geometry, 1003 for partial PXD geometry (early phase 3).
+          For training SVD only SectorMaps this setting does not matter, as SVD does not change between exp 0, 1004 and 1003.
     '''
+    if (expNumber not in (0, 1003, 1004)):
+        b2.B2FATAL("Specified experiment experiment number " + str(expNumber) + " not valid! Allowed numbers are 0, 1003, 1004.")
+
     # set the exp number
     eventinfosetter = b2.register_module('EventInfoSetter')
     eventinfosetter.param("expList", [expNumber])
@@ -102,6 +104,7 @@ def add_simulation_and_reconstruction_modules(path, usePXD=False):
     Adds the required modules to the path for simulate and reconstruct events (not event generation) needed for the
     SectorMap training.
     @param path: the path the modules should be added to
+    @param usePXD: If True allows to collect PXD data for SectorMap training.
     '''
     # Detector Simulation:
     add_simulation(path=path,
@@ -145,6 +148,8 @@ def add_simulation_and_reconstruction_modules(path, usePXD=False):
 
 def add_rootoutput(path, outputFileName):
     ''' Adds the RootOutput module to the path. All branches not needed for the SectorMap training will be excluded.
+      @param: path the path the modules should be added.
+      @param: outputFileName the name of the file the root output will be stored.
     '''
     # Root output. Default filename can be overriden with '-o' basf2 option.
     rootOutput = b2.register_module('RootOutput')
@@ -188,10 +193,12 @@ def setup_RTCtoSPTCConverters(
         useOnlyFittedTracks=False):
     """This function adds the modules needed to convert Reco-TCs to SpacePointTCs to given path.
 
-    @param path if set to 0 (standard) the created modules will not be added, but returned.
-    If a path is given, 'None' is returned but will be added to given path instead.
+    @param path if set to 0 (standard) the created modules will not be added, but returned. Else
+      modules will be added to this path.
 
-    @param SPscollection the name of the storeArray containing SPs of both SVD and PXD.
+    @param SVDSPscollection the name of the storeArray containing SPs of  SVD.
+
+    @param PXDSPscollection the name of the storeArray containing SPs of PXD.
 
     @param RTCinput defines the name of input-Reco-TCs.
 
@@ -258,10 +265,7 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('skipProblematicCluster', False)
     recoTrackCandConverter.param('convertFittedOnly', useOnlyFittedTracks)
 
-    if os.environ.get('USE_BEAST2_GEOMETRY'):
-        NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCutsPhase2.root")
-    else:
-        NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+    NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
 
     if useNoKick:
         recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)  # NoKickCuts applied
@@ -396,6 +400,9 @@ def remove_timing_cuts_from_SectorMap(sectorMapFile, setupToRead="SVDOnlyDefault
     SMBSM1.param("ReadSectorMap", True)
     SMBSM1.param("SectorMapsInputFile", sectorMapFile)
     SMBSM1.param("SetupToRead", setupToRead)
+
+    if not sectorMapFile.endswith(".root"):
+        b2.B2FATAL("SectorMaps are supposed to be root - files! Provided name does not end on \".root\"")
 
     # assumes it is a root file so replace the last 5 letters
     outputMapFile = sectorMapFile[:-5] + '_timingRemoved.root'

@@ -13,8 +13,8 @@
 # VXDTF2 Script to write out the training data needed to train a SectorMap
 #
 # This script can be used to produce MC data. Two types of events can be
-# generated: 1) "BBbar" which are Y(4S) events mixed with ParticleGun tracks.
-#            2) "BhaBha" which ee->ee events mixed with ParticleGun tracks
+# generated: 1) "BBbar" which are Y(4S) events mixed with muon tracks from the  ParticleGun.
+#            2) "BhaBha" which ee->ee events mixed with muon tracks from the ParticleGun. 
 #    The event type can be set with the "--eventType" option followed by
 #    one of the two options above ("BBbar" or "BhaBha")
 #

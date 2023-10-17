@@ -36,6 +36,9 @@ if __name__ == "__main__":
   if args.inputSectorMap is None:
       basf2.B2FATAL("You need to provide the name of the input SectorMap!")
 
+  if not args.inputSectorMap.endswith(".root"):
+      basf2.B2FATAL("SectorMaps are supposed to be root files. The file provided does not end with \".root\". Will abort.")
+
   # check if the output directory exists 
   if os.path.isdir(outputDir):
       basf2.B2FATAL('Output directory already exists: ' + outputDir + '. Will abort!')

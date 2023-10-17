@@ -23,6 +23,7 @@ from tracking.secMapTraining.SectorMapTrainingUtils import create_unique_random_
 
 import os
 import argparse
+import shutil
 import basf2 as b2
 
 if __name__ == "__main__": 
@@ -77,6 +78,15 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # check if LSF queue is attached, if not FATAL out
+    if shutil.which("bsub") is None:
+        b2.B2FATAL('Sorry this script assumes an attached LSF queue (e.g. at KEKcc). Please switch \
+          to a system with LSF or you need to adjust the script.')
+
+    # check if the output directory exists 
+    if not os.path.isdir(args.outputDir):
+        b2.B2FATAL('Output directory ' + args.outputDir + ' does not exist. Create it to proceed!')
+    
     # 2500 seeds (with nevts=4000 : 10Mio {Y(4S)+uniform muon particlegun} evts)
     rndseeds_BB= create_unique_random_numbers(n=args.nBBbar,random_seed=12345)
 
@@ -84,9 +94,6 @@ if __name__ == "__main__":
     rndseeds_BhaBha= create_unique_random_numbers(n=args.nBhaBha,random_seed=54321)
 
 
-    # check if the output directory exists 
-    if not os.path.isdir(args.outputDir):
-        b2.B2FATAL('Output directory ' + args.outputDir + ' does not exist. Create it to proceed!')
     
     
     

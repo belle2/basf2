@@ -35,11 +35,32 @@ DQMHistAnalysisTrackingHLTModule::DQMHistAnalysisTrackingHLTModule()
   setDescription("DQM Analysis Module of the Tracking HLT Plots.");
 
   addParam("failureRateThreshold", m_failureRateThreshold,
-           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red", double(m_failureRateThreshold));
-  addParam("minNoEvents", m_statThreshold, "Minimum Number of Events before scaring CR shifters", int(m_statThreshold));
+           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red. Will be taken from Epics by default, \
+    this value is only taken if Epics is not available!", double(m_failureRateThreshold));
+  addParam("minNoEvents", m_statThreshold,
+           "Minimum Number of Events before scaring CR shifters. Will be taken from Epics by default, \
+    this value is only taken if Epics is not available!", int(m_statThreshold));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(m_printCanvas));
 
 }
+
+
+
+void DQMHistAnalysisTrackingHLTModule::beginRun()
+{
+  // get the abort rate and statThreshold from epics
+  double buffThreshold(NAN);
+  double buffMinEvents(NAN);
+  double dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, dummy_upperAlarm;
+
+  requestLimitsFromEpicsPVs("failureRateThreshold", dummy_lowerAlarm, dummy_lowerWarn, buffThreshold, dummy_upperAlarm);
+  requestLimitsFromEpicsPVs("minNoEvent",           dummy_lowerAlarm, buffMinEvents, dummy_upperWarn, dummy_upperAlarm);
+
+  if (!std::isnan(buffThreshold)) m_failureRateThreshold = buffThreshold;
+  if (!std::isnan(buffMinEvents)) m_statThreshold = buffMinEvents;
+
+}
+
 
 void DQMHistAnalysisTrackingHLTModule::initialize()
 {
@@ -52,6 +73,9 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   // add MonitoringObject
   m_monObj = getMonitoringObject("trackingHLT");
 
+  // register the PVs for setting thresholds
+  registerEpicsPV("TRACKING:failureRateThreshold", "failureRateThreshold");
+  registerEpicsPV("TRACKING:minNoEvent", "minNoEvent");
 }
 
 void DQMHistAnalysisTrackingHLTModule::event()

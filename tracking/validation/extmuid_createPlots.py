@@ -89,7 +89,7 @@ def draw_exthits(file_chain):
     Draw the ExtHit-related distributions.
     """
 
-    contact_mail = "giacomo.pietro@kit.edu"
+    contact_mail = CONTACT_PERSON["Email"]
 
     # NOTE: *.Draw() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     detectorID = TH1F('DetectorID', 'Detector ID for ExtHits', 8, -0.5, 7.5)
@@ -221,7 +221,7 @@ def draw_likelihoods(file_chain):
     Draw the Muid likelihood-based distributions.
     """
 
-    contact_mail = "giacomo.pietro@kit.edu"
+    contact_mail = CONTACT_PERSON["Email"]
 
     outcome = TH1F('Outcome', 'Outcome', 5, -0.5, 4.5)
 

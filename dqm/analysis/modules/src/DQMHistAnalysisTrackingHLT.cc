@@ -54,11 +54,16 @@ void DQMHistAnalysisTrackingHLTModule::beginRun()
   double dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, dummy_upperAlarm;
 
   requestLimitsFromEpicsPVs("failureRateThreshold", dummy_lowerAlarm, dummy_lowerWarn, buffThreshold, dummy_upperAlarm);
-  requestLimitsFromEpicsPVs("minNoEvent",           dummy_lowerAlarm, buffMinEvents, dummy_upperWarn, dummy_upperAlarm);
+  requestLimitsFromEpicsPVs("minNoEvents",          dummy_lowerAlarm, buffMinEvents, dummy_upperWarn, dummy_upperAlarm);
 
-  if (!std::isnan(buffThreshold)) m_failureRateThreshold = buffThreshold;
-  if (!std::isnan(buffMinEvents)) m_statThreshold = buffMinEvents;
-
+  if (!std::isnan(buffThreshold)) {
+    B2INFO(getName() << ": Setting failure rate threshold from EPICS. New failureRateThreshold " << buffThreshold);
+    m_failureRateThreshold = buffThreshold;
+  }
+  if (!std::isnan(buffMinEvents)) {
+    B2INFO(getName() << ": Setting min number of events threshold from EPICS. New minNoEvents " << buffMinEvents);
+    m_statThreshold = buffMinEvents;
+  }
 }
 
 
@@ -75,14 +80,13 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
 
   // register the PVs for setting thresholds
   registerEpicsPV("TRACKING:failureRateThreshold", "failureRateThreshold");
-  registerEpicsPV("TRACKING:minNoEvent", "minNoEvent");
+  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents");
 }
 
 void DQMHistAnalysisTrackingHLTModule::event()
 {
 
   //check Tracking Abort Rate
-
   TH1* hAbort = findHist("TrackingHLTDQM/NumberTrackingErrorFlags");
   if (hAbort != nullptr) {
 

@@ -12,11 +12,11 @@
 #include <string>
 
 namespace Belle2 {
-  class SharedMem {
+  class DqmSharedMem {
   public:
-    SharedMem(const char* name, int size);
-    SharedMem(int shm_id, int sem_id, int size);
-    ~SharedMem(void);
+    DqmSharedMem(const char* name, int size);
+    DqmSharedMem(int shm_id, int sem_id, int size);
+    ~DqmSharedMem(void);
 
     void* ptr(void);
     int shmid(void);
@@ -32,6 +32,7 @@ namespace Belle2 {
 
   private:
     bool m_new{false}; /**< True if we created the ring buffer ourselves (and need to clean it). */
+    int  m_pathfd; /** Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key */
 

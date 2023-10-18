@@ -58,9 +58,9 @@ void DQMHistAnalysisInputModule::initialize()
     if (m_memname != "") {
       m_shm_id = -1;
       m_sem_id = -1;
-      auto pathname = SharedMem::getTmpFileName(m_username, m_memname);
+      auto pathname = DqmSharedMem::getTmpFileName(m_username, m_memname);
       B2INFO("Open HistMemoryName for user " << m_username << " Name " << m_memname << " Path " << pathname);
-      if (!SharedMem::getIdFromTmpFileName(pathname, m_shm_id, m_sem_id)) {
+      if (!DqmSharedMem::getIdFromTmpFileName(pathname, m_shm_id, m_sem_id)) {
         B2FATAL("Could not open shared memory user " << m_username << " Name " << m_memname);
       }
     }

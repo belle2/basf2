@@ -13,7 +13,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-class TProfile;
 class TH1F;
 
 namespace Belle2 {

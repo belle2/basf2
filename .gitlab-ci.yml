@@ -27,11 +27,11 @@ workflow:
     # - we force the pipeline
     # Moreover, the pipelines are redirected to the runners extagent4 or extagent8
     # according to some rules defined below
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_ID =~ /[02468]$/  # merge request event and even merge request ID
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[02468]$/  # merge request event and even merge request ID
       variables:
         GITLAB_RUNNER: "extagent4"
       when: always
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_ID =~ /[13579]$/  # merge request event and odd merge request ID
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_IID =~ /[13579]$/  # merge request event and odd merge request ID
       variables:
         GITLAB_RUNNER: "extagent8"
       when: always

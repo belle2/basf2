@@ -14,6 +14,7 @@ variables:
   GITLAB_BELLE2_EXTERNALS_TOPDIR: "/belle2/externals"
   GITLAB_IS_FIRST_STAGE: "no"
   GITLAB_FORCE_RUNNING_PIPELINE: "no"
+  GITLAB_RUNNER: "extagent4"
   # Define cvmfs as source for conditions metadata
   BELLE2_CONDB_METADATA: "/cvmfs/belle.cern.ch/conditions/database.sqlite"
   # The other BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
@@ -61,9 +62,32 @@ default:
 
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/
-    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
+    # We run the pipeline only if:
+    # - it is a merge request event
+    # - it is a merge commit in the main, release or upgrade branch
+    # - we force the pipeline
+    # Moreover, the pipelines are redirected to the runners extagent4 or extagent8
+    # according to some rules defined below
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_ID =~ /[02468]$/  # merge request event and even merge request ID
+      variables:
+        GITLAB_RUNNER: "extagent4"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_ID =~ /[13579]$/  # merge request event and odd merge request ID
+      variables:
+        GITLAB_RUNNER: "extagent8"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in main branch
+      variables:
+        GITLAB_RUNNER: "extagent4"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/  # merge commit in release or upgrade branch
+      variables:
+        GITLAB_RUNNER: "extagent8"
+      when: always
+    - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'  # forced pipeline
+      variables:
+        GITLAB_RUNNER: "extagent4"
+      when: always
 
 prepare-pipeline:
   stage: prepare-pipeline
@@ -71,6 +95,7 @@ prepare-pipeline:
   variables:
     GITLAB_IS_FIRST_STAGE: "yes"
   script:
+    - echo "$GITLAB_RUNNER $CI_MERGE_REQUEST_ID"
     - echo "stage start time -> $(date +%H:%M:%S)"
     # Identify the current HEAD of the target branch and cache it
     - |

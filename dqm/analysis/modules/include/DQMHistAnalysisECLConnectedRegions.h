@@ -22,15 +22,16 @@ namespace Belle2 {
    * This module is for analysis of ECL DQM histograms.
    */
 
-  class DQMHistAnalysisECLClustersModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
+  class DQMHistAnalysisECLConnectedRegionsModule final : public
+    DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
   public:
 
     /** Constructor. */
-    DQMHistAnalysisECLClustersModule();
+    DQMHistAnalysisECLConnectedRegionsModule();
 
     /** Destructor. */
-    ~DQMHistAnalysisECLClustersModule() {};
+    ~DQMHistAnalysisECLConnectedRegionsModule() {};
 
     /** Initialize the module. */
     void initialize() override final;
@@ -48,10 +49,10 @@ namespace Belle2 {
     /** Prefix to use for PVs registered by this module */
     std::string m_pvPrefix;
 
-    /** Number of bad ECL Clusters */
-    double m_badClustersNumber = 0;
-    /** Average number of crestals in ECL Clusters */
-    double m_avgClusterCrystalsNum = 0;
+    /** Average number of crystals in largest ECL CR */
+    double m_largestCRAvgCrystalsNum = 0;
+    /** Average number local maximum in largest ECL CR */
+    double m_largestCRLocalMaxNum = 0;
     /**< monitoring object */
     MonitoringObject* m_monObj = nullptr;
     /**< main panel for monitoring object */

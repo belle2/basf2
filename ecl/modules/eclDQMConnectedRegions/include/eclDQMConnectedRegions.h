@@ -21,12 +21,12 @@ namespace Belle2 {
   /**
    * This module is created to monitor ECL Data Quality.
    */
-  class ECLDQMClustersModule : public HistoModule {  /**< derived from HistoModule class. */
+  class ECLDQMConnectedRegionsModule : public HistoModule {  /**< derived from HistoModule class. */
 
   public:
 
     /** Constructor. */
-    ECLDQMClustersModule();
+    ECLDQMConnectedRegionsModule();
 
     /** Initialize the module. */
     virtual void initialize() override;
@@ -39,14 +39,10 @@ namespace Belle2 {
 
   private:
 
-    /** Histogram to hold average number of crystals in Clusters */
-    TProfile* m_CrystalsInClustersHistogram;
-    /** Histogram to hold number of bad Clusters */
-    TProfile* m_BadClustersHistogram;
-    /** Histogram to hold crystals distribution in ECL Clusters */
-    TH1F* m_ClustersCrystalsNumHistogram;
-    /** Crystals number threshold */
-    int m_BadCrystalsThreshold;
+    /** Histogram to hold number of crystals in largest ECL connected region */
+    TH1F* m_largestCRCrystalsNum;
+    /** Histogram to hold number of local maximum in ECL connected region */
+    TH1F* m_largestCRLocalMaxNum;
     /** Histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
   };

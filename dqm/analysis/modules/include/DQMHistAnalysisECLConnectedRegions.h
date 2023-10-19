@@ -53,7 +53,7 @@ namespace Belle2 {
     double m_largestCRAvgCrystalsNum = 0;
     /** Average number local maximum in largest ECL CR */
     double m_largestCRLocalMaxNum = 0;
-    /**< monitoring object */
+    /** monitoring object */
     MonitoringObject* m_monObj = nullptr;
   };
 } // end namespace Belle2

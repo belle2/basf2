@@ -386,10 +386,66 @@ def upload_file_gitlab(
     return uploaded_file
 
 
+def parse_contact(
+        contact: str,
+        map_file: str,
+        gitlab_object: gitlab.Gitlab
+) -> List[str]:
+    """
+    Parse string to find email id(s) and then match them with their Gitlab ids
+    using the userid map.
+
+    Returns :
+        list of Gitlab IDs
+    """
+
+    email_regex = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*"
+                             r"|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9="
+                             r"?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]"
+                             r"*])"
+                             )
+    email_ids = re.finditer(email_regex, contact)
+    gitlab_ids = []
+
+    try:
+        with open(map_file, 'r') as f:
+            id_map = f.readlines()
+    except FileNotFoundError:
+        logging.exception(
+            f"{map_file} couldn't be found. Did you get the location right?"
+        )
+        return gitlab_ids
+
+    for email in email_ids:
+        try:
+            match = next(
+                (line for line in id_map if email.group() in line), None
+            )
+            username = match.split(' ')[1].rstrip()
+            gitlab_ids.append(gitlab_object.users.list(username=username)[0].id)
+        except IndexError:
+            logging.error(
+                f"Map info {match} does not match the required format for map "
+                "'email gitlab_username'."
+            )
+            continue
+        # to-do: warning if gitlab user doesn't exist
+
+    logging.info(
+        "Issue will be assigned to "
+        f"{[gitlab_object.users.get(id) for id in gitlab_ids]}."
+    )
+
+    # to-do: add comment/note if no ids matched
+
+    return gitlab_ids
+
+
 def create_gitlab_issue(
     title: str,
     description: str,
     uploaded_file: Dict[str, str],
+    assignees: List[int],
     package: str,
     project: 'gitlab.project'
 ) -> str:
@@ -409,6 +465,8 @@ def create_gitlab_issue(
         {"body": "View the [error plot/log file]({}).".format(
             uploaded_file["url"])}
     )
+
+    issue.assignee_ids = assignees
 
     issue.save()
 
@@ -515,7 +573,7 @@ class ValidationRoot:
 
     """
 
-    def __init__(self, working_folder, gitlab_object, gitlab_config):
+    def __init__(self, working_folder, gitlab_object, gitlab_config, gitlab_map):
         """
         class initializer, which takes the path to the folders containing the
         validation run results and plots (aka comparison), gitlab object and
@@ -539,10 +597,15 @@ class ValidationRoot:
         #: Gitlab config
         self.gitlab_config = gitlab_config
 
+        # Gitlab usermap
+        self.gitlab_map = gitlab_map
+
         #: placeholder variable for path
         self.file_path = None
         #: placeholder variable for revision label
         self.revision_label = None
+        #: placeholder variable for contact
+        self.contact = None
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -784,6 +847,12 @@ class ValidationRoot:
         # Create issue in the Gitlab project and save it
         project = get_project_object(self.gitlab_object, project_id)
         uploaded_file = upload_file_gitlab(self.file_path, project)
+        assignees = []
+        print(f"Contact:{self.contact}")
+        if self.gitlab_map:
+            assignees = parse_contact(
+                self.contact, self.gitlab_map, self.gitlab_object
+            )
         file_name = self.file_path.split("/")[-1].split(".log")[0]
         file_package = self.file_path.split("/")[-2]
         description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
@@ -794,7 +863,7 @@ class ValidationRoot:
             issue_type
         )
         issue_id = create_gitlab_issue(
-            title, description, uploaded_file, file_package, project
+            title, description, uploaded_file, assignees, file_package, project
         )
         project.save()
 
@@ -826,7 +895,7 @@ class ValidationRoot:
         )
 
     @cherrypy.expose
-    def issue(self, file_path, rev_label):
+    def issue(self, file_path, rev_label, contact):
         """
         Return a template issue creation interface
         for the user to add title and description.
@@ -836,6 +905,7 @@ class ValidationRoot:
         )
 
         self.revision_label = rev_label
+        self.contact = contact
 
         if not self.gitlab_object:
             return "ERROR: Gitlab integration not set up, verify config file."
@@ -946,6 +1016,13 @@ def get_argument_parser():
         help="Run in production environment: "
         "no log/error output via website and no auto-reload",
         action="store_true",
+    )
+    parser.add_argument(
+        "-u",
+        "--usermap",
+        help="Path of file containing <email gitlab_username> map.",
+        type=str,
+        default=None,
     )
 
     return parser
@@ -1108,6 +1185,7 @@ def run_server(
         port = int(cmd_arguments.port)
         open_site = cmd_arguments.view
         production_env = cmd_arguments.production
+        usermap_file = cmd_arguments.usermap
 
     cherrypy.config.update(
         {
@@ -1129,6 +1207,7 @@ def run_server(
         # gitlab toggle
         gitlab_object = None
         gitlab_config = None
+        gitlab_map = None
         if not os.path.exists(config_path):
             logging.warning(
                 "ERROR: Expected to find config folder with Gitlab config,"
@@ -1140,12 +1219,17 @@ def run_server(
             gitlab_object = create_gitlab_object(config_path)
             if gitlab_object:
                 update_linked_issues(gitlab_object, cwd_folder)
+                gitlab_map = usermap_file
+                logging.info(
+                    f"{gitlab_map} will be used to assign isues."
+                )
 
         cherrypy.quickstart(
             ValidationRoot(
                 working_folder=cwd_folder,
                 gitlab_object=gitlab_object,
                 gitlab_config=gitlab_config,
+                gitlab_map=gitlab_map,
             ),
             "/",
             cherry_config,

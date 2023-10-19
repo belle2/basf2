@@ -55,8 +55,6 @@ namespace Belle2 {
     double m_largestCRLocalMaxNum = 0;
     /**< monitoring object */
     MonitoringObject* m_monObj = nullptr;
-    /**< main panel for monitoring object */
-    TCanvas* m_c_main = nullptr;
   };
 } // end namespace Belle2
 

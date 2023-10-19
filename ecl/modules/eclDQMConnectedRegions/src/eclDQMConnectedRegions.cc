@@ -30,7 +30,7 @@ ECLDQMConnectedRegionsModule::ECLDQMConnectedRegionsModule()
   : HistoModule()
 {
   //Set module properties.
-  setDescription("ECL Data Quality Monitor to monitor ECL clusters");
+  setDescription("ECL Data Quality Monitor to monitor ECL Connected Regions");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify parallel processing.
 
   addParam("histogramDirectoryName", m_histogramDirectoryName,

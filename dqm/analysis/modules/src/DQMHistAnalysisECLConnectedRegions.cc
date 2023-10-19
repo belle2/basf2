@@ -22,7 +22,7 @@ DQMHistAnalysisECLConnectedRegionsModule::DQMHistAnalysisECLConnectedRegionsModu
   B2DEBUG(20, "DQMHistAnalysisECLConnectedRegions: Constructor done.");
 
   addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
-           std::string("DQM:ECL:"));
+           std::string("ECL:"));
 }
 
 void DQMHistAnalysisECLConnectedRegionsModule::initialize()

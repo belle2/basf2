@@ -6,6 +6,9 @@ stages:
   - build-doc
 
 variables:
+  # GitLab CI variables
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 0
   # GitLab specific variables
   GITLAB_BELLE2_TOOLS_B2SETUP: "/cvmfs/belle.cern.ch/tools/b2setup"
   GITLAB_BELLE2_EXTERNALS_TOPDIR: "/belle2/externals"
@@ -18,7 +21,7 @@ variables:
 default:
   image: belle2/externals-ubuntu2004:v01-12-01
   tags:
-    - extagent8
+    - extagent4
   cache:
     key: $CI_COMMIT_REF_SLUG
     paths:

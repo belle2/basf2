@@ -14,6 +14,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
@@ -168,6 +169,9 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_strip3CountV = new TH1F*[nSVDSensors];
   m_strip6CountU = new TH1F*[nSVDSensors];
   m_strip6CountV = new TH1F*[nSVDSensors];
+
+  m_stripCountGroupId0U = new TH1F*[nSVDSensors];
+  m_stripCountGroupId0V = new TH1F*[nSVDSensors];
 
   m_onlineZSstripCountU = new TH1F*[nSVDSensors];
   m_onlineZSstripCountV = new TH1F*[nSVDSensors];
@@ -632,6 +636,23 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_onlineZSstrip6CountV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_onlineZSstrip6CountV[i]);
 
+
+    //----------------------------------------------------------------
+    // Strips Counts for cluster time group id = 0
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_StripCountGroupId0U") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated NumberFired U-Strip for group Id = 0 vs Strip Number") % sensorDescr);
+    m_stripCountGroupId0U[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_stripCountGroupId0U[i]->GetXaxis()->SetTitle("cellID");
+    m_stripCountGroupId0U[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripCountGroupId0U[i]);
+    name = str(format("SVDDQM_%1%_StripCountGroupId0V") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of Fired V-Strip for group Id = 0 vs Strip Number") % sensorDescr);
+    m_stripCountGroupId0V[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_stripCountGroupId0V[i]->GetXaxis()->SetTitle("cellID");
+    m_stripCountGroupId0V[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripCountGroupId0V[i]);
+
     //----------------------------------------------------------------
     // Cluster size distribution
     //----------------------------------------------------------------
@@ -803,8 +824,11 @@ void SVDDQMExpressRecoModule::event()
   }
   m_nEvents->Fill(0);
 
-  int nSamples = m_svdEventInfo->getNSamples();
-
+  int nSamples = 0;
+  if (m_svdEventInfo.isValid())
+    nSamples = m_svdEventInfo->getNSamples();
+  else
+    return;
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
@@ -966,8 +990,9 @@ void SVDDQMExpressRecoModule::event()
 
     vector<int> vec = cluster.getTimeGroupId();
     auto minElement = min_element(vec.begin(), vec.end());
+    int groupId  = -1;
     if (vec.size() > 0) {
-      int groupId = *minElement;
+      groupId = *minElement;
 
       if (iLayer == 3) {
         if (m_cluster3TimeGroupId != nullptr) m_cluster3TimeGroupId->Fill(time, groupId);
@@ -1011,6 +1036,13 @@ void SVDDQMExpressRecoModule::event()
 
       if (m_ShowAllHistos == 1)
         if (m_hitMapUCl[index] != nullptr) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
+
+      // groupId for U side
+      if (groupId == 0) {
+        for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
+          if (m_stripCountGroupId0U != nullptr) m_stripCountGroupId0U[index]->Fill(digitIn.getCellID());
+        }
+      }
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE,
@@ -1046,6 +1078,12 @@ void SVDDQMExpressRecoModule::event()
       if (m_ShowAllHistos == 1)
         if (m_hitMapVCl[index] != nullptr) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
 
+      // groupId for V side
+      if (groupId == 0) {
+        for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
+          if (m_stripCountGroupId0V != nullptr) m_stripCountGroupId0V[index]->Fill(digitIn.getCellID());
+        }
+      }
     }
   }
   if (m_additionalPlots) {

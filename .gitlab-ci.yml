@@ -95,7 +95,6 @@ prepare-pipeline:
   variables:
     GITLAB_IS_FIRST_STAGE: "yes"
   script:
-    - echo "$GITLAB_RUNNER $CI_MERGE_REQUEST_IID"
     - echo "stage start time -> $(date +%H:%M:%S)"
     # Identify the current HEAD of the target branch and cache it
     - |

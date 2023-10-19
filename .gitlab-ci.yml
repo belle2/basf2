@@ -1,8 +1,8 @@
 stages:
   - prepare-pipeline
-  - build-clang
-  - run-tests
   - build-gcc
+  - run-tests
+  - build-clang
   - build-doc
 
 variables:
@@ -80,20 +80,21 @@ prepare-pipeline:
       fi
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
-build-clang:
-  stage: build-clang
+build-gcc:
+  stage: build-gcc
   needs: [prepare-pipeline]
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - b2code-option clang
+    - b2code-option opt
     - b2setup
     - scons --no-debuginfo
     - basf2 --info
+    - which root
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 run-tests:
   stage: run-tests
-  needs: [build-clang]
+  needs: [build-gcc]
   artifacts:
     when: always
     reports:
@@ -103,19 +104,18 @@ run-tests:
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - mkdir -p tests_report
-    - b2code-option clang
+    - b2code-option opt
     - b2setup
-    - basf2 --info
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
     - b2test-scripts -j $(nproc) --exclude "framework/tests/foreach.py" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-scripts.xml --timeout 1200
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
-build-gcc:
-  stage: build-gcc
+build-clang:
+  stage: build-clang
   needs: [run-tests]
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - b2code-option opt
+    - b2code-option clang
     - b2setup
     - scons --no-debuginfo
     - basf2 --info
@@ -131,8 +131,7 @@ build-doc:
       - build/html/
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - b2code-option clang
+    - b2code-option opt
     - b2setup
-    - basf2 --info
     - scons --no-debuginfo --sphinx html
     - echo "stage stop time -> $(date +%H:%M:%S)"

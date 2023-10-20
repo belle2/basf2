@@ -30,8 +30,8 @@
 [INFO]  o) creating (anti-)ParticleList with name: B+:other (B-:other)
 [INFO]    -> MDST source: RestOfEvents
 [INFO] Number of ParticleLists to be studied: 1 
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with

@@ -18,8 +18,6 @@
 /* ROOT headers. */
 #include <TDirectory.h>
 #include <TH1F.h>
-#include <TH2F.h>
-#include <TProfile.h>
 
 /* C++ headers. */
 #include <stdexcept>
@@ -60,11 +58,19 @@ void ECLDQMOutOfTimeDigitsModule::defineHisto()
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string key_name = event_type + std::string("_") + ecl_part;
       TString hist_name    = "out_of_time_" + key_name;
-      h_out_of_time[key_name] = new TProfile(hist_name, "", 1, 0, 1);
+      // Max possible value in the histogram is 8736 (=total number of crystals
+      // in ECL), however the overflow over 2000 is not relevant for the
+      // distribution shape.
+      h_out_of_time[key_name] = new TH1F(hist_name, "", 250, 0, 2000);
+
       // Set titles
+      h_out_of_time[key_name]->GetXaxis()->SetTitle("Out-of-time ECLCalDigits");
       TString title = "Out-of-time ECLCalDigits";
-      h_out_of_time[key_name]->GetYaxis()->SetTitle(title);
-      title += " (" + std::string(event_type) + " events)";
+      title += " (";
+      title += ecl_part;
+      title += " of ECL, ";
+      title += event_type;
+      title += " events)";
       h_out_of_time[key_name]->SetTitle(title);
     }
   }
@@ -110,7 +116,7 @@ void ECLDQMOutOfTimeDigitsModule::event()
     auto var = Variable::Manager::Instance().getVariable(var_name);
     if (!var) continue;
     double value =  std::get<double>(var->function(nullptr));
-    h_out_of_time[key_name]->Fill(0.0, value);
+    h_out_of_time[key_name]->Fill(value);
   }
 }
 

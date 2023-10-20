@@ -29,6 +29,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("Modify and analyze the data quality histograms of IP Monitoring");
 
   //Parameter definition
   addParam("HistoName", m_histoName, "Name of Histogram (excl dir)", std::string(""));

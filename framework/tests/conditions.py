@@ -233,6 +233,8 @@ def set_serverlist(serverlist):
     basf2.conditions.metadata_providers = serverlist + [e for e in basf2.conditions.metadata_providers if not e.startswith("http")]
 
 
+os.environ.pop('BELLE2_CONDB_METADATA', None)
+
 # keep timeouts short for testing
 basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5,
                                  stalled_timeout=5, max_retries=3)

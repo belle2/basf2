@@ -19,7 +19,8 @@ namespace Belle2 {
   public:
     /// Initialize the multicast and a data socket of the given type.
     template <int AZMQType>
-    void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress, const std::string& socketName, bool bind);
+    void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress, const std::string& socketAddress,
+                    bool bind);
 
     /// Initialize only the multicast.
     void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress);

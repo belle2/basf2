@@ -17,7 +17,7 @@ Python interface to the ConditionsDB
 
 import os
 import stat
-from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING
+from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING, conditions
 import requests
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
@@ -98,6 +98,22 @@ def get_cdb_authentication_token(path=None):
     # read and return token
     with open(path_to_token) as token_file:
         return token_file.read().strip()
+
+
+def set_cdb_authentication_token(cdb_instance, auth_token=None):
+    """
+    Helper function for setting the CDB authentication token.
+
+    :param cdb_instance: An instance of the ``ConditionsDB`` class.
+    :param auth_token: A CDB authentication token: if ``None``, it is automatically retrieved from the issuing server
+           and then set
+    """
+    if auth_token is not None:
+        cdb_instance.set_authentication_token(auth_token)
+    else:
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
+        cdb_instance.set_authentication_token(token)
 
 
 class BearerAuth(requests.auth.AuthBase):
@@ -213,7 +229,7 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URLS = ["http://belle2db.sdcc.bnl.gov/b2s/rest/"]
+    BASE_URLS = [conditions.default_metadata_provider_url]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""

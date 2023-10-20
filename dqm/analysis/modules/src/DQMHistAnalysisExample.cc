@@ -23,7 +23,8 @@ REG_MODULE(DQMHistAnalysisExample);
 DQMHistAnalysisExampleModule::DQMHistAnalysisExampleModule()
   : DQMHistAnalysisModule()
 {
-  //Parameter definition
+  setDescription("Example DQMHistAnalysisModule! with base features");
+
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
   addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));

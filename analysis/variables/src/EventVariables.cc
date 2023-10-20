@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/V0.h>
 
 #include <framework/dataobjects/EventT0.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
@@ -140,6 +141,52 @@ namespace Belle2 {
     {
       StoreArray<Track> tracks;
       return tracks.getEntries();
+    }
+
+    int nV0s(const Particle*)
+    {
+      StoreArray<V0> v0s;
+      return v0s.getEntries();
+    }
+
+    int nValidV0s(const Particle*)
+    {
+      StoreArray<V0> v0s;
+
+      int n = 0;
+      for (int i = 0; i < v0s.getEntries(); i++) {
+        const V0* v0 = v0s[i];
+        if (v0->getTrackFitResults().first->getChargeSign() == v0->getTrackFitResults().second->getChargeSign())
+          continue;
+        n++;
+      }
+
+      return n;
+    }
+
+    int nNeutralECLClusters(const Particle*, const std::vector<double>& hypothesis)
+    {
+      if (hypothesis.size() != 1)
+        B2FATAL("Number of arguments of nNeutralECLClusters must be 1.");
+
+      int hypothesis_int = std::lround(hypothesis[0]);
+      if (hypothesis_int < 1 or hypothesis_int > 2) {
+        B2WARNING("nNeutralECLClusters:: Hypothesis must be 1 (nPhotons) or 2 (NeutralHadron)");
+        return 0;
+      }
+
+      StoreArray<ECLCluster> eclClusters;
+      int nClusters = 0;
+      for (int i = 0; i < eclClusters.getEntries(); i++) {
+        auto cluster = eclClusters[i];
+        if (!cluster->isNeutral())
+          continue;
+
+        if ((hypothesis_int == 1 and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) or
+            (hypothesis_int == 2 and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)))
+          nClusters++;
+      }
+      return nClusters;
     }
 
     int nChargeZeroTrackFits(const Particle*)
@@ -358,17 +405,20 @@ namespace Belle2 {
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
     {
-      int elementI = int(std::lround(element[0]));
-      int elementJ = int(std::lround(element[1]));
+      int elementI = std::lround(element[0]);
+      int elementJ = std::lround(element[1]);
 
-      if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
-        return Const::doubleNaN;
+      bool isOutOfRange = false;
+      if (elementI < 0 || elementI > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("i", elementI));
+        isOutOfRange = true;
       }
-      if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
-        return Const::doubleNaN;
+      if (elementJ < 0 || elementJ > 2) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 2]:" << LogVar("j", elementJ));
+        isOutOfRange = true;
       }
+
+      if (isOutOfRange) return Const::doubleNaN;
 
       static DBObjPtr<BeamSpot> beamSpotDB;
       return beamSpotDB->getCovVertex()(elementI, elementJ);
@@ -902,6 +952,12 @@ namespace Belle2 {
 )DOC","GeV");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] Returns number of KLM clusters in the event.");
+    REGISTER_VARIABLE("nNeutralECLClusters(hypothesis)", nNeutralECLClusters,
+                      "[Eventbased] Returns number of neutral ECL clusters with a given hypothesis, 1:nPhotons, 2:NeutralHadron.");
+    REGISTER_VARIABLE("nV0s", nV0s,
+                      "[Eventbased] Returns number of V0s in the event.");
+    REGISTER_VARIABLE("nValidV0s", nValidV0s,
+                      "[Eventbased] Returns number of V0s consisting of pair of tracks with opposite charges.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] Returns number of MCParticles in the event.");
     REGISTER_VARIABLE("nPrimaryMCParticles", nPrimaryMCParticles,

@@ -406,8 +406,7 @@ def create_gitlab_issue(
                                    "labels": [package, 'validation_issue']})
 
     issue.notes.create(
-        {"body": "View the [error plot/log file]({}).".format(
-            uploaded_file["url"])}
+        {"body": f'View the [error plot/log file]({uploaded_file["url"]}).'}
     )
 
     issue.save()
@@ -440,10 +439,8 @@ def update_gitlab_issue(
         issue_type = 'script'
     issue.notes.create(
         {
-            "body": "Related observation in validation of `{0}` package, `{1}`\
-             {4} in `{2}` build. View the [error plot/log file]({3}).".format(
-                package, name, rev_label, uploaded_file["url"], issue_type
-            )
+            "body": f'Related observation in validation of `{package}` package, `{name}`' +
+            f'{issue_type} in `{rev_label}` build. View the [error plot/log file]({uploaded_file["url"]}).'
         }
     )
 
@@ -786,13 +783,9 @@ class ValidationRoot:
         uploaded_file = upload_file_gitlab(self.file_path, project)
         file_name = self.file_path.split("/")[-1].split(".log")[0]
         file_package = self.file_path.split("/")[-2]
-        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant {2}: {0}\n\n\
-            Revision label: {1}\n\n---".format(
-            file_name,
-            self.revision_label,
-            issue_type
-        )
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n" + \
+                       f"Relevant {issue_type}: {file_name}\n\n" + \
+                       f"Revision label: {self.revision_label}\n\n---"
         issue_id = create_gitlab_issue(
             title, description, uploaded_file, file_package, project
         )

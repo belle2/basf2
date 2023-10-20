@@ -1371,14 +1371,18 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   // Create a new MuidHit and RelationEntry between it and the track.
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (intersection.chi2 >= 0.0) {
-    TVector3 tpos(intersection.position.x(), intersection.position.y(), intersection.position.z());
-    TVector3 tposAtHitPlane(intersection.positionAtHitPlane.x(),
-                            intersection.positionAtHitPlane.y(),
-                            intersection.positionAtHitPlane.z());
-    KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward,
-                                                     intersection.sector,
-                                                     intersection.layer, tpos,
-                                                     tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
+    ROOT::Math::XYZVector tpos(intersection.position.x(),
+                               intersection.position.y(),
+                               intersection.position.z());
+    ROOT::Math::XYZVector tposAtHitPlane(intersection.positionAtHitPlane.x(),
+                                         intersection.positionAtHitPlane.y(),
+                                         intersection.positionAtHitPlane.z());
+    KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode,
+                                                     intersection.inBarrel, intersection.isForward,
+                                                     intersection.sector, intersection.layer,
+                                                     tpos, tposAtHitPlane,
+                                                     extState.tof, intersection.time,
+                                                     intersection.chi2);
     if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,

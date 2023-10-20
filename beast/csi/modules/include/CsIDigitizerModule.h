@@ -115,15 +115,6 @@ namespace Belle2 {
        */
       Signal firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay);
 
-
-      /** Method to use when crystal has two light components
-       * @param _tRatio: For crystal with two light components: ratio fast light / slow light
-       * @param _tFast: For crystal with two light components: fast time constant
-       */
-      //      Signal firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay, double _tRatio, double _tFast);
-
-
-
       /** Realizes the charge integration of the input signal
        *
        * @param _u: The input signal in Volts

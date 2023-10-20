@@ -9,11 +9,11 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond
-
 """ This script includes the core of 'CNN_PID_ECL' module
 
 """
+
+# @cond
 
 import math
 import numpy as np

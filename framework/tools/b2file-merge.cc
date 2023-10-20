@@ -14,13 +14,13 @@
 #include <framework/utilities/KeyValuePrinter.h>
 
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranchElement.h>
 
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -29,7 +29,7 @@
 
 using namespace Belle2;
 namespace po = boost::program_options;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 /** Simple typedef to conveniently define a exp,run,evt structure with a
  * working comparison operator */
@@ -353,7 +353,7 @@ The following restrictions apply:
   }
 
   // we need to set the LFN to the absolute path name
-  outputMetaData->setLfn(fs::absolute(outputfilename, fs::initial_path()).string());
+  outputMetaData->setLfn(fs::absolute(outputfilename).string());
   // and maybe register it in the file catalog
   if(variables.count("add-to-catalog")>0) {
     FileCatalog::Instance().registerFile(outputfilename, *outputMetaData);

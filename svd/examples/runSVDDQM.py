@@ -64,18 +64,21 @@ main.add_module(
     ShaperDigitsIN='SVDShaperDigitsZS5',
     FADCmode=True)
 
-
 # SVD space point
-b2.set_module_parameters(main, 'SVDSpacePointCreator', useDB=False, useSVDGroupInfoIn3Sample=False, useSVDGroupInfoIn6Sample=False)
+b2.set_module_parameters(
+    main,
+    'SVDSpacePointCreator',
+    forceGroupingFromDB=False,
+    useSVDGroupInfoIn3Sample=False,
+    useSVDGroupInfoIn6Sample=False)
 
 # SVD grouping
-main.add_module("SVDTimeGrouping",
-                useDB=False,
-                isEnabledIn6Samples=True,
-                isEnabledIn3Samples=True,
-                maxGroups=20,
-                numberOfSignalGroups=20,
-                formSingleSignalGroup=False)
+b2.set_module_parameters(
+    main,
+    'SVDTimeGrouping',
+    forceGroupingFromDB=False,
+    isEnabledIn6Samples=True,
+    isEnabledIn3Samples=True)
 
 # ** SVD DATA FORMAT - available only with unpacking
 # -> it needs SVDDAQDiagnostic

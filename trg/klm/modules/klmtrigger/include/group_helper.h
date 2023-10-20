@@ -9,15 +9,14 @@
 #ifndef group_helper_h
 #define group_helper_h
 
-
-#include <type_traits>
-#include <unordered_map>
 #include <algorithm>
+#include <cstdint>
+#include <iostream>
 #include <numeric>
-#include <vector>
 #include <tuple>
 #include <type_traits>
-#include <iostream>
+#include <unordered_map>
+#include <vector>
 
 #define let const auto
 #define letref const auto&

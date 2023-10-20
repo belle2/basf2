@@ -11,6 +11,7 @@
 #include <TObject.h>
 #include <vector>
 #include <TF1.h>
+#include <TF2.h>
 
 namespace Belle2 {
   //! The Class for ARICH reconstruction parameters
@@ -35,6 +36,16 @@ namespace Belle2 {
     {
       m_bkgPDF = bkgPDF;
     }
+
+    /**
+     * Set background PDF function with flattening phi correction
+     * @param bkgPhiPDF background PDF f(phi, theta)
+     */
+    void setBackgroundPhiPDF(TF2* bkgPhiPDF)
+    {
+      m_bkgPhiPDF = bkgPhiPDF;
+    }
+
 
     /**
      * Set function for cherenkov angle resolution vs. momentum
@@ -91,6 +102,15 @@ namespace Belle2 {
     }
 
     /**
+     * Get background PDF function (with phi correction)
+     * @return background PDF function - flat with phi dependance
+     */
+    const TF2* getBackgroundPhiPDF() const
+    {
+      return m_bkgPhiPDF;
+    }
+
+    /**
     * Get Cherenkov angle resolution (without smearing due to pad size!) at given track momentum
     * @param momentum track momentum
     * @return cherenkov angle resolution
@@ -128,6 +148,17 @@ namespace Belle2 {
     double getBackgroundPerPad(double th_cer, const std::vector<double>& pars) const;
 
     /**
+    * Get expected number of background hits for pad at given theta at given phi_Cer_trk
+    * (flat background in Cherenkov s)pace
+    * @param th_cer pad theta angle
+    * @param th_cer pad theta angle
+    * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
+    * @return expected number of backgrond hits on pad
+    */
+    double getPhiCorrectedBackgroundPerPad(double fi_cer_trk, double th_cer, const std::vector<double>& pars) const;
+
+
+    /**
      * Get number of expected background hits in ring (0.1<theta<0.5rad by default)
      * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
      * @param minThc inner theta angle of ring
@@ -152,14 +183,16 @@ namespace Belle2 {
 
   private:
 
+    mutable TF2* m_bkgPhiPDF = NULL; /**< background PDF function with phi correction */
     mutable TF1* m_bkgPDF = NULL; /**< background PDF function (function of theta) */
     TF1* m_thcResolution = NULL; /**< cherenkov angle resolution (function of track momentum)*/
     std::vector<float> m_pars; /**< vector of other pdf parameters */
     std::vector<float> m_aerogelFOM; /**< aerogel figure of merit (for photon yield) */
     float m_flatBkgPerPad = 0.0; /**< expected background hits per pad (treated flat over detector surface) */
 
-    ClassDef(ARICHReconstructionPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHReconstructionPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 
 } // namespace
+

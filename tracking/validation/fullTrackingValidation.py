@@ -24,7 +24,6 @@ import basf2
 VALIDATION_OUTPUT_FILE = 'FullTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
-basf2.conditions.prepend_testing_payloads('/afs/desy.de/user/g/giampi/b2tracking10/localdb/database.txt')
 
 basf2.set_random_seed(1337)
 

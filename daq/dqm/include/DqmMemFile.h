@@ -5,12 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef DQM_MEMFILE
-#define DQM_MEMFILE
+#pragma once
 
 #include <string>
 
-#include <daq/rfarm/manager/SharedMem.h>
+#include <daq/dqm/DqmSharedMem.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"
@@ -42,13 +41,12 @@ namespace Belle2 {
     int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& nobjs);
 
   private:
-    SharedMem* m_shm;
+    DqmSharedMem* m_shm;
     TMemFile* m_memfile;
     char* m_buf;
     std::string m_name;
     int m_size;
-    int m_mode;
+    bool m_writeMode;
   };
 }
-#endif
 

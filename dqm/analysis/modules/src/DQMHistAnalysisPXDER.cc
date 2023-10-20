@@ -32,13 +32,13 @@ REG_MODULE(DQMHistAnalysisPXDER);
 
 DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule()
 {
-  //Set module properties
+  // This module CAN NOT be run in parallel!
   setDescription("PXD DQM analysis module for Express Reco ");
+
+  // Set module properties
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDER"));
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
-
-  // NO parallel processing
 }
 
 

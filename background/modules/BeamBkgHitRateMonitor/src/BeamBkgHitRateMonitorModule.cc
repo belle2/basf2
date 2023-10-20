@@ -27,9 +27,9 @@
 #include <framework/utilities/EnvironmentVariables.h>
 
 #include <boost/python.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
@@ -355,7 +355,7 @@ void BeamBkgHitRateMonitorModule::setFileMetaData()
   }
 
   std::string lfn = m_file->GetName();
-  lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+  lfn = std::filesystem::absolute(lfn).string();
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
   if (!format.empty()) {
     auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");

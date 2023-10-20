@@ -10,23 +10,24 @@
 
 #include <framework/logging/Logger.h>
 
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
 #include <random>
 #include <cstring>
+#include <filesystem>
 
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <TMD5.h>
 #include <zlib.h>
 
 using namespace std;
 using namespace Belle2;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 bool FileSystem::fileExists(const string& filename)
 {
@@ -118,7 +119,9 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
   for (auto dir : dirs) {
     if (dir.empty())
       continue;
-    fullpath = (fs::path(dir) / path).string();
+    if (fs::path(path).is_absolute())
+      fullpath = (fs::path(dir) += path).string();
+    else fullpath = (fs::path(dir) / path).string();
     if (fileExists(fullpath)) {
       if (isSymLink(fullpath) or isSymLink(dir))
         return fullpath;
@@ -216,12 +219,18 @@ bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
 
 FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fstream()
 {
-  fs::path filename = fs::temp_directory_path() / fs::unique_path();
-  m_filename = filename.native();
-  open(m_filename.c_str(), mode);
-  if (!is_open()) {
+  char temporaryFileName[] = "/tmp/basf2_XXXXXX";
+  int fileDescriptor = mkstemp(temporaryFileName);
+  if (fileDescriptor == -1) {
     B2ERROR("Cannot create temporary file: " << strerror(errno));
+    return;
   }
+  m_filename = temporaryFileName;
+  open(temporaryFileName, mode);
+  if (!is_open()) {
+    B2ERROR("Cannot open temporary file: " << strerror(errno));
+  }
+  ::close(fileDescriptor);
 }
 
 FileSystem::TemporaryFile::~TemporaryFile()

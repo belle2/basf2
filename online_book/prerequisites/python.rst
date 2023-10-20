@@ -160,7 +160,7 @@ Let's create a python file from terminal and run it
 .. admonition:: Hint
   :class: xhint stacked toggle
 
-  Add the ``import`` command inside your python file using your favourite
+  Add the ``import`` command inside your python file using your favorite
   editor. Previous tutorials introduced the ``nano`` editor to you.
 
 .. admonition:: Solution
@@ -515,7 +515,7 @@ which is a large 2D numpy matrix
 
 However ``to_numpy`` may not be the most visually pleasing (or easy) way to inspect the contents of your dataframe.
 
-A useful feature to quickly summarize your data is to use the ``descibe`` method:
+A useful feature to quickly summarize your data is to use the ``describe`` method:
 
 .. code:: ipython3
 
@@ -916,7 +916,7 @@ The implementation of 2D histograms are often very useful and are easily done:
 
   Note that this also solves the last exercise (we only call ``query`` once).
 
-Finally, Belle II does have an `official plot style <https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally.
+Finally, Belle II does have an `official plot style <https://gitlab.desy.de/belle2/software/belle2style>`_, for plots that are *published* internally and externally.
 You do not need to worry about this at this stage, but keep it in mind.
 
 .. warning::
@@ -942,7 +942,7 @@ Importing the style is as easy as "one, two, ...
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Select your favorit plot from the ``matplotlib`` gallery. Can you generate
+  Select your favorite plot from the ``matplotlib`` gallery. Can you generate
   it in your notebook? Try to modify some properties of the plotting
   (different colors, labels or data).
 

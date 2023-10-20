@@ -193,13 +193,13 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
           return false;
         }
         //change the precision based in FPGA (hls4ml)
-        for (int it = 0; it < warray.size(); it++) {
+        for (uint it = 0; it < warray.size(); it++) {
           if (it < 380)      warray[it] = float_to_fixed(warray[it], 2, 13);
           else if (it < 780) warray[it] = float_to_fixed(warray[it], 1, 13);
           else            warray[it] = float_to_fixed(warray[it], 2, 11);
         }
 
-        for (int it = 0; it < barray.size(); it++) {
+        for (uint it = 0; it < barray.size(); it++) {
           if (it < 20)      barray[it] = float_to_fixed(barray[it], 4, 2);
           else if (it < 40) barray[it] = float_to_fixed(barray[it], 4, 3);
           else           barray[it] = float_to_fixed(barray[it], 0, 2);
@@ -215,6 +215,7 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
 
 float GRLNeuro::float_to_fixed(float num, int m, int n)
 {
+  // integer: 1 bit for sign and others are values
   //Get integer and decimal digits
   int integer_part = num;
   float fractional_part = num - integer_part;
@@ -223,13 +224,22 @@ float GRLNeuro::float_to_fixed(float num, int m, int n)
   fractional_part =  floor(fractional_part * (1 << n)) * (1.0 / (1 << n)) ;
 
   //Remove the overflow of integer bits
-  //int final_integer = 0;
-  //if( m >0 ){
-  // final_integer = (integer_part & ((1 << m) -1)) ;
-  //}
+  int final_integer = 0;
+  if (m > 0) {
+    if (std::abs(integer_part) < ((1 << (m - 1)) - 1)) {
+      final_integer = std::abs(integer_part);
+      final_integer = (final_integer & ((1 << (m - 1)) - 1)) ;
+      final_integer = (integer_part & (1 << (m - 1))) > 0 ? (final_integer) * (-1) : final_integer;
+    } else {
+      final_integer = integer_part;
+      final_integer = (final_integer & ((1 << (m - 1)) - 1)) ;
+      final_integer = (integer_part & (1 << (m - 1))) > 0 ? (final_integer) * (-1) : final_integer;
+    }
+  }
 
-  float final_value = integer_part + fractional_part;
+  float final_value = final_integer  + fractional_part;
   return final_value;
+
 }
 
 float GRLNeuro::mysigmiod(float num)

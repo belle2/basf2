@@ -49,10 +49,6 @@ const int c_TotalSections_per_EKLM_BKLM = 2;
 const int c_MaxSectorID = 7;
 
 
-
-const int c_TotalLayers = 15;
-
-
 constexpr  Subdetector c_BKLM = Subdetector(KLMElementNumbers::c_BKLM);
 constexpr  Subdetector c_EKLM = Subdetector(KLMElementNumbers::c_EKLM);
 

@@ -22,13 +22,13 @@
 
 /* ROOT headers. */
 #include <Math/MinimizerOptions.h>
+#include <Math/Vector3D.h>
 #include <TFile.h>
 #include <TFitResult.h>
 #include <TMinuit.h>
 #include <TROOT.h>
 #include <TString.h>
 #include <TTree.h>
-#include <TVector3.h>
 
 using namespace Belle2;
 using namespace ROOT::Math;
@@ -828,8 +828,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     int iSub = klmChannel.getSubdetector();
 
     for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      TVector3 diffD = TVector3(it->diffDistX, it->diffDistY, it->diffDistZ);
-      h_diff->Fill(diffD.Mag());
+      XYZVector diffD = XYZVector(it->diffDistX, it->diffDistY, it->diffDistZ);
+      h_diff->Fill(diffD.R());
       double timeHit = it->time();
       if (m_useEventT0)
         timeHit = timeHit - it->t0;

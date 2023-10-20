@@ -32,120 +32,119 @@
 
 namespace genfit {
 
-  /** @brief Determinstic Annealing Filter (DAF) implementation.
+/** @brief Determinstic Annealing Filter (DAF) implementation.
+ *
+ * @author Christian H&ouml;ppner (Technische Universit&auml;t M&uuml;nchen, original author)
+ * @author Karl Bicker (Technische Universit&auml;t M&uuml;nchen)
+ *
+ * The DAF is an iterative Kalman filter with annealing. It is capable of
+ * fitting tracks which are contaminated with noise hits. The algorithm is
+ * taken from the references R. Fruehwirth & A. Strandlie, Computer Physics
+ * Communications 120 (1999) 197-214 and CERN thesis: Dissertation by Matthias
+ * Winkler.
+ *
+ * The weights which were assigned to the hits by the DAF are accessible in the MeasurementOnPlane objects
+ * in the KalmanFitterInfo objects.
+ */
+class DAF : public AbsKalmanFitter {
+
+ private:
+
+  DAF(const DAF&);
+  DAF& operator=(genfit::DAF const&);
+
+ public:
+
+  /**
+   * @brief Create DAF. Per default, use KalmanFitterRefTrack as fitter, 
+   * this constructor should be used for additional configuration of the DAF, allows to provide custom parameters
    *
-   * @author Christian H&ouml;ppner (Technische Universit&auml;t M&uuml;nchen, original author)
-   * @author Karl Bicker (Technische Universit&auml;t M&uuml;nchen)
-   *
-   * The DAF is an iterative Kalman filter with annealing. It is capable of
-   * fitting tracks which are contaminated with noise hits. The algorithm is
-   * taken from the references R. Fruehwirth & A. Strandlie, Computer Physics
-   * Communications 120 (1999) 197-214 and CERN thesis: Dissertation by Matthias
-   * Winkler.
-   *
-   * The weights which were assigned to the hits by the DAF are accessible in the MeasurementOnPlane objects
-   * in the KalmanFitterInfo objects.
+   * @param annealingScheme Start and Final temperatures, and number of steps for the annealing scheme
+   * @param minIter Minimum number of iterations for the annealing scheme
+   * @param maxIter Maximum number of iterations for the annealing scheme
+   * @param minIterForPval Minimum number of iterations before checking the convergence by pvalue
+   * @param useRefKalman If false, use KalmanFitter as fitter.
+   * @param deltaPval Threshold value for pvalue convergence criterion
+   * @param deltaWeight Threshold value for weight convergence criterion
+   * @param probCut Probability cut for weight calculation
    */
-  class DAF : public AbsKalmanFitter {
+  DAF(std::tuple<double, double, int> annealingScheme, int minIter, int maxIter, int minIterForPval, bool useRefKalman = true, double deltaPval = 1e-3, double deltaWeight = 1e-3, double probCut = 1e-3);
+  /**
+   * @brief Create DAF. Per default, use KalmanFitterRefTrack as fitter.
+   *
+   * @param useRefKalman If false, use KalmanFitter as fitter.
+   */
+  DAF(bool useRefKalman = true, double deltaPval = 1e-3, double deltaWeight = 1e-3);
+  /**
+   * @brief Create DAF. Use the provided AbsKalmanFitter as fitter.
+   */
+  DAF(AbsKalmanFitter* kalman, double deltaPval = 1e-3, double deltaWeight = 1e-3);
+  ~DAF() {};
 
-  private:
+  //! Process a track using the DAF.
+  void processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool resortHits = false) override;
 
-    DAF(const DAF&);
-    DAF& operator=(genfit::DAF const&);
+  /** @brief Set the probability cut for the weight calculation for the hits.
+   *
+   * By default the cut values for measurements of dimensionality from 1 to 5 are calculated.
+   * If you what to have cut values for an arbitrary measurement dimensionality use
+   * addProbCut(double prob_cut, int maxDim);
+   */
+  void setProbCut(const double prob_cut);
 
-  public:
+  //! Set the probability cut for the weight calculation for the hits for a specific measurement dimensionality.
+  void addProbCut(const double prob_cut, const int measDim);
 
-    /**
-     * @brief Create DAF. Per default, use KalmanFitterRefTrack as fitter,
-     * this constructor should be used for additional configuration of the DAF, allows to provide custom parameters
-     *
-     * @param annealingScheme Start and Final temperatures, and number of steps for the annealing scheme
-     * @param minIter Minimum number of iterations for the annealing scheme
-     * @param maxIter Maximum number of iterations for the annealing scheme
-     * @param minIterForPval Minimum number of iterations before checking the convergence by pvalue
-     * @param useRefKalman If false, use KalmanFitter as fitter.
-     * @param deltaPval Threshold value for pvalue convergence criterion
-     * @param deltaWeight Threshold value for weight convergence criterion
-     * @param probCut Probability cut for weight calculation
-     */
-    DAF(std::tuple<double, double, int> annealingScheme, int minIter, int maxIter, int minIterForPval, bool useRefKalman = true,
-        double deltaPval = 1e-3, double deltaWeight = 1e-3, double probCut = 1e-3);
-    /**
-     * @brief Create DAF. Per default, use KalmanFitterRefTrack as fitter.
-     *
-     * @param useRefKalman If false, use KalmanFitter as fitter.
-     */
-    DAF(bool useRefKalman = true, double deltaPval = 1e-3, double deltaWeight = 1e-3);
-    /**
-     * @brief Create DAF. Use the provided AbsKalmanFitter as fitter.
-     */
-    DAF(AbsKalmanFitter* kalman, double deltaPval = 1e-3, double deltaWeight = 1e-3);
-    ~DAF() {};
+  const std::vector<double>& getBetas() const {return betas_;}
 
-    //! Process a track using the DAF.
-    void processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool resortHits = false) override;
+  /** @brief Configure the annealing scheme.
+   *
+   * Set a start and end temperature and the number of steps. A logarithmic sequence of temperatures will be calculated.
+   * Also sets #minIterations_, #maxIterations_ and #minIterForPval as a function of the number of steps
+   */
+  void setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps);
 
-    /** @brief Set the probability cut for the weight calculation for the hits.
-     *
-     * By default the cut values for measurements of dimensionality from 1 to 5 are calculated.
-     * If you what to have cut values for an arbitrary measurement dimensionality use
-     * addProbCut(double prob_cut, int maxDim);
-     */
-    void setProbCut(const double prob_cut);
+  /** @brief Configure the annealing scheme with custom values of min and max iterations.
+   *
+   * Set a start and end temperature and the number of steps. A logarithmic sequence of temperatures will be calculated.
+   * Also sets #minIterations_ and #maxIterations_ to the values provided instead of values depending on nSteps
+   */
+  void setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps, unsigned int minIter, unsigned int  maxIter);
 
-    //! Set the probability cut for the weight calculation for the hits for a specific measurement dimensionality.
-    void addProbCut(const double prob_cut, const int measDim);
+  void setMaxIterations(unsigned int n) override {maxIterations_ = n; betas_.resize(maxIterations_,betas_.back());}
 
-    const std::vector<double>& getBetas() const {return betas_;}
+  //! If all weights change less than delta between two iterations, the fit is regarded as converged.
+  void setConvergenceDeltaWeight(double delta) {deltaWeight_ = delta;}
 
-    /** @brief Configure the annealing scheme.
-     *
-     * Set a start and end temperature and the number of steps. A logarithmic sequence of temperatures will be calculated.
-     * Also sets #minIterations_, #maxIterations_ and #minIterForPval as a function of the number of steps
-     */
-    void setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps);
+  AbsKalmanFitter* getKalman() const {return kalman_.get();}
 
-    /** @brief Configure the annealing scheme with custom values of min and max iterations.
-     *
-     * Set a start and end temperature and the number of steps. A logarithmic sequence of temperatures will be calculated.
-     * Also sets #minIterations_ and #maxIterations_ to the values provided instead of values depending on nSteps
-     */
-    void setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps, unsigned int minIter, unsigned int  maxIter);
+  virtual void setMaxFailedHits(int val) override {getKalman()->setMaxFailedHits(val);}
 
-    void setMaxIterations(unsigned int n) override {maxIterations_ = n; betas_.resize(maxIterations_, betas_.back());}
+  virtual void setDebugLvl(unsigned int lvl = 1) override {AbsFitter::setDebugLvl(lvl); if (lvl > 1) getKalman()->setDebugLvl(lvl-1);}
 
-    //! If all weights change less than delta between two iterations, the fit is regarded as converged.
-    void setConvergenceDeltaWeight(double delta) {deltaWeight_ = delta;}
+ private:
 
-    AbsKalmanFitter* getKalman() const {return kalman_.get();}
+  /** @brief Calculate and set the weights for the next fitting pass.
+   * Return if convergence is met.
+   * The convergence criterium is the largest absolute change of all weights.
+    */
+  bool calcWeights(Track* trk, const AbsTrackRep* rep, double beta);
 
-    virtual void setMaxFailedHits(int val) override {getKalman()->setMaxFailedHits(val);}
+  int minIterForPval_; //minimum number of iterations before checking pvalue convergence criterion
+  double deltaWeight_; // convergence criterium
+  std::vector<double> betas_;   // Temperatures, NOT inverse temperatures.
+  double chi2Cuts_[7];  // '7' assumes tracks are helices with one
+			// parameter, i.e. we're living in 3D space,
+			// where time may be used in the fit.  Zeroth
+			// entry is not used.
 
-    virtual void setDebugLvl(unsigned int lvl = 1) override {AbsFitter::setDebugLvl(lvl); if (lvl > 1) getKalman()->setDebugLvl(lvl - 1);}
+  std::unique_ptr<AbsKalmanFitter> kalman_;
 
-  private:
+ public:
 
-    /** @brief Calculate and set the weights for the next fitting pass.
-     * Return if convergence is met.
-     * The convergence criterium is the largest absolute change of all weights.
-      */
-    bool calcWeights(Track* trk, const AbsTrackRep* rep, double beta);
+  ClassDefOverride(DAF,2)
 
-    int minIterForPval_; //minimum number of iterations before checking pvalue convergence criterion
-    double deltaWeight_; // convergence criterium
-    std::vector<double> betas_;   // Temperatures, NOT inverse temperatures.
-    double chi2Cuts_[7];  // '7' assumes tracks are helices with one
-    // parameter, i.e. we're living in 3D space,
-    // where time may be used in the fit.  Zeroth
-    // entry is not used.
-
-    std::unique_ptr<AbsKalmanFitter> kalman_;
-
-  public:
-
-    ClassDefOverride(DAF, 2)
-
-  };
+};
 
 }  /* End of namespace genfit */
 /** @} */

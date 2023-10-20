@@ -54,9 +54,6 @@ namespace Belle2 {
     // Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! # of connections
-    int m_num_connections;
-
     //! Receiver Port
     std::vector<int> m_ports;
 

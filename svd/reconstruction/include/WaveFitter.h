@@ -31,7 +31,6 @@ namespace Belle2 {
       /** getValue() returns the value at desired time and time shift.
        * It is normalized to unit amplitude (value at maximum).
        * @param t time at which wave has to be calculated
-       * @param t0 time shift - time when the wave starts to rise from 0
        * @return waveform at time t
        */
       inline double getValue(double t) const

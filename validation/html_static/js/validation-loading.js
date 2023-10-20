@@ -124,7 +124,12 @@ function triggerPopup(itemId) {
  * This function call is triggered by the button under the revisions list
  * "Load custom selection" and sets up the page with the new set of revisions.
  */
-function loadSelectedRevisions() {
+function loadSelectedRevisions(button=false) {
+
+    if (button === true){
+        // Change the dropdown option to Custom
+        $("#prebuilt-select").val('c');
+    }
 
     let revList = getSelectedRevsList();
 
@@ -176,7 +181,7 @@ function setDefaultPrebuildOption(){
 
     let mode = localStorage.getItem(getStorageId("prebuildRevisionDefault"));
     console.debug(`RECOVERED ${mode}`);
-    if (mode == null){
+    if (mode == null || mode == 'c'){
         mode = "rbn";
     }
     // todo: check if this is an allowed mode (since it might since have vanished), else discard!
@@ -390,6 +395,27 @@ function loadCustomSelectionRequired(required){
     }
 }
 
+/**
+ * Display the scriptfiles accordion of the selected revision,
+ * hiding the rest. Also highlight the selected reference button. 
+ */
+function showScriptFiles(revision) {
+    var i;
+    var revisions = document.getElementsByClassName("script_logs");
+    for (i = 0; i < revisions.length; i++) {
+      revisions[i].style.display = "none";
+    }
+    document.getElementById(revision).style.display = "block";
+
+    var buttons = document.getElementsByClassName("button");
+    for (i = 0; i < buttons.length; i++) {
+      buttons[i].style.backgroundColor = '';
+    }
+    document.getElementById('bt_'+revision).style.backgroundColor = '#a09ec2';
+    
+}
+
+
 // ============================================================================
 // Loading
 // ============================================================================
@@ -406,6 +432,7 @@ function updateComparisonData(_comparisonData) {
     // to get information about failed scripts and the
     // log files
     let newestRev = getObjectWithKey(revisionsData["revisions"], "label", getNewestRevision());
+    let revs = getSelectedRevsList();
 
     console.debug(`Newest revision is '${newestRev["label"]}'`);
 
@@ -425,6 +452,7 @@ function updateComparisonData(_comparisonData) {
         for (let index in comparisonData["packages"]) {
             let name = comparisonData["packages"][index]["name"];
             comparisonDataPkg2Index[name] = index;
+            comparisonData["packages"][index]['scriptfiles_dict'] = {};
         }
 
         for (let irev in newestRev["packages"]) {
@@ -442,6 +470,17 @@ function updateComparisonData(_comparisonData) {
 
                 comparisonData["packages"][ipkg]["fail_count"] = failCount;
                 comparisonData["packages"][ipkg]["scriptfiles"] = scriptfiles;
+                // Store all the selected revs' scriptfiles as well,
+                // along with the newestRev's
+                for (let rev of revs) {
+                    if (rev == 'reference') {
+                        continue;
+                    }
+                    let selectedRev = getObjectWithKey(revisionsData["revisions"], "label", rev);
+                    comparisonData["packages"][ipkg]["scriptfiles_dict"][rev] = selectedRev["packages"][irev]["scriptfiles"];
+                }
+                
+
                 // Also store the label of the newest revision as this
                 // is needed to stich together the loading path of
                 // log files
@@ -648,27 +687,13 @@ function loadValidationPlots(packageLoadName="") {
             ractive.observe('show_expert_plots', function () {
                 ractiveValuePreserveSession(ractive, "show_expert_plots");
             });
-
-            // check if an "empty" entry needs to be added to the script accordion
-            if ( $('.failed_script').length > 0) {
-                $("#no_failed_scripts").hide();
-            }
-
-            if ( $('.finished_script').length > 0) {
-                $("#no_finished_scripts").hide();
-            }
-
-            if ( $('.skipped_script').length > 0) {
-                $("#no_skipped_scripts").hide();
-            }
-
         },
         // on teardown
         function (ractive) {
         },
         // on render
         function () {
-            $("#accordion_script_files").accordion({
+            $(".accordion_script_files").accordion({
                 heightStyle: "content"
             });
         },
@@ -844,7 +869,8 @@ function getNewestRevision(index=0) {
     let nightlySelected = false;
     for (let revision of revisionsData["revisions"]){
         let label = revision["label"];
-        if (label.startsWith("nightly")) {
+        if ( ! selectedRevs.includes(label)) continue;
+	if (label.startsWith("nightly")) {
             nightlySelected = true;
         }
     }

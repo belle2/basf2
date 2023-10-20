@@ -18,7 +18,6 @@
 
 #include "framework/pcore/RingBuffer.h"
 
-using namespace Belle2;
 using namespace std;
 
 int main(int argc, char** argv)
@@ -47,7 +46,7 @@ int main(int argc, char** argv)
 
   // remove id file
   char fname[1024];
-  sscanf(fname, "/tmp/SHM%d-SEM%d-RB_%s", argv[1]); //TODO too few args!
+  sprintf(fname, "/tmp/SHM%d-SEM%d-RB_%s", shmid, semid, argv[1]);
   unlink(fname);
 
   return 0;

@@ -999,7 +999,6 @@ namespace Belle2 {
       double rho, phi0, pt, chi2;
       rho = 0;
       phi0 = 0;
-      pt = 0;
       chi2 = 0;
       vector<double>phi2DInvError(5);
       for (unsigned iAx = 0; iAx < 5; iAx++) {

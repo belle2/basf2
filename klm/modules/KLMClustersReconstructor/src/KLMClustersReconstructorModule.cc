@@ -83,7 +83,6 @@ void KLMClustersReconstructorModule::event()
   std::vector<KLMHit2d*> klmHit2ds, klmClusterHits;
   std::vector<KLMHit2d*>::iterator it, it0, it2;
   KLMCluster* klmCluster;
-  ROOT::Math::XYZVector hitPos(0, 0, 0);
   layerHitsBKLM = new int[nLayersBKLM];
   layerHitsEKLM = new int[nLayersEKLM];
   /* Fill vector of 2d hits. */
@@ -129,6 +128,7 @@ void KLMClustersReconstructorModule::event()
       ++it;
 clusterFound:;
     }
+    ROOT::Math::XYZVector clusterPosition{0, 0, 0};
     for (i = 0; i < nLayersBKLM; i++)
       layerHitsBKLM[i] = 0;
     for (i = 0; i < nLayersEKLM; i++)
@@ -140,7 +140,7 @@ clusterFound:;
       if (((*it)->getSubdetector() == (*it0)->getSubdetector() &&
            (*it)->getLayer() == (*it0)->getLayer()) ||
           m_PositionMode == c_FullAverage) {
-        hitPos = hitPos + (*it)->getPosition();
+        clusterPosition = clusterPosition + (*it)->getPosition();
         nHits++;
       }
       if (minTime < 0 || (*it)->getTime() < minTime)
@@ -150,7 +150,7 @@ clusterFound:;
       else
         layerHitsEKLM[(*it)->getLayer() - 1]++;
     }
-    hitPos = hitPos * (1.0 / nHits);
+    clusterPosition = clusterPosition * (1.0 / nHits);
     /* Find innermost layer. */
     nLayers = 0;
     innermostLayer = -1;
@@ -177,14 +177,14 @@ clusterFound:;
     p = klmClusterHits.size() * 0.215;
     /* FIXME: Reimplement time calculation after completion of time calibration.
     } else {
-      v = hitPos.Mag() / minTime / Const::speedOfLight;
+      v = clusterPosition.R() / minTime / Const::speedOfLight;
       if (v < 0.999999)
         p = mass * v / sqrt(1.0 - v * v);
       else
         p = 0;
     }*/
     klmCluster = m_KLMClusters.appendNew(
-                   hitPos.X(), hitPos.Y(), hitPos.Z(), minTime, nLayers,
+                   clusterPosition.X(), clusterPosition.Y(), clusterPosition.Z(), minTime, nLayers,
                    innermostLayer, p);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it)
       klmCluster->addRelationTo(*it);

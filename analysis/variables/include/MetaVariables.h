@@ -539,5 +539,10 @@ namespace Belle2 {
      */
     Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments);
 
+    /**
+     * return number of TrackFitResults for a given particleTyle
+     */
+    Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments);
+
   }
 }

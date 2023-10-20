@@ -34,8 +34,6 @@
 
 using namespace Belle2;
 
-const unsigned long long GB = 1000 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 2 * GB;
 const char* g_table = "datafiles";
 unsigned int g_streamersize = 0;
 char* g_streamerinfo = new char[1000000];
@@ -248,7 +246,7 @@ int main(int argc, char** argv)
   if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
-  unsigned long long nbyte_out = 0;
+  unsigned long long nbyte_out [[maybe_unused]] = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
@@ -331,14 +329,6 @@ int main(int argc, char** argv)
         continue;
       }
       if (file) {
-        /*
-              if (nbyte_out > MAX_FILE_SIZE) {
-                file.close();
-                nbyte_out = 0;
-                file.open(path, ndisks, expno, runno, fileid);
-                fileid++;
-              }
-        */
         file.write((char*)evtbuf, nbyte);
         nbyte_out += nbyte;
         if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {

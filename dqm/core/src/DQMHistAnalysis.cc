@@ -35,6 +35,7 @@ DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedL
 bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
 bool DQMHistAnalysisModule::m_epicsReadOnly =
   false; // special for second "online" use (reading limits). default to false, to enable EPICS, add special EPICS Module parameter
+std::string DQMHistAnalysisModule::m_PVPrefix = "TEST:"; // default to "TEST:", for production, set in EPICS enabler to e.g. "DQM:"
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
@@ -260,6 +261,11 @@ void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
   s_canvasUpdatedList[name] = updated;
 }
 
+void DQMHistAnalysisModule::UpdateCanvas(TCanvas* c, bool updated)
+{
+  if (c) UpdateCanvas(c->GetName(), updated);
+}
+
 void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
 {
   s_runType = "";
@@ -285,7 +291,7 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
 }
 
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname, bool update_pvs)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -301,9 +307,10 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   m_epicsChID.emplace_back();
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(pvname.data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
+  // the subscribed name includes the prefix, the map below does *not*
+  SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;
@@ -361,6 +368,53 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
 #endif
 }
 
+double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
+{
+  double value{NAN};
+  if (!m_useEpics) return value;
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return value;
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    return value;
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return NAN;
+}
+
+double DQMHistAnalysisModule::getEpicsPV(int index)
+{
+  double value{NAN};
+  if (!m_useEpics) return value;
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return value;
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    return value;
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return NAN;
+}
+
+
 chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
 {
 #ifdef _BELLE2_EPICS
@@ -409,4 +463,51 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
     m_epicsNameToChID.clear();
   }
 #endif
+}
+
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(std::string name, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                                      double& upperAlarm)
+{
+  return requestLimitsFromEpicsPVs(getEpicsPVChID(name), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
+}
+
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(int index, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                                      double& upperAlarm)
+{
+  return requestLimitsFromEpicsPVs(getEpicsPVChID(index), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
+}
+
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                                      double& upperAlarm)
+{
+  // get warn and error limit only if pv exists
+  // overwrite only if limit is defined (not NaN)
+  // user should initilize with NaN before calling, unless
+  // some "default" values should be set otherwise
+  if (pv != nullptr) {
+    struct dbr_ctrl_double tPvData;
+    // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+    // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+    // outstanding get requests are not automatically reissued following reconnect.
+    auto r = ca_get(DBR_CTRL_DOUBLE, pv, &tPvData);
+    if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+    if (r == ECA_NORMAL) {
+      if (!std::isnan(tPvData.lower_alarm_limit)) {
+        lowerAlarm = tPvData.lower_alarm_limit;
+      }
+      if (!std::isnan(tPvData.lower_warning_limit)) {
+        lowerWarn = tPvData.lower_warning_limit;
+      }
+      if (!std::isnan(tPvData.upper_warning_limit)) {
+        upperWarn = tPvData.upper_warning_limit;
+      }
+      if (!std::isnan(tPvData.upper_alarm_limit)) {
+        upperAlarm = tPvData.upper_alarm_limit;
+      }
+      return true;
+    } else {
+      SEVCHK(r, "ca_get or ca_pend_io failure");
+    }
+  }
+  return false;
 }

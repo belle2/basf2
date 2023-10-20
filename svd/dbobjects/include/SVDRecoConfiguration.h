@@ -36,6 +36,8 @@ namespace Belle2 {
       , m_assignSVDGroupIn3Samples(false)
       , m_useSVDGroupInfoInSPfor6Samples(false)
       , m_useSVDGroupInfoInSPfor3Samples(false)
+      , m_useSVDSpacePointSNRFractionFor6Samples(false)
+      , m_useSVDSpacePointSNRFractionFor3Samples(false)
     {};
 
     /**
@@ -236,6 +238,32 @@ namespace Belle2 {
      */
     TString get_uniqueID() const {return m_uniqueID;}
 
+    /**
+     * Returns the parameter which turns On/Off usage of SVDSpacePointSNRFractionSelector
+     * in the SVDSpacePointCreator for 3/6-sample acquisition mode
+     */
+    Bool_t useSVDSpacePointSNRFraction(const Int_t& numberOfAcquiredSamples) const
+    {
+      if (numberOfAcquiredSamples == 6)
+        return m_useSVDSpacePointSNRFractionFor6Samples;
+      else if (numberOfAcquiredSamples == 3)
+        return m_useSVDSpacePointSNRFractionFor3Samples;
+      else
+        return false;
+    }
+
+    /**
+     * Set the parameter which turns On/Off usage of SVDSpacePointSNRFractionSelector
+     * in the SVDSpacePointCreator for 3/6-sample acquisition mode
+     */
+    void setUseOfSVDSpacePointSNRFraction(const Int_t& numberOfAcquiredSamples, const Bool_t& state = false)
+    {
+      if (numberOfAcquiredSamples == 3)
+        m_useSVDSpacePointSNRFractionFor3Samples = state;
+      else if (numberOfAcquiredSamples == 6)
+        m_useSVDSpacePointSNRFractionFor6Samples = state;
+    }
+
     /** name of the payload */
     static std::string name;
 
@@ -277,7 +305,12 @@ namespace Belle2 {
     /** Use SVD clusters groupId in SVDSpacePointCreator for 3-sample acquisition mode */
     Bool_t m_useSVDGroupInfoInSPfor3Samples;
 
-    ClassDef(SVDRecoConfiguration, 2); /**< needed by root*/
+    /** Use SVDSpacePointSNRFractionSelector in SVDSpacePointCreator for 6-sample acquisition mode */
+    Bool_t m_useSVDSpacePointSNRFractionFor6Samples;
+    /** Use SVDSpacePointSNRFractionSelector in SVDSpacePointCreator for 3-sample acquisition mode */
+    Bool_t m_useSVDSpacePointSNRFractionFor3Samples;
+
+    ClassDef(SVDRecoConfiguration, 3); /**< needed by root*/
 
   };
 

@@ -128,8 +128,8 @@ namespace Belle2 {
       if (targetvector[4] == 0) {
         continue;
       } // no valid representation found
-      float phi0Target = targetvector[0];
-      float invptTarget = targetvector[1];
+      // float phi0Target = targetvector[0];  // currently unused
+      // float invptTarget = targetvector[1]; // currently unused
       float thetaTarget = targetvector[2];
       float zTarget = targetvector[3];
 

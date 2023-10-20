@@ -446,8 +446,9 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   return NAN;
 }
 
-std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname)
+std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& status)
 {
+  status = false;
   char value[40] = "";
   if (!m_useEpics) return std::string(value);
 #ifdef _BELLE2_EPICS
@@ -461,6 +462,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname)
   auto r = ca_get(DBR_STRING, m_epicsNameToChID[keyname], value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
+    status = true;
     return std::string(value);
   } else {
     SEVCHK(r, "ca_get or ca_pend_io failure");
@@ -469,8 +471,9 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname)
   return std::string(value);
 }
 
-std::string DQMHistAnalysisModule::getEpicsStringPV(int index)
+std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
 {
+  status = false;
   char value[40] = "";
   if (!m_useEpics) return std::string(value);
 #ifdef _BELLE2_EPICS
@@ -484,6 +487,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index)
   auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
+    status = true;
     return std::string(value);
   } else {
     SEVCHK(r, "ca_get or ca_pend_io failure");

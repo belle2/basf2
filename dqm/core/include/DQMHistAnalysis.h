@@ -380,16 +380,18 @@ namespace Belle2 {
     /**
      * Read value from a EPICS PV
      * @param keyname key name (or full PV name) of PV
+     * @param status return status (true on success)
      * @return string value (empty string if non existing)
      */
-    std::string getEpicsStringPV(std::string keyname);
+    std::string getEpicsStringPV(std::string keyname, bool& status);
 
     /**
      * Read value from a EPICS PV
      * @param index index of PV
+     * @param status return status (true on success)
      * @return string value (empty string if non existing)
      */
-    std::string getEpicsStringPV(int index);
+    std::string getEpicsStringPV(int index, bool& status);
 
     /**
      * Update all EPICS PV (flush to network)

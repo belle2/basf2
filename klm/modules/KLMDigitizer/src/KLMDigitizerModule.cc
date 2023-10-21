@@ -150,7 +150,7 @@ bool KLMDigitizerModule::checkActive(KLMChannelNumber channel)
 
 bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
 {
-  if (isnan(efficiency))
+  if (std::isnan(efficiency))
     B2FATAL("Incomplete KLM efficiency data.");
   double selection = gRandom->Rndm();
   return (selection < efficiency);

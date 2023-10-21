@@ -16,7 +16,7 @@ from pathlib import Path
 
 # Import XML Parser. Use C-Version, if available
 try:
-    import xml.etree.ElementTree as XMLTree
+    import xml.etree.cElementTree as XMLTree
 except ImportError:
     import xml.etree.ElementTree as XMLTree
 

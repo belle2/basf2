@@ -1012,8 +1012,7 @@ class GroupByRefiner(Refiner):
                     elif upper_bound == np.inf:
                         groupby_values.append(f"above {lower_bound}")
                     else:
-                        groupby_values.append("between {lower_bound} and {upper_bound}".format(lower_bound=lower_bound,
-                                                                                               upper_bound=upper_bound))
+                        groupby_values.append(f"between {lower_bound} and {upper_bound}")
                 groupby_values.append("is nan")
                 assert len(groupby_values) == len(digitization_cuts) + 1
 

@@ -160,7 +160,7 @@ def statistics_plots(
         h_module_timing.GetListOfFunctions().Add(
             ROOT.TNamed(
                 "Description",
-                """The (average) execution time of the {method_name[method]} method of modules
+                f"""The (average) execution time of the {method_name[method]} method of modules
                 for {job_desc}. The error bars show the rms of the time
                 distributions.""",
             )

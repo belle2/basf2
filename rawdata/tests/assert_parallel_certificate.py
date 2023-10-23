@@ -24,4 +24,4 @@ rawdata.add_unpackers(path)
 modules = path.modules()
 for m in modules:
     assert m.has_properties(
-        basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), f'{m} is missing c_ParallelProcessingCertified flag!'

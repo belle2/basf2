@@ -1228,7 +1228,7 @@ def flavorTagger(
             B2FATAL('Flavor Tagger: ' + category + ' has been already given')
 
     for code in sorted(categoriesCombination):
-        categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
+        categoriesCombinationCode = categoriesCombinationCode + f'{int(code):02}'
 
     # Create default ROE-mask
     if maskName == 'FTDefaultMask':

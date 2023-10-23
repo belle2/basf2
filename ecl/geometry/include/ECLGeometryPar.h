@@ -135,7 +135,7 @@ namespace Belle2 {
       int mPar_thetaID;
       /** The Phi ID information*/
       int mPar_phiID;
-      /** . */
+      /** initial crystal ID */
       int m_ini_cid;
       /** Pointer that saves the instance of this class. */
       static ECLGeometryPar* m_B4ECLGeometryParDB;

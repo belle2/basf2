@@ -33,7 +33,10 @@ REG_MODULE(DQMHistAnalysisPXDFits);
 DQMHistAnalysisPXDFitsModule::DQMHistAnalysisPXDFitsModule()
   : DQMHistAnalysisModule()
 {
-  //Parameter definition
+  // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Raw");
+
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDRAW"));
 //  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));

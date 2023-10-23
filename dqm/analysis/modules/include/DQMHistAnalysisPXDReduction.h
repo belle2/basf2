@@ -14,11 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <vxd/dataobjects/VxdID.h>
 #include <TLine.h>
 
@@ -66,16 +61,14 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     //! low warn limit for alarm
-    double m_lowarnlimit;
+    double m_lowarnlimit{NAN};
     //! low error limit for alarm
-    double m_loerrorlimit;
+    double m_loerrorlimit{NAN};
     //! high warn limit for alarm
-    double m_hiwarnlimit;
+    double m_hiwarnlimit{NAN};
     //! high error limit for alarm
-    double m_hierrorlimit;
+    double m_hierrorlimit{NAN};
     /** Update entry intervall */
     int m_minEntries = 1000;
 
@@ -92,11 +85,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-#ifdef _BELLE2_EPICS
-    //! EPICS PVs
-    std::vector <chid>  mychid;
-#endif
   };
 } // end namespace Belle2
 

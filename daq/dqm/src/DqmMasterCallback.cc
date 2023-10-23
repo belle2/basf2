@@ -51,9 +51,32 @@ DqmMasterCallback::~DqmMasterCallback()
 
 }
 
+void DqmMasterCallback::filedump(TMemFile* memfile, const char* outfile)
+{
+  printf("dump to dqm file = %s\n", outfile);
+
+  TFile* dqmtfile = new TFile(outfile, "RECREATE");
+
+  // Copy all histograms in TFile
+  TIter next(memfile->GetListOfKeys());
+  TKey* key = NULL;
+  while ((key = (TKey*)next())) {
+    TH1* hist = (TH1*)key->ReadObj();
+    printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
+    hist->Write();
+  }
+
+  // Close TFile
+  dqmtfile->Write();
+  dqmtfile->Close();
+
+  delete dqmtfile;
+}
+
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
+  printf("LOAD: runtype %s\n", m_runtype.c_str());
 }
 
 void DqmMasterCallback::start(int expno, int runno)
@@ -92,14 +115,15 @@ void DqmMasterCallback::start(int expno, int runno)
 
   m_sock_hlt->send(msg);
   m_sock_reco->send(msg);
-  delete(msg);
+  delete (msg);
 
-  printf("expno = %d, runno = %d\n", m_expno, m_runno);
+  printf("START: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
   m_running = 1;
 }
 
-void DqmMasterCallback::stop()
+void DqmMasterCallback::stop(void)
 {
+  printf("STOP: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
 
   if (m_running == 0) return;
 
@@ -109,31 +133,14 @@ void DqmMasterCallback::stop()
   //  m_expno = getExpNumber();
   //  m_runno = getRunNumber();
 
-  // Connect TMemFile
-  TMemFile* hlttmem = m_hltdqm->LoadMemFile();
-  TMemFile* erecotmem = m_erecodqm->LoadMemFile();
-
   // Dump HLT DQM
   int proc1 = fork();
   if (proc1 == 0) {
-    //  TMemFile* tmem = m_hltdqm->LoadMemFile();
-    sprintf(outfile, "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
-    TFile* dqmtfile = new TFile(outfile, "RECREATE");
-    printf("HLT dqm file = %s\n", outfile);
-
-    // Copy all histograms in TFile
-    TIter next(hlttmem->GetListOfKeys());
-    TKey* key = NULL;
-    while ((key = (TKey*)next())) {
-      TH1* hist = (TH1*)key->ReadObj();
-      printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-    }
-
-    // Close TFile
-    dqmtfile->Write();
-    dqmtfile->Close();
-    delete dqmtfile;
-    //    delete hlttmem;
+    // Copy ShM and create TMemFile
+    TMemFile* hlttmem = m_hltdqm->LoadMemFile();
+    snprintf(outfile, sizeof(outfile), "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
+    filedump(hlttmem, outfile);
+    //    delete hlttmem; // we die anyway
     exit(0);
   } else if (proc1 < 0) {
     perror("DQMMASTER : fork HLTDQM writing");
@@ -142,25 +149,11 @@ void DqmMasterCallback::stop()
   // Dump ERECO DQM
   int proc2 = fork();
   if (proc2 == 0) {
-    //    TMemFile* tmem = m_erecodqm->LoadMemFile();
-    sprintf(outfile, "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-    //  sprintf(outfile, "hltdqm_e%4.4dr%6.6d.root", m_expno, m_runno);
-    TFile* erdqmtfile = new TFile(outfile, "RECREATE");
-    printf("ERECO dqm file = %s\n", outfile);
-
-    // Copy all histograms in TFile
-    TIter ernext(erecotmem->GetListOfKeys());
-    TKey* erkey = NULL;
-    while ((erkey = (TKey*)ernext())) {
-      TH1* hist = (TH1*)erkey->ReadObj();
-      printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-    }
-
-    // Close TFile
-    erdqmtfile->Write();
-    erdqmtfile->Close();
-    delete erdqmtfile;
-    //    delete erecotmem;
+    // Copy ShM and create TMemFile
+    TMemFile* erecotmem = m_erecodqm->LoadMemFile();
+    snprintf(outfile, sizeof(outfile), "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
+    filedump(erecotmem, outfile);
+    //    delete erecotmem; // we die anyway
     exit(0);
   } else if (proc2 < 0) {
     perror("DQMMASTER : fork ERECODQM writing");
@@ -170,12 +163,9 @@ void DqmMasterCallback::stop()
   int status1, status2;
   waitpid(proc1, &status1, 0);
   waitpid(proc2, &status2, 0);
-
-  //  delete hlttmem;
-  //  delete erecotmem;
 }
 
-void DqmMasterCallback::abort()
+void DqmMasterCallback::abort(void)
 {
   stop();
 }

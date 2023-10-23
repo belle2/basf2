@@ -166,8 +166,15 @@ namespace Belle2 {
     void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
 
     /** Squeeze phi-axis in a 2D (omega,phi) plane
+     * @param writeArray write into this array
+     * @param readArray read from this array
+     * @param outparcels number of 1/32 sectors in output plane
      * @param inparcels number of 1/32 sectors in input plane
-     * @param outparcels number of 1/32 sectors in output plane */
+     * @param ihit hit index
+     * @param iprio prio index
+     * @param itheta theta index
+     * @param nomega number of omega points
+     */
     void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
                     c5elem nomega);
 

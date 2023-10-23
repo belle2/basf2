@@ -14,8 +14,8 @@ with a charged :math:`B` meson pair.
 
 .. seealso:: For a more detailed introduction, take a look at
 
-  * `First flavor tagging calibration using 2019 Belle II data (2008.02707) <https://arxiv.org/abs/2008.02707>`_
-  * `BELLE2-NOTE-PH-2020-013 <https://docs.belle2.org/record/1905>`_
+  * The paper: `B-flavor tagging at Belle II <https://link.springer.com/article/10.1140/epjc/s10052-022-10180-9>`_
+  * The note on calibration using 62.8/fb data collected in 2019 and 2020: `BELLE2-NOTE-PH-2021-001 <https://docs.belle2.org/record/2686>`_
 
 Flavor Tagging Principle
 ------------------------
@@ -302,10 +302,10 @@ An example tutorial for normal use can be found under:
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
 Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_
-at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
+at `GitLab <https://gitlab.desy.de/belle2/software/training/handsonexercises>`_.
 
-Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
-(Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
+Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://gitlab.desy.de/belle2/software/training/b2-starterkit/-/blob/main/B2T_Advanced_3_FlavorTagger.ipynb>`_
+(Jupyter notebook) under the latest `b2-starter-kit <https://gitlab.desy.de/belle2/software/training/b2-starterkit>`_ tutorials.
 
 As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.
 You find them under:
@@ -329,7 +329,7 @@ The convention is BGx0 for no machine background and BGx1 for MC with machine ba
   flavorTaggerVertexingValidation.py
 
 
-If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://stash.desy.de/projects/B2A/repos/flavortaggingvalidation>`_ repository.
+If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://gitlab.desy.de/belle2/data-production/validation/flavortaggingvalidation>`_ repository.
 
 
 Functions

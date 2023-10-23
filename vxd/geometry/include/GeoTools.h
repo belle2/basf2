@@ -275,7 +275,7 @@ namespace Belle2 {
         return getPXDChipIndex(VxdID(layer, ladder, sensor), isU, chip);
       }
 
-      /** Return chipID (VxdID + side and chipNo) for index in the list. .
+      /** Return chipID (VxdID + side and chipNo) for index in the list.
        * @param pxdChipIndex Index in the list of PXD sensors.
        * @return chipID: VxdID + chip number/side encoded in segment part.
        */
@@ -373,7 +373,7 @@ namespace Belle2 {
         return getSVDChipIndex(VxdID(layer, ladder, sensor), isU, chip);
       }
 
-      /** Return chipID (VxdID with side and chipNo) for index in the list. .
+      /** Return chipID (VxdID with side and chipNo) for index in the list.
        * @param svdChipIndex Index in the list of SVD sensors.
        * @return chipID: VxdID with chip number/side encoded in segment part.
        */

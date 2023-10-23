@@ -61,14 +61,14 @@ def populate_avail_samples(
 
 
 def preload_root_data(
-    root_files, features, discarded, global_features=[], use_lcas=False
+    root_files, features, discarded, global_features=[],
 ):
     """Load all data from root files as lazyarrays (not actually read from disk until accessed)
 
     This is intended to make the data in roughly the same format as it is for HDF5.
     Main difference is the missing event key, instead each entry is an array with n_events rows
     x[file_index] = {'event', 'features', 'all_features', 'n_particles'}
-    y[file_index][b_index] = {'n_LCA', 'LCA', 'LCA_leaves', 'semileptonic'}
+    y[file_index][b_index] = {'n_LCA', 'LCA', 'LCA_leaves'}
     """
     x = []
     y = []
@@ -99,11 +99,7 @@ def preload_root_data(
                 # Get this LCA
                 # Need this to reshape the falttened LCA when loading
                 y_dict[i]["n_LCA"] = tree[f"n_LCA_leaves_{i}"].array(library="np")
-                if use_lcas:
-                    y_dict[i]["LCA"] = tree[f"LCAS_{i}"].array(library="np")
-                else:
-                    y_dict[i]["LCA"] = tree[f"LCA_{i}"].array(library="np")
-
+                y_dict[i]["LCA"] = tree[f"LCAS_{i}"].array(library="np")
                 y_dict[i]["LCA_leaves"] = tree[f"LCA_leaves_{i}"].array(library="np")
                 # y_dict[i]["isB"] = tree[f"isB_{i}"].array(library="np")
 

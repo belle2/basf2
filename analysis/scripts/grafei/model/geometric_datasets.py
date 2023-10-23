@@ -2,7 +2,6 @@ import itertools
 from pathlib import Path
 import numpy as np
 import torch
-from .data_utils import pull_down_LCA
 from .tree_utils import masses_to_classes
 from .dataset_utils import populate_avail_samples, preload_root_data
 from .edge_features import compute_edge_features
@@ -70,7 +69,6 @@ def _preload(self):
         self.features,
         self.discarded,
         self.global_features,
-        self.use_lcas,
     )
     print("ROOT data preloaded")
 
@@ -210,11 +208,6 @@ def _process_graph(self, idx):
     # Get the true mcPDG pf FSPs
     y_mass = masses_to_classes(x_item["mc_pdg"][evt][x_rows])
 
-    # Pull down, this assumes the raw LCA does NOT contain secondaries (locs will insert those later)
-    # First need unique elements in LCA
-    if self.pull_down_lca:
-        y_edge = pull_down_LCA(y_edge)
-
     # Get the specificed row/cols, this inserts dummy rows/cols for secondaries
     y_edge = y_edge[locs, :][:, locs]
     # if self.allow_secondaries:
@@ -274,8 +267,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         edge_features=[],
         global_features=[],
         normalize=None,
-        pull_down_lca=False,
-        use_lcas=False,
         overwrite=False,
         **kwargs,
     ):
@@ -304,9 +295,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
 
         self.subset_unmatched = subset_unmatched
 
-        self.use_lcas = use_lcas
-        self.pull_down_lca = pull_down_lca and not use_lcas
-
         self.n_files = n_files
         self.node_features = features
         self.edge_features = edge_features
@@ -314,9 +302,7 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         self.ignore = ignore
         self.samples = samples
 
-        # If we're using LCAS then don't pull-down since the stages correspond to particle types
-        if self.use_lcas:
-            print("Using LCAS format, max depth of 6 equals Ups(4S)")
+        print("Using LCAS format, max depth of 6 equals Ups(4S)")
 
         # Delete processed files, in case
         file_path = Path(self.root, "processed")
@@ -356,8 +342,6 @@ class BelleRecoSetGeometric(Dataset):
         edge_features=[],
         global_features=[],
         normalize=None,
-        pull_down_lca=False,
-        use_lcas=False,
         overwrite=False,
         **kwargs,
     ):
@@ -386,8 +370,6 @@ class BelleRecoSetGeometric(Dataset):
 
         self.subset_unmatched = subset_unmatched
 
-        self.use_lcas = use_lcas
-        self.pull_down_lca = pull_down_lca and not use_lcas
         self.overwrite = overwrite
 
         self.n_files = n_files
@@ -397,9 +379,7 @@ class BelleRecoSetGeometric(Dataset):
         self.ignore = ignore
         self.samples = samples
 
-        # If we're using LCAS then don't pull-down since the stages correspond to particle types
-        if self.use_lcas:
-            print("Using LCAS format, max depth of 6 equals Ups(4S)")
+        print("Using LCAS format, max depth of 6 equals Ups(4S)")
 
         # Delete processed files, in case
         self.file_path = Path(self.root, "processed")

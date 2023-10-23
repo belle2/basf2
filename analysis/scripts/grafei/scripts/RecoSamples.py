@@ -29,9 +29,9 @@ def get_args():
     parser.add_argument('-t', '--type', choices=['B02nunu', 'mixed', 'charged', 'Ups'], required=True,
                         help='Training target', metavar='type',
                         dest='type')
-    parser.add_argument('-b', '--bkg_prob', required=False, default=0., type=float,
-                        help="Choose probability of an event to be constructed as background",
-                        dest='bkg_prob')
+    # parser.add_argument('-b', '--bkg_prob', required=False, default=0., type=float,
+    #                     help="Choose probability of an event to be constructed as background",
+    #                     dest='bkg_prob')
     return parser.parse_args()
 
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     args = get_args()
 
-    assert args.bkg_prob >= 0 and args.bkg_prob <= 1, "Background probability should be in [0, 1]"
+    # assert args.bkg_prob >= 0 and args.bkg_prob <= 1, "Background probability should be in [0, 1]"
 
     # This assumes one input file only
     # Use this to set the output filenames to match the input

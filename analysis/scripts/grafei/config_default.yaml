@@ -3,7 +3,7 @@ dataset:
   inMemory: True
   path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts/ntuples_test # Should contain train/val subdirectories
   config:
-    ups_reco: True
+    ups_reco: False
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
     edge_features: [costheta, doca]
     global_features: null #[nParticles]
@@ -11,7 +11,6 @@ dataset:
     subset_unmatched: True
     # allow_background: False
     pull_down_lca: True  # Whether to ensure contiguous numbers for entries in full LCA
-    use_lcas: True  # Whether to use LCA stages (LCAS) instead of default LCAG
     monitor_tag: 'Validation'  # Which dataset tag to monitor for e.g. checkpointing
     # You can configure simple normalization of features
     # They will be executed in the order given

@@ -212,3 +212,4 @@ path.add_module('Progress')
 if ACTIVE:
     print(path)
     basf2.process(path)
+    print(basf2.statistics)

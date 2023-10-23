@@ -143,7 +143,7 @@ class GeometricNetwork(torch.nn.Module):
                 edge_classes,
                 hidden_layer_dim,
                 hidden_layer_dim,
-                4,
+                1,
                 num_hid_layers,
                 dropout,
                 normalize=None,

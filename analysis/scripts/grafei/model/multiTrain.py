@@ -44,7 +44,7 @@ class MultiTrainLoss(nn.Module):
         alpha_prob=0,
         ignore_index=-1,
         reduction="mean",
-        global_layer=True,
+        global_layer=False,
         edge_weights=None,
         node_weights=None,
     ):
@@ -70,12 +70,10 @@ class MultiTrainLoss(nn.Module):
         ), "Alphas should be positive"
 
     def forward(self, x_input, x_target, edge_input, edge_target, u_input, u_target):
-        # B probability is in position 3 of axis 1
-        prob_input = u_input[:, 3] if self.global_layer else None
-        prob_target = u_target[:, 3]
-        # B momentum is in position 0,1,2 of axis 1
-        p_input = u_input[:, :3] if self.global_layer else None
-        p_target = u_target[:, :3]
+        prob_input = u_input if self.global_layer else None
+        prob_target = u_target
+        # p_input = u_input[:, :3] if self.global_layer else None
+        # p_target = u_target[:, :3]
 
         LCA_loss = self.LCA_CE(
             edge_input,
@@ -100,18 +98,18 @@ class MultiTrainLoss(nn.Module):
             else 0
         )
 
-        momentum_loss = (
-            self.momentum_L1(
-                p_target,
-                p_input,
-            )
-            if self.alpha_momentum > 0
-            else 0
-        )
+        # momentum_loss = (
+        #     self.momentum_L1(
+        #         p_target,
+        #         p_input,
+        #     )
+        #     if self.alpha_momentum > 0
+        #     else 0
+        # )
 
         return (
             LCA_loss
             + self.alpha_mass * mass_loss
             + self.alpha_prob * prob_loss
-            + self.alpha_momentum * momentum_loss
+            # + self.alpha_momentum * momentum_loss
         ) / self.scaling

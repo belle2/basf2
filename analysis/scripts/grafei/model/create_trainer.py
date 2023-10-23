@@ -163,7 +163,7 @@ class GraFEIIgniteTrainer:
                         x[1],
                         x[4],
                         x[6],
-                        x[5][:, 3],
+                        x[5],
                         x[7],
                         x[8],
                     ],
@@ -172,7 +172,7 @@ class GraFEIIgniteTrainer:
                 "perfectMasses_noBkg": PerfectMasses(
                     ignore_index=ignore_index,
                     device=device,
-                    output_transform=lambda x: [x[0], x[3], x[5][:, 3], x[7], x[8]],
+                    output_transform=lambda x: [x[0], x[3], x[5], x[7], x[8]],
                     ignore_background=True,
                 ),
                 "perfectEvent_noBkg": PerfectEvent(
@@ -184,7 +184,7 @@ class GraFEIIgniteTrainer:
                         x[1],
                         x[4],
                         x[6],
-                        x[5][:, 3],
+                        x[5],
                         x[7],
                         x[8],
                     ],
@@ -196,7 +196,7 @@ class GraFEIIgniteTrainer:
                     {
                         "correct_class": IsTrueB(
                             ignore_index=ignore_index,
-                            output_transform=lambda x: [x[2][:, 3], x[5][:, 3], x[8]],
+                            output_transform=lambda x: [x[2], x[5], x[8]],
                             device=device,
                         ),
                         # "momentum_loss": ignite.metrics.Loss(

@@ -25,26 +25,7 @@ FEI_pdg_converter = {
 }
 
 
-def update_levels(levels, hist):
-    """This updates the highest level each node in the decay exists at
-
-    Args:
-        levels (dict): Dictionary with ArrayIndex:max_level
-        hist (list): A leaf's history of ancestor ArrayIndexes up to the root, leaf itself not included.
-    """
-    # Reverse and start enumeration at 1 so the enumeration
-    # number is the level of each node in the history
-    for i, n in enumerate(reversed(hist), 1):
-        if n not in levels:
-            levels[n] = i
-        else:
-            # Want to record the max level a node exists on only
-            levels[n] = max(levels[n], i)
-
-    return levels
-
-
-def update_levels_LCAS(levels, hist, pdg, intermediate_skipped=False):
+def update_levels(levels, hist, pdg, intermediate_skipped=False):
     for i, n in enumerate(hist):
         if n not in levels.keys():
             temp_pdg = abs(
@@ -76,7 +57,7 @@ def write_hist(
     semilep_flag=False,
     electron=False,
     intermediate_skipped=False,
-    LCAS=False,
+    LCAS=True,  # Leftover but it's there in too many places
     save_secondaries=False,
 ):
     """Recursive function to traverse down to the leaves saving the history
@@ -145,13 +126,9 @@ def write_hist(
 
             # And now that we have a full history down to the leaf
             # we can update the levels
-            if LCAS:
-                # print("update LCAS")
-                levels, intermediate_skipped = update_levels_LCAS(
-                    levels, hist, pdg, intermediate_skipped
-                )
-            else:
-                levels = update_levels(levels, hist)
+            levels, intermediate_skipped = update_levels(
+                levels, hist, pdg, intermediate_skipped
+            )
 
     # Here is deciding whether to continue traversing down the decay tree
     # Don't want to do this if all daughters are secondaries and we're not saving them
@@ -169,82 +146,45 @@ def write_hist(
         # Now iterate over daughters passing history down
         daughters = getObjectList(particle.getDaughters())
         for daughter in daughters:
-            if LCAS:
-                (
-                    leaf_hist,
-                    levels,
-                    pdg,
-                    leaf_pdg,
-                    leaf_E,
-                    leaf_theta,
-                    leaf_mother_pdg,
-                    semilep_flag,
-                    electron,
-                    intermediate_skipped,
-                ) = write_hist(
-                    daughter,
-                    leaf_hist,
-                    levels,
-                    hist,
-                    pdg,
-                    leaf_pdg,
-                    leaf_E,
-                    leaf_theta,
-                    leaf_mother_pdg,
-                    semilep_flag,
-                    electron,
-                    intermediate_skipped,
-                    True,
-                )
-            else:
-                (
-                    leaf_hist,
-                    levels,
-                    pdg,
-                    leaf_pdg,
-                    leaf_E,
-                    leaf_theta,
-                    leaf_mother_pdg,
-                    semilep_flag,
-                    electron,
-                ) = write_hist(
-                    daughter,
-                    leaf_hist,
-                    levels,
-                    hist,
-                    pdg,
-                    leaf_pdg,
-                    leaf_E,
-                    leaf_theta,
-                    leaf_mother_pdg,
-                    semilep_flag,
-                    electron,
-                )
-    if LCAS:
-        return (
-            leaf_hist,
-            levels,
-            pdg,
-            leaf_pdg,
-            leaf_E,
-            leaf_theta,
-            leaf_mother_pdg,
-            semilep_flag,
-            electron,
-            intermediate_skipped,
-        )
-    else:
-        return (
-            leaf_hist,
-            levels,
-            pdg,
-            leaf_pdg,
-            leaf_E,
-            leaf_theta,
-            leaf_mother_pdg,
-            semilep_flag,
-            electron,
-        )
+            (
+                leaf_hist,
+                levels,
+                pdg,
+                leaf_pdg,
+                leaf_E,
+                leaf_theta,
+                leaf_mother_pdg,
+                semilep_flag,
+                electron,
+                intermediate_skipped,
+            ) = write_hist(
+                daughter,
+                leaf_hist,
+                levels,
+                hist,
+                pdg,
+                leaf_pdg,
+                leaf_E,
+                leaf_theta,
+                leaf_mother_pdg,
+                semilep_flag,
+                electron,
+                intermediate_skipped,
+                True,
+            )
+
+    return (
+        leaf_hist,
+        levels,
+        pdg,
+        leaf_pdg,
+        leaf_E,
+        leaf_theta,
+        leaf_mother_pdg,
+        semilep_flag,
+        electron,
+        intermediate_skipped,
+    )
 
 
 class RootSaverModule(b2.Module):
@@ -257,9 +197,7 @@ class RootSaverModule(b2.Module):
         b_parent_var,
         mcparticle_list,
         output_file,
-        save_secondaries=False,
-        LCAS=False,
-        bkg_prob=0.0,
+        # bkg_prob=0.0,
     ):
         """Class Constructor.
 
@@ -270,7 +208,6 @@ class RootSaverModule(b2.Module):
             output_file (str): Path to output file to save
             mcparticle_list (str): Name of particle list to build LCAs from (will use as root)
             output_file (str): Path to output file to save
-            save_secondaries (bool): Whether to save secondaries in the LCA, this is NOT recommended as it triples the LCA size
         """
         super().__init__()
         self.particle_lists = particle_lists
@@ -278,9 +215,7 @@ class RootSaverModule(b2.Module):
         self.b_parent_var = b_parent_var
         self.mcparticle_list = mcparticle_list
         self.output_file = output_file
-        self.save_secondaries = save_secondaries
-        self.LCAS = LCAS
-        self.bkg_probability = bkg_prob
+        # self.bkg_probability = bkg_prob
 
         # Set a max num particles, it doesn't actually matter what this is as long as it's bigger than
         # any events we'll encounter. ROOT won't save all entries
@@ -309,49 +244,35 @@ class RootSaverModule(b2.Module):
         # how many entries in the array to save via the xxx[n_xxx] string
 
         # LCA data
-        # Note we assume one Upsilon(4S) per event (reasonable)
         self.truth_dict = {}
 
-        self.truth_dict["isUps"] = np.zeros(1, dtype=np.int32)
-        self.tree.Branch("isUps", self.truth_dict["isUps"], "isUps/I")
-        if self.LCAS:
-            self.truth_dict["intermediate_skipped"] = np.zeros(1, dtype=np.bool)
+        # self.truth_dict["isUps"] = np.zeros(1, dtype=np.int32)
+        # self.tree.Branch("isUps", self.truth_dict["isUps"], "isUps/I")
+
+        # We assume at most two LCA matrices for event
+        for i in [1, 2]:
+            self.truth_dict[f"n_LCA_leaves_{i}"] = np.zeros(1, dtype=np.int32)
+            self.truth_dict[f"LCA_leaves_{i}"] = np.zeros(
+                self.max_particles, dtype=np.int32
+            )
             self.tree.Branch(
-                "intermediate_skipped",
-                self.truth_dict["intermediate_skipped"],
-                "intermediate_skipped/O",
+                f"n_LCA_leaves_{i}",
+                self.truth_dict[f"n_LCA_leaves_{i}"],
+                f"n_LCA_leaves_{i}/I",
+            )
+            self.tree.Branch(
+                f"LCA_leaves_{i}",
+                self.truth_dict[f"LCA_leaves_{i}"],
+                f"LCA_leaves_{i}[n_LCA_leaves_{i}]/I",
             )
 
-        self.truth_dict["n_LCA_leaves"] = np.zeros(1, dtype=np.int32)
-        self.truth_dict["LCA_leaves"] = np.zeros(
-            self.max_particles, dtype=np.int32
-        )
-        self.tree.Branch(
-            "n_LCA_leaves",
-            self.truth_dict["n_LCA_leaves"],
-            "n_LCA_leaves/I",
-        )
-        self.tree.Branch(
-            "LCA_leaves",
-            self.truth_dict["LCA_leaves"],
-            "LCA_leaves[n_LCA_leaves]/I",
-        )
-
-        self.truth_dict["n_LCA"] = np.zeros(1, dtype=np.int32)
-        self.truth_dict["LCA"] = np.zeros(
-            self.max_particles**2, dtype=np.uint8
-        )
-        if self.LCAS:
-            self.truth_dict["LCAS"] = np.zeros(
+            self.truth_dict[f"n_LCA_{i}"] = np.zeros(1, dtype=np.int32)
+            self.truth_dict[f"LCAS_{i}"] = np.zeros(
                 self.max_particles**2, dtype=np.uint8
             )
-        self.tree.Branch("n_LCA", self.truth_dict["n_LCA"], "n_LCA/I")
-        self.tree.Branch(
-            "LCA", self.truth_dict["LCA"], "LCA[n_LCA]/b"
-        )
-        if self.LCAS:
+            self.tree.Branch(f"n_LCA_{i}", self.truth_dict[f"n_LCA_{i}"], f"n_LCA_{i}/I")
             self.tree.Branch(
-                "LCAS", self.truth_dict["LCAS"], "LCAS[n_LCA]/b"
+                f"LCAS_{i}", self.truth_dict[f"LCAS_{i}"], f"LCAS_{i}[n_LCA_{i}]/b"
             )
 
         # print(f'LCA dictionary initialized as {self.truth_dict}')
@@ -383,13 +304,11 @@ class RootSaverModule(b2.Module):
         self.tree.Branch("mcPDG", self.mc_pdg, "mcPDG[n_particles]/F")
 
     def reset_LCA(self):
-        if self.LCAS:
-            self.truth_dict["intermediate_skipped"][0] *= 0
-            self.truth_dict["LCAS"][: self.max_particles**2] *= 0
-        self.truth_dict["n_LCA_leaves"][0] *= 0
-        self.truth_dict["LCA_leaves"][: self.max_particles] *= 0
-        self.truth_dict["n_LCA"][0] *= 0
-        self.truth_dict["LCA"][: self.max_particles**2] *= 0
+        for p_index in [1, 2]:
+            self.truth_dict[f"LCAS_{p_index}"][: self.max_particles**2] *= 0
+            self.truth_dict[f"n_LCA_leaves_{p_index}"][0] *= 0
+            self.truth_dict[f"LCA_leaves_{p_index}"][: self.max_particles] *= 0
+            self.truth_dict[f"n_LCA_{p_index}"][0] *= 0
 
     def event(self):
         """Run every event"""
@@ -401,7 +320,7 @@ class RootSaverModule(b2.Module):
         self.event_num[0] = self.eventinfo.getEvent()
 
         # Is background flag
-        bkg_event = np.random.rand(1) > (1 - self.bkg_probability)
+        # bkg_event = np.random.rand(1) > (1 - self.bkg_probability)
 
         # ### Create the LCA
         # IMPORTANT: The ArrayIndex is 0-based.
@@ -409,49 +328,31 @@ class RootSaverModule(b2.Module):
         # Reset the LCA list so if only one B is there it does now carry an older version over
         self.reset_LCA()
 
-        if p_list.getListSize() == 1:
-            part = p_list.obj()[0]
+        if p_list.getListSize() > 0:
+            for part in p_list.obj():
+                # Get the corresponding MCParticle
+                mcp = part.getMCParticle()
+                array_index = mcp.getArrayIndex() + 1 if self.mcparticle_list == "Upsilon(4S):MC" else mcp.getArrayIndex()
 
-            # Get the corresponding MCParticle
-            mcp = part.getMCParticle()
+                # Get the B flag
+                # self.truth_dict["isUps"][0] = int(not bkg_event)
 
-            # Get the B flag
-            self.truth_dict["isUps"][0] = int(not bkg_event)
-
-            # Call function to write history of leaves in the tree.
-            # It internally calls function update_levels to find and save the level of each particle in the tree.
-            # Necessary step to build the LCA.
-            if self.LCAS:
+                # Call function to write history of leaves in the tree.
+                # It internally calls function update_levels to find and save the level of each particle in the tree.
+                # Necessary step to build the LCA.
                 (
                     lcas_leaf_hist,
                     lcas_levels,
-                    _, _, _, _, _, _, _,
-                    intermediate_skipped,
+                    _, _, _, _, _, _, _, _,
                 ) = write_hist(
                     mcp,
                     {}, {}, [], {}, {}, {}, {}, {},
                     False, False, False, True,
-                    save_secondaries=self.save_secondaries,
+                    save_secondaries=False,
                 )
-            leaf_hist, levels, _, _, _, _, _, _, _ = write_hist(
-                mcp,
-                {}, {}, [], {}, {}, {}, {}, {},
-                False,
-                False,
-                save_secondaries=self.save_secondaries,
-            )
 
-            lca = np.zeros([len(leaf_hist), len(leaf_hist)])
-            lcas = np.zeros([len(leaf_hist), len(leaf_hist)])
+                lcas = np.zeros([len(lcas_leaf_hist), len(lcas_leaf_hist)])
 
-            for x, y in combinations(enumerate(leaf_hist), 2):
-                intersection = [
-                    i for i in leaf_hist[x[1]] if i in leaf_hist[y[1]]
-                ]  # Such pythonic, much order
-                lca[x[0], y[0]] = levels[intersection[-1]]
-                lca[y[0], x[0]] = levels[intersection[-1]]
-
-            if self.LCAS:
                 for x, y in combinations(enumerate(lcas_leaf_hist), 2):
                     lcas_intersection = [
                         i for i in lcas_leaf_hist[x[1]] if i in lcas_leaf_hist[y[1]]
@@ -459,19 +360,14 @@ class RootSaverModule(b2.Module):
                     lcas[x[0], y[0]] = lcas_levels[lcas_intersection[-1]]
                     lcas[y[0], x[0]] = lcas_levels[lcas_intersection[-1]]
 
-            if self.LCAS:
-                self.truth_dict["intermediate_skipped"][
-                    0
-                ] = intermediate_skipped
-                self.truth_dict["LCAS"][: lcas.size] = lcas.flatten()
+                self.truth_dict[f"LCAS_{array_index}"][: lcas.size] = lcas.flatten()
 
-            self.truth_dict["n_LCA_leaves"][0] = len(leaf_hist.keys())
-            self.truth_dict["LCA_leaves"][
-                : len(leaf_hist.keys())
-            ] = list(leaf_hist.keys())
+                self.truth_dict[f"n_LCA_leaves_{array_index}"][0] = len(lcas_leaf_hist.keys())
+                self.truth_dict[f"LCA_leaves_{array_index}"][
+                    : len(lcas_leaf_hist.keys())
+                ] = list(lcas_leaf_hist.keys())
 
-            self.truth_dict["n_LCA"][0] = lca.size
-            self.truth_dict["LCA"][: lca.size] = lca.flatten()
+                self.truth_dict[f"n_LCA_{array_index}"][0] = lcas.size
 
             # ### Create the features
             # Where we'll append features
@@ -502,12 +398,12 @@ class RootSaverModule(b2.Module):
                         # Save particle's PDG code
                         mc_pdg = particle.getMCParticle().getPDG()
                         # Generate random b_index if event is background
-                        if bkg_event:
-                            b_index = (
-                                int(1 if b_index == 2 else 2)
-                                if np.random.rand(1) > 0.5
-                                else b_index
-                            )
+                        # if bkg_event:
+                        #     b_index = (
+                        #         int(1 if b_index == 2 else 2)
+                        #         if np.random.rand(1) > 0.5
+                        #         else b_index
+                        #     )
                     else:
                         p_index = -1
                         p_primary = False

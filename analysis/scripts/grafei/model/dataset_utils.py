@@ -6,11 +6,8 @@ import uproot
 def populate_avail_samples(
     X,
     Y,
-    decay_type="hadronic",
-    allow_missing=False,
-    duplicates="skip",
-    fixed_size=False,
-    allow_background=False,
+    ups_reco=False,
+    # allow_background=False,
 ):
     """Sift through the file metadata to populate a list of available dataset samples
 
@@ -26,62 +23,39 @@ def populate_avail_samples(
         events = X[i]["event"]
 
         for evt_idx, _ in enumerate(events):  # iterate over events in current file
-            # Check that LCA is not trivial
-            lca_rows = f["n_LCA"][evt_idx]
+            b_indices = [1] if ups_reco else [1, 2]
 
-            if lca_rows < 2:
-                continue
+            for b_index in b_indices:
+                # Check that LCA is not trivial
+                lca_rows = f[b_index]["n_LCA"][evt_idx]
 
-            # Fetch relevant event properties
-            isUps = f["isUps"][evt_idx]
-
-            x_attrs = X[i]
-            evt_b_index = x_attrs["b_index"][evt_idx]
-            evt_leaves = x_attrs["leaves"][evt_idx]
-            evt_primary = x_attrs["primary"][evt_idx]
-
-            # Keeping only signal events
-            if not allow_background and not isUps:
-                continue
-
-            # Keeping only those where there are reconstructed particles
-            if not ((1 in evt_b_index) or (2 in evt_b_index)):
-                continue
-
-            # Particles coming from either Bs
-            evt_matched = np.logical_or((evt_b_index == 1), (evt_b_index == 2))
-
-            # Handle missing particles if requested
-            primaries = evt_leaves[
-                np.logical_and(evt_primary, evt_matched)
-            ]
-            if not allow_missing:
-                # Keeping those with no missing particles in reconstructed list
-                # We only consider primaries, secondaries must be dropped using the allow_secondaries flag
-                if len(set(primaries)) != lca_rows:
+                if lca_rows < 2:
                     continue
 
-            # Handle duplicates if requested
-            if duplicates == "skip":
-                # Keeping those with no duplicates in reconstructed list
-                # Note we only consider primaries since secondaries are 0 in the LCA
-                if len(primaries) != len(set(primaries)):
+                # Fetch relevant event properties
+                # isUps = f["isUps"][evt_idx]
+
+                x_attrs = X[i]
+                evt_b_index = x_attrs["b_index"][evt_idx]
+                evt_primary = x_attrs["primary"][evt_idx]
+
+                # Keeping only signal events
+                # if not allow_background and not isUps:
+                #     continue
+
+                # particles coming from one or both Bs
+                matched = np.logical_or((evt_b_index == 1), (evt_b_index == 2)) if ups_reco else (evt_b_index == int(b_index))
+
+                # Keeping only those where there are reconstructed particles
+                if matched.sum() == 0:
                     continue
 
-            # Skip events/B's with one or less primaries reconstructed
-            if np.sum(np.logical_and(evt_matched, evt_primary)) < 2:
-                continue
-
-            # If requested, only allow samples of the given fixed_size
-            if fixed_size is not None:
-                if (
-                    np.sum(np.logical_and(evt_matched, evt_primary))
-                    != fixed_size
-                ):
+                # Skip events/B's with one or less primaries reconstructed
+                if np.sum(np.logical_and(matched, evt_primary)) < 2:
                     continue
 
-            # If we made it to here a sample is valid and we add it to the one available
-            avail_samples.append((i, evt_idx))
+                # If we made it to here a sample is valid and we add it to the one available
+                avail_samples.append((i, evt_idx, b_index))
 
     return avail_samples
 
@@ -120,18 +94,18 @@ def preload_root_data(
             x_dict["b_index"] = tree["b_index"].array(library="np")
             x_dict["mc_pdg"] = tree["mcPDG"].array(library="np")
 
-            y_dict = {}
+            y_dict = {1: {}, 2: {}}
+            for i in [1, 2]:
+                # Get this LCA
+                # Need this to reshape the falttened LCA when loading
+                y_dict[i]["n_LCA"] = tree[f"n_LCA_leaves_{i}"].array(library="np")
+                if use_lcas:
+                    y_dict[i]["LCA"] = tree[f"LCAS_{i}"].array(library="np")
+                else:
+                    y_dict[i]["LCA"] = tree[f"LCA_{i}"].array(library="np")
 
-            # Get this LCA
-            # Need this to reshape the falttened LCA when loading
-            y_dict["n_LCA"] = tree["n_LCA_leaves"].array(library="np")
-            if use_lcas:
-                y_dict["LCA"] = tree["LCAS"].array(library="np")
-            else:
-                y_dict["LCA"] = tree["LCA"].array(library="np")
-
-            y_dict["LCA_leaves"] = tree["LCA_leaves"].array(library="np")
-            y_dict["isUps"] = tree["isUps"].array(library="np")
+                y_dict[i]["LCA_leaves"] = tree[f"LCA_leaves_{i}"].array(library="np")
+                # y_dict[i]["isB"] = tree[f"isB_{i}"].array(library="np")
 
             x.append(x_dict)
             y.append(y_dict)

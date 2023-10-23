@@ -1,19 +1,15 @@
 dataset:
   # Select the data type, this decides which Dataset class to use
   inMemory: True
-  path: /home/jcerasol/Data/graFEI/mixed/graFEI_Ups4SReco_test # Should contain train/val subdirectories
+  path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts/ntuples_test # Should contain train/val subdirectories
   config:
-    decay_type: 'both' # hadronic/semileptonic/both
-    duplicates: copy  # skip/copy/delete
+    ups_reco: True
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
     edge_features: [costheta, doca]
     global_features: null #[nParticles]
     #ignore: ['isSignal']  # Input features to ignore
-    allow_secondaries: True
-    allow_unmatched: True
     subset_unmatched: True
-    allow_missing: True
-    allow_background: False
+    # allow_background: False
     pull_down_lca: True  # Whether to ensure contiguous numbers for entries in full LCA
     use_lcas: True  # Whether to use LCA stages (LCAS) instead of default LCAG
     monitor_tag: 'Validation'  # Which dataset tag to monitor for e.g. checkpointing

@@ -79,11 +79,7 @@ def _preload(self):
     self.avail_samples = populate_avail_samples(
         self.x,
         self.y,
-        self.decay_type,
-        self.allow_missing,
-        self.duplicates,
-        self.fixed_size,
-        self.allow_background,
+        self.ups_reco,
     )
     print("Available samples populated")
 
@@ -106,12 +102,12 @@ def _preload(self):
 
 def _process_graph(self, idx):
 
-    file_id, evt = self.avail_samples[idx]
+    file_id, evt, p_index = self.avail_samples[idx]
 
     x_item = self.x[file_id]
-    y_item = self.y[file_id]
+    y_item = self.y[file_id][p_index]
 
-    evt_b_index = x_item["b_index"][evt]
+    evt_p_index = x_item["b_index"][evt]
     evt_leaves = x_item["leaves"][evt]
     evt_primary = x_item["primary"][evt]
 
@@ -124,30 +120,20 @@ def _process_graph(self, idx):
 
     # Get the rows of the X inputs to fetch
     # This is a boolean numpy array
-    x_rows = np.logical_or(evt_b_index == 1, evt_b_index == 2)
-    # Handle secondaries if requested
-    # Filter out reconstructed secondaries, need to do before skip duplicates
-    # so we don't skip events with only duplicate secondaries
-    if not self.allow_secondaries:
-        x_rows = np.logical_and(x_rows, evt_primary)
+    x_rows = np.logical_or(evt_p_index == 1, evt_p_index == 2) if self.ups_reco else evt_p_index == int(p_index)
 
-    # Handle unmatched particles
-    # I'll take a random subset of what's there
-    # Not sure if this is ideal but for a pairwise neural net it probs doesn't matter
-    if self.allow_unmatched:
+    # Find the unmatched particles
+    unmatched_rows = evt_p_index == -1
 
-        # Find the unmatched particles
-        unmatched_rows = evt_b_index == -1
+    if self.subset_unmatched and np.any(unmatched_rows):
+        # Create a random boolean array the same size as the number of leaves
+        rand_mask = np.random.choice(a=[False, True], size=unmatched_rows.size)
+        # AND the mask with the unmatched leaves
+        # This selects a random subset of the unmatched leaves
+        unmatched_rows = np.logical_and(unmatched_rows, rand_mask)
 
-        if self.subset_unmatched and np.any(unmatched_rows):
-            # Create a random boolean array the same size as the number of leaves
-            rand_mask = np.random.choice(a=[False, True], size=unmatched_rows.size)
-            # AND the mask with the unmatched leaves
-            # This selects a random subset of the unmatched leaves
-            unmatched_rows = np.logical_and(unmatched_rows, rand_mask)
-
-        # Add the unmatched rows to the current decay's rows
-        x_rows = np.logical_or(x_rows, unmatched_rows)
+    # Add the unmatched rows to the current decay's rows
+    x_rows = np.logical_or(x_rows, unmatched_rows)
 
     # Here we actually load the data
 
@@ -175,7 +161,7 @@ def _process_graph(self, idx):
         np.array(
             [
                 [
-                    x_item["global"][feat][evt]
+                    x_item["global"][feat + f"_{p_index}"][evt]
                     for feat in self.global_features
                 ]
             ]
@@ -190,11 +176,6 @@ def _process_graph(self, idx):
     np.nan_to_num(x, copy=False)
     np.nan_to_num(x_edges, copy=False)
     np.nan_to_num(x_global, copy=False)
-
-    # Handle duplicates, use self.duplicates
-    # This need to remove them from the x_item leaves attribute as well
-    if not self.duplicates:
-        pass
 
     # Normalize any features that should be
     if self.normalize is not None:
@@ -225,7 +206,7 @@ def _process_graph(self, idx):
     # We can't load the firs locs directly (i.e. y_item[locs, :]) because locs is (intentionally) unsorted
     y_edge = y_item["LCA"][evt].reshape((n_LCA, n_LCA)).astype(int)
     # Get the Upsilon(4S) flag
-    y_isUps = y_item["isUps"][evt]
+    # y_isUps = y_item["isUps"][evt]
     # Get the true mcPDG pf FSPs
     y_mass = masses_to_classes(x_item["mc_pdg"][evt][x_rows])
 
@@ -245,10 +226,10 @@ def _process_graph(self, idx):
     # Set diagonal to -1 (actually not necessary but ok...)
     np.fill_diagonal(y_edge, -1)
 
-    # Ignore true LCA and masses on background events
-    if not y_isUps:
-        y_edge.fill(-1)
-        y_mass.fill(-1)
+    # # Ignore true LCA and masses on background events
+    # if not y_isUps:
+    #     y_edge.fill(-1)
+    #     y_mass.fill(-1)
 
     n_nodes = x.shape[0]
 
@@ -262,7 +243,7 @@ def _process_graph(self, idx):
     )  # Fill tensor with edge indices: shape [N*(N-1), 2] == [E, 2]
 
     u_y = torch.tensor(
-        [[0, 0, 0, y_isUps]], dtype=torch.float
+        [[1]], dtype=torch.float
     )  # Target global tensor: shape [B, F_g]
 
     x_y = torch.tensor(y_mass, dtype=torch.long)  # Target node tensor: shape [N]
@@ -284,25 +265,18 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
     def __init__(
         self,
         root,
-        decay_type="hadronic",
+        ups_reco=False,
         n_files=None,
         samples=None,
-        duplicates="skip",
-        allow_secondaries=True,
-        allow_unmatched=True,
         subset_unmatched=True,
-        allow_missing=True,
         features=[],
         ignore=[],
         edge_features=[],
         global_features=[],
-        tokenize=None,
         normalize=None,
         pull_down_lca=False,
-        fixed_size=None,
         use_lcas=False,
         overwrite=False,
-        allow_background=False,
         **kwargs,
     ):
         """Dataset handler thingy for reconstructed Belle II MC to pytorch geometric InMemoryDataset
@@ -321,34 +295,15 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         assert isinstance(
             features, list
         ), f'Argument "features" must be a list and not {type(features)}'
-        assert decay_type in [
-            "hadronic",
-            "semileptonic",
-            "both",
-        ], "decay_type should be 'hadronic', 'semileptonic' or 'both'"
 
         self.root = Path(root)
 
+        self.ups_reco = ups_reco
+
         self.normalize = normalize
 
-        # TODO: Extend duplicates to handle all modes, e.g. skip/delete/duplicate
-        # for skipping events, deleting one duplicate from recon. particles, or duplicating
-        # the row/column in the LCA.
-        duplicates_options = ["skip", "copy"]
-        assert (
-            duplicates in duplicates_options
-        ), f"Only duplicates={duplicates_options} currently supported"
-        self.duplicates = duplicates
-
-        # self.hadronic = hadronic
-        self.decay_type = decay_type
-        self.allow_secondaries = allow_secondaries
-        self.allow_unmatched = allow_unmatched
         self.subset_unmatched = subset_unmatched
-        self.allow_missing = allow_missing
-        self.allow_background = allow_background
 
-        self.fixed_size = fixed_size
         self.use_lcas = use_lcas
         self.pull_down_lca = pull_down_lca and not use_lcas
 
@@ -392,25 +347,18 @@ class BelleRecoSetGeometric(Dataset):
     def __init__(
         self,
         root,
-        decay_type="hadronic",
+        ups_reco=False,
         n_files=None,
         samples=None,
-        duplicates="skip",
-        allow_secondaries=True,
-        allow_unmatched=True,
         subset_unmatched=True,
-        allow_missing=True,
         features=[],
         ignore=[],
         edge_features=[],
         global_features=[],
-        tokenize=None,
         normalize=None,
         pull_down_lca=False,
-        fixed_size=None,
         use_lcas=False,
         overwrite=False,
-        allow_background=False,
         **kwargs,
     ):
         """Dataset handler thingy for reconstructed Belle II MC to pytorch geometric InMemoryDataset
@@ -429,34 +377,15 @@ class BelleRecoSetGeometric(Dataset):
         assert isinstance(
             features, list
         ), f'Argument "features" must be a list and not {type(features)}'
-        assert decay_type in [
-            "hadronic",
-            "semileptonic",
-            "both",
-        ], "decay_type should be 'hadronic', 'semileptonic' or 'both'"
 
         self.root = Path(root)
 
+        self.ups_reco = ups_reco
+
         self.normalize = normalize
 
-        # TODO: Extend duplicates to handle all modes, e.g. skip/delete/duplicate
-        # for skipping events, deleting one duplicate from recon. particles, or duplicating
-        # the row/column in the LCA.
-        duplicates_options = ["skip", "copy"]
-        assert (
-            duplicates in duplicates_options
-        ), f"Only duplicates={duplicates_options} currently supported"
-        self.duplicates = duplicates
-
-        # self.hadronic = hadronic
-        self.decay_type = decay_type
-        self.allow_secondaries = allow_secondaries
-        self.allow_unmatched = allow_unmatched
         self.subset_unmatched = subset_unmatched
-        self.allow_missing = allow_missing
-        self.allow_background = allow_background
 
-        self.fixed_size = fixed_size
         self.use_lcas = use_lcas
         self.pull_down_lca = pull_down_lca and not use_lcas
         self.overwrite = overwrite

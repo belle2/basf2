@@ -25,7 +25,7 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
                                const std::string& controlSocketAddress)
 {
   if (GlobalProcHandler::startProxyProcess()) {
-    B2DEBUG(10, "ProcessMonitor starting.....");
+    B2DEBUG(30, "ProcessMonitor starting.....");
     m_client.reset();
 
     // The default will be to not do anything on signals...

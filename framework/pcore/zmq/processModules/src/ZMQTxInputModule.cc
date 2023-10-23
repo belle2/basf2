@@ -85,7 +85,7 @@ void ZMQTxInputModule::event()
 
       if (multicastMessage->isMessage(EMessageTypes::c_helloMessage)) {
         m_workers.push_back(std::stoi(data));
-        B2DEBUG(10, "received c_helloMessage from " << data << "... replying");
+        B2DEBUG(30, "received c_helloMessage from " << data << "... replying");
         //        B2INFO ( "ZMQTxInput : received c_helloMessage from " << data << "... replying");
         auto replyHelloMessage = ZMQMessageFactory::createMessage(data, EMessageTypes::c_helloMessage);
         m_zmqClient.send(std::move(replyHelloMessage));
@@ -93,16 +93,16 @@ void ZMQTxInputModule::event()
       } else if (multicastMessage->isMessage(EMessageTypes::c_confirmMessage) and m_param_useEventBackup) {
         const auto& eventMetaData = EventMetaDataSerialization::deserialize(data);
         m_procEvtBackupList.removeEvent(eventMetaData);
-        B2DEBUG(10, "removed event backup.. list size: " << m_procEvtBackupList.size());
+        B2DEBUG(30, "removed event backup.. list size: " << m_procEvtBackupList.size());
         return true;
       } else if (multicastMessage->isMessage(EMessageTypes::c_deleteWorkerMessage) and m_param_useEventBackup) {
         const int workerID = std::atoi(data.c_str());
-        B2DEBUG(10, "received worker delete message, workerID: " << workerID);
+        B2DEBUG(30, "received worker delete message, workerID: " << workerID);
         m_procEvtBackupList.sendWorkerBackupEvents(workerID, m_zmqClient);
         m_nextWorker.erase(std::remove(m_nextWorker.begin(), m_nextWorker.end(), workerID), m_nextWorker.end());
         return true;
       } else if (multicastMessage->isMessage(EMessageTypes::c_terminateMessage)) {
-        B2DEBUG(10, "Having received a stop message. I can not do much here, but just hope for the best.");
+        B2DEBUG(30, "Having received a stop message. I can not do much here, but just hope for the best.");
         terminate = true;
         return false;
       }
@@ -113,7 +113,7 @@ void ZMQTxInputModule::event()
     const auto socketAnswer = [this](const auto & socket) {
       const auto message = ZMQMessageFactory::fromSocket<ZMQIdMessage>(socket);
       if (message->isMessage(EMessageTypes::c_readyMessage)) {
-        B2DEBUG(10, "got worker ready message");
+        B2DEBUG(30, "got worker ready message");
         m_nextWorker.push_back(std::stoi(message->getIdentity()));
         return false;
       }
@@ -181,21 +181,21 @@ void ZMQTxInputModule::event()
 
     const unsigned int nextWorker = m_nextWorker.front();
     m_nextWorker.pop_front();
-    B2DEBUG(10, "Next worker is " << nextWorker);
+    B2DEBUG(30, "Next worker is " << nextWorker);
 
     auto eventMessage = m_streamer.stream();
 
     if (eventMessage->size() > 0) {
       auto message = ZMQMessageFactory::createMessage(std::to_string(nextWorker), EMessageTypes::c_eventMessage, eventMessage);
       m_zmqClient.send(std::move(message));
-      B2DEBUG(10, "Having send message to worker " << nextWorker);
+      B2DEBUG(30, "Having send message to worker " << nextWorker);
 
       if (m_param_useEventBackup) {
         m_procEvtBackupList.storeEvent(std::move(eventMessage), m_eventMetaData, nextWorker);
-        B2DEBUG(10, "stored event " << m_eventMetaData->getEvent() << " backup.. list size: " << m_procEvtBackupList.size());
+        B2DEBUG(30, "stored event " << m_eventMetaData->getEvent() << " backup.. list size: " << m_procEvtBackupList.size());
         checkWorkerProcTimeout();
       }
-      B2DEBUG(10, "finished event");
+      B2DEBUG(30, "finished event");
     }
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
@@ -211,7 +211,7 @@ void ZMQTxInputModule::event()
 void ZMQTxInputModule::endRun()
 {
 
-  B2DEBUG(10, "ZMQTxInput:: EndRun detected. isEndOfRun = " << m_eventMetaData->isEndOfRun() << " RunNo = " <<
+  B2DEBUG(30, "ZMQTxInput:: EndRun detected. isEndOfRun = " << m_eventMetaData->isEndOfRun() << " RunNo = " <<
           m_eventMetaData->getRun());
   if (m_eventMetaData->isEndOfRun() != 1) return;
 
@@ -270,17 +270,17 @@ void ZMQTxInputModule::terminate()
     if (multicastMessage->isMessage(EMessageTypes::c_confirmMessage) and m_param_useEventBackup) {
       const auto& eventMetaData = EventMetaDataSerialization::deserialize(data);
       m_procEvtBackupList.removeEvent(eventMetaData);
-      B2DEBUG(10, "removed event backup.. list size: " << m_procEvtBackupList.size());
+      B2DEBUG(30, "removed event backup.. list size: " << m_procEvtBackupList.size());
       return true;
     } else if (multicastMessage->isMessage(EMessageTypes::c_deleteWorkerMessage) and m_param_useEventBackup) {
       const int workerID = std::atoi(data.c_str());
 
-      B2DEBUG(10, "received worker delete message, workerID: " << workerID);
+      B2DEBUG(30, "received worker delete message, workerID: " << workerID);
       m_procEvtBackupList.sendWorkerBackupEvents(workerID, m_zmqClient);
       return true;
     } else if (multicastMessage->isMessage(EMessageTypes::c_helloMessage)) {
       // A new worker? Well, he is quite late... nevertheless, lets tell him to end it
-      B2DEBUG(10, "received c_helloMessage from " << data << "... replying with end message");
+      B2DEBUG(30, "received c_helloMessage from " << data << "... replying with end message");
       auto message = ZMQMessageFactory::createMessage(data, EMessageTypes::c_lastEventMessage);
       m_zmqClient.send(std::move(message));
       return true;

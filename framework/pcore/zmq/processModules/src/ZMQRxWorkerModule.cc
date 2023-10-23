@@ -93,7 +93,7 @@ void ZMQRxWorkerModule::event()
     const auto multicastAnswer = [](const auto & socket) {
       const auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(EMessageTypes::c_terminateMessage)) {
-        B2DEBUG(10, "Having received an graceful stop message. Will now go on.");
+        B2DEBUG(30, "Having received an graceful stop message. Will now go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
       }
@@ -105,7 +105,7 @@ void ZMQRxWorkerModule::event()
     const auto socketAnswer = [this](const auto & socket) {
       auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(EMessageTypes::c_eventMessage)) {
-        B2DEBUG(10, "received event message... write it to data store");
+        B2DEBUG(30, "received event message... write it to data store");
         //  B2INFO ( "ZMQRxWorker : event received" );
         m_streamer.read(std::move(message));
         //  if ( m_eventMetaData->getExperiment() == 42 && m_eventMetaData->getRun() == 8 )
@@ -115,11 +115,11 @@ void ZMQRxWorkerModule::event()
         m_zmqClient.send(std::move(readyMessage));
         return false;
       } else if (message->isMessage(EMessageTypes::c_lastEventMessage)) {
-        B2DEBUG(10, "received end message from input");
+        B2DEBUG(30, "received end message from input");
         return false;
       }
 
-      B2DEBUG(10, "received unexpected message from input");
+      B2DEBUG(30, "received unexpected message from input");
       return true;
     };
 
@@ -132,7 +132,7 @@ void ZMQRxWorkerModule::event()
     //    B2INFO ( "ZMQRxWorker : event received and moved to data store" );
     //    B2INFO ( " ---- exp = " << m_eventMetaData->getExperiment() << "  run = " << m_eventMetaData->getRun() );
 
-    B2DEBUG(10, "Finished with event");
+    B2DEBUG(30, "Finished with event");
     //    B2INFO ( "ZMQRxWorker :: Finished with the event" );
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {

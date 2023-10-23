@@ -81,9 +81,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas->cd(0);
 
   //update ECLTRG timing
-  double ECLTRG_timing_mean = 0.0;
   auto hist =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_ECLTRG", 0, true);// only if updated
   if (hist) {
+    double ECLTRG_timing_mean = 0.0;
     hist->Draw();
     ECLTRG_timing_mean = hist->GetMean();
     B2DEBUG(1, "ECLTRG_timing_mean:" << ECLTRG_timing_mean);

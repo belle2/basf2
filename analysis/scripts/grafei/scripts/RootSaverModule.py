@@ -8,11 +8,11 @@ from variables import variables as vm
 from grafei.scripts.FlagBDecayModule import getObjectList
 
 
-def update_levels(levels, hist, pdg, intermediate_skipped=False):
+def update_levels(levels, hist, pdg):
     """
     Assigns LCAS level to each particle in the decay tree.
     """
-    # taken from MC PDG code
+    # MC PDG code
     FEI_pdg_converter = {
         443: 1,  # J/psi
         111: 1,  # pi^0
@@ -37,14 +37,13 @@ def update_levels(levels, hist, pdg, intermediate_skipped=False):
         if temp_pdg in FEI_pdg_converter:
             levels[n] = FEI_pdg_converter[temp_pdg]
         else:
-            intermediate_skipped = True
             for j in range(i + 1):
                 temp_pdg = abs(pdg[hist[i - j]])
                 if temp_pdg in FEI_pdg_converter:
                     levels[n] = FEI_pdg_converter[temp_pdg]
                     break
 
-    return levels, intermediate_skipped
+    return levels
 
 
 def write_hist(
@@ -54,21 +53,13 @@ def write_hist(
     hist=[],
     pdg={},
     leaf_pdg={},
-    leaf_E={},
-    leaf_theta={},
-    leaf_mother_pdg={},
     semilep_flag=False,
-    electron=False,
-    intermediate_skipped=False,
-    LCAS=True,  # Leftover but it's there in too many places
-    save_secondaries=False,
 ):
     """Recursive function to traverse down to the leaves saving the history
 
     Args:
         particle (MCParticle): The current particle being inspected
         semilep_flag (bool): Whether or not the current decay is semileptonic
-        intermediate_skipped (bool): Wheter or not an intermediate particle was skipped in the reconstruction (excited states...)
     """
 
     neutrino_pdgs = [12, 14, 16, 18]
@@ -78,16 +69,10 @@ def write_hist(
     if (abs(particle.getPDG()) in neutrino_pdgs) and particle.isPrimaryParticle():
         semilep_flag = True
 
-    if (abs(particle.getPDG()) == 11) and particle.isPrimaryParticle():
-        electron = True
-
     # Need to create a true copy, no just a ref to the object
     hist = copy.deepcopy(hist)
     leaf_hist = copy.deepcopy(leaf_hist)
     leaf_pdg = copy.deepcopy(leaf_pdg)
-    leaf_E = copy.deepcopy(leaf_E)
-    leaf_theta = copy.deepcopy(leaf_theta)
-    leaf_mother_pdg = copy.deepcopy(leaf_mother_pdg)
     levels = copy.deepcopy(levels)
     pdg = copy.deepcopy(pdg)
 
@@ -121,25 +106,16 @@ def write_hist(
             # Leaves get their history added
             leaf_hist[particle.getArrayIndex()] = hist
             leaf_pdg[particle.getArrayIndex()] = particle.getPDG()
-            leaf_E[particle.getArrayIndex()] = particle.getEnergy()
-            leaf_theta[particle.getArrayIndex()] = particle.getMomentum().Theta()
-            leaf_mother_pdg[particle.getArrayIndex()] = (
-                particle.getMother().getPDG() if particle.getMother() else 0
-            )
 
             # And now that we have a full history down to the leaf
             # we can update the levels
-            levels, intermediate_skipped = update_levels(
-                levels, hist, pdg, intermediate_skipped
-            )
+            levels = update_levels(levels, hist, pdg)
 
     # Here is deciding whether to continue traversing down the decay tree
-    # Don't want to do this if all daughters are secondaries and we're not saving them
+    # Don't want to do this if all daughters are secondaries since we're not saving them
     if (
         particle.getNDaughters() != 0
-    ) and not (  # if saving secondaries we can traverse down no matter what
-        (not save_secondaries) and prim_no_prim_daughters
-    ):  # When not saving secondaries, don't travers if all daughters are secondaries
+    ) and not prim_no_prim_daughters:  # Don't travers if all daughters are secondaries
         # Only append primaries to history
         if particle.isPrimaryParticle():
             hist.append(particle.getArrayIndex())
@@ -154,12 +130,7 @@ def write_hist(
                 levels,
                 pdg,
                 leaf_pdg,
-                leaf_E,
-                leaf_theta,
-                leaf_mother_pdg,
                 semilep_flag,
-                electron,
-                intermediate_skipped,
             ) = write_hist(
                 daughter,
                 leaf_hist,
@@ -167,13 +138,7 @@ def write_hist(
                 hist,
                 pdg,
                 leaf_pdg,
-                leaf_E,
-                leaf_theta,
-                leaf_mother_pdg,
                 semilep_flag,
-                electron,
-                intermediate_skipped,
-                LCAS=True,
             )
 
     return (
@@ -181,12 +146,7 @@ def write_hist(
         levels,
         pdg,
         leaf_pdg,
-        leaf_E,
-        leaf_theta,
-        leaf_mother_pdg,
         semilep_flag,
-        electron,
-        intermediate_skipped,
     )
 
 
@@ -354,14 +314,15 @@ class RootSaverModule(b2.Module):
                 (
                     lcas_leaf_hist,
                     lcas_levels,
-                    _, _, _, _, _, _, _, _,
+                    _, _, _,
                 ) = write_hist(
-                    mcp,
-                    {}, {}, [], {}, {}, {}, {}, {},
-                    False, False,
-                    intermediate_skipped=False,
-                    LCAS=True,
-                    save_secondaries=False,
+                    particle=mcp,
+                    leaf_hist={},
+                    levels={},
+                    hist=[],
+                    pdg={},
+                    leaf_pdg={},
+                    semilep_flag=False,
                 )
 
                 lcas = np.zeros([len(lcas_leaf_hist), len(lcas_leaf_hist)])

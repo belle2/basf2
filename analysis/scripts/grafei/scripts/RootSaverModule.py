@@ -30,17 +30,19 @@ def update_levels(levels, hist, pdg, intermediate_skipped=False):
     }
 
     for i, n in enumerate(hist):
-        if n not in levels.keys():
-            temp_pdg = abs(pdg[n])  # Take the absolute value of the pdg for the converter
-            if temp_pdg in FEI_pdg_converter:
-                levels[n] = FEI_pdg_converter[temp_pdg]
-            else:
-                intermediate_skipped = True
-                for j in range(i + 1):
-                    temp_pdg = abs(pdg[hist[i - j]])
-                    if temp_pdg in FEI_pdg_converter:
-                        levels[n] = FEI_pdg_converter[temp_pdg]
-                        break
+        if n in levels.keys():
+            continue
+
+        temp_pdg = abs(pdg[n])  # Take the absolute value of the pdg for the converter
+        if temp_pdg in FEI_pdg_converter:
+            levels[n] = FEI_pdg_converter[temp_pdg]
+        else:
+            intermediate_skipped = True
+            for j in range(i + 1):
+                temp_pdg = abs(pdg[hist[i - j]])
+                if temp_pdg in FEI_pdg_converter:
+                    levels[n] = FEI_pdg_converter[temp_pdg]
+                    break
 
     return levels, intermediate_skipped
 

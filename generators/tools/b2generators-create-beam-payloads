@@ -150,7 +150,7 @@ if __name__ == "__main__":
             evt = gen.generate()
             e_cms.append(evt.getMass())
             cms = evt.getLER() + evt.getHER()
-            boosts.append(list(cms.BoostVector()))
+            boosts.append(list(cms.BoostToCM()))
 
         e_cms = np.array(e_cms)
         energy_mean = e_cms.mean()
@@ -170,7 +170,7 @@ if __name__ == "__main__":
         energy_mean = cms.M()
         energy_spread = 0
         energy_error = 0
-        boost_mean = list(cms.BoostVector())
+        boost_mean = cms.BoostToCM()
         boost_cov = ROOT.TMatrixDSym(3)
 
     #: beamspot object
@@ -182,19 +182,25 @@ if __name__ == "__main__":
         for j in range(3):
             pos_cov[i][j] = 1e-6 * vtx_cov[i][j]
     
-    beamspot.setIP(beamparams.getVertex(), pos_cov)
+    vertex = beamparams.getVertex()
+    beamspot.setIP(ROOT.TVector3(vertex.X(), vertex.Y(), vertex.Z()), pos_cov)
     beamspot.setSizeCovMatrix(vtx_cov)
     
-    #: invariant mass object
+    #: Collision invariant mass.
     invmass = Belle2.CollisionInvariantMass()
     invmass.setMass(energy_mean, energy_error, energy_spread)
-    #: boost object
+    #: Collision boost vector.
     boost = Belle2.CollisionBoostVector()
-    boost.setBoost(ROOT.TVector3(*boost_mean), boost_cov)
+    boost.setBoost(-ROOT.TVector3(boost_mean.X(), boost_mean.Y(),
+                   boost_mean.Z()), boost_cov)
+    #: Collision axis in CMS.
+    axis = Belle2.CollisionAxisCMS()
+    center_cov = ROOT.TMatrixDSym(2)
+    axis.setAngles(values['angleXHER'], values['angleYHER'], center_cov)
 
     # save them all ...
     database = Belle2.Database.Instance()
     iov = Belle2.IntervalOfValidity(*arguments.iov)
-    for obj in beamparams, beamspot, invmass, boost:
+    for obj in beamparams, beamspot, invmass, boost, axis:
         name = obj.ClassName()[8:]
         database.storeData(name, obj, iov)

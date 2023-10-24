@@ -168,7 +168,7 @@ def write_hist(
                 semilep_flag,
                 electron,
                 intermediate_skipped,
-                True,
+                LCAS=True,
             )
 
     return (
@@ -353,7 +353,9 @@ class RootSaverModule(b2.Module):
                 ) = write_hist(
                     mcp,
                     {}, {}, [], {}, {}, {}, {}, {},
-                    False, False, False, True,
+                    False, False,
+                    intermediate_skipped=False,
+                    LCAS=True,
                     save_secondaries=False,
                 )
 

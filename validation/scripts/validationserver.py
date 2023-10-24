@@ -659,7 +659,7 @@ class ValidationRoot:
         #: Gitlab config
         self.gitlab_config = gitlab_config
 
-        # Gitlab usermap
+        #: Gitlab usermap
         self.gitlab_map = gitlab_map
 
         #: placeholder variable for path

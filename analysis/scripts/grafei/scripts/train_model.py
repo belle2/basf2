@@ -60,11 +60,11 @@ def main(
         samples=samples,
     )
 
-    assert configs["geometric_model"]["global_layer"] or (
-        not configs["geometric_model"]["global_layer"]
-        and configs["geometric_model"]["alpha_momentum"] == 0
-        and configs["geometric_model"]["alpha_prob"] == 0
-    ), "You can not learn B probability and/or B momentum without global layer"
+    # assert configs["geometric_model"]["global_layer"] or (
+    #     not configs["geometric_model"]["global_layer"]
+    #     and configs["geometric_model"]["alpha_momentum"] == 0
+    #     and configs["geometric_model"]["alpha_prob"] == 0
+    # ), "You can not learn B probability and/or B momentum without global layer"
 
     # Random seed
     if configs["train"]["seed"]:
@@ -133,10 +133,10 @@ def main(
     loss_fn = MultiTrainLoss(
         ignore_index=-1,
         reduction=configs["geometric_model"]["loss_reduction"],
-        alpha_momentum=configs["geometric_model"]["alpha_momentum"],
+        # alpha_momentum=configs["geometric_model"]["alpha_momentum"],
         alpha_mass=configs["geometric_model"]["alpha_mass"],
-        alpha_prob=configs["geometric_model"]["alpha_prob"],
-        global_layer=configs["geometric_model"]["global_layer"],
+        # alpha_prob=configs["geometric_model"]["alpha_prob"],
+        # global_layer=configs["geometric_model"]["global_layer"],
         edge_weights=edge_weights,
         node_weights=node_weights,
     )

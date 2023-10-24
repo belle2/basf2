@@ -3,14 +3,12 @@ dataset:
   inMemory: True
   path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts/ntuples_test # Should contain train/val subdirectories
   config:
-    ups_reco: False
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
     edge_features: [costheta, doca]
     global_features: null #[nParticles]
     #ignore: ['isSignal']  # Input features to ignore
     subset_unmatched: True
     # allow_background: False
-    pull_down_lca: True  # Whether to ensure contiguous numbers for entries in full LCA
     monitor_tag: 'Validation'  # Which dataset tag to monitor for e.g. checkpointing
     # You can configure simple normalization of features
     # They will be executed in the order given
@@ -79,8 +77,8 @@ geometric_model:
   overwrite: True # Process the graphs from scratch
   global_layer: False
   loss_reduction: mean #mean #sum
-  alpha_prob: 0 # 0.1 # Parameter to tune the learning of B probability
-  alpha_momentum: 0 # 0.1 # Parameter to tune the learning of B momentum
+  # alpha_prob: 0 # 0.1 # Parameter to tune the learning of B probability
+  # alpha_momentum: 0 # 0.1 # Parameter to tune the learning of B momentum
   alpha_mass: 1 # 0.1 # Parameter to tune the learning of masses of FSP
   hidden_layer_dim: 512
   num_hid_layers: 1

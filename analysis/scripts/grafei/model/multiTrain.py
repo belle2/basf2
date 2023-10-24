@@ -40,19 +40,19 @@ class MultiTrainLoss(nn.Module):
     def __init__(
         self,
         alpha_mass=0,
-        alpha_momentum=0,
-        alpha_prob=0,
+        # alpha_momentum=0,
+        # alpha_prob=0,
         ignore_index=-1,
         reduction="mean",
-        global_layer=False,
+        # global_layer=False,
         edge_weights=None,
         node_weights=None,
     ):
         super().__init__()
         self.alpha_mass = alpha_mass
-        self.alpha_momentum = alpha_momentum
-        self.alpha_prob = alpha_prob
-        self.global_layer = global_layer
+        # self.alpha_momentum = alpha_momentum
+        # self.alpha_prob = alpha_prob
+        # self.global_layer = global_layer
 
         self.LCA_CE = nn.CrossEntropyLoss(
             weight=edge_weights, ignore_index=ignore_index, reduction=reduction
@@ -60,18 +60,18 @@ class MultiTrainLoss(nn.Module):
         self.mass_CE = nn.CrossEntropyLoss(
             weight=node_weights, ignore_index=ignore_index, reduction=reduction
         )
-        self.prob_CE = nn.BCEWithLogitsLoss(reduction=reduction)
-        self.momentum_L1 = B_MomentumLoss(reduction=reduction)
+        # self.prob_CE = nn.BCEWithLogitsLoss(reduction=reduction)
+        # self.momentum_L1 = B_MomentumLoss(reduction=reduction)
 
         self.scaling = 1 if reduction == "mean" else 100
 
         assert (
-            alpha_mass >= 0 and alpha_momentum >= 0 and alpha_prob >= 0
-        ), "Alphas should be positive"
+            alpha_mass >= 0  # and alpha_momentum >= 0 and alpha_prob >= 0
+        ), "Alpha should be positive"
 
     def forward(self, x_input, x_target, edge_input, edge_target, u_input, u_target):
-        prob_input = u_input if self.global_layer else None
-        prob_target = u_target
+        # prob_input = u_input if self.global_layer else None
+        # prob_target = u_target
         # p_input = u_input[:, :3] if self.global_layer else None
         # p_target = u_target[:, :3]
 
@@ -89,14 +89,14 @@ class MultiTrainLoss(nn.Module):
             else 0
         )
 
-        prob_loss = (
-            self.prob_CE(
-                prob_input,
-                prob_target,
-            )
-            if self.alpha_prob > 0
-            else 0
-        )
+        # prob_loss = (
+        #     self.prob_CE(
+        #         prob_input,
+        #         prob_target,
+        #     )
+        #     if self.alpha_prob > 0
+        #     else 0
+        # )
 
         # momentum_loss = (
         #     self.momentum_L1(
@@ -110,6 +110,6 @@ class MultiTrainLoss(nn.Module):
         return (
             LCA_loss
             + self.alpha_mass * mass_loss
-            + self.alpha_prob * prob_loss
+            # + self.alpha_prob * prob_loss
             # + self.alpha_momentum * momentum_loss
         ) / self.scaling

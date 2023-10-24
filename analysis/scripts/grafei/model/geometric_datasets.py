@@ -36,6 +36,7 @@ def _preload(self):
     # self.features = [f for f in self.root_trees[0].keys() if f.startswith("feat_")]
     with uproot.open(self.x_files[0])["Tree"] as t:
         self.features = [f for f in t.keys() if f.startswith("feat_")]
+        self.ups_reco = True if t["isUps"].array(library="np").any() else False
 
     if self.node_features:
         # Keep only requested features
@@ -258,7 +259,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
     def __init__(
         self,
         root,
-        ups_reco=False,
         n_files=None,
         samples=None,
         subset_unmatched=True,
@@ -288,8 +288,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         ), f'Argument "features" must be a list and not {type(features)}'
 
         self.root = Path(root)
-
-        self.ups_reco = ups_reco
 
         self.normalize = normalize
 
@@ -333,7 +331,6 @@ class BelleRecoSetGeometric(Dataset):
     def __init__(
         self,
         root,
-        ups_reco=False,
         n_files=None,
         samples=None,
         subset_unmatched=True,
@@ -363,8 +360,6 @@ class BelleRecoSetGeometric(Dataset):
         ), f'Argument "features" must be a list and not {type(features)}'
 
         self.root = Path(root)
-
-        self.ups_reco = ups_reco
 
         self.normalize = normalize
 

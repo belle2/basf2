@@ -28,9 +28,7 @@ FEI_pdg_converter = {
 def update_levels(levels, hist, pdg, intermediate_skipped=False):
     for i, n in enumerate(hist):
         if n not in levels.keys():
-            temp_pdg = abs(
-                pdg[n]
-            )  # Take the absolute value of the pdg for the converter
+            temp_pdg = abs(pdg[n])  # Take the absolute value of the pdg for the converter
             if temp_pdg in FEI_pdg_converter:
                 levels[n] = FEI_pdg_converter[temp_pdg]
             else:
@@ -239,6 +237,8 @@ class RootSaverModule(b2.Module):
         # General data
         self.event_num = np.zeros(1, dtype=np.int32)
         self.tree.Branch("event", self.event_num, "event/I")
+        self.isUps = np.zeros(1, dtype=bool)
+        self.tree.Branch("isUps", self.isUps, "isUps/O")
 
         # We use a placeholder to point each Branch to initially, we'll use the n_xxx for vectors to tell ROOT
         # how many entries in the array to save via the xxx[n_xxx] string
@@ -318,6 +318,8 @@ class RootSaverModule(b2.Module):
 
         # Event number from EventMetaData -loaded with PyStoreObj
         self.event_num[0] = self.eventinfo.getEvent()
+        # Is Upsilon flag
+        self.isUps[0] = True if self.mcparticle_list == "Upsilon(4S):MC" else False
 
         # Is background flag
         # bkg_event = np.random.rand(1) > (1 - self.bkg_probability)
@@ -332,7 +334,11 @@ class RootSaverModule(b2.Module):
             for part in p_list.obj():
                 # Get the corresponding MCParticle
                 mcp = part.getMCParticle()
-                array_index = mcp.getArrayIndex() + 1 if self.mcparticle_list == "Upsilon(4S):MC" else mcp.getArrayIndex()
+                # In this way the LCA variables in the ntuples will be labelled _1 and _2
+                # If we train on B decays these will correspond to the two Bs
+                # while if we train on the Upsilon, _1 will correspond to it and _2 will remain empty
+                # becaus getArrayIndex() gives 0 for the Upsilon and 1, 2 for the Bs
+                array_index = mcp.getArrayIndex() + 1 if self.isUps[0] else mcp.getArrayIndex()
 
                 # Get the B flag
                 # self.truth_dict["isUps"][0] = int(not bkg_event)

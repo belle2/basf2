@@ -386,9 +386,55 @@ def upload_file_gitlab(
     return uploaded_file
 
 
+def get_librarians(package: str) -> List[str]:
+    """
+    Function to get package librarian(s)' GitLab usernames. Temp solution
+    until the .librarians file directly provdies Gitlab usernames.
+
+    Return:
+        list of librarians' Gitlab usernames
+    """
+
+    usernames = []
+    librarian_file = os.path.join(
+        validationpath.get_basepath()['local'],
+        package,
+        '.librarians'
+    )
+    try:
+        with open(librarian_file, 'r') as f:
+            librarians = f.readlines()
+    except FileNotFoundError:
+        logging.exception(
+            f"{librarian_file} couldn't be found. Corrupted package/librarian file?"
+        )
+        return usernames
+    # Temp workaround to fetch DESY -> Gitlab map
+    import importlib
+    try:
+        desy_map_path = os.path.join(
+            "/home/b2soft/gitlab",
+            "account_map.py"
+        )
+    except FileNotFoundError:
+        logging.exception(
+            f"{desy_map_path} couldn't be found. Have you setup Gitlab Webhook?"
+        )
+        return usernames
+
+    spec = importlib.util.spec_from_file_location('account_map', desy_map_path)
+    desy_map = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(desy_map)
+    for librarian in librarians:
+        usernames.append(desy_map.get_gitlab_account(librarian.rstrip()))
+
+    return usernames
+
+
 def parse_contact(
         contact: str,
         map_file: str,
+        package: str,
         gitlab_object: gitlab.Gitlab
 ) -> List[str]:
     """
@@ -406,6 +452,7 @@ def parse_contact(
                              )
     email_ids = re.finditer(email_regex, contact)
     gitlab_ids = []
+    usernames = []
 
     try:
         with open(map_file, 'r') as f:
@@ -414,7 +461,7 @@ def parse_contact(
         logging.exception(
             f"{map_file} couldn't be found. Did you get the location right?"
         )
-        return gitlab_ids
+        email_ids = []
 
     for email in email_ids:
         try:
@@ -422,15 +469,30 @@ def parse_contact(
                 (line for line in id_map if email.group() in line), None
             )
             username = match.split(' ')[1].rstrip()
-            gitlab_ids.append(gitlab_object.users.list(username=username)[0].id)
+            usernames.append(username)
         except IndexError:
             logging.error(
                 f"Map info {match} does not match the required format for map "
                 "'email gitlab_username'."
             )
             continue
-        # to-do: warning if gitlab user doesn't exist
 
+    # Assign to librarian(s) if no contact found
+    if not usernames:
+        usernames = get_librarians(package)
+        logging.info(
+            "Couldn't find contact/id so assigning issue to the"
+            " package librarians."
+        )
+
+    for user in usernames:
+        try:
+            gitlab_ids.append(gitlab_object.users.list(username=user)[0].id)
+        except IndexError:
+            logging.error(
+                f"Could not find {user} in Gitlab."
+            )
+            continue
     logging.info(
         "Issue will be assigned to "
         f"{[gitlab_object.users.get(id) for id in gitlab_ids]}."
@@ -848,13 +910,12 @@ class ValidationRoot:
         project = get_project_object(self.gitlab_object, project_id)
         uploaded_file = upload_file_gitlab(self.file_path, project)
         assignees = []
-        print(f"Contact:{self.contact}")
-        if self.gitlab_map:
-            assignees = parse_contact(
-                self.contact, self.gitlab_map, self.gitlab_object
-            )
         file_name = self.file_path.split("/")[-1].split(".log")[0]
         file_package = self.file_path.split("/")[-2]
+        if self.gitlab_map:
+            assignees = parse_contact(
+                self.contact, self.gitlab_map, file_package, self.gitlab_object
+            )
         description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
             Relevant {2}: {0}\n\n\
             Revision label: {1}\n\n---".format(

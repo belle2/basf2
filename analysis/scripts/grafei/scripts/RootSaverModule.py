@@ -7,25 +7,28 @@ from itertools import combinations
 from variables import variables as vm
 from grafei.scripts.FlagBDecayModule import getObjectList
 
-# taken from MC PDG code
-FEI_pdg_converter = {
-    443: 1,  # J/psi
-    111: 1,  # pi^0 #different groups because decay is very different
-    310: 2,  # K_S^0
-    # 130, #K_L^0 #this should be part of the first step particles with e,mu etc, its a flag for FEI
-    421: 3,  # D^0
-    411: 3,  # D^+
-    431: 3,  # D_s^+
-    413: 4,  # D^+*
-    423: 4,  # D^0*
-    433: 4,  # D_s^*+
-    521: 5,  # B^+
-    511: 5,  # B^0
-    300553: 6,  # Upsilon(4S)
-}
-
 
 def update_levels(levels, hist, pdg, intermediate_skipped=False):
+    """
+    Assigns LCAS level to each particle in the decay tree.
+    """
+    # taken from MC PDG code
+    FEI_pdg_converter = {
+        443: 1,  # J/psi
+        111: 1,  # pi^0
+        310: 2,  # K_S^0
+        # 130: 2, #K_L^0
+        421: 3,  # D^0
+        411: 3,  # D^+
+        431: 3,  # D_s^+
+        413: 4,  # D^+*
+        423: 4,  # D^0*
+        433: 4,  # D_s^*+
+        521: 5,  # B^+
+        511: 5,  # B^0
+        300553: 6,  # Upsilon(4S)
+    }
+
     for i, n in enumerate(hist):
         if n not in levels.keys():
             temp_pdg = abs(pdg[n])  # Take the absolute value of the pdg for the converter

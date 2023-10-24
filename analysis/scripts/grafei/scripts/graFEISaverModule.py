@@ -16,7 +16,6 @@ from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
 from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, n_intermediate_particles
 from grafei.model.tree_utils import masses_to_classes
-from grafei.model.data_utils import pull_down_LCA
 from grafei.scripts.RootSaverModule import write_hist
 
 warnings.filterwarnings(
@@ -148,15 +147,6 @@ class graFEISaverModule(b2.Module):
         self.use_amp = self.configs["train"][
             "mixed_precision"
         ] and self.device == torch.device("cuda")
-
-        # LCAG or LCAS
-        self.LCAS = self.configs["dataset"]["config"]["use_lcas"]
-
-        # Whether to pull down LCA
-        self.pull_down_lca = (
-            self.configs["dataset"]["config"]["pull_down_lca"]
-            and not self.LCAS
-        )
 
         # Get features
         self.node_features = self.configs["dataset"]["config"]["features"]
@@ -513,7 +503,7 @@ class graFEISaverModule(b2.Module):
         masses_ordered = dict(
             (i, j) for i, j in zip(range(1, 7), [[] for _ in range(6)])
         )
-        if graFEI_B_isValidTree and self.LCAS:
+        if graFEI_B_isValidTree:
             level_intermediates, lca_idx_of_daughters, graFEI_depthLCA = n_intermediate_particles(
                 predicted_LCA_square_matched
             )
@@ -720,37 +710,20 @@ class graFEISaverModule(b2.Module):
                 mcp = genUps_list.obj()[0].getMCParticle()
 
                 # Write leaf history
-                if self.LCAS:
-                    (
-                        leaf_hist,
-                        levels,
-                        pdg,
-                        leaf_pdg,
-                        semilep_flag,
-                    ) = write_hist(
-                        particle=mcp,
-                        leaf_hist={},
-                        levels={},
-                        hist=[],
-                        pdg={},
-                        leaf_pdg={},
-                        semilep_flag=False,
-                        )
-                else:
-                    (
-                        leaf_hist,
-                        levels,
-                        pdg,
-                        leaf_pdg,
-                        semilep_flag,
-                    ) = write_hist(
-                        particle=mcp,
-                        leaf_hist={},
-                        levels={},
-                        hist=[],
-                        pdg={},
-                        leaf_pdg={},
-                        semilep_flag=False,
+                (
+                    leaf_hist,
+                    levels,
+                    pdg,
+                    leaf_pdg,
+                    semilep_flag,
+                ) = write_hist(
+                    particle=mcp,
+                    leaf_hist={},
+                    levels={},
+                    hist=[],
+                    pdg={},
+                    leaf_pdg={},
+                    semilep_flag=False,
                     )
 
                 if self.storeDecayTrees:
@@ -783,10 +756,6 @@ class graFEISaverModule(b2.Module):
                     ]
                     true_LCA_square[x[0], y[0]] = levels[intersection[-1]]
                     true_LCA_square[y[0], x[0]] = levels[intersection[-1]]
-
-                # Pull down in case (not done if using LCAS)
-                if self.pull_down_lca:
-                    true_LCA_square = pull_down_LCA(true_LCA_square)
 
                 try:
                     _, _, graFEI_truth_depthLCA = n_intermediate_particles(

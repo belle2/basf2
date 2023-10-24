@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 from particle import Particle, ParticleNotFound
 
 
@@ -209,33 +208,3 @@ def calculate_class_weights(dataloader, num_classes, edges, num_batches=100):
     weights = torch.nan_to_num(weights, nan=1)
 
     return weights
-
-
-def pull_down_LCA(lca):
-    """Generic method to pull down a single LCA
-
-    This assumes that all LCA values are positive, if it contains e.g. padding those will be also pulled down.
-    """
-
-    # Only support a single LCA at a time
-    assert lca.ndim == 2, "LCA to pull down must be a single LCA with 2 dimensions"
-
-    # Do for torch tensors
-    if isinstance(lca, torch.Tensor):
-        unique_els = torch.unique(lca, sorted=True)
-        for idx, val in enumerate(unique_els):
-            lca[lca == val] = idx
-
-    # And for numpy arrays
-    elif isinstance(lca, np.ndarray):
-        unique_els = np.unique(lca)
-        for idx, val in np.ndenumerate(unique_els):
-            lca[lca == val] = idx
-
-    # Raise error if anything else
-    else:
-        raise TypeError(
-            "Only torch.tensor or numpy.ndarray supported for LCA pull-down"
-        )
-
-    return lca

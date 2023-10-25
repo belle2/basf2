@@ -12,6 +12,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>V0ValidationHarvested.root</input>
+  <output>V0Validation.root</output>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>
 """

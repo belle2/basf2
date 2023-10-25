@@ -12,6 +12,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>VxdCdcValidationHarvested.root</input>
+  <output>VxdCdcMergerValidation.root</output>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>
 """

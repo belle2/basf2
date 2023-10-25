@@ -584,7 +584,8 @@ class graFEISaverModule(b2.Module):
 
                 if gen_list.getListSize() > 0:
                     # Here we look if the candidate has a perfectly reconstructed LCA
-                    for mcp in gen_list.obj():
+                    for genP in gen_list.obj():
+                        mcp = genP.getMCParticle()
                         # If storing true info on B decays and we have paricles coming from different Bs
                         # the decay will not have a perfectLCA
                         if self.storeTrueInfo != "Upsilon(4S):MC" and len(B_indices) != 1:

@@ -1539,10 +1539,13 @@ C      CALL INIOFC ! dummy for now anyway
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       INTEGER CHCONJUGATE
       COMMON /CHCONJUGATE/ CHCONJUGATE
+      INTEGER TauToElOrMu
+      COMMON /TauToElOrMu/ TauToElOrMu
       INTEGER JAKT ! temporary place holder for JAK1
       DATA    JAKT /-1/
       SAVE    JAKT
       REAL    RRR(1)
+      REAL    RRR1(1)
       IF (KTO.EQ.1) THEN  
          IF (CHCONJUGATE.EQ.1) THEN  
             CALL KKMC_RANMAR(RRR,1)
@@ -1550,6 +1553,16 @@ C      CALL INIOFC ! dummy for now anyway
                JAKT = JAK1
                JAK1 = JAK2
                JAK2 = JAKT
+            ENDIF
+         ENDIF
+         IF (TauToElOrMu.EQ.1) THEN
+            CALL KKMC_RANMAR(RRR1,1)
+            IF (RRR1(1).GT.0.5) THEN ! flip between 1 and 2
+               IF (JAK1.EQ.1.OR.JAK1.EQ.2) THEN
+                  JAK1=MOD(JAK1,2)+1
+               ELSE
+                  JAK2=MOD(JAK2,2)+1
+               ENDIF
             ENDIF
          ENDIF
       ENDIF

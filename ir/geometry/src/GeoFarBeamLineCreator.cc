@@ -314,9 +314,10 @@ namespace Belle2 {
         string geo_torusx_name = "geo_" + name + "x_name";
         string geo_torus_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_torusxx(NULL), *geo_torus(NULL);
+        G4VSolid* geo_torus(NULL);
 
         if (subtract != "" || intersect != "") {
+          G4VSolid* geo_torusxx(NULL);
           if (type == "pipe") // for pipes inner space will be created as vacuum
             geo_torusxx = new G4Torus(geo_torusxx_name, 0, torus_R, torus_RT, torus_SPHI, torus_DPHI);
           else

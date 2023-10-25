@@ -149,15 +149,15 @@ namespace Belle2 {
     /**m_2GeV_flag_ECL leaf*/
     int get_2GeV_ECL(int i) const {return m_2GeV_ECL[i];}
 
-    /**#wire hit in SL0*/
+    /** \#wire hit in SL0*/
     int get_wire_tsf0() const {return m_wire_tsf0;}
-    /**#wire hit in SL1*/
+    /** \#wire hit in SL1*/
     int get_wire_tsf1() const {return m_wire_tsf1;}
-    /**#wire hit in SL2*/
+    /** \#wire hit in SL2*/
     int get_wire_tsf2() const {return m_wire_tsf2;}
-    /**#wire hit in SL3*/
+    /** \#wire hit in SL3*/
     int get_wire_tsf3() const {return m_wire_tsf3;}
-    /**#wire hit in SL4*/
+    /** \#wire hit in SL4*/
     int get_wire_tsf4() const {return m_wire_tsf4;}
 
     /**m_map_TSF0 integer leaf*/
@@ -405,15 +405,15 @@ namespace Belle2 {
     void set_2GeV_ECL(int i, int c2GeV_ECL)  { m_2GeV_ECL[i] = c2GeV_ECL; }
     void Addto_2GeV_ECL(int c2GeV_ECL)  { m_2GeV_ECL.push_back(c2GeV_ECL) ; }
 
-    /**#wire hit in SL0*/
+    /** \#wire hit in SL0*/
     void set_wire_tsf0(int wire_tsf0) { m_wire_tsf0 = wire_tsf0; }
-    /**#wire hit in SL1*/
+    /** \#wire hit in SL1*/
     void set_wire_tsf1(int wire_tsf1) { m_wire_tsf1 = wire_tsf1; }
-    /**#wire hit in SL2*/
+    /** \#wire hit in SL2*/
     void set_wire_tsf2(int wire_tsf2) { m_wire_tsf2 = wire_tsf2; }
-    /**#wire hit in SL3*/
+    /** \#wire hit in SL3*/
     void set_wire_tsf3(int wire_tsf3) { m_wire_tsf3 = wire_tsf3; }
-    /**#wire hit in SL4*/
+    /** \#wire hit in SL4*/
     void set_wire_tsf4(int wire_tsf4) { m_wire_tsf4 = wire_tsf4; }
 
     /**m_map_TSF0 integer leaf*/
@@ -665,15 +665,15 @@ namespace Belle2 {
     /**m_2GeV_flag_ECL leaf*/
     std::vector<int> m_2GeV_ECL = std::vector<int>(30, 0);
 
-    /**#wire hit in SL0*/
+    /** \#wire hit in SL0*/
     int m_wire_tsf0;
-    /**#wire hit in SL2*/
+    /** \#wire hit in SL2*/
     int m_wire_tsf2;
-    /**#wire hit in SL4*/
+    /** \#wire hit in SL4*/
     int m_wire_tsf4;
-    /**#wire hit in SL1*/
+    /** \#wire hit in SL1*/
     int m_wire_tsf1;
-    /**#wire hit in SL3*/
+    /** \#wire hit in SL3*/
     int m_wire_tsf3;
 
     /**m_map_TSF0 integer leaf*/

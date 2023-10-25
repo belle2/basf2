@@ -723,7 +723,7 @@ def command_iov(args, db):
                 """Add the numerical ids to the table"""
                 if args.show_ids:
                     table[0] += ["IovId", "PayloadId"]
-                    columns += [7, 9]
+                    columns += [9, 9]
                     for row, p in zip(table[1:], payloads):
                         row += [p.iov_id, p.payload_id]
             payloads.sort()

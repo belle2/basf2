@@ -42,6 +42,8 @@ REG_MODULE(Root2Raw)
 Root2RawModule::Root2RawModule()
 {
   addParam("outputFileName", m_filename, "Output binary filename", string("datafile.binary"));
+  addParam("expno", m_expno, "experiment number for output raw file", 0);
+  addParam("runno", m_runno, "run number for output raw file", 0);
 }
 
 Root2RawModule::~Root2RawModule()
@@ -203,6 +205,15 @@ void Root2RawModule::event()
   nblock++;
   */
 
+  // skip empty events, mostly discarded from HLT
+  if (svdarray.getEntries() < 1 &&
+      cdcarray.getEntries() < 1 &&
+      toparray.getEntries() < 1 &&
+      aricharray.getEntries() < 1 &&
+      eclarray.getEntries() < 1 &&
+      klmarray.getEntries() < 1) {
+    return;
+  }
 
   //  printf ( "COPPERs filling completed\n" );
 
@@ -227,6 +238,11 @@ void Root2RawModule::event()
   //  printf ( "%8.8x %8.8x %8.8x %8.8x ", *hdrbuf, *(hdrbuf+1), *(hdrbuf+2), *(hdrbuf+3) );
   //  printf ( "%8.8x %8.8x %8.8x %8.8x\n", *(hdrbuf+4), *(hdrbuf+5), *(hdrbuf+6), *(hdrbuf+7) );
 
+  // Set exp/rnu number explicitly if there are parameters
+  if (m_expno != 0 && m_runno != 0) {
+    hdr.SetExpNum(m_expno);
+    hdr.SetRunNum(m_runno);
+  }
 
   memcpy(evtbuf, hdr.GetBuffer(), hdr.GetHdrNwords()*sizeof(int));
   memcpy(databuf, trl.GetBuffer(), trl.GetTrlNwords()*sizeof(int));

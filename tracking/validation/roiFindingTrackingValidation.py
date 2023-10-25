@@ -261,3 +261,5 @@ if ACTIVE:
     basf2.process(path)
 
     print(path)
+
+    print(basf2.statistics)

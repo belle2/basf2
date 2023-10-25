@@ -202,7 +202,6 @@ namespace Belle2 {
 
 
     /** Return the LorentzRotation from CMS to LAB based on the following parameters
-     * @param Ecms     centre-of-mass energy of the collision
      * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
      * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
      * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors

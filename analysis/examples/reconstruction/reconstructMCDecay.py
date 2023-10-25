@@ -8,12 +8,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 An example script to find a specific decay chain at MC level.
 """
+
+# Doxygen should skip this script
+# @cond
 
 import basf2
 from modularAnalysis import fillParticleListFromMC, inputMdst, reconstructMCDecay, variablesToNtuple

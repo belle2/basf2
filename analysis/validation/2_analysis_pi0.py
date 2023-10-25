@@ -183,7 +183,7 @@ validation_metadata_update(
     output,
     "pi0_mass",
     title="Pi0 mass fit results",
-    contact="selce@infn.it",
+    contact="eldar.ganiev@desy.de",
     description="Fit to the invariant mass of the reconstructed and truth matched pi0s",
     check="Consistent numerical fit results. Stable mean and width.",
     metaoptions="shifter")

@@ -83,17 +83,9 @@ namespace Belle2 {
 
     /**
      * Process 2D efficiency histograms.
-     * @param[in]  mainHist Live efficiency histogram.
-     * @param[in]  refHist Reference efficiency histogram
-     * @param[in]  planeHist Live ratio histogram
-     * @param[in]  errHist Error histogram
-     * @param[in]  layers Number of layers
-     * @param[in]  sectors Number of sectors
-     * @param[in]  ratioPlot True if ratio plot, False if difference plot
-     * @param[in]  eff2dCanv Canvas
      */
-    void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
-                               TCanvas* eff2dCanv);
+    void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors,
+                               bool ratioPlot, int* pvcount, double layerLimit, TCanvas* eff2dCanv);
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
@@ -148,6 +140,9 @@ namespace Belle2 {
     /** reference histogram file **/
     TFile* m_refFile = nullptr;
 
+    /** efficiency ratio warning threshold **/
+    float m_warnThr = 0;
+
     /** efficiency ratio alarm threshold **/
     float m_alarmThr = 0;
 
@@ -189,6 +184,18 @@ namespace Belle2 {
 
     /** Minimal number of entries for delta histogram update. */
     double m_minEvents;
+
+    /** Number of inefficient BKLM layers. */
+    int m_nEffBKLMLayers;
+
+    /** Number of inefficient EKLM Layers*/
+    int m_nEffEKLMLayers;
+
+    /** alarm limits from inefficient BKLM layers PV */
+    double m_BKLMLayerWarn;
+
+    /** alarm limits from inefficient EKLM layers PV*/
+    double m_EKLMLayerWarn;
 
   };
 

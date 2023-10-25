@@ -20,7 +20,7 @@ import basf2
 from ROOT import TFile, TNamed
 import os
 
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+VALIDATION_OUTPUT_FILE = "fullTrackingValidationTable.root"
 
 try:
     import uproot  # noqa

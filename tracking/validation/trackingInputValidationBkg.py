@@ -121,9 +121,9 @@ class TrackingInputValidation(basf2.Module):
         output_tfile = ROOT.TFile(self.output_file_name, 'recreate')
 
         h_nPXDDigits = ValidationPlot('h_nPXDDigits')
-        h_nPXDDigits.hist(self.nPXDDigits, bins=100, lower_bound=0, upper_bound=1000)
+        h_nPXDDigits.hist(self.nPXDDigits, bins=100, lower_bound=0, upper_bound=2000)
         h_nPXDDigits.contact = self.contact
-        h_nPXDDigits.check = 'Average of 250 +/- 100 is expected'
+        h_nPXDDigits.check = 'Average of 500 +/- 100 is expected.'
         h_nPXDDigits.description = 'Number of PXDDigits after ROI filtering'
         h_nPXDDigits.title = 'Number of selected PXDDigits per event'
         h_nPXDDigits.xlabel = 'Number of PXDDigits'
@@ -133,8 +133,8 @@ class TrackingInputValidation(basf2.Module):
         h_nPXDClusters = ValidationPlot('h_nPXDClusters')
         h_nPXDClusters.hist(self.nPXDClusters, bins=100, lower_bound=0, upper_bound=500)
         h_nPXDClusters.contact = self.contact
-        h_nPXDClusters.check = 'Average of 75 +/- 20 is expected'
-        h_nPXDClusters.description = 'Number of PXDClusters after ROI filtering'
+        h_nPXDClusters.check = 'Average of 150 +/- 30 is expected'
+        h_nPXDClusters.description = 'Number of PXDClusters after ROI filtering.'
         h_nPXDClusters.title = 'Number of PXDClusters per event'
         h_nPXDClusters.xlabel = 'Number of PXDClusters'
         h_nPXDClusters.ylabel = ''
@@ -143,9 +143,9 @@ class TrackingInputValidation(basf2.Module):
         h_nPXDSpacePoints = ValidationPlot('h_nPXDSpacePoints')
         h_nPXDSpacePoints.hist(self.nPXDSpacePoints, bins=100, lower_bound=0, upper_bound=500)
         h_nPXDSpacePoints.contact = self.contact
-        h_nPXDSpacePoints.check = 'Average of 75 +/- 20 is expected'
+        h_nPXDSpacePoints.check = 'Average of 150 +/- 30 is expected'
         h_nPXDSpacePoints.description = 'Number of PXDSpacePoints after ROI filtering. \
-                                         Should be the same as the number of PXDClusters'
+                                         Should be the same as the number of PXDClusters.'
         h_nPXDSpacePoints.title = 'Number of PXDSpacePoints per event'
         h_nPXDSpacePoints.xlabel = 'Number of PXDSpacePoints'
         h_nPXDSpacePoints.ylabel = ''
@@ -154,7 +154,7 @@ class TrackingInputValidation(basf2.Module):
         h_nSVDShaperDigits = ValidationPlot('h_nSVDShaperDigits')
         h_nSVDShaperDigits.hist(self.nSVDShaperDigits, bins=100, lower_bound=0, upper_bound=10000)
         h_nSVDShaperDigits.contact = self.contact
-        h_nSVDShaperDigits.check = 'First peak at about 3200 +/- 200 is expected, with a second peak round 5500'
+        h_nSVDShaperDigits.check = 'First peak at about 5500 +/- 200 is expected.'
         h_nSVDShaperDigits.description = 'Number of SVDDigits'
         h_nSVDShaperDigits.title = 'Number of SVDDigits per event'
         h_nSVDShaperDigits.xlabel = 'Number of SVDDigits'
@@ -164,7 +164,7 @@ class TrackingInputValidation(basf2.Module):
         h_nSVDClusters = ValidationPlot('h_nSVDClusters')
         h_nSVDClusters.hist(self.nSVDClusters, bins=100, lower_bound=0, upper_bound=2000)
         h_nSVDClusters.contact = self.contact
-        h_nSVDClusters.check = 'Average of 500 +/- 100 is expected'
+        h_nSVDClusters.check = 'Average of 1100 +/- 100 is expected.'
         h_nSVDClusters.description = 'Number of SVDClusters'
         h_nSVDClusters.title = 'Number of SVDClusters per event'
         h_nSVDClusters.xlabel = 'Number of SVDClusters'
@@ -174,7 +174,7 @@ class TrackingInputValidation(basf2.Module):
         h_nSVDSpacePoints = ValidationPlot('h_nSVDSpacePoints')
         h_nSVDSpacePoints.hist(self.nSVDSpacePoints, bins=100, lower_bound=0, upper_bound=2000)
         h_nSVDSpacePoints.contact = self.contact
-        h_nSVDSpacePoints.check = 'Average of 200 +/- 50 is expected'
+        h_nSVDSpacePoints.check = 'Average of 200 +/- 50 is expected.'
         h_nSVDSpacePoints.description = 'Number of SVDSpacePoints'
         h_nSVDSpacePoints.title = 'Number of SVDSpacePoints per event'
         h_nSVDSpacePoints.xlabel = 'Number of SVDSpacePoints'
@@ -182,9 +182,9 @@ class TrackingInputValidation(basf2.Module):
         h_nSVDSpacePoints.write(output_tfile)
 
         h_nCDCHits = ValidationPlot('h_nCDCHits')
-        h_nCDCHits.hist(self.nCDCHits, bins=100, lower_bound=0, upper_bound=5000)
+        h_nCDCHits.hist(self.nCDCHits, bins=100, lower_bound=0, upper_bound=6000)
         h_nCDCHits.contact = self.contact
-        h_nCDCHits.check = 'Average of 3000 +/- 200 is expected'
+        h_nCDCHits.check = 'Average of 3500 +/- 200 is expected.'
         h_nCDCHits.description = 'Number of CDCHits'
         h_nCDCHits.title = 'Number of CDCHits per event'
         h_nCDCHits.xlabel = 'Number of CDCHits'
@@ -212,3 +212,4 @@ path.add_module('Progress')
 if ACTIVE:
     print(path)
     basf2.process(path)
+    print(basf2.statistics)

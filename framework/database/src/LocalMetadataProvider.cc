@@ -24,7 +24,9 @@ namespace Belle2::Conditions {
           ((firstExp==:exp AND firstRun<=:run) OR firstExp<:exp) AND
           (finalExp<0 OR (finalRun<0 AND finalExp>=:exp) OR finalExp>:exp OR (finalExp==:exp AND finalRun>=:run));
       )SQL", true}
-  {}
+  {
+    printInfoMessage(m_filename);
+  }
 
   std::string LocalMetadataProvider::getGlobaltagStatus(const std::string& globaltag)
   {

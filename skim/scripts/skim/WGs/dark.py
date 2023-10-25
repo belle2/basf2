@@ -333,7 +333,7 @@ class EGammaControlDark(BaseSkim):
         path = self.skim_event_cuts(event_cuts, path=path)
 
         # fill electron lists (tighter than previous selection)
-        good_track_w_hie_cluster_match = '%s and clusterE > 2.0' % phys_perf_good_track
+        good_track_w_hie_cluster_match = f'{phys_perf_good_track} and clusterE > 2.0'
         ma.cutAndCopyList(f'e+:{internal_skim_label}', 'e+:all', good_track_w_hie_cluster_match, path=path)
 
         # reconstruct decay

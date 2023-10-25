@@ -430,16 +430,16 @@ def improve_docstring(obj):
         pyclass.__doc__ += f'\n * {f.GetReturnTypeName()} {f.GetName()}{f.GetSignature()}'
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += ' (%s)' % (title)
+            pyclass.__doc__ += f' ({title})'
 
     members = tclass.GetListOfAllPublicDataMembers()
     if members.GetEntries() > 0:
         pyclass.__doc__ += '\n\nPublic data members'
     for f in members:
-        pyclass.__doc__ += '\n * %s' % (f.GetName())
+        pyclass.__doc__ += f'\n * {f.GetName()}'
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += ' (%s)' % (title)
+            pyclass.__doc__ += f' ({title})'
 
 
 def skipmember(app, what, name, obj, skip, options):

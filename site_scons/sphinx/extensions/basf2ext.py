@@ -112,8 +112,8 @@ class ModuleListDirective(Directive):
         env = self.state.document.settings.env
         env.app.emit('autodoc-process-docstring', "b2:module", module.name(), module, None, description)
         description += ["", "",
-                        ":Package: %s" % module.package(),
-                        ":Library: %s" % os.path.basename(library),
+                        f":Package: {module.package()}",
+                        f":Library: {os.path.basename(library)}",
                         ]
 
         if "no-parameters" not in self.options:
@@ -136,9 +136,9 @@ class ModuleListDirective(Directive):
                 description += [":Parameters:", "    "] + optional_params
 
         if "io-plots" in self.options:
-            image = "build/ioplots/%s.png" % module.name()
+            image = f"build/ioplots/{module.name()}.png"
             if os.path.exists(image):
-                description += [":IO diagram:", "    ", "    .. image:: /%s" % image]
+                description += [":IO diagram:", "    ", f"    .. image:: /{image}"]
 
         content = [f".. b2:module:: {module.name()}"] + self.noindex + ["    "]
         content += ["    " + e for e in description]

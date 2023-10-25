@@ -188,7 +188,7 @@ elif option == 'opt':
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
     # evils, oversubscription is the better choice.
-    global_env.Append(LINKFLAGS='-flto$(=%d$)' % GetOption('num_jobs'))
+    global_env.Append(LINKFLAGS=f"-flto$(={int(GetOption('num_jobs'))}$)")
     # LTO requires some binutils wrappers that preserve the GCC IR
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'
@@ -244,7 +244,7 @@ elif option == 'clang':
         # ok, here we process all lines in the g++ default include path. If they
         # have c++ in the name we take them
         if is_search_path and line.find("c++") >= 0:
-            global_env.Append(CXXFLAGS=["-isystem%s" % line.strip()])
+            global_env.Append(CXXFLAGS=[f"-isystem{line.strip()}"])
         # search path starts after this line
         if line.startswith("#include <...> search starts here:"):
             is_search_path = True

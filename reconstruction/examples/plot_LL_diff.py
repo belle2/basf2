@@ -72,7 +72,7 @@ class MinModule(b2.Module):
                 # some tracks don't have an mcparticle
                 b2.B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
-                print('event: %d, track: %d' % (event, track.getArrayIndex()))
+                print(f'event: {int(event)}, track: {int(track.getArrayIndex())}')
             else:
                 pdg = abs(mcpart.getPDG())
                 momentumVec = mcpart.getMomentum()

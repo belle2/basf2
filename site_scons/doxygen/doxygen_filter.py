@@ -80,10 +80,10 @@ for line in open(filename):
     try:
         if re.match(r'namespace Belle2 {.*', line):
             belle2ns = True
-            print("""  /**
-   * @addtogroup %s
-   * @{
-   */""" % group)
+            print(f"""  /**
+   * @addtogroup {group}
+   * @{{
+   */""")
     except OSError:
         pass  # doxygen closes pipe for whatever reason
 

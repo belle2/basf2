@@ -30,7 +30,7 @@ def check_simulation(path):
         if module_type in required:
             # unless it is already in there
             if module_type in found:
-                b2.B2ERROR("Duplicate module in path: %s" % module_type)
+                b2.B2ERROR(f"Duplicate module in path: {module_type}")
             else:
                 found.append(module.type())
 
@@ -38,11 +38,10 @@ def check_simulation(path):
         # Apparently at least one module is missing
         for r in required:
             if r not in found:
-                b2.B2ERROR("No '%s' module found but needed for simulation" % r)
+                b2.B2ERROR(f"No '{r}' module found but needed for simulation")
     # We have all modules but do they have the correct order?
     elif required != found:
-        b2.B2ERROR("Simulation modules in wrong order. Should be '%s' but is '%s'"
-                   % (", ".join(required), ", ".join(found)))
+        b2.B2ERROR(f"Simulation modules in wrong order. Should be '{', '.join(required)}' but is '{', '.join(found)}'")
 
 
 def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',

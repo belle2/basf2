@@ -122,7 +122,7 @@ for category in categories:
         fraction = time / limits[category]
         if fraction > max_fraction:
             max_fraction = fraction
-        message += ' = %.f%% of the limit.' % (100 * fraction)
+        message += f' = {100 * fraction:.f}% of the limit.'
         if fraction <= 0.9:
             b2.B2INFO(message)
         elif fraction <= 1:
@@ -135,7 +135,7 @@ for category in categories:
     if output is not None:
         output.write(f'{category} {time:.2f}')
         if fraction >= 0:
-            output.write(' %.4f' % fraction)
+            output.write(f' {fraction:.4f}')
         output.write('\n')
 
 # fail if above limit

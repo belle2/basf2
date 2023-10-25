@@ -137,8 +137,8 @@ def check_libraries(target, source, env):
         # But for now we just restrict ourselves to libraries in $LIBDIR
         # because we know they don't have so-versions. So reduce the
         # lists to libraries which we can actually find in $LIBDIR
-        given_internal = {"lib%s.so" % library for library in given if os.path.exists(os.path.join(libdir,
-                                                                                                   "lib%s.so" % library))}
+        given_internal = {f"lib{library}.so" for library in given if os.path.exists(os.path.join(libdir,
+                                                                                                 f"lib{library}.so"))}
         needed_internal = {library for library in needed if os.path.exists(os.path.join(libdir, library))}
 
         # now check for extra or missing direct dependencies using

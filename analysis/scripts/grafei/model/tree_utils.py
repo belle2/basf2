@@ -1,4 +1,42 @@
 import torch as t
+from variables import variables as vm
+import numpy as np
+
+
+def node_masses(particles, nodes):
+    """
+    Computes the invariant mass of particles who have the same ancestor, one for each element in nodes.
+
+    Args:
+        particles (list): list of predicted matched particles.
+        nodes (list): list of lists of indices, one for each ancestor node that you want to consider. Each list contains
+                        the position of the particles in the LCA matrix.
+
+    Returns:
+        masses (list): list of invariant masses, one for each element in indices.
+    """
+    masses = []
+
+    for indices in nodes:
+        fsps = [j for i, j in enumerate(particles) if i in indices]
+
+        E = 0.0
+        px = 0.0
+        py = 0.0
+        pz = 0.0
+
+        for particle in fsps:
+            E += vm.evaluate("E", particle)
+            px += vm.evaluate("px", particle)
+            py += vm.evaluate("py", particle)
+            pz += vm.evaluate("pz", particle)
+
+        m2 = E**2 - px**2 - py**2 - pz**2
+        m = np.sqrt(m2) if m2 >= 0 else np.nan
+
+        masses.append(m)
+
+    return masses
 
 
 def masses_to_classes(array):

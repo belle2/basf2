@@ -27,9 +27,9 @@ from grafei.model.create_trainer import GraFEIIgniteTrainer
     help="path to config file",
 )
 @click.option(
-    "-s",
-    "--samples",
-    "samples",
+    "-n",
+    "--n_samples",
+    "n_samples",
     required=False,
     type=int,
     help="Number of samples to train on",
@@ -40,7 +40,7 @@ from grafei.model.create_trainer import GraFEIIgniteTrainer
 # @click.version_option(grafei.__version__)
 def main(
     cfg_path: Path,
-    samples: int,
+    n_samples: int,
     log_level: int,
 ):
     logging.basicConfig(
@@ -57,7 +57,7 @@ def main(
     # Load configs
     configs, tags = load_config(
         Path(cfg_path).resolve(),
-        samples=samples,
+        samples=n_samples,
     )
 
     # assert configs["geometric_model"]["global_layer"] or (

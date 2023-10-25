@@ -1,4 +1,5 @@
 import ignite
+from ignite.contrib.handlers.tensorboard_logger import TensorboardLogger, OutputHandler, WeightsHistHandler
 import torch
 from torch_geometric.data import Batch
 import numpy as np
@@ -372,7 +373,7 @@ class GraFEIIgniteTrainer:
 
         # Attach Tensorboard logging
         if self.tb_dir is not None:
-            tb_logger = ignite.contrib.handlers.TensorboardLogger(
+            tb_logger = TensorboardLogger(
                 log_dir=self.tb_dir, max_queue=1
             )
 
@@ -383,7 +384,7 @@ class GraFEIIgniteTrainer:
                 tb_logger.attach(
                     self.evaluators[tag],
                     event_name=ignite.engine.Events.EPOCH_COMPLETED,
-                    log_handler=ignite.contrib.handlers.tensorboard_logger.OutputHandler(
+                    log_handler=OutputHandler(
                         tag=tag,
                         metric_names="all",
                         global_step_transform=ignite.handlers.global_step_from_engine(
@@ -395,7 +396,7 @@ class GraFEIIgniteTrainer:
             tb_logger.attach(
                 self.trainer,
                 event_name=ignite.engine.Events.EPOCH_COMPLETED,
-                log_handler=ignite.contrib.handlers.tensorboard_logger.WeightsHistHandler(
+                log_handler=WeightsHistHandler(
                     self.model
                 ),
             )

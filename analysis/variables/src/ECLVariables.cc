@@ -86,7 +86,7 @@ namespace Belle2 {
         return particle->getExtraInfo("beamBackgroundSuppression");
       } else {
         B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getBeamBackgroundProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -97,7 +97,7 @@ namespace Belle2 {
         return particle->getExtraInfo("fakePhotonSuppression");
       } else {
         B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getFakePhotonProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -241,7 +241,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyEnergy();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[0][0]));
       }
       return Const::doubleNaN;
     }
@@ -385,7 +387,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster  = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyTheta();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[2][2]));
       }
       return Const::doubleNaN;
     }
@@ -395,7 +399,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyPhi();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[1][1]));
       }
       return Const::doubleNaN;
     }
@@ -529,15 +535,6 @@ namespace Belle2 {
       // one or more tracks may be matched to charged particles
       size_t out = cluster->getRelationsFrom<Track>().size();
       return double(out);
-    }
-
-    double eclClusterConnectedRegionId(const Particle* particle)
-    {
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        return cluster->getConnectedRegionId();
-      }
-      return Const::doubleNaN;
     }
 
     double eclClusterId(const Particle* particle)
@@ -792,6 +789,118 @@ namespace Belle2 {
       StoreObjPtr<EventLevelClusteringInfo> elci;
       if (!elci) return Const::doubleNaN;
       return (double) elci->getNECLShowersRejected();
+    }
+
+    double nKLMMultistripHitsFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNKLMDigitsMultiStripFWD();
+    }
+
+    double nKLMMultistripHitsBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNKLMDigitsMultiStripBarrel();
+    }
+
+    double nKLMMultistripHitsBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNKLMDigitsMultiStripBWD();
+    }
+
+    double nKLMMultistripHits(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNKLMDigitsMultiStrip();
+    }
+
+    double nECLShowersFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLShowersFWD();
+    }
+
+    double nECLShowersBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLShowersBarrel();
+    }
+
+    double nECLShowersBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLShowersBWD();
+    }
+
+    double nECLShowers(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLShowers();
+    }
+
+    double nECLLocalMaximumsFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLLocalMaximumsFWD();
+    }
+
+    double nECLLocalMaximumsBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLLocalMaximumsBarrel();
+    }
+
+    double nECLLocalMaximumsBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLLocalMaximumsBWD();
+    }
+
+    double nECLLocalMaximums(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLLocalMaximums();
+    }
+
+    double nECLTriggerCellsFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLTriggerCellsFWD();
+    }
+
+    double nECLTriggerCellsBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLTriggerCellsBarrel();
+    }
+
+    double nECLTriggerCellsBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLTriggerCellsBWD();
+    }
+
+    double nECLTriggerCells(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return Const::doubleNaN;
+      return (double) elci->getNECLTriggerCells();
     }
 
     double eclClusterEoP(const Particle* part)
@@ -1523,6 +1632,70 @@ If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the backward endcap.
 If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
+)DOC");
+  
+  REGISTER_VARIABLE("nKLMMultistripHitsFWDEndcap", nKLMMultistripHitsFWDEndcap, R"DOC(
+[Eventbased] Returns the number of multi-strip hits in the KLM forward endcap.
+)DOC");
+  
+  REGISTER_VARIABLE("nKLMMultistripHitsBarrel", nKLMMultistripHitsBarrel, R"DOC(
+[Eventbased] Returns the number of multi-strip hits in the KLM barrel.
+)DOC");
+  
+  REGISTER_VARIABLE("nKLMMultistripHitsBWDEndcap", nKLMMultistripHitsBWDEndcap, R"DOC(
+[Eventbased] Returns the number of multi-strip hits in the KLM backward endcap.
+)DOC");
+  
+  REGISTER_VARIABLE("nKLMMultistripHits", nKLMMultistripHits, R"DOC(
+[Eventbased] Returns the number of multi-strip hits in the KLM.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLShowersFWDEndcap", nECLShowersFWDEndcap, R"DOC(
+[Eventbased] Returns the number of ECLShowers in the forward endcap.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLShowersBarrel", nECLShowersBarrel, R"DOC(
+[Eventbased] Returns the number of ECLShowers in the barrel.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLShowersBWDEndcap", nECLShowersBWDEndcap, R"DOC(
+[Eventbased] Returns the number of ECLShowers in the backward endcap.
+)DOC");
+
+  REGISTER_VARIABLE("nECLShowers", nECLShowers, R"DOC(
+[Eventbased] Returns the number of ECLShowers.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLLocalMaximumsFWDEndcap", nECLLocalMaximumsFWDEndcap, R"DOC(
+[Eventbased] Returns the number of LocalMaximums in the ECL forward endcap.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLLocalMaximumsBarrel", nECLLocalMaximumsBarrel, R"DOC(
+[Eventbased] Returns the number of LocalMaximums in the ECL barrel.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLLocalMaximumsBWDEndcap", nECLLocalMaximumsBWDEndcap, R"DOC(
+[Eventbased] Returns the number of LocalMaximums in the ECL backward endcap.
+)DOC");
+
+  REGISTER_VARIABLE("nECLLocalMaximums", nECLLocalMaximums, R"DOC(
+[Eventbased] Returns the number of LocalMaximums in the ECL.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLTriggerCellsFWDEndcap", nECLTriggerCellsFWDEndcap, R"DOC(
+[Eventbased] Returns the number of ECL trigger cells above 100 MeV in the forward endcap.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLTriggerCellsBarrel", nECLTriggerCellsBarrel, R"DOC(
+[Eventbased] Returns the number of ECL trigger cells above 100 MeV in the barrel.
+)DOC");
+  
+  REGISTER_VARIABLE("nECLTriggerCellsBWDEndcap", nECLTriggerCellsBWDEndcap, R"DOC(
+[Eventbased] Returns the number of ECL trigger cells above 100 MeV in the backward endcap.
+)DOC");
+
+  REGISTER_VARIABLE("nECLTriggerCells", nECLTriggerCells, R"DOC(
+[Eventbased] Returns the number of ECL trigger cells above 100 MeV.
 )DOC");
 
     REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass, R"DOC(

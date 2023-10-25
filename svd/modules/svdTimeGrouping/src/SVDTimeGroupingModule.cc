@@ -37,11 +37,14 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            "SVDEventInfo collection name.", std::string("SVDEventInfo"));
 
   // 1b. Module Configuration
-  addParam("useDB", m_useDB, "if False, use configuration module parameters", bool(true));
+  addParam("forceGroupingFromDB", m_forceGroupingFromDB,
+           "use SVDRecoConfiguration from DB", bool(true));
   addParam("isEnabledIn6Samples", m_isEnabledIn6Samples,
            "if true, module is enabled for 6-sample DAQ mode", bool(false));
   addParam("isEnabledIn3Samples", m_isEnabledIn3Samples,
            "if true, module is enabled for 3-sample DAQ mode", bool(false));
+  addParam("useParamFromDB", m_useParamFromDB,
+           "use SVDTimeGroupingConfiguration from DB", bool(true));
 
   // 2. Fill time Histogram:
   addParam("tRangeLow", m_usedPars.tRange[0], "This sets the x- range of histogram [ns].",
@@ -90,12 +93,6 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            float(30.));
 
   // 5. Signal group selection:
-  addParam("numberOfSignalGroups", m_usedPars.numberOfSignalGroups,
-           "Number of groups expected to contain the signal clusters.",
-           int(1));
-  addParam("formSingleSignalGroup", m_usedPars.formSingleSignalGroup,
-           "Form a single super-group.",
-           bool(false));
   addParam("acceptSigmaN", m_usedPars.acceptSigmaN,
            "Accept clusters upto N sigma.",
            float(7.));
@@ -122,7 +119,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
 void SVDTimeGroupingModule::beginRun()
 {
-  if (m_useDB) {
+  if (m_forceGroupingFromDB) {
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
     else
@@ -142,8 +139,13 @@ void SVDTimeGroupingModule::beginRun()
   else
     B2INFO("SVDTimeGrouping : SVDCluster groupId is not assigned for 3-sample DAQ mode.");
 
-  if (m_useDB &&
+  if (m_useParamFromDB &&
       (m_isEnabledIn6Samples || m_isEnabledIn3Samples)) {
+
+    if (!m_recoConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
     TString timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
     TString timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
@@ -187,14 +189,11 @@ void SVDTimeGroupingModule::event()
   // then use the respective parameters
   if (numberOfAcquiredSamples == 6) {
     if (!m_isEnabledIn6Samples) return;
-    else if (m_useDB) m_usedPars = m_usedParsIn6Samples;
+    else if (m_useParamFromDB) m_usedPars = m_usedParsIn6Samples;
   } else if (numberOfAcquiredSamples == 3) {
     if (!m_isEnabledIn3Samples) return;
-    else if (m_useDB) m_usedPars = m_usedParsIn3Samples;
+    else if (m_useParamFromDB) m_usedPars = m_usedParsIn3Samples;
   }
-  if (m_usedPars.numberOfSignalGroups != m_usedPars.maxGroups)
-    m_usedPars.includeOutOfRangeClusters = false;
-
 
   // declare and fill the histogram shaping each cluster with a normalised gaussian
   // G(cluster time, resolution)
@@ -215,10 +214,6 @@ void SVDTimeGroupingModule::event()
   sortBackgroundGroups(groupInfoVector);
   // sorting signal groups
   sortSignalGroups(groupInfoVector);
-
-  // only select few signal groups
-  if (m_usedPars.numberOfSignalGroups < int(groupInfoVector.size()))
-    groupInfoVector.resize(m_usedPars.numberOfSignalGroups);
 
   // assign the groupID to clusters
   assignGroupIdsToClusters(h_clsTime, groupInfoVector);
@@ -472,15 +467,11 @@ void SVDTimeGroupingModule::assignGroupIdsToClusters(TH1D& hist, std::vector<Gro
       if (pars[2] != 0 &&   // if the last group is dummy, we straight go to leftover clusters
           clsTime >= lowestAcceptedTime && clsTime <= highestAcceptedTime) {
 
-        if (m_usedPars.formSingleSignalGroup) {
-          if (int(m_svdClusters[jk]->getTimeGroupId().size()) == 0)
-            m_svdClusters[jk]->setTimeGroupId().push_back(0);
-        } else      // assigning groupId starting from 0
-          m_svdClusters[jk]->setTimeGroupId().push_back(ij);
+        // assigning groupId starting from 0
+        m_svdClusters[jk]->setTimeGroupId().push_back(ij);
 
         // writing group info to clusters.
         // this is independent of group id, that means,
-        // group info is correctly associated even if formSingleSignalGroup flag is on.
         if (m_usedPars.writeGroupInfo)
           m_svdClusters[jk]->setTimeGroupInfo().push_back(GroupInfo(pars[0], pars[1], pars[2]));
 

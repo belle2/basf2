@@ -73,7 +73,6 @@ namespace Belle2 {
     int m_sock;
     int m_sender;
     int m_errno;
-    int m_int;
 
   };
 

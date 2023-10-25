@@ -15,11 +15,11 @@ B->Xgamma, B->Xll, B->Xll (LFV modes)
 
 """
 
-import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
+import basf2 as b2
 from variables import variables as vm
 
 __liaison__ = "Rahul Tiwary <rahul.tiwary@tifr.res.in>"

@@ -24,7 +24,8 @@ namespace Belle2 {
     std::string m_filename;
     DqmMemFile* m_memfile;
     EvtSocketSend* m_sock;
-    MsgHandler* m_msg;
+    std::string m_dest;
+    int m_port;
 
   };
 }

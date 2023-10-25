@@ -34,10 +34,12 @@
 #pragma read sourceClass="Belle2::TOPPDFCollection" version="[3]" \
   source="TVector3 m_localHitPosition" \
   targetClass="Belle2::TOPPDFCollection" target="m_localHitPosition" \
+  include="TVector3.h" \
   code="{m_localHitPosition = ROOT::Math::XYZPoint(onfile.m_localHitPosition);}"
 #pragma read sourceClass="Belle2::TOPPDFCollection" version="[3]" \
   source = "TVector3 m_localHitMomentum" \
   targetClass = "Belle2::TOPPDFCollection" target = "m_localHitMomentum" \
+  include="TVector3.h" \
   code = "{m_localHitMomentum = ROOT::Math::XYZVector(onfile.m_localHitMomentum);}"
 
 #pragma read sourceClass="Belle2::TOPSimHit" version="[-2]" \

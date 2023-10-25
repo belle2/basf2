@@ -4,12 +4,12 @@
   <span>Popular/prebuilt/default</span>:
   <label for="prebuilt-select"></label>
   <select id="prebuilt-select" onchange="loadPrebuildRevisions()">
-    <option value="rbn" title="Reference and the latest (pre)release, latest build and latest nightly">R+latest rel/build/night</option>
+    <option value="rbn" title="Reference and the latest (pre)release and latest nightly">R+latest rel/night</option>
     <option value="r" title="Reference and the latest (pre)release">R+latest release</option>
-    <option value="b" title="Reference and the latest build">R+latest build</option>
     <option value="n" title="Reference and the latest nightly">R+latest nightly</option>
     <option value="nnn" title="Reference and all nightly revisions">R+all nightlies</option>
     <option value="all" title="Reference and all revisions">R+all revisions</option>
+    <option value="c" title="Custom selection(s)">Custom</option>
   </select>
 </span>
 {{#revisions}}
@@ -50,7 +50,7 @@ CSS properties -->
 <span id="button-revision-load-container">
 	<button
       id="button-revision-load"
-      onclick='loadSelectedRevisions()'
+      onclick='loadSelectedRevisions(true)'
       title="Load a combination of revisions selected above. This button turns red when you change a setting that requires a reload.">
     Load custom selection
   </button>

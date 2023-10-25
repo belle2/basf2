@@ -36,10 +36,10 @@ int main(int argc, char** argv)
   //  RFEventProcessor* evproc = new RFEventProcessor(argv[1]);
   evproc = new RFEventProcessor(argv[1]);
 
-  char nodename[256];
+  char nodename[256 + 4];
   strcpy(nodename, "evp_");
 #ifndef DESY
-  gethostname(&nodename[4], sizeof(nodename));
+  gethostname(&nodename[4], sizeof(nodename) - 4);
 #else
   // Special treatment for DESY test nodes!!
   char hostnamebuf[256];

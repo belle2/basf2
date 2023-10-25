@@ -15,10 +15,10 @@ Enddecay
 #
 Decay anti-B0sig
 0.000145   pi+    e-    anti-nu_e      PHOTOS   BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
-0.000294   rho+   e-    anti-nu_e      PHOTOS   BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000294   rho+   e-    anti-nu_e      PHOTOS   BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #[FF values from arxiv:2104.05739; values updated in June 2023]
 
 0.000145   pi+    mu-    anti-nu_mu    PHOTOS   BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
-0.000294   rho+   mu-    anti-nu_mu    PHOTOS   BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000294   rho+   mu-    anti-nu_mu    PHOTOS   BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #[FF values from arxiv:2104.05739; values updated in June 2023]
 Enddecay
 CDecay B0sig
 #

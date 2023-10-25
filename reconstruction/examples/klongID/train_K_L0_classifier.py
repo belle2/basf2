@@ -40,5 +40,6 @@ training_string = f'basf2_mva_teacher --datafiles {data_path} --treename KLMdata
 os.system(training_string)
 
 # "upload" to localdb
-os.system(f'basf2_mva_upload --identifier {identifier} --db_identifier {identifier.split(".xml")[0]} ' +
-          f'--begin_experiment {ex_b} --end_experiment {ex_e} --begin_run {run_b} --end_run {run_e}')
+os.system(
+    f"basf2_mva_add_to_local_database --weight_file_name {identifier} --db_identifier {identifier.split('.xml')[0]} " +
+    f"--begin_experiment {ex_b} --end_experiment {ex_e} --begin_run {run_b} --end_run {run_e}")

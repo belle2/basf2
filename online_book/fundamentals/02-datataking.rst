@@ -44,7 +44,7 @@ of the physics program.
 .. admonition:: Question
     :class: exercise stacked
 
-    At LHC, every bunch collision generates dozens of individual particle
+    At the LHC, every bunch collision generates dozens of individual particle
     interactions that overlay each other in the detectors (pile-up),
     considerably complicating the data analysis.
     This doesn't seem to be a problem at SuperKEKB and Belle II. Why?
@@ -60,7 +60,7 @@ of the physics program.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^{35}\, \textrm
+    The goal instantaneous luminosity of SuperKEKB is :math:`6\times 10^{35}\, \textrm
     {cm}^{-2} \textrm{s}^{-1}`. It takes a beam particle bunch roughly 10 μs to complete
     a full revolution around the accelerator ring. Up to 2376 bunches will circulate
     in each ring.
@@ -68,13 +68,13 @@ of the physics program.
 .. admonition:: Solution
     :class: toggle solution
 
-    At a final design luminosity of :math:`8\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
+    At a final design luminosity of :math:`6\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
     {-1}` at 2376 bunches per ring, each taking about 10 μs to complete a revolution, the
-    delivered luminosity per bunch crossing is about :math:`8\times 10^{35}\, \textrm
-    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 3.4\times10^{-6}\,
+    delivered luminosity per bunch crossing is about :math:`6\times 10^{35}\, \textrm
+    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 2.6\times10^{-6}\,
     (\textrm{nb})^{-1}`, so even the most likely Bhabha process at :math:`125\,
     \textrm{nb}` only happens about once every
-    :math:`(3.4\times 10^{-6}\cdot 125)^{-1} \approx 2400` bunch crossings.
+    :math:`(2.6\times 10^{-6}\cdot 125)^{-1} \approx 3100` bunch crossings.
 
 .. figure:: belle2.png
     :align: center

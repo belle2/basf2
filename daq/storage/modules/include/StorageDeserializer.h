@@ -67,7 +67,6 @@ namespace Belle2 {
     int m_expno;
     int m_runno;
     unsigned int m_evtno;
-    unsigned long long m_datasize;
     MsgHandler* m_handler;
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;

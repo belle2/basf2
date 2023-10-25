@@ -144,8 +144,8 @@ void UdstListFilterModule::swapV0s()
     const Track* r2 = tracks.second->getRelated<Track>("myudst_tracks");
     if ((r1 != nullptr) and (r2 != nullptr)) {
       // New V0 with new track relations:
-      m_selectedV0s->appendNew(std::make_pair(r1, fitResults.first)
-                               , std::make_pair(r2, fitResults.second));
+      m_selectedV0s->appendNew(std::make_pair(r1, fitResults.first), std::make_pair(r2, fitResults.second),
+                               v0.getFittedVertexX(), v0.getFittedVertexY(), v0.getFittedVertexZ());
     }
   }
 
@@ -159,4 +159,3 @@ void UdstListFilterModule::swapV0s()
     DataStore::Instance().replaceData(*m_selectedV0s, m_v0s);
   }
 }
-

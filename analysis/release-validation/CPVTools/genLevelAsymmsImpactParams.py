@@ -335,7 +335,7 @@ def makePlotsForEachParticleKind(cutOnUpsilonFourS=""):
 
             binWidth = negativeHistogram.GetBinWidth(2)
 
-            binWidth = '{:8.3f}'.format(binWidth)
+            binWidth = f'{binWidth:8.3f}'
 
             legendLocation = 1
             ax1.set_ylabel(r'${\rm Fraction\hspace{0.25em} of\hspace{0.25em} Events}\, /\, (\, ' + binWidth + r'\, ' +
@@ -530,7 +530,7 @@ def makeZtagDecayPlot(cutOnUpsilonFourS="", asymplot=True):
 
         binWidth = negativeHistogram.GetBinWidth(2)
 
-        binWidth = '{:8.3f}'.format(binWidth)
+        binWidth = f'{binWidth:8.3f}'
 
         legendLocation = 1
         ax1.set_ylabel(r'${\rm Fraction\hspace{0.25em} of\hspace{0.25em} Events}\, /\, (\, ' + binWidth + r'\, ' +

@@ -119,7 +119,6 @@ namespace Belle2 {
        * @param Frame_Number current frame number
        * @param Frames_in_event number of frames in PxdRaw object (subevent)
        * @param daqpktstat Daq Packet Status Object
-       * @param daqdhevect Daq DHE Status Object
        */
       void unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event, PXDDAQPacketStatus& daqpktstat);
 

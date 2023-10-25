@@ -913,13 +913,9 @@ class ValidationRoot:
             assignees = parse_contact(
                 self.contact, self.gitlab_map, file_package, self.gitlab_object
             )
-        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant {2}: {0}\n\n\
-            Revision label: {1}\n\n---".format(
-            file_name,
-            self.revision_label,
-            issue_type
-        )
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n" + \
+            f"Relevant {issue_type}: {file_name}\n\n" + \
+            f"Revision label: {self.revision_label}\n\n---"
         issue_id = create_gitlab_issue(
             title, description, uploaded_file, assignees, file_package, project
         )

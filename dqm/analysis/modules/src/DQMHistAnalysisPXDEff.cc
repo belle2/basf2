@@ -280,11 +280,11 @@ void DQMHistAnalysisPXDEffModule::event()
   }// Single-Module histos + 2d overview finished
 
   m_cInnerMap->cd();
-  m_hInnerMap->Draw("colz");
+  if (m_hInnerMap) m_hInnerMap->Draw("colz");
   m_cInnerMap->Modified();
   m_cInnerMap->Update();
   m_cOuterMap->cd();
-  m_hOuterMap->Draw("colz");
+  if (m_hOuterMap) m_hOuterMap->Draw("colz");
   m_cOuterMap->Modified();
   m_cOuterMap->Update();
   UpdateCanvas(m_cInnerMap->GetName());

@@ -12,6 +12,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>CosmicsSimNoBkg.root</input>
+  <output>CosmicsAxialHoughTrackingValidation.root</output>
   <description>Validates the axial hough finder working on segments in cosmics events.</description>
 </header>
 """

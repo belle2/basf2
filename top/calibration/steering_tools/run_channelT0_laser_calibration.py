@@ -54,7 +54,7 @@ run_last = run_numbers[-1]
 inputFiles = []
 expNo = 'e' + f'{experiment:04d}'
 for run in run_numbers:
-    expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
+    expRun = f'{experiment:04d}' + '.' + f'{run:05d}'
     if sroot_format:
         filename = f"{data_dir}/top.{expRun}.*.sroot"
     else:

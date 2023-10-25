@@ -9,7 +9,7 @@
 #include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>
@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Destroy the DB and the DataStore.
       void TearDown()
       {
-        boost::filesystem::remove_all("testPayloads");
+        std::filesystem::remove_all("testPayloads");
         DataStore::Instance().reset();
       }
     };

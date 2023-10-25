@@ -1,0 +1,80 @@
+# EventType: 1210052000
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (eta' -> eta(gammagamma) pi+pi-) (K*+ -> K_S^0(pi+pi-) pi+]
+#                      B- -> anything
+# NickName: Bu_etapKst+_eta2pi-_Kspi+
+# Documentation:    Decay mode for hadronic decay  
+# Tested: Yes
+# Reponsible: Chia-Ling Hsu
+# Email: chia-ling.hsu@sydney.edu.au 
+# PhysicsWG: BToHadronic 
+# Cuts: None
+# Date: 08/01/2023
+
+
+#
+# Aliases
+#
+#
+
+Alias eta'sig      eta'
+Alias etasig       eta
+
+Alias K*+sig       K*+
+Alias K*-sig       K*-
+ChargeConj K*+sig K*-sig
+
+Alias K_S0sig K_S0
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-   VSS;
+0.5 B+   B-sig VSS;
+Enddecay
+
+#
+# B+ -> eta' K*+
+#
+
+Decay B+sig
+1.0 K*+sig   eta'sig      PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+#
+# eta' -> eta pi+ pi-
+#
+
+Decay eta'sig
+1.0     pi+ pi- etasig                     PHOTOS PHSP;
+Enddecay
+
+#
+# eta -> gamma gamma
+#
+
+Decay etasig
+1.0    gamma gamma                      PHSP;
+Enddecay
+
+#
+# K*+ -> Ks pi+
+#
+
+Decay K*+sig
+1.0      K_S0sig  pi+                        PHOTOS VSS;
+Enddecay
+CDecay K*-sig
+
+#
+# Ks -> pi+ pi-
+#
+
+Decay K_S0sig
+1.0 pi+ pi- PHOTOS PHSP;
+Enddecay
+
+End

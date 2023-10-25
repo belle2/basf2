@@ -100,7 +100,7 @@ namespace Belle2 {
     addParam("useTimeSeed",  m_useTimeSeed, "use SVD or CDC event T0 as a seed "
              "(only when running in data processing mode and autoRange turned off).", true);
     addParam("useFillPattern", m_useFillPattern, "use known accelerator fill pattern to enhance efficiency "
-             "(only when running in data processing mode).", false);
+             "(only when running in data processing mode).", true);
   }
 
 

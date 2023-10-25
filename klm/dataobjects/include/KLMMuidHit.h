@@ -12,7 +12,7 @@
 #include <framework/datastore/RelationsObject.h>
 
 /* C++ headers. */
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -35,7 +35,8 @@ namespace Belle2 {
     //! @param extTime extrapolation time of this hit (ns)
     //! @param hitTime Measured time of this hit (ns)
     //! @param chiSq Chi-squared contribution of this hit
-    KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPos, const TVector3& hitPos,
+    KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer,
+               const ROOT::Math::XYZVector& extPos, const ROOT::Math::XYZVector& hitPos,
                double extTime, double hitTime, double chiSq);
 
     //! Destructor
@@ -50,15 +51,15 @@ namespace Belle2 {
     }
 
     //! @return global-coordinate position of the extrapolated point (cm)
-    TVector3 getExtPosition() const
+    ROOT::Math::XYZVector getExtPosition() const
     {
-      return m_ExtPosition;
+      return ROOT::Math::XYZVector(m_ExtPosition[0], m_ExtPosition[1], m_ExtPosition[2]);
     }
 
     //! @return global-coordinate position of the matching KLM hit (cm)
-    TVector3 getHitPosition() const
+    ROOT::Math::XYZVector getHitPosition() const
     {
-      return m_HitPosition;
+      return ROOT::Math::XYZVector(m_HitPosition[0], m_HitPosition[1], m_HitPosition[2]);
     }
 
     //! @return time since start of event of the extrapolated point (ns)
@@ -109,13 +110,13 @@ namespace Belle2 {
     int m_PdgCode;
 
     //! global-coordinate position of the extrapolated point (cm)
-    TVector3 m_ExtPosition;
+    float m_ExtPosition[3];
 
     //! time of the extrapolated point (ns)
     double m_ExtTime;
 
     //! global-coordinate position of the matching KLM hit (cm)
-    TVector3 m_HitPosition;
+    float m_HitPosition[3];
 
     //! time of the matching KLM hit (ns)
     double m_HitTime;
@@ -136,7 +137,7 @@ namespace Belle2 {
     double m_ChiSquared;
 
     //! Needed to make the ROOT object storable
-    ClassDef(KLMMuidHit, 1)
+    ClassDef(KLMMuidHit, 2)
 
   };
 }

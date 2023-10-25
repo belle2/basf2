@@ -384,8 +384,8 @@ void TOPRingPlotterModule::event()
         // find the two slots closer to the cluster
         auto phi = particle->getECLCluster()->getPhi();
         if (phi < 0)
-          phi = 2 * TMath::Pi() - phi;
-        auto rawModuleID = phi / (TMath::Pi() / 8) + 1;
+          phi = 2 * M_PI - phi;
+        auto rawModuleID = phi / (M_PI / 8) + 1;
         moduleID = int(rawModuleID);
         if (rawModuleID - moduleID > 0.5) {
           deltaModule = 1;

@@ -16,7 +16,7 @@ from ROOT import TH2F, TFile, gDirectory
 # ------------------------------------------------------------------------
 # Simple module to study the width and amplitude of TOPDigits
 #
-# usage: basf2 checkHitHeightAndWidth.py -i <raw_data.sroot>
+# usage: basf2 checkHitHeightAndWidth.py -i <raw_data.root>
 # ------------------------------------------------------------------------
 
 
@@ -75,8 +75,8 @@ b2.conditions.append_globaltag('online')
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
-# roinput = b2.register_module('RootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)

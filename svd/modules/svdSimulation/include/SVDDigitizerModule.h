@@ -196,9 +196,9 @@ namespace Belle2 {
       SensorWaveforms*            m_currentSensorWaveforms = nullptr;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo = nullptr;
-      /** Time of the current SimHit.. */
+      /** Time of the current SimHit */
       double m_currentTime = 0;
-      /** Thickness of current sensor (read from m_currentSensorInfo).*/
+      /** Thickness of current sensor (read from m_currentSensorInfo) */
       double m_sensorThickness = 0.03;
 
       /** relative shift in SVDEventInfo obj */

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
     <input>muon-KLMValidation.root</input>
-    <contact>Martina Laurenza (martina.laurenza@roma3.infn.it)</contact>
+    <contact>Laura Salutari (Laura.Salutari@uniroma3.it)</contact>
     <description>Creation of EKLM muon validation plots.</description>
 </header>
 """
@@ -24,7 +23,7 @@ ROOT.gROOT.SetBatch(True)
 input_file = ROOT.TFile('../muon-KLMValidation.root')
 tree = input_file.Get('tree')
 output_file = ROOT.TFile('EKLMMuon.root', 'recreate')
-contact = 'Martina Laurenza (martina.laurenza@roma3.infn.it)'
+contact = 'Laura Salutari (Laura.Salutari@uniroma3.it)'
 
 
 # Shifter Plots

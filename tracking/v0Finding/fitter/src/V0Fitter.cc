@@ -464,7 +464,8 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
     B2DEBUG(20, "Creating new V0.");
     auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
-                              std::make_pair(trackMinus, tfrMinusVtx));
+                              std::make_pair(trackMinus, tfrMinusVtx),
+                              posVert.X(), posVert.Y(), posVert.Z());
 
     if (m_validation) {
       B2DEBUG(24, "Create StoreArray and Output for validation.");

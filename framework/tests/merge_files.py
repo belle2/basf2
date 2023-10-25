@@ -277,18 +277,20 @@ def check_17_checkparentLFN():
 def check_18_checkEventNr():
     """Check that event and mc numbers are summed correctly"""
     evtNr = [10, 1243, 232, 1272, 25]
+    evtNrFullEvents = [i-1 for i in evtNr]
     mcNr = [120, 821, 23, 923, 1]
     files = []
-    for i, (e, m) in enumerate(zip(evtNr, mcNr)):
+    for i, (e, f, m) in enumerate(zip(evtNr, evtNrFullEvents, mcNr)):
         meta = FileMetaData()
         meta.setNEvents(e)
+        meta.setNFullEvents(f)
         meta.setMcEvents(m)
         meta.setRandomSeed(str(i))
         files.append("test%d.root" % i)
         create_testfile_direct(files[-1], meta)
     merge_files(*files)
     meta = get_metadata()
-    return sum(evtNr) == meta.getNEvents() and sum(mcNr) == meta.getMcEvents()
+    return sum(evtNr) == meta.getNEvents() and sum(evtNrFullEvents) == meta.getNFullEvents() and sum(mcNr) == meta.getMcEvents()
 
 
 def check_19_lowhigh():
@@ -305,6 +307,7 @@ def check_19_lowhigh():
     for i, e in enumerate(lowhigh):
         meta = FileMetaData()
         meta.setNEvents(0 if e == (-1, -1, 0) else 1)
+        meta.setNFullEvents(0 if e == (-1, -1, 0) else 1)
         meta.setRandomSeed(str(i))
         meta.setLow(e[0], e[1], e[2])
         meta.setHigh(e[0], e[1], e[2])
@@ -402,8 +405,8 @@ def check_25_legacy_ip_only():
 def check_XX_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
-    affect merge_basf2_files and adapt the correct version number here."""
-    return FileMetaData.Class().GetClassVersion() == 10
+    affect b2file-merge and adapt the correct version number here."""
+    return FileMetaData.Class().GetClassVersion() == 11
 
 
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ This works in any python installation with python version >=3.5 and the requests
 package installed
     """)
     parser.add_argument("--user", help="Username, corresponds to your DESY credentials.", required=False)
+    parser.add_argument("--token", help="Use the read-only token to query the RunDB.", required=False)
     parser.add_argument("--min-experiment", help="Only query entries after or equal the given experiment number.", default=7)
     parser.add_argument("--max-experiment", help="Only query entries before or equal the given experiment number.", default=99)
     parser.add_argument("--run-type", help="", choices=["null", "physics", "cosmic", "beam", "debug", "hlttest", "unknown"], required=False)
@@ -80,7 +81,10 @@ if __name__ == "__main__":
 
     args = get_argument_parser().parse_args()
 
-    rundb = RunDB(username=args.user)
+    if args.token is None:
+        rundb = RunDB(username=args.user)
+    else:
+        rundb = RunDB(apikey=args.token)
     # get the list of runs, all parameters are forwarded as get request
     # parameters. expand=True makes the server return full run info with all
     # sub objects, not just the short one and store them in a pandas.DataFrame.

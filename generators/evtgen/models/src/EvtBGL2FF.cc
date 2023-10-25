@@ -97,8 +97,7 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
 
 // NOTE : This class should not be used for vector mesons (D*). Use the EvtBGL class instead.
 
-void EvtBGL2FF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a1f,
-                            double* a2f, double* vf, double* a0f)
+void EvtBGL2FF::getvectorff(EvtId, EvtId, double, double, double*, double*, double*, double*)
 
 {
 

@@ -29,6 +29,9 @@
 // analysis utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
+#include <cmath>
 
 using namespace CLHEP;
 using namespace std;
@@ -322,13 +325,16 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
       B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
     }
 
-    double startingE = particle -> getECLCluster() -> getEnergy(particle -> getECLClusterEHypothesisBit());
-    double startingPhi = particle -> getECLCluster() -> getPhi();
-    double startingTheta = particle -> getECLCluster() -> getTheta();
+    const ECLCluster* cluster = particle->getECLCluster();
+    double startingE = cluster->getEnergy(particle->getECLClusterEHypothesisBit());
+    double startingPhi = cluster->getPhi();
+    double startingTheta = cluster->getTheta();
 
-    double startingeE = particle->getECLCluster() -> getUncertaintyEnergy();
-    double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
-    double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
+    ClusterUtils clutls;
+    const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+    double startingeE = sqrt(fabs(EPhiThetaCov[0][0]));
+    double startingePhi = sqrt(fabs(EPhiThetaCov[1][1]));
+    double startingeTheta = sqrt(fabs(EPhiThetaCov[2][2]));
 
     B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
     // create a fit object

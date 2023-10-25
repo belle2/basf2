@@ -60,7 +60,6 @@ def touch_CRFinder(path, new_seed):
         else:
             crfinder = basf2.register_module('ECLCRFinder')
             crfinder.param('energyCut0', new_seed)
-            crfinder.param('energyCutBkgd0', new_seed)
             basf2.print_params(crfinder)
             new_path.add_module(crfinder)
             found = True

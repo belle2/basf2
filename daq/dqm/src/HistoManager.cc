@@ -16,13 +16,15 @@ using namespace std;
 HistoManager::HistoManager(DqmMemFile* memfile)
 {
   m_memfile = memfile;
+  clear();
+  merge();
 }
 
 HistoManager::~HistoManager()
 {
 }
 
-bool HistoManager::add(string& subdir, const string& name, int pid, TH1* histo)
+bool HistoManager::add(const string& subdir, const string& name, int pid, TH1* histo)
 {
   //  printf ( "HistoManager: adding %s to subdir %s from id %d\n",
   //  name.c_str(), subdir.c_str(), pid );
@@ -57,7 +59,7 @@ bool HistoManager::add(string& subdir, const string& name, int pid, TH1* histo)
   return false;
 }
 
-bool HistoManager::update(string& subdir, const string& name, int pid, TH1* histo)
+bool HistoManager::update(const string& subdir, const string& name, int pid, TH1* histo)
 {
   // Register the histogram if not yet done
   if (add(subdir, name, pid, histo)) return true;

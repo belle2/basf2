@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,7 +26,7 @@ from pxd.calibration.condition_checker import plot_type_dict
 
 # lookup dictrionary for finding a checker based on objType
 __cal_checker_dict__ = {
-    "PXDHotPixelMaskCalibrationChecker": set([PXDMaskedPixelPar, PXDDeadPixelPar, PXDOccupancyInfoPar]),
+    "PXDHotPixelMaskCalibrationChecker": {PXDMaskedPixelPar, PXDDeadPixelPar, PXDOccupancyInfoPar},
 }
 
 

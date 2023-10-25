@@ -13,26 +13,33 @@
 # ---------------------------------------------------------------------------------------
 
 import basf2
+from rawdata import add_unpackers
+from reconstruction import add_cosmics_reconstruction
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 from caf.framework import Calibration, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
 from ROOT.Belle2 import TOP
 
 
-def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None):
+def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None, sroot=False):
     '''
     Returns calibration object for carrier shift calibration of BS13d with local runs
     (laser, single-pulse or double-pulse).
-    :param inputFiles: A list of input files in sroot format
+    :param inputFiles: A list of input files
     :param look_back: look-back window setting (set it to 0 to use the one from DB)
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param sroot: True if input files are in sroot format, False if in root format
     '''
 
     #   create path
     main = basf2.create_path()
 
     #   add basic modules
-    main.add_module('SeqRootInput')
+    if sroot:
+        main.add_module('SeqRootInput')
+    else:
+        main.add_module('RootInput')
     main.add_module('TOPGeometryParInitializer')
     main.add_module('TOPUnpacker')
     main.add_module('TOPRawDigitConverter', lookBackWindows=look_back,
@@ -258,6 +265,64 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     return cal
 
 
+def moduleT0_calibration_cosmics(inputFiles, globalTags=None, localDBs=None,
+                                 data_format="raw", full_reco=True):
+    '''
+    Returns calibration object for module T0 calibration with cosmic data using DeltaT method.
+    Note: by default cdst is processed with merging incoming and outcoming track segments of a cosmic particle,
+    but we need here separate track segments in order to get ExtHits in incoming and outcoming module.
+    :param inputFiles: A list of input files in cdst data format
+    :param globalTags: a list of global tags, highest priority first
+    :param localDBs: a list of local databases, highest priority first
+    :param data_format: "raw" for raw data or "cdst" for the new cdst format
+    :param full_reco: on True, run full cosmics reconstruction also if data_format=="cdst"
+    '''
+
+    #   create path
+    main = basf2.create_path()
+
+    #   add basic modules
+    if data_format == "cdst" and full_reco:
+        main.add_module('RootInput', branchNames=ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
+    else:
+        main.add_module('RootInput')
+
+    main.add_module('Gearbox')
+    main.add_module('Geometry')
+    if data_format == "raw" or full_reco:
+        add_unpackers(main)
+        add_cosmics_reconstruction(main, merge_tracks=False, reconstruct_cdst=True)
+    else:
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+
+    main.add_module('Ext')
+    main.add_module('TOPChannelMasker')
+    main.add_module('TOPCosmicT0Finder', useIncomingTrack=True, applyT0=False)
+    main.add_module('TOPCosmicT0Finder', useIncomingTrack=False, applyT0=False)
+
+    #   collector module
+    collector = basf2.register_module('TOPModuleT0DeltaTCollector')
+    collector.param('granularity', 'run')
+
+    #   algorithm
+    algorithm = TOP.TOPModuleT0DeltaTAlgorithm()
+
+    #   define calibration
+    cal = Calibration(name='TOP_moduleT0_cosmics', collector=collector,
+                      algorithms=algorithm, input_files=inputFiles)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
+    cal.pre_collector_path = main
+    cal.strategies = SingleIOV
+
+    return cal
+
+
 def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
                             new_cdst_format=True):
     '''
@@ -363,23 +428,27 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
 
 
 def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=28,
-                                  globalTags=None, localDBs=None):
+                                  globalTags=None, localDBs=None, sroot=False):
     '''
     Returns calibration object for calibration of pulse-height distributions and
     threshold efficiencies with local laser runs.
-    :param inputFiles: A list of input files in sroot format
+    :param inputFiles: A list of input files
     :param t_min: lower edge of time window to select laser signal [ns]
     :param t_max: upper edge of time window to select laser signal [ns]
     :param look_back: look-back window setting (set it to 0 to use the one from DB)
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param sroot: True if input files are in sroot format, False if in root format
     '''
 
     #   create path
     main = basf2.create_path()
 
     #   add basic modules
-    main.add_module('SeqRootInput')
+    if sroot:
+        main.add_module('SeqRootInput')
+    else:
+        main.add_module('RootInput')
     main.add_module('TOPGeometryParInitializer')
     main.add_module('TOPUnpacker')
     main.add_module('TOPRawDigitConverter', lookBackWindows=look_back)

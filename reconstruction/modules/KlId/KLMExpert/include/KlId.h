@@ -292,9 +292,7 @@ namespace Belle2::KlongId {
         if (angle < cutAngle) {
           state = track.getMeasuredStateOnPlaneFromLastHit();
           state.extrapolateToPoint(XYZToTVector(clusterPosition));
-          const TVector3& position = state.getPos();
-          const ROOT::Math::XYZVector trackPos(
-            position.X(), position.Y(), position.Z());
+          const ROOT::Math::XYZVector& trackPos = ROOT::Math::XYZVector(state.getPos());
 
           const ROOT::Math::XYZVector& distanceVecCluster = clusterPosition - trackPos;
           double newDistance = distanceVecCluster.Mag2();

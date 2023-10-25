@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "TObject.h"
-#include "TClonesArray.h"
+#include <TObject.h>
+#include <TClonesArray.h>
 
-enum SIMPLEPID {PHOTON, ELECTRON, PION, MUON, KAON, PROTON, JPSI, D, DSTAR, B, PHI, LAMBDA0, ALL };
+enum SIMPLEPID {PHOTON, ELECTRON, PION, MUON, KAON, PROTON, JPSI, D, DSTAR, B, PHI, LAMBDA0, DEUTERON, ALL };
 
 //! The Class for Masterclass particle information
 //! This class provides the data structure of the particle that are used by Belle II Masterclass application.
@@ -24,6 +24,12 @@ private:
   float m_e;  /*!< energy of the particle */
   float m_charge;  /*!< charge of the particle */
   SIMPLEPID m_pid;  /*!< particle identity */
+  float m_logL_e;  /*!< log likelihood of the electron hypothesis */
+  float m_logL_mu;  /*!< log likelihood of the muon hypothesis */
+  float m_logL_pi;  /*!< log likelihood of the pion hypothesis */
+  float m_logL_k;  /*!< log likelihood of the kaon hypothesis */
+  float m_logL_p;  /*!< log likelihood of the proton hypothesis */
+  float m_logL_d;  /*!< log likelihood of the deuteron hypothesis */
 
 public:
 //! Default constructor
@@ -41,8 +47,15 @@ public:
    * @param energy  - energy of the particle
    * @param charge  - unit charge of the particle
    * @param pid - particle identity - hypothesis with the highest maximum likelihood
+   * @param logL_e - log likelihood of the electron hypothesis
+    * @param logL_mu - log likelihood of the muon hypothesis
+    * @param logL_pi - log likelihood of the pion hypothesis
+    * @param logL_k - log likelihood of the kaon hypothesis
+    * @param logL_p - log likelihood of the proton hypothesis
+    * @param logL_d - log likelihood of the deuteron hypothesis
    */
-  BParticle(float px, float py, float pz, float energy, float charge, SIMPLEPID pid);
+  BParticle(float px, float py, float pz, float energy, float charge, SIMPLEPID pid,
+            float logL_e = 0, float logL_mu = 0, float logL_pi = 0, float logL_k = 0, float logL_p = 0, float logL_d = 0);
 
 //! Default destructor
   ~BParticle() {};
@@ -86,6 +99,56 @@ public:
    */
 
   SIMPLEPID pid() const { return m_pid; };
+  /**
+   * Get the log likelihood for electron hypothesis
+   * @return the log likelihood for electron hypothesis
+   */
+  float logL_e() const { return m_logL_e; };
+  /**
+   * Get the log likelihood for muon hypothesis
+   * @return the log likelihood for muon hypothesis
+   */
+  float logL_mu() const { return m_logL_mu; };
+  /**
+   * Get the log likelihood for pion hypothesis
+   * @return the log likelihood for pion hypothesis
+   */
+  float logL_pi() const { return m_logL_pi; };
+  /**
+   * Get the log likelihood for kaon hypothesis
+   * @return the log likelihood for kaon hypothesis
+   */
+  float logL_k() const { return m_logL_k; };
+  /**
+   * Get the log likelihood for proton hypothesis
+   * @return the log likelihood for proton hypothesis
+   */
+  float logL_p() const { return m_logL_p; };
+  /**
+   * Get the log likelihood for deuteron hypothesis
+   * @return the log likelihood for deuteron hypothesis
+   */
+  float logL_d() const { return m_logL_d; };
+  /**
+   * Get the log likelihood for a particle hypothesis
+    * @param pid particle identity
+   * @return the log likelihood for a particle hypothesis
+   */
+  float GetLogL(SIMPLEPID pid);
+  /**
+    * Get the log likelihood ratio for a particle hypothesis with respect to all other hypotheses
+    * @param pid particle identity
+    * @return the log likelihood ratio for a particle hypothesis
+    */
+  float GetPID(SIMPLEPID pid);
+  /**
+    * Get the binary log likelihood ratio for a particle hypothesis with respect to a second hypothesis
+    * @param pid1 particle identity
+    * @param pid2 particle identity
+    * @return the binary log likelihood ratio for two particle hypotheses
+    */
+  float GetBinPID(SIMPLEPID pid1, SIMPLEPID pid2);
+
   /**
    * Get the mass of the particle with the identity
    * @param pid particle identity
@@ -134,10 +197,16 @@ public:
     m_e  = p.e();
     m_charge  = p.charge();
     m_pid  =  p.pid();
+    m_logL_e = p.logL_e();
+    m_logL_mu = p.logL_mu();
+    m_logL_pi = p.logL_pi();
+    m_logL_k = p.logL_k();
+    m_logL_p = p.logL_p();
+    m_logL_d = p.logL_d();
     return *this;
   };
 
-  ClassDef(BParticle, 1)    // Simple particle class
+  ClassDef(BParticle, 2)    // Simple particle class
 };
 
 int SelectParticles(TClonesArray* pin, int charge, SIMPLEPID type, TClonesArray* pout);

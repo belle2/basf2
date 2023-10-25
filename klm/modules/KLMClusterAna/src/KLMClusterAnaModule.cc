@@ -17,7 +17,6 @@
 #include <TMatrixT.h>
 #include <TMatrixDSymEigen.h>
 #include <TVectorT.h>
-#include <TVector3.h>
 
 /* C++ headers. */
 #include <algorithm>

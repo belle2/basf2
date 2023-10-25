@@ -29,7 +29,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
         result_filter_parameters = {}
     else:
         result_filter = "mva_with_relations"
-        result_filter_parameters = {"cut": 0.6}
+        result_filter_parameters = {'DBPayloadName': 'ckf_SeededCDCToSVDResultParameters'}
 
     if direction == "forward":
         reverse_seed = True
@@ -58,16 +58,20 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
                     ).set_name(f"CDCToSVDSeedCKF_{direction}")
 
 
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,
-                overlap_cut=0.2, use_best_seeds=10, use_best_results=2, direction="backward"):
+def add_pxd_ckf(
+        path,
+        svd_cdc_reco_tracks,
+        pxd_reco_tracks,
+        use_mc_truth=False,
+        use_best_seeds=10,
+        use_best_results=2,
+        direction="backward"):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
     :param svd_cdc_reco_tracks: The name of the already created SVD+CDC reco tracks
     :param pxd_reco_tracks: The name to output the PXD reco tracks to
     :param use_mc_truth: Use the MC information in the CKF
-    :param filter_cut: CKF parameter for MVA state filter
-    :param overlap_cut: CKF parameter for MVA overlap filter.
     :param use_best_results: CKF parameter for useBestNInSeed
     :param use_best_seeds: CKF parameter for UseNStates
     :param direction: where to extrapolate to. Valid options are forward and backward
@@ -97,19 +101,20 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
         )
     else:
         module_parameters = dict(
-            firstHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_1",
-                                       "direction": direction},
+            firstHighFilterParameters={
+                'DBPayloadName': 'ckf_ToPXDStateFilter_1Parameters',
+                "direction": direction},
             firstHighUseNStates=use_best_seeds,
-
-            secondHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_2"},
+            secondHighFilterParameters={
+                'DBPayloadName': 'ckf_ToPXDStateFilter_2Parameters'},
             secondHighUseNStates=use_best_seeds,
-
-            thirdHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_3"},
+            thirdHighFilterParameters={
+                'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'},
             thirdHighUseNStates=use_best_seeds,
-
-            filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
+            filterParameters={
+                    'DBPayloadName': 'ckf_PXDTrackCombinationParameters'},
             useBestNInSeed=use_best_results,
-        )
+                     )
 
     module_parameters["seedHitJumping"] = -1  # get from payload
     module_parameters["hitHitJumping"] = 0
@@ -131,16 +136,20 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
                     **module_parameters).set_name(f"ToPXDCKF_{direction}")
 
 
-def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, filter_cut=0.1,
-                overlap_cut=0.2, use_best_results=5, use_best_seeds=10, direction="backward"):
+def add_svd_ckf(
+        path,
+        cdc_reco_tracks,
+        svd_reco_tracks,
+        use_mc_truth=False,
+        use_best_results=5,
+        use_best_seeds=10,
+        direction="backward"):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
     :param cdc_reco_tracks: The name of the already created CDC reco tracks
     :param svd_reco_tracks: The name to output the SVD reco tracks to
     :param use_mc_truth: Use the MC information in the CKF
-    :param filter_cut: CKF parameter for MVA filter
-    :param overlap_cut: CKF parameter for MVA overlap filter
     :param use_best_results: CKF parameter for useNResults
     :param use_best_seeds: CKF parameter for useBestNInSeed
     :param direction: where to extrapolate to. Valid options are forward and backward
@@ -160,20 +169,38 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, filt
             useBestNInSeed=1
         )
     else:
-        module_parameters = dict(
-            firstHighFilterParameters={"identifier": "ckf_CDCSVDStateFilter_1", "cut": filter_cut,
-                                       "direction": direction},
-            firstHighUseNStates=use_best_seeds,
-
-            secondHighFilterParameters={"identifier": "ckf_CDCSVDStateFilter_2", "cut": filter_cut},
-            secondHighUseNStates=use_best_seeds,
-
-            thirdHighFilterParameters={"identifier": "ckf_CDCSVDStateFilter_3", "cut": filter_cut},
-            thirdHighUseNStates=use_best_seeds,
-
-            filterParameters={"cut": overlap_cut, "identifier": "ckf_CDCToSVDResult"},
-            useBestNInSeed=use_best_results,
-        )
+        if direction == "forward":
+            module_parameters = dict(
+                firstHighFilterParameters={
+                    "direction": direction,
+                    'DBPayloadName': 'ckf_CDCSVDStateFilter_1_forward_Parameters'},
+                firstHighUseNStates=use_best_seeds,
+                secondHighFilterParameters={
+                    'DBPayloadName': 'ckf_CDCSVDStateFilter_2_forward_Parameters'},
+                secondHighUseNStates=use_best_seeds,
+                thirdHighFilterParameters={
+                    'DBPayloadName': 'ckf_CDCSVDStateFilter_3_forward_Parameters'},
+                thirdHighUseNStates=use_best_seeds,
+                filterParameters={
+                    'DBPayloadName': 'ckf_CDCToSVDResultParameters'},
+                useBestNInSeed=use_best_results,
+            )
+        else:
+            module_parameters = dict(
+                firstHighFilterParameters={
+                    "direction": direction,
+                    'DBPayloadName': 'ckf_CDCSVDStateFilter_1_backward_Parameters'},
+                firstHighUseNStates=use_best_seeds,
+                secondHighFilterParameters={
+                    'DBPayloadName': 'ckf_CDCSVDStateFilter_2_backward_Parameters'},
+                secondHighUseNStates=use_best_seeds,
+                thirdHighFilterParameters={
+                    'DBPayloadName': 'ckf_CDCSVDStateFilter_3_backward_Parameters'},
+                thirdHighUseNStates=use_best_seeds,
+                filterParameters={
+                    'DBPayloadName': 'ckf_CDCToSVDResultParameters'},
+                useBestNInSeed=use_best_results,
+            )
 
     path.add_module("CDCToSVDSpacePointCKF",
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
@@ -193,8 +220,14 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, filt
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
 
 
-def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, use_best_results=5,
-                        use_best_seeds=10, direction="backward"):
+def add_cosmics_svd_ckf(
+        path,
+        cdc_reco_tracks,
+        svd_reco_tracks,
+        use_mc_truth=False,
+        use_best_results=5,
+        use_best_seeds=10,
+        direction="backward"):
     """
     Convenience function to add the SVD ckf to the path with cosmics settings valid for phase2 and 3.
     :param path: The path to add the module to
@@ -258,8 +291,14 @@ def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fal
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
 
 
-def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, use_best_results=5,
-                        filter_cut=0.03, overlap_cut=0.2, use_best_seeds=10, direction="backward"):
+def add_cosmics_pxd_ckf(
+        path,
+        svd_cdc_reco_tracks,
+        pxd_reco_tracks,
+        use_mc_truth=False,
+        use_best_results=5,
+        use_best_seeds=10,
+        direction="backward"):
     """
     Convenience function to add the PXD ckf to the path with cosmics settings valid for phase2 and 3.
     :param path: The path to add the module to
@@ -267,8 +306,6 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
     :param pxd_reco_tracks: The name to output the SVD reco tracks to
     :param use_mc_truth: Use the MC information in the CKF
     :param use_best_results: CKF parameter for useNResults
-    :param filter_cut: CKF parameter for MVA filter
-    :param overlap_cut: CKF parameter for MVA overlap filter
     :param use_best_seeds: CKF parameter for useBestNInSeed
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
@@ -301,23 +338,22 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
             seedFilter="all",
             preHitFilter="all",
             preSeedFilter="all",
-
-            firstHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_1",
-                                       "direction": direction},
+            firstHighFilterParameters={
+                'DBPayloadName': 'ckf_ToPXDStateFilter_1Parameters',
+                "direction": direction},
             firstHighUseNStates=use_best_seeds,
-
-            secondHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_2"},
+            secondHighFilterParameters={
+                'DBPayloadName': 'ckf_ToPXDStateFilter_2Parameters'},
             secondHighUseNStates=use_best_seeds,
-
-            thirdHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_3"},
+            thirdHighFilterParameters={
+                'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'},
             thirdHighUseNStates=use_best_seeds,
-
-            filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
+            filterParameters={
+                'DBPayloadName': 'ckf_PXDTrackCombinationParameters'},
             useBestNInSeed=use_best_results,
-
             seedHitJumping=1,
             hitHitJumping=0,
-        )
+                     )
 
     path.add_module("ToPXDCKF",
                     advanceHighFilterParameters={"direction": direction},

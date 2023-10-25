@@ -14,6 +14,8 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
+#include <TMath.h>
+
 #include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>

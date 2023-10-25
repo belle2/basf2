@@ -24,7 +24,7 @@ import sys
 argvs = sys.argv
 if len(argvs) != 5:
     print('usage: basf2', argvs[0],
-          '-i <file_sroot> (pocket|local) <slot> <channel> <output_dir>')
+          '-i <file_root> (pocket|local) <slot> <channel> <output_dir>')
     sys.exit()
 
 datatype = argvs[1]      # data type (pocket, local)
@@ -47,7 +47,8 @@ b2.set_log_level(b2.LogLevel.ERROR)
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects

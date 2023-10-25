@@ -29,8 +29,6 @@ main.add_module('PXDROIFinder',
                 PXDInterceptListName='PXDIntercepts',
                 ROIListName='ROIs',
                 logLevel=b2.LogLevel.DEBUG)
-# PXD digitization module
-main.add_module('PXDDigitizer')
 # filter PXDClusters that are in ROIs
 main.add_module('PXDdigiFilter', ROIidsName='ROIs', CreateOutside=True, overrideDB=True, usePXDDataReduction=True)
 

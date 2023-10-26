@@ -100,6 +100,8 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   if (hdPhi0_cm) hdPhi0_cm->Write();
   if (hdTheta_cm) hdTheta_cm->Write();
   TTree* newtree = tree->CloneTree();
+  newtree->SetName("tree_dimuon");
+  newtree->Write();
   fout->Write();
   fout->Close();
   return c_OK;

@@ -123,12 +123,9 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   B2DEBUG(199, "Number of muon canndiate:" << nCandidates);
   if (nCandidates < 1) return;
 
-  //  make evt t0 incase we dont use evt t0
-  double evtT0 = 0;
   // event with is fail to extract t0 will be exclude from analysis
   if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
-    evtT0 =  m_eventTimeStoreObject->getEventT0();
-    getObjectPtr<TH1F>("hEventT0")->Fill(evtT0);
+    getObjectPtr<TH1F>("hEventT0")->Fill(m_eventTimeStoreObject->getEventT0());
   } else {
     return;
   }
@@ -156,8 +153,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   //now start to collect dimuon parameters
   double   theta_pos, theta_neg;
   int charge_sum = 0;
-  double  Eecl_trk;
-
+  double  Eecl_trk = 0;
 
   for (int i = 0; i < nCandidates; ++i) {
     Particle* part = m_DiMuonList->getParticle(i);

@@ -5,7 +5,7 @@ import numpy as np
 import copy
 from itertools import combinations
 from variables import variables as vm
-from grafei.scripts.FlagBDecayModule import getObjectList
+from grafei.modules.FlagBDecayModule import getObjectList
 
 
 def update_levels(levels, hist, pdg):

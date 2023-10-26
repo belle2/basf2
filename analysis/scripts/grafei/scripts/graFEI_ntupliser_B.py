@@ -4,14 +4,13 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import vertex as vtx
 from ROOT import Belle2
 from variables import variables as vm
 from stdCharged import stdK, stdPi
 import random
 import argparse
-from grafei.scripts.graFEISaverModule import graFEISaverModule
-from grafei.scripts.FlagBDecayModule import FlagBDecayModule
+from grafei import graFEISaverModule
+from grafei import FlagBDecayModule
 
 # Random seeds
 b2.set_random_seed("Pino")
@@ -64,33 +63,18 @@ parser.add_argument(
     "--mc",
     required=False,
     default=None,
-    choices=[
-        "B0:MC",
-        "B+:MC"],
+    choices=["Upsilon(4S):MC",
+             "B0:MC",
+             "B+:MC"],
     help="Decide which MC particle to load for truth-matching")
-parser.add_argument(
-    "-r",
-    "--onROE",
-    choices=range(1, 6),
-    type=int,
-    required=True,
-    help="""Run on ROE of a signal side, choose among:
-    1) Bd --> K*0 nu nu
-    2) Bd --> K*0 mu mu
-    3) Bd --> K+ pi-
-    4) Bd --> D- ( --> K+ pi- pi-) pi+
-    5) Bd --> D- ( --> K+ pi- pi-) mu+ nu
-    """,
-)
 parser.add_argument("-c", "--cfg", type=str, default=None, help="graFEI config file")
 parser.add_argument("-w", "--weight", type=str, default=None, help="graFEI weight file")
 args = parser.parse_args()
-run_onROE = args.onROE
 cfg_file = args.cfg
 weight_file = args.weight
 mc = args.mc
 
-assert args.mc == "B0:MC", "This script actually works only for B0"
+assert not args.mc or args.mc == "B0:MC", "This script actually works only for B0"
 
 # Create path
 path = b2.Path()
@@ -123,47 +107,19 @@ vm.addAlias("mostLikelyTracks", most_likely_tracks)
 stdK("loose", path=path)
 stdPi("loose", path=path)
 
-if run_onROE in [1, 2]:
-    ma.reconstructDecay("K*0:Kpi -> K+:loose pi-:loose", "0.6 < M < 1.3", path=path)
-    vtx.treeFit("K*0:Kpi", conf_level=0.001, ipConstraint=False, path=path)
-
-    if run_onROE == 1:
-        ma.reconstructDecay("B0:sig -> K*0:Kpi", "", path=path)
-    elif run_onROE == 2:
-        ma.fillParticleList(
-            "mu+:good",
-            "abs(dz)<4 and dr<2 and nCDCHits>20 and thetaInCDCAcceptance and pt>0.1 and E<5.5 and muonID>0.5",
-            path=path,
-        )
-        ma.reconstructDecay(
-            "B0:sig -> K*0:Kpi mu+:good mu-:good", "5.0 < M < 6.0", path=path
-        )
-
-elif run_onROE == 3:
-    ma.reconstructDecay("B0:sig -> K+:loose pi-:loose", "5.0 < M < 6.0", path=path)
-    # vtx.treeFit("B0:sig", conf_level=0.001, ipConstraint=False, path=path)
-
-elif run_onROE == 4:
-    ma.reconstructDecay(
-        "D-:Kpipi -> K+:loose pi-:loose pi-:loose", "1.7 < M < 2.0", path=path
-    )
-    ma.reconstructDecay(
-        "B0:sig -> D-:Kpipi pi+:loose", "5.25 < M < 5.30", path=path
-    )
-elif run_onROE == 5:
-    ma.reconstructDecay(
-        "D-:Kpipi -> K+:loose pi-:loose pi-:loose", "1.85 < M < 1.88", path=path
-    )
-    ma.fillParticleList(
-        "mu+:tight",
-        "abs(dz)<2 and dr<0.5 and nCDCHits>20 and thetaInCDCAcceptance and pt>0.6 and E<5.5 and muonID_noSVD>0.9",
-        path=path,
-    )
-    ma.reconstructDecay(
-        "B0:sig -> D-:Kpipi mu+:tight",
-        "cosThetaBetweenParticleAndNominalB>-2 and cosThetaBetweenParticleAndNominalB<2",
-        path=path,
-    )
+ma.reconstructDecay(
+    "D-:Kpipi -> K+:loose pi-:loose pi-:loose", "1.85 < M < 1.88", path=path
+)
+ma.fillParticleList(
+    "mu+:tight",
+    "abs(dz)<2 and dr<0.5 and nCDCHits>20 and thetaInCDCAcceptance and pt>0.6 and E<5.5 and muonID_noSVD>0.9",
+    path=path,
+)
+ma.reconstructDecay(
+    "B0:sig -> D-:Kpipi mu+:tight",
+    "cosThetaBetweenParticleAndNominalB>-2 and cosThetaBetweenParticleAndNominalB<2",
+    path=path,
+)
 
 # ROE
 ma.buildRestOfEvent("B0:sig", path=path)
@@ -367,13 +323,12 @@ for var in graFEI_vars:
 graFEI_vars = [f"Btag_{var}" for var in graFEI_vars + default_vars] + \
     ["Btag_Mbc", "Bsig_Rank"] + [f"Bsig_{var}" for var in default_vars]
 
-if run_onROE in [4, 5]:
-    vm.addAlias("Bsig_D_M", "daughter(1, daughter(0, M))")
-    vm.addAlias("Bsig_D_E", "daughter(1, daughter(0, E))")
-    vm.addAlias("Bsig_D_pt", "daughter(1, daughter(0, pt))")
-    vm.addAlias("Bsig_D_p", "daughter(1, daughter(0, p))")
+vm.addAlias("Bsig_D_M", "daughter(1, daughter(0, M))")
+vm.addAlias("Bsig_D_E", "daughter(1, daughter(0, E))")
+vm.addAlias("Bsig_D_pt", "daughter(1, daughter(0, pt))")
+vm.addAlias("Bsig_D_p", "daughter(1, daughter(0, p))")
 
-    graFEI_vars.extend(["Bsig_D_M", "Bsig_D_E", "Bsig_D_pt", "Bsig_D_p"])
+graFEI_vars.extend(["Bsig_D_M", "Bsig_D_E", "Bsig_D_pt", "Bsig_D_p"])
 
 graFEI_vars = sorted(list(set(graFEI_vars)))
 

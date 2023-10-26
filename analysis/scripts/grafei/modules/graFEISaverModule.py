@@ -9,14 +9,14 @@ import basf2 as b2
 from ROOT import Belle2
 from variables import variables as vm
 import torch
-from grafei.scripts.FlagBDecayModule import getObjectList
+from grafei.modules.FlagBDecayModule import getObjectList
 from grafei.model.geometric_network import GeometricNetwork
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
 from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, n_intermediate_particles
 from grafei.model.tree_utils import masses_to_classes
 # from grafei.model.tree_utils import node_masses
-from grafei.scripts.RootSaverModule import write_hist
+from grafei.modules.RootSaverModule import write_hist
 
 warnings.filterwarnings(
     action="ignore", category=RuntimeWarning, message="Mean of empty slice.*"
@@ -156,25 +156,21 @@ class graFEISaverModule(b2.Module):
             # Get FSPs
             p_list = getObjectList(candidate.getFinalStateDaughters())
 
-            # Get particle nature
-            photons = np.array([(abs(p.getPDGCode()) == 22) for p in p_list])
-            electrons = np.array([(abs(p.getPDGCode()) == 11) for p in p_list])
-            muons = np.array([(abs(p.getPDGCode()) == 13) for p in p_list])
-            pions = np.array([(abs(p.getPDGCode()) == 211) for p in p_list])
-            kaons = np.array([(abs(p.getPDGCode()) == 321) for p in p_list])
-            protons = np.array([(abs(p.getPDGCode()) == 2212) for p in p_list])
-
-            # Number of FSPs, charged and photons
+            # Number of FSPs
             n_nodes = len(p_list)
 
+            # Particle nature
+            masses = np.array([abs(p.getPDGCode()) for p in p_list])
+
+            # Number of charged and photons
             graFEI_nFSP = n_nodes
-            graFEI_nPhotons_preFit = sum(photons)
+            graFEI_nPhotons_preFit = (masses == 22).sum()
             graFEI_nCharged_preFit = graFEI_nFSP - graFEI_nPhotons_preFit
-            graFEI_nElectrons_preFit = sum(electrons)
-            graFEI_nMuons_preFit = sum(muons)
-            graFEI_nPions_preFit = sum(pions)
-            graFEI_nKaons_preFit = sum(kaons)
-            graFEI_nProtons_preFit = sum(protons)
+            graFEI_nElectrons_preFit = (masses == 11).sum()
+            graFEI_nMuons_preFit = (masses == 13).sum()
+            graFEI_nPions_preFit = (masses == 211).sum()
+            graFEI_nKaons_preFit = (masses == 321).sum()
+            graFEI_nProtons_preFit = (masses == 2212).sum()
             graFEI_nLeptons_preFit = graFEI_nElectrons_preFit + graFEI_nMuons_preFit
             graFEI_nOthers_preFit = graFEI_nCharged_preFit - \
                 (graFEI_nLeptons_preFit + graFEI_nPions_preFit + graFEI_nKaons_preFit + graFEI_nProtons_preFit)
@@ -351,7 +347,7 @@ class graFEISaverModule(b2.Module):
             )
             b2.B2DEBUG(10, "Predicted matched particles:\n", predicted_matched)
             # Same but ignoring photons
-            predicted_matched_noPhotons = predicted_matched[~photons]
+            predicted_matched_noPhotons = predicted_matched[masses != 22]
 
             # Get number of predicted as unmatched
             graFEI_nPredictedUnmatched = (~predicted_matched).sum()
@@ -551,7 +547,7 @@ class graFEISaverModule(b2.Module):
 
                 # Get unique B indices associated to each predicted matched particle which is also a primary
                 # The idea is that if a primary particle coming from the other B is categorized as unmatched,
-                # then it's ok and the decay could be truth-matched
+                # then it's ok and the decay could still have a perfectLCA
                 B_indices = parentID[np.logical_and(evt_primary, predicted_matched)]
                 b2.B2DEBUG(
                     10, "Ancestor ID of predicted matched particles:\n", B_indices
@@ -586,8 +582,8 @@ class graFEISaverModule(b2.Module):
                     # Here we look if the candidate has a perfectly reconstructed LCA
                     for genP in gen_list.obj():
                         mcp = genP.getMCParticle()
-                        # If storing true info on B decays and we have paricles coming from different Bs
-                        # the decay will not have a perfectLCA
+                        # If storing true info on B decays and we have matched paricles coming
+                        # from different Bs the decay will not have a perfectLCA
                         if self.storeTrueInfo != "Upsilon(4S):MC" and len(B_indices) != 1:
                             break
 

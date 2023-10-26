@@ -8,8 +8,8 @@ from ROOT import Belle2
 from variables import variables as vm
 import random
 import argparse
-from grafei.scripts.graFEISaverModule import graFEISaverModule
-from grafei.scripts.FlagBDecayModule import FlagBDecayModule
+from grafei import graFEISaverModule
+from grafei import FlagBDecayModule
 
 # Random seeds
 b2.set_random_seed("Pino")
@@ -60,7 +60,7 @@ parser.add_argument(
     "--mc",
     required=False,
     default=None,
-    choices=["Upsilon(4S):MC"],
+    choices=["Upsilon(4S):MC", "B0:MC", "B+:MC"],
     help="Decide which MC particle to load for truth-matching")
 parser.add_argument("-c", "--cfg", type=str, default=None, help="graFEI config file")
 parser.add_argument("-w", "--weight", type=str, default=None, help="graFEI weight file")
@@ -69,7 +69,7 @@ cfg_file = args.cfg
 weight_file = args.weight
 mc = args.mc
 
-assert args.mc == "Upsilon(4S):MC", "This script actually works only for Upsilon"
+assert not args.mc or args.mc == "Upsilon(4S):MC", "This script actually works only for Upsilon"
 
 # Create path
 path = b2.Path()

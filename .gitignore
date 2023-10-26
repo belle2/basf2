@@ -115,3 +115,7 @@ Belle2FileCatalog.xml
 # ############### #
 *.o
 *.os
+
+# PyTorch output #
+# ############## #
+*.pt

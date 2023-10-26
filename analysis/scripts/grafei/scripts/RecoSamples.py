@@ -26,7 +26,7 @@ def get_args():
     parser.add_argument('-i', type=Path, required=False,
                         help='Input mdst files', metavar='INPUT',
                         dest='input')
-    parser.add_argument('-t', '--type', choices=['B02nunu', 'mixed', 'charged', 'Ups'], required=True,
+    parser.add_argument('-t', '--type', choices=['B0:MC', 'B+:MC', 'Upsilon(4S):MC'], required=True,
                         help='Training target', metavar='type',
                         dest='type')
     # parser.add_argument('-b', '--bkg_prob', required=False, default=0., type=float,
@@ -53,17 +53,7 @@ if __name__ == '__main__':
     ma.inputMdst(str(args.input), path=path)
 
     # ###### BUILD MC B/Ups FOR LCA/TAGGING ######
-    if args.type in ['B02nunu', 'mixed']:
-        ma.fillParticleListFromMC('B0:MC', '', path=path)
-        mcparticle_list = 'B0:MC'
-
-    elif args.type == 'charged':
-        ma.fillParticleListFromMC('B+:MC', '', path=path)
-        mcparticle_list = 'B+:MC'
-
-    elif args.type == 'Ups':
-        ma.fillParticleListFromMC('Upsilon(4S):MC', '', path=path)
-        mcparticle_list = 'Upsilon(4S):MC'
+    ma.fillParticleListFromMC(args.type, '', path=path)
 
     # Fill particle list with optimized cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
@@ -113,10 +103,7 @@ if __name__ == '__main__':
     vm.addAlias('n_K_in_evt', 'nParticlesInList(K+:final)')
     vm.addAlias('n_charged_in_evt', 'formula(n_p_in_evt+n_e_in_evt+n_mu_in_evt+n_pi_in_evt+n_K_in_evt)')
 
-    n_gamma_max = 10 if args.type == 'B02nunu' else 20
-    n_charged_max = 10 if args.type == 'B02nunu' else 20
-
-    ma.applyEventCuts(f'n_gamma_in_evt<{n_gamma_max} and n_charged_in_evt<{n_charged_max}', path=path)
+    ma.applyEventCuts('n_gamma_in_evt<20 and n_charged_in_evt<20', path=path)
 
     # Set up variables to save to NTuple
     save_vars = [
@@ -186,7 +173,7 @@ if __name__ == '__main__':
         particle_lists=p_lists,
         features=save_vars,
         b_parent_var=b_parent_var,
-        mcparticle_list=mcparticle_list,
+        mcparticle_list=args.type,
         output_file=f'output_{input_file.stem}.root',
         # bkg_prob=args.bkg_prob,
     )

@@ -42,7 +42,7 @@ class graFEISaverModule(b2.Module):
         particle_list: str,
         cfg_path=None,
         param_file=None,
-        store_true_info=False,
+        store_true_info=None,
         gpu=False,
     ):
         """Class Constructor.
@@ -59,7 +59,7 @@ class graFEISaverModule(b2.Module):
         self.storeTrueInfo = store_true_info
         self.gpu = gpu
 
-        assert self.storeTrueInfo in [False, "B0:MC", "B+:MC", "Upsilon(4S):MC"], \
+        assert self.storeTrueInfo in [None, "B0:MC", "B+:MC", "Upsilon(4S):MC"], \
             "You should select one of B0, B+ or Upsilon(4S) for truth-matching, or choose not to store truth-matching info"
 
     def initialize(self):
@@ -489,6 +489,7 @@ class graFEISaverModule(b2.Module):
             candidate.addExtraInfo("graFEI_nKaons_preFit", graFEI_nKaons_preFit)
             candidate.addExtraInfo("graFEI_nProtons_preFit", graFEI_nProtons_preFit)
             candidate.addExtraInfo("graFEI_nLeptons_preFit", graFEI_nLeptons_preFit)
+            candidate.addExtraInfo("graFEI_nOthers_preFit", graFEI_nOthers_preFit)
             candidate.addExtraInfo("graFEI_nPhotons_postFit", graFEI_nPhotons_postFit)
             candidate.addExtraInfo("graFEI_nCharged_postFit", graFEI_nCharged_postFit)
             candidate.addExtraInfo("graFEI_nElectrons_postFit", graFEI_nElectrons_postFit)
@@ -501,9 +502,9 @@ class graFEISaverModule(b2.Module):
             candidate.addExtraInfo("graFEI_nPredictedUnmatched", graFEI_nPredictedUnmatched)
             candidate.addExtraInfo("graFEI_nPredictedUnmatched_noPhotons", graFEI_nPredictedUnmatched_noPhotons)
             candidate.addExtraInfo("graFEI_depthLCA", graFEI_depthLCA)
-            candidate.addExtraInfo("graFEI_nBtag_daughters", graFEI_nB1_daughters)
-            candidate.addExtraInfo("graFEI_nBsig_daughters", graFEI_nB2_daughters)
-            candidate.addExtraInfo("graFEI_notB_daughters", graFEI_notB_daughters)
+            candidate.addExtraInfo("graFEI_nBtagDaughters", graFEI_nB1_daughters)
+            candidate.addExtraInfo("graFEI_nBsigDaughters", graFEI_nB2_daughters)
+            candidate.addExtraInfo("graFEI_nNotBParticles", graFEI_notB_daughters)
 
             # # Invariant masses of intermediates are stored in dedicated extraInfo, one for each intermediate
             # for lcas_level in range(1, 7):

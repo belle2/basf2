@@ -15,17 +15,16 @@
 #include "TMemFile.h"
 #include "TDirectory.h"
 
-#define MEMFILESIZE 128000000
-
 namespace Belle2 {
   class MsgHandler;
 
   class DqmMemFile {
   public:
+    enum {c_memFileSize = 128000000};
+  public:
     DqmMemFile(std::string name = "dqmhisto",
-               const std::string& mode = "readonly", int size = MEMFILESIZE);
-    DqmMemFile(int shm_id, int sem_id,
-               const std::string& mode = "readonly", int size = MEMFILESIZE);
+               const std::string& mode = "readonly", int size = c_memFileSize);
+    DqmMemFile(int shm_id, int sem_id, int size = c_memFileSize);
     ~DqmMemFile();
 
     // Sender function

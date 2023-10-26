@@ -1,7 +1,7 @@
 dataset:
   # Select the data type, this decides which Dataset class to use
   inMemory: True
-  path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts/ntuples_test # Should contain train/val subdirectories
+  path:  # Should contain train/val subdirectories
   config:
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
     edge_features: [costheta, doca]
@@ -32,7 +32,7 @@ dataset:
       #muonID : [[linear, 0.19, 0.3]]
       #protonID : [[linear, 0.03, 0.14]]
       #pionID : [[linear, 0.53, 0.41]]
-  edge_classes: 7 # 6: 0, 1, 2, 3, 4, 5, 6 
+  edge_classes: 7 # 6 (7): 0, 1, 2, 3, 4, 5(, 6)
   x_classes: 7 # 7: e, mu, K, pi, p, gamma, other
 output:
   # Top directory to save model, run_name as subdir and timestamp suffix

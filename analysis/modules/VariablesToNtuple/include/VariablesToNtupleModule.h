@@ -61,6 +61,8 @@ namespace Belle2 {
     std::string m_treeName;
     /** Suffix to be appended to the output file name. */
     std::string m_fileNameSuffix;
+    /** Use float type for floating-point numbers. */
+    bool m_useFloat;
     /** Size of TBaskets in the output ROOT file in bytes. */
     int m_basketsize;
 

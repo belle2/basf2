@@ -94,9 +94,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas->cd(0);
 //YJ
   //update comL1-GDLL1
-  double comL1_GDLL1_mean = 0.0;
+//  double comL1_GDLL1_mean = 0.0;
   auto hist_comL1_GDLL1 =  getDelta("TRGGDL", "hGDL_gdlL1TocomL1_all", 0, true);// only if updated
   if (hist_comL1_GDLL1) {
+    double comL1_GDLL1_mean = 0.0;
     hist_comL1_GDLL1->Draw();
     comL1_GDLL1_mean = hist_comL1_GDLL1->GetMean();
     B2DEBUG(1, "comL1_GDLL1_mean:" << comL1_GDLL1_mean);
@@ -107,9 +108,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //YJ
 
   //update ECLTRG timing
-  double ECLTRG_timing_mean = 0.0;
+//  double ECLTRG_timing_mean = 0.0;
   auto hist =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_ECLTRG", 0, true);// only if updated
   if (hist) {
+    double ECLTRG_timing_mean = 0.0;
     hist->Draw();
     ECLTRG_timing_mean = hist->GetMean();
     B2DEBUG(1, "ECLTRG_timing_mean:" << ECLTRG_timing_mean);
@@ -119,9 +121,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   }
 
   //update CDCTRG timing
-  double CDCTRG_timing_mean = 0.0;
+//  double CDCTRG_timing_mean = 0.0;
   auto histCDCTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG", 0, true);// only if updated
   if (histCDCTRG) {
+    double CDCTRG_timing_mean = 0.0;
     histCDCTRG->Draw();
     CDCTRG_timing_mean = histCDCTRG->GetMean();
     B2DEBUG(1, "CDCTRG_timing_mean:" << CDCTRG_timing_mean);
@@ -131,9 +134,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   }
 
   //update TOPTRG timing
-  double TOPTRG_timing_mean = 0.0;
+//  double TOPTRG_timing_mean = 0.0;
   auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", 0, true);// only if updated
   if (histTOPTRG) {
+    double TOPTRG_timing_mean = 0.0;
     histTOPTRG->Draw();
     TOPTRG_timing_mean = histTOPTRG->GetMean();
     B2DEBUG(1, "TOPTRG_timing_mean:" << TOPTRG_timing_mean);

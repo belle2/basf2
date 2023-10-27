@@ -42,6 +42,11 @@ def node_masses(particles, nodes):
 def masses_to_classes(array):
     """
     Convert the mass hypotheses to classes.
+
+    Args:
+        array (numpy array): array containing PDG mass codes
+    Returns:
+        array (numpy array): array containing mass hypothese converted to classes
     """
     array[array > 0] *= -1  # All elements become negative
     array[array == -11] = 1  # Electrons are class 1

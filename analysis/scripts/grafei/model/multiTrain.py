@@ -1,41 +1,53 @@
 from torch import nn
-import torch
 
 
-class B_MomentumLoss(nn.Module):
-    """Loss function to train the model against the B momentum."""
+# class B_MomentumLoss(nn.Module):
+#     """Loss function to train the model against the B momentum.
+#        Actually not used at the moment.
+#     """
 
-    def __init__(
-        self,
-        reduction="mean",
-    ):
-        super().__init__()
-        self.rho_L1 = nn.L1Loss(reduction=reduction)
-        self.theta_L1 = nn.L1Loss(reduction=reduction)
-        self.phi_L1 = nn.L1Loss(reduction=reduction)
+#     def __init__(
+#         self,
+#         reduction="mean",
+#     ):
+#         super().__init__()
+#         self.rho_L1 = nn.L1Loss(reduction=reduction)
+#         self.theta_L1 = nn.L1Loss(reduction=reduction)
+#         self.phi_L1 = nn.L1Loss(reduction=reduction)
 
-    def forward(self, u_input, u_target):
-        x, y, z = u_input[:, 0], u_input[:, 1], u_input[:, 2]
-        x_y, y_y, z_y = u_target[:, 0], u_target[:, 1], u_target[:, 2]
+#     def forward(self, u_input, u_target):
+#         x, y, z = u_input[:, 0], u_input[:, 1], u_input[:, 2]
+#         x_y, y_y, z_y = u_target[:, 0], u_target[:, 1], u_target[:, 2]
 
-        rho = torch.sqrt(x**2 + y**2 + z**2)
-        rho_y = torch.sqrt(x_y**2 + y_y**2 + z_y**2)
+#         rho = torch.sqrt(x**2 + y**2 + z**2)
+#         rho_y = torch.sqrt(x_y**2 + y_y**2 + z_y**2)
 
-        cosTheta = z / rho
-        cosTheta_y = z_y / rho_y
+#         cosTheta = z / rho
+#         cosTheta_y = z_y / rho_y
 
-        cosPhi = x / torch.sqrt(x**2 + y**2)
-        cosPhi_y = x_y / torch.sqrt(x_y**2 + y_y**2)
+#         cosPhi = x / torch.sqrt(x**2 + y**2)
+#         cosPhi_y = x_y / torch.sqrt(x_y**2 + y_y**2)
 
-        rho_loss = self.rho_L1(rho, rho_y)
-        cosTheta_loss = self.theta_L1(cosTheta, cosTheta_y)
-        cosPhi_loss = self.phi_L1(cosPhi, cosPhi_y)
+#         rho_loss = self.rho_L1(rho, rho_y)
+#         cosTheta_loss = self.theta_L1(cosTheta, cosTheta_y)
+#         cosPhi_loss = self.phi_L1(cosPhi, cosPhi_y)
 
-        return rho_loss + cosTheta_loss + cosPhi_loss
+#         return rho_loss + cosTheta_loss + cosPhi_loss
 
 
 class MultiTrainLoss(nn.Module):
-    """Loss function to train the model against a variety of targets: LCA, B momentum, B probability and masses of FSP."""
+    """
+    Loss function to train the model against a variety of targets: LCA, B momentum, B probability and masses of FSP.
+
+    Args:
+        alpha_mass (float): weight of masses term in the loss
+        ignore_index (int): index to ignore while padding
+        reduction (string): type of reduction to be applied on the batch
+        edge_weights (array): weights applied to edge classes
+        node_weights (array): weights applied to node classes
+    Returns:
+        Total loss
+    """
 
     def __init__(
         self,

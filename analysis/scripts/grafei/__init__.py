@@ -26,7 +26,7 @@ print(r"""
                       x   x   x   x       x
 
       Authors: Jacopo Cerasoli, Giulio Dujany, Lucas Martel, Corentin Santos 2022 - 2023
-      More information in ---TO BE DEFINED---
-      Code based on the work of Kahn et al 10.1088/2632-2153/ac8de0 (https://github.com/Helmholtz-AI-Energy/BaumBauen)
+      Model description: https://indico.cern.ch/event/1106990/papers/4996235/files/12252-ACAT_2022_proceedings.pdf
+      Based on the work of Kahn et al: 10.1088/2632-2153/ac8de0 (https://github.com/Helmholtz-AI-Energy/BaumBauen)
       Please consider citing both articles.
       """)

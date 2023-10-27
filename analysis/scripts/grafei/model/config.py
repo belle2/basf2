@@ -4,11 +4,12 @@ import collections.abc
 
 
 def update_config_dict(d, u):
-    ''' Function to update the config dictionary.
+    """
+    Function to update the config dictionary.
 
     Need a recursive solution because it's a nested dict of varying depth.
     This is pulled from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
-    '''
+    """
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
             d[k] = update_config_dict(d.get(k, {}), v)
@@ -18,7 +19,8 @@ def update_config_dict(d, u):
 
 
 def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=None, **kwargs):
-    ''' Load default configs followed by user configs and populate dataset tags.
+    """
+    Load default configs followed by user configs and populate dataset tags.
 
     Args:
         cfg_path(str or Path): Path to user config yaml
@@ -30,7 +32,7 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
     Returns:
         dict: The loaded training configuration dictionary
         list: A list of tuples containing (tag name, dataset path, tag key)
-    '''
+    """
 
     # Need to get this file's working directory to import config from
     cwd = Path(__file__).resolve().parent
@@ -64,7 +66,8 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
 
 
 def generate_dataset_tags(configs, samples=None):
-    ''' Generate the different dataset tags and assign their file paths.
+    """
+    Generate the different dataset tags and assign their file paths.
 
     This helps us keep track of the train/val/test datasets throughout training and evaluation
 
@@ -74,7 +77,7 @@ def generate_dataset_tags(configs, samples=None):
 
     Returns:
         list: A list of tuples containing (tag name, dataset path, tag key)
-    '''
+    """
     # Fetch whichever data source we're loading
     source_confs = configs['dataset']
 

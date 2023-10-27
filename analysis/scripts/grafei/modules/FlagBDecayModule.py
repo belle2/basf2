@@ -18,12 +18,13 @@ def getObjectList(pointerVec):
 
 
 class FlagBDecayModule(b2.Module):
-    ''' Save variables indicating the decay mode the particles originated from.
+    """
+    Save variables indicating the decay mode the particles originated from.
 
     Flags indicated which B meson was the parent and whether the decay was semileptonic
     or hadronic.
     Assumes MC matching has already been run on the list.
-    '''
+    """
 
     def __init__(
         self,
@@ -75,11 +76,12 @@ class FlagBDecayModule(b2.Module):
                 particle.addExtraInfo(self.b_parent_var, -1)
 
     def _is_semileptonic(self, mcp):
-        ''' Recursive function to check if MCParticle is neutrino.
+        """
+        Recursive function to check if MCParticle is neutrino.
 
         If not then this calls itself on the daughters.
         Exits on first neutrino found.
-        '''
+        """
         for daughter in mcp.getDaughters():
             if self._is_semileptonic(daughter):
                 return True

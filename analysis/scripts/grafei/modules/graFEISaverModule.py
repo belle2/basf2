@@ -35,8 +35,6 @@ class Batch:
 
 
 class graFEISaverModule(b2.Module):
-    """Apply graFEI model to some given particle lists in basf2"""
-
     def __init__(
         self,
         particle_list: str,
@@ -45,12 +43,15 @@ class graFEISaverModule(b2.Module):
         store_true_info=None,
         gpu=False,
     ):
-        """Class Constructor.
+        """
+        Apply graFEI model to some given particle lists in basf2
 
         Args:
             particle_list (list): Name of particle list to run graFEI on
             cfg_path (str): path to config file
             param_file (str): path to file containing weight files for the model
+            store_true_info (bool): whether to save truth-matched information
+            gpu (bool): whether running on a GPU
         """
         super().__init__()
         self.particle_list = particle_list
@@ -127,17 +128,6 @@ class graFEISaverModule(b2.Module):
         self.model.eval()
         # Push model to GPU in case
         self.model.to(self.device)
-
-        # Print stuff
-        print()
-        print("**************************************************")
-        print("**************************************************")
-        print("*                                                *")
-        print("*                     graFEI                     *")
-        print("*                                                *")
-        print("**************************************************")
-        print("**************************************************")
-        print()
 
         b2.B2DEBUG(10, "Model structure:\n", {self.model})
 

@@ -11,7 +11,9 @@ from .metrics import PerfectLCAGeometric, PerfectEvent, PerfectMasses, IsTrueB
 
 
 class GraFEIIgniteTrainer:
-    """A class to setup the ignite trainer and hold all the things associated"""
+    """
+    A class to setup the ignite trainer and hold all the things associated
+    """
 
     def __init__(
         self,
@@ -25,7 +27,8 @@ class GraFEIIgniteTrainer:
         ignore_index=-1.0,
         include_efficiency=False,
     ):
-        """These are all the inputs to ignite's create_supervised_trainer plus the yaml configs
+        """
+        These are all the inputs to ignite's create_supervised_trainer plus the yaml configs
 
         Args:
             model(Torch Model): The actual PyTorch model
@@ -33,7 +36,7 @@ class GraFEIIgniteTrainer:
             loss_fn(Torch Loss): Loss function
             device(Torch Device): Device to use
             configs(dict): Dictionary of run configs from loaded YAML config file
-            tags(list): Various tags to sort train and validation evaluators by, e.g. "Training", "Validation Known"
+            tags(list): Various tags to sort train and validation evaluators by, e.g. "Training", "Validation"
             ignore_index(int): Label index to ignore when calculating metrics, e.g. padding
             include_efficiency(bool): Whether to include efficiency and purity metrics. Slows down computation significantly
         """
@@ -277,7 +280,8 @@ class GraFEIIgniteTrainer:
         return engine.state.metrics["perfectEvent_noBkg"]
 
     def _clean_config_dict(self, configs):
-        """Clean configs to prepare them for writing to file
+        """
+        Clean configs to prepare them for writing to file
 
         This will convert any non-native types to Python natives.
         Currently just converts numpy arrays to lists.
@@ -298,8 +302,9 @@ class GraFEIIgniteTrainer:
                 configs[k] = v
         return configs
 
-    def setup_handlers(self, cfg_filename="confignite.yaml"):
-        """Create the various ignite handlers (callbacks)
+    def setup_handlers(self, cfg_filename="config.yaml"):
+        """
+        Create the various ignite handlers (callbacks)
 
         Args:
             cfg_filename(str, optional): Name of config yaml file to use when saving configs
@@ -406,11 +411,10 @@ class GraFEIIgniteTrainer:
     # Set up end of epoch validation procedure
     # Tell it to print epoch results
     def log_results(self, trainer, mode_tags):
-        """Callback to run evaluation and report the results.
+        """
+        Callback to run evaluation and report the results.
 
         We place this here since it needs access to the evaluator engines in order to run.
-        No idea why ignite even bother to pass the trainer engine in the first place, their examples all call
-        things created outside of the log_results function that aren't passed to it... bad programming practice in my opinion.
 
         Call this function via the add_event_handler() ignite function to tell it when to fire, e.g.:
             `GraFEIIgniteTrainer.trainer.add_event_handler(ignite.engine.Events.EPOCH_COMPLETED,

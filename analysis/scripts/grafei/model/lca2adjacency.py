@@ -13,6 +13,10 @@ class InvalidLCAMatrix(Exception):
 
 
 class Node:
+    """
+    Class to hold levels of nodes in the tree.
+    """
+
     def __init__(self, level, children, lca_index=None):
         self.level = level
         self.children = children
@@ -32,7 +36,7 @@ def _get_ancestor(node):
         node (Node): A node instance for which to determine the ancestor.
 
     Returns:
-        Node: the node's ancestor, returns self if a disconnected leaf node.
+        ancestor (Node): the node's ancestor, returns self if a disconnected leaf node.
     """
     ancestor = node
 
@@ -52,7 +56,7 @@ def _nodes_in_ancestors_children(parent, node1, node2):
         node2 (Node): A node instance in the decay tree.
 
     Returns:
-        bool: True if both node1 and node2 have a common ancestor in parent's line of descent.
+        (bool): True if both node1 and node2 have a common ancestor in parent's line of descent.
     """
     for child in parent.children:
         if (node1 in child.children) and (node2 in child.children):
@@ -68,13 +72,10 @@ def _pull_down(node):
     Work up the node's history, pulling down a level any nodes
     whose children are all more than one level below.
 
-    Performs the operation in place
+    Performs the operation in place.
 
     Args:
         node (Node): A node instance for which to determine the ancestor.
-
-    Returns:
-        Node: the node's ancestor, returns self if a disconnected leaf node.
     """
     # First check the children
     if len(node.children) > 0:

@@ -55,11 +55,12 @@ def write_hist(
     leaf_pdg={},
     semilep_flag=False,
 ):
-    """Recursive function to traverse down to the leaves saving the history
+    """
+    Recursive function to traverse down to the leaves saving the history
 
     Args:
         particle (MCParticle): The current particle being inspected
-        semilep_flag (bool): Whether or not the current decay is semileptonic
+        Other arguments are automatically set.
     """
 
     neutrino_pdgs = [12, 14, 16, 18]
@@ -151,8 +152,6 @@ def write_hist(
 
 
 class RootSaverModule(b2.Module):
-    """Save Lowest Common Ancestor matrix of each MC Particle in the given list"""
-
     def __init__(
         self,
         particle_lists,
@@ -162,13 +161,13 @@ class RootSaverModule(b2.Module):
         output_file,
         # bkg_prob=0.0,
     ):
-        """Class Constructor.
+        """
+        Save Lowest Common Ancestor matrix of each MC Particle in the given list
 
         Args:
             particle_lists (list): Name of particle lists to save features of
             features (list): List of features to save for each particle
             b_parent_var (str): Name of variable used to flag ancestor B meson and split particles
-            output_file (str): Path to output file to save
             mcparticle_list (str): Name of particle list to build LCAs from (will use as root)
             output_file (str): Path to output file to save
         """
@@ -184,8 +183,6 @@ class RootSaverModule(b2.Module):
         # any events we'll encounter. ROOT won't save all entries
         # And yeah it's dumb but that's because root fucking sucks
         self.max_particles = 500
-
-        """ (James: not sure if should do) delete output file if it already exists, since we will apend later """
 
     def initialize(self):
         """Create a member to access event info StoreArray"""

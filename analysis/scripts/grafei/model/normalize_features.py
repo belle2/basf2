@@ -24,7 +24,18 @@ def normalize_features(
     global_features=[],
     x_global=[],
 ):
-    """Function to normalize input features"""
+    """
+    Function to normalize input features
+
+    Args:
+        normalize (dict): what kind of normalization and parameters to apply
+        features (list): list of node feature names
+        x (array): array of node features
+        edge_features (list): list of edge feature names
+        x_edges (array): array of edge features
+        global_features (list): list of global feature names
+        x_global (array): array of global features
+    """
     for feat, processes in normalize.items():
         # Start with node features
         feat_name = f"feat_{feat}"

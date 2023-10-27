@@ -7,7 +7,7 @@ from grafei.modules.FlagBDecayModule import getObjectList
 
 class isMostLikelyTempVars(b2.Module):
     """
-    Module to compute isMostLikely with temporary _noSVD and _noTOP likelihoods
+    Module to compute isMostLikely with temporary _noSVD and _noTOP likelihoods (will be removed when using new MC)
     """
 
     def __init__(self, particle_lists, priors):

@@ -7,7 +7,8 @@ from .lca2adjacency import lca2adjacency, InvalidLCAMatrix
 
 
 class Efficiency(Metric, object):
-    ''' Calculates the efficiency, calculated as (valid trees/total trees)
+    """
+    Calculates the efficiency, calculated as (valid trees/total trees)
 
     - `update` must receive output of the form `(y_pred, y)` or `{'y_pred': y_pred, 'y': y}`.
     - `y_pred` must contain logits and has the following shape (batch_size, num_categories, ...)
@@ -21,7 +22,7 @@ class Efficiency(Metric, object):
     Args:
         ignore_index (int or list[int]): Class index(es) to ignore when calculating accuracy
         ignore_disconnected_leaves (bool): Whether to ignore disconnected leaves in the LCA when determining if valid
-    '''
+    """
 
     def __init__(self, ignore_index=-1., ignore_disconnected_leaves=False, output_transform=lambda x: x, device='cpu'):
 
@@ -46,7 +47,8 @@ class Efficiency(Metric, object):
 
     # @reinit__is_reduced
     def _is_valid_lca(self, y_pred, y):
-        ''' Remove padding from y_pred and build adjacency
+        """
+        Remove padding from y_pred and build adjacency
 
         Args:
             y_pred (Tensor): (d1, d2) square matrix of predicted LCA (no batch dim)
@@ -54,7 +56,7 @@ class Efficiency(Metric, object):
 
         Returns:
             bool: True if adjacency can be built and is valid, else false
-        '''
+        """
         # Check we weren't passed an empty LCA
         if y.nelement() == 0:
             return False
@@ -104,7 +106,9 @@ class Efficiency(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
-        ''' Computes the number of valid LCAs PER BATCH!. '''
+        """
+        Computes the number of valid LCAs PER BATCH!
+        """
 
         y_pred, y = output  # (N, C, d1, d2), (N, d1, d2), where d1 = L =leaves
 
@@ -135,7 +139,9 @@ class Efficiency(Metric, object):
 
     @sync_all_reduce("_efficiency")
     def compute(self):
-        ''' Computes the average fraction of valid LCAs across all batches '''
+        """
+        Computes the average fraction of valid LCAs across all batches
+        """
 
         if self._num_examples == 0:
             raise NotComputableError(
@@ -145,24 +151,22 @@ class Efficiency(Metric, object):
 
 
 class Pad_Accuracy(Metric, object):
-
-    """ Computes the average classification accuracy ignoring the given class (e.g. 0 for padding)
+    """
+    Computes the average classification accuracy ignoring the given class (e.g. 0 for padding)
 
     This is almost identical to the CustomAccuracy example in https://pytorch.org/ignite/metrics.html
     except we don't ignore y_pred occurances of the ignored class.
-
     - `update` must receive output of the form `(y_pred, y)` or `{'y_pred': y_pred, 'y': y}`.
     - `y_pred` must contain logits and has the following shape (batch_size, num_categories, ...)
     - `y` should have the following shape (batch_size, ...) and contains ground-truth class indices
-        with or without the background class. During the computation, argmax of `y_pred` is taken to determine
-        predicted classes.
+          with or without the background class. During the computation, argmax of `y_pred` is taken to determine
+          predicted classes.
 
     First the average percentage per batch is computed.
     Then the average of all the batches is returned.
 
     Args:
         ignore_index (int or [int]): Class index(es) to ignore when calculating accuracy
-
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu'):
@@ -204,14 +208,13 @@ class Pad_Accuracy(Metric, object):
 
 
 class PerfectLCA(Metric, object):
-
-    """ Computes the percentage of the Perfectly predicted LCAs
-
-    - `update` must receive output of the form `(y_pred, y)` or `{'y_pred': y_pred, 'y': y}`.
-    - `y_pred` must contain logits and has the following shape (batch_size, num_categories, ...)
-    - `y` should have the following shape (batch_size, ...) and contains ground-truth class indices
-        with or without the background class. During the computation, argmax of `y_pred` is taken to determine
-        predicted classes.
+    """
+    Computes the percentage of the Perfectly predicted LCAs
+        - `update` must receive output of the form `(y_pred, y)` or `{'y_pred': y_pred, 'y': y}`.
+        - `y_pred` must contain logits and has the following shape (batch_size, num_categories, ...)
+        - `y` should have the following shape (batch_size, ...) and contains ground-truth class indices
+              with or without the background class. During the computation, argmax of `y_pred` is taken to determine
+              predicted classes.
 
     First the average percentage per batch is computed.
     Then the average of all the batches is returned.
@@ -235,10 +238,6 @@ class PerfectLCA(Metric, object):
         self._num_examples = 0
 
         super(PerfectLCA, self).reset()
-
-    ''' Computes the percentage of Perfect LCAs PER BATCH!.
-    the tensors y_pred and y contain multiple LCAs that belong in a batch.
-    '''
 
     @reinit__is_reduced
     def update(self, output):
@@ -285,7 +284,7 @@ class PerfectLCA(Metric, object):
 
 
 class PerfectLCAGeometric(Metric, object):
-    '''
+    """
     Computes the percentage of the Perfectly predicted LCAs
     - `update` must receive output of the form `(y_pred, y, edge_index, u_y, batch, num_graph)` or `{'y_pred': y_pred, ...}`.
     - `edge_pred` must contain logits and has the following shape (num_edges_in_batch, classes)
@@ -295,7 +294,7 @@ class PerfectLCAGeometric(Metric, object):
     - 'u_y' is the signal/background class
     - batch is a vector that comes with a batch of graph and maps nodes to their graph
     - num graph is the number of graph, it could be computed here using batch
-    '''
+    """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
 
@@ -362,7 +361,7 @@ class PerfectLCAGeometric(Metric, object):
 
 
 class PerfectMasses(Metric, object):
-    '''
+    """
     Computes the rate of events with perfectly predicted masses of FSP
     - 'update' must receive output of the form `(x_pred, x, u_y, batch, num_graph)` or `{'x_pred': x_pred, 'x': x, ...}`.
     - 'x_pred' must contain logits and has the following shape (num_nodes_in_batch, classes)
@@ -371,7 +370,7 @@ class PerfectMasses(Metric, object):
     - 'u_y' is the signal/background class
     - batch is a vector that comes with a batch of graph and maps nodes to their graph
     - num graph is the number of graph, it could be computed here using batch
-    '''
+    """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
 
@@ -436,7 +435,7 @@ class PerfectMasses(Metric, object):
 
 
 class PerfectEvent(Metric, object):
-    '''
+    """
     Computes the rate of events with masses and LCA correctly predicted
     - 'update' must receive output of the form `(x_pred, x_y, y_pred, y, edge_index, u_y, batch, num_graph)`
       or `{'x_pred': x_pred, ...}`
@@ -449,7 +448,7 @@ class PerfectEvent(Metric, object):
     - 'u_y' is the signal/background class
     - batch is a vector that comes with a batch of graph and maps nodes to their graph
     - num graph is the number of graph, it could be computed here using batch
-    '''
+    """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
 
@@ -527,13 +526,13 @@ class PerfectEvent(Metric, object):
 
 
 class IsTrueB(Metric, object):
-    '''
+    """
     Computes the percentage of correctly identified B's
     - `update` must receive output of the form `(u_pred, u_y, batch, num_graph)` or `{'u_pred': u_pred, 'u_y': u_y , ...}`.
     - `u_pred` must contain logits and has shape (num_graph, 1)
     - `u` contains ground-truth class indices and has same shape as u_pred
     - num graph is the number of graph, it could be computed here using batch
-    '''
+    """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu'):
 

@@ -6,12 +6,7 @@ from .geometric_datasets import BelleRecoSetGeometricInMemory, BelleRecoSetGeome
 
 def create_dataloader_mode_tags(configs, tags):
     """
-    Convenience function to create the dataset/dataloader for each mode tag (train/val/val unknown) and return them.
-
-    *Important*: The scaling used on the PhasespaceSet will calculate the scaling factors
-                 according to the first dataset in tags if
-                 it doesn't exist in configs already and then pass this to subsequent datasets.
-                 Make sure the Training tag is first if that's what you want to use (you should).
+    Convenience function to create the dataset/dataloader for each mode tag (train/val) and return them.
 
     Args:
         configs (dict): Training configuration

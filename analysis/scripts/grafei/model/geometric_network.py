@@ -4,16 +4,6 @@ from .geometric_layers import NodeLayer, EdgeLayer, GlobalLayer
 
 
 class GeometricNetwork(torch.nn.Module):
-    """
-    The network is composed of:
-        1) First meta layer to increase the number of nodes and edges features
-        2) num_ML different meta layers
-        3) A last meta layer to decrease the number of nodes and edges features to efeat_out_dim
-
-    MetaLayer: torch geomtric class that takes 2 layers as an input, and just calls their forward in its own forward
-    https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.meta.MetaLayer
-    """
-
     def __init__(
         self,
         nfeat_in_dim,
@@ -30,15 +20,36 @@ class GeometricNetwork(torch.nn.Module):
         global_layer=True,
         **kwargs
     ):
+        """
+        Actual implementation of the model.
+        The network is composed of:
+            1) First meta layer to increase the number of nodes and edges features
+            2) num_ML different meta layers
+            3) A last meta layer to decrease the number of nodes and edges features
+
+        MetaLayer: torch geomtric class that takes layers as an input, and calls their forward in its own forward
+        https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.meta.MetaLayer
+
+        Args:
+            nfeat_in_dim (int): node features dimension (number of node features)
+            ... (same for edge and global features)
+            edge_classes (int): number of edge classes (i.e. number of different edge labels in the LCAS matrix)
+            x_classes (int): number of node classes (i.e. number of different mass hypotheses)
+            hidden_layer_dim (int): number of features when they enter/exit every MetaLayer
+            num_hid_layers (int): number of hidden layers in every MetaLayer
+            num_ML (int): number of MetaLayers used (except for the first and the last)
+            droput (float): dropout rate
+            normalize (string): type of normalization used (layer/batch)
+            symmetrize (bool): whether to symmetrize CAS matrix at the end
+            global_layer (bool): whether or not to use global layer
+
+        Returns:
+            x (torch.tensor): node features after model evaluation
+            edge_attr (torch.tensor): edge features after model evaluation
+            u (torch.tensor): global features after model evaluation
+
+        """
         super(GeometricNetwork, self).__init__()
-        """
-        nfeat_in_dim (efeat_in_dim): number of input feat per node (edge)
-        hidden_layer_dim: number of node (edge) features when they enter/exit every MetaLayer
-        num_hid_layers: number of hidden layers in every MetaLayer
-        hidden_layer_dim: number of hidden neurons in every MetaLayer
-        num_ML: number of MetaLayers used (except for the first and the last)
-        edge_classes: number of final classes (i.e. number of different edge labels in the LCA matrix)
-        """
 
         self.num_ML = num_ML
         self.symmetrize = symmetrize
@@ -153,15 +164,6 @@ class GeometricNetwork(torch.nn.Module):
         )
 
     def forward(self, batch):
-        """
-        x: node features [N, F_x]
-        edge_index: index of receiver and sender nodes for every edge [2, E]
-        edge_attr: edge features [E, F_e]
-        u: global attribute [B, F_g]
-        torch_batch: vector that maps every node of a batch to its graph.
-                            Note that geometric_dataloader returns batch (i.e. mini-batch),
-                            and this holds the batch vector, called batch.batch.
-        """
         x, u, edge_index, edge_attr, torch_batch = (
             batch.x,
             batch.u,

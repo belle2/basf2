@@ -12,7 +12,7 @@ import uproot
 
 def _preload(self):
     """
-    Function to create graph object and store them into a python list.
+    Creates graph object and stores them into a python list.
     """
 
     # Going to use x_files as an array that always exists
@@ -69,7 +69,6 @@ def _preload(self):
         self.x_files,
         self.features,
         self.discarded,
-        self.global_features,
     )
     print("ROOT data preloaded")
 
@@ -100,6 +99,9 @@ def _preload(self):
 
 
 def _process_graph(self, idx):
+    """
+    Actually builds the graph object.
+    """
 
     file_id, evt, p_index = self.avail_samples[idx]
 
@@ -114,9 +116,6 @@ def _process_graph(self, idx):
     # Use this to correctly reshape LCA (might be able to just use shape of y_leaves?)
     n_LCA = y_item["n_LCA"][evt]
 
-    # TODO: Get feature order for this file, and reorder according to global ordering
-    # TODO: One-hot encode charge and any other categorical features, jks probs not
-
     # Get the rows of the X inputs to fetch
     # This is a boolean numpy array
     x_rows = np.logical_or(evt_p_index == 1, evt_p_index == 2) if self.ups_reco else evt_p_index == int(p_index)
@@ -124,7 +123,7 @@ def _process_graph(self, idx):
     # Find the unmatched particles
     unmatched_rows = evt_p_index == -1
 
-    if self.subset_unmatched and np.any(unmatched_rows):
+    if self.subset_unmatched and np.any(unmatched_rows) and not self.ups_reco:
         # Create a random boolean array the same size as the number of leaves
         rand_mask = np.random.choice(a=[False, True], size=unmatched_rows.size)
         # AND the mask with the unmatched leaves
@@ -270,14 +269,27 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         overwrite=False,
         **kwargs,
     ):
-        """Dataset handler thingy for reconstructed Belle II MC to pytorch geometric InMemoryDataset
+        """
+        Dataset handler thingy for reconstructed Belle II MC to pytorch geometric InMemoryDataset
 
         This expects the files under root to have the structure:
             `root/**/<file_id>.py`
-        where the root path is different for train, val, and test.
+        where the root path is different for train, and val.
         The `**/` is to handle subdirectories, e.g. `sub00`
 
         The ROOT format expects the tree in every file to be named `Tree`, and all features to have the format `feat_<name>`.
+
+        Args:
+            root (string): path to ROOT files
+            n_files (int): load only `n_files` files
+            samples (int): load only `samples` events
+            subset_unmatched (bool): assign a random subset of unmatched particles to each B
+            features (list): list of node features names
+            ignore (list): list of discarded node features names
+            edge_features (list): list of edge features names
+            global_features (list): list of global features names
+            normalize (bool): whether to normalize input features
+            overwrite (bool): overwrite graph files if already present
         """
 
         assert isinstance(
@@ -342,14 +354,27 @@ class BelleRecoSetGeometric(Dataset):
         overwrite=False,
         **kwargs,
     ):
-        """Dataset handler thingy for reconstructed Belle II MC to pytorch geometric InMemoryDataset
+        """
+        Dataset handler thingy for reconstructed Belle II MC to pytorch geometric Dataset
 
         This expects the files under root to have the structure:
             `root/**/<file_id>.py`
-        where the root path is different for train, val, and test.
+        where the root path is different for train, and val.
         The `**/` is to handle subdirectories, e.g. `sub00`
 
-        The ROOT format expects the tree to be named `Tree`, and all features to have the format `feat_<name>`.
+        The ROOT format expects the tree in every file to be named `Tree`, and all features to have the format `feat_<name>`.
+
+        Args:
+            root (string): path to ROOT files
+            n_files (int): load only `n_files` files
+            samples (int): load only `samples` events
+            subset_unmatched (bool): assign a random subset of unmatched particles to each B
+            features (list): list of node features names
+            ignore (list): list of discarded node features names
+            edge_features (list): list of edge features names
+            global_features (list): list of global features names
+            normalize (bool): whether to normalize input features
+            overwrite (bool): overwrite graph files if already present
         """
 
         assert isinstance(

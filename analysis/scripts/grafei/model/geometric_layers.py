@@ -8,6 +8,10 @@ from torch_scatter import scatter
 def init_weights(layer, normalize):
     """
     Initialize the weights and biases.
+
+    Args:
+        layer (torch.nn.Module): pytorch module
+        normalize (string): whether to fill biases or not
     """
     for m in layer.modules():
         if isinstance(m, nn.Linear):
@@ -20,11 +24,6 @@ def init_weights(layer, normalize):
 
 
 class EdgeLayer(nn.Module):
-    """
-    Module to update edges in MetaLayer.
-    e_ij' = f(e_ij, v_i, v_j)
-    """
-
     def __init__(
         self,
         nfeat_in_dim,
@@ -36,6 +35,22 @@ class EdgeLayer(nn.Module):
         dropout,
         normalize,
     ):
+        """
+        Module to update edges in MetaLayer.
+           e_ij' = f(e_ij, v_i, v_j)
+
+        Args:
+            nfeat_in_dim (int): node features input dimension (number of node features in input)
+            ... (same for edge and global features)
+            efeat_hid_dim (int): edge features dimension in hidden layers
+            efeat_out_dim (int): edge features output dimension
+            num_hid_layers (int) number of hidden layers
+            dropout (float): dropout rate
+            normalize (string): type of normalization (batch/layer)
+
+        Returns:
+            out (torch.tensor): updated edge features tensor
+        """
         super(EdgeLayer, self).__init__()
 
         self.nonlin_function = F.elu
@@ -98,11 +113,6 @@ class EdgeLayer(nn.Module):
 
 
 class NodeLayer(nn.Module):
-    """
-    Module to update nodes in MetaLayer.
-    v_i' = f(v_i, Avg(e_i1, ..., e_ik, e_1i, ..., e_ki))
-    """
-
     def __init__(
         self,
         nfeat_in_dim,
@@ -114,6 +124,22 @@ class NodeLayer(nn.Module):
         dropout,
         normalize,
     ):
+        """
+        Module to update nodes in MetaLayer.
+           v_i' = f(v_i, Avg(e_i1, ..., e_ik, e_1i, ..., e_ki))
+
+        Args:
+            nfeat_in_dim (int): node features input dimension (number of node features in input)
+            ... (same for edge and global features)
+            nfeat_hid_dim (int): node features dimension in hidden layers
+            nfeat_out_dim (int): node features output dimension
+            num_hid_layers (int) number of hidden layers
+            dropout (float): dropout rate
+            normalize (string): type of normalization (batch/layer)
+
+        Returns:
+            out (torch.tensor): updated node features tensor
+        """
         super(NodeLayer, self).__init__()
 
         self.nonlin_function = F.elu
@@ -181,11 +207,6 @@ class NodeLayer(nn.Module):
 
 
 class GlobalLayer(nn.Module):
-    """
-    Module to update global attribute in MetaLayer.
-    u_i' = f(Avg(v_11, ..., v_jk), Avg(e_11, ..., e_jk))
-    """
-
     def __init__(
         self,
         nfeat_in_dim,
@@ -197,6 +218,22 @@ class GlobalLayer(nn.Module):
         dropout,
         normalize,
     ):
+        """
+        Module to update global attribute in MetaLayer.
+           u_i' = f(Avg(v_11, ..., v_jk), Avg(e_11, ..., e_jk))
+
+        Args:
+            nfeat_in_dim (int): node features input dimension (number of node features in input)
+            ... (same for edge and global features)
+            gfeat_hid_dim (int): global features dimension in hidden layers
+            gfeat_out_dim (int): global features output dimension
+            num_hid_layers (int) number of hidden layers
+            dropout (float): dropout rate
+            normalize (string): type of normalization (batch/layer)
+
+        Returns:
+            out (torch.tensor): updated global features tensor
+        """
         super(GlobalLayer, self).__init__()
 
         self.nonlin_function = F.elu

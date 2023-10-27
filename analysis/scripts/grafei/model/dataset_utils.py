@@ -2,18 +2,19 @@ import numpy as np
 import uproot
 
 
-# def populate_avail_samples(X, Y, hadronic=False, allow_missing=False, duplicates='skip', fixed_size=False):
 def populate_avail_samples(
     X,
     Y,
     ups_reco=False,
     # allow_background=False,
 ):
-    """Sift through the file metadata to populate a list of available dataset samples
+    """
+    Shift through the file metadata to populate a list of available dataset samples
 
     Args:
-        X(list): List of h5py file objects or ROOT lazyarray dicts for X (input) data
-        Y(list): List of h5py file objects or ROOT lazyarray dicts for Y (ground truth) data
+        X (list): List of ROOT lazyarray dicts for X (input) data
+        Y (list): List of ROOT lazyarray dicts for Y (ground truth) data
+        ups_reco (bool): flag for Upsilon/B reconstruction (set automatically from the config file)
     """
     # Must iterate over Y because X contains a b_index of -1 for unmatched particles
     avail_samples = []
@@ -61,14 +62,18 @@ def populate_avail_samples(
 
 
 def preload_root_data(
-    root_files, features, discarded, global_features=[],
+    root_files, features, discarded,
 ):
-    """Load all data from root files as lazyarrays (not actually read from disk until accessed)
+    """
+    Load all data from root files as lazyarrays (not actually read from disk until accessed)
 
-    This is intended to make the data in roughly the same format as it is for HDF5.
-    Main difference is the missing event key, instead each entry is an array with n_events rows
-    x[file_index] = {'event', 'features', 'all_features', 'n_particles'}
-    y[file_index][b_index] = {'n_LCA', 'LCA', 'LCA_leaves'}
+    Args:
+        root_files (string): path to ROOT files
+        features (list): list of feature names
+        discarded (list): list of features present in the ROOT files and not used as input,
+                          but used to calculate other quantities (e.g. edge features)
+    Returns:
+        x, y (list): list of dictionaries containing training information
     """
     x = []
     y = []

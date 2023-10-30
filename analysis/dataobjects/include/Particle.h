@@ -296,6 +296,30 @@ namespace Belle2 {
     };
 
     /**
+     * Sets Energy loss correction
+     * @param EnergyLossCorrection Correction factor
+     */
+    void setEnergyLossCorrection(double EnergyLossCorrection)
+    {
+      double old_p  = sqrt(getEnergy() * getEnergy() - m_mass * m_mass);
+      double old_px = getPx();
+      double old_py = getPy();
+      double old_pz = getPz();
+      double td = old_pz / sqrt(old_px * old_px + old_py * old_py); // tan(dip angle)
+      double phi = atan2(old_py, old_px);
+
+      m_EnergyLossCorrection = EnergyLossCorrection;
+      double new_p = sqrt((getEnergy() - m_EnergyLossCorrection) * (getEnergy() - m_EnergyLossCorrection) - m_mass * m_mass);
+      double new_pt = new_p / sqrt(1 + td * td);
+
+      // settings variables used to update the momentum components after applying Energy loss correction
+      m_Eloss_p_ScalingFactor =  new_p / old_p;
+      m_Eloss_px_ScalingFactor = (new_pt * cos(phi)) / old_px;
+      m_Eloss_py_ScalingFactor = (new_pt * sin(phi)) / old_py;
+      m_Eloss_pz_ScalingFactor = (new_pt * td) / old_pz;
+    }
+
+    /**
      * Sets momentum scaling
      * @param momentumScalingFactor scaling factor
      */
@@ -502,8 +526,10 @@ namespace Belle2 {
      */
     double getEnergy() const
     {
-      return sqrt(m_momentumScale * m_momentumScale * m_px * m_px + m_momentumScale * m_momentumScale * m_py * m_py + m_momentumScale *
-                  m_momentumScale * m_pz * m_pz + m_mass * m_mass);
+      return sqrt(m_momentumScale * m_momentumScale * m_Eloss_px_ScalingFactor * m_Eloss_px_ScalingFactor * m_px * m_px +
+                  m_momentumScale * m_momentumScale * m_Eloss_py_ScalingFactor * m_Eloss_py_ScalingFactor * m_py * m_py +
+                  m_momentumScale * m_momentumScale * m_Eloss_pz_ScalingFactor * m_Eloss_pz_ScalingFactor * m_pz * m_pz +
+                  m_mass * m_mass);
     }
 
     /**
@@ -512,7 +538,8 @@ namespace Belle2 {
      */
     ROOT::Math::PxPyPzEVector get4Vector() const
     {
-      return ROOT::Math::PxPyPzEVector(m_momentumScale * m_px, m_momentumScale * m_py, m_momentumScale * m_pz, getEnergy());
+      return ROOT::Math::PxPyPzEVector(m_momentumScale * m_Eloss_px_ScalingFactor * m_px,
+                                       m_momentumScale * m_Eloss_py_ScalingFactor * m_py, m_momentumScale * m_Eloss_pz_ScalingFactor * m_pz, getEnergy());
     }
 
     /**
@@ -521,7 +548,7 @@ namespace Belle2 {
      */
     ROOT::Math::XYZVector getMomentum() const
     {
-      return m_momentumScale * ROOT::Math::XYZVector(m_px, m_py, m_pz);
+      return m_momentumScale * m_Eloss_p_ScalingFactor * ROOT::Math::XYZVector(m_px, m_py, m_pz);
     };
 
     /**
@@ -530,7 +557,7 @@ namespace Belle2 {
      */
     double getMomentumMagnitude() const
     {
-      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * m_Eloss_p_ScalingFactor * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -539,7 +566,7 @@ namespace Belle2 {
      */
     double getP() const
     {
-      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * m_Eloss_p_ScalingFactor * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -548,7 +575,7 @@ namespace Belle2 {
      */
     double getPx() const
     {
-      return m_momentumScale * m_px;
+      return m_momentumScale * m_Eloss_px_ScalingFactor * m_px;
     }
 
     /**
@@ -557,7 +584,7 @@ namespace Belle2 {
      */
     double getPy() const
     {
-      return m_momentumScale * m_py;
+      return m_momentumScale * m_Eloss_py_ScalingFactor * m_py;
     }
 
     /**
@@ -566,7 +593,7 @@ namespace Belle2 {
      */
     double getPz() const
     {
-      return m_momentumScale * m_pz;
+      return m_momentumScale * m_Eloss_pz_ScalingFactor * m_pz;
     }
 
     /**
@@ -578,6 +605,19 @@ namespace Belle2 {
       return m_momentumScale;
     }
 
+    /**
+     * Returns effective Energy Loss Correction
+     * @return vector containing Energy Loss Correction and the p, px, py and pz scale factor resulting from the application of the Energy loss correction
+     */
+    std::vector<double> getEffectiveEnergyLossCorrection() const
+    {
+      return std::vector<double> {m_EnergyLossCorrection,
+                                  m_Eloss_p_ScalingFactor,
+                                  m_Eloss_px_ScalingFactor,
+                                  m_Eloss_py_ScalingFactor,
+                                  m_Eloss_pz_ScalingFactor,
+                                 };
+    }
     /**
      * Returns vertex position (POCA for charged, IP for neutral FS particles)
      * @return vertex position
@@ -1014,6 +1054,11 @@ namespace Belle2 {
     double m_momentumScale = 1.0; /**< effective momentum scale factor */
     double m_momentumScalingFactor = 1.0; /**< momentum scaling factor */
     double m_momentumSmearingFactor = 1.0; /**< momentum smearing factor */
+    double m_EnergyLossCorrection = 0.0; /**< energy loss correction */
+    double m_Eloss_p_ScalingFactor = 1.0; /**< Energy loss correction effect on p */
+    double m_Eloss_px_ScalingFactor = 1.0; /**< Energy loss correction effect on px */
+    double m_Eloss_py_ScalingFactor = 1.0; /**< Energy loss correction effect on py */
+    double m_Eloss_pz_ScalingFactor = 1.0; /**< Energy loss correction effect on pz */
     double m_x;      /**< position component x */
     double m_y;      /**< position component y */
     double m_z;      /**< position component z */
@@ -1109,7 +1154,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 16); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 17); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1119,7 +1164,7 @@ namespace Belle2 {
     // v14: added m_jacobiMatrix
     // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
     // v16: use double precision for private members
-
+    // v17: added m_Energylosscorrection
     friend class ParticleSubset;
   };
 

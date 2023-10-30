@@ -750,6 +750,35 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     path.add_module(TrackingMomentumScaleFactors)
 
 
+def correctTrackEnergy(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
+    """
+    substract to the energy of the particles according to a correction value.
+    This correction can either be given as constant number or as the name of the payload which contains
+    the variable corrections.
+    If the particle list contains composite particles, the momenta of the track-based daughters are corrected.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        correction (float): correction value to be substracted to the particle energy (0.0 -- no correction)
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        correctionName (str): name of correction variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
+
+    TrackingEnergyLossScaleFactors = register_module('TrackingEnergyLossScaleFactors')
+    TrackingEnergyLossScaleFactors.param('particleLists', inputListNames)
+    TrackingEnergyLossScaleFactors.param('scale', scale)
+    TrackingEnergyLossScaleFactors.param('payloadName', payloadName)
+    TrackingEnergyLossScaleFactors.param('correctionName', scalingFactorName)
+
+    path.add_module(TrackingEnergyLossScaleFactors)
+
+
 def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
     """
     Smear the momenta of the particles according the values read from the given payload.
@@ -4352,7 +4381,7 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
 
 
 func_requiring_analysisGT = [
-    scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
+    correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
     addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
 for _ in func_requiring_analysisGT:

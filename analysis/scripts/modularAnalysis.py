@@ -2012,7 +2012,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
-        useFloat (bool): Use float type for floating-point numbers.
+        useFloat (bool): Use single precision (float) instead of double precision (double)
+                         for floating-point numbers.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """

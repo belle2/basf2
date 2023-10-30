@@ -161,10 +161,11 @@ void VariablesToNtupleModule::initialize()
   });
   m_variables.erase(newEnd, m_variables.end());
 
+  m_branchAddressesFloat.resize(m_variables.size() + 1);
   m_branchAddressesDouble.resize(m_variables.size() + 1);
   m_branchAddressesInt.resize(m_variables.size() + 1);
   if (m_useFloat) {
-    m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/F");
+    m_tree->get().Branch("__weight__", &m_branchAddressesFloat[0], "__weight__/F");
   } else {
     m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
   }
@@ -190,7 +191,7 @@ void VariablesToNtupleModule::initialize()
       }
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
         if (m_useFloat) {
-          m_tree->get().Branch(branchName.c_str(), &m_branchAddressesDouble[enumerate], (branchName + "/F").c_str());
+          m_tree->get().Branch(branchName.c_str(), &m_branchAddressesFloat[enumerate], (branchName + "/F").c_str());
         } else {
           m_tree->get().Branch(branchName.c_str(), &m_branchAddressesDouble[enumerate], (branchName + "/D").c_str());
         }
@@ -273,7 +274,7 @@ void VariablesToNtupleModule::event()
   if (m_particleList.empty()) {
     double weight = getInverseSamplingRateWeight(nullptr);
     if (m_useFloat) {
-      *((float*)&m_branchAddressesDouble[0]) = weight;
+      m_branchAddressesFloat[0] = weight;
     } else {
       m_branchAddressesDouble[0] = weight;
     }
@@ -286,8 +287,7 @@ void VariablesToNtupleModule::event()
             B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                       "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
           if (m_useFloat) {
-            *((float*)&m_branchAddressesDouble[iVar + 1]) =
-              std::get<double>(var_result);
+            m_branchAddressesFloat[iVar + 1] = std::get<double>(var_result);
           } else {
             m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
           }
@@ -314,7 +314,7 @@ void VariablesToNtupleModule::event()
       const Particle* particle = particlelist->getParticle(iPart);
       double weight = getInverseSamplingRateWeight(particle);
       if (m_useFloat) {
-        *((float*)&m_branchAddressesDouble[0]) = weight;
+        m_branchAddressesFLoat[0] = weight;
       } else {
         m_branchAddressesDouble[0] = weight;
       }
@@ -327,8 +327,7 @@ void VariablesToNtupleModule::event()
               B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                         "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
             if (m_useFloat) {
-              *((float*)&m_branchAddressesDouble[iVar + 1]) =
-                std::get<double>(var_result);
+              m_branchAddressesFloat[iVar + 1] = std::get<double>(var_result);
             } else {
               m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
             }

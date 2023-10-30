@@ -161,8 +161,10 @@ void VariablesToNtupleModule::initialize()
   });
   m_variables.erase(newEnd, m_variables.end());
 
-  m_branchAddressesFloat.resize(m_variables.size() + 1);
-  m_branchAddressesDouble.resize(m_variables.size() + 1);
+  if (m_useFloat)
+    m_branchAddressesFloat.resize(m_variables.size() + 1);
+  else
+    m_branchAddressesDouble.resize(m_variables.size() + 1);
   m_branchAddressesInt.resize(m_variables.size() + 1);
   if (m_useFloat) {
     m_tree->get().Branch("__weight__", &m_branchAddressesFloat[0], "__weight__/F");
@@ -314,7 +316,7 @@ void VariablesToNtupleModule::event()
       const Particle* particle = particlelist->getParticle(iPart);
       double weight = getInverseSamplingRateWeight(particle);
       if (m_useFloat) {
-        m_branchAddressesFLoat[0] = weight;
+        m_branchAddressesFloat[0] = weight;
       } else {
         m_branchAddressesDouble[0] = weight;
       }

@@ -3340,7 +3340,9 @@ def getBeamBackgroundProbability(particleList, weight, path=None):
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The beam background MVA is not trained for Belle data.")
+        if weight != "Belle":
+            B2WARNING("weight type must be 'Belle' for b2bii.")
+            weight = "Belle"
 
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -3358,7 +3360,9 @@ def getFakePhotonProbability(particleList, weight, path=None):
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The fake photon MVA is not trained for Belle data.")
+        if weight != "Belle":
+            B2WARNING("weight type must be 'Belle' for b2bii.")
+            weight = "Belle"
 
     path.add_module('MVAExpert',
                     listNames=particleList,

@@ -130,6 +130,8 @@ experiment-dependent, but not run-dependent.
 Moreover, ``RunNo`` for these events will be set to 0 in the ``mcproduzh`` package,
 hence it doesn't work for off-resonance or :math:`\Upsilon(nS)`.
 
+If one wants to generate run-dependent MC samples, ``gsim/gsim/gsim.*.dat`` have 
+to be modified with corresponding ``RunNo`` accordingly.
 
 .. seealso::
    More information of generating Belle MC in ``basf`` can be found
@@ -175,6 +177,26 @@ Then modify the following line in your generation script:
    main.add_module('EventInfoSetter', expList=55, runList=402, evtNumList=100)
 
 This will generate signal MC using the beam energy from run 402 in experiment 55.
+
+.. rubric:: Simuation with run-dependent MC
+
+If one wants to generate run-dependent MC samples, ``gsim/gsim/gsim.*.dat`` have
+to be modified with corresponding ``RunNo`` accordingly.
+
+For example, in ``gsim/gsim/gsim.55.dat`` under ``mcproduzh``:
+
+.. code-block:: none
+
+   C Set run number (format "RUNG IDRUN IDEV")
+   C   Run#  = 0 : for run-independence MC
+   C   Run# != 0 : for run-dependent MC
+   RUNG 0 1
+
+in which ``RUNG 0 1`` should be changed to ``RUNG 402 1``.
+
+.. warning::
+   If ``RunNo`` is not currectly set in ``gsim.*.dat``, it will be overwritten by gsim.
+   As a result, incorrect beam energies will be used for your MC files.
 
 
 .. rubric:: User signal decay files

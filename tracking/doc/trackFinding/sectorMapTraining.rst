@@ -59,10 +59,30 @@ Internally the :command:`tracking-vxdtf2-collect-train-data` command is called w
 
 Note, for SectorMaps applied on data (the real one) the displacement of sensors should be included in the training. By default the MC has a perfect geometry which is not the case for the actual geometry in Belle II. Though differences are small, they do have an effect on the performance of the trained SectorMap.  The default way of including a displaced geometry in the training is to provide a global tag with the displaced SVD-geometry (assuming PXD is ignored). This can be done by providing the name of a global tag containing such a geometry. Both of the above commands (:command:`tracking-vxdtf2-submitAllCollectionJobs` and :command:`tracking-vxdtf2-collect-train-data`) provide the option :command:`--prependGT` which can be used to provide the name of such a global tag. The given global will be prepend to the other global tags. 
 
-.. note::
-  
-  provide a description on how to generate such a payload and GT, once figured out on how to do it
 
+
+The script :code:`tracking/scripts/tracking/secMapTraining/CreateSensorDisplacements.py` can be used to create xml files containing sensor displacements which can be used 
+to create a geometry with displaced (w.r.t. the ideal geometry) sensors. You have to provide global tags 
+which contain the geometry payload and the payloads containing the relevant alignment data (named :code:`VXDAlignment*`). The payloads can be either 
+provided as list of global tags using the :code:`--listOfGT` parameter where you can give a list of global tags separated by spaces. Alternatively 
+one can provide the payloads as local database using the :code:`--localDB` option.  Note that the *IOV* of the alignment data and the geometry has to 
+match. The experiment number and run number can be specified using command line parameters. An example is given below 
+
+.. code-block:: python
+  
+  basf2 CreateSensorDisplacements.py -- --help
+
+  basf2 CreateSensorDisplacements.py -- --localDB database.txt --listOfGT  globaltag1 globaltag2 globaltag2 --expNum 0 --runNum 0
+
+, where the first command will display all available command line parameter. Note the leading :code:`--` is needed. 
+The output will be two xml files containing the displacement for `SVD` (:code:`SVD-Alignment.xml`) and :code:`PXD` (:code:`PXD-Alignment.xml`). The geometry in xml format is 
+stored in :code:`svd/data` and :code:`pxd/data`, respectively. These already contain afore mentioned files, which should be replaced with the newly created  versions. 
+It is recommended to not use the original folders :code:`svd/data` and :code:`pxd/data` to not mess around with your release. Instead you should either create a copy 
+of those folders or work on a branch. Once you replaced the corresponding files you can use the :code:`Geometry` module to create the actual payloads. 
+For the :code:`Geometry` module you need to set the options :code:`createPayloads` to `True` and you should set the :code:`components` parameter correspondingly. 
+If you use a copy of the original xml files you may also need to set the :code:`fileName` parameter in the `Gearbox` module. 
+An example for the SVD geometry is given in the script :code:`svd/scripts/dbImporters/create_SVDGeometryPar_payload.py`. The output 
+will be the geometry payloads which can be uploaded to the database or used as local database. 
 
 
 SectorMap training

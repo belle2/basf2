@@ -338,7 +338,7 @@ void StorageRootOutputModule::openFile()
                   out_notmp.filename().c_str(), out_notmp.c_str(), m_HLTName.c_str(),
                   m_runType.c_str(), m_expno, m_runno,
                   m_compressionLevel, m_compressionAlgorithm,
-                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str());
+                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())+std::string("+09")).c_str());
   } catch (const DBHandlerException &e) {
     B2WARNING(e.what());
   } 
@@ -574,7 +574,7 @@ void StorageRootOutputModule::closeFile()
                   "WHERE name = '%s' AND host = '%s';",
                   ((boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize || m_ramdiskBuffer) ? "true" : "false",
                   m_outputFileMetaData.getNEvents(), m_outputFileMetaData.getNFullEvents(), m_file->GetSize(),
-                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str(),
+                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())+std::string("+09")).c_str(),
                   filename_path.filename().c_str(), m_HLTName.c_str());
   } catch (const DBHandlerException &e) {
     B2WARNING(e.what());

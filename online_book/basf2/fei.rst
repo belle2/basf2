@@ -348,10 +348,13 @@ indicator for the quality of the B mesons we have reconstructed.
 
         fig, ax = plt.subplots()
         n, bins, patches = ax.hist(df['Mbc'], bins=30, range=(5.15, 5.3))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c$^2$')
         ax.set_ylabel('Number of candidates')
         fig.savefig('m_bc.pdf')
 
+    .. figure:: fei/m_bc.png
+        :width: 40em
+        :align: center
 
 .. admonition:: Question
     :class: exercise stacked
@@ -400,14 +403,17 @@ indicator for the quality of the B mesons we have reconstructed.
 
         # If you didn't do the optional exercise, the 'FEIProbRank' column won't be there.
         # Just remove this part of the query in this case.
-        sig_prob_cut_df = df.query('(SigProb > 0.01)
-                                    & (FEIProbRank == 1)')
+        sig_prob_cut_df = df.query('(SigProb > 0.01) & (FEIProbRank == 1)')
 
         n, bins, patches = ax.hist(sig_prob_cut_df['Mbc'], bins=30, range=(5.15, 5.3))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c$^2$')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
         fig.savefig('m_bc_cut_0_01.pdf')
+
+    .. figure:: fei/m_bc_cut_0_01.png
+        :width: 40em
+        :align: center
 
 Congratulations, you have now discovered the B meson in Monte Carlo data!
 This concludes the first part of this lesson. The second part of this lesson will show you now how to use
@@ -681,7 +687,7 @@ an MC sample with only four decay channels.
         signal_df = df.query('(Bsig_isSignal  == 1.0)')
 
         n, bins, patches = ax.hist(signal_df['m2RecoilSignalSide'], bins=30, range=(-2, 5))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_xlabel(r'$m^2_{\mathrm{recoil}}$ in (GeV/c$^2$)$^2$')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('Bsig_isSignal == 1')
         fig.savefig('m2RSS_Signal.pdf')
@@ -693,11 +699,18 @@ an MC sample with only four decay channels.
         cut_df = df.query('(Btag_SigProb > 0.01) & (nCharged == 0.0)')
 
         n, bins, patches = ax.hist(cut_df['m2RecoilSignalSide'], bins=30, range=(-2, 5))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_xlabel(r'$m^2_{\mathrm{recoil}}$ in (GeV/c$^2$)$^2$')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
         fig.savefig('m2RSS_FEIcut_0_01_nCharged_0.pdf')
 
+    .. figure:: fei/m2RSS_Signal.png
+        :width: 40em
+        :align: center
+
+    .. figure:: fei/m2RSS_FEIcut_0_01_nCharged_0.png
+        :width: 40em
+        :align: center
 
 Congratulations, you now know how to run the FEI and how to use it in your analysis. If you would like to know more
 you can always read the extensive documentation of the FEI. Here you can also find instructions on how to train the FEI

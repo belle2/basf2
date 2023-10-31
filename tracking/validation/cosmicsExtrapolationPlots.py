@@ -340,5 +340,9 @@ main = basf2.create_path()
 main.add_module(root_input)
 main.add_module(plot)
 
+main.add_module('Progress')
+
 # Run.
 basf2.process(main)
+
+print(basf2.statistics)

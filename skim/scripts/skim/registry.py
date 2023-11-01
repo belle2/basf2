@@ -137,6 +137,7 @@ _RegisteredSkims = [
     ("18130100", "dark", "BtoKplusLLP"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
+    ("18570800", "taupair", "TauKshort"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),

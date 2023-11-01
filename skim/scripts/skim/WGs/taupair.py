@@ -18,6 +18,9 @@ from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from variables import variables as vm
+from stdV0s import stdKshorts
+import variables.collections as vc
+import variables.utils as vu
 
 __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -94,7 +97,7 @@ def tauskim_particle_selection(label, path):
 @fancy_skim_header
 class TauLFV(BaseSkim):
     """
-    **Channel**: :math:`\\tau \\to l \\gamma, lll, l \\pi^0, l V^0, lhh, llp, phh`
+    **Channel**: :math:`\\tau \\to l \\gamma, lll, l \\pi^0, l \\eta, l \\eta', l K_S, l f_0, l V^0, lhh, llp, phh`
 
     **Output particle lists**: ``e+:taulfv, mu+:taulfv, pi+:taulfv, K+:taulfv, p+:taulfv``,
     ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv``,
@@ -154,7 +157,7 @@ class TauLFV(BaseSkim):
         ma.reconstructDecay("omega:taulfv -> pi0:taulfv pi-:all pi+:all", "0.73 < M < 0.83", path=path)
 
         # event selection
-        vm.addAlias("netChargeLFV", "formula(countInList(pi+:taulfv, charge == 1) - countInList(pi+:taulfv, charge == -1))")
+#        vm.addAlias("netChargeLFV", "formula(countInList(pi+:taulfv, charge == 1) - countInList(pi+:taulfv, charge == -1))")
         tauLFVCuts1 = "nParticlesInList(pi+:taulfv) < 5 and 1.0 < M < 2.0 and -1.5 < deltaE < 0.5"
         tauLFVCuts3 = "nParticlesInList(pi+:taulfv) < 7 and 1.4 < M < 2.0 and -1.0 < deltaE < 0.5"
 
@@ -526,6 +529,146 @@ class TauThrust(BaseSkim):
             particlelist='tau+:thrust',
             variables_1d=[
                 ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
+                ('thrust', 50, 0.75, 1, '', contact, '', '')],
+            path=path)
+
+############################################################
+
+
+@fancy_skim_header
+class TauKshort(BaseSkim):
+    """
+    **Channel**: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
+
+    **Criteria**:
+
+    * ``nAlltracks < 5``
+    """
+    __authors__ = ["Paolo Leo", "Kenji Inami"]
+    __description__ = "Skim for Tau decays with Kshort."
+    __contact__ = __liaison__
+    __category__ = "physics, tau"
+
+    produce_on_tau_samples = False  # retention is too high on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+        # if arg_dataORmc == 'mc':
+        #    stdKshorts(prioritiseV0=True, fitter='TreeFit', path=main, updateAllDaughters=True)
+        # if arg_dataORmc == 'data':
+        #    stdKshorts(prioritiseV0=True, fitter='TreeFit', path=main, updateAllDaughters=False)
+        stdKshorts(path=path)
+
+    def additional_setup(self, path):
+        """
+        Set particle lists and variables for TauKshort skim.
+
+        **Constructed particle lists**: ``pi+:tauKs, gamma:tauKs, pi+:tauKsS1/tauKsS2, pi0:tauKs``
+
+        **Variables**:
+
+        """
+
+        tauskim_particle_selection("tauKs", path)
+
+#        ma.cutAndCopyLists('pi+:tauKs_pid', 'pi+:tauKs', 'EoverP < 0.8', path=path)
+        ma.cutAndCopyLists('pi+:tauKs_pid', 'pi+:tauKs', 'clusterEoP < 0.8', path=path)
+
+    def build_lists(self, path):
+
+        vm.addAlias('nAllTracksTauKs', 'nParticlesInList(pi+:all)')
+
+        ma.cutAndCopyLists('K_S0:tauKs_merged', 'K_S0:merged', 'significanceOfDistance > 3', path=path)
+        ma.cutAndCopyLists('pi+:tauKs_kshort', 'pi+:all', 'isDescendantOfList(K_S0:tauKs_merged) == 1', path=path)
+        ma.cutAndCopyLists('pi+:tauKs_notKs', 'pi+:tauKs', 'isDescendantOfList(K_S0:tauKs_merged) == 0', path=path)
+
+        ma.copyLists('pi+:tauKs_used', ['pi+:tauKs_kshort', 'pi+:tauKs_notKs'], path=path)
+        vm.addAlias('netChargeTauKs',
+                    'formula(countInList(pi+:tauKs_used, charge == 1) - countInList(pi+:tauKs_used, charge == -1))')
+
+        # Get EventShape variables
+        ma.buildEventShape(
+            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'pi0:tauKs', 'gamma:tauKs'],
+            allMoments=False, foxWolfram=False, cleoCones=False,
+            sphericity=False, jets=False, path=path)
+        ma.buildEventKinematics(
+            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'pi0:tauKs', 'gamma:tauKs'],
+            path=path)
+
+        # reconstruct
+        ma.reconstructDecay('tau+:tauKs_kshort -> K_S0:tauKs_merged pi+:tauKs_pid', '', path=path)
+        ma.reconstructDecay('tau-:tauKs_1prong -> pi-:tauKs', '', path=path)
+        ma.reconstructDecay('vpho:tauKs -> tau+:tauKs_kshort tau-:tauKs_1prong', '', path=path)
+        # Cut on events requiring oppositie hemispheres
+        vm.addAlias('prod1',
+                    'formula(daughter(0, daughter(0, cosToThrustOfEvent))*daughter(1, daughter(0,cosToThrustOfEvent)))')
+        vm.addAlias('prod2',
+                    'formula(daughter(0, daughter(1, cosToThrustOfEvent))*daughter(1, daughter(0,cosToThrustOfEvent)))')
+        ma.applyCuts('vpho:tauKs', 'prod1 < 0 and prod2 < 0', path=path)
+
+        evP = 'vpho:tauKs'
+        ma.applyCuts(evP, 'nAllTracksTauKs < 7', path=path)   # cut0
+        ma.applyCuts(evP, '0.9 < thrust < 0.995', path=path)  # cut1
+        ma.applyCuts(evP, '2.5 < visibleEnergyOfEventCMS < 10', path=path)  # cut2
+        ####
+        eventVariables = ['nGoodPhotons', 'nPhotonsFromPi0', 'nAllTracks']
+        eventVariables += ['thrust',
+                           'visibleEnergyOfEventCMS',
+                           'missingMomentumOfEventCMS_theta',
+                           'missingMass2OfEvent'
+                           ]
+        commonVariables = vc.kinematics
+        commonVariables += ['theta']
+        vm.addAlias('invM12',  'daughterInvariantMass(0, 1)')
+        taukshortVariables = ['invM12']
+        kshortVariables = ['flightDistance', 'significanceOfDistance', 'daughter1DecayAngle', 'daughter2DecayAngle']
+        vu.create_aliases_for_selected(list_of_variables=eventVariables,
+                                       decay_string='^vpho')
+        vu.create_aliases_for_selected(list_of_variables=commonVariables,
+                                       decay_string='vpho -> ^tau+ ^tau-',
+                                       prefix=['tau_kshort', 'tau_1prong'])
+        vu.create_aliases_for_selected(list_of_variables=taukshortVariables,
+                                       decay_string='vpho -> ^tau+ tau-',
+                                       prefix=['tau_kshort'])
+        vu.create_aliases_for_selected(list_of_variables=commonVariables + kshortVariables,
+                                       decay_string='vpho -> [tau+ -> ^K_S0 ^pi+] [tau- -> ^pi-]',
+                                       prefix=['track_kshort', 'track_pi_kshort', 'track_1prong'])
+        vu.create_aliases_for_selected(list_of_variables=commonVariables,
+                                       decay_string='vpho -> [tau+ -> [K_S0 -> ^pi+ ^pi-] pi+] tau-',
+                                       prefix=['kshort_track1', 'kshort_track2'])
+
+        ####
+        ma.applyCuts(evP, '0.2 < track_kshort_pt < 4.5', path=path)   # cut3
+        ma.applyCuts(evP, 'max(kshort_track1_pt, kshort_track2_pt) > 0.25', path=path)   # cut4
+        ma.applyCuts(evP, 'useCMSFrame(track_1prong_p) < 4.6', path=path)   # cut5
+        ma.applyCuts(evP, '0.7 < tau_kshort_invM12 < 1.3', path=path)   # cut6
+        ma.applyCuts(evP, 'track_kshort_significanceOfDistance > 3', path=path)   # cut7
+
+        return [evP]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+        evP = 'vpho:tauKs'
+        ma.rankByHighest(particleList=evP, variable='p', numBest=1, path=path)
+
+        # ma.fillParticleListsFromMC([('K_S0:gen','')],path=path)
+        # vm.addAlias('nKsMC', 'nParticlesInList(K_S0:gen)')
+
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist=evP,
+            variables_1d=[
+                # ('nKsMC',5,0,5,'', contact, '', ''),
+                ('nAllTracksTauKs', 7, 1, 8, '', contact, '', ''),
+                ('netChargeTauKs', 7, -3, 4, '', contact, '', ''),
                 ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
                 ('thrust', 50, 0.75, 1, '', contact, '', '')],
             path=path)

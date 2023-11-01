@@ -1,3 +1,10 @@
+Changes in the analysis package in light-2311-nebelung
+------------------------------------------------------
+
+Modules
++++++++
+* Added a new option ``useFloat`` in `VariablesToNtupleModule` and `modularAnalysis.variablesToNtuple` used to store floating-point data as single-precision (float) numbers instead of double-precision (double) numbers.
+
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------
 

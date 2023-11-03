@@ -24,7 +24,7 @@ ma.inputMdstList(filelist=[b2test_utils.require_file("mdst14.root", "validation"
 ma.fillParticleList('pi+:sig', "[pt > 0.1]", path=path)
 
 ma.scaleTrackMomenta(['pi+:sig'], scale=1.01, path=path)
-ma.printVariableValues('pi+:sig', ['p', 'M', 'E'], path=path)
+ma.printVariableValues('pi+:sig', ['p', 'px', 'py', 'pz', 'M', 'E', 'theta', 'phi'], path=path)
 
 with b2test_utils.clean_working_directory():
     with b2test_utils.set_loglevel(b2.LogLevel.INFO):

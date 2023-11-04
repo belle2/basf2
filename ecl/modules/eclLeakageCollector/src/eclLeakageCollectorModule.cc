@@ -253,11 +253,12 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Generated and reconstructed energy quantities
 
-  //..Find the generated energy bin
-  const int iGenEnergyMeV = (int)(1000.*mcLabE + 0.5);
+  //..Find the generated energy bin by requiring it be close enough to expected value
+  const float genEnergyMeV = 1000.*mcLabE;
+  const float tolerance = std::max(0.001 * genEnergyMeV, 0.5);
   t_energyBin = -1;
   for (int ie = 0; ie < m_number_energies; ie++) {
-    if (iGenEnergyMeV == i_energies[t_region][ie]) {
+    if (std::abs(genEnergyMeV - i_energies[t_region][ie]) < tolerance) {
       t_energyBin = ie;
       break;
     }

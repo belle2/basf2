@@ -739,7 +739,7 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
+        B2FATAL("The tracking momentum scaler can only be run over Belle II data.")
 
     TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
     TrackingMomentumScaleFactors.param('particleLists', inputListNames)
@@ -750,9 +750,9 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     path.add_module(TrackingMomentumScaleFactors)
 
 
-def correctTrackEnergy(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
+def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", correctionName="SF", path=None):
     """
-    substract to the energy of the particles according to a correction value.
+    Correct the energy loss of tracks according to a 'correction' value.
     This correction can either be given as constant number or as the name of the payload which contains
     the variable corrections.
     If the particle list contains composite particles, the momenta of the track-based daughters are corrected.
@@ -768,15 +768,15 @@ def correctTrackEnergy(inputListNames, scale=float('nan'), payloadName="", scali
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
+        B2FATAL("The tracking energy correction can only be run over Belle II data.")
 
-    TrackingEnergyLossScaleFactors = register_module('TrackingEnergyLossScaleFactors')
-    TrackingEnergyLossScaleFactors.param('particleLists', inputListNames)
-    TrackingEnergyLossScaleFactors.param('scale', scale)
-    TrackingEnergyLossScaleFactors.param('payloadName', payloadName)
-    TrackingEnergyLossScaleFactors.param('correctionName', scalingFactorName)
+    TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')
+    TrackingEnergyLossCorrection.param('particleLists', inputListNames)
+    TrackingEnergyLossCorrection.param('correction', correction)
+    TrackingEnergyLossCorrection.param('payloadName', payloadName)
+    TrackingEnergyLossCorrection.param('correctionName', correctionName)
 
-    path.add_module(TrackingEnergyLossScaleFactors)
+    path.add_module(TrackingEnergyLossCorrection)
 
 
 def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):

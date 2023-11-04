@@ -38,9 +38,8 @@ TrackingEnergyLossCorrectionModule::TrackingEnergyLossCorrectionModule() : Modul
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("correction", m_correction, "correction value to be substracted from the particle energy",
            nan(""));                                        // Nan
-  addParam("payloadName", m_payloadName, "ID of table used for reweighing",
-           std::string(""));                             // "Test_momSF_Eloss"
-  addParam("correctionName", m_correctionName, "Label for the correction in the look up table", std::string("")); // "sf_central"
+  addParam("payloadName", m_payloadName, "ID of table used for reweighing", std::string(""));
+  addParam("correctionName", m_correctionName, "Label for the correction in the look up table", std::string(""));
 }
 
 void TrackingEnergyLossCorrectionModule::initialize()
@@ -91,8 +90,6 @@ double TrackingEnergyLossCorrectionModule::getCorrectionValue(Particle* particle
 
   std::map<std::string, double> values;
   for (const auto& i_variable : variables) {
-    //if (abs(getPDGCodeUsedForFit())==211) {// add here the pID condition
-    //}
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
     double value = std::get<double>(var->function(particle));
     values.insert(std::make_pair(i_variable, value));

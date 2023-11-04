@@ -255,7 +255,7 @@ void eclLeakageCollectorModule::collect()
 
   //..Find the generated energy bin by requiring it be close enough to expected value
   const float genEnergyMeV = 1000.*mcLabE;
-  const float tolerance = std::max(0.001 * genEnergyMeV, 0.5);
+  const float tolerance = std::max(0.002 * genEnergyMeV, 1.0);
   t_energyBin = -1;
   for (int ie = 0; ie < m_number_energies; ie++) {
     if (std::abs(genEnergyMeV - i_energies[t_region][ie]) < tolerance) {

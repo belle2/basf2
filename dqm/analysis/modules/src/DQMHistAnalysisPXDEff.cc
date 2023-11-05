@@ -323,8 +323,9 @@ void DQMHistAnalysisPXDEffModule::event()
         ihit +=  nhit;
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        // keep workaround code for re-use
-//         if (j == 6) continue; // workaround for 1.3.2 module
+        // workaround for excluded module
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
       }
@@ -352,8 +353,8 @@ void DQMHistAnalysisPXDEffModule::event()
         updated[aModule] = true;
       }
 
-      // keep workaround code for re-use
-//       if (j == 6) continue; // workaround for 1.3.2 module
+      // workaround for excluded module
+      if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
       // get the errors and check for limits for each bin seperately ...
 
@@ -390,9 +391,10 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        // keep workaround code for re-use
-//         if (i != 5) // exclude 1.3.2
-        if (scale_min > val) scale_min = val;
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+          // scale update only for included module
+          if (scale_min > val) scale_min = val;
+        }
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -474,9 +476,10 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        // keep workaround code for re-use
-//         if (i != 5) { // exclude 1.3.2
-        if (scale_min > val) scale_min = val;
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+          // skip scale update only for included modules
+          if (scale_min > val) scale_min = val;
+        }
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;

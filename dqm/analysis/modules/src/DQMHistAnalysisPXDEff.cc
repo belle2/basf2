@@ -48,6 +48,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -414,11 +415,12 @@ void DQMHistAnalysisPXDEffModule::event()
 
       gr->Draw("AP");
 
-      // keep workaround code for re-use
-//       auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-//       tt->SetTextAngle(90);// Rotated
-//       tt->SetTextAlign(12);// Centered
-//       tt->Draw();
+      for (auto& it : m_excluded) {
+        auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextAngle(90);// Rotated
+        tt->SetTextAlign(12);// Centered
+        tt->Draw();
+      }
 
       if (all < 100.) {
         m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
@@ -502,15 +504,17 @@ void DQMHistAnalysisPXDEffModule::event()
       gr->SetLineColor(kBlack);
       gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
+      gr->Draw("AP");
     } else scale_min = 0.0;
-    if (gr) gr->Draw("AP");
-    if (gr3) gr3->Draw("P");
-    // keep workaround code for re-use
-//     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-//     tt->SetTextSize(0.035);
-//     tt->SetTextAngle(90);// Rotated
-//     tt->SetTextAlign(12);// Centered
-//     tt->Draw();
+    if (gr3) gr3->Draw("P"); // both in one plot
+
+    for (auto& it : m_excluded) {
+      auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
+    }
 
     if (all < 100.) {
       m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray

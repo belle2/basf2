@@ -74,7 +74,9 @@ namespace Belle2 {
       m_neuroParameters.loadconfigtxt(m_configFileName);
       m_NeuroTrigger.initialize(m_neuroParameters);
     } else {
-      B2ERROR("Configuration file is missing! Make sure to give the configuration file as a parameter.");
+      m_neuroParameters.saveconfigtxt("neuroconfig_example.conf");
+      B2ERROR("Configuration file is missing! Make sure to give the configuration file as a parameter. \
+              An example file neuroconfig_example.conf has been saved.");
     }
     m_trainSets_prepare.clear();
     CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();

@@ -151,7 +151,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   //  const int nTr = m_Tracks.getEntries();
   PCmsLabTransform T;
   //now start to collect dimuon parameters
-  double   theta_pos, theta_neg;
+  double   theta_pos(0), theta_neg(0);
   int charge_sum = 0;
   double  Eecl_trk = 0;
 

@@ -15,7 +15,8 @@
 using namespace Belle2;
 
 PostProcessingParticleWeighting::PostProcessingParticleWeighting(
-  const char* lookupTableName) : m_LookupTableName(lookupTableName)
+  const char* lookupTableName) :
+  m_EventMetaData(-1, -1), m_LookupTable(lookupTableName)
 {
 }
 
@@ -31,9 +32,11 @@ void PostProcessingParticleWeighting::setValue(
 
 WeightInfo PostProcessingParticleWeighting::getInfo(int experiment, int run)
 {
-  if ((experiment != m_Experiment) || (run != m_Run)) {
-    m_LookupTable = (ParticleWeightingLookUpTable*)Database::Instance().getData(
-                      m_LookupTableName, experiment, run);
+  if ((experiment != m_EventMetaData.getExperiment()) ||
+      (run != m_EventMetaData.getRun())) {
+    m_EventMetaData.setExperiment(experiment);
+    m_EventMetaData.setRun(run);
+    DBStore::Instance().update(m_EventMetaData);
   }
   WeightInfo weightInfo = m_LookupTable->getInfo(m_Values);
   return weightInfo;

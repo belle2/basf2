@@ -8,8 +8,13 @@
 
 #pragma once
 
-/* Basf2 headers. */
+/* Analysis headers. */
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
+
+/* Basf2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 /* Python headers. */
 #include <Python.h>
@@ -57,20 +62,14 @@ namespace Belle2 {
 
   protected:
 
-    /** Lookup-table name. */
-    std::string m_LookupTableName;
-
-    /** Lookup table. */
-    ParticleWeightingLookUpTable* m_LookupTable = nullptr;
-
     /** Values. */
     std::map<std::string, double> m_Values;
 
-    /** Experiment. */
-    int m_Experiment = -1;
+    /** Event metadata. */
+    EventMetaData m_EventMetaData;
 
-    /** Run. */
-    int m_Run = -1;
+    /** Lookup table. */
+    DBObjPtr<ParticleWeightingLookUpTable> m_LookupTable;
 
   };
 

@@ -232,14 +232,14 @@ namespace Belle2 {
       std::vector<NNTParam<float>> expertline;
       expertline.push_back(float(isector));
       expertline.back().lock();
-      for (auto x : m_NeuroTrigger[isector].getRelID()) {
+      for (auto x : hset.relID) {
         expertline.push_back(x);
         expertline.back().lock();
       }
       m_neuroParameters.IDRanges.push_back(expertline);
       B2DEBUG(15, hset);
     }
-    m_configFileName = "IDTable_" + m_configFileName;
+    // m_configFileName = "IDTable_" + m_configFileName;
     // lock the variables used in this module, that are not supposed be changed
     // further down the training chain because of the danger of implications or
     // wrong assumptions.

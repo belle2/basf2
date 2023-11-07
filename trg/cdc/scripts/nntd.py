@@ -161,8 +161,7 @@ class nntd(basf2.Module):
             evlist[self.varnum["recotheta"][0]] = fitres.getMomentum().Theta()  # self.costotheta(fitres.getMomentum().CosTheta())
             evlist[self.varnum["recophi"][0]] = fitres.getMomentum().Phi()
             evlist[self.varnum["recopt"][0]] = fitres.getTransverseMomentum()
-            evlist[self.varnum["recop"][0]] = np.sqrt(fitres.getMomentum(
-            ).X()**2+fitres.getMomentum().Y()**2+fitres.getMomentum().Z()**2)
+            evlist[self.varnum["recop"][0]] = fitres.getMomentum().R()
         return evlist
 
     def getrecovals(self, evlist, state):
@@ -258,7 +257,6 @@ class nntd(basf2.Module):
 
                 reps = reco.getRepresentations()
                 irep = 0
-                state = None
                 for irep, rep in enumerate(reps):
                     if not reco.wasFitSuccessful(rep):
                         continue

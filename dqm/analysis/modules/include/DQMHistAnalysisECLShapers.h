@@ -42,7 +42,7 @@ namespace Belle2 {
     /** Call when a run ends. */
     void endRun() override final;
     /** Terminate. */
-    void terminate() override final;
+    void terminate() override final {}
 
   private:
     /** Prefix to use for PVs registered by this module */

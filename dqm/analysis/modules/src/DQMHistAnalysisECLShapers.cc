@@ -143,8 +143,6 @@ void DQMHistAnalysisECLShapersModule::endRun()
 }
 
 
-void DQMHistAnalysisECLShapersModule::terminate() { }
-
 double DQMHistAnalysisECLShapersModule::robust_max(std::multiset<double> values)
 {
   int len = values.size();

@@ -14,25 +14,21 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-
-#include <TLorentzVector.h>
-
 #include <string>
 
 namespace Belle2 {
 
-  /** This module replaces the momentum of the Particle in the target particle list
-  by p(beam) - p(selected daughters). */
+  /**  */
 
-  class PhiGammaPhotonCorrectorModule : public Module {
+  class TwoBodyISRPhotonCorrectorModule : public Module {
   private:
     /** name of input particle list. */
-    std::string m_particleList;
+    std::string m_gammaList;
+    Int_t m_massiveParticle;
 
   public:
     /** Constructor. */
-    PhiGammaPhotonCorrectorModule();
+    TwoBodyISRPhotonCorrectorModule();
 
     /** Initialises the module.
      */

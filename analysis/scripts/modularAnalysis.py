@@ -4166,21 +4166,52 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
-def phiGammaPhotonCorrector(particleList=None, path=None):
+def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticle, writeOut=False, path=None):
     """
-    Sets photon kinematics to corrected values in phi gamma events.
+    Sets photon kinematics to corrected values in two body decays with an ISR photon
+    and a massive particle.
 
-    @param particleList  new ParticleList filled with copied Particles
-    @param path          modules are added to this path
+    @param ouputListName    new ParticleList filled with copied Particles
+    @param inputListName    input ParticleList with original Particles
+    @param massiveParticle  name or PDG code of massive particle participating in the two
+                            body decay with the ISR photon
+    @param writeOut         whether RootOutput module should save the created ParticleList
+    @param path             modules are added to this path
     """
 
-    if particleList is None:
-        particleList = ""
+    # following the scheme of the ParticleCopier module
+    # first copy original particles to the new ParticleList
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListCopyForPhotonCorrector_' + outputListName)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', [inputListName])
+    pmanipulate.param('writeOut', writeOut)
+    path.add_module(pmanipulate)
 
-    mod = register_module('PhiGammaPhotonCorrector')
-    mod.set_name('PhiGammaPhotonCorrector' + particleList)
-    mod.param('particleList', particleList)
-    path.add_module(mod)
+    # then replace original particles with their copies
+    pcopy = register_module('ParticleCopier')
+    pcopy.set_name('ParticleCopierForPhotonCorrector_' + outputListName)
+    pcopy.param('inputListNames', [outputListName])
+    path.add_module(pcopy)
+
+    # make sure we save the original photon kinematics as extraInfo
+    extra_info_vars = {"E": "originalE",
+                       "px": "originalPx",
+                       "py": "originalPy",
+                       "pz": "originalPz",
+                       "useCMSFrame(E)": "originalECMS",
+                       "useCMSFrame(px)": "originalPxCMS",
+                       "useCMSFrame(py)": "originalPyCMS",
+                       "useCMSFrame(pz)": "originalPzCMS",
+                       }
+    variablesToExtraInfo(outputListName, extra_info_vars, path=path)
+
+    # now set the proper energy of the photon in the new list
+    photon_energy_correction = register_module('TwoBodyISRPhotonCorrector')
+    photon_energy_correction.set_name('TwoBodyISRPhotonCorrector_' + outputListName)
+    photon_energy_correction.param('gammaList', outputListName)
+    photon_energy_correction.param('massiveParticle', massiveParticle)
+    path.add_module(photon_energy_correction)
 
 
 def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):

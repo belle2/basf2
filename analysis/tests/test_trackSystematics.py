@@ -18,11 +18,16 @@ b2test_utils.configure_logging_for_tests()
 b2.set_random_seed("1103")
 
 ma.inputMdstList(filelist=[b2test_utils.require_file("mdst14.root", "validation")],
-                 entrySequences=["0:10"],
+                 entrySequences=["0:5"],
                  path=path)
 
-ma.fillParticleList('pi+:sig', "[pt > 0.1]", path=path)
+ma.fillParticleList('pi+:sig', "pt > 0.1", path=path)
 
+# print variables before momentum scaling
+ma.printVariableValues('pi+:sig', ['p', 'px', 'py', 'pz', 'M', 'E', 'theta', 'phi'], path=path)
+
+
+# print variables after momentum scaling
 ma.scaleTrackMomenta(['pi+:sig'], scale=1.01, path=path)
 ma.printVariableValues('pi+:sig', ['p', 'px', 'py', 'pz', 'M', 'E', 'theta', 'phi'], path=path)
 

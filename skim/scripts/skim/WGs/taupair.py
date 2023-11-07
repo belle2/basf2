@@ -539,11 +539,16 @@ class TauThrust(BaseSkim):
 @fancy_skim_header
 class TauKshort(BaseSkim):
     """
-    **Channel**: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
+    **Channel**: :math:`e^+ e^- \\to \\tau^+ \\tau^-, \\tau \\to K_s \\pi X`
 
     **Criteria**:
 
-    * ``nAlltracks < 5``
+    * ``nAlltracks < 7``
+    * ``0.9 < thrust < 0.995``
+    * ``2.5 < visibleEnergyOfEventCMS < 10 GeV``
+    * ``0.2 < track_kshort_pt < 4.5``
+    * ``max(kshort_track1_pt,kshort_track2_pt) > 0.25``
+    * ``track_kshort_significanceOfDistance > 3``
     """
     __authors__ = ["Paolo Leo", "Kenji Inami"]
     __description__ = "Skim for Tau decays with Kshort."
@@ -574,9 +579,6 @@ class TauKshort(BaseSkim):
 
         tauskim_particle_selection("tauKs", path)
 
-#        ma.cutAndCopyLists('pi+:tauKs_pid', 'pi+:tauKs', 'EoverP < 0.8', path=path)
-        ma.cutAndCopyLists('pi+:tauKs_pid', 'pi+:tauKs', 'clusterEoP < 0.8', path=path)
-
     def build_lists(self, path):
 
         vm.addAlias('nAllTracksTauKs', 'nParticlesInList(pi+:all)')
@@ -599,10 +601,10 @@ class TauKshort(BaseSkim):
             path=path)
 
         # reconstruct
-        ma.reconstructDecay('tau+:tauKs_kshort -> K_S0:tauKs_merged pi+:tauKs_pid', '', path=path)
+        ma.reconstructDecay('tau+:tauKs_kshort -> K_S0:tauKs_merged pi+:tauKs_notKs', '', path=path)
         ma.reconstructDecay('tau-:tauKs_1prong -> pi-:tauKs', '', path=path)
         ma.reconstructDecay('vpho:tauKs -> tau+:tauKs_kshort tau-:tauKs_1prong', '', path=path)
-        # Cut on events requiring oppositie hemispheres
+        # Cut on events requiring opposite hemispheres
         vm.addAlias('prod1',
                     'formula(daughter(0, daughter(0, cosToThrustOfEvent))*daughter(1, daughter(0,cosToThrustOfEvent)))')
         vm.addAlias('prod2',
@@ -614,38 +616,18 @@ class TauKshort(BaseSkim):
         ma.applyCuts(evP, '0.9 < thrust < 0.995', path=path)  # cut1
         ma.applyCuts(evP, '2.5 < visibleEnergyOfEventCMS < 10', path=path)  # cut2
         ####
-        eventVariables = ['nGoodPhotons', 'nPhotonsFromPi0', 'nAllTracks']
-        eventVariables += ['thrust',
-                           'visibleEnergyOfEventCMS',
-                           'missingMomentumOfEventCMS_theta',
-                           'missingMass2OfEvent'
-                           ]
         commonVariables = vc.kinematics
-        commonVariables += ['theta']
-        vm.addAlias('invM12',  'daughterInvariantMass(0, 1)')
-        taukshortVariables = ['invM12']
         kshortVariables = ['flightDistance', 'significanceOfDistance', 'daughter1DecayAngle', 'daughter2DecayAngle']
-        vu.create_aliases_for_selected(list_of_variables=eventVariables,
-                                       decay_string='^vpho')
-        vu.create_aliases_for_selected(list_of_variables=commonVariables,
-                                       decay_string='vpho -> ^tau+ ^tau-',
-                                       prefix=['tau_kshort', 'tau_1prong'])
-        vu.create_aliases_for_selected(list_of_variables=taukshortVariables,
-                                       decay_string='vpho -> ^tau+ tau-',
-                                       prefix=['tau_kshort'])
         vu.create_aliases_for_selected(list_of_variables=commonVariables + kshortVariables,
                                        decay_string='vpho -> [tau+ -> ^K_S0 ^pi+] [tau- -> ^pi-]',
                                        prefix=['track_kshort', 'track_pi_kshort', 'track_1prong'])
         vu.create_aliases_for_selected(list_of_variables=commonVariables,
                                        decay_string='vpho -> [tau+ -> [K_S0 -> ^pi+ ^pi-] pi+] tau-',
                                        prefix=['kshort_track1', 'kshort_track2'])
-
         ####
         ma.applyCuts(evP, '0.2 < track_kshort_pt < 4.5', path=path)   # cut3
         ma.applyCuts(evP, 'max(kshort_track1_pt, kshort_track2_pt) > 0.25', path=path)   # cut4
-        ma.applyCuts(evP, 'useCMSFrame(track_1prong_p) < 4.6', path=path)   # cut5
-        ma.applyCuts(evP, '0.7 < tau_kshort_invM12 < 1.3', path=path)   # cut6
-        ma.applyCuts(evP, 'track_kshort_significanceOfDistance > 3', path=path)   # cut7
+        ma.applyCuts(evP, 'track_kshort_significanceOfDistance > 3', path=path)   # cut5
 
         return [evP]
 

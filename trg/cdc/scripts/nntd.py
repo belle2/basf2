@@ -1,7 +1,7 @@
 import basf2
 from ROOT import Belle2
-# from ROOT import TVector3
-# from ROOT.Math import XYZVector
+from ROOT import TVector3
+from ROOT.Math import XYZVector
 import numpy as np
 import pickle
 import os
@@ -160,8 +160,7 @@ class nntd(basf2.Module):
             evlist[self.varnum["recoz"][0]] = fitres.getPosition().Z()
             evlist[self.varnum["recotheta"][0]] = fitres.getMomentum().Theta()  # self.costotheta(fitres.getMomentum().CosTheta())
             evlist[self.varnum["recophi"][0]] = fitres.getMomentum().Phi()
-            evlist[self.varnum["recopt"][0]] = np.sqrt(fitres.getMomentum(
-            ).X()**2+fitres.getMomentum().Y()**2)
+            evlist[self.varnum["recopt"][0]] = fitres.getTransverseMomentum()
             evlist[self.varnum["recop"][0]] = np.sqrt(fitres.getMomentum(
             ).X()**2+fitres.getMomentum().Y()**2+fitres.getMomentum().Z()**2)
         return evlist
@@ -172,8 +171,7 @@ class nntd(basf2.Module):
             evlist[self.varnum["recotheta"][0]] = state.getMom().Theta()  # self.costotheta(fitres.getMomentum().CosTheta())
             evlist[self.varnum["recophi"][0]] = state.getMom().Phi()
             evlist[self.varnum["recopt"][0]] = state.getMom().Pt()
-            evlist[self.varnum["recop"][0]] = np.sqrt(state.getMom(
-            ).X()**2+state.getMom().Y()**2+state.getMom().Z()**2)
+            evlist[self.varnum["recop"][0]] = state.getMomMag()
         return evlist
 
     def getneurovals(self, evlist, neuro, status=""):
@@ -239,32 +237,38 @@ class nntd(basf2.Module):
         for reco in self.recotracks:
             track = reco.getRelatedFrom("Tracks")
 
-            # # old way: ########################################################################
-            if not track:
-                print("no track found for recotrack")
-                continue
-            whishPdg = 211  # pion
-            fitres = track.getTrackFitResultWithClosestMass(Belle2.Const.ChargedStable(whishPdg))
-            if not fitres:
-                continue
+            fitres = None
+            state = None
 
-            # # new way: ########################################################################
+            # method should be either 'old' for the old method or anything else for the new one
+            method = 'old'
 
-            # reps = reco.getRepresentations()
-            # #valrep = False
-            #
-            # irep = 0
-            # state = None
-            # for irep, rep in enumerate(reps):
-            #     if not reco.wasFitSuccessful(rep):
-            #         continue
-            #     try:
-            #         state = reco.getMeasuredStateOnPlaneClosestTo(XYZVector(0, 0, 0), rep)
-            #         rep.extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000))
-            #     except:
-            #         continue
-            # if not state:
-            #     continue
+            if method == 'old':
+                # # old way: ########################################################################
+
+                if not track:
+                    print("no track found for recotrack")
+                    continue
+                whishPdg = 211  # pion
+                fitres = track.getTrackFitResultWithClosestMass(Belle2.Const.ChargedStable(whishPdg))
+                if not fitres:
+                    continue
+            else:
+                # # new way: ########################################################################
+
+                reps = reco.getRepresentations()
+                irep = 0
+                state = None
+                for irep, rep in enumerate(reps):
+                    if not reco.wasFitSuccessful(rep):
+                        continue
+                    try:
+                        state = reco.getMeasuredStateOnPlaneClosestTo(XYZVector(0, 0, 0), rep)
+                        rep.extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000))
+                    except BaseException:
+                        continue
+                if not state:
+                    continue
 
             ####################################################################################
 
@@ -286,8 +290,10 @@ class nntd(basf2.Module):
                 twod = reco.getRelatedTo(self.twodtracksname)
             except BaseException:
                 twod = None
-            event[-1] = self.getrecovalsold(event[-1], fitres)
-            # event[-1] = self.getrecovals(event[-1], state)
+            if method == 'old':
+                event[-1] = self.getrecovalsold(event[-1], fitres)
+            else:
+                event[-1] = self.getrecovals(event[-1], state)
             event[-1] = self.getneurovals(event[-1], neuro)
             event[-1] = self.gettwodvals(event[-1], twod)
             event[-1] = self.getneurovals(event[-1], hwneuro, status="hw")

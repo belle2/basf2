@@ -18,13 +18,22 @@
 
 namespace Belle2 {
 
-  /**  */
+  /** This module corrects the energy and momentum of high energy
+  ISR photons in single ISR events based on the beam energy,
+  photon direction, and mass of the recoil particle.  */
 
   class TwoBodyISRPhotonCorrectorModule : public Module {
   private:
+    /** output particleList */
+    StoreObjPtr<ParticleList> m_outputGammaList;
     /** name of input particle list. */
-    std::string m_gammaList;
-    Int_t m_massiveParticle;
+    std::string m_inputGammaListName;
+    /** name of output particle list. */
+    std::string m_outputGammaListName;
+    /** PDG code of particle constraining the gamma energy */
+    Int_t m_massiveParticlePDGCode;
+    /** PDG code of output particle list. Should be 22 (photon)*/
+    Int_t m_outputGammaPDGCode;
 
   public:
     /** Constructor. */
@@ -35,8 +44,6 @@ namespace Belle2 {
     virtual void initialize() override;
     /** Method called for each event. */
     virtual void event() override;
-    /** Write TTree to file, and close file if necessary. */
-    virtual void terminate() override;
   };
 } // end namespace Belle2
 

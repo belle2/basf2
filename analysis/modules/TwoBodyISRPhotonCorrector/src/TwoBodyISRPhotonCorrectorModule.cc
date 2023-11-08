@@ -13,7 +13,10 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 #include <TDatabasePDG.h>
@@ -29,22 +32,49 @@ REG_MODULE(TwoBodyISRPhotonCorrector);
 TwoBodyISRPhotonCorrectorModule::TwoBodyISRPhotonCorrectorModule() : Module()
 {
   //Set module properties
-  setDescription("This module calculates the energy and momentum of photons in single ISR events based on the beam energy, photon direction, and mass of the recoil particle. A copy of the photon list must be set before using this module. The copy should be filled with the new kinematics.");
+  setDescription("This module corrects the energy and momentum of high energy ISR photons in single ISR events based on the beam energy, photon direction, and mass of the recoil particle.");
 //  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
-  addParam("gammaList", m_gammaList, "Name of photon list containing the ISR gammas to be corrected");
-  addParam("massiveParticle", m_massiveParticle,
+  addParam("inputGammaList", m_inputGammaListName, "Name of photon list containing the ISR gammas to be corrected");
+  addParam("outputGammaList", m_outputGammaListName, "Name of photon list containing the corrected ISR gammas");
+  addParam("massiveParticlePDGCode", m_massiveParticlePDGCode,
            "Name of the massive particle participating in the two body decay with the ISR gamma.");
 }
 
 void TwoBodyISRPhotonCorrectorModule::initialize()
 {
-  StoreObjPtr<ParticleList>().isRequired(m_gammaList);
   StoreArray<Belle2::Particle> particles;
   particles.isRequired();
+  DecayDescriptor inputDD, outputDD;
+  m_outputGammaPDGCode = 0;
 
-  TParticlePDG* massiveParticlePDG = TDatabasePDG::Instance()->GetParticle(m_massiveParticle);
-  B2INFO("PDG: " << m_massiveParticle <<
+  // Ouput list checks
+  bool valid = outputDD.init(m_outputGammaListName);
+  if (!valid)
+    B2ERROR("Invalid output ParticleList: " << m_outputGammaListName);
+  const DecayDescriptorParticle* outputMother = outputDD.getMother();
+  m_outputGammaPDGCode = outputMother->getPDGCode();
+  if (outputMother->getPDGCode() != Const::photon.getPDGCode())
+    B2ERROR("TwoBodyISRPhotonCorrectorModule::event ParticleList " << m_outputGammaListName << " is not a gamma list");
+
+  // Input list checks
+  const DecayDescriptorParticle* inputMother = inputDD.getMother();
+  if (m_inputGammaListName == m_outputGammaListName) {
+    B2ERROR("TwoBodyISRPhotonCorrectorModule: cannot copy Particles from " << m_inputGammaListName <<
+            " to itself!");
+  } else if (!inputDD.init(m_inputGammaListName)) {
+    B2ERROR("Invalid input ParticleList name: " << m_inputGammaListName);
+  } else {
+    if (inputMother->getPDGCode() != Const::photon.getPDGCode())
+      B2ERROR("TwoBodyISRPhotonCorrectorModule::event ParticleList " << m_inputGammaListName << " is not a gamma list");
+
+    StoreObjPtr<ParticleList>().isRequired(m_inputGammaListName);
+  }
+
+  m_outputGammaList.registerInDataStore(m_outputGammaListName, DataStore::c_DontWriteOut);
+
+  TParticlePDG* massiveParticlePDG = TDatabasePDG::Instance()->GetParticle(m_massiveParticlePDGCode);
+  B2INFO("PDG: " << m_massiveParticlePDGCode <<
          " selected for massive particle participating in two body decay. It's mass is " <<
          massiveParticlePDG->Mass() << " GeV/c^2.");
 
@@ -52,49 +82,76 @@ void TwoBodyISRPhotonCorrectorModule::initialize()
 
 void TwoBodyISRPhotonCorrectorModule::event()
 {
-
   StoreArray<Particle> particles;
-  StoreObjPtr<ParticleList> plist(m_gammaList);
+  StoreObjPtr<ParticleList> m_inputGammaList(m_inputGammaListName);
 
-  if (!plist) {
-    B2ERROR("ParticleList " << m_gammaList << " not found");
+  // Set up particle lists
+  if (!m_inputGammaList) {
+    B2ERROR("ParticleList " << m_inputGammaListName << " not found");
     return;
   }
+  bool isReserved = m_inputGammaList->getIsReserved();
+  if (isReserved)
+    m_inputGammaList->setEditable(true);
 
-  if (plist->getPDGCode() != 22) {
-    B2ERROR("TwoBodyISRPhotonCorrectorModule::event ParticleList " << m_gammaList << " is not a gamma list");
-    return;
+  bool existingList = m_outputGammaList.isValid();
+  if (!existingList) {
+    // new particle list: create it
+    m_outputGammaList.create();
+    m_outputGammaList->initialize(m_outputGammaPDGCode, m_outputGammaListName);
   }
 
-  double mMassiveParticle = TDatabasePDG::Instance()->GetParticle(m_massiveParticle)->Mass();
-
+  // Initialize the mass to which we are constraining and the beam momentum
+  const double massMassiveParticle = TDatabasePDG::Instance()->GetParticle(m_massiveParticlePDGCode)->Mass();
   PCmsLabTransform T;
-  ROOT::Math::PxPyPzEVector Pbeam, Pgamma, Pcorrected;
+  ROOT::Math::PxPyPzEVector P4beam = T.getBeamFourMomentum();
 
-  Pbeam = T.getBeamFourMomentum();
-
-  //ROOT::Math::PxPyPzEVector daughters4Vector;
-
-  const unsigned int numParticles = plist->getListSize();
+  // Loop through the given gamma list
+  const unsigned int numParticles = m_inputGammaList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
-    // Get gamma and it's 4 momentum
-    Particle* iParticle = plist->getParticle(i);
+    ROOT::Math::PxPyPzEVector P4gamma, P4corrected;
 
-    Pgamma = iParticle->get4Vector();
+    // Get gamma and it's 4 momentum
+    Particle* iParticle = m_inputGammaList->getParticle(i);
+    iParticle->setMomentumScalingFactor(1.0);
+    P4gamma = iParticle->get4Vector();
 
     // Calculate corrected energy for photon in list
-    ROOT::Math::XYZVector pgamma_versor((Pgamma.Vect()).Unit());
-    ROOT::Math::XYZVector pbeam(Pbeam.Vect());
-    double E_corrected = 0.5 * (Pbeam.mag2() - mMassiveParticle * mMassiveParticle) / (Pbeam.E() - pbeam.Dot(pgamma_versor));
-    Pcorrected.SetPxPyPzE(pgamma_versor.X()*E_corrected, pgamma_versor.Y()*E_corrected,
-                          pgamma_versor.Z()*E_corrected, E_corrected);
+    ROOT::Math::XYZVector p3gamma_unit((P4gamma.Vect()).Unit());
+    ROOT::Math::XYZVector pbeam(P4beam.Vect());
+    double E_corrected = 0.5 * (P4beam.mag2() - massMassiveParticle * massMassiveParticle) /
+                         (P4beam.E() - pbeam.Dot(p3gamma_unit));
+    P4corrected.SetPxPyPzE(p3gamma_unit.X()*E_corrected, p3gamma_unit.Y()*E_corrected,
+                           p3gamma_unit.Z()*E_corrected, E_corrected);
 
-    // Set particle's new 4 momentum
-    iParticle->set4Vector(Pcorrected);
+    // Set particle's new 4 momentum in a copy
+    Particle* correctedP = ParticleCopy::copyParticle(iParticle);
+    correctedP->set4Vector(P4corrected);
+
+    // Add original kinematics as extraInfo
+    ROOT::Math::PxPyPzEVector P4gammaCMS = PCmsLabTransform::labToCms(P4gamma);
+    correctedP->writeExtraInfo("originalE", P4gamma.E());
+    correctedP->writeExtraInfo("originalPx", P4gamma.Px());
+    correctedP->writeExtraInfo("originalPy", P4gamma.Py());
+    correctedP->writeExtraInfo("originalPz", P4gamma.Pz());
+    correctedP->writeExtraInfo("originalECMS", P4gammaCMS.E());
+    correctedP->writeExtraInfo("originalPxCMS", P4gammaCMS.Px());
+    correctedP->writeExtraInfo("originalPyCMS", P4gammaCMS.Py());
+    correctedP->writeExtraInfo("originalPzCMS", P4gammaCMS.Pz());
+
+    m_outputGammaList->addParticle(correctedP);
   }
+
+  // cppcheck-suppress knownConditionTrueFalse; we know that this shouldn't happen
+  const unsigned int numCopy = m_outputGammaList->getListSize();
+  if (numCopy != numParticles)
+    B2FATAL("Size of the ParticleList " << m_inputGammaListName
+            << " has changed while copying the Particles! original size = "
+            << numParticles << " vs. new size = " << numCopy);
+
+  if (isReserved)
+    m_inputGammaList->setEditable(false);
+
 }
 
-void TwoBodyISRPhotonCorrectorModule::terminate()
-{
-}
 

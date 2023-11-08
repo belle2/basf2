@@ -19,8 +19,11 @@
 namespace Belle2 {
 
   /** This module corrects the energy and momentum of high energy
-  ISR photons in single ISR events based on the beam energy,
-  photon direction, and mass of the recoil particle.  */
+      ISR photons in single ISR events based on the beam energy,
+      photon direction, and mass of the recoil particle. The
+      corrected photons are stored in a new list, the original
+      photon kinematics can be accessed via the originalParticle()
+      metavariable. */
 
   class TwoBodyISRPhotonCorrectorModule : public Module {
   private:

@@ -4170,8 +4170,8 @@ def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticlePDGC
     """
     Sets photon kinematics to corrected values in two body decays with an ISR photon
     and a massive particle. The original photon kinematics are kept in the input
-    particleList and can be accessed as extraInfo (under extraInfo namesoriginalE,
-    originalPx, originalPzCMS, etc.) in the new particleList.
+    particleList and can be accessed using the originalParticle() metavariable on the
+    new list.
 
     @param ouputListName    new ParticleList filled with copied Particles
     @param inputListName    input ParticleList with original Particles

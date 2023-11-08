@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <daq/dqm/DqmMasterCallback.h>
+#include <daq/slc/system/LogFile.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
@@ -35,7 +36,7 @@ DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
   auto host = config.get("dqmmaster.host");
   auto port = config.getInt("dqmmaster.port");
   m_running = 0;
-  printf("DqmMasterCallback : instance = %s, histodir = %s\n", m_instance.c_str(), m_histodir.c_str());
+  LogFile::info("DqmMasterCallback : instance = %s, histodir = %s", m_instance.c_str(), m_histodir.c_str());
 
   // Open sockets to hserver
   m_sock = new EvtSocketSend(host.c_str(), port);
@@ -49,7 +50,7 @@ DqmMasterCallback::~DqmMasterCallback()
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
-  printf("LOAD: runtype %s\n", m_runtype.c_str());
+  LogFile::info("LOAD: runtype %s", m_runtype.c_str());
 }
 
 void DqmMasterCallback::start(int expno, int runno)
@@ -89,13 +90,13 @@ void DqmMasterCallback::start(int expno, int runno)
   m_sock->send(msg);
   delete (msg);
 
-  printf("START: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
+  LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
   m_running = 1;
 }
 
 void DqmMasterCallback::stop(void)
 {
-  printf("STOP: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
+  LogFile::info("STOP: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
 
   if (m_running == 0) return;
 

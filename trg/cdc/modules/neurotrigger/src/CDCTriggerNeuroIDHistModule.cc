@@ -163,7 +163,6 @@ namespace Belle2 {
           }
         }
         if (!m_neuroParameters.rescaleTarget && outOfRange) continue;
-        //
         if (m_nPrepare == 0 || m_trainSets_prepare[isector].getTrackCounter() < m_nPrepare) {
           // get relative ids for all hits related to the MCParticle / RecoTrack
           // and count them to find relevant id range
@@ -239,7 +238,6 @@ namespace Belle2 {
       m_neuroParameters.IDRanges.push_back(expertline);
       B2DEBUG(15, hset);
     }
-    // m_configFileName = "IDTable_" + m_configFileName;
     // lock the variables used in this module, that are not supposed be changed
     // further down the training chain because of the danger of implications or
     // wrong assumptions.

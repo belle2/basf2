@@ -97,7 +97,8 @@ class TestStdV0(unittest.TestCase):
         expected_lists = ['V0_ToFit', 'V0_ToFit', 'all', 'all', 'RD', 'merged']
         self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
 
-    def test_scaleErrorKshorts(self):
+    def test_kshort_signals(self):
+        """check the number of signals in K_S0:merged and K_S0:scaled lists"""
 
         main = create_path()
 

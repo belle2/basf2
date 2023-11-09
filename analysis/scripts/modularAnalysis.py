@@ -4166,7 +4166,7 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
-def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticlePDGCode, path=None):
+def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticle, path=None):
     """
     Sets photon kinematics to corrected values in two body decays with an ISR photon
     and a massive particle. The original photon kinematics are kept in the input
@@ -4175,17 +4175,29 @@ def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticlePDGC
 
     @param ouputListName    new ParticleList filled with copied Particles
     @param inputListName    input ParticleList with original Particles
-    @param massiveParticlePDGCode  name or PDG code of massive particle participating in the two
+    @param massiveParticle  name or PDG code of massive particle participating in the two
                             body decay with the ISR photon
     @param path             modules are added to this path
     """
 
-    # now set the proper energy of the photon in the new list
+    # set the corrected energy of the photon in a new list
     photon_energy_correction = register_module('TwoBodyISRPhotonCorrector')
     photon_energy_correction.set_name('TwoBodyISRPhotonCorrector_' + outputListName)
     photon_energy_correction.param('outputGammaList', outputListName)
     photon_energy_correction.param('inputGammaList', inputListName)
-    photon_energy_correction.param('massiveParticlePDGCode', massiveParticlePDGCode)
+
+    # prepare PDG code of massive particle
+    if isinstance(massiveParticle, int):
+        photon_energy_correction.param('massiveParticlePDGCode', massiveParticle)
+    else:
+        from ROOT import Belle2
+        decayDescriptor = Belle2.DecayDescriptor()
+        if not decayDescriptor.init(massiveParticle):
+            raise ValueError("TwoBodyISRPhotonCorrector: value of massiveParticle must be" +
+                             " an int or valid decay string.")
+        pdgCode = decayDescriptor.getMother().getPDGCode()
+        photon_energy_correction.param('massiveParticlePDGCode', pdgCode)
+
     path.add_module(photon_energy_correction)
 
 

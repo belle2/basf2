@@ -9,7 +9,8 @@
 #include <iostream>
 
 #include <analysis/modules/TwoBodyISRPhotonCorrector/TwoBodyISRPhotonCorrectorModule.h>
-#include <analysis/dataobjects/ParticleList.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
@@ -23,7 +24,6 @@
 
 #include <algorithm>
 
-using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
@@ -33,7 +33,6 @@ TwoBodyISRPhotonCorrectorModule::TwoBodyISRPhotonCorrectorModule() : Module()
 {
   //Set module properties
   setDescription("This module corrects the energy and momentum of high energy ISR photons in single ISR events based on the beam energy, photon direction, and mass of the recoil particle. The corrected photons are stored in a new list, the original photon kinematics can be accessed via the originalParticle() metavariable.");
-//  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("inputGammaList", m_inputGammaListName, "Name of photon list containing the ISR gammas to be corrected");
   addParam("outputGammaList", m_outputGammaListName, "Name of photon list containing the corrected ISR gammas");
@@ -43,7 +42,7 @@ TwoBodyISRPhotonCorrectorModule::TwoBodyISRPhotonCorrectorModule() : Module()
 
 void TwoBodyISRPhotonCorrectorModule::initialize()
 {
-  StoreArray<Belle2::Particle> particles;
+  StoreArray<Particle> particles;
   particles.isRequired();
   DecayDescriptor inputDD, outputDD;
   m_outputGammaPDGCode = 0;

@@ -6,12 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//#pragma once
+#pragma once
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <string>

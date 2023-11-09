@@ -42,29 +42,24 @@ TwoBodyISRPhotonCorrectorModule::TwoBodyISRPhotonCorrectorModule() : Module()
 
 void TwoBodyISRPhotonCorrectorModule::initialize()
 {
-  StoreArray<Particle> particles;
-  particles.isRequired();
+  StoreArray<Particle>().isRequired();
   DecayDescriptor inputDD, outputDD;
-  m_outputGammaPDGCode = 0;
 
   // Ouput list checks
-  bool valid = outputDD.init(m_outputGammaListName);
-  if (!valid)
+  bool outputValid = outputDD.init(m_outputGammaListName);
+  if (!outputValid)
     B2ERROR("Invalid output ParticleList: " << m_outputGammaListName);
-  const DecayDescriptorParticle* outputMother = outputDD.getMother();
-  m_outputGammaPDGCode = outputMother->getPDGCode();
-  if (outputMother->getPDGCode() != Const::photon.getPDGCode())
+  if (outputDD.getMother()->getPDGCode() != Const::photon.getPDGCode())
     B2ERROR("TwoBodyISRPhotonCorrectorModule::event ParticleList " << m_outputGammaListName << " is not a gamma list");
 
   // Input list checks
-  const DecayDescriptorParticle* inputMother = inputDD.getMother();
   if (m_inputGammaListName == m_outputGammaListName) {
     B2ERROR("TwoBodyISRPhotonCorrectorModule: cannot copy Particles from " << m_inputGammaListName <<
             " to itself!");
   } else if (!inputDD.init(m_inputGammaListName)) {
     B2ERROR("Invalid input ParticleList name: " << m_inputGammaListName);
   } else {
-    if (inputMother->getPDGCode() != Const::photon.getPDGCode())
+    if (inputDD.getMother()->getPDGCode() != Const::photon.getPDGCode())
       B2ERROR("TwoBodyISRPhotonCorrectorModule::event ParticleList " << m_inputGammaListName << " is not a gamma list");
 
     StoreObjPtr<ParticleList>().isRequired(m_inputGammaListName);
@@ -73,28 +68,24 @@ void TwoBodyISRPhotonCorrectorModule::initialize()
   m_outputGammaList.registerInDataStore(m_outputGammaListName, DataStore::c_DontWriteOut);
 
   TParticlePDG* massiveParticlePDG = TDatabasePDG::Instance()->GetParticle(m_massiveParticlePDGCode);
-  B2INFO("TwoBodyISRPhotonCorrectorModule: PDG code " << m_massiveParticlePDGCode <<
-         " selected for massive particle participating in two body decay. It's mass is " <<
-         massiveParticlePDG->Mass() << " GeV/c^2.");
+  B2DEBUG(19, "TwoBodyISRPhotonCorrectorModule: PDG code " << m_massiveParticlePDGCode <<
+          " selected for massive particle participating in two body decay. Its mass is " <<
+          massiveParticlePDG->Mass() << " GeV/c^2.");
 
 }
 
 void TwoBodyISRPhotonCorrectorModule::event()
 {
-  StoreArray<Particle> particles;
-  StoreObjPtr<ParticleList> m_inputGammaList(m_inputGammaListName);
-
-  // Set up particle lists
-  if (!m_inputGammaList) {
-    B2ERROR("ParticleList " << m_inputGammaListName << " not found");
-    return;
-  }
+  StoreObjPtr<ParticleList> inputGammaList(m_inputGammaListName);
 
   bool existingList = m_outputGammaList.isValid();
   if (!existingList) {
     // new particle list: create it
     m_outputGammaList.create();
-    m_outputGammaList->initialize(m_outputGammaPDGCode, m_outputGammaListName);
+    m_outputGammaList->initialize(Const::photon.getPDGCode(), m_outputGammaListName);
+  } else {
+    B2WARNING("TwoBodyISRPhotonCorrectorModule: Output ParticleList " << m_outputGammaListName << " already exists. Overwriting.");
+    m_outputGammaList->clear();
   }
 
   // Initialize the mass to which we are constraining and the beam momentum
@@ -103,13 +94,13 @@ void TwoBodyISRPhotonCorrectorModule::event()
   ROOT::Math::PxPyPzEVector P4beam = T.getBeamFourMomentum();
 
   // Loop through the given gamma list
-  const unsigned int numParticles = m_inputGammaList->getListSize();
+  const unsigned int numParticles = inputGammaList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
-    ROOT::Math::PxPyPzEVector P4gamma, P4corrected;
+    ROOT::Math::PxPyPzEVector P4corrected;
 
     // Get gamma and it's 4 momentum
-    Particle* iParticle = m_inputGammaList->getParticle(i);
-    P4gamma = iParticle->get4Vector();
+    Particle* iParticle = inputGammaList->getParticle(i);
+    ROOT::Math::PxPyPzEVector P4gamma = iParticle->get4Vector();
 
     // Calculate corrected energy for photon in list
     ROOT::Math::XYZVector p3gamma_unit((P4gamma.Vect()).Unit());

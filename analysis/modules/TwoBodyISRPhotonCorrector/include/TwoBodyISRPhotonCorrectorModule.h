@@ -17,9 +17,9 @@
 
 namespace Belle2 {
 
-  /** This module corrects the energy and momentum of high energy
+  /** This module corrects the energy and momentum of high-energy
       ISR photons in single ISR events based on the beam energy,
-      photon direction, and mass of the recoil particle. The
+      photon direction, and the mass of the recoil particle. The
       corrected photons are stored in a new list, the original
       photon kinematics can be accessed via the originalParticle()
       metavariable. */
@@ -34,8 +34,6 @@ namespace Belle2 {
     std::string m_outputGammaListName;
     /** PDG code of particle constraining the gamma energy */
     Int_t m_massiveParticlePDGCode;
-    /** PDG code of output particle list. Should be 22 (photon)*/
-    Int_t m_outputGammaPDGCode;
 
   public:
     /** Constructor. */

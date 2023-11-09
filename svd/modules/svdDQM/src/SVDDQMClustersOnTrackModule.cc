@@ -381,7 +381,11 @@ void SVDDQMClustersOnTrackModule::event()
   m_expNumber = evtMetaData->getExperiment();
   m_runNumber = evtMetaData->getRun();
 
-  int nSamples = m_svdEventInfo->getNSamples();
+  int nSamples = 0;
+  if (m_svdEventInfo.isValid())
+    nSamples = m_svdEventInfo->getNSamples();
+  else
+    return;
 
   // get EventT0 if present and valid
   double eventT0 = -1000;

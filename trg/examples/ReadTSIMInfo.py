@@ -371,21 +371,21 @@ class CreateLogics(b2.Module):
     ntrk_2dfitter_t = array('i', [-1])
     #: #3d fitter tracks
     ntrk_3dfitter_t = array('i', [-1])
-    #: #NN tracks
+    #: number of NN tracks
     ntrk_NN_t = array('i', [-1])
     #: #2d matched tracks
     ntrk_2Dmatch_t = array('i', [-1])
     #: #3d matched tracks
     ntrk_3Dmatch_t = array('i', [-1])
-    #: #max phi angle between two 2d finder tracks
+    #: max phi angle between two 2d finder tracks
     max_deltphi_2dfinder_t = array('f', [0.0])
-    #: #cluster pairs with different energy threshold
+    #: number of cluster pairs with different energy threshold
     cpair_t = array('i', 8 * [0])
-    #: #array components
+    #: number of array components
     ncomp_clu = 3
     #: the total deposited cluster energy in ecl
     etot_t = array('f', [0.0])
-    #: #ecl cluster with threshold >1.0GeV, exclude TC ID 1,2, 17
+    #: number of ecl cluster with threshold >1.0GeV, exclude TC ID 1,2, 17
     ncluster_1000b_t = array('i', [-1])
     #: # ecl cluster with threshold >2.0GeV in TC ID 1, 17
     ncluster_2000e_t = array('i', [-1])
@@ -413,15 +413,15 @@ class CreateLogics(b2.Module):
     max_deltphi_cluster_t = array('f', [0.0])
     #: the timing of clusters
     time_cluster_t = array('f', 100 * [-99999.])
-    #: #KLM track
+    #: number of KLM tracks
     ntrk_klm_t = array('i', [-1])
-    #: #KLM hits
+    #: number of KLM hits
     nhit_klm_t = array('i', [-1])
     #: # back to back track and cluster pairs
     npair_tc_t = array('i', [-1])
     #: # back to back cluster pairs
     npair_cc_t = array('i', [-1])
-    #: #array components
+    #: number of array components
     nbha_var = 5
     #: bhabha veto logic, 1: bhabha, 0: non bhabha
     bhabha_t = array('i', [0])

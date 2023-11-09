@@ -95,8 +95,9 @@ namespace Belle2 {
      */
     void save(const std::string& filename, const std::string& arrayname = "MLPs");
     /** Load MLPs from file.
-     * @param filename name of the TFile to read from
-     * @param arrayname name of the TObjArray holding the MLPs in the file
+     * @param isector index of the MLP
+     * @param wfilename name of the TFile to read from
+     * @param bfilename name of the TObjArray holding the MLPs in the file
      * @return true if the MLPs were loaded correctly
      */
     bool load(unsigned isector, const std::string& wfilename, const std::string& bfilename);

@@ -1,3 +1,15 @@
+Changes in the analysis package in light-2311-nebelung
+------------------------------------------------------
+
+Modules
++++++++
+* Added a new option ``useFloat`` in `VariablesToNtuple` and `modularAnalysis.variablesToNtuple` used to store floating-point data as single-precision (float) numbers instead of double-precision (double) numbers.
+* Fixed a bug of MCMatching in `HelixErrorScaler` module, which is used for `stdV0s.scaleErrorKshorts` function. The MCMatching
+  properties of K_S0 can be configured by the decayString in `modularAnalysis.fillParticleList`. However, the properties were
+  not correctly propagated to the new V0 particles created with `HelixErrorScaler`.
+  This bug caused the loss of signal (``isSignal==1``) candidates by about 5% for B-meson decays due to missing radiated photons,
+  which should be accepted.
+
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------
 

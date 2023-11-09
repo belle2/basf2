@@ -94,7 +94,11 @@ void SVDDQMEfficiencyModule::event()
   std::string m_svdEventInfoName = "SVDEventInfo";
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
 
-  int nSamples = eventinfo->getNSamples();
+  int nSamples = 0;
+  if (eventinfo.isValid())
+    nSamples = eventinfo->getNSamples();
+  else
+    return;
 
   //intercepts
   for (int inter = 0 ; inter < m_intercepts.getEntries(); inter++) {

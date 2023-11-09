@@ -74,25 +74,20 @@ void DQMHistAnalysisTOPModule::initialize()
   if (m_backgroundAlarmLevels.size() != 2) B2ERROR("Parameter list 'backgroundAlarmLevels' must contain two numbers");
   if (m_photonYieldsAlarmLevels.size() != 2) B2ERROR("Parameter list 'photonYieldsAlarmLevels' must contain two numbers");
 
-  // parse excluded boardstacks
+  // make a map of boardstack names to ID's
 
-  m_includedBoardstacks.resize(64, true);
-  if (not m_excludedBoardstacks.empty()) {
-    std::map<std::string, int> bsmap;
-    int id = 1;
-    for (int slot = 1; slot <= 16; slot++) {
-      string slotstr = to_string(slot);
-      for (std::string bs : {"a", "b", "c", "d"}) {
-        bsmap[slotstr + bs] = id;
-        id++;
-      }
-    }
-    for (const auto& bsname : m_excludedBoardstacks) {
-      id = bsmap[bsname];
-      if (id > 0) m_includedBoardstacks[id - 1] = false;
-      else B2ERROR("Invalid boardstack name: " << bsname);
+  int id = 1;
+  for (int slot = 1; slot <= 16; slot++) {
+    string slotstr = to_string(slot);
+    for (std::string bs : {"a", "b", "c", "d"}) {
+      m_bsmap[slotstr + bs] = id;
+      id++;
     }
   }
+
+  // parse excluded boardstacks
+
+  setIncludedBoardstacks(m_excludedBoardstacks);
 
   // MiraBelle monitoring
 
@@ -104,6 +99,7 @@ void DQMHistAnalysisTOPModule::initialize()
   registerEpicsPV(m_pvPrefix + "badCarriers", "badCarriers");
   registerEpicsPV(m_pvPrefix + "badAsics", "badAsics");
   registerEpicsPV(m_pvPrefix + "badPMTs", "badPMTs");
+  registerEpicsPV(m_pvPrefix + "numExcludedBS", "numExcludedBS");
 
   // Epics used to get limits from configuration file - override module parameters (input only)
 
@@ -114,10 +110,7 @@ void DQMHistAnalysisTOPModule::initialize()
   registerEpicsPV(m_pvPrefix + "deadChannelsAlarmLevels", "deadChannelsAlarmLevels");
   registerEpicsPV(m_pvPrefix + "backgroundAlarmLevels", "backgroundAlarmLevels");
   registerEpicsPV(m_pvPrefix + "photonYieldsAlarmLevels", "photonYieldsAlarmLevels");
-  for (int slot = 1; slot <= 16; slot++) {
-    std::string varName = "slot" + to_string(slot);
-    registerEpicsPV(m_pvPrefix + varName, varName); // excludedBoardstacks (lolo = BS0, low = BS1, high = BS2, hihi = BS3)
-  }
+  registerEpicsPV(m_pvPrefix + "excludedBoardstacks", "excludedBoardstacks");
 
   updateEpicsPVs(5.0);
 
@@ -266,6 +259,7 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
     canvas->cd();
     m_text1->Draw();
     for (auto* line : m_asicWindowsBandLines) line->Draw();
+    canvas->Pad()->SetFrameFillColor(10);
     canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
     canvas->Modified();
   }
@@ -292,6 +286,7 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
   if (canvas) {
     canvas->cd();
     m_text2->Draw();
+    canvas->Pad()->SetFrameFillColor(10);
     canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
     canvas->Modified();
   }
@@ -705,12 +700,16 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   setEpicsPV("badCarriers", badCarriers);
   setEpicsPV("badAsics", badAsics);
   setEpicsPV("badPMTs", badPMTs);
+  int numBS = 0;
+  for (auto included : m_includedBoardstacks) if (not included) numBS++;
+  setEpicsPV("numExcludedBS", numBS);
   updateEpicsPVs(5.0);
 
   B2DEBUG(20, "badBoardstacks: " << badBoardstacks);
   B2DEBUG(20, "badCarriers: " << badCarriers);
   B2DEBUG(20, "badAsics: " << badAsics);
   B2DEBUG(20, "badPMTs: " << badPMTs);
+  B2DEBUG(20, "excludedBS: " << numBS);
 }
 
 void DQMHistAnalysisTOPModule::updateLimits()
@@ -732,24 +731,31 @@ void DQMHistAnalysisTOPModule::updateLimits()
 
   setAlarmLines();
 
-  m_excludedBoardstacks.clear();
-  std::vector<std::string> bsLabels = {"a", "b", "c", "d"};
-  for (int slot = 1; slot <= 16; slot++) {
-    std::vector<double> includedBS(4);
-    for (int bs = 0; bs < 4; bs++) includedBS[bs] = m_includedBoardstacks[(slot - 1) * 4 + bs];
-    std::string varName = "slot" + to_string(slot);
-    requestLimitsFromEpicsPVs(varName, includedBS[0], includedBS[1], includedBS[2], includedBS[3]);
-    for (int bs = 0; bs < 4; bs++) {
-      int index = (slot - 1) * 4 + bs;
-      m_includedBoardstacks[index] = (includedBS[bs] != 0);
-      if (not m_includedBoardstacks[index]) m_excludedBoardstacks.push_back(to_string(slot) + bsLabels[bs]);
+  bool status = false;
+  std::string excludedBS = getEpicsStringPV("excludedBoardstacks", status);
+
+  if (status) {
+    m_excludedBoardstacks.clear();
+    std::string name;
+    for (auto c : excludedBS) {
+      if (isspace(c)) continue;
+      else if (ispunct(c)) {
+        if (not name.empty()) {
+          m_excludedBoardstacks.push_back(name);
+          name.clear();
+        }
+      } else name.push_back(c);
     }
+    if (not name.empty()) {
+      m_excludedBoardstacks.push_back(name);
+    }
+    setIncludedBoardstacks(m_excludedBoardstacks);
   }
 
-  B2DEBUG(20, "asicWindowsBand:           [" << m_asicWindowsBand[0] << ", " << m_asicWindowsBand[1] << "]");
-  B2DEBUG(20, "asicWindowsAlarmLevels:    [" << m_asicWindowsAlarmLevels[0] << ", " << m_asicWindowsAlarmLevels[1] << "]");
+  B2DEBUG(20, "asicWindowsBand:         [" << m_asicWindowsBand[0] << ", " << m_asicWindowsBand[1] << "]");
+  B2DEBUG(20, "asicWindowsAlarmLevels:  [" << m_asicWindowsAlarmLevels[0] << ", " << m_asicWindowsAlarmLevels[1] << "]");
   B2DEBUG(20, "eventMonitorAlarmLevels: [" << m_eventMonitorAlarmLevels[0] << ", " << m_eventMonitorAlarmLevels[1] << "]");
-  B2DEBUG(20, "junkHitsAlarmLevels:      [" << m_junkHitsAlarmLevels[0] << ", " << m_junkHitsAlarmLevels[1] << "]");
+  B2DEBUG(20, "junkHitsAlarmLevels:     [" << m_junkHitsAlarmLevels[0] << ", " << m_junkHitsAlarmLevels[1] << "]");
   B2DEBUG(20, "deadChannelsAlarmLevels: [" << m_deadChannelsAlarmLevels[0] << ", " << m_deadChannelsAlarmLevels[1] << "]");
   B2DEBUG(20, "backgroundAlarmLevels:   [" << m_backgroundAlarmLevels[0] << ", " << m_backgroundAlarmLevels[1] << "]");
   B2DEBUG(20, "photonYieldsAlarmLevels: [" << m_photonYieldsAlarmLevels[0] << ", " << m_photonYieldsAlarmLevels[1] << "]");
@@ -757,5 +763,17 @@ void DQMHistAnalysisTOPModule::updateLimits()
   for (const auto& s : m_excludedBoardstacks) ss += "'" + s + "', ";
   if (ss.size() > 2)  {ss.pop_back(); ss.pop_back();}
   B2DEBUG(20, "excludedBoardstacks:     [" << ss << "]");
+
 }
 
+void DQMHistAnalysisTOPModule::setIncludedBoardstacks(const std::vector<std::string>& excludedBoardstacks)
+{
+  m_includedBoardstacks.clear();
+  m_includedBoardstacks.resize(64, true);
+
+  for (const auto& bsname : excludedBoardstacks) {
+    int id = m_bsmap[bsname];
+    if (id > 0) m_includedBoardstacks[id - 1] = false;
+    else B2ERROR("Invalid boardstack name: " << bsname);
+  }
+}

@@ -24,7 +24,7 @@ basf2_mva_download --identifier weightfile.root --db_identifier MVADatabaseIdent
 basf2_mva_teacher --datafiles train.root --treename tree --identifier weightfile2.root --variables p pz 'daughter(0, kaonID)' --target_variable isSignal --method FastBDT
 
 # Upload the weightfile on disk to the database
-basf2_mva_upload --identifier weightfile2.root --db_identifier MVADatabaseIdentifier2 
+basf2_mva_add_to_local_database --weight_file_name weightfile2.root --db_identifier MVADatabaseIdentifier2 
 
 # Apply the trained methods on data
 basf2_mva_expert --identifiers weightfile.root weightfile2.root MVADatabaseIdentifier MVADatabaseIdentifier2 --datafiles train.root --treename tree --outputfile expert.root

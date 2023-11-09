@@ -29,6 +29,8 @@ namespace Belle2 {
     void initialize() override final;
     /** Module function event */
     void event() override final;
+    /** Module function doing stuff at beginning of a run */
+    void beginRun() override final;
 
     // parameters
     bool m_printCanvas = false; /**< if true print the pdf of the canvases */

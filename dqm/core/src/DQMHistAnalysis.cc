@@ -344,6 +344,24 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
 #endif
 }
 
+void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string value)
+{
+  if (!m_useEpics || m_epicsReadOnly) return;
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return;
+  }
+  if (value.length() > 40) {
+    B2ERROR("Epics string PV " << keyname << " too long (>40 characters)!");
+    return;
+  }
+  char text[40];
+  strcpy(text, value.c_str());
+  SEVCHK(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure");
+#endif
+}
+
 void DQMHistAnalysisModule::setEpicsPV(int index, double value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
@@ -366,6 +384,116 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
   }
   SEVCHK(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure");
 #endif
+}
+
+void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
+{
+  if (!m_useEpics || m_epicsReadOnly) return;
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return;
+  }
+  char text[40];
+  strcpy(text, value.c_str());
+  SEVCHK(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure");
+#endif
+}
+
+double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
+{
+  double value{NAN};
+  if (!m_useEpics) return value;
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return value;
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    return value;
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return NAN;
+}
+
+double DQMHistAnalysisModule::getEpicsPV(int index)
+{
+  double value{NAN};
+  if (!m_useEpics) return value;
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return value;
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    return value;
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return NAN;
+}
+
+std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& status)
+{
+  status = false;
+  char value[40] = "";
+  if (!m_useEpics) return std::string(value);
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return std::string(value);
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_STRING, m_epicsNameToChID[keyname], value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    status = true;
+    return std::string(value);
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return std::string(value);
+}
+
+std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
+{
+  status = false;
+  char value[40] = "";
+  if (!m_useEpics) return std::string(value);
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return std::string(value);
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    status = true;
+    return std::string(value);
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return std::string(value);
 }
 
 chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
@@ -439,8 +567,11 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
   // some "default" values should be set otherwise
   if (pv != nullptr) {
     struct dbr_ctrl_double tPvData;
+    // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+    // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+    // outstanding get requests are not automatically reissued following reconnect.
     auto r = ca_get(DBR_CTRL_DOUBLE, pv, &tPvData);
-    if (r == ECA_NORMAL) r = ca_pend_io(5.0); // TODO << why is this needed?
+    if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
     if (r == ECA_NORMAL) {
       if (!std::isnan(tPvData.lower_alarm_limit)) {
         lowerAlarm = tPvData.lower_alarm_limit;

@@ -179,6 +179,12 @@ namespace Belle2 {
      */
     void updateLimits();
 
+    /**
+     * Sets flags for boardstacks to be included in alarming
+     * @param excludedBoardstacks list of boarstacks to be excluded from alarming
+     */
+    void setIncludedBoardstacks(const std::vector<std::string>& excludedBoardstacks);
+
     // module parameters
 
     std::vector<int> m_asicWindowsBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
@@ -195,6 +201,7 @@ namespace Belle2 {
 
     std::vector<int> m_alarmColors = {kGray, kGreen, kYellow, kRed}; /**< alarm colors */
     std::vector<bool> m_includedBoardstacks; /**< boardstacks included in alarming */
+    std::map<std::string, int> m_bsmap;  /**< a map of boardstack names to ID's */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
 

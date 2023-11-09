@@ -12,7 +12,7 @@
 
 #include <tracking/dataobjects/ExtHit.h>
 
-#include <klm/muidgnn/KLMMuIDGetterModule.h>
+#include <klm/modules/KLMMuIDGetter/KLMMuIDGetterModule.h>
 
 #include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/KLMMuidHit.h>

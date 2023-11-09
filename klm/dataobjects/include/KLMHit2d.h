@@ -58,7 +58,7 @@ namespace Belle2 {
      * Reconstructed time of the hit.
      */
     KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ,
-             const CLHEP::Hep3Vector& globalPos, double time);
+             const CLHEP::Hep3Vector& globalPos, const CLHEP::Hep3Vector& minStripPos, double time);
 
     /**
      * Destructor.
@@ -278,12 +278,6 @@ namespace Belle2 {
     }
 
     /**
-     * Set hit global position.
-     * @param[in] pos Position.
-     */
-    //void setPosition(const ROOT::Math::XYZVector& pos);
-
-    /**
      * Get hit global position x coordinate.
      * @return Hit x coordinate.
      */
@@ -317,6 +311,61 @@ namespace Belle2 {
     ROOT::Math::XYZVector getPosition() const
     {
       return ROOT::Math::XYZVector(m_GlobalX, m_GlobalY, m_GlobalZ);
+    }
+
+    /**
+     * Set hit global position.
+     * @param[in] pos Position.
+     */
+    //void setPosition(const ROOT::Math::XYZVector& pos);
+
+    /**
+     * Set minimum strip global position.
+     * @param[in] x Minimum strip x coordinate.
+     * @param[in] y Minimum strip y coordinate.
+     * @param[in] z Minimum strip z coordinate.
+     */
+    void setMinStripPosition(float x, float y, float z)
+    {
+      m_GlobalXOfMinStrip = x;
+      m_GlobalYOfMinStrip = y;
+      m_GlobalZOfMinStrip = z;
+    }
+
+    /**
+     * Get hit global position x coordinate of minimum strip.
+     * @return Minimum strip x coordinate.
+     */
+    float getPositionXOfMinStrip() const
+    {
+      return m_GlobalXOfMinStrip;
+    }
+
+    /**
+     * Get hit global position y coordinate of minimum strip.
+     * @return Minimum strip y coordinate.
+     */
+    float getPositionYOfMinStrip() const
+    {
+      return m_GlobalYOfMinStrip;
+    }
+
+    /**
+     * Get hit global position z coordinate of minimum strip.
+     * @return Minimum strip z coordinate.
+     */
+    float getPositionZOfMinStrip() const
+    {
+      return m_GlobalZOfMinStrip;
+    }
+
+    /**
+     * Get Minimum strip global position.
+     * @return Minimum strip coordinates.
+     */
+    ROOT::Math::XYZVector getPositionOfMinStrip() const
+    {
+      return ROOT::Math::XYZVector(m_GlobalXOfMinStrip, m_GlobalYOfMinStrip, m_GlobalZOfMinStrip);
     }
 
     /**
@@ -470,6 +519,15 @@ namespace Belle2 {
     /** Global position Z coordinate. */
     float m_GlobalZ = 0.0;
 
+    /** Global position X coordinate of smallest strip. */
+    float m_GlobalXOfMinStrip = 0.0;
+
+    /** Global position Y coordinate of smallest strip. */
+    float m_GlobalYOfMinStrip = 0.0;
+
+    /** Global position Z coordinate of smallest strip. */
+    float m_GlobalZOfMinStrip = 0.0;
+
     /** Time of the hit. */
     float m_Time = 0.0;
 
@@ -496,7 +554,7 @@ namespace Belle2 {
     bool m_IsOnStaTrack = false;
 
     /** Class version. */
-    ClassDef(Belle2::KLMHit2d, 1);
+    ClassDef(Belle2::KLMHit2d, 2);
 
   };
 

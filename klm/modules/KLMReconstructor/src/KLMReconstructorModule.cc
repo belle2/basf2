@@ -274,6 +274,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       const BKLMHit1d* phiHit = m_bklmHit1ds[phiIndex];
       const BKLMHit1d* zHit = m_bklmHit1ds[zIndex];
       CLHEP::Hep3Vector local = m->getLocalPosition(phiHit->getStripAve(), zHit->getStripAve());
+      CLHEP::Hep3Vector localMinStrip = m->getLocalPosition(phiHit->getStripMin(), zHit->getStripMin());
       CLHEP::Hep3Vector propagationDist;
       if (m_bklmHit1ds[i]->getLayer() < BKLMElementNumbers::c_FirstRPCLayer) {
         if (isPhiReadout) {
@@ -303,10 +304,11 @@ void KLMReconstructorModule::reconstructBKLMHits()
         continue;
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
+      CLHEP::Hep3Vector globalMinStrip = m->localToGlobal(localMinStrip + m->getLocalReconstructionShift(), m_bklmIfAlign);
       double time = 0.5 * (phiTime + zTime);
       if (m_EventT0Correction)
         time -= m_EventT0Value;
-      KLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation KLMHit2d -> BKLMHit1d
+      KLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, globalMinStrip, time); // Also sets relation KLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
     }
@@ -322,6 +324,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
   uint16_t nKLMDigitsMultiStripBWD{0};
   int i, n;
   double d1, d2, time, t1, t2, sd;
+  double d1_trashcan, d2_trashcan, sd_trashcan; // trash can when calculating minimum strip crosspoint
   std::vector<KLMDigit*> digitVector;
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
   n = m_Digits.getEntries();
@@ -340,6 +343,11 @@ void KLMReconstructorModule::reconstructEKLMHits()
   KLMDigit plane1Digit; // to look for geometric intersection of a multi-strip hit
   KLMDigit plane2Digit; // to look for geometric intersection of a multi-strip hit
   HepGeom::Point3D<double> crossPoint(0, 0, 0); // (x,y,z) of geometric intersection
+
+  KLMDigit plane1MinStripDigit; // to look for geometric intersection of minimum strip for a multi-strip hit
+  KLMDigit plane2MinStripDigit; // to look for geometric intersection of minimum strip for a multi-strip hit
+  HepGeom::Point3D<double> crossPointOfMinStrip(0, 0, 0); // (x,y,z) of geometric intersection for minimum strip
+
   /* Sort by sector. */
   sort(digitVector.begin(), digitVector.end(), compareSector);
   it1 = digitVector.begin();
@@ -454,11 +462,19 @@ void KLMReconstructorModule::reconstructEKLMHits()
                 intersect = m_eklmTransformData->intersection(&plane1Digit, &plane2Digit, &crossPoint,
                                                               &d1, &d2, &sd,
                                                               false); // crossPoint MIGHT be outside fiducial area
+                plane1MinStripDigit = plane1Digit;
+                plane2MinStripDigit = plane2Digit;
+                plane1MinStripDigit.setStrip(s1First);
+                plane2MinStripDigit.setStrip(s2First);
+                m_eklmTransformData->intersection(&plane1MinStripDigit, &plane2MinStripDigit, &crossPointOfMinStrip,
+                                                  &d1_trashcan, &d2_trashcan, &sd_trashcan,
+                                                  false);
               }
             } else {
               intersect = m_eklmTransformData->intersection(*it8, *it9, &crossPoint,
                                                             &d1, &d2, &sd,
                                                             m_eklmCheckSegmentIntersection);
+              crossPointOfMinStrip = crossPoint;
             }
             if (!intersect)
               continue;
@@ -479,6 +495,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
             hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() +
                                     (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
+            hit2d->setMinStripPosition(crossPointOfMinStrip.x(), crossPointOfMinStrip.y(), crossPointOfMinStrip.z());
             double timeResolution = 1.0;
             if (m_TimeResolution.isValid()) {
               timeResolution *= m_TimeResolution->getTimeResolution(

@@ -46,7 +46,8 @@ KLMHit2d::KLMHit2d(KLMDigit* digit1, KLMDigit* digit2) :
 }
 
 // Constructor with orthogonal 1D hits
-KLMHit2d::KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::Hep3Vector& globalPos, double time) :
+KLMHit2d::KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::Hep3Vector& globalPos,
+                   const CLHEP::Hep3Vector& minStripPos, double time) :
   RelationsObject()
 {
   if (!BKLMElementNumbers::hitsFromSameModule(hitPhi->getModuleID(),
@@ -63,6 +64,9 @@ KLMHit2d::KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::
   m_GlobalX = globalPos.x();
   m_GlobalY = globalPos.y();
   m_GlobalZ = globalPos.z();
+  m_GlobalXOfMinStrip = minStripPos.x();
+  m_GlobalYOfMinStrip = minStripPos.y();
+  m_GlobalZOfMinStrip = minStripPos.z();
   m_Time = time;
   m_EnergyDeposit = hitPhi->getEnergyDeposit() + hitZ->getEnergyDeposit();
   addRelationTo(hitPhi);

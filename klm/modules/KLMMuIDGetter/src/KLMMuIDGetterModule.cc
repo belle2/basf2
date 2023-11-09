@@ -252,10 +252,13 @@ void KLMMuIDGetterModule::event()
         //
         unsigned long int hit_Zstripmin = klmhit.getZStripMin();
         unsigned long int hit_Zstripmax = klmhit.getZStripMax();
-        double  hit_Zposition = klmhit.getPositionZ();
         double  hit_Xposition = klmhit.getPositionX();
         double  hit_Yposition = klmhit.getPositionY();
+        double  hit_Zposition = klmhit.getPositionZ();
         double  hit_Rposition = sqrt(hit_Xposition * hit_Xposition + hit_Yposition * hit_Yposition);
+        double  hit_MinStripXposition = klmhit.getPositionXOfMinStrip();
+        double  hit_MinStripYposition = klmhit.getPositionYOfMinStrip();
+        double  hit_MinStripZposition = klmhit.getPositionZOfMinStrip();
         unsigned long int hit_Phistripmin = klmhit.getPhiStripMin();
         unsigned long int hit_Phistripmax = klmhit.getPhiStripMax();
         unsigned long int hit_layer = klmhit.getLayer();
@@ -284,6 +287,11 @@ void KLMMuIDGetterModule::event()
         part->writeExtraInfo("HitYposition_" + std::to_string(nklmhits - 1), hit_Yposition);
         part->writeExtraInfo("HitZposition_" + std::to_string(nklmhits - 1), hit_Zposition);
         part->writeExtraInfo("HitRposition_" + std::to_string(nklmhits - 1), hit_Rposition);
+
+        part->writeExtraInfo("HitMinStripXposition_" + std::to_string(nklmhits - 1), hit_MinStripXposition);
+        part->writeExtraInfo("HitMinStripYposition_" + std::to_string(nklmhits - 1), hit_MinStripYposition);
+        part->writeExtraInfo("HitMinStripZposition_" + std::to_string(nklmhits - 1), hit_MinStripZposition);
+
 
       }
     }

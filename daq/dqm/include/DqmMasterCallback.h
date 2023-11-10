@@ -27,15 +27,14 @@ namespace Belle2 {
     void stop(void) override final;
     void abort(void) override final;
 
+    static int m_running;
   private:
     int m_expno;
     int m_runno;
     std::string m_runtype;
-    std::string m_hltdir;
-    std::string m_erecodir;
-    //    static int m_running;
-    EvtSocketSend* m_sock_hlt;
-    EvtSocketSend* m_sock_reco;
+    std::string m_histodir;
+    std::string m_instance;
+    EvtSocketSend* m_sock;
   };
 
 }

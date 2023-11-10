@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <daq/dqm/DqmMasterCallback.h>
+#include <daq/slc/system/LogFile.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
@@ -18,7 +19,7 @@
 using namespace Belle2;
 using namespace std;
 
-static int m_running = 0;
+int DqmMasterCallback::m_running = 0; // TODO
 
 //-----------------------------------------------------------------
 // Rbuf-Read Thread Interface
@@ -30,14 +31,15 @@ void* RunDqmMasterLogger(void*)
 
 DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
 {
-  m_hltdir = config.get("dqmmaster.hltdir");
-  m_erecodir = config.get("dqmmaster.erecodir");
+  m_histodir = config.get("dqmmaster.histodir");
+  m_instance = config.get("dqmmaster.instance");
+  auto host = config.get("dqmmaster.host");
+  auto port = config.getInt("dqmmaster.port");
   m_running = 0;
-  printf("DqmMasterCallback : hltdir = %s, erecodir = %s\n", m_hltdir.c_str(), m_erecodir.c_str());
+  LogFile::info("DqmMasterCallback : instance = %s, histodir = %s", m_instance.c_str(), m_histodir.c_str());
 
-  // Open sockets to hservers
-  m_sock_hlt = new EvtSocketSend("localhost", 9991);
-  m_sock_reco = new EvtSocketSend("localhost", 9992);
+  // Open sockets to hserver
+  m_sock = new EvtSocketSend(host.c_str(), port);
 }
 
 DqmMasterCallback::~DqmMasterCallback()
@@ -48,7 +50,7 @@ DqmMasterCallback::~DqmMasterCallback()
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
-  printf("LOAD: runtype %s\n", m_runtype.c_str());
+  LogFile::info("LOAD: runtype %s", m_runtype.c_str());
 }
 
 void DqmMasterCallback::start(int expno, int runno)
@@ -85,17 +87,16 @@ void DqmMasterCallback::start(int expno, int runno)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock_hlt->send(msg);
-  m_sock_reco->send(msg);
+  m_sock->send(msg);
   delete (msg);
 
-  printf("START: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
+  LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
   m_running = 1;
 }
 
 void DqmMasterCallback::stop(void)
 {
-  printf("STOP: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
+  LogFile::info("STOP: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
 
   if (m_running == 0) return;
 
@@ -103,42 +104,22 @@ void DqmMasterCallback::stop(void)
 
   char outfile[1024];
 
-  {
-    MsgHandler hdl(0);
-    int numobjs = 0;
+  MsgHandler hdl(0);
+  int numobjs = 0;
 
-    snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
+  snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%sdqm_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
+           m_runno);
 
-    TText rc_save(0, 0, outfile);
-    hdl.add(&rc_save, outfile);
-    numobjs++;
+  TText rc_save(0, 0, outfile);
+  hdl.add(&rc_save, outfile);
+  numobjs++;
 
-    EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
-    (msg->header())->reserved[0] = 0;
-    (msg->header())->reserved[1] = numobjs;
+  EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
+  (msg->header())->reserved[0] = 0;
+  (msg->header())->reserved[1] = numobjs;
 
-    m_sock_hlt->send(msg);
-
-    m_sock_reco->send(msg);
-    delete (msg);
-  }
-  {
-    MsgHandler hdl(0);
-    int numobjs = 0;
-
-    snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-
-    TText rc_save(0, 0, outfile);
-    hdl.add(&rc_save, outfile);
-    numobjs++;
-
-    EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
-    (msg->header())->reserved[0] = 0;
-    (msg->header())->reserved[1] = numobjs;
-
-    m_sock_reco->send(msg);
-    delete (msg);
-  }
+  m_sock->send(msg);
+  delete (msg);
 }
 
 void DqmMasterCallback::abort(void)

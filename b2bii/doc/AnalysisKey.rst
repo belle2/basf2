@@ -157,6 +157,7 @@ To utilize FEI, the correct prefix of FEI payloads needs to be set:
 .. code-block:: python3
 
    import fei
+   basf2.conditions.append_globaltag("analysis_tools_light-2012-minos")
    configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos', cache=0)
 
    feistate = fei.get_path(particles, configuration)

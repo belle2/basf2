@@ -192,7 +192,14 @@ For example, in ``gsim/gsim/gsim.55.dat`` under ``mcproduzh``:
    C   Run# != 0 : for run-dependent MC
    RUNG 0 1
 
-in which ``RUNG 0 1`` should be changed to ``RUNG 402 1``.
+one need to modify ``.dat`` file to set up the correct ``RunNo`` as:
+
+.. code-block:: none
+
+   C Set run number (format "RUNG IDRUN IDEV")
+   C   Run#  = 0 : for run-independence MC
+   C   Run# != 0 : for run-dependent MC
+   RUNG 402 1
 
 .. warning::
    If ``RunNo`` is not currectly set in ``gsim.*.dat``, it will be overwritten by gsim.

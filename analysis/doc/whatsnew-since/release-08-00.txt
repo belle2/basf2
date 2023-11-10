@@ -9,6 +9,11 @@ Modules
   not correctly propagated to the new V0 particles created with `HelixErrorScaler`.
   This bug caused the loss of signal (``isSignal==1``) candidates by about 5% for B-meson decays due to missing radiated photons,
   which should be accepted.
+* Added a new module `TwoBodyISRPhotonCorrector` which can be accessed in the new function `modularAnalysis.twoBodyISRPhotonCorrector`.
+  This module is meant to be used in two-body decays involving a high-energy ISR photon that likely experiences ECL leakage leading to an
+  innacurate energy measurement. The energy is corrected kinematically based on the beam energy, the photon's direction, and the mass of the 
+  other particle in the two-body decay. The corrected kinematics are stored in copied particles in a new ParticleList. The original 
+  kinematics of the ISR photon can be accessed using the metavariable `originalParticle`.
 
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------

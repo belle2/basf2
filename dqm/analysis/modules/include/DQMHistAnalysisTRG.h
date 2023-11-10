@@ -74,6 +74,18 @@ namespace Belle2 {
 
     //! Final Canvas
     TCanvas* m_canvas = nullptr;
+    TCanvas* m_canvas_ECLTRG_timing_mean = nullptr;
+    TCanvas* m_canvas_CDCTRG_timing_mean = nullptr;
+    TCanvas* m_canvas_TOPTRG_timing_mean = nullptr;
+    TCanvas* m_canvas_ECLTRG_peak = nullptr;
+    TCanvas* m_canvas_CDCTRG_2D_peak = nullptr;
+    TCanvas* m_canvas_NN_peak = nullptr;
+    TCanvas* m_canvas_CDCTRG_TSF_peak = nullptr;
+    TCanvas* m_canvas_KLMTRG_peak = nullptr;
+    TCanvas* m_canvas_TOPTRG_peak = nullptr;
+    TCanvas* m_canvas_hadronb2_over_bhabha_all = nullptr;
+    TCanvas* m_canvas_mumu2trk_over_bhabha_all = nullptr;
+    TCanvas* m_canvas_hadronb2_over_mumu2trk = nullptr;
 
   };
 } // end namespace Belle2

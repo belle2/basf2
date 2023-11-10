@@ -7,12 +7,13 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisTRGModule.cc
-// Description : Test Module for Delta Histogram Access
+// Description : Test Module for TRG
 //-
 
 
 #include <dqm/analysis/modules/DQMHistAnalysisTRG.h>
 #include <TROOT.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -49,27 +50,73 @@ void DQMHistAnalysisTRGModule::initialize()
 
   gROOT->cd();
   m_canvas = new TCanvas("TRG/c_Test");
-//YJ
   //comL1-GDLL1
   addDeltaPar("TRGGDL", "hGDL_gdlL1TocomL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "comL1_GDLL1_mean", "comL1_GDLL1_mean");
-//YJ
 
   //ECLTRG timing
+  m_canvas_ECLTRG_timing_mean = new TCanvas("TRG/ECLTRG_timing_mean");
   addDeltaPar("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_ECLTRG", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_timing_mean", "ECLTRG_timing_mean");
 
   //CDCTRG event timing
+  m_canvas_CDCTRG_timing_mean = new TCanvas("TRGCDCTRG_timing_mean");
   addDeltaPar("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_timing_mean", "CDCTRG_timing_mean");
 
   //TOPTRG event timing
+  m_canvas_TOPTRG_timing_mean = new TCanvas("TOPTRG_timing_mean");
   addDeltaPar("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_timing_mean", "TOPTRG_timing_mean");
 
+  //ECLTRG_peak
+  m_canvas_ECLTRG_peak = new TCanvas("ECLTRG_peak");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_ECLTRG_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_peak", "ECLTRG_peak");
+
+  //CDCTRG_2D_peak
+  m_canvas_CDCTRG_2D_peak = new TCanvas("CDCTRG_2D_peak");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_CDCTRG_2D_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "CDCTRG_2D_peak", "CDCTRG_2D_peak");
+
+  //NN_peak
+  m_canvas_NN_peak = new TCanvas("NN_peak");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_NN_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "NN_peak", "NN_peak");
+
+  //CDCTRG_TSF_peak
+  m_canvas_CDCTRG_TSF_peak = new TCanvas("CDCTRG_TSF_peak");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_CDCTRG_TSF_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "CDCTRG_TSF_peak", "CDCTRG_TSF_peak");
+
+  //KLMTRG_peak
+  m_canvas_KLMTRG_peak = new TCanvas("KLMTRG_peak");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_KLMTRG_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "KLMTRG_peak", "KLMTRG_peak");
+
+  //TOPTRG_peak
+  m_canvas_TOPTRG_peak = new TCanvas("TOPTRG_peak");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_TOPTRG_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "TOPTRG_peak", "TOPTRG_peak");
+
+  //hadronb2_over_bhabha_all
+  m_canvas_hadronb2_over_bhabha_all = new TCanvas("hadronb2_over_bhabha_all");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_hadronb2_over_bhabha_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "hadronb2_over_bhabha_all", "hadronb2_over_bhabha_all");
+
+  //mumu2trk_over_bhabha_all
+  m_canvas_mumu2trk_over_bhabha_all = new TCanvas("mumu2trk_over_bhabha_all");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_mumu2trk_over_bhabha_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_all", "mumu2trk_over_bhabha_all");
+
+  //hadronb2_over_mumu2trk
+  m_canvas_hadronb2_over_mumu2trk = new TCanvas("hadronb2_over_mumu2trk");
+  addDeltaPar("EventT0DQMdir", "m_histEvent_hadronb2_over_mumu2trk", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
+
   //update PV
-  updateEpicsPVs(
-    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
+//  updateEpicsPVs(
+//    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
 }
 
 void DQMHistAnalysisTRGModule::beginRun()
@@ -92,9 +139,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 {
   m_canvas->Clear();
   m_canvas->cd(0);
-//YJ
   //update comL1-GDLL1
-//  double comL1_GDLL1_mean = 0.0;
   auto hist_comL1_GDLL1 =  getDelta("TRGGDL", "hGDL_gdlL1TocomL1_all", 0, true);// only if updated
   if (hist_comL1_GDLL1) {
     double comL1_GDLL1_mean = 0.0;
@@ -102,13 +147,13 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     comL1_GDLL1_mean = hist_comL1_GDLL1->GetMean();
     B2DEBUG(1, "comL1_GDLL1_mean:" << comL1_GDLL1_mean);
     setEpicsPV("comL1_GDLL1_mean", comL1_GDLL1_mean);
-    updateEpicsPVs(
-      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
+//    updateEpicsPVs(
+//      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
-//YJ
 
+  m_canvas_ECLTRG_timing_mean->Clear();
+  m_canvas_ECLTRG_timing_mean->cd(0);
   //update ECLTRG timing
-//  double ECLTRG_timing_mean = 0.0;
   auto hist =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_ECLTRG", 0, true);// only if updated
   if (hist) {
     double ECLTRG_timing_mean = 0.0;
@@ -116,12 +161,11 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     ECLTRG_timing_mean = hist->GetMean();
     B2DEBUG(1, "ECLTRG_timing_mean:" << ECLTRG_timing_mean);
     setEpicsPV("ECLTRG_timing_mean", ECLTRG_timing_mean);
-    updateEpicsPVs(
-      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
 
+  m_canvas_CDCTRG_timing_mean->Clear();
+  m_canvas_CDCTRG_timing_mean->cd(0);
   //update CDCTRG timing
-//  double CDCTRG_timing_mean = 0.0;
   auto histCDCTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG", 0, true);// only if updated
   if (histCDCTRG) {
     double CDCTRG_timing_mean = 0.0;
@@ -129,12 +173,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     CDCTRG_timing_mean = histCDCTRG->GetMean();
     B2DEBUG(1, "CDCTRG_timing_mean:" << CDCTRG_timing_mean);
     setEpicsPV("CDCTRG_timing_mean", CDCTRG_timing_mean);
-    updateEpicsPVs(
-      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
+  cout << "histCDCTRG = " << histCDCTRG << endl;
 
+  m_canvas_TOPTRG_timing_mean->Clear();
+  m_canvas_TOPTRG_timing_mean->cd(0);
   //update TOPTRG timing
-//  double TOPTRG_timing_mean = 0.0;
   auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", 0, true);// only if updated
   if (histTOPTRG) {
     double TOPTRG_timing_mean = 0.0;
@@ -142,16 +186,202 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     TOPTRG_timing_mean = histTOPTRG->GetMean();
     B2DEBUG(1, "TOPTRG_timing_mean:" << TOPTRG_timing_mean);
     setEpicsPV("TOPTRG_timing_mean", TOPTRG_timing_mean);
-    updateEpicsPVs(
-      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
 
+  m_canvas_ECLTRG_peak->Clear();
+  m_canvas_ECLTRG_peak->cd(0);
+// update ECLTRG peak
+  auto hist_ECLTRG_peak = getDelta("TRGGRL", "h_ECLL1", 0, true);// only if updated
+  if (hist_ECLTRG_peak) {
+    double ECLTRG_peak = 0.0;
+    hist_ECLTRG_peak->Draw();
+    ECLTRG_peak = hist_ECLTRG_peak->GetMaximum();
+    B2DEBUG(1, "ECLTRG_peak:" << ECLTRG_peak);
+    setEpicsPV("ECLTRG_peak", ECLTRG_peak);
+
+  }
+
+  m_canvas_CDCTRG_2D_peak->Clear();
+  m_canvas_CDCTRG_2D_peak->cd(0);
+// update CDCTRG 2D peak
+  auto hist_CDCTRG_2D_peak = getDelta("TRGGRL", "h_CDCL1", 0, true);// only if updated
+  if (hist_CDCTRG_2D_peak) {
+    double CDCTRG_2D_peak = 0.0;
+    hist_CDCTRG_2D_peak->Draw();
+    CDCTRG_2D_peak = hist_CDCTRG_2D_peak->GetMaximum();
+    B2DEBUG(1, "CDCTRG_2D_peak:" << CDCTRG_2D_peak);
+    setEpicsPV("CDCTRG_2D_peak", CDCTRG_2D_peak);
+
+  }
+
+  m_canvas_NN_peak->Clear();
+  m_canvas_NN_peak->cd(0);
+// update CDCTRG NN peak
+  auto hist_NN_peak = getDelta("TRGGRL", "h_CDCNNL1", 0, true);// only if updated
+  if (hist_NN_peak) {
+    double NN_peak = 0.0;
+    hist_NN_peak->Draw();
+    NN_peak = hist_NN_peak->GetMaximum();
+    B2DEBUG(1, "NN_peak:" << NN_peak);
+    setEpicsPV("NN_peak", NN_peak);
+
+  }
+
+  m_canvas_CDCTRG_TSF_peak->Clear();
+  m_canvas_CDCTRG_TSF_peak->cd(0);
+// update CDCTRG TSF
+  auto hist_CDCTRG_TSF_peak = getDelta("TRGGRL", "h_TSFL1", 0, true);// only if updated
+  if (hist_CDCTRG_TSF_peak) {
+    double CDCTRG_TSF_peak = 0.0;
+    hist_CDCTRG_TSF_peak->Draw();
+    CDCTRG_TSF_peak = hist_CDCTRG_TSF_peak->GetMaximum();
+    B2DEBUG(1, "CDCTRG_TSF_peak:" << CDCTRG_TSF_peak);
+    setEpicsPV("CDCTRG_TSF_peak", CDCTRG_TSF_peak);
+
+  }
+
+  m_canvas_KLMTRG_peak->Clear();
+  m_canvas_KLMTRG_peak->cd(0);
+// update KLMTRG
+  auto hist_KLMTRG_peak = getDelta("TRGGRL", "h_KLML1", 0, true);// only if updated
+  if (hist_KLMTRG_peak) {
+    double KLMTRG_peak = 0.0;
+    hist_KLMTRG_peak->Draw();
+    KLMTRG_peak = hist_KLMTRG_peak->GetMaximum();
+    B2DEBUG(1, "KLMTRG_peak:" << KLMTRG_peak);
+    setEpicsPV("KLMTRG_peak", KLMTRG_peak);
+
+  }
+
+  m_canvas_TOPTRG_peak->Clear();
+  m_canvas_TOPTRG_peak->cd(0);
+// update TOPTRG
+  auto hist_TOPTRG_peak = getDelta("TRGGRL", "h_TOPL1", 0, true);// only if updated
+  if (hist_TOPTRG_peak) {
+    double TOPTRG_peak = 0.0;
+    hist_TOPTRG_peak->Draw();
+    TOPTRG_peak = hist_TOPTRG_peak->GetMaximum();
+    B2DEBUG(1, "TOPTRG_peak:" << TOPTRG_peak);
+    setEpicsPV("TOPTRG_peak", TOPTRG_peak);
+
+  }
+
+  m_canvas_hadronb2_over_bhabha_all->Clear();
+  m_canvas_hadronb2_over_bhabha_all->cd(0);
+// update #hadronb2/#bhabha_all
+  auto hist_hadronb2_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_hadronb2_over_bhabha_all) {
+    double hadronb2_over_bhabha_all = 0.0;
+    hist_hadronb2_over_bhabha_all->Draw();
+    hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->FindBin(30) / hist_hadronb2_over_bhabha_all->FindBin(30);
+    B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
+    setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
+
+  }
+
+  m_canvas_mumu2trk_over_bhabha_all->Clear();
+  m_canvas_mumu2trk_over_bhabha_all->cd(0);
+// update #mumu2trk/#bhabha_all
+  auto hist_mumu2trk_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_mumu2trk_over_bhabha_all) {
+    double mumu2trk_over_bhabha_all = 0.0;
+    hist_mumu2trk_over_bhabha_all->Draw();
+    mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->FindBin(17) / hist_mumu2trk_over_bhabha_all->FindBin(1);
+    B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
+    setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+
+  }
+
+  m_canvas_hadronb2_over_mumu2trk->Clear();
+  m_canvas_hadronb2_over_mumu2trk->cd(0);
+// update #hadronb2/#mumu2trk
+  auto hist_hadronb2_over_mumu2trk = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_hadronb2_over_mumu2trk) {
+    double hadronb2_over_mumu2trk = 0.0;
+    hist_hadronb2_over_mumu2trk->Draw();
+    hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->FindBin(30) / hist_hadronb2_over_mumu2trk->FindBin(17);
+    B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
+    setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
+
+  }
+
+//******************     BACK UP       ********************//
+
+// update #mumu_tight/#bhabha_all
+  auto hist_mumu_tight_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_mumu_tight_over_bhabha_all) {
+    double mumu_tight_over_bhabha_all = 0.0;
+    hist_mumu_tight_over_bhabha_all->Draw();
+    mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->FindBin(4) / hist_mumu_tight_over_bhabha_all->FindBin(1);
+    B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
+    setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+
+  }
+
+// update #gammagamma/#bhabha_all
+  auto hist_gammagamma_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_gammagamma_over_bhabha_all) {
+    double gammagamma_over_bhabha_all = 0.0;
+    hist_gammagamma_over_bhabha_all->Draw();
+    gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->FindBin(2) / hist_gammagamma_over_bhabha_all->FindBin(1);
+    B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
+    setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+
+  }
+
+// update #tautau2trk/#bhabha_all
+  auto hist_tautau2trk_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_tautau2trk_over_bhabha_all) {
+    double tautau2trk_over_bhabha_all = 0.0;
+    hist_tautau2trk_over_bhabha_all->Draw();
+    tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->FindBin(35) / hist_tautau2trk_over_bhabha_all->FindBin(1);
+    B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
+    setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+
+  }
+
+// update #hadron/#bhabha_all
+  auto hist_hadron_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  if (hist_hadron_over_bhabha_all) {
+    double hadron_over_bhabha_all = 0.0;
+    hist_hadron_over_bhabha_all->Draw();
+    hadron_over_bhabha_all = hist_hadron_over_bhabha_all->FindBin(3) / hist_hadron_over_bhabha_all->FindBin(1);
+    B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
+    setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+
+  }
+
+//******************     BACK UP       ********************//
 
   // Tag canvas as updated ONLY if things have changed.
   UpdateCanvas(m_canvas->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_ECLTRG_timing_mean->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_CDCTRG_timing_mean->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_TOPTRG_timing_mean->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_ECLTRG_peak->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_CDCTRG_2D_peak->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_NN_peak->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_CDCTRG_TSF_peak->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_KLMTRG_peak->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_TOPTRG_peak->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_hadronb2_over_bhabha_all->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_mumu2trk_over_bhabha_all->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_hadronb2_over_mumu2trk->GetName(), hist != nullptr);
 
   // this if left over from jsroot, may not be needed anymore (to check)
   m_canvas->Update();
+  m_canvas_ECLTRG_timing_mean->Update();
+  m_canvas_CDCTRG_timing_mean->Update();
+  m_canvas_TOPTRG_timing_mean->Update();
+  m_canvas_ECLTRG_peak->Update();
+  m_canvas_CDCTRG_2D_peak->Update();
+  m_canvas_NN_peak->Update();
+  m_canvas_CDCTRG_TSF_peak->Update();
+  m_canvas_KLMTRG_peak->Update();
+  m_canvas_TOPTRG_peak->Update();
+  m_canvas_hadronb2_over_bhabha_all->Update();
+  m_canvas_mumu2trk_over_bhabha_all->Update();
+  m_canvas_hadronb2_over_mumu2trk->Update();
 
 }
 

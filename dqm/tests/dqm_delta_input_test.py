@@ -27,7 +27,7 @@ with b2tu.clean_working_directory():
     # Modules
     main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=[
         b2.find_file("dqm/tests/test1.json"), b2.find_file("dqm/tests/test2.json")])
-    main.add_module('DQMHistAnalysisDeltaTest', histogramDirectoryName="test", histogramName="testHist2", useEpics=False)
+    main.add_module('DQMHistAnalysisDeltaTest', histogramDirectoryName="test", histogramName="testHist2")
 
     # Process all events
     b2.process(main)

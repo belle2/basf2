@@ -125,7 +125,7 @@ namespace Belle2 {
     float getAmplitudeError() const { return m_fittedAmplitudeError; }
 
     /** Get time estimate
-     * @returm fitted signal arrival time
+     * @return fitted signal arrival time
      */
     float getTime() const { return m_fittedTime; }
 

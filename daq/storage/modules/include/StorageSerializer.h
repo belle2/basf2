@@ -60,7 +60,6 @@ namespace Belle2 {
     int m_expno;
     int m_runno;
     unsigned long long m_nbyte;
-    double m_ctime;
     int m_nodeid;
 
   private:

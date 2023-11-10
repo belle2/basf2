@@ -31,7 +31,7 @@ RFEventProcessor::RFEventProcessor(string conffile)
   //  char nodename[256];
   strcpy(m_nodename, "evp_");
 #ifndef DESY
-  gethostname(&m_nodename[4], sizeof(m_nodename));
+  gethostname(&m_nodename[4], sizeof(m_nodename) - 4);
 #else
   // Special treatment for DESY test nodes!!
   char hostnamebuf[256];

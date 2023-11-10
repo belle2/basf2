@@ -16,6 +16,9 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
+/* ROOT headers. */
+#include <TMath.h>
+
 /* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 

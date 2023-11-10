@@ -287,6 +287,7 @@ void VariablesToEventBasedTreeModule::terminate()
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
+    m_file.reset();
     if (writeError) {
       B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }

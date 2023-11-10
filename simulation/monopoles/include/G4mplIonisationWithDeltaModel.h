@@ -108,7 +108,7 @@ namespace Belle2 {
        *
        * @param vdp Pointer to the storage of sampled delta electrons
        * @param materialCutsCouple This argument of base function is ignored
-       * @param dp Secnodary particle pointer
+       * @param dp Secondary particle pointer
        * @param tmin Minimal energy of secondary electrons
        * @param maxEnergy Maximum energy of secondary electrons
        */
@@ -122,8 +122,9 @@ namespace Belle2 {
       /**
        * Create fluctuations in the energies lost to a secondary delta electron.
        *
-       * @param couple Current volume coulple to get its material
-       * @param dp Secnodary particle pointer
+       * @param couple Current volume couple to get its material
+       * @param dp Secondary particle pointer
+       * @param tcut Tcut in dispersion formula
        * @param tmax Tmax in dispersion formula?
        * @param length Length in dispersion formula?
        * @param meanLoss Mean of energy loss
@@ -131,6 +132,7 @@ namespace Belle2 {
        */
       virtual G4double SampleFluctuations(const G4MaterialCutsCouple* couple,
                                           const G4DynamicParticle* dp,
+                                          G4double tcut,
                                           G4double tmax,
                                           G4double length,
                                           G4double meanLoss) override;
@@ -139,13 +141,15 @@ namespace Belle2 {
        * Calculate dispersion.
        *
        * @param material Pointer to current material definition
-       * @param dp Secnodary particle pointer
+       * @param dp Secondary particle pointer
+       * @param tcut Tcut in dispersion formula
        * @param tmax Tmax in dispersion formula?
        * @param length Length in dispersion formula?
        * @return Dispersion
        */
       virtual G4double Dispersion(const G4Material* material,
                                   const G4DynamicParticle*,
+                                  G4double tcut,
                                   G4double tmax,
                                   G4double length) override;
 
@@ -172,7 +176,7 @@ namespace Belle2 {
     private:
 
       /**
-       * Caculate dedx based on extrapolated Ahlen formula.
+       * Calculate dedx based on extrapolated Ahlen formula.
        *
        * References
        * [1] Steven P. Ahlen: Energy loss of relativistic heavy ionizing particles,

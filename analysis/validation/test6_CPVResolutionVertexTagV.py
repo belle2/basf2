@@ -410,7 +410,7 @@ for VXDReq in VXDReqs:
     if resolutionErr < 0.01:
         resolutionErr = 0.01
 
-    Numbr = '{:d}'.format(int((f1 + f2) * fitDataDT.numEntries()))
+    Numbr = f'{int((f1 + f2) * fitDataDT.numEntries()):d}'
 
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)

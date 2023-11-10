@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace boost::python;
 
 FileMetaData::FileMetaData() :
-  m_lfn(""), m_nEvents(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
+  m_lfn(""), m_nEvents(0), m_nFullEvents(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0), m_date(""), m_site(""), m_user(""), m_release(""),
   m_steering(""), m_isMC(true), m_mcEvents(0)
 {
@@ -51,6 +51,7 @@ void FileMetaData::exposePythonAPI()
   class_<FileMetaData>("FileMetaData")
   .def("get_lfn", &FileMetaData::getLfn, return_value_policy<copy_const_reference>())
   .def("get_nevents", &FileMetaData::getNEvents)
+  .def("get_nfullevents", &FileMetaData::getNFullEvents)
   .def("get_experiment_low", &FileMetaData::getExperimentLow)
   .def("get_run_low", &FileMetaData::getRunLow)
   .def("get_event_low", &FileMetaData::getEventLow)
@@ -86,6 +87,7 @@ void FileMetaData::Print(Option_t* option) const
   KeyValuePrinter printer(false);
   printer.put("LFN", m_lfn);
   printer.put("nEvents", m_nEvents);
+  printer.put("nFullEvents", m_nFullEvents);
   printer.put("range", std::to_string(m_experimentLow) + "/" + std::to_string(m_runLow) + "/" + std::to_string(m_eventLow)
               + " - "  + std::to_string(m_experimentHigh) + "/" + std::to_string(m_runHigh) + "/" + std::to_string(m_eventHigh));
   printer.put("parents", m_parentLfns);
@@ -182,6 +184,7 @@ std::string FileMetaData::getJsonStr() const
   nlohmann::json metadata = {
     {"LFN", m_lfn},
     {"nEvents", m_nEvents},
+    {"nFullEvents", m_nFullEvents},
     {"experimentLow", m_experimentLow},
     {"runLow", m_runLow},
     {"eventLow", m_eventLow},

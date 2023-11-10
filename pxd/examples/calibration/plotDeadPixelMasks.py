@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -61,7 +60,7 @@ run_list = list()
 
 for condition in b2.conditions:
     if condition.PXDDeadPixelPar_valid:
-        print("Starting on run {}".format(condition.run))
+        print(f"Starting on run {condition.run}")
         run_list.append(condition.run)
 
         for sensorID in sensor_list:
@@ -92,8 +91,8 @@ for condition in b2.conditions:
             if args.maps:
                 counter = 0
 
-                name = "DeadPixels_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
-                title = "Dead Pixels Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
+                name = f"DeadPixels_{layer:d}_{ladder:d}_{sensor:d}_run_{condition.run:d}"
+                title = f"Dead Pixels Sensor={layer:d}.{ladder:d}.{sensor:d} run={condition.run:d}"
                 dead_map = ROOT.TH2F(name, title, nUCells, 0, nUCells, nVCells, 0, nVCells)
                 dead_map.GetXaxis().SetTitle("uCell")
                 dead_map.GetYaxis().SetTitle("vCell")
@@ -135,10 +134,10 @@ for sensorID in sensor_list:
     gr = ROOT.TGraph(n, x, y)
     gr.SetLineColor(ROOT.kBlue)
     gr.SetLineWidth(4)
-    gr.SetName("graph_{}".format(sensorID.getID()))
+    gr.SetName(f"graph_{sensorID.getID()}")
     gr.SetMarkerColor(ROOT.kBlue)
     gr.SetMarkerStyle(21)
-    gr.SetTitle('Deadpixel evolution Sensor={}'.format(sensorID))
+    gr.SetTitle(f'Deadpixel evolution Sensor={sensorID}')
     gr.GetXaxis().SetTitle('run number')
     gr.GetYaxis().SetTitle('dead fraction')
     gr.GetYaxis().SetRangeUser(0.0, 1.0)
@@ -146,7 +145,7 @@ for sensorID in sensor_list:
 
     c.Update()
     c.Modified()
-    c.Print('deadpixels_vs_runno_{}.png'.format(sensorID.getID()))
+    c.Print(f'deadpixels_vs_runno_{sensorID.getID()}.png')
     c.Write()
 
 

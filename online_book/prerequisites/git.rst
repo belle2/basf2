@@ -46,7 +46,7 @@ sometimes we might get an email like this
 
     -- Poor Student
 
-Now one way to achieve this is would maybe be to keep all old versions manually,
+Now one way to achieve this would maybe be to keep all old versions manually,
 either in the same file but commented out like this:
 
 .. code-block:: python
@@ -86,8 +86,8 @@ be aware of.
 Belle II Specifics
 ==================
 
-In Belle II we use Bitbucket Server by Atlassian for our git repositories. While
-this is rather similar to github in some regards. It is strongly advised to use
+In Belle II we use GitLab by GitLab Inc. for our git repositories, with our instance hosted at DESY.
+This is quite similar to github in some regards. It is strongly advised to use
 ``ssh`` as access protocol and for that you need to upload your public key to
 https://gitlab.desy.de.
 
@@ -133,13 +133,13 @@ Let's test what you learned so far!
 .. admonition:: Hint
    :class: xhint stacked toggle
 
-   The project lives `here <https://stash.desy.de/projects/B2T>`__.
+   The project lives `here <https://gitlab.desy.de/belle2/software/training>`__.
 
 .. admonition:: Hint
    :class: xhint stacked toggle
 
-   The repositories live `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space/browse>`__
-   and `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/browse>`__.
+   The repositories live `here <https://gitlab.desy.de/belle2/software/training/b2-git-training-space>`__
+   and `here <https://gitlab.desy.de/belle2/software/training/b2-git-training-space-2>`__.
    You can find the URL to clone by clicking a button in the sidebar on your left.
 
 .. admonition:: Solution
@@ -147,8 +147,8 @@ Let's test what you learned so far!
 
    .. code-block:: bash
 
-      git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space.git
-      git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space-2.git
+      git clone git@gitlab.desy.de:belle2/software/training/b2-git-training-space.git
+      git clone git@gitlab.desy.de:belle2/software/training/b2-git-training-space-2.git
 
 Now you should have both repositories on your local machine.
 
@@ -181,7 +181,7 @@ Now you should have both repositories on your local machine.
      committed yet) and ``git reset`` ("undo" ``git commit``)
 
 Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you
-cannot just push changes there directly. Instead, you have to open a pull request (PR).
+cannot just push changes there directly. Instead, you have to open a merge request (MR).
 For this concept you need to complete the next section.
 
 Branches (intermediate)
@@ -257,9 +257,9 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
       git add my_story.txt
       git commit -m "Adding a story"
 
-Remember that you weren't allowed to push to the master branch in this
+Remember that you weren't allowed to push to the main branch in this
 repository. To still get your changes in, you need to first push your
-new branch to the remote (just like there is a local and a remote ``master``
+new branch to the remote (just like there is a local and a remote ``main``
 branch you will then have a local and a remote ``<your new branch>`` branch).
 
 .. code-block:: bash
@@ -270,14 +270,14 @@ The output of the last command tells you to go to
 
 .. code-block::
 
-   https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/<your new branch>
+   https://gitlab.desy.de/belle2/software/training/b2-git-training-space-2/-/merge_requests/new?merge_request%5Bsource_branch%5D=<your new branch>
 
-to open a PR. That's exactly what we want to do!
+to open a MR. That's exactly what we want to do!
 
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Create a PR and add the StarterKit organizer as a reviewer.
+   Create a MR and add the StarterKit organizer as a reviewer.
 
 .. admonition:: Solution
    :class: solution toggle
@@ -287,20 +287,20 @@ to open a PR. That's exactly what we want to do!
 
 Now you have to wait for someone to approve your PR. Once they do,
 you can click on the ``Merge`` button. Then your changes are finally
-in the repository (verify this by checkout out the ``master`` branch and
+in the repository (verify this by checkout out the ``main`` branch and
 updating it with ``git pull``).
 
 .. admonition:: Exercise
    :class: Exercise
 
-   Check if there are any other open PRs. If there are, leave some comments!
+   Check if there are any other open MRs. If there are, leave some comments!
    You can also add yourself as the reviewer and approve them.
 
 Further reading
 ---------------
 
 Git is complex and it might take you months (or years, depending on your effort)
-to really feel its full power and to be able to use it effortless.
+to really feel its full power and to be able to use it effortlessly.
 
 At this point `the xkcd comic <https://xkcd.com/1597/>`_ from above might still
 show you (we certainly haven't taught you enough to change it). Therefore it's important

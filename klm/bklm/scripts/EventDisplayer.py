@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -98,7 +97,7 @@ class EventDisplayer(basf2.Module):
 
         #: TCanvas on which event displays will be drawn
         self.eventCanvas = ROOT.TCanvas("eventCanvas", self.eventPdfName, 3200, 1600)
-        title = '{0}['.format(self.eventPdfName)
+        title = f'{self.eventPdfName}['
         self.eventCanvas.SaveAs(title)
         self.eventCanvas.Clear()
         self.eventCanvas.Divide(2, 1)
@@ -314,7 +313,7 @@ class EventDisplayer(basf2.Module):
     def terminate(self):
         """Handle job termination: close event-display file"""
 
-        pdfNameLast = '{0}]'.format(self.eventPdfName)
+        pdfNameLast = f'{self.eventPdfName}]'
         self.eventCanvas.Print(pdfNameLast, self.lastTitle)
         print('Goodbye')
 
@@ -617,7 +616,7 @@ class EventDisplayer(basf2.Module):
                 break
         if hasEnoughRPCHits and (len(muidhits) > self.minMuidHits):
             self.eventDisplays += 1
-            title = 'e{0:02d}r{1}: event {2}'.format(int(self.exp), int(self.run), event)
+            title = f'e{int(self.exp):02d}r{int(self.run)}: event {event}'
             self.hist_XY.SetTitle(title)
             self.hist_ZY.SetTitle(title)
             self.eventCanvas.cd(1)
@@ -644,11 +643,11 @@ class EventDisplayer(basf2.Module):
                 bkgdZYGraph.Draw("P")
             if promptZYGraph.GetN() > 0:
                 promptZYGraph.Draw("P")
-            self.lastTitle = "Title:E{0} (#{1})".format(event, self.eventCounter)
+            self.lastTitle = f"Title:E{event} (#{self.eventCounter})"
             self.eventCanvas.Print(self.eventPdfName, self.lastTitle)
             for sector in range(0, 8):
                 if nMuids[sector] > 0:
-                    title = 'e{0:02d}r{1}: event {2} sector {3}'.format(int(self.exp), int(self.run), event, sector)
+                    title = f'e{int(self.exp):02d}r{int(self.run)}: event {event} sector {sector}'
                     self.hist_XYS[sector].SetTitle(title)
                     self.eventCanvas.cd(1)
                     self.hist_XYS[sector].Draw()
@@ -679,5 +678,5 @@ class EventDisplayer(basf2.Module):
                         bkgdZYSGraph[sector].Draw("P")
                     if promptZYSGraph[sector].GetN() > 0:
                         promptZYSGraph[sector].Draw("P")
-                    self.lastTitle = "Title:E{0} sector {1}".format(event, sector)
+                    self.lastTitle = f"Title:E{event} sector {sector}"
                     self.eventCanvas.Print(self.eventPdfName, self.lastTitle)

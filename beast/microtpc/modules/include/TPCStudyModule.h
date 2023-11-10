@@ -12,7 +12,7 @@
 #include <framework/core/HistoModule.h>
 #include <vector>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TH1.h>
 #include <TH2.h>
 
@@ -45,12 +45,6 @@ namespace Belle2 {
       virtual void initialize() override;
 
       /**
-       * Called when entering a new run.
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun() override;
-
-      /**
        * Event processor.
        */
       virtual void event() override;
@@ -60,12 +54,6 @@ namespace Belle2 {
        * Save run-related stuff, such as statistics.
        */
       virtual void endRun() override;
-
-      /**
-       * Termination action.
-       * Clean-up, close files, summarize statistics, etc.
-       */
-      virtual void terminate() override;
 
       /** Defines the histograms*/
       virtual void defineHisto() override;
@@ -89,7 +77,7 @@ namespace Belle2 {
       /** number of detectors. Read from MICROTPC.xml*/
       int nTPC = 0;
       /** TPC coordinate */
-      std::vector<TVector3> TPCCenter;
+      std::vector<ROOT::Math::XYZVector> TPCCenter;
       /** Event counter */
       //int Event = 0;
       /** Recoil kin  */

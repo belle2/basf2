@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -84,10 +83,10 @@ print(basf2.statistics)
 root_file = ROOT.TFile('ParticleGunMuonsKLM.root')
 tree = root_file.Get('tree')
 events = tree.GetEntriesFast()
-print('Events: %d' % events)
+print(f'Events: {int(events)}')
 for branch in tree.GetListOfBranches():
     name = branch.GetName()
     if name.startswith('Raw'):
         size = branch.GetTotBytes('*') * 1.0
         zipsize = branch.GetZipBytes('*') * 1.0
-        print("%s %.2f (%.2f)" % (name, size / 1024. / events, zipsize / 1024. / events))
+        print(f"{name} {size / 1024.0 / events:.2f} ({zipsize / 1024.0 / events:.2f})")

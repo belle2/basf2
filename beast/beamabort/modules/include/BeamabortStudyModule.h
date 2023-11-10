@@ -78,8 +78,6 @@ namespace Belle2 {
 
       /** number of detectors. Read from BEAMABORT.xml*/
       //int nDIA = 0;
-      /** PIN coordinate */
-      //std::vector<TVector3> PINCenter;
       /** Event counter */
       //int Event = 0;
       /** Work function */

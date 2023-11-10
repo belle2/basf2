@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "daq/rfarm/manager/SharedMem.h"
+#include "daq/dqm/DqmSharedMem.h"
 
 #include "TH1F.h"
 #include "TMemFile.h"
@@ -17,7 +17,7 @@ using namespace std;
 
 int main(int /*argc*/, char** /*argv*/)
 {
-  SharedMem* shm = new SharedMem("testhisto", 2000000);
+  DqmSharedMem* shm = new DqmSharedMem("testhisto", 2000000);
   //  TMemFile* file = new TMemFile ( "TestHisto", (char*)shm->ptr(), 2000000, "RECREATE", "", 0 );
   TMemFile* file = new TMemFile("TestHisto", "RECREATE");
   int cpysize = file->CopyTo(shm->ptr(), 500000);

@@ -51,7 +51,7 @@ def _stdChargedEffCuts(particletype, listtype):
     return effcuts[particleindex][effindex]
 
 
-def stdCharged(particletype, listtype, path):
+def stdCharged(particletype, listtype, path, writeOut=True):
     """
     Function to prepare one of several standardized types of charged particle lists:
       - 'all' with no cuts on track
@@ -69,6 +69,7 @@ def stdCharged(particletype, listtype, path):
     @param particletype type of charged particle to make a list of
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
 
     # basic quality cut strings
@@ -80,30 +81,30 @@ def stdCharged(particletype, listtype, path):
         b2.B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
     if listtype == 'all':
-        ma.fillParticleList(particletype + '+:all', '', True, path=path)
+        ma.fillParticleList(particletype + '+:all', '', writeOut=writeOut, path=path)
     elif listtype == 'good':
         ma.fillParticleList(
             particletype + '+:good',
             _pidnames[_chargednames.index(particletype)] + ' > 0.5 and ' + goodTrack,
-            True,
+            writeOut=writeOut,
             path=path)
     elif listtype == 'loose':
         ma.fillParticleList(
             particletype + '+:loose',
             _pidnames[_chargednames.index(particletype)] + ' > 0.1 and ' + goodTrack,
-            True,
+            writeOut=writeOut,
             path=path)
     elif listtype == 'loosepid':
         ma.fillParticleList(
             particletype + '+:loosepid',
             _pidnames[_chargednames.index(particletype)] + ' > 0.1',
-            True,
+            writeOut=writeOut,
             path=path)
     elif listtype == 'higheff':
         ma.fillParticleList(
             particletype + '+:higheff',
             _pidnames[_chargednames.index(particletype)] + ' > 0.002 and ' + goodTrack,
-            True,
+            writeOut=writeOut,
             path=path)
     elif listtype not in _effnames:
         b2.B2ERROR("The requested list is not defined. Please refer to the stdCharged documentation.")
@@ -119,41 +120,44 @@ def stdCharged(particletype, listtype, path):
                 str(pidcut) +
                 ' and ' +
                 goodTrack,
-                True,
+                writeOut=writeOut,
                 path=path)
         else:
             b2.B2ERROR('The requested standard particle list ' + particletype +
                        '+:' + listtype + ' is not available in this release.')
 
 
-def stdPi(listtype=_defaultlist, path=None):
+def stdPi(listtype=_defaultlist, path=None, writeOut=True):
     """
     Function to prepare standard pion lists, refer to `stdCharged` for details
 
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
-    stdCharged('pi', listtype, path)
+    stdCharged('pi', listtype, path, writeOut)
 
 
-def stdK(listtype=_defaultlist, path=None):
+def stdK(listtype=_defaultlist, path=None, writeOut=True):
     """
     Function to prepare standard kaon lists, refer to `stdCharged` for details
 
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
-    stdCharged('K', listtype, path)
+    stdCharged('K', listtype, path, writeOut)
 
 
-def stdPr(listtype=_defaultlist, path=None):
+def stdPr(listtype=_defaultlist, path=None, writeOut=True):
     """
     Function to prepare standard proton lists, refer to `stdCharged` for details
 
     @param listtype     name of standard list
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
-    stdCharged('p', listtype, path)
+    stdCharged('p', listtype, path, writeOut)
 
 
 def stdLep(pdgId,
@@ -583,7 +587,7 @@ def stdMu(listtype=_defaultlist,
                   path=path)
 
 
-def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
+def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut=True):
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
@@ -591,6 +595,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
     @param suffix       string added to the end of particle list names
     @param custom_cuts  custom selection cut string, if empty, standard track quality cuts will be applied
     @param path         modules are added to this path
+    @param writeOut     whether RootOutput module should save the created ParticleList
     """
     # Here we need basic track quality cuts to be applied,
     # otherwise, we get a lot of badly reconstructed particles,
@@ -603,4 +608,4 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
         trackQuality = custom_cuts
     for name in _chargednames:
         ma.fillParticleList(f'{name}+:{_mostLikelyList}{suffix}',
-                            f'pidIsMostLikely({args}) > 0 and {trackQuality}', True, path=path)
+                            f'pidIsMostLikely({args}) > 0 and {trackQuality}', writeOut=writeOut, path=path)

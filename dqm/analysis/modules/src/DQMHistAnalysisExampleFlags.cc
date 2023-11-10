@@ -32,6 +32,7 @@ DQMHistAnalysisExampleFlagsModule::DQMHistAnalysisExampleFlagsModule()
 {
   //Parameter definition
   B2DEBUG(20, "DQMHistAnalysisExampleFlags: Constructor done.");
+  setDescription("Example DQMHistAnalysisModules with how canvas flag settings.");
 }
 
 

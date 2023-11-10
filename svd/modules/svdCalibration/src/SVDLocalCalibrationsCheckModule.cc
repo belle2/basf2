@@ -585,6 +585,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     leftLine = -m_cutPedestal_out;
     rightLine = m_cutPedestal_out;
     topLine = 25;
+  } else {
+    B2FATAL("The printPage function is not implemented for" << LogVar("variable", variable));
   }
   refU->GetYaxis()->SetRangeUser(minY, maxY);
   refV->GetYaxis()->SetRangeUser(minY, maxY);

@@ -125,7 +125,7 @@ namespace Belle2 {
     }
 
     //! Set reconstructed hit time.
-    //! @parameter time Reconstructed hit time (ns).
+    //! @param[in] time Reconstructed hit time (ns).
     void setTime(double time)
     {
       m_Time = time;

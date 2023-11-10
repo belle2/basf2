@@ -248,7 +248,8 @@ def add_prefilter_reconstruction(path,
     # Add prefilter posttracking modules
     add_prefilter_posttracking_reconstruction(path,
                                               components=components,
-                                              add_muid_hits=add_muid_hits)
+                                              add_muid_hits=add_muid_hits,
+                                              useVTX=useVTX)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_PostTracking')
@@ -529,7 +530,8 @@ def add_posttracking_reconstruction(path,
                                     for_cdst_analysis=False,
                                     add_eventt0_combiner_for_cdst=False,
                                     eventt0_combiner_mode="prefer_svd",
-                                    legacy_ecl_charged_pid=False):
+                                    legacy_ecl_charged_pid=False,
+                                    useVTX=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -551,6 +553,7 @@ def add_posttracking_reconstruction(path,
     :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
+    :param useVTX: use VTX instead of VXD
     """
 
     add_prefilter_posttracking_reconstruction(path,
@@ -558,7 +561,8 @@ def add_posttracking_reconstruction(path,
                                               add_muid_hits=add_muid_hits,
                                               for_cdst_analysis=for_cdst_analysis,
                                               add_eventt0_combiner_for_cdst=add_eventt0_combiner_for_cdst,
-                                              eventt0_combiner_mode=eventt0_combiner_mode)
+                                              eventt0_combiner_mode=eventt0_combiner_mode,
+                                              useVTX=useVTX)
 
     add_postfilter_posttracking_reconstruction(path,
                                                components=components,
@@ -930,7 +934,8 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
                                     components=components,
                                     for_cdst_analysis=True,
                                     add_eventt0_combiner_for_cdst=add_eventt0_combiner,
-                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid,
+                                    useVTX=useVTX)
 
 
 def prepare_user_cdst_analysis(path, components=None, mc=False):

@@ -17,7 +17,7 @@
 #include <TLine.h>
 
 namespace Belle2 {
-  /*! DQM Delta Histogram Test code and example */
+  /*! DQM Trigger Histogram code and example */
 
   class DQMHistAnalysisTRGModule final : public DQMHistAnalysisModule {
 

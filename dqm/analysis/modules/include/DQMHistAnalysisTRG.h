@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisDeltaEpicsMonObjExample.h
-// Description : DQM Analysis Delta+Epics+MonObj example
+// File : DQMHistAnalysisTRG.h
+// Description : DQM Analysis TRG
 //-
 
 #pragma once

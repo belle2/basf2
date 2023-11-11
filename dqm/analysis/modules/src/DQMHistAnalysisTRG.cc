@@ -163,6 +163,21 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     setEpicsPV("ECLTRG_timing_mean", ECLTRG_timing_mean);
   }
 
+  /**
+  *      * Name of canvas of ECLTRG_timing_mean
+  *      *Name of canvas of CDCTRG_timing_mean
+  *      *Name of canvas of TOPTRG_timing_mean
+  *      *Name of canvas of ECLTRG_peak
+  *      *Name of canvas of CDCTRG_2D_peak
+  *      *Name of canvas of NN_peak
+  *      *Name of canvas of CDCTRG_TSF_peak
+  *      *Name of canvas of KLMTRG_peak
+  *      *Name of canvas of TOPTRG_peak
+  *      *Name of canvas of hadronb2_over_bhabha_all
+  *      *Name of canvas of mumu2trk_over_bhabha_all
+  *      *Name of canvas of hadronb2_over_mumu2trk
+        */
+
   m_canvas_CDCTRG_timing_mean->Clear();
   m_canvas_CDCTRG_timing_mean->cd(0);
   //update CDCTRG timing

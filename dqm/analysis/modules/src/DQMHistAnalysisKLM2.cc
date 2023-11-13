@@ -313,8 +313,8 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
 {
   effHist->Reset();
   TH1* effClone = (TH1*)effHist->Clone(); //will be useful for delta plots
+  canvas->cd();
   if (denominator != nullptr && numerator != nullptr) {
-    canvas->cd();
     effHist->Divide(numerator, denominator, 1, 1, "B");
     effHist->Draw();
     canvas->Modified();
@@ -324,8 +324,9 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
     auto deltaDenom = getDelta("", denominator->GetName());
     auto deltaNumer = getDelta("", numerator->GetName());
 
-    //both histograms should have the same update condition but checking both should be okay?
-    UpdateCanvas(canvas->GetName(), (deltaNumer != nullptr && deltaDenom != nullptr));
+    // both histograms should have the same update condition but checking both should be okay?
+    // if this condition is not satisfied, does it cause the above to not ever update?
+    //UpdateCanvas(canvas->GetName(), (deltaNumer != nullptr && deltaDenom != nullptr));
     if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
       effClone->Draw("SAME");
@@ -345,10 +346,8 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
     B2WARNING("KLMDQM2 histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
     return;
   } else {
-    canvas->Clear();
     canvas->cd();
     histogram->SetStats(false);
-    histogram->Draw();
     double histMin = gPad->GetUymin();
     double histMax = gPad->GetUymax();
     double histRange = histMax - histMin;

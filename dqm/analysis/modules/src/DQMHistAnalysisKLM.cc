@@ -332,6 +332,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
   }
 
+  // for hot/masked channels, log scale plots (reference and main)
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
     histogram->SetMinimum(1);
     canvas->SetLogy();
@@ -352,6 +353,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int divisions;
   int bin = 1;
   double xLine;
+  // drawing lines for BKLM sectors
   if (subdetector == 1) {
     int shift;
     if (index == 0) {
@@ -367,7 +369,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       bin += BKLMElementNumbers::getNStrips(section, sector, k + shift, 0)
              + BKLMElementNumbers::getNStrips(section, sector, k + shift, 1);
     }
-  } else {
+  } else { // drawing lines for EKLM sectors
     if ((section == 2) && (index == 0 || index == 1))
       divisions = 5;
     else
@@ -589,6 +591,7 @@ void DQMHistAnalysisKLMModule::event()
   latex.SetTextColor(kRed);
   latex.SetTextAlign(11);
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  // gathering relevant info for analyseChannelHitHistogram
   for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
@@ -616,10 +619,11 @@ void DQMHistAnalysisKLMModule::event()
         B2WARNING("KLM DQM histogram canvas " << canvasName << " is not found.");
         continue;
       }
-      UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
       analyseChannelHitHistogram(
         klmSector.getSubdetector(), klmSector.getSection(),
         klmSector.getSector(), j, histogram, delta, canvas, latex);
+      // Add this canvas that it is time to update
+      UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
 
     }
   }

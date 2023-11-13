@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisTRGModule.cc
-// Description : Test Module for TRG
+// Description : Module for TRG
 //-
 
 
@@ -60,22 +60,22 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "ECLTRG_timing_mean", "ECLTRG_timing_mean");
 
   //CDCTRG event timing
-  m_canvas_CDCTRG_timing_mean = new TCanvas("TRGCDCTRG_timing_mean");
+  m_canvas_CDCTRG_timing_mean = new TCanvas("TRG/CDCTRG_timing_mean");
   addDeltaPar("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_timing_mean", "CDCTRG_timing_mean");
 
   //TOPTRG event timing
-  m_canvas_TOPTRG_timing_mean = new TCanvas("TOPTRG_timing_mean");
+  m_canvas_TOPTRG_timing_mean = new TCanvas("TOP/TRG_timing_mean");
   addDeltaPar("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_timing_mean", "TOPTRG_timing_mean");
 
   //ECLTRG_peak
-  m_canvas_ECLTRG_peak = new TCanvas("ECLTRG_peak");
+  m_canvas_ECLTRG_peak = new TCanvas("ECL/TRG_peak");
   addDeltaPar("EventT0DQMdir", "m_histEvent_ECLTRG_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_peak", "ECLTRG_peak");
 
   //CDCTRG_2D_peak
-  m_canvas_CDCTRG_2D_peak = new TCanvas("CDCTRG_2D_peak");
+  m_canvas_CDCTRG_2D_peak = new TCanvas("CDC/TRG_2D_peak");
   addDeltaPar("EventT0DQMdir", "m_histEvent_CDCTRG_2D_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_2D_peak", "CDCTRG_2D_peak");
 
@@ -85,17 +85,17 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "NN_peak", "NN_peak");
 
   //CDCTRG_TSF_peak
-  m_canvas_CDCTRG_TSF_peak = new TCanvas("CDCTRG_TSF_peak");
+  m_canvas_CDCTRG_TSF_peak = new TCanvas("CDC/TRG_TSF_peak");
   addDeltaPar("EventT0DQMdir", "m_histEvent_CDCTRG_TSF_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_TSF_peak", "CDCTRG_TSF_peak");
 
   //KLMTRG_peak
-  m_canvas_KLMTRG_peak = new TCanvas("KLMTRG_peak");
+  m_canvas_KLMTRG_peak = new TCanvas("KLM/TRG_peak");
   addDeltaPar("EventT0DQMdir", "m_histEvent_KLMTRG_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "KLMTRG_peak", "KLMTRG_peak");
 
   //TOPTRG_peak
-  m_canvas_TOPTRG_peak = new TCanvas("TOPTRG_peak");
+  m_canvas_TOPTRG_peak = new TCanvas("TOP/TRG_peak");
   addDeltaPar("EventT0DQMdir", "m_histEvent_TOPTRG_peak", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_peak", "TOPTRG_peak");
 
@@ -113,6 +113,16 @@ void DQMHistAnalysisTRGModule::initialize()
   m_canvas_hadronb2_over_mumu2trk = new TCanvas("hadronb2_over_mumu2trk");
   addDeltaPar("EventT0DQMdir", "m_histEvent_hadronb2_over_mumu2trk", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
+
+  //deadch_c_h_TCId
+  m_canvas_deadch_c_h_TCId = new TCanvas("deadch_c_h_TCId");
+  addDeltaPar("TRG", "c_h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "deadch_c_h_TCId", "deadch_c_h_TCId");
+
+  //deadch_c_NeuroHWInTSID
+  m_canvas_deadch_c_NeuroHWInTSID = new TCanvas("deadch_c_NeuroHWInTSID");
+  addDeltaPar("TRGCDCTNN", "c_NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "deadch_c_NeuroHWInTSID", "deadch_c_NeuroHWInTSID");
 
   //update PV
 //  updateEpicsPVs(
@@ -163,20 +173,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     setEpicsPV("ECLTRG_timing_mean", ECLTRG_timing_mean);
   }
 
-  /**
-  *      * Name of canvas of ECLTRG_timing_mean
-  *      *Name of canvas of CDCTRG_timing_mean
-  *      *Name of canvas of TOPTRG_timing_mean
-  *      *Name of canvas of ECLTRG_peak
-  *      *Name of canvas of CDCTRG_2D_peak
-  *      *Name of canvas of NN_peak
-  *      *Name of canvas of CDCTRG_TSF_peak
-  *      *Name of canvas of KLMTRG_peak
-  *      *Name of canvas of TOPTRG_peak
-  *      *Name of canvas of hadronb2_over_bhabha_all
-  *      *Name of canvas of mumu2trk_over_bhabha_all
-  *      *Name of canvas of hadronb2_over_mumu2trk
-        */
 
   m_canvas_CDCTRG_timing_mean->Clear();
   m_canvas_CDCTRG_timing_mean->cd(0);
@@ -320,6 +316,28 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+// update #deadch_c_h_TCId
+  auto hist_c_h_TCId = getDelta("TRG", "c_h_TCId", 0, true);// only if updated
+  if (hist_c_h_TCId) {
+    double deadch_c_h_TCId = 0.0;
+    hist_c_h_TCId->Draw();
+    deadch_c_h_TCId = hist_c_h_TCId->GetMaximum() * 0.01;
+    B2DEBUG(1, "deadch_c_h_TCId:" << deadch_c_h_TCId);
+    setEpicsPV("deadch_c_h_TCId", deadch_c_h_TCId);
+
+  }
+
+// update #deadch_c_NeuroHWInTSID
+  auto hist_c_NeuroHWInTSID = getDelta("TRGCDCTNN", "c_NeuroHWInTSID", 0, true);// only if updated
+  if (hist_c_NeuroHWInTSID) {
+    double deadch_c_NeuroHWInTSID = 0.0;
+    hist_c_NeuroHWInTSID->Draw();
+    deadch_c_NeuroHWInTSID = hist_c_NeuroHWInTSID->GetMaximum() * 0.01;
+    B2DEBUG(1, "deadch_c_NeuroHWInTSID:" << deadch_c_NeuroHWInTSID);
+    setEpicsPV("deadch_c_NeuroHWInTSID", deadch_c_NeuroHWInTSID);
+
+  }
+
 //******************     BACK UP       ********************//
 
 // update #mumu_tight/#bhabha_all
@@ -366,6 +384,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+
 //******************     BACK UP       ********************//
 
   // Tag canvas as updated ONLY if things have changed.
@@ -382,6 +401,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   UpdateCanvas(m_canvas_hadronb2_over_bhabha_all->GetName(), hist != nullptr);
   UpdateCanvas(m_canvas_mumu2trk_over_bhabha_all->GetName(), hist != nullptr);
   UpdateCanvas(m_canvas_hadronb2_over_mumu2trk->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_deadch_c_h_TCId->GetName(), hist != nullptr);
+  UpdateCanvas(m_canvas_deadch_c_NeuroHWInTSID->GetName(), hist != nullptr);
 
   // this if left over from jsroot, may not be needed anymore (to check)
   m_canvas->Update();
@@ -397,6 +418,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_hadronb2_over_bhabha_all->Update();
   m_canvas_mumu2trk_over_bhabha_all->Update();
   m_canvas_hadronb2_over_mumu2trk->Update();
+  m_canvas_deadch_c_h_TCId->Update();
+  m_canvas_deadch_c_NeuroHWInTSID->Update();
 
 }
 

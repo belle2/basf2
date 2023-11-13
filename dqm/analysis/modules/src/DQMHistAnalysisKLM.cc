@@ -619,11 +619,12 @@ void DQMHistAnalysisKLMModule::event()
         B2WARNING("KLM DQM histogram canvas " << canvasName << " is not found.");
         continue;
       }
+      // Add this canvas that it is time to update
+      // not sure if this is interfering with the generation of some features
+      //UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
       analyseChannelHitHistogram(
         klmSector.getSubdetector(), klmSector.getSection(),
         klmSector.getSector(), j, histogram, delta, canvas, latex);
-      // Add this canvas that it is time to update
-      UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
 
     }
   }

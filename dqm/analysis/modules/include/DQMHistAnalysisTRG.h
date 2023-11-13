@@ -120,8 +120,16 @@ namespace Belle2 {
     TCanvas* m_canvas_mumu2trk_over_bhabha_all = nullptr;
     /**
      * @Name of canvas of hadronb2_over_mumu2trk
-    */
+     */
     TCanvas* m_canvas_hadronb2_over_mumu2trk = nullptr;
+    /**
+     * @Name of canvas of deadch_c_h_TCId
+     */
+    TCanvas* m_canvas_deadch_c_h_TCId = nullptr;
+    /**
+     * @Name of canvas of deadch_c_NeuroHWInTSID
+     */
+    TCanvas* m_canvas_deadch_c_NeuroHWInTSID = nullptr;
 
   };
 } // end namespace Belle2

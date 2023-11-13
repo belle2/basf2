@@ -316,6 +316,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+  m_canvas_deadch_c_h_TCId->Clear();
+  m_canvas_deadch_c_h_TCId->cd(0);
 // update #deadch_c_h_TCId
   auto hist_c_h_TCId = getDelta("TRG", "c_h_TCId", 0, true);// only if updated
   if (hist_c_h_TCId) {
@@ -327,6 +329,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+  m_canvas_deadch_c_NeuroHWInTSID->Clear();
+  m_canvas_deadch_c_NeuroHWInTSID->cd(0);
 // update #deadch_c_NeuroHWInTSID
   auto hist_c_NeuroHWInTSID = getDelta("TRGCDCTNN", "c_NeuroHWInTSID", 0, true);// only if updated
   if (hist_c_NeuroHWInTSID) {

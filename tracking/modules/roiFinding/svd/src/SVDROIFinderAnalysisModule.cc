@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/svdROIFinder/SVDROIFinderAnalysisModule.h>
+#include <tracking/modules/roiFinding/svd/SVDROIFinderAnalysisModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>

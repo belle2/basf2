@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/svdROIFinder/SVDROIDQMModule.h>
+#include <tracking/modules/roiFinding/svd/SVDROIDQMModule.h>
 
 #include <TDirectory.h>
 #include <TH2F.h>

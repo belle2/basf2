@@ -93,7 +93,7 @@ void SVDROIFinderModule::beginRun()
   m_ROIinfo.ROIListName = m_ROIListName;
   m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
-  m_theSVDInterceptor = new SVDInterceptor(&m_ROIinfo, m_toleranceZ, m_tolerancePhi);
+  m_theSVDInterceptor = new SVDInterceptor(m_toleranceZ, m_tolerancePhi);
 
   m_theStripTranslator = new ROIStripTranslator(&m_ROIinfo);
 

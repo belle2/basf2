@@ -121,7 +121,7 @@ void PXDROIFinderModule::beginRun()
   m_ROIinfo.ROIListName = m_ROIListName;
   m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
-  m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo, m_toleranceZ, m_tolerancePhi);
+  m_thePXDInterceptor = new PXDInterceptor(m_toleranceZ, m_tolerancePhi);
 
   m_thePixelTranslator = new ROIPixelTranslator(&m_ROIinfo);
 

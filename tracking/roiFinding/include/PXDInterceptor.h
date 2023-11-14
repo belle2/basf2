@@ -29,7 +29,7 @@ namespace Belle2 {
 
     /** Class Constructor.
      */
-    PXDInterceptor(const ROIinfo* user_theROIinfo, double toleranceZ, double tolerancePhi);
+    PXDInterceptor(double toleranceZ, double tolerancePhi);
 
     /** Destructor.
      */
@@ -47,8 +47,6 @@ namespace Belle2 {
     genfit::KalmanFitter m_kalmanFilter; /**< kalman filter object to fit the track */
 
     ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
-
-    ROIinfo m_theROIinfo; /**< the ROI info structure */
 
     /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
      */

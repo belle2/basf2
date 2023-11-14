@@ -15,8 +15,7 @@
 
 using namespace Belle2;
 
-PXDInterceptor::PXDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, double tolerancePhi):
-  m_theROIinfo(*theROIinfo)
+PXDInterceptor::PXDInterceptor(double toleranceZ, double tolerancePhi)
 {
   m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi);
 }

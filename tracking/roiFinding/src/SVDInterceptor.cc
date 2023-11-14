@@ -17,8 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-SVDInterceptor::SVDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, double tolerancePhi):
-  m_theROIinfo(*theROIinfo)
+SVDInterceptor::SVDInterceptor(double toleranceZ, double tolerancePhi)
 {
   m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi);
 }

@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    SVDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, double tolerancePhi);
+    SVDInterceptor(double toleranceZ, double tolerancePhi);
 
     /** Destructor.
      */
@@ -42,8 +42,6 @@ namespace Belle2 {
     const float m_svdLayerRadius[4] = {3.8, 8.0, 11.5, 14.0}; /**< mean SVD layer radius for both layers */
 
     SVDROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
-
-    ROIinfo m_theROIinfo; /**< the ROI info structure */
 
     /** Append the SVDIntercept infos related to the track theTrack to the listToBeFilled.
      */

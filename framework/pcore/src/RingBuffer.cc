@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <sys/sem.h>
 
+#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 
@@ -40,7 +41,7 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
   // 0. Determine shared memory type
   if (name != "private") { // Global
     m_file = true;
-    m_pathname = string("/tmp/") + getenv("USER") + "_RB_" + name;
+    m_pathname = std::string(std::filesystem::temp_directory_path() / getenv("USER")) + "_RB_" + name;
     m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
     if (m_pathfd > 0) {   // a new shared memory file created
       B2DEBUG(32, "[RingBuffer] Creating a ring buffer with key " << name);
@@ -145,7 +146,8 @@ void RingBuffer::openSHM(int nwords)
 
   if (m_new) {
     // Leave id of shm and semaphore in file name
-    m_semshmFileName = "/tmp/SHM" + to_string(m_shmid) + "-SEM" + to_string(m_semid) + "-UNNAMED";
+    m_semshmFileName = std::string(std::filesystem::temp_directory_path() / "SHM") + to_string(m_shmid) + "-SEM" + to_string(
+                         m_semid) + "-UNNAMED";
     int fd = open(m_semshmFileName.c_str(), O_CREAT | O_TRUNC | O_RDWR, 0644);
     if (fd < 0) {
       B2WARNING("RingBuffer ID file could not be created.");

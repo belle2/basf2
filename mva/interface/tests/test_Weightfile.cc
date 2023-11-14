@@ -334,7 +334,7 @@ namespace {
     std::filesystem::remove_all(std::filesystem::path(filename).parent_path());
     EXPECT_FALSE(std::filesystem::exists(std::filesystem::path(filename).parent_path()));
 
-    char* directory_template = strdup("/tmp/Basf2Sub.XXXXXX");
+    char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2Sub.XXXXXX").c_str());
     auto tempdir = std::string(mkdtemp(directory_template));
     {
       MVA::Weightfile weightfile2;

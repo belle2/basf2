@@ -75,6 +75,8 @@ namespace Belle2 {
     double m_errorOutsideAdhoc{};
     /** threshold level/line for outside fraction */
     int m_upperLineAdhoc{};
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! Module list for masking
     std::vector <std::string> m_parModuleList;

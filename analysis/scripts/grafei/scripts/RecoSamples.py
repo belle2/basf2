@@ -23,9 +23,6 @@ def get_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Reconstruct most likely particles and save their features + B meson LCA matrices'
     )
-    parser.add_argument('-i', type=Path, required=False,
-                        help='Input mdst files', metavar='INPUT',
-                        dest='input')
     parser.add_argument('-t', '--type', choices=['B0:MC', 'B+:MC', 'Upsilon(4S):MC'], required=True,
                         help='Training target', metavar='type',
                         dest='type')
@@ -42,12 +39,7 @@ if __name__ == '__main__':
 
     # assert args.bkg_prob >= 0 and args.bkg_prob <= 1, "Background probability should be in [0, 1]"
 
-    # This assumes one input file only
-    # Use this to set the output filenames to match the input
-    if not args.input:
-        input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
-    else:
-        input_file = args.input
+    input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
 
     path = b2.create_path()
     ma.inputMdst(str(args.input), path=path)

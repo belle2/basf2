@@ -115,7 +115,6 @@ class graFEISaverModule(b2.Module):
             efeat_in_dim=e_infeatures,
             gfeat_in_dim=g_infeatures,
             edge_classes=self.configs["dataset"]["edge_classes"],
-            x_classes=self.configs["dataset"]["x_classes"],
             **self.configs["geometric_model"],
         )
 

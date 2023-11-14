@@ -10,9 +10,8 @@ def calculate_class_weights(dataloader, num_classes, edges, num_batches=100):
 
     Args:
         dataloader(torch.Dataloader): Dataloader to iterate through when collecting batches
-        edge_classes(int): Number of classes
+        edges(bool): True for edges, False for nodes
         num_batches(int, optional): Number of batches from dataloader to use to approximate class weights
-        amp_enabled(bool, optional): Enabled mixed precision. Creates weights tensor as half precision
     Return:
         (torch.tensor): Tensor of class weights, normalised to 1
     """

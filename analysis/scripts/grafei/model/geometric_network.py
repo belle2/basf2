@@ -10,7 +10,7 @@ class GeometricNetwork(torch.nn.Module):
         efeat_in_dim,
         gfeat_in_dim,
         edge_classes,
-        x_classes,
+        x_classes=7,
         hidden_layer_dim=128,
         num_hid_layers=1,
         num_ML=1,
@@ -51,9 +51,9 @@ class GeometricNetwork(torch.nn.Module):
         """
         super(GeometricNetwork, self).__init__()
 
-        self.num_ML = num_ML
         self.symmetrize = symmetrize
-        self.global_layer = global_layer
+        self.x_classes = x_classes
+        self.edge_classes = edge_classes
 
         self.first_ML = MetaLayer(
             EdgeLayer(
@@ -86,7 +86,7 @@ class GeometricNetwork(torch.nn.Module):
                 dropout,
                 normalize,
             )
-            if self.global_layer
+            if global_layer
             else None,
         )
         self.ML_list = torch.nn.ModuleList(
@@ -95,7 +95,7 @@ class GeometricNetwork(torch.nn.Module):
                     EdgeLayer(
                         hidden_layer_dim,
                         hidden_layer_dim,
-                        hidden_layer_dim if self.global_layer else 0,
+                        hidden_layer_dim if global_layer else 0,
                         hidden_layer_dim,
                         hidden_layer_dim,
                         num_hid_layers,
@@ -105,7 +105,7 @@ class GeometricNetwork(torch.nn.Module):
                     NodeLayer(
                         hidden_layer_dim,
                         hidden_layer_dim,
-                        hidden_layer_dim if self.global_layer else 0,
+                        hidden_layer_dim if global_layer else 0,
                         hidden_layer_dim,
                         hidden_layer_dim,
                         num_hid_layers,
@@ -122,17 +122,17 @@ class GeometricNetwork(torch.nn.Module):
                         dropout,
                         normalize,
                     )
-                    if self.global_layer
+                    if global_layer
                     else None,
                 )
-                for _ in range(self.num_ML)
+                for _ in range(num_ML)
             ]
         )
         self.last_ML = MetaLayer(
             EdgeLayer(
                 hidden_layer_dim,
                 hidden_layer_dim,
-                hidden_layer_dim if self.global_layer else 0,
+                hidden_layer_dim if global_layer else 0,
                 hidden_layer_dim,
                 edge_classes,
                 num_hid_layers,
@@ -142,7 +142,7 @@ class GeometricNetwork(torch.nn.Module):
             NodeLayer(
                 hidden_layer_dim,
                 edge_classes,
-                hidden_layer_dim if self.global_layer else 0,
+                hidden_layer_dim if global_layer else 0,
                 hidden_layer_dim,
                 x_classes,
                 num_hid_layers,
@@ -159,7 +159,7 @@ class GeometricNetwork(torch.nn.Module):
                 dropout,
                 normalize=None,
             )
-            if self.global_layer
+            if global_layer
             else None,
         )
 
@@ -217,3 +217,15 @@ class GeometricNetwork(torch.nn.Module):
                 ).values()  # Symmetrization happens here
 
         return x, edge_attr, u
+
+    def getNXClasses(self):
+        """
+        Returns the number of node classes in the model.
+        """
+        return self.x_classes
+
+    def getNEClasses(self):
+        """
+        Returns the number of edge classes in the model.
+        """
+        return self.edge_classes

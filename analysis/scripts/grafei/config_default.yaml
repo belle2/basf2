@@ -1,7 +1,7 @@
 dataset:
   # Select the data type, this decides which Dataset class to use
   inMemory: True
-  path:  # Should contain train/val subdirectories
+  path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts/ntuples_test_B # Should contain train/val subdirectories
   config:
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
     edge_features: [costheta, doca]
@@ -32,16 +32,16 @@ dataset:
       #muonID : [[linear, 0.19, 0.3]]
       #protonID : [[linear, 0.03, 0.14]]
       #pionID : [[linear, 0.53, 0.41]]
-  edge_classes: 7 # 6 (7): 0, 1, 2, 3, 4, 5(, 6)
+  edge_classes: 6 # 6 (7): 0, 1, 2, 3, 4, 5(, 6)
 output:
   # Top directory to save model, run_name as subdir and timestamp suffix
   # will be added automatically
-  path: null 
-  tensorboard: null
+  path: #/home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts #null 
+  tensorboard: null #/home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts #null
   # Give a name to this config file's series of training
   # Tensorboard logs will be saved in a subdir with that name to help 
   # organise them
-  run_name: test
+  run_name: test_B
 train:
   epochs: 3
   batch_size: 128

@@ -88,7 +88,6 @@ def main(
         efeat_in_dim=e_infeatures,
         gfeat_in_dim=g_infeatures,
         edge_classes=configs["dataset"]["edge_classes"],
-        x_classes=configs["dataset"]["x_classes"],
         **configs["geometric_model"],
     )
 
@@ -118,12 +117,12 @@ def main(
     if configs["train"]["class_weights"]:
         edge_weights = calculate_class_weights(
             dataloader=mode_tags["Training"][2],
-            num_classes=configs["dataset"]["edge_classes"],
+            num_classes=model.getNEClasses(),
             edges=True,
         )
         node_weights = calculate_class_weights(
             dataloader=mode_tags["Training"][2],
-            num_classes=configs["dataset"]["x_classes"],
+            num_classes=model.getNXClasses(),
             edges=False,
         )
         edge_weights = edge_weights.to(device)

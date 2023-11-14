@@ -38,9 +38,7 @@ ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
   std::set<Belle2::VxdID> pxdLayers = aGeometry.getLayers(VXD::SensorInfoBase::PXD);
   std::set<Belle2::VxdID>::iterator itPxdLayers = pxdLayers.begin();
 
-  //  while (itPxdLayers != pxdLayers.end()) {
-  //in DESY TB the EUDET telescope planes have been associated to PXD layer 7, we do not want ROIs there, therefore:
-  while ((itPxdLayers != pxdLayers.end()) && (itPxdLayers->getLayerNumber() != 7)) {
+  while (itPxdLayers != pxdLayers.end()) {
 
     std::set<Belle2::VxdID> pxdLadders = aGeometry.getLadders(*itPxdLayers);
     std::set<Belle2::VxdID>::iterator itPxdLadders = pxdLadders.begin();

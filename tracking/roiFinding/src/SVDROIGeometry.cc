@@ -37,9 +37,7 @@ SVDROIGeometry::fillPlaneList(double toleranceZ,
   std::set<Belle2::VxdID> svdLayers = geoCache.getLayers(VXD::SensorInfoBase::SVD);
   std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
 
-  //  while (itSvdLayers != svdLayers.end()) {
-  //in DESY TB the EUDET telescope planes have been associated to SVD layer 7, we do not want ROIs there, therefore:
-  while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) {
+  while (itSvdLayers != svdLayers.end()) {
 
     std::set<Belle2::VxdID> svdLadders = geoCache.getLadders(*itSvdLayers);
     std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();

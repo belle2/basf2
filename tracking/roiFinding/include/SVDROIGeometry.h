@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
+#include <tracking/roiFinding/ROIDetPlane.h>
 #include <Math/Vector3D.h>
 
 #include <list>

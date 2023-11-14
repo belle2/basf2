@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
+#include <tracking/roiFinding/ROIDetPlane.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>

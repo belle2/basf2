@@ -13,7 +13,7 @@
 #include <tracking/roiFinding/SVDROIGeometry.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/pxdDataReductionClasses/ROIinfo.h>
+#include <tracking/roiFinding/ROIinfo.h>
 
 namespace Belle2 {
 

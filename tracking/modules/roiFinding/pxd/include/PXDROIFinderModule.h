@@ -13,10 +13,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
-#include <tracking/pxdDataReductionClasses/ROIPixelTranslator.h>
+#include <tracking/roiFinding/PXDInterceptor.h>
+#include <tracking/roiFinding/ROIPixelTranslator.h>
 #include <string>
-#include <tracking/pxdDataReductionClasses/ROIinfo.h>
+#include <tracking/roiFinding/ROIinfo.h>
 #include <framework/database/DBObjPtr.h>
 #include <tracking/dbobjects/ROICalculationParameters.h>
 

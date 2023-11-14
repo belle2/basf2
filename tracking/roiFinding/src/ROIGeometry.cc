@@ -7,11 +7,11 @@
  **************************************************************************/
 
 
-#include "tracking/pxdDataReductionClasses/ROIGeometry.h"
+#include "tracking/roiFinding/ROIGeometry.h"
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
+#include <tracking/roiFinding/ROIDetPlane.h>
 
 #include <set>
 

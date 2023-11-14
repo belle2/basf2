@@ -12,8 +12,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/pxdDataReductionClasses/ROIGeometry.h>
-#include <tracking/pxdDataReductionClasses/ROIinfo.h>
+#include <tracking/roiFinding/ROIGeometry.h>
+#include <tracking/roiFinding/ROIinfo.h>
 #include <genfit/KalmanFitter.h>
 
 

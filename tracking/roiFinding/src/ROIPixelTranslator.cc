@@ -7,7 +7,7 @@
  **************************************************************************/
 
 
-#include <tracking/pxdDataReductionClasses/ROIPixelTranslator.h>
+#include <tracking/roiFinding/ROIPixelTranslator.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>

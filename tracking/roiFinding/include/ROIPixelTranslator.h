@@ -11,7 +11,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/dataobjects/ROIid.h>
-#include <tracking/pxdDataReductionClasses/ROIinfo.h>
+#include <tracking/roiFinding/ROIinfo.h>
 
 namespace Belle2 {
 

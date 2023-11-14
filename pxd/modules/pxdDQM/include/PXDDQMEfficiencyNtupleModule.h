@@ -20,7 +20,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
+#include <tracking/roiFinding/PXDInterceptor.h>
 
 //root stuff
 #include <Math/Vector3D.h>

@@ -216,6 +216,7 @@ void DQMHistAnalysisPXDChargeModule::event()
 
   m_cCharge->Modified();
   m_cCharge->Update();
+  UpdateCanvas(m_cCharge);
 }
 
 void DQMHistAnalysisPXDChargeModule::endRun()

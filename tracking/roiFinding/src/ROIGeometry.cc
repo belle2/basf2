@@ -29,40 +29,39 @@ ROIGeometry::~ROIGeometry()
 
 
 void
-ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
+ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi, const VXD::SensorInfoBase::SensorType det)
 {
 
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  std::set<Belle2::VxdID> vxdLayers = geoCache.getLayers(det);
+  std::set<Belle2::VxdID>::iterator itVXDLayers = vxdLayers.begin();
 
-  std::set<Belle2::VxdID> pxdLayers = aGeometry.getLayers(VXD::SensorInfoBase::PXD);
-  std::set<Belle2::VxdID>::iterator itPxdLayers = pxdLayers.begin();
+  while (itVXDLayers != vxdLayers.end()) {
 
-  while (itPxdLayers != pxdLayers.end()) {
+    std::set<Belle2::VxdID> vxdLadders = geoCache.getLadders(*itVXDLayers);
+    std::set<Belle2::VxdID>::iterator itVXDLadders = vxdLadders.begin();
 
-    std::set<Belle2::VxdID> pxdLadders = aGeometry.getLadders(*itPxdLayers);
-    std::set<Belle2::VxdID>::iterator itPxdLadders = pxdLadders.begin();
+    while (itVXDLadders != vxdLadders.end()) {
 
-    while (itPxdLadders != pxdLadders.end()) {
+      std::set<Belle2::VxdID> vxdSensors = geoCache.getSensors(*itVXDLadders);
+      std::set<Belle2::VxdID>::iterator itVXDSensors = vxdSensors.begin();
+      B2DEBUG(20, "    vxd sensor info " << * (vxdSensors.begin()));
 
-      std::set<Belle2::VxdID> pxdSensors = aGeometry.getSensors(*itPxdLadders);
-      std::set<Belle2::VxdID>::iterator itPxdSensors = pxdSensors.begin();
-      B2DEBUG(20, "    pxd sensor info " << * (pxdSensors.begin()));
+      while (itVXDSensors != vxdSensors.end()) {
+        B2DEBUG(20, "    vxd sensor info " << *itVXDSensors);
 
-      while (itPxdSensors != pxdSensors.end()) {
-        B2DEBUG(20, "    pxd sensor info " << *itPxdSensors);
-
-        ROIDetPlane plane(*itPxdSensors, toleranceZ, tolerancePhi);
+        ROIDetPlane plane(*itVXDSensors, toleranceZ, tolerancePhi);
         genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
         plane.setSharedPlanePtr(sharedPlane);
 
         m_planeList.push_back(plane);
 
-        ++itPxdSensors;
+        ++itVXDSensors;
       }
-      ++itPxdLadders;
+      ++itVXDLadders;
     }
-    ++itPxdLayers;
+    ++itVXDLayers;
   }
 
   B2DEBUG(20, "just filled the plane list with " << m_planeList.size() << "planes");

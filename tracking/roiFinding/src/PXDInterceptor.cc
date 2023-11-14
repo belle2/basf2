@@ -17,7 +17,7 @@ using namespace Belle2;
 
 PXDInterceptor::PXDInterceptor(double toleranceZ, double tolerancePhi)
 {
-  m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi);
+  m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi, VXD::SensorInfoBase::PXD);
 }
 
 PXDInterceptor::~PXDInterceptor()

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/PXDclusterFilterModule.h>
+#include <tracking/modules/roiFinding/pxd/PXDclusterFilterModule.h>
 #include <map>
 
 using namespace Belle2;

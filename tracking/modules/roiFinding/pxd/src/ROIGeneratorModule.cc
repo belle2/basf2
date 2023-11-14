@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/ROIGeneratorModule.h>
+#include <tracking/modules/roiFinding/pxd/ROIGeneratorModule.h>
 #include <framework/datastore/StoreArray.h>
 
 using namespace Belle2;

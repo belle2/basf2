@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/ROIReadTestModule.h>
+#include <tracking/modules/roiFinding/pxd/ROIReadTestModule.h>
 
 using namespace Belle2;
 

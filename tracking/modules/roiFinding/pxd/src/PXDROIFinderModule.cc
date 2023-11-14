@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/PXDROIFinderModule.h>
+#include <tracking/modules/roiFinding/pxd/PXDROIFinderModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>

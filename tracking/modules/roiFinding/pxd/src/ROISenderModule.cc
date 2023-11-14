@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/ROISenderModule.h>
+#include <tracking/modules/roiFinding/pxd/ROISenderModule.h>
 #include <sys/stat.h>
 #include <chrono>
 

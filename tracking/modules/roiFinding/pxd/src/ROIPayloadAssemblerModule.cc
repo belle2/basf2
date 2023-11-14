@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/ROIPayloadAssemblerModule.h>
+#include <tracking/modules/roiFinding/pxd/ROIPayloadAssemblerModule.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <set>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>

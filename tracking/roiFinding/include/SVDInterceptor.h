@@ -10,7 +10,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/svdROIFinder/SVDROIGeometry.h>
+#include <tracking/roiFinding/SVDROIGeometry.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>

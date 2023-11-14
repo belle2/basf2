@@ -9,8 +9,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/svdROIFinder/SVDInterceptor.h>
-#include <tracking/svdROIFinder/ROIStripTranslator.h>
+#include <tracking/roiFinding/SVDInterceptor.h>
+#include <tracking/roiFinding/ROIStripTranslator.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>

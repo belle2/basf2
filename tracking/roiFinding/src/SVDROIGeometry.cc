@@ -7,7 +7,7 @@
  **************************************************************************/
 
 
-#include <tracking/svdROIFinder/SVDROIGeometry.h>
+#include <tracking/roiFinding/SVDROIGeometry.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>

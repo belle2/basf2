@@ -28,11 +28,6 @@ namespace Belle2 {
      */
     ~ROIGeometry();
 
-    /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
-     */
-    //    void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, RecoTrack* theTrack,
-    //                          int recoTrackIndex, RelationArray* recoTrackToPXDIntercepts);
-
     std::list<ROIDetPlane> m_planeList; /**< list of planes*/
 
     void fillPlaneList(double toleranceZ, double tolerancePhi,

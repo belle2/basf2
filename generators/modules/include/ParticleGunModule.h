@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+/* #include <framework/core/Module.h> */
+#include <generators/modules/GeneratorBaseModule.h>
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/particlegun/ParticleGun.h>
@@ -21,7 +22,7 @@ namespace Belle2 {
    * Generate tracks with the particle gun and store them
    * into the MCParticle class.
    */
-  class ParticleGunModule : public Module {
+  class ParticleGunModule : public GeneratorBaseModule {
   public:
     /**
      * Constructor.
@@ -36,7 +37,7 @@ namespace Belle2 {
     void initialize() override;
 
     /** Method is called for each event. */
-    void event() override;
+    void generatorEvent() override;
 
   protected:
     /** function to convert the strings the uses sets in the parameter list to the internal encoding */

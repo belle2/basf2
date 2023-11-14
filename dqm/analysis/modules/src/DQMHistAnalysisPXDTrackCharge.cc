@@ -184,8 +184,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_hTrackedClusters->Reset();
 
     std::string name = "Tracked_Clusters"; // new name
-    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters");
-    if (hh2) {
+    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
+    if (hh2) {// update only if histogram is updated
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
         int j = 1;
@@ -224,6 +224,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 //       tt->SetTextAngle(90);// Rotated
 //       tt->SetTextAlign(12);// Centered
 //       tt->Draw();
+
+      UpdateCanvas(m_cTrackedClusters);
     }
   }
 
@@ -239,8 +241,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     canvas->cd();
     canvas->Clear();
 
-    TH1* hh1 = findHist(m_histogramDirectoryName, name);
-    if (hh1) {
+    TH1* hh1 = findHist(m_histogramDirectoryName, name, true);
+    if (hh1) {// update only if histo was updated
 
       if (hh1->GetEntries() > 50) {
 
@@ -302,6 +304,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
       canvas->Modified();
       canvas->Update();
+      UpdateCanvas(canvas);
 
       // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
       if (hh1->GetEntries() >= 1000) enough = true;
@@ -355,6 +358,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     if (m_hChargeModASIC2d[aVxdID] && m_cChargeModASIC2d[aVxdID]) {
       m_cChargeModASIC2d[aVxdID]->cd();
       m_hChargeModASIC2d[aVxdID]->Draw("colz");
+      UpdateCanvas(m_cChargeModASIC2d[aVxdID]);
     }
   }
 
@@ -385,6 +389,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_cCharge->cd(0);
   m_cCharge->Modified();
   m_cCharge->Update();
+  UpdateCanvas(m_cCharge);
 
   double data = 0;
   double diff = 0;

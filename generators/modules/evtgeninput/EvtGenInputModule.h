@@ -13,7 +13,7 @@
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <framework/core/Module.h>
+#include <generators/modules/GeneratorBaseModule.h>
 
 #include <Math/Vector3D.h>
 
@@ -25,7 +25,7 @@ namespace Belle2 {
    * interface for EvtGen Event Generator
    * stores generated particles in MCParticles.
    */
-  class EvtGenInputModule : public Module {
+  class EvtGenInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -45,7 +45,24 @@ namespace Belle2 {
     virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual  void event() override;
+    virtual void generatorEvent() override;
+
+    /** Convert m_eventType from string to int */
+    double getEventType() const override
+    {
+      if (m_eventType == "charged") return 1.0;
+      if (m_eventType == "mixed") return 2.0;
+
+      if (m_eventType == "signal") {
+        std::string basename = m_userDECFileName;
+        basename = basename.substr(basename.find_last_of('/') + 1);
+        basename = basename.substr(0, basename.find_last_of('.'));
+
+        return atoi(basename.c_str());
+      }
+
+      return Const::doubleNaN;
+    };
 
   protected:
 

@@ -8,7 +8,6 @@
 
 #pragma once
 
-/* #include <framework/core/Module.h> */
 #include <generators/modules/GeneratorBaseModule.h>
 
 #include <mdst/dataobjects/MCParticleGraph.h>

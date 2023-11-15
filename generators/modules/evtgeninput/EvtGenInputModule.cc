@@ -30,7 +30,7 @@ REG_MODULE(EvtGenInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtGenInputModule::EvtGenInputModule() : Module(),
+EvtGenInputModule::EvtGenInputModule() : GeneratorBaseModule(),
   m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
@@ -48,6 +48,10 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
   addParam("maxTries", m_maxTries, "Number of tries to generate a parent "
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
+
+  //Generator common parameters
+  addParam("eventType", m_eventType, "Event type", string(""));
+  m_generatorName = "EvtGen";
 }
 
 
@@ -108,7 +112,7 @@ static void addInitialParticle(MCParticleGraph& mpg, int pdg, ROOT::Math::PxPyPz
 
 
 
-void EvtGenInputModule::event()
+void EvtGenInputModule::generatorEvent()
 {
   B2DEBUG(10, "Starting event generation");
 

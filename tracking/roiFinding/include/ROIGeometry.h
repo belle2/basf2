@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  /** This class appends the PXDIntercept infos of a track to the list of intercepts.
+  /** This class appends the VXDIntercept infos of a track to the list of intercepts.
    */
   class ROIGeometry {
 

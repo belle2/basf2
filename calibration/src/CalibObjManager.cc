@@ -120,7 +120,7 @@ namespace Belle2 {
     return index;
   }
 
-  string CalibObjManager::getSuffix(const ExpRun& expRun) const
+  string CalibObjManager::getSuffix(const Calibration::ExpRun& expRun) const
   {
     return "_" + encodeExpRun(expRun);
   }

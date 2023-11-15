@@ -52,6 +52,19 @@ namespace Belle2 {
     TrackFindingCDC::RelationFilterUtil::appendUsing(m_seedFilter, seedStatePointers, statePointers, relations, 1000000);
 
     // relations += states -> states
-    TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, statePointers, statePointers, relations, 1000000);
+    if (m_onlyUseHitStatesRelatedToSeeds) {
+      // only use subset of hit states for inter hit state relation creation
+      std::vector<AState*> selectedStatePointers;
+      selectedStatePointers.reserve(relations.size());
+
+      for (const auto relation : relations) {
+        // hit state pointers are the "To"s in the relation, only take those
+        selectedStatePointers.push_back(relation.getTo());
+      }
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, selectedStatePointers, relations, 1000000);
+    } else {
+      // use all of hit states for inter hit state relation creation
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, statePointers, statePointers, relations, 1000000);
+    }
   }
 }

@@ -13,15 +13,12 @@ in addition choose a predefined preset (one of %s) and scale the beam energies
 to achieve a selected cms energy.
 """
 
-import basf2
-import os
-from beamparameters import beamparameter_presets, calculate_beamparameters
 import argparse
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+import numpy as np
+import basf2
+from beamparameters import beamparameter_presets, calculate_beamparameters
 import ROOT
 from ROOT import Belle2
-import numpy as np
 
 
 def __parse_floatlist(string):
@@ -122,9 +119,9 @@ if __name__ == "__main__":
 
     #: Beamparameter object we want
     beamparams = Belle2.BeamParameters()
-    beamparams.setHER(values['energyHER'], values['angleXHER'], 0, __vec(values['covHER']))
-    beamparams.setLER(values['energyLER'], values['angleXLER'], 0, __vec(values['covLER']))
-    beamparams.setVertex(ROOT.TVector3(*values['vertex']), __vec(values['covVertex']))
+    beamparams.setHER(values['energyHER'], values['angleXHER'], values['angleYHER'], __vec(values['covHER']))
+    beamparams.setLER(values['energyLER'], values['angleXLER'], values['angleYLER'], __vec(values['covLER']))
+    beamparams.setVertex(ROOT.Math.XYZVector(*values['vertex']), __vec(values['covVertex']))
     flags = 0
     if values['generateCMS']:
         flags |= Belle2.BeamParameters.c_generateCMS
@@ -137,7 +134,7 @@ if __name__ == "__main__":
     beamparams.setGenerationFlags(flags)
 
     # do we want to estimate uncertainties from smearing?
-    if arguments.tries >  0:
+    if arguments.tries > 0:
         # then we need the intial particle generator
         ROOT.gInterpreter.Declare("#include <generators/utilities/InitialParticleGeneration.h>")
         Belle2.DBStore.Instance().addConstantOverride("BeamParameters", beamparams)
@@ -150,7 +147,9 @@ if __name__ == "__main__":
             evt = gen.generate()
             e_cms.append(evt.getMass())
             cms = evt.getLER() + evt.getHER()
-            boosts.append(list(cms.BoostToCM()))
+            boost = cms.BoostToCM()
+            boost_tvector3 = ROOT.TVector3(boost.X(), boost.Y(), boost.Z())
+            boosts.append(list(boost_tvector3))
 
         e_cms = np.array(e_cms)
         energy_mean = e_cms.mean()
@@ -158,7 +157,8 @@ if __name__ == "__main__":
         energy_error = energy_spread/len(e_cms)**.5
 
         boosts = np.array(boosts)
-        boost_mean = boosts.mean(axis=0)
+        boost_mean_np = boosts.mean(axis=0)
+        boost_mean = ROOT.TVector3(*boost_mean_np)
         cov = np.cov(boosts.T)
         boost_cov = ROOT.TMatrixDSym(3)
         for i in range(3):
@@ -170,7 +170,8 @@ if __name__ == "__main__":
         energy_mean = cms.M()
         energy_spread = 0
         energy_error = 0
-        boost_mean = cms.BoostToCM()
+        boost = cms.BoostToCM()
+        boost_mean = ROOT.TVector3(boost.X(), boost.Y(), boost.Z())
         boost_cov = ROOT.TMatrixDSym(3)
 
     #: beamspot object
@@ -191,8 +192,7 @@ if __name__ == "__main__":
     invmass.setMass(energy_mean, energy_error, energy_spread)
     #: Collision boost vector.
     boost = Belle2.CollisionBoostVector()
-    boost.setBoost(-ROOT.TVector3(boost_mean.X(), boost_mean.Y(),
-                   boost_mean.Z()), boost_cov)
+    boost.setBoost(-boost_mean, boost_cov)
     #: Collision axis in CMS.
     axis = Belle2.CollisionAxisCMS()
     center_cov = ROOT.TMatrixDSym(2)

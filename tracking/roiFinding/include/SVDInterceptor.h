@@ -10,7 +10,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/roiFinding/SVDROIGeometry.h>
+#include <tracking/roiFinding/ROIGeometry.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/roiFinding/ROIinfo.h>
@@ -41,7 +41,7 @@ namespace Belle2 {
 
     const float m_svdLayerRadius[4] = {3.8, 8.0, 11.5, 14.0}; /**< mean SVD layer radius for both layers */
 
-    SVDROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
+    ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
 
     /** Append the SVDIntercept infos related to the track theTrack to the listToBeFilled.
      */

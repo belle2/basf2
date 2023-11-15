@@ -19,7 +19,7 @@ using namespace Belle2;
 
 SVDInterceptor::SVDInterceptor(double toleranceZ, double tolerancePhi)
 {
-  m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi);
+  m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi, VXD::SensorInfoBase::SVD);
 }
 
 SVDInterceptor::~SVDInterceptor()

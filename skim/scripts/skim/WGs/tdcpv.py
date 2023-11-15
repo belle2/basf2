@@ -366,3 +366,75 @@ class TDCPV_ccs(BaseSkim):
         variableshisto = [('deltaE', 100, -0.020, 0.180)]
         ma.variablesToHistogram('B0:KL_jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
         ma.variablesToHistogram('B0:KL_jpsiee',   variableshisto, filename=filename, path=path, directory="jpsiee")
+
+
+@fancy_skim_header
+class dilepton(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`B\\overline{B} \\to l^+l^-`
+        * :math:`B\\overline{B} \\to l^+l^+`
+        * :math:`B\\overline{B} \\to l^-l^-`
+    """
+    __authors__ = ["Alessandro Gaz, Chiara La Licata"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Inclusive dilepton skim"
+    )
+    __category__ = "physics, leptonic"
+
+    NoisyModules = ["EventShapeCalculator"]
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList(
+            "e+:pid",
+            "e+:all",
+            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID_noTOP > 0.5",
+            True,
+            path=path,
+        )
+        ma.cutAndCopyList(
+            "mu+:pid",
+            "mu+:all",
+            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and muonID > 0.5",
+            True,
+            path=path,
+        )
+
+        ma.buildEventShape(
+            inputListNames=[],
+            default_cleanup=True,
+            allMoments=False,
+            cleoCones=True,
+            collisionAxis=True,
+            foxWolfram=True,
+            harmonicMoments=True,
+            jets=True,
+            sphericity=True,
+            thrust=True,
+            checkForDuplicates=False,
+            path=path)
+
+        path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 3', path=path)
+
+        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):mumu -> mu+:pid mu-:pid', 'M < 15', path=path)
+
+        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:mumu -> mu+:pid mu+:pid', 'M < 15', path=path)
+
+        ma.copyLists(outputListName='Upsilon(4S):ll',
+                     inputListNames=['Upsilon(4S):ee', 'Upsilon(4S):emu', 'Upsilon(4S):mumu'],
+                     path=path)
+
+        ma.copyLists(outputListName='Delta++:ll',
+                     inputListNames=['Delta++:ee', 'Delta++:emu', 'Delta++:mumu'],
+                     path=path)
+
+        return ["Upsilon(4S):ll", "Delta++:ll"]

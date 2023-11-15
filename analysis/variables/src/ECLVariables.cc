@@ -86,7 +86,7 @@ namespace Belle2 {
         return particle->getExtraInfo("beamBackgroundSuppression");
       } else {
         B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getBeamBackgroundProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -97,7 +97,7 @@ namespace Belle2 {
         return particle->getExtraInfo("fakePhotonSuppression");
       } else {
         B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getFakePhotonProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -241,7 +241,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyEnergy();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[0][0]));
       }
       return Const::doubleNaN;
     }
@@ -385,7 +387,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster  = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyTheta();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[2][2]));
       }
       return Const::doubleNaN;
     }
@@ -395,7 +399,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyPhi();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[1][1]));
       }
       return Const::doubleNaN;
     }

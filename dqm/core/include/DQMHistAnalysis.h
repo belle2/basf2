@@ -290,6 +290,13 @@ namespace Belle2 {
     void UpdateCanvas(std::string name, bool updated = true);
 
     /**
+     * Mark canvas as updated (or not)
+     * @param canvas Canvas from which to take the name for update
+     * @param updated was updated
+     */
+    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+
+    /**
      * Extract Run Type from histogram title, called from input module
      */
     void ExtractRunType(std::vector <TH1*>& hs);
@@ -329,6 +336,13 @@ namespace Belle2 {
     void setEpicsPV(std::string keyname, int value);
 
     /**
+     * Write string to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value string to write
+     */
+    void setEpicsStringPV(std::string keyname, std::string value);
+
+    /**
      * Write value to a EPICS PV
      * @param index index of PV
      * @param value value to write
@@ -341,6 +355,43 @@ namespace Belle2 {
      * @param value value to write
      */
     void setEpicsPV(int index, int value);
+
+    /**
+     * Write string to a EPICS PV
+     * @param index index of PV
+     * @param value string to write
+     */
+    void setEpicsStringPV(int index, std::string value);
+
+    /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(std::string keyname);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(int index);
+
+    /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param status return status (true on success)
+     * @return string value (empty string if non existing)
+     */
+    std::string getEpicsStringPV(std::string keyname, bool& status);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @param status return status (true on success)
+     * @return string value (empty string if non existing)
+     */
+    std::string getEpicsStringPV(int index, bool& status);
 
     /**
      * Update all EPICS PV (flush to network)

@@ -64,8 +64,8 @@
 [INFO] Number of ParticleLists to be studied: 12 
 [INFO] Number of ParticleLists to be studied: 1 
  ... message repeated 1 times
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] ParticleStats Summary:
 [INFO] 
@@ -251,8 +251,8 @@ Total Number of Particles created in the DataStore: 14612778
 [INFO] Number of ParticleLists to be studied: 12 
 [INFO] Number of ParticleLists to be studied: 1 
  ... message repeated 1 times
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltags (highest priority first) are release-05-01-03, Legacy_CollisionAxisCMS
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+:all (8+0) + e-:all (8+0)

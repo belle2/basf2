@@ -1,0 +1,28 @@
+# EventType: 1213012102
+# Descriptor: [B+ -> [D+ -> pi+ pi0] K_S0]cc
+# NickName: Bu_DKs_Dtopi+pi0
+# Documentation: BToHadronic for [B+ -> KS pi+ pi0] Dalitz studies.
+# Tested: Yes
+# PhysicsWG: BHADRONIC
+# Responsible: Oskar Tittel
+# Email: otittel@mpp.mpg.de
+# Cuts: None
+# Date: 31/08/2023
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 D+sig K_S0 PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay D+sig
+1.0 pi+    pi0   PHOTOS PHSP;
+Enddecay
+CDecay D-sig
+
+End
+

@@ -13,6 +13,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDReduction.h>
 #include <TROOT.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -40,6 +41,7 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   addParam("HighWarnlimit", m_hiwarnlimit, "Mean Reduction High Warn limit for alarms", 1.01);
   addParam("HighErrorlimit", m_hierrorlimit, "Mean Reduction High limit for alarms", 1.10);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
@@ -64,6 +66,19 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
   gROOT->cd(); // this seems to be important, or strange things happen
+
+  if (m_PXDModules.size() == 0) {
+    // Backup if no geometry is present (testing...)
+    B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
+    std::vector <string> mod = {
+      "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
+      "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
+      "2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.3.1", "2.3.2", "2.4.1", "2.4.2",
+      "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
+      "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
+    };
+    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+  }
 
   m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
   m_hReduction = new TH1F("hPXDReduction", "PXD Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
@@ -117,20 +132,28 @@ void DQMHistAnalysisPXDReductionModule::event()
   double ireduction = 0.0;
   int ireductioncnt = 0;
 
+  bool anyupdate = false;
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = getDelta(name);
+    TH1* hh1 = getDelta(m_histogramDirectoryName, name);
     // no inital sampling, we should get lenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();
       m_hReduction->SetBinContent(i + 1, mean);
+      anyupdate = true;
     }
   }
+
+  if (!anyupdate) return; // nothing new -> no update
+
+  // calculate the mean of the mean
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    // ignore modules in exclude list
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
     auto mean = m_hReduction->GetBinContent(i + 1);
-    if (mean > 0) {
+    if (mean > 0) { // onyl for valid values
       ireduction += mean; // well fit would be better
       ireductioncnt++;
     }
@@ -171,10 +194,18 @@ void DQMHistAnalysisPXDReductionModule::event()
     }
 //     m_line2->Draw();
 //     m_line3->Draw();
+    for (auto& it : m_excluded) {
+      auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
+    }
   }
 
   m_monObj->setVariable("reduction", value);
 
+  UpdateCanvas(m_cReduction);
   m_cReduction->Modified();
   m_cReduction->Update();
 

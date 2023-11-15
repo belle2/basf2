@@ -329,6 +329,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     codes in the event, for example ::
 
         [INFO] Content of MCParticle list
+        ├── e- (11)
+        ├── e+ (-11)
         ╰── Upsilon(4S) (300553)
             ├── B+ (521)
             │   ├── anti-D_0*0 (-10421)
@@ -408,6 +410,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     the pion don't have additional daughters. ::
 
         [INFO] Content of MCParticle list
+        ├── e- (11)
+        ├── e+ (-11)
         ╰── Upsilon(4S) (300553)
             ├── B+ (521)
             │   ├── anti-D*0 (-423) → …
@@ -1196,7 +1200,8 @@ def fillParticleListFromMC(decayString,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
                            path=None,
-                           skipNonPrimary=False):
+                           skipNonPrimary=False,
+                           skipInitial=True):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1211,6 +1216,7 @@ def fillParticleListFromMC(decayString,
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     @param skipNonPrimary          if true, skip non primary particle
+    @param skipInitial             if true, skip initial particles
     """
 
     pload = register_module('ParticleLoader')
@@ -1221,6 +1227,7 @@ def fillParticleListFromMC(decayString,
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     pload.param('skipNonPrimary', skipNonPrimary)
+    pload.param('skipInitial', skipInitial)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1238,7 +1245,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
                             path=None,
-                            skipNonPrimary=False):
+                            skipNonPrimary=False,
+                            skipInitial=True):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1267,6 +1275,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     @param skipNonPrimary          if true, skip non primary particle
+    @param skipInitial             if true, skip initial particles
     """
 
     pload = register_module('ParticleLoader')
@@ -1277,6 +1286,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     pload.param('skipNonPrimary', skipNonPrimary)
+    pload.param('skipInitial', skipInitial)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1986,7 +1996,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix=""):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2002,6 +2012,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+        useFloat (bool): Use single precision (float) instead of double precision (double)
+                         for floating-point numbers.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2015,6 +2027,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
+    output.param('useFloat', useFloat)
     path.add_module(output)
 
 
@@ -2451,7 +2464,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
-        inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
+        inputParticlelists = [f'{ptype}:mostlikely_roe' for ptype in ['K+', 'p+', 'e+', 'mu+']]
     import b2bii
     if not b2bii.isB2BII():
         fillParticleList('gamma:all', '', path=path)
@@ -2503,9 +2516,9 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC(f"{t}:roe_default_gen", 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
-            inputParticlelists += ["%s:roe_default_gen" % t]
+            inputParticlelists += [f"{t}:roe_default_gen"]
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('MCROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
@@ -3273,16 +3286,51 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     """
 
     # Select photons with higher energy for formation of veto combinations.
-    cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
+    gammaListVeto = f'{gammaList}_pi0veto'
+    cutAndCopyList(gammaListVeto, gammaList, 'E > 0.2', path=path)
     import b2bii
     payload_name = 'LowEnergyPi0Veto' + payloadNameSuffix
     path.add_module('LowEnergyPi0VetoExpert', identifier=payload_name,
-                    VetoPi0Daughters=True, GammaListName='gamma:pi0veto',
+                    VetoPi0Daughters=True, GammaListName=gammaListVeto,
                     Pi0ListName=pi0List, Belle1=b2bii.isB2BII())
     payload_name = 'LowEnergyPi0Identification' + payloadNameSuffix
     path.add_module('LowEnergyPi0IdentificationExpert',
                     identifier=payload_name, Pi0ListName=pi0List,
                     Belle1=b2bii.isB2BII())
+
+
+def getNeutralHadronGeomMatches(
+        particleLists,
+        addKL=True,
+        addNeutrons=False,
+        efficiencyCorrectionKl=0.83,
+        efficiencyCorrectionNeutrons=1.0,
+        path=None):
+    """
+    For an ECL-based list, assign the mcdistanceKL and mcdistanceNeutron variables that correspond
+    to the distance to the closest MC KL and neutron, respectively.
+    @param particleLists the input ParticleLists, must be ECL-based lists (e.g. photons)
+    @param addKL (default True) add distance to MC KL
+    @param addNeutrons (default False) add distance to MC neutrons
+    @param efficiencyCorrectionKl (default 0.83) apply overall efficiency correction
+    @param efficiencyCorrectionNeutrons (default 1.0) apply overall efficiency correction
+    @param path    modules are added to this path
+    """
+    from ROOT import Belle2
+    Const = Belle2.Const
+
+    if addKL:
+        path.add_module(
+            "NeutralHadronMatcher",
+            particleLists=particleLists,
+            mcPDGcode=Const.Klong.getPDGCode(),
+            efficiencyCorrection=efficiencyCorrectionKl)
+    if addNeutrons:
+        path.add_module(
+            "NeutralHadronMatcher",
+            particleLists=particleLists,
+            mcPDGcode=Const.neutron.getPDGCode(),
+            efficiencyCorrection=efficiencyCorrectionNeutrons)
 
 
 def getBeamBackgroundProbability(particleList, weight, path=None):
@@ -3362,7 +3410,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
-        inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        inputListNames = [f'{ptype}:mostlikely_evtkin' for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         if b2bii.isB2BII():
             copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
@@ -3419,11 +3467,11 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC(f"{t}:evtkin_default_gen", 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
-                applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
-            inputListNames += ["%s:evtkin_default_gen" % t]
+                applyCuts(f"{t}:evtkin_default_gen", selectionCut, path=path)
+            inputListNames += [f"{t}:evtkin_default_gen"]
 
     eventKinematicsModule = register_module('EventKinematics')
     eventKinematicsModule.set_name('EventKinematics_gen')
@@ -4121,6 +4169,41 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
+def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticle, path=None):
+    """
+    Sets photon kinematics to corrected values in two body decays with an ISR photon
+    and a massive particle. The original photon kinematics are kept in the input
+    particleList and can be accessed using the originalParticle() metavariable on the
+    new list.
+
+    @param ouputListName    new ParticleList filled with copied Particles
+    @param inputListName    input ParticleList with original Particles
+    @param massiveParticle  name or PDG code of massive particle participating in the two
+                            body decay with the ISR photon
+    @param path             modules are added to this path
+    """
+
+    # set the corrected energy of the photon in a new list
+    photon_energy_correction = register_module('TwoBodyISRPhotonCorrector')
+    photon_energy_correction.set_name('TwoBodyISRPhotonCorrector_' + outputListName)
+    photon_energy_correction.param('outputGammaList', outputListName)
+    photon_energy_correction.param('inputGammaList', inputListName)
+
+    # prepare PDG code of massive particle
+    if isinstance(massiveParticle, int):
+        photon_energy_correction.param('massiveParticlePDGCode', massiveParticle)
+    else:
+        from ROOT import Belle2
+        decayDescriptor = Belle2.DecayDescriptor()
+        if not decayDescriptor.init(massiveParticle):
+            raise ValueError("TwoBodyISRPhotonCorrector: value of massiveParticle must be" +
+                             " an int or valid decay string.")
+        pdgCode = decayDescriptor.getMother().getPDGCode()
+        photon_energy_correction.param('massiveParticlePDGCode', pdgCode)
+
+    path.add_module(photon_energy_correction)
+
+
 def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     """
     Add photon Data/MC detection efficiency ratio weights to the specified particle list
@@ -4225,22 +4308,25 @@ def getAnalysisGlobaltagB2BII() -> str:
     return recommended_b2bii_analysis_global_tag()
 
 
-def getNbarIDMVA(particleList, path=None):
+def getNbarIDMVA(particleList: str, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
     It is not used to predict n0.
     Currently, this can be used only for ECL cluster.
     output will be stored in extraInfo(nbarID); -1 means MVA invalid
 
-    @param particleList     The input ParticleList
+    @param particleList     The input ParticleList name or a decay string which contains a full mother particle list name.
+                            Only one selected daughter is supported.
     @param path             modules are added to this path
     """
-
     import b2bii
+    from ROOT import Belle2
+
     if b2bii.isB2BII():
         B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
 
     from variables import variables
+
     variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
     variables.addAlias('V2', 'clusterE')
     variables.addAlias('V3', 'clusterLAT')
@@ -4250,12 +4336,20 @@ def getNbarIDMVA(particleList, path=None):
     variables.addAlias('V7', 'clusterAbsZernikeMoment40')
     variables.addAlias('V8', 'clusterAbsZernikeMoment51')
 
-    variables.addAlias('nbarIDValid',
-                       'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
+    variables.addAlias(
+        'nbarIDValid',
+        'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
     variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
 
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
-    variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(particleList):
+        raise ValueError(f"Provided decay string is invalid: {particleList}")
+    if decayDescriptor.getNDaughters() == 0:
+        variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+    else:
+        listname = decayDescriptor.getMother().getFullName()
+        variablesToDaughterExtraInfo(listname, particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
 def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowAnyParticleSource=False, path=None, **kwargs):

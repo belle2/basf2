@@ -33,14 +33,13 @@ DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
 
 //   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed", std::string("PXDINJ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistInjection: Constructor done.");
 }
 
 DQMHistInjectionModule::~DQMHistInjectionModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -106,7 +105,7 @@ void DQMHistInjectionModule::initialize()
                                 20000);
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     m_nodes.resize(14);
     SEVCHK(ca_create_channel((m_pvPrefix + "LER:Triggers").data(), NULL, NULL, 10, &m_nodes[0].mychid), "ca_create_channel failure");
@@ -287,7 +286,7 @@ void DQMHistInjectionModule::event()
 
   //Finding only one of them should only happen in very strange situations...
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     m_nodes[0].histo = Triggers;
   }
 #endif
@@ -312,7 +311,7 @@ void DQMHistInjectionModule::event()
 
   //Finding only one of them should only happen in very strange situations...
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     m_nodes[3].histo = Triggers;
   }
 #endif
@@ -485,7 +484,7 @@ void DQMHistInjectionModule::event()
   m_hInjectionHERKLM->Draw("hist");
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto& m : m_nodes) {
       if (!m.mychid) continue;
       int length = m.data.size();
@@ -530,7 +529,7 @@ void DQMHistInjectionModule::event()
 void DQMHistInjectionModule::cleanPVs(void)
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto m : m_nodes) {
       if (m.mychid) {
         int length = int(ca_element_count(m.mychid));
@@ -552,7 +551,7 @@ void DQMHistInjectionModule::terminate()
 {
   B2DEBUG(1, "DQMHistInjection: terminate called");
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto m : m_nodes) {
       SEVCHK(ca_clear_channel(m.mychid), "ca_clear_channel failure");
     }

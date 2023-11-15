@@ -34,6 +34,7 @@ inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', sys.argv[1])
 inroot.param('Experiment', 1003)
 main.add_module(inroot)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 
 gearbox = b2.register_module('Gearbox')

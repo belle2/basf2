@@ -103,7 +103,10 @@ def add_mdst_dump(path, print_untested=False):
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
         }),
-        DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
+        DataStorePrinter("V0", [
+            "getTracks", "getTrackFitResults", "getV0Hypothesis",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ"
+            ], {
             "getRelationsWith": ["MCParticles"],
         }),
         DataStorePrinter("TrackFitResult", [
@@ -126,7 +129,7 @@ def add_mdst_dump(path, print_untested=False):
         }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
-            "getClusterId", "getMinTrkDistance", "getDeltaL",
+            "getClusterId", "getUniqueClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getNumberOfHadronDigits", "getR", "getHypotheses",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
@@ -145,7 +148,15 @@ def add_mdst_dump(path, print_untested=False):
             "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",
             "getNECLCalDigitsOutOfTimeBWD", "getNECLCalDigitsOutOfTime",
             "getNECLShowersRejectedFWD", "getNECLShowersRejectedBarrel",
-            "getNECLShowersRejectedBWD", "getNECLShowersRejected"
+            "getNECLShowersRejectedBWD", "getNECLShowersRejected",
+            "getNKLMDigitsMultiStripFWD", "getNKLMDigitsMultiStripBarrel",
+            "getNKLMDigitsMultiStripBWD", "getNKLMDigitsMultiStrip",
+            "getNECLShowersFWD", "getNECLShowersBarrel",
+            "getNECLShowersBWD", "getNECLShowers",
+            "getNECLLocalMaximumsFWD", "getNECLLocalMaximumsBarrel",
+            "getNECLLocalMaximumsBWD", "getNECLLocalMaximums",
+            "getNECLTriggerCellsFWD", "getNECLTriggerCellsBarrel",
+            "getNECLTriggerCellsBWD", "getNECLTriggerCells"
         ], array=False),
         DataStorePrinter("KLMCluster", [
             "getTime", "getLayers", "getInnermostLayer",

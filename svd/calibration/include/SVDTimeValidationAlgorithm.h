@@ -9,9 +9,6 @@
 #pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
-#include <vxd/geometry/GeoCache.h>
-#include "TH1F.h"
-#include <svd/dataobjects/SVDHistograms.h>
 
 #include <optional>
 

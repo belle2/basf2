@@ -99,7 +99,8 @@ namespace Belle2 {
       m_i2io(-1),
       m_n_iecl(-1),
       m_n_iklm(-1),
-      m_n_eecleklm(-1)
+      m_n_eecleklm(-1),
+      m_tauNeuro(false)
     {}
     ~TRGGRLInfo() {}
 
@@ -268,6 +269,8 @@ namespace Belle2 {
     int getNeecleklm() const  {return m_n_eecleklm;}
     /**get GDL input bit */
     bool getInputBits(int i) const {return m_InputBits[i];}
+    /**get the the tau neuro net result*/
+    bool getTauNN() const  {return m_tauNeuro;}
 
     /**set the number of 2D tracks*/
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -431,7 +434,8 @@ namespace Belle2 {
     void setNeecleklm(int Nieecleklm)  {m_n_eecleklm = Nieecleklm;}
     /**set GDL input bit*/
     void setInputBits(int i, bool bit) {m_InputBits[i] = bit;}
-
+    /**set tau neuro net result*/
+    void setTauNN(bool istau)  {m_tauNeuro = istau;}
 
   private:
     /**#2D finder tracks*/
@@ -446,13 +450,13 @@ namespace Belle2 {
     int m_n_3dfitter_track_Z25;
     /**#3D fitter tracks*/
     int m_n_3dfitter_track_Z35;
-    /**#NN tracks*/
+    /** \#NN tracks*/
     int m_n_NN_track;
-    /**#NN tracks Z0<20cm*/
+    /** \#NN tracks Z0<20cm*/
     int m_n_NN_track_Z20;
-    /**#NN tracks Z0<40cm*/
+    /** \#NN tracks Z0<40cm*/
     int m_n_NN_track_Z40;
-    /**#NN tracks Z0<15cm,P>0.7GeV*/
+    /** \#NN tracks Z0<15cm,P>0.7GeV*/
     int m_n_NN_track_STT;
     /**#2D matched finder tracks*/
     int m_n_2dmatch_track;
@@ -604,6 +608,8 @@ namespace Belle2 {
     int m_n_eecleklm;
     /**GDL input bits**/
     std::vector<bool> m_InputBits = std::vector<bool>(320, false);
+    /**if the events satisfied tau neuro net selection*/
+    bool m_tauNeuro;
 
     /**! The Class title*/
     ClassDef(TRGGRLInfo, 7); /*< the class title */

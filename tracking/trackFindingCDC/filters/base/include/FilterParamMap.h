@@ -32,7 +32,7 @@ namespace Belle2 {
      *  boost::variant from all the users, which reduced the compilation time by a good 20%.
      *
      *  The parameters can still be inspected by getValues(), but the user must include the
-     *  implementation (e.g. #include <boost/variant/variant.hpp>) to be able to inspect them.
+     *  implementation (e.g. "#include <boost/variant/variant.hpp>") to be able to inspect them.
      */
     class FilterParamMap {
 

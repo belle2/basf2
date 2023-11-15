@@ -65,9 +65,11 @@ namespace Belle2 {
   private:
 
     //parameters
-    float m_effError; /**<error level of the efficiency */
-    float m_effWarning; /**< warning level of the efficiency */
-    float m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
+    double m_effError; /**<error level of the efficiency */
+    double m_effWarning; /**< warning level of the efficiency */
+    double m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
+    bool m_3Samples; /**< if true enable 3 samples histograms analysis */
+
     //! Data members
 
     /** Reference Histogram Root file name */
@@ -81,6 +83,13 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrU = nullptr; /**<efficiency U error plot canvas */
     TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
+
+    TCanvas* m_cEfficiencyU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
+    TCanvas* m_cEfficiencyV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
+    SVDSummaryPlots* m_hEfficiency3Samples = nullptr; /**< efficiency histo for 3 samples */
+    TCanvas* m_cEfficiencyErrU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
+    TCanvas* m_cEfficiencyErrV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
+    SVDSummaryPlots* m_hEfficiencyErr3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 
@@ -101,6 +110,9 @@ namespace Belle2 {
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
+
+    std::string m_pvPrefix; /**< string prefix for EPICS PVs */
+
 
   };
 } // end namespace Belle2

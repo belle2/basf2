@@ -27,8 +27,9 @@ namespace Belle2 {
 
     /** Check if update of histogram is necessary
      * @param hist pointer to histogram
+     * @return histogram was updated flag (return m_updated)
      */
-    void update(TH1* hist);
+    bool update(TH1* hist);
 
     /** Reset histogram and update flag, not the entries
      */

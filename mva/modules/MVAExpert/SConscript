@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'mva', 'mva_dataobjects', 'analysis', 'analysis_dataobjects', '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'mva', 'mva_dataobjects', 'analysis', 'analysis_dataobjects', 'analysis_DecayDescriptor', '$ROOT_LIBS']
 
 Return('env')

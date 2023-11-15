@@ -8,15 +8,25 @@
 
 #pragma once
 
+// framework
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+
+// svd
+#include <vxd/dataobjects/VxdID.h>
+#include <svd/dbobjects/SVDRecoConfiguration.h>
+#include <svd/dbobjects/SVDTimeGroupingConfiguration.h>
 #include <svd/dataobjects/SVDCluster.h>
 
+// std
 #include <string>
 
+// root
 #include <TH1D.h>
 #include <TF1.h>
 #include <TMath.h>
+
 
 namespace Belle2 {
 
@@ -46,6 +56,8 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** configure */
+    void beginRun() override;
 
     /** EventWise jobs
      *
@@ -56,56 +68,40 @@ namespace Belle2 {
 
   protected:
 
+    DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
+    DBObjPtr<SVDTimeGroupingConfiguration> m_groupingConfig; /**< SVDTimeGrouping Configuration payload*/
 
     // Data members
-    std::string m_svdClustersName = "SVDClusters"; /**< SVDCluster collection name */
+    std::string m_svdClustersName; /**< SVDCluster collection name */
+    std::string m_svdEventInfoName; /**< Name of the collection to use for the SVDEventInfo */
 
     /**
      * the storeArray for svdClusters as member,
      * is faster than recreating link for each event
-     *
      */
     StoreArray<SVDCluster> m_svdClusters;
 
-    bool   m_useClusterRawTime  = false; /**< Prepare module to work in raw-time if this
-      parameter is set. */
+    bool m_forceGroupingFromDB; /**< if true use configuration from the SVDRecConfiguration DB. */
+    bool m_isEnabledIn6Samples; /**< Enables the module if true for 6-sample DAQ mode. */
+    bool m_isEnabledIn3Samples; /**< Enables the module if true for 3-sample DAQ mode. */
 
-    double m_tRangeLow          = -160.; /**< Expected low range of time histogram [ns]. */
-    double m_tRangeHigh         =  160.; /**< Expected high range of time histogram [ns]. */
-    int    m_rebinningFactor    =   2; /**< Time bin width is 1/m_rebinningFactor ns. Also disables
-            the module if zero. */
-    double m_fillSigmaN         = 3.; /**< Number of Gaussian sigmas (= hardcoded resolutions) used
-           to fill the time histogram for each cluster. */
-    double m_minSigma           = 1.; /**< Lower limit of cluster time sigma for the fit for the
-           peak-search [ns]. */
-    double m_maxSigma           = 15.; /**< Upper limit of cluster time sigma for the fit for the
-            peak-search [ns]. */
-    double m_fitRangeHalfWidth  = 5.; /**< Half width of the range in which the fit for the
-           peak-search is performed [ns]. */
-    double m_removeSigmaN       = 5.; /**< Remove upto this sigma of fitted gaus from histogram. */
-    double m_fracThreshold      = 0.05; /**< Minimum fraction of candidates in a peak (wrt to the
-             highest peak) considered for fitting in the peak-search. */
-    int    m_maxGroups          = 20; /**< maximum number of groups to be accepted. */
-    double m_expectedSignalTimeCenter =   0; /**< Expected time of the signal [ns]. */
-    double m_expectedSignalTimeMin    = -50; /**< Expected low range of signal hits [ns]. */
-    double m_expectedSignalTimeMax    =  50; /**< Expected high range of signal hits [ns]. */
-    double m_signalLifetime     = 30.; /**< Group prominence is weighted with exponential weight
-            with a lifetime defined by this parameter [ns]. */
-    int    m_numberOfSignalGroups = 1; /**< Number of groups expected to contain the signal
-            clusters. */
-    bool   m_formSingleSignalGroup = false; /**< Assign groupID = 0 to all clusters belonging to
-                the signal groups. */
-    double m_acceptSigmaN       = 5.;    /**< Clusters are tagged within this of fitted group. */
-    bool   m_writeGroupInfo     = true;  /**< Write group info in SVDCluster, otherwise kept empty. */
-    bool   m_includeOutOfRangeClusters = true; /**< Assign groups to under and overflow. */
+    bool m_useParamFromDB; /**< if true use the configuration from SVDTimeGroupingConfiguration DB. */
 
-    /*! cls-time resolution based on clsSize -> 0: V, 1: U */
-    std::vector<double> m_clsSizeVsSigma[2] = {
-      {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805},
-      {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485}
-    };
+    /**
+     * module parameter values for 6-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
+     */
+    SVDTimeGroupingParameters m_usedParsIn6Samples;
 
+    /**
+     * module parameter values for 3-sample DAQ taken from SVDTimeGroupingConfiguration dbobject.
+     */
+    SVDTimeGroupingParameters m_usedParsIn3Samples;
 
+    /**
+     * module parameter values used.
+     * if usedDB=true, then its values are taken from the SVDTimeGroupingConfiguration dbobject,
+     */
+    SVDTimeGroupingParameters m_usedPars;
 
     // helper functions
 
@@ -129,7 +125,7 @@ namespace Belle2 {
     /*! increase the size of vector to max, this helps in sorting */
     void resizeToMaxSize(std::vector<GroupInfo>& groupInfoVector)
     {
-      groupInfoVector.resize(m_maxGroups, GroupInfo(0., 0., 0.));
+      groupInfoVector.resize(m_usedPars.maxGroups, GroupInfo(0., 0., 0.));
     }
 
     /** Sort Background Groups
@@ -203,7 +199,20 @@ namespace Belle2 {
     addGausToHistogram(hist, integral, center, sigma, sigmaN, false);
   }
 
-
+  /** Get Sensor Type of SVD sensors */
+  inline int getSensorType(const VxdID& sensorID)
+  {
+    int layer  = sensorID.getLayerNumber();
+    int sensor = sensorID.getSensorNumber();
+    if (layer == 3)
+      return 0;
+    else {
+      if (sensor == 1)
+        return 1;
+      else
+        return 2;
+    }
+  }
 
 
 } // end namespace Belle2

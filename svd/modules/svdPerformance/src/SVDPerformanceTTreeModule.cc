@@ -21,7 +21,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
-#include <TVector3.h>
 #include <Math/Boost.h>
 #include <math.h>
 #include <iostream>

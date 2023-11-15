@@ -30,6 +30,7 @@ main = b2.create_path()
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', sys.argv[1])
 main.add_module(inroot)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 # add DQM analysis module
 mirabelle = b2.register_module('DQMHistAnalysisMiraBelle')

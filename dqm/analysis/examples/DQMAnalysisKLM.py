@@ -26,6 +26,8 @@ main.add_module('DQMHistAnalysisInputRootFile',
                 FileList=['KLMDQM.root'],
                 SelectHistograms=['KLM/*', 'DAQ/*'])
 
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
+
 # KLM DQM analysis module.
 main.add_module('DQMHistAnalysisKLM')
 

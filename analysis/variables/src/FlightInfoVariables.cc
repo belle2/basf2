@@ -51,16 +51,14 @@ namespace Belle2 {
         outErr = Const::doubleNaN;
         return Const::doubleNaN;
       }
-      // check if the particle source is a composite particle
-      if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) ||
-          !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite)) {
-        // check if the particle source is a V0
-        if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) ||
-            !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0)) {
-          B2WARNING("Attempting to calculate flight " << mode << " for neither composite particle nor V0");
-          outErr = Const::doubleNaN;
-          return Const::doubleNaN;
-        }
+      // check if the particle source is a composite particle or a V0
+      if ((particle->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+           particle->getParticleSource() != Particle::EParticleSourceObject::c_V0) or
+          (daughter->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+           daughter->getParticleSource() != Particle::EParticleSourceObject::c_V0)) {
+        B2WARNING("Attempting to calculate flight " << mode << " for neither composite particle nor V0");
+        outErr = Const::doubleNaN;
+        return Const::doubleNaN;
       }
       if (!(mode == "distance") && !(mode == "time")) {
         B2WARNING("FlightInfo helper function called with mode '" << mode

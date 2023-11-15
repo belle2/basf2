@@ -21,7 +21,8 @@
 #include <TGraph.h>
 #include <TH1F.h>
 #include <TH1I.h>
-#include <TVector3.h>
+#include <TMath.h>
+#include <Math/Vector3D.h>
 
 // C++ headers
 #include <math.h>
@@ -132,12 +133,12 @@ void CsIDigitizerModule::event()
       //      double hitTimeRMS = sqrt( aCsISimHit->getTimeVar()/aCsISimHit->getEnergyDep());    /**< Time rms of the hit*/
       CsiGeometryPar* csip = CsiGeometryPar::Instance();
 
-      TVector3 hitPos    = aCsISimHit->getPosition();
-      TVector3 cellPos   = csip->GetPositionTV3(m_cellID);
-      TVector3 cellAngle = csip->GetOrientationTV3(m_cellID);
+      ROOT::Math::XYZVector hitPos    = aCsISimHit->getPosition();
+      ROOT::Math::XYZVector cellPos   = csip->GetPosition(m_cellID);
+      ROOT::Math::XYZVector cellAngle = csip->GetOrientation(m_cellID);
 
-      double localPos = (15. - (hitPos  - cellPos) *
-                         cellAngle);  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
+      double localPos = (15. - (hitPos  - cellPos).Dot(
+                           cellAngle));  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
 
       // 0.06 is the speed of light in CsI(Tl)
       double  propagTime = m_SampleRate *

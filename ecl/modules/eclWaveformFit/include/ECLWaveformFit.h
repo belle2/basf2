@@ -25,83 +25,101 @@ class TMinuit;
 
 namespace Belle2 {
 
-  /** Struct to keep upper triangle of the covariance matrix. Since the
-  *  matrix is already inverted we do not need extra precision, so
-  *  keep matrix elements in float type to save space.
-  *  sigma is the average noise.
-  */
+  /**
+   * Struct to keep upper triangle of the covariance matrix. Since the
+   * matrix is already inverted we do not need extra precision, so
+   * keep matrix elements in float type to save space.
+   * sigma is the average noise.
+   */
   struct CovariancePacked {
-    /** packed matrix*/
+
+    /** Packed matrix. */
     float m_covMatPacked[31 * (31 + 1) / 2] = {};
-    /** sigma noise*/
+
+    /** Sigma noise. */
     float sigma{ -1};
-    /** lvalue access by index */
+
+    /** Lvalue access by index. */
     float& operator[](int i) { return m_covMatPacked[i];}
-    /** rvalue access by index */
+
+    /** Rvalue access by index. */
     const float& operator[](int i) const { return m_covMatPacked[i];}
   };
 
-  /** Struct to return signal function information
-   * f0 is the function value
-   * f1 is the first derivative
-   * f2 is the second derivative
-   */
-  struct val_der_t {
-    /** see struct description */
-    double f0;
-    /** see struct description */
-    double f1;
-    /** see struct description */
-    double f2;
-  };
-
-  /** Interpolate signal shape using function values and the first derivative.
+  /**
+   * Interpolation of signal shape using function values and
+   * the first derivative.
    */
   struct SignalInterpolation2 {
+
     /**
-    * Signal function is sampled in c_nt time steps with c_ndt substeps + c_ntail steps
-    * c_dt is the time step.
-    */
-    constexpr static int c_nt = 12;
-    /** substeps */
-    constexpr static int c_ndt = 5;
-    /** tail steps */
-    constexpr static int c_ntail = 20;
-    /** time step */
-    constexpr static double c_dt = 0.5;
-    /** inverted time step */
-    constexpr static double c_idt = 1 / c_dt;
-    /** time substep */
-    constexpr static double c_dtn = c_dt / c_ndt;
-    /** inverted time substep */
-    constexpr static double c_idtn = c_ndt / c_dt;
-    /**
-     * storage for function value + first derivative
+     * Signal function is sampled in c_nt time steps with c_ndt substeps
+     * and c_ntail steps. c_dt is the time step.
      */
-    std::pair<double, double> m_F[c_nt * c_ndt + c_ntail];
+    constexpr static int c_nt = 12;
+
+    /** Number of substeps. */
+    constexpr static int c_ndt = 5;
+
+    /** Number of tail steps. */
+    constexpr static int c_ntail = 20;
+
+    /** Time step. */
+    constexpr static double c_dt = 0.5;
+
+    /** Inverted time step */
+    constexpr static double c_idt = 1 / c_dt;
+
+    /** Time substep. */
+    constexpr static double c_dtn = c_dt / c_ndt;
+
+    /** Inverted time substep. */
+    constexpr static double c_idtn = c_ndt / c_dt;
+
+    /** Function values. */
+    double m_FunctionInterpolation[c_nt * c_ndt + c_ntail];
+
+    /** Derivative values. */
+    double m_DerivativeInterpolation[c_nt * c_ndt + c_ntail];
+
     /**
-     * assuming exponential drop of the signal function far away from 0, extrapolate it to +inf
+     * Assuming exponential drop of the signal function far away from 0,
+     * extrapolate it to +inf.
      * f(i_last + i) = f(i_last)*m_r0^i
      * f'(i_last + i) = f'(i_last)*m_r1^i
-     * where i_last is the last point within sampled values in m_F
+     * where i_last is the last point within sampled values in
+     * m_FunctionInterpolation (m_DerivativeInterpolation).
      */
     double m_r0;
-    /** see above */
+
+    /** See above/ */
     double m_r1;
 
-    /** Default constructor. */
-    SignalInterpolation2() {};
-    /** Constructor with parameters with the parameter layout as in ECLDigitWaveformParameters*/
-    explicit SignalInterpolation2(const std::vector<double>&);
     /**
-     *  returns signal shape(+derivatives) in 31 equidistant time points
-     *  starting from T0
+     * Default constructor.
      */
-    void getshape(double, val_der_t*) const;
+    SignalInterpolation2() {};
+
+    /**
+     * Constructor with parameters with the parameter layout as
+     * in ECLDigitWaveformParameters.
+     */
+    explicit SignalInterpolation2(const std::vector<double>&);
+
+    /**
+     * Returns signal shape and derivatives in 31 equidistant time points
+     * starting from t0.
+     * @param[in]  t0          Time.
+     * @param[out] function    Function values.
+     * @param[out] derivatives Derivatives.
+     */
+    void getShape(double t0, double* function, double* derivatives) const;
+
   };
 
-  /** Module performs offline fit for saved ecl waveforms.
-   *    */
+  /**
+   * Module performs offline fit for saved ECL waveforms.
+   */
   class ECLWaveformFitModule : public Module {
 
   public:
@@ -141,23 +159,70 @@ namespace Belle2 {
 
   private:
 
-    double m_EnergyThreshold{0.03};  /**< energy threshold to fit pulse offline*/
-    double m_chi2Threshold25dof{57.1};  /**< chi2 threshold (25 dof) to classify offline fit as good fit.*/
-    double m_chi2Threshold27dof{60.0};  /**< chi2 threshold (27 dof) to classify offline fit as good fit.*/
-    bool m_TemplatesLoaded{false};  /**< Flag to indicate if waveform templates are loaded from database.*/
-    void loadTemplateParameterArray();  /**< loads waveform templates from database.*/
-    std::vector<double> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
+    /**
+     * Loads waveform templates from database.
+     */
+    void loadTemplateParameterArray();
 
-    TMinuit* m_Minit2h{nullptr};   /**< minuit minimizer for optimized fit*/
-    TMinuit* m_Minit2h2{nullptr};   /**< minuit minimizer for optimized fit with background photon*/
-    void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /**< Optimized fit using hadron component model*/
-    void Fit2hExtraPhoton(double& b, double& a0, double& t0, double& a1, double& A2, double& T2,
-                          double& chi2);  /**< Optimized fit using hadron component model plus out of time background photon*/
-    SignalInterpolation2 m_si[ECLElementNumbers::c_NCrystals][3];  /**< ShaperDSP signal shapes.*/
+    /**
+     * Fit with photon and hadron.
+     * @param[out] pedestal        Pedestal.
+     * @param[out] amplitudePhoton Photon amplitude.
+     * @param[out] signalTime      Signal time.
+     * @param[out] amplitudeHadron Hadron amplitude.
+     * @param[out] chi2            Chi-squared.
+     */
+    void fitPhotonHadron(
+      double& pedestal, double& amplitudePhoton, double& signalTime,
+      double& amplitudeHadron, double& chi2);
 
-    CovariancePacked m_c[ECLElementNumbers::c_NCrystals] = {};  /**< Packed covariance matrices */
-    bool m_CovarianceMatrix{true};  /**< Option to use crystal dependent covariance matrices.*/
-    bool m_IsMCFlag{false};  /**< Flag to indicate if running over data or MC.*/
+    /**
+     * Fit with photon, hadron, and background photon.
+     * @param[out] pedestal                  Pedestal.
+     * @param[out] amplitudePhoton           Photon amplitude.
+     * @param[out] signalTime                Signal time.
+     * @param[out] amplitudeHadron           Hadron amplitude.
+     * @param[out] amplitudeBackgroundPhoton Background-photon amplitude.
+     * @param[out] timeBackgroundPhoton      Background-photon time.
+     * @param[out] chi2                      Chi-squared.
+     */
+    void fitPhotonHadronBackgroundPhoton(
+      double& pedestal, double& amplitudePhoton, double& signalTime,
+      double& amplitudeHadron, double& amplitudeBackgroundPhoton,
+      double& timeBackgroundPhoton, double& chi2);
+
+    /** Energy threshold to fit pulse offline. */
+    double m_EnergyThreshold{0.03};
+
+    /** chi2 threshold (25 dof) to classify offline fit as good fit. */
+    double m_Chi2Threshold25dof{57.1};
+
+    /** chi2 threshold (27 dof) to classify offline fit as good fit. */
+    double m_Chi2Threshold27dof{60.0};
+
+    /** Option to use crystal dependent covariance matrices. */
+    bool m_CovarianceMatrix{true};
+
+    /** Flag to indicate if waveform templates are loaded from database. */
+    bool m_TemplatesLoaded{false};
+
+    /** Calibration vector from ADC to energy. */
+    std::vector<double> m_ADCtoEnergy;
+
+    /** Minuit minimizer for fit with photon and hadron. */
+    TMinuit* m_MinuitPhotonHadron = nullptr;
+
+    /** Minuit minimizer for fit with photon, hadron, and background photon. */
+    TMinuit* m_MinuitPhotonHadronBackgroundPhoton = nullptr;
+
+    /** ShaperDSP signal shapes. */
+    SignalInterpolation2 m_SignalInterpolation[ECLElementNumbers::c_NCrystals][3];
+
+    /** Packed covariance matrices. */
+    CovariancePacked m_PackedCovariance[ECLElementNumbers::c_NCrystals] = {};
+
+    /** Flag to indicate if running over data or MC. */
+    bool m_IsMCFlag{false};
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
@@ -181,4 +246,5 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits;
 
   };
-} // end Belle2 namespace
+
+}

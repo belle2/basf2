@@ -81,8 +81,8 @@ def partial_fit(state, X, S, y, w, epoch, batch):
             """
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
-            print('\nTesting loss: {}, acc: {}'.format(loss, acc))
-            print('Training loss: {}, acc: {}'.format(loss2, acc2))
+            print(f'\nTesting loss: {loss}, acc: {acc}')
+            print(f'Training loss: {loss2}, acc: {acc2}')
 
     state.model.fit(X, y, batch_size=100, epochs=100, validation_data=(state.Xtest, state.ytest),
                     callbacks=[TestCallback(), EarlyStopping(monitor='val_loss')])

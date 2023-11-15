@@ -31,10 +31,11 @@ namespace Belle2 {
     /**
      * @brief Change fitter options to not use scatterers
      * inside CDC. Currently by checking the volume name
-     * in the middle of entry and exit vectors
+     * in the middle of entry and exit vectors.
      *
-     * @param entry First point in track segment position in global coords
-     * @param exit Second point in track segment position in global coords
+     * The first two arguments are unused in our implementation, so they are not explicitely named here,
+     * even though they are present in the base class genfit::GblTrackSegmentController.
+     *
      * @param scatTheta Total MS variance accumulated in segment
      * @param fitter Pointer to the fitter
      * @return void

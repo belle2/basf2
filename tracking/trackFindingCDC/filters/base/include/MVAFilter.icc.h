@@ -32,10 +32,9 @@ namespace Belle2 {
     template <class AFilter>
     MVA<AFilter>::MVA(std::unique_ptr<AVarSet> varSet,
                       const std::string& identifier,
-                      double defaultCut)
-      : Super(std::move(varSet))
-      , m_param_cut(defaultCut)
-      , m_param_identifier(identifier)
+                      double defaultCut,
+                      const std::string& dbObjectName)
+      : Super(std::move(varSet)), m_identifier(identifier), m_cutValue(defaultCut), m_DBPayloadName(dbObjectName)
     {
     }
 
@@ -47,22 +46,39 @@ namespace Belle2 {
     {
       Super::exposeParameters(moduleParamList, prefix);
       moduleParamList->addParameter(prefixed(prefix, "cut"),
-                                    m_param_cut,
+                                    m_cutValue,
                                     "The cut value of the mva output below which the object is rejected",
-                                    m_param_cut);
+                                    m_cutValue);
 
       moduleParamList->addParameter(prefixed(prefix, "identifier"),
-                                    m_param_identifier,
+                                    m_identifier,
                                     "Database identfier of the expert of weight file name",
-                                    m_param_identifier);
+                                    m_identifier);
+
+      moduleParamList->addParameter(prefixed(prefix, "DBPayloadName"),
+                                    m_DBPayloadName,
+                                    "Name of the DB payload containing weightfile name and the cut value. If a DB payload with both values is available and valid, it will override the values provided by parameters.",
+                                    m_DBPayloadName);
     }
 
     template <class AFilter>
     void MVA<AFilter>::initialize()
     {
       Super::initialize();
+
+      DBObjPtr<TrackingMVAFilterParameters> mvaParameterPayload(m_DBPayloadName);
+      if (mvaParameterPayload.isValid()) {
+        m_identifier = mvaParameterPayload->getIdentifierName();
+        m_cutValue = mvaParameterPayload->getCutValue();
+        B2DEBUG(20, "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " <<
+                m_cutValue << ".");
+      } else {
+        B2FATAL("MVAFilter: No valid MVAFilter payload with name " + m_DBPayloadName + " was found.");
+      }
+
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
-      m_mvaExpert = std::make_unique<MVAExpert>(m_param_identifier, std::move(namedVariables));
+
+      m_mvaExpert = std::make_unique<MVAExpert>(m_identifier, std::move(namedVariables));
       m_mvaExpert->initialize();
     }
 
@@ -77,7 +93,7 @@ namespace Belle2 {
     Weight MVA<AFilter>::operator()(const Object& obj)
     {
       double prediction = predict(obj);
-      return prediction < m_param_cut ? NAN : prediction;
+      return prediction < m_cutValue ? NAN : prediction;
     }
 
     template <class AFilter>
@@ -93,8 +109,9 @@ namespace Belle2 {
 
     template <class AVarSet>
     MVAFilter<AVarSet>::MVAFilter(const std::string& defaultTrainingName,
-                                  double defaultCut)
-      : Super(std::make_unique<AVarSet>(), defaultTrainingName, defaultCut)
+                                  double defaultCut,
+                                  const std::string& defaultDBObjectName)
+      : Super(std::make_unique<AVarSet>(), defaultTrainingName, defaultCut, defaultDBObjectName)
     {
     }
 

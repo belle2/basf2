@@ -50,16 +50,6 @@ namespace Belle2 {
      */
     void event() override final;
 
-    /**
-     * End-of-run action.
-     */
-    void endRun() override final;
-
-    /**
-     * Termination action.
-     */
-    void terminate() override final;
-
   private:
     /**
      * Pattern match for histogram name
@@ -77,9 +67,6 @@ namespace Belle2 {
 
     /** Global EventMetaData for run number and event number. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
-
-    /** The map between canvas name and canvas object. */
-    std::map<std::string, TCanvas*> m_cs;
 
     /** List of histogram name patterns to process. */
     std::vector<std::string> m_histograms;
@@ -113,9 +100,6 @@ namespace Belle2 {
 
     /** Test mode for null histograms */
     bool m_nullHistoMode = false;
-
-    /** Whether to automatically generate canvases for histograms */
-    bool m_autocanvas = true;
   };
 } // end namespace Belle2
 

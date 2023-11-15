@@ -36,10 +36,11 @@ namespace Belle2 {
     KLMHit2d();
 
     /**
-     * Constructor from KLMDigit (EKLM).
-     * @param[in] digit One of KLMDigits.
+     * Constructor from two orthogonal KLMDigits (EKLM).
+     * @param[in] digit1 KLMDigit in plane 1.
+     * @param[in] digit2 KLMDigit in plane 2.
      */
-    explicit KLMHit2d(KLMDigit* digit);
+    explicit KLMHit2d(KLMDigit* digit1, KLMDigit* digit2);
 
     /**
      * Constructor with initial values (BKLM).
@@ -139,6 +140,42 @@ namespace Belle2 {
     }
 
     /**
+     * Set first strip number for EKLM hit in the x-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setXStripMin(int strip)
+    {
+      m_Strip[0] = strip;
+    }
+
+    /**
+     * Set last strip number for EKLM hit in the x-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setXStripMax(int strip)
+    {
+      m_LastStrip[0] = strip;
+    }
+
+    /**
+     * Set first strip number for EKLM hit in the y-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setYStripMin(int strip)
+    {
+      m_Strip[1] = strip;
+    }
+
+    /**
+     * Set last strip number for EKLM hit in y-measuring plane.
+     * @param[in] strip Strip number.
+     */
+    void setYStripMax(int strip)
+    {
+      m_LastStrip[1] = strip;
+    }
+
+    /**
      * Determine whether this 2D hit is in RPC or scintillator.
      */
     bool inRPC() const
@@ -193,6 +230,38 @@ namespace Belle2 {
     double getPhiStripAve() const
     {
       return 0.5 * (getPhiStripMin() + getPhiStripMax());
+    }
+
+    /**
+     * Get first strip number for EKLM hit in the x-measuring plane.
+     */
+    int getXStripMin() const
+    {
+      return m_Strip[0];
+    }
+
+    /**
+     * Get last strip number for EKLM hit in the x-measuring plane.
+     */
+    int getXStripMax() const
+    {
+      return m_LastStrip[0];
+    }
+
+    /**
+     * Get first strip number for EKLM hit in the y-measuring plane.
+     */
+    int getYStripMin() const
+    {
+      return m_Strip[1];
+    }
+
+    /**
+     * Get last strip number for EKLM hit in the y-measuring plane.
+     */
+    int getYStripMax() const
+    {
+      return m_LastStrip[1];
     }
 
     /**

@@ -7,7 +7,6 @@ Finally, let us look at the skim task whose output files make up the input mdst 
 
 .. literalinclude:: skim.py
    :language: python
-   :linenos:
    :caption:
    
 The :code:`BatchesToTextFile` task fills text files with lists of skim output mdst paths, where :code:`NumBatches` specifies the number of batches per skim. Instead of through text files, one could pass a batch directly to the reconstruction by merging the corresponding skim output files. However direct, this would require a significant amount of additional storage space. 

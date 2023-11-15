@@ -350,7 +350,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             mc_figures_of_merit['mc_multiplicities'] = self.mc_multiplicities
             mc_figures_of_merit['mc_phis'] = self.mc_phi
             mc_figures_of_merit['mc_tan_lambdas'] = self.mc_tan_lambdas
-            mc_figures_of_merit['mc_thetas'] = self.mc_theta
             mc_figures_of_merit['mc_missing'] = self.mc_missing
             mc_figures_of_merit['mc_is_primary'] = self.mc_is_primary
             mc_figures_of_merit['mc_number_of_hits'] = self.mc_number_of_hits
@@ -376,7 +375,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 self.pr_number_of_matched_hits
             pr_figures_of_merit['pr_seed_tan_lambdas'] = self.pr_seed_tan_lambdas
             pr_figures_of_merit['pr_seed_phi'] = self.pr_seed_phi
-            pr_figures_of_merit['pr_seed_theta'] = self.pr_seed_theta
 
             pr_figures_of_merit['number_of_connected_tracks'] = \
                 self.number_of_connected_tracks

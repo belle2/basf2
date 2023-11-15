@@ -16,10 +16,11 @@
 #include <TFile.h>
 #include <TObject.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
+
 #include <boost/algorithm/string.hpp>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Belle2::Conditions {
   TestingPayloadStorage::TestingPayloadStorage(const std::string& filename):
@@ -147,7 +148,7 @@ namespace Belle2::Conditions {
     }
     return store(name, iov, resolved.string(), [&resolved](const std::string & destination) {
       // copy payload file to payload directory and rename it to follow the file name convention
-      fs::copy_file(resolved, destination, fs::copy_option::overwrite_if_exists);
+      fs::copy_file(resolved, destination, fs::copy_options::overwrite_existing);
       return true;
     });
   }
@@ -169,22 +170,28 @@ namespace Belle2::Conditions {
 
     // create a temporary file if we don't have a source file yet
     fs::path sourcefile{source};
+    int length = m_payloadDir.length();
+    char* temporaryFileName = new char[length + 16];
+    std::strcpy(temporaryFileName, m_payloadDir.c_str());
+    std::strcpy(temporaryFileName + length, "/payload_XXXXXX");
     if (source.empty()) {
       while (true) {
-        sourcefile = fs::path(m_payloadDir) / fs::unique_path();
-        auto fd = open(sourcefile.c_str(), O_CREAT | O_EXCL);
-        if (fd >= 0) {
-          close(fd);
-          break;
-        }
-        if (errno != EEXIST && errno != EINTR) {
+        int fileDescriptor = mkstemp(temporaryFileName);
+        if ((fileDescriptor == -1) && (errno != EINTR)) {
           B2ERROR("Cannot create payload file:" << strerror(errno));
+          delete[] temporaryFileName;
           return false;
+        }
+        if (fileDescriptor > 0) {
+          sourcefile = temporaryFileName;
+          close(fileDescriptor);
+          break;
         }
         B2DEBUG(35, "first try to create tempfile failed, trying again");
       }
       if (!writer(sourcefile.string())) return false;
     }
+    delete[] temporaryFileName;
     // If we created a temporary file we want to delete it again so we'd like to
     // use a scope guard to do so. However we need it in this scope so we need
     // to create one in any case and release it if we didn't create a temporary
@@ -221,14 +228,14 @@ namespace Belle2::Conditions {
           fs::rename(sourcefile, filename);
           delete_srcfile.release();
         } else {
-          fs::copy_file(source, filename, fs::copy_option::overwrite_if_exists);
+          fs::copy_file(source, filename, fs::copy_options::overwrite_existing);
         }
       }
       found = true;
       break;
     }
     if (!found) {
-      B2ERROR("Cannot create payload file: checksum mistmatch for existing files");
+      B2ERROR("Cannot create payload file: checksum mismatch for existing files");
       return false;
     }
     // Ok, add to the text file

@@ -15,6 +15,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 
 namespace Belle2 {
@@ -30,6 +31,8 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable; /**< Pointer to the table in DB */
     StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    std::string m_selectedDaughters;  /**< Daughters for which one wants to append weights */
+    DecayDescriptor m_decayDescriptor; /**< Decay Descriptor to be initialized with m_selectedDaughters */
 
   public:
 

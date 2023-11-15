@@ -16,8 +16,6 @@
 #include <vector>
 #include <fstream>
 
-#include <root/TVector2.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
@@ -25,13 +23,16 @@
 #include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 
+#include <TMatrix.h>
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
-  typedef std::pair<unsigned short, TVector2> cdcPair;
+  typedef std::pair<unsigned short, ROOT::Math::XYVector> cdcPair;
   /** Map of <counter, cdcPair>, for hits with indices */
   typedef std::map<int, cdcPair> cdcMap;
   /** Hough Tuples */
-  typedef std::pair<TVector2, TVector2> coord2dPair;
+  typedef std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> coord2dPair;
 
   /**
    * Hough Candidates class.
@@ -100,12 +101,12 @@ namespace Belle2 {
                             unsigned ix_s, unsigned iy_s);
 
     /** count the number of super layers with hits
-     *  @param array of hit/no hit for all super layers */
-    unsigned short countSL(bool*);
+     *  @param superLayers array of hit/no hit for all super layers */
+    unsigned short countSL(bool* superLayers);
     /** check the short track condition
      *  (= hits in the inner super layers rather than any super layers)
-     *  @param array of hit/no hit for all super layers */
-    bool shortTrack(bool*);
+     *  @param superLayers array of hit/no hit for all super layers */
+    bool shortTrack(bool* superLayers);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */

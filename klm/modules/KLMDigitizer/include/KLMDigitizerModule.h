@@ -16,6 +16,7 @@
 #include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
+#include <klm/dbobjects/KLMScintillatorFirmware.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/rawdata/RawData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
@@ -130,6 +131,9 @@ namespace Belle2 {
     /** Scintillator FEE parameters. */
     DBObjPtr<KLMScintillatorFEEParameters> m_FEEPar;
 
+    /** Scintillator FEE firmware version. */
+    DBObjPtr<KLMScintillatorFirmware> m_ScintillatorFirmware;
+
     /** Strip efficiency. */
     DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
 
@@ -159,6 +163,9 @@ namespace Belle2 {
 
     /** Whether to create multi-strip digits. */
     bool m_CreateMultiStripDigits;
+
+    /** Whether to create multi-strip digits for one particular run. */
+    bool m_CreateMultiStripDigitsByRun;
 
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;

@@ -82,6 +82,7 @@ void ECLLocalMaximumFinderModule::initialize()
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclConnectedRegions.registerRelationTo(m_eclLocalMaximums);
   m_eclCalDigits.registerRelationTo(m_eclLocalMaximums);
+  m_eventLevelClusteringInfo.registerInDataStore();
 
   // Check user input.
   if (m_energyCut < c_minEnergyCut) {
@@ -335,6 +336,21 @@ void ECLLocalMaximumFinderModule::event()
     }
 
   } // end CR loop
+
+  // Find the number of local maximums in each ECL region in mdst
+  uint16_t nLMPerRegion[3] = {};
+  for (const ECLLocalMaximum& aLM : m_eclLocalMaximums) {
+    const int iCellId = aLM.getCellId();
+    if (ECLElementNumbers::isForward(iCellId)) {nLMPerRegion[0]++;}
+    if (ECLElementNumbers::isBarrel(iCellId)) {nLMPerRegion[1]++;}
+    if (ECLElementNumbers::isBackward(iCellId)) {nLMPerRegion[2]++;}
+  }
+
+  // Store numbers in EventLevelClusteringInfo mdst object
+  if (!m_eventLevelClusteringInfo) { m_eventLevelClusteringInfo.create();}
+  m_eventLevelClusteringInfo->setNECLLocalMaximumsFWD(nLMPerRegion[0]);
+  m_eventLevelClusteringInfo->setNECLLocalMaximumsBarrel(nLMPerRegion[1]);
+  m_eventLevelClusteringInfo->setNECLLocalMaximumsBWD(nLMPerRegion[2]);
 
 }
 

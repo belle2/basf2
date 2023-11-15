@@ -23,7 +23,6 @@ namespace Belle2 {
   public:
     /** Constructor fills variableSet with variables to be extracted
      * @param variableSet set of variable to be filled
-     * @param useTimingInfo whether to use the timing info in clusters
      */
     explicit HitInfoExtractor(std::vector<Named<float*>>& variableSet) :
       VariableExtractor()

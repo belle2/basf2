@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -149,14 +148,14 @@ class TestJob(TestCase):
         self.job1.splitter.create_subjobs(self.job1)
         self.assertEqual(len(self.job1.subjobs), 3)  # Did the splitter create the number of jobs we expect?
         for i, subjob in self.job1.subjobs.items():
-            self.assertTrue((len(subjob.input_files) == 2 or len(subjob.input_files) == 1))
+            self.assertTrue(len(subjob.input_files) == 2 or len(subjob.input_files) == 1)
 
         self.job1.subjobs = {}
         self.job1.splitter = MaxSubjobsSplitter(max_subjobs=4)
         self.job1.splitter.create_subjobs(self.job1)
         self.assertEqual(len(self.job1.subjobs), 4)  # Did the splitter create the number of jobs we expect?
         for i, subjob in self.job1.subjobs.items():
-            self.assertTrue((len(subjob.input_files) == 2 or len(subjob.input_files) == 1))
+            self.assertTrue(len(subjob.input_files) == 2 or len(subjob.input_files) == 1)
 
         # Does the ArgumentSplitter create jobs
         self.job1.subjobs = {}

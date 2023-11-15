@@ -70,6 +70,14 @@ if args.isMC:
         forceSetPXDDataReduction=True,
         usePXDDataReduction=ROIfinding,
         simulateT0jitter=simulateJitter)
+
+    if args.is3sample:
+        for m in main.modules():
+            if m.name() == "SVDEventInfoSetter":
+                m.param("daqMode", 1)
+                m.param("relativeShift", 7)
+                m.param("useDB", False)
+
 else:
     # setup database
     b2conditions.reset()
@@ -80,40 +88,40 @@ else:
 
     MCTracking = False
 
-if args.test:
-    main.add_module('RootInput', entrySequences=['0:100'])
-else:
-    main.add_module('RootInput')
+    if args.test:
+        main.add_module('RootInput', entrySequences=['0:100'])
+    else:
+        main.add_module('RootInput')
 
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)
 
-if not args.isMC:
     raw.add_unpackers(main)
 
     if args.is3sample:
+
         # change ListName
         for moda in main.modules():
             if moda.name() == 'SVDUnpacker':
                 moda.param("svdShaperDigitListName", "SVDShaperDigits6Sample")
                 moda.param("SVDEventInfo", "SVDEventInfo6Sample")
 
-if args.is3sample:
-    # emulate 3-sample DAQ for events
-    zsemulator = b2.register_module("SVD3SamplesEmulator")
-    zsemulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
-    zsemulator.param("outputSVDEventInfo", "SVDEventInfo")
-    zsemulator.param("chooseStartingSample", False)
-    zsemulator.param("chooseRelativeShift", True)
-    zsemulator.param("relativeShift", 7)
-    zsemulator.param("SVDShaperDigits", "SVDShaperDigits6Sample")
-    zsemulator.param("SVDEventInfo", "SVDEventInfo6Sample")
-    main.add_module(zsemulator)
+        # emulate 3-sample DAQ for events
+        zsemulator = b2.register_module("SVD3SamplesEmulator")
+        zsemulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
+        zsemulator.param("outputSVDEventInfo", "SVDEventInfo")
+        zsemulator.param("chooseStartingSample", False)
+        zsemulator.param("chooseRelativeShift", True)
+        zsemulator.param("relativeShift", 7)
+        zsemulator.param("SVDShaperDigits", "SVDShaperDigits6Sample")
+        zsemulator.param("SVDEventInfo", "SVDEventInfo6Sample")
+        main.add_module(zsemulator)
 
-    zsonline = b2.register_module("SVDZeroSuppressionEmulator")
-    zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
-    zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
-    main.add_module(zsonline)
+        zsonline = b2.register_module("SVDZeroSuppressionEmulator")
+        zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
+        zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
+        main.add_module(zsonline)
+
 
 if args.noReco:
     #  clusterizer

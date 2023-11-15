@@ -26,7 +26,7 @@ namespace Belle2 {
   /** The SecMapTrainerVXDTFModule
    * this module analyzes a big number of events (pGun or evtGen) to create raw sectorMaps which are needed for the VXDTF.
    * This information will be exported via and root files.
-  . */
+   */
   class SecMapTrainerVXDTFModule : public Module {
 
   public:

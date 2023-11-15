@@ -67,7 +67,7 @@ std::unique_ptr<ZMQIdMessage> ZMQConfirmedInput::handleIncomingData()
   } else if (message->isMessage(EMessageTypes::c_deleteWorkerMessage)) {
     // a delete message makes us forget about the worker identity. The identity is taken from the message data
     // making it possible to delete other workers.
-    B2DEBUG(10, "Got message from " << message->getIdentity() << " to kill " << message->getMessagePartAsString<2>());
+    B2DEBUG(30, "Got message from " << message->getIdentity() << " to kill " << message->getMessagePartAsString<2>());
     const std::string& killedIdentity = message->getMessagePartAsString<2>();
     m_registeredWorkersInput.erase(killedIdentity);
 

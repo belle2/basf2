@@ -16,8 +16,25 @@ namespace Belle2 {
   /** Optimizes class to iterate over TObjArray and classes inheriting from it.
    *  iterators are invalidated if the size of the TObjArray is changed.
    */
-  template <class ArrayType, class ValueType> class ObjArrayIterator: public std::iterator<std::forward_iterator_tag, ValueType>  {
+  template <class ArrayType, class ValueType> class ObjArrayIterator {
+
   public:
+
+    /** Iterator category. */
+    using iterator_category = std::forward_iterator_tag;
+
+    /** Difference type. */
+    using difference_type = std::ptrdiff_t;
+
+    /** Value type. */
+    using value_type = ValueType;
+
+    /** Pointer. */
+    using pointer = ValueType*;
+
+    /** Reference. */
+    using reference = ValueType&;
+
     /** default constructor */
     ObjArrayIterator() = default;
     /** real constructor

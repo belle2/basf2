@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/ROISenderModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIpayload.h>
+
 #include <sys/stat.h>
 #include <chrono>
 

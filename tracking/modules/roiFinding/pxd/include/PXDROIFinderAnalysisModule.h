@@ -5,30 +5,27 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <string>
+
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
 
+#include <string>
+
 namespace Belle2 {
+  class RecoTrack;
+  class ROIid;
+  class PXDIntercept;
+  class MCParticle;
 
   /** The PXD Data Reduction Analysis Module
    *
-   * this module performs the analysis of the PXD data redution module performances
+   * this module performs the analysis of the PXD data reduction module performances
    *
    */
 

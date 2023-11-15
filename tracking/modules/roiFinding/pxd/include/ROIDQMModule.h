@@ -13,17 +13,17 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <pxd/dataobjects/PXDDigit.h>
+#include <TH1.h>
+#include <TH1F.h>
 
 #include <unordered_map>
 #include <utility>
 #include <functional>
-#include <TH1.h>
-#include <TH1F.h>
 
 namespace Belle2 {
+  class PXDDigit;
+  class ROIid;
+  class PXDIntercept;
 
   /** The HLT ROI DQM module.
    *

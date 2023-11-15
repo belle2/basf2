@@ -11,7 +11,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-
 namespace Belle2 {
   class ROIid;
   class MCParticle;

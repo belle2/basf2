@@ -9,11 +9,9 @@
 #include <tracking/modules/roiFinding/pxd/MCSlowPionPXDROICreatorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-
 #include <pxd/dataobjects/PXDDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/ROIid.h>
-
 
 using namespace Belle2;
 

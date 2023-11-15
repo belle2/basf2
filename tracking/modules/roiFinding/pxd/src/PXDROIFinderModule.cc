@@ -7,9 +7,16 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/PXDROIFinderModule.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+
 #include <genfit/MaterialEffects.h>
+
+#include <tracking/dbobjects/ROICalculationParameters.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 
 using namespace Belle2;
 

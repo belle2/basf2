@@ -7,12 +7,16 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/ROIPayloadAssemblerModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/ROIpayload.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <set>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+
+#include <set>
 
 using namespace Belle2;
 

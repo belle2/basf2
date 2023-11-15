@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/ROIReadTestModule.h>
+#include <tracking/dataobjects/ROIpayload.h>
 
 using namespace Belle2;
 

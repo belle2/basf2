@@ -7,6 +7,10 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/ROIDQMModule.h>
+
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/PXDIntercept.h>
+#include <pxd/dataobjects/PXDDigit.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <TDirectory.h>

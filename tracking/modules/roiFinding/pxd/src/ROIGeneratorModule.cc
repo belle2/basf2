@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/ROIGeneratorModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIid.h>
 #include <framework/datastore/StoreArray.h>
 
 using namespace Belle2;

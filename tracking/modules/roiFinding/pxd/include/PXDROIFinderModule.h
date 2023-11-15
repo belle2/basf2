@@ -5,22 +5,21 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/roiFinding/PXDInterceptor.h>
 #include <tracking/roiFinding/ROIPixelTranslator.h>
-#include <string>
 #include <tracking/roiFinding/ROIinfo.h>
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/ROICalculationParameters.h>
+
+#include <string>
 
 namespace Belle2 {
+  class RecoTrack;
+  class PXDIntercept;
+  class ROIid;
+  class ROICalculationParameters;
 
   /** The PXD ROI Finder Module
    *

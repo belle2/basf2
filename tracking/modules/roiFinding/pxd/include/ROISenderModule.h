@@ -10,13 +10,13 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <tracking/dataobjects/ROIpayload.h>
-#include <string>
 
+#include <string>
 #include <mqueue.h>
 
 namespace Belle2 {
+  class ROIpayload;
+  class EventMetaData;
 
   /** The ROI to ONSEN Module
    *

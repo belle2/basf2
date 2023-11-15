@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/pxd/PXDclusterFilterModule.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <simulation/dbobjects/ROISimulationParameters.h>
+
 #include <map>
 
 using namespace Belle2;

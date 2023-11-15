@@ -11,12 +11,13 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/ROIpayload.h>
+
 #include <string>
 
 namespace Belle2 {
+  class EventMetaData;
+  class ROIid;
+  class ROIpayload;
 
   /** The ROI Payload Assembler Module
    *

@@ -12,10 +12,10 @@
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <framework/database/DBObjPtr.h>
-#include <simulation/dbobjects/ROISimulationParameters.h>
-#include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {
+  class ROIid;
+  class ROISimulationParameters;
 
   /**
    * The module produce a StoreArray of PXDDigit inside the ROIs, thus simulating "ONSEN" ROI selection.

@@ -10,11 +10,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <tracking/dataobjects/ROIpayload.h>
+
 #include <string>
 #include <stdio.h>
 
 namespace Belle2 {
+  class ROIpayload;
 
   /** The ROI to ONSEN Module
    *

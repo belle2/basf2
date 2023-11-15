@@ -5,22 +5,19 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <tracking/dataobjects/ROIid.h>
 #include <framework/database/DBObjPtr.h>
-#include <simulation/dbobjects/ROISimulationParameters.h>
 
 namespace Belle2 {
+  class ROIid;
+  class ROISimulationParameters;
 
   /**
    * The module produce a StoreArray of PXDCluster inside the ROIs.
-   *
-   *    *
    */
   class PXDclusterFilterModule : public Module {
 

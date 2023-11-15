@@ -11,10 +11,10 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {
+  class EventMetaData;
+  class ROIid;
 
   /** The ROI generator Module
    *

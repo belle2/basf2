@@ -10,15 +10,18 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/PXDIntercept.h>
+
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <Math/Vector3D.h>
-
 #include <vxd/geometry/GeoCache.h>
 
 #include <TMath.h>
-
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 

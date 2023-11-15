@@ -11,14 +11,14 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {
+  class ROIid;
 
   /**
    * The module produce a StoreArray of PXDRawHit inside the ROIs.
    * Thus simulation "ONSEN" ROI selection.
-   * An oitside of ROI array can be produced on demand.
+   * An outside of ROI array can be produced on demand.
    */
   class PXDRawHitFilterModule : public Module {
 

@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <algorithm>
+
 namespace Belle2 {
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
   CKFRelationCreator<AState, ASeedRelationFilter, AHitRelationFilter>::~CKFRelationCreator() = default;
@@ -59,7 +61,10 @@ namespace Belle2 {
 
       for (const auto relation : relations) {
         // hit state pointers are the "To"s in the relation, only take those
-        selectedStatePointers.push_back(relation.getTo());
+        const auto it = std::find(selectedStatePointers.begin(), selectedStatePointers.end(), relation.getTo());
+        if (it == selectedStatePointers.end()) {
+          selectedStatePointers.push_back(relation.getTo());
+        }
       }
       TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, statePointers, relations, 1000000);
     } else {

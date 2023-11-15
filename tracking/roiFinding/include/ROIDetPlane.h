@@ -26,8 +26,6 @@ namespace Belle2 {
     // TODO: Using u and v tolerances seems to be more "natural", or use theta and phi so its consistent for u and v direction
     ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerancePhi); /**< the constructor*/
 
-    explicit ROIDetPlane(const VxdID& vxdID); /**< the constructor - needed for testbeam package*/
-
     // Needed by root. Dont use!
     ROIDetPlane() = default;
 

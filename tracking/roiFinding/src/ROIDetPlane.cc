@@ -16,11 +16,6 @@
 using namespace Belle2;
 
 
-ROIDetPlane::ROIDetPlane(const VxdID& vxdID) : ROIDetPlane(vxdID, 10.0, 0.4999999 * M_PI)
-{
-}
-
-
 ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerancePhi)
   : m_vxdID(vxdID), m_orthoVec_upper(0, 0, 0), m_orthoVec_lower(0, 0, 0)
 {

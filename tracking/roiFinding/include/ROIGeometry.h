@@ -14,6 +14,7 @@
 #include <list>
 
 namespace Belle2 {
+  class ROIDetPlane;
 
   /** This class appends the VXDIntercept infos of a track to the list of intercepts.
    */

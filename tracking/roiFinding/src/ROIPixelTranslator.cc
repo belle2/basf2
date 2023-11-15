@@ -11,6 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <tracking/dataobjects/ROIid.h>
 
 using namespace Belle2;
 

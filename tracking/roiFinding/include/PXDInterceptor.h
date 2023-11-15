@@ -10,14 +10,13 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/roiFinding/ROIGeometry.h>
-#include <tracking/roiFinding/ROIinfo.h>
 #include <genfit/KalmanFitter.h>
 
 
 namespace Belle2 {
+  class PXDIntercept;
+  class RecoTrack;
 
   /** The PXDInterceptor class fills a StoreArray of PXDIntercepts that will be used to define the PXD ROIs.
    * The class assumes that the tracks are coming from the IP and that the genfit propagation direction is

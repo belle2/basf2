@@ -10,10 +10,10 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/dataobjects/ROIid.h>
 #include <tracking/roiFinding/ROIinfo.h>
 
 namespace Belle2 {
+  class ROIid;
 
   /** Translator for ROI-geometry-information into a list of pixels.
    */

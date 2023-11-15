@@ -6,10 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/dataobjects/RecoTrack.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <tracking/roiFinding/PXDInterceptor.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/PXDIntercept.h>
+#include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 

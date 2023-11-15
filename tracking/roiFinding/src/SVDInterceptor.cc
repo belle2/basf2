@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <tracking/roiFinding/SVDInterceptor.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/AbsTrackRep.h>
+#include <tracking/dataobjects/SVDIntercept.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/roiFinding/SVDInterceptor.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 

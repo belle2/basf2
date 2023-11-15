@@ -11,11 +11,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/roiFinding/ROIGeometry.h>
-#include <tracking/dataobjects/SVDIntercept.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/roiFinding/ROIinfo.h>
 
 namespace Belle2 {
+  class SVDIntercept;
+  class RecoTrack;
 
   /** This Class implements the interceptor of the SVD tracks on the PXD layers.
    */

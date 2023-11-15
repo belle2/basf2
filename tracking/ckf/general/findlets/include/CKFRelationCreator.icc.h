@@ -30,6 +30,11 @@ namespace Belle2 {
   {
     m_seedFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("seed", prefix));
     m_hitFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("hit", prefix));
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "onlyUseHitStatesRelatedToSeeds"),
+                                  m_onlyUseHitStatesRelatedToSeeds,
+                                  "Only use hit states related to seed states to build the inter hit relations to reduce combinatorics.",
+                                  m_onlyUseHitStatesRelatedToSeeds);
   }
 
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter>

@@ -41,5 +41,8 @@ namespace Belle2 {
     ASeedRelationFilter m_seedFilter;
     /// Subfindlet for the relation checking between hits and hits
     AHitRelationFilter m_hitFilter;
+    /// Only use subset of hits already related to the seeds to reduce combinatorics.
+    /// Will only work reasonably well for PXD as we only have two layers and can jump over L2.
+    bool m_onlyUseHitStatesRelatedToSeeds = false;
   };
 }

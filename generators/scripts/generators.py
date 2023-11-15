@@ -334,7 +334,8 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
         'EvtGenInput',
         userDECFile=evtgen_userdecfile,
         CoherentMixing=coherentMixing,
-        ParentParticle=parentParticle
+        ParentParticle=parentParticle,
+        eventType=finalstate
     )
 
 

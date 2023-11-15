@@ -11,6 +11,7 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 #include <string>
 #include <unordered_map>
@@ -41,6 +42,8 @@ namespace Belle2 {
 
       m_eventExtraInfo->addExtraInfo(m_generatorName, 1.0);
 
+      m_eventExtraInfo->addExtraInfo("eventType", getEventType());
+
       for (auto [name, val] : m_generatorInfoMap)
         m_eventExtraInfo->addExtraInfo(name, val);
     };
@@ -57,6 +60,12 @@ namespace Belle2 {
       m_generatorInfoMap = generatorInfoMap;
     };
 
+    /** Convert m_eventType from string to int */
+    virtual double getEventType() const
+    {
+      return Const::doubleNaN;
+    }
+
   protected:
     /** pointer to EventExtraInfo  */
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
@@ -65,6 +74,9 @@ namespace Belle2 {
     std::string m_generatorName = "";
     /** Generator information to be set on extraInfo */
     std::unordered_map<std::string, double> m_generatorInfoMap = {};
+    /** Event type */
+    std::string m_eventType = "";
+
   };
 
 } // end namespace Belle2

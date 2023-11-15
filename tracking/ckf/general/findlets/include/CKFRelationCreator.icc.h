@@ -61,7 +61,7 @@ namespace Belle2 {
         // hit state pointers are the "To"s in the relation, only take those
         selectedStatePointers.push_back(relation.getTo());
       }
-      TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, selectedStatePointers, relations, 1000000);
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, statePointers, relations, 1000000);
     } else {
       // use all of hit states for inter hit state relation creation
       TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, statePointers, statePointers, relations, 1000000);

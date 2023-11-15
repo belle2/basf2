@@ -223,6 +223,7 @@ FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fst
   int fileDescriptor = mkstemp(temporaryFileName);
   if (fileDescriptor == -1) {
     B2ERROR("Cannot create temporary file: " << strerror(errno));
+    free(temporaryFileName);
     return;
   }
   m_filename = std::string(temporaryFileName);

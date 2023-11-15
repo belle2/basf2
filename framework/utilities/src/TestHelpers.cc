@@ -49,6 +49,7 @@ TempDirCreator::TempDirCreator():
   auto directory = mkdtemp(temporaryDirName);
   if (!directory) {
     B2ERROR("Cannot create temporary directory: " << strerror(errno));
+    free(temporaryDirName);
     return;
   }
   path tmpdir = directory;

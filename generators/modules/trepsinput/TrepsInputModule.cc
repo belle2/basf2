@@ -27,7 +27,7 @@ REG_MODULE(TrepsInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+TrepsInputModule::TrepsInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
@@ -60,6 +60,9 @@ TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_sme
            "Whether to apply cut on the minimal transverse momentum for "
            "charged particles only.", true);
 
+  //Generator common parameters
+  addParam("eventType", m_eventType, "Event type", std::string(""));
+  m_generatorName = "TREPS";
 }
 
 void TrepsInputModule::initialize()
@@ -68,7 +71,7 @@ void TrepsInputModule::initialize()
   m_mcparticles.registerInDataStore();
 }
 
-void TrepsInputModule::event()
+void TrepsInputModule::generatorEvent()
 {
   /*
    * Check if the BeamParameters have changed (if they do, abort the job;

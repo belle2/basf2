@@ -8,14 +8,13 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <generators/modules/GeneratorBaseModule.h>
+#include <generators/kkmc/KKGenInterface.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <string>
-
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/kkmc/KKGenInterface.h>
-
-#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -23,7 +22,7 @@ namespace Belle2 {
    *  interface for KK2f MC Event Generator
    *  stores generated particles in MCParticles.
    */
-  class KKGenInputModule : public Module {
+  class KKGenInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -43,11 +42,24 @@ namespace Belle2 {
     virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;
 
+    /** Convert m_eventType from string to double */
+    double getEventType() const override
+    {
+      if (m_eventType == "tau-tau+") return 1515;
+      if (m_eventType == "mu-mu+") return 1313;
+
+      if (m_eventType == "ccbar") return 3;
+      if (m_eventType == "ssbar") return 4;
+      if (m_eventType == "ddbar") return 5;
+      if (m_eventType == "uubar") return 6;
+
+      return Const::doubleNaN;
+    };
 
   protected:
 

@@ -8,12 +8,12 @@
 
 #pragma once
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
 
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <generators/modules/GeneratorBaseModule.h>
 
 #include <Math/Vector3D.h>
 
@@ -58,7 +58,12 @@ namespace Belle2 {
         basename = basename.substr(basename.find_last_of('/') + 1);
         basename = basename.substr(0, basename.find_last_of('.'));
 
-        return atoi(basename.c_str());
+        try {
+          int eventType = std::stoi(basename);
+          return eventType;
+        } catch (const std::invalid_argument& e) {
+          return Const::doubleNaN;
+        }
       }
 
       return Const::doubleNaN;

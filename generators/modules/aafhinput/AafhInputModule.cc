@@ -23,7 +23,7 @@ REG_MODULE(AafhInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearALL)
+AafhInputModule::AafhInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearALL)
 {
   // Set module properties
   setDescription("AAFH Generator to generate non-radiative two-photon events like e+e- -> e+e-e+e-");
@@ -84,6 +84,10 @@ AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smear
   addParam("particle", m_particle,
            "name of the generated particle for mode 1 and 4",
            m_generator.getParticle());
+
+  //Generator common parameters
+  addParam("eventType", m_eventType, "Event type", std::string(""));
+  m_generatorName = "AAFH";
 }
 
 void AafhInputModule::initialize()
@@ -94,7 +98,7 @@ void AafhInputModule::initialize()
   m_initial.initialize();
 }
 
-void AafhInputModule::event()
+void AafhInputModule::generatorEvent()
 {
 
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)

@@ -9,18 +9,21 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/SVDIntercept.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <string>
+#include <framework/datastore/StoreArray.h>
+
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
 
+#include <string>
+
 namespace Belle2 {
+  class ROIid;
+  class SVDIntercept;
+  class SVDShaperDigit;
+  class RecoTrack;
+  class MCParticle;
 
   /** This module performs the analysis of the SVD data reduction module performances  */
 

@@ -9,17 +9,20 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/SVDIntercept.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <string>
-#include <TFile.h>
+#include <framework/datastore/StoreArray.h>
+
 #include <TH1F.h>
 #include <TH2F.h>
 
+#include <string>
+#include <TFile.h>
+
 namespace Belle2 {
+  class ROIid;
+  class SVDIntercept;
+  class SVDShaperDigit;
+  class Track;
+  class RecoTrack;
 
   /** The Module evaluates the efficiency on SVD based on the number of empty ROIs */
 

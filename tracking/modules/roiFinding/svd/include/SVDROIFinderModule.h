@@ -11,13 +11,14 @@
 #include <framework/core/Module.h>
 #include <tracking/roiFinding/SVDInterceptor.h>
 #include <tracking/roiFinding/ROIStripTranslator.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/SVDIntercept.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <string>
 #include <tracking/roiFinding/ROIinfo.h>
 
+#include <string>
+
 namespace Belle2 {
+  class RecoTrack;
+  class ROIid;
+  class SVDIntercept;
 
   /** The SVD ROI Finder Module
    *

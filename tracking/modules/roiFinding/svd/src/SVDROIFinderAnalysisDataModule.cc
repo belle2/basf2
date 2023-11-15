@@ -10,7 +10,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/SVDIntercept.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+
 #include <iostream>
 
 using namespace Belle2;

@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/svd/SVDShaperDigitFilterModule.h>
+#include <tracking/dataobjects/ROIid.h>
+
 #include <map>
 
 using namespace Belle2;

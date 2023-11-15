@@ -11,10 +11,10 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/SelectSubset.h>
-#include <tracking/dataobjects/ROIid.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 namespace Belle2 {
+  class ROIid;
 
   /**
    * The module produce a StoreArray of SVDShaperDigit inside the ROIs.

@@ -13,19 +13,19 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/SVDIntercept.h>
+#include <TH1.h>
+#include <TH1F.h>
 
 #include <unordered_map>
 #include <utility>
 #include <functional>
-#include <TH1.h>
-#include <TH1F.h>
 
 namespace Belle2 {
+  class ROIid;
+  class SVDIntercept;
+  class SVDShaperDigit;
+  class SVDRecoDigit;
+  class SVDCluster;
 
   /** Creates basic DQM for ROI creation on ExpressReco  */
 

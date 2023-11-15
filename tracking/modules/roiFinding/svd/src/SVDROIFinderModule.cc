@@ -9,6 +9,9 @@
 #include <tracking/modules/roiFinding/svd/SVDROIFinderModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/SVDIntercept.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MaterialEffects.h>
 
 using namespace Belle2;

@@ -7,6 +7,11 @@
  **************************************************************************/
 
 #include <tracking/modules/roiFinding/svd/SVDROIDQMModule.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/SVDIntercept.h>
 
 #include <TDirectory.h>
 #include <TH2F.h>

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
-#include <tracking/roiFinding/ROIPixelTranslator.h>
+#include <tracking/roiFinding/ROIToUnitTranslator.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -15,18 +14,18 @@
 
 using namespace Belle2;
 
-ROIPixelTranslator::ROIPixelTranslator(double user_sigmaSystU, double user_sigmaSystV, double user_numSigmaTotU,
-                                       double user_numSigmaTotV, double user_maxWidthU, double user_maxWidthV)
-  : m_sigmaSystU(user_sigmaSystU)
-  , m_sigmaSystV(user_sigmaSystV)
-  , m_numSigmaTotU(user_numSigmaTotU)
-  , m_numSigmaTotV(user_numSigmaTotV)
-  , m_maxWidthU(user_maxWidthU)
-  , m_maxWidthV(user_maxWidthV)
+ROIToUnitTranslator::ROIToUnitTranslator(double sigmaSystU, double sigmaSystV, double numSigmaTotU,
+                                         double numSigmaTotV, double maxWidthU, double maxWidthV)
+  : m_sigmaSystU(sigmaSystU)
+  , m_sigmaSystV(sigmaSystV)
+  , m_numSigmaTotU(numSigmaTotU)
+  , m_numSigmaTotV(numSigmaTotV)
+  , m_maxWidthU(maxWidthU)
+  , m_maxWidthV(maxWidthV)
 {}
 
 
-ROIPixelTranslator::ROIPixelTranslator(const ROIinfo* theROIinfo)
+ROIToUnitTranslator::ROIToUnitTranslator(const ROIinfo* theROIinfo)
   : m_sigmaSystU(theROIinfo->sigmaSystU)
   , m_sigmaSystV(theROIinfo->sigmaSystV)
   , m_numSigmaTotU(theROIinfo->numSigmaTotU)
@@ -36,13 +35,13 @@ ROIPixelTranslator::ROIPixelTranslator(const ROIinfo* theROIinfo)
 {}
 
 
-ROIPixelTranslator::~ROIPixelTranslator()
+ROIToUnitTranslator::~ROIToUnitTranslator()
 {}
 
 
 void
-ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
-                                  StoreArray<ROIid>* ROIidList)
+ROIToUnitTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
+                                   StoreArray<ROIid>* ROIidList)
 {
 
   const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
@@ -99,7 +98,7 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
     //check that the pixel belong to the sensor
     bool inside = true;
     if (bottomLeft_uID > nPixelsU || topRight_uID < firstPixelID || bottomLeft_vID > nPixelsV || topRight_vID < firstPixelID) {
-      B2DEBUG(20, "  OOOPS: this pixel does NOT belong to the sensor");
+      B2DEBUG(21, "  OOOPS: this pixel does NOT belong to the sensor");
       inside = false;
     }
 

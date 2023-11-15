@@ -9,7 +9,7 @@
 
 #include <framework/core/Module.h>
 #include <tracking/roiFinding/PXDInterceptor.h>
-#include <tracking/roiFinding/ROIPixelTranslator.h>
+#include <tracking/roiFinding/ROIToUnitTranslator.h>
 #include <tracking/roiFinding/ROIinfo.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -67,7 +67,7 @@ namespace Belle2 {
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    ROIPixelTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
+    ROIToUnitTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
     PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
 
     double m_toleranceZ; /**< tolerance for finding sensor in Z coordinate (cm) */

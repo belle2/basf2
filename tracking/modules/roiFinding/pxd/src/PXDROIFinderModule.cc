@@ -130,7 +130,7 @@ void PXDROIFinderModule::beginRun()
 
   m_thePXDInterceptor = new PXDInterceptor(m_toleranceZ, m_tolerancePhi);
 
-  m_thePixelTranslator = new ROIPixelTranslator(&m_ROIinfo);
+  m_thePixelTranslator = new ROIToUnitTranslator(&m_ROIinfo);
 
 }
 

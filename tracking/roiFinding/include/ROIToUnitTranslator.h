@@ -17,24 +17,24 @@ namespace Belle2 {
 
   /** Translator for ROI-geometry-information into a list of pixels.
    */
-  class ROIPixelTranslator {
+  class ROIToUnitTranslator {
 
   public:
 
     /** Constructor.
      */
-    explicit ROIPixelTranslator(const ROIinfo*  theROIinfo);
+    explicit ROIToUnitTranslator(const ROIinfo*  theROIinfo);
 
     /** Second Constructor.
      */
-    ROIPixelTranslator(double sigmaSystU, double sigmaSystV,
-                       double numSigmaTotU, double numSigmaTotV,
-                       double maxWidthU, double maxWidthV);
+    ROIToUnitTranslator(double sigmaSystU, double sigmaSystV,
+                        double numSigmaTotU, double numSigmaTotV,
+                        double maxWidthU, double maxWidthV);
 
 
     /** Destructor.
      */
-    ~ROIPixelTranslator();
+    ~ROIToUnitTranslator();
 
     /** Append the ROIid to the list listToBeFilled.
      */

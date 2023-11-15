@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/babayaganlo/BabayagaNLO.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -28,7 +28,7 @@ namespace Belle2 {
    * The Babayaga.NLO Generator module.
    * Generates radiative Bhabha scattering and exlcusive photon pairs events using the Babayaga.NLO FORTRAN generator.
    */
-  class BabayagaNLOInputModule : public Module {
+  class BabayagaNLOInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -45,7 +45,7 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;
@@ -55,6 +55,15 @@ namespace Belle2 {
     {
       return s_initial.generate().getMass();
     }
+
+    /** Convert m_eventType from string to int */
+    double getEventType() const override
+    {
+      if (m_finalState == "ee") return 1111;
+      if (m_finalState == "gg") return 2222;
+
+      return Const::doubleNaN;
+    };
 
   protected:
 

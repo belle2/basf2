@@ -176,7 +176,8 @@ def add_aafh_generator(
         maxFinalWeight=aafh_maxFinalWeight,
         subgeneratorWeights=aafh_subgeneratorWeights,
         suppressionLimits=[1e100] * 4,
-        minMass=minmass
+        minMass=minmass,
+        eventType=finalstate
     )
 
     if preselection:
@@ -264,6 +265,7 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         KKdefaultFile=kkmc_config,
         taudecaytableFile=kkmc_tauconfigfile,
         kkmcoutputfilename=kkmc_logfile,
+        eventType=finalstate
     )
 
 
@@ -399,6 +401,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
         KKdefaultFile=kkmc_config,
         taudecaytableFile='',
         kkmcoutputfilename=kkmc_logfile,
+        eventType=finalstate
     )
 
     # add the fragmentation module to fragment the generated quarks into hadrons
@@ -872,4 +875,5 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
         ApplyCosThetaCutCharged=True,
         MinimalTransverseMomentum=0,
         ApplyTransverseMomentumCutCharged=True,
+        eventType=finalstate,
     )

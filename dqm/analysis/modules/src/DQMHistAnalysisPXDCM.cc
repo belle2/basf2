@@ -297,7 +297,7 @@ void DQMHistAnalysisPXDCMModule::event()
       tt->Draw();
     }
 
-    UpdateCanvas(m_cCommonModeDelta->GetName());
+    UpdateCanvas(m_cCommonModeDelta);
     m_cCommonModeDelta->Modified();
     m_cCommonModeDelta->Update();
   }

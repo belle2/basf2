@@ -199,8 +199,8 @@ class RootSaverModule(b2.Module):
         # General data
         self.event_num = np.zeros(1, dtype=np.int32)
         self.tree.Branch("event", self.event_num, "event/I")
-        self.isUps = np.zeros(1, dtype=bool)
-        self.tree.Branch("isUps", self.isUps, "isUps/O")
+        self.isB = np.zeros(1, dtype=bool)
+        self.tree.Branch("isB", self.isB, "isB/b")
 
         # We use a placeholder to point each Branch to initially, we'll use the n_xxx for vectors to tell ROOT
         # how many entries in the array to save via the xxx[n_xxx] string
@@ -208,8 +208,8 @@ class RootSaverModule(b2.Module):
         # LCA data
         self.truth_dict = {}
 
-        # self.truth_dict["isUps"] = np.zeros(1, dtype=np.int32)
-        # self.tree.Branch("isUps", self.truth_dict["isUps"], "isUps/I")
+        # self.truth_dict["isB"] = np.zeros(1, dtype=np.int32)
+        # self.tree.Branch("isB", self.truth_dict["isB"], "isB/b")
 
         # We assume at most two LCA matrices for event
         for i in [1, 2]:
@@ -281,7 +281,12 @@ class RootSaverModule(b2.Module):
         # Event number from EventMetaData -loaded with PyStoreObj
         self.event_num[0] = self.eventinfo.getEvent()
         # Is Upsilon flag
-        self.isUps[0] = True if self.mcparticle_list == "Upsilon(4S):MC" else False
+        if self.mcparticle_list == "Upsilon(4S):MC":
+            self.isB[0] = 0
+        elif self.mcparticle_list == "B0:MC":
+            self.isB[0] = 1
+        elif self.mcparticle_list == "B+:MC":
+            self.isB[0] = 2
 
         # Is background flag
         # bkg_event = np.random.rand(1) > (1 - self.bkg_probability)
@@ -300,10 +305,10 @@ class RootSaverModule(b2.Module):
                 # If we train on B decays these will correspond to the two Bs
                 # while if we train on the Upsilon, _1 will correspond to it and _2 will remain empty
                 # becaus getArrayIndex() gives 0 for the Upsilon and 1, 2 for the Bs
-                array_index = mcp.getArrayIndex() + 1 if self.isUps[0] else mcp.getArrayIndex()
+                array_index = 1 if self.isB[0] == 0 else mcp.getArrayIndex()
 
                 # Get the B flag
-                # self.truth_dict["isUps"][0] = int(not bkg_event)
+                # self.truth_dict["isB"][0] = int(not bkg_event)
 
                 # Call function to write history of leaves in the tree.
                 # It internally calls function update_levels to find and save the level of each particle in the tree.

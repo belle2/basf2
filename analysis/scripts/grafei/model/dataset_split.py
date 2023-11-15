@@ -33,7 +33,7 @@ def create_dataloader_mode_tags(configs, tags):
         )
 
         print(
-            f"{type(dataset).__name__} created for {mode} with {dataset.__len__()} samples"
+            f"{type(dataset).__name__} created for {mode} with {dataset.__len__()} samples\n"
         )
 
         dataloader_type = (

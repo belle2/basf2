@@ -1,6 +1,7 @@
 import itertools
 from pathlib import Path
 import numpy as np
+from scipy import stats
 import torch
 from .tree_utils import masses_to_classes
 from .dataset_utils import populate_avail_samples, preload_root_data
@@ -36,7 +37,8 @@ def _preload(self):
     # self.features = [f for f in self.root_trees[0].keys() if f.startswith("feat_")]
     with uproot.open(self.x_files[0])["Tree"] as t:
         self.features = [f for f in t.keys() if f.startswith("feat_")]
-        self.ups_reco = True if t["isUps"].array(library="np").any() else False
+        self.B_reco = int(stats.mode(t["isB"].array(library="np"), keepdims=False).mode)
+        assert self.B_reco in [0, 1, 2], "B_reco should be 0, 1 or 2, something went wrong"
 
     if self.node_features:
         # Keep only requested features
@@ -62,24 +64,21 @@ def _preload(self):
     self.global_features = [f"glob_{f}" for f in self.global_features] if self.global_features else []
     print(f"Input edge features: {self.edge_features}")
     print(f"Input global features: {self.global_features}")
-    # TODO: Preload all data as lazyarrays
-    print("Preloading ROOT data...")
+
+    # Preload data
     self.x, self.y = preload_root_data(
         # self.root_trees,
         self.x_files,
         self.features,
         self.discarded,
     )
-    print("ROOT data preloaded")
 
     # Need to populate a list of available training samples
-    print("Populating available samples...")
     self.avail_samples = populate_avail_samples(
         self.x,
         self.y,
-        self.ups_reco,
+        self.B_reco,
     )
-    print("Available samples populated")
 
     # Select a subset of available samples if requested
     if self.samples and self.samples < len(self.avail_samples):
@@ -118,12 +117,12 @@ def _process_graph(self, idx):
 
     # Get the rows of the X inputs to fetch
     # This is a boolean numpy array
-    x_rows = np.logical_or(evt_p_index == 1, evt_p_index == 2) if self.ups_reco else evt_p_index == int(p_index)
+    x_rows = np.logical_or(evt_p_index == 1, evt_p_index == 2) if not self.B_reco else evt_p_index == int(p_index)
 
     # Find the unmatched particles
     unmatched_rows = evt_p_index == -1
 
-    if self.subset_unmatched and np.any(unmatched_rows) and not self.ups_reco:
+    if self.subset_unmatched and np.any(unmatched_rows) and self.B_reco:
         # Create a random boolean array the same size as the number of leaves
         rand_mask = np.random.choice(a=[False, True], size=unmatched_rows.size)
         # AND the mask with the unmatched leaves
@@ -291,7 +290,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
             normalize (bool): whether to normalize input features
             overwrite (bool): overwrite graph files if already present
         """
-
         assert isinstance(
             ignore, list
         ), f'Argument "ignore" must be a list and not {type(ignore)}'
@@ -311,8 +309,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         self.global_features = global_features
         self.ignore = ignore
         self.samples = samples
-
-        print("Using LCAS format, max depth of 6 equals Ups(4S)")
 
         # Delete processed files, in case
         file_path = Path(self.root, "processed")
@@ -398,8 +394,6 @@ class BelleRecoSetGeometric(Dataset):
         self.global_features = global_features
         self.ignore = ignore
         self.samples = samples
-
-        print("Using LCAS format, max depth of 6 equals Ups(4S)")
 
         # Delete processed files, in case
         self.file_path = Path(self.root, "processed")

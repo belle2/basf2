@@ -23,7 +23,7 @@ def get_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Reconstruct most likely particles and save their features + B meson LCA matrices'
     )
-    parser.add_argument('-t', '--type', choices=['B0:MC', 'B+:MC', 'Upsilon(4S):MC'], required=True,
+    parser.add_argument('-t', '--type', choices=['B0', 'B+', 'Upsilon(4S)'], required=True,
                         help='Training target', metavar='type',
                         dest='type')
     # parser.add_argument('-b', '--bkg_prob', required=False, default=0., type=float,
@@ -42,10 +42,10 @@ if __name__ == '__main__':
     input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
 
     path = b2.create_path()
-    ma.inputMdst(str(args.input), path=path)
+    ma.inputMdst(str(input_file), path=path)
 
     # ###### BUILD MC B/Ups FOR LCA/TAGGING ######
-    ma.fillParticleListFromMC(args.type, '', path=path)
+    ma.fillParticleListFromMC(args.type + ":MC", '', path=path)
 
     # Fill particle list with optimized cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
@@ -165,7 +165,7 @@ if __name__ == '__main__':
         particle_lists=p_lists,
         features=save_vars,
         b_parent_var=b_parent_var,
-        mcparticle_list=args.type,
+        mcparticle_list=args.type + ":MC",
         output_file=f'output_{input_file.stem}.root',
         # bkg_prob=args.bkg_prob,
     )

@@ -9,7 +9,7 @@ class GeometricNetwork(torch.nn.Module):
         nfeat_in_dim,
         efeat_in_dim,
         gfeat_in_dim,
-        edge_classes,
+        edge_classes=6,
         x_classes=7,
         hidden_layer_dim=128,
         num_hid_layers=1,
@@ -162,6 +162,8 @@ class GeometricNetwork(torch.nn.Module):
             if global_layer
             else None,
         )
+
+        print(f"Using LCAS format, max depth of {edge_classes-1}\n")
 
     def forward(self, batch):
         x, u, edge_index, edge_attr, torch_batch = (

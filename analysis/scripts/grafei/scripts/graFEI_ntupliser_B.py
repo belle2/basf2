@@ -58,23 +58,13 @@ cut_photons_graFEI = " and ".join(cut_photons_graFEI)
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-t",
-    "--type",
-    required=False,
-    default=None,
-    choices=["Upsilon(4S):MC",
-             "B0:MC",
-             "B+:MC"],
-    help="Decide which MC particle to load for truth-matching")
 parser.add_argument("-c", "--cfg", type=str, default=None, help="graFEI config file")
 parser.add_argument("-w", "--weight", type=str, default=None, help="graFEI weight file")
 args = parser.parse_args()
 cfg_file = args.cfg
 weight_file = args.weight
-mc = args.type
 
-assert not args.type or args.type == "B0:MC", "This script actually works only for B0"
+mc = True
 
 # Create path
 path = b2.Path()
@@ -182,7 +172,7 @@ if mc:
 
 if mc:
     # Fill particle list of true B0 from ground-truth information
-    ma.fillParticleListFromMC(mc, "", path=path)
+    ma.fillParticleListFromMC("B0:MC", "", path=path)
 
 graFEI_roe_mask = (
     "graFEIROE",

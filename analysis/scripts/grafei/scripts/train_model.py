@@ -52,7 +52,7 @@ def main(
 
     # First figure out which device all this is running on
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using {device} device")
+    print(f"Using {str(device).upper()} device\n")
 
     # Load configs
     configs, tags = load_config(
@@ -77,6 +77,11 @@ def main(
     # Load datasets
     mode_tags = create_dataloader_mode_tags(configs, tags)
 
+    # Find out if we are reconstructing B or Ups
+    B_reco = mode_tags["Training"][1].B_reco
+
+    configs["geometric_model"].update({"edge_classes": 6 if B_reco else 7, "B_reco": B_reco})
+
     # Now build the model
     # Extract the number of features, assuming last dim is features
     n_infeatures = mode_tags["Training"][1][0].x.shape[-1]
@@ -87,7 +92,6 @@ def main(
         nfeat_in_dim=n_infeatures,
         efeat_in_dim=e_infeatures,
         gfeat_in_dim=g_infeatures,
-        edge_classes=configs["dataset"]["edge_classes"],
         **configs["geometric_model"],
     )
 
@@ -96,9 +100,9 @@ def main(
         print("We're going to use", torch.cuda.device_count(), "GPUs!")
         base_model = torch_geometric.nn.DataParallel(base_model)
 
-    print(f"Model: {base_model}")
+    print(f"Model: {base_model}\n")
     print(
-        f"Number of parameters: {sum(p.numel() for p in base_model.parameters() if p.requires_grad)}"
+        f"Number of parameters: {sum(p.numel() for p in base_model.parameters() if p.requires_grad)}\n"
     )
 
     # Compile the model (requires Pytorch >= 2.0.0)

@@ -5,7 +5,7 @@ import uproot
 def populate_avail_samples(
     X,
     Y,
-    ups_reco=False,
+    B_reco=0,
     # allow_background=False,
 ):
     """
@@ -14,7 +14,7 @@ def populate_avail_samples(
     Args:
         X (list): List of ROOT lazyarray dicts for X (input) data
         Y (list): List of ROOT lazyarray dicts for Y (ground truth) data
-        ups_reco (bool): flag for Upsilon/B reconstruction (set automatically from the config file)
+        B_reco (int): flag for Upsilon/B0/B+ reconstruction (set automatically). Ups = 0, B0 = 1, B+ = 2
     """
     # Must iterate over Y because X contains a b_index of -1 for unmatched particles
     avail_samples = []
@@ -24,7 +24,7 @@ def populate_avail_samples(
         events = X[i]["event"]
 
         for evt_idx, _ in enumerate(events):  # iterate over events in current file
-            b_indices = [1] if ups_reco else [1, 2]
+            b_indices = [1] if not B_reco else [1, 2]
 
             for b_index in b_indices:
                 # Check that LCA is not trivial
@@ -45,7 +45,7 @@ def populate_avail_samples(
                 #     continue
 
                 # particles coming from one or both Bs
-                matched = np.logical_or((evt_b_index == 1), (evt_b_index == 2)) if ups_reco else (evt_b_index == int(b_index))
+                matched = np.logical_or((evt_b_index == 1), (evt_b_index == 2)) if not B_reco else (evt_b_index == int(b_index))
 
                 # Keeping only those where there are reconstructed particles
                 if matched.sum() == 0:

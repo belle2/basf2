@@ -32,7 +32,6 @@ dataset:
       #muonID : [[linear, 0.19, 0.3]]
       #protonID : [[linear, 0.03, 0.14]]
       #pionID : [[linear, 0.53, 0.41]]
-  edge_classes: 7 # 6 (7): 0, 1, 2, 3, 4, 5(, 6)
 output:
   # Top directory to save model, run_name as subdir and timestamp suffix
   # will be added automatically

@@ -40,7 +40,7 @@ class graFEISaverModule(b2.Module):
         particle_list: str,
         cfg_path=None,
         param_file=None,
-        store_true_info=None,
+        store_true_info: bool = False,
         gpu=False,
     ):
         """
@@ -50,7 +50,7 @@ class graFEISaverModule(b2.Module):
             particle_list (list): Name of particle list to run graFEI on
             cfg_path (str): path to config file
             param_file (str): path to file containing weight files for the model
-            store_true_info (bool): whether to save truth-matched information
+            store_true_info (bool): whether to save truth-matching information
             gpu (bool): whether running on a GPU
         """
         super().__init__()
@@ -59,9 +59,6 @@ class graFEISaverModule(b2.Module):
         self.param_file = param_file
         self.storeTrueInfo = store_true_info
         self.gpu = gpu
-
-        assert self.storeTrueInfo in [None, "B0:MC", "B+:MC", "Upsilon(4S):MC"], \
-            "You should select one of B0, B+ or Upsilon(4S) for truth-matching, or choose not to store truth-matching info"
 
     def initialize(self):
         # Get weights and configs from the DB if they are not provided from the user
@@ -84,6 +81,14 @@ class graFEISaverModule(b2.Module):
         # Load configs
         cfg_file = open(self.cfg_path, "r")
         self.configs = yaml.safe_load(cfg_file)
+
+        # B or Ups reco? 0 = Ups, 1 = B0, 2 = B+
+        if self.configs["geometric_model"]["B_reco"] == 0:
+            self.mc_particle = "Upsilon(4S):MC"
+        elif self.configs["geometric_model"]["B_reco"] == 1:
+            self.mc_particle = "B0:MC"
+        elif self.configs["geometric_model"]["B_reco"] == 2:
+            self.mc_particle = "B+:MC"
 
         # Normalize features
         self.normalize = self.configs["dataset"]["config"]["normalize"]
@@ -109,12 +114,11 @@ class graFEISaverModule(b2.Module):
         e_infeatures = len(self.edge_features)
         g_infeatures = len(self.glob_features)
 
-        # Build the model
+        # Build the model (the correct edge_classes is taken from the config file)
         self.model = GeometricNetwork(
             nfeat_in_dim=n_infeatures,
             efeat_in_dim=e_infeatures,
             gfeat_in_dim=g_infeatures,
-            edge_classes=self.configs["dataset"]["edge_classes"],
             **self.configs["geometric_model"],
         )
 
@@ -561,10 +565,10 @@ class graFEISaverModule(b2.Module):
                 graFEI_truth_nOthers = (p_masses == 0).sum()
 
                 # Get the generated B's
-                gen_list = Belle2.PyStoreObj(self.storeTrueInfo)
+                gen_list = Belle2.PyStoreObj(self.mc_particle)
 
                 # Iterate over generated Ups
-                if self.storeTrueInfo == "Upsilon(4S):MC" and gen_list.getListSize() > 1:
+                if self.mc_particle == "Upsilon(4S):MC" and gen_list.getListSize() > 1:
                     b2.B2WARNING(
                         f"Found {gen_list.getListSize()} true Upsilon(4S) in the generated MC (??)")
 
@@ -574,14 +578,14 @@ class graFEISaverModule(b2.Module):
                         mcp = genP.getMCParticle()
                         # If storing true info on B decays and we have matched paricles coming
                         # from different Bs the decay will not have a perfectLCA
-                        if self.storeTrueInfo != "Upsilon(4S):MC" and len(B_indices) != 1:
+                        if self.mc_particle != "Upsilon(4S):MC" and len(B_indices) != 1:
                             break
 
                         # Get array index of MC particle
                         array_index = mcp.getArrayIndex()
 
                         # If we are reconstructing Bs, skip the other in the event
-                        if self.storeTrueInfo != "Upsilon(4S):MC" and array_index != B_indices[0]:
+                        if self.mc_particle != "Upsilon(4S):MC" and array_index != B_indices[0]:
                             continue
 
                         # Write leaf history
@@ -653,7 +657,7 @@ class graFEISaverModule(b2.Module):
                                 p.getExtraInfo("BParentGenID") == array_index
                                 for p in p_list
                             ]
-                        ) if self.storeTrueInfo != "Upsilon(4S):MC" else evt_primary
+                        ) if self.mc_particle != "Upsilon(4S):MC" else evt_primary
 
                         primaries_from_right_cand = np.logical_and(evt_primary, x_rows)
 

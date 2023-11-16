@@ -90,7 +90,7 @@ void DqmMasterCallback::start(int expno, int runno)
   while (m_sock->send(msg) < 0) {
     LogFile::error("Connection to histogramm server is missing in START: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
                    m_runtype.c_str());
-    m_sock->reconnect(10); // each one waits 5s
+    m_sock->sock()->reconnect(10); // each one waits 5s
   }
   delete (msg);
 

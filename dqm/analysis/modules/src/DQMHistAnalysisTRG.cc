@@ -284,7 +284,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_hadronb2_over_bhabha_all) {
     double hadronb2_over_bhabha_all = 0.0;
     hist_hadronb2_over_bhabha_all->Draw();
-    hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->FindBin(30) / hist_hadronb2_over_bhabha_all->FindBin(30);
+    hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
+                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
+                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2"));
     B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
     setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
 
@@ -297,7 +299,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_mumu2trk_over_bhabha_all) {
     double mumu2trk_over_bhabha_all = 0.0;
     hist_mumu2trk_over_bhabha_all->Draw();
-    mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->FindBin(17) / hist_mumu2trk_over_bhabha_all->FindBin(1);
+    mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->GetBinContent(
+                                 hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_mumu2trk_over_bhabha_all->GetBinContent(
+                                 hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
     B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
     setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
 
@@ -310,7 +314,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_hadronb2_over_mumu2trk) {
     double hadronb2_over_mumu2trk = 0.0;
     hist_hadronb2_over_mumu2trk->Draw();
-    hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->FindBin(30) / hist_hadronb2_over_mumu2trk->FindBin(17);
+    hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->GetBinContent(
+                               hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_mumu2trk->GetBinContent(
+                               hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk"));
     B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
     setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
 
@@ -349,7 +355,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_mumu_tight_over_bhabha_all) {
     double mumu_tight_over_bhabha_all = 0.0;
     hist_mumu_tight_over_bhabha_all->Draw();
-    mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->FindBin(4) / hist_mumu_tight_over_bhabha_all->FindBin(1);
+    mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->GetBinContent(
+                                   hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_mumutight")) / hist_mumu_tight_over_bhabha_all->GetBinContent(
+                                   hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
     B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
     setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
 
@@ -360,7 +368,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_gammagamma_over_bhabha_all) {
     double gammagamma_over_bhabha_all = 0.0;
     hist_gammagamma_over_bhabha_all->Draw();
-    gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->FindBin(2) / hist_gammagamma_over_bhabha_all->FindBin(1);
+    gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->GetBinContent(
+                                   hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_gamma_gamma")) / hist_gammagamma_over_bhabha_all->GetBinContent(
+                                   hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
     B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
     setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
 
@@ -371,7 +381,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_tautau2trk_over_bhabha_all) {
     double tautau2trk_over_bhabha_all = 0.0;
     hist_tautau2trk_over_bhabha_all->Draw();
-    tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->FindBin(35) / hist_tautau2trk_over_bhabha_all->FindBin(1);
+    tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->GetBinContent(
+                                   hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_tau_2trk")) / hist_tautau2trk_over_bhabha_all->GetBinContent(
+                                   hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
     B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
     setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
 
@@ -382,7 +394,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_hadron_over_bhabha_all) {
     double hadron_over_bhabha_all = 0.0;
     hist_hadron_over_bhabha_all->Draw();
-    hadron_over_bhabha_all = hist_hadron_over_bhabha_all->FindBin(3) / hist_hadron_over_bhabha_all->FindBin(1);
+    hadron_over_bhabha_all = hist_hadron_over_bhabha_all->GetBinContent(
+                               hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_hadron")) / hist_hadron_over_bhabha_all->GetBinContent(
+                               hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
     B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
     setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
 

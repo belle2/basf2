@@ -64,7 +64,7 @@ namespace Belle2 {
      */
     int getLinearisedBinIndex(const std::vector<float> values)
     {
-      int globalBin(0);
+      int globalBin(-1);
       std::vector<int> binIndices = getBinIndices(values);
       for (unsigned int i = 0; i < binIndices.size(); i++) {
         if (binIndices[i] < 0) return -1;

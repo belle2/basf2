@@ -58,7 +58,6 @@ namespace Belle2 {
     /// Module parameter: waiting output confirmation message or not
     bool m_param_outputConfirmation = true;
 
-
     /// ZMQ Parent needed for the connections
     std::shared_ptr<ZMQParent> m_parent;
     /// Confirmed connection to the ZMQ application

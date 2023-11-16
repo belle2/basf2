@@ -122,11 +122,14 @@ void DqmMasterCallback::stop(void)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  if (m_sock->send(msg) < 0) {
+  while (m_sock->send(msg) < 0) {
     LogFile::error("Connection closed during STOP, file not saved: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
                    m_runtype.c_str());
-    // we do not reconnect here, as we cannot do anything about it
-    // if we assume that the connection was terminated yb a restart of the serve, there is nothing to dump ...
+    m_sock->sock()->reconnect(10); // each one waits 5s
+    // we assume that the connection was terminated by a restart of the server
+    // depending on when this happened, we may have new histograms to dump
+    // EVEN if the DQM analysis could not handle it (because after restart there is no
+    // run information.
   }
   delete (msg);
 }

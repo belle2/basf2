@@ -375,12 +375,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_hEfficiencyErr3Samples->getHistogram(0)->Reset();
     m_hEfficiencyErr3Samples->getHistogram(1)->Reset();
 
-
-    effU = -1;
-    effV = -1;
-    erreffU = -1;
-    erreffV = -1;
-
     // Efficiency for the U side - 3 samples
     TH2F* found3_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHits3U");
     TH2F* matched3_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHits3U");

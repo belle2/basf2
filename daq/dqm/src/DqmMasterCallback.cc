@@ -87,7 +87,11 @@ void DqmMasterCallback::start(int expno, int runno)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock->send(msg);
+  while (m_sock->send(msg) < 0) {
+    LogFile::error("Connection to histogramm server is missing in START: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                   m_runtype.c_str());
+    m_sock->reconnect(10); // each one waits 5s
+  }
   delete (msg);
 
   LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
@@ -118,7 +122,12 @@ void DqmMasterCallback::stop(void)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock->send(msg);
+  if (m_sock->send(msg) < 0) {
+    LogFile::error("Connection closed during STOP, file not saved: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                   m_runtype.c_str());
+    // we do not reconnect here, as we cannot do anything about it
+    // if we assume that the connection was terminated yb a restart of the serve, there is nothing to dump ...
+  }
   delete (msg);
 }
 

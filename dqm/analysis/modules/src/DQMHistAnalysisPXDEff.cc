@@ -48,6 +48,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -279,11 +280,11 @@ void DQMHistAnalysisPXDEffModule::event()
   }// Single-Module histos + 2d overview finished
 
   m_cInnerMap->cd();
-  m_hInnerMap->Draw("colz");
+  if (m_hInnerMap) m_hInnerMap->Draw("colz");
   m_cInnerMap->Modified();
   m_cInnerMap->Update();
   m_cOuterMap->cd();
-  m_hOuterMap->Draw("colz");
+  if (m_hOuterMap) m_hOuterMap->Draw("colz");
   m_cOuterMap->Modified();
   m_cOuterMap->Update();
   UpdateCanvas(m_cInnerMap->GetName());
@@ -322,8 +323,9 @@ void DQMHistAnalysisPXDEffModule::event()
         ihit +=  nhit;
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        // keep workaround code for re-use
-//         if (j == 6) continue; // workaround for 1.3.2 module
+        // workaround for excluded module
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
       }
@@ -351,8 +353,8 @@ void DQMHistAnalysisPXDEffModule::event()
         updated[aModule] = true;
       }
 
-      // keep workaround code for re-use
-//       if (j == 6) continue; // workaround for 1.3.2 module
+      // workaround for excluded module
+      if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
       // get the errors and check for limits for each bin seperately ...
 
@@ -389,9 +391,10 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        // keep workaround code for re-use
-//         if (i != 5) // exclude 1.3.2
-        if (scale_min > val) scale_min = val;
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+          // scale update only for included module
+          if (scale_min > val) scale_min = val;
+        }
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -414,11 +417,12 @@ void DQMHistAnalysisPXDEffModule::event()
 
       gr->Draw("AP");
 
-      // keep workaround code for re-use
-//       auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-//       tt->SetTextAngle(90);// Rotated
-//       tt->SetTextAlign(12);// Centered
-//       tt->Draw();
+      for (auto& it : m_excluded) {
+        auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextAngle(90);// Rotated
+        tt->SetTextAlign(12);// Centered
+        tt->Draw();
+      }
 
       if (all < 100.) {
         m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
@@ -472,9 +476,10 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        // keep workaround code for re-use
-//         if (i != 5) { // exclude 1.3.2
-        if (scale_min > val) scale_min = val;
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+          // skip scale update only for included modules
+          if (scale_min > val) scale_min = val;
+        }
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
@@ -502,15 +507,17 @@ void DQMHistAnalysisPXDEffModule::event()
       gr->SetLineColor(kBlack);
       gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
+      gr->Draw("AP");
     } else scale_min = 0.0;
-    if (gr) gr->Draw("AP");
-    if (gr3) gr3->Draw("P");
-    // keep workaround code for re-use
-//     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-//     tt->SetTextSize(0.035);
-//     tt->SetTextAngle(90);// Rotated
-//     tt->SetTextAlign(12);// Centered
-//     tt->Draw();
+    if (gr3) gr3->Draw("P"); // both in one plot
+
+    for (auto& it : m_excluded) {
+      auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
+    }
 
     if (all < 100.) {
       m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray

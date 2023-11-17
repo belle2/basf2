@@ -84,13 +84,9 @@ AafhInputModule::AafhInputModule() : GeneratorBaseModule(), m_initial(BeamParame
   addParam("particle", m_particle,
            "name of the generated particle for mode 1 and 4",
            m_generator.getParticle());
-
-  //Generator common parameters
-  addParam("eventType", m_eventType, "Event type", std::string(""));
-  m_generatorName = "AAFH";
 }
 
-void AafhInputModule::initialize()
+void AafhInputModule::generatorInitialize()
 {
   m_mcparticles.registerInDataStore();
 

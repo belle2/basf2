@@ -48,14 +48,10 @@ EvtGenInputModule::EvtGenInputModule() : GeneratorBaseModule(),
   addParam("maxTries", m_maxTries, "Number of tries to generate a parent "
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
-
-  //Generator common parameters
-  addParam("eventType", m_eventType, "Event type", string(""));
-  m_generatorName = "EvtGen";
 }
 
 
-void EvtGenInputModule::initialize()
+void EvtGenInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();

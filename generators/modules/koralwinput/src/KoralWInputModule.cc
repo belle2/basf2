@@ -34,16 +34,13 @@ KoralWInputModule::KoralWInputModule() : GeneratorBaseModule(), m_initial(BeamPa
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
            FileSystem::findFile("/data/generators/koralw/KoralW_eeee.data"));
 
-  //Generator common parameters
-  addParam("eventType", m_eventType, "Event type", std::string(""));
-  m_generatorName = "KoralW";
 }
 
 KoralWInputModule::~KoralWInputModule()
 {
 }
 
-void KoralWInputModule::initialize()
+void KoralWInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();

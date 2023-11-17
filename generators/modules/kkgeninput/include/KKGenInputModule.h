@@ -36,7 +36,7 @@ namespace Belle2 {
     virtual ~KKGenInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each run. */
     virtual void beginRun() override;
@@ -46,20 +46,6 @@ namespace Belle2 {
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;
-
-    /** Convert m_eventType from string to double */
-    double getEventType() const override
-    {
-      if (m_eventType == "tau-tau+") return 1515;
-      if (m_eventType == "mu-mu+") return 1313;
-
-      if (m_eventType == "ccbar") return 3;
-      if (m_eventType == "ssbar") return 4;
-      if (m_eventType == "ddbar") return 5;
-      if (m_eventType == "uubar") return 6;
-
-      return Const::doubleNaN;
-    };
 
   protected:
 

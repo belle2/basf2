@@ -83,8 +83,6 @@ PhokharaInputModule::PhokharaInputModule() : GeneratorBaseModule(), m_initial(Be
   addParam("BeamEnergySpread", m_BeamEnergySpread,
            "Simulate beam-energy spread (initializes PHOKHARA for every event - very slow).", false);
 
-  //Generator common parameters
-  m_generatorName = "Phokhara";
 }
 
 //-----------------------------------------------------------------
@@ -98,7 +96,7 @@ PhokharaInputModule::~PhokharaInputModule()
 //-----------------------------------------------------------------
 //                 Initialize
 //-----------------------------------------------------------------
-void PhokharaInputModule::initialize()
+void PhokharaInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();

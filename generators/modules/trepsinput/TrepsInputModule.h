@@ -32,7 +32,7 @@ namespace Belle2 {
     TrepsInputModule();
 
     /** initialization for trepsinput */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** initialization for trepsinput */
     virtual void terminate() override;
@@ -48,16 +48,6 @@ namespace Belle2 {
 
     /** Initialize the TREPS generator  */
     void initializeGenerator();
-
-    /** Convert m_eventType from string to int */
-    double getEventType() const override
-    {
-      if (m_eventType == "e+e-pi+pi-") return 1111211211;
-      if (m_eventType == "e+e-K+K-") return 1111321321;
-      if (m_eventType == "e+e-K+K-") return 111122122212;
-
-      return Const::doubleNaN;
-    };
 
   private:
 

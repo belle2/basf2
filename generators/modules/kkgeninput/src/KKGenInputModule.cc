@@ -52,13 +52,10 @@ KKGenInputModule::KKGenInputModule() : GeneratorBaseModule(), m_initial(BeamPara
            FileSystem::findFile("/data/generators/kkmc/tau.input.dat"));
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", string(""));
 
-  //Generator common parameters
-  addParam("eventType", m_eventType, "Event type", string(""));
-  m_generatorName = "KKMC";
 }
 
 
-void KKGenInputModule::initialize()
+void KKGenInputModule::generatorInitialize()
 {
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;

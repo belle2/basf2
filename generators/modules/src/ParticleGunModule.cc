@@ -23,10 +23,8 @@ REG_MODULE(ParticleGun);
 //                 Implementation
 //-----------------------------------------------------------------
 
-ParticleGunModule::ParticleGunModule() : GeneratorBaseModule()
+ParticleGunModule::ParticleGunModule() : Module()
 {
-  setGeneratorName("ParticleGun");
-
   //Set module properties
   setDescription(R"DOC(
 Particle gun to generate simple tracks.
@@ -218,7 +216,7 @@ void ParticleGunModule::initialize()
   m_particleGun.setParameters(m_parameters);
 }
 
-void ParticleGunModule::generatorEvent()
+void ParticleGunModule::event()
 {
   try {
     m_particleGraph.clear();

@@ -206,7 +206,6 @@ if mc:
 # Run graFEI
 graFEI = graFEISaverModule(
     "B0:tag",
-    store_true_info=mc,
     cfg_path=cfg_file,
     param_file=weight_file,
 )

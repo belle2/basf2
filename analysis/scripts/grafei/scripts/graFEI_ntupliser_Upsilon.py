@@ -129,7 +129,6 @@ if mc:
 
 graFEI = graFEISaverModule(
     "Upsilon(4S):graFEI",
-    store_true_info=mc,
     cfg_path=cfg_file,
     param_file=weight_file,
 )

@@ -40,7 +40,6 @@ class graFEISaverModule(b2.Module):
         particle_list: str,
         cfg_path=None,
         param_file=None,
-        store_true_info: bool = False,
         gpu=False,
     ):
         """
@@ -57,7 +56,6 @@ class graFEISaverModule(b2.Module):
         self.particle_list = particle_list
         self.cfg_path = cfg_path
         self.param_file = param_file
-        self.storeTrueInfo = store_true_info
         self.gpu = gpu
 
     def initialize(self):
@@ -72,6 +70,9 @@ class graFEISaverModule(b2.Module):
                 Belle2.DBStoreEntry.c_RawFile, "graFEIModelFile", True
             )
             self.param_file = model.getFilename()
+
+        # Figure out if we re running on data or MC
+        self.storeTrueInfo = Belle2.Environment.Instance().isMC()
 
         # Figure out which device all this is running on
         self.device = torch.device(

@@ -5416,7 +5416,7 @@ Decay B+
 0.000001000   anti-Sigma+  Lambda0                         PHSP;
 0.000001000   anti-Sigma+  Sigma0                          PHSP;
 0.000000100   anti-Xi+  Xi0                                PHSP;
-0.000001500   Lambda(1520)0  p+                            PHSP; #UL
+0.000000315   anti-Lambda(1520)0  p+                       PHSP; # updated to https://inspirehep.net/literature/1307247
 
 # b->u (cs)
 # Ds- pi+:hep-ex/0207077 Belle + isospin. Others are ASSUMED like that.
@@ -6959,7 +6959,7 @@ Decay B-
 0.000001000   Sigma-  anti-Lambda0                         PHSP;
 0.000001000   Sigma-  anti-Sigma0                          PHSP;
 0.000000100   Xi-  anti-Xi0                                PHSP;
-0.000001500   Lambda(1520)0  anti-p-                       PHSP; #UL
+0.000000315   Lambda(1520)0  anti-p-                       PHSP; # updated to https://inspirehep.net/literature/1307247
 
 # b->u (cs)
 # Ds- pi+:hep-ex/0207077 Belle + isospin. Others are ASSUMED like that.

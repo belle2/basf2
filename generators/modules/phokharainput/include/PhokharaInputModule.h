@@ -39,23 +39,13 @@ namespace Belle2 {
     virtual ~PhokharaInputModule();
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each event. */
     virtual void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;
-
-    /** Convert m_eventType from string to int */
-    double getEventType() const override
-    {
-      if (m_finalState == 0) return 1313; // mu+mu-
-      if (m_finalState == 1) return 211211; // pi+pi-
-      if (m_finalState == 8) return 211211111; // pi+pi-pi0
-
-      return Const::doubleNaN;
-    };
 
   protected:
 

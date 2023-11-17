@@ -39,35 +39,13 @@ namespace Belle2 {
     virtual ~EvtGenInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each run. */
     virtual void beginRun() override;
 
     /** Method is called for each event. */
     virtual void generatorEvent() override;
-
-    /** Convert m_eventType from string to int */
-    double getEventType() const override
-    {
-      if (m_eventType == "charged") return 1.0;
-      if (m_eventType == "mixed") return 2.0;
-
-      if (m_eventType == "signal") {
-        std::string basename = m_userDECFileName;
-        basename = basename.substr(basename.find_last_of('/') + 1);
-        basename = basename.substr(0, basename.find_last_of('.'));
-
-        try {
-          int eventType = std::stoi(basename);
-          return eventType;
-        } catch (const std::invalid_argument& e) {
-          return Const::doubleNaN;
-        }
-      }
-
-      return Const::doubleNaN;
-    };
 
   protected:
 

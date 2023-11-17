@@ -42,7 +42,7 @@ namespace Belle2 {
     virtual ~BabayagaNLOInputModule();
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each event. */
     virtual void generatorEvent() override;
@@ -55,15 +55,6 @@ namespace Belle2 {
     {
       return s_initial.generate().getMass();
     }
-
-    /** Convert m_eventType from string to int */
-    double getEventType() const override
-    {
-      if (m_finalState == "ee") return 1111;
-      if (m_finalState == "gg") return 2222;
-
-      return Const::doubleNaN;
-    };
 
   protected:
 

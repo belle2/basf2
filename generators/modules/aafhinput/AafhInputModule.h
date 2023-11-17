@@ -32,26 +32,13 @@ namespace Belle2 {
     AafhInputModule();
 
     /** initialize generator */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** generate event */
     virtual void generatorEvent() override;
 
     /** calculate cross section */
     virtual void terminate() override;
-
-    /** Convert m_eventType from string to int */
-    double getEventType() const override
-    {
-      if (m_eventType == "e+e-e+e-") return 11111111;
-      if (m_eventType == "e+e-mu+mu-") return 11111313;
-      if (m_eventType == "e+e-tau+tau-") return 11111515;
-
-      if (m_eventType == "mu+mu-mu+mu-") return 13131313;
-      if (m_eventType == "mu+mu-tau+tau-") return 13131515;
-
-      return Const::doubleNaN;
-    };
 
   private:
     /** Generator mode */

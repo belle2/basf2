@@ -83,15 +83,13 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : GeneratorBaseModule()
   m_fileExtraInfo = 0;
   m_th1dSDif = 0;
 
-  //Generator common parameters
-  m_generatorName = "Babayaga";
 }
 
 BabayagaNLOInputModule::~BabayagaNLOInputModule()
 {
 }
 
-void BabayagaNLOInputModule::initialize()
+void BabayagaNLOInputModule::generatorInitialize()
 {
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;

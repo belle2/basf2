@@ -60,12 +60,9 @@ TrepsInputModule::TrepsInputModule() : GeneratorBaseModule(), m_initial(BeamPara
            "Whether to apply cut on the minimal transverse momentum for "
            "charged particles only.", true);
 
-  //Generator common parameters
-  addParam("eventType", m_eventType, "Event type", std::string(""));
-  m_generatorName = "TREPS";
 }
 
-void TrepsInputModule::initialize()
+void TrepsInputModule::generatorInitialize()
 {
   m_initial.initialize();
   m_mcparticles.registerInDataStore();

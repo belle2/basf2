@@ -364,11 +364,13 @@ double EvtGenDecays::decay()
       bfs.push_back(signal->second.bfs[0]);
       wgt *= 1 - bfs.back();
       egPro->deleteDaughters();
+      /* TODO why are these lines bad?
       EvtParticle* egDau = EvtParticleFactory::particleFactory
                            (EvtPDL::evtIdFromStdHep(pyPro->id()),
                             EvtVector4R(pyPro->e(), pyPro->px(), pyPro->py(), pyPro->pz()));
       egDau->addDaug(egPro);
       egDau->setDiagonalSpinDensity();
+      */
 
       // If not signal, add to event record.
     } else updateEvent(pyPro, egPro, &pySigs, &egSigs, &bfs, &wgt);

@@ -104,6 +104,7 @@ def main(
     print(
         f"Number of parameters: {sum(p.numel() for p in base_model.parameters() if p.requires_grad)}\n"
     )
+    print(f"Using LCAS format, max depth of {5 if B_reco else 6} corresponding to {'B' if B_reco else 'Upsilon(4S)'}\n")
 
     # Compile the model (requires Pytorch >= 2.0.0)
     if float(torch.__version__[0]) >= 2 and configs["train"]["compile_model"]:

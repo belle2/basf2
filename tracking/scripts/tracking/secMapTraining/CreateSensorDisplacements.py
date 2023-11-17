@@ -83,7 +83,8 @@ class Reader(basf2.Module):
 
     def __init__(self):
         ''' Init '''
-        # dictionary from sensors to observed displacements
+
+        #: dictionary to map the displacements for each sensor
         self.sensors = dict()
 
         super().__init__()

@@ -59,7 +59,7 @@ namespace Belle2 {
       std::vector<AState*> selectedStatePointers;
       selectedStatePointers.reserve(relations.size());
 
-      for (const auto relation : relations) {
+      for (const auto& relation : relations) {
         // hit state pointers are the "To"s in the relation, only take those
         const auto it = std::find(selectedStatePointers.begin(), selectedStatePointers.end(), relation.getTo());
         if (it == selectedStatePointers.end()) {

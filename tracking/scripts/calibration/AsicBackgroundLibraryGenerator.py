@@ -14,7 +14,7 @@ import tracking
 
 def main():
     """
-        Sample script to generte ASIC cross-talk library.  Usage:
+        Sample script to generate ASIC cross-talk library.  Usage:
 
         basf2 AsicBackgroundLibraryGenerator.py <cosmic_raw_data_file> <output_asicbg_root_file> <data_type>
 

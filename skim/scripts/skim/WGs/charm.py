@@ -32,7 +32,7 @@ from functools import lru_cache
 
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
@@ -40,6 +40,21 @@ from stdV0s import stdKshorts
 
 __liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
 _VALIDATION_SAMPLE = "mdst14.root"
+
+
+@lru_cache  # Avoid loading the list multiple time on the same path
+def charm_skim_std_charged(particle_type, path):
+    """
+    Provides a list of charged particles to be used by charm skims named
+    ``<particle_type>+:charmSkim``, with basic cuts applied:
+    ``dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance``.
+    """
+    if particle_type not in ['pi', 'K', 'p', 'e', 'mu']:
+        raise ValueError(f"Unknown particle type {particle_type!r}")
+    stdCharged(particle_type, 'all', path=path)
+    ma.cutAndCopyList(
+        f"{particle_type}+:charmSkim", f"{particle_type}+:all",
+        "dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance", path=path)
 
 
 @fancy_skim_header
@@ -482,23 +497,20 @@ class DstToD0Pi_D0To2HadronsPi0(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdK("all", path=path)  # No cuts
-        stdPi("all", path=path)  # No cuts
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        track_cuts = "dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance"
         D0_cuts = "1.70 < M < 2.10"
         Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
-        ma.cutAndCopyList("pi+:D0To2HadronsPi0", "pi+:all", track_cuts, path=path)
-        ma.cutAndCopyList("K+:D0To2HadronsPi0", "K+:all", track_cuts, path=path)
 
         Dst_lists = []
         for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:
             lst = f"{h1}{h2}Pi0"
-            ma.reconstructDecay(f"D0:{lst} -> {h1}+:D0To2HadronsPi0 {h2}-:D0To2HadronsPi0 pi0:skim", D0_cuts, path=path)
-            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:D0To2HadronsPi0", Dst_cuts, path=path)
-            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:D0To2HadronsPi0", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D0:{lst} -> {h1}+:charmSkim {h2}-:charmSkim pi0:skim", D0_cuts, path=path)
+            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:charmSkim", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:charmSkim", Dst_cuts, path=path)
             ma.copyLists(f"D*+:{lst}", [f"D*+:{lst}_RS", f"D*+:{lst}_WS"], path=path)
             Dst_lists.append(f"D*+:{lst}")
 

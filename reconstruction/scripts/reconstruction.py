@@ -9,6 +9,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import os
+os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
+
 import basf2
 
 from geometry import check_components

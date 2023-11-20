@@ -9,6 +9,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# Limit the number of threads spawned by external libraries (e.g. XGBoost)
 import os
 os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
 

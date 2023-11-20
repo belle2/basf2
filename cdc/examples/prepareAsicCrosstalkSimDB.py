@@ -19,7 +19,6 @@
 '''
 
 import uproot
-from root_pandas import to_root
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import UnivariateSpline
@@ -47,14 +46,16 @@ def getEff(var, cut, n=40, limits=(0., 2500.)):
     return x, eff, effErr
 
 
-# Problematic boards ID
-remB = {'22': [24, 196],
-        '24': [0, 15, 24, 40, 117, 175, 196, 202, 86, 89],
-        '25': [0, 24, 15],
-        '26': [24, 210, 62],
-        '27': [92, 24, 51, 106, 53],
-        }
-#
+# Problematic boards ID in each run
+bad_boards = {'22': [24, 196],
+              '24': [0, 15, 24, 40, 117, 175, 196, 202, 86, 89],
+              '25': [0, 24, 15],
+              '26': [24, 210, 62],
+              '27': [92, 24, 51, 106, 53],
+              }
+# Input arguments
+if len(sys.argv) != 5:
+    sys.exit("Four arguments are required: input_root, output_path, experiemnt numebr and data_type")
 InputFile = sys.argv[1]
 OutputPath = sys.argv[2]
 exp = sys.argv[3]
@@ -66,7 +67,7 @@ df.columns = ['_'.join(col) if col[1] != '' else col[0] for col in df.columns.va
 # Defining asic
 df['asic'] = df.Channel//8
 # Remove the problematic boards
-mask = df['Board'].isin([m for m in remB[f'{exp}']])
+mask = df['Board'].isin([m for m in bad_boards[f'{exp}']])
 df = df[~mask]
 
 nhits = 3
@@ -113,7 +114,11 @@ names = ["Board", "Channel", 'Nhit', 'asic']
 for i in range(8):
     names += ['Asic_ADC{:d}'.format(i), 'Asic_TDC{:d}'.format(i), 'Asic_TOT{:d}'.format(i)]
 #: do not write index
-to_root(df[(df.nhit > 3) & (df.asic % 3 == 1)][names], f'{OutputPath}/xTalkProb_{exp}_{data_type}.root', index=False)
+with uproot.recreate(f'{OutputPath}/xTalkProb_{exp}_{data_type}.root') as output:
+    df_tmp = df.query('nhit>3 & asic==1')
+    output['ASIC'] = uproot.newtree({name: df_tmp[name].dtype for name in names})
+    output['ASIC'].extend({name: df_tmp[name].values for name in names})
+
 #: open root file to store x-talk probability histogram
 fi = TFile(f'{OutputPath}/xTalkProb_{exp}_{data_type}.root', "update")
 #: histogram to store x-talk probability

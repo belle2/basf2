@@ -11,9 +11,7 @@ import sys
 import rawdata
 import tracking
 
-
-def main():
-    """
+"""
         Sample script to generate ASIC cross-talk library.  Usage:
 
         basf2 AsicBackgroundLibraryGenerator.py <cosmic_raw_data_file> <output_asicbg_root_file> <data_type>
@@ -24,16 +22,18 @@ def main():
 
           data_type: 'mc' or 'data'
     """
-    # global_tag = "data_reprocessing_prompt_rel4_patchb"
-    # basf2.conditions.override_globaltags()
-    # basf2.conditions.expert_settings(usable_globaltag_states={"TESTING", "VALIDATED",
-    #                                                           "PUBLISHED", "RUNNING", "OPEN"})
-    # basf2.conditions.append_globaltag(global_tag)
 
-    basf2.conditions.prepend_globaltag('patch_main_release-07')
+
+def main():
+
+    GT = ['patch_main_release-07'][0]
+    basf2.B2WARNING(f'Current global tag is {GT}, please update the proper global tag to match the data')
+    basf2.conditions.prepend_globaltag(GT)
     path = basf2.create_path()
     path.add_module("Progress")
 
+    if len(sys.argv) != 4:
+        sys.exit("Three arguments are required: input_root, output_root, and data_type")
     # Input raw data file
     inputFilename = sys.argv[1]
     # Output file
@@ -49,10 +49,8 @@ def main():
     path.add_module("Geometry", useDB=True)
 
     if sample_name == 'data':
-        unpackers = ['CDC']
-        rawdata.add_unpackers(path, components=unpackers)
-    else:
-        print('mc do not need to unpack')
+        rawdata.add_unpackers(path, components=['CDC'])
+
     tracking.add_track_finding(path, components=['CDC'])
 
     path.add_module("AsicBackgroundLibraryCreator",

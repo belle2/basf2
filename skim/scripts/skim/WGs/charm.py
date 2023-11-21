@@ -470,7 +470,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
 
 
 @fancy_skim_header
-class DstToD0Pi_D0To2HadronsPi0(BaseSkim):
+class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
     **Decay Modes**: :math:`D^{*\\pm}\\to D^{0} \\pi^\\pm` with
         * :math:`D^{0}\\to K^\\mp \\pi^\\pm \\pi^0` (and CC)

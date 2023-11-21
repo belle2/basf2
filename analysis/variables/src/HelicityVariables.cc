@@ -123,9 +123,11 @@ namespace Belle2 {
         PxPyPzEVector pGamma;
 
         for (auto& idaughter : daughters) {
-          if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) pGamma = frame.getMomentum(idaughter);
+          if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) {
+            pGamma = frame.getMomentum(idaughter);
+            break;
+          }
         }
-
         pGamma = Boost(motherBoost) * pGamma;
 
         return std::cos(motherMomentum.Angle(pGamma.Vect()));

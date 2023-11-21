@@ -389,7 +389,7 @@ namespace Belle2 {
                       cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
 
-                      One can call the variable for the decay :math:`\pi^0 \to \gamma \gamma, \gamma \to e^+ e^-`: as well. 
+                      One can call the variable for the decay :math:`\pi^0 \to \gamma \gamma, \gamma \to e^+ e^-` as well.
 
                       Otherwise, it returns 0.)DOC");
 

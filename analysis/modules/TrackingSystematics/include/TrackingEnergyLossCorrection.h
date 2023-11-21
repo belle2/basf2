@@ -15,14 +15,9 @@
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
-  /**
-  *This module is designed for tracking systematics studies
-  *
-  */
-
 
   /**
-  * Tracking momentum systematics
+  * Tracking energy systematics module: allows for the application of an additive energy correction which is read from a ParticleWeightingLookUpTable payload
   */
   class TrackingEnergyLossCorrectionModule : public Module {
   public:

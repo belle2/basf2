@@ -307,13 +307,11 @@ namespace Belle2 {
       * Returns effect of energy correction on the particle momentum
       * @return momentum change
       */
-    double getMomentumLossCorrection() const
+    double getMomentumLossCorrectionFactor() const
     {
       double origP = m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
-      double origE = sqrt(m_momentumScale * m_momentumScale * m_px * m_px +
-                          m_momentumScale * m_momentumScale * m_py * m_py +
-                          m_momentumScale * m_momentumScale * m_pz * m_pz +
-                          m_mass * m_mass);
+      double origE = sqrt(origP * origP + m_mass * m_mass);
+
       double newP = sqrt((origE - m_energyLossCorrection) * (origE - m_energyLossCorrection) - m_mass * m_mass);
       return newP / origP;
     }
@@ -537,9 +535,10 @@ namespace Belle2 {
      */
     ROOT::Math::PxPyPzEVector get4Vector() const
     {
-      return ROOT::Math::PxPyPzEVector(m_momentumScale * getMomentumLossCorrection() * m_px,
-                                       m_momentumScale * getMomentumLossCorrection() * m_py,
-                                       m_momentumScale * getMomentumLossCorrection() * m_pz,
+      double correction = getMomentumLossCorrectionFactor();
+      return ROOT::Math::PxPyPzEVector(m_momentumScale * correction * m_px,
+                                       m_momentumScale * correction * m_py,
+                                       m_momentumScale * correction * m_pz,
                                        getEnergy());
     }
 
@@ -549,7 +548,7 @@ namespace Belle2 {
      */
     ROOT::Math::XYZVector getMomentum() const
     {
-      return m_momentumScale * getMomentumLossCorrection() * ROOT::Math::XYZVector(m_px, m_py, m_pz);
+      return m_momentumScale * getMomentumLossCorrectionFactor() * ROOT::Math::XYZVector(m_px, m_py, m_pz);
     };
 
     /**
@@ -567,7 +566,7 @@ namespace Belle2 {
      */
     double getP() const
     {
-      return m_momentumScale * getMomentumLossCorrection() * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * getMomentumLossCorrectionFactor() * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -576,7 +575,7 @@ namespace Belle2 {
      */
     double getPx() const
     {
-      return m_momentumScale * getMomentumLossCorrection() * m_px;
+      return m_momentumScale * getMomentumLossCorrectionFactor() * m_px;
     }
 
     /**
@@ -585,7 +584,7 @@ namespace Belle2 {
      */
     double getPy() const
     {
-      return m_momentumScale * getMomentumLossCorrection() * m_py;
+      return m_momentumScale * getMomentumLossCorrectionFactor() * m_py;
     }
 
     /**
@@ -594,7 +593,7 @@ namespace Belle2 {
      */
     double getPz() const
     {
-      return m_momentumScale * getMomentumLossCorrection() * m_pz;
+      return m_momentumScale * getMomentumLossCorrectionFactor() * m_pz;
     }
 
     /**
@@ -1156,7 +1155,7 @@ namespace Belle2 {
     // v14: added m_jacobiMatrix
     // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
     // v16: use double precision for private members
-    // v17: added m_energylosscorrection
+    // v17: added m_energyLossCorrection
     friend class ParticleSubset;
   };
 

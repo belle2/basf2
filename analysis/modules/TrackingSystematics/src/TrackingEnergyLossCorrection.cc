@@ -76,6 +76,13 @@ void TrackingEnergyLossCorrectionModule::event()
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
+      if (particle->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+          particle->getParticleSource() != Particle::EParticleSourceObject::c_V0 and
+          particle->getParticleSource() != Particle::EParticleSourceObject::c_Track) {
+        B2WARNING("particle source " << particle->getParticleSource() <<
+                  " is not within the expected values. please check before continuing");
+        continue;
+      }
       setEnergyLossCorrection(particle);
     }
   }

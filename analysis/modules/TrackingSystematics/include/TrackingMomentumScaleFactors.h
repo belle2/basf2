@@ -15,14 +15,9 @@
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
-  /**
-  *This module is designed for tracking systematics studies
-  *
-  */
-
 
   /**
-  * Tracking momentum systematics
+  * Tracking momentum systematics module: allows for the application of a corrective momentum scale factor which is read from a ParticleWeightingLookUpTable payload
   */
   class TrackingMomentumScaleFactorsModule : public Module {
   public:

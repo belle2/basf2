@@ -15,14 +15,9 @@
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
-  /**
-  *This set of module is designed for tracking systematics studies
-  *
-  */
-
 
   /**
-   * Tracking efficiency systematics
+   * Tracking efficiency systematics module: removes tracks from the lists at random for efficiency studies
    */
   class TrackingEfficiencyModule : public Module {
   public:

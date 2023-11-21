@@ -739,7 +739,7 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
 
     import b2bii
     if b2bii.isB2BII():
-        B2FATAL("The tracking momentum scaler can only be run over Belle II data.")
+        B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
 
     TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
     TrackingMomentumScaleFactors.param('particleLists', inputListNames)
@@ -768,7 +768,7 @@ def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", 
 
     import b2bii
     if b2bii.isB2BII():
-        B2FATAL("The tracking energy correction can only be run over Belle II data.")
+        B2ERROR("The tracking energy correction can only be run over Belle II data.")
 
     TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')
     TrackingEnergyLossCorrection.param('particleLists', inputListNames)

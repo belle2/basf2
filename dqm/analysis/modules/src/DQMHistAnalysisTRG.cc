@@ -65,7 +65,7 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "CDCTRG_timing_mean", "CDCTRG_timing_mean");
 
   //TOPTRG event timing
-  m_canvas_TOPTRG_timing_mean = new TCanvas("TOP/TRG_timing_mean");
+  m_canvas_TOPTRG_timing_mean = new TCanvas("TOP/TOPTRG_timing_mean");
   addDeltaPar("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_timing_mean", "TOPTRG_timing_mean");
 
@@ -150,7 +150,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas->Clear();
   m_canvas->cd(0);
   //update comL1-GDLL1
-  auto hist_comL1_GDLL1 =  getDelta("TRGGDL", "hGDL_gdlL1TocomL1_all", 0, true);// only if updated
+  auto* hist_comL1_GDLL1 = (TH1F*) findHist("TRGGDL/hGDL_gdlL1TocomL1_all");
   if (hist_comL1_GDLL1) {
     double comL1_GDLL1_mean = 0.0;
     hist_comL1_GDLL1->Draw();
@@ -177,7 +177,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_CDCTRG_timing_mean->Clear();
   m_canvas_CDCTRG_timing_mean->cd(0);
   //update CDCTRG timing
-  auto histCDCTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG", 0, true);// only if updated
+  auto* histCDCTRG = (TH1F*) findHist("EventT0DQMdir/m_histEventT0_TOP_hadron_L1_CDCTRG");
   if (histCDCTRG) {
     double CDCTRG_timing_mean = 0.0;
     histCDCTRG->Draw();
@@ -190,7 +190,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_TOPTRG_timing_mean->Clear();
   m_canvas_TOPTRG_timing_mean->cd(0);
   //update TOPTRG timing
-  auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", 0, true);// only if updated
+  auto* histTOPTRG = (TH1F*) findHist("EventT0DQMdir/m_histEventT0_TOP_hadron_L1_TOPTRG");
   if (histTOPTRG) {
     double TOPTRG_timing_mean = 0.0;
     histTOPTRG->Draw();
@@ -202,11 +202,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_ECLTRG_peak->Clear();
   m_canvas_ECLTRG_peak->cd(0);
 // update ECLTRG peak
-  auto hist_ECLTRG_peak = getDelta("TRGGRL", "h_ECLL1", 0, true);// only if updated
+  auto* hist_ECLTRG_peak = (TH1F*) findHist("TRGGRL/h_ECLL1");
   if (hist_ECLTRG_peak) {
     double ECLTRG_peak = 0.0;
     hist_ECLTRG_peak->Draw();
-    ECLTRG_peak = hist_ECLTRG_peak->GetMaximum();
+    int bin_ECLTRG_peak = hist_ECLTRG_peak->GetMaximumBin();
+    ECLTRG_peak = hist_ECLTRG_peak->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
     B2DEBUG(1, "ECLTRG_peak:" << ECLTRG_peak);
     setEpicsPV("ECLTRG_peak", ECLTRG_peak);
 
@@ -215,11 +216,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_CDCTRG_2D_peak->Clear();
   m_canvas_CDCTRG_2D_peak->cd(0);
 // update CDCTRG 2D peak
-  auto hist_CDCTRG_2D_peak = getDelta("TRGGRL", "h_CDCL1", 0, true);// only if updated
+  auto* hist_CDCTRG_2D_peak = (TH1F*) findHist("TRGGRL/h_CDCL1");
   if (hist_CDCTRG_2D_peak) {
     double CDCTRG_2D_peak = 0.0;
     hist_CDCTRG_2D_peak->Draw();
-    CDCTRG_2D_peak = hist_CDCTRG_2D_peak->GetMaximum();
+    int bin_CDCTRG_2D_peak = hist_CDCTRG_2D_peak->GetMaximumBin();
+    CDCTRG_2D_peak = hist_CDCTRG_2D_peak->GetXaxis()->GetBinCenter(bin_CDCTRG_2D_peak);
     B2DEBUG(1, "CDCTRG_2D_peak:" << CDCTRG_2D_peak);
     setEpicsPV("CDCTRG_2D_peak", CDCTRG_2D_peak);
 
@@ -228,11 +230,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_NN_peak->Clear();
   m_canvas_NN_peak->cd(0);
 // update CDCTRG NN peak
-  auto hist_NN_peak = getDelta("TRGGRL", "h_CDCNNL1", 0, true);// only if updated
+  auto* hist_NN_peak = (TH1F*) findHist("TRGGRL/h_CDCNNL1");
   if (hist_NN_peak) {
     double NN_peak = 0.0;
     hist_NN_peak->Draw();
-    NN_peak = hist_NN_peak->GetMaximum();
+    int bin_NN_peak = hist_NN_peak->GetMaximumBin();
+    NN_peak = hist_NN_peak->GetXaxis()->GetBinCenter(bin_NN_peak);
     B2DEBUG(1, "NN_peak:" << NN_peak);
     setEpicsPV("NN_peak", NN_peak);
 
@@ -241,11 +244,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_CDCTRG_TSF_peak->Clear();
   m_canvas_CDCTRG_TSF_peak->cd(0);
 // update CDCTRG TSF
-  auto hist_CDCTRG_TSF_peak = getDelta("TRGGRL", "h_TSFL1", 0, true);// only if updated
+  auto* hist_CDCTRG_TSF_peak = (TH1F*) findHist("TRGGRL/h_TSFL1");
   if (hist_CDCTRG_TSF_peak) {
     double CDCTRG_TSF_peak = 0.0;
     hist_CDCTRG_TSF_peak->Draw();
-    CDCTRG_TSF_peak = hist_CDCTRG_TSF_peak->GetMaximum();
+    int bin_CDCTRG_TSF_peak = hist_CDCTRG_TSF_peak->GetMaximumBin();
+    CDCTRG_TSF_peak = hist_CDCTRG_TSF_peak->GetXaxis()->GetBinCenter(bin_CDCTRG_TSF_peak);
     B2DEBUG(1, "CDCTRG_TSF_peak:" << CDCTRG_TSF_peak);
     setEpicsPV("CDCTRG_TSF_peak", CDCTRG_TSF_peak);
 
@@ -254,11 +258,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_KLMTRG_peak->Clear();
   m_canvas_KLMTRG_peak->cd(0);
 // update KLMTRG
-  auto hist_KLMTRG_peak = getDelta("TRGGRL", "h_KLML1", 0, true);// only if updated
+  auto* hist_KLMTRG_peak = (TH1F*) findHist("TRGGRL/h_KLML1");
   if (hist_KLMTRG_peak) {
     double KLMTRG_peak = 0.0;
     hist_KLMTRG_peak->Draw();
-    KLMTRG_peak = hist_KLMTRG_peak->GetMaximum();
+    int bin_KLMTRG_peak = hist_KLMTRG_peak->GetMaximumBin();
+    KLMTRG_peak = hist_KLMTRG_peak->GetXaxis()->GetBinCenter(bin_KLMTRG_peak);
     B2DEBUG(1, "KLMTRG_peak:" << KLMTRG_peak);
     setEpicsPV("KLMTRG_peak", KLMTRG_peak);
 
@@ -267,11 +272,12 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_TOPTRG_peak->Clear();
   m_canvas_TOPTRG_peak->cd(0);
 // update TOPTRG
-  auto hist_TOPTRG_peak = getDelta("TRGGRL", "h_TOPL1", 0, true);// only if updated
+  auto* hist_TOPTRG_peak = (TH1F*) findHist("TRGGRL/h_TOPL1");
   if (hist_TOPTRG_peak) {
     double TOPTRG_peak = 0.0;
     hist_TOPTRG_peak->Draw();
-    TOPTRG_peak = hist_TOPTRG_peak->GetMaximum();
+    int bin_TOPTRG_peak = hist_TOPTRG_peak->GetMaximumBin();
+    TOPTRG_peak = hist_TOPTRG_peak->GetXaxis()->GetBinCenter(bin_TOPTRG_peak);
     B2DEBUG(1, "TOPTRG_peak:" << TOPTRG_peak);
     setEpicsPV("TOPTRG_peak", TOPTRG_peak);
 
@@ -280,7 +286,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_hadronb2_over_bhabha_all->Clear();
   m_canvas_hadronb2_over_bhabha_all->cd(0);
 // update #hadronb2/#bhabha_all
-  auto hist_hadronb2_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_hadronb2_over_bhabha_all = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_hadronb2_over_bhabha_all) {
     double hadronb2_over_bhabha_all = 0.0;
     hist_hadronb2_over_bhabha_all->Draw();
@@ -295,7 +301,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_mumu2trk_over_bhabha_all->Clear();
   m_canvas_mumu2trk_over_bhabha_all->cd(0);
 // update #mumu2trk/#bhabha_all
-  auto hist_mumu2trk_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_mumu2trk_over_bhabha_all = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_mumu2trk_over_bhabha_all) {
     double mumu2trk_over_bhabha_all = 0.0;
     hist_mumu2trk_over_bhabha_all->Draw();
@@ -310,7 +316,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_hadronb2_over_mumu2trk->Clear();
   m_canvas_hadronb2_over_mumu2trk->cd(0);
 // update #hadronb2/#mumu2trk
-  auto hist_hadronb2_over_mumu2trk = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_hadronb2_over_mumu2trk = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_hadronb2_over_mumu2trk) {
     double hadronb2_over_mumu2trk = 0.0;
     hist_hadronb2_over_mumu2trk->Draw();
@@ -325,7 +331,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_deadch_c_h_TCId->Clear();
   m_canvas_deadch_c_h_TCId->cd(0);
 // update #deadch_c_h_TCId
-  auto hist_c_h_TCId = getDelta("TRG", "c_h_TCId", 0, true);// only if updated
+  auto* hist_c_h_TCId = (TH1F*) findHist("TRG/c_h_TCId");
   if (hist_c_h_TCId) {
     double deadch_c_h_TCId = 0.0;
     hist_c_h_TCId->Draw();
@@ -338,7 +344,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas_deadch_c_NeuroHWInTSID->Clear();
   m_canvas_deadch_c_NeuroHWInTSID->cd(0);
 // update #deadch_c_NeuroHWInTSID
-  auto hist_c_NeuroHWInTSID = getDelta("TRGCDCTNN", "c_NeuroHWInTSID", 0, true);// only if updated
+  auto* hist_c_NeuroHWInTSID = (TH1F*) findHist("TRGCDCTNN/c_NeuroHWInTSID");
   if (hist_c_NeuroHWInTSID) {
     double deadch_c_NeuroHWInTSID = 0.0;
     hist_c_NeuroHWInTSID->Draw();
@@ -351,7 +357,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //******************     BACK UP       ********************//
 
 // update #mumu_tight/#bhabha_all
-  auto hist_mumu_tight_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_mumu_tight_over_bhabha_all = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_mumu_tight_over_bhabha_all) {
     double mumu_tight_over_bhabha_all = 0.0;
     hist_mumu_tight_over_bhabha_all->Draw();
@@ -364,7 +370,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   }
 
 // update #gammagamma/#bhabha_all
-  auto hist_gammagamma_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_gammagamma_over_bhabha_all = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_gammagamma_over_bhabha_all) {
     double gammagamma_over_bhabha_all = 0.0;
     hist_gammagamma_over_bhabha_all->Draw();
@@ -377,7 +383,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   }
 
 // update #tautau2trk/#bhabha_all
-  auto hist_tautau2trk_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_tautau2trk_over_bhabha_all = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_tautau2trk_over_bhabha_all) {
     double tautau2trk_over_bhabha_all = 0.0;
     hist_tautau2trk_over_bhabha_all->Draw();
@@ -390,7 +396,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   }
 
 // update #hadron/#bhabha_all
-  auto hist_hadron_over_bhabha_all = getDelta("softwaretrigger", "skim", 0, true);// only if updated
+  auto* hist_hadron_over_bhabha_all = (TH1F*) findHist("softwaretrigger/skim");
   if (hist_hadron_over_bhabha_all) {
     double hadron_over_bhabha_all = 0.0;
     hist_hadron_over_bhabha_all->Draw();

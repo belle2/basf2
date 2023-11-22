@@ -163,8 +163,6 @@ class GeometricNetwork(torch.nn.Module):
             else None,
         )
 
-        print(f"Using LCAS format, max depth of {edge_classes-1}\n")
-
     def forward(self, batch):
         x, u, edge_index, edge_attr, torch_batch = (
             batch.x,

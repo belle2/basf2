@@ -309,7 +309,13 @@ namespace Belle2 {
       */
     double getMomentumLossCorrectionFactor() const
     {
+      if (m_energyLossCorrection == 0.0) {
+        return 1.0;
+      }
       double origP = m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      if (origP == 0.0) {
+        return 1.0;
+      }
       double origE = sqrt(origP * origP + m_mass * m_mass);
 
       double newP = sqrt((origE - m_energyLossCorrection) * (origE - m_energyLossCorrection) - m_mass * m_mass);

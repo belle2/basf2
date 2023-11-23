@@ -113,7 +113,7 @@ void BaseRecoFitterModule::event()
       if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
         Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
-        B2DEBUG(100, "resortHits: " << m_param_resortHits);
+        B2DEBUG(29, "resortHits: " << m_param_resortHits);
 
         wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting, m_param_resortHits);
 

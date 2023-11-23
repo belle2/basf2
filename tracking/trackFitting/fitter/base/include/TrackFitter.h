@@ -47,6 +47,9 @@ namespace Belle2 {
    * -> Create measurements if hit content has changed (dirty flag)
    * -> Fit (again) if (a) no fit result present or (b) hit content has changed (dirty flag)
    *
+   * If resortHits is True, the hits are resorted while fitting (e.g. using the
+   * the track length) if the underlying fitter supports it.
+   *
    * Non-default fitter
    * ------------------
    *
@@ -156,12 +159,15 @@ namespace Belle2 {
      * If hit content did not change (indicated by the dirty flag of the reco track),
      * the track will not be refitted.
      *
+     * If resortHits is True, the hits are resorted while fitting (e.g. using the
+     * the track length) if the underlying fitter supports it.
+     *
      * This fit function is only to be used for non-standard expert use.
      * For the typical use case, please use the other fit function.
      *
      * Return bool if the track was successful.
      */
-    bool fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation) const;
+    bool fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation, bool resortHits = false) const;
 
     /**
      * Fit a reco track with the given particle hypothesis, or with pion as default.
@@ -174,14 +180,17 @@ namespace Belle2 {
      * and added to the reco track, if not already present. For this, a RKTrackRep is used as a
      * base class. The PDG-code-sign is deduced from the reco track charge.
      *
+     * If resortHits is True, the hits are resorted while fitting (e.g. using the
+     * the track length) if the underlying fitter supports it.
+     *
      * Return bool if the track was successful.
      */
-    bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const;
+    bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType, bool resortHits = false) const;
 
     /**
      * Same as above, but hypothesis set by pdg code
      */
-    bool fit(RecoTrack& recoTrack, const int pdgCode) const;
+    bool fit(RecoTrack& recoTrack, const int pdgCode, bool resortHits = false) const;
 
     /**
      * Fit a reco track with the already present cardinal representation or with pion as default.
@@ -194,9 +203,12 @@ namespace Belle2 {
      * and added to the reco track, if not already present. For this, a RKTrackRep is used as a
      * base class. The PDG-code-sign is deduced from the reco track charge.
      *
+     * If resortHits is True, the hits are resorted while fitting (e.g. using the
+     * the track length) if the underlying fitter supports it.
+     *
      * Return bool if the track was successful.
      */
-    bool fit(RecoTrack& recoTrack) const;
+    bool fit(RecoTrack& recoTrack, bool resortHits = false) const;
 
     /**
      * Reset the internal measurement creator storage to the default settings.
@@ -268,12 +280,14 @@ namespace Belle2 {
 
     /// Set the gErrorIgnoreLevel for the fitter.
     void setgErrorIgnoreLevel(Int_t errorIgnoreLevel) { m_gErrorIgnoreLevel = errorIgnoreLevel; }
+
     /// Return the currently set gErrorIgnoreLevel for the fitter.
     Int_t getgErrorIgnoreLevel() { return m_gErrorIgnoreLevel; }
 
   private:
     /// The internal storage of the used fitting algorithms.
     std::shared_ptr<genfit::AbsFitter> m_fitter;
+
     /// Flag to skip the dirty flag check which is needed when using non-default fitters.
     bool m_skipDirtyCheck = false;
 
@@ -294,8 +308,11 @@ namespace Belle2 {
      * In every fit step, all track representations are fitted with genfit. The given track representation is only used
      * for calculating the time seed for the fit. For this, the track representation needs to have the correct PDG code set
      * (indicating the correct particle AND the correct charge).
+     *
+     * If resortHits is True, the hits are resorted while fitting (e.g. using the
+     * the track length) if the underlying fitter supports it.
      */
-    bool fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const;
+    bool fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation, bool resortHits = false) const;
   };
 }
 

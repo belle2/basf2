@@ -5416,7 +5416,7 @@ Decay B+
 0.000001000   anti-Sigma+  Lambda0                         PHSP;
 0.000001000   anti-Sigma+  Sigma0                          PHSP;
 0.000000100   anti-Xi+  Xi0                                PHSP;
-0.000001500   Lambda(1520)0  p+                            PHSP; #UL
+0.000000315   anti-Lambda(1520)0  p+                       PHSP; # updated to https://inspirehep.net/literature/1307247
 
 # b->u (cs)
 # Ds- pi+:hep-ex/0207077 Belle + isospin. Others are ASSUMED like that.
@@ -5500,27 +5500,27 @@ Decay B+
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02991614    anti-cd_1  uu_1                              PYTHIA 63;
+0.02991622    anti-cd_1  uu_1                              PYTHIA 63;
 
 # Xi_c X      2.4%
-0.00815899    anti-cs_1  uu_1                              PYTHIA 63;
+0.00815901    anti-cs_1  uu_1                              PYTHIA 63;
 
-0.23900997    u  anti-d  anti-c  u                         PYTHIA 23; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
-0.04730592    u  anti-d  anti-c  u                         PYTHIA 43; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
-0.02039737    u  anti-s  anti-c  u                         PYTHIA 43;
+0.23901062    u  anti-d  anti-c  u                         PYTHIA 23; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
+0.04730605    u  anti-d  anti-c  u                         PYTHIA 43; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
+0.02039743    u  anti-s  anti-c  u                         PYTHIA 43;
 # Try to crank up the psi production (Lange).
-0.06708473    c  anti-s  anti-c  u                         PYTHIA 43;
-0.00362619    c  anti-d  anti-c  u                         PYTHIA 43;
-0.00271963    u  anti-d  anti-u  u                         PYTHIA 23;
-0.00362619    c  anti-s  anti-u  u                         PYTHIA 23;
+0.06708491    c  anti-s  anti-c  u                         PYTHIA 43;
+0.00362620    c  anti-d  anti-c  u                         PYTHIA 43;
+0.00271964    u  anti-d  anti-u  u                         PYTHIA 23;
+0.00362620    c  anti-s  anti-u  u                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00185843    u  anti-u  anti-d  u                         PYTHIA 23;
+0.00185844    u  anti-u  anti-d  u                         PYTHIA 23;
 0.00006349    d  anti-d  anti-d  u                         PYTHIA 23;
 0.00008160    s  anti-s  anti-d  u                         PYTHIA 23;
-0.00199444    u  anti-u  anti-s  u                         PYTHIA 23;
+0.00199445    u  anti-u  anti-s  u                         PYTHIA 23;
 0.00163180    d  anti-d  anti-s  u                         PYTHIA 23;
 0.00135988    s  anti-s  anti-s  u                         PYTHIA 23;
-0.00453271    anti-s  u                                    PYTHIA 91;
+0.00453272    anti-s  u                                    PYTHIA 91;
 
 Enddecay
 
@@ -6959,7 +6959,7 @@ Decay B-
 0.000001000   Sigma-  anti-Lambda0                         PHSP;
 0.000001000   Sigma-  anti-Sigma0                          PHSP;
 0.000000100   Xi-  anti-Xi0                                PHSP;
-0.000001500   Lambda(1520)0  anti-p-                       PHSP; #UL
+0.000000315   Lambda(1520)0  anti-p-                       PHSP; # updated to https://inspirehep.net/literature/1307247
 
 # b->u (cs)
 # Ds- pi+:hep-ex/0207077 Belle + isospin. Others are ASSUMED like that.
@@ -7043,27 +7043,27 @@ Decay B-
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02991614    cd_1  anti-uu_1                              PYTHIA 63;
+0.02991622    cd_1  anti-uu_1                              PYTHIA 63;
 
 # Xi_c X      2.4%
-0.00815899    cs_1  anti-uu_1                              PYTHIA 63;
+0.00815901    cs_1  anti-uu_1                              PYTHIA 63;
 
-0.23900997    anti-u  d  c  anti-u                         PYTHIA 23; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
-0.04730592    anti-u  d  c  anti-u                         PYTHIA 43; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
-0.02039737    anti-u  s  c  anti-u                         PYTHIA 43;
+0.23901062    anti-u  d  c  anti-u                         PYTHIA 23; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
+0.04730605    anti-u  d  c  anti-u                         PYTHIA 43; # changed according to remaining BFs from 100%; the ratio of PYTHIA 23 to 43 is kept constant [BF update - NR 06/2023]
+0.02039743    anti-u  s  c  anti-u                         PYTHIA 43;
 # Try to crank up the psi production (Lange).
-0.06708473    anti-c  s  c  anti-u                         PYTHIA 43;
-0.00362619    anti-c  d  c  anti-u                         PYTHIA 43;
-0.00271963    anti-u  d  u  anti-u                         PYTHIA 23;
-0.00362619    anti-c  s  u  anti-u                         PYTHIA 23;
+0.06708491    anti-c  s  c  anti-u                         PYTHIA 43;
+0.00362620    anti-c  d  c  anti-u                         PYTHIA 43;
+0.00271964    anti-u  d  u  anti-u                         PYTHIA 23;
+0.00362620    anti-c  s  u  anti-u                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00185843    anti-u  u  d  anti-u                         PYTHIA 23;
+0.00185844    anti-u  u  d  anti-u                         PYTHIA 23;
 0.00006349    anti-d  d  d  anti-u                         PYTHIA 23;
 0.00008160    anti-s  s  d  anti-u                         PYTHIA 23;
-0.00199444    anti-u  u  s  anti-u                         PYTHIA 23;
+0.00199445    anti-u  u  s  anti-u                         PYTHIA 23;
 0.00163180    anti-d  d  s  anti-u                         PYTHIA 23;
 0.00135988    anti-s  s  s  anti-u                         PYTHIA 23;
-0.00453271    s  anti-u                                    PYTHIA 91;
+0.00453272    s  anti-u                                    PYTHIA 91;
 
 Enddecay
 

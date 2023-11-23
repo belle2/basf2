@@ -297,12 +297,13 @@ namespace Belle2 {
 
     /**
      * Sets Energy loss correction
-     * @param EnergyLossCorrection Correction factor
+     * @param energyLossCorrection Correction factor
      */
     void setEnergyLossCorrection(double energyLossCorrection)
     {
       m_energyLossCorrection = energyLossCorrection;
     }
+
     /**
       * Returns effect of energy correction on the particle momentum
       * @return momentum change

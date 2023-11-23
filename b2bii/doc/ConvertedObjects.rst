@@ -147,7 +147,7 @@ The quality indicators for :math:`K_S^0` and :math:`\Lambda` as estimated by the
 The vertex fit information of ``V0`` particles is also attached as ``extraInfo`` variables.
 
 .. note::
-   `goodBelleKshort` and `goodBelleLambda` return the values of ``extraInfo(goodKs)`` and 
+   :b2:var:`goodBelleKshort` and :b2:var:`goodBelleLambda` return the values of ``extraInfo(goodKs)`` and 
    ``extraInfo(goodLambda)``.
 
 

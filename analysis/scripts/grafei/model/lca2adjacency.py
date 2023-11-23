@@ -1,6 +1,7 @@
 import torch as t
 import numpy as np
-from collections import defaultdict
+# import re
+from collections import defaultdict, Counter
 from .tree_utils import is_valid_tree
 
 
@@ -12,21 +13,42 @@ class InvalidLCAMatrix(Exception):
     pass
 
 
+class BadDecayString(Exception):
+    """
+    Specialized Exception sub-class raised for invalid decay strings.
+    """
+
+    pass
+
+
 class Node:
     """
     Class to hold levels of nodes in the tree.
     """
 
-    def __init__(self, level, children, lca_index=None):
+    def __init__(self, level, children, lca_index=None, lcas_level=0):
         self.level = level
         self.children = children
         self.lca_index = lca_index
+        self.lcas_level = lcas_level
 
         self.actual_level = level  # It won't be modified
         self.parent = None
         self.bfs_index = -1
         self.dfs_index = -1
 
+
+# def _print_history(node):
+#     """
+#     Debug function to print history of node.
+
+#     Args:
+#         node (Node): root node to inspect.
+#     """
+
+#     print([child.lcas_level for child in node.children])
+#     for child in node.children:
+#         _print_history(child)
 
 def _get_ancestor(node):
     """
@@ -253,7 +275,7 @@ def _reconstruct(lca_matrix):
                 # We need to make one and connect them to it
                 elif a_level < idx + 1 and another_level < idx + 1:
                     # parent = Node(max(a_level, another_level) + 1, [an_ancestor, another_ancestor])
-                    parent = Node(idx + 1, [an_ancestor, another_ancestor])
+                    parent = Node(idx + 1, [an_ancestor, another_ancestor], lcas_level=current_level)
                     an_ancestor.parent = parent
                     another_ancestor.parent = parent
                     total_nodes += 1
@@ -418,3 +440,86 @@ def n_intermediate_particles(lca_matrix):
         n_particles[i] = level_count[j]
 
     return n_particles, nodes_to_fsps, root.level
+
+
+def _is_good_decay_string(decay_string):
+    """
+    Check if decay string has the good syntax.
+
+    Args:
+        decay_string (str): decay string to check
+    """
+
+    # Decay string should start with 5
+    try:
+        int(decay_string[0])
+    except ValueError:
+        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 0 0'")
+    if int(decay_string[0]) != 5:
+        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 0 0'")
+
+    # ... and continue with '->'
+    if not decay_string[1:3] == "->":
+        raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 0 0'")
+
+    # For the time being it is possible to check only one level, so we should have only integers after
+    try:
+        FSPs = [int(fsp) for fsp in decay_string[3:]]
+    except ValueError:
+        raise BadDecayString("Please use only one level. Example of decay string:'5 -> 1 0 0'")
+
+    # If only one FSP, then must be a 0
+    if len(FSPs) == 1 and FSPs[0] != 0:
+        raise BadDecayString("If the signal side is composed of only one particle, it should be a 0. Example:'5->0'")
+
+
+def select_good_signal_side(lcas_matrix, decay_string):
+    """
+    Cheks if given decay string is found in LCAS matrix.
+
+    Args:
+        lcas_matrix (torch.Tensor): LCAS matrix
+        decay_string (str): decay string
+
+    Returns:
+        bool: True if LCAS matches decay string, False otherwise
+    """
+
+    # Remove whitespaces from decay string
+    decay_string = "".join(decay_string.split())
+
+    # Check if decay string has good syntax
+    _is_good_decay_string(decay_string)
+
+    # Reconstruct decay chain
+    root, _ = _reconstruct(lcas_matrix)
+
+    # If root is not Ups then False
+    if root.lcas_level != 6:
+        return False
+
+    # Remove root and first arrow
+    decay_string = decay_string[3:]
+    # Get final state particles
+    FSPs = [int(fsp) for fsp in decay_string]
+
+    # Case 1: only one FSP in the signal-side
+    # There should be two nodes: one '5' and one '0'
+    if len(FSPs) == 1:
+        if Counter([child.lcas_level for child in root.children]) != Counter({5: 1, 0: 1}):
+            return False
+    # Case 2: more FSP in the signal-side
+    else:
+        # There should be two nodes labelled as '5'
+        if Counter([child.lcas_level for child in root.children]) != Counter({5: 2}):
+            return False
+        # If there are two '5', at least one of them should decay into the nodes given by the decay string
+        if Counter([gchild.lcas_level for gchild in root.children[0].children]) != Counter(FSPs)\
+                and Counter([gchild.lcas_level for gchild in root.children[1].children]) != Counter(FSPs):
+            return False
+
+    # # Find all decays of root children
+    # decays = re.findall(r"\(.*?\)", decay_string)
+
+    # I think the exceptions are over, LCAS is good
+    return True

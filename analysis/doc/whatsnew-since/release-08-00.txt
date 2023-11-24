@@ -17,7 +17,7 @@ Modules
   kinematics of the ISR photon can be accessed using the metavariable `originalParticle`.
 * Added a new module `TrackingEnergyLossCorrection` alongside its helper function `modularAnalysis.correctTrackEnergy`.
   This module modifies the track energy of each particle inside a particle list acording to given correction value
-  or by a phase-space dependent correction value extracted from a `ParticleWeightingLookUpTable` payload.
+  or by a phase-space dependent correction value extracted from a ParticleWeightingLookUpTable payload.
   This module is inteded to be used alongside the momentum scale factors implemented in the module `TrackingMomentumScaleFactors`.
 
 Variables

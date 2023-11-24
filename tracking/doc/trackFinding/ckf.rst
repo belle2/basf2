@@ -1,7 +1,7 @@
 .. _tracking_ckf:
 
-Inter-Detector Track Finding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Inter-Detector Hit Finding
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
   This documentation is under construction!
@@ -18,7 +18,7 @@ The base concept of the CKF in basf2 is described here briefly. The first step i
 
 This marks the beginning of the combinatorial part in CKF. In the following steps the relations are followed to build the tracks. However, the implementation of the two steps can vary. For both the :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>` and the :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>` the relations are created all at once at the beginning, while for the :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>` and the :ref:`ECL to CDC CKF<tracking_ecl2cdc_ckf>` the relations are only build step by step ("on-the-fly") to reduce the number of possible combinations significantly, as far less relations between individual hit-bases states are created. Note that during the relation creation it is possible to "jump" over a layer if the setup allows for this. This might be necessary to account for e.g. insensitive or noisy detector parts, e.g. where sensors are stitched together, broken electronics, etc.
 
-The relation creation is followed by a *tree search*. Beginning with the track-based *seed state** all related hit-bases states are probed. The *seed state* marks the beginning of a *path* that is followed, and over time more and more states are added to the path. In the terminology of the CKF, the current state is the *parent state*, or just referred to as *current state*, while all the states to be probed, i.e. the candidates, are referred to as *child states*. Each child state is probed individually using a set of filters, and if it is found to be worthy child state by passing all filters and being among the ``n`` best candidates, it is added to the pat* which is then used as the next parent state and all the hit-states related to the last state in the path are the next child states to be probed. This process continues until no more states can be added to a given path, either because we leave the current detector (= we are at the innermost or outermost layer of that detector, depending on the direction), or because no more child states are available e.g. because the current state is a dead end (bad path) or because the current detector has insensitive or inefficient regions in the direction of extrapolation. As the ``n`` best candidates can be added to a path in each step, a tree is build for each track-based seed state. Hence the name *tree search*. In the end, only the best final paths are considered for a final check.
+The relation creation is followed by a *tree search*. Beginning with the track-based *seed state* all related hit-bases states are probed. The *seed state* marks the beginning of a *path* that is followed, and over time more and more states are added to the path. In the terminology of the CKF, the current state is the *parent state*, or just referred to as *current state*, while all the states to be probed, i.e. the candidates, are referred to as *child states*. Each child state is probed individually using a set of filters, and if it is found to be worthy child state by passing all filters and being among the ``n`` best candidates, it is added to the path* which is then used as the next parent state and all the hit-states related to the last state in the path are the next child states to be probed. This process continues until no more states can be added to a given path, either because we leave the current detector (= we are at the innermost or outermost layer of that detector, depending on the direction), or because no more child states are available e.g. because the current state is a dead end (bad path) or because the current detector has insensitive or inefficient regions in the direction of extrapolation. As the ``n`` best candidates can be added to a path in each step, a tree is build for each track-based seed state. Hence the name *tree search*. In the end, only the best final paths are considered for a final check.
 
 As the relation creation before, the tree search differs for the CKFs. In the two cases where all relations are built at the beginning, all relations are available at the start of the tree search so the trees are just traversed based on the relations. In the two cases where the relations are build on-the-fly, the relation creation is embedded in the tree search: at the end of the current path, possible child states are defined and probed immediately.
 
@@ -39,7 +39,6 @@ Each of the filters thus has different information available to decide whether o
 After the tree has been traversed and no more hit-bases states can be added to any path, a final *result filter* is employed. It checks for all the paths belonging to a given seed state which is the best path overall. Only the best overall path for each seed is kept.
 
 These are the CKF algorithms that are used in basf2. Each section contains more information about the specific implementation.
-""""""""""""""
 
 .. _tracking_cdc2svd_ckf:
 
@@ -62,7 +61,7 @@ To do so, it first extrapolates both the CDC standalone tracks and the SVD stand
 SVD to CDC CKF
 """"""""""""""
 
-All SVDRecoTracks from SVD standalone track finding that were not combined with an existing CDCRecoTrack before are now extrapolated into the CDC volume to attach CDC hits to these tracks. Often these tracks have a rather low transverse momentum :math:`p_{T}` so that track parts in the CDC are often quite small. This makes it difficult for the CDC track finding to identify tracks. The goal is to improve the momentum resolution with the additional CDC hits.
+All SVDRecoTracks from SVD standalone track finding that were not combined with an existing CDCRecoTrack before are now extrapolated into the CDC volume to attach CDC hits to these tracks in the *ToCDCCKF*. Often these tracks have a rather low transverse momentum :math:`p_{T}` so that track parts in the CDC are often quite small. This makes it difficult for the CDC track finding to identify tracks. The goal is to improve the momentum resolution with the additional CDC hits.
 
 To reduce the problem of combinatorics, this CKF does not create all the relations in advance before traversing the tree, but builds the relations and thus the tree in each step considering only the next possible hits. In addition, the it does not use the scheme of five filters described above ... TODO ...
 
@@ -73,7 +72,7 @@ ECL to CDC CKF
 
 .. _tracking_svd2pxd_ckf:
 
-SVD to PXD CKF
-""""""""""""""
+To PXD CKF
+""""""""""
 
 The *ToPXDCKF* is the last step of the track finding chain and currently the only algorithm to add PXD hits to tracks. While the VXDTF2 used in the :ref:`tracking_trackFindingSVD` can in principle be used with PXD hits, this feature isn't used currently. Besides that, it is essentially working the same way as the :ref:`CDCToSVDSpacePointCKF<tracking_cdc2svd_ckf>` in the way the filters work and the type of the filters, i.e. the first, second, and third filter as well as the result filter are all using MVAs.

@@ -17,7 +17,7 @@ doesn't cut it (such as if you are testing your skim on the grid).
 """
 
 import argparse
-import sys
+
 
 import jinja2
 

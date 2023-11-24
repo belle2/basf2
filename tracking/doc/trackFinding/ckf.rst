@@ -39,15 +39,6 @@ Each of the filters thus has different information available to decide whether o
 After the tree has been traversed and no more hit-bases states can be added to any path, a final *result filter* is employed. It checks for all the paths belonging to a given seed state which is the best path overall. Only the best overall path for each seed is kept.
 
 These are the CKF algorithms that are used in basf2. Each section contains more information about the specific implementation.
-
-.. _tracking_svd2pxd_ckf:
-
-SVD to PXD CKF
-""""""""""""""
-
-.. _tracking_svd2cdc_ckf:
-
-SVD to CDC CKF
 """"""""""""""
 
 .. _tracking_cdc2svd_ckf:
@@ -55,12 +46,34 @@ SVD to CDC CKF
 CDC to SVD CKF
 """"""""""""""
 
+The *CDCToSVDSpacePointCKF* is the first CKF in the track finding chain. It takes all tracks found in :ref:`tracking_trackFindingCDC`, converts them into sees, and extrapolates them into the SVD volume to add SVD :ref:`SVDSpacePoints<svdsps>` to the tracks. Thus, in this case the SVDSpacePoints are the hit states. The CDCToSVDSpacePointCKF uses the method of creating all the relations in advance and then follows the relations in the tree search. During relation creation, simple cuts on geometrical properties are employed. The *first*, *second*, and *third* filter applied during the tree search are all based on MVAs (using FastBDT), but also here simple cut based filters exist. Finally, the *result filter* also uses an MVA to decide which paths to keep and thus to convert to :ref:`RecoTracks<recotrack>`.
+
 .. _tracking_svdcdc_merger_ckf:
 
 SVD and CDC merger CKF
 """"""""""""""""""""""
 
+This CKF is used after the :ref:`CDCToSVDSpacePointCKF<tracking_cdc2svd_ckf>` and after the :ref:`standalone SVD track finding using the VXDTF2<tracking_trackFindingSVD>` were applied to all the :ref:`SVDSpacePoints<svdsps>`. Its goal is to combine the remaining :ref:`CDCRecoTracks<recotrack>` from the :ref:`tracking_trackFindingCDC` that do not have any SVDSpacePoints attached to them after the CDCToSVDSpacePointCKF with :ref:`SVDRecoTracks<recotrack>` from the SVD standalone tracking.
+
+To do so, it first extrapolates both the CDC standalone tracks and the SVD standalone tracks onto the CDC inner wall. Afterwards it creates relations as well and performs the tree search. Since it is operating on existing SVD RecoTracks, the tree search is a lot simpler. The first, second, and third filter do not attempt to remove any hits but accept all of them. The final decision of the result filter on which combinations of CDCRecoTracks and SVDRecoTracks to combine is based on an MVA again.
+
+.. _tracking_svd2cdc_ckf:
+
+SVD to CDC CKF
+""""""""""""""
+
+All SVDRecoTracks from SVD standalone track finding that were not combined with an existing CDCRecoTrack before are now extrapolated into the CDC volume to attach CDC hits to these tracks. Often these tracks have a rather low transverse momentum :math:`p_{T}` so that track parts in the CDC are often quite small. This makes it difficult for the CDC track finding to identify tracks. The goal is to improve the momentum resolution with the additional CDC hits.
+
+To reduce the problem of combinatorics, this CKF does not create all the relations in advance before traversing the tree, but builds the relations and thus the tree in each step considering only the next possible hits. In addition, the it does not use the scheme of five filters described above ... TODO ...
+
 .. _tracking_ecl2cdc_ckf:
 
 ECL to CDC CKF
 """"""""""""""
+
+.. _tracking_svd2pxd_ckf:
+
+SVD to PXD CKF
+""""""""""""""
+
+The *ToPXDCKF* is the last step of the track finding chain and currently the only algorithm to add PXD hits to tracks. While the VXDTF2 used in the :ref:`tracking_trackFindingSVD` can in principle be used with PXD hits, this feature isn't used currently. Besides that, it is essentially working the same way as the :ref:`CDCToSVDSpacePointCKF<tracking_cdc2svd_ckf>` in the way the filters work and the type of the filters, i.e. the first, second, and third filter as well as the result filter are all using MVAs.

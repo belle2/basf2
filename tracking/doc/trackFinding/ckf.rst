@@ -45,14 +45,14 @@ These are the CKF algorithms that are used in basf2. Each section contains more 
 CDC to SVD CKF
 """"""""""""""
 
-The *CDCToSVDSpacePointCKF* is the first CKF in the track finding chain. It takes all tracks found in :ref:`tracking_trackFindingCDC`, converts them into sees, and extrapolates them into the SVD volume to add SVD :ref:`SVDSpacePoints<svdsps>` to the tracks. Thus, in this case the SVDSpacePoints are the hit states. The CDCToSVDSpacePointCKF uses the method of creating all the relations in advance and then follows the relations in the tree search. During relation creation, simple cuts on geometrical properties are employed. The *first*, *second*, and *third* filter applied during the tree search are all based on MVAs (using FastBDT), but also here simple cut based filters exist. Finally, the *result filter* also uses an MVA to decide which paths to keep and thus to convert to :ref:`RecoTracks<recotrack>`.
+The *CDCToSVDSpacePointCKF* is the first CKF in the track finding chain. It takes all tracks found in :ref:`tracking_trackFindingCDC`, converts them into seeds, and extrapolates them into the SVD volume to add SVD :ref:`SVDSpacePoints<svdsps>` to the tracks. Thus, in this case the SVDSpacePoints are the hit states. The CDCToSVDSpacePointCKF uses the method of creating all the relations in advance and then follows the relations in the tree search. During relation creation, simple cuts on geometrical properties are employed. The *first*, *second*, and *third* filter applied during the tree search are all based on MVAs (using FastBDT), but also here simple cut based filters exist. Finally, the *result filter* also uses an MVA to decide which paths to keep and thus to convert to :ref:`RecoTracks<recotrack>`.
 
 .. _tracking_svdcdc_merger_ckf:
 
 SVD and CDC merger CKF
 """"""""""""""""""""""
 
-This CKF is used after the :ref:`CDCToSVDSpacePointCKF<tracking_cdc2svd_ckf>` and after the :ref:`standalone SVD track finding using the VXDTF2<tracking_trackFindingSVD>` were applied to all the :ref:`SVDSpacePoints<svdsps>`. Its goal is to combine the remaining :ref:`CDCRecoTracks<recotrack>` from the :ref:`tracking_trackFindingCDC` that do not have any SVDSpacePoints attached to them after the CDCToSVDSpacePointCKF with :ref:`SVDRecoTracks<recotrack>` from the SVD standalone tracking.
+This CKF, called *CDCToSVDSeedCKF*, is used after the :ref:`CDCToSVDSpacePointCKF<tracking_cdc2svd_ckf>` and after the :ref:`standalone SVD track finding using the VXDTF2<tracking_trackFindingSVD>` were applied to all the :ref:`SVDSpacePoints<svdsps>`. Its goal is to combine the remaining :ref:`CDCRecoTracks<recotrack>` from the :ref:`tracking_trackFindingCDC` that do not have any SVDSpacePoints attached to them after the CDCToSVDSpacePointCKF with :ref:`SVDRecoTracks<recotrack>` from the SVD standalone tracking.
 
 To do so, it first extrapolates both the CDC standalone tracks and the SVD standalone tracks onto the CDC inner wall. Afterwards it creates relations as well and performs the tree search. Since it is operating on existing SVD RecoTracks, the tree search is a lot simpler. The first, second, and third filter do not attempt to remove any hits but accept all of them. The final decision of the result filter on which combinations of CDCRecoTracks and SVDRecoTracks to combine is based on an MVA again.
 
@@ -63,12 +63,14 @@ SVD to CDC CKF
 
 All SVDRecoTracks from SVD standalone track finding that were not combined with an existing CDCRecoTrack before are now extrapolated into the CDC volume to attach CDC hits to these tracks in the *ToCDCCKF*. Often these tracks have a rather low transverse momentum :math:`p_{T}` so that track parts in the CDC are often quite small. This makes it difficult for the CDC track finding to identify tracks. The goal is to improve the momentum resolution with the additional CDC hits.
 
-To reduce the problem of combinatorics, this CKF does not create all the relations in advance before traversing the tree, but builds the relations and thus the tree in each step considering only the next possible hits. In addition, the it does not use the scheme of five filters described above ... TODO ...
+To reduce the problem of combinatorics, this CKF does not create all the relations in advance before traversing the tree, but builds the relations and thus the tree in each step considering only the next possible hits. It loops over all the seeds and uses them as a starting point. Then, it creates all the possible next states from the CDC hits applying a loose preselection on the difference in :math:`\varphi` and the difference in CDC layer number, which are then filtered more thoroughly in the next steps. All selected states are then extrapolated and updated without a filter in between, so basically the *second filter* from above is skipped. Afterwards, a selection on the best fit results is performed and the next sub-tree is created and checked. Once all seeds were processed and extrapolated to the furthest possible extend, a final track selection is performed and the results are stored as RecoTracks.
 
 .. _tracking_ecl2cdc_ckf:
 
 ECL to CDC CKF
 """"""""""""""
+
+This CKF is still experimental and not actively used. The idea is that we might miss tracks that are very forward or backward and have rather low transverse momentum , e.g. electrons, during track reconstruction. These particles can nonetheless create ECLClusters that are reconstructed. The ECL clusters are used to estimate the momentum of the particle, based on the cluster energy and the location. The clusters are then used to create seed states, which are then extrapolated to the CDC as in the :ref:`ToCDCCKF<tracking_svd2cdc_ckf>`. More active development of this feature would be needed to improve the performance of this CKF before we would actively use it.
 
 .. _tracking_svd2pxd_ckf:
 

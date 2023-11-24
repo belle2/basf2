@@ -47,8 +47,7 @@ namespace Belle2 {
    * -> Create measurements if hit content has changed (dirty flag)
    * -> Fit (again) if (a) no fit result present or (b) hit content has changed (dirty flag)
    *
-   * If resortHits is True, the hits are resorted while fitting (e.g. using the
-   * the track length) if the underlying fitter supports it.
+   * If resortHits is True, the hits are resorted while fitting (e.g. using the track length) if the underlying fitter supports it.
    *
    * Non-default fitter
    * ------------------
@@ -67,6 +66,8 @@ namespace Belle2 {
    * -> Create measurements if hit content has changed (dirty flag)
    * -> Always fitted
    *
+   * If resortHits is True, the hits are resorted while fitting (e.g. using the track length) if the underlying fitter supports it.
+   *
    * Non-default track representations
    * ---------------------------------
    *
@@ -82,6 +83,8 @@ namespace Belle2 {
    *
    * -> Create measurements if hit content has changed (dirty flag)
    * -> Fit (again) if (a) added track representation is new or (b) hit content has changed (dirty flag) or (c) you use a non-default fitter.
+   *
+   * If resortHits is True, the hits are resorted while fitting (e.g. using the track length) if the underlying fitter supports it.
    *
    * Non-default measurements
    * ------------------------
@@ -109,8 +112,7 @@ namespace Belle2 {
    * -> Always recreate all measurements (not only when hit content has changed).
    * -> Always refit (not only when using non default parameters or hit content has changed or track representation is new).
    *
-   * Because the different cases are rather complicated, there is a flow chart available.
-   * TODO: Create flow chart.
+   * If resortHits is True, the hits are resorted while fitting (e.g. using the track length) if the underlying fitter supports it.
    */
   class TrackFitter {
   public:

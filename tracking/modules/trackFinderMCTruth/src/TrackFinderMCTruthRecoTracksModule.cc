@@ -71,8 +71,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            INFINITY);
   addParam("UseOnlyBeforeTOP",
            m_useOnlyBeforeTOP,
-           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector "
-           "(only implemented for CDCHits).",
+           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector.",
            false);
   addParam("UseReassignedHits",
            m_useReassignedHits,
@@ -562,6 +561,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<PXDCluster, PXDTrueHit>(relatedClusters.object(i))) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
@@ -627,6 +631,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<SVDCluster, SVDTrueHit>(relatedClusters.object(i))) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
@@ -670,27 +679,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     } // end if m_useSVDHits
 
-
-    auto didParticleExitCDC = [](const CDCHit * hit) {
-      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
-      if (not simHit) return false;
-
-      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
-      if (not mcParticle) return false;
-      if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
-
-      RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
-      if (topHits.size() == 0) return false;
-
-      // Get hit with the smallest time.
-      auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
-        return lhs.getTime() < rhs.getTime();
-      };
-      auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
-
-      return simHit->getGlobalTime() > itFirstTopHit->getTime();
-    };
-
     if (m_useCDCHits) {
       // create a list containing the indices to the CDCHits that belong to one track
       int nAxialHits = 0;
@@ -729,7 +717,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // check if the particle left hits in TOP and add mark hits after that as auxiliary.
-          if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<CDCHit, CDCSimHit>(cdcHit)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -989,6 +977,28 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
     return true;
   }
 }
+
+template< class THit, class TSimHit>
+bool TrackFinderMCTruthRecoTracksModule::didParticleExitCDC(const THit* ahit)
+{
+  const TSimHit* simHit = ahit->template getRelated<TSimHit>();
+  if (not simHit) return false;
+
+  const MCParticle* mcParticle = simHit->template getRelated<MCParticle>();
+  if (not mcParticle) return false;
+  if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
+
+  RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
+  if (topHits.size() == 0) return false;
+
+  // Get hit with the smallest time.
+  auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
+    return lhs.getTime() < rhs.getTime();
+  };
+  auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
+
+  return simHit->getGlobalTime() > itFirstTopHit->getTime();
+};
 
 
 

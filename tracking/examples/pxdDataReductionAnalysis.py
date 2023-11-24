@@ -22,16 +22,22 @@ main.add_module('EventInfoSetter', expList=[0], runList=[1], evtNumList=[100])
 main.add_module('EvtGenInput', logLevel=b2.LogLevel.INFO)
 
 add_simulation(main, forceSetPXDDataReduction=True, usePXDDataReduction=False)
-add_tracking_reconstruction(main, ['SVD', 'CDC'])
+
+add_tracking_reconstruction(main, ['SVD', 'CDC'], mcTrackFinding=True)
 
 main.add_module('PXDROIFinder',
                 recoTrackListName='RecoTracks',
                 PXDInterceptListName='PXDIntercepts',
                 ROIListName='ROIs',
                 logLevel=b2.LogLevel.DEBUG)
-# filter PXDClusters that are in ROIs
-main.add_module('PXDdigiFilter', ROIidsName='ROIs', CreateOutside=True, overrideDB=True, usePXDDataReduction=True)
 
+main.add_module('PXDROIFinderAnalysis',
+                recoTrackListName='RecoTracks',
+                PXDInterceptListName='PXDIntercepts',
+                ROIListName='ROIs',
+                writeToRoot=True,
+                rootFileName='pxdDataRedAnalysis_SVDCDC_MCTF_test',
+                logLevel=b2.LogLevel.RESULT)
 main.add_module('Progress')
 
 # Process events

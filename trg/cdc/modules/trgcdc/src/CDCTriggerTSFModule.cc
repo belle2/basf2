@@ -103,6 +103,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_adccut,
            "Threshold for the adc cut.  Default: -1",
            -1);
+  addParam("SaveADC",
+           m_saveadc,
+           "Flag to save ADC for other trg module or not, Default: false",
+           false);
 }
 
 void
@@ -119,6 +123,7 @@ CDCTriggerTSFModule::initialize()
   }
   if (m_makeRecoLRTable) {
     m_recoTracks.isRequired("RecoTracks");
+    m_cdcHits.isRequired();
     innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
     outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
@@ -479,6 +484,26 @@ CDCTriggerTSFModule::event()
                                           || neibor_hit[isl][(its + 1) % tsLayers[isl]->nCells()] == 1))continue;
 
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
+
+        /* generate ADC Pattern for NN*/
+        unsigned int adcpattern = -1;
+        std::vector<float> fullADC = {};
+        if (m_saveadc) {
+          unsigned int PatternAfterCut = s.lutPattern();
+          int nwires = (isl == 0) ? 15 : 11;
+          for (int iwire = 0; iwire < nwires; iwire++) {
+            if (!s[iwire] || !(s[iwire]->hit())) { //Make sure the wire do exist
+              fullADC.push_back(-1);
+              continue;
+            }
+            const CDCHit* cdchit0 = m_cdcHits[s[iwire]->hit()->iCDCHit()];
+            fullADC.push_back(cdchit0->getADCCount());
+            if (cdchit0 && (cdchit0->getADCCount() < m_adccut)) {
+              PatternAfterCut &= ~(1UL << (iwire + 1));
+            }
+          }
+          adcpattern =  PatternAfterCut;
+        }
         const CDCTriggerSegmentHit* tsHit =
           m_segmentHits.appendNew(*priorityHit,
                                   s.id(),
@@ -486,7 +511,12 @@ CDCTriggerTSFModule::event()
                                   s.LUT()->getValue(s.lutPattern()),
                                   s.priorityTime(),
                                   s.fastestTime(),
-                                  s.foundTime());
+                                  s.foundTime(),
+                                  -1,
+                                  s.hitPattern(),
+                                  s.hitPatternTime(),
+                                  adcpattern,
+                                  fullADC);
         unsigned short adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {

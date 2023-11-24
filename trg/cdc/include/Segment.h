@@ -77,6 +77,8 @@ namespace Belle2 {
     unsigned hitPattern(void) const;
     /// returns hit pattern for hits in given time window.
     unsigned hitPattern(int clk0, int clk1) const;
+    /// returns hit pattern with hit time
+    std::vector<float> hitPatternTime(void) const;
     /// hit pattern containing bit for priority position
     unsigned lutPattern(void) const;
     /// hit pattern containing bit for priority position for hits in given time window.

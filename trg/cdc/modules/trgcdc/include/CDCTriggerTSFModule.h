@@ -93,6 +93,8 @@ namespace Belle2 {
     /** threshold for the adc cut. Default: -1 */
     int m_adccut;
 
+    /** flag for saving adc information or not. Default false**/
+    bool m_saveadc;
   private:
     /** structure to hold pointers to all wires in the CDC */
     std::vector<std::vector<TRGCDCLayer*>> superLayers;

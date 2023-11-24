@@ -267,13 +267,34 @@ namespace Belle2 {
      * @return list of selected hit indices */
     std::vector<unsigned> selectHits(unsigned isector, const CDCTriggerTrack& track,
                                      bool returnAllRelevant = false);
-
     /** Calculate input values for MLP.
      * @param isector index of the MLP that will use the input
      * @param hitIds hit indices to be used for the input
      * @return scaled vector of input values (1 for each input node)
+     * based on the initial parameters , will choose different modes
      */
     std::vector<float> getInputVector(unsigned isector, const std::vector<unsigned>& hitIds);
+
+    /** Calculate input values for MLP Default mode.
+     * @param isector index of the MLP that will use the input
+     * @param hitIds hit indices to be used for the input
+     * @return scaled vector of input values (1 for each input node)
+     */
+    std::vector<float> getInputVectorDefault(unsigned isector, const std::vector<unsigned>& hitIds);
+
+    /** Calculate input values for MLP in full hit mode.
+     * @param isector index of the MLP that will use the input
+     * @param hitIds hit indices to be used for the input
+     * @return scaled vector of input values (1 for each input node)
+     */
+    std::vector<float> getInputVector_fullhit(unsigned isector, const std::vector<unsigned>& hitIds);
+
+    /** Calculate input values for MLP in extra hit mode.
+     * @param isector index of the MLP that will use the input
+     * @param hitIds hit indices to be used for the input
+     * @return scaled vector of input values (1 for each input node)
+     */
+    std::vector<float> getInputVector_extrahit(unsigned isector, const std::vector<unsigned>& hitIds);
 
     /** Run an expert MLP.
      * @param isector index of the MLP
@@ -288,17 +309,26 @@ namespace Belle2 {
     /** List of networks */
     std::vector<CDCTriggerMLP> m_MLPs = {};
     /** Radius of the CDC layers with priority wires (2 per super layer) */
-    double m_radius[9][2] = {};
+    double m_radius[9][5] = {};
     /** Number of track segments up to super layer */
     unsigned m_TSoffset[10] = {};
     /** 2D phi position of current track scaled to number of wires */
-    double m_idRef[9][2] = {};
+    double m_idRef[9][5] = {};
     /** 2D crossing angle of current track */
-    double m_alpha[9][2] = {};
+    double m_alpha[9][5] = {};
     /** Event time of current event / track */
     int m_T0 = 0;
     /** Flag to show if stored event time is valid */
     bool m_hasT0 = false;
+    /** Switch for addtional input modes*/
+    int m_AdditionWireMode = 0;
+    /** Value for additional input*/
+    int m_AdditionInputPerSL = 0;
+    /** Min Drift time limitation for ETF case only*/
+    int m_TMin = -20;
+
+
+
     /** Fixed point precision in bit after radix point.
      *  8 values:
      *  - 2D track parameters: omega, phi

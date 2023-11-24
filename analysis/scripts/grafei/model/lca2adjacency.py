@@ -1,7 +1,8 @@
 import torch as t
-import numpy as np
+# import numpy as np
 # import re
-from collections import defaultdict, Counter
+# from collections import defaultdict, Counter
+from collections import Counter
 from .tree_utils import is_valid_tree
 
 
@@ -32,7 +33,7 @@ class Node:
         self.lca_index = lca_index
         self.lcas_level = lcas_level
 
-        self.actual_level = level  # It won't be modified
+        # self.actual_level = level  # It won't be modified
         self.parent = None
         self.bfs_index = -1
         self.dfs_index = -1
@@ -321,9 +322,7 @@ def _get_fsps_of_node(node):
     """
     indices = []
 
-    if (
-        node.lca_index is not None
-    ):  # If you simply use if node.lca_index: then you will always miss the first final state particle
+    if node.lca_index is not None:  # If you simply use 'if node.lca_index:' you will always miss the first fsp
         indices.append(node.lca_index)
     else:
         for child in node.children:
@@ -398,48 +397,48 @@ def lca2adjacency(lca_matrix, format="bfs"):
     return adjacency_matrix
 
 
-def n_intermediate_particles(lca_matrix):
-    """
-    Counts how many intermediate particles of each generation are in the tree.
+# def n_intermediate_particles(lca_matrix):
+#     """
+#     Counts how many intermediate particles of each generation are in the tree.
 
-    Args:
-        lca (np.ndarray): LCA matrix.
-    Returns:
-        defaultdict(<class 'int'>): number of particles for each generation in a dictionary.
-    """
+#     Args:
+#         lca (np.ndarray): LCA matrix.
+#     Returns:
+#         defaultdict(<class 'int'>): number of particles for each generation in a dictionary.
+#     """
 
-    level_count = defaultdict(int)
-    n_particles = defaultdict(int)
-    nodes_to_fsps = []
-    nodes_to_level = []
+#     level_count = defaultdict(int)
+#     n_particles = defaultdict(int)
+#     nodes_to_fsps = []
+#     nodes_to_level = []
 
-    # Get unique elements of LCA without 0's
-    elements = lca_matrix.unique().sort(descending=True).values
-    elements = elements[elements > 0].tolist()
+#     # Get unique elements of LCA without 0's
+#     elements = lca_matrix.unique().sort(descending=True).values
+#     elements = elements[elements > 0].tolist()
 
-    # Reconstruct the tree structure
-    root, _ = _reconstruct(lca_matrix)
-    queue = _breadth_first_enumeration(root, {}, None)
+#     # Reconstruct the tree structure
+#     root, _ = _reconstruct(lca_matrix)
+#     queue = _breadth_first_enumeration(root, {}, None)
 
-    # Count how many particles there are at a given level
-    for i in range(root.level, 0, -1):
-        for node in queue[i]:
-            if node.actual_level > 1:
-                level_count[node.actual_level - 1] += 1
-                nodes_to_fsps.append(_get_fsps_of_node(node))
-                nodes_to_level.append(node.actual_level - 1)
+#     # Count how many particles there are at a given level
+#     for i in range(root.level, 0, -1):
+#         for node in queue[i]:
+#             if node.actual_level > 1:
+#                 level_count[node.actual_level - 1] += 1
+#                 nodes_to_fsps.append(_get_fsps_of_node(node))
+#                 nodes_to_level.append(node.actual_level - 1)
 
-    # Order masses
-    nodes_to_level = np.array(nodes_to_level)
-    nodes_to_level = nodes_to_level.max() - nodes_to_level
+#     # Order masses
+#     nodes_to_level = np.array(nodes_to_level)
+#     nodes_to_level = nodes_to_level.max() - nodes_to_level
 
-    nodes_to_fsps = [x for _, x in sorted(zip(nodes_to_level, nodes_to_fsps))]
+#     nodes_to_fsps = [x for _, x in sorted(zip(nodes_to_level, nodes_to_fsps))]
 
-    # Transform levels to actual generation/stages
-    for i, j in zip(elements, level_count):
-        n_particles[i] = level_count[j]
+#     # Transform levels to actual generation/stages
+#     for i, j in zip(elements, level_count):
+#         n_particles[i] = level_count[j]
 
-    return n_particles, nodes_to_fsps, root.level
+#     return n_particles, nodes_to_fsps, root.level
 
 
 def _is_good_decay_string(decay_string):
@@ -462,6 +461,10 @@ def _is_good_decay_string(decay_string):
     if not decay_string[1:3] == "->":
         raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 0 0'")
 
+    # if Counter(list(decay_string[3:])) > Counter({'0':15, '1':15, '2':15, '3':15, '4':15}):
+        # raise BadDecayString("Decay string should contain numbers in the range 0-4 after the '->'.
+        # Example of decay string:'5 -> 1 0 0'")
+
     # For the time being it is possible to check only one level, so we should have only integers after
     try:
         FSPs = [int(fsp) for fsp in decay_string[3:]]
@@ -473,9 +476,11 @@ def _is_good_decay_string(decay_string):
         raise BadDecayString("If the signal side is composed of only one particle, it should be a 0. Example:'5->0'")
 
 
-def select_good_signal_side(lcas_matrix, decay_string):
+def select_good_decay(lcas_matrix, decay_string):
     """
     Cheks if given decay string is found in LCAS matrix.
+    WARNING: you have to make sure to call this function only for valid tree structures,
+             because it doesn't throw an exception in that case
 
     Args:
         lcas_matrix (torch.Tensor): LCAS matrix
@@ -483,6 +488,8 @@ def select_good_signal_side(lcas_matrix, decay_string):
 
     Returns:
         bool: True if LCAS matches decay string, False otherwise
+        int: LCAS level of root node
+        list: LCA indices of FSPs belonging to the signal side ([-1] if LCAS does not match decay string)
     """
 
     # Remove whitespaces from decay string
@@ -494,9 +501,13 @@ def select_good_signal_side(lcas_matrix, decay_string):
     # Reconstruct decay chain
     root, _ = _reconstruct(lcas_matrix)
 
-    # If root is not Ups then False
-    if root.lcas_level != 6:
-        return False
+    # If root is not Ups nor B then False
+    if root.lcas_level not in [5, 6]:
+        return (False, root.lcas_level, [-1])
+
+    # If root is B don't go any further (function is supposed to check wheter signal-side on Ups decay is good)
+    if root.lcas_level == 5:
+        return (True, 5, [i for i in range(lcas_matrix.shape[0])])
 
     # Remove root and first arrow
     decay_string = decay_string[3:]
@@ -507,19 +518,26 @@ def select_good_signal_side(lcas_matrix, decay_string):
     # There should be two nodes: one '5' and one '0'
     if len(FSPs) == 1:
         if Counter([child.lcas_level for child in root.children]) != Counter({5: 1, 0: 1}):
-            return False
+            return (False, root.lcas_level, [-1])
+        # I think the exceptions are over, LCAS is good
+        lca_idx = root.children[0].lca_index if root.children[0].lcas_level == 0 else root.children[1].lca_index
+        return (True, root.lcas_level, [lca_idx])
+
     # Case 2: more FSP in the signal-side
     else:
         # There should be two nodes labelled as '5'
         if Counter([child.lcas_level for child in root.children]) != Counter({5: 2}):
-            return False
+            return (False, root.lcas_level, [-1])
         # If there are two '5', at least one of them should decay into the nodes given by the decay string
-        if Counter([gchild.lcas_level for gchild in root.children[0].children]) != Counter(FSPs)\
-                and Counter([gchild.lcas_level for gchild in root.children[1].children]) != Counter(FSPs):
-            return False
+        fsps_counter = Counter(FSPs)
+        B1_counter = Counter([gchild.lcas_level for gchild in root.children[0].children])
+        B2_counter = Counter([gchild.lcas_level for gchild in root.children[1].children])
+        if B1_counter != fsps_counter and B2_counter != fsps_counter:
+            return (False, root.lcas_level, [-1])
 
-    # # Find all decays of root children
-    # decays = re.findall(r"\(.*?\)", decay_string)
+        # # Find all decays of root children
+        # decays = re.findall(r"\(.*?\)", decay_string)
 
-    # I think the exceptions are over, LCAS is good
-    return True
+        # I think the exceptions are over, LCAS is good
+        sig_B = root.children[0] if B1_counter == fsps_counter else root.children[1]
+        return (True, root.lcas_level, _get_fsps_of_node(sig_B))

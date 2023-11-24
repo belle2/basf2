@@ -77,7 +77,7 @@ namespace Belle2 {
     /** helper function which returns true if the current hit has a creation time after
      * the MCParticle left the CDC and entered TOP. These tracks that re-enter the tracking
      * volume are more difficult to reconstruct due to the energy loss in the CDC outer all and in TOP.
-     * The template give the hit type and the according sim hit type (e.g. CDCHit and CDCSimHit)
+     * The template gives the hit type and the according sim hit type (e.g. CDCHit and CDCSimHit)
      * @param aHit: pointer to the hit under investiation
      * @return : returns true if the the track left CDC and entered TOP before this hit was registered
      */

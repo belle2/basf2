@@ -1,7 +1,7 @@
 .. _tracking_ckf:
 
 Inter-Detector Track Finding
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
   This documentation is under construction!

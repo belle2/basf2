@@ -2025,7 +2025,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix=""):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2041,6 +2041,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+        useFloat (bool): Use single precision (float) instead of double precision (double)
+                         for floating-point numbers.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2054,6 +2056,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
+    output.param('useFloat', useFloat)
     path.add_module(output)
 
 
@@ -4193,6 +4196,41 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     correctenergybias.param('particleLists', inputListNames)
     correctenergybias.param('tableName', tableName)
     path.add_module(correctenergybias)
+
+
+def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticle, path=None):
+    """
+    Sets photon kinematics to corrected values in two body decays with an ISR photon
+    and a massive particle. The original photon kinematics are kept in the input
+    particleList and can be accessed using the originalParticle() metavariable on the
+    new list.
+
+    @param ouputListName    new ParticleList filled with copied Particles
+    @param inputListName    input ParticleList with original Particles
+    @param massiveParticle  name or PDG code of massive particle participating in the two
+                            body decay with the ISR photon
+    @param path             modules are added to this path
+    """
+
+    # set the corrected energy of the photon in a new list
+    photon_energy_correction = register_module('TwoBodyISRPhotonCorrector')
+    photon_energy_correction.set_name('TwoBodyISRPhotonCorrector_' + outputListName)
+    photon_energy_correction.param('outputGammaList', outputListName)
+    photon_energy_correction.param('inputGammaList', inputListName)
+
+    # prepare PDG code of massive particle
+    if isinstance(massiveParticle, int):
+        photon_energy_correction.param('massiveParticlePDGCode', massiveParticle)
+    else:
+        from ROOT import Belle2
+        decayDescriptor = Belle2.DecayDescriptor()
+        if not decayDescriptor.init(massiveParticle):
+            raise ValueError("TwoBodyISRPhotonCorrector: value of massiveParticle must be" +
+                             " an int or valid decay string.")
+        pdgCode = decayDescriptor.getMother().getPDGCode()
+        photon_energy_correction.param('massiveParticlePDGCode', pdgCode)
+
+    path.add_module(photon_energy_correction)
 
 
 def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):

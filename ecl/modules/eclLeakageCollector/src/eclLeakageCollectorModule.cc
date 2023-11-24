@@ -79,9 +79,9 @@ void eclLeakageCollectorModule::prepare()
   //..Store generated energies as integers in MeV
   i_energies.resize(nLeakReg, std::vector<int>(m_number_energies, 0));
   for (int ie = 0; ie < m_number_energies; ie++) {
-    i_energies[0][ie] = (int)(1000.*m_energies_forward[ie] + 0.001);
-    i_energies[1][ie] = (int)(1000.*m_energies_barrel[ie] + 0.001);
-    i_energies[2][ie] = (int)(1000.*m_energies_backward[ie] + 0.001);
+    i_energies[0][ie] = (int)(1000.*m_energies_forward[ie] + 0.5);
+    i_energies[1][ie] = (int)(1000.*m_energies_barrel[ie] + 0.5);
+    i_energies[2][ie] = (int)(1000.*m_energies_backward[ie] + 0.5);
   }
 
   //..Require all energies are different, and that there are at least two
@@ -253,11 +253,12 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Generated and reconstructed energy quantities
 
-  //..Find the generated energy bin
-  const int iGenEnergyMeV = (int)(1000.*mcLabE + 0.001);
+  //..Find the generated energy bin by requiring it be close enough to expected value
+  const float genEnergyMeV = 1000.*mcLabE;
+  const float tolerance = std::max(0.002 * genEnergyMeV, 1.0);
   t_energyBin = -1;
   for (int ie = 0; ie < m_number_energies; ie++) {
-    if (iGenEnergyMeV == i_energies[t_region][ie]) {
+    if (std::abs(genEnergyMeV - i_energies[t_region][ie]) < tolerance) {
       t_energyBin = ie;
       break;
     }

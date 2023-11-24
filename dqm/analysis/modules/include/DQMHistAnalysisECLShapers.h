@@ -8,11 +8,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
@@ -47,21 +42,17 @@ namespace Belle2 {
     /** Call when a run ends. */
     void endRun() override final;
     /** Terminate. */
-    void terminate() override final;
+    void terminate() override final {}
 
   private:
+    /** Prefix to use for PVs registered by this module */
+    std::string m_pvPrefix;
 
     /** Number of ECLCollector modules (normally 52) */
     const static int c_collector_count = ECL::ECL_CRATES;
 
     /** Remove upper 10% of the values, return the maximum in the remaining 90% */
     double robust_max(std::multiset<double> values);
-
-#ifdef _BELLE2_EPICS
-    /** EPICS channels for logic_summary histogram */
-    chid chid_logic[c_collector_count];
-    /** EPICS channels for pedestal width */
-    chid chid_pedwidth[4];
 
     /** Max pedestal width array
      * [0] -> Max pedestal width in FWD endcap
@@ -76,7 +67,6 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
     TCanvas* m_c_main = nullptr; /**< main panel for monitoring object */
-#endif
   };
 } // end namespace Belle2
 

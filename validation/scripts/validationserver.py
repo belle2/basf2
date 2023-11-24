@@ -411,20 +411,20 @@ def get_librarians(package: str) -> List[str]:
         return usernames
     # Temp workaround to fetch DESY -> Gitlab map
     import importlib
+    desy_map_path = os.path.join(
+        "/home/b2soft/gitlab",
+        "account_map.py"
+    )
+    spec = importlib.util.spec_from_file_location('account_map', desy_map_path)
+    desy_map = importlib.util.module_from_spec(spec)
     try:
-        desy_map_path = os.path.join(
-            "/home/b2soft/gitlab",
-            "account_map.py"
-        )
+        spec.loader.exec_module(desy_map)
     except FileNotFoundError:
         logging.exception(
             f"{desy_map_path} couldn't be found. Have you setup Gitlab Webhook?"
         )
         return usernames
 
-    spec = importlib.util.spec_from_file_location('account_map', desy_map_path)
-    desy_map = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(desy_map)
     for librarian in librarians:
         usernames.append(desy_map.get_gitlab_account(librarian.rstrip()))
 
@@ -442,7 +442,8 @@ def parse_contact(
     using the userid map.
 
     Returns :
-        list of Gitlab IDs
+        Dictionary with list of Gitlab IDs and corresponding list of
+        Gitlab usernames.
     """
 
     email_regex = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*"
@@ -451,8 +452,10 @@ def parse_contact(
                              r"*])"
                              )
     email_ids = re.finditer(email_regex, contact)
-    gitlab_ids = []
-    usernames = []
+    assignees = {
+        'gitlab_ids': [],
+        'usernames': [],
+    }
 
     try:
         with open(map_file, 'r') as f:
@@ -469,7 +472,7 @@ def parse_contact(
                 (line for line in id_map if email.group() in line), None
             )
             username = match.split(' ')[1].rstrip()
-            usernames.append(username)
+            assignees['usernames'].append(username)
         except IndexError:
             logging.error(
                 f"Map info {match} does not match the required format for map "
@@ -478,16 +481,18 @@ def parse_contact(
             continue
 
     # Assign to librarian(s) if no contact found
-    if not usernames:
-        usernames = get_librarians(package)
+    if not assignees['usernames']:
+        assignees['usernames'] = get_librarians(package)
         logging.info(
             "Couldn't find contact/id so assigning issue to the"
             " package librarians."
         )
 
-    for user in usernames:
+    for user in assignees['usernames']:
         try:
-            gitlab_ids.append(gitlab_object.users.list(username=user)[0].id)
+            assignees['gitlab_ids'].append(
+                gitlab_object.users.list(username=user)[0].id
+                )
         except IndexError:
             logging.error(
                 f"Could not find {user} in Gitlab."
@@ -495,19 +500,19 @@ def parse_contact(
             continue
     logging.info(
         "Issue will be assigned to "
-        f"{[gitlab_object.users.get(id) for id in gitlab_ids]}."
+        f"{[gitlab_object.users.get(id) for id in assignees['gitlab_ids']]}."
     )
 
     # to-do: add comment/note if no ids matched
 
-    return gitlab_ids
+    return assignees
 
 
 def create_gitlab_issue(
     title: str,
     description: str,
     uploaded_file: Dict[str, str],
-    assignees: List[int],
+    assignees: Dict[str, List],
     package: str,
     project: 'gitlab.project'
 ) -> str:
@@ -523,12 +528,18 @@ def create_gitlab_issue(
                                    "description": description,
                                    "labels": [package, 'validation_issue']})
 
-    issue.notes.create(
+    issue_note = issue.notes.create(
         {"body": "View the [error plot/log file]({}).".format(
             uploaded_file["url"])}
     )
 
-    issue.assignee_ids = assignees
+    issue.assignee_ids = assignees['gitlab_ids']
+
+    # Workaround for Gitlab not allowing multiple assignees
+    if len(assignees['gitlab_ids']) > 1:
+        related_users = [f'@{user} ' for user in assignees['usernames'][1:]]
+        issue_note.body += f"\n\nPinging {' '.join(related_users)}"
+        issue_note.save()
 
     issue.save()
 
@@ -909,7 +920,10 @@ class ValidationRoot:
         # Create issue in the Gitlab project and save it
         project = get_project_object(self.gitlab_object, project_id)
         uploaded_file = upload_file_gitlab(self.file_path, project)
-        assignees = []
+        assignees = {
+            'gitlab_ids': [],
+            'usernames': [],
+        }
         file_name = self.file_path.split("/")[-1].split(".log")[0]
         file_package = self.file_path.split("/")[-2]
         if self.gitlab_map:

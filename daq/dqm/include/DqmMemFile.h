@@ -36,6 +36,8 @@ namespace Belle2 {
     // Receiver functions
     EvtMessage* StreamMemFile();
 
+    bool SaveToFile(std::string outfile);
+
   private:
     int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& nobjs);
 

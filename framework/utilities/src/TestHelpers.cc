@@ -45,14 +45,17 @@ void TestWithGearbox::TearDownTestCase()
 TempDirCreator::TempDirCreator():
   m_oldpwd(current_path().string())
 {
-  char temporaryDirName[] = "/tmp/basf2_XXXXXX";
-  if (mkdtemp(temporaryDirName) == nullptr) {
+  char* temporaryDirName = strdup((temp_directory_path() / "basf2_XXXXXX").c_str());
+  auto directory = mkdtemp(temporaryDirName);
+  if (!directory) {
     B2ERROR("Cannot create temporary directory: " << strerror(errno));
+    free(temporaryDirName);
     return;
   }
-  path tmpdir = temporaryDirName;
+  path tmpdir = directory;
   current_path(tmpdir);
   m_tmpdir = tmpdir.string();
+  free(temporaryDirName);
 }
 
 TempDirCreator::~TempDirCreator()

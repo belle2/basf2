@@ -16,7 +16,7 @@ Skim list building functions for charm analyses.
     The Hp, Hm and Jm in the function name represent arbitrary charged particles with
     positive or negative charge. The Hp and Jm in `XToD0_D0ToHpJm`, mean a positive particle
     and a negative particle that could be either conjugate or non-conjugate. The Hp and Hm
-    in `DstToD0Pi_D0ToHpHmPi0`, mean a positive particle and a negative particle that
+    in `EarlyData_DstToD0Pi_D0ToHpHmPi0`, mean a positive particle and a negative particle that
     must be conjugate.
 
 .. Note::
@@ -839,7 +839,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
 
     __authors__ = []
-    __description__ = "A special version of `DstToD0Pi_D0ToHpHmPi0` to deal with Early Data."
+    __description__ = "A special version of ``DstToD0Pi_D0ToHpHmPi0`` to deal with Early Data."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 

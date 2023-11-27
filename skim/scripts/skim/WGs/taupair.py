@@ -97,11 +97,11 @@ def tauskim_particle_selection(label, path):
 @fancy_skim_header
 class TauLFV(BaseSkim):
     """
-    **Channel**: :math:`\\tau \\to l \\gamma, lll, l \\pi^0, l \\eta, l \\eta', l K_S, l f_0, l V^0, lhh, llp, phh`
+    **Channel**: :math:`\\tau \\to l \\gamma, lll, l \\pi^0, l \\eta, l \\eta', l K_S, l f_0, l V^0, lhh, llp, phh, \\lambda\\pi`
 
     **Output particle lists**: ``e+:taulfv, mu+:taulfv, pi+:taulfv, K+:taulfv, p+:taulfv``,
     ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv``,
-    ``omega:taulfv``
+    ``omega:taulfv, Lambda0:taulfv1, Lambda0:taulfv2``
 
     **Criteria for 1 prong final states**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \\Delta E < 0.5` GeV
 
@@ -149,12 +149,16 @@ class TauLFV(BaseSkim):
         ma.reconstructDecay("eta:taulfv1 -> gamma:taulfvloose gamma:taulfvloose", "0.4 < M < 0.6", path=path)
         ma.reconstructDecay("eta:taulfv2 -> pi0:taulfv pi-:all pi+:all", "0.4 < M < 0.6", path=path)
         ma.copyLists("eta:taulfv", ["eta:taulfv1", "eta:taulfv2"], path=path)
-        # eta"
+        # eta'
         ma.reconstructDecay("eta':taulfv1 -> pi+:all pi-:all gamma:taulfvloose", "0.8 < M < 1.1", path=path)
         ma.reconstructDecay("eta':taulfv2 -> pi+:all pi-:all eta:taulfv", "0.8 < M < 1.1", path=path)
         ma.copyLists("eta':taulfv", ["eta':taulfv1", "eta':taulfv2"], path=path)
         # omega
         ma.reconstructDecay("omega:taulfv -> pi0:taulfv pi-:all pi+:all", "0.73 < M < 0.83", path=path)
+
+        # Lambda0
+        ma.reconstructDecay("Lambda0:taulfv1 -> p+:all pi-:all", "0.9 < M < 1.3", path=path)
+        ma.reconstructDecay("Lambda0:taulfv2 -> anti-p-:all pi+:all", "0.9 < M < 1.3", path=path)
 
         # event selection
 #        vm.addAlias("netChargeLFV", "formula(countInList(pi+:taulfv, charge == 1) - countInList(pi+:taulfv, charge == -1))")
@@ -223,7 +227,9 @@ class TauLFV(BaseSkim):
                             "anti-p-:taulfv pi+:taulfv pi+:taulfv",
                             "p+:taulfv pi-:taulfv pi+:taulfv",
                             "anti-p-:taulfv pi+:taulfv K+:taulfv",
-                            "p+:taulfv pi-:taulfv K+:taulfv"
+                            "p+:taulfv pi-:taulfv K+:taulfv",
+                            "Lambda0:taulfv1 pi+:taulfv",
+                            "Lambda0:taulfv2 pi+:taulfv"
                             ]
 
         tau_lgamma_list = []

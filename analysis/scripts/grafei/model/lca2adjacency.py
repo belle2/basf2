@@ -310,27 +310,6 @@ def _reconstruct(lca_matrix):
     return root, total_nodes
 
 
-def _get_fsps_of_node(node):
-    """
-    Given a node, find all the final state particles connected to it and get their indices in the LCA.
-
-    Args:
-        node (Node): node to be inspected.
-
-    Returns:
-        indices (list): list of final state particles' indices in the LCA matrix connected to node.
-    """
-    indices = []
-
-    if node.lca_index is not None:  # If you simply use 'if node.lca_index:' you will always miss the first fsp
-        indices.append(node.lca_index)
-    else:
-        for child in node.children:
-            indices.extend(_get_fsps_of_node(child))
-
-    return list(set(indices))
-
-
 def lca2adjacency(lca_matrix, format="bfs"):
     """
     Converts a tree's LCA-gram matrix representation, i.e. a square matrix (M, M), where each row/column corresponds to
@@ -449,17 +428,21 @@ def _is_good_decay_string(decay_string):
         decay_string (str): decay string to check
     """
 
+    # Empty decay string is allowed
+    if decay_string == "":
+        return
+
     # Decay string should start with 5
     try:
         int(decay_string[0])
     except ValueError:
-        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 0 0'")
+        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m 0'")
     if int(decay_string[0]) != 5:
-        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 0 0'")
+        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m 0'")
 
     # ... and continue with '->'
     if not decay_string[1:3] == "->":
-        raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 0 0'")
+        raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 p m 0'")
 
     # if Counter(list(decay_string[3:])) > Counter({'0':15, '1':15, '2':15, '3':15, '4':15}):
         # raise BadDecayString("Decay string should contain numbers in the range 0-4 after the '->'.
@@ -469,11 +452,38 @@ def _is_good_decay_string(decay_string):
     try:
         FSPs = [int(fsp) for fsp in decay_string[3:]]
     except ValueError:
-        raise BadDecayString("Please use only one level. Example of decay string:'5 -> 1 0 0'")
+        raise BadDecayString(
+            "Allowed characters are 0-6 and 'i', 'o', 'g', 'k', 'm', 'e', 'p'. Example of decay string:'5 -> 1 p m 0'")
+
+    for e in set(FSPs):
+        if e not in range(0, 7):
+            raise BadDecayString(
+                "Allowed characters are 0-6 and 'i', 'o', 'g', 'k', 'm', 'e', 'p'. Example of decay string:'5 -> 1 p m 0'")
 
     # If only one FSP, then must be a 0
     if len(FSPs) == 1 and FSPs[0] != 0:
         raise BadDecayString("If the signal side is composed of only one particle, it should be a 0. Example:'5->0'")
+
+
+def _get_fsps_of_node(node):
+    """
+    Given a node, find all the final state particles connected to it and get their indices in the LCA.
+
+    Args:
+        node (Node): node to be inspected.
+
+    Returns:
+        indices (list): list of final state particles' indices in the LCA matrix connected to node.
+    """
+    indices = []
+
+    if node.lca_index is not None:  # If you simply use 'if node.lca_index:' you will always miss the first fsp
+        indices.append(node.lca_index)
+    else:
+        for child in node.children:
+            indices.extend(_get_fsps_of_node(child))
+
+    return list(set(indices))
 
 
 def select_good_decay(lcas_matrix, decay_string):
@@ -495,11 +505,19 @@ def select_good_decay(lcas_matrix, decay_string):
     # Remove whitespaces from decay string
     decay_string = "".join(decay_string.split())
 
+    # Remove particle hypotheses from decay string
+    for particle in ["i", "k", "p", "e", "m", "g", "o"]:
+        decay_string = decay_string.replace(particle, "0")
+
     # Check if decay string has good syntax
     _is_good_decay_string(decay_string)
 
     # Reconstruct decay chain
     root, _ = _reconstruct(lcas_matrix)
+
+    # If decay string is empty then False
+    if decay_string == "":
+        return (False, root.lcas_level, [-1])
 
     # If root is not Ups nor B then False
     if root.lcas_level not in [5, 6]:

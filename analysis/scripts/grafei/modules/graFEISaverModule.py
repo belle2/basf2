@@ -3,6 +3,7 @@
 
 import itertools
 import numpy as np
+from collections import Counter
 import yaml
 import warnings
 import basf2 as b2
@@ -57,7 +58,7 @@ class graFEISaverModule(b2.Module):
         self.particle_list = particle_list
         self.cfg_path = cfg_path
         self.param_file = param_file
-        self.decay_string = decay_string
+        self.decay_string = "".join(decay_string.split())  # Remove whitespaces
         self.gpu = gpu
 
     def initialize(self):
@@ -366,6 +367,9 @@ class graFEISaverModule(b2.Module):
             predicted_LCA_square_matched = predicted_LCA_square[predicted_matched]
             predicted_LCA_square_matched = predicted_LCA_square_matched[:, predicted_matched]
 
+            # Get predicted masses of predicted matched only
+            predicted_masses_matched = predicted_masses[predicted_matched]
+
             # Check if LCA describes a tree graph
             graFEI_validTree = 0
             if not torch.all(predicted_LCA_square == 0):
@@ -391,8 +395,19 @@ class graFEISaverModule(b2.Module):
             # masses_ordered = dict((i, []) for i in range(1, 7))
             if graFEI_validTree:
                 good_decay, root_level, sig_side_fsps = select_good_decay(predicted_LCA_square_matched, self.decay_string)
-                # TODO: add mass hypotheses to graFEI_goodEvent
-                graFEI_goodEvent = int((self.max_level == root_level) and good_decay)
+                good_topology = int((self.max_level == root_level) and good_decay)
+
+                if good_topology:
+                    # Check if mass hypotheses are correct
+                    sig_side_predicted_masses = predicted_masses_matched[sig_side_fsps]
+                    chosen_predicted_masses = "".join(
+                        list(filter(lambda x: x in ["i", "k", "p", "e", "m", "g", "o"],
+                                    self.decay_string[self.decay_string.find("->") + 2:])))
+
+                    for s, n in zip(["i", "k", "p", "e", "m", "g", "o"], ["3", "4", "5", "1", "2", "6", "0"]):
+                        chosen_predicted_masses = chosen_predicted_masses.replace(s, n)
+
+                    graFEI_goodEvent = int(Counter(sig_side_predicted_masses) == Counter(chosen_predicted_masses))
 
                 # level_intermediates, lca_idx_of_daughters, graFEI_depthLCA = n_intermediate_particles(
                 #     predicted_LCA_square_matched

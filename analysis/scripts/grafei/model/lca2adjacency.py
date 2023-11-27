@@ -426,43 +426,46 @@ def _is_good_decay_string(decay_string):
 
     Args:
         decay_string (str): decay string to check
+
+    Returns:
+        decay_string (str): decay string with some formatting
     """
 
     # Empty decay string is allowed
     if decay_string == "":
-        return
+        return decay_string
+
+    # Remove whitespaces from decay string
+    decay_string = "".join(decay_string.split())
 
     # Decay string should start with 5
     try:
         int(decay_string[0])
     except ValueError:
-        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m 0'")
+        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m'")
     if int(decay_string[0]) != 5:
-        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m 0'")
+        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m'")
 
     # ... and continue with '->'
     if not decay_string[1:3] == "->":
-        raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 p m 0'")
+        raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 p m'")
 
-    # if Counter(list(decay_string[3:])) > Counter({'0':15, '1':15, '2':15, '3':15, '4':15}):
-        # raise BadDecayString("Decay string should contain numbers in the range 0-4 after the '->'.
-        # Example of decay string:'5 -> 1 0 0'")
+    FSPs = decay_string[3:]
 
-    # For the time being it is possible to check only one level, so we should have only integers after
-    try:
-        FSPs = [int(fsp) for fsp in decay_string[3:]]
-    except ValueError:
-        raise BadDecayString(
-            "Allowed characters are 0-6 and 'i', 'o', 'g', 'k', 'm', 'e', 'p'. Example of decay string:'5 -> 1 p m 0'")
-
+    # Select only allowed characters
     for e in set(FSPs):
-        if e not in range(0, 7):
+        if e not in ['1', '2', '3', '4', 'i', 'o', 'g', 'k', 'm', 'e', 'p']:
             raise BadDecayString(
-                "Allowed characters are 0-6 and 'i', 'o', 'g', 'k', 'm', 'e', 'p'. Example of decay string:'5 -> 1 p m 0'")
+                "Allowed characters are 1-4 and 'i', 'o', 'g', 'k', 'm', 'e', 'p'. Example of decay string:'5 -> 1 p m'")
+
+    for p in ['i', 'o', 'g', 'k', 'm', 'e', 'p']:
+        decay_string = decay_string.replace(p, "0")
 
     # If only one FSP, then must be a 0
-    if len(FSPs) == 1 and FSPs[0] != 0:
-        raise BadDecayString("If the signal side is composed of only one particle, it should be a 0. Example:'5->0'")
+    if len(FSPs) == 1 and FSPs[0] not in ['i', 'o', 'g', 'k', 'm', 'e', 'p']:
+        raise BadDecayString("If the signal side is composed of only one particle, it should be a FSP. Example:'5->p'")
+
+    return decay_string
 
 
 def _get_fsps_of_node(node):
@@ -502,15 +505,8 @@ def select_good_decay(lcas_matrix, decay_string):
         list: LCA indices of FSPs belonging to the signal side ([-1] if LCAS does not match decay string)
     """
 
-    # Remove whitespaces from decay string
-    decay_string = "".join(decay_string.split())
-
-    # Remove particle hypotheses from decay string
-    for particle in ["i", "k", "p", "e", "m", "g", "o"]:
-        decay_string = decay_string.replace(particle, "0")
-
     # Check if decay string has good syntax
-    _is_good_decay_string(decay_string)
+    decay_string = _is_good_decay_string(decay_string)
 
     # Reconstruct decay chain
     root, _ = _reconstruct(lcas_matrix)

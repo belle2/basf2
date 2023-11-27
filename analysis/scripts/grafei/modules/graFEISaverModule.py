@@ -407,6 +407,8 @@ class graFEISaverModule(b2.Module):
                     for s, n in zip(["i", "k", "p", "e", "m", "g", "o"], ["3", "4", "5", "1", "2", "6", "0"]):
                         chosen_predicted_masses = chosen_predicted_masses.replace(s, n)
 
+                    chosen_predicted_masses = [int(i) for i in chosen_predicted_masses]
+
                     graFEI_goodEvent = int(Counter(sig_side_predicted_masses) == Counter(chosen_predicted_masses))
 
                 # level_intermediates, lca_idx_of_daughters, graFEI_depthLCA = n_intermediate_particles(

@@ -1056,7 +1056,7 @@ namespace Belle2 {
     double m_momentumScale = 1.0; /**< effective momentum scale factor */
     double m_momentumScalingFactor = 1.0; /**< momentum scaling factor */
     double m_momentumSmearingFactor = 1.0; /**< momentum smearing factor */
-    double m_energyLossCorrection = 0.0; /**< energy loss correction */
+    double m_energyLossCorrection = 0.0; /**< energy loss correction. defined as 'm_energyLossCorrection = E_measured - E_true'*/
     double m_x;      /**< position component x */
     double m_y;      /**< position component y */
     double m_z;      /**< position component z */

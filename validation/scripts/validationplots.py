@@ -826,7 +826,7 @@ def create_plots(
     """!
     This function generates the plots and html
     page for the requested revisions.
-    By default all available revisions are taken. New plots will ony be
+    By default all available revisions are taken. New plots will only be
     created if they don't exist already for the given set of revisions,
     unless the force option is used.
     @param revisions: The revisions which should be taken into account.

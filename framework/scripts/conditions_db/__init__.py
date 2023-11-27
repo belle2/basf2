@@ -30,6 +30,7 @@ import hashlib
 import itertools
 from typing import Union  # noqa
 import getpass
+import tempfile
 
 
 def encode_name(name):
@@ -66,7 +67,7 @@ def get_cdb_authentication_token(path=None):
     if path:
         path_to_token = path
     else:
-        path_to_token = os.path.join(os.getenv('HOME', '/tmp'), f'b2cdb_{os.getenv("BELLE2_USER", None)}.token')
+        path_to_token = os.path.join(os.getenv('HOME', tempfile.gettempdir()), f'b2cdb_{os.getenv("BELLE2_USER", None)}.token')
 
     # check validity of existing token
     if os.path.isfile(path_to_token):

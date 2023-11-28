@@ -63,9 +63,6 @@ class BtoXgamma(BaseSkim):
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
 
-        # Remove events with insuffcient number of good tracks and clusters, this
-        # mitigates "The 0th-order FoxWolfram moment is zero" error
-        R2_cleanup = 'nParticlesInList(pi+:BtoXgamma_eventshape) + nParticlesInList(gamma:BtoXgamma_eventshape) > 0'
         # Event cleanup
         Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
@@ -82,7 +79,7 @@ class BtoXgamma(BaseSkim):
                            path=path)
 
         # Apply event cuts R2 < 0.7
-        path = self.skim_event_cuts(f'{R2_cleanup} and {Event_cleanup} and foxWolframR2 < 0.7', path=path)
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
         ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
@@ -174,9 +171,6 @@ class BtoXll(BaseSkim):
         ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
 
-        # Remove events with insuffcient number of good tracks and clusters, this
-        # mitigates "The 0th-order FoxWolfram moment is zero" error
-        R2_cleanup = 'nParticlesInList(pi+:BtoXll_eventshape) + nParticlesInList(gamma:BtoXll_eventshape) > 0'
         # Event cleanup
         Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
@@ -193,7 +187,7 @@ class BtoXll(BaseSkim):
                            path=path)
 
         # Apply event cuts R2 < 0.7
-        path = self.skim_event_cuts(f'{R2_cleanup} and {Event_cleanup} and foxWolframR2 < 0.7', path=path)
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
@@ -291,9 +285,6 @@ class BtoXll_LFV(BaseSkim):
         ma.cutAndCopyList('pi+:BtoXllLFV_eventshape', 'pi+:all', 'pt> 0.1', path=path)
         ma.cutAndCopyList('gamma:BtoXllLFV_eventshape', 'gamma:all', 'E > 0.1', path=path)
 
-        # Remove events with insuffcient number of good tracks and clusters, this
-        # mitigates "The 0th-order FoxWolfram moment is zero" error
-        R2_cleanup = 'nParticlesInList(pi+:BtoXllLFV_eventshape) + nParticlesInList(gamma:BtoXllLFV_eventshape) > 0'
         # Event cleanup
         Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
@@ -311,7 +302,7 @@ class BtoXll_LFV(BaseSkim):
                            path=path)
 
         # Apply event cuts R2 < 0.7
-        path = self.skim_event_cuts(f'{R2_cleanup} and {Event_cleanup} and foxWolframR2 < 0.7', path=path)
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack

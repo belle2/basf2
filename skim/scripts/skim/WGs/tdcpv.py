@@ -354,15 +354,10 @@ class TDCPV_ccs(BaseSkim):
         filename = f'{self}_Validation.root'
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
         ma.variablesToHistogram('B0:jpsiee', variableshisto, filename=filename, path=path, directory="jpsiee")
-        ma.variablesToHistogram(
-            'B0:jpsimumu',
-            variableshisto,
-            filename=filename,
-            path=path,
-            directory="jpsimumu")
+        ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
 
         ma.reconstructMissingKlongDecayExpert('B0:KL_jpsimumu -> J/psi:mumu K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
-        ma.reconstructMissingKlongDecayExpert('B0:KL_jpsimuee -> J/psi:ee   K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
+        ma.reconstructMissingKlongDecayExpert('B0:KL_jpsiee -> J/psi:ee   K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
         variableshisto = [('deltaE', 100, -0.020, 0.180)]
-        ma.variablesToHistogram('B0:KL_jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
-        ma.variablesToHistogram('B0:KL_jpsiee',   variableshisto, filename=filename, path=path, directory="jpsiee")
+        ma.variablesToHistogram('B0:KL_jpsimumu', variableshisto, filename=filename, path=path, directory="KLjpsimumu")
+        ma.variablesToHistogram('B0:KL_jpsiee',   variableshisto, filename=filename, path=path, directory="KLjpsiee")

@@ -393,7 +393,7 @@ class dilepton(BaseSkim):
         ma.cutAndCopyList(
             "e+:pid",
             "e+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID_noTOP > 0.5",
+            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID > 0.5",
             True,
             path=path,
         )
@@ -419,7 +419,7 @@ class dilepton(BaseSkim):
             checkForDuplicates=False,
             path=path)
 
-        path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 3', path=path)
+        path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 4', path=path)
 
         ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
         ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)

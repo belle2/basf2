@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'framework_dbobjects', '$ROOT_LIBS']
 
 Return('env')
